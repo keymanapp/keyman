@@ -8,217 +8,217 @@
     <Fragment>
         <ComponentGroup Id="MonacoFiles">
             <Component Id="cmp0B9EE08828CE17D90A67947F2FB14401" Directory="dir19AE937E466293F02FD70B2F4E9AB81B" Guid="{7DBB30C0-16A1-436E-8BF1-E248274E8FC2}">
-                <File Id="fil3F06BB28AAC006AAC04090357843FFF1" KeyPath="yes" Source="$(MonacoSourceDir)\loader.js" />
+                <File Id="fil3F06BB28AAC006AAC04090357843FFF1" KeyPath="yes" Source="$(var.MonacoSourceDir)\loader.js" />
             </Component>
             <Component Id="cmp53A88F627946A5803B421508CC5B3A5C" Directory="dirAB786DEB25CE9712524D17F6B7AF4131" Guid="{4704E5AD-06B7-471A-B881-9455E59C9316}">
-                <File Id="filAB82BD168BCBF5CB90198E4DF809FDBA" KeyPath="yes" Source="$(MonacoSourceDir)\base\worker\workerMain.js" />
+                <File Id="filAB82BD168BCBF5CB90198E4DF809FDBA" KeyPath="yes" Source="$(var.MonacoSourceDir)\base\worker\workerMain.js" />
             </Component>
             <Component Id="cmpC92D95CA432A512A100187B6565A1102" Directory="dir8AC237AF30BF37782FE523671652E2AF" Guid="{2C029FBD-10EA-45FF-B954-11BB3F0C33EC}">
-                <File Id="fil9B2346EC6099D536D2764740AC404045" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\apex\apex.js" />
+                <File Id="fil9B2346EC6099D536D2764740AC404045" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\apex\apex.js" />
             </Component>
             <Component Id="cmp4D054F1A6F8F2827A14ED51736ABDC20" Directory="dir2C0CABD9ECFDCCECA02B73458F2086D7" Guid="{7FE7055E-36AE-4D4E-B083-B8CE10642DCF}">
-                <File Id="fil6DC824D72070B96995A2E591ABDC0B8D" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\azcli\azcli.js" />
+                <File Id="fil6DC824D72070B96995A2E591ABDC0B8D" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\azcli\azcli.js" />
             </Component>
             <Component Id="cmpDEDF501A1A66780609E193AC10564F2F" Directory="dirE4F7C19D0616734AC7161FD65CFA4161" Guid="{D867A669-7D79-4FF9-91E1-D38BBB89D2E3}">
-                <File Id="filAC6E7C573A579B2B18D7E49FDCD8101A" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\bat\bat.js" />
+                <File Id="filAC6E7C573A579B2B18D7E49FDCD8101A" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\bat\bat.js" />
             </Component>
             <Component Id="cmpC15555D48D400369BCF563646E6C5480" Directory="dirDA5217EEF5722B75C319EFDCCB2523FE" Guid="{9586802B-E2E9-4E42-AA43-21C0A31E40CA}">
-                <File Id="filF0435654A09F22E52956ED20331026FB" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\clojure\clojure.js" />
+                <File Id="filF0435654A09F22E52956ED20331026FB" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\clojure\clojure.js" />
             </Component>
             <Component Id="cmpD979CC9FAEE08A2C6DDF3198039ED908" Directory="dir974DBEC72135203010DE2993E4772C3F" Guid="{4620382B-4511-4CB5-8766-90E17B5D6BCC}">
-                <File Id="filA154F3BE2FA586B85694BC2DE28BB6B4" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\coffee\coffee.js" />
+                <File Id="filA154F3BE2FA586B85694BC2DE28BB6B4" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\coffee\coffee.js" />
             </Component>
             <Component Id="cmp0B1BC33D0BE783CA16CB7DE0573F3F66" Directory="dir16C9191ED186604B8977528B8401F266" Guid="{B04A4FB6-9134-404C-976E-372D89FC0CDE}">
-                <File Id="filC96C375936113338280BAD004B80086D" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\cpp\cpp.js" />
+                <File Id="filC96C375936113338280BAD004B80086D" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\cpp\cpp.js" />
             </Component>
             <Component Id="cmpA3393450AA1D89F41830015B9E24480B" Directory="dir30F2968A39072C4B1B09BFC7E3C351E8" Guid="{067D2F35-3BD4-4EF5-91A4-F1B0A0724AC8}">
-                <File Id="fil86B16F243B4894AABDE4149F9ED90346" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\csharp\csharp.js" />
+                <File Id="fil86B16F243B4894AABDE4149F9ED90346" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\csharp\csharp.js" />
             </Component>
             <Component Id="cmp8D2B8D3E1116EEE1D69578BBD786FD54" Directory="dir0CBF140816A0FDA8871997683687A902" Guid="{8D0798B4-FEDC-4A33-B6C1-9D8E2DD97B95}">
-                <File Id="filD27FDE40298D7CF1DA458D2FB3222999" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\csp\csp.js" />
+                <File Id="filD27FDE40298D7CF1DA458D2FB3222999" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\csp\csp.js" />
             </Component>
             <Component Id="cmpA2E836F5D75508D6D90DD25EBE03451E" Directory="dir446F0E5BE6C88FAA37F1898391327C36" Guid="{9536A950-01EC-41DB-BB84-25E442892A12}">
-                <File Id="fil8F456BB5EBA58912FC2D9F68CA534C84" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\css\css.js" />
+                <File Id="fil8F456BB5EBA58912FC2D9F68CA534C84" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\css\css.js" />
             </Component>
             <Component Id="cmp86657345934437A1A3B4AD8700D40C63" Directory="dir2693CBDC919031646AFA20A9426122E6" Guid="{47804D7C-23D8-4FC6-A48C-9850E3B837EB}">
-                <File Id="filF6AD09A4EB65AB5BB197AAAE04888C8D" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\dockerfile\dockerfile.js" />
+                <File Id="filF6AD09A4EB65AB5BB197AAAE04888C8D" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\dockerfile\dockerfile.js" />
             </Component>
             <Component Id="cmp1832992C4E6C9C0ECBE8071AC0DCD044" Directory="dir1C3E1A2823CED736A764329283BBA1D2" Guid="{6E3B62FA-88D7-4AB7-95E2-70A087372DB1}">
-                <File Id="fil8020334CDB98629B1D71CF5822CB2159" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\fsharp\fsharp.js" />
+                <File Id="fil8020334CDB98629B1D71CF5822CB2159" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\fsharp\fsharp.js" />
             </Component>
             <Component Id="cmp3FAD24A8B5ABDCE21F97D50C3D6BB0DB" Directory="dirA2450B9CC0E367E21E42DC154B2ED5E6" Guid="{FF3C1BCC-1C68-4F8E-AEFF-7463D5BF4781}">
-                <File Id="fil41A1509EE0944CD10429E2CF761E6ABF" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\go\go.js" />
+                <File Id="fil41A1509EE0944CD10429E2CF761E6ABF" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\go\go.js" />
             </Component>
             <Component Id="cmp3D5077970DF84B5D1CF126E0F98280A4" Directory="dir89060703DD7875A72E9334DB6D9FF0EA" Guid="{49516DE6-4A67-47AA-8DE1-0C30FDC7EDDE}">
-                <File Id="fil417FDF31281AB8684CAE13862610A18E" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\handlebars\handlebars.js" />
+                <File Id="fil417FDF31281AB8684CAE13862610A18E" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\handlebars\handlebars.js" />
             </Component>
             <Component Id="cmp0987AC7348E1D3E6D9E0A1936F4D78DF" Directory="dirB55731B461E8D47D4EA8A62ACBE64EC7" Guid="{1C8311A9-D38F-4F3E-89AA-9C6788AB946F}">
-                <File Id="filB32182977F5C2A7B40175E7074564238" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\html\html.js" />
+                <File Id="filB32182977F5C2A7B40175E7074564238" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\html\html.js" />
             </Component>
             <Component Id="cmpB69FB0C1CCFE41CA28F3DF1C50EA2759" Directory="dir57AD55D5A3C11C5505F81F8BA074E44C" Guid="{D742F69F-FFCA-483D-947B-DB7A376DC9C2}">
-                <File Id="fil288AFEC5521A1CDA8CC3F26947D9F927" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\ini\ini.js" />
+                <File Id="fil288AFEC5521A1CDA8CC3F26947D9F927" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\ini\ini.js" />
             </Component>
             <Component Id="cmp31205CB1BD321CE64ACE962D44800781" Directory="dir66D37A08D3760A63F5A5FDD5A645F2E7" Guid="{7D9A86FD-8D7C-4345-ABFA-B3DA2FB9ECF0}">
-                <File Id="fil779A250F054A9728C44AFE155D357EA5" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\java\java.js" />
+                <File Id="fil779A250F054A9728C44AFE155D357EA5" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\java\java.js" />
             </Component>
             <Component Id="cmp4EB8DB39635F1EB969E6BB6F703BD3EA" Directory="dirEF3D6AE200777F8E280494618329657A" Guid="{CB2D8C32-E487-4EA0-BAE7-85BF60C0C26A}">
-                <File Id="filF66A137144C1A45BE79185BDA761E42E" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\javascript\javascript.js" />
+                <File Id="filF66A137144C1A45BE79185BDA761E42E" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\javascript\javascript.js" />
             </Component>
             <Component Id="cmp55CFB8AEF94E777F756AB995B4A0E884" Directory="dir81431013A2C6A09E8A2942B2C67A62F4" Guid="{95A60F97-9718-4F89-BF8E-DB3DB0646261}">
-                <File Id="fil363685B5980F9214E06591117CD79183" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\less\less.js" />
+                <File Id="fil363685B5980F9214E06591117CD79183" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\less\less.js" />
             </Component>
             <Component Id="cmp0465D986C5CA8075A54CC160D5422974" Directory="dir86CE790556B4200CAAADE6D19A43D6AD" Guid="{936C3C37-DA1B-4870-BC51-062BAE97E8B1}">
-                <File Id="filD687A9BB72C9C1D7FBE498590134C7B4" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\lua\lua.js" />
+                <File Id="filD687A9BB72C9C1D7FBE498590134C7B4" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\lua\lua.js" />
             </Component>
             <Component Id="cmp202BC52D38B1C5C9D8403D9E933AD5D2" Directory="dir59B828A73E5738C8396CC964BDD65FC4" Guid="{5A818A7E-E456-4BC4-8ED2-DD07D129A165}">
-                <File Id="filA2B2CFD062A7BEDB9DEEBAF38485E1E7" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\markdown\markdown.js" />
+                <File Id="filA2B2CFD062A7BEDB9DEEBAF38485E1E7" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\markdown\markdown.js" />
             </Component>
             <Component Id="cmp2ED2818109C657E65251BEBDCAC38AE9" Directory="dirDD50070C52A043253945DA2872A0FBED" Guid="{F1CFA516-CD3A-4ADE-A7FF-47EA961AFC07}">
-                <File Id="fil3B6851DBF90772E3A7193C6EC2C74A52" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\msdax\msdax.js" />
+                <File Id="fil3B6851DBF90772E3A7193C6EC2C74A52" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\msdax\msdax.js" />
             </Component>
             <Component Id="cmp60D00123824F665D2F53D57CF4D9C162" Directory="dirA85BF3ABF3DB1F89A0EAAA6AB9DB932D" Guid="{9DD377BE-1804-4150-A4B1-B05885BC09CF}">
-                <File Id="fil73F342B2D8DB38E6E5FBD8B5EF3ED291" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\mysql\mysql.js" />
+                <File Id="fil73F342B2D8DB38E6E5FBD8B5EF3ED291" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\mysql\mysql.js" />
             </Component>
             <Component Id="cmpA4C33E2FED10A05408A61577458BC2A2" Directory="dirD93C52632F46867DD0B369BEB2B1F49D" Guid="{675CA649-6373-4862-A509-5D6583F255A1}">
-                <File Id="fil5ED4EAA4DE396C0AA16424BA886E9A41" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\objective-c\objective-c.js" />
+                <File Id="fil5ED4EAA4DE396C0AA16424BA886E9A41" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\objective-c\objective-c.js" />
             </Component>
             <Component Id="cmp4FC7DE6B7CE5A49A87934098926BC121" Directory="dir899D59914F0DA3123C888473A4729CAA" Guid="{5A2F726C-8FBD-46DD-9F5F-102673DE39F8}">
-                <File Id="fil56499C6A4BCCC5C1B49E797C0186E734" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\perl\perl.js" />
+                <File Id="fil56499C6A4BCCC5C1B49E797C0186E734" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\perl\perl.js" />
             </Component>
             <Component Id="cmpFF601A99CB1BDEC82F97E5098059D5F5" Directory="dirE7C3138F59DF5D06A70B48A5AD116CE6" Guid="{111C52E7-EA5E-474C-98E6-EE5638371E2E}">
-                <File Id="fil637439452FEFF758E758F4C34619D16C" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\pgsql\pgsql.js" />
+                <File Id="fil637439452FEFF758E758F4C34619D16C" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\pgsql\pgsql.js" />
             </Component>
             <Component Id="cmp29F00144741440A16A37E1C5F8086DEC" Directory="dir6DDCDF56ADCD75F6E34453F811437D2F" Guid="{08587E2F-1DBF-42CC-990D-E64748B39CC2}">
-                <File Id="filC413D6AFCDA1D8466135A8648E7B38B7" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\php\php.js" />
+                <File Id="filC413D6AFCDA1D8466135A8648E7B38B7" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\php\php.js" />
             </Component>
             <Component Id="cmp45FCA5B6A803328531AABB0F4772034F" Directory="dir959EBDFFAD5E758D9BAF7DB4F55DECE6" Guid="{864ECD45-66F6-4A3D-81BA-39E2094748D7}">
-                <File Id="filCD3F1A58220298776FE4137D8F945624" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\postiats\postiats.js" />
+                <File Id="filCD3F1A58220298776FE4137D8F945624" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\postiats\postiats.js" />
             </Component>
             <Component Id="cmpE7960C3620B15B2EF093F07CC68BE344" Directory="dir52F3B1F6A951C02EFCB216309D6DBB87" Guid="{9FFD21ED-7BD5-44CD-BB55-44A520448CE3}">
-                <File Id="fil3EF91293104CE5EBA29DF064B00A18BC" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\powerquery\powerquery.js" />
+                <File Id="fil3EF91293104CE5EBA29DF064B00A18BC" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\powerquery\powerquery.js" />
             </Component>
             <Component Id="cmp8E61EB69BD235A0C2680E243968F915C" Directory="dirDD39E90C7F3493C43707B32439F29094" Guid="{042B6B44-FE65-46F4-BE09-77AE1A3F437A}">
-                <File Id="filD2A8AD8180EFA1C40C6EA8A70425C228" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\powershell\powershell.js" />
+                <File Id="filD2A8AD8180EFA1C40C6EA8A70425C228" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\powershell\powershell.js" />
             </Component>
             <Component Id="cmp7F65D23AD5E1BC184708846F713E79AF" Directory="dirE85C95B413BA008D92904B244270E9DE" Guid="{CE1DEB80-DAB1-4E81-B394-95499DBFF6C6}">
-                <File Id="fil2088990C1F02C0859F73E29D1483B409" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\pug\pug.js" />
+                <File Id="fil2088990C1F02C0859F73E29D1483B409" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\pug\pug.js" />
             </Component>
             <Component Id="cmp7A387AB46624BD21F4E334D61D34A45F" Directory="dir641AECD2878342CE2C91668D4968FB0E" Guid="{3E1176D1-D7A9-4716-9756-2A8EC106EF26}">
-                <File Id="filFB42454AA93F419DDAA0A726FA1712F1" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\python\python.js" />
+                <File Id="filFB42454AA93F419DDAA0A726FA1712F1" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\python\python.js" />
             </Component>
             <Component Id="cmpBF70B32B401B4BF6C8389885C8EBDA9B" Directory="dirFB01AD916094A60D4C887B85BF063615" Guid="{FF60FE25-3C6F-432E-8440-B4D124AD4D49}">
-                <File Id="filB46A62B91C218C55C2F6D38983E467CB" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\r\r.js" />
+                <File Id="filB46A62B91C218C55C2F6D38983E467CB" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\r\r.js" />
             </Component>
             <Component Id="cmp330F6F7DFC58BDBF49B71AD99C546FA2" Directory="dir47F7B2A56BB508C3BAA3BFF727366F58" Guid="{2517B230-B32F-4688-9E9A-0C494AC76FEA}">
-                <File Id="filCDAB731E4B6E17111FCD61B6D026E396" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\razor\razor.js" />
+                <File Id="filCDAB731E4B6E17111FCD61B6D026E396" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\razor\razor.js" />
             </Component>
             <Component Id="cmpAA4A1BF3FC08A13C16AC1E7340CB8E06" Directory="dirF683047CB2AA90828B322FAF691E864D" Guid="{F34B6663-F1C8-4F5A-ACA4-32F228F9BAC5}">
-                <File Id="filB536F52B9FDA33579BE3DB3E30D84A2F" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\redis\redis.js" />
+                <File Id="filB536F52B9FDA33579BE3DB3E30D84A2F" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\redis\redis.js" />
             </Component>
             <Component Id="cmpA5CCE407DB21A5B00E742F7CD4B20777" Directory="dir4C0F681D80ABE01EA1B280CBDBA4C9C8" Guid="{E990D374-F5FD-4C6B-AC80-CD595808FB42}">
-                <File Id="fil9547E0E2F9E308B4FB085D0066A522D8" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\redshift\redshift.js" />
+                <File Id="fil9547E0E2F9E308B4FB085D0066A522D8" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\redshift\redshift.js" />
             </Component>
             <Component Id="cmp48F779875112085DDCA6B0326DC2D399" Directory="dirB7B56DADBF80D993CFB54336AE39D90A" Guid="{43D35265-88A9-44BF-BB56-098354E3BE89}">
-                <File Id="filB345BC7D93193709E6D34A7BF34958D9" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\ruby\ruby.js" />
+                <File Id="filB345BC7D93193709E6D34A7BF34958D9" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\ruby\ruby.js" />
             </Component>
             <Component Id="cmp7BC2DFA9C7CEFCB2FEA7AFEC0BC646B0" Directory="dir76975A95213E0F9FC6EE0183CD9B4FA8" Guid="{C6C2D50E-3476-4AAD-976A-8E6E8A1D4D0D}">
-                <File Id="fil38F8C0A90BF1031D1A14578AD35CB85C" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\rust\rust.js" />
+                <File Id="fil38F8C0A90BF1031D1A14578AD35CB85C" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\rust\rust.js" />
             </Component>
             <Component Id="cmpFBF971BD96D70F467995C4EF69EB7421" Directory="dir2E39C4C53E0250A381326FADFBFC1CA9" Guid="{68D1971E-0C56-4671-8715-1981B4FE1CEF}">
-                <File Id="fil1AC27831AB18758B3F9E4402C128A9CB" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\sb\sb.js" />
+                <File Id="fil1AC27831AB18758B3F9E4402C128A9CB" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\sb\sb.js" />
             </Component>
             <Component Id="cmpFFD5A8F1D3A23AB5CBCE8677683870CF" Directory="dir5EDFAE0321E9BA4C80ABF357AAA15AB5" Guid="{BE44C441-6573-48F2-A041-90AEC6B251EE}">
-                <File Id="filD33BB292DDAA84F3303DDBE3A56BED43" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\scheme\scheme.js" />
+                <File Id="filD33BB292DDAA84F3303DDBE3A56BED43" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\scheme\scheme.js" />
             </Component>
             <Component Id="cmp7811ABAB6AE8B1DD252FC8625B19DF66" Directory="dir2B8F0F7D316D9014FFB8680DA6549C72" Guid="{DE6D7DE7-3301-4929-AF6B-54FD9E24A849}">
-                <File Id="filB83EED20212CCC40DF0B714C40F55855" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\scss\scss.js" />
+                <File Id="filB83EED20212CCC40DF0B714C40F55855" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\scss\scss.js" />
             </Component>
             <Component Id="cmp9BEF6768C491345CA490CA8663DD7A4E" Directory="dirE0E4FA1B4D7A63CFA6C89462D39EEFBF" Guid="{5F0864B3-FA23-41E1-AAF0-A336F0F21738}">
-                <File Id="fil4E529AEADA6FB79EE38DD25A0B2F53FD" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\shell\shell.js" />
+                <File Id="fil4E529AEADA6FB79EE38DD25A0B2F53FD" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\shell\shell.js" />
             </Component>
             <Component Id="cmp19A902FA2EE63125294334D2886EF80B" Directory="dir96F70B62AF53312513FB22D287483A49" Guid="{684BF92E-A7DB-4CD8-9581-854A77787A2F}">
-                <File Id="filADAB17B720DAB09DF15625036178BFD8" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\solidity\solidity.js" />
+                <File Id="filADAB17B720DAB09DF15625036178BFD8" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\solidity\solidity.js" />
             </Component>
             <Component Id="cmp765E0D1B32A1B28ECA555F983C12FEF2" Directory="dirDFCE619DC76FDC0B973436CEB9728C96" Guid="{2E7870A8-5B26-41CF-BE92-52DAC0171E0F}">
-                <File Id="fil63E431D133916AEEF56F070CBE8B63AE" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\sql\sql.js" />
+                <File Id="fil63E431D133916AEEF56F070CBE8B63AE" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\sql\sql.js" />
             </Component>
             <Component Id="cmpA331F29C5EC509023F152819BFD1C60D" Directory="dir0EE3D145AAF5902882A7F1EB79379894" Guid="{32210399-0E16-4AE3-B2B4-344EBF93F8BD}">
-                <File Id="fil193F14900DA199386645475DB09A7585" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\st\st.js" />
+                <File Id="fil193F14900DA199386645475DB09A7585" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\st\st.js" />
             </Component>
             <Component Id="cmp38D333876F83212760B4DB3682095E29" Directory="dir90385AB50525C67D02AE307B8F47E076" Guid="{47B28D7B-2E2F-405A-B75F-B00758E163A9}">
-                <File Id="fil826B6D8991101C15AF613769ABEC5FF4" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\swift\swift.js" />
+                <File Id="fil826B6D8991101C15AF613769ABEC5FF4" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\swift\swift.js" />
             </Component>
             <Component Id="cmpC4F955A52478A5450619B35029B50609" Directory="dir33C4FD61927AFB45ECE0E4863CC105E9" Guid="{519BC732-8B5D-4B23-9CC5-3911C2711E46}">
-                <File Id="filFB56A4A7D153766C1E240664290E6EC3" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\typescript\typescript.js" />
+                <File Id="filFB56A4A7D153766C1E240664290E6EC3" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\typescript\typescript.js" />
             </Component>
             <Component Id="cmp750CFC2CDC722BFF5E5274A201C02CB1" Directory="dir3608B3DF7C199534889E2AF377130C5E" Guid="{3E134146-3400-4258-A372-486E5D128E78}">
-                <File Id="fil2A6D6C6A9E95119C52A8539D06E257BE" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\vb\vb.js" />
+                <File Id="fil2A6D6C6A9E95119C52A8539D06E257BE" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\vb\vb.js" />
             </Component>
             <Component Id="cmpA9C51B7BEA272A2F9FEC2B9636B24F93" Directory="dir09FBBE4F18ECFB9E03EA5A598BB219E5" Guid="{FDFEB9A1-19A8-4EB5-96D9-B288ACA5EA52}">
-                <File Id="fil584011BB014F249A81A53D973A3D6E28" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\xml\xml.js" />
+                <File Id="fil584011BB014F249A81A53D973A3D6E28" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\xml\xml.js" />
             </Component>
             <Component Id="cmpD773EE9A803AFE85C7D221FA8948BCB8" Directory="dir6AF61D5B15AC7CE993B1998A7FAED056" Guid="{D62D9BD4-40A8-42E0-B9B9-29320B7EA46F}">
-                <File Id="filA8B944EDC57E790DC53CC8768B83EB31" KeyPath="yes" Source="$(MonacoSourceDir)\basic-languages\yaml\yaml.js" />
+                <File Id="filA8B944EDC57E790DC53CC8768B83EB31" KeyPath="yes" Source="$(var.MonacoSourceDir)\basic-languages\yaml\yaml.js" />
             </Component>
             <Component Id="cmpC5782F59BA44E5C7B837354D4B190B6C" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{EFB37C73-D852-4BE2-813A-6B36348D3A69}">
-                <File Id="filD8325738C8F269AC9EF848B7911B12E6" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.css" />
+                <File Id="filD8325738C8F269AC9EF848B7911B12E6" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.css" />
             </Component>
             <Component Id="cmpF20B29CBBAD2498C4D6A30B7F28E0806" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{984063D0-9EFE-47F7-9F1E-C5EAA289032D}">
-                <File Id="filE7AF841D44F6B09457F85E7578ABBE6A" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.js" />
+                <File Id="filE7AF841D44F6B09457F85E7578ABBE6A" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.js" />
             </Component>
             <Component Id="cmpC05BA97E8B5219BD0F486CD1DB5EB1ED" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{8A9FF926-3AF5-4EF0-9AE1-A4690D869EB9}">
-                <File Id="filBA45BA77CE7143ECA0267CA3CD486D2F" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.de.js" />
+                <File Id="filBA45BA77CE7143ECA0267CA3CD486D2F" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.de.js" />
             </Component>
             <Component Id="cmp8ADBA7C98CA5A2FCD14CC8CF45E89511" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{64B4F48D-9A05-4600-AEA0-298E701BF9FB}">
-                <File Id="fil1B899B5104559AE1B0473DCFE59CD946" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.es.js" />
+                <File Id="fil1B899B5104559AE1B0473DCFE59CD946" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.es.js" />
             </Component>
             <Component Id="cmp6140FAEA966F52DE2B1DCF31494518A8" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{B16B9D90-EA4D-4C61-BB75-755BFE9D8CF3}">
-                <File Id="fil0E59302B3132519F4D01FD6ECBBEBF81" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.fr.js" />
+                <File Id="fil0E59302B3132519F4D01FD6ECBBEBF81" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.fr.js" />
             </Component>
             <Component Id="cmp5B1AA8609E863E7CAEF7147925D42E1E" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{F32B1405-4212-4CD3-B55F-1EF0A21E3EFA}">
-                <File Id="filB837A1EA732B0D9AE50FF0DDFC674C9F" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.it.js" />
+                <File Id="filB837A1EA732B0D9AE50FF0DDFC674C9F" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.it.js" />
             </Component>
             <Component Id="cmp19895CE9F77188FC33AA416B2D3C9927" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{88243C1F-D010-4926-B677-4067515E3AE7}">
-                <File Id="filFC1A466CF9C3EB7D4795EB531C55DB61" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.ja.js" />
+                <File Id="filFC1A466CF9C3EB7D4795EB531C55DB61" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.ja.js" />
             </Component>
             <Component Id="cmp30F13CC13DAF5141969CB4A774715374" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{476BC9EE-6A91-4D3E-822B-8E15D72CBD26}">
-                <File Id="filF738DB12C2485155989E2B718229EF61" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.js" />
+                <File Id="filF738DB12C2485155989E2B718229EF61" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.js" />
             </Component>
             <Component Id="cmpD6473C98AD7A05FB1FAFEDEE14B65589" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{F9BF7293-F07F-4483-9919-4D6508E2F5C0}">
-                <File Id="filCB599D373774967134DD7FFF9DBC0694" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.ko.js" />
+                <File Id="filCB599D373774967134DD7FFF9DBC0694" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.ko.js" />
             </Component>
             <Component Id="cmp87203D769021DD182AB29B428F1A49C5" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{F87EDB77-497F-4FAA-8442-1495BC5EE394}">
-                <File Id="filB180492A4FFFA22308D6BEBA55379FA7" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.ru.js" />
+                <File Id="filB180492A4FFFA22308D6BEBA55379FA7" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.ru.js" />
             </Component>
             <Component Id="cmp952AD0F9CEFF37A81B3A7A88E35DFDC4" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{274FFA9D-1E54-4654-8111-D8A9507686AD}">
-                <File Id="filB80299F19C31430E2C709F01C917B0FD" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.zh-cn.js" />
+                <File Id="filB80299F19C31430E2C709F01C917B0FD" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.zh-cn.js" />
             </Component>
             <Component Id="cmpF3E03B6D74E00A36CBE8D8AFBD19EC2A" Directory="dirBC38157AF610241A3B597688B940E8D9" Guid="{0A4F64D3-1224-4D68-8E21-C47A57E73C43}">
-                <File Id="fil34B250499032138D8F2BE74A32C6BCF3" KeyPath="yes" Source="$(MonacoSourceDir)\editor\editor.main.nls.zh-tw.js" />
+                <File Id="fil34B250499032138D8F2BE74A32C6BCF3" KeyPath="yes" Source="$(var.MonacoSourceDir)\editor\editor.main.nls.zh-tw.js" />
             </Component>
             <Component Id="cmp4C482BAAA61CAD21959F13F43AA4B582" Directory="dir7938E5FD4685235D6D58BE8748E5CA42" Guid="{713E8990-43A3-4F1B-973C-5C6E5B95636B}">
-                <File Id="fil541BE6CF2A651A306DD602396535F79D" KeyPath="yes" Source="$(MonacoSourceDir)\language\css\cssMode.js" />
+                <File Id="fil541BE6CF2A651A306DD602396535F79D" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\css\cssMode.js" />
             </Component>
             <Component Id="cmp7615037161294368B47E3EACC4C0E431" Directory="dir7938E5FD4685235D6D58BE8748E5CA42" Guid="{48ADB1C2-C8CE-49FA-B85D-3CA1FF1ADCD5}">
-                <File Id="filD3F54EC1AC0FEB0E545327096BC452E9" KeyPath="yes" Source="$(MonacoSourceDir)\language\css\cssWorker.js" />
+                <File Id="filD3F54EC1AC0FEB0E545327096BC452E9" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\css\cssWorker.js" />
             </Component>
             <Component Id="cmpFE1D1EDBEE28F368799F6E1CCC1120BB" Directory="dir279D50147A1B63DFF3BFD9F7C6F52A65" Guid="{D04F0229-E08A-4638-8270-DA0D96FAA79C}">
-                <File Id="filC3711E7116F887D4F3064CBCB95E3775" KeyPath="yes" Source="$(MonacoSourceDir)\language\html\htmlMode.js" />
+                <File Id="filC3711E7116F887D4F3064CBCB95E3775" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\html\htmlMode.js" />
             </Component>
             <Component Id="cmpFFB56F67214FF54E48861FAC489E6909" Directory="dir279D50147A1B63DFF3BFD9F7C6F52A65" Guid="{A27A25C7-39AE-4F4D-9EA5-E7686BD55C0B}">
-                <File Id="filEF361DE25FD6086A96CA462BB6FE684C" KeyPath="yes" Source="$(MonacoSourceDir)\language\html\htmlWorker.js" />
+                <File Id="filEF361DE25FD6086A96CA462BB6FE684C" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\html\htmlWorker.js" />
             </Component>
             <Component Id="cmp3D74B3A660EFE9CD119F093642549EA6" Directory="dir09CBC82CC6184C4749DAE4D222DB9D9C" Guid="{F9D94A4D-9D1B-498A-A33A-C287385D0740}">
-                <File Id="filFA02C96DB13CBBC5D903C6A509939A2F" KeyPath="yes" Source="$(MonacoSourceDir)\language\json\jsonMode.js" />
+                <File Id="filFA02C96DB13CBBC5D903C6A509939A2F" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\json\jsonMode.js" />
             </Component>
             <Component Id="cmp26CA22FAD1158A5BBDD5B27339A85F40" Directory="dir09CBC82CC6184C4749DAE4D222DB9D9C" Guid="{A4E72549-BB73-479D-AB05-1F47D383DC0E}">
-                <File Id="fil3E6508B9E6D8FB0C08EB038FDB9D136B" KeyPath="yes" Source="$(MonacoSourceDir)\language\json\jsonWorker.js" />
+                <File Id="fil3E6508B9E6D8FB0C08EB038FDB9D136B" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\json\jsonWorker.js" />
             </Component>
             <Component Id="cmpC2B9E488CF78E2C528F470ED0BC44554" Directory="dir5679F9CD5C394286FB94DE4B803689C3" Guid="{A779A328-AC1F-443A-9AC6-C06DCFD20660}">
-                <File Id="filC3D58BB5B39273F39196D8183E76DA0D" KeyPath="yes" Source="$(MonacoSourceDir)\language\typescript\tsMode.js" />
+                <File Id="filC3D58BB5B39273F39196D8183E76DA0D" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\typescript\tsMode.js" />
             </Component>
             <Component Id="cmpD6478971827D7AFB73FF8D2F3B6B19A6" Directory="dir5679F9CD5C394286FB94DE4B803689C3" Guid="{268C9000-FAB4-4352-B152-D903D50D0AF6}">
-                <File Id="fil816EC0DD80CB1C2D13A8BD8DBCE1E170" KeyPath="yes" Source="$(MonacoSourceDir)\language\typescript\tsWorker.js" />
+                <File Id="fil816EC0DD80CB1C2D13A8BD8DBCE1E170" KeyPath="yes" Source="$(var.MonacoSourceDir)\language\typescript\tsWorker.js" />
             </Component>
         </ComponentGroup>
     </Fragment>

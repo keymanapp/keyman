@@ -70,7 +70,7 @@ generate-app-wxs:
     @echo monaco.xws. Existing component GUIDs must be maintained per Windows Installer component 
     @echo rules (a file at a single location should have a permanent GUID for reference counting).
     @echo *******************************************************************************************
-    $(WIXPATH)\heat.exe dir xml\app\lib\monaco\min\vs -gg -o ..\inst\monaco_gen.wxs -cg MonacoFiles -var MonacoSourceDir -dr MonacoTargetDir
+    $(WIXPATH)\heat.exe dir xml\app\lib\monaco\min\vs -gg -o ..\inst\monaco_gen.wxs -cg MonacoFiles -var var.MonacoSourceDir -dr MonacoTargetDir
     
 !include ..\..\Target.mak
 
