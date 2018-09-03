@@ -57,20 +57,40 @@ unit UfrmDebug;  // I3323  // I3306
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, Grids, ComCtrls, CaptionPanel, Buttons,
-  StdCtrls, debugging, debugkeyboard, UfrmMDIEditor, PaintPanel, Menus,
-  HintLabel, debugdeadkeys, UserMessages,
-  UframeTextEditor,
+  System.Classes,
+  System.Generics.Collections,
+  System.SysUtils,
   Vcl.AppEvnts,
+  Vcl.Buttons,
+  Vcl.ComCtrls,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.Grids,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  CaptionPanel,
+  debugdeadkeys,
+  debugging,
+  debugkeyboard,
   DebugUtils,
-  keymanapi_TLB, msctf, UfrmTike,
-  KeymanDeveloperDebuggerMemo;
+  HintLabel,
+  PaintPanel,
+  keymanapi_TLB,
+  KeymanDeveloperDebuggerMemo,
+  msctf,
+  UframeTextEditor,
+  UfrmMDIEditor,
+  UfrmTike,
+  UserMessages;
 
 type
-  TUpdateParColourEvent = procedure(Sender: TObject; ALine: Integer; ALineType: TParColourLineType) of object;
-
-  TBreakpointRange = 0..99;
+  TDebugLineEvent = procedure(Sender: TObject; ALine: Integer) of object;
 
   TDebugUIStatus = (duiInvalid, duiPaused, duiFocusedForInput, duiReadyForInput, duiReceivingEvents, duiDebugging,
     duiClosing, duiDebuggingOutput, duiTest);
@@ -86,6 +106,8 @@ type
     constructor Create(AOwner: TframeTextEditor);
     property TrueLineNumber: Integer read GetTrueLineNumber write SetTrueLineNumber;
   end;
+
+  TDebugBreakpoints = class(TObjectList<TDebugBreakpoint>);
 
   TfrmDebug = class(TTikeForm)
     memo: TKeymanDeveloperDebuggerMemo;
@@ -115,7 +137,7 @@ type
   private
 
     FDebugVisible: Boolean;
-    FBreakpoint: array[TBreakpointRange] of TDebugBreakpoint;
+    FBreakpoints: TDebugBreakpoints;
     FRunning, FFoundBreakpoint, FForceKeyboard: Boolean;
     FFileName: string;
     //FEditor: TfrmTikeEditor;
@@ -163,8 +185,6 @@ type
 
     procedure KeymanGetContext(var Message: TMessage);
 
-    procedure UpdateParColour(Line: Integer; LineType: TParColourLineType);
-
     procedure AddDebug(s: WideString);
 
     { Debug panel functions }
@@ -174,10 +194,13 @@ type
   private
     FANSITest: Boolean;
     FEditorMemo: TframeTextEditor;
-    FOnUpdateParColour: TUpdateParColourEvent;
+
     FDebugFileName: WideString;
     FSingleStepMode: Boolean;
     FCanDebug: Boolean;
+    FOnUpdateExecutionPoint: TDebugLineEvent;
+    FOnClearBreakpoint: TDebugLineEvent;
+    FOnSetBreakpoint: TDebugLineEvent;
     procedure SetANSITest(const Value: Boolean);
     procedure UpdateANSITest;
     procedure ClearDeadkeys;
@@ -216,13 +239,14 @@ type
 
     procedure SetBreakpoint(ALine: Integer);
     procedure ClearBreakpoint(ALine: Integer);
+    procedure ToggleBreakpoint(ALine: Integer);
 
     function IsBreakPointLine(ALine: Integer): Boolean;
     function IsExecutionPointLine(ALine: Integer): Boolean;
 
     function GetDebugKeyboard: TDebugKeyboard;
 
-    property CanDebug: Boolean read FCanDebug write FCanDebug; 
+    property CanDebug: Boolean read FCanDebug write FCanDebug;
     property UIStatus: TDebugUIStatus read FUIStatus write SetUIStatus;
 
     property SingleStepMode: Boolean read FSingleStepMode write SetSingleStepMode;
@@ -250,7 +274,9 @@ type
 
     property CurrentEvent: TDebugEvent read GetCurrentEvent;
 
-    property OnUpdateParColour: TUpdateParColourEvent read FOnUpdateParColour write FOnUpdateParColour;
+    property OnSetBreakpoint: TDebugLineEvent read FOnSetBreakpoint write FOnSetBreakpoint;
+    property OnClearBreakpoint: TDebugLineEvent read FOnClearBreakpoint write FOnClearBreakpoint;
+    property OnUpdateExecutionPoint: TDebugLineEvent read FOnUpdateExecutionPoint write FOnUpdateExecutionPoint;
   end;
 
 implementation
@@ -317,6 +343,7 @@ begin
 //  InitMSCTF;   // I3655
 
   TDebugUtils.GetActiveTSFProfile(FLastActiveProfile);   // I4331
+  FBreakpoints := TDebugBreakpoints.Create;
 
   FExecutionPointLine := -1;
   //InitControlCaptions;
@@ -331,11 +358,9 @@ begin
 end;
 
 procedure TfrmDebug.FormDestroy(Sender: TObject);
-var
-  i: TBreakpointRange;
 begin
   ResetDebug;
-  for i := Low(TBreakpointRange) to High(TBreakpointRange) do FBreakpoint[i].Free;
+  FBreakpoints.Free;
   FEvents.Free;
   //UninitControlCaptions;
   //UninitSystemKeyboard;
@@ -722,7 +747,7 @@ end;
 procedure TfrmDebug.WMUSERUpdateForceKeyboard(var Message: TMessage);   // I4767
     procedure FailTidyUp;
     begin
-      Windows.SetFocus(0);
+      Winapi.Windows.SetFocus(0);
       HideDebugForm;
       FForceKeyboard := False;
     end;
@@ -763,8 +788,8 @@ begin
       if FWasStarted then  // I3283   // I3503
       begin
         // Give Keyman Engine a chance to correctly attach focus after it starts
-        Windows.SetFocus(0);
-        Windows.SetFocus(memo.Handle);
+        Winapi.Windows.SetFocus(0);
+        Winapi.Windows.SetFocus(memo.Handle);
         Exit;
       end;
 
@@ -784,7 +809,7 @@ begin
         {Keyman_Exit; I3283   // I3503
         if not Keyman_Initialise(Application.MainForm.Handle, True) or not Keyman_ForceKeyboard(FFileName) then
         begin}
-          Windows.SetFocus(0);
+          Winapi.Windows.SetFocus(0);
           HideDebugForm;
           ShowMessage('Unable to start debugger - please make sure that Keyman Developer is correctly installed (the error code was '+IntToHex(FLastError, 8)+').');  // I3173   // I3504
           //(Editor as TfrmEditor).HideDebugForm;
@@ -1017,59 +1042,49 @@ end;
 
 procedure TfrmDebug.SetBreakpoint(ALine: Integer);
 var
-  i: TBreakpointRange;
-  j: Integer;
+  b: TDebugBreakpoint;
 begin
-  j := -1;
-  for i := Low(TBreakpointRange) to High(TBreakpointRange) do
-  begin
-    if Assigned(FBreakpoint[i]) then
-    begin
-      if (FBreakpoint[i].TrueLineNumber = ALine) then Exit;
-    end
-    else if j = -1 then j := i;
-  end;
+  for b in FBreakpoints do
+    if b.TrueLineNumber = ALine then
+      Exit;
 
-  if j = -1 then
-  begin
-    ShowMessage('You can only have a maximum of '+
-      IntToStr(High(TBreakpointRange)-Low(TBreakpointRange))+' breakpoints.');
-    Exit;
-  end;
+  b := TDebugBreakpoint.Create(EditorMemo);
+  b.TrueLineNumber := ALine;
+  FBreakpoints.Add(b);
 
-  FBreakpoint[j] := TDebugBreakpoint.Create(EditorMemo);
-  FBreakpoint[j].TrueLineNumber := ALine;
-  UpdateParColour(ALine, pcltBreakpoint);
+  if Assigned(FOnSetBreakpoint) then
+    FOnSetBreakpoint(Self, ALine);
 end;
 
 procedure TfrmDebug.ClearBreakpoint(ALine: Integer);
 var
-  i: TBreakpointRange;
+  b: TDebugBreakpoint;
 begin
-  for i := Low(TBreakpointRange) to High(TBreakpointRange) do
-    if Assigned(FBreakpoint[i]) and (FBreakpoint[i].TrueLineNumber = ALine) then
+  for b in FBreakpoints do
+    if b.TrueLineNumber = ALine then
     begin
-      FBreakpoint[i].Free;
-      FBreakpoint[i] := nil;
-      if IsExecutionPointLine(ALine)
-        then UpdateParColour(ALine, pcltExecutionPoint)
-        else UpdateParColour(ALine, pcltNone);
+      FBreakpoints.Remove(b);
+      if Assigned(FOnClearBreakpoint) then
+        FOnClearBreakpoint(Self, ALine);
       Exit;
     end;
 end;
 
+procedure TfrmDebug.ToggleBreakpoint(ALine: Integer);
+begin
+  if IsBreakpointLine(ALine)
+    then ClearBreakpoint(ALine)
+    else SetBreakpoint(ALine)
+end;
+
 function TfrmDebug.IsBreakPointLine(ALine: Integer): Boolean;
 var
-  i: Integer;
+  b: TDebugBreakpoint;
 begin
-  Result := True;
-  for i := Low(TBreakpointRange) to High(TBreakpointRange) do
-  begin
-    if FBreakpoint[i] <> nil then
-      if FBreakpoint[i].TrueLineNumber = ALine then
-        Exit;
-  end;
-  Result := False;
+  for b in FBreakpoints do
+    if b.TrueLineNumber = ALine then
+      Exit(True);
+  Exit(False);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1082,28 +1097,21 @@ begin
 end;
 
 procedure TfrmDebug.SetExecutionPointLine(ALine: Integer);
-var
-  oldline: Integer;
 begin
-  oldline := FExecutionPointLine;
   FExecutionPointLine := ALine;
-  if IsBreakPointLine(oldline)
-    then UpdateParColour(oldline, pcltBreakpoint)
-    else UpdateParColour(oldline, pcltNone);
-  if FRunning then Exit;
-  if FExecutionPointLine >= 0 then
-    UpdateParColour(FExecutionPointLine, pcltExecutionPoint);
+  if FRunning and (FExecutionPointLine >= 0) then Exit;
+  if Assigned(FOnUpdateExecutionPoint) then
+    FOnUpdateExecutionPoint(Self, ALine);
 end;
 
 procedure TfrmDebug.ListBreakpoints;
 var
-  i: Integer;
+  b: TDebugBreakpoint;
 begin
   memo.Clear;
-  //frmDebugStatus.DeadKeys.ClearDeadkeys;  I1699
-  for i := 0 to 99 do
-    if Assigned(FBreakPoint[i]) and (FBreakpoint[i].TrueLineNumber >= 0) then
-      UpdateParColour(FBreakpoint[i].TrueLineNumber, pcltBreakpoint);
+  for b in FBreakpoints do
+    if Assigned(FOnSetBreakpoint) then
+      FOnSetBreakpoint(Self, b.TrueLineNumber);
 end;
 
 
@@ -1176,12 +1184,6 @@ begin
     FDefaultFont := False;
   memo.Font := FFont;
   (frmDebugStatus as TfrmDebugStatus).DisplayFont := FFont;
-end;
-
-procedure TfrmDebug.UpdateParColour(Line: Integer; LineType: TParColourLineType);
-begin
-  if Assigned(FOnUpdateParColour) then
-    FOnUpdateParColour(Self, Line, LineType);
 end;
 
 procedure TfrmDebug.Pause;
