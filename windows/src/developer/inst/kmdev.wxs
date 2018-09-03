@@ -469,8 +469,7 @@
       <ComponentRef Id='xml_file_layoutbuilder_keymanweb_osk2.ttf'/>
       
       <ComponentRef Id="xml_app_editor" />
-      <ComponentRef Id="xml_app_lib_ace" />
-      <ComponentRef Id="xml_app_lib_ace_snippets" />
+      <ComponentGroupRef Id="MonacoFiles" />
       <ComponentRef Id="xml_app_lib_jquery" />
       
       <MergeRef Id='keymanengine' />

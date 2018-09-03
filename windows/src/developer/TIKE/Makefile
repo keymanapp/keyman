@@ -64,5 +64,13 @@ test-manifest:
     # test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\tike.exe -validate_manifest
 
+generate-app-wxs:
+    @echo *******************************************************************************************
+    @echo The generated ..\inst\monaco_gen.wxs file will require manual merging with the existing 
+    @echo monaco.xws. Existing component GUIDs must be maintained per Windows Installer component 
+    @echo rules (a file at a single location should have a permanent GUID for reference counting).
+    @echo *******************************************************************************************
+    $(WIXPATH)\heat.exe dir xml\app\lib\monaco\min\vs -gg -o ..\inst\monaco_gen.wxs -cg MonacoFiles -var MonacoSourceDir -dr MonacoTargetDir
+    
 !include ..\..\Target.mak
 
