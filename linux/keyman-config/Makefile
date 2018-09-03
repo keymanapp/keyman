@@ -11,10 +11,13 @@ install:
 clean:
 	-rm -rf dist make_deb build
 
+devdist:
+	python3 setup.py egg_info -b.`date -u +"%Y%m%d%H%M%S"` sdist
+
 dist: clean
 	python3 setup.py sdist
 
-deb: clean dist man
+deb: clean devdist man
 	-mkdir make_deb
 	cd make_deb && tar xf ../dist/keyman_config-$(VERSION).tar.gz && \
 		mv keyman_config-$(VERSION) keyman-config-$(VERSION) && \

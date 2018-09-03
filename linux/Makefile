@@ -9,8 +9,10 @@ install_local:
 uninstall_local:
 	SUDOINSTALL="uninstall" ./build.sh
 
-deb: cow
+debnocow:
 	./deb.sh
+
+deb: cow debnocow
 
 cow:
 	./cow.sh
