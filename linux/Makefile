@@ -16,3 +16,6 @@ deb: cow debnocow
 
 cow:
 	./cow.sh
+
+nightlydist:
+	./build.sh dist

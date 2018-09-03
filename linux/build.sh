@@ -18,13 +18,36 @@ SUDOINSTALL=${SUDOINSTALL:-"no"}
 
 INSTALLDIR=${INSTALLDIR:-"/tmp/kmfl"}
 
+if [ "$1" == "dist" ]; then
+	rm -rf dist
+	mkdir -p ../dist
+fi
+
 # autoreconf the projects
 for proj in kmflcomp libkmfl ibus-kmfl; do
 	cd $proj
 	echo "Reconfiguring $proj"
 	autoreconf -if
+	if [ "$1" == "dist" ]; then
+		mkdir -p ../dist
+		rm -rf ../build-$proj
+		mkdir -p ../build-$proj
+		cd ../build-$proj
+		../$proj/configure
+		make dist
+		mv *.tar.gz ../dist
+	fi
 	cd $BASEDIR
 done
+
+if [ "$1" == "dist" ]; then
+	cd keyman-config
+	rm -rf dist
+	python3 setup.py egg_info -b.`date -u +"%Y%m%d%H%M%S"` sdist
+	cp dist/*.tar.gz ../dist
+	exit 0
+fi
+
 
 if [[ "${SUDOINSTALL}" == "uninstall" ]]
 then
