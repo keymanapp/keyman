@@ -254,6 +254,14 @@ ltsugar.m4
 ltversion.m4
 lt~obsolete.m4
 libtool.m4
+__pycache__
+*.egg-info
+build-*
+deb-*
+builddebs
+make_deb
+tmp/
+dist/
 
 .DS_Store
 
