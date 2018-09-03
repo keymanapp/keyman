@@ -29,7 +29,17 @@ window.editorGlobalContext = {
   */
 
   require.config({ paths: { 'vs': '../lib/monaco/min/vs' } });
-  require(['vs/editor/editor.main'], function () {
+  require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
+    
+    // Register Keyman .kmn tokens provider and language formatter
+    // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
+    monaco.languages.register({ id: 'keyman' });
+    monaco.languages.setMonarchTokensProvider('keyman', _language.language);
+    
+    //
+    // Create editor and load source file
+    //
+
     editor = monaco.editor.create(document.getElementById('editor'), {
       language: mode,
       minimap: {
@@ -50,6 +60,10 @@ window.editorGlobalContext = {
       },
       "text"
     );
+    
+    //
+    // Setup callbacks
+    //
 
     const model = editor.getModel();
     model.onDidChangeContent(() => {
@@ -76,7 +90,9 @@ window.editorGlobalContext = {
     });
   });
 
-  /* Search and replace interfaces */
+  //
+  // Search and replace interfaces 
+  //
   
   context.searchFind = function () {
     editor.trigger('', 'actions.find');
@@ -90,7 +106,9 @@ window.editorGlobalContext = {
     editor.trigger('', 'editor.action.startFindReplaceAction');
   };
   
-  /* Edit command interfaces */
+  //
+  // Edit command interfaces
+  //
 
   context.editUndo = function() {
     editor.model.undo();
@@ -104,14 +122,18 @@ window.editorGlobalContext = {
     editor.setSelection(editor.model.getFullModelRange());
   };
 
-  /* Row selection */
+  //
+  // Row selection
+  //
 
   context.moveCursor = function (o) {
     editor.setPosition({ column: o.column + 1, lineNumber: o.row + 1 });
     editor.revealPositionInCenterIfOutsideViewport(editor.getPosition(), monaco.editor.ScrollType.Smooth);
   };
   
-  /* Debug interactions */
+  //
+  // Debug interactions
+  //
   
   context.setBreakpoint = function (row) {
     if (!breakpoints[row]) {
@@ -137,7 +159,9 @@ window.editorGlobalContext = {
     context.moveCursor({ row: row, column: 0 });
   };
 
-  /* Error highlighting */
+  //
+  // Error highlighting
+  //
 
   context.highlightError = function (row) {
     if (errorRange) {
@@ -165,7 +189,9 @@ window.editorGlobalContext = {
     context.loading = false;
   };
 
-  /* Printing */
+  //
+  // Printing
+  //
 
   context.print = function () {
     /****require("ace/config").loadModule("ace/ext/static_highlight", function (m) {
@@ -219,8 +245,10 @@ window.editorGlobalContext = {
     commands.push(cmd);
   };
   
-  /**
-  */
+  //
+  // Updates the state of the host application 
+  //
+  
   var updateState = function () {
     let s = editor.getSelection();
     command(s.isEmpty() ? 'no-selection' : 'has-selection');
@@ -230,7 +258,6 @@ window.editorGlobalContext = {
     var n = editor.model.getValueInRange(s).length;
     if (editor.getSelection().getDirection() == monaco.SelectionDirection.LTR) n = -n;
     command('location,' + (s.startLineNumber-1) + ',' + (s.startColumn-1) + ',' + (s.endLineNumber-1) + ',' + (s.endColumn-1) + ',' + n);
-    //command('insert-mode,' + (editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
     var token = getTokenAtCursor();
     if (token) {
       command('token,' + token.column + ',' + encodeURIComponent(token.text));
@@ -248,7 +275,13 @@ window.editorGlobalContext = {
     if (mode == 'keyman') {
       // Get the token under the cursor
       var c = editor.getSelection();
-      var line = editor.model.getLineContent(c.positionLineNumber);
+      try {
+        var line = editor.model.getLineContent(c.positionLineNumber);
+      } catch(e) {
+        // In some situations, e.g. deleting a selection at the end of the document,
+        // the selected line may be past the end of the document for a moment
+        return null;
+      }
       return { column: c.positionColumn-1, text: line };
     } else {
       // Get the character under the cursor
