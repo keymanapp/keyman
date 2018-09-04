@@ -650,8 +650,8 @@ begin
   SetupDebugForm;
 
   GetCharMapDropTool.Handle(Self, cmimText);
-//TODO:  GetCharMapDropTool.Handle(frameSource.memo, cmimDefault);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
+  frameSource.SetupCharMapDrop;
 
   FillFeatureGrid;
 
