@@ -98,6 +98,9 @@ type
     procedure cefLoadEnd(Sender: TObject);
     procedure DoBreakpointClicked(const line: string);
     procedure UpdateEditorFonts;
+    procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
 
   protected
     function GetHelpTopic: string; override;
@@ -146,6 +149,7 @@ type
     property OnBreakpointClicked: TEditorBreakpointClickedEvent read FOnBreakpointClicked write FOnBreakpointClicked;
 
     procedure SetFocus; override;
+    procedure SetupCharMapDrop;
 
     procedure FindError(ln: Integer);
     procedure FindErrorByOffset(offset: Integer);   // I4083
@@ -184,8 +188,10 @@ uses
 
   dmActionsMain,
   dmActionsTextEditor,
+  CharacterDragObject,
   CharacterInfo,
   CharMapDropTool,
+  CharMapInsertMode,
   keyboardparser,
   KeymanDeveloperOptions,
   kwhelp,
@@ -310,6 +316,12 @@ begin
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
   cef.cef.OnContextMenuCommand := cefContextMenuCommand;
   cef.OnPreKeyEvent := cefPreKeyEvent;
+  SetupCharMapDrop;
+end;
+
+procedure TframeTextEditor.SetupCharMapDrop;
+begin
+  GetCharMapDropTool.Handle(cef.cefwp, cmimDefault, CharMapDragOver, CharMapDragDrop);
 end;
 
 procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
@@ -1047,6 +1059,46 @@ begin
 
   FreeAndNil(FCharFont);
   FreeAndNil(FCodeFont);
+end;
+
+procedure TframeTextEditor.CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+var
+  j: TJSONObject;
+begin
+  cef.cefwp.SetFocus;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('x', TJSONNumber.Create(X));
+    j.AddPair('y', TJSONNumber.Create(Y));
+    j.AddPair('state', GetEnumName(TypeInfo(TDragState), Ord(State)));
+    ExecuteCommand('charmapDragOver', j);
+  finally
+    j.Free;
+  end;
+
+  // We cannot test acceptance via event because it is asynchronous
+  // So we will just assume we can accept and throw it away if it is outside bounds
+  // during drop.
+  Accept := True;
+end;
+
+procedure TframeTextEditor.CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  j: TJSONObject;
+  cdo: TCharacterDragObject;
+begin
+  cef.cefwp.SetFocus;
+  cdo := Source as TCharacterDragObject;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('x', TJSONNumber.Create(X));
+    j.AddPair('y', TJSONNumber.Create(Y));
+    j.AddPair('text', cdo.Text[cdo.InsertType]);
+    ExecuteCommand('charmapDragDrop', j);
+  finally
+    j.Free;
+  end;
 end;
 
 end.

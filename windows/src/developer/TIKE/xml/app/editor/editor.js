@@ -172,6 +172,48 @@ window.editorGlobalContext = {
     );
     context.moveCursor({ row: row, column: 0 });
   };
+  
+  //
+  // Character map drag+drop and double-click insertion
+  //
+  
+  context.charmapDragOver = function(o) {
+    
+    // Convert X, Y to document coordinates
+    
+    let target = editor.getTargetAtClientPoint(o.x, o.y);
+    
+    if(target === null || target.type !== monaco.editor.MouseTargetType.CONTENT_TEXT) {
+      return false;
+    }
+    
+    // Move insertion point accordingly
+    
+    let position = editor.getPosition();
+    
+    if(!position.equals(target.position)) {
+      editor.setPosition(target.position);
+    }
+
+    return true;    
+  };
+  
+  context.charmapDragDrop = function(o) {
+
+    // Convert X, Y to document coordinates
+    
+    if(o.x >= 0 && o.y >= 0) {
+      let target = editor.getTargetAtClientPoint(o.x, o.y);
+      
+      if(target === null || target.type !== monaco.editor.MouseTargetType.CONTENT_TEXT) {
+        return false;
+      }
+      
+      editor.setPosition(target.position);
+    }
+    
+    editor.trigger('keyboard', 'type', {text: o.text});
+  };
 
   //
   // Error highlighting

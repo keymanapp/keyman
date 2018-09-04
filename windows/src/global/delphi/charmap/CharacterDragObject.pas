@@ -30,6 +30,7 @@ type
     FFontName: WideString;
     FText: array[TCharMapInsertMode] of WideString;
     FDragImages: TDragImageList;
+    FInsertType: TCharMapInsertMode;
     function GetText(Index: TCharMapInsertMode): WideString;
     procedure SetText(Index: TCharMapInsertMode; Value: WideString);
     procedure CreateDragCursor;
@@ -44,6 +45,7 @@ type
     function GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor; override;
     procedure SetDragCursorOptions(ADefaultInsertMode: TCharMapInsertMode; AFontName: WideString);
     property Text[Index: TCharMapInsertMode]: WideString read GetText write SetText;
+    property InsertType: TCharMapInsertMode read FInsertType write FInsertType; // used for custom insertion only
   end;
 
 implementation

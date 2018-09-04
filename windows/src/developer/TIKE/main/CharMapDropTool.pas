@@ -49,6 +49,13 @@ type
     property InsertMode: TCharMapInsertMode read FInsertMode;
   end;
 
+  TCharMapDropToolControlDefault = class(TCharMapDropToolControl)
+  public
+    class function Handles: TControlClass; override;
+    procedure Drag(AObject: TCharacterDragObject; X, Y: Integer; var Accept: Boolean); override;
+    procedure Drop(AInsertType: TCharMapInsertMode; AObject: TCharacterDragObject; X, Y: Integer); override;
+  end;
+
   TCharMapDropToolControlClass = class of TCharMapDropToolControl;
 
   TCharMapDropToolControls = class(TObjectList)
@@ -180,8 +187,11 @@ begin
       if Control is TCharMapDropToolControlClass(FControlClasses[i]).Handles then
       begin
         FControls.Add(TCharMapDropToolControlClass(FControlClasses[i]).Create(Self, Control, AInsertMode, AOnDragOver, AOnDragDrop));
-        Break;
+        Exit;
       end;
+
+    if Assigned(AOnDragOver) and Assigned(AOnDragDrop) then
+      FControls.Add(TCharMapDropToolControlDefault.Create(Self, Control, cmimCustom, AOnDragOver, AOnDragDrop));
   end;
 end;
 
@@ -367,6 +377,31 @@ begin
           if FCharContext = 3 then Result := ''''+AObject.Text[AInsertType] else Result := ' '''+AObject.Text[AInsertType];
       end;
   end;
+end;
+
+{ TCharMapDropToolControlDefault }
+
+procedure TCharMapDropToolControlDefault.Drag(AObject: TCharacterDragObject; X,
+  Y: Integer; var Accept: Boolean);
+begin
+  if Assigned(FOnDragOver)
+    then FOnDragOver(Self, AObject, X, Y, dsDragMove, Accept)
+    else Accept := False;
+end;
+
+procedure TCharMapDropToolControlDefault.Drop(AInsertType: TCharMapInsertMode;
+  AObject: TCharacterDragObject; X, Y: Integer);
+begin
+  if Assigned(FOnDragDrop) then
+  begin
+    AObject.InsertType := AInsertType;
+    FOnDragDrop(Self, AObject, X, Y);
+  end;
+end;
+
+class function TCharMapDropToolControlDefault.Handles: TControlClass;
+begin
+  Result := TWinControl;
 end;
 
 initialization
