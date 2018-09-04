@@ -111,7 +111,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
     end;
 
     // Transform the .kpj
-    with TProject.Create(path) do
+    with TProject.Create(path, (path='')) do
     try
       AResponseInfo.ContentType := 'text/html; charset=UTF-8';
       AResponseInfo.ContentText := Render;
@@ -196,16 +196,10 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       Exit;
     end;
 
-    FProject := TProject.Create(path, False);
+    FProject := TProject.Create(path, (path = ''));
     try
       FProject.DisplayState := displayState;
-      //TODO: file in-use conflicts
-      with TProjectSaver.Create(FProject, path) do
-      try
-        SaveUser;
-      finally
-        Free;
-      end;
+      FProject.SaveUser;
     finally
       FProject.Free;
     end;
