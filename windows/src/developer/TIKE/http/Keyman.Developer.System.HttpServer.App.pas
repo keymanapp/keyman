@@ -262,9 +262,9 @@ begin
   end
   else
   begin
-    if Pos('..', doc) > 0 then
+    if IncludesParentFolderReference(doc) then
     begin
-      // TODO: This is a naive security check. Need to expand
+      // Block paths that attempt to break out of our 'root'
       Respond404(AContext, ARequestInfo, AResponseInfo);
     end
     else
