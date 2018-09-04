@@ -1,9 +1,9 @@
 Source: kmflcomp
 Priority: optional
 Section: utils
-Maintainer: Doug Rintoul <doug_rintoul@sil.org>
+Maintainer: Daniel Glassey <wdg@debian.org>
 Uploaders: Torsten Werner <twerner@debian.org>
-Homepage: http://kmfl.sourceforge.net/
+Homepage: http://www.keyman.com
 Build-Depends: cdbs (>= 0.4.27), debhelper (>= 9), libx11-dev, dh-autoreconf
 Standards-Version: 3.9.8.0
 
