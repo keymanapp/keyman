@@ -96,7 +96,6 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_Define>$(DCC_Define)</DCC_Define>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -104,7 +103,6 @@
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_Define>$(DCC_Define)</DCC_Define>
         <DCC_UnitSearchPath>C:\keyman\10.0\src\ext\jcl\jcl\source\common;C:\keyman\10.0\src\ext\jcl\jcl\source\vcl;C:\keyman\10.0\src\ext\jcl\jcl\source\windows;C:\keyman\10.0\src\ext\jcl\jvcl\run;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <Icon_MainIcon>KeymanDeveloper90.ico</Icon_MainIcon>
@@ -511,6 +509,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.UI.FontUtils.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

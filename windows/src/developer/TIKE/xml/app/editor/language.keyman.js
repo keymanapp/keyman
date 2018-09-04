@@ -67,7 +67,7 @@ define("language.keyman", ["require", "exports"], function (require, exports) {
           [/\b(ctrl|shift|alt|caps|ncaps|nnumlock|numlock|ralt|lalt|rctrl|lctrl)\b/, 'tag'],
 
           // virtual key
-          [/\b[ktu]_([A-Z0-9]+)\b/, 'tag'],
+          [/\b[ktu]_([A-Z0-9_]+)\b/, 'tag'],
 
           // closing bracket
           [/\]/, { token: 'tag', bracket: '@close', next: '@pop' }],
@@ -89,11 +89,13 @@ define("language.keyman", ["require", "exports"], function (require, exports) {
         ],
 
         stringDouble: [
-          [/"/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ]
+          [/"/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ],
+          [/./,        'string' ]
         ],
 
         stringSingle: [
-          [/'/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ]
+          [/'/,        { token: 'string.quote', bracket: '@close', next: '@pop' } ],
+          [/./,        'string' ]
         ],
 
         whitespace: [
