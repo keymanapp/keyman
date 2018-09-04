@@ -262,6 +262,7 @@ builddebs
 make_deb
 tmp/
 dist/
+*~
 
 .DS_Store
 
