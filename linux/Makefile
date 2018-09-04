@@ -21,7 +21,10 @@ dist:
 origdist:
 	./dist.sh origdist
 
-sourcepackage:
+sourcepackage: reconf origdist
+	./deb.sh sourcepackage
+
+devsourcepackage: devreconf origdist
 	./deb.sh sourcepackage
 
 devreconf:
@@ -37,3 +40,4 @@ releasedeb: reconf origdist cow debnocow
 	echo "Built release Debian packages in builddebs/"
 
 nightlydist: devreconf dist
+	echo "Built nightly source release in dist/"
