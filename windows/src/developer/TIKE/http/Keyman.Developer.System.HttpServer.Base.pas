@@ -10,6 +10,7 @@ uses
 type
   TBaseHttpResponder = class
   protected
+    function IncludesParentFolderReference(const path: string): Boolean;
     procedure RespondFile(AFileName: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure Respond404(AContext: TIdContext;
@@ -24,6 +25,12 @@ uses
   System.SysUtils;
 
 { TBaseHttpResponder }
+
+function TBaseHttpResponder.IncludesParentFolderReference(
+  const path: string): Boolean;
+begin
+  Result := path.Contains('../') or path.Contains('..\');
+end;
 
 procedure TBaseHttpResponder.Respond404(
   AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo;
