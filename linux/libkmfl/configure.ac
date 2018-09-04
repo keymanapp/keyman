@@ -4,7 +4,6 @@ dnl If you don't want it to overwrite it,
 dnl 	Please disable it in the Anjuta project configuration
 
 AC_INIT(libkmfl, m4_esyscmd_s([cat VERSION]))
-
 AM_INIT_AUTOMAKE
 
 AM_CONFIG_HEADER(config.h)
