@@ -428,7 +428,7 @@ procedure TframeTextEditor.LoadFileInBrowser(const AData: string);
   end;
   function EncodeFont(const prefix: string; f: TFont): string;
   begin
-    Result := Format('&%sName=%s&%sSize=%dpt', [prefix, URLEncode(f.Name), prefix, TFontUtils.FontSizeInPoints(f)]);
+    Result := Format('&%sName=%s&%sSize=%d', [prefix, URLEncode(f.Name), prefix, TFontUtils.FontSizeInPixels(f)]);
   end;
 const
   mode: array[TEditorFormat] of string = (
@@ -591,7 +591,7 @@ procedure TframeTextEditor.UpdateEditorFonts;
   begin
     Result := TJSONObject.Create;
     Result.AddPair('name', f.Name);
-    Result.AddPair('size', IntToStr(TFontUtils.FontSizeInPoints(f))+'pt');
+    Result.AddPair('size', TJSONNumber.Create(TFontUtils.FontSizeInPixels(f)));
   end;
 var
   j: TJSONObject;

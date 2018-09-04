@@ -32,8 +32,11 @@ window.editorGlobalContext = {
   require.config({ paths: { 'vs': '../lib/monaco/min/vs' } });
   require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
     
+    //
     // Register Keyman .kmn tokens provider and language formatter
     // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
+    //
+    
     monaco.languages.register({ id: 'keyman' });
     monaco.languages.setMonarchTokensProvider('keyman', _language.language);
     
@@ -47,6 +50,7 @@ window.editorGlobalContext = {
         enabled: false
       },
       glyphMargin: true,
+      lineNumbersMinChars: 2,
       disableMonospaceOptimizations: true
     });
 
@@ -61,6 +65,15 @@ window.editorGlobalContext = {
       },
       "text"
     );
+    
+    //
+    // Set initial fonts
+    //
+    
+    context.setFonts({
+      codeFont: { name: params.get('codeFontName'), size: params.get('codeFontSize') },
+      charFont: { name: params.get('charFontName'), size: params.get('charFontSize') }
+    });
     
     //
     // Setup callbacks
@@ -204,9 +217,26 @@ window.editorGlobalContext = {
       document.head.appendChild(fontCss);
     }
 
-    fontCss.innerHTML =
-      ".monaco-editor .view-lines { font-size: " + fonts.codeFont.size + "; font-family: \"" + fonts.codeFont.name + "\"; }" +
-      ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "; font-family: \"" + fonts.charFont.name + "\"; }";
+    fontCss.innerHTML = ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+      
+    // Calculate the appropriate line height based on the maximum from the two fonts set
+      
+    var eChar = document.createElement('div');
+    eChar.innerHTML = '?';
+    eChar.style = "position:absolute; top: -50000px; left: 0; font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\";";
+    document.body.appendChild(eChar);
+    var lineHeight = eChar.offsetHeight;
+
+    eChar.style = "position:absolute; top: -50000px; left: 0; font-size: " + fonts.codeFont.size + "px; font-family: \"" + fonts.codeFont.name + "\";";
+    lineHeight = Math.max(lineHeight, eChar.offsetHeight);
+    
+    document.body.removeChild(eChar);
+      
+    editor.updateOptions({
+      fontFamily: fonts.codeFont.name,
+      fontSize: fonts.codeFont.size,
+      lineHeight: lineHeight
+    });
   };
 
   //
