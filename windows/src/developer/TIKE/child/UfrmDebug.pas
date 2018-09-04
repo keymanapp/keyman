@@ -1044,9 +1044,8 @@ procedure TfrmDebug.SetBreakpoint(ALine: Integer);
 var
   b: TDebugBreakpoint;
 begin
-  for b in FBreakpoints do
-    if b.TrueLineNumber = ALine then
-      Exit;
+  if IsBreakpointLine(ALine) then
+    Exit;
 
   b := TDebugBreakpoint.Create(EditorMemo);
   b.TrueLineNumber := ALine;
