@@ -1,3 +1,11 @@
+/*
+ * Editor using monaco
+ * 
+ * Helpful references:
+ * https://microsoft.github.io/monaco-editor/api/index.html
+ * https://blog.expo.io/building-a-code-editor-with-monaco-f84b3a06deaf 
+ */
+
 window.editorGlobalContext = {
   loading: false
 };
@@ -5,7 +13,8 @@ window.editorGlobalContext = {
 (function(context) {
   var editor = null;
   var errorRange = null;
-  var ranges = [];
+  var executionPoint = [];
+  var breakpoints = [];
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
@@ -13,103 +22,153 @@ window.editorGlobalContext = {
   if(!mode) {
     mode = 'keyman';
   }
-  
+
+
+  /**
+    Initialize the editor
+  */
+
+  require.config({ paths: { 'vs': '../lib/monaco/min/vs' } });
+  require(['vs/editor/editor.main'], function () {
+    editor = monaco.editor.create(document.getElementById('editor'), {
+      language: mode,
+      minimap: {
+        enabled: false
+      },
+      glyphMargin: true,
+      disableMonospaceOptimizations: true
+    });
+
+    $.get("/app/source/file",
+      {
+        Filename: filename
+      },
+      function (response) {
+        context.loading = true;
+        editor.setValue(response);
+        context.loading = false;
+      },
+      "text"
+    );
+
+    const model = editor.getModel();
+    model.onDidChangeContent(() => {
+      // Even when loading, we post back the data to the backend so we have an original version
+      $.post("/app/source/file", {
+        Filename: filename,
+        Data: model.getValue()
+        // delta.start, delta.end, delta.lines, delta.action
+      });
+      if (!context.loading) {
+        context.highlightError(); // clear the selected error
+        command('modified');
+        updateState();
+      }
+    });
+
+    editor.onDidChangeCursorPosition(updateState);
+    editor.onDidChangeCursorSelection(updateState);
+    editor.onMouseDown(e => {
+      if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+        return;
+      }
+      command('breakpoint-clicked,'+(e.target.position.lineNumber-1));
+    });
+  });
+
   /* Search and replace interfaces */
   
-  context.searchFind = function() {  
-    editor.commands.byName.find.exec(editor);
+  context.searchFind = function () {
+    editor.trigger('', 'actions.find');
   };
 
   context.searchFindNext = function() {  
-    editor.commands.byName.selectOrFindNext.exec(editor);
+    editor.trigger('', 'editor.action.nextMatchFindAction');
   };
 
   context.searchReplace = function() {  
-    editor.commands.byName.replace.exec(editor);
+    editor.trigger('', 'editor.action.startFindReplaceAction');
   };
   
   /* Edit command interfaces */
 
   context.editUndo = function() {
-    editor.undo();
+    editor.model.undo();
   };
 
   context.editRedo = function() {
-    editor.redo();
+    editor.model.redo();
   };
   
   context.editSelectAll = function() {
-    editor.selectAll();
+    editor.setSelection(editor.model.getFullModelRange());
   };
 
   /* Row selection */
 
   context.moveCursor = function (o) {
-    editor.moveCursorTo(o.row, o.column);
-    editor.selection.clearSelection();
-    editor.renderer.scrollCursorIntoView();
+    editor.setPosition({ column: o.column + 1, lineNumber: o.row + 1 });
+    editor.revealPositionInCenterIfOutsideViewport(editor.getPosition(), monaco.editor.ScrollType.Smooth);
   };
   
+  /* Debug interactions */
+  
+  context.setBreakpoint = function (row) {
+    if (!breakpoints[row]) {
+      breakpoints[row] = editor.deltaDecorations(
+        [],
+        [{ range: new monaco.Range(row + 1, 1, row + 1, 1), options: { isWholeLine: true, glyphMarginClassName: 'km_breakpoint' } }]
+      );
+    }
+  };
+  
+  context.clearBreakpoint = function (row) {
+    if (breakpoints[row]) {
+      editor.deltaDecorations(breakpoints[row], []);
+      breakpoints[row] = null;
+    }
+  };
+
+  context.updateExecutionPoint = function (row) {
+    executionPoint = editor.deltaDecorations(
+      executionPoint,
+      row >= 0 ? [{ range: new monaco.Range(row + 1, 1, row + 1, 1), options: { isWholeLine: true, linesDecorationsClassName: 'km_executionPoint' } }] : []
+    );
+    context.moveCursor({ row: row, column: 0 });
+  };
+
   /* Error highlighting */
-  
-  context.setRowColor = function(o) {
-    if (o.style) {
-      var r = new ace.Range(o.row, 0, o.row, Infinity);
-      r.row = o.row;
-      r.id = editor.session.addMarker(r, 'km_'+o.style, "fullLine", false);
-      ranges.push(r);
-    } else {
-      ranges = ranges.filter(function (v) {
-        if (v.row !== o.row) {
-          return true;
-        }
-        editor.session.removeMarker(v.id);
-        return false;
-      });
+
+  context.highlightError = function (row) {
+    if (errorRange) {
+      editor.deltaDecorations(errorRange, []);
+      errorRange = null;
     }
-    editor.moveCursorTo(o.row, 0);
-    editor.selection.clearSelection();
-    editor.renderer.scrollCursorIntoView();
-  };
-  
-  context.highlightError = function(row) {
-    if(errorRange) {
-      editor.session.removeMarker(errorRange.id);
-    }
-    if(typeof row == 'number') {
-      errorRange = new ace.Range(row, 0, row, Infinity);
-      errorRange.id = editor.session.addMarker(errorRange, 'km_error', "fullLine", false);
+    if (typeof row == 'number') {
+      errorRange = editor.deltaDecorations([], [{ range: new monaco.Range(row + 1, 1, row + 1, 1), options: { isWholeLine: true, linesDecorationsClassName: 'km_error', className: 'km_error' } }]);
     }
   };
 
   context.replaceSelection = function (o) {
-    let originalRange = new ace.Range(o.top, o.left, o.bottom, o.right);
-    let end = editor.session.doc.replace(originalRange, o.newText);
-
-    let newRange = new ace.Range(o.top, o.left, end.row, end.column);
-    editor.selection.setSelectionRange(newRange, false);
+    let r = new monaco.Range(o.top + 1, o.left + 1, o.bottom + 1, o.right + 1);
+    editor.setSelection(r);
+    editor.executeEdits("", [
+      { range: r, text: o.newText }
+    ]);
   };
   
   context.setText = function (text) {
-    let range = editor.session.selection.getRange();
+    let range = editor.getSelection();
     context.loading = true;
-    editor.session.setValue(text);
-    editor.session.selection.setSelectionRange(range);
-    context.loading = false;
-  };
-
-  context.setText = function (text) {
-    let range = editor.session.selection.getRange();
-    context.loading = true;
-    editor.session.setValue(text);
-    editor.session.selection.setSelectionRange(range);
+    editor.setValue(text);
+    editor.setSelection(range);
     context.loading = false;
   };
 
   /* Printing */
 
   context.print = function () {
-    require("ace/config").loadModule("ace/ext/static_highlight", function (m) {
+    /****require("ace/config").loadModule("ace/ext/static_highlight", function (m) {
       var result = m.renderSync(
         editor.getValue(), editor.session.getMode(), editor.renderer.theme
       );
@@ -129,7 +188,7 @@ window.editorGlobalContext = {
         }, 10);
       };
       document.body.appendChild(iframe);
-    });
+    });*/
   };
       
   /**
@@ -162,84 +221,38 @@ window.editorGlobalContext = {
   
   /**
   */
-  var updateState = function() {
-    command(editor.getSelectedText() == '' ? 'no-selection' : 'has-selection');
-    command(editor.session.getUndoManager().hasUndo() ? 'undo-enable' : 'undo-disable');
-    command(editor.session.getUndoManager().hasRedo() ? 'redo-enable' : 'redo-disable');
-    let r = editor.selection.getRange();
-    var n = editor.session.doc.getTextRange(editor.selection.getRange()).length;
-    if (!editor.selection.isBackwards()) n = -n;
-    command('location,' + r.start.row + ',' + r.start.column + ',' + r.end.row + ',' + r.end.column + ',' + n);
-    command('insert-mode,' + (editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
-//    command(editor.session.getUndoManager().isClean() ? 'modified' : 'not-modified');
-    var s = getTokenAtCursor();
-    if(s) {
-      command('token,'+s.column+','+encodeURIComponent(s.text));
+  var updateState = function () {
+    let s = editor.getSelection();
+    command(s.isEmpty() ? 'no-selection' : 'has-selection');
+    command(editor.model.canUndo() ? 'undo-enable' : 'undo-disable');
+    command(editor.model.canRedo() ? 'redo-enable' : 'redo-disable');
+
+    var n = editor.model.getValueInRange(s).length;
+    if (editor.getSelection().getDirection() == monaco.SelectionDirection.LTR) n = -n;
+    command('location,' + (s.startLineNumber-1) + ',' + (s.startColumn-1) + ',' + (s.endLineNumber-1) + ',' + (s.endColumn-1) + ',' + n);
+    //command('insert-mode,' + (editor.session.getOption('overwrite') ? 'Overwrite' : 'Insert'));
+    var token = getTokenAtCursor();
+    if (token) {
+      command('token,' + token.column + ',' + encodeURIComponent(token.text));
     }
   };
-  
-  var getTokenAtCursor = function() {
-    var txt = editor.getSelectedText();
-    if(txt != '') {
+
+  var getTokenAtCursor = function () {
+    var txt = editor.model.getValueInRange(editor.getSelection());
+    if (txt != '') {
       // We'll always return the first 100 characters of the selection and not 
       // do any manipulation here.
-      return {column:null,text:txt.substr(0, 99)};
+      return { column: null, text: txt.substr(0, 99) };
     }
-    
-    if(mode == 'keyman') {
+
+    if (mode == 'keyman') {
       // Get the token under the cursor
-      var c = editor.session.selection.getCursor();
-      var line = editor.session.getLine(c.row);
-      return {column:c.column, text:line};
+      var c = editor.getSelection();
+      var line = editor.model.getLineContent(c.positionLineNumber);
+      return { column: c.positionColumn-1, text: line };
     } else {
       // Get the character under the cursor
       return null;
     }
   };
-  
-  /**
-    Initialize the editor
-  */
-  $(function initialize() {
-    editor = ace.edit("editor");
-
-    // Remove Alt+ key bindings which may conflict with environment shortcuts, e.g. Alt+E, function keys
-
-    var reAltKeyBindings = /(^alt-[a-z0-9]|f[0-9]+)$/;
-    for (var key in editor.keyBinding.$defaultHandler.commandKeyBinding) {
-      if (key.match(reAltKeyBindings)) {
-        delete editor.keyBinding.$defaultHandler.commandKeyBinding[key];
-      }
-    }
-
-    editor.setTheme("ace/theme/xcode");
-    
-    editor.session.selection.on('changeCursor', updateState);    
-    editor.session.on('changeOverwrite', updateState);
-    editor.session.selection.on('changeSelection', updateState);
-    
-    editor.session.on('change', function (delta) {
-      // Even when loading, we post back the data to the backend so we have an original version
-      $.post("/app/source/file", {
-        Filename: filename,
-        Data: editor.session.getValue()
-        // delta.start, delta.end, delta.lines, delta.action
-      });
-      if (!context.loading) {
-        context.highlightError(); // clear the selected error
-        command('modified');
-        updateState();
-      }
-    });
-    // Start reading the source file
-    $.get("/app/source/file", { 
-      Filename: filename
-    }, function (response) {
-      context.loading = true;
-      editor.session.setValue(response);
-      editor.session.setMode("ace/mode/"+mode);
-      context.loading = false;
-    }, 
-    "text"); 
-  });
 })(window.editorGlobalContext);

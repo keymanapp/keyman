@@ -32,7 +32,7 @@ uses
   UserMessages;
 
 type
-  TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
+  TEditorBreakpointClickedEvent = procedure(Sender: TObject; ALine: Integer) of object;
 
   TframeTextEditor = class(TTIKEForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
@@ -59,6 +59,7 @@ type
 
     cef: TframeCEFHost;
     FFilename: string;
+    FOnBreakpointClicked: TEditorBreakpointClickedEvent;
 
     procedure RefreshOptions;
     function GetText: WideString;
@@ -91,9 +92,11 @@ type
     procedure LoadFileInBrowser(const AData: string);
     procedure UpdateInsertState(const AMode: string);
     procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
+    procedure ExecuteLineCommand(ALine: Integer; const command: string);
     procedure UpdateToken(command: string);
     procedure SetCursorPosition(AColumn, ARow: Integer);
     procedure cefLoadEnd(Sender: TObject);
+    procedure DoBreakpointClicked(const line: string);
 
   protected
     function GetHelpTopic: string; override;
@@ -136,7 +139,11 @@ type
 
   public
     { Public declarations }
-    procedure UpdateParColour(par: Integer; LineType: TParColourLineType);
+    procedure DebugSetBreakpoint(ALine: Integer);
+    procedure DebugClearBreakpoint(ALine: Integer);
+    procedure DebugUpdateExecutionPoint(ALine: Integer);
+    property OnBreakpointClicked: TEditorBreakpointClickedEvent read FOnBreakpointClicked write FOnBreakpointClicked;
+
     procedure SetFocus; override;
 
     procedure FindError(ln: Integer);
@@ -170,6 +177,7 @@ implementation
 uses
   System.TypInfo,
   Vcl.Clipbrd,
+
   Keyman.Developer.System.HelpTopics,
 
   dmActionsMain,
@@ -785,6 +793,21 @@ begin
   cef.cef.ClipboardCut;
 end;
 
+procedure TframeTextEditor.DebugClearBreakpoint(ALine: Integer);
+begin
+  ExecuteLineCommand(ALine, 'clearBreakpoint');
+end;
+
+procedure TframeTextEditor.DebugSetBreakpoint(ALine: Integer);
+begin
+  ExecuteLineCommand(ALine, 'setBreakpoint');
+end;
+
+procedure TframeTextEditor.DebugUpdateExecutionPoint(ALine: Integer);
+begin
+  ExecuteLineCommand(ALine, 'updateExecutionPoint');
+end;
+
 procedure TframeTextEditor.PasteFromClipboard;
 begin
   cef.cef.ClipboardPaste;
@@ -832,28 +855,32 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.FindError(ln: Integer);
+procedure TframeTextEditor.ExecuteLineCommand(ALine: Integer;
+  const command: string);
 var
   v: TJSONNumber;
+begin
+  v := TJSONNumber.Create(ALine);
+  try
+    ExecuteCommand(command, v);
+  finally
+    v.Free;
+  end;
+end;
+
+procedure TframeTextEditor.FindError(ln: Integer);
 begin
   ClearError;
   if (ln <= 0) then Exit;
 
-  v := TJSONNumber.Create(ln);
-  try
-    ExecuteCommand('highlightError', v);
-    SetSelectedRow(ln);
-  finally
-    v.Free;
-  end;
+  ExecuteLineCommand(ln, 'highlightError');
+  SetSelectedRow(ln);
 end;
 
 function TframeTextEditor.OffsetToLine(Offset: Integer): Integer;   // I4083
 var
   line: Integer;
 begin
-  Result := 0;
-
   with TStringList.Create do
   try
     Text := Self.GetText;
@@ -879,40 +906,49 @@ end;
 procedure TframeTextEditor.FireCommand(const commands: TStringList);
 var
   i: Integer;
-  command: string;
+  command0, command: string;
+  commandParams: TArray<string>;
 begin
   i := 0;
   while i < commands.Count do
   begin
-    command := commands[i];
+    command0 := commands[i];
+    commandParams := command0.Split([',']);
+    command := commandParams[0];
     if command = 'modified' then Changed   // I3948
-
     else if command = 'undo-disable' then FCanUndo := False
     else if command = 'undo-enable' then FCanUndo := True
     else if command = 'redo-disable' then FCanRedo := False
     else if command = 'redo-enable' then FCanRedo := True
     else if command = 'has-selection' then FHasSelection := True
     else if command = 'no-selection' then FHasSelection := False
-    else if command.StartsWith('insert-mode,') then
+    else if command = 'breakpoint-clicked' then DoBreakpointClicked(commandParams[1])
+    else if command0.StartsWith('insert-mode,') then
     begin
-      UpdateInsertState(command.Substring('insert-mode,'.Length));
+      UpdateInsertState(command0.Substring('insert-mode,'.Length));
     end
-    else if command.StartsWith('location,') then
+    else if command0.StartsWith('location,') then
     begin
-      UpdateState(command.Substring('location,'.Length));
+      UpdateState(command0.Substring('location,'.Length));
     end
-    else if command.StartsWith('token,') then
+    else if command0.StartsWith('token,') then
     begin
-      UpdateToken(command.Substring('token,'.Length));
+      UpdateToken(command0.Substring('token,'.Length));
     end
     else ShowMessage('keyman:'+commands.Text);
     Inc(i);
   end;
 end;
 
+procedure TframeTextEditor.DoBreakpointClicked(const line: string);
+begin
+  if Assigned(FOnBreakpointClicked) then
+    FOnBreakpointClicked(Self, StrToInt(line));
+end;
+
 procedure TframeTextEditor.UpdateToken(command: string);
 var
-  n, col: Integer;
+  col: Integer;
   line: string;
   x, tx: Integer;
   token, prevtoken: WideString;
@@ -967,23 +1003,6 @@ begin
     end;
   end;
 end;
-
-procedure TframeTextEditor.UpdateParColour(par: Integer; LineType: TParColourLineType);
-var
-  j: TJSONObject;
-begin
-  if par < 0 then Exit;
-  j := TJSONObject.Create;
-  try
-    j.AddPair('row', TJSONNumber.Create(par));
-    if LineType <> pcltNone then
-      j.AddPair('style', TJSONString.Create(GetEnumName(TypeInfo(TParColourLineType), Ord(LineType))));
-    ExecuteCommand('setRowColor', j);
-  finally
-    j.Free;
-  end;
-end;
-
 
 function TframeTextEditor.GetHelpTopic: string;
 begin

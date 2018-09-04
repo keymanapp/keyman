@@ -437,6 +437,8 @@ type
     procedure TouchLayoutModified(Sender: TObject);
     procedure FocusTabTouchLayout;
 
+    procedure EditorBreakpointClicked(Sender: TObject; ALine: Integer);
+
     procedure FillFeatureGrid;
     procedure CheckParserSourceMove(Changed: Boolean);
     procedure ToggleWinLanguagesRow(Y: Integer);
@@ -488,7 +490,9 @@ type
     procedure StopDebugging;
     function PrepareForBuild(var DebugReset: Boolean): Boolean;   // I4504
 
-    procedure UpdateParColour(Sender: TObject; ALine: Integer; ALineType: TParColourLineType);
+    procedure DebugSetBreakpoint(Sender: TObject; ALine: Integer);
+    procedure DebugClearBreakpoint(Sender: TObject; ALine: Integer);
+    procedure DebugUpdateExecutionPoint(Sender: TObject; ALine: Integer);
 
     function HasSubfilename(const Filename: string): Boolean; override;   // I4081
 
@@ -626,6 +630,7 @@ begin
   frameSource.EditorFormat := efKMN;
   frameSource.Visible := True;
   frameSource.OnChanged := SourceChanged;
+  frameSource.OnBreakpointClicked := EditorBreakpointClicked;
   frameSource.TextFileFormat := FTextFileFormat;
 
   pages.ActivePage := pageDetails;
@@ -701,6 +706,13 @@ end;
 {-----------------------------------------------------------------------------}
 { General Functions                                                           }
 {-----------------------------------------------------------------------------}
+
+procedure TfrmKeymanWizard.EditorBreakpointClicked(Sender: TObject;
+  ALine: Integer);
+begin
+  if Assigned(FDebugForm) then
+    FDebugForm.ToggleBreakpoint(ALine);
+end;
 
 procedure TfrmKeymanWizard.EnableControls;
 begin
@@ -1478,11 +1490,6 @@ begin
   tmrUpdateCharacterMap.Enabled := True;
 end;
 
-procedure TfrmKeymanWizard.UpdateParColour(Sender: TObject; ALine: Integer; ALineType: TParColourLineType);
-begin
-  frameSource.UpdateParColour(ALine, ALineType);
-end;
-
 procedure TfrmKeymanWizard.SelectVKey(VKey: Integer);
 begin
   kbdLayout.SelectedKey := kbdLayout.Keys.ItemsByUSVK[VKey];
@@ -1940,6 +1947,22 @@ begin
 
   DoOpenFileFormat(TextFileFormat, True);
   frmKeymanDeveloper.cbTextFileFormat.ItemIndex := Ord(TextFileFormat);
+end;
+
+procedure TfrmKeymanWizard.DebugClearBreakpoint(Sender: TObject;
+  ALine: Integer);
+begin
+  frameSource.DebugClearBreakpoint(ALine);
+end;
+
+procedure TfrmKeymanWizard.DebugSetBreakpoint(Sender: TObject; ALine: Integer);
+begin
+  frameSource.DebugSetBreakpoint(ALine);
+end;
+
+procedure TfrmKeymanWizard.DebugUpdateExecutionPoint(Sender: TObject; ALine: Integer);
+begin
+  frameSource.DebugUpdateExecutionPoint(ALine);
 end;
 
 procedure TfrmKeymanWizard.DoFocus(control: TWinControl);
@@ -2835,7 +2858,9 @@ begin
   FDebugForm.BorderStyle := bsNone;
   FDebugForm.Parent := panDebugWindowHost;
   FDebugForm.Align := alClient;
-  FDebugForm.OnUpdateParColour := UpdateParColour;
+  FDebugForm.OnSetBreakpoint := DebugSetBreakpoint;
+  FDebugForm.OnClearBreakpoint := DebugClearBreakpoint;
+  FDebugForm.OnUpdateExecutionPoint := DebugUpdateExecutionPoint;
   FDebugForm.Visible := True;
 
 
