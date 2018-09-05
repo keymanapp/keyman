@@ -4,8 +4,11 @@
 * Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
 * Bookmark add button is enabled only when title/url fields have text (#1073)
 
+## 2018-08-02 10.0.208 stable 
+* Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159) 
+
 ## 2018-07-06 10.0.203 stable
-* Fixes an issue where a keyboard with varying row counts in different layers could crash (#1055)
+* Fixes an issue where a keyboard with varying row counts in different layers could crash (#1056, #1057)
 
 ## 2018-06-28 10.0.200 stable
 * 10.0 stable release
