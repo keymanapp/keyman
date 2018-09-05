@@ -2,9 +2,9 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="{2245D16B-E916-47FD-A06A-7EA6CBDC1059}"
            UpgradeCode="7B78D2C8-31EC-4B0C-8D7F-650418A4686E" Manufacturer="SIL International"
-           Name="Keyman Developer 10.0" Version="$(var.VERSION)" Language="1033">
+           Name="Keyman Developer $(var.RELEASE)" Version="$(var.VERSION)" Language="1033">
     <Package Keywords="Keyman,Keyboard,Engine" Compressed="yes"
-             Description="Keyman Developer 10.0" Comments="Contact:  Your local administrator"
+             Description="Keyman Developer $(var.RELEASE)" Comments="Contact:  Your local administrator"
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
     
     <!-- Upgrade from Developer 7.0 -->
@@ -29,7 +29,7 @@
                       Maximum="10.0.699.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION9FOUND" />
     </Upgrade>
 
-    <!-- Upgrade from Developer 10.0 -->
+    <!-- Upgrade from Developer 10.0 or later versions -->
 
     <Upgrade Id="7B78D2C8-31EC-4B0C-8D7F-650418A4686E">
       <UpgradeVersion OnlyDetect="no" Minimum="10.0.699.0" IncludeMinimum="yes"
@@ -41,7 +41,7 @@
 
     <Property Id="ALLUSERS"><![CDATA[1]]></Property>
 
-    <Condition Message="Keyman Developer 10.0 requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
+    <Condition Message="Keyman Developer requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
     
     <Directory Id='TARGETDIR' Name='SourceDir' DiskId='1'>
 
@@ -49,19 +49,19 @@
 
       <Directory Id="ProgramFilesFolder" Name="PFiles">
         <Directory Id="KeymanRoot" Name="Keyman">
-          <Directory Id="KEYMANDEV" Name="Keyman Developer 10.0">
+          <Directory Id="KEYMANDEV" Name="Keyman Developer">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\developer\">
               
               <Component Id="KeymanDevApp" Guid="{39B172D1-35ED-424B-8546-BF11E38979C0}" SharedDllRefCount="yes" Location="local" DiskId="1">
                 <File Id="tike.exe" Name="tike.exe" KeyPath="yes" Vital='yes'>
-                  <Shortcut Id="startmenuTIKE" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Developer 10.0" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
-                  <Shortcut Id="desktopTIKE" Advertise="yes" Directory="DesktopFolder" Name="Keyman Developer 10.0" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
+                  <Shortcut Id="startmenuTIKE" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
+                  <Shortcut Id="desktopTIKE" Advertise="yes" Directory="DesktopFolder" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
                 </File>
                 <File Id="kmcomp.exe" Name="kmcomp.exe" />
                 <File Id="kmcmpdll.dll" Name="kmcmpdll.dll" />
                 <File Id="debughost.kmx" Name="debughost.kmx" Source="..\..\developer\tike\redist\debughost.kmx" />
                 <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
-                <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer\10.0" />
+                <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)" />
                 <Environment Id="environmentKeymanDeveloperPath" Action="set" Name="KeymanDeveloperPath" System="yes" Value="[INSTALLDIR]" />
 
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
@@ -248,9 +248,9 @@
               
               <Component Id="Reg_RootPath" Guid="{FCC8C517-BFBE-4C24-B3CD-D566D114CE12}" KeyPath="yes" SharedDllRefCount="yes" Location="local">
                 <CreateFolder />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\10.0\Installed Products" Name="developer_pro" Type="string" Value="developer_pro" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\10.0\Installed Products\developer_pro" Name="product id" Type="integer" Value="4" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer\$(var.RELEASE)" Name="root path" Type="string" Value="[INSTALLDIR]" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\$(var.RELEASE)\Installed Products" Name="developer_pro" Type="string" Value="developer_pro" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\$(var.RELEASE)\Installed Products\developer_pro" Name="product id" Type="integer" Value="4" />
               </Component>
 
             </Directory>
@@ -259,19 +259,19 @@
       </Directory>
 
       <Directory Id="ProgramMenuFolder" Name="Programs">
-        <Directory Id="ProgramMenuDir" Name="Keyman Developer 10.0" />
+        <Directory Id="ProgramMenuDir" Name="Keyman Developer" />
       </Directory>
 
       <Directory Id="DesktopFolder" Name="Desktop" />
 
       <Directory Id="AppDataFolder" Name="ADF">
         <Directory Id="App_KeymanRoot" Name="Keyman" >
-          <Directory Id="App_TS_KeymanDev" Name="Keyman Developer 10.0">
+          <Directory Id="App_TS_KeymanDev" Name="Keyman Developer">
             <Directory Id="App_TS_KeymanDev_Databases" Name="Databases" />
           </Directory>
           <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}">
-            <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0" />
+            <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)" Name="root path" Type="string" Value="[INSTALLDIR]" />
+            <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)" />
             <RemoveFolder Id="AD_ts_Uninstall" On="uninstall" />
             <RemoveFolder Id="AD_ts_KeymanDev_Uninstall" On="uninstall" Directory="App_TS_KeymanDev" />
             <RemoveFolder Id="AD_ts_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_TS_KeymanDev_Databases" />
@@ -282,16 +282,16 @@
       </Directory>
       
       <Directory Id="PersonalFolder" Name="Documents">
-        <Directory Id="KMDevSamples" Name="Keyman Developer 10.0">
+        <Directory Id="KMDevSamples" Name="Keyman Developer">
           <Directory Id="SAMPLES" Name="Samples">
             <Component Id="Samples" Guid="{E2F0314D-1053-4699-A768-00DE1679C42D}" SharedDllRefCount="yes" Location="local" DiskId="1">
-              <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0\Samples" Type="string" Name="Samples" Value="" />
+              <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="Samples" Value="" />
               <File Id="s_readme.txt" Name="readme.txt" Source="..\..\developer\samples\readme.txt" />
               <RemoveFolder Id="Samples" On="uninstall" />
               <RemoveFolder Id="KMDevSamples" Directory="KMDevSamples" On="uninstall" />
             </Component>
             <Component Id="Samples_Link" Guid="{5749861C-6F63-4135-B702-C426AF4E86E5}" Location="local" DiskId="1">
-              <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0\Samples" Type="string" Name="Link" Value="" />
+              <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="Link" Value="" />
               <CreateFolder>
                 <Shortcut Id="startmenuSamples" Directory="ProgramMenuDir" Name="Samples"
                   WorkingDirectory='INSTALLDIR' Icon="samples.ico" IconIndex="0" />
@@ -299,7 +299,7 @@
             </Component>
             <Directory Id="Samples_IMSample" Name="imsample" FileSource="..\..\developer\samples\imsample">
               <Component Id="Samples_IMSample9" Guid="{003288A1-C6BE-4EE0-A91A-AD9C82A6DEE1}" Location="local" DiskId="1">
-                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0\Samples" Type="string" Name="IMSample" Value="" />
+                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="IMSample" Value="" />
                 <File Id="si_imsample.dll" Name="imsample.dll" Source="..\..\..\bin\developer\imsample.dll" />
                 <File Id="si_imdllref.rtf" Name="imdllref.rtf" />
                 <File Id="si_imlib.cpp" Name="imlib.cpp" />
@@ -317,7 +317,7 @@
             </Directory>
             <Directory Id="Samples_Keyboards" Name="Keyboards" FileSource="..\..\developer\samples\Examples\">
               <Component Id="Samples_Keyboards" Guid="{1B6F5A52-1E05-4A1D-8D53-77D8EB293439}" Location="local" DiskId="1">
-                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0\Samples" Type="string" Name="Keyboards" Value="" />
+                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="Keyboards" Value="" />
                 <File Id="enhlao.bmp" Name="enhlao.bmp" />
                 <File Id="enhlao.kmn" Name="enhlao.kmn" />
                 <File Id="Examples.kpj" Name="Examples.kpj" />
@@ -330,7 +330,7 @@
               </Component>
               <Directory Id="Samples_Keyboards_European" Name="European" FileSource="..\..\developer\samples\Examples\European\">
                 <Component Id="Samples_Keyboards_European" Guid="{4B72D2E9-D8F4-4C41-81DF-CBDF0CE9C97F}" Location="local" DiskId="1">
-                  <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\10.0\Samples" Type="string" Name="European" Value="" />
+                  <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="European" Value="" />
                   <File Id="ske_european.bmp" Name="european.bmp" />
                   <File Id="ske_european.kmn" Name="european.kmn" />
                   <File Id="ske_european.kps" Name="european.kps" />
@@ -530,7 +530,7 @@ where you replace C:\Program Files\WiX with the location of any copy of wix.dll.
     <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] is already installed.' />
 
     <Property Id='OLDINSTALLDIR'>
-      <RegistrySearch Id='productinstalldir' Key='Software\Keyman\Keyman Developer\10.0' Root='HKLM' Name='root path' Type='raw' />
+      <RegistrySearch Id='productinstalldir' Key='Software\Keyman\Keyman Developer\$(var.RELEASE)' Root='HKLM' Name='root path' Type='raw' />
     </Property>
 
     <CustomAction Id='LocateInstallDir' Execute='immediate' Directory='INSTALLDIR' Value='[OLDINSTALLDIR]' />

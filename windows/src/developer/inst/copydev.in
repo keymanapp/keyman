@@ -10,14 +10,14 @@ test-releaseexists:
     if exist $(ROOT)\release\$VERSION\keymandeveloper*.msi echo. & echo Release $VERSION already exists. Delete it or update src\version.txt and try again & exit 1
 
 candle:
-    $(WIXCANDLE) -dVERSION=$VERSION -dPRODUCTID=$GUID0 -dMonacoSourceDir=$(ROOT)\src\developer\TIKE\xml\app\lib\monaco\min\vs kmdev.wxs monaco.wxs
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID0 -dMonacoSourceDir=$(ROOT)\src\developer\TIKE\xml\app\lib\monaco\min\vs kmdev.wxs monaco.wxs
 
 makeinstaller:
     cd $(ROOT)\src\developer\inst
     echo [Setup] > setup.inf
     echo Version=$VERSION >> setup.inf
     echo MSIFileName=keymandeveloper100.msi >> setup.inf
-    echo Title=Keyman Developer 10.0 >>setup.inf
+    echo Title=Keyman Developer $RELEASE >>setup.inf
     $(WZZIP) setup.zip keymandeveloper100.msi setup.inf
     copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$VERSION.exe
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$VERSION.exe

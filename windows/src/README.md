@@ -1,4 +1,4 @@
-# Keyman Desktop 10.0 and Keyman Developer 10.0
+# Keyman Desktop and Keyman Developer
 
 ## Build Prerequisites
 
@@ -39,7 +39,7 @@ Type `make` to see build targets. Common build targets are:
   `make clean` <-- remove temporary files and build artifacts
   `make release` <-- makes a release of all Keyman Windows projects
 
-By default the version generated will be 10.0.700.0.
+The version will have a major and minor component that reflects the current release version -- but may not match the actual version.
 
 ### Release build
 
@@ -54,13 +54,14 @@ environment.
    Environment variable `HELP_KEYMAN_COM` needs to be set to the root of the local 
    help.keyman.com git repository.
 
-Note: by default, the version generated will be 10.0.700.0. You will not be able to
-install it over a later version of Keyman, and will need to uninstall and reinstall.
+Note: by default, the version number generated may vary from the current release version. 
+You will not be able to install it over a later version of Keyman, and will need to 
+uninstall and reinstall.
 
 ## Installing Keyman
 
 These steps are only required the first time you install Keyman:
-1. Install release versions of Keyman 10.0 and Keyman Developer 10.0.
+1. Install release versions of Keyman Desktop and Keyman Developer
   * Download the [latest official builds (alpha)](https://keyman.com/beta/) and run the installers.
 2. Install the Keyman test certificates. Do the following for each KeymanTestCA cert in
 **windows/src/buildtools/certificates**:

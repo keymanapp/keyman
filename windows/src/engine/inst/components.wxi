@@ -3,7 +3,7 @@
   <Component Id="kmcomapi.dll" Guid="{C289B903-7EE8-49C7-B186-BE98259EC540}" SharedDllRefCount="yes" Location="local">
     <File Id="kmcomapi.dll" Name="kmcomapi.dll" KeyPath="yes" >
       <TypeLib Id="{F16E2A9A-DA46-4EA3-BFF3-BA46B480C961}" Description="Keyman API Library" Language="0" MajorVersion="1" MinorVersion="5">
-          <Class Id="{CF46549D-4D2D-4679-A2E1-23A815F172F8}" Context="InprocServer32" Description="Keyman Object" ThreadingModel="apartment" Version="10.0">
+          <Class Id="{CF46549D-4D2D-4679-A2E1-23A815F172F8}" Context="InprocServer32" Description="Keyman Object" ThreadingModel="apartment" Version="$(var.RELEASE)">
               <ProgId Id="keymanapi.Keyman" Description="Keyman Object" />
           </Class>
 
@@ -52,7 +52,7 @@
     <Condition>VersionNT64</Condition>
     <File Id="kmcomapi.x64.dll" Name="kmcomapi.x64.dll" KeyPath="yes">
       <TypeLib Id="{F16E2A9A-DA46-4EA3-BFF3-BA46B480C961}" Description="Keyman API Library (64-bit)" Language="0" MajorVersion="1" MinorVersion="5">
-          <Class Id="{CF46549D-4D2D-4679-A2E1-23A815F172F8}" Context="InprocServer32" Description="Keyman Object" ThreadingModel="apartment" Version="10.0">
+          <Class Id="{CF46549D-4D2D-4679-A2E1-23A815F172F8}" Context="InprocServer32" Description="Keyman Object" ThreadingModel="apartment" Version="$(var.RELEASE)">
               <ProgId Id="keymanapi.Keyman" Description="Keyman Object" />
           </Class>
 
@@ -104,7 +104,7 @@
 
   <Component Id="keyman.exe" Guid="{949D85B9-24E0-4DCE-9C25-A710A578E3A0}" Location="local">
     <File Id="keyman.exe" Name="keyman.exe" KeyPath="yes" />
-    <RegistryValue Id="registryRootPath" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" Name="root path" Value="[$keyman.exe]" Type="string" />
+    <RegistryValue Id="registryRootPath" Root="HKLM" Key="Software\Keyman\Keyman Engine\$(var.RELEASE)" Name="root path" Value="[$keyman.exe]" Type="string" />
   </Component>
 
   <Component Id="tsysinfo.exe" Guid="{00627578-92D8-491A-829A-C1C63A872A7E}" Location="local">
@@ -172,7 +172,7 @@
   <Component Id="kmtip_reg_win8" Guid="{C8D74FE5-4D07-4F65-A99B-A3D429C26E9D}" Location="local">
     <Condition>VersionNT &gt;= 602</Condition>
     
-    <RegistryValue KeyPath="yes" Id="registry_win8_keypath" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" Name="win8 tip install" Value="installed" Type="string" />
+    <RegistryValue KeyPath="yes" Id="registry_win8_keypath" Root="HKLM" Key="Software\Keyman\Keyman Engine\$(var.RELEASE)" Name="win8 tip install" Value="installed" Type="string" />
 
     <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}">
       <RegistryKey Key="Category">

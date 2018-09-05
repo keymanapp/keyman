@@ -23,5 +23,5 @@ clean:
   rem clean
 
 candle-desktop:
-  $(WIXCANDLE) -dVERSION=$VERSION -dPRODUCTID=$GUID1 keymandesktop.wxs
+  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 keymandesktop.wxs
 

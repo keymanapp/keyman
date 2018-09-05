@@ -3,7 +3,7 @@ object frmRunDesktop: TfrmRunDesktop
   Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Install Keyman Desktop 10.0'
+  Caption = 'Install Keyman Desktop'
   ClientHeight = 405
   ClientWidth = 699
   Color = clWhite

@@ -332,6 +332,14 @@ begin
       n := Pos('$VERSION', s);
     end;
 
+    n := Pos('$RELEASE', s);
+    while n > 0 do
+    begin
+      Delete(s, n, 8);
+      Insert(SKeymanVersion, s, n);
+      n := Pos('$RELEASE', s);
+    end;
+
     n := Pos('$GUID', s);
     while n > 0 do
     begin
@@ -379,9 +387,12 @@ begin
     writeln('   -v:         Update the version.rc with the template information');
     writeln('   -m:         Update manifest.xml with the template information');
     writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
-    writeln('                          $VERSION     5.0.50.0');
-    writeln('                          $VERSIONNUM  5,0,50,0');
-    writeln('                          $VERSIONCVS  5-0-50-0');
+    writeln('                          $VERSION     '+SKeymanVersion+'.700.0');
+    writeln('                          $VERSIONNUM  9,0,700,0');
+    writeln('                          $VERSIONCVS  9-0-700-0');
+    writeln('                          $RELEASE     '+SKeymanVersion);
+    writeln('                          $GUID#       GUID 0-9');
+    writeln('                          $DATE        1 March 2018');
     writeln('   template:   The source template, usually \keyman\'+SKeymanVersion+'\src\<dir>\version.txt');
     writeln('   root:       The source template, usually \keyman\'+SKeymanVersion+'\src\version.txt');
     writeln('   version.rc: version.rc file to update');

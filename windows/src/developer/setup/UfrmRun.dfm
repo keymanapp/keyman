@@ -24,7 +24,7 @@ object frmRun: TfrmRun
     Height = 53
     Cursor = crHandPoint
     AutoSize = False
-    Caption = 'Keyman Developer 10.0'
+    Caption = 'Keyman Developer'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -21
