@@ -2,6 +2,7 @@
 
 ## 11.0 alpha
 * Refactored target-action call from keyView
+* Added SIL logo and copyright information to About box and DMG image (#1163)
 
 ## 2018-08-14 10.0.111 stable 
 * CORRECLTY fixed bug in engine that caused incorrect rules to be used (#1095, #1099)

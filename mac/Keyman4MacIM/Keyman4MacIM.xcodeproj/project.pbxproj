@@ -59,6 +59,7 @@
 		E218403020A53A010035AADB /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
 		E21E645820C04EA8000D6274 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = E21E645720C04EA7000D6274 /* logo.png */; };
 		E22020F6200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */; };
+		E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */ = {isa = PBXBuildFile; fileRef = E23380FA21407AA100B90591 /* SILInBlue76.png */; };
 		E240F599202DED740000067D /* KMPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = E240F598202DED740000067D /* KMPackage.m */; };
 		E24C79EA1FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */; };
 		E2585A7D20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A7C20DD68BA00CBB994 /* KMInputMethodEventHandlerTests.m */; };
@@ -206,6 +207,7 @@
 		E22020F3200505EF00B74FAC /* KMInputMethodSafariClientEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodSafariClientEventHandler.h; sourceTree = "<group>"; };
 		E22020F5200506F300B74FAC /* KMInputMethodSafariClientEventHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodSafariClientEventHandler.m; sourceTree = "<group>"; };
 		E22020F920050D6300B74FAC /* KMInputMethodBrowserClientEventHandlerProtected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMInputMethodBrowserClientEventHandlerProtected.h; sourceTree = "<group>"; };
+		E23380FA21407AA100B90591 /* SILInBlue76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SILInBlue76.png; path = Keyman4MacIM/Images/SILInBlue76.png; sourceTree = SOURCE_ROOT; };
 		E240F597202DED300000067D /* KMPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackage.h; sourceTree = "<group>"; };
 		E240F598202DED740000067D /* KMPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackage.m; sourceTree = "<group>"; };
 		E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodBrowserClientEventHandler.m; sourceTree = "<group>"; };
@@ -414,6 +416,7 @@
 		98BF92401BF01CBE0002126A /* KMAboutWindow */ = {
 			isa = PBXGroup;
 			children = (
+				E23380FA21407AA100B90591 /* SILInBlue76.png */,
 				98BF924D1BF02DC20002126A /* KMBarView.h */,
 				98BF924E1BF02DC20002126A /* KMBarView.m */,
 				98BF92501BF03D4D0002126A /* KMAboutBGView.h */,
@@ -606,6 +609,7 @@
 				98E2CEA11A92C39C00AE2455 /* InfoPlist.strings in Resources */,
 				98BF92491BF0216F0002126A /* logo.png in Resources */,
 				E21E645820C04EA8000D6274 /* logo.png in Resources */,
+				E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */,
 				9874C3211B536847000BB543 /* info.png in Resources */,
 				98E672A01B532F5E00DBDE2F /* KMDownloadKBWindowController.xib in Resources */,
 				984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */,

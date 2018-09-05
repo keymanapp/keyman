@@ -11,6 +11,7 @@
 
 @interface KMAboutWindowController ()
 @property (nonatomic, weak) IBOutlet NSTextField *versionLabel;
+@property (nonatomic, weak) IBOutlet NSTextField *copyrightLabel;
 @property (nonatomic, weak) IBOutlet NSButton *licenseButton;
 @end
 
@@ -29,6 +30,14 @@
     NSString *build = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleVersionKey];
     [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@ (build %@)", version, build]];
     
+    NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
+    NSRange copyrightSymbolLocation = [copyrightInfo rangeOfString:@"©"];
+    if (copyrightSymbolLocation.location > 0 && copyrightSymbolLocation.length == 1)
+    {
+        [copyrightInfo insertString:@"\n" atIndex:copyrightSymbolLocation.location];
+    }
+    [self.copyrightLabel setStringValue:copyrightInfo];
+
     NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:[self.licenseButton bounds]
                                                                 options:NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
                                                                   owner:self
