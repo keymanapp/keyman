@@ -122,12 +122,13 @@ type
     procedure MRUChange(Sender: TObject);
     procedure UpdateFileParameters;
     procedure LoadPersistedUntitledProject;
+    procedure PersistUntitledProjectUser;
   protected
     procedure DoRefresh; virtual;
     procedure DoRefreshCaption; virtual;
 
-    property SavedFileName: string read GetSavedFileName;
     property State: TProjectState read FState;
+    property SavedFileName: string read GetSavedFileName;
 
   public
     procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual;
@@ -143,6 +144,7 @@ type
 
     function Load: Boolean; virtual;   // I4694
     function Save: Boolean; virtual;   // I4694
+    function SaveUser: Boolean; virtual;   // I4694
 
     class function StandardTemplatePath: string;
     class function StringsTemplatePath: string;
@@ -813,6 +815,22 @@ begin
   FState := psReady;
 end;
 
+procedure TProject.PersistUntitledProjectUser;
+var
+  path: string;
+begin
+  path := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled.kps';
+
+  FState := psSaving;
+  with TProjectSaver.Create(Self, path) do
+  try
+    SaveUser;
+  finally
+    Free;
+  end;
+  FState := psReady;
+end;
+
 procedure TProject.Refresh;   // I4687
 begin
   DoRefresh;
@@ -940,16 +958,36 @@ end;
 function TProject.Save: Boolean;
 begin
   FState := psSaving;
-  //Result := False;
-
-  with TProjectSaver.Create(Self, SavedFileName) do
   try
-    Execute;
+    with TProjectSaver.Create(Self, SavedFileName) do
+    try
+      Execute;
+    finally
+      Free;
+    end;
   finally
-    Free;
+    FState := psReady;
   end;
 
-  FState := psReady;
+  Result := True;
+end;
+
+function TProject.SaveUser: Boolean;
+begin
+  FState := psSaving;
+  try
+    if FFilename = '' then
+      PersistUntitledProjectUser
+    else
+      with TProjectSaver.Create(Self, SavedFileName) do
+      try
+        SaveUser;
+      finally
+        Free;
+      end;
+  finally
+    FState := psReady;
+  end;
 
   Result := True;
 end;
