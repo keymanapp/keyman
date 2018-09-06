@@ -7,7 +7,6 @@ set -e
 
 distributions='bionic xenial'
 
-
 dpkgcheck=`dpkg-query -l cowbuilder`
 if [ $? != 0 ]; then
 
@@ -26,11 +25,14 @@ for dist in $distributions; do
     fi
     sudo mkdir -p /var/cache/pbuilder/hook.d/${dist}
     if [ ! -e /var/cache/pbuilder/hook.d/${dist}/D70results ]; then
-        sudo echo "#!/bin/bash" > /var/cache/pbuilder/hook.d/${dist}/D70results
-        sudo echo "cd /var/cache/pbuilder/result/bionic" >> /var/cache/pbuilder/hook.d/${dist}/D70results
-        sudo echo "/usr/bin/dpkg-scanpackages . /dev/null > /var/cache/pbuilder/result/bionic/Packages" >> /var/cache/pbuilder/hook.d/${dist}/D70results
-        sudo echo "/usr/bin/apt-get update" >> /var/cache/pbuilder/hook.d/${dist}/D70results
+        echo "#!/bin/bash" | sudo tee /var/cache/pbuilder/hook.d/${dist}/D70results
+        echo "cd /var/cache/pbuilder/result/${dist}" | sudo tee -a /var/cache/pbuilder/hook.d/${dist}/D70results
+        echo "/usr/bin/dpkg-scanpackages . /dev/null > /var/cache/pbuilder/result/${dist}/Packages" | sudo tee -a /var/cache/pbuilder/hook.d/${dist}/D70results
+        echo "/usr/bin/apt-get update" | sudo tee -a /var/cache/pbuilder/hook.d/${dist}/D70results
         sudo ln -s /var/cache/pbuilder/hook.d/${dist}/D70results /var/cache/pbuilder/hook.d/${dist}/B70buildresults
+    fi
+    if [ ! -e /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild ]; then
+        sudo ln -s /usr/share/doc/pbuilder/examples/D80no-man-db-rebuild /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild
     fi
     sudo mkdir -p /var/cache/pbuilder/result/${dist}
     sudo cowbuilder update --distribution ${dist} --basepath /var/cache/pbuilder/base-${dist}.cow --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist} --hookdir /var/cache/pbuilder/hook.d/${dist}

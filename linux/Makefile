@@ -1,37 +1,37 @@
 #!/usr/bin/make
 
 tmpbuild: devreconf
-	./build.sh
+	./scripts/build.sh
 
 install_local: devreconf
-	SUDOINSTALL="yes" ./build.sh
+	SUDOINSTALL="yes" ./scripts/build.sh
 
 uninstall_local: devreconf
-	SUDOINSTALL="uninstall" ./build.sh
+	SUDOINSTALL="uninstall" ./scripts/build.sh
 
 debnocow:
-	./deb.sh
+	./scripts/deb.sh
 
 reconf:
-	./reconf.sh
+	./scripts/reconf.sh
 
 dist:
-	./dist.sh
+	./scripts/dist.sh
 
 origdist:
-	./dist.sh origdist
+	./scripts/dist.sh origdist
 
 sourcepackage: reconf origdist
-	./deb.sh sourcepackage
+	./scripts/deb.sh sourcepackage
 
 devsourcepackage: devreconf origdist
-	./deb.sh sourcepackage
+	./scripts/deb.sh sourcepackage
 
 devreconf:
-	./reconf.sh dev
+	./scripts/reconf.sh dev
 
 cow:
-	./cow.sh
+	./scripts/cow.sh
 
 deb: devreconf origdist cow debnocow
 	echo "Built dev Debian packages in builddebs/"
