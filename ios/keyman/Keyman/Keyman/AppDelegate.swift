@@ -22,24 +22,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ app: UIApplication, open url: URL,
                    options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
-    if url.scheme == "keyman" {
-      // legacy ad-hoc keyboard install.
-      // Deprecated; remove in Keyman 11
-      log.info("installing legacy ad-hoc keyboard from "+url.absoluteString)
-      viewController.launchFromUrl(fromUrl: url)
-    } else {
-      // .kmp package install, Keyman 10 onwards
-      var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
-      do {
-        try FileManager.default.copyItem(at: url, to: destinationUrl)
-        installAdhocKeyboard(url: destinationUrl)
-      } catch {
-        showKMPError(KMPError.copyFiles)
-      }
+    // .kmp package install, Keyman 10 onwards
+    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
+    do {
+      try FileManager.default.copyItem(at: url, to: destinationUrl)
+      installAdhocKeyboard(url: destinationUrl)
+      return true
+    } catch {
+      showKMPError(KMPError.copyFiles)
+      return false
     }
-
-    return true
   }
 
   func application(_ application: UIApplication,

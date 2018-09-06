@@ -120,8 +120,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardRemoved,
       observer: self,
       function: MainViewController.keyboardRemoved)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
-        name: launchedFromUrlNotification, object: nil)
 
   }
 
@@ -477,34 +475,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   // MARK: - View Actions
-
-  //
-  // Called from AppDelegate when a keyman:// legacy ad-hoc keyboard
-  // install URL is encountered. Deprecated, remove in Keyman 11
-  //
-  func launchFromUrl(fromUrl: URL) {
-    launchUrl = fromUrl
-    if didKeyboardLoad {
-      performAction(from: fromUrl)
-    } else {
-      launchUrl = nil
-    }
-  }
-
-  //
-  // TODO: Is this notification-based launched event ever used any more? If not,
-  // refactor it into oblivion. Probably deprecated with legacy ad-hoc keyboard.
-  //
-  @objc func launched(fromUrl notification: Notification) {
-    if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
-      launchUrl = url
-      if didKeyboardLoad {
-        performAction(from: url)
-      }
-    } else {
-      launchUrl = nil
-    }
-  }
 
   @objc func infoButtonClick(_ sender: Any?) {
     UIView.setAnimationDelegate(self)
