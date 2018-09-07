@@ -290,39 +290,58 @@ begin
         end;
       end;
 
+      FKMXTempFile := TTempFileManager.Get('.kmx');
+      FJSTempFile := TTempFileManager.Get('.js');
 
-      for i := 0 to FKMPInfFile.Keyboards.Count - 1 do
-      begin
-        FKMXTempFile := TTempFileManager.Get('.kmx');
-        FJSTempFile := TTempFileManager.Get('.js');
-        try
-          for j := 0 to High(Zip.FileNames) do
+      try
+        if FMergingValidateIds then
+        begin
+          for i := 0 to FKMPInfFile.Keyboards.Count - 1 do
           begin
-            // Add the KMX to FPackageKMXFileinfos
-            if SameText(Zip.FileName[j], FKMPInfFile.Keyboards[i].ID + '.kmx') then
+            for j := 0 to High(Zip.FileNames) do
             begin
-              SetLength(FPackageKMXFileInfos, Length(FPackageKMXFileInfos)+1);
-              SaveMemberToFile(Zip.FileNames[j], FKMXTempFile.Name);
-              FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Filename := Zip.FileNames[j];
-              GetKeyboardInfo(FKMXTempFile.Name, False, FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Info, False);
-            end;
+              // Add the KMX to FPackageKMXFileinfos
+              if SameText(Zip.FileName[j], FKMPInfFile.Keyboards[i].ID + '.kmx') then
+              begin
+                SetLength(FPackageKMXFileInfos, Length(FPackageKMXFileInfos)+1);
+                SaveMemberToFile(Zip.FileNames[j], FKMXTempFile.Name);
+                FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Filename := Zip.FileNames[j];
+                GetKeyboardInfo(FKMXTempFile.Name, False, FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Info, False);
+              end;
 
-            // Add the JS to FPackageJSFileInfos
-            if SameText(Zip.FileNames[j], FKMPInfFile.Keyboards[i].ID + '.js') then
-            begin
-              SetLength(FPackageJSFileInfos, Length(FPackageJSFileInfos)+1);
-              SaveMemberToFile(Zip.FileNames[j], FJSTempFile.Name);
-              FPackageJSFileInfos[High(FPackageJSFileInfos)].Filename := Zip.FileNames[j];
+              // Add the JS to FPackageJSFileInfos
+              if SameText(Zip.FileNames[j], FKMPInfFile.Keyboards[i].ID + '.js') then
+              begin
+                SetLength(FPackageJSFileInfos, Length(FPackageJSFileInfos)+1);
+                SaveMemberToFile(Zip.FileNames[j], FJSTempFile.Name);
+                FPackageJSFileInfos[High(FPackageJSFileInfos)].Filename := Zip.FileNames[j];
 
-              // For now, apply JS keyboard to all web and mobile targets
-              // Not using GetKeyboardInfo because that only handles kmx files
-              FPackageJSFileInfos[High(FPackageJSFileInfos)].Info.Targets := 'web mobile';
+                // For now, apply JS keyboard to all web and mobile targets
+                // Not using GetKeyboardInfo because that only handles kmx files
+                FPackageJSFileInfos[High(FPackageJSFileInfos)].Info.Targets := 'web mobile';
+              end;
             end;
           end;
-        finally
+        end
+
+        // Handle legacy keyboards which may not have keyboards defined in kmp.inf
+        else
+        begin
+          for i := 0 to High(Zip.FileNames) do
+          begin
+            if IsKEyboardFile(Zip.FileName[i]) then
+            begin
+              SetLength(FPackageKMXFileInfos, Length(FPackageKMXFileInfos)+1);
+              SaveMemberToFile(Zip.FileNames[i], FKMXTempFile.Name);
+              FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Filename := Zip.FileNames[i];
+              GetKeyboardInfo(FKMXTempFile.Name, False, FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Info, False);
+            end;
+          end;
+        end;
+
+      finally
           FKMXTempFile.Free;
           FJSTempFile.Free;
-        end;
       end;
     finally
       FreeAndNil(Zip);
