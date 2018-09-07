@@ -28,14 +28,14 @@
     [self.window setBackgroundColor:[NSColor whiteColor]];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSString *build = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleVersionKey];
-    [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@ (build %@)", version, build]];
-    
-    NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
-    NSRange copyrightSymbolLocation = [copyrightInfo rangeOfString:@"©"];
-    if (copyrightSymbolLocation.location > 0 && copyrightSymbolLocation.length == 1)
-    {
-        [copyrightInfo insertString:@"\n" atIndex:copyrightSymbolLocation.location];
+    if ([version isEqualToString:build]) {
+        [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@", version]];
     }
+    else {
+        [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@ (build %@)", version, build]];
+    }
+         
+    NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
     [self.copyrightLabel setStringValue:copyrightInfo];
 
     NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:[self.licenseButton bounds]
