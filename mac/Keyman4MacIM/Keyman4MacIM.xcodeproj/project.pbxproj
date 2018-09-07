@@ -54,6 +54,7 @@
 		E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */; };
 		E21291A920A4DD680049790C /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
 		E21291AB20A4DDE70049790C /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
+		E213601E2142D7C000A043B7 /* keyman-88.png in Resources */ = {isa = PBXBuildFile; fileRef = E213601D2142D7BF00A043B7 /* keyman-88.png */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E218402F20A539E20035AADB /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291A820A4DD680049790C /* Crashlytics.framework */; };
 		E218403020A53A010035AADB /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E21291AA20A4DDE70049790C /* Fabric.framework */; };
@@ -201,6 +202,7 @@
 		E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = KeymanEngine4Mac.framework.dSYM; path = Keyman4MacIM/Frameworks/KeymanEngine4Mac.framework.dSYM; sourceTree = "<group>"; };
 		E21291A820A4DD680049790C /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../Carthage/Build/Mac/Crashlytics.framework; sourceTree = "<group>"; };
 		E21291AA20A4DDE70049790C /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = ../../Carthage/Build/Mac/Fabric.framework; sourceTree = "<group>"; };
+		E213601D2142D7BF00A043B7 /* keyman-88.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-88.png"; sourceTree = "<group>"; };
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
 		E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandler.m; sourceTree = "<group>"; };
 		E21E645720C04EA7000D6274 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Keyman4MacIM/KMAboutWindow/logo.png; sourceTree = SOURCE_ROOT; };
@@ -416,7 +418,6 @@
 		98BF92401BF01CBE0002126A /* KMAboutWindow */ = {
 			isa = PBXGroup;
 			children = (
-				E23380FA21407AA100B90591 /* SILInBlue76.png */,
 				98BF924D1BF02DC20002126A /* KMBarView.h */,
 				98BF924E1BF02DC20002126A /* KMBarView.m */,
 				98BF92501BF03D4D0002126A /* KMAboutBGView.h */,
@@ -426,6 +427,8 @@
 				98BF92411BF01CBE0002126A /* KMAboutWindowController.h */,
 				98BF92421BF01CBE0002126A /* KMAboutWindowController.m */,
 				98BF92431BF01CBE0002126A /* KMAboutWindowController.xib */,
+				E213601D2142D7BF00A043B7 /* keyman-88.png */,
+				E23380FA21407AA100B90591 /* SILInBlue76.png */,
 				98BF92461BF01D890002126A /* image.jpg */,
 				98BF92481BF0216F0002126A /* logo.png */,
 				98BF92531BF040A50002126A /* title.png */,
@@ -614,6 +617,7 @@
 				98E672A01B532F5E00DBDE2F /* KMDownloadKBWindowController.xib in Resources */,
 				984B8F451AF1C3D900E096A8 /* OSKWindowController.xib in Resources */,
 				98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */,
+				E213601E2142D7C000A043B7 /* keyman-88.png in Resources */,
 				98BF92471BF01D890002126A /* image.jpg in Resources */,
 				98BF92451BF01CBE0002126A /* KMAboutWindowController.xib in Resources */,
 				98F3C8941A8D739500F675E3 /* preferences.xib in Resources */,
