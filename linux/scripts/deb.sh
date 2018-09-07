@@ -78,6 +78,7 @@ BASEDIR=`pwd`
 
 mkdir -p builddebs
 
+# make the source packages
 cd builddebs
 for proj in ${projects}; do
 	vers=`ls ../dist/${proj}_*.orig.tar.gz`
@@ -102,6 +103,7 @@ if [ "$1" == "sourcepackage" ]; then
 	exit 0
 fi
 
+# build the packages with cowbuilder from the source package
 for proj in ${projects}; do
 	cd builddebs
 	echo "$proj version ${vers}"

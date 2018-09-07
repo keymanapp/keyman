@@ -58,6 +58,7 @@ for proj in ${autotool_projects}; do
 done
 
 
+# dist for keyman-config
 if [ "${extra_project}" == "keyman-config" ]; then
     cd kmflcomp
     baseversion=`cat VERSION`
@@ -78,6 +79,7 @@ if [ "${extra_project}" == "keyman-config" ]; then
 fi
 cd $BASEDIR
 
+# create orig.tar.gz
 if [ "$1" == "origdist" ]; then
     cd dist
     for proj in ${autotool_projects}; do

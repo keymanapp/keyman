@@ -3,6 +3,7 @@
 . $HOME/ci-builder-scripts/bash/common.sh
 init "$@"
 
+# clean up prev deb builds
 rm -rf builddebs
 rm -rf $1/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 rm -rf ${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
