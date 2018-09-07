@@ -329,7 +329,7 @@ begin
         begin
           for i := 0 to High(Zip.FileNames) do
           begin
-            if IsKEyboardFile(Zip.FileName[i]) then
+            if IsKeyboardFile(Zip.FileName[i]) then
             begin
               SetLength(FPackageKMXFileInfos, Length(FPackageKMXFileInfos)+1);
               SaveMemberToFile(Zip.FileNames[i], FKMXTempFile.Name);
