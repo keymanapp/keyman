@@ -80,10 +80,14 @@ To deploy a development build of Keyman and Keyman Developer,
 
 ### Visual Studio 2017 Community Edition setup requirements
 
-In Visual Studio 2017, you need to have the following components installed:
-* Universal Windows Platform development
-    * Desktop development with C++ > Windows 8.1 SDK and UCRT SDK
+In Visual Studio 2017, you need to have the following installed:
+#### Workloads
 * Desktop development with C++
+* Universal Windows Platform development
+
+#### Individual components
+* Windows Universal CRT SDK
+* Windows 8.1 SDK
 
 Configure Visual Studio to use two-space tab stops:
 1. Open the options dialog: Tools > Options.
