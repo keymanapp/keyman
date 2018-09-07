@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-. \$HOME/ci-builder-scripts/bash/common.sh
+. $HOME/ci-builder-scripts/bash/common.sh
 init "$@"
 
 rm -rf builddebs
