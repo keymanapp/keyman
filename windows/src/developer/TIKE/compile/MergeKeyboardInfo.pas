@@ -946,19 +946,16 @@ procedure TMergeKeyboardInfo.CheckPackageKeyboardFilenames;
 var
   numberKMXFiles, numberJSFiles : Integer;
 begin
-  if (FJsFile <> '') then
-    Exit;
-
-  numberKMXFiles := Length(FPackageKMXFileInfos);
-  numberJSFiles := Length(FPackageJSFileInfos);
-  if (numberKMXFiles = 0) and (numberJSFiles = 0) then
-    raise EInvalidKeyboardInfo.Create('There should be at least 1 .kmx or .js keyboard file in the package.');
-
   // Check that the id of the kmx/js files matches the base filename; used only for release/ keyboards
   // in the keyboards repository. This implies there should be only 1 kmx and/or 1 js in release/ keyboard
   // packages; this check would not be done in the packages folder.
   if FMergingValidateIds and Assigned(FKMPInfFile) then
   begin
+    numberKMXFiles := Length(FPackageKMXFileInfos);
+    numberJSFiles := Length(FPackageJSFileInfos);
+    if (numberKMXFiles = 0) and (numberJSFiles = 0) then
+      raise EInvalidKeyboardInfo.Create('There should be at least 1 .kmx or .js keyboard file in the package.');
+
     if numberKMXFiles > 1 then
     begin
       raise EInvalidKeyboardInfo.Create('There should be at most 1 .kmx keyboard file in the packge.');
