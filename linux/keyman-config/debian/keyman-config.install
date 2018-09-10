@@ -1,2 +1,2 @@
 ./keyman_config/icons/* /usr/share/keyman/icons/
-debian/keyman-config.desktop /usr/share/applications
+debian/km-config.desktop /usr/share/applications

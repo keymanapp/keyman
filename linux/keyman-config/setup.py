@@ -8,10 +8,10 @@ setup(
     name="keyman_config",
     version=__version__,
     packages=find_packages(),
-    scripts=['keyman-config', 'get_kmp',
-             'install_kmp', 'kvk2ldml',
-             'uninstall_kmp',
-             'list_installed_kmp', ],
+    scripts=['km-config', 'km-package-get',
+             'km-package-install', 'km-kvk2ldml',
+             'km-package-uninstall',
+             'km-package-list-installed', ],
 
     install_requires=[
         'lxml', 'numpy', 'PIL', 'requests', 'requests-cache',

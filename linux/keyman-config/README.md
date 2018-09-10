@@ -67,6 +67,6 @@ Command line uninstaller for kmp
 
 You will need the build dependencies as well as the runtime dependencies above
 
-`sudo apt install dh-python python3-all debhelper`
+`sudo apt install dh-python python3-all debhelper help2man`
 
 Run `make deb`. This will build the Debian package in the make_deb directory.
