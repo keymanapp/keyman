@@ -2,6 +2,12 @@
 
 VERSION=10.99.1
 
+default:
+	python3 setup.py build
+
+install:
+	python3 setup.py install
+
 clean:
 	-rm -rf dist make_deb build
 

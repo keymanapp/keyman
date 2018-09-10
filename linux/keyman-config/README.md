@@ -13,18 +13,23 @@ You will also need kmflcomp either from a package or built and installed locally
 run the script `./createkeymandirs.sh` to create the directories for these programs to
 install the packages to
 
+### Installing manually
+
+`make && sudo make install` will install locally to /usr/local
+`python3 setup.py --help install` will give you more install options
+
 ## Things to run
 
-### keyman-config
+### km-config
 
-`./keyman-config`
+`./km-config`
 
 This shows a list of installed kmps.
 For each one it has buttons to `show the welcome page`, `show more information` and `uninstall`.
 
 ##### Buttons
 
-* `Refresh` - useful if you install or uninstall on the commandline while running keyman-config.
+* `Refresh` - useful if you install or uninstall on the commandline while running km-config.
 * `Download keyboard...` - runs `DownloadKmpWindow` (see below)
 * `Install keyboard...` - opens a file choose dialog to choose a kmp file to install and bring up the `InstallKmpWindow` for more details and to confirm installing.
 
@@ -43,25 +48,38 @@ Click it to download the keyboard and bring up the `InstallKmpWindow` for more d
 Secondary-click gives you a menu including 'Back' to go back a page.
 
 
-### install_kmp
+### km-package-install
 
 Command line installer for kmp
 
-`install_kmp -k <keyboard id>`
+`km-package-install -k <keyboard id>`
 or
-`install_kmp -f <kmp file>`
+`km-package-install -f <kmp file>`
 
-### uninstall_kmp
+### km-package-uninstall
 
 Command line uninstaller for kmp
 
-`.uninstall_kmp <keyboard id>`
+`km-package-uninstall <keyboard id>`
 
-### list_installed_kmp
+### km-package-list-installed
 
-`list_installed_kmp` shows name, version, id, description of each installed keyboard
+`km-package-list-installed` shows name, version, id, description of each installed keyboard
 
-`list_installed_kmp.py` shows name, version, id of each installed keyboard
+`km-package-list-installed -s` shows name, version, id of each installed keyboard
+
+### km-package-get
+
+Download Keyman keyboard package to ~/Downloads
+
+`km-package-get <keyboard id>`
+
+### km-kvk2ldml
+
+Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print
+the details of the kvk file [-p] optionally with all keys [-k].
+
+`km-kvk2ldml [-p] [-k] [-o LDMLFILE] <kvk file>`
 
 ## Building the Debian package
 
