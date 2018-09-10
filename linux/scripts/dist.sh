@@ -75,6 +75,7 @@ if [ "${extra_project}" == "keyman-config" ]; then
         echo "datever: ${datever}"
         python3 setup.py egg_info -b.${datever} sdist
     fi
+    make man
     cp dist/*.tar.gz ../dist
 fi
 cd $BASEDIR
