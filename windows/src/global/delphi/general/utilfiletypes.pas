@@ -26,13 +26,13 @@ type
     ftFont, ftReadme, ftTextFile,
     ftKeymanWizard, ftOther, ftBitmap,
     ftVisualKeyboard, ftXMLFile, ftHTMLFile, ftJavascript,
-    ftTouchLayout, ftVisualKeyboardSource, ftKeymanEncryptedFile);
+    ftTouchLayout, ftVisualKeyboardSource);
 const
   FileTypeNames: array[TKMFileType] of string = ('Keyman Source File', 'Package Source File',
     'Keyman Keyboard File', 'Keyman Package File', 'Font', 'Readme File', 'Text File',
     'Keyman Wizard File', 'Other File', 'Bitmap File',
     'Keyman Visual Keyboard File', 'XML File', 'HTML File', 'Javascript File',
-    'Keyman Touch Layout Source File', 'Keyman Visual Keyboard Source File', 'Keyman Encrpyted File');
+    'Keyman Touch Layout Source File', 'Keyman Visual Keyboard Source File');
 
 
 type
@@ -43,14 +43,13 @@ type
 
 const
   Ext_KeymanFile = '.kmx';
-  Ext_KeymanEncryptedFile = '.kxx';
   Ext_PackageFile = '.kmp';
   Ext_KeymanTouchLayout = '.keyman-touch-layout';
   Ext_VisualKeyboard = '.kvk';
   Ext_VisualKeyboardSource = '.kvks';
 
 
-const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
+const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (
   (Ext: '.kmn'; FileType: ftKeymanSource),
   (Ext: '.kps'; FileType: ftPackageSource),
   (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
@@ -63,7 +62,6 @@ const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
   (Ext: Ext_VisualKeyboardSource; FileType: ftVisualKeyboardSource),
   (Ext: '.js'; FileType: ftJavascript),
   (Ext: Ext_KeymanTouchLayout; FileType: ftTouchLayout),
-  (Ext: Ext_KeymanEncryptedFile; FileType: ftKeymanEncryptedFile),
   (Ext: ''; FileType: ftOther));
 
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;
@@ -140,7 +138,7 @@ var
   t : TKMFileType;
 begin
   t := GetFileTypeFromFileName(FileName);
-  Result := (t = ftKeymanFile) or (t = ftKeymanEncryptedFile);
+  Result := t = ftKeymanFile;
 end;
 
 function RemoveFileExtension(Filename, Extension: string): string;

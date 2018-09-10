@@ -89,7 +89,6 @@ type
     procedure CheckPackageKeyboardFilenames;
     procedure AddIsRTL;
     procedure AddSourcePath;
-    procedure AddJSFile(const Filename: string);
   public
     destructor Destroy; override;
     class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
@@ -231,7 +230,7 @@ end;
 
 function TMergeKeyboardInfo.LoadKMPFile: Boolean;
 var
-  FKMXTempFile, FJSTempFile, FKMPInfTempFile: TTempFile;
+  FKMXTempFile, FKMPInfTempFile: TTempFile;
   i, j: Integer;
   LocalHeader: TZipHeader;
   Zip: TZipFile;
@@ -291,10 +290,8 @@ begin
       end;
 
       FKMXTempFile := TTempFileManager.Get('.kmx');
-      FJSTempFile := TTempFileManager.Get('.js');
-
       try
-        if FMergingValidateIds then
+        if FKMPInfFile.Keyboards.Count > 0 then
         begin
           for i := 0 to FKMPInfFile.Keyboards.Count - 1 do
           begin
@@ -313,7 +310,6 @@ begin
               if SameText(Zip.FileNames[j], FKMPInfFile.Keyboards[i].ID + '.js') then
               begin
                 SetLength(FPackageJSFileInfos, Length(FPackageJSFileInfos)+1);
-                SaveMemberToFile(Zip.FileNames[j], FJSTempFile.Name);
                 FPackageJSFileInfos[High(FPackageJSFileInfos)].Filename := Zip.FileNames[j];
 
                 // For now, apply JS keyboard to all web and mobile targets
@@ -324,8 +320,9 @@ begin
           end;
         end
 
-        // Handle legacy keyboards which may not have keyboards defined in kmp.inf
-        else
+        // Handle keyboard packages which may not have [Keyboard] sections defined in kmp.inf.
+        // Note: They will never include any js keyboards.
+        else if FKMPInfFile.Keyboards.Count = 0 then
         begin
           for i := 0 to High(Zip.FileNames) do
           begin
@@ -341,7 +338,6 @@ begin
 
       finally
           FKMXTempFile.Free;
-          FJSTempFile.Free;
       end;
     finally
       FreeAndNil(Zip);
@@ -359,7 +355,16 @@ begin
   if FJsFile = '' then
     Exit(True);
 
-  AddJSFile(FJsFile);
+  with TStringStream.Create('', TEncoding.UTF8) do
+  try
+    LoadFromFile(FJsFile);
+    FJSFileInfo.Filename := FJsFile;
+    FJSFileInfo.Data := DataString;
+    FJSFileInfo.Standalone := False;
+  finally
+    Free;
+  end;
+
   FJSFileInfo.Standalone := True;
   Result := True;
 end;
@@ -388,19 +393,6 @@ function TMergeKeyboardInfo.Failed(message: string): Boolean;
 begin
   FCallback(0, 0, PAnsiChar(AnsiString(Message)));
   Result := False;
-end;
-
-procedure TMergeKeyboardInfo.AddJSFile(const Filename: string);
-begin
-  with TStringStream.Create('', TEncoding.UTF8) do
-  try
-    LoadFromFile(FJsFile);
-    FJSFileInfo.Filename := Filename;
-    FJSFileInfo.Data := DataString;
-    FJSFileInfo.Standalone := False;
-  finally
-    Free;
-  end;
 end;
 
 //
@@ -434,7 +426,7 @@ begin
 
   if Assigned(FKMPInfFile) then
     FName := FKMPInfFile.Info.Desc[PackageInfo_Name]
-  else if (FJSFileInfo.Data <> '')  then
+  else if not FJSFileInfo.Data.IsEmpty then
   begin
     with TRegEx.Match(FJSFileInfo.Data, 'this\.KN="([^"]+)"') do
     begin
@@ -759,14 +751,14 @@ begin
       MinVersion := FPackageKMXFileInfos[i].Info.FileVersion;
 
   FJSMinVersionString := '';
+  with TRegEx.Match(FJSFileInfo.Data, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
   begin
-    with TRegEx.Match(FJSFileInfo.Data, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
-      if Success then
-      begin
-        s := TGroupHelperRSP19902.Create(Groups[2], FJSFileInfo.Data).FixedValue;
-        if (FJSMinVersionString = '') or (CompareVersions(FJSMinVersionString, s) > 0) then
-          FJSMinVersionString := s;
-      end;
+    if Success then
+    begin
+      s := TGroupHelperRSP19902.Create(Groups[2], FJSFileInfo.Data).FixedValue;
+      if (FJSMinVersionString = '') or (CompareVersions(FJSMinVersionString, s) > 0) then
+        FJSMinVersionString := s;
+    end;
   end;
 
   MinVersionString := Format('%d.%d', [(MinVersion and VERSION_MASK_MAJOR) shr 8, (MinVersion and VERSION_MASK_MINOR)]);
@@ -942,6 +934,11 @@ begin
   begin
     AddNewPair('desktopWeb', 'full');
     AddNewPair('mobileWeb', 'full');
+
+    // TODO: Don't add Android and iOS when we complete the addition of all .js keyboards
+    // to packages in the repository (including legacy keyboards)
+    AddNewPair('android', 'full');
+    AddNewPair('ios', 'full');
   end;
 
   json.AddPair('platformSupport', v);
