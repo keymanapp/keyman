@@ -175,6 +175,7 @@
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
+		E213601C2141C5FB00A043B7 /* sil-small.png in Resources */ = {isa = PBXBuildFile; fileRef = E213601B2141C5FB00A043B7 /* sil-small.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -377,6 +378,7 @@
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E213601B2141C5FB00A043B7 /* sil-small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sil-small.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -520,6 +522,7 @@
 		9845A8331A439B8F00544E2E /* Info */ = {
 			isa = PBXGroup;
 			children = (
+				E213601B2141C5FB00A043B7 /* sil-small.png */,
 				98CF00B41B461EDE00627DC6 /* browser-icon.png */,
 				98CF00B51B461EDE00627DC6 /* get-started.png */,
 				98CF00B61B461EDE00627DC6 /* info.png */,
@@ -889,6 +892,7 @@
 				981AFA9819EF44DE006706BF /* 724-info.png in Resources */,
 				9845A85E1A439B8F00544E2E /* confirm-dl-a.png in Resources */,
 				9845A87A1A439B8F00544E2E /* hide-keyboard.png in Resources */,
+				E213601C2141C5FB00A043B7 /* sil-small.png in Resources */,
 				981AFA9919EF44DE006706BF /* MainViewController_iPad.xib in Resources */,
 				982D149319FF462A007D4629 /* 724-info-selected@3x.png in Resources */,
 				982D149519FF462A007D4629 /* 724-info@3x.png in Resources */,
