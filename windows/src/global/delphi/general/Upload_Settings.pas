@@ -26,33 +26,36 @@ unit Upload_Settings;
 
 interface
 
+uses
+  KeymanVersion;
+
 const
   // https://api.keyman.com/ - programmatic endpoints
-  API_Path_UpdateCheck_Desktop = '/desktop/10.0/update';
-  API_Path_UpdateCheck_Developer = '/developer/10.0/update';
-  API_Path_DownloadLocale = '/desktop/10.0/locale';
-  API_Path_Crash = '/desktop/10.0/exception'; // also used for Developer and Engine
-  API_Path_SubmitDiag = '/desktop/10.0/submitdiag';
-  API_Path_IsOnline = '/desktop/10.0/isonline';
+  API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';
+  API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
+  API_Path_DownloadLocale = '/desktop/'+SKeymanVersion+'/locale';
+  API_Path_Crash = '/desktop/'+SKeymanVersion+'/exception'; // also used for Developer and Engine
+  API_Path_SubmitDiag = '/desktop/'+SKeymanVersion+'/submitdiag';
+  API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
 
   // https://www.keyman.com/ - web pages
-  URLPath_KeymanLanguageLookup = '/go/developer/10.0/language-lookup';
-  URLPath_CreateTranslation = '/go/desktop/10.0/create-locale';
-  URLPath_KeymanException = '/go/desktop/10.0/view-exception?id=%s';
-  URLPath_KeepInTouch = '/go/desktop/10.0/keep-in-touch';
-  URLPath_KeymanDeveloperDocumentation = '/go/developer/10.0/docs';
+  URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
+  URLPath_CreateTranslation = '/go/desktop/'+SKeymanVersion+'/create-locale';
+  URLPath_KeymanException = '/go/desktop/'+SKeymanVersion+'/view-exception?id=%s';
+  URLPath_KeepInTouch = '/go/desktop/'+SKeymanVersion+'/keep-in-touch';
+  URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
 
-  URLPath_KeymanDeveloperHome = '/go/developer/10.0/home';
-  URLPath_KeymanHome = '/go/desktop/10.0/home';
-  URLPath_ArchivedDownloads = '/go/desktop/10.0/archived-downloads';
-  URLPath_Support = '/go/10.0/support';
-  URLPath_Privacy = '/go/10.0/privacy';
+  URLPath_KeymanDeveloperHome = '/go/developer/'+SKeymanVersion+'/home';
+  URLPath_KeymanHome = '/go/desktop/'+SKeymanVersion+'/home';
+  URLPath_ArchivedDownloads = '/go/desktop/'+SKeymanVersion+'/archived-downloads';
+  URLPath_Support = '/go/'+SKeymanVersion+'/support';
+  URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
 
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';
 
-function API_UserAgent: string; // = 'Keyman Desktop/10.0...'
-function API_UserAgent_Developer: string; // = 'Keyman Developer/10.0...'
+function API_UserAgent: string; // = 'Keyman Desktop/<ver>...'
+function API_UserAgent_Developer: string; // = 'Keyman Developer/<ver>...'
 function API_UserAgent_Diagnostics: string;
 
 function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';

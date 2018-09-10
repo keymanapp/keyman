@@ -2,7 +2,7 @@
 
 copykmdev: makeinstaller
     -mkdir $(ROOT)\release\$VERSION
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper100.msi $(ROOT)\release\$VERSION\keymandeveloper100.msi
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$VERSION\keymandeveloper.msi
     copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$VERSION.exe $(ROOT)\release\$VERSION\keymandeveloper-$VERSION.exe
     echo ProductGUID=$GUID0 > $(ROOT)\release\$VERSION\GUIDInfo.txt
 
@@ -16,8 +16,8 @@ makeinstaller:
     cd $(ROOT)\src\developer\inst
     echo [Setup] > setup.inf
     echo Version=$VERSION >> setup.inf
-    echo MSIFileName=keymandeveloper100.msi >> setup.inf
+    echo MSIFileName=keymandeveloper.msi >> setup.inf
     echo Title=Keyman Developer $RELEASE >>setup.inf
-    $(WZZIP) setup.zip keymandeveloper100.msi setup.inf
+    $(WZZIP) setup.zip keymandeveloper.msi setup.inf
     copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$VERSION.exe
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$VERSION.exe

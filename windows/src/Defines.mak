@@ -204,3 +204,21 @@ SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_P
 
 PLATFORM=Win32
 
+#
+# mkver commands
+#
+
+MKVER_APP=$(PROGRAM)\buildtools\mkver
+
+!IFDEF VERSION_TXT_PATH
+MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.txt
+!ELSE
+MKVER_VERSION_TXT=..\version.txt
+!ENDIF
+
+# Update a version.rc file
+MKVER_V=$(MKVER_APP) -v $(MKVER_VERSION_TXT)
+# Update a manifest.xml file
+MKVER_M=$(MKVER_APP) -m $(MKVER_VERSION_TXT)
+# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out> $(MKVER_VERSION_TXT)
+MKVER_U=$(MKVER_APP) -v -u 

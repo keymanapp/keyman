@@ -22,19 +22,11 @@ devtools-app: dirs
     cd $(ROOT)\src
 
 version.res: version.rc
-!IFDEF VERSION_TXT_PATH
-    $(PROGRAM)\buildtools\mkver -v $(VERSION_TXT_PATH)\version.txt
-!ELSE
-    $(PROGRAM)\buildtools\mkver -v ..\version.txt
-!ENDIF
+    $(MKVER_V)
     rc version.rc
 
 manifest.res: version.res
-!IFDEF VERSION_TXT_PATH
-    $(PROGRAM)\buildtools\mkver -m $(VERSION_TXT_PATH)\version.txt
-!ELSE
-    $(PROGRAM)\buildtools\mkver -m ..\version.txt
-!ENDIF
+    $(MKVER_M)
     rc manifest.rc
 
 dirs: 

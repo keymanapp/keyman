@@ -413,6 +413,7 @@ uses
   HTMLHelpViewer,
   KLog,
   keymanapi_TLB,
+  KeymanVersion,
   OnlineConstants,
   OnlineUpdateCheck,
   GlobalProxySettings,

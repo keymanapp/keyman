@@ -120,8 +120,6 @@ procedure CheckMSIResult(res: UINT);
 
 implementation
 
-{R *.dfm}
-
 uses
   Unicode, utilexecute,
   utilsystem, shlobj,

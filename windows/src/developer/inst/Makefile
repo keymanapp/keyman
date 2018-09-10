@@ -20,13 +20,13 @@ setup:
     #
     
     $(MAKE) -fcopydev.mak candle
-    $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf  -out keymandeveloper100.msi kmdev.wixobj monaco.wixobj -ext WixUIExtension
+    $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf  -out keymandeveloper.msi kmdev.wixobj monaco.wixobj -ext WixUIExtension
 
     #
     # Sign the installation archive
     #
 
-    $(SIGNCODE) /d "Keyman Developer" keymandeveloper100.msi
+    $(SIGNCODE) /d "Keyman Developer" keymandeveloper.msi
 
     #
     # Copy the installation archive

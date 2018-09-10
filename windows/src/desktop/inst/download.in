@@ -9,12 +9,9 @@ default:
 
 copyredist-desktop:
   -mkdir $(ROOT)\release\$VERSION
-  copy /Y keymandesktop100.msi $(ROOT)\release\$VERSION\keymandesktop100.msi
-  copy /Y keymandesktop100.exe $(ROOT)\release\$VERSION\keymandesktop-$VERSION.exe
+  copy /Y keymandesktop.msi $(ROOT)\release\$VERSION\keymandesktop.msi
+  copy /Y keymandesktop.exe $(ROOT)\release\$VERSION\keymandesktop-$VERSION.exe
   copy /Y $(ROOT)\bin\desktop\setup.exe $(ROOT)\release\$VERSION\setup.exe
-
-copydoc:
-  if exist $(ROOT)\src\desktop\help\rtf\desktop.pdf copy /Y $(ROOT)\src\desktop\help\rtf\desktop.pdf $(ROOT)\release\$VERSION\desktop80.pdf
 
 prepareredist:
   rem prepareredist
