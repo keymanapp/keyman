@@ -37,8 +37,6 @@ def main():
 		if not kbdata:
 			print("install_kmp.py: error: Could not download keyboard data for", args.k)
 		if installed_kmp_ver:
-#			print("Found installed version", installed_kmp_ver)
-#			print("Api knows about version", kbdata['version'])
 			if kbdata['version'] == installed_kmp_ver:
 				print("install_kmp.py The %s version of the %s keyboard is already installed." % (installed_kmp_ver, args.k))
 				sys.exit(0)

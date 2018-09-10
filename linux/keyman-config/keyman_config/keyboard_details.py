@@ -9,7 +9,7 @@ gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 
 # basics: keyboard name, package version, description
-# other things: filename (of kmx), , 
+# other things: filename (of kmx), ,
 #    OSK availability, documentation availability, package copyright
 # also: supported languages, fonts
 # from kmx?: keyboard version, encoding, layout type
@@ -18,6 +18,9 @@ from gi.repository import Gtk, WebKit
 # there is possibly data in kbid.json (downloaded from api)
 
 class KeyboardDetailsView(Gtk.Window):
+    # TODO Display all the information that is available
+    #    especially what is displayed for Keyman on Windows
+    # TODO clean up file once have what we want
     def __init__(self, kmp):
         if "keyboard" in kmp["name"].lower():
             wintitle = kmp["name"]

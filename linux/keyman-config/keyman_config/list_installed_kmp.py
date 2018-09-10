@@ -34,8 +34,6 @@ def get_installed_kmp():
                 if os.path.isfile(kbjson):
                     with open(kbjson, "r") as read_file:
                         kbdata = json.load(read_file)
-#                else:
-#                    kbdata = get_keyboard_data(o)
                 if kbdata:
                     if 'description' in kbdata:
                         description = kbdata['description']
@@ -77,8 +75,6 @@ def main():
     args = parser.parse_args()
 
     installed_kmp = get_installed_kmp()
-#    print(installed_kmp)
-#    print(sorted(installed_kmp))
     print("--- Installed keyboards ---")
     for kmp in sorted(installed_kmp):
         print(installed_kmp[kmp]['name'] + ", version:", installed_kmp[kmp]['version'] + ", id:", kmp)

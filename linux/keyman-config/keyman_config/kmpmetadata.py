@@ -268,12 +268,6 @@ def parseinfdata(inffile, verbose=False):
 						options['readmeFile'] = item[1]
 
 		if verbose:
-			# print(config.sections())
-			# print(config.items('Info'))
-			# print(config.items('Keyboard0'))
-			# print(config.items('Files'))
-			# print(config.items('Package'))
-			# print(config.items('StartMenu'))
 			print_info(info)
 			print_system(system)
 			print_options(options)
@@ -327,7 +321,6 @@ def parsemetadata(jsonfile, verbose=False):
 		with open(jsonfile, "r") as read_file:
 			data = json.load(read_file)
 			for x in data:
-	#			print("%s: %s" % (x, data[x]))
 				if x == 'info':
 					info = data[x]
 				elif x == 'system':

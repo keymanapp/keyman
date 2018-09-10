@@ -19,10 +19,10 @@ kvkkAltGr =               b'\x08'
 # AssociatedKeyboard NSTRING
 # AnsiFont NFONT
 # UnicodeFont NFONT
- 
+
 # KeyCount: DWORD
 # Keys: NKEY[KeyCount]
- 
+
 class KVKData:
     magic = ""
     version = None
@@ -54,8 +54,8 @@ class NFont:
 kvkkBitmap = b'\x01'
 kvkkUnicode = b'\x02'
 #   Shift: WORD;   // See KVKS_* below
-#   VKey: WORD; 
-#   Text: NSTRING; 
+#   VKey: WORD;
+#   Text: NSTRING;
 #   Bitmap: NBITMAP
 # )
 # NBITMAP = (BitmapSize: DWORD; Bitmap: BYTE[BitmapSize])
@@ -292,10 +292,7 @@ def convert_ldml(kvkData):
     keymaps = {}
 
     for key in kvkData.Keys:
-        #print(key.VKey)
-        #print(key.text)
         modifier = get_modifer(key)
-        #print(modifier)
         if modifier in keymaps:
             keymaps[modifier] = keymaps[modifier] + (key,)
         else:
@@ -303,12 +300,8 @@ def convert_ldml(kvkData):
 
     ldml = etree.Element("keyboard", locale = "zzz-keyman")
     etree.SubElement(ldml, "version", platform = "10")
-    #ldml.append( etree.Element("version", platform = "10") )
     names = etree.SubElement(ldml, "names")
-    #names = ldml.append( etree.Element("names") )
-    #print(etree.tostring(ldml, pretty_print=True))
     names.append( etree.Element("name", value = "ZZZ") )
-    #print(etree.tostring(ldml, pretty_print=True))
 
     for modifier in keymaps:
         if modifier == "None":

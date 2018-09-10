@@ -6,7 +6,7 @@ If you are running from the repo or installing keyman-config manually rather tha
 then you will need to
 
 `sudo apt install python3-lxml python3-magic python3-numpy python3-pil python3-requests 
-python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli`
+python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli python3-setuptools`
 
 You will also need kmflcomp either from a package or built and installed locally.
 
@@ -24,7 +24,7 @@ For each one it has buttons to `show the welcome page`, `show more information` 
 
 ##### Buttons
 
-* `Refresh` - useful if you install or uninstall on the commandline while running view_installed.
+* `Refresh` - useful if you install or uninstall on the commandline while running keyman-config.
 * `Download keyboard...` - runs `DownloadKmpWindow` (see below)
 * `Install keyboard...` - opens a file choose dialog to choose a kmp file to install and bring up the `InstallKmpWindow` for more details and to confirm installing.
 
@@ -65,8 +65,8 @@ Command line uninstaller for kmp
 
 ## Building the Debian package
 
-You will need the build dependencies
+You will need the build dependencies as well as the runtime dependencies above
 
-`sudo apt install dh-python python3-setuptools python3-all debhelper`
+`sudo apt install dh-python python3-all debhelper`
 
 Run `make deb`. This will build the Debian package in the make_deb directory.

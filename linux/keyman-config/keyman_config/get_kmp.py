@@ -39,7 +39,6 @@ def get_keyboard_data(keyboardid, verbose=False):
 	os.chdir(current_dir)
 	requests_cache.core.uninstall_cache()
 	if response.status_code == 200:
-#		return json.loads(response.content.decode('utf-8'))
 		return response.json()
 	else:
 		return None

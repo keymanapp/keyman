@@ -26,31 +26,21 @@ class DownloadKmpWindow(Gtk.Window):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
         s = Gtk.ScrolledWindow()
+        # TODO update (or remove) user_agent once website supports Linux kmp packages
         user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"
-        #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
         webview = WebKit.WebView()
         settings = WebKit.WebSettings()
         settings.set_property('user-agent', user_agent)
         webview.set_settings(settings)
         webview.connect("navigation-policy-decision-requested", self.check)
         webview.connect("mime-type-policy-decision-requested", check_mime_type)
+        # TODO update website URI once website supports Linux kmp packages
         webview.load_uri("https://keyman.com/keyboards?embed=macos&version=10")
-        #webview.load_uri("https://keyman.com/keyboards?embed=windows&version=10.0")
-        #webview.load_uri("https://keyman.com/keyboards?embed=linux&version=11")
         s.add(webview)
         vbox.pack_start(s, True, True, 0)
 
         hbox = Gtk.Box(spacing=6)
-        #hbox.set_halign(Gtk.Align.FILL)
         vbox.pack_start(hbox, False, False, 0)
-
-        #button = Gtk.Button.new_with_label("Click Me")
-        #button.connect("clicked", self.on_click_me_clicked)
-        #hbox.pack_start(button, False, False, 0)
-
-        #button = Gtk.Button.new_with_mnemonic("_Open")
-        #button.connect("clicked", self.on_open_clicked)
-        #hbox.pack_start(button, False, False, 0)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
@@ -86,13 +76,6 @@ class DownloadKmpWindow(Gtk.Window):
                 webbrowser.open(qs['url'][0])
                 return True
         return False
-
-
-    #def on_click_me_clicked(self, button):
-    #    print("\"Click me\" button was clicked")
-
-    #def on_open_clicked(self, button):
-    #    print("\"Open\" button was clicked")
 
     def on_close_clicked(self, button):
         print("Closing download window")

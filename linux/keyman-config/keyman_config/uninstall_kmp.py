@@ -43,7 +43,7 @@ def uninstall_kmp(keyboardid):
 	if not os.path.isdir(kbdir):
 		print("Keyboard directory for", keyboardid, "does not exist. Aborting")
 		exit(3)
-		
+
 	kbdocdir = os.path.join('/usr/local/share/doc/keyman', keyboardid)
 	kbfontdir = os.path.join('/usr/local/share/fonts/keyman', keyboardid)
 

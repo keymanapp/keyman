@@ -201,7 +201,6 @@ class InstallKmpWindow(Gtk.Window):
                 grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
 
             self.page2 = Gtk.Box()
-            #self.page2.set_border_width(10)
             s = Gtk.ScrolledWindow()
             webview = WebKit.WebView()
             webview.connect("navigation-policy-decision-requested", self.check)
@@ -233,7 +232,6 @@ class InstallKmpWindow(Gtk.Window):
         vbox.pack_start(mainhbox, True, True, 0)
 
         hbox = Gtk.Box(spacing=6)
-        #hbox.set_halign(Gtk.Align.FILL)
         vbox.pack_start(hbox, False, False, 0)
 
         button = Gtk.Button.new_with_mnemonic("_Install")
@@ -269,12 +267,9 @@ class InstallKmpWindow(Gtk.Window):
             w = WelcomeView(uri_path, self.kbname)
             w.resize(800, 600)
             w.show_all()
-        #    view.load_uri(uri_path)
         else:
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
                 Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
-            #dialog.format_secondary_text(
-            #    "And this is the secondary text that explains things.")
             dialog.run()
             print("INFO dialog closed")
             dialog.destroy()

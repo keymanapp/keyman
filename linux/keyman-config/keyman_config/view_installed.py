@@ -19,7 +19,6 @@ class KeyboardBox(Gtk.Box):
         Gtk.Box.__init__(self)
         self.parent = window
 
-        #print(kmp)
         self.kmp = kmp
         icofile = os.path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".ico.bmp")
         if not os.path.isfile(icofile):
@@ -31,15 +30,12 @@ class KeyboardBox(Gtk.Box):
         if not os.path.isfile(icofile):
             icofile = "icons/icon_kmp.png"
         self.image = Gtk.Image.new_from_file(icofile)
-        #image.set_from_pixbuf(pics[0])
-        #grid.add(image)
         self.pack_start(self.image, False, False, 10)
 
         self.label1 = Gtk.Label()
         labeltext = kmp["name"] + " (" + kmp["version"] + ")"
         self.label1.set_text(labeltext)
         self.label1.set_halign(Gtk.Align.END)
-        #grid.attach_next_to(label1, image, Gtk.PositionType.RIGHT, 1, 1)
         self.pack_start(self.label1, False, False, 10)
 
         img_expand = "/usr/share/keyman/icons/expand20.png"
@@ -53,7 +49,6 @@ class KeyboardBox(Gtk.Box):
         self.expandimage = Gtk.Image.new_from_file(img_expand)
         self.expandbutton.set_image(self.expandimage)
         self.expandbutton.set_tooltip_text("More information about " + kmp["name"])
-        #grid.attach_next_to(expandbutton, helpbutton, Gtk.PositionType.RIGHT, 1, 1)
         self.expandbutton.connect("clicked", self.on_expand_clicked)
         self.pack_end(self.expandbutton, False, False, 0)
 
@@ -68,7 +63,6 @@ class KeyboardBox(Gtk.Box):
         self.uninstallimage = Gtk.Image.new_from_file(img_cross)
         self.uninstallbutton.set_image(self.uninstallimage)
         self.uninstallbutton.set_tooltip_text("Uninstall " + kmp["name"] + " (" + kmp["id"] + ")")
-        #grid.attach_next_to(uninstallbutton, expandbutton, Gtk.PositionType.RIGHT, 1, 1)
         self.uninstallbutton.connect("clicked", self.on_uninstall_clicked)
         self.pack_end(self.uninstallbutton, False, False, 0)
 
@@ -85,7 +79,6 @@ class KeyboardBox(Gtk.Box):
             self.helpimage = Gtk.Image.new_from_file(img_help)
             self.helpbutton.set_image(self.helpimage)
             self.helpbutton.set_tooltip_text("Help for " + kmp["name"])
-            #grid.attach_next_to(helpbutton, label1, Gtk.PositionType.RIGHT, 1, 1)
             self.helpbutton.connect("clicked", self.on_help_clicked)
             self.pack_end(self.helpbutton, False, False, 0)
 
@@ -132,7 +125,6 @@ class KmpGrid(Gtk.Grid):
         prevbox = None
         shade = False
         for kmp in sorted(installed_kmp):
-            #print(kmp)
             kbbox = KeyboardBox(installed_kmp[kmp], window)
             if shade:
                 kbbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.8,.8,.8,.5))
@@ -158,7 +150,6 @@ class ViewInstalledWindow(Gtk.Window):
         vbox.pack_start(self.s, True, True, 0)
 
         hbox = Gtk.Box(spacing=6)
-        #hbox.set_halign(Gtk.Align.FILL)
         vbox.pack_start(hbox, False, False, 0)
 
         self.grid = KmpGrid(self)
@@ -190,13 +181,6 @@ class ViewInstalledWindow(Gtk.Window):
         self.grid = KmpGrid(self)
         self.s.add_with_viewport(self.grid)
         self.s.show_all()
-
-
-    #def on_click_me_clicked(self, button):
-    #    print("\"Click me\" button was clicked")
-
-    #def on_open_clicked(self, button):
-    #    print("\"Open\" button was clicked")
 
     def on_close_clicked(self, button):
         print("Closing application")

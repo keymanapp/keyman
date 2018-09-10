@@ -13,8 +13,6 @@ def main():
     args = parser.parse_args()
 
     installed_kmp = get_installed_kmp()
-#    print(installed_kmp)
-#    print(sorted(installed_kmp))
     print("--- Installed keyboards ---")
     for kmp in sorted(installed_kmp):
         print(installed_kmp[kmp]['name'] + ", version:", installed_kmp[kmp]['version'] + ", id:", kmp)
