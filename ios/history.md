@@ -1,6 +1,9 @@
 # Keyman for iPhone and iPad Version History
 
 ## 2018-08-06 10.0.209 stable 
+* Fixed crash when setting up reachability callback (#1168)
+
+## 2018-08-06 10.0.209 stable 
 * Removed unnecessary UIFileSharingEnabled flag (#1087)
 
 ## 2018-08-03 10.0.208 stable 
