@@ -1,5 +1,11 @@
 # Keyman Developer Version History
 
+## 2018-09-12 10.0.1202 stable
+* Fix docbook links (#1067)
+
+## 2018-07-06 10.0.1201 stable
+* No changes to Keyman Developer (update to KeymanWeb script)
+
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release
 
