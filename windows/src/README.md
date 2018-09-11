@@ -61,8 +61,9 @@ uninstall and reinstall.
 ## Installing Keyman
 
 These steps are only required the first time you install Keyman:
-1. Install release versions of Keyman Desktop and Keyman Developer
-  * Download the [latest official builds (alpha)](https://keyman.com/beta/) and run the installers.
+1. Install release versions of Keyman Desktop and Keyman Developer for the branch in which you are working (
+   e.g. for master branch, download latest alpha, for beta, download latest beta, etc).
+   * Download from https://keyman.com/downloads/ and run the installers.
 2. Install the Keyman test certificates. Do the following for each KeymanTestCA cert in
 **windows/src/buildtools/certificates**:
     1. Open the certificate and click 'Install certificate...' to open the Certificate Import Wizard.
