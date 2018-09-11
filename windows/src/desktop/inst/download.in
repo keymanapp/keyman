@@ -20,5 +20,6 @@ clean:
   rem clean
 
 candle-desktop:
-  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 keymandesktop.wxs
+  $(WIXHEAT) dir ..\kmshell\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
+  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
 

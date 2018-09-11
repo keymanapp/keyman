@@ -154,16 +154,17 @@ TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
-WIXCANDLE=$(WIXPATH)\candle.exe -wx
+WIXCANDLE=$(WIXPATH)\candle.exe -wx -nologo
 
 !IFDEF LINT
-WIXLIGHT=$(WIXPATH)\light.exe -wx
+WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo
 !ELSE
 # we suppress ICE82 because it reports spurious errors with merge module keymanengine to do with duplicate sequence numbers.  Safely ignored.
-WIXLIGHT=$(WIXPATH)\light.exe -wx -sice:ICE82 -sice:ICE80
+WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo -sice:ICE82 -sice:ICE80
 !ENDIF
 
-WIXLIT=$(WIXPATH)\lit.exe -wx
+WIXLIT=$(WIXPATH)\lit.exe -wx -nologo
+WIXHEAT=$(WIXPATH)\heat.exe
 
 LINKPATH=link.exe
 
