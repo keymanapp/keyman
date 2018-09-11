@@ -360,7 +360,6 @@ begin
     LoadFromFile(FJsFile);
     FJSFileInfo.Filename := FJsFile;
     FJSFileInfo.Data := DataString;
-    FJSFileInfo.Standalone := False;
   finally
     Free;
   end;
