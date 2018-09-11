@@ -1,7 +1,7 @@
 # Keyman Developer Version History
 
-## 2018-09-13 10.0.1202 stable
-* Refactor how keyboard_info metdata is generated
+## 2018-09-12 10.0.1202 stable
+* Refactor how keyboard_info metdata is generated (#1174)
 
 ## 2018-07-06 10.0.1201 stable
 * No changes to Keyman Developer (update to KeymanWeb script)
