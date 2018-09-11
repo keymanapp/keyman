@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 11.0 alpha
+* Refactor how keyboard_info metdata is generated (#1158)
+
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release
 

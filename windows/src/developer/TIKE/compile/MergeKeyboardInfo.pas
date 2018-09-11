@@ -38,7 +38,8 @@ uses
   packageinfo,
   TempFileManager,
   kmxfile,
-  kmxfileconsts;
+  kmxfileconsts,
+  UKeymanTargets;
 
 type
   TKeyboardInfoMap = record
@@ -60,8 +61,9 @@ type
     FBaseName, FJsFile, FKmpFile, FJsonFile: string;
     FMergingValidateIds: Boolean;
     FKMPInfFile: TKMPInfFile;
-    FKMXFiles: array of TKeyboardInfoMap;
-    FJSFiles: array of TJSKeyboardInfoMap;
+    FPackageKMXFileInfos: array of TKeyboardInfoMap;
+    FPackageJSFileInfos: array of TKeyboardInfoMap;
+    FJSFileInfo: TJSKeyboardInfoMap;
     FVersion: string;
     FSourcePath: string;
     function Failed(message: string): Boolean;
@@ -84,10 +86,9 @@ type
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
     function SaveJsonFile: Boolean;
-    procedure CheckKMXFilenames;
+    procedure CheckPackageKeyboardFilenames;
     procedure AddIsRTL;
     procedure AddSourcePath;
-    function AddJSFile(const Filename: string): Integer;
   public
     destructor Destroy; override;
     class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
@@ -171,7 +172,7 @@ begin
     if not LoadJSFile then
       Exit(Failed('Could not load JS file '+FJsFile));
 
-    CheckKMXFileNames;
+    CheckPackageKeyboardFilenames;
 
     CheckOrAddID;
     AddName;
@@ -230,7 +231,7 @@ end;
 function TMergeKeyboardInfo.LoadKMPFile: Boolean;
 var
   FKMXTempFile, FKMPInfTempFile: TTempFile;
-  i: Integer;
+  i, j: Integer;
   LocalHeader: TZipHeader;
   Zip: TZipFile;
 
@@ -290,20 +291,53 @@ begin
 
       FKMXTempFile := TTempFileManager.Get('.kmx');
       try
-        for i := 0 to High(Zip.FileNames) do
+        if FKMPInfFile.Keyboards.Count > 0 then
         begin
-          if SameText(ExtractFileExt(Zip.FileNames[i]), '.kmx') then
+          for i := 0 to FKMPInfFile.Keyboards.Count - 1 do
           begin
-            SetLength(FKMXFiles, Length(FKMXFiles)+1);
+            for j := 0 to High(Zip.FileNames) do
+            begin
+              // Add the KMX to FPackageKMXFileinfos
+              if SameText(Zip.FileName[j], FKMPInfFile.Keyboards[i].ID + '.kmx') then
+              begin
+                SetLength(FPackageKMXFileInfos, Length(FPackageKMXFileInfos)+1);
+                SaveMemberToFile(Zip.FileNames[j], FKMXTempFile.Name);
+                FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Filename := Zip.FileNames[j];
+                GetKeyboardInfo(FKMXTempFile.Name, False, FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Info, False);
+              end;
 
-            SaveMemberToFile(Zip.FileNames[i], FKMXTempFile.Name);
+              // Add the JS to FPackageJSFileInfos
+              if SameText(Zip.FileNames[j], FKMPInfFile.Keyboards[i].ID + '.js') then
+              begin
+                SetLength(FPackageJSFileInfos, Length(FPackageJSFileInfos)+1);
+                FPackageJSFileInfos[High(FPackageJSFileInfos)].Filename := Zip.FileNames[j];
 
-            FKMXFiles[High(FKMXFiles)].Filename := Zip.FileNames[i];
-            GetKeyboardInfo(FKMXTempFile.Name, False, FKMXFiles[High(FKMXFiles)].Info, False);
+                // For now, apply JS keyboard to all web and mobile targets
+                // Not using GetKeyboardInfo because that only handles kmx files
+                FPackageJSFileInfos[High(FPackageJSFileInfos)].Info.Targets := 'web mobile';
+              end;
+            end;
+          end;
+        end
+
+        // Handle keyboard packages which may not have [Keyboard] sections defined in kmp.inf.
+        // Note: They will never include any js keyboards.
+        else if FKMPInfFile.Keyboards.Count = 0 then
+        begin
+          for i := 0 to High(Zip.FileNames) do
+          begin
+            if IsKeyboardFile(Zip.FileName[i]) then
+            begin
+              SetLength(FPackageKMXFileInfos, Length(FPackageKMXFileInfos)+1);
+              SaveMemberToFile(Zip.FileNames[i], FKMXTempFile.Name);
+              FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Filename := Zip.FileNames[i];
+              GetKeyboardInfo(FKMXTempFile.Name, False, FPackageKMXFileInfos[High(FPackageKMXFileInfos)].Info, False);
+            end;
           end;
         end;
+
       finally
-        FKMXTempFile.Free;
+          FKMXTempFile.Free;
       end;
     finally
       FreeAndNil(Zip);
@@ -321,23 +355,17 @@ begin
   if FJsFile = '' then
     Exit(True);
 
-  FJSFiles[AddJSFile(FJsFile)].Standalone := True;
-  Result := True;
-end;
-
-function TMergeKeyboardInfo.AddJSFile(const Filename: string): Integer;
-begin
   with TStringStream.Create('', TEncoding.UTF8) do
   try
     LoadFromFile(FJsFile);
-    SetLength(FJSFiles, Length(FJSFiles)+1);
-    Result := High(FJSFiles);
-    FJSFiles[Result].Filename := Filename;
-    FJSFiles[Result].Data := DataString;
-    FJSFiles[Result].Standalone := False;
+    FJSFileInfo.Filename := FJsFile;
+    FJSFileInfo.Data := DataString;
   finally
     Free;
   end;
+
+  FJSFileInfo.Standalone := True;
+  Result := True;
 end;
 
 function TMergeKeyboardInfo.SaveJsonFile: Boolean;
@@ -397,12 +425,12 @@ begin
 
   if Assigned(FKMPInfFile) then
     FName := FKMPInfFile.Info.Desc[PackageInfo_Name]
-  else if Length(FJSFiles) > 0  then
+  else if not FJSFileInfo.Data.IsEmpty then
   begin
-    with TRegEx.Match(FJSFiles[0].Data, 'this\.KN="([^"]+)"') do
+    with TRegEx.Match(FJSFileInfo.Data, 'this\.KN="([^"]+)"') do
     begin
       if Success
-        then FName := TGroupHelperRSP19902.Create(Groups[1], FJsFiles[0].Data).FixedValue
+        then FName := TGroupHelperRSP19902.Create(Groups[1], FJSFileInfo.Data).FixedValue
         else Exit;
     end;
   end
@@ -419,9 +447,9 @@ procedure TMergeKeyboardInfo.AddIsRTL;
 begin
   if json.GetValue('isRTL') <> nil then Exit;
 
-  if Length(FJSFiles) > 0 then
+  if (FJSFileInfo.Data <> '') then
   begin
-    with TRegEx.Match(FJsFiles[0].Data, 'this\.KRTL=1') do
+    with TRegEx.Match(FJSFileInfo.Data, 'this\.KRTL=1') do
     begin
       if not Success then Exit;
     end;
@@ -562,8 +590,8 @@ var
 begin
   encodings := [];
   // For each .kmx, get encodings and add to the result
-  for i := 0 to High(FKMXFiles) do
-    encodings := encodings + FKMXFiles[i].Info.Encodings;
+  for i := 0 to High(FPackageKMXFileInfos) do
+    encodings := encodings + FPackageKMXFileInfos[i].Info.Encodings;
 
   if FJsFile <> '' then Include(encodings, keUnicode);
 
@@ -684,10 +712,10 @@ begin
   begin
     FVersion := FKMPInfFile.Info.Desc[PackageInfo_Version];
   end
-  else if Length(FJsFiles) > 0 then
+  else if (FJSFileInfo.Data <> '') then
   begin
-    with TRegEx.Match(FJsFiles[0].Data, 'this\.KBVER=([''"])([^''"]+)(\1)') do
-      if Success then FVersion := TGroupHelperRSP19902.Create(Groups[2], FJsFiles[0].Data).FixedValue;
+    with TRegEx.Match(FJSFileInfo.Data, 'this\.KBVER=([''"])([^''"]+)(\1)') do
+      if Success then FVersion := TGroupHelperRSP19902.Create(Groups[2], FJSFileInfo.Data).FixedValue;
   end;
 
   if FVersion = '' then
@@ -717,20 +745,19 @@ var
 begin
   MinVersion := $0500;
   // For each .kmx, get minimum version and add to the result
-  for i := 0 to High(FKMXFiles) do
-    if FKMXFiles[i].Info.FileVersion > MinVersion then
-      MinVersion := FKMXFiles[i].Info.FileVersion;
+  for i := 0 to High(FPackageKMXFileInfos) do
+    if FPackageKMXFileInfos[i].Info.FileVersion > MinVersion then
+      MinVersion := FPackageKMXFileInfos[i].Info.FileVersion;
 
   FJSMinVersionString := '';
-  for i := Low(FJSFiles) to High(FJSFiles) do
+  with TRegEx.Match(FJSFileInfo.Data, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
   begin
-    with TRegEx.Match(FJsFiles[i].Data, 'this\.KMINVER=([''"])([^''"]+)(\1)') do
-      if Success then
-      begin
-        s := TGroupHelperRSP19902.Create(Groups[2], FJsFiles[i].Data).FixedValue;
-        if (FJSMinVersionString = '') or (CompareVersions(FJSMinVersionString, s) > 0) then
-          FJSMinVersionString := s;
-      end;
+    if Success then
+    begin
+      s := TGroupHelperRSP19902.Create(Groups[2], FJSFileInfo.Data).FixedValue;
+      if (FJSMinVersionString = '') or (CompareVersions(FJSMinVersionString, s) > 0) then
+        FJSMinVersionString := s;
+    end;
   end;
 
   MinVersionString := Format('%d.%d', [(MinVersion and VERSION_MASK_MAJOR) shr 8, (MinVersion and VERSION_MASK_MINOR)]);
@@ -753,26 +780,164 @@ end;
 //
 procedure TMergeKeyboardInfo.AddPlatformSupport;
 var
-  v: TJSONObject;
-begin
-  if json.GetValue('platformSupport') <> nil then Exit;
+  keyboardFile: TKeyboardInfoMap;
+  target: TKeymanTarget;
+  targets: TKeymanTargets;
+  p, v: TJSONObject;
+  numberKMXFiles, numberJSFiles : Integer;
 
+  procedure AddNewPair(PairName: string; value: string);
+  begin
+    try
+      if (v.GetValue(PairName) = nil) then
+        v.AddPair(PairName, value);
+    finally
+    end;
+  end;
+
+begin
+  try
+    // Validate pre-existing platformSupport
+    p := json.GetValue('platformSupport') as TJSONObject;
+    if p <> nil then
+    begin
+      numberKMXFiles := Length(FPackageKMXFileInfos);
+      if FJsFile <> '' then
+      begin
+        numberJSFiles := 1;
+      end
+      else
+      begin
+        numberJSFiles := Length(FPackageJSFileInfos);
+      end;
+
+      // Validate any target
+      if (p.GetValue('any') <> nil) and ((numberKMXFiles = 0) or (numberJSFiles = 0)) then
+        raise EInvalidKeyboardInfo.Create(
+          '"Any" target should have at least 1 .kmx and 1 .js keyboard file in the package');
+
+      // Validate desktop targets
+      if ((p.GetValue('windows') <> nil) or (p.GetValue('macos') <> nil) or
+          (p.GetValue('linux') <> nil) or (p.GetValue('desktop') <> nil)) and
+          (numberKMXFiles = 0) then
+        raise EInvalidKeyboardInfo.Create(
+          'Desktop targets should have at least 1 .kmx keyboard file in the package');
+
+      // Validate web/mobile targets. No kmx implies web/mobile targets
+      if ((numberKMXFiles = 0) or (p.GetValue('web') <> nil) or
+          (p.GetValue('iphone') <> nil) or (p.GetValue('ipad') <> nil) or
+          (p.GetValue('androidphone') <> nil) or (p.GetValue('androidtablet') <> nil) or
+          (p.GetValue('mobile') <> nil) or (p.GetValue('tablet') <> nil)) and
+          (numberJSFiles = 0) then
+        raise EInvalidKeyboardInfo.Create(
+          'Web/mobile targets should have at least 1 .js keyboard file in the package');
+
+      Exit;
+    end;
+  finally
+  end;
+
+  // Parse targets to populate platformSuppport
   v := TJSONObject.Create;
 
-  if Assigned(FKMPInfFile) then
+  for keyboardFile in FPackageKMXFileInfos do
   begin
-    v.AddPair('windows', 'full');
-    v.AddPair('macos', 'full');
-  end
-  else if Length(FKMXFiles) > 0 then
-    v.AddPair('windows', 'full');
+    targets := StringToKeymanTargets(keyboardFile.Info.Targets);
+    if ktAny in targets then
+    begin
+      AddNewPair('windows', 'full');
+      AddNewPair('macos', 'full');
+      AddNewPair('linux', 'full');
+      AddNewPair('desktopWeb', 'full');
+      AddNewPair('mobileWeb', 'full');
+      AddNewPair('android', 'full');
+      AddNewPair('ios', 'full');
+    end
+    else
+    begin
+      // If targets empty, then include all desktop targets
+      if (targets = []) then
+      begin
+        AddNewPair('windows', 'full');
+        AddNewPair('macos', 'full');
+        AddNewPair('linux', 'full');
+      end;
 
+      for target in targets do
+      begin
+        if target = ktDesktop then
+        begin
+          AddNewPair('windows', 'full');
+          AddNewPair('macos', 'full');
+          AddNewPair('linux', 'full');
+        end;
+        if target = ktWindows then
+          AddNewPair('windows', 'full');
+        if target = ktMacosx then
+          AddNewPair('macos', 'full');
+        if target = ktLinux then
+          AddNewPair('linux', 'full');
+
+        // FPackageKMXFileInfos can contain target information for web/mobile targets.
+        // This is a current limitation of FPackageJSFileInfos if there's no kmx files
+        if target = ktWeb then
+        begin
+          AddNewPair('desktopWeb', 'full');
+          AddNewPair('mobileWeb', 'full');
+        end;
+        if (target = ktMobile) then
+        begin
+          AddNewPair('android', 'full');
+          AddNewPair('ios', 'full');
+        end;
+        if (target = ktIphone) or (target = ktIpad) then
+        begin
+          AddNewPair('ios', 'full');
+        end;
+        if (target = ktAndroidphone) or (target = ktAndroidtablet) then
+        begin
+          AddNewPair('android', 'full');
+        end;
+      end;
+    end;
+  end;
+
+  for keyboardFile in FPackageJSFileInfos do
+  begin
+    targets := StringToKeymanTargets(keyboardFile.Info.Targets);
+    for target in targets do
+    begin
+      if (target = ktWeb) then
+      begin
+        AddNewPair('desktopWeb', 'full');
+        AddNewPair('mobileWeb', 'full');
+      end;
+      if (target = ktMobile) then
+      begin
+        AddNewPair('android', 'full');
+        AddNewPair('ios', 'full');
+      end;
+      if (target = ktIphone) or (target = ktIpad) then
+      begin
+        AddNewPair('ios', 'full');
+      end;
+      if (target = ktAndroidphone) or (target = ktAndroidtablet) then
+      begin
+        AddNewPair('android', 'full');
+      end;
+    end;
+  end;
+
+  // Handle JS file not in kmp
   if FJsFile <> '' then
   begin
-    v.AddPair('desktopWeb', 'full');
-    v.AddPair('mobileWeb', 'full');
-    v.AddPair('android', 'full');
-    v.AddPair('ios', 'full');
+    AddNewPair('desktopWeb', 'full');
+    AddNewPair('mobileWeb', 'full');
+
+    // TODO: Don't add Android and iOS when we complete the addition of all .js keyboards
+    // to packages in the repository (including legacy keyboards)
+    AddNewPair('android', 'full');
+    AddNewPair('ios', 'full');
   end;
 
   json.AddPair('platformSupport', v);
@@ -792,19 +957,40 @@ begin
   json.AddPair('sourcePath', FSourcePath);
 end;
 
-procedure TMergeKeyboardInfo.CheckKMXFilenames;
+procedure TMergeKeyboardInfo.CheckPackageKeyboardFilenames;
+var
+  numberKMXFiles, numberJSFiles : Integer;
 begin
-  // Check that the id of the kmx files matches the filename; used only for release/ keyboards
-  // in the keyboards repository. This implies there should be only 1 kmx in release/ keyboard
+  // Check that the id of the kmx/js files matches the base filename; used only for release/ keyboards
+  // in the keyboards repository. This implies there should be only 1 kmx and/or 1 js in release/ keyboard
   // packages; this check would not be done in the packages folder.
   if FMergingValidateIds and Assigned(FKMPInfFile) then
   begin
-    if Length(FKMXFiles) <> 1 then
-      raise EInvalidKeyboardInfo.Create('There should be exactly 1 .kmx file in the package.');
+    numberKMXFiles := Length(FPackageKMXFileInfos);
+    numberJSFiles := Length(FPackageJSFileInfos);
+    if (numberKMXFiles = 0) and (numberJSFiles = 0) then
+      raise EInvalidKeyboardInfo.Create('There should be at least 1 .kmx or .js keyboard file in the package.');
 
-    if ChangeFileExt(FKMXFiles[0].Filename, '') <> FBaseName then
+    if numberKMXFiles > 1 then
+    begin
+      raise EInvalidKeyboardInfo.Create('There should be at most 1 .kmx keyboard file in the packge.');
+    end
+    else if (numberKMXFiles = 1) and (ChangeFileExt(FPackageKMXFileInfos[0].Filename, '') <> FBaseName) then
+    begin
       raise EInvalidKeyboardInfo.CreateFmt('The file "%s" file in the package has the wrong filename. It should be "%s.kmx"',
-        [FKMXFiles[0].Filename, FBaseName]);
+        [FPackageKMXFileInfos[0].Filename, FBaseName]);
+    end;
+
+    if numberJSFiles > 1 then
+    begin
+      raise EInvalidKeyboardInfo.Create('There should be at most 1 .js keyboard file in the package.');
+    end
+    else if (numberJSFiles = 1) and (ChangeFileExt(FPackageJSFileInfos[0].Filename, '') <> FBaseName) then
+    begin
+      raise EInvalidKeyboardInfo.CreateFmt('The file "%s" file in the package has the wrong filename. It should be "%s.js"',
+        [FPackageJSFileInfos[0].Filename, FBaseName]);
+    end;
+
   end;
 end;
 
