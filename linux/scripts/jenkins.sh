@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 . $HOME/ci-builder-scripts/bash/common.sh
-init
+init --no-package
 
 # clean up prev deb builds
 log "cleaning previous builds of $1"
