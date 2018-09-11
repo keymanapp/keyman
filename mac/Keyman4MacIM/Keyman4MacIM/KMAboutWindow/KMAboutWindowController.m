@@ -11,6 +11,7 @@
 
 @interface KMAboutWindowController ()
 @property (nonatomic, weak) IBOutlet NSTextField *versionLabel;
+@property (nonatomic, weak) IBOutlet NSTextField *copyrightLabel;
 @property (nonatomic, weak) IBOutlet NSButton *licenseButton;
 @end
 
@@ -27,8 +28,16 @@
     [self.window setBackgroundColor:[NSColor whiteColor]];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSString *build = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString *)kCFBundleVersionKey];
-    [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@ (build %@)", version, build]];
-    
+    if ([version isEqualToString:build]) {
+        [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@", version]];
+    }
+    else {
+        [self.versionLabel setStringValue:[NSString stringWithFormat:@"Version %@ (build %@)", version, build]];
+    }
+         
+    NSMutableString *copyrightInfo = [[NSMutableString alloc] initWithString: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"]];
+    [self.copyrightLabel setStringValue:copyrightInfo];
+
     NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:[self.licenseButton bounds]
                                                                 options:NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
                                                                   owner:self

@@ -1,12 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="KMAboutWindowController">
             <connections>
+                <outlet property="copyrightLabel" destination="fjZ-Vg-DtW" id="N6V-px-DIQ"/>
                 <outlet property="licenseButton" destination="i8D-2n-KYh" id="zAX-zS-xuh"/>
                 <outlet property="versionLabel" destination="ln9-LY-e8d" id="z7u-VF-TqG"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
@@ -17,43 +19,63 @@
         <window title="KeymanMac" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" animationBehavior="default" id="F0z-JX-Cv5" customClass="KMAboutWindow">
             <windowStyleMask key="styleMask" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="450" height="300"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="contentRect" x="196" y="240" width="450" height="318"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="se5-gp-TjO" customClass="KMAboutBGView">
-                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                <rect key="frame" x="0.0" y="0.0" width="450" height="318"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FYn-ZH-f76">
-                        <rect key="frame" x="0.0" y="73" width="450" height="150"/>
+                        <rect key="frame" x="0.0" y="95" width="450" height="150"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="450" id="hah-EB-4r4"/>
                             <constraint firstAttribute="height" constant="150" id="oF1-V1-6Sf"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="image" id="LQf-V6-Tof"/>
                     </imageView>
-                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UOr-Co-IuK">
-                        <rect key="frame" x="15" y="240" width="48" height="48"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="48" id="13X-xl-BgG"/>
-                            <constraint firstAttribute="width" constant="48" id="nsA-cc-d9t"/>
-                        </constraints>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="logo" id="4mp-20-rlf"/>
-                    </imageView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="wFc-QI-nGq" customClass="KMBarView">
-                        <rect key="frame" x="0.0" y="223" width="450" height="7"/>
+                        <rect key="frame" x="0.0" y="245" width="450" height="7"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="7" id="NHA-id-0ze"/>
                             <constraint firstAttribute="width" constant="450" id="vat-1d-q8p"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="7" id="vyH-ga-e1G"/>
                         </constraints>
                     </customView>
-                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ab3-8I-BqS">
-                        <rect key="frame" x="65" y="232" width="150" height="60"/>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i8D-2n-KYh">
+                        <rect key="frame" x="20" y="60" width="89" height="19"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="150" id="KsS-15-a76"/>
-                            <constraint firstAttribute="height" constant="60" id="lfQ-4g-zNR"/>
+                            <constraint firstAttribute="height" constant="19" id="si0-WI-zp7"/>
                         </constraints>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="title" id="7Hs-8o-a6P"/>
+                        <buttonCell key="cell" type="roundRect" title="License Agreement" bezelStyle="roundedRect" alignment="left" controlSize="mini" state="on" imageScaling="proportionallyDown" inset="2" id="hYC-Bx-aoP">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="miniSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="licenseAction:" target="-2" id="DOO-Wo-6Sv"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ln9-LY-e8d">
+                        <rect key="frame" x="20" y="35" width="256" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="15" id="Eps-Mv-cM9"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Version 1.0.100" id="69w-EI-e3y">
+                            <font key="font" metaFont="miniSystem"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IcZ-9F-kwH">
+                        <rect key="frame" x="20" y="20" width="80" height="11"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Copyright ©2018" id="fjZ-Vg-DtW">
+                            <font key="font" metaFont="miniSystem"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sgd-KC-LbG">
+                        <rect key="frame" x="403" y="263" width="32" height="36"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="SILInBlue76" id="0zb-i2-bhN"/>
                     </imageView>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XIT-T3-xre">
                         <rect key="frame" x="390" y="19" width="50" height="19"/>
@@ -69,34 +91,8 @@
                             <action selector="closeAction:" target="-2" id="frJ-pm-Iyg"/>
                         </connections>
                     </button>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ln9-LY-e8d">
-                        <rect key="frame" x="247" y="232" width="200" height="15"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="15" id="Eps-Mv-cM9"/>
-                            <constraint firstAttribute="width" constant="196" id="OEW-Si-NHr"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Version 1.0 (build 100)" id="69w-EI-e3y">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i8D-2n-KYh">
-                        <rect key="frame" x="180" y="0.0" width="90" height="19"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="90" id="EbG-vA-8du"/>
-                            <constraint firstAttribute="height" constant="19" id="si0-WI-zp7"/>
-                        </constraints>
-                        <buttonCell key="cell" type="roundRect" title="License Agreement" bezelStyle="roundedRect" alignment="center" controlSize="mini" state="on" imageScaling="proportionallyDown" inset="2" id="hYC-Bx-aoP">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="miniSystem"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="licenseAction:" target="-2" id="DOO-Wo-6Sv"/>
-                        </connections>
-                    </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xqc-bi-pPI">
-                        <rect key="frame" x="10" y="19" width="100" height="19"/>
+                        <rect key="frame" x="282" y="19" width="100" height="19"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="18" id="W0C-Lh-ns5"/>
                             <constraint firstAttribute="width" constant="100" id="l3A-K7-gqm"/>
@@ -109,37 +105,51 @@
                             <action selector="configAction:" target="-2" id="3W6-cm-6P5"/>
                         </connections>
                     </button>
+                    <imageView autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UOr-Co-IuK">
+                        <rect key="frame" x="15" y="252" width="400" height="58"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="58" id="AMG-Zr-ebx"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="left" imageScaling="proportionallyUpOrDown" image="keyman-88" id="4mp-20-rlf"/>
+                    </imageView>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="IcZ-9F-kwH" firstAttribute="top" secondItem="ln9-LY-e8d" secondAttribute="bottom" priority="750" constant="4" id="34l-hR-vnD"/>
                     <constraint firstAttribute="trailing" secondItem="wFc-QI-nGq" secondAttribute="trailing" id="3IX-BW-75e"/>
                     <constraint firstItem="FYn-ZH-f76" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="4Pt-4T-0oy"/>
                     <constraint firstAttribute="bottom" secondItem="XIT-T3-xre" secondAttribute="bottom" constant="20" id="4Yp-Kh-DkL"/>
                     <constraint firstItem="wFc-QI-nGq" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="5wh-lg-tMG"/>
-                    <constraint firstItem="i8D-2n-KYh" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="75V-Z3-L22"/>
+                    <constraint firstItem="sgd-KC-LbG" firstAttribute="centerY" secondItem="UOr-Co-IuK" secondAttribute="centerY" id="6m8-lC-irl"/>
+                    <constraint firstAttribute="bottom" secondItem="IcZ-9F-kwH" secondAttribute="bottom" constant="20" symbolic="YES" id="7Ws-Q0-kt9"/>
+                    <constraint firstItem="xqc-bi-pPI" firstAttribute="leading" secondItem="IcZ-9F-kwH" secondAttribute="trailing" priority="250" constant="8" symbolic="YES" id="8hY-Hr-7J0"/>
                     <constraint firstAttribute="trailing" secondItem="FYn-ZH-f76" secondAttribute="trailing" id="A7I-Rh-hkf"/>
-                    <constraint firstItem="ab3-8I-BqS" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="8" id="CNm-Xe-hVd"/>
-                    <constraint firstItem="ab3-8I-BqS" firstAttribute="leading" secondItem="UOr-Co-IuK" secondAttribute="trailing" constant="2" id="Coa-2b-ZM9"/>
-                    <constraint firstAttribute="bottom" secondItem="FYn-ZH-f76" secondAttribute="bottom" constant="73" id="L7A-L6-Rcz"/>
-                    <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="UOr-Co-IuK" secondAttribute="bottom" constant="10" id="LBM-uP-nY9"/>
-                    <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="ln9-LY-e8d" secondAttribute="bottom" constant="2" id="Nce-eH-8Y1"/>
-                    <constraint firstItem="UOr-Co-IuK" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="TsV-7T-FPF"/>
-                    <constraint firstAttribute="trailing" secondItem="ln9-LY-e8d" secondAttribute="trailing" constant="5" id="WLO-qQ-Rqn"/>
-                    <constraint firstAttribute="bottom" secondItem="i8D-2n-KYh" secondAttribute="bottom" id="ZTK-qO-ku8"/>
-                    <constraint firstItem="xqc-bi-pPI" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="10" id="klp-ej-xB8"/>
+                    <constraint firstAttribute="bottom" secondItem="FYn-ZH-f76" secondAttribute="bottom" priority="750" constant="93" id="L7A-L6-Rcz"/>
+                    <constraint firstItem="i8D-2n-KYh" firstAttribute="top" secondItem="FYn-ZH-f76" secondAttribute="bottom" constant="16" id="M00-mR-yMk"/>
+                    <constraint firstItem="UOr-Co-IuK" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="8" id="Ovf-6T-VEs"/>
+                    <constraint firstItem="UOr-Co-IuK" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Wq2-xT-mCh"/>
+                    <constraint firstItem="XIT-T3-xre" firstAttribute="leading" secondItem="xqc-bi-pPI" secondAttribute="trailing" constant="8" symbolic="YES" id="Xu7-qs-jYd"/>
+                    <constraint firstItem="ln9-LY-e8d" firstAttribute="leading" secondItem="i8D-2n-KYh" secondAttribute="leading" constant="2" id="YgZ-NC-0Za"/>
+                    <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="UOr-Co-IuK" secondAttribute="bottom" id="ZZw-D6-rjh"/>
+                    <constraint firstItem="XIT-T3-xre" firstAttribute="bottom" secondItem="xqc-bi-pPI" secondAttribute="bottom" id="cSa-p4-Xov"/>
+                    <constraint firstItem="xqc-bi-pPI" firstAttribute="leading" secondItem="ln9-LY-e8d" secondAttribute="trailing" priority="750" constant="8" symbolic="YES" id="ey1-4k-Pht"/>
+                    <constraint firstItem="i8D-2n-KYh" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="hLb-9t-eDw"/>
                     <constraint firstItem="FYn-ZH-f76" firstAttribute="top" secondItem="wFc-QI-nGq" secondAttribute="bottom" id="kuI-RR-4wa"/>
-                    <constraint firstItem="UOr-Co-IuK" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="12" id="l9c-4G-GZr"/>
                     <constraint firstAttribute="trailing" secondItem="XIT-T3-xre" secondAttribute="trailing" constant="10" id="pJs-ap-Bgn"/>
+                    <constraint firstItem="IcZ-9F-kwH" firstAttribute="leading" secondItem="ln9-LY-e8d" secondAttribute="leading" id="q3g-Rz-0gh"/>
+                    <constraint firstAttribute="trailing" secondItem="sgd-KC-LbG" secondAttribute="trailing" constant="15" id="xGg-Cj-G34"/>
                     <constraint firstAttribute="bottom" secondItem="xqc-bi-pPI" secondAttribute="bottom" constant="20" id="ysa-9B-9Vg"/>
+                    <constraint firstItem="ln9-LY-e8d" firstAttribute="top" secondItem="i8D-2n-KYh" secondAttribute="bottom" constant="10" id="znF-Zd-vGG"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
+            <point key="canvasLocation" x="132" y="133"/>
         </window>
     </objects>
     <resources>
+        <image name="SILInBlue76" width="31.799999237060547" height="35.400001525878906"/>
         <image name="image" width="1125" height="375"/>
-        <image name="logo" width="17.058769226074219" height="17.058769226074219"/>
-        <image name="title" width="150" height="60"/>
+        <image name="keyman-88" width="400" height="140.80000305175781"/>
     </resources>
 </document>
