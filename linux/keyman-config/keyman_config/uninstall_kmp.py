@@ -33,7 +33,7 @@ def uninstall_from_ibus(keyboardid):
 			result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
 				stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 
-def uninstall_kmp(keyboardid):
+def uninstall_kmp_shared(keyboardid):
 	"""
 	Uninstall a kmp from /usr/local/share/keyman
 
@@ -72,3 +72,27 @@ def uninstall_kmp(keyboardid):
 	rmtree(kbdir)
 	logging.info("Removed keyman directory: %s", kbdir)
 	logging.info("Finished uninstalling keyboard: %s", keyboardid)
+
+def uninstall_kmp_user(keyboardid):
+	"""
+	Uninstall a kmp from ~/.local/share/keyman
+
+	Args:
+		keyboardid (str): Keyboard ID
+	"""
+	# TODO use XDG_DATA_HOME
+	pass
+
+
+def uninstall_kmp(keyboardid, sharedarea):
+	"""
+	Uninstall a kmp
+
+	Args:
+		keyboardid (str): Keyboard ID
+		sharedarea (str): whether to uninstall from /usr/local or ~/.local
+	"""
+	if sharedarea:
+		uninstall_kmp_shared(keyboardid)
+	else:
+		uninstall_kmp_user(keyboardid)
