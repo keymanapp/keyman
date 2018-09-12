@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="common_mac">
   <title>Does Keyman Desktop run on a Mac?</title>
-  <para>Yes. Please visit <ulink href="https://keyman.com/macos/">Keyman for macOS</ulink> for more information. Also note that there are two other ways you can use Keyman keyboards on a Mac:</para>
+  <para>Yes. Please visit <ulink url="https://keyman.com/macos/">Keyman for macOS</ulink> for more information. Also note that there are two other ways you can use Keyman keyboards on a Mac:</para>
   <orderedlist>
     <listitem><para>If you are running Windows on your Mac (through a program like Fusion, Parallels or BootCamp) you can use Keyman Desktop through Windows.</para></listitem>
     <listitem>
