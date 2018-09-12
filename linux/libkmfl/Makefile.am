@@ -9,8 +9,7 @@ libkmfldoc_DATA = \
 	AUTHORS\
 	ChangeLog\
 	INSTALL\
-	NEWS\
-	TODO
+	NEWS
 
 EXTRA_DIST = $(libkmfldoc_DATA)
 

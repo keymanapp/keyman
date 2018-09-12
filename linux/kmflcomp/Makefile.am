@@ -12,8 +12,7 @@ kmflcompdoc_DATA = \
 	AUTHORS\
 	ChangeLog\
 	INSTALL\
-	NEWS\
-	TODO
+	NEWS
 
 EXTRA_DIST = $(kmflcompdoc_DATA)
 
