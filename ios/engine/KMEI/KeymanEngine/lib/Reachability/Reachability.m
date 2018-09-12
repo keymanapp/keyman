@@ -134,10 +134,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 	if (SCNetworkReachabilitySetCallback(_reachabilityRef, ReachabilityCallback, &context))
 	{
-		if (SCNetworkReachabilityScheduleWithRunLoop(_reachabilityRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode))
-		{
-			returnValue = YES;
-		}
+        @try
+        {
+            returnValue = SCNetworkReachabilityScheduleWithRunLoop(_reachabilityRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        }
+        @catch (NSException *exception)
+        {
+            NSLog(@"%@ ",exception.name);
+            NSLog(@"Reason: %@ ",exception.reason);
+        }
 	}
     
 	return returnValue;
