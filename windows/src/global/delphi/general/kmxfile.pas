@@ -80,6 +80,7 @@ type
     WindowsLanguages: WideString;
     ISO6393Languages: WideString;
     KeyboardVersion: WideString;   // I4136
+    Targets: WideString;
   end;
 
   PKeyboardInfo = ^TKeyboardInfo;
@@ -242,6 +243,7 @@ begin
 
       GetSystemStore(Memory, TSS_WINDOWSLANGUAGES, ki.WindowsLanguages);
       GetSystemStore(Memory, TSS_ETHNOLOGUECODE, ki.ISO6393Languages);
+      GetSystemStore(Memory, TSS_TARGETS, ki.Targets);
 
       if not GetSystemStore(Memory, TSS_KEYBOARDVERSION, ki.KeyboardVersion) then   // I4136
         ki.KeyboardVersion := '1.0';

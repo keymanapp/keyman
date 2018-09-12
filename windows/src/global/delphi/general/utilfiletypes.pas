@@ -134,10 +134,11 @@ begin
 end;
 
 function IsKeyboardFile(const FileName: string): Boolean;
+var
+  t : TKMFileType;
 begin
-    if Length(FileName) < 5 then Result := False
-    else Result := (LowerCase(Copy(FileName, Length(FileName)-3, 4)) = '.kmx') or
-        (LowerCase(Copy(FileName, Length(FileName)-3, 4)) = '.kxx');
+  t := GetFileTypeFromFileName(FileName);
+  Result := t = ftKeymanFile;
 end;
 
 function RemoveFileExtension(Filename, Extension: string): string;
