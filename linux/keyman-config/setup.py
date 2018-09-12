@@ -14,7 +14,7 @@ setup(
              'km-package-list-installed', ],
 
     install_requires=[
-        'lxml', 'numpy', 'PIL', 'requests', 'requests-cache',
+        'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
         'python-magic',
     ],
 
