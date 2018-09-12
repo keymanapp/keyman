@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import gi
+import logging
 import subprocess
 import webbrowser
 import urllib.parse
@@ -55,9 +56,9 @@ class WelcomeView(Gtk.Window):
         return False
 
     def on_openweb_clicked(self, button):
-        print("\"Open in Web browser\" button was clicked")
+        logging.info("\"Open in Web browser\" button was clicked")
         webbrowser.open(self.welcomeurl)
 
     def on_ok_clicked(self, button):
-        print("Closing welcome window")
+        logging.info("Closing welcome window")
         self.close()

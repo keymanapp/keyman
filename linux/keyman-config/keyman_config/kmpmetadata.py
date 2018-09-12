@@ -2,6 +2,7 @@
 
 import json
 import configparser
+import logging
 import sys
 import os.path
 import magic
@@ -161,8 +162,7 @@ def parseinfdata(inffile, verbose=False):
 	if os.path.isfile(inffile):
 		config = configparser.ConfigParser()
 		config.optionxform = str
-		if verbose:
-			print("reading file", inffile, "dir:", extracted_dir)
+		logging.info("parseinfdata: reading file:%s dir:%s", inffile, extracted_dir)
 
 		with open(inffile, 'r', encoding='latin_1') as f:
 			config.read_file(f)
@@ -184,7 +184,7 @@ def parseinfdata(inffile, verbose=False):
 					elif item[0] == "WebSite":
 						info['website'] = { 'description' : item[1].split("\"")[1] }
 					else:
-						print("Unknown item in Info:", item[0])
+						logging.warning("Unknown item in Info: %s", item[0])
 			if section == 'PackageInfo':
 				if not info:
 					info = {}
@@ -210,7 +210,7 @@ def parseinfdata(inffile, verbose=False):
 						else:
 							info['website'] = { 'description' : item[1].split("\"")[2] }
 					else:
-						print("Unknown item in Info:", item[0])
+						logging.warning("Unknown item in Info: %s", item[0])
 			elif section == 'Package':
 				system = {}
 				if not options:
@@ -246,7 +246,7 @@ def parseinfdata(inffile, verbose=False):
 						langname, langid = item[1].split(",")
 						languages.append({ 'name' : langname, 'id' : langid })
 					else:
-						print("Unknown item in keyboard:", item[0])
+						logging.warning("Unknown item in keyboard: %s", item[0])
 				keyboard['languages'] = languages
 				keyboards.append(keyboard)
 			elif section == "Files":
@@ -334,7 +334,7 @@ def parsemetadata(jsonfile, verbose=False):
 				elif x == 'nonexistent':
 					nonexistent = data[x]
 			if nonexistent != None:
-				print("This should not happen")
+				logging.warning("This should not happen")
 			if verbose:
 				print_info(info)
 				print_system(system)
@@ -346,13 +346,13 @@ def parsemetadata(jsonfile, verbose=False):
 
 def main(argv):
 	if len(sys.argv) != 2:
-		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		logging.error("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 	inputfile = sys.argv[1]
 	
 	if not os.path.isfile(inputfile):
-		print("kmpmetadata.py Input file ", inputfile, " not found.")
-		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		logging.error"kmpmetadata.py Input file ", inputfile, " not found.")
+		logging.error("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 	
 	name, ext = os.path.splitext(inputfile)
@@ -361,8 +361,8 @@ def main(argv):
 	elif ext == ".inf":
 		parseinfdata(inputfile, True)
 	else:
-		print("kmpmetadata.py Input file must be json or inf.")
-		print("kmpmetadata.py <kmp.json> or <kmp.inf>")
+		logging.error("kmpmetadata.py Input file must be json or inf.")
+		logging.error("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 
 if __name__ == "__main__":

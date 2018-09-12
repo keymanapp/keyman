@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import logging
 import os.path
 import urllib.parse
 import pathlib
@@ -49,12 +50,10 @@ class DownloadKmpWindow(Gtk.Window):
 
         self.add(vbox)
 
-    def process_kmp(self, url, downloadfile, verbose=False):
-        if verbose:
-            print("Downloading file to", downloadfile)
-        if download_kmp_file(url, downloadfile, True):
-            if verbose:
-                print("File downloaded")
+    def process_kmp(self, url, downloadfile):
+        logging.info("Downloading kmp file to %s", downloadfile)
+        if download_kmp_file(url, downloadfile):
+            logging.info("File downloaded")
             w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow)
             if w.checkcontinue:
                 w.show_all()
@@ -68,7 +67,7 @@ class DownloadKmpWindow(Gtk.Window):
             if parsed.path == "download":
                 qs = urllib.parse.parse_qs(parsed.query)
                 downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
-                if self.process_kmp(qs['url'][0], downloadfile, True):
+                if self.process_kmp(qs['url'][0], downloadfile):
                     policy.ignore()
                     return True
             elif parsed.path == "link":
@@ -78,7 +77,7 @@ class DownloadKmpWindow(Gtk.Window):
         return False
 
     def on_close_clicked(self, button):
-        print("Closing download window")
+        logging.debug("Closing download window")
         if self.endonclose:
             Gtk.main_quit()
         else:
@@ -89,6 +88,7 @@ class DownloadKmpWindow(Gtk.Window):
         self.endonclose = True
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     w = DownloadKmpWindow()
     w.connectdestroy()
     w.resize(800, 450)

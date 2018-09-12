@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import logging
 import os.path
 import pathlib
 import gi
@@ -83,19 +84,19 @@ class KeyboardBox(Gtk.Box):
             self.pack_end(self.helpbutton, False, False, 0)
 
     def on_help_clicked(self, button):
-        print("Open welcome.htm for", self.kmp["name"], "if available")
+        logging.info("Open welcome.htm for" + self.kmp["name"] + "if available")
         welcome_file = os.path.join("/usr/local/share/doc/keyman", self.kmp["id"], "welcome.htm")
         if os.path.isfile(welcome_file):
             uri_path = pathlib.Path(welcome_file).as_uri()
-            print("opening", uri_path)
+            logging.info("opening" + uri_path)
             w = WelcomeView(uri_path, self.kmp["id"])
             w.resize(800, 600)
             w.show_all()
         else:
-            print("not available")
+            logging.info("welcome.htm not available")
 
     def on_uninstall_clicked(self, button):
-        print("Uninstall keyboard", self.kmp["id"], "?")
+        logging.info("Uninstall keyboard " +  self.kmp["id"] + "?")
         dialog = Gtk.MessageDialog(self.parent, 0, Gtk.MessageType.QUESTION,
             Gtk.ButtonsType.YES_NO, "Uninstall keyboard?")
         dialog.format_secondary_text(
@@ -103,15 +104,15 @@ class KeyboardBox(Gtk.Box):
         response = dialog.run()
         dialog.destroy()
         if response == Gtk.ResponseType.YES:
-            print("Uninstalling keyboard", self.kmp["name"])
+            logging.info("Uninstalling keyboard" + self.kmp["name"])
             uninstall_kmp(self.kmp["id"])
-            print("need to refresh window after uninstalling a keyboard")
+            logging.info("need to refresh window after uninstalling a keyboard")
             self.parent.refresh_installed_kmp()
         elif response == Gtk.ResponseType.NO:
-            print("Not uninstalling keyboard", self.kmp["name"])
+            logging.info("Not uninstalling keyboard " + self.kmp["name"])
 
     def on_expand_clicked(self, button):
-        print("Show keyboard details of", self.kmp["name"])
+        logging.info("Show keyboard details of " + self.kmp["name"])
         w = KeyboardDetailsView(self.kmp)
         w.resize(800, 450)
         w.show_all()
@@ -176,28 +177,28 @@ class ViewInstalledWindow(Gtk.Window):
         self.add(vbox)
 
     def refresh_installed_kmp(self):
-        print("Refreshing grid")
+        logging.debug("Refreshing grid")
         self.s.remove(self.s.get_child())
         self.grid = KmpGrid(self)
         self.s.add_with_viewport(self.grid)
         self.s.show_all()
 
     def on_close_clicked(self, button):
-        print("Closing application")
+        logging.debug("Close application clicked")
         Gtk.main_quit()
 
     def on_refresh_clicked(self, button):
-        print("Refreshing application")
+        logging.debug("Refresh application clicked")
         self.refresh_installed_kmp()
 
     def on_download_clicked(self, button):
-        print("Download")
+        logging.debug("Download clicked")
         w = DownloadKmpWindow(self)
         w.resize(800, 450)
         w.show_all()
 
     def on_installfile_clicked(self, button):
-        print("Install from file")
+        logging.debug("Install from file clicked")
         dlg = Gtk.FileChooserDialog("Choose a kmp file..", self, Gtk.FileChooserAction.OPEN,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         filter_text = Gtk.FileFilter()

@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import argparse
+import logging
 import os
 import json
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
-from keyman_config.get_kmp import get_keyboard_data
 
 def get_installed_kmp():
     """
@@ -80,9 +80,9 @@ def main():
         print(installed_kmp[kmp]['name'] + ", version:", installed_kmp[kmp]['version'] + ", id:", kmp)
         if not args.short:
             if installed_kmp[kmp]['version'] != installed_kmp[kmp]['kmpversion']:
-                print("Version mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['kmpversion'], installed_kmp[kmp]['version']))
+                logging.warning("Version mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['kmpversion'], installed_kmp[kmp]['version']))
             if installed_kmp[kmp]['name'] != installed_kmp[kmp]['kmpname']:
-                print("Name mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['name'], installed_kmp[kmp]['kmpname']))
+                logging.warning("Name mismatch. Installed keyboard is %s. Website says it is %s." % (installed_kmp[kmp]['name'], installed_kmp[kmp]['kmpname']))
 
             if installed_kmp[kmp]['description']:
                 print(installed_kmp[kmp]['description'])

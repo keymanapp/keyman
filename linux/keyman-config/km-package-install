@@ -12,22 +12,31 @@ def main():
 	parser.add_argument('-f', metavar='<kmpfile>', help='Keyman kmp file')
 	parser.add_argument('-k', metavar='<keyboardid>', help='Keyman keyboard id')
 	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+	parser.add_argument('-v', action='store_true', help='verbose logging')
+	parser.add_argument('-vv', action='store_true', help='very verbose logging')
 
 	args = parser.parse_args()
+	if args.v:
+		logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
+	elif args.vv:
+		logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
+	else:
+		logging.basicConfig(format='%(levelname)s:%(message)s')
+
 	if args.k and args.f:
-		print("km-package-install: error: too many arguments: either install a local kmp file or specify a keyboard id to download and install.")
+		logging.error("km-package-install: error: too many arguments: either install a local kmp file or specify a keyboard id to download and install.")
 		sys.exit(2)
 
 	if args.f:
 		name, ext = os.path.splitext(args.f)
 		if ext != ".kmp":
-			print("km-package-install: Input file", args.f, "is not a kmp file.")
-			print("km-package-install -f <kmpfile>")
+			logging.error("km-package-install: Input file", args.f, "is not a kmp file.")
+			logging.error("km-package-install -f <kmpfile>")
 			sys.exit(2)
 
 		if not os.path.isfile(args.f):
-			print("km-package-install: Keyman kmp file", args.f, "not found.")
-			print("km-package-install -f <kmpfile>")
+			logging.error("km-package-install: Keyman kmp file %s not found.", args.f)
+			logging.error("km-package-install -f <kmpfile>")
 			sys.exit(2)
 
 		install_kmp(args.f)
@@ -35,27 +44,25 @@ def main():
 		installed_kmp_ver = get_kmp_version(args.k)
 		kbdata = get_keyboard_data(args.k)
 		if not kbdata:
-			print("km-package-install: error: Could not download keyboard data for", args.k)
+			logging.error("km-package-install: error: Could not download keyboard data for", args.k)
 			sys.exit(3)
 		if installed_kmp_ver:
 			if kbdata['version'] == installed_kmp_ver:
-				print("km-package-install: The %s version of the %s keyboard is already installed." % (installed_kmp_ver, args.k))
+				logging.error("km-package-install: The %s version of the %s keyboard is already installed.", installed_kmp_ver, args.k)
 				sys.exit(1)
 			elif float(kbdata['version']) > float(installed_kmp_ver):
-				print("km-package-install: A newer version of %s keyboard is available. Uninstalling old version %s then downloading and installing new version %s." % (args.k, installed_kmp_ver, kbdata['version']))
+				logging.error("km-package-install: A newer version of %s keyboard is available. Uninstalling old version %s then downloading and installing new version %s.", args.k, installed_kmp_ver, kbdata['version'])
 				uninstall_kmp(args.k)
 
 		kmpfile = get_kmp(args.k)
 		if kmpfile:
 			install_kmp(kmpfile, True)
 		else:
-			print("km-package-install: error: Could not download keyboard package", args.k)
+			logging.error("km-package-install: error: Could not download keyboard package %s", args.k)
 			sys.exit(2)
 	else:
-		print("km-package-install: error: no arguments: either install a local kmp file or specify a keyboard id to download and install.")
+		logging.error("km-package-install: error: no arguments: either install a local kmp file or specify a keyboard id to download and install.")
 		sys.exit(2)
-
-
 
 if __name__ == "__main__":
 	main()

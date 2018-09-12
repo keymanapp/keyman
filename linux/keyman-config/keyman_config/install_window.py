@@ -2,6 +2,7 @@
 
 # Install confirmation with details window
 
+import logging
 import os.path
 import pathlib
 import subprocess
@@ -25,7 +26,7 @@ from keyman_config.accelerators import bind_accelerator, init_accel
 class InstallKmpWindow(Gtk.Window):
 
     def __init__(self, kmpfile, online=False, viewkmp=None):
-        print("kmpfile:", kmpfile)
+        logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
         self.kmpfile = kmpfile
         self.online = online
         self.endonclose = False
@@ -34,7 +35,7 @@ class InstallKmpWindow(Gtk.Window):
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         installed_kmp_ver = get_kmp_version(keyboardid)
         if installed_kmp_ver:
-            print("installed kmp version", installed_kmp_ver)
+            logging.info("installed kmp version %s", installed_kmp_ver)
 
         windowtitle = "Installing keyboard/package " + keyboardid
         Gtk.Window.__init__(self, title=windowtitle)
@@ -62,15 +63,15 @@ class InstallKmpWindow(Gtk.Window):
                     response = dialog.run()
                     dialog.destroy()
                     if response == Gtk.ResponseType.YES:
-                        print("QUESTION dialog closed by clicking YES button")
+                        logging.debug("QUESTION dialog closed by clicking YES button")
                         uninstall_kmp(keyboardid)
                     elif response == Gtk.ResponseType.NO:
-                        print("QUESTION dialog closed by clicking NO button")
+                        logging.debug("QUESTION dialog closed by clicking NO button")
                         self.checkcontinue = False
                 else:
                     try:
-                        print("package version", info['version']['description'])
-                        print("installed kmp version", installed_kmp_ver)
+                        logging.info("package version %s", info['version']['description'])
+                        logging.info("installed kmp version %s", installed_kmp_ver)
                         if StrictVersion(info['version']['description']) <= StrictVersion(installed_kmp_ver):
                             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.QUESTION,
                                 Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
@@ -80,13 +81,13 @@ class InstallKmpWindow(Gtk.Window):
                             response = dialog.run()
                             dialog.destroy()
                             if response == Gtk.ResponseType.YES:
-                                print("QUESTION dialog closed by clicking YES button")
+                                logging.debug("QUESTION dialog closed by clicking YES button")
                                 uninstall_kmp(keyboardid)
                             elif response == Gtk.ResponseType.NO:
-                                print("QUESTION dialog closed by clicking NO button")
+                                logging.debug("QUESTION dialog closed by clicking NO button")
                                 self.checkcontinue = False
                     except:
-                        print("exception")
+                        logging.warning("Exception uninstalling an old kmp, continuing")
                         pass
 
             image = Gtk.Image()
@@ -225,8 +226,7 @@ class InstallKmpWindow(Gtk.Window):
                     Gtk.Label('Details'))
                 self.notebook.append_page(
                     self.page2,
-                    Gtk.Label('README')
-        )
+                    Gtk.Label('README'))
             else:
                 mainhbox.pack_start(self.page1, True, True, 0)
         vbox.pack_start(mainhbox, True, True, 0)
@@ -255,7 +255,7 @@ class InstallKmpWindow(Gtk.Window):
         return False
 
     def on_install_clicked(self, button):
-        print("Installing keyboard")
+        logging.info("Installing keyboard")
         install_kmp(self.kmpfile, self.online)
         if self.viewwindow:
             self.viewwindow.refresh_installed_kmp()
@@ -263,7 +263,7 @@ class InstallKmpWindow(Gtk.Window):
         welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
         if os.path.isfile(welcome_file):
             uri_path = pathlib.Path(welcome_file).as_uri()
-            print(uri_path)
+            logging.debug(uri_path)
             w = WelcomeView(uri_path, self.kbname)
             w.resize(800, 600)
             w.show_all()
@@ -271,13 +271,13 @@ class InstallKmpWindow(Gtk.Window):
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
                 Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
             dialog.run()
-            print("INFO dialog closed")
+            logging.debug("INFO dialog closed")
             dialog.destroy()
         if not self.endonclose:
             self.close()
 
     def on_cancel_clicked(self, button):
-        print("Cancel install keyboard")
+        logging.info("Cancel install keyboard")
         if self.endonclose:
             Gtk.main_quit()
         else:
@@ -290,18 +290,18 @@ class InstallKmpWindow(Gtk.Window):
 
 def main(argv):
     if len(sys.argv) != 2:
-        print("install_window.py <kmpfile>")
+        logging.error("install_window.py <kmpfile>")
         sys.exit(2)
 
     name, ext = os.path.splitext(sys.argv[1])
     if ext != ".kmp":
-        print("install_window.py Input file", sys.argv[1], "is not a kmp file.")
-        print("install_window.py <kmpfile>")
+        logging.error("install_window.py Input file", sys.argv[1], "is not a kmp file.")
+        logging.error("install_window.py <kmpfile>")
         sys.exit(2)
 
     if not os.path.isfile(sys.argv[1]):
-        print("install_window.py Keyman kmp file", sys.argv[1], "not found.")
-        print("install_window.py <kmpfile>")
+        logging.error("install_window.py Keyman kmp file", sys.argv[1], "not found.")
+        logging.error("install_window.py <kmpfile>")
         sys.exit(2)
 
     w = InstallKmpWindow(sys.argv[1])

@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 import os.path
 import subprocess
 import sys
@@ -84,32 +85,29 @@ def install_kmp(inputfile, online=False):
 	install_to_ibus = False
 	# create a temporary directory using the context manager
 	with tempfile.TemporaryDirectory() as tmpdirname:
-		print('created temporary directory', tmpdirname)
+		logging.debug('created temporary directory %s', tmpdirname)
 		extract_kmp(inputfile, tmpdirname)
 		info, system, options, keyboards, files = get_metadata(tmpdirname)
 
 		if keyboards:
 			kbid = keyboards[0]['id']
-			print("Installing", info['name']['description'])
+			logging.info("Installing %s", info['name']['description'])
 			if not os.access('/usr/local/share/keyman', os.X_OK | os.W_OK): # Check for write access of keyman dir
-				print("You do not have permissions to install the keyboard files. You need to be a member of the keyman group. `sudo adduser <username> keyman`")
+				logging.error("You do not have permissions to install the keyboard files. You need to be a member of the keyman group. `sudo adduser <username> keyman`")
 				exit(3)
 			kbdir = os.path.join('/usr/local/share/keyman', kbid)
 			if not os.access('/usr/local/share/doc/keyman', os.X_OK | os.W_OK): # Check for write access of keyman doc dir
-				print("You do not have permissions to install the documentation. You need to be a member of the keyman group. `sudo adduser <username> keyman`")
+				logging.error("You do not have permissions to install the documentation. You need to be a member of the keyman group. `sudo adduser <username> keyman`")
 				exit(3)
 			kbdocdir = os.path.join('/usr/local/share/doc/keyman', kbid)
 			if not os.access('/usr/local/share/fonts/keyman', os.X_OK | os.W_OK): # Check for write access of keyman fonts
-				print("You do not have permissions to install the font files. You need to be a member of the keyman group. `sudo adduser <username> keyman`")
+				logging.error("You do not have permissions to install the font files. You need to be a member of the keyman group. `sudo adduser <username> keyman`")
 				exit(3)
 			kbfontdir = os.path.join('/usr/local/share/fonts/keyman', kbid)
 
 			if online:
 				kbdata = get_keyboard_data(kbid)
 				# just get latest version of kmn unless there turns out to be a way to get the version of a file at a date
-#				if 'lastModifiedDate' in kbdata:
-#					lastModifiedDate = datetime(kbdata['lastModifiedDate'])
-#					print("Last Modified Date:", lastModifiedDate)
 				if kbdata:
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
@@ -121,20 +119,20 @@ def install_kmp(inputfile, online=False):
 							kmndownloadfile = os.path.join(tmpdirname, kbid + ".kmn")
 							with open(kmndownloadfile, 'wb') as f:
 								f.write(response.content)
-							print("Installing", kbid + ".kmn", "as keyman file, minimum version:", kbdata['minKeymanVersion'])
+							logging.info("Installing %s.kmn as keyman file, minimum version: %s", kbid, kbdata['minKeymanVersion'])
 							copy2(kmndownloadfile, kbdir)
 							kmn_file = os.path.join(kbdir, kbid + ".kmn")
-							print("Compiling kmn file")
+							logging.info("Compiling kmn file")
 							subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
 							kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
 							if not os.path.isfile(kmfl_file):
-								print("Could not compile", kmn_file, "to", kmfl_file, "so not installing keyboard.")
+								logging.warning("Could not compile %s to %s so not installing keyboard.", kmn_file, kmfl_file)
 								os.remove(kmn_file)
 								os.rmdir(kbdir)
 								return
 							install_to_ibus = True
 						else:
-							print("install_kmp.py: warning: no kmn source file for", kbid, "so not installing keyboard.")
+							logging.warning("install_kmp.py: warning: no kmn source file for %s so not installing keyboard.", kbid)
 							os.rmdir(kbdir)
 							return
 						icodownloadfile = os.path.join(tmpdirname, kbid + ".ico")
@@ -144,39 +142,39 @@ def install_kmp(inputfile, online=False):
 							if response.status_code == 200:
 								with open(icodownloadfile, 'wb') as f:
 									f.write(response.content)
-								print("Installing", kbid + ".ico", "as keyman file")
+								logging.info("Installing %s.ico as keyman file", kbid)
 								copy2(icodownloadfile, kbdir)
 								checkandsaveico(icodownloadfile)
 								copy2(icodownloadfile+".bmp", kbdir)
 							else:
-								print("install_kmp.py: warning: no ico source file for", kbid)
+								logging.warning("install_kmp.py: warning: no ico source file for %s", kbid)
 					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
 						json.dump(kbdata, outfile)
-						print("Installing api data file", kbid + ".json", "as keyman file")
+						logging.info("Installing api data file %s.json as keyman file", kbid)
 				else:
-					print("install_kmp.py: error: cannot download keyboard data so not installing.")
+					logging.error("install_kmp.py: error: cannot download keyboard data so not installing.")
 					return
 
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])
 				ftype = determine_filetype(f['name'])
 				if ftype == "Documentation" or ftype == "Image":
-					print("Installing", f['name'], "as documentation")
+					logging.info("Installing %s as documentation", f['name'])
 					if not os.path.isdir(kbdocdir):
 						os.makedirs(kbdocdir)
 					copy2(fpath, kbdocdir)
 				elif ftype == "Font":
-					print("Installing", f['name'], "as font")
+					logging.info("Installing %s as font", f['name'])
 					if not os.path.isdir(kbfontdir):
 						os.makedirs(kbfontdir)
 					copy2(fpath, kbfontdir)
 				elif ftype == "Metadata" or ftype == "Keyboard source" or ftype == "Compiled keyboard":
-					print("Installing", f['name'], "as keyman file")
+					logging.info("Installing %s as keyman file", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
 				elif ftype == "Compiled on screen keyboard":
-					print("Converting", f['name'], "to LDML and installing both as as keyman file")
+					logging.info("Converting %s to LDML and installing both as as keyman file", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
@@ -184,10 +182,8 @@ def install_kmp(inputfile, online=False):
 					name, ext = os.path.splitext(f['name'])
 					ldmlfile = os.path.join(kbdir, name+".ldml")
 					output_ldml(ldmlfile, ldml)
-					# temp test copy ldml to /usr/local/share/keyman/test.ldml
-					copy2(ldmlfile, "/usr/local/share/keyman/test.ldml")
 				elif ftype == "Keyboard icon":
-					print("Converting", f['name'], "to BMP and installing both as keyman files")
+					logging.info("Converting %s to BMP and installing both as keyman files", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
@@ -205,7 +201,7 @@ def install_kmp(inputfile, online=False):
 				if (dconfreadresult.returncode == 0) and dconfread:
 					preload_engines = literal_eval(dconfread)
 					preload_engines.append(kmn_file)
-					print("Installing", kbid, "into IBus")
+					logging.info("Installing %s into IBus", kbid)
 					if sys.version_info.major == 3 and sys.version_info.minor < 6:
 						dconfwriteresult = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
 							stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
@@ -214,60 +210,7 @@ def install_kmp(inputfile, online=False):
 							stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
 
 		else:
-			print("install_kmp.py: error: No kmp.json or kmp.inf found in", inputfile)
-			print("Contents of", inputfile+":")
+			logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
+			logging.info("Contents of %s:", inputfile)
 			for o in os.listdir(tmpdirname):
-				print(o)
-
-
-# def main():
-# 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')
-# 	parser.add_argument('-f', metavar='<kmpfile>', help='Keyman kmp file')
-# 	parser.add_argument('-k', metavar='<keyboardid>', help='Keyman keyboard id')
-
-# 	args = parser.parse_args()
-# 	if args.k and args.f:
-# 		print("install_kmp.py: error: too many arguments: either install a local kmp file or specify a keyboard id to download and install.")
-# 		sys.exit(2)
-
-# 	if args.f:
-# 		name, ext = os.path.splitext(args.f)
-# 		if ext != ".kmp":
-# 			print("install_kmp.py Input file", args.f, "is not a kmp file.")
-# 			print("install_kmp.py -f <kmpfile>")
-# 			sys.exit(2)
-
-# 		if not os.path.isfile(args.f):
-# 			print("install_kmp.py Keyman kmp file", args.f, "not found.")
-# 			print("install_kmp.py -f <kmpfile>")
-# 			sys.exit(2)
-
-# 		install_kmp(args.f)
-# 	elif args.k:
-# 		installed_kmp_ver = get_kmp_version(args.k)
-# 		kbdata = get_keyboard_data(args.k)
-# 		if not kbdata:
-# 			print("install_kmp.py: error: Could not download keyboard data for", args.k)
-# 		if installed_kmp_ver:
-# #			print("Found installed version", installed_kmp_ver)
-# #			print("Api knows about version", kbdata['version'])
-# 			if kbdata['version'] == installed_kmp_ver:
-# 				print("install_kmp.py The %s version of the %s keyboard is already installed." % (installed_kmp_ver, args.k))
-# 				sys.exit(0)
-# 			elif float(kbdata['version']) > float(installed_kmp_ver):
-# 				print("install_kmp.py A newer version of %s keyboard is available. Uninstalling old version %s then downloading and installing new version %s." % (args.k, installed_kmp_ver, kbdata['version']))
-# 				uninstall_kmp(args.k)
-
-# 		kmpfile = get_kmp(args.k)
-# 		if kmpfile:
-# 			install_kmp(kmpfile, True)
-# 		else:
-# 			print("install_kmp.py: error: Could not download keyboard package", args.k)
-# 	else:
-# 		print("install_kmp.py: error: no arguments: either install a local kmp file or specify a keyboard id to download and install.")
-# 		sys.exit(2)
-
-
-
-# if __name__ == "__main__":
-# 	main()
+				logging.info(o)

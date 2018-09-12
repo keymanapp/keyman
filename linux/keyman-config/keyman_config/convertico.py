@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import logging
 import numpy as np
 import sys
 from PIL import Image
@@ -21,17 +22,18 @@ def checkandsaveico(icofile):
     im = im.convert('RGBA')
     im2 = im
     num, colour = max(im.getcolors(im.size[0]*im.size[1]))
-    print("{0}: {1}".format(num, colour))
+    logging.debug("checkandsaveico maxcolour: num {0}: colour {1}".format(num, colour))
     if num > 160 and colour == (0, 0, 0, 0):
-        print("mostly black so changing black to white")
+        logging.info("checkandsaveico:" + icofile + " mostly black so changing black to white")
         im2 = changeblacktowhite(im)
     im2.save(icofile + ".bmp")
 
 
 def main(argv):
     if len(sys.argv) != 2:
-        print("convertico.py <ico file>")
+        logging.error("convertico.py <ico file>")
         sys.exit(2)
+    logging.basicConfig(level=logging.INFO)
     checkandsaveico(sys.argv[1])
 
 if __name__ == "__main__":

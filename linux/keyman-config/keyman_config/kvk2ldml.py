@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import logging
 import os.path
 import struct
 import sys
@@ -199,7 +200,7 @@ def get_nstring(file, fileContent, offset):
     stringlength = struct.unpack_from("<H", fileContent, offset)
     file.seek(offset+2)
     if stringlength[0] > 256:
-        print("error: suspiciously long string. ABORT.")
+        logging.error("error: suspiciously long string. ABORT.")
         sys.exit(5)
     if stringlength[0]:
         #don't read the null string terminator
@@ -313,7 +314,7 @@ def convert_ldml(kvkData):
                 iso_key = VKey_to_Iso[key.VKey]
                 keymap.append( etree.Element("map", iso = iso_key, to = key.text) )
             else:
-                print("Unknown vkey:", key.VKey)
+                logging.warning("Unknown vkey: %s", key.VKey)
     return ldml
 
 def output_ldml(ldmlfile, ldml):
@@ -348,38 +349,3 @@ def parse_kvk_file(kvkfile):
 def convert_kvk_to_ldml(kvkfile):
     kvkData = parse_kvk_file(kvkfile)
     return convert_ldml(kvkData)
-
-def main():
-    parser = argparse.ArgumentParser(description='Read and parse kvk on-screen keyboard file.')
-    parser.add_argument('-k', "--keys", help='print all keys', action="store_true")
-    parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
-    parser.add_argument('kvkfile', help='kvk file')
-    parser.add_argument('-o', metavar='LDMLFILE', help='output LDML file')
-
-    args = parser.parse_args()
-
-    name, ext = os.path.splitext(args.kvkfile)
-    # Check if input file extension is kvk
-    if ext != ".kvk":
-        print("kvk2ldml.py: error, input file %s is not a kvk file." % (args.kvkfile))
-        print("kvk2ldml.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
-        sys.exit(2)
-
-    # Check if input kvk file exists
-    if not os.path.isfile(args.kvkfile):
-        print("kvk2ldml.py: error, input file %s does not exist." % (args.kvkfile))
-        print("kvk2ldml.py [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
-        sys.exit(2)
-
-    kvkData = parse_kvk_file(args.kvkfile)
-
-    if args.print:
-        print_kvk(kvkData, args.keys)
-
-    if args.o:
-        with open(args.o, 'wb') as ldmlfile:
-            ldml = convert_ldml(kvkData)
-            output_ldml(ldmlfile, ldml)
-
-if __name__ == "__main__":
-    main()

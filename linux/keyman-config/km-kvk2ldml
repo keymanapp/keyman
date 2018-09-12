@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import logging
 import os.path
 import sys
 
@@ -14,20 +15,29 @@ def main():
     parser.add_argument('kvkfile', help='kvk file')
     parser.add_argument('-o', metavar='LDMLFILE', help='output LDML file location')
     parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+    parser.add_argument('-v', action='store_true', help='verbose logging')
+    parser.add_argument('-vv', action='store_true', help='very verbose logging')
 
     args = parser.parse_args()
+    if args.v:
+        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
+    elif args.vv:
+        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
+    else:
+        logging.basicConfig(format='%(levelname)s:%(message)s')
+
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk
     if ext != ".kvk":
-        print("km-kvk2ldml: error, input file %s is not a kvk file." % (args.kvkfile))
-        print("km-kvk2ldml [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
+        logging.error("km-kvk2ldml: error, input file %s is not a kvk file.", args.kvkfile)
+        logging.error("km-kvk2ldml [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
     # Check if input kvk file exists
     if not os.path.isfile(args.kvkfile):
-        print("km-kvk2ldml: error, input file %s does not exist." % (args.kvkfile))
-        print("km-kvk2ldml [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
+        logging.error("km-kvk2ldml: error, input file %s does not exist.", args.kvkfile)
+        logging.error("km-kvk2ldml [-h] [-k] [-p] [-o <ldml file>] <kvk file>")
         sys.exit(2)
 
     kvkData = parse_kvk_file(args.kvkfile)
