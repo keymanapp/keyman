@@ -209,7 +209,7 @@ class InstallKmpWindow(Gtk.Window):
             if options and "readmeFile" in options:
                 self.readme = options['readmeFile']
             else:
-                self.readme = "readme.htm"
+                self.readme = "noreadme"
             readme_file = os.path.join(tmpdirname, self.readme)
             if os.path.isfile(readme_file):
                 readme_uri = pathlib.Path(readme_file).as_uri()
