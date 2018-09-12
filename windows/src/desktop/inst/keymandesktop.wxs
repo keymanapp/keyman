@@ -37,13 +37,13 @@
 
     <!-- ALLOW Upgrade from 10.0 -->
     <Upgrade Id="1211D5B5-AAF5-4AE5-8D3D-67E3C19E3C13">
-      <UpgradeVersion OnlyDetect="no" Minimum="9.0.454.0" IncludeMinimum="yes" 
-                      Maximum="10.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
+      <UpgradeVersion OnlyDetect="no" Minimum="10.0.0.0" IncludeMinimum="yes" 
+                      Maximum="11.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
     </Upgrade>
     
     <!-- PREVENT or ALLOW Upgrade from 11.0 or later versions -->
     <Upgrade Id="c70af17c-8b9e-47a1-a099-b65aee3dc8b4">
-      <UpgradeVersion OnlyDetect="no" Minimum="11.0.1499.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes" 
                       Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes" 
                       Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
