@@ -35,7 +35,7 @@ for dist in $distributions; do
         sudo ln -s /usr/share/doc/pbuilder/examples/D80no-man-db-rebuild /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild
     fi
     sudo mkdir -p /var/cache/pbuilder/result/${dist}
-    if [ ! -e /var/cache/pbuilder/result/${dist}/Packages ]
+    if [ ! -e /var/cache/pbuilder/result/${dist}/Packages ]; then
         sudo touch /var/cache/pbuilder/result/${dist}/Packages
     fi
     sudo cowbuilder update --distribution ${dist} --basepath /var/cache/pbuilder/base-${dist}.cow --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist} --hookdir /var/cache/pbuilder/hook.d/${dist}
