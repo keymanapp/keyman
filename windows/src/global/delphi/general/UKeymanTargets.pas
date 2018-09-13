@@ -28,7 +28,7 @@ const
 
   // Compile to .kmx
   KMXKeymanTargets: TKeymanTargets = [
-    ktWindows, ktMacosx, ktDesktop
+    ktWindows, ktMacosx, ktLinux, ktDesktop
   ];
 
   // Compile to .js
