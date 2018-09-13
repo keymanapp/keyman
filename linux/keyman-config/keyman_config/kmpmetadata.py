@@ -351,7 +351,7 @@ def main(argv):
 	inputfile = sys.argv[1]
 	
 	if not os.path.isfile(inputfile):
-		logging.error"kmpmetadata.py Input file ", inputfile, " not found.")
+		logging.error("kmpmetadata.py Input file ", inputfile, " not found.")
 		logging.error("kmpmetadata.py <kmp.json> or <kmp.inf>")
 		sys.exit(2)
 	
