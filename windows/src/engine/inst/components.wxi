@@ -156,14 +156,14 @@
       <RegistryValue Name="Enable" Type="string" Value="1" />
       <RegistryKey Key="Category">
         <RegistryKey Key="Category">
-          <RegistryKey Action="create" Key="{34745C63-B2F0-4784-8B67-5E12C8701A31}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIP_KEYBOARD -->
-          <RegistryKey Action="create" Key="{364215D9-75BC-11D7-A6EF-00065B84435C}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_COMLESS -->
-          <RegistryKey Action="create" Key="{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_SECUREMODE -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{34745C63-B2F0-4784-8B67-5E12C8701A31}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIP_KEYBOARD -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{364215D9-75BC-11D7-A6EF-00065B84435C}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_COMLESS -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_SECUREMODE -->
         </RegistryKey>
         <RegistryKey Key="Item">
-          <RegistryKey Action="create" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{34745C63-B2F0-4784-8B67-5E12C8701A31}" /><!-- TFCAT_KEYBOARD -->
-          <RegistryKey Action="create" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{364215D9-75BC-11D7-A6EF-00065B84435C}" /><!-- TFCAT_TIPCAP_COMLESS -->
-          <RegistryKey Action="create" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}" /><!-- TFCAT_TIPCAP_SECUREMODE -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{34745C63-B2F0-4784-8B67-5E12C8701A31}" /><!-- TFCAT_KEYBOARD -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{364215D9-75BC-11D7-A6EF-00065B84435C}" /><!-- TFCAT_TIPCAP_COMLESS -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}" /><!-- TFCAT_TIPCAP_SECUREMODE -->
         </RegistryKey>
       </RegistryKey>
     </RegistryKey>
@@ -177,12 +177,12 @@
     <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}">
       <RegistryKey Key="Category">
         <RegistryKey Key="Category">
-          <RegistryKey Action="create" Key="{13A016DF-560B-46CD-947A-4C3AF1E0E35D}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_IMMERSIVESUPPORT -->
-          <RegistryKey Action="create" Key="{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_SYSTRAYSUPPORT -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{13A016DF-560B-46CD-947A-4C3AF1E0E35D}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_IMMERSIVESUPPORT -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}" /><!-- TFCAT_TIPCAP_SYSTRAYSUPPORT -->
         </RegistryKey>
         <RegistryKey Key="Item">
-          <RegistryKey Action="create" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{13A016DF-560B-46CD-947A-4C3AF1E0E35D}" /><!-- TFCAT_TIPCAP_IMMERSIVESUPPORT -->
-          <RegistryKey Action="create" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}" /><!-- TFCAT_TIPCAP_SYSTRAYSUPPORT -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{13A016DF-560B-46CD-947A-4C3AF1E0E35D}" /><!-- TFCAT_TIPCAP_IMMERSIVESUPPORT -->
+          <RegistryKey ForceCreateOnInstall="yes" Key="{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}\{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}" /><!-- TFCAT_TIPCAP_SYSTRAYSUPPORT -->
         </RegistryKey>
       </RegistryKey>
     </RegistryKey>

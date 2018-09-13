@@ -46,7 +46,7 @@
           </Directory>
           <Component Id="CommonAppDataRemovals" Guid="{B8AA53CB-E32E-47E6-88E6-C704B89A7108}">
             <RegistryValue KeyPath="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey Action="createAndRemoveOnUninstall" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" />
+            <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine\10.0" />
             <RemoveFolder Id="CAD_ts_Uninstall" On="uninstall" />
             <RemoveFolder Id="CAD_ts_Keyman_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman" />
             <RemoveFolder Id="CAD_ts_Keyman_Kbd_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman_Kbd" />
@@ -65,7 +65,7 @@
           </Directory>
           <Component Id="AppDataRemovals" Guid="{95D0FCEE-F1B7-45B1-B263-B80A96D0AA92}">
             <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey Action="createAndRemoveOnUninstall" Root="HKCU" Key="Software\Keyman\Keyman Engine\10.0" />
+            <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine\10.0" />
             <RemoveFolder Id="AD_ts_Uninstall" On="uninstall" />
             <RemoveFolder Id="AD_ts_Keyman_Uninstall" On="uninstall" Directory="App_TS_Keyman" />
             <RemoveFolder Id="AD_ts_Keyman_Keyboard_Uninstall" On="uninstall" Directory="App_TS_Keyman_Keyboard" />

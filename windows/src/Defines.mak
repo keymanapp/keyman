@@ -192,7 +192,7 @@ TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
 
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 
-WIXPATH="c:\program files (x86)\windows installer xml v3.5\bin"
+WIXPATH="c:\program files (x86)\wix toolset v3.11\bin"
 WIXCANDLE=$(WIXPATH)\candle.exe -wx
 
 !IFDEF LINT
