@@ -103,7 +103,7 @@
         </File>
 
         <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
-        <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer" />
 
         <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
         <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\Installed Products" Name="developer_pro" Type="string" Value="developer_pro" />
@@ -242,7 +242,7 @@
     <ComponentGroup Id="AppData">
       <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}" Directory="App_KeymanDev_Databases">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
-        <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" />
         <RemoveFolder Id="AD_Uninstall" On="uninstall" Directory="App_KeymanRoot" />
         <RemoveFolder Id="AD_KeymanDev_Uninstall" On="uninstall" Directory="App_KeymanDev" />
         <RemoveFolder Id="AD_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_KeymanDev_Databases" />
