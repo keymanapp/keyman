@@ -29,7 +29,8 @@ for dist in $distributions; do
         echo "cd /var/cache/pbuilder/result/${dist}" | sudo tee -a /var/cache/pbuilder/hook.d/${dist}/D70results
         echo "/usr/bin/dpkg-scanpackages . /dev/null > /var/cache/pbuilder/result/${dist}/Packages" | sudo tee -a /var/cache/pbuilder/hook.d/${dist}/D70results
         echo "/usr/bin/apt-get update" | sudo tee -a /var/cache/pbuilder/hook.d/${dist}/D70results
-        sudo ln -s /var/cache/pbuilder/hook.d/${dist}/D70results /var/cache/pbuilder/hook.d/${dist}/B70buildresults
+        sudo chmod +x /var/cache/pbuilder/hook.d/${dist}/D70results
+        sudo ln -s /var/cache/pbuilder/hook.d/${dist}/D70results /var/cache/pbuilder/hook.d/${dist}/I70buildresults
     fi
     if [ ! -e /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild ]; then
         sudo ln -s /usr/share/doc/pbuilder/examples/D80no-man-db-rebuild /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild
