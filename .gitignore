@@ -263,6 +263,7 @@ make_deb
 tmp/
 dist/
 *~
+linux/keyman-config/debian/man
 
 .DS_Store
 
