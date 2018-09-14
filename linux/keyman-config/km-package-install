@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import logging
 import sys
 from keyman_config import __version__
 from keyman_config.install_kmp import install_kmp
