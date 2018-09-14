@@ -63,7 +63,11 @@ if [ "${extra_project}" == "keyman-config" ]; then
     cd kmflcomp
     baseversion=`cat VERSION`
     echo "baseversion: ${baseversion}"
-    distversion=`./configure --version|grep kmfl|grep -Po 'kmflcomp configure \K[^a-z]*'`
+    if [ -e configure ]; then
+        distversion=`./configure --version|grep kmfl|grep -Po 'kmflcomp configure \K[^a-z]*'`
+    else
+        distversion=`cat VERSION`.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
+    fi
     echo "distversion: ${distversion}"
 
     cd ../keyman-config
