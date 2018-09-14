@@ -21,7 +21,8 @@ fi
 
 if [ "$1" == "dev" ]; then
     vers=`cat VERSION`
-    datevers=`date -u +"%Y%m%d%H%M%S"`
+    # get datetime of latest git commit
+    datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
     echo "$vers.${datevers}" > VERSION
 else
     if [ "$1" != "" ]; then

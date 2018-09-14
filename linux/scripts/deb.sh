@@ -112,8 +112,8 @@ for proj in ${projects}; do
 	cd ${proj}-${vers}
 	for dist in ${distributions}; do
 		dch -v ${vers}-1${dist} "local build for ${dist}"
-		echo "$dist"
-		pdebuild --pbuilder cowbuilder --buildresult /var/cache/pbuilder/result/${dist} -- --basepath /var/cache/pbuilder/base-${dist}.cow --distribution ${dist} --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist}  --hookdir /var/cache/pbuilder/hook.d/${dist}
+		echo "dist: $dist"
+		DIST=${dist} pdebuild --pbuilder cowbuilder --buildresult /var/cache/pbuilder/result/${dist} -- --basepath /var/cache/pbuilder/base-${dist}.cow --distribution ${dist} --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist}  --hookdir /var/cache/pbuilder/hook.d/${dist}
 	done
 	cd ${BASEDIR}
 done

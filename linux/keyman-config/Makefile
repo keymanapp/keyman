@@ -12,7 +12,7 @@ clean:
 	-rm -rf dist make_deb build
 
 devdist:
-	python3 setup.py egg_info -b.`date -u +"%Y%m%d%H%M%S"` sdist
+	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
 
 dist: clean
 	python3 setup.py sdist
