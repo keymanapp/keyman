@@ -5,7 +5,6 @@ import logging
 import sys
 
 from keyman_config import __version__
-from keyman_config.get_kmp import get_kmp
 
 def main():
 	parser = argparse.ArgumentParser(description='Download Keyman keyboard package to ~/Downloads')
@@ -22,6 +21,7 @@ def main():
 	else:
 		logging.basicConfig(format='%(levelname)s:%(message)s')
 
+	from keyman_config.get_kmp import get_kmp
 	get_kmp(args.id)
 
 if __name__ == "__main__":

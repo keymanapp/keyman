@@ -4,7 +4,6 @@ import argparse
 import logging
 import os
 from keyman_config import __version__
-from keyman_config.list_installed_kmp import get_installed_kmp
 
 def main():
     parser = argparse.ArgumentParser(description='Show installed Keyman keyboards with name, version, id and description.')
@@ -21,6 +20,7 @@ def main():
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
+    from keyman_config.list_installed_kmp import get_installed_kmp
 
     installed_kmp = get_installed_kmp()
     print("--- Installed keyboards ---")
