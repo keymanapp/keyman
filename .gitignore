@@ -226,10 +226,42 @@
 
 # /test/wm_unichar/
 
+# VS Code
+.vscode
+
 # linux
 autom4te.cache
 *.orig
+Makefile.in
+configure
+aclocal.m4
+config.guess
+config.sub
+config.h.in
+config.h.in~
+config.rpath
+compile
+depcomp
+install-sh
+ltmain.sh
+missing
+test-driver
+ylwrap
+INSTALL
+ABOUT-NLS
+ltoptions.m4
+ltsugar.m4
+ltversion.m4
+lt~obsolete.m4
+libtool.m4
 
 .DS_Store
 
 *.kpj.user
+
+build*
+deb-*
+dist
+*~
+*.egg-info
+__pycache__

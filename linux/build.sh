@@ -21,7 +21,7 @@ INSTALLDIR=${INSTALLDIR:-"/tmp/kmfl"}
 # autoreconf the projects
 for proj in kmflcomp libkmfl ibus-kmfl; do
 	cd $proj
-	autoreconf
+	autoreconf -if
 	cd $BASEDIR
 done
 

@@ -1,0 +1,22 @@
+Source: keyman-config
+Maintainer: Daniel Glassey <wdg@debian.org>
+Section: python
+Priority: optional
+Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9)
+Standards-Version: 3.9.7
+Homepage: http://www.keyman.com/
+
+Package: python3-keyman-config
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, python3-gi, gir1.2-webkit-3.0,
+ kmflcomp, dconf-cli
+Description: Keyman for Linux configuration
+ Python module to install, uninstall and view information about Keyman keyboard
+ packages.
+
+Package: keyman-config
+Architecture: all
+Depends: ${misc:Depends}, python3-keyman-config
+Description: Keyman for Linux configuration
+ Install, uninstall and view information about Keyman keyboard
+ packages.

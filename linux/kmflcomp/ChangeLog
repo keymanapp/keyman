@@ -2,8 +2,10 @@ kmflcomp (10.99.1-1)
 
   * Change license to MIT as it is being moved into Keyman 11
   * Keyman is now owned by SIL
+  * kmflcomp can now compile Keyman kmn source files up to version 10
+      provided they don't use newer syntax
 
- -- Doug Rintoul <doug_rintoul@sil.org>  Thu, 17 May 2018 11:43:22 +0700
+ -- Daniel Glassey <wdg@debian.org>  Wed, 12 Sep 2018 11:43:22 +0700
 
 kmflcomp (0.9.10-1)
 
