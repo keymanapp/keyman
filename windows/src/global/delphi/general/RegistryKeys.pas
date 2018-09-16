@@ -162,8 +162,8 @@ const
 
   SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman Desktop';
   SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman Desktop';
-  SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU + '\' + SKeymanVersion;
-  SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM + '\' + SKeymanVersion;
+  SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU;
+  SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM;
 
   { Other Keyman Settings }
 
