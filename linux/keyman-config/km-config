@@ -7,7 +7,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from keyman_config import __version__
-from keyman_config.view_installed import ViewInstalledWindow
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Keyman keyboards installation and information')
@@ -22,6 +21,8 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
+
+    from keyman_config.view_installed import ViewInstalledWindow
 
     w = ViewInstalledWindow()
     w.connect("destroy", Gtk.main_quit)

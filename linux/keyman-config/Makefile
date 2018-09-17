@@ -8,13 +8,21 @@ default:
 install:
 	python3 setup.py install
 
+install-temp:
+	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`
+	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
+
+
 clean:
 	-rm -rf dist make_deb build
+
+devdist:
+	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
 
 dist: clean
 	python3 setup.py sdist
 
-deb: clean dist man
+deb: clean devdist man
 	-mkdir make_deb
 	cd make_deb && tar xf ../dist/keyman_config-$(VERSION).tar.gz && \
 		mv keyman_config-$(VERSION) keyman-config-$(VERSION) && \

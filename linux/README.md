@@ -14,34 +14,32 @@
 - It is helpful to be using the [packages.sil.org](http://packages.sil.org)  repo
 
 - Install packages required for building and developing KMFL
-`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev`
+`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools`
 
 
 ### Compiling from Command Line
 
 #### Build script
 
-##### Build only
+##### Tmp install
 
-Run `./build.sh` to build and install kmflcomp, libkmfl and ibus-kmfl to `/tmp/kmfl`
-
-set `$INSTALLDIR` to use a different install directory.
-e.g. `INSTALLDIR=/home/me/kmfl ./build.sh`
+Run `make tmpinstall` to build and install kmflcomp, libkmfl and ibus-kmfl to `/tmp/kmfl`
 
 This is only for testing the build, not for running ibus-kmfl in ibus
+
 
 ##### Installing for ibus to use ibus-kmfl
 
 - Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
 
- - To do this run `SUDOINSTALL="yes" ./build.sh`
+ - To do this run `sudo make install_local`
 
     * This will install to /usr/local
         * and `/usr/share/ibus/component/kmfl.xml` and `/usr/share/kmfl/icons`
 
     * If you already have the ibus-kmfl package installed then build.sh will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
 
-        * run `SUDOINSTALL="uninstall" ./build.sh` to put it back again
+        * run `sudo make uninstall_local` to put it back again
 
 #### Manually
 
@@ -66,7 +64,7 @@ This is only for testing the build, not for running ibus-kmfl in ibus
 
 ### Continuous integration
 
-Teamcity will run build.sh
+Teamcity will run `make tmpinstall`
 
 
 ### Building packages
