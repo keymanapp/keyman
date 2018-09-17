@@ -18,13 +18,6 @@ SUDOINSTALL=${SUDOINSTALL:-"no"}
 
 INSTALLDIR=${INSTALLDIR:-"/tmp/kmfl"}
 
-# autoreconf the projects
-for proj in kmflcomp libkmfl ibus-kmfl; do
-	cd $proj
-	autoreconf -if
-	cd $BASEDIR
-done
-
 if [[ "${SUDOINSTALL}" == "uninstall" ]]
 then
 	echo "putting ibus-kmfl package component file back"
@@ -54,9 +47,22 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 		make
 		sudo make install
 	else
+		echo "doing /tmp install of $proj"
 		../$proj/configure CPPFLAGS="-I${INSTALLDIR}/include" LDFLAGS="-L${INSTALLDIR}/lib" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
 		make
 		make install
 	fi
 	cd $BASEDIR
 done
+
+cd keyman-config
+echo "SUDOINSTALL: ${SUDOINSTALL}"
+if [[ "${SUDOINSTALL}" == "yes" ]]
+then
+	echo "doing sudo install of keyman-config"
+	sudo make install
+else
+	echo "doing /tmp install of keyman-config"
+	make install-temp
+fi
+cd $BASEDIR

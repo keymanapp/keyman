@@ -1,0 +1,5 @@
+You need autoconf, autopoint, gettext, automake and libtool to generate the build system
+
+flex and bison are useful to rebuild lex.l and yacc.y in kmflcomp but not essential
+
+Run `make reconf` to run them

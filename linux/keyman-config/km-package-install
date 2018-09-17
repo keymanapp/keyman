@@ -3,10 +3,8 @@
 import argparse
 import logging
 import sys
+import os
 from keyman_config import __version__
-from keyman_config.install_kmp import install_kmp
-from keyman_config.list_installed_kmp import get_kmp_version
-from keyman_config.get_kmp import get_keyboard_data, get_kmp
 
 def main():
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')
@@ -27,6 +25,10 @@ def main():
 	if args.k and args.f:
 		logging.error("km-package-install: error: too many arguments: either install a local kmp file or specify a keyboard id to download and install.")
 		sys.exit(2)
+
+	from keyman_config.install_kmp import install_kmp
+	from keyman_config.list_installed_kmp import get_kmp_version
+	from keyman_config.get_kmp import get_keyboard_data, get_kmp
 
 	if args.f:
 		name, ext = os.path.splitext(args.f)

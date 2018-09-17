@@ -6,7 +6,6 @@ import os.path
 import sys
 
 from keyman_config import __version__
-from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 def main():
     parser = argparse.ArgumentParser(description='Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print the details of the kvk file.')
@@ -26,6 +25,7 @@ def main():
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
+    from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk
