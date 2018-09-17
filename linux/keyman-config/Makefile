@@ -8,9 +8,9 @@ default:
 install:
 	python3 setup.py install
 
-install-local:
-	mkdir -p /tmp/kmfl/lib/python3.6/site-packages
-	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
+install-temp:
+	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver=f"python{sys.version_info[0]}.{sys.version_info[1]}";sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`
+	#PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
 
 
 clean:

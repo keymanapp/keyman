@@ -63,6 +63,6 @@ then
 	sudo make install
 else
 	echo "doing /tmp install of keyman-config"
-	make install-local
+	make install-temp
 fi
 cd $BASEDIR
