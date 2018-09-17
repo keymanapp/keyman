@@ -1,6 +1,6 @@
 #!/usr/bin/make
 
-tmpbuild: devreconf
+tmpinstall: devreconf
 	./scripts/build.sh
 
 install_local: devreconf
@@ -8,8 +8,6 @@ install_local: devreconf
 
 uninstall_local: devreconf
 	SUDOINSTALL="uninstall" ./scripts/build.sh
-
-default: tmpbuild
 
 
 debnocow:
