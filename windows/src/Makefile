@@ -188,7 +188,11 @@ build-release-wrapper: clean-output update-version
 # Tools needed to complete a build
 #
 
-build-tools: 
+global-versions:
+    cd $(ROOT)\src\global
+    $(MAKE) global-versions
+    
+build-tools: global-versions
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)
     
