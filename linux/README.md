@@ -32,14 +32,14 @@ This is only for testing the build, not for running ibus-kmfl in ibus
 
 - Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
 
- - To do this run `sudo make install_local`
+ - To do this run `make install_local`
 
     * This will install to /usr/local
         * and `/usr/share/ibus/component/kmfl.xml` and `/usr/share/kmfl/icons`
 
     * If you already have the ibus-kmfl package installed then build.sh will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
 
-        * run `sudo make uninstall_local` to put it back again
+        * run `make uninstall_local` to put it back again
 
 #### Manually
 
