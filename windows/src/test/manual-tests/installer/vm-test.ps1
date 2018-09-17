@@ -8,7 +8,7 @@ $InstallerName="keymandesktop"
 
 # Virtual machine parameters
 
-$VMIP="172.23.14.244" # 
+$VMIP="172.23.14.244"  # after restoring from checkpoint it can take time for hostnames to be found; using IP address is simpler
 $VMName="PELION-WIN10"
 $Checkpoint="Keyman Install Start Point"
 
@@ -19,26 +19,28 @@ $VMLocalTempPath = "c:\temp"
 
 $psexec="psexec.exe"
 
-$InstallerRoot="${env:KEYMAN_ROOT}\windows\release"
-$KMValidationSourcePath="${PSScriptRoot}\km-validation.bat"
-$ResultsPath="${PSScriptRoot}\results"
-
 # Versions to test
 
 $protocols = @(
-  @("11.0.1500.0"),
-  @("11.0.1501.0"),
-  @("11.0.1502.0"),
-  @("22.0.900.0"),
-  @("11.0.1500.0", "11.0.1501.0"),
-  @("11.0.1500.0", "11.0.1502.0"),
-  @("11.0.1500.0", "22.0.900.0"),
-  @("11.0.1500.0", "11.0.1501.0", "11.0.1502.0"),
-  @("11.0.1500.0", "11.0.1501.0", "11.0.1502.0", "22.0.900.0"),
-  @("10.0.1201.0", "11.0.1500.0"),
-  @("10.0.1201.0", "11.0.1500.0", "11.0.1501.0"),
-  @("9.0.528.0", "11.0.1500.0"),
-  @("9.0.528.0", "11.0.1500.0", "11.0.1501.0"),
+  @("11.0.1500.0"),   # 0
+  @("11.0.1501.0"),   # 1
+  @("11.0.1502.0"),   # 2
+  @("22.0.900.0"),    # 3
+  @("11.0.1500.0", "11.0.1501.0"),   # 4
+  @("11.0.1500.0", "11.0.1502.0"),   # 5
+  @("11.0.1500.0", "22.0.900.0"),    # 6
+  @("11.0.1500.0", "11.0.1501.0", "11.0.1502.0"),   # 7
+  @("11.0.1500.0", "11.0.1501.0", "11.0.1502.0", "22.0.900.0"),   # 8
+  @("10.0.1201.0", "11.0.1500.0"),   # 9
+  @("10.0.1201.0", "11.0.1500.0", "11.0.1501.0"),   # 10
+  @("9.0.528.0", "11.0.1500.0"),     # 11
+  @("9.0.528.0", "11.0.1500.0", "11.0.1501.0"),     # 12
+  @("9.0.528.0", "10.0.1201.0", "11.0.1500.0", "11.0.1501.0", "22.0.900.0")    # 13
+)
+<#
+Note: the 8.0.361.0 installer is giving a runtime error on scripted start. May be 
+      incorrect parameters or something else. For now will focus on upgrades from
+      9.0
   @("8.0.361.0", "11.0.1500.0"),
   @("8.0.361.0", "11.0.1500.0", "11.0.1501.0"),
   @("8.0.361.0", "9.0.528.0", "11.0.1500.0"),
@@ -49,19 +51,31 @@ $protocols = @(
   @("8.0.361.0", "9.0.528.0", "10.0.1201.0", "11.0.1500.0", "11.0.1501.0"),
   @("8.0.361.0", "9.0.528.0", "10.0.1201.0", "11.0.1500.0", "11.0.1501.0", "22.0.900.0")
 )
+#>
 
 ###########################################################################
 # End configuration parameters
 ###########################################################################
 
+$InstallerRoot="${env:KEYMAN_ROOT}\windows\release"
+$KMValidationSourcePath="${PSScriptRoot}\km-validation.bat"
+$ResultsPath="${PSScriptRoot}\results"
+
+# 
+
 $ScriptFilename="run.bat"
 $VMLocalTempScriptFilename="${VMLocalTempPath}\${ScriptFilename}"
 $VMTempScriptFilename="${VMTempPath}\${ScriptFilename}"
+$ValidationFilename="validation.txt"
+$VMValidationPath="${VMTempPath}\${ValidationFilename}"
+$VMLocalValidationPath="${VMLocalTempPath}\${ValidationFilename}"
 
-New-Item -Path $ResultsPath -Force -ItemType "directory"
+if(!(Test-Path $ResultsPath)) {
+  mkdir $ResultsPath
+}
 
 #$protocols.Length
-for ($i = 0; $i -lt 1; $i++) {
+for ($i = 0; $i -lt $protocols.Length; $i++) {
   $protocol = $protocols[$i]
   
   Restore-VMSnapshot -Name $Checkpoint -VMName $VMName -Confirm:$false
@@ -85,18 +99,28 @@ for ($i = 0; $i -lt 1; $i++) {
     Remove-Item $VMTempScriptFilename
   }
   
+  if(Test-Path $VMValidationPath) {
+    Remove-Item $VMValidationPath
+  }
+  
   "@echo (VM) Validating baseline" | Add-Content -Path $VMTempScriptFilename
-  "@call ${VMLocalTempPath}\km-validation.bat > ${VMLocalTempPath}\validation.txt" | Add-Content -Path $VMTempScriptFilename
+  "@call ${VMLocalTempPath}\km-validation.bat > ${VMLocalValidationPath}" | Add-Content -Path $VMTempScriptFilename
   "@echo ..." | Add-Content -Path $VMTempScriptFilename
   "@exit /b 0" | Add-Content -Path $VMTempScriptFilename
 
-  & $psexec -accepteula -nobanner \\$VMIP $VMLocalTempScriptFilename
+  & $psexec -accepteula -nobanner -i \\$VMIP $VMLocalTempScriptFilename
   if($LASTEXITCODE -ne 0) {
     Exit $LASTEXITCODE
   }
-    
-  Copy-Item -Path "${VMTempPath}\validation.txt" -Destination "${ResultsPath}\${i}-baseline.txt"
+
+  # Without a sleep, sometimes things get grumpy
   
+  while(!(Test-Path $VMValidationPath)) {
+    Sleep 1
+  }
+  Copy-Item -Path $VMValidationPath -Destination "${ResultsPath}\${i}-baseline.txt"
+
+
   # Run the protocol
 
   for ($j = 0; $j -lt $protocol.Length; $j++) {
@@ -123,12 +147,16 @@ for ($i = 0; $i -lt 1; $i++) {
       Remove-Item $VMTempScriptFilename
     }
     
+    if(Test-Path $VMValidationPath) {
+      Remove-Item $VMValidationPath
+    }
+    
     "@echo (VM) Starting ${InstallerFilename}" | Add-Content -Path $VMTempScriptFilename
-    "@start /wait ${VMLocalTempPath}\${InstallerFilename} -s -s" | Add-Content -Path $VMTempScriptFilename
+    "@start /wait ${VMLocalTempPath}\${InstallerFilename} -s -r -o -s" | Add-Content -Path $VMTempScriptFilename
     "@if errorlevel 1 exit /b %errorlevel%" | Add-Content -Path $VMTempScriptFilename
     "@echo ..." | Add-Content -Path $VMTempScriptFilename
     "@echo (VM) Installer finished, validating result" | Add-Content -Path $VMTempScriptFilename
-    "@call ${VMLocalTempPath}\km-validation.bat > ${VMLocalTempPath}\validation.txt" | Add-Content -Path $VMTempScriptFilename
+    "@call ${VMLocalTempPath}\km-validation.bat > ${VMLocalValidationPath}" | Add-Content -Path $VMTempScriptFilename
     "@echo ..." | Add-Content -Path $VMTempScriptFilename
     "@exit /b 0" | Add-Content -Path $VMTempScriptFilename
     
@@ -137,13 +165,16 @@ for ($i = 0; $i -lt 1; $i++) {
     
     # Run the test script
     
-    & $psexec -accepteula -nobanner \\$VMIP $VMLocalTempScriptFilename
+    & $psexec -accepteula -nobanner -i \\$VMIP $VMLocalTempScriptFilename
     if($LASTEXITCODE -ne 0) {
       Exit $LASTEXITCODE
     }
     
-    # Record results
+    # Without a sleep, sometimes things get grumpy
     
-    Copy-Item -Path "${VMTempPath}\validation.txt" -Destination "${ResultsPath}\${i}-${j}.txt"
+    while(!(Test-Path $VMValidationPath)) {
+      Sleep 1
+    }
+    Copy-Item -Path $VMValidationPath -Destination "${ResultsPath}\${i}-${j}.txt"
   }
 }

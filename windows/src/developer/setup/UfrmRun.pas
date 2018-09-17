@@ -440,7 +440,6 @@ begin
         on E:Exception do // I1440 - avoid update check failure stopping install
         begin
           LogError(E.Message);
-          Result := False;  // I1901
         end;
       end;
     end;
