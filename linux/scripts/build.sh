@@ -47,9 +47,22 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 		make
 		sudo make install
 	else
+		echo "doing /tmp install of $proj"
 		../$proj/configure CPPFLAGS="-I${INSTALLDIR}/include" LDFLAGS="-L${INSTALLDIR}/lib" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
 		make
 		make install
 	fi
 	cd $BASEDIR
 done
+
+cd keyman-config
+echo "SUDOINSTALL: ${SUDOINSTALL}"
+if [[ "${SUDOINSTALL}" == "yes" ]]
+then
+	echo "doing sudo install of keyman-config"
+	sudo make install
+else
+	echo "doing /tmp install of keyman-config"
+	make install-local
+fi
+cd $BASEDIR

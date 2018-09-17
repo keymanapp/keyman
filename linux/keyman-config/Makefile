@@ -8,6 +8,11 @@ default:
 install:
 	python3 setup.py install
 
+install-local:
+	mkdir -p /tmp/kmfl/lib/python3.6/site-packages
+	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
+
+
 clean:
 	-rm -rf dist make_deb build
 

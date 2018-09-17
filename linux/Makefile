@@ -9,6 +9,9 @@ install_local: devreconf
 uninstall_local: devreconf
 	SUDOINSTALL="uninstall" ./scripts/build.sh
 
+default: tmpbuild
+
+
 debnocow:
 	./scripts/deb.sh
 
