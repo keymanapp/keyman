@@ -4,7 +4,7 @@
 
 # Project to test (e.g. keymandesktop, keymandeveloper
 
-$InstallerName="keymandesktop"
+$InstallerName="keymandeveloper"
 
 # Virtual machine parameters
 
@@ -153,7 +153,11 @@ for ($i = 0; $i -lt $protocols.Length; $i++) {
     
     "@echo (VM) Starting ${InstallerFilename}" | Add-Content -Path $VMTempScriptFilename
     "@start /wait ${VMLocalTempPath}\${InstallerFilename} -s -r -o -s" | Add-Content -Path $VMTempScriptFilename
-    "@if errorlevel 1 exit /b %errorlevel%" | Add-Content -Path $VMTempScriptFilename
+    if($InstallerName -eq "keymandeveloper") {
+      "@if errorlevel 0 if not errorlevel 1 exit /b 1" | Add-Content -Path $VMTempScriptFilename
+    } else {
+      "@if errorlevel 1 exit /b %errorlevel%" | Add-Content -Path $VMTempScriptFilename
+    }
     "@echo ..." | Add-Content -Path $VMTempScriptFilename
     "@echo (VM) Installer finished, validating result" | Add-Content -Path $VMTempScriptFilename
     "@call ${VMLocalTempPath}\km-validation.bat > ${VMLocalValidationPath}" | Add-Content -Path $VMTempScriptFilename

@@ -46,10 +46,14 @@ type
 
   TfrmStartup = class(TTIKEForm)
     Timer: TTimer;
-    PaintPanel1: TPaintPanel;
     lblVersion: TLabel;
     Image1: TImage;
     Shape1: TShape;
+    Image2: TImage;
+    Label1: TLabel;
+    Shape2: TShape;
+    Shape3: TShape;
+    Shape4: TShape;
     procedure FormCreate(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure imgSplashClick(Sender: TObject);
