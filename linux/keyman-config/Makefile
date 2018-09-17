@@ -23,7 +23,14 @@ uninstall:
 	sudo rm /usr/local/share/man/man1/km-*.1
 	sudo pip3 uninstall keyman_config
 	sudo rm /usr/local/bin/km-{config,kvk2ldml,package-{get,install,list-installed,uninstall}}
-
+	sudo rm -f /usr/local/share/man/man1/km-*.1
+        sudo pip3 uninstall keyman_config
+	sudo rm -f /usr/local/bin/km-config
+	sudo rm -f /usr/local/bin/km-kvk2ldml
+	sudo rm -f /usr/local/bin/km-package-get
+	sudo rm -f /usr/local/bin/km-package-install
+	sudo rm -f /usr/local/bin/km-package-list-installed
+	sudo rm -f /usr/local/bin/km-package-uninstall
 
 clean:
 	-rm -rf dist make_deb build

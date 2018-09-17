@@ -33,13 +33,12 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 	rm -rf build-$proj
 	mkdir build-$proj
 	cd build-$proj
-	if [[ "${SUDOINSTALL}" == "yes" ]]
-	then
+	if [[ "${SUDOINSTALL}" == "yes" ]]; then
 		echo "doing sudo install of $proj"
 		../$proj/configure CPPFLAGS="-I$/usr/local/include" LDFLAGS="-L/usr/local/lib" --libexecdir=/usr/local/lib/ibus --datadir=/usr/share
 		make
 		sudo make install
-	elif [[ "${SUDOINSTALL}" == "uninstall" ]]
+	elif [[ "${SUDOINSTALL}" == "uninstall" ]]; then
 		echo "doing sudo uninstall of $proj"
 		../$proj/configure CPPFLAGS="-I$/usr/local/include" LDFLAGS="-L/usr/local/lib" --libexecdir=/usr/local/lib/ibus --datadir=/usr/share
 		sudo make uninstall
@@ -54,11 +53,10 @@ done
 
 cd keyman-config
 echo "SUDOINSTALL: ${SUDOINSTALL}"
-if [[ "${SUDOINSTALL}" == "yes" ]]
-then
+if [[ "${SUDOINSTALL}" == "yes" ]]; then
 	echo "doing sudo install of keyman-config"
 	make install
-elif [[ "${SUDOINSTALL}" == "uninstall" ]]
+elif [[ "${SUDOINSTALL}" == "uninstall" ]]; then
 	echo "doing sudo uninstall of keyman-config"
 	make uninstall
 else
@@ -68,7 +66,6 @@ fi
 cd $BASEDIR
 
 if [ -f "/usr/share/doc/ibus-kmfl/kmfl.xml" ] && [ "${SUDOINSTALL}" == "uninstall" ]; then
-then
 	echo "putting ibus-kmfl package component file back"
 	sudo mv /usr/share/doc/ibus-kmfl/kmfl.xml /usr/share/ibus/component/
 fi
