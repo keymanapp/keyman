@@ -28,7 +28,7 @@ const
   SKeymanVersion60 = '6.0';
   SKeymanVersion50 = '5.0';
 
-  SKeymanVersion = SKeymanVersion110;
+{$I keymanversion_build.inc}
 
   SKeymanKeyboardVersion = SKeymanVersion100;
 
