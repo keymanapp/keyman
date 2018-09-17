@@ -1,7 +1,7 @@
 
 !include ..\Defines.mak
 
-build: global-versions
+build:
   cd $(ROOT)\src\global\delphi
   $(MAKE) $(TARGET)
 
@@ -13,10 +13,6 @@ build: global-versions
 
   cd $(ROOT)\src\global\wix
   $(MAKE) $(TARGET)
-
-global-versions:
-  $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h $(MKVER_VERSION_TXT)
-  $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc $(MKVER_VERSION_TXT)
   
 build-release:
   @rem

@@ -92,8 +92,9 @@ unit-tests:
 # release
 # ----------------------------------------------------------------------
 
-release: clean-pathdefines test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean 
+release: clean-pathdefines test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean
     cd $(ROOT)\src
+    $(MAKE) global-versions
     $(MAKE) disable-search
     $(MAKE) build-release-wrapper
     $(MAKE) clean    
@@ -134,7 +135,7 @@ test-releaseexists: mkver-app
 # Test various release prerequisites, e.g. Debug reg key not set
 #
 
-test-releasebuildcheck: 
+test-releasebuildcheck: global-versions
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE) test-releasebuildcheck
     cd $(ROOT)\src
@@ -155,6 +156,7 @@ test-uiaccess:
 #
     
 update-version: build-tools mkver-app
+    cd $(ROOT)\src
     $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\buildtools\version.txt $(ROOT)\src\version.txt
     $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\developer\version.txt $(ROOT)\src\version.txt
     $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\desktop\version.txt $(ROOT)\src\version.txt
@@ -164,6 +166,7 @@ update-version: build-tools mkver-app
 # Build a release
     
 build-release-wrapper: clean-output update-version
+    cd $(ROOT)\src
     $(MAKE) dirs
     $(MAKE) build-tools
     $(MAKE) build unit-tests
@@ -188,10 +191,11 @@ build-release-wrapper: clean-output update-version
 # Tools needed to complete a build
 #
 
-global-versions:
-    cd $(ROOT)\src\global
-    $(MAKE) global-versions
-    
+global-versions: mkver-app
+    cd $(ROOT)\src
+    $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc $(ROOT)\src\version.txt
+
 build-tools: global-versions
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)

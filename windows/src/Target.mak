@@ -12,8 +12,8 @@ versionhistory-app2:
     $(MAKE) versionhistory
 
 mkver-app: dirs
-    cd $(ROOT)\src\buildtools
-    $(MAKE) mkver
+    cd $(ROOT)\src\buildtools\mkver
+    $(MAKE)
     cd $(ROOT)\src
 
 devtools-app: dirs
