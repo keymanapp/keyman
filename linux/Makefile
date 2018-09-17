@@ -16,7 +16,7 @@ debnocow:
 reconf:
 	./scripts/reconf.sh
 
-dist:
+sources:
 	./scripts/dist.sh
 
 origdist:
@@ -40,5 +40,5 @@ deb: devreconf origdist cow debnocow
 releasedeb: reconf origdist cow debnocow
 	echo "Built release Debian packages in builddebs/"
 
-nightlydist: devreconf dist
+nightlydist: devreconf sources
 	echo "Built nightly source release in dist/"
