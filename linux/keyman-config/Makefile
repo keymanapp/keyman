@@ -18,6 +18,12 @@ install-temp:
 	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`
 	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
 
+uninstall:
+	sudo rm -rf /usr/local/share/keyman/icons
+	sudo rm /usr/local/share/man/man1/km-*.1
+	sudo pip3 uninstall keyman_config
+	sudo rm /usr/local/bin/km-{config,kvk2ldml,package-{get,install,list-installed,uninstall}}
+
 
 clean:
 	-rm -rf dist make_deb build
