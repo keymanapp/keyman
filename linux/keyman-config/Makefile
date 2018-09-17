@@ -1,12 +1,18 @@
 #!/usr/bin/make
 
-VERSION=10.99.1
+VERSION=`cat ../VERSION`
 
 default:
 	python3 setup.py build
 
-install:
-	python3 setup.py install
+install: man
+	sudo python3 setup.py install
+	# install icons
+	sudo mkdir -p /usr/local/share/keyman/icons
+	sudo cp keyman_config/icons/* /usr/local/share/keyman
+	# install man pages
+	sudo mkdir -p /usr/local/share/man/man1
+	sudo cp debian/man/*.1 /usr/local/share/man/man1
 
 install-temp:
 	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`

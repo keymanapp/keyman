@@ -96,11 +96,13 @@ class InstallKmpWindow(Gtk.Window):
             else:
                 img_default = "/usr/share/keyman/icons/defaultpackage.gif"
                 if not os.path.isfile(img_default):
-                    img_default = "keyman_config/icons/defaultpackage.gif"
-                if not os.path.isfile(img_default):
-                    img_default = "defaultpackage.gif"
-                if not os.path.isfile(img_default):
-                    img_default = "icons/defaultpackage.gif"
+                    img_default = "/usr/local/share/keyman/icons/defaultpackage.gif"
+                    if not os.path.isfile(img_default):
+                        img_default = "keyman_config/icons/defaultpackage.gif"
+                        if not os.path.isfile(img_default):
+                            img_default = "defaultpackage.gif"
+                            if not os.path.isfile(img_default):
+                                img_default = "icons/defaultpackage.gif"
                 image.set_from_file(img_default)
 
             mainhbox.pack_start(image, False, False, 0)
