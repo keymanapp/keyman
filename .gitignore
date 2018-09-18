@@ -264,14 +264,8 @@ tmp/
 dist/
 *~
 linux/keyman-config/debian/man
+linux/keyman-config/build
 
 .DS_Store
 
 *.kpj.user
-
-build*
-deb-*
-dist
-*~
-*.egg-info
-__pycache__

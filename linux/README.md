@@ -30,16 +30,23 @@ This is only for testing the build, not for running ibus-kmfl in ibus
 
 ##### Installing for ibus to use ibus-kmfl
 
+- The process to build and install everything is:
+
+    * `make devreconf` (or `make reconf`) to create the build system and set the version
+    * `make configure
+    * `make` to build
+    * `sudo make install` to install to /usr/local
+
 - Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
 
- - To do this run `make install_local`
+ - To do this run ` sudo make install`
 
     * This will install to /usr/local
         * and `/usr/share/ibus/component/kmfl.xml` and `/usr/share/kmfl/icons`
 
-    * If you already have the ibus-kmfl package installed then build.sh will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
+    * If you already have the ibus-kmfl package installed then it will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
 
-        * run `make uninstall_local` to put it back again
+        * run `make uninstall` to uninstall everything and put it back again
 
 #### Manually
 
@@ -69,7 +76,8 @@ Teamcity will run `make tmpinstall`
 
 ### Building packages
 
-TBD, hopefully jenkins
+Jenkins now continuously builds Debian packages on every commit to master
+Periodically test packages will be uploaded to https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily
 
 ### Testing
 Tests to be created as there are no current tests
