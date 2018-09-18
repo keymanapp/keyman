@@ -27,6 +27,8 @@ const
   IDC_MESSAGE = 1004;
   IDC_IMAGE = 1005;
   IDC_STATUS = 1006;
+  IDC_LOGO = 1007;
+  IDC_LOGOMESSAGE = 1008;
 
 implementation
 

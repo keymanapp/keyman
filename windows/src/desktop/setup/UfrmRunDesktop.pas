@@ -62,6 +62,7 @@ type
     lblStatus: TLabel;
     Image1: TImage;
     Label1: TLabel;
+    Image2: TImage;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);

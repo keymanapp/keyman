@@ -736,6 +736,19 @@ th
   color: #444444;
 }
 
+.support_sil {
+  background: white url('sil-logo-blue.png') no-repeat top left;
+  font-size: 12px;
+  color: #444;
+  position: absolute;
+  bottom: 32px;
+  left: 80px;
+  height: 50px;
+  padding-top: 25px;
+  padding-left: 56px;
+  box-sizing: border-box;
+}
+
 .support_copyright
 {
   font-size: 11px;
