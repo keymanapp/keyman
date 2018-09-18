@@ -198,6 +198,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_ContactHeading" Version="9.0.465.0" Description="">Contact Keyman Support</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_ContactInstructions_Free" Version="9.0.465.0" Description="">If you have any issues using Keyman, just ask a question on the Keyman Community Forum.</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_CommunitySupport" Version="9.0.465.0" Description="">Open Keyman Community Forum</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_CreatedBySIL" Version="11.0.1500.0" Description="Support - SIL statement">Created by SIL International</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Copyright" Version="7.0.230.0" Description="Support - Product Copyright">Copyright &#xa9; SIL International. All Rights Reserved.</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Version" Version="7.0.230.0" Description="Support - version">Version</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_EngineVersion" Version="7.0.230.0" Description="Support - engine version">Engine Version</String>

@@ -68,8 +68,11 @@ function UnloadUserProfile(hToken, hProfile: THandle): BOOL; stdcall; external '
 procedure RaiseLastError(func: string; LastError: Integer); overload;
 var
   Error: EOSError;
+resourcestring
+  SOSError = 'System Error.  Code: %d.'+sLineBreak+'%s%s';
 begin
-  Error := EOSError.CreateResFmt(@SOSError, [LastError, func + ': ' + SysErrorMessage(LastError)]);
+  //Note: System.SysConst.SOSError format can change in Delphi version changes, so don't rely on it
+  Error := EOSError.CreateResFmt(@SOSError, [LastError, func + ': ', SysErrorMessage(LastError)]);
   Error.ErrorCode := LastError;
   raise Error;
 end;

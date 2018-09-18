@@ -2,9 +2,9 @@
 # InstHelper Makefile
 #
 
-!include ..\..\..\Defines.mak
-
 VERSION_TXT_PATH=..\..
+
+!include ..\..\..\Defines.mak
 
 build: dirs version.res
     $(DCC32) insthelper.dpr

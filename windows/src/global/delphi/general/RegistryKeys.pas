@@ -92,8 +92,8 @@ const
 
   { Keyman base key and values }
 
-  SRegKey_KeymanEngine_LM     = SRegKey_KeymanEngineRoot_LM  + '\'+SKeymanVersion;     // LM
-  SRegKey_KeymanEngine_CU     = SRegKey_KeymanEngineRoot_CU  + '\'+SKeymanVersion;     // CU
+  SRegKey_KeymanEngine_LM     = SRegKey_KeymanEngineRoot_LM;     // LM
+  SRegKey_KeymanEngine_CU     = SRegKey_KeymanEngineRoot_CU;     // CU
   SRegKey_KeymanEngineDiag_CU = SRegKey_KeymanEngine_CU + '\Diag';                     // CU
 
   SregKey_KeymanHotkeys_CU    = SRegKey_KeymanEngine_CU + '\hotkeys';
@@ -162,8 +162,8 @@ const
 
   SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman Desktop';
   SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman Desktop';
-  SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU + '\' + SKeymanVersion;
-  SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM + '\' + SKeymanVersion;
+  SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU;
+  SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM;
 
   { Other Keyman Settings }
 
@@ -296,10 +296,10 @@ const
   { Keyman Developer Keys }
 
   SRegKey_KeymanDeveloperRoot_CU = SRegKey_KeymanRoot_CU          + '\Keyman Developer';  // LM CU
-  SRegKey_KeymanDeveloper_CU     = SRegKey_KeymanDeveloperRoot_CU + '\'+SKeymanVersion;               // LM CU
+  SRegKey_KeymanDeveloper_CU     = SRegKey_KeymanDeveloperRoot_CU;               // LM CU
 
   SRegKey_KeymanDeveloperRoot_LM = SRegKey_KeymanRoot_LM          + '\Keyman Developer';  // LM CU
-  SRegKey_KeymanDeveloper_LM     = SRegKey_KeymanDeveloperRoot_LM + '\'+SKeymanVersion;               // LM CU
+  SRegKey_KeymanDeveloper_LM     = SRegKey_KeymanDeveloperRoot_LM;               // LM CU
 
   SRegKey_IDE_CU                 = SRegKey_KeymanDeveloper_CU     + '\IDE';                // CU
   SRegKey_IDEDock_CU             = SRegKey_IDE_CU                 + '\Dock';              // CU
@@ -503,11 +503,11 @@ const
 
   SFolderTavultesoft_                = 'Tavultesoft';                              // PF, PFC, AD, CAD
   SFolderKeymanRoot                 = 'Keyman';
-  SFolderKeymanEngine               = SFolderKeymanRoot + '\Keyman Engine '+SKeymanVersion;
+  SFolderKeymanEngine               = SFolderKeymanRoot + '\Keyman Engine';
   SFolderKeymanKeyboard             = SFolderKeymanEngine + '\Keyboard';
-  SFolderShared                     = SFolderKeymanRoot + '\Shared Data '+SKeymanVersion;
+  SFolderShared                     = SFolderKeymanRoot + '\Shared Data';
   SFolderSharedDatabases            = SFolderShared + '\Databases';
-  SFolderKeymanDeveloper            = SFolderKeymanRoot + '\Keyman Developer '+SKeymanVersion;
+  SFolderKeymanDeveloper            = SFolderKeymanRoot + '\Keyman Developer';
   SFolderKeymanDeveloperTemplates   = SFolderKeymanDeveloper + '\Templates';
   SFolderRegressionTests            = SFolderKeymanDeveloper + '\Regression Tests';
 

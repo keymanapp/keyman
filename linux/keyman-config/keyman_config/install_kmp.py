@@ -145,7 +145,7 @@ def install_kmp(inputfile, online=False):
 								logging.info("Installing %s.ico as keyman file", kbid)
 								copy2(icodownloadfile, kbdir)
 								checkandsaveico(icodownloadfile)
-								copy2(icodownloadfile+".bmp", kbdir)
+								copy2(icodownloadfile+".png", kbdir)
 							else:
 								logging.warning("install_kmp.py: warning: no ico source file for %s", kbid)
 					with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
@@ -183,12 +183,12 @@ def install_kmp(inputfile, online=False):
 					ldmlfile = os.path.join(kbdir, name+".ldml")
 					output_ldml(ldmlfile, ldml)
 				elif ftype == "Keyboard icon":
-					logging.info("Converting %s to BMP and installing both as keyman files", f['name'])
+					logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
 					checkandsaveico(fpath)
-					copy2(fpath+".bmp", kbdir)
+					copy2(fpath+".png", kbdir)
 			if install_to_ibus:
 				if sys.version_info.major == 3 and sys.version_info.minor < 6:
 					dconfreadresult = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],

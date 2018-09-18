@@ -24,6 +24,7 @@
     <div id="ribbon3"></div>
   </div>
   <div id="titleBox"></div>
+  <div id="silLogo"></div>
   <div id="family"></div>
   
   <a href="keyman:start" id="startNow" class="button">

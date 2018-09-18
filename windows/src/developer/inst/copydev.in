@@ -1,23 +1,49 @@
 !include ..\..\Defines.mak
 
+# We use different directories so that heat generates
+# different identifiers for the various folders
+KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build_xml
+KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build_cef
+
 copykmdev: makeinstaller
     -mkdir $(ROOT)\release\$VERSION
-    copy /Y $(ROOT)\src\developer\inst\keymandeveloper100.msi $(ROOT)\release\$VERSION\keymandeveloper100.msi
+    copy /Y $(ROOT)\src\developer\inst\keymandeveloper.msi $(ROOT)\release\$VERSION\keymandeveloper.msi
     copy /Y $(ROOT)\src\developer\inst\keymandeveloper-$VERSION.exe $(ROOT)\release\$VERSION\keymandeveloper-$VERSION.exe
-    echo ProductGUID=$GUID0 > $(ROOT)\release\$VERSION\GUIDInfo.txt
 
 test-releaseexists:
     if exist $(ROOT)\release\$VERSION\keymandeveloper*.msi echo. & echo Release $VERSION already exists. Delete it or update src\version.txt and try again & exit 1
 
-candle:
-    $(WIXCANDLE) -dVERSION=$VERSION -dPRODUCTID=$GUID0 -dMonacoSourceDir=$(ROOT)\src\developer\TIKE\xml\app\lib\monaco\min\vs kmdev.wxs monaco.wxs
+candle: heat-cef heat-xml
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE kmdev.wxs 
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
+    
+heat-xml:
+    # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
+    mkdir $(KEYMAN_WIX_TEMP_XML)
+    xcopy $(ROOT)\src\developer\TIKE\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
+    -del /f /s /q $(KEYMAN_WIX_TEMP_XML)\Thumbs.db
+    -for /f %i in ('dir /a:d /s /b $(KEYMAN_WIX_TEMP_XML)\.vs') do rd /s /q %i
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_XML) -o xml.wxs -ag -cg XML -dr INSTALLDIR -var var.XmlSourceDir -wx -nologo
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
+    
+heat-cef:
+    # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+    mkdir $(KEYMAN_WIX_TEMP_CEF)
+    xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 makeinstaller:
     cd $(ROOT)\src\developer\inst
     echo [Setup] > setup.inf
     echo Version=$VERSION >> setup.inf
-    echo MSIFileName=keymandeveloper100.msi >> setup.inf
-    echo Title=Keyman Developer 10.0 >>setup.inf
-    $(WZZIP) setup.zip keymandeveloper100.msi setup.inf
+    echo MSIFileName=keymandeveloper.msi >> setup.inf
+    echo Title=Keyman Developer $RELEASE >>setup.inf
+    $(WZZIP) setup.zip keymandeveloper.msi setup.inf
     copy /b $(ROOT)\bin\developer\setup.exe + setup.zip keymandeveloper-$VERSION.exe
     $(SIGNCODE) /d "Keyman Developer" keymandeveloper-$VERSION.exe
