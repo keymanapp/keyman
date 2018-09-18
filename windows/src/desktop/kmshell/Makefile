@@ -5,6 +5,8 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons xml
+    $(MKVER_U) localedef.dtd.in xml\localedef.dtd $(MKVER_VERSION_TXT)
+    $(PROGRAM)\buildtools\mkver -v $(MKVER_VERSION_TXT)
     $(DCC32) kmshell.dpr
     $(TDS2DBG) kmshell.exe 
     $(MAKEJCLDBG) kmshell.map
@@ -24,6 +26,7 @@ xml:
 clean: def-clean
     if exist MessageIdentifiers.pas del MessageIdentifiers.pas
     if exist icons\icons.res del icons\icons.res
+    if exist xml\localedef.dtd del xml\localedef.dtd
 
 signcode:
     $(SIGNCODE) /d "Keyman Desktop" $(PROGRAM)\desktop\kmshell.exe

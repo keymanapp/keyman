@@ -81,7 +81,7 @@ const
 
   OnlineProductIDs_KeymanDeveloper_90_: array[0..1] of Integer = (22,23);  //I2521
 
-  { Version 10.0 }
+  { Version 10.0 + later versions }
 
   OnlineProductID_KeymanDesktop_100 = 30;
   OnlineProductID_KeymanDeveloper_100 = 31;

@@ -38,13 +38,14 @@ type
 //  end;
 
   TfrmAboutTike = class(TTIKEForm)
-    PaintPanel1: TPaintPanel;
-    lblCopyright: TLabel;
     lblVersion: TLabel;
+    lblCopyright: TLabel;
     lblWebsite: TLabel;
     Image2: TImage;
     Shape1: TShape;
     cmdOK: TButton;
+    Image1: TImage;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure lblWebsiteClick(Sender: TObject);
     procedure imgKeymanClick(Sender: TObject);
@@ -70,7 +71,7 @@ uses
   utilexecute;
 
 const
-  SCaption = 'About Keyman Developer'; // I4819
+  SCaption = 'About Keyman Developer '+SKeymanVersion; // I4819
 
 {$R *.DFM}
 

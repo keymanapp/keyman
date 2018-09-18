@@ -62,6 +62,7 @@ type
     lblStatus: TLabel;
     Image1: TImage;
     Label1: TLabel;
+    Image2: TImage;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -511,6 +512,8 @@ var
   i: Integer;
 begin
   Application.Title := 'Keyman Desktop '+SKeymanVersion+' Setup';  // I2617
+  Caption := 'Install Keyman Desktop '+SKeymanVersion;
+  cmdInstall.Caption := '&Install Keyman Desktop '+SKeymanVersion;
   memoPackages.Text := 'This install includes:'#13#10+'• Keyman Desktop '+SKeymanVersion+#13#10;
   if FInstallInfo.Packages.Count > 0 then
   begin

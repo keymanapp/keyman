@@ -1481,7 +1481,7 @@ int check_bitmap_file(STORE *sp, int line)
 
 	if (strncmp(bmp_path+strlen(bmp_path)-4, ".ico", 4) == 0)
 	{
-		strcat(bmp_path,".bmp");
+		strcat(bmp_path,".png");
 	}
 	// First test if the file exists exactly as in BITMAP statement
 	else if(stat(bmp_path,&fstat) == 0)
@@ -1537,16 +1537,16 @@ int check_bitmap_file(STORE *sp, int line)
 		}
 		if(p == NULL)
 		{
-			// Add .ico.bmp (ico converted to bmp)
-			strcpy(bmp_path+strlen(bmp_path)-4,".ico.bmp");
+			// Add .ico.png (ico converted to png)
+			strcpy(bmp_path+strlen(bmp_path)-4,".ico.png");
 			p = find_first_match(bmp_path);
 		}
 	}
 
-	// If there is an extension but not found, try .bmp added (converted from .ico)
+	// If there is an extension but not found, try .png added (converted from .ico)
 	if(p == NULL)
 	{
-		strcat(bmp_path, ".bmp");
+		strcat(bmp_path, ".png");
 		p = find_first_match(bmp_path);
 	}
 

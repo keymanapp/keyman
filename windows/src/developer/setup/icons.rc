@@ -14,6 +14,7 @@
 //
 
 20                      BITMAP                  "kbd.bmp"
+21                      BITMAP                  "logo.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -35,9 +36,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTI
 EXSTYLE WS_EX_WINDOWEDGE | WS_EX_APPWINDOW
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "",IDOK,141,98,145,23
+    DEFPUSHBUTTON   "",IDOK,141,90,145,23
     PUSHBUTTON      "",IDCANCEL,267,164,49,15
     CONTROL         "",IDC_IMAGE,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,8,7,93,154
+    CONTROL         "",IDC_LOGO,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,109,130,30,31
+    LTEXT           "",IDC_LOGOMESSAGE,145,144,206,18,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,167,198,10,WS_EX_TRANSPARENT
     LTEXT           "",IDC_TITLE,109,5,201,33,0,WS_EX_TRANSPARENT
     LTEXT           "",IDC_MESSAGE,109,42,206,18,0,WS_EX_TRANSPARENT

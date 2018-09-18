@@ -33,7 +33,8 @@ msm:
 
     $(MAKE) -fdownload.mak prepareredist
     $(MAKE) -fdownload.mak candle
-    $(WIXLIGHT) keymanengine.wixobj
+    
+    $(WIXLIGHT) keymanengine.wixobj components.wixobj -o keymanengine.msm
 
 copy:    
     #
@@ -57,9 +58,9 @@ clean:
     cd $(ROOT)\src\engine\inst
     if exist download.mak $(MAKE) -fdownload.mak clean
     -del /Q download.mak
-    -del /Q keymanengine.msm
-    -del /Q keymanengine.wixobj
-    -del /Q keymanengine.wixpdb
+    -del /Q *.msm
+    -del /Q *.wixobj
+    -del /Q *.wixpdb
 
 install:
     rem nothing

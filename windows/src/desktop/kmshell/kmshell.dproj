@@ -94,7 +94,7 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-c</Debugger_RunParams>
+        <Debugger_RunParams>-splash</Debugger_RunParams>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -370,9 +370,6 @@
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvTimeFrameworkDesign240.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvWizardsDesign240.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvXPCtrlsDesign240.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\DragDropD2011.bpl">File c:\keyman\10.0\lib\DragDropD2011.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\tb2kdsgn_d12.bpl">File c:\keyman\10.0\lib\tb2kdsgn_d12.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl">File c:\keyman\10.0\lib\SpTBXLibDsgn_d16.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k240.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp240.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\18.0\Bpl\JvControlsDesign240.bpl not found</Excluded_Packages>
@@ -394,15 +391,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

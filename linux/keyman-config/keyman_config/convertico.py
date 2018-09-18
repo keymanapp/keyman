@@ -2,6 +2,7 @@
 
 import logging
 import numpy as np
+import os
 import sys
 from PIL import Image
 
@@ -27,6 +28,10 @@ def checkandsaveico(icofile):
         logging.info("checkandsaveico:" + icofile + " mostly black so changing black to white")
         im2 = changeblacktowhite(im)
     im2.save(icofile + ".bmp")
+    im3 = Image.open(icofile + ".bmp")
+    im4 = im3.resize((64, 64), Image.ANTIALIAS)
+    im4.save(icofile + ".png")
+    os.remove(icofile + ".bmp")
 
 
 def main(argv):
@@ -37,4 +42,4 @@ def main(argv):
     checkandsaveico(sys.argv[1])
 
 if __name__ == "__main__":
-    main(sys.argv[1:])  
+    main(sys.argv[1:])

@@ -1,0 +1,4 @@
+#pragma once
+
+#define KEYMANVERSION	"$RELEASE"
+#define KEYMANVERSIONW	L"$RELEASE"

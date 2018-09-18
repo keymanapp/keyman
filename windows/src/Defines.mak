@@ -154,16 +154,17 @@ TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
-WIXCANDLE=$(WIXPATH)\candle.exe -wx
+WIXCANDLE=$(WIXPATH)\candle.exe -wx -nologo
 
 !IFDEF LINT
-WIXLIGHT=$(WIXPATH)\light.exe -wx
+WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo
 !ELSE
 # we suppress ICE82 because it reports spurious errors with merge module keymanengine to do with duplicate sequence numbers.  Safely ignored.
-WIXLIGHT=$(WIXPATH)\light.exe -wx -sice:ICE82 -sice:ICE80
+WIXLIGHT=$(WIXPATH)\light.exe -wx -nologo -sice:ICE82 -sice:ICE80
 !ENDIF
 
-WIXLIT=$(WIXPATH)\lit.exe -wx
+WIXLIT=$(WIXPATH)\lit.exe -wx -nologo
+WIXHEAT=$(WIXPATH)\heat.exe
 
 LINKPATH=link.exe
 
@@ -204,3 +205,21 @@ SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_P
 
 PLATFORM=Win32
 
+#
+# mkver commands
+#
+
+MKVER_APP=$(PROGRAM)\buildtools\mkver
+
+!IFDEF VERSION_TXT_PATH
+MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.txt
+!ELSE
+MKVER_VERSION_TXT=..\version.txt
+!ENDIF
+
+# Update a version.rc file
+MKVER_V=$(MKVER_APP) -v $(MKVER_VERSION_TXT)
+# Update a manifest.xml file
+MKVER_M=$(MKVER_APP) -m $(MKVER_VERSION_TXT)
+# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out> $(MKVER_VERSION_TXT)
+MKVER_U=$(MKVER_APP) -v -u 
