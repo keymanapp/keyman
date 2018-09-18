@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="{2245D16B-E916-47FD-A06A-7EA6CBDC1059}"
-           UpgradeCode="7B78D2C8-31EC-4B0C-8D7F-650418A4686E" Manufacturer="SIL International"
+  <Product Id="*"
+           UpgradeCode="{E99A1F1E-7046-44F9-89EF-D3A59F84B209}" Manufacturer="SIL International"
            Name="Keyman Developer $(var.RELEASE)" Version="$(var.VERSION)" Language="1033">
     <Package Keywords="Keyman,Keyboard,Engine" Compressed="yes"
              Description="Keyman Developer $(var.RELEASE)" Comments="Contact:  Your local administrator"
@@ -32,17 +32,24 @@
     <!-- Upgrade from Developer 10.0 or later versions -->
 
     <Upgrade Id="7B78D2C8-31EC-4B0C-8D7F-650418A4686E">
-      <UpgradeVersion OnlyDetect="no" Minimum="10.0.699.0" IncludeMinimum="yes"
-                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
+      <UpgradeVersion OnlyDetect="no" Minimum="10.0.0.0" IncludeMinimum="yes"
+                      Maximum="11.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
+    </Upgrade>
+
+    <!-- Upgrade from Developer 11.0 or later versions -->
+
+    <Upgrade Id="{E99A1F1E-7046-44F9-89EF-D3A59F84B209}">
+      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes"
+                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes"
                       Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
-
+    
     <Property Id="ALLUSERS"><![CDATA[1]]></Property>
 
     <Condition Message="Keyman Developer requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
-    
+
     <Directory Id='TARGETDIR' Name='SourceDir' DiskId='1'>
 
       <Merge Id="keymanengine" Language='1033' SourceFile='..\..\engine\inst\keymanengine.msm' DiskId='1' />
@@ -51,450 +58,275 @@
         <Directory Id="KeymanRoot" Name="Keyman">
           <Directory Id="KEYMANDEV" Name="Keyman Developer">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\developer\">
-              
-              <Component Id="KeymanDevApp" Guid="{39B172D1-35ED-424B-8546-BF11E38979C0}" SharedDllRefCount="yes" Location="local" DiskId="1">
-                <File Id="tike.exe" Name="tike.exe" KeyPath="yes" Vital='yes'>
-                  <Shortcut Id="startmenuTIKE" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
-                  <Shortcut Id="desktopTIKE" Advertise="yes" Directory="DesktopFolder" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
-                </File>
-                <File Id="kmcomp.exe" Name="kmcomp.exe" />
-                <File Id="kmcmpdll.dll" Name="kmcmpdll.dll" />
-                <File Id="debughost.kmx" Name="debughost.kmx" Source="..\..\developer\tike\redist\debughost.kmx" />
-                <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
-                <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)" />
-                <Environment Id="environmentKeymanDeveloperPath" Action="set" Name="KeymanDeveloperPath" System="yes" Value="[INSTALLDIR]" />
-
-                <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
-                <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
-                <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
-
-                <File Id="keyboard_info.distribution.json" Name="keyboard_info.distribution.json" Source="..\..\global\inst\data\keyboard_info\" />
-                <File Id="keyboard_info.source.json" Name="keyboard_info.source.json" Source="..\..\global\inst\data\keyboard_info\" />
-                
-                <?include 'file_associations.wxi' ?>
-              </Component>
-
-              <Directory Id="FontsFolder" FileSource="..\..\developer\inst\fonts\">
-                <Component Id="componentFonts" Guid="{3C426EE5-ECD4-42D4-AB1E-69A142B1C9BD}" Location="local" DiskId="1">
-                  <File Id="file_code2000.ttf" Name="code2000.ttf" TrueType="yes" />
-                  <File Id="file_code2001.ttf" Name="code2001.ttf" TrueType="yes" />
-                  <File Id="file_code2002.ttf" Name="code2002.ttf" TrueType="yes" />
-                </Component>  
-                <Component Id='oskFonts' Guid='{91771217-4CD4-47AB-BA1A-58FF58614E64}' Location='local' DiskId='1'>
-                  <File Id='xml_file_layoutbuilder_keymanweb_osk.ttf' Name='keymanweb-osk.ttf' TrueType='yes' Source='..\..\developer\tike\xml\layoutbuilder\keymanweb-osk.ttf' />
-                </Component>
-              </Directory>
-
-              <Component Id="Data" Guid="{04EB5A8F-7163-4575-97A8-460C2900B60E}" SharedDllRefCount="yes">
-                <File Id="file_unicodedata" Name="unicodedata.mdb" Source="..\..\global\inst\data\" KeyPath="yes" />
-                <File Id="unicodedata.txt" Name="unicodedata.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
-                <File Id="blocks.txt" Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" />
-              </Component>
-              
-              <?include cef.wxi ?>
-
-              <Directory Id='xml' Name='xml'>
-                <?include app.wxi ?>
-                
-                <Directory Id='xmlcommon' Name='common' />
-                <Directory Id='xmlproject' Name='project' FileSource='..\..\developer\tike\xml\project\'>
-                  
-                    <Component><File Id="xml_file7" Name="btn_contract.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file8" Name="btn_expand.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file9" Name="btn_left.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file10" Name="btn_mid.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file11" Name="btn_right.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file1" Name="btndown_left.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file2" Name="btndown_mid.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file3" Name="btndown_right.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file4" Name="btnsel_left.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file5" Name="btnsel_mid.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file6" Name="btnsel_right.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file12" Name="chk_checkbox.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file13" Name="chk_checked.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file14" Name="distribution.xsl"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file15" Name="elements.xsl"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file17" Name="header_distrib.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file18" Name="header_keyboard.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file19" Name="header_package.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file31" Name="header_welcome.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file20" Name="icon_kmn.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file33" Name="icon_kmp.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file34" Name="icon_kmx.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file36" Name="icon_kps.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file37" Name="icon_kvk.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file21" Name="keyboards.xsl"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file40" Name="menugrey.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file22" Name="packages.xsl"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file23" Name="project.xsl"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file25" Name="tab_distrib.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file26" Name="tab_keyboard.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file27" Name="tab_package.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file30" Name="tab_welcome.gif"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_file29" Name="welcome.xsl"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_iconfile.gif" Name="icon_file.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_arrow.gif" Name="icon32_arrow.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_blank.gif" Name="icon32_blank.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_doc.gif" Name="icon32_doc.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_html.gif" Name="icon32_html.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_kmn.png" Name="icon32_kmn.png" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_kmp.png" Name="icon32_kmp.png" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_kmx.png" Name="icon32_kmx.png" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_kps.png" Name="icon32_kps.png" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_kvk.png" Name="icon32_kvk.png" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_msi.gif" Name="icon32_msi.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_ttf.gif" Name="icon32_ttf.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_ico.gif" Name="icon32_ico.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_plus.gif" Name="icon32_plus.gif" KeyPath="yes" /></Component>
-                    <Component><File Id="xml_project.js" Name="project.js"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_project.css" Name="project.css"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon32_kvks.png" Name="icon32_kvks.png"  KeyPath="yes" /></Component>
-                    <Component><File Id="xml_icon_kvks.png" Name="icon_kvks.png"  KeyPath="yes" /></Component>
-
-                </Directory>
-
-                <Directory Id='xmlkmw' Name='kmw' FileSource='..\..\developer\tike\xml\kmw\'>
-                  <Component Id='componentxmlkmw2' Guid='*' Location='local' DiskId='1'>
-                    <File Id='xml_kmw_index.html' Name='index.html' />
-                  </Component>
-
-                  <Component><File Id='xml_kmw_packages.html' Name='packages.html' KeyPath='yes' /></Component>
-
-                  <Directory Id='xmlkmwresource' Name='resource' DiskId='1'>
-                    <Component><File Id='xml_kmw_resource_keymanweb.js' Name='keymanweb.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuibutton.js' Name='kmwuibutton.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuifloat.js' Name='kmwuifloat.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuitoggle.js' Name='kmwuitoggle.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuitoolbar.js' Name='kmwuitoolbar.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_keymanweb.js.map' Name='keymanweb.js.map' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuibutton.js.map' Name='kmwuibutton.js.map' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuifloat.js.map' Name='kmwuifloat.js.map' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuitoggle.js.map' Name='kmwuitoggle.js.map' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_kmwuitoolbar.js.map' Name='kmwuitoolbar.js.map' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_license' Name='LICENSE' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_kmw_resource_readme_md' Name='README.md' KeyPath="yes" /></Component>
-                    
-                    <Directory Id='xmlkmwresourceosk' Name='osk' FileSource='..\..\developer\tike\xml\kmw\resource\osk\' DiskId='1'>
-                        <Component><File Id='xml_kmw_resource_osk_ajax_loader.gif'             Name='ajax-loader.gif'               KeyPath="yes" /></Component>
-                        <Component><File Id='xml_kmw_resource_osk_keymanweb_osk.eot'           Name='keymanweb-osk.eot'             KeyPath="yes" /></Component>
-                        <Component><File Id='xml_kmw_resource_osk_keymanweb_osk.ttf'           Name='keymanweb-osk.ttf'             KeyPath="yes" /></Component>
-                        <Component><File Id='xml_kmw_resource_osk_keymanweb_osk.woff'          Name='keymanweb-osk.woff'            KeyPath="yes" /></Component>
-                        <Component><File Id='xml_kmw_resource_osk_kmwosk.css'                  Name='kmwosk.css'                    KeyPath="yes" /></Component>
-                    </Directory>
-                    <Directory Id='xmlkmwresourceui' Name='ui'>
-                      <Directory Id='xmlkmwresourceuibutton' Name='button' FileSource='..\..\developer\tike\xml\kmw\resource\ui\button\'>
-                          <Component><File Id='xml_kmw_resource_ui_button_kbdicon.gif'           Name='kbdicon.gif'             KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_button_kmw_button.gif'        Name='kmw_button.gif'          KeyPath="yes" /></Component>
-                      </Directory>
-                      <Directory Id='xmlkmwresourceuifloat' Name='float' FileSource='..\..\developer\tike\xml\kmw\resource\ui\float\'>
-                          <Component><File Id='xml_kmw_resource_ui_float_kbdicon.gif'            Name='kbdicon.gif'              KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_float_kmicon.gif'             Name='kmicon.gif'               KeyPath="yes" /></Component>
-                      </Directory>
-                      <Directory Id='xmlkmwresourceuiios' Name='ios' FileSource='..\..\developer\tike\xml\kmw\resource\ui\ios\'>
-                          <Component><File Id='xml_kmw_resource_ui_ios_kbdicon.png'              Name='kbdicon.png'                KeyPath="yes" /></Component>
-                      </Directory>
-                      <Directory Id='xmlkmwresourceuitoggle' Name='toggle' FileSource='..\..\developer\tike\xml\kmw\resource\ui\toggle\'>
-                          <Component><File Id='xml_kmw_resource_ui_toggle_kbdicon.gif'           Name='kbdicon.gif'             KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toggle_kmw_logo_16.gif'       Name='kmw_logo_16.gif'         KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toggle_kmw_logo_16_down.gif'  Name='kmw_logo_16_down.gif'    KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toggle_kmw_osk_16.gif'        Name='kmw_osk_16.gif'          KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toggle_kmwcontroller2.gif'    Name='kmwcontroller2.gif'      KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toggle_kmwcontroller2x.gif'   Name='kmwcontroller2x.gif'     KeyPath="yes" /></Component>
-                      </Directory>
-                      <Directory Id='xmlkmwresourceuitoolbar' Name='toolbar' FileSource='..\..\developer\tike\xml\kmw\resource\ui\toolbar\'>
-                          <Component><File Id='xml_kmw_resource_ui_toolbar_blank.gif'            Name='blank.gif'              KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toolbar_kmwuitoolbar.css'     Name='kmwuitoolbar.css'       KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toolbar_toolbar.gif'          Name='toolbar.gif'            KeyPath="yes" /></Component>
-                          <Component><File Id='xml_kmw_resource_ui_toolbar_world.png'            Name='world.png'              KeyPath="yes" /></Component>
-                      </Directory>
-                    </Directory>
-                  </Directory>
-                </Directory>
-
-                <Directory Id='xmlhelp' Name='help' FileSource='..\..\developer\tike\xml\help\'>
-                    <Component><File Id='xml_file80' Name='help.xsl' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file81' Name='contexthelp.xml' KeyPath="yes" /></Component>
-                </Directory>
-
-                <Directory Id='xmllayout' Name='layoutbuilder' FileSource='..\..\developer\tike\xml\layoutbuilder\'>
-                    <Component><File Id='xml_file_layoutbuilder_builder.css' Name='builder.css' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_physical_keyboard_template' Name='physical-keyboard-template.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_builder.js' Name='builder.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_builder.xsl' Name='builder.xsl' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_jquery_1.10.2.js' Name='jquery-1.10.2.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_jquery_ui.css' Name='jquery-ui.css' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_jquery_ui.js' Name='jquery-ui.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_platform.js' Name='platform.js' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_skflag.png' Name='skflag.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_skflags.png' Name='skflags.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_basic.keymantouchlayout' Name='template-basic.keyman-touch-layout' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_latin.keymantouchlayout' Name='template-latin.keyman-touch-layout' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_template_traditional.keymantouchlayout' Name='template-traditional.keyman-touch-layout' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_phone_iphone5_landscape.png' Name='phone-iphone5-landscape.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_phone_iphone5_portrait.png' Name='phone-iphone5-portrait.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_tablet_ipad_landscape.png' Name='tablet-ipad-landscape.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_tablet_ipad_portrait.png' Name='tablet-ipad-portrait.png' KeyPath="yes" /></Component>
-                    <Component><File Id='xml_file_layoutbuilder_keymanweb_osk2.ttf' Name='keymanweb-osk.ttf' KeyPath="yes" /></Component>
-                </Directory>
-              </Directory>
-
               <Directory Id="dirRedist" Name="Redist">
-                <Directory Id="dirRedistSetup" Name="Setup">
-                  <Component Id="componentRedistSetup" Guid="*" SharedDllRefCount="no" Location="local" DiskId="1">
-                    <File Id="redist_setup_setup.exe" Name="setup.exe"   Source="..\..\..\bin\desktop\setup.exe" />
-                  </Component>
-                </Directory>
+                <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
-              
-              <Component Id="Reg_RootPath" Guid="{FCC8C517-BFBE-4C24-B3CD-D566D114CE12}" KeyPath="yes" SharedDllRefCount="yes" Location="local">
-                <CreateFolder />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer\$(var.RELEASE)" Name="root path" Type="string" Value="[INSTALLDIR]" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\$(var.RELEASE)\Installed Products" Name="developer_pro" Type="string" Value="developer_pro" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\$(var.RELEASE)\Installed Products\developer_pro" Name="product id" Type="integer" Value="4" />
-              </Component>
-
             </Directory>
           </Directory>
         </Directory>
       </Directory>
-
-      <Directory Id="ProgramMenuFolder" Name="Programs">
+      
+      <Directory Id="FontsFolder" />
+      
+      <Directory Id="ProgramMenuFolder">
         <Directory Id="ProgramMenuDir" Name="Keyman Developer" />
       </Directory>
 
       <Directory Id="DesktopFolder" Name="Desktop" />
 
-      <Directory Id="AppDataFolder" Name="ADF">
+      <Directory Id="AppDataFolder">
         <Directory Id="App_KeymanRoot" Name="Keyman" >
-          <Directory Id="App_TS_KeymanDev" Name="Keyman Developer">
-            <Directory Id="App_TS_KeymanDev_Databases" Name="Databases" />
+          <Directory Id="App_KeymanDev" Name="Keyman Developer">
+            <Directory Id="App_KeymanDev_Databases" Name="Databases" />
           </Directory>
-          <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}">
-            <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)" />
-            <RemoveFolder Id="AD_ts_Uninstall" On="uninstall" />
-            <RemoveFolder Id="AD_ts_KeymanDev_Uninstall" On="uninstall" Directory="App_TS_KeymanDev" />
-            <RemoveFolder Id="AD_ts_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_TS_KeymanDev_Databases" />
-            <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
-            <RemoveFile Id="AD_ts_KeymanDev_Databases_Uninstall_F" Directory="App_TS_KeymanDev_Databases" On="uninstall"  Name="*.mdb" />
-          </Component>
         </Directory>
       </Directory>
-      
+
       <Directory Id="PersonalFolder" Name="Documents">
         <Directory Id="KMDevSamples" Name="Keyman Developer">
-          <Directory Id="SAMPLES" Name="Samples">
-            <Component Id="Samples" Guid="{E2F0314D-1053-4699-A768-00DE1679C42D}" SharedDllRefCount="yes" Location="local" DiskId="1">
-              <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="Samples" Value="" />
-              <File Id="s_readme.txt" Name="readme.txt" Source="..\..\developer\samples\readme.txt" />
-              <RemoveFolder Id="Samples" On="uninstall" />
-              <RemoveFolder Id="KMDevSamples" Directory="KMDevSamples" On="uninstall" />
-            </Component>
-            <Component Id="Samples_Link" Guid="{5749861C-6F63-4135-B702-C426AF4E86E5}" Location="local" DiskId="1">
-              <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="Link" Value="" />
-              <CreateFolder>
-                <Shortcut Id="startmenuSamples" Directory="ProgramMenuDir" Name="Samples"
-                  WorkingDirectory='INSTALLDIR' Icon="samples.ico" IconIndex="0" />
-              </CreateFolder>
-            </Component>
-            <Directory Id="Samples_IMSample" Name="imsample" FileSource="..\..\developer\samples\imsample">
-              <Component Id="Samples_IMSample9" Guid="{003288A1-C6BE-4EE0-A91A-AD9C82A6DEE1}" Location="local" DiskId="1">
-                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="IMSample" Value="" />
-                <File Id="si_imsample.dll" Name="imsample.dll" Source="..\..\..\bin\developer\imsample.dll" />
-                <File Id="si_imdllref.rtf" Name="imdllref.rtf" />
-                <File Id="si_imlib.cpp" Name="imlib.cpp" />
-                <File Id="si_imlib.h" Name="imlib.h" />
-                <File Id="si_imsample.cpp" Name="imsample.cpp" />
-                <File Id="si_imsample.def" Name="imsample.def" />
-                <File Id="si_IMSample.sln" Name="IMSample.sln" />
-                <File Id="si_IMSample.vcxproj" Name="IMSample.vcxproj" />
-                <File Id="si_imsample.kmn" Name="imsample.kmn" />
-                <File Id="si_IMSample.txt" Name="IMSample.txt" />
-                <File Id="si_Makefile" Name="Makefile" />
-                <File Id="si_version.rc" Name="version.rc" />
-                <RemoveFolder Id="Samples_IMSample" On="uninstall" />
-              </Component>
-            </Directory>
-            <Directory Id="Samples_Keyboards" Name="Keyboards" FileSource="..\..\developer\samples\Examples\">
-              <Component Id="Samples_Keyboards" Guid="{1B6F5A52-1E05-4A1D-8D53-77D8EB293439}" Location="local" DiskId="1">
-                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="Keyboards" Value="" />
-                <File Id="enhlao.bmp" Name="enhlao.bmp" />
-                <File Id="enhlao.kmn" Name="enhlao.kmn" />
-                <File Id="Examples.kpj" Name="Examples.kpj" />
-                <File Id="ipamenu.kmn" Name="ipamenu.kmn" />
-                <File Id="nepali.kmn" Name="nepali.kmn" />
-                <File Id="qfrench.ico" Name="qfrench.ico" />
-                <File Id="qfrench.kmn" Name="qfrench.kmn" />
-                <File Id="sk_readme.txt" Name="readme.txt" />
-                <RemoveFolder Id="Samples_Keyboards" On="uninstall" />
-              </Component>
-              <Directory Id="Samples_Keyboards_European" Name="European" FileSource="..\..\developer\samples\Examples\European\">
-                <Component Id="Samples_Keyboards_European" Guid="{4B72D2E9-D8F4-4C41-81DF-CBDF0CE9C97F}" Location="local" DiskId="1">
-                  <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\$(var.RELEASE)\Samples" Type="string" Name="European" Value="" />
-                  <File Id="ske_european.bmp" Name="european.bmp" />
-                  <File Id="ske_european.kmn" Name="european.kmn" />
-                  <File Id="ske_european.kps" Name="european.kps" />
-                  <File Id="ske_readme.html" Name="readme.html" />
-                  <File Id="ske_welcome.htm" Name="welcome.htm" />
-                  <File Id="ske_european.html" Name="european.html" />
-                  <File Id="ske_european_js_2.txt" Name="european_js_2.txt" />
-                  <File Id="ske_latin.ico" Name="latin.ico" />
-                  <RemoveFolder Id="Samples_Keyboards_European" On="uninstall" />
-                </Component>
-              </Directory>
+          <Directory Id="Samples" Name="Samples">
+            <!-- TODO: start sourcing samples from keyboards repository. European keyboard sample here is very outdated -->
+            <Directory Id="Samples_IMSample" Name="imsample"  />
+            <Directory Id="Samples_Keyboards" Name="Keyboards">
+              <Directory Id="Samples_Keyboards_European" Name="European" />
             </Directory>
           </Directory>
         </Directory>
       </Directory>
     </Directory>
 
+    <ComponentGroup Id="KeymanDeveloperApp" Source="..\..\..\bin\developer\" Directory="INSTALLDIR">
+      <Component>
+        <File Name="tike.exe" KeyPath="yes" Vital='yes'>
+          <Shortcut Id="startmenuTIKE" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
+          <Shortcut Id="desktopTIKE" Advertise="yes" Directory="DesktopFolder" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
+        </File>
+
+        <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer" />
+
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\Installed Products" Name="developer_pro" Type="string" Value="developer_pro" />
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Engine\Installed Products\developer_pro" Name="product id" Type="integer" Value="4" />
+
+        <Environment Id="environmentKeymanDeveloperPath" Action="set" Name="KeymanDeveloperPath" System="yes" Value="[INSTALLDIR]" />
+
+        <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
+        <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
+        <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
+
+        <RegistryValue Root="HKCR" Key=".kmn" Type="string" Value="KeymanDeveloper.File.Keyboard" />
+        <RegistryValue Root="HKCR" Key=".kps" Type="string" Value="KeymanDeveloper.File.Package" />
+        <RegistryValue Root="HKCR" Key=".kct" Type="string" Value="KeymanDeveloper.File.Branding" />
+        <RegistryValue Root="HKCR" Key=".kpp" Type="string" Value="KeymanDeveloper.File.Distribution" />
+
+        <RegistryValue Root="HKCR" Key=".kvks" Type="string" Value="KeymanDeveloper.File.OnScreenKeyboard" />
+        <RegistryValue Root="HKCR" Key=".kpj" Type="string" Value="KeymanDeveloper.File.Project" />
+
+        <RegistryValue Root="HKCR" Key=".kmx" Type="string" Value="Keyman.File.Keyboard" />
+        <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
+        <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
+        
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard" Type="string" Value="Keyman Developer Keyboard Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],1" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+        
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package" Type="string" Value="Keyman Developer Package Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],2" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding" Type="string" Value="Keyman Developer Branding Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\DefaultIcon" Type="string" Value="[#tike.exe],3" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution" Type="string" Value="Keyman Developer Distribution Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\DefaultIcon" Type="string" Value="[#tike.exe],4" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+       
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project" Type="string" Value="Keyman Developer Project Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\DefaultIcon" Type="string" Value="[#tike.exe],5" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell" Type="string" Value="open" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell\open" Type="string" Value="&amp;Open" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell\open\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+
+        <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard" Type="string" Value="Keyman Keyboard File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],6" />
+
+        <RegistryValue Root="HKCR" Key="Keyman.File.Package" Type="string" Value="Keyman Package File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],7" />
+
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard" Type="string" Value="Keyman Keyboard File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],10" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+        
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard" Type="string" Value="Keyman Developer On Screen Keyboard File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],11" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
+      </Component>
+      
+      <Component>
+        <File Name="kmcomp.exe" KeyPath="yes" />
+      </Component>
+      
+      <Component>
+        <File Name="kmcmpdll.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component>
+        <File Name="debughost.kmx" KeyPath="yes" Source="..\..\developer\tike\redist\debughost.kmx" />
+      </Component>
+      
+      <Component>
+        <File Name="keyboard_info.distribution.json" Source="..\..\global\inst\data\keyboard_info\" KeyPath="yes" />
+      </Component>
+      
+      <Component>
+        <File Name="keyboard_info.source.json" Source="..\..\global\inst\data\keyboard_info\" KeyPath="yes" />
+      </Component>
+
+      <!-- Data Files --> 
+      
+      <Component>
+        <File Name="unicodedata.mdb" Source="..\..\global\inst\data\" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="unicodedata.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+    
+    <ComponentGroup Id="FontsAndRedist" Source="..\..\developer\inst\fonts\">
+
+      <!-- Fonts --> 
+      
+      <Component Directory="FontsFolder">
+        <File Name="code2000.ttf" TrueType="yes" KeyPath="yes" />
+      </Component>
+
+      <Component Directory="FontsFolder">
+        <File Name="code2001.ttf" TrueType="yes" KeyPath="yes" />
+      </Component>
+
+      <Component Directory="FontsFolder">
+        <File Name="code2002.ttf" TrueType="yes" KeyPath="yes" />
+      </Component>  
+      
+      <Component Directory="FontsFolder">
+        <File Name='keymanweb-osk.ttf' TrueType='yes' Source='..\..\developer\tike\xml\layoutbuilder\keymanweb-osk.ttf' KeyPath="yes" />
+      </Component>
+                
+      <!-- Redistributable files -->
+
+      <Component Directory="dirRedistSetup">
+        <File Name="setup.exe" Source="..\..\..\bin\desktop\setup.exe" KeyPath="yes" />
+      </Component>
+      
+    </ComponentGroup>
+    
+    <ComponentGroup Id="AppData">
+      <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}" Directory="App_KeymanDev_Databases">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" />
+        <RemoveFolder Id="AD_Uninstall" On="uninstall" Directory="App_KeymanRoot" />
+        <RemoveFolder Id="AD_KeymanDev_Uninstall" On="uninstall" Directory="App_KeymanDev" />
+        <RemoveFolder Id="AD_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_KeymanDev_Databases" />
+        <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
+        <RemoveFile Id="AD_KeymanDev_Databases_Uninstall_F" Directory="App_KeymanDev_Databases" On="uninstall"  Name="*.mdb" />
+      </Component>
+    </ComponentGroup>
+      
+    <ComponentGroup Id="Samples">
+      <Component Guid="{BC44DD9F-F91B-4DB8-B792-CA5744FE5990}" Directory="Samples">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Readme" Value="" />
+        <File Name="readme.txt" Source="..\..\developer\samples\readme.txt" />
+        <RemoveFolder Id="Samples" On="uninstall" />
+        <RemoveFolder Id="KMDevSamples" Directory="KMDevSamples" On="uninstall" />
+      </Component>
+    
+      <Component Directory="Samples">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Link" Value="" />
+        <CreateFolder>
+          <Shortcut Id="startmenuSamples" Directory="ProgramMenuDir" Name="Samples"
+            WorkingDirectory='INSTALLDIR' Icon="samples.ico" IconIndex="0" />
+        </CreateFolder>
+      </Component>
+              
+      <Component Guid="{003288A1-C6BE-4EE0-A91A-AD9C82A6DEE1}" Directory="Samples_IMSample">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="IMSample" Value="" />
+        <File Name="imsample.dll" Source="..\..\..\bin\developer\imsample.dll" />
+        <File Name="imdllref.rtf" Source="..\..\developer\samples\imsample\" />
+        <File Name="imlib.cpp" Source="..\..\developer\samples\imsample\" />
+        <File Name="imlib.h" Source="..\..\developer\samples\imsample\" />
+        <File Name="imsample.cpp" Source="..\..\developer\samples\imsample\" />
+        <File Name="imsample.def" Source="..\..\developer\samples\imsample\" />
+        <File Name="IMSample.sln" Source="..\..\developer\samples\imsample\" />
+        <File Name="IMSample.vcxproj" Source="..\..\developer\samples\imsample\" />
+        <File Name="imsample.kmn" Source="..\..\developer\samples\imsample\" />
+        <File Name="IMSample.txt" Source="..\..\developer\samples\imsample\" />
+        <File Name="Makefile" Source="..\..\developer\samples\imsample\" />
+        <File Name="version.rc" Source="..\..\developer\samples\imsample\" />
+        <RemoveFolder Id="Samples_IMSample" On="uninstall" />
+      </Component>
+
+      <Component Guid="{1B6F5A52-1E05-4A1D-8D53-77D8EB293439}" Directory="Samples_Keyboards">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Keyboards" Value="" />
+        <File Id="enhlao.bmp" Name="enhlao.bmp" Source="..\..\developer\samples\Examples\" />
+        <File Id="enhlao.kmn" Name="enhlao.kmn" Source="..\..\developer\samples\Examples\" />
+        <File Id="Examples.kpj" Name="Examples.kpj" Source="..\..\developer\samples\Examples\" />
+        <File Id="ipamenu.kmn" Name="ipamenu.kmn" Source="..\..\developer\samples\Examples\" />
+        <File Id="nepali.kmn" Name="nepali.kmn" Source="..\..\developer\samples\Examples\" />
+        <File Id="qfrench.ico" Name="qfrench.ico" Source="..\..\developer\samples\Examples\" />
+        <File Id="qfrench.kmn" Name="qfrench.kmn" Source="..\..\developer\samples\Examples\" />
+        <File Id="sk_readme.txt" Name="readme.txt" Source="..\..\developer\samples\Examples\" />
+        <RemoveFolder Id="Samples_Keyboards" On="uninstall" />
+      </Component>
+      
+      <Component Guid="{4B72D2E9-D8F4-4C41-81DF-CBDF0CE9C97F}" Directory="Samples_Keyboards_European">
+        <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="European" Value="" />
+        <File Id="ske_european.bmp" Name="european.bmp" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_european.kmn" Name="european.kmn" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_european.kps" Name="european.kps" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_readme.html" Name="readme.html" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_welcome.htm" Name="welcome.htm" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_european.html" Name="european.html" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_european_js_2.txt" Name="european_js_2.txt" Source="..\..\developer\samples\Examples\European\" />
+        <File Id="ske_latin.ico" Name="latin.ico" Source="..\..\developer\samples\Examples\European\" />
+        <RemoveFolder Id="Samples_Keyboards_European" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+
     <Feature Id="featProgram" Title="Keyman Developer Program" Description="Required program files for Keyman Developer"
              Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow">
-      <ComponentRef Id="KeymanDevApp" />
 
-      <ComponentRef Id="Data" />
-      <ComponentRef Id="cef" />
-      <ComponentRef Id="cef_locales" />
-      <ComponentRef Id="cef_swiftshader" />
-      <ComponentRef Id="Reg_RootPath" />
-      <ComponentRef Id="AppDataRemovals" />
-      <ComponentRef Id='oskFonts' />
-      <ComponentRef Id="componentxmlkmw2" />
-      <ComponentRef Id='xml_kmw_packages.html' />
-     
-      <ComponentRef Id="xml_file7"/>
-      <ComponentRef Id="xml_file8"/>
-      <ComponentRef Id="xml_file9"/>
-      <ComponentRef Id="xml_file10"/>
-      <ComponentRef Id="xml_file11"/>
-      <ComponentRef Id="xml_file1"/>
-      <ComponentRef Id="xml_file2"/>
-      <ComponentRef Id="xml_file3"/>
-      <ComponentRef Id="xml_file4"/>
-      <ComponentRef Id="xml_file5"/>
-      <ComponentRef Id="xml_file6"/>
-      <ComponentRef Id="xml_file12"/>
-      <ComponentRef Id="xml_file13"/>
-      <ComponentRef Id="xml_file14"/>
-      <ComponentRef Id="xml_file15"/>
-      <ComponentRef Id="xml_file17"/>
-      <ComponentRef Id="xml_file18"/>
-      <ComponentRef Id="xml_file19"/>
-      <ComponentRef Id="xml_file31"/>
-      <ComponentRef Id="xml_file20"/>
-      <ComponentRef Id="xml_file33"/>
-      <ComponentRef Id="xml_file34"/>
-      <ComponentRef Id="xml_file36"/>
-      <ComponentRef Id="xml_file37"/>
-      <ComponentRef Id="xml_file21"/>
-      <ComponentRef Id="xml_file40"/>
-      <ComponentRef Id="xml_file22"/>
-      <ComponentRef Id="xml_file23"/>
-      <ComponentRef Id="xml_file25"/>
-      <ComponentRef Id="xml_file26"/>
-      <ComponentRef Id="xml_file27"/>
-      <ComponentRef Id="xml_file30"/>
-      <ComponentRef Id="xml_file29"/>
-      <ComponentRef Id="xml_iconfile.gif"/>
-      <ComponentRef Id="xml_icon32_arrow.gif"/>
-      <ComponentRef Id="xml_icon32_blank.gif"/>
-      <ComponentRef Id="xml_icon32_doc.gif"/>
-      <ComponentRef Id="xml_icon32_html.gif"/>
-      <ComponentRef Id="xml_icon32_kmn.png"/>
-      <ComponentRef Id="xml_icon32_kmp.png"/>
-      <ComponentRef Id="xml_icon32_kmx.png"/>
-      <ComponentRef Id="xml_icon32_kps.png"/>
-      <ComponentRef Id="xml_icon32_kvk.png"/>
-      <ComponentRef Id="xml_icon32_msi.gif"/>
-      <ComponentRef Id="xml_icon32_ttf.gif"/>
-      <ComponentRef Id="xml_icon32_ico.gif"/>
-      <ComponentRef Id="xml_icon32_plus.gif"/>
-      <ComponentRef Id="xml_project.js"/>
-      <ComponentRef Id="xml_project.css"/>
-      <ComponentRef Id="xml_icon32_kvks.png"/>
-      <ComponentRef Id="xml_icon_kvks.png"/>
-
-      <ComponentRef Id='xml_kmw_resource_keymanweb.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwuibutton.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwuifloat.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwuitoggle.js'/>
-      <ComponentRef Id='xml_kmw_resource_kmwuitoolbar.js'/>
-      <ComponentRef Id='xml_kmw_resource_keymanweb.js.map' />
-      <ComponentRef Id='xml_kmw_resource_kmwuibutton.js.map' />
-      <ComponentRef Id='xml_kmw_resource_kmwuifloat.js.map'  />
-      <ComponentRef Id='xml_kmw_resource_kmwuitoggle.js.map' />
-      <ComponentRef Id='xml_kmw_resource_kmwuitoolbar.js.map' />
-      <ComponentRef Id='xml_kmw_resource_license'/>
-      <ComponentRef Id='xml_kmw_resource_readme_md'/>
-
-      <ComponentRef Id='xml_kmw_resource_osk_ajax_loader.gif'            />
-      <ComponentRef Id='xml_kmw_resource_osk_keymanweb_osk.eot'          />
-      <ComponentRef Id='xml_kmw_resource_osk_keymanweb_osk.ttf'          />
-      <ComponentRef Id='xml_kmw_resource_osk_keymanweb_osk.woff'         />
-      <ComponentRef Id='xml_kmw_resource_osk_kmwosk.css'                 />
-      <ComponentRef Id='xml_kmw_resource_ui_button_kbdicon.gif'          />
-      <ComponentRef Id='xml_kmw_resource_ui_button_kmw_button.gif'       />
-      <ComponentRef Id='xml_kmw_resource_ui_float_kbdicon.gif'           />
-      <ComponentRef Id='xml_kmw_resource_ui_float_kmicon.gif'            />
-      <ComponentRef Id='xml_kmw_resource_ui_ios_kbdicon.png'             />
-      <ComponentRef Id='xml_kmw_resource_ui_toggle_kbdicon.gif'          />
-      <ComponentRef Id='xml_kmw_resource_ui_toggle_kmw_logo_16.gif'      />
-      <ComponentRef Id='xml_kmw_resource_ui_toggle_kmw_logo_16_down.gif' />
-      <ComponentRef Id='xml_kmw_resource_ui_toggle_kmw_osk_16.gif'       />
-      <ComponentRef Id='xml_kmw_resource_ui_toggle_kmwcontroller2.gif'   />
-      <ComponentRef Id='xml_kmw_resource_ui_toggle_kmwcontroller2x.gif'  />
-      <ComponentRef Id='xml_kmw_resource_ui_toolbar_blank.gif'           />
-      <ComponentRef Id='xml_kmw_resource_ui_toolbar_kmwuitoolbar.css'    />
-      <ComponentRef Id='xml_kmw_resource_ui_toolbar_toolbar.gif'         />
-      <ComponentRef Id='xml_kmw_resource_ui_toolbar_world.png'           />
-      <ComponentRef Id='xml_file80'/>
-      <ComponentRef Id='xml_file81'/>
-      <ComponentRef Id='xml_file_layoutbuilder_builder.css'/>
-      <ComponentRef Id='xml_file_layoutbuilder_physical_keyboard_template' />
-      <ComponentRef Id='xml_file_layoutbuilder_builder.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_builder.xsl'/>
-      <ComponentRef Id='xml_file_layoutbuilder_jquery_1.10.2.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_jquery_ui.css'/>
-      <ComponentRef Id='xml_file_layoutbuilder_jquery_ui.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_platform.js'/>
-      <ComponentRef Id='xml_file_layoutbuilder_skflag.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_skflags.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_basic.keymantouchlayout'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_latin.keymantouchlayout'/>
-      <ComponentRef Id='xml_file_layoutbuilder_template_traditional.keymantouchlayout'/>
-      <ComponentRef Id='xml_file_layoutbuilder_phone_iphone5_landscape.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_phone_iphone5_portrait.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_landscape.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_tablet_ipad_portrait.png'/>
-      <ComponentRef Id='xml_file_layoutbuilder_keymanweb_osk2.ttf'/>
-      
-      <ComponentRef Id="xml_app_editor" />
-      <ComponentGroupRef Id="MonacoFiles" />
-      <ComponentRef Id="xml_app_lib_jquery" />
+      <ComponentGroupRef Id="KeymanDeveloperApp" />
+      <ComponentGroupRef Id="FontsAndRedist" />
+      <ComponentGroupRef Id="AppData" />
+      <ComponentGroupRef Id="XML" />
+      <ComponentGroupRef Id="CEF" />
       
       <MergeRef Id='keymanengine' />
     </Feature>
 
     <Feature Id="featSamples" Title="Sample Files" Description="Example keyboards, packages and products"
              Display="expand" Level="1" Absent="allow">
-      <ComponentRef Id="Samples" />
-      <ComponentRef Id="Samples_Link"/>
-      <ComponentRef Id="Samples_IMSample9"/>
-      <ComponentRef Id="Samples_Keyboards"/>
-      <ComponentRef Id="Samples_Keyboards_European"/>
+      <ComponentGroupRef Id="Samples" />
     </Feature>
-
-    <Feature Id="featFonts" Title="Character Map Fonts" Description="Code2000, Code2001 and Code 2002 fonts for Character Map"
-             Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR" Absent="allow">
-      <ComponentRef Id="componentFonts" />
-    </Feature>
-      
-    <Feature Id="featRedist" Title="Redistributable Files" Description="Keyman Redistributables" Level="1" Absent="allow">
-      <Feature Id="featRedistSetup" Title="Package Installer files" Description="Package Installer files - required to build Package Installers" Level="1" Absent="allow">
-        <ComponentRef Id="componentRedistSetup" />
-      </Feature>
-    </Feature>
-
 
     <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
@@ -503,34 +335,11 @@
     <Icon Id="TIKE.ico" SourceFile="..\..\global\res\90\developer\KeymanDeveloper90.ico" />
     <Icon Id="samples.ico" SourceFile="..\..\global\res\ico\samples.ico" />
 
-    <!-- Update the security policy for wix.dll so that it can run anywhere -->
-<!--
-
-Why doesn’t WiX run from a network share?
-
-By default, the .NET Framework security policy prevents code loaded from such untrusted sources from doing potentially dangerous
-things. You can alter this policy to trust WiX through the CasPol command:
-%WINDIR%\Microsoft.NET\Framework\v1.1.4322\CasPol -q -ag All_Code -strong -file "C:\Program Files\WiX\wix.dll" -noname 
-   -noversion FullTrust -name "WiX_Strong_Name" -levelfinal on
-
-where you replace C:\Program Files\WiX with the location of any copy of wix.dll.
-
-
-    <CustomAction Id="caspolupdate" 
-                  Execute='deferred'
-                  Directory='INSTALLDIR'
-                  ExeCommand='"[WindowsFolder]Microsoft.NET\Framework\v1.1.4322\CasPol.exe" -q -ag All_Code -strong -file "[#wixfile14]" -noname -noversion FullTrust -name "WiX_Strong_Name" -levelfinal on' />
-    
-    <InstallExecuteSequence>
-      <Custom Action='caspolupdate' After='PublishProduct'><![CDATA[Not Installed]]></Custom>
-    </InstallExecuteSequence>
--->
-
     <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to $(var.VERSION) or newer.' />
     <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] is already installed.' />
 
     <Property Id='OLDINSTALLDIR'>
-      <RegistrySearch Id='productinstalldir' Key='Software\Keyman\Keyman Developer\$(var.RELEASE)' Root='HKLM' Name='root path' Type='raw' />
+      <RegistrySearch Id='productinstalldir' Key='Software\Keyman\Keyman Developer' Root='HKLM' Name='root path' Type='raw' />
     </Property>
 
     <CustomAction Id='LocateInstallDir' Execute='immediate' Directory='INSTALLDIR' Value='[OLDINSTALLDIR]' />
@@ -540,12 +349,12 @@ where you replace C:\Program Files\WiX with the location of any copy of wix.dll.
     <CustomAction Id='CachedInstallDirParent' Property='CachedInstallDirParent' Value='[ProgramFilesFolder]\Keyman\Cached Installer Files' />
 
     <InstallExecuteSequence>
-      <Custom Action='LocateInstallDir' After='CostFinalize'>VERSION10FOUND</Custom>
+      <Custom Action='LocateInstallDir' After='CostFinalize'>VERSION11FOUND</Custom>
 
       <Custom Action='CachedInstallDir' After='CostFinalize' />
       <Custom Action='CachedInstallDirParent' After='CostFinalize' />
 
-      <RemoveExistingProducts After='InstallValidate'>VERSION8FOUND or VERSION9FOUND or VERSION10FOUND or OLDERFOUND</RemoveExistingProducts><!--I2839-->
+      <RemoveExistingProducts After='InstallValidate'>VERSION8FOUND or VERSION9FOUND or VERSION10FOUND or VERSION11FOUND or OLDERFOUND</RemoveExistingProducts><!--I2839-->
       
       <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>CURRENTVERSIONFOUND</Custom>
       <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND</Custom>

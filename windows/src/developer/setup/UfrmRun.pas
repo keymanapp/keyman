@@ -423,29 +423,28 @@ begin
     EnableWindow(GetDlgItem(Handle, IDCANCEL), False);
     EnableWindow(GetDlgItem(Handle, IDC_CHECK1), False);
 
-    try
-      StatusMax := 6;
+    StatusMax := 6;
 
-      if not CheckDependencies then Exit;
+    if not CheckDependencies then Exit;
 
-      SetupMSI;
+    SetupMSI;
 
-      CheckInstalledVersion;
+    CheckInstalledVersion;
 
-      if SendDlgItemMessage(Handle, IDC_CHECK1, BM_GETCHECK, 0, 0) = BST_CHECKED then
-      begin
-        Status(FInstallInfo.Text(ssStatusCheckingForUpdates));
+    if SendDlgItemMessage(Handle, IDC_CHECK1, BM_GETCHECK, 0, 0) = BST_CHECKED then
+    begin
+      Status(FInstallInfo.Text(ssStatusCheckingForUpdates));
+      try
         CheckNewVersion;
-      end;
-      Status(FInstallInfo.Text(ssStatusInstalling));
-      Result := InstallMSI;  // I1901
-    except
-      on E:Exception do // I1440 - avoid update check failure stopping install
-      begin
-        MessageBox(0, PChar(E.Message), PChar('Error checking for updates'), MB_OK or MB_ICONHAND);
-        Result := False;  // I1901
+      except
+        on E:Exception do // I1440 - avoid update check failure stopping install
+        begin
+          LogError(E.Message);
+        end;
       end;
     end;
+    Status(FInstallInfo.Text(ssStatusInstalling));
+    Result := InstallMSI;  // I1901
   finally
     EnableWindow(GetDlgItem(Handle, IDC_MESSAGE), True);
     EnableWindow(GetDlgItem(Handle, IDOK), True);

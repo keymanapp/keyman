@@ -6,11 +6,11 @@
 
 # ----------------------------------------------------------------------
 
-DESKTOP_FILES=keymandesktop.wixobj
+DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj
 
 manual-setup: check setup
 
-setup: desktop copydoc
+setup: desktop
 
 prereq: prereq-resources
     #
@@ -27,9 +27,6 @@ prereq-resources:
     rc desktop_resources.rc
     $(LINKPATH) /DLL /OUT:desktop_resources.dll /RELEASE /NOENTRY /MACHINE:X86 desktop_resources.RES
     $(SIGNCODE) /d "Keyman Desktop Resources" desktop_resources.dll
-
-copydoc: prereq
-    $(MAKE) -fdownload.mak copydoc
 
 desktop: prereq
     $(MAKE) -fdownload.mak candle-desktop
@@ -51,6 +48,7 @@ clean:
     -del /Q download.mak
     -del /Q desktop_resources.dll
     -del /Q desktop_resources.res
+    -del /Q desktopui.wxs
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine

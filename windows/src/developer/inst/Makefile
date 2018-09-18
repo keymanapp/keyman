@@ -6,6 +6,8 @@
 
 # ----------------------------------------------------------------------
 
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj
+
 setup:
 
     #
@@ -20,7 +22,7 @@ setup:
     #
     
     $(MAKE) -fcopydev.mak candle
-    $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf  -out keymandeveloper.msi kmdev.wixobj monaco.wixobj -ext WixUIExtension
+    $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
 
     #
     # Sign the installation archive
@@ -55,6 +57,9 @@ clean:
     -del /Q setup.inf
     -del /Q setup.zip
     -del /Q *.exe
+    -del /Q *.wixpdb
+    -del /Q xml.wxs
+    -del /Q cef.wxs
 
 test-releaseexists:
     cd $(ROOT)\src\developer\inst

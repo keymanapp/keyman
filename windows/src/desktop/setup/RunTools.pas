@@ -198,9 +198,7 @@ begin
         CheckNewVersion;
       except
         on E:Exception do // I1440 - avoid update check failure stopping install
-        begin
-          MessageBox(0, PChar(E.Message), PChar('Error checking for updates'), MB_OK or MB_ICONHAND);
-        end;
+          LogError('Error checking for updates: '+E.Message);
       end;
     end;
     Status(FInstallInfo.Text(ssStatusInstalling));

@@ -32,9 +32,7 @@ uses
   WinApi.ActiveX,
   System.Win.ComObj,
   Xml.XMLIntf,
-  Xml.XMLDoc,
-
-  KeymanVersion;
+  Xml.XMLDoc;
 
 var
   IncrementVersion, DebugVersion: Boolean;
@@ -275,6 +273,7 @@ var
   v: Integer;
   FGUID: array[0..9] of string;
   g: TGUID;
+  ProductRelease: string;
 begin
   for i := 0 to 9 do
   begin
@@ -302,6 +301,12 @@ begin
     if ProductVersion[i] = ',' then ProductVersion[i] := '.';
     if ProductVersionCvs[i] = ',' then ProductVersionCvs[i] := '-';
   end;
+
+  ProductRelease := ProductVersion;
+  i := Pos('.', ProductRelease, Pos('.', ProductRelease)+1);
+  if i > 0 then
+    Delete(ProductRelease, i, MaxInt);
+
 
   AssignFile(tfi, fin);
   AssignFile(tfo, fout);
@@ -336,7 +341,7 @@ begin
     while n > 0 do
     begin
       Delete(s, n, 8);
-      Insert(SKeymanVersion, s, n);
+      Insert(ProductRelease, s, n);
       n := Pos('$RELEASE', s);
     end;
 
@@ -387,14 +392,14 @@ begin
     writeln('   -v:         Update the version.rc with the template information');
     writeln('   -m:         Update manifest.xml with the template information');
     writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
-    writeln('                          $VERSION     '+SKeymanVersion+'.700.0');
+    writeln('                          $VERSION     1.2.3.4');
     writeln('                          $VERSIONNUM  9,0,700,0');
     writeln('                          $VERSIONCVS  9-0-700-0');
-    writeln('                          $RELEASE     '+SKeymanVersion);
+    writeln('                          $RELEASE     1.2');
     writeln('                          $GUID#       GUID 0-9');
     writeln('                          $DATE        1 March 2018');
-    writeln('   template:   The source template, usually \keyman\'+SKeymanVersion+'\src\<dir>\version.txt');
-    writeln('   root:       The source template, usually \keyman\'+SKeymanVersion+'\src\version.txt');
+    writeln('   template:   The source template, usually \keyman\windows\src\<dir>\version.txt');
+    writeln('   root:       The source template, usually \keyman\windows\src\version.txt');
     writeln('   version.rc: version.rc file to update');
     ExitCode := 2;
     Exit;

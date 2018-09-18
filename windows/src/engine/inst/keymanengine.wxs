@@ -1,18 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Module Id="engine" Version="$(var.VERSION)" Language="1033">
-    <Package Id="{10C11671-2746-463b-930A-38E615C4175C}" Keywords="Keyman,Keyboard,Engine" 
+    <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine" 
              Description="Keyman Engine $(var.RELEASE)" Comments="Contact:  Your local administrator" 
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
+    
+    <ComponentGroupRef Id="KeymanEngineComponents" />
+    
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="CommonFilesFolder" Name=".">
+      <Directory Id="CommonFilesFolder">
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine">
-            <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\engine\">
-              <?include components.wxi ?>
+            <Directory Id="INSTALLDIR">
               <Directory Id="xml" Name="xml">
                 <Directory Id="osk" Name="osk" FileSource="..\..\engine\xml\osk\">
-                  <Component Id="xml" Guid="{BB7359CF-4E39-4022-ACDB-05694D237CA7}" Location="local">
+                  <Component Id="xml" Guid="{58D31506-F964-47AF-B4A0-51107A74C2FE}">
+                    <!-- while we'd like to use heat to harvest the files in the OSK folder during build, this breaks component 
+                         guid rules with merge modules, as we end up with LGHT0231, as the CommonFilesFolder root folder seems to be 
+                         ignored when building the merge module. Therefore we list these files in a single component for now. -->
                     <File Id="osk.xsl" Name="osk.xsl" />
                     <File Id="keyaltl.gif"         Name="key-altl.gif" />
                     <File Id="keyaltr.gif"         Name="key-altr.gif" />
@@ -44,9 +49,9 @@
             </Directory>
             <Directory Id="CommonApp_TS_Keyman_Products" Name="Products" />
           </Directory>
-          <Component Id="CommonAppDataRemovals" Guid="{B8AA53CB-E32E-47E6-88E6-C704B89A7108}">
-            <RegistryValue KeyPath="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine\$(var.RELEASE)" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine\$(var.RELEASE)" />
+          <Component Id="CommonAppDataRemovals" Guid="{13CEAE9E-0A5F-4B97-9D18-6F4006B147BC}">
+            <RegistryValue KeyPath="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="root path" Type="string" Value="[INSTALLDIR]" />
+            <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Engine" />
             <RemoveFolder Id="CAD_ts_Uninstall" On="uninstall" />
             <RemoveFolder Id="CAD_ts_Keyman_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman" />
             <RemoveFolder Id="CAD_ts_Keyman_Kbd_Uninstall" On="uninstall" Directory="CommonApp_TS_Keyman_Kbd" />
@@ -63,9 +68,9 @@
             </Directory>
             <Directory Id="App_TS_Keyman_Products" Name="Products" />
           </Directory>
-          <Component Id="AppDataRemovals" Guid="{95D0FCEE-F1B7-45B1-B263-B80A96D0AA92}">
-            <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine\$(var.RELEASE)" Name="root path" Type="string" Value="[INSTALLDIR]" />
-            <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine\$(var.RELEASE)" />
+          <Component Id="AppDataRemovals" Guid="{53643EA7-7DEA-4398-BA11-3409C5A7D60C}">
+            <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine" Name="root path" Type="string" Value="[INSTALLDIR]" />
+            <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Engine" />
             <RemoveFolder Id="AD_ts_Uninstall" On="uninstall" />
             <RemoveFolder Id="AD_ts_Keyman_Uninstall" On="uninstall" Directory="App_TS_Keyman" />
             <RemoveFolder Id="AD_ts_Keyman_Keyboard_Uninstall" On="uninstall" Directory="App_TS_Keyman_Keyboard" />
