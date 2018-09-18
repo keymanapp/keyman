@@ -29,14 +29,16 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 	mkdir -p build-$proj
 	cd build-$proj
 	if [[ "${BUILDONLY}" == "no" ]]; then
-		if [ -d ../$proj/include ]; then
-			mkdir kmfl
-			cp -a ../$proj/include/*.h kmfl
-		fi
+		echo "Configuring $proj"
 		if [[ "${INSTALLDIR}" == "/tmp/kmfl" ]]; then # don't install ibus-kmfl into ibus
 			../$proj/configure CPPFLAGS="-I../build-kmflcomp -I../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
 		else	# install ibus-kmfl into ibus
 			../$proj/configure CPPFLAGS="-I../build-kmflcomp -I../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
+		fi
+		if [ -d ../$proj/include ]; then
+			echo "copying $proj include files to kmfl dir"
+			mkdir kmfl
+			cp -a ../$proj/include/*.h kmfl
 		fi
 	fi
 	if [[ "${CONFIGUREONLY}" == "no" ]]; then
@@ -44,6 +46,7 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 			echo "$proj has not been configured before building. First run 'make configure'"
 			exit 1
 		fi
+		echo "Building $proj"
 		make
 	fi
 	cd $BASEDIR
