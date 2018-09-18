@@ -6,12 +6,12 @@ import pathlib
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GdkPixbuf
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.welcome import WelcomeView
 from keyman_config.keyboard_details import KeyboardDetailsView
 from keyman_config.downloadkeyboard import DownloadKmpWindow
-from keyman_config.install_window import InstallKmpWindow
+from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
 
@@ -23,16 +23,9 @@ class KeyboardBox(Gtk.Box):
         self.kmp = kmp
         icofile = os.path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".ico.png")
         if not os.path.isfile(icofile):
-            icofile = "/usr/share/keyman/icons/icon_kmp.png"
-            if not os.path.isfile(icofile):
-                icofile = "/usr/local/share/keyman/icons/icon_kmp.png"
-                if not os.path.isfile(icofile):
-                    icofile = "keyman_config/icons/icon_kmp.png"
-                    if not os.path.isfile(icofile):
-                        icofile = "icon_kmp.png"
-                        if not os.path.isfile(icofile):
-                            icofile = "icons/icon_kmp.png"
-        self.image = Gtk.Image.new_from_file(icofile)
+            icofile = find_keyman_image("icon_kmp.png")
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icofile, 16, 16)
+        self.image = Gtk.Image.new_from_pixbuf(pixbuf)
         self.pack_start(self.image, False, False, 10)
 
         self.label1 = Gtk.Label()
@@ -41,15 +34,7 @@ class KeyboardBox(Gtk.Box):
         self.label1.set_halign(Gtk.Align.END)
         self.pack_start(self.label1, False, False, 10)
 
-        img_expand = "/usr/share/keyman/icons/expand20.png"
-        if not os.path.isfile(img_expand):
-            img_expand = "/usr/local/share/keyman/icons/expand20.png"
-            if not os.path.isfile(img_expand):
-                img_expand = "keyman_config/icons/expand20.png"
-                if not os.path.isfile(img_expand):
-                    img_expand = "expand20.png"
-                    if not os.path.isfile(img_expand):
-                        img_expand = "icons/expand20.png"
+        img_expand = find_keyman_image("expand20.png")
         self.expandbutton = Gtk.Button()
         self.expandimage = Gtk.Image.new_from_file(img_expand)
         self.expandbutton.set_image(self.expandimage)
@@ -57,15 +42,7 @@ class KeyboardBox(Gtk.Box):
         self.expandbutton.connect("clicked", self.on_expand_clicked)
         self.pack_end(self.expandbutton, False, False, 0)
 
-        img_cross = "/usr/share/keyman/icons/cross20.png"
-        if not os.path.isfile(img_cross):
-            img_cross = "/usr/local/share/keyman/icons/cross20.png"
-            if not os.path.isfile(img_cross):
-                img_cross = "keyman_config/icons/cross20.png"
-                if not os.path.isfile(img_cross):
-                    img_cross = "cross20.png"
-                    if not os.path.isfile(img_cross):
-                        img_cross = "icons/cross20.png"
+        img_cross = find_keyman_image("cross20.png")
         self.uninstallbutton = Gtk.Button()
         self.uninstallimage = Gtk.Image.new_from_file(img_cross)
         self.uninstallbutton.set_image(self.uninstallimage)
@@ -75,15 +52,7 @@ class KeyboardBox(Gtk.Box):
 
         welcome_file = os.path.join("/usr/local/share/doc/keyman", self.kmp["id"], "welcome.htm")
         if os.path.isfile(welcome_file):
-            img_help = "/usr/share/keyman/icons/help20.png"
-            if not os.path.isfile(img_help):
-                img_help = "/usr/local/share/keyman/icons/help20.png"
-                if not os.path.isfile(img_help):
-                    img_help = "keyman_config/icons/help20.png"
-                    if not os.path.isfile(img_help):
-                        img_help = "help20.png"
-                        if not os.path.isfile(img_help):
-                            img_help = "icons/help20.png"
+            img_help = find_keyman_image("help20.png")
             self.helpbutton = Gtk.Button()
             self.helpimage = Gtk.Image.new_from_file(img_help)
             self.helpbutton.set_image(self.helpimage)
