@@ -28,4 +28,5 @@
 #define IDC_IMAGE                       1005
 #define IDC_STATUS			1006
 #define IDC_STATIC                      -1
-
+#define IDC_LOGO                        1007
+#define IDC_LOGOMESSAGE                 1008

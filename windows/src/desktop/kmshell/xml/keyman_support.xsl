@@ -33,6 +33,10 @@
           </xsl:call-template>
         </div>
         
+        <div class="support_sil">
+          <xsl:value-of select="$locale/String[@Id='S_Support_CreatedBySIL']"/>
+        </div>
+        
         <div class="support_copyright">
           <xsl:value-of select="$locale/String[@Id='S_Support_Copyright']"/>
         </div>
