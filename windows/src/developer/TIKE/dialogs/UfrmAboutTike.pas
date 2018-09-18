@@ -70,7 +70,7 @@ uses
   utilexecute;
 
 const
-  SCaption = 'About Keyman Developer'; // I4819
+  SCaption = 'About Keyman Developer '+SKeymanVersion; // I4819
 
 {$R *.DFM}
 

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product UpgradeCode="{1211D5B5-AAF5-4AE5-8D3D-67E3C19E3C13}" Manufacturer="SIL International"
-           Id="{F3C193F3-2BA8-43A4-96C0-5CD444AE70FE}" Name="Keyman Desktop 10.0" Version="$(var.VERSION)" Language="1033">
+  <Product UpgradeCode="c70af17c-8b9e-47a1-a099-b65aee3dc8b4" Manufacturer="SIL International"
+           Id="*" Name="Keyman Desktop $(var.RELEASE)" Version="$(var.VERSION)" Language="1033">
     <Package Keywords="Keyman,Keyman Desktop,Keyboard,Engine"
-             Description="Keyman Desktop 10.0" Comments="Contact:  Your local administrator" Compressed="yes"
+             Description="Keyman Desktop $(var.RELEASE)" Comments="Contact:  Your local administrator" Compressed="yes"
              Manufacturer="SIL International" InstallerVersion="400" Platform="x86" Languages="1033" SummaryCodepage="1252" />
 
     <!-- ALLOW Upgrade from 7.0 Light -->
@@ -35,82 +35,113 @@
                       Maximum="10.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION9FOUND" />
     </Upgrade>
 
-    <!-- PREVENT or ALLOW Upgrade from 10.0 -->
+    <!-- ALLOW Upgrade from 10.0 -->
     <Upgrade Id="1211D5B5-AAF5-4AE5-8D3D-67E3C19E3C13">
-      <UpgradeVersion OnlyDetect="no" Minimum="10.0.699.0" IncludeMinimum="yes" 
-                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
+      <UpgradeVersion OnlyDetect="no" Minimum="10.0.0.0" IncludeMinimum="yes" 
+                      Maximum="11.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
+    </Upgrade>
+    
+    <!-- PREVENT or ALLOW Upgrade from 11.0 or later versions -->
+    <Upgrade Id="c70af17c-8b9e-47a1-a099-b65aee3dc8b4">
+      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes" 
+                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes" 
                       Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
 
     <Property Id='OLDINSTALLDIR'>
-      <RegistrySearch Id='oldinstalldir_search' Key='Software\Keyman\Keyman Desktop\10.0' Root='HKLM' Name='root path' Type='raw' />
+      <RegistrySearch Id='oldinstalldir_search' Key='Software\Keyman\Keyman Desktop' Root='HKLM' Name='root path' Type='raw' />
     </Property>
     
     <Property Id='OnlineProductID' Value='30' />
     
-    <Directory Id="TARGETDIR" Name="SourceDir">
+    <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
 
-      <Merge Id="keymanengine" Language='1033' SourceFile='..\..\engine\inst\keymanengine.msm' DiskId='1' />
+      <Merge Id="keymanengine" Language='1033' SourceFile='..\..\engine\inst\keymanengine.msm' />
       
       <Directory Id="ProgramFilesFolder" Name=".">
         <Directory Id="KEYMANROOT" Name="Keyman">
-          <Directory Id="KEYMAN" Name="Keyman Desktop 10.0">
+          <Directory Id="KEYMAN" Name="Keyman Desktop">
             <Directory Id="INSTALLDIR" Name="." FileSource="..\..\..\bin\desktop\">
 
-              <Component Guid="{A20AFB02-7581-4019-9229-5312308FBA1E}">
-                <File Id="kmshell.exe" Name="kmshell.exe" DiskId="1" KeyPath="yes">
-                  <Shortcut Id="desktopKeyman" Advertise="yes" Directory="DesktopFolder" Name="Keyman Desktop 10.0" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
-                  <Shortcut Id="startmenuKeyman" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Desktop 10.0" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
+              <Component>
+                <File Name="kmshell.exe" KeyPath="yes">
+                  <Shortcut Id="desktopKeyman" Advertise="yes" Directory="DesktopFolder" Name="Keyman Desktop" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
+                  <Shortcut Id="startmenuKeyman" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman Desktop" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
                   <Shortcut Id="startmenuKeymanConfiguration" Advertise="yes" Directory="ProgramMenuDir" Arguments="-c" Name="Keyman Configuration" WorkingDirectory='INSTALLDIR' Icon="KMSHELL.ico" IconIndex="0" />
                 </File>
 
-                <File Id="desktop_resources.dll" Name="desktop_resources.dll" DiskId="1" Source="..\..\desktop\inst\desktop_resources.dll" />
-                <?include 'file_associations.wxi' ?>
+                <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
+                <RegistryValue Root="HKCR" Key=".kmx" Type="string" Value="Keyman.File.Keyboard" />
+                <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
                 
-                <File Id="menu.txt" Name="menu.txt" DiskId="1" Source="..\..\desktop\branding\menu.txt" />
-                <File Id="messages.txt" Name="messages.txt" DiskId="1" Source="..\..\desktop\branding\messages.txt" />
-                <File Id="trayicon.ico" Name="trayicon.ico" DiskId="1" Source="..\..\desktop\branding\trayicon.ico" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Package" Type="string" Value="Keyman Package File" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell" Type="string" Value="install" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell\install" Type="string" Value="&amp;Install" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+
+                <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard" Type="string" Value="Keyman Keyboard File" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\Shell" Type="string" Value="install" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\Shell\install" Type="string" Value="&amp;Install" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+
+                <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard" Type="string" Value="Keyman On Screen Keyboard File" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="install" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install" Type="string" Value="&amp;Install" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
                 
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
               </Component>
+
+              <Component>
+                <File Name="desktop_resources.dll" Source="..\..\desktop\inst\desktop_resources.dll" KeyPath="yes" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#desktop_resources.dll],0" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],1" />
+                <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],2" />
+              </Component>
               
               <Component>
-                <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" DiskId="1" KeyPath="yes" />
+                <File Name="menu.txt" Source="..\..\desktop\branding\menu.txt" KeyPath="yes" />
               </Component>
               
               <Component>
-                <File Id="appicon.ico" Name="appicon.ico" DiskId="1" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
+                <File Name="messages.txt" Source="..\..\desktop\branding\messages.txt" KeyPath="yes" />
               </Component>
               
               <Component>
-                <File Id="cfgicon.ico" Name="cfgicon.ico" DiskId="1" Source="..\..\global\res\90\desktop\cfgicon.ico" KeyPath="yes" />
+                <File Id="trayicon.ico" Name="trayicon.ico" Source="..\..\desktop\branding\trayicon.ico" KeyPath="yes" />
+              </Component>
+                            
+              <Component>
+                <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" KeyPath="yes" />
               </Component>
               
-              <!--<Directory Id="FontsFolder" FileSource="..\..\developerdeveloper\inst\fonts\">
-                <Component Id="componentFonts" Guid="*" Location="local" DiskId="1">
-                  <File Id="file_code2000.ttf" Name="code2000.ttf" TrueType="yes" />
-                  <File Id="file_code2001.ttf" Name="code2001.ttf" TrueType="yes" />
-                  <File Id="file_code2002.ttf" Name="code2002.ttf" TrueType="yes" />
-                </Component>  
-              </Directory>-->
-              
-              <Component Id="componentUniData" Guid="*" SharedDllRefCount="yes" Location="local" DiskId="1">
-                <File Id="file_unicodedata" Name="unicodedata.mdb" Source="..\..\global\inst\data\" />
+              <Component>
+                <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
               </Component>
               
-              <Component Id="Reg_RootPath" Guid="*" Location="either">
-                <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop\10.0" Name="root path" Type="string" Value="[INSTALLDIR]" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop\10.0" Name="charmap source data" Type="string" Value="[INSTALLDIR]" />
-                <RegistryKey ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Desktop\10.0" />
+              <Component>
+                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\..\global\res\90\desktop\cfgicon.ico" KeyPath="yes" />
+              </Component>
+              
+              <Component>
+                <File Name="unicodedata.mdb" Source="..\..\global\inst\data\unicodedata.mdb" />
+              </Component>
+              
+              <Component Id="Reg_RootPath" Guid="*">
+                <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="root path" Type="string" Value="[INSTALLDIR]" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="version" Type="string" Value="$(var.VERSION)" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="release" Type="string" Value="$(var.RELEASE)" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="charmap source data" Type="string" Value="[INSTALLDIR]" />
+                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Desktop" />
               </Component>
               
               <Component Id="removeCU" Guid="*">
-                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop\10.0" Name="Install" Type="string" Value="1" />
-                <RegistryKey ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop\10.0" />
+                <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop" Name="Install" Type="string" Value="1" />
+                <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop" />
                 <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
       
                 <RemoveFile Id="Version70ShortcutKeyman"   Name="Keyman Desktop Light 7.0.lnk"  Directory="ProgramMenuDirLight70" On="both" />
@@ -144,14 +175,6 @@
 
                 <RemoveFolder Id="Version90Shortcuts" Directory="ProgramMenuDir90" On="both" />
               </Component>
-              
-              <Directory Id="dir_xml" Name="xml" >
-                <Component Id="componentxml" DiskId="1" Guid="{05200BE9-533F-4EAD-A480-33A9095E8E1C}">
-                  <RemoveFile Id="xmlimg_thumbsdb" On="uninstall" Name="thumbs.db" />
-                  <?include 'DesktopUI.wxi' ?>
-                  <File Id="desktopuifile_localedef_dtd" Name='localedef.dtd' Source="..\..\desktop\kmshell\xml\localedef.dtd" />
-                </Component>
-              </Directory>
 
               <Directory Id="dir_locale" Name="locale">
                 <Directory Id="dir_locale_de" Name="de">
@@ -197,7 +220,7 @@
       </Directory>
       
       <Directory Id="ProgramMenuFolder" Name="Programs">
-        <Directory Id="ProgramMenuDir" Name="Keyman Desktop 10.0" />
+        <Directory Id="ProgramMenuDir" Name="Keyman Desktop" />
         <Directory Id="ProgramMenuDirLight70" Name="Tavultesoft Keyman Desktop Light 7.0" />
         <Directory Id="ProgramMenuDirLight71" Name="Tavultesoft Keyman Desktop Light 7.1" />
         <Directory Id="ProgramMenuDirPro70" Name="Tavultesoft Keyman Desktop Professional 7.0" />
@@ -210,16 +233,21 @@
 
     </Directory>
 
-    <Feature Id="AlwaysInstall" Title="Keyman Desktop Application Files" Description="Required program files for Keyman Desktop 10.0"
+    <Feature Id="AlwaysInstall" Title="Keyman Desktop Application Files" Description="Required program files for Keyman Desktop"
              Level="1" ConfigurableDirectory="INSTALLDIR" Absent="disallow" AllowAdvertise="no">
       <ComponentRef Id="kmshell.exe" Primary="yes" />
+      <ComponentRef Id="desktop_resources.dll" />
+      <ComponentRef Id="menu.txt" />
+      <ComponentRef Id="messages.txt" />
+      <ComponentRef Id="trayicon.ico" />
       <ComponentRef Id="KeymanDesktop.chm" />
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />
-              
+      <ComponentRef Id="unicodedata.mdb" />
+      
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="removeCU" />
-      <ComponentRef Id="componentxml" />
+      <ComponentGroupRef Id="DesktopUI" />
 
       <ComponentRef Id="locale_de" />  
       <ComponentRef Id="locale_fr" />
@@ -228,8 +256,6 @@
       <ComponentRef Id="locale_ta" />
       <ComponentRef Id="locale_tr" />
       <ComponentRef Id="locale_vec" />
-
-      <ComponentRef Id='componentUniData' />
 
       <MergeRef Id='keymanengine' />
     </Feature>
@@ -251,7 +277,7 @@
     <CustomAction Id='CachedInstallDirParent' Property='CachedInstallDirParent' Value='[ProgramFilesFolder]\Keyman\Cached Installer Files' />
 
     <InstallExecuteSequence>
-      <Custom Action='LocateInstallDir' After='CostFinalize'>VERSION10FOUND</Custom>
+      <Custom Action='LocateInstallDir' After='CostFinalize'>VERSION11FOUND</Custom>
 
       <Custom Action='CachedInstallDir' After='CostFinalize' />
       <Custom Action='CachedInstallDirParent' After='CostFinalize' />
@@ -259,7 +285,7 @@
       <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>CURRENTVERSIONFOUND</Custom>
       <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND Or HIGHERFOUND</Custom>
 
-      <RemoveExistingProducts After='InstallValidate'>VERSION9FOUND or VERSION10FOUND or OLDERFOUND70 OR OLDERFOUND80 Or OLDERFOUNDL70</RemoveExistingProducts>
+      <RemoveExistingProducts After='InstallValidate'>VERSION9FOUND or VERSION10FOUND or VERSION11FOUND or OLDERFOUND70 OR OLDERFOUND80 Or OLDERFOUNDL70</RemoveExistingProducts>
 
       <Custom Action='RollbackPostInstallLM' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
       <Custom Action='RollbackPostInstallCU' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
@@ -280,7 +306,7 @@
 
     <Binary Id="insthelp.exe" SourceFile="..\..\..\bin\desktop\insthelp.exe" />
 
-    <Condition Message="Keyman Desktop 10.0 requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
+    <Condition Message="Keyman Desktop requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
 
     <Property Id="ARPURLINFOABOUT" Value="http://www.keyman.com/desktop/" />
     <Property Id="ARPURLUPDATEINFO" Value="http://www.keyman.com/" />

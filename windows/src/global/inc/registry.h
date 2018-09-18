@@ -34,20 +34,18 @@
 
 #include <windows.h>
 
-#include "keymanversion.h"
-
 #ifdef _WIN64
 
-#define REGSZ_KeymanCU    			"software\\keyman\\keyman engine\\" KEYMANVERSION
-#define REGSZ_KeymanDeveloperCU	"software\\keyman\\keyman developer\\" KEYMANVERSION
+#define REGSZ_KeymanCU    			"software\\keyman\\keyman engine"
+#define REGSZ_KeymanDeveloperCU	"software\\keyman\\keyman developer"
 
-#define REGSZ_KeymanLM			"software\\wow6432node\\keyman\\keyman engine\\" KEYMANVERSION
-#define REGSZ_KeymanDeveloperLM	"software\\wow6432node\\keyman\\keyman developer\\" KEYMANVERSION
+#define REGSZ_KeymanLM			"software\\wow6432node\\keyman\\keyman engine"
+#define REGSZ_KeymanDeveloperLM	"software\\wow6432node\\keyman\\keyman developer"
 
 #else
 // this below is same in NT 4 and Win95; others will be different
-#define REGSZ_Keyman			"software\\keyman\\keyman engine\\" KEYMANVERSION
-#define REGSZ_KeymanDeveloper	"software\\keyman\\keyman developer\\" KEYMANVERSION
+#define REGSZ_Keyman			"software\\keyman\\keyman engine" 
+#define REGSZ_KeymanDeveloper	"software\\keyman\\keyman developer"
 #define REGSZ_KeymanCU  REGSZ_Keyman
 #define REGSZ_KeymanLM  REGSZ_Keyman
 #define REGSZ_KeymanDeveloperCU  REGSZ_Keyman

@@ -223,7 +223,7 @@ begin
 
     if KeyExists('\'+SKey_DelphiPackageCache) then DeleteKey('\'+SKey_DelphiPackageCache);
 
-    // Add C:\keyman\10.0\lib to the user PATH environment variable
+    // Add C:\keyman\<ver>\lib to the user PATH environment variable
 
     if OpenKey('\Environment', True) then
     begin

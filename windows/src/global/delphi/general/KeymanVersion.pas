@@ -28,11 +28,12 @@ const
   SKeymanVersion60 = '6.0';
   SKeymanVersion50 = '5.0';
 
-  SKeymanVersion = SKeymanVersion110;
+{$I keymanversion_build.inc}
 
   SKeymanKeyboardVersion = SKeymanVersion100;
 
   SKeymanInstallerComponentCode = '{C289B903-7EE8-49C7-B186-BE98259EC540}';
+
 implementation
 
 end.

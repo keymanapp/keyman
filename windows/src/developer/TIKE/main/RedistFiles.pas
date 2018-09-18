@@ -36,7 +36,7 @@ type
 
 const
   CRuntimeFiles: array[0..0] of TRedistFile = (
-    (FileName: 'keymandesktop100.msi'; Description: 'Keyman Desktop Installer')
+    (FileName: 'keymandesktop.msi'; Description: 'Keyman Desktop Installer')
   );
 
   CRedistFiles: array[0..11] of TRedistFile = (
