@@ -7,6 +7,10 @@
 # origdist = create Debian orig.tar.gz
 # proj = only make tarball for this project
 
+# this manages the release version for keyman-config
+# so need to change this to get it from git
+# using the function?
+
 set -e
 
 BASEDIR=`pwd`

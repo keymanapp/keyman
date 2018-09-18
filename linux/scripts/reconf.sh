@@ -2,37 +2,39 @@
 
 # autoreconf autotool projects
 
-# parameters: ./reconf.sh [dev] [proj]
-# dev = append current GMT datetime to VERSION
+# parameters: [JENKINS="yes"] ./reconf.sh [proj]
+# JENKINS="yes" to set version for jenkins builds
 # proj = only reconf this project
 
 set -e
 
+# maybe don't need dev any more
+# from git can determine whether to use current tagnum or next
+# and whether to use current.datetime
+# see ../test.sh for script to bring in
+# maybe make it a function to get the minor number?
+
+JENKINS=${JENKINS:="no"}
+
+. $(dirname "$0")/version.sh
+
+version
+
+oldvers=`cat VERSION`
+echo "version: ${newvers}"
+
 BASEDIR=`pwd`
 autotool_projects="kmflcomp libkmfl ibus-kmfl"
 
-if [ "$2" != "" ]; then
-    autotool_projects="$2"
-    if [ ! -d "$2" ]; then
-        echo "project $2 does not exist"
+if [ "$1" != "" ]; then
+    autotool_projects="$1"
+    if [ ! -d "$1" ]; then
+        echo "project $1 does not exist"
         exit 1
     fi
 fi
 
-if [ "$1" == "dev" ]; then
-    vers=`cat VERSION`
-    # get datetime of latest git commit
-    datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
-    echo "$vers.${datevers}" > VERSION
-else
-    if [ "$1" != "" ]; then
-        autotool_projects="$1"
-        if [ ! -d "$1" ]; then
-            echo "project $1 does not exist"
-            exit 1
-        fi
-    fi
-fi
+echo "${newvers}" > VERSION
 
 # autoreconf the projects
 for proj in ${autotool_projects}; do
@@ -44,6 +46,5 @@ for proj in ${autotool_projects}; do
     fi
 done
 
-if [ "$1" == "dev" ]; then
-    echo "${vers}" > VERSION
-fi
+# reset VERSION file
+echo "${oldvers}" > VERSION
