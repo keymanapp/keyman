@@ -31,9 +31,9 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 	if [[ "${BUILDONLY}" == "no" ]]; then
 		echo "Configuring $proj"
 		if [[ "${INSTALLDIR}" == "/tmp/kmfl" ]]; then # don't install ibus-kmfl into ibus
-			../$proj/configure CPPFLAGS="-I$(top_builddir)/../build-kmflcomp -I$(top_builddir)/../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
+			../$proj/configure CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
 		else	# install ibus-kmfl into ibus
-			../$proj/configure CPPFLAGS="-I$(top_builddir)/../build-kmflcomp -I$(top_builddir)/../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
+			../$proj/configure CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
 		fi
 		if [ -d ../$proj/include ]; then
 			echo "copying $proj include files to kmfl dir"
