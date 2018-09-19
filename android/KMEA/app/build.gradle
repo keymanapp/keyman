@@ -47,7 +47,8 @@ ext {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'commons-io:commons-io:2.6'
     implementation 'org.apache.commons:commons-text:1.2'
     testImplementation 'junit:junit:4.12'
