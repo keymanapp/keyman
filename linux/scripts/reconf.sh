@@ -15,22 +15,28 @@ set -e
 # maybe make it a function to get the minor number?
 
 JENKINS=${JENKINS:="no"}
+oldvers=`cat VERSION`
 
 . $(dirname "$0")/version.sh
 
 version
 
-oldvers=`cat VERSION`
 echo "version: ${newvers}"
 
 BASEDIR=`pwd`
 autotool_projects="kmflcomp libkmfl ibus-kmfl"
+extra_project="keyman-config"
 
 if [ "$1" != "" ]; then
-    autotool_projects="$1"
     if [ ! -d "$1" ]; then
         echo "project $1 does not exist"
         exit 1
+    fi
+    if [ "$1" == "keyman-config" ]; then
+        autotool_projects=""
+    else
+        autotool_projects="$1"
+        extra_project=""
     fi
 fi
 
@@ -45,6 +51,12 @@ for proj in ${autotool_projects}; do
         cd $BASEDIR
     fi
 done
+
+if [ "${extra_project}" == "keyman-config" ]; then
+    cd keyman-config/keyman_config
+    sed "s/_VERSION_/${newvers}/g" version.py.in > version.py
+fi
+cd $BASEDIR
 
 # reset VERSION file
 echo "${oldvers}" > VERSION
