@@ -29,7 +29,10 @@ def print_info(info):
 		print("Author: ", info['author']['description'])
 		print("Author URL: ", info['author']['url'])
 		print("Website: ", info['website']['description'])
-	except Exception:
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def print_system(system):
@@ -37,7 +40,10 @@ def print_system(system):
 		print("---- System ----")
 		print("File Version: ", system['fileVersion'])
 		print("Keyman Developer Version: ", system['keymanDeveloperVersion'])
-	except Exception:
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def print_options(options):
@@ -45,7 +51,10 @@ def print_options(options):
 		print("---- Options ----")
 		print("Readme File: ", options['readmeFile'])
 		print("Graphic File: ", options['graphicFile'])
-	except Exception:
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def print_keyboards(keyboards):
@@ -62,7 +71,10 @@ def print_keyboards(keyboards):
 			print("Languages")
 			for lang in kb['languages']:
 				print("  Name: ", lang['name'], "Id: ", lang['id'])
-	except Exception:
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def determine_filetype(filename):
@@ -105,21 +117,27 @@ def determine_filetype(filename):
 		return KMFileTypes.KM_UNKNOWN
 
 def print_files(files, extracted_dir):
-	print("---- Files ----")
-	for kbfile in files:
-		print("* File name: ", kbfile['name'])
-		print("    Description: ", kbfile['description'])
-		print("    Type: ", kbfile['type'])
-		file = os.path.join(extracted_dir, kbfile['name'])
-		if os.path.isfile(file):
-			print("    File", file, "exists")
-			ms = magic.open(magic.MAGIC_NONE)
-			ms.load()
-			ftype =  ms.file(file)
-			print ("        Type: ", ftype)
-			ms.close()
-		else:
-			print("    File", file, "does not exist")
+	try:
+		print("---- Files ----")
+		for kbfile in files:
+			print("* File name: ", kbfile['name'])
+			print("    Description: ", kbfile['description'])
+			print("    Type: ", kbfile['type'])
+			file = os.path.join(extracted_dir, kbfile['name'])
+			if os.path.isfile(file):
+				print("    File", file, "exists")
+				ms = magic.open(magic.MAGIC_NONE)
+				ms.load()
+				ftype =  ms.file(file)
+				print ("        Type: ", ftype)
+				ms.close()
+			else:
+				print("    File", file, "does not exist")
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
+		pass
 
 def get_fonts(files):
 	fonts = []
