@@ -26,9 +26,14 @@ def print_info(info):
 		print("Name: ", info['name']['description'])
 		print("Copyright: ", info['copyright']['description'])
 		print("Version: ", info['version']['description'])
-		print("Author: ", info['author']['description'])
-		print("Author URL: ", info['author']['url'])
-		print("Website: ", info['website']['description'])
+		if 'author' in info:
+			print("Author: ", info['author']['description'])
+			if 'url' in info['author']:
+				print("Author URL: ", info['author']['url'])
+		if 'website' in info:
+			print("Website description: ", info['website']['description'])
+			if 'url' in info['website']:
+				print("Website URL: ", info['website']['url'])
 	except Exception as e:
 		print(type(e))    # the exception instance
 		print(e.args)     # arguments stored in .args
@@ -38,8 +43,10 @@ def print_info(info):
 def print_system(system):
 	try:
 		print("---- System ----")
-		print("File Version: ", system['fileVersion'])
-		print("Keyman Developer Version: ", system['keymanDeveloperVersion'])
+		if 'fileVersion' in system:
+			print("File Version: ", system['fileVersion'])
+		if 'keymanDeveloperVersion' in system:
+			print("Keyman Developer Version: ", system['keymanDeveloperVersion'])
 	except Exception as e:
 		print(type(e))    # the exception instance
 		print(e.args)     # arguments stored in .args
@@ -49,8 +56,10 @@ def print_system(system):
 def print_options(options):
 	try:
 		print("---- Options ----")
-		print("Readme File: ", options['readmeFile'])
-		print("Graphic File: ", options['graphicFile'])
+		if 'readmeFile' in options:
+			print("Readme File: ", options['readmeFile'])
+		if 'graphicFile' in options:
+			print("Graphic File: ", options['graphicFile'])
 	except Exception as e:
 		print(type(e))    # the exception instance
 		print(e.args)     # arguments stored in .args
@@ -212,7 +221,7 @@ def parseinfdata(inffile, verbose=False):
 					elif item[0] == 'Author':
 						info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
 					elif item[0] == "WebSite":
-						info['website'] = { 'description' : item[1].split("\"")[1] }
+						info['website'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
 					else:
 						logging.warning("Unknown item in Info: %s", item[0])
 			if section == 'PackageInfo':
@@ -272,8 +281,11 @@ def parseinfdata(inffile, verbose=False):
 						keyboard['oskFont'] = item[1]
 					elif item[0] == 'DisplayFont':
 						keyboard['displayFont'] = item[1]
+					elif item[0] == 'RTL':
+						keyboard['RTL'] = item[1]
 					elif "Language" in item[0]:
-						langname, langid = item[1].split(",")
+						# only split on first ','
+						langid, langname = item[1].split(",", 1)
 						languages.append({ 'name' : langname, 'id' : langid })
 					else:
 						logging.warning("Unknown item in keyboard: %s", item[0])
