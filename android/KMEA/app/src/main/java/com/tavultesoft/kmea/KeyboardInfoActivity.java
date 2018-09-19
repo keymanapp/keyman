@@ -49,6 +49,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_list_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
