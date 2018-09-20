@@ -7,9 +7,7 @@ import sys
 import os.path
 from shutil import rmtree
 
-def uninstall_from_ibus(keyboardid):
-	kbdir = os.path.join('/usr/local/share/keyman', keyboardid)
-	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
+def uninstall_from_ibus(kmnfile):
 	if sys.version_info.major == 3 and sys.version_info.minor < 6:
 		result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
 			stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
@@ -68,7 +66,8 @@ def uninstall_kmp_shared(keyboardid):
 		logging.info("Removed font directory: %s", kbfontdir)
 	else:
 		logging.info("No font directory")
-	uninstall_from_ibus(keyboardid)
+	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
+	uninstall_from_ibus(kmnfile)
 	rmtree(kbdir)
 	logging.info("Removed keyman directory: %s", kbdir)
 	logging.info("Finished uninstalling shared keyboard: %s", keyboardid)
@@ -80,7 +79,6 @@ def uninstall_kmp_user(keyboardid):
 	Args:
 		keyboardid (str): Keyboard ID
 	"""
-	# TODO handle whatever is done with fonts
 	home = os.path.expanduser("~")
 	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
 	kbdir=os.path.join(datahome, "keyman", keyboardid)
@@ -88,9 +86,14 @@ def uninstall_kmp_user(keyboardid):
 		logging.error("Keyboard directory for %s does not exist. Aborting", keyboardid)
 		exit(3)
 	logging.info("Uninstalling local keyboard: %s", keyboardid)
-	uninstall_from_ibus(keyboardid)
+	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
+	uninstall_from_ibus(kmnfile)
 	rmtree(kbdir)
-	logging.info("Removed keyman directory: %s", kbdir)
+	logging.info("Removed user keyman directory: %s", kbdir)
+	fontdir=os.path.join(datahome, "fonts", "keyman", keyboardid)
+	if os.path.isdir(fontdir):
+		rmtree(fontdir)
+		logging.info("Removed user keyman font directory: %s", fontdir)
 	logging.info("Finished uninstalling local keyboard: %s", keyboardid)
 
 
