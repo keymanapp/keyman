@@ -64,8 +64,7 @@ uses
   System.Win.ComObj,
 
   OnlineConstants,
-  ProjectFiles,
-  utilhttp;
+  ProjectFiles;
 
 { TProjectSaver }
 

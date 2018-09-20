@@ -40,7 +40,7 @@ uses
 
 type
   EProjectLoader = class(Exception);
-  
+
   TProjectLoader = class
   private
     FFileName: string;
@@ -60,8 +60,7 @@ uses
   kmnProjectFile,
   kpsProjectFile,
   ProjectFiles,
-  ProjectFileType,
-  utilhttp;
+  ProjectFileType;
 
 { TProjectLoader }
 

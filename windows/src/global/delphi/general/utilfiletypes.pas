@@ -47,11 +47,15 @@ const
   Ext_KeymanTouchLayout = '.keyman-touch-layout';
   Ext_VisualKeyboard = '.kvk';
   Ext_VisualKeyboardSource = '.kvks';
-
+  Ext_PackageSource = '.kps';
+  Ext_KeymanSource = '.kmn';
+  Ext_Icon = '.ico';
+  Ext_ProjectSource = '.kpj';
+  Ext_Javascript = '.js';
 
 const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (
-  (Ext: '.kmn'; FileType: ftKeymanSource),
-  (Ext: '.kps'; FileType: ftPackageSource),
+  (Ext: Ext_KeymanSource; FileType: ftKeymanSource),
+  (Ext: Ext_PackageSource; FileType: ftPackageSource),
   (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
   (Ext: Ext_PackageFile; FileType: ftPackageFile),
   (Ext: '.ttf'; FileType: ftFont),
@@ -60,7 +64,7 @@ const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (
   (Ext: '.ttc'; FileType: ftFont),
   (Ext: Ext_VisualKeyboard; FileType: ftVisualKeyboard),
   (Ext: Ext_VisualKeyboardSource; FileType: ftVisualKeyboardSource),
-  (Ext: '.js'; FileType: ftJavascript),
+  (Ext: Ext_Javascript; FileType: ftJavascript),
   (Ext: Ext_KeymanTouchLayout; FileType: ftTouchLayout),
   (Ext: ''; FileType: ftOther));
 

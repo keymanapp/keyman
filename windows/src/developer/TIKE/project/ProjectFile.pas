@@ -321,7 +321,6 @@ uses
   UMD5Hash,
   Unicode,
   utildir,
-  utilhttp,
   utilsystem;
 
 { TProjectFileList }
