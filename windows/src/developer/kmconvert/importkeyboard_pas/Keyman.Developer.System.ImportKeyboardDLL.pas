@@ -3,9 +3,30 @@ unit Keyman.Developer.System.ImportKeyboardDLL;
 interface
 
 uses
+  System.SysUtils,
+
   Winapi.Windows;
 
-procedure Run;
+type
+  TImportKeyboardDLL = class
+  private
+    FLayoutFile: string;
+    FLayoutText: string;
+    FRecommendedOutputKMNFileName: string;
+    FInputHKL: string;
+    FKMN: string;
+    FKVKS: string;
+  public
+    constructor Create(const inputHKL: string);
+    procedure Execute;
+    property InputHKL: string read FInputHKL;
+    property KMN: string read FKMN;
+    property KVKS: string read FKVKS;
+    property RecommendedOutputKMNFileName: string read FRecommendedOutputKMNFileName;
+  end;
+
+type
+  EImportKeyboardDLL = class(Exception);
 
 implementation
 
@@ -13,7 +34,6 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.Math,
-  System.SysUtils,
   System.Win.Registry,
 
   ScanCodeMap,
@@ -95,6 +115,10 @@ type
 type
   TLoader = class
   private
+    inputHKL, layoutFile, layoutText: string;
+    rgkey: array[0..255] of TVirtualKey;
+    alDead: TDeadKeyList;
+
     FKeyStateNull: TKeyboardState;
     FXxxxVk: UINT;
     function GetMaxShiftState: TKBDShiftState;
@@ -102,15 +126,15 @@ type
         iKeyDead: UINT;             // The index into the VirtualKey of the dead key
         shiftStateDead: TKBDShiftState;  // The shiftstate that contains the dead key
         pKeyStateDead: TKeyboardState;    // The key state for the dead key
-        const rgKey: array of TVirtualKey;         // Our array of dead keys
         fCapsLock: Boolean;             // Was the caps lock key pressed?
         hkl: HKL): TDeadKey;      // The keyboard layout
     procedure ClearKeyboardBuffer(vk: UINT; sc: UINT; hkl: HKL);
-    procedure ShowKeyboardList;
+    procedure ScanKeyboard(hkl: HKL);
+    function WriteOutputKMNFile: string;
   public
-    constructor Create;
+    constructor Create(inputHKL, layoutFile, layoutText: string);
     destructor Destroy; override;
-    procedure Main;
+    procedure Main(var KMN, KVKS: string);
     procedure FillKeyState(var pKeyState: TKeyboardState; ss: TKBDShiftState; fCapsLock: Boolean);
     property XxxxVk: UINT read FXxxxVk write FXxxxVk;
     property MaxShiftState: TKBDShiftState read GetMaxShiftState;
@@ -428,14 +452,20 @@ begin
     else Result := ShftXxxx;
 end;
 
-constructor TLoader.Create;
+constructor TLoader.Create(inputHKL, layoutFile, layoutText: string);
 begin
   inherited Create;
+  Self.inputHKL := inputHKL;
+  Self.layoutFile := layoutFile;
+  Self.layoutText := layoutText;
+
+  alDead := TDeadKeyList.Create;
 end;
 
 destructor TLoader.Destroy;
 begin
   // TODO: Cleanup
+  alDead.Free;
   inherited Destroy;
 end;
 
@@ -455,7 +485,7 @@ begin
 end;
 
 function TLoader.ProcessDeadKey(iKeyDead: UINT; shiftStateDead: TKBDShiftState;
-  pKeyStateDead: TKeyboardState; const rgKey: array of TVirtualKey; fCapsLock: Boolean;
+  pKeyStateDead: TKeyboardState; fCapsLock: Boolean;
   hkl: HKL): TDeadKey;
 var
   pKeyState: TKeyboardState;
@@ -574,55 +604,9 @@ begin
   end;
 end;
 
-const
-  CRootKey = 'System\CurrentControlSet\Control\Keyboard Layouts';
-
-procedure TLoader.ShowKeyboardList;
+procedure TLoader.ScanKeyboard(hkl: HKL);
 var
-  r: TRegistry;
-  keyboardIds: TStringList;
-  keyboardId: string;
-  layoutFile: string;
-  layoutText: string;
-begin
-  r := TRegistry.Create;
-  keyboardIds := TStringList.Create;
-  try
-    r.RootKey := HKEY_LOCAL_MACHINE;
-    if r.OpenKeyReadOnly(CRootKey) then //TODO Use RegistryKeys
-    begin
-      r.GetKeyNames(keyboardIds);
-      for keyboardId in keyboardIds do
-      begin
-        if r.OpenKeyReadOnly('\' + CRootKey + '\' + keyboardId) then
-        begin
-          if not r.ValueExists('keyman install') then
-          begin
-            layoutFile := r.ReadString('layout file');
-            layoutText := r.ReadString('layout text');
-            if (layoutFile <> '') and (layoutText <> '') then
-            begin
-              writeln('  ' + keyboardId + #9 + layoutFile + #9 + layoutText);
-            end;
-          end;
-        end;
-      end;
-    end;
-  finally
-    r.Free;
-    keyboardIds.Free;
-  end;
-end;
-
-procedure TLoader.Main;
-var
-  inputHKL: string;
-  outputFileName: string;
-  cKeyboards: Cardinal;
-  rghkl: array of HKL;
-  rgkey: array[0..255] of TVirtualKey;
   pKeyState: TKeyboardState;
-  alDead: TDeadKeyList;
   sc: Integer;
   key: TVirtualKey;
   ke: UINT;
@@ -636,49 +620,9 @@ var
   rc: Integer;
   dk: TDeadKey;
   iDead: Integer;
-  i: Integer;
-  r: TRegistry;
-  outFile: TStringList;
-  layoutText: string;
-  layoutFile: string;
-  sbDKFrom: string;
-  sbDKTo: string;
-  id: Integer;
-  hkl: THandle;
 begin
-  if ParamCount = 0 then
-  begin
-    writeln('Usage: importkeyboard /list | hkl [output.kmn] ');
-    writeln(' /list shows a list of keyboards available on your system.');
-    writeln(' hkl should be an 8 hex digit Keyboard ID.  See /list to enumerate these.');
-    writeln(' If output.kmn is not specified, the filename of the source keyboard will be used; e.g. 00000409 will produce kbdus.kmn');
-    Exit;
-  end;
-
-  if SameText(ParamStr(1), '/list') then
-  begin
-    ShowKeyboardList;
-    Exit;
-  end;
-
-  inputHKL := ParamStr(1);
-  if ParamCount > 1 then
-    outputFileName := ParamStr(2);
-
-  inputHKL := IntToHex(StrToInt('$'+inputHKL), 8);
-
-  cKeyboards := GetKeyboardLayoutList(0, rghkl);
-  SetLength(rghkl, cKeyboards);
-  hkl := LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
-  if hkl = 0 then
-  begin
-    writeln('Sorry, the keyboard '+inputHKL+' does not seem to be valid.');
-    Exit;
-  end;
-
-  FillChar(pKeyState, sizeof(pKeyState), 0);
   FillChar(rgKey, sizeof(rgKey), 0);
-  alDead := TDeadKeyList.Create;
+  FillChar(pKeyState, sizeof(pKeyState), 0);
 
   for sc := $01 to $7f do
   begin
@@ -787,49 +731,55 @@ begin
 
             if dk = nil then
             begin
-              alDead.Add(ProcessDeadKey(iKey, ss, pKeyState, rgKey, not caps, hkl));
+              alDead.Add(ProcessDeadKey(iKey, ss, pKeyState, not caps, hkl));
             end;
           end;
-
         end;
       end;
     end;
   end;
+end;
 
-  for i := 0 to High(rghkl) do
-  begin
-    if hkl = rghkl[i] then
-    begin
-      hkl := 0;
-    end;
-  end;
+procedure TLoader.Main(var KMN, KVKS: string);
+var
+  cKeyboards: Cardinal;
+  rghkl: array of HKL;
+  i: Integer;
+  hkl: THandle;
+begin
+  inputHKL := IntToHex(StrToInt('$'+inputHKL), 8);
 
-  if hkl <> 0 then
-  begin
-    UnloadKeyboardLayout(hkl);
-  end;
+  cKeyboards := GetKeyboardLayoutList(0, rghkl);
+  SetLength(rghkl, cKeyboards);
+  hkl := LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
+  if hkl = 0 then
+    raise EImportKeyboardDLL.CreateFmt('The keyboard %s could not be loaded (error %d, %s)',
+      [inputHKL, GetLastError, SysErrorMessage(GetLastError)]);
 
-  r := TRegistry.Create;
   try
-    r.RootKey := HKEY_LOCAL_MACHINE;
-    if not r.OpenKeyReadOnly(CRootKey + '\' + inputHKL) then
-    begin
-      writeln('Could not find '+inputHKL+' in registry');
-      Exit;
-    end;
-
-    layoutFile := r.ReadString('Layout File');
-    layoutText := r.ReadString('Layout Text');
+    ScanKeyboard(hkl);
   finally
-    r.Free;
+    for i := 0 to High(rghkl) do
+      if hkl = rghkl[i] then
+        hkl := 0;
+
+    if hkl <> 0 then
+      UnloadKeyboardLayout(hkl);
   end;
 
-  if outputFileName = '' then
-  begin
-    outputFileName := ChangeFileExt(layoutFile, '.kmn');
-  end;
+  KMN := WriteOutputKMNFile;
+  //WriteOutputKVKSFile(KVKS);
+end;
 
-  writeln('Importing Windows system keyboard '+inputHKL+' to Keyman keyboard '+outputFileName);
+function TLoader.WriteOutputKMNFile: string;
+var
+  iKey: UINT;
+  dk: TDeadKey;
+  outFile: TStringList;
+  sbDKFrom: string;
+  sbDKTo: string;
+  id: Integer;
+begin
 
   outFile := TStringList.Create;
   try
@@ -881,17 +831,48 @@ begin
 
     outFile.Add('');
 
-    outFile.SaveToFile(outputFileName, TEncoding.UTF8);
+    Result := outFile.Text;
   finally
     outFile.Free;
   end;
 end;
 
-procedure Run;
+{ TImportKeyboardDLL }
+
+const
+  CRootKey = 'System\CurrentControlSet\Control\Keyboard Layouts';
+
+constructor TImportKeyboardDLL.Create(const inputHKL: string);
+var
+  r: TRegistry;
 begin
-  Loader := TLoader.Create;
+  inherited Create;
+  FInputHKL := inputHKL;
+
+  // Because the output filename is optional, we read layoutFile, layoutText
+  // here in order to populate the outputFileName. layoutText is also used in
+  // comment data when genrating the .kmn file
+  r := TRegistry.Create;
   try
-    Loader.Main;
+    r.RootKey := HKEY_LOCAL_MACHINE;
+    if not r.OpenKeyReadOnly(CRootKey + '\' + inputHKL) then
+      raise EImportKeyboardDLL.CreateFmt('The keyboard %s could not be found in the registry (error %d, %s)',
+        [inputHKL, GetLastError, SysErrorMessage(GetLastError)]);
+
+    FLayoutFile := r.ReadString('Layout File');
+    FLayoutText := r.ReadString('Layout Text');
+  finally
+    r.Free;
+  end;
+
+  FRecommendedOutputKMNFileName := ChangeFileExt(FLayoutFile, '.kmn');
+end;
+
+procedure TImportKeyboardDLL.Execute;
+begin
+  Loader := TLoader.Create(FInputHKL, FLayoutFile, FLayoutText);
+  try
+    Loader.Main(FKMN, FKVKS);
   finally
     FreeAndNil(Loader);
   end;
