@@ -1,6 +1,6 @@
 package com.tavultesoft.kmea;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -28,7 +28,7 @@ import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 import static com.tavultesoft.kmea.KMManager.KMKey_FontSource;
 
-public class KMKeyboardDownloaderActivity extends Activity {
+public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   // Bundle Keys
   // Cloud
   public static final String ARG_PKG_ID = "KMKeyboardActivity.pkgID";
@@ -155,7 +155,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Downloading keyboard...");
         progressDialog.setCancelable(false);
-        if (!((Activity) context).isFinishing()) {
+        if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
         } else {
           cancel(true);
@@ -218,7 +218,7 @@ public class KMKeyboardDownloaderActivity extends Activity {
         progressDialog = null;
       }
 
-      ((Activity) context).finish();
+      ((AppCompatActivity) context).finish();
       if (result > 0) {
         notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
       }

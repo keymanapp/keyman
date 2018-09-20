@@ -26,12 +26,13 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.BuildConfig;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,9 +43,10 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public final class LanguageListActivity extends Activity implements OnKeyboardDownloadEventListener {
+public final class LanguageListActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
   private Context context;
+  private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
@@ -71,26 +73,18 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
-    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-    try {
-      int titleContainerId = (Integer) Class.forName("com.android.internal.R$id").getField("title_container").get(null);
-      ((ViewGroup) getWindow().findViewById(titleContainerId)).removeAllViews();
-    } catch (Exception e) {
-      Log.e("LanguageListActivity", "Error: " + e);
-    }
+    setContentView(R.layout.activity_list_layout);
 
-    getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.list_title_layout1);
-    setContentView(R.layout.list_layout);
+    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
-
-    final ImageButton backButton = (ImageButton) findViewById(R.id.left_button);
-    backButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        finish();
-      }
-    });
 
     languagesArrayList = new ArrayList<HashMap<String, String>>();
   }
@@ -111,6 +105,17 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
 
     // Intentionally not removing KeyboardDownloadEventListener to
     // ensure onKeyboardDownloadFinished() gets called
+  }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    onBackPressed();
+    return true;
+  }
+
+  @Override
+  public void onBackPressed() {
+    finish();
   }
 
   @Override
@@ -336,7 +341,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
-        if (!((Activity) context).isFinishing()) {
+        if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
         } else {
           cancel(true);
@@ -429,7 +434,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
             kbKey = String.format("%s_%s", langID, kbID);
             if (KeyboardPickerActivity.containsKeyboard(context, kbKey)) {
               isEnabled = "false";
-              icon = String.valueOf(R.drawable.ic_action_check);
+              icon = String.valueOf(R.drawable.ic_check);
             }
 
             HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -443,7 +448,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
             if (keyboardModifiedDates.get(kbID) == null)
               keyboardModifiedDates.put(kbID, keyboard.getString(KMManager.KMKey_KeyboardModified));
           } else {
-            icon = String.valueOf(R.drawable.ic_action_next);
+            icon = String.valueOf(R.drawable.ic_arrow_forward);
             for (int j = 0; j < kbLength; j++) {
               keyboard = langKeyboards.getJSONObject(j);
               kbID = keyboard.getString(KMManager.KMKey_ID);

@@ -11,6 +11,9 @@ import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 
 import android.app.Activity;
+import android.content.ContextWrapper;
+import android.view.ContextThemeWrapper;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -23,11 +26,11 @@ import android.view.ViewGroup.OnHierarchyChangeListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+import android.support.v7.widget.AppCompatEditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-public final class KMTextView extends EditText {
+public final class KMTextView extends AppCompatEditText {
   private Context context;
   protected KMHardwareKeyboardInterpreter hardwareKeyboardInterpreter;
 
@@ -58,7 +61,8 @@ public final class KMTextView extends EditText {
     this.context = context;
     this.hardwareKeyboardInterpreter = new KMHardwareKeyboardInterpreter(context, KeyboardType.KEYBOARD_TYPE_INAPP);
 
-    Activity activity = (Activity) context;
+    AppCompatActivity activity = (AppCompatActivity)context;
+
     Window mainWindow = activity.getWindow();
     mainWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     FrameLayout mainLayout = (FrameLayout) mainWindow.getDecorView().findViewById(android.R.id.content);
@@ -159,7 +163,8 @@ public final class KMTextView extends EditText {
 
   @Override
   public void onWindowFocusChanged(boolean hasWindowFocus) {
-    Activity activity = (Activity) context;
+    AppCompatActivity activity = (AppCompatActivity)context;
+
     Window mainWindow = activity.getWindow();
     if (hasWindowFocus) {
       KMManager.KMInAppKeyboardWebViewClient.context = context;
@@ -254,12 +259,13 @@ public final class KMTextView extends EditText {
   }
 
   private void showKeyboard() {
-    Activity activity = (Activity) context;
+    AppCompatActivity activity = (AppCompatActivity)context;
+
     Window mainWindow = activity.getWindow();
     FrameLayout mainLayout = (FrameLayout) mainWindow.getDecorView().findViewById(android.R.id.content);
 
     mainWindow.setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM, WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-    ((InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mainLayout.getWindowToken(), 0);
+    ((InputMethodManager) activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mainLayout.getWindowToken(), 0);
 
     ViewGroup parent = (ViewGroup) keyboardLayout.getParent();
     if (parent != null) {
@@ -282,11 +288,17 @@ public final class KMTextView extends EditText {
   }
 
   public void dismissKeyboard() {
-    Activity activity = (Activity) context;
+    AppCompatActivity activity;
+    if (context instanceof ContextThemeWrapper) {
+      activity = (AppCompatActivity)(((ContextThemeWrapper)context).getBaseContext());
+    } else {
+      activity = (AppCompatActivity)context;
+    }
+
     Window mainWindow = activity.getWindow();
     FrameLayout mainLayout = (FrameLayout) mainWindow.getDecorView().findViewById(android.R.id.content);
     //mainWindow.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-    ((InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mainLayout.getWindowToken(), 0);
+    ((InputMethodManager) activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mainLayout.getWindowToken(), 0);
     //keyboardLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_out));
     //keyboardLayout.setAnimation(null);
     keyboardLayout.setVisibility(View.GONE);
