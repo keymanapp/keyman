@@ -15,7 +15,7 @@ from ast import literal_eval
 import requests
 
 from keyman_config.get_kmp import get_keyboard_data, get_kmp
-from keyman_config.kmpmetadata import determine_filetype, parseinfdata, parsemetadata
+from keyman_config.kmpmetadata import parseinfdata, parsemetadata, KMFileTypes
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.convertico import checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
@@ -64,7 +64,7 @@ def get_infdata(tmpdirname):
 		if files and not keyboards:
 			id = "unknown"
 			for kbfile in files:
-				if determine_filetype(kbfile['name']) == "Compiled keyboard":
+				if kbfile['type'] == KMFileTypes.KM_KVK:
 					id = os.path.basename(os.path.splitext(kbfile['name'])[0])
 			#inf file may not have keyboards so generate it if needed
 			keyboards = [ { 'name' : info['name']['description'],
@@ -157,23 +157,23 @@ def install_kmp(inputfile, online=False):
 
 			for f in files:
 				fpath = os.path.join(tmpdirname, f['name'])
-				ftype = determine_filetype(f['name'])
-				if ftype == "Documentation" or ftype == "Image":
+				ftype = f['type']
+				if ftype == KMFileTypes.KM_DOC or ftype == KMFileTypes.KM_IMAGE:
 					logging.info("Installing %s as documentation", f['name'])
 					if not os.path.isdir(kbdocdir):
 						os.makedirs(kbdocdir)
 					copy2(fpath, kbdocdir)
-				elif ftype == "Font":
+				elif ftype == KMFileTypes.KM_FONT:
 					logging.info("Installing %s as font", f['name'])
 					if not os.path.isdir(kbfontdir):
 						os.makedirs(kbfontdir)
 					copy2(fpath, kbfontdir)
-				elif ftype == "Metadata" or ftype == "Keyboard source" or ftype == "Compiled keyboard":
+				elif ftype == KMFileTypes.KM_META or ftype == KMFileTypes.KM_SOURCE or ftype == KMFileTypes.KM_KMX:
 					logging.info("Installing %s as keyman file", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
 					copy2(fpath, kbdir)
-				elif ftype == "Compiled on screen keyboard":
+				elif ftype == KMFileTypes.KM_KVK:
 					logging.info("Converting %s to LDML and installing both as as keyman file", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
@@ -182,7 +182,7 @@ def install_kmp(inputfile, online=False):
 					name, ext = os.path.splitext(f['name'])
 					ldmlfile = os.path.join(kbdir, name+".ldml")
 					output_ldml(ldmlfile, ldml)
-				elif ftype == "Keyboard icon":
+				elif ftype == KMFileTypes.KM_ICON:
 					logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 					if not os.path.isdir(kbdir):
 						os.makedirs(kbdir)
