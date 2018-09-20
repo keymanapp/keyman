@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<android.support.design.widget.AppBarLayout
+<android.support.v7.widget.Toolbar
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_alignParentTop="true"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/web_browser_appbar"
-    app:elevation="0dp">
+    android:layout_height="?attr/actionBarSize"
+    android:id="@+id/web_browser_toolbar">
 
-    <android.support.v7.widget.Toolbar
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:id="@+id/web_browser_toolbar">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/frame"
@@ -75,16 +71,16 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.Toolbar>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/keyman_bar_height"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:visibility="visible"
+            android:progressDrawable="@drawable/progress_bg" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/keyman_bar_height"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:progressDrawable="@drawable/progress_bg" />
+    </RelativeLayout>
 
-
-</android.support.design.widget.AppBarLayout>
+</android.support.v7.widget.Toolbar>
