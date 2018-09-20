@@ -151,7 +151,6 @@ def print_files(files, extracted_dir):
 def get_fonts(files):
 	fonts = []
 	for kbfile in files:
-		#if determine_filetype(kbfile['name']) == KMFileTypes.KM_FONT:
 		if kbfile['type'] == KMFileTypes.KM_FONT:
 			fonts.append(kbfile)
 	return fonts
