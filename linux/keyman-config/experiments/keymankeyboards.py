@@ -33,7 +33,7 @@ def get_api_keyboards(verbose=False):
 		dict: Keyboard data
 		None: if http request not successful
 	"""
-	api_url = "https://api.keyman.com/cloud/4.0/keyboards"
+	api_url = "https://api.keyman.com/cloud/4.0/keyboards?version=10.0"
 	headers = {'Content-Type': 'application/json',
 		'Accept-Encoding': 'gzip, deflate, br'}
 	home = str(Path.home())
