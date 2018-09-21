@@ -33,9 +33,13 @@ from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 # ~lsf/keyman/<kbid> just like in /u/l/s/fonts/keyman - sorted
 
 #TODO userdir install
-# just unpack everything in ~ls/k/kbid
+# just unpack everything in ~ls/k/kbid - done
 # special processing for font, kvk, ico, kmn
 # what errors need abort and uninstall?
+
+#TODO changed shared install to put all files in
+# /usr/local/shared/keyman/kbid and link the files
+# to dirs in uls/doc and uls/fonts
 
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
@@ -268,7 +272,11 @@ def install_kmp_user(inputfile, online=False):
 			fpath = os.path.join(kbdir, f['name'])
 			ftype = f['type']
 			if ftype == KMFileTypes.KM_FONT:
-				#TODO Special handling of font to link it into font dir
+				#Special handling of font to hard link it into font dir
+				fontsdir = os.path.join(datahome, "fonts", "keyman", keyboardid)
+				if not os.path.isdir(fontsdir):
+					os.makedirs(fontsdir)
+				os.link(fpath, os.path.join(fontsdir, f['name']))
 				logging.info("Installing %s as font", f['name'])
 			elif ftype == KMFileTypes.KM_KVK:
 				# Special handling to convert kvk into LDML
@@ -281,6 +289,10 @@ def install_kmp_user(inputfile, online=False):
 				# Special handling of icon to convert to PNG
 				logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 				checkandsaveico(fpath)
+			elif ftype == KMFileTypes.KM_SOURCES:
+				#TODO try to compile kmn and disable if it doesn't work
+				# or just leave it for ibus-kmfl to ignore if it doesn't load
+				pass
 		if do_install_to_ibus:
 			install_to_ibus(kmn_file)
 	else:
