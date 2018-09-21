@@ -53,6 +53,8 @@ ibus_engine_kmfl_SOURCES = \
 	main.c \
 	engine.c \
 	engine.h \
+	keyman-service.c \
+	keyman-service.h \
 	$(NULL)
 ibus_engine_kmfl_CFLAGS = \
 	@IBUS_CFLAGS@ \

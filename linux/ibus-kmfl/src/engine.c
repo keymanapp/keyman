@@ -29,6 +29,7 @@
 #include <X11/keysym.h>
 
 #include "kmflutil.h"
+#include "keyman-service.h"
 #include "engine.h"
 
 typedef struct _IBusKMFLEngine IBusKMFLEngine;
@@ -196,6 +197,7 @@ ibus_kmfl_engine_constructor (GType                   type,
 
     engine_name = ibus_engine_get_name ((IBusEngine *) kmfl);
     g_assert (engine_name);
+    g_message("DAR: ibus_kmfl_engine_constructor %s", engine_name);
 
     if (im_table == NULL) {
         im_table = g_hash_table_new_full (g_str_hash,
@@ -231,10 +233,11 @@ static void
 ibus_kmfl_engine_destroy (IBusKMFLEngine *kmfl)
 {
     const gchar *engine_name;
-    g_debug("DAR: ibus_kmfl_engine_destroy");
     
+    g_debug("DAR: ibus_kmfl_engine_destroy");
     engine_name = ibus_engine_get_name ((IBusEngine *) kmfl);
     g_assert (engine_name);
+    g_message("DAR: ibus_kmfl_engine_destroy %s", engine_name);
 
     if (kmfl->prop_list) {
         g_debug("DAR: unref kmfl->prop_list");
@@ -402,17 +405,39 @@ ibus_kmfl_engine_reset (IBusEngine *engine)
 static void
 ibus_kmfl_engine_enable (IBusEngine *engine)
 {
+    const gchar *engine_name;
     IBusKMFLEngine *kmfl = (IBusKMFLEngine *) engine;
+    KInputMethod *im;
 
+    engine_name = ibus_engine_get_name (engine);
+    g_assert (engine_name);
+    g_message("WDG: ibus_kmfl_engine_enable %s", engine_name);
+    im = (KInputMethod *) g_hash_table_lookup (im_table, engine_name);
+    // own dbus name com.Keyman
+    // expose properties LDMLFile and Name
+    KeymanService *service = km_service_get_default();
+    //const gchar *ldmlfile = "";
+    km_service_set_ldmlfile (service, im->keyboard_ldmlfile);
+    km_service_set_name (service, im->keyboard_name);
     parent_class->enable (engine);
 }
 
 static void
 ibus_kmfl_engine_disable (IBusEngine *engine)
 {
+    const gchar *engine_name;
     IBusKMFLEngine *kmfl = (IBusKMFLEngine *) engine;
 
+    engine_name = ibus_engine_get_name (engine);
+    g_assert (engine_name);
+    g_message("WDG: ibus_kmfl_engine_disable %s", engine_name);
     ibus_kmfl_engine_focus_out (engine);
+    // stop owning dbus name com.Keyman
+    KeymanService *service = km_service_get_default();
+    km_service_set_ldmlfile (service, "");
+    km_service_set_name (service, "None");
+    // g_clear_object(&service);
+
     parent_class->disable (engine);
 }
 

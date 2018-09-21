@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include "kmflutil.h"
 #include "engine.h"
+#include "keyman-service.h"
 
 static IBusBus *bus = NULL;
 static IBusFactory *factory = NULL;
@@ -50,6 +51,9 @@ ibus_disconnected_cb (IBusBus  *bus,
                       gpointer  user_data)
 {
     g_debug ("bus disconnected");
+    KeymanService *service = km_service_get_default();
+    g_clear_object(&service);
+
     ibus_quit ();
 }
 
@@ -88,6 +92,7 @@ start_component (void)
     }
 
     g_object_unref (component);
+    km_service_get_default(); // initialise dbus service
 
     ibus_main ();
 }
