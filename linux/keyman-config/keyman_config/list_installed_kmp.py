@@ -4,12 +4,24 @@ import argparse
 import logging
 import os
 import json
+from enum import Enum, auto
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
 
-def get_installed_kmp_os():
-    """
-    Get list of installed keyboards in /usr/share.
+class InstallArea(Enum):
+    IA_OS = auto()
+    IA_SHARED = auto()
+    IA_USER = auto()
+    IA_UNKNOWN = auto()
 
+def get_installed_kmp(area):
+    """
+    Get list of installed keyboards in an install area.
+
+	Args:
+		area (InstallArea): install area to check
+            InstallArea.IA_USER: ~/.local/share/keyman and ~/.kmfl
+            InstallArea.IA_SHARED: /usr/local/share/keyman
+            InstallArea.IA_OS: /usr/share/keyman
     Returns:
         list: Installed keyboards
             dict: Keyboard
@@ -21,50 +33,20 @@ def get_installed_kmp_os():
                 path (str): base path where keyboard is installed
                 description (str): Keyboard description
     """
-    check_paths = [ "/usr/share/keyman" ]
-    return get_installed_kmp(check_paths)
+    check_paths = []
+    if area == InstallArea.IA_USER:
+        home = os.path.expanduser("~")
+        datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+        check_paths = [ os.path.join(datahome, "keyman"), os.path.join(home, ".kmfl") ]
+    elif area == InstallArea.IA_SHARED:
+        check_paths = [ "/usr/local/share/keyman" ]
+    elif area == InstallArea.IA_OS:
+        check_paths = [ "/usr/share/keyman" ]
+
+    return get_installed_kmp_paths(check_paths)
 
 
-def get_installed_kmp_shared():
-    """
-    Get list of installed keyboards in /usr/local/share.
-
-    Returns:
-        list: Installed keyboards
-            dict: Keyboard
-                id (str): Keyboard ID
-                name (str): Keyboard name
-                kmpname (str): Keyboard name in local
-                version (str): Keyboard version
-                kmpversion (str):
-                path (str): base path where keyboard is installed
-                description (str): Keyboard description
-    """
-    check_paths = [ "/usr/local/share/keyman" ]
-    return get_installed_kmp(check_paths)
-
-def get_installed_kmp_user():
-    """
-    Get list of installed keyboards in user areas.
-
-    Returns:
-        list: Installed keyboards
-            dict: Keyboard
-                id (str): Keyboard ID
-                name (str): Keyboard name
-                kmpname (str): Keyboard name in local
-                version (str): Keyboard version
-                kmpversion (str):
-                path (str): base path where keyboard is installed
-                description (str): Keyboard description
-    """
-    home = os.path.expanduser("~")
-    datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-    check_paths = [ os.path.join(datahome, "keyman"), os.path.join(home, ".kmfl") ]
-    return get_installed_kmp(check_paths)
-
-
-def get_installed_kmp(check_paths):
+def get_installed_kmp_paths(check_paths):
     """
     Get list of installed keyboards.
 

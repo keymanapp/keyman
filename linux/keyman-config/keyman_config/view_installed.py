@@ -7,7 +7,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
-from keyman_config.list_installed_kmp import get_installed_kmp
+from keyman_config.list_installed_kmp import get_installed_kmp, InstallArea
 from keyman_config.welcome import WelcomeView
 from keyman_config.keyboard_details import KeyboardDetailsView
 from keyman_config.downloadkeyboard import DownloadKmpWindow
@@ -16,12 +16,24 @@ from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
 
 class KeyboardBox(Gtk.Box):
-    def __init__(self, kmp, window):
+    def __init__(self, kmp, window, area):
         Gtk.Box.__init__(self)
         self.parent = window
 
         self.kmp = kmp
-        icofile = os.path.join("/usr/local/share/keyman", self.kmp["id"], self.kmp["id"] + ".ico.png")
+        if area == InstallArea.IA_USER:
+            home = os.path.expanduser("~")
+            datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+            self.kbhome = os.path.join(datahome, "keyman", self.kmp["id"])
+            self.kbdoc = self.kbhome
+        elif area == InstallArea.IA_SHARED:
+            self.kbhome = os.path.join("/usr/local/share/keyman", self.kmp["id"])
+            self.kbdoc = os.path.join("/usr/local/share/doc/keyman", self.kmp["id"])
+        elif area == InstallArea.IA_OS:
+            self.kbhome = os.path.join("/usr/share/keyman", self.kmp["id"])
+            self.kbdoc = os.path.join("/usr/share/doc/keyman", self.kmp["id"])
+
+        icofile = os.path.join(self.kbhome, self.kmp["id"] + ".ico.png")
         if not os.path.isfile(icofile):
             icofile = find_keyman_image("icon_kmp.png")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icofile, 16, 16)
@@ -42,15 +54,16 @@ class KeyboardBox(Gtk.Box):
         self.expandbutton.connect("clicked", self.on_expand_clicked)
         self.pack_end(self.expandbutton, False, False, 0)
 
-        img_cross = find_keyman_image("cross20.png")
-        self.uninstallbutton = Gtk.Button()
-        self.uninstallimage = Gtk.Image.new_from_file(img_cross)
-        self.uninstallbutton.set_image(self.uninstallimage)
-        self.uninstallbutton.set_tooltip_text("Uninstall " + kmp["name"] + " (" + kmp["id"] + ")")
-        self.uninstallbutton.connect("clicked", self.on_uninstall_clicked)
-        self.pack_end(self.uninstallbutton, False, False, 0)
+        if area == InstallArea.IA_USER:
+            img_cross = find_keyman_image("cross20.png")
+            self.uninstallbutton = Gtk.Button()
+            self.uninstallimage = Gtk.Image.new_from_file(img_cross)
+            self.uninstallbutton.set_image(self.uninstallimage)
+            self.uninstallbutton.set_tooltip_text("Uninstall " + kmp["name"] + " (" + kmp["id"] + ")")
+            self.uninstallbutton.connect("clicked", self.on_uninstall_clicked)
+            self.pack_end(self.uninstallbutton, False, False, 0)
 
-        welcome_file = os.path.join("/usr/local/share/doc/keyman", self.kmp["id"], "welcome.htm")
+        welcome_file = os.path.join(self.kbdoc, "welcome.htm")
         if os.path.isfile(welcome_file):
             img_help = find_keyman_image("help20.png")
             self.helpbutton = Gtk.Button()
@@ -62,7 +75,7 @@ class KeyboardBox(Gtk.Box):
 
     def on_help_clicked(self, button):
         logging.info("Open welcome.htm for" + self.kmp["name"] + "if available")
-        welcome_file = os.path.join("/usr/local/share/doc/keyman", self.kmp["id"], "welcome.htm")
+        welcome_file = os.path.join(self.kbdoc, "welcome.htm")
         if os.path.isfile(welcome_file):
             uri_path = pathlib.Path(welcome_file).as_uri()
             logging.info("opening" + uri_path)
@@ -97,13 +110,20 @@ class KeyboardBox(Gtk.Box):
 class KmpGrid(Gtk.Grid):
     def __init__(self, window):
         Gtk.Grid.__init__(self)
-        installed_kmp = get_installed_kmp()
         self.set_column_homogeneous(True)
 
         prevbox = None
         shade = False
+        user_kmp = get_installed_kmp(InstallArea.IA_USER)
+        (prevbox, shade) = self.addboxes(user_kmp, window, prevbox, shade, InstallArea.IA_USER)
+        shared_kmp = get_installed_kmp(InstallArea.IA_SHARED)
+        (prevbox, shade) = self.addboxes(shared_kmp, window, prevbox, shade, InstallArea.IA_SHARED)
+        os_kmp = get_installed_kmp(InstallArea.IA_OS)
+        (prevbox, shade) = self.addboxes(os_kmp, window, prevbox, shade, InstallArea.IA_OS)
+
+    def addboxes(self, installed_kmp, window, prevbox, shade, area):
         for kmp in sorted(installed_kmp):
-            kbbox = KeyboardBox(installed_kmp[kmp], window)
+            kbbox = KeyboardBox(installed_kmp[kmp], window, area)
             if shade:
                 kbbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.8,.8,.8,.5))
                 shade = False
@@ -115,6 +135,7 @@ class KmpGrid(Gtk.Grid):
             else:
                 self.attach_next_to(kbbox, prevbox, Gtk.PositionType.BOTTOM, 1, 1)
                 prevbox = kbbox
+        return (prevbox, shade)
 
 class ViewInstalledWindow(Gtk.Window):
     def __init__(self):

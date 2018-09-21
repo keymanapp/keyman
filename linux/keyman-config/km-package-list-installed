@@ -24,20 +24,17 @@ def main():
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
     all = not args.user and not args.shared and not args.os
-
+    from keyman_config.list_installed_kmp import get_installed_kmp, InstallArea
     if args.user or all:
-        from keyman_config.list_installed_kmp import get_installed_kmp_user
-        installed_kmp = get_installed_kmp_user()
+        installed_kmp = get_installed_kmp(InstallArea.IA_USER)
         print("--- Installed user keyboards ---")
         print_keyboards(installed_kmp, args.long)
     if args.shared or all:
-        from keyman_config.list_installed_kmp import get_installed_kmp_shared
-        installed_kmp = get_installed_kmp_shared()
+        installed_kmp = get_installed_kmp(InstallArea.IA_SHARED)
         print("--- Installed shared keyboards ---")
         print_keyboards(installed_kmp, args.long)
     if args.os or all:
-        from keyman_config.list_installed_kmp import get_installed_kmp_os
-        installed_kmp = get_installed_kmp_os()
+        installed_kmp = get_installed_kmp(InstallArea.IA_OS)
         print("--- Installed OS keyboards ---")
         print_keyboards(installed_kmp, args.long)
 
