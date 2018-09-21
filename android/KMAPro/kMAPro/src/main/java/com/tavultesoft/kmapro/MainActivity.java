@@ -39,9 +39,9 @@ import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.ActionBar;
-import android.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -65,6 +65,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -75,7 +76,7 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
   ActivityCompat.OnRequestPermissionsResultCallback {
 
   // Fields used for installing kmp packages
@@ -93,7 +94,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
+  private Toolbar toolbar;
   private Menu menu;
+
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
 
@@ -133,10 +136,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     resultReceiver = new DownloadResultReceiver(new Handler());
-    final ActionBar actionBar = getActionBar();
-    actionBar.setLogo(R.drawable.keyman_logo);
-    actionBar.setDisplayShowTitleEnabled(false);
-    actionBar.setBackgroundDrawable(getActionBarDrawable(this));
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -146,15 +145,22 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     setContentView(R.layout.activity_main);
+
+    toolbar = (Toolbar) findViewById(R.id.titlebar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setTitle(null);
+    getSupportActionBar().setDisplayUseLogoEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setLogo(R.drawable.keyman_logo);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+    getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
+
     textView = (KMTextView) findViewById(R.id.kmTextView);
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     textView.setText(prefs.getString(userTextKey, ""));
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
-
-
-
 
     boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
     if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
@@ -343,7 +349,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    getActionBar().setBackgroundDrawable(getActionBarDrawable(this));
+    getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
   }

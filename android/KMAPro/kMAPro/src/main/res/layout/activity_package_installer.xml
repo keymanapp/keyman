@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".PackageActivity" >
 
+    <include layout="@layout/titlebar" />
     <WebView
         android:id="@+id/packageWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/titlebar"
         android:layout_above="@+id/buttonBar"/>
 
     <LinearLayout
@@ -27,30 +30,32 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/installButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
-            android:text="@string/label_install"
-            android:background="@color/android:white"
-            android:textColor="@color/keyman_blue"
-            android:layout_marginStart="10dp" android:layout_marginEnd="15dp" >
-            <requestFocus/>
-        </Button>
-
-        <Button
             android:id="@+id/cancelButton"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="15dp"
             android:text="@string/label_cancel"
-            android:background="@color/android:white"
             android:textColor="@color/keyman_blue"
+            android:elevation="1dp"
+            android:singleLine="true"
             android:layout_marginStart="10dp" android:layout_marginEnd="15dp" />
+
+        <Button
+            android:id="@+id/installButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:text="@string/label_install"
+            android:textColor="@color/keyman_blue"
+            android:layout_marginStart="10dp" android:layout_marginEnd="15dp" >
+            <requestFocus/>
+        </Button>
+
+
 
     </LinearLayout>
 
