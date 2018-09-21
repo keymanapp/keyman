@@ -25,12 +25,12 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-public class GetStartedActivity extends Activity {
+public class GetStartedActivity extends AppCompatActivity {
 
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> list = null;
@@ -42,17 +42,10 @@ public class GetStartedActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
-    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-    try {
-      int titleContainerId = (Integer) Class.forName("com.android.internal.R$id").getField("title_container").get(null);
-      ((ViewGroup) getWindow().findViewById(titleContainerId)).removeAllViews();
-    } catch (Exception e) {
-      Log.e("GetStartedActivity", e.getMessage());
-    }
-
-    getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.get_started_title_layout);
     setContentView(R.layout.get_started_list_layout);
+
     listView = (ListView) findViewById(R.id.listView);
 
     final ImageButton closeButton = (ImageButton) findViewById(R.id.close_button);
@@ -80,27 +73,28 @@ public class GetStartedActivity extends Activity {
 
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, "Add a keyboard for your language");
+    hashMap.put(textKey, context.getResources().getString(R.string.add_a_keyboard));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, "Enable Keyman as system-wide keyboard");
+    hashMap.put(textKey, context.getResources().getString(R.string.enable_system_keyboard));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, "Set Keyman as default keyboard");
+    hashMap.put(textKey, context.getResources().getString(R.string.set_keyman_as_default));
     hashMap.put(isEnabledKey, "false");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
-    hashMap.put(iconKey, String.valueOf(R.drawable.ic_light_action_info));
-    hashMap.put(textKey, "More info");
+    hashMap.put(iconKey, "0");
+    hashMap.put(textKey, context.getResources().getString(R.string.more_info));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
+
 
     String[] from = new String[]{iconKey, textKey};
     int[] to = new int[]{R.id.left_icon, R.id.text};
@@ -140,29 +134,35 @@ public class GetStartedActivity extends Activity {
   public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
-      String checkbox_off = String.valueOf(android.R.drawable.checkbox_off_background);
+      // Enumerated steps are replaced with checkboxes when the user completes a step
+      String one = String.valueOf(R.drawable.ic_looks_one);
+      String two = String.valueOf(R.drawable.ic_looks_two);
+      String three = String.valueOf(R.drawable.ic_looks_three);
       String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
+      String info = String.valueOf(R.drawable.ic_info_outline);
 
       ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() > 1) {
         list.get(0).put(iconKey, checkbox_on);
       } else {
-        list.get(0).put(iconKey, checkbox_off);
+        list.get(0).put(iconKey, one);
       }
 
       if (isEnabledAsSystemKB(this)) {
         list.get(1).put(iconKey, checkbox_on);
         list.get(2).put(isEnabledKey, "true");
       } else {
-        list.get(1).put(iconKey, checkbox_off);
+        list.get(1).put(iconKey, two);
         list.get(2).put(isEnabledKey, "false");
       }
 
       if (isDefaultKB(this)) {
         list.get(2).put(iconKey, checkbox_on);
       } else {
-        list.get(2).put(iconKey, checkbox_off);
+        list.get(2).put(iconKey, three);
       }
+
+      list.get(3).put(iconKey, info);
 
       String[] from = new String[]{iconKey, textKey};
       int[] to = new int[]{R.id.left_icon, R.id.text};

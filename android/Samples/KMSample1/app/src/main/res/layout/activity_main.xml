@@ -16,5 +16,4 @@
 
         <requestFocus />
     </com.tavultesoft.kmea.KMTextView>
-
 </RelativeLayout>

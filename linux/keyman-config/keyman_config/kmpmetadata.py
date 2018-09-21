@@ -6,6 +6,19 @@ import logging
 import sys
 import os.path
 import magic
+from enum import Enum, auto
+
+class KMFileTypes(Enum):
+	KM_ICON = auto()
+	KM_SOURCE = auto()
+	KM_KMX = auto()
+	KM_KVK = auto()
+	KM_FONT = auto()
+	KM_DOC = auto()
+	KM_META = auto()
+	KM_IMAGE = auto()
+	KM_UNKNOWN = auto()
+
 
 def print_info(info):
 	try:
@@ -13,26 +26,44 @@ def print_info(info):
 		print("Name: ", info['name']['description'])
 		print("Copyright: ", info['copyright']['description'])
 		print("Version: ", info['version']['description'])
-		print("Author: ", info['author']['description'])
-		print("Author URL: ", info['author']['url'])
-		print("Website: ", info['website']['description'])
-	except Exception:
+		if 'author' in info:
+			print("Author: ", info['author']['description'])
+			if 'url' in info['author']:
+				print("Author URL: ", info['author']['url'])
+		if 'website' in info:
+			print("Website description: ", info['website']['description'])
+			if 'url' in info['website']:
+				print("Website URL: ", info['website']['url'])
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def print_system(system):
 	try:
 		print("---- System ----")
-		print("File Version: ", system['fileVersion'])
-		print("Keyman Developer Version: ", system['keymanDeveloperVersion'])
-	except Exception:
+		if 'fileVersion' in system:
+			print("File Version: ", system['fileVersion'])
+		if 'keymanDeveloperVersion' in system:
+			print("Keyman Developer Version: ", system['keymanDeveloperVersion'])
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def print_options(options):
 	try:
 		print("---- Options ----")
-		print("Readme File: ", options['readmeFile'])
-		print("Graphic File: ", options['graphicFile'])
-	except Exception:
+		if 'readmeFile' in options:
+			print("Readme File: ", options['readmeFile'])
+		if 'graphicFile' in options:
+			print("Graphic File: ", options['graphicFile'])
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def print_keyboards(keyboards):
@@ -49,7 +80,10 @@ def print_keyboards(keyboards):
 			print("Languages")
 			for lang in kb['languages']:
 				print("  Name: ", lang['name'], "Id: ", lang['id'])
-	except Exception:
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def determine_filetype(filename):
@@ -60,35 +94,36 @@ def determine_filetype(filename):
 		filename (str): File name
 
 	Returns:
-		str: Description of file type
-			Keyboard icon
-			Keyboard source
-			Compiled keyboard
-			Compiled on screen keyboard
-			Font
-			Documentation
-			Metadata
-			Image
+		KMFileTypes: Enum of file type
+			KM_ICON: Keyboard icon
+			KM_SOURCE: Keyboard source
+			KM_KMX: Compiled keyboard
+			KM_KVK: Compiled on screen keyboard
+			KM_FONT: Font
+			KM_DOC: Documentation
+			KM_META: Metadata
+			KM_IMAGE: Image
+			KM_UNKNOWN: Unknown
 	"""
 	name, ext = os.path.splitext(filename)
 	if ext.lower() == ".ico":
-		return "Keyboard icon"
+		return KMFileTypes.KM_ICON
 	elif ext.lower() == ".kmn":
-		return "Keyboard source"
+		return KMFileTypes.KM_SOURCE
 	elif ext.lower() == ".kmx":
-		return "Compiled keyboard"
+		return KMFileTypes.KM_KMX
 	elif ext.lower() == ".kvk":
-		return "Compiled on screen keyboard"
+		return KMFileTypes.KM_KVK
 	elif ext.lower() == ".ttf" or ext.lower() == ".otf":
-		return "Font"
+		return KMFileTypes.KM_FONT
 	elif ext.lower() == ".txt" or ext.lower() == ".pdf" or ext.lower() == ".htm" or ext.lower() == ".html":
-		return "Documentation"
+		return KMFileTypes.KM_DOC
 	elif ext.lower() == ".inf" or ext.lower() == ".json":
-		return "Metadata"
+		return KMFileTypes.KM_META
 	elif ext.lower() == ".png" or ext.lower() == ".jpeg" or ext.lower() == ".jpg" or ext.lower() == ".gif":
-		return "Image"
+		return KMFileTypes.KM_IMAGE
 	else:
-		return "Unknown type"
+		return KMFileTypes.KM_UNKNOWN
 
 def print_files(files, extracted_dir):
 	try:
@@ -96,7 +131,7 @@ def print_files(files, extracted_dir):
 		for kbfile in files:
 			print("* File name: ", kbfile['name'])
 			print("    Description: ", kbfile['description'])
-			print("    Type: ", determine_filetype(kbfile['name']))
+			print("    Type: ", kbfile['type'])
 			file = os.path.join(extracted_dir, kbfile['name'])
 			if os.path.isfile(file):
 				print("    File", file, "exists")
@@ -107,14 +142,16 @@ def print_files(files, extracted_dir):
 				ms.close()
 			else:
 				print("    File", file, "does not exist")
-
-	except Exception:
+	except Exception as e:
+		print(type(e))    # the exception instance
+		print(e.args)     # arguments stored in .args
+		print(e)          # __str__ allows args to be printed directly,		pass
 		pass
 
 def get_fonts(files):
 	fonts = []
 	for kbfile in files:
-		if determine_filetype(kbfile['name']) == "Font":
+		if kbfile['type'] == KMFileTypes.KM_FONT:
 			fonts.append(kbfile)
 	return fonts
 
@@ -155,6 +192,7 @@ def parseinfdata(inffile, verbose=False):
 			files (list): Files in the kmp
 				name (str): File name
 				description (str): File description
+				type (KMFileTypes): Keyman file type
 	"""
 	info = system = keyboards = files = options = nonexistent = None
 	extracted_dir = os.path.dirname(inffile)
@@ -182,7 +220,7 @@ def parseinfdata(inffile, verbose=False):
 					elif item[0] == 'Author':
 						info['author'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
 					elif item[0] == "WebSite":
-						info['website'] = { 'description' : item[1].split("\"")[1] }
+						info['website'] = { 'description' : item[1].split("\"")[1], 'url' : item[1].split("\"")[3] }
 					else:
 						logging.warning("Unknown item in Info: %s", item[0])
 			if section == 'PackageInfo':
@@ -242,8 +280,11 @@ def parseinfdata(inffile, verbose=False):
 						keyboard['oskFont'] = item[1]
 					elif item[0] == 'DisplayFont':
 						keyboard['displayFont'] = item[1]
+					elif item[0] == 'RTL':
+						keyboard['RTL'] = item[1]
 					elif "Language" in item[0]:
-						langname, langid = item[1].split(",")
+						# only split on first ','
+						langid, langname = item[1].split(",", 1)
 						languages.append({ 'name' : langname, 'id' : langid })
 					else:
 						logging.warning("Unknown item in keyboard: %s", item[0])
@@ -253,12 +294,12 @@ def parseinfdata(inffile, verbose=False):
 				files = []
 				for item in config.items(section):
 					splititem = item[1].split("\"")
-					kbfile = { 'name' : splititem[3], 'description' : splititem[1] }
+					kbfile = { 'name' : splititem[3], 'description' : splititem[1], 'type' : determine_filetype(splititem[3]) }
 					files.append(kbfile)
 			elif section == "InstallFiles":
 				files = []
 				for item in config.items(section):
-					kbfile = { 'name' : item[0], 'description' : item[1] }
+					kbfile = { 'name' : item[0], 'description' : item[1], 'type' : determine_filetype(item[0]) }
 					files.append(kbfile)
 			elif section == 'Install':
 				if not options:
@@ -329,6 +370,8 @@ def parsemetadata(jsonfile, verbose=False):
 					keyboards = data[x]
 				elif x == 'files':
 					files = data[x]
+					for kbfile in files:
+						kbfile['type'] = determine_filetype(kbfile['name'])
 				elif x == 'options':
 					options = data[x]
 				elif x == 'nonexistent':

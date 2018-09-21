@@ -8,7 +8,7 @@
     <string name="app_name" translatable="false">KMEA</string>
     
     <!-- Title for settings  -->
-	<string name="action_settings" translatable="false">Settings</string>
+    <string name="action_settings" translatable="false">Settings</string>
        
     <!-- Title for lists-->
     <string name="title_keyboards" translatable="false">Keyboards</string>

@@ -4,7 +4,7 @@
         style="@style/subkey_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-    	android:minHeight="1dp"
-    	android:minWidth="1dp" >  
+        android:minHeight="1dp"
+        android:minWidth="1dp" >
 
 </Button>

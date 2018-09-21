@@ -32,13 +32,14 @@
 
     <ImageButton
         android:id="@+id/imageButton1"
+        style="?android:attr/actionButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp"
-        android:background="@drawable/oval_button"
         android:contentDescription="@string/image_button"
-        android:src="@android:drawable/ic_dialog_info" />
+        android:tint="@android:color/darker_gray"
+        android:src="@drawable/ic_light_action_info" />
 
 </RelativeLayout>
