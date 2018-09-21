@@ -54,6 +54,9 @@ done
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
 	cd keyman-config
+	if [ ! -f keyman_config/version.py ]; then
+		echo "The version of keyman-config has not been configured before building. First run 'make reconf'"
+	fi
 	make clean
 	make
 	cd $BASEDIR

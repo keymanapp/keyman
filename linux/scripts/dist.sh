@@ -9,6 +9,8 @@
 
 set -e
 
+version
+
 BASEDIR=`pwd`
 autotool_projects="kmflcomp libkmfl ibus-kmfl"
 extra_project="keyman-config"
@@ -60,25 +62,9 @@ done
 
 # dist for keyman-config
 if [ "${extra_project}" == "keyman-config" ]; then
-    cd kmflcomp
-    baseversion=`cat VERSION`
-    echo "baseversion: ${baseversion}"
-    if [ -e configure ]; then
-        distversion=`./configure --version|grep kmfl|grep -Po 'kmflcomp configure \K[^a-z]*'`
-    else
-        distversion=`cat VERSION`.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
-    fi
-    echo "distversion: ${distversion}"
-
-    cd ../keyman-config
+    cd keyman-config
     rm -rf dist
-    if [ "${distversion}" == "${baseversion}" ]; then
-        python3 setup.py sdist
-    else
-        datever=${distversion##*.}
-        echo "datever: ${datever}"
-        python3 setup.py egg_info -b.${datever} sdist
-    fi
+    python3 setup.py sdist
     make man
     cp dist/*.tar.gz ../dist
 fi

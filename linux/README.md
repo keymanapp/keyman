@@ -33,7 +33,7 @@ This is only for testing the build, not for running ibus-kmfl in ibus
 - The process to build and install everything is:
 
     * `make devreconf` (or `make reconf`) to create the build system and set the version
-    * `make configure
+    * `make configure`
     * `make` to build
     * `sudo make install` to install to /usr/local
 

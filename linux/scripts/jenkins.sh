@@ -10,7 +10,7 @@ rm -rf $1/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 rm -rf ${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $1"
-./scripts/reconf.sh dev $1
+JENKINS="yes" ./scripts/reconf.sh $1
 ./scripts/dist.sh origdist $1
 ./scripts/deb.sh sourcepackage $1
 
