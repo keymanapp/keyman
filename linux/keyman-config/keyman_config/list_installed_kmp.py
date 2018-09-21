@@ -115,6 +115,7 @@ def get_installed_kmp(check_paths):
 def get_kmp_version(keyboardid):
     """
     Get version of the kmp for a keyboard ID.
+    This return the highest version if installed in more than one area
 
     Args:
         keyboardid (dict): Keyboard ID
@@ -122,8 +123,45 @@ def get_kmp_version(keyboardid):
         str: kmp version if keyboard ID is installed
         None: if not found
     """
-    installed_kmp = get_installed_kmp()
-    if keyboardid in installed_kmp:
-        return installed_kmp[keyboardid]['version']
+    version = None
+    user_kmp = get_installed_kmp_user()
+    shared_kmp = get_installed_kmp_shared()
+    os_kmp = get_installed_kmp_os()
+
+    if keyboardid in os_kmp:
+        version = os_kmp[keyboardid]['version']
+
+    if keyboardid in shared_kmp:
+        shared_version = shared_kmp[keyboardid]['version']
+        if version:
+            if version < shared_version:
+                version = shared_version
+        else:
+            version = shared_version
+
+    if keyboardid in user_kmp:
+        user_version = user_kmp[keyboardid]['version']
+        if version:
+            if version < user_version:
+                version = user_version
+        else:
+            version = shared_version
+
+    return version
+
+def get_kmp_version_user(keyboardid):
+    """
+    Get version of the kmp for a keyboard ID.
+    This only checks the user area.
+
+    Args:
+        keyboardid (dict): Keyboard ID
+    Returns:
+        str: kmp version if keyboard ID is installed
+        None: if not found
+    """
+    user_kmp = get_installed_kmp_user()
+    if keyboardid in user_kmp:
+        return user_kmp[keyboardid]['version']
     else:
         return None
