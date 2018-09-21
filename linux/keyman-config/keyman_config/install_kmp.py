@@ -81,7 +81,7 @@ def get_infdata(tmpdirname):
 		if files and not keyboards:
 			id = "unknown"
 			for kbfile in files:
-				if kbfile['type'] == KMFileTypes.KM_KVK:
+				if kbfile['type'] == KMFileTypes.KM_KMX:
 					id = os.path.basename(os.path.splitext(kbfile['name'])[0])
 			#inf file may not have keyboards so generate it if needed
 			keyboards = [ { 'name' : info['name']['description'],

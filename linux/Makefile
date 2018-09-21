@@ -6,16 +6,13 @@ default: # builds only
 reconf:
 	./scripts/reconf.sh
 
-devreconf:
-	./scripts/reconf.sh dev
-
 configure:
 	CONFIGUREONLY="yes" ./scripts/build.sh
 
 fullbuild: # configure and build
 	./scripts/build.sh
 
-tmpinstall: devreconf
+tmpinstall: reconf
 	INSTALLDIR="/tmp/kmfl" ./scripts/build.sh
 	INSTALLDIR="/tmp/kmfl" ./scripts/install.sh
 
@@ -37,17 +34,14 @@ origdist:
 sourcepackage: reconf origdist
 	./scripts/deb.sh sourcepackage
 
-devsourcepackage: devreconf origdist
-	./scripts/deb.sh sourcepackage
-
 cow: # it will prompt for sudo if required for cowbuilder
 	./scripts/cow.sh
 
-deb: devreconf origdist cow debnocow # it will prompt for sudo if required for cowbuilder
+deb: reconf origdist cow debnocow # it will prompt for sudo if required for cowbuilder
 	echo "Built dev Debian packages in builddebs/"
 
 releasedeb: reconf origdist cow debnocow # it will prompt for sudo if required for cowbuilder
 	echo "Built release Debian packages in builddebs/"
 
-nightlydist: devreconf sources
+nightlydist: reconf sources
 	echo "Built nightly source release in dist/"

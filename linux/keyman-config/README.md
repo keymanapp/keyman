@@ -13,7 +13,7 @@ You will also need kmflcomp either from a package or built and installed locally
 run the script `./createkeymandirs.sh` to create the directories for these programs to
 install the packages to
 
-### Installing manually
+### Installing manually from the repo
 
 `make && sudo make install` will install locally to /usr/local
 `python3 setup.py --help install` will give you more install options

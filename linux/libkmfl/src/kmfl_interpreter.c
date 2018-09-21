@@ -80,7 +80,6 @@ int kmfl_interpret(KMSI *p_kmsi, UINT key, UINT state)
 	XKEYBOARD *p_kbd;
 	XGROUP *p_group1;
 	ITEM keysym;
-	int matched;
 
 	p_kmsi->noutput_queue=0;
 	
@@ -250,7 +249,7 @@ int match_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 {
 	
 	UINT k, m, n, nmax, rulelen, nhistory, index;
-	ITEM *pr, *ph, *ps, mask;
+	ITEM *pr, *ph, *ps;
 
 	rulelen = rp->ilen;
 	pr = p_kmsi->strings+rp->lhs;
@@ -351,7 +350,7 @@ int process_rule(KMSI *p_kmsi, XRULE *rp, ITEM *any_index, int usekeys)
 	XGROUP *gp;
 	UINT i, k, m, n, nout, itp, index;
 	ITEM *p, *pr, *ps, output[MAX_OUTPUT+1], history[MAX_HISTORY], *it;
-	int erase, result, retCode=1, nhistory;
+	int erase, retCode=1, nhistory;
 
 	DBGMSG(1, "DAR - libkmfl - process_rule\n");
 	pr = p_kmsi->strings+rp->rhs;	// Pointer to start of output rule
@@ -739,7 +738,7 @@ int kmfl_get_header(KMSI *p_kmsi,int hdrID,char *buf,int buflen)
 
 	if(!p_kmsi) return -1;
 
-	if(hdrID < 0 || hdrID > SS_AUTHOR) return -2;
+	if(hdrID < 0 || hdrID > SS_KEYBOARDVERSION) return -2;
 
 	p32 = (UTF32 *)store_content(p_kmsi,hdrID);
 	p8 = (UTF8 *)buf;

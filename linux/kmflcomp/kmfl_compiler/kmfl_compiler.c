@@ -4,7 +4,9 @@
  * This file is part of KMFL compiler.
  *
  */
-const char * VERSION= "10.99.1";
+#include "config.h"
+
+const char * KMFL_VERSION= VERSION;
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -45,7 +47,7 @@ const char * usagemsg=
 
 void usage(void)
 {
-	fprintf(stderr, "kmflcomp version %s\n", VERSION);
+	fprintf(stderr, "kmflcomp version %s\n", KMFL_VERSION);
 	fprintf(stderr, "%s", usagemsg);
 	exit(1);
 }
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
 			opt_verbose = 1;
 			break;
 		case 'v':
-			fprintf(stderr, "kmflcomp version %s\n", VERSION);
+			fprintf(stderr, "kmflcomp version %s\n", KMFL_VERSION);
 			exit(0);
 		case 'y':
 			yydebug = 1;
