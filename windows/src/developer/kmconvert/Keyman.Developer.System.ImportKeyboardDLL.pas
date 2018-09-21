@@ -17,7 +17,7 @@ type
     FKMN: string;
     FKVKS: string;
   public
-    constructor Create(const inputHKL: string);
+    constructor Create(const inputHKL, nameFormatString: string);
     procedure Execute;
     property InputHKL: string read FInputHKL;
     property KMN: string read FKMN;
@@ -37,7 +37,10 @@ uses
   System.Win.Registry,
 
   ScanCodeMap,
+  Unicode,
+  VisualKeyboard,
   VKeys;
+
 
 type
   TKBDShiftState = (
@@ -51,6 +54,20 @@ type
     ShftMenuCtrl = 7, //Shft or Menu or Ctrl, // 7
     Xxxx = 8,  // 8
     ShftXxxx = 9 //Shft or Xxxx // 9
+  );
+
+const
+  KBDShiftStateToVisualKeyboardShiftState: array[TKBDShiftState] of WORD = (
+    KVKS_NORMAL,                //Base = 0,
+    KVKS_SHIFT,                 //Shft = 1,
+    KVKS_CTRL,                  //Ctrl = 2,
+    KVKS_SHIFT or KVKS_CTRL,    //ShftCtrl = 3,
+    KVKS_ALT,                   //Menu = 4,
+    KVKS_SHIFT or KVKS_ALT,     //ShftMenu = 5,
+    KVKS_RALT,                  //MenuCtrl = 6,
+    KVKS_SHIFT or KVKS_RALT,    //ShftMenuCtrl = 7,
+    $FFFF,                      //Xxxx = 8,
+    $FFFF                       //ShftXxxx = 9
   );
 
 { TDeadKey }
@@ -97,6 +114,7 @@ type
     procedure SetShiftState(shiftState: TKBDShiftState; value: string; isDeadKey, capsLock: Boolean);
     function GetShiftStateName(capsLock: UINT; caps: Boolean; ss: TKBDShiftState): string;
     function LayoutRow: string;
+    procedure AddKeysToVisualKeyboard(vk: TVisualKeyboard);
 
     property VK: UINT read FVK;
     property SC: UINT read FSC;
@@ -131,6 +149,7 @@ type
     procedure ClearKeyboardBuffer(vk: UINT; sc: UINT; hkl: HKL);
     procedure ScanKeyboard(hkl: HKL);
     function WriteOutputKMNFile: string;
+    function WriteOutputKVKSFile: string;
   public
     constructor Create(inputHKL, layoutFile, layoutText: string);
     destructor Destroy; override;
@@ -390,20 +409,29 @@ begin
           end;
         end;
 
+        // We don't add Shift+Space, Ctrl+Space as they are not
+        // useful
+        if (st = #$20) and (FVK = VK_SPACE) and (ss <> Base) then
+          isvalid := False;
+
         if isvalid then
         begin
           // It's some characters; put 'em in there.
-          Result := Result + Format('+ [%s%s] > ', [
-            GetShiftStateName(capslock, caps, ss),
-            GetVKeyName
-          ]);
+          Result := Result + Format('+ [%s%s] >', [GetShiftStateName(capslock, caps, ss), GetVKeyName]);
 
-          for ich := 1 to st.Length do
+          ich := 1;
+          while ich <= st.Length do
           begin
-            //TODO: Support surrogate pairs
-            Result := Result + 'U+' + IntToHexLC(Ord(st[ich]), 4);
-            if ich < st.Length then
-              Result := Result + ' ';
+            if (ich < st.Length) and Uni_IsSurrogate1(st[ich]) and Uni_IsSurrogate2(st[ich+1]) then
+            begin
+              Result := Result + ' U+' + IntToHexLC(Uni_SurrogateToUTF32(st[ich], st[ich+1]), 6);
+              Inc(ich, 2);
+            end
+            else
+            begin
+              Result := Result + ' U+' + IntToHexLC(Ord(st[ich]), 4);
+              Inc(ich);
+            end;
           end;
 
           Result := Result + #13#10;
@@ -412,6 +440,64 @@ begin
     end;
   end;
 end;
+
+procedure TVirtualKey.AddKeysToVisualKeyboard(vk: TVisualKeyboard);
+var
+  ss: TKBDShiftState;
+  st: string;
+  ich: Integer;
+  isvalid: Boolean;
+  vkk: TVisualKeyboardKey;
+begin
+  for ss := Low(TKBDShiftState) to Loader.MaxShiftState do
+  begin
+    if (ss = Menu) or (ss = ShftMenu) then
+    begin
+      // Alt and Shift+Alt don't work, so skip them
+      Continue;
+    end;
+
+    st := GetShiftState(ss, False);
+    if st.Length = 0 then
+    begin
+      // No character assigned here
+    end
+    else if FRGFDeadKey[ss, False] then
+    begin
+      // It's a dead key
+      vkk := TVisualKeyboardKey.Create;
+      vkk.VKey := FVK;
+      vkk.Text := st[1];
+      vkk.Flags := [kvkkUnicode];
+      vkk.Shift := KBDShiftStateToVisualKeyboardShiftState[ss];
+      vk.Keys.Add(vkk);
+    end
+    else
+    begin
+      isvalid := True;
+      for ich := 1 to st.Length do
+      begin
+        if (st[ich] < #$20) or (st[ich] = #$7F) then
+        begin
+          isvalid := False;
+          Break;
+        end;
+      end;
+
+      if isvalid then
+      begin
+        // It's some characters; put 'em in there.
+        vkk := TVisualKeyboardKey.Create;
+        vkk.VKey := FVK;
+        vkk.Text := st;
+        vkk.Flags := [kvkkUnicode];
+        vkk.Shift := KBDShiftStateToVisualKeyboardShiftState[ss];
+        vk.Keys.Add(vkk);
+      end;
+    end;
+  end;
+end;
+
 
 (*  public class Loader
   {
@@ -741,6 +827,8 @@ begin
 end;
 
 procedure TLoader.Main(var KMN, KVKS: string);
+type
+  PHKL = ^HKL;
 var
   cKeyboards: Cardinal;
   rghkl: array of HKL;
@@ -751,6 +839,8 @@ begin
 
   cKeyboards := GetKeyboardLayoutList(0, rghkl);
   SetLength(rghkl, cKeyboards);
+  GetKeyboardLayoutList(cKeyboards, rghkl);
+
   hkl := LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
   if hkl = 0 then
     raise EImportKeyboardDLL.CreateFmt('The keyboard %s could not be loaded (error %d, %s)',
@@ -768,7 +858,7 @@ begin
   end;
 
   KMN := WriteOutputKMNFile;
-  //WriteOutputKVKSFile(KVKS);
+  KVKS := WriteOutputKVKSFile;
 end;
 
 function TLoader.WriteOutputKMNFile: string;
@@ -793,7 +883,6 @@ begin
     outFile.Add('c '#13#10);
     outFile.Add('store(&Version) "10.0"');
     outFile.Add(Format('store(&Name) "%s"', [layoutText]));
-    outFile.Add('store(&Copyright) "(C) 2018 SIL International"');
     outFile.Add('store(&Targets) "windows macosx linux web"');
     outFile.Add('');
     outFile.Add('begin Unicode > use(main)'#13#10);
@@ -819,6 +908,7 @@ begin
       sbDKTo := Format('store(dkt%s)', [IntToHexLC(Ord(dk.DeadCharacter), 4)]);
       for id := 0 to dk.Count - 1 do
       begin
+        // Surrogate pairs not supported in kbd.dll
         sbDKFrom := sbDKFrom + ' U+'+IntToHexLC(Ord(dk.GetBaseCharacter(id)), 4);
         sbDKTo := sbDKTo + ' U+'+IntToHexLC(Ord(dk.GetCombinedCharacter(id)), 4);
       end;
@@ -837,12 +927,38 @@ begin
   end;
 end;
 
+function TLoader.WriteOutputKVKSFile: string;
+var
+  iKey: UINT;
+  vk: TVisualKeyboard;
+  ss: TStringStream;
+begin
+  vk := TVisualKeyboard.Create;
+  ss := TStringStream.Create('', TEncoding.UTF8);
+  try
+    for iKey := 0 to Length(rgKey) - 1 do
+    begin
+      if (rgKey[iKey] <> nil) and rgKey[iKey].IsKeymanUsedKey and not rgKey[iKey].IsEmpty then
+      begin
+        rgKey[iKey].AddKeysToVisualKeyboard(vk);
+      end;
+    end;
+
+    vk.SaveToStream(ss, kvksfXML);
+
+    Result := ss.DataString;
+  finally
+    vk.Free;
+    ss.Free;
+  end;
+end;
+
 { TImportKeyboardDLL }
 
 const
   CRootKey = 'System\CurrentControlSet\Control\Keyboard Layouts';
 
-constructor TImportKeyboardDLL.Create(const inputHKL: string);
+constructor TImportKeyboardDLL.Create(const inputHKL, nameFormatString: string);
 var
   r: TRegistry;
 begin
@@ -861,6 +977,8 @@ begin
 
     FLayoutFile := r.ReadString('Layout File');
     FLayoutText := r.ReadString('Layout Text');
+    if nameFormatString <> ''
+      then FLayoutText := Format(nameFormatString, [FLayoutText]);
   finally
     r.Free;
   end;

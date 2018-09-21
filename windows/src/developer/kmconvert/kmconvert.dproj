@@ -180,6 +180,8 @@
         <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
+        <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ScanCodeMap.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

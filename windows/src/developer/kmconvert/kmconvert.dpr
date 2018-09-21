@@ -88,7 +88,9 @@ uses
   CompilePackageInstaller in '..\..\global\delphi\general\CompilePackageInstaller.pas',
   kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
-  Keyman.Developer.System.KMConvertParameters in 'Keyman.Developer.System.KMConvertParameters.pas';
+  Keyman.Developer.System.KMConvertParameters in 'Keyman.Developer.System.KMConvertParameters.pas',
+  Keyman.Developer.System.ImportKeyboardDLL in 'Keyman.Developer.System.ImportKeyboardDLL.pas',
+  ScanCodeMap in '..\..\global\delphi\general\ScanCodeMap.pas';
 
 begin
   try
