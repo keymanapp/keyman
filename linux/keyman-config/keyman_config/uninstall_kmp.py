@@ -98,7 +98,7 @@ def uninstall_kmp_user(keyboardid):
 
 
 
-def uninstall_kmp(keyboardid, sharedarea):
+def uninstall_kmp(keyboardid, sharedarea=False):
 	"""
 	Uninstall a kmp
 
