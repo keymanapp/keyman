@@ -108,7 +108,7 @@ def determine_filetype(filename):
 	name, ext = os.path.splitext(filename)
 	if ext.lower() == ".ico":
 		return KMFileTypes.KM_ICON
-	elif ext.lower() == ".kmn":
+	elif ext.lower() == ".kmn" or ext.lower() == ".kvks":
 		return KMFileTypes.KM_SOURCE
 	elif ext.lower() == ".kmx":
 		return KMFileTypes.KM_KMX
@@ -116,11 +116,17 @@ def determine_filetype(filename):
 		return KMFileTypes.KM_KVK
 	elif ext.lower() == ".ttf" or ext.lower() == ".otf":
 		return KMFileTypes.KM_FONT
-	elif ext.lower() == ".txt" or ext.lower() == ".pdf" or ext.lower() == ".htm" or ext.lower() == ".html":
+	elif ext.lower() == ".txt" or ext.lower() == ".pdf" or ext.lower() == ".htm" \
+			or ext.lower() == ".html" or ext.lower() == ".doc" or ext.lower() == ".docx" \
+			or ext.lower() == ".css" or ext.lower() == ".chm" or ext.lower() == "" \
+			or ext.lower() == ".md" or ext.lower() == ".odt" or ext.lower() == ".rtf" \
+			or ext.lower() == ".dot":
 		return KMFileTypes.KM_DOC
 	elif ext.lower() == ".inf" or ext.lower() == ".json":
 		return KMFileTypes.KM_META
-	elif ext.lower() == ".png" or ext.lower() == ".jpeg" or ext.lower() == ".jpg" or ext.lower() == ".gif":
+	elif ext.lower() == ".png" or ext.lower() == ".jpeg" \
+		or ext.lower() == ".jpg" or ext.lower() == ".gif" \
+		or ext.lower() == ".bmp":
 		return KMFileTypes.KM_IMAGE
 	else:
 		return KMFileTypes.KM_UNKNOWN
