@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/keyboard_picker_toolbar" />
+
+    <include layout="@layout/list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/keyboard_picker_appbar"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/right_button"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        app:useCompatPadding="true"
+        android:contentDescription="@string/image_button"
+        android:src="@drawable/ic_add_white"
+        app:fabSize="normal" />
+
+</RelativeLayout>

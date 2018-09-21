@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WebBrowserActivity" >
+    tools:context=".WebBrowserActivity"
+    android:orientation="vertical">
+
+    <include layout="@layout/web_browser_bar_layout" />
 
     <WebView
         android:id="@+id/browserWebView"
@@ -11,6 +14,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_above="@+id/toolbar"
+        android:layout_below="@+id/web_browser_toolbar"
         android:layout_alignParentStart="true" />
 
     <LinearLayout

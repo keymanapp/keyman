@@ -6,10 +6,11 @@
     <dimen name="activity_splash_textsize">20sp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="version_label_width">100dp</dimen>
-    <dimen name="version_label_textsize">4.5sp</dimen>
+    <dimen name="label_width">200dp</dimen>
+    <dimen name="titlebar_label_textsize">6sp</dimen>
     <dimen name="package_label_width">250dp</dimen>
-    <dimen name="package_label_textsize">6sp</dimen>
-    <dimen name="keyman_bar_height">6dp</dimen>
+    <dimen name="keyman_bar_height">8dp</dimen>
+    <dimen name="checkbox_margin">8dp</dimen>
+    <dimen name="checkbox_padding">10dp</dimen>
 
 </resources>
