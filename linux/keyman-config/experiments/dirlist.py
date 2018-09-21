@@ -42,7 +42,7 @@ def get_dir_list():
 def list_keyboards():
     kblist = []
     for file in get_dir_list():
-        print(file)
+        logging.debug(file)
         kb = os.path.basename(os.path.dirname(file))
         if kb != "keyboards":
             kblist.append(kb)
