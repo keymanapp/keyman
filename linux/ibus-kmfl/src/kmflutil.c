@@ -151,15 +151,20 @@ gchar * kmfl_get_ldml_file(KInputMethod * im)
     gchar * full_path_to_ldml_file=NULL, *p, *filename;
     struct stat filestat;
 
-    p=rindex(im->keyboard_visualkeyboard,'.');
     if(g_strcmp0(im->keyboard_visualkeyboard, "") == 0)
     {
         g_debug("WDG: no kvk(s) so no ldml file");
         return g_strdup("");
     }
+    p=rindex(im->keyboard_visualkeyboard,'.');
     if (p==NULL)
     {
         g_debug("WDG: couldn't find . in vk filename %s", im->keyboard_visualkeyboard);
+        return g_strdup("");
+    }
+    if (strncmp(p, ".kvk", 4) != 0) // sometimes kmn have kvks as the "visual keyboard"
+    {
+        g_debug("WDG: visual keyboard is not a kvk. Filename: %s", im->keyboard_visualkeyboard);
         return g_strdup("");
     }
     filename = g_strndup(im->keyboard_visualkeyboard, p-(im->keyboard_visualkeyboard));
