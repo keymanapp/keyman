@@ -78,15 +78,6 @@ def get_infdata(tmpdirname):
 	kmpinf = os.path.join(tmpdirname, "kmp.inf")
 	if os.path.isfile(kmpinf):
 		info, system, options, keyboards, files =  parseinfdata(kmpinf, False)
-		if files and not keyboards:
-			id = "unknown"
-			for kbfile in files:
-				if kbfile['type'] == KMFileTypes.KM_KMX:
-					id = os.path.basename(os.path.splitext(kbfile['name'])[0])
-			#inf file may not have keyboards so generate it if needed
-			keyboards = [ { 'name' : info['name']['description'],
-				'id' : id,
-				'version' : info['version']['description'] } ]
 		return info, system, options, keyboards, files
 	else:
 		return None, None, None, None, None
