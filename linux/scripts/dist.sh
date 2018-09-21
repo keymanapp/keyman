@@ -9,8 +9,6 @@
 
 set -e
 
-version
-
 BASEDIR=`pwd`
 autotool_projects="kmflcomp libkmfl ibus-kmfl"
 extra_project="keyman-config"
