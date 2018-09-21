@@ -1,17 +1,33 @@
 #!/usr/bin/make
 
-VERSION=10.99.1
+VERSION=`cat ../VERSION`
 
-default:
+default: man
 	python3 setup.py build
 
-install:
+install: # run as sudo
 	python3 setup.py install
+	# install icons
+	mkdir -p /usr/local/share/keyman/icons
+	cp keyman_config/icons/* /usr/local/share/keyman
+	# install man pages
+	mkdir -p /usr/local/share/man/man1
+	cp debian/man/*.1 /usr/local/share/man/man1
 
 install-temp:
 	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`
 	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
 
+uninstall: # run as sudo
+	rm -rf /usr/local/share/keyman/icons
+	rm -f /usr/local/share/man/man1/km-*.1
+	pip3 uninstall keyman_config
+	rm -f /usr/local/bin/km-config
+	rm -f /usr/local/bin/km-kvk2ldml
+	rm -f /usr/local/bin/km-package-get
+	rm -f /usr/local/bin/km-package-install
+	rm -f /usr/local/bin/km-package-list-installed
+	rm -f /usr/local/bin/km-package-uninstall
 
 clean:
 	-rm -rf dist make_deb build

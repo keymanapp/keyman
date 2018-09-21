@@ -17,6 +17,7 @@ install the packages to
 
 `make && sudo make install` will install locally to /usr/local
 `python3 setup.py --help install` will give you more install options
+You will need `sudo apt install python3-pip` to `make uninstall`
 
 ## Things to run
 

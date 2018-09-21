@@ -23,6 +23,18 @@ from keyman_config.get_kmp import get_download_folder
 from keyman_config.check_mime_type import check_mime_type
 from keyman_config.accelerators import bind_accelerator, init_accel
 
+def find_keyman_image(image_file):
+    img_path = os.path.join("/usr/share/keyman/icons", image_file)
+    if not os.path.isfile(img_path):
+        img_path = os.path.join("/usr/local/share/keyman/icons/", image_file)
+        if not os.path.isfile(img_path):
+            img_path = os.path.join("keyman_config/icons/", image_file)
+            if not os.path.isfile(img_path):
+                img_path = image_file
+                if not os.path.isfile(img_path):
+                    img_path = os.path.join("icons", image_file)
+    return img_path
+
 class InstallKmpWindow(Gtk.Window):
 
     def __init__(self, kmpfile, online=False, viewkmp=None):
@@ -94,13 +106,7 @@ class InstallKmpWindow(Gtk.Window):
             if options and "graphicFile" in options:
                 image.set_from_file(os.path.join(tmpdirname, options['graphicFile']))
             else:
-                img_default = "/usr/share/keyman/icons/defaultpackage.gif"
-                if not os.path.isfile(img_default):
-                    img_default = "keyman_config/icons/defaultpackage.gif"
-                if not os.path.isfile(img_default):
-                    img_default = "defaultpackage.gif"
-                if not os.path.isfile(img_default):
-                    img_default = "icons/defaultpackage.gif"
+                img_default = find_keyman_image("defaultpackage.gif")
                 image.set_from_file(img_default)
 
             mainhbox.pack_start(image, False, False, 0)
