@@ -12,7 +12,7 @@ configure:
 fullbuild: # configure and build
 	./scripts/build.sh
 
-tmpinstall: devreconf
+tmpinstall: reconf
 	INSTALLDIR="/tmp/kmfl" ./scripts/build.sh
 	INSTALLDIR="/tmp/kmfl" ./scripts/install.sh
 
@@ -43,5 +43,5 @@ deb: reconf origdist cow debnocow # it will prompt for sudo if required for cowb
 releasedeb: reconf origdist cow debnocow # it will prompt for sudo if required for cowbuilder
 	echo "Built release Debian packages in builddebs/"
 
-nightlydist: devreconf sources
+nightlydist: reconf sources
 	echo "Built nightly source release in dist/"
