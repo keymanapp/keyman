@@ -71,10 +71,6 @@ uses
   kmxfileutils in '..\..\global\delphi\general\kmxfileutils.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
-  TouchLayout in '..\TIKE\oskbuilder\TouchLayout.pas',
-  TouchLayoutUtils in '..\TIKE\oskbuilder\TouchLayoutUtils.pas',
-  TouchLayoutDefinitions in '..\TIKE\oskbuilder\TouchLayoutDefinitions.pas',
-  KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas',
   UnicodeData in '..\..\global\delphi\charmap\UnicodeData.pas',
   ADOX_TLB in '..\..\global\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\global\delphi\tlb\ADODB_TLB.pas',
@@ -90,7 +86,13 @@ uses
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   Keyman.Developer.System.KMConvertParameters in 'Keyman.Developer.System.KMConvertParameters.pas',
   Keyman.Developer.System.ImportKeyboardDLL in 'Keyman.Developer.System.ImportKeyboardDLL.pas',
-  ScanCodeMap in '..\..\global\delphi\general\ScanCodeMap.pas';
+  ScanCodeMap in '..\..\global\delphi\general\ScanCodeMap.pas',
+  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in 'Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
+  OnScreenKeyboardData in '..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas',
+  TouchLayout in '..\TIKE\oskbuilder\TouchLayout.pas',
+  TouchLayoutDefinitions in '..\TIKE\oskbuilder\TouchLayoutDefinitions.pas',
+  TouchLayoutUtils in '..\TIKE\oskbuilder\TouchLayoutUtils.pas',
+  KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas';
 
 begin
   try

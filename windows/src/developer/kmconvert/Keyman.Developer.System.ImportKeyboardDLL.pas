@@ -4,10 +4,11 @@ interface
 
 uses
   System.SysUtils,
-
   Winapi.Windows;
 
 type
+  EImportKeyboardDLL = class(Exception);
+
   TImportKeyboardDLL = class
   private
     FLayoutFile: string;
@@ -17,16 +18,13 @@ type
     FKMN: string;
     FKVKS: string;
   public
-    constructor Create(const inputHKL, nameFormatString: string);
+    constructor Create(const inputHKL: string);
     procedure Execute;
     property InputHKL: string read FInputHKL;
     property KMN: string read FKMN;
     property KVKS: string read FKVKS;
     property RecommendedOutputKMNFileName: string read FRecommendedOutputKMNFileName;
   end;
-
-type
-  EImportKeyboardDLL = class(Exception);
 
 implementation
 
@@ -498,37 +496,6 @@ begin
   end;
 end;
 
-
-(*  public class Loader
-  {
-
-    private const uint KLF_NOTELLSHELL = 0x00000080;
-
-    internal static KeysEx[] lpKeyStateNull = new KeysEx[256];
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "LoadKeyboardLayoutW", ExactSpelling = true)]
-    private static extern IntPtr LoadKeyboardLayout(string pwszKLID, uint Flags);
-
-    [DllImport("user32.dll", ExactSpelling = true)]
-    private static extern bool UnloadKeyboardLayout(IntPtr hkl);
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-    private static extern int ToUnicodeEx(
-        uint wVirtKey,
-        uint wScanCode,
-        KeysEx[] lpKeyState,
-        StringBuilder pwszBuff,
-        int cchBuff,
-        uint wFlags,
-        IntPtr dwhkl);
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "VkKeyScanExW", ExactSpelling = true)]
-    private static extern ushort VkKeyScanEx(char ch, IntPtr dwhkl);
-
-    [DllImport("user32.dll", ExactSpelling = true)]
-    private static extern int GetKeyboardLayoutList(int nBuff, [Out, MarshalAs(UnmanagedType.LPArray)] IntPtr[] lpList);
-*)
-
 { TLoader }
 
 function TLoader.GetMaxShiftState: TKBDShiftState;
@@ -549,9 +516,12 @@ begin
 end;
 
 destructor TLoader.Destroy;
+var
+  i: Integer;
 begin
-  // TODO: Cleanup
-  alDead.Free;
+  for i := 0 to High(rgkey) do
+    FreeAndNil(rgkey[i]);
+  FreeandNil(alDead);
   inherited Destroy;
 end;
 
@@ -792,13 +762,11 @@ begin
                 Continue;
               end;
 
-              //rgKey[iKey].SetShiftState(ss, sbBuffer.ToString().Substring(0, rc), false, (caps != 0));
               rgKey[iKey].SetShiftState(ss, Copy(sbBuffer, 1, rc), False, not caps);
             end;
           end
           else if rc < 0 then
           begin
-            //rgKey[iKey].SetShiftState(ss, sbBuffer.ToString().Substring(0, 1), true, (caps != 0));
             rgKey[iKey].SetShiftState(ss, sbBuffer[0], True, not caps);
 
             // It's a dead key; let's flush out whats stored in the keyboard state.
@@ -809,16 +777,12 @@ begin
             begin
               dk := alDead[iDead];
               if dk.DeadCharacter = rgKey[iKey].GetShiftState(ss, not caps)[1] then
-              begin
                 Break;
-              end;
               dk := nil;
             end;
 
             if dk = nil then
-            begin
               alDead.Add(ProcessDeadKey(iKey, ss, pKeyState, not caps, hkl));
-            end;
           end;
         end;
       end;
@@ -827,8 +791,6 @@ begin
 end;
 
 procedure TLoader.Main(var KMN, KVKS: string);
-type
-  PHKL = ^HKL;
 var
   cKeyboards: Cardinal;
   rghkl: array of HKL;
@@ -837,9 +799,9 @@ var
 begin
   inputHKL := IntToHex(StrToInt('$'+inputHKL), 8);
 
-  cKeyboards := GetKeyboardLayoutList(0, rghkl);
+  cKeyboards := GetKeyboardLayoutList(0, rghkl[0]);
   SetLength(rghkl, cKeyboards);
-  GetKeyboardLayoutList(cKeyboards, rghkl);
+  GetKeyboardLayoutList(cKeyboards, rghkl[0]);
 
   hkl := LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
   if hkl = 0 then
@@ -958,7 +920,7 @@ end;
 const
   CRootKey = 'System\CurrentControlSet\Control\Keyboard Layouts';
 
-constructor TImportKeyboardDLL.Create(const inputHKL, nameFormatString: string);
+constructor TImportKeyboardDLL.Create(const inputHKL: string);
 var
   r: TRegistry;
 begin
@@ -977,8 +939,6 @@ begin
 
     FLayoutFile := r.ReadString('Layout File');
     FLayoutText := r.ReadString('Layout Text');
-    if nameFormatString <> ''
-      then FLayoutText := Format(nameFormatString, [FLayoutText]);
   finally
     r.Free;
   end;

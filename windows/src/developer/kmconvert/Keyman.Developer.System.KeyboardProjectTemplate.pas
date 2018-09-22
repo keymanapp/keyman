@@ -403,6 +403,8 @@ begin
     // We'll load and save to ensure we get formatting
     tl.Load(JSON);
     JSON := tl.Save(True);
+
+    // We don't want a BOM on output
     ss := TStringStream.Create(JSON, TEncoding.UTF8);
     try
       ss.SaveToFile(TouchLayoutFilename);
@@ -417,6 +419,7 @@ end;
 function TKeyboardProjectTemplate.DataPath: string;
 begin
   Result := ExtractFilePath(ParamStr(0));
+  // TODO: use KeymanDebugPaths
   if DirectoryExists(Result + 'data') then
     Exit(Result + 'data\');
 

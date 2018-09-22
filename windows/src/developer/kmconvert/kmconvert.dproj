@@ -86,6 +86,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <Debugger_RunParams>import-windows -klid 00000401</Debugger_RunParams>
+        <Debugger_CWD>c:\temp\test</Debugger_CWD>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -162,10 +164,6 @@
         <DCCReference Include="..\..\global\delphi\general\kmxfileutils.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
-        <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>
-        <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutUtils.pas"/>
-        <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutDefinitions.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\global\delphi\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
@@ -182,6 +180,12 @@
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ScanCodeMap.pas"/>
+        <DCCReference Include="Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
+        <DCCReference Include="..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
+        <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>
+        <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutDefinitions.pas"/>
+        <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeyboardFonts.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

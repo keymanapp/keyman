@@ -21,7 +21,7 @@ type
     FBCP47Tags: string;
     FCopyright: string;
     function LoadKLIDDetails: Boolean;
-    function ImportKeyboard(const DestinationFilename, DestinationKVKSFilename, Name: string): Boolean;
+    function ImportKeyboard(const DestinationFilename, DestinationKVKSFilename: string): Boolean;
     function GenerateIcon(const IconFilename: string): Boolean;
     procedure SetAuthor(const Value: string);
     procedure SetCopyright(const Value: string);
@@ -32,7 +32,8 @@ type
     procedure SetSourceKLID(const Value: string);
     procedure SetVersion(const Value: string);
     procedure InjectSystemStores(const KeyboardFilename, OSKFilename,
-      IconFilename: string);
+      IconFilename, TouchLayoutFilename: string);
+    function ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
   public
     function Execute: Boolean; overload;
 
@@ -55,6 +56,7 @@ uses
   Winapi.Windows,
 
   Keyman.Developer.System.ImportKeyboardDLL,
+  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
   KeyboardParser,
   kmxfileconsts,
   RegistryKeys,
@@ -149,10 +151,20 @@ begin
 
   FTemplate := TKeyboardProjectTemplate.Create(FDestinationPath, Format(FKeyboardIDTemplate, [FBaseKeyboardID]), KMXKeymanTargets + [ktWeb]);
   try
+    //
+    // These parameters apply to .kmn and .kps so set them even though
+    // ImportKeyboard will overwrite the template .kmn
+    //
+
     FTemplate.Name := Format(FNameTemplate, [FBaseName]);
     FTemplate.Copyright := FCopyright;
     FTemplate.Author := FAuthor;
     FTemplate.Version := FVersion;
+
+    //
+    // Set languages in package
+    //
+
     FTemplate.BCP47Tags := FBCP47Tags;
 
     //
@@ -167,7 +179,7 @@ begin
 
     // Run importkeyboard into destination file; this replaces the keyboard template
     // file that has been generated
-    if not ImportKeyboard(FTemplate.KeyboardFilename, FTemplate.OSKFilename, FTemplate.Name) then
+    if not ImportKeyboard(FTemplate.KeyboardFilename, FTemplate.OSKFilename) then
       Exit(Fail('Unable to run importkeyboard on '+FSourceKLID));
 
     // Replace .ico with a new one based on the language id
@@ -175,11 +187,13 @@ begin
     if not GenerateIcon(FTemplate.IconFilename) then
       Exit(Fail('Unable to generate an icon for '+FTemplate.KeyboardFilename));
 
-    // Load the source .kmn and add bitmap, copyright, visualkeyboard fields
-    InjectSystemStores(FTemplate.KeyboardFilename, FTemplate.OSKFilename, FTemplate.IconFilename);
+    // Load the source .kmn and add bitmap, copyright, visualkeyboard, touch layout fields
+    InjectSystemStores(FTemplate.KeyboardFilename, FTemplate.OSKFilename, FTemplate.IconFilename, FTemplate.TouchLayoutFilename);
 
-    // Create .kpj
-    //FTemplate.SaveProjectFile; <-- already done
+    // Take the generated OSK and convert it into a default touch layout
+    if not ConvertOSKToTouchLayout(FTemplate.OSKFilename, FTemplate.TouchLayoutFilename) then
+      Exit(Fail('Unable to create a default touch layout based on the OSK for '+FTemplate.KeyboardFilename));
+
   finally
     FreeAndNil(FTemplate);
   end;
@@ -187,7 +201,7 @@ begin
   Result := True;
 end;
 
-procedure TImportWindowsKeyboard.InjectSystemStores(const KeyboardFilename, OSKFilename, IconFilename: string);
+procedure TImportWindowsKeyboard.InjectSystemStores(const KeyboardFilename, OSKFilename, IconFilename, TouchLayoutFilename: string);
 var
   kp: TKeyboardParser;
   sl: TStringList;
@@ -198,9 +212,17 @@ begin
     kp.LoadFromFile(KeyboardFilename);
     kp.Features.Add(kfIcon);
     kp.Features.Add(kfOSK);
+    kp.Features.Add(kfTouchLayout);
+    // TODO: Are these file settings actually doing anything? Or is it controlled
+    // entirely by kp.Features.Add -- which could cause this to fall over a little
+    // if we change filenames for any reason in the future
+    kp.SetSystemStoreValue(ssName, Format(FNameTemplate, [FBaseName]));
     kp.SetSystemStoreValue(ssVisualKeyboard, ExtractFileName(OSKFilename));
     kp.SetSystemStoreValue(ssBitmap, ExtractFilename(IconFilename));
+    kp.SetSystemStoreValue(ssLayoutFile, ExtractFileName(TouchLayoutFilename));
     kp.SetSystemStoreValue(ssCopyright, FCopyright);
+    if FVersion <> '' then
+      kp.SetSystemStoreValue(ssVersion, FVersion);
     if FAuthor <> '' then
       kp.InitialComment := kp.InitialComment + 'Run by: ' + FAuthor + #13#10;
 
@@ -216,13 +238,13 @@ begin
   end;
 end;
 
-function TImportWindowsKeyboard.ImportKeyboard(const DestinationFilename, DestinationKVKSFilename, Name: string): Boolean;
+function TImportWindowsKeyboard.ImportKeyboard(const DestinationFilename, DestinationKVKSFilename: string): Boolean;
 var
   ik: TImportKeyboardDLL;
   sl: TStringList;
   ss: TStringStream;
 begin
-  ik := TImportKeyboardDLL.Create(FSourceKLID, Name);
+  ik := TImportKeyboardDLL.Create(FSourceKLID);
   try
     try
       ik.Execute;
@@ -265,5 +287,30 @@ begin
   Result := True;
 end;
 
+function TImportWindowsKeyboard.ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
+var
+  converter: TTouchLayoutToVisualKeyboardConverter;
+  FNewLayout: string;
+  ss: TStringStream;
+begin
+  converter := TTouchLayoutToVisualKeyboardConverter.Create(OSKFilename);
+  try
+    if converter.Execute(FNewLayout) then
+    begin
+      ss := TStringStream.Create(FNewLayout, TEncoding.UTF8);
+      try
+        ss.SaveToFile(TouchLayoutFilename);
+      finally
+        ss.Free;
+      end;
+    end
+    else
+      Exit(False);
+  finally
+    converter.Free;
+  end;
+
+  Result := True;
+end;
 
 end.
