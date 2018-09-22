@@ -10,6 +10,7 @@ import requests_cache
 import os
 from pathlib import Path
 
+
 def get_keyboard_data(keyboardid):
 	"""
 	Get Keyboard data from web api.
@@ -47,7 +48,7 @@ def get_download_folder():
 	"""
 	return keyman_cache_dir()
 
-def keyman_cache_dir()
+def keyman_cache_dir():
 	"""
 	User keyman cache folder
 
@@ -60,6 +61,21 @@ def keyman_cache_dir()
 	if not os.path.isdir(km_cache):
 		os.mkdir(km_cache)
 	return km_cache
+
+def user_keyman_dir():
+	home = os.path.expanduser("~")
+	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+	return os.path.join(datahome, "keyman")
+
+def user_keyman_font_dir():
+	home = os.path.expanduser("~")
+	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+	return os.path.join(datahome, "fonts", "keyman")
+
+
+def user_keyboard_dir(keyboardid):
+	return os.path.join(user_keyman_dir(), keyboardid)
+
 
 def get_kmp_file(kbdata):
 	"""

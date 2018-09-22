@@ -6,7 +6,7 @@ import os
 import json
 from enum import Enum, auto
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
-from keyman_config.install_kmp import user_keyman_dir
+from keyman_config.get_kmp import user_keyman_dir
 
 class InstallArea(Enum):
     IA_OS = auto()
@@ -106,9 +106,9 @@ def get_kmp_version(keyboardid):
         None: if not found
     """
     version = None
-    user_kmp = get_installed_kmp_user()
-    shared_kmp = get_installed_kmp_shared()
-    os_kmp = get_installed_kmp_os()
+    user_kmp = get_installed_kmp(InstallArea.IA_USER)
+    shared_kmp = get_installed_kmp(InstallArea.IA_SHARED)
+    os_kmp = get_installed_kmp(InstallArea.IA_OS)
 
     if keyboardid in os_kmp:
         version = os_kmp[keyboardid]['version']

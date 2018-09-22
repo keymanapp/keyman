@@ -11,8 +11,9 @@ from enum import Enum, auto
 class KMFileTypes(Enum):
 	KM_ICON = auto()
 	KM_SOURCE = auto()
+	KM_OSK_SOURCE = auto()
 	KM_KMX = auto()
-	KM_KVK = auto()
+	KM_OSK = auto()
 	KM_TOUCH = auto()
 	KM_FONT = auto()
 	KM_DOC = auto()
@@ -104,8 +105,9 @@ def determine_filetype(kblist, filename):
 		KMFileTypes: Enum of file type
 			KM_ICON: Keyboard icon
 			KM_SOURCE: Keyboard source
+			KM_OSK_SOURCE: Keyboard on-screen keyboard source
 			KM_KMX: Compiled keyboard
-			KM_KVK: Compiled on screen keyboard
+			KM_OSK: Compiled on screen keyboard
 			KM_TOUCH: JS touch keyboard
 			KM_FONT: Font
 			KM_DOC: Documentation
@@ -119,12 +121,14 @@ def determine_filetype(kblist, filename):
 	name, ext = os.path.splitext(filename)
 	if ext.lower() == ".ico":
 		return KMFileTypes.KM_ICON
-	elif ext.lower() == ".kmn" or ext.lower() == ".kvks":
+	elif ext.lower() == ".kmn":
 		return KMFileTypes.KM_SOURCE
+	elif ext.lower() == ".kvks":
+		return KMFileTypes.KM_OSK_SOURCE
 	elif ext.lower() == ".kmx":
 		return KMFileTypes.KM_KMX
 	elif ext.lower() == ".kvk":
-		return KMFileTypes.KM_KVK
+		return KMFileTypes.KM_OSK
 	elif ext.lower() == ".ttf" or ext.lower() == ".otf":
 		return KMFileTypes.KM_FONT
 	elif ext.lower() == ".js":

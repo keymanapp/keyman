@@ -6,7 +6,7 @@ import subprocess
 import sys
 import os.path
 from shutil import rmtree
-from keyman_config.install_kmp import user_keyboard_dir
+from keyman_config.get_kmp import user_keyboard_dir, user_keyman_font_dir
 
 def uninstall_from_ibus(kmnfile):
 	if sys.version_info.major == 3 and sys.version_info.minor < 6:
@@ -89,7 +89,7 @@ def uninstall_kmp_user(keyboardid):
 	uninstall_from_ibus(kmnfile)
 	rmtree(kbdir)
 	logging.info("Removed user keyman directory: %s", kbdir)
-	fontdir=os.path.join(datahome, "fonts", "keyman", keyboardid)
+	fontdir=os.path.join(user_keyman_font_dir(), keyboardid)
 	if os.path.isdir(fontdir):
 		rmtree(fontdir)
 		logging.info("Removed user keyman font directory: %s", fontdir)

@@ -14,7 +14,7 @@ from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
-from keyman_config.install_kmp import user_keyboard_dir
+from keyman_config.get_kmp import user_keyboard_dir
 
 class KeyboardBox(Gtk.Box):
     def __init__(self, kmp, window, area):
