@@ -1,5 +1,5 @@
 (*
-  Name:             kmnProjectFile
+  Name:             Keyman.Developer.System.Project.kmnProjectFile
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -49,7 +49,7 @@
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     
 *)
-unit kmnProjectFile;  // I3306   // I4687   // I4688   // I4692
+unit Keyman.Developer.System.Project.kmnProjectFile;  // I3306   // I4687   // I4688   // I4692
 
 interface
 
@@ -57,9 +57,9 @@ uses
   System.SysUtils,
   Xml.XMLIntf,
 
-  ProjectFile,
-  ProjectFiles,
-  ProjectFileType,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.System.Project.ProjectFileType,
   UKeymanTargets;
 
 type
@@ -119,7 +119,7 @@ uses
   KeyboardFonts,
   KeymanDeveloperOptions,
   Keyman.System.KeyboardUtils,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectLog,
   utilsystem,
   VisualKeyboard;
 

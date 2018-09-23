@@ -128,7 +128,7 @@
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
-        <DCCReference Include="..\TIKE\project\ProjectLog.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
@@ -142,10 +142,10 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas"/>
         <DCCReference Include="..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshKeyboards.pas"/>
-        <DCCReference Include="..\TIKE\project\ProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\ProjectFiles.pas"/>
-        <DCCReference Include="..\TIKE\project\ProjectSaver.pas"/>
-        <DCCReference Include="..\TIKE\project\ProjectFileType.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFile.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFiles.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectSaver.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectFileType.pas"/>
         <DCCReference Include="..\TIKE\main\mrulist.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
@@ -154,10 +154,12 @@
         <DCCReference Include="..\TIKE\main\RedistFiles.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="..\TIKE\project\Project.pas"/>
-        <DCCReference Include="..\TIKE\project\ProjectLoader.pas"/>
-        <DCCReference Include="..\TIKE\project\kmnProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\kpsProjectFile.pas"/>
+        <DCCReference Include="..\TIKE\project\Project.pas">
+            <ModuleName>Keyman.Developer.System.Project.Project</ModuleName>
+        </DCCReference>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLoader.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
         <DCCReference Include="..\TIKE\compile\CompileKeymanWeb.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
         <DCCReference Include="..\TIKE\compile\KeymanWebKeyCodes.pas"/>

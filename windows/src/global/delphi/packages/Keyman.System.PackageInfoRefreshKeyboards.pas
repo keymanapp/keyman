@@ -6,7 +6,7 @@ uses
   System.Types,
 
   PackageInfo,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectLog,
   utilfiletypes;
 
 type

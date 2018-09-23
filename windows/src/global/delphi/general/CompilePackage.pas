@@ -27,7 +27,8 @@ unit CompilePackage;
 interface
 
 uses
-  kpsfile, kmpinffile, PackageInfo, ProjectLog;
+  kpsfile, kmpinffile, PackageInfo,
+  Keyman.Developer.System.Project.ProjectLog;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
 

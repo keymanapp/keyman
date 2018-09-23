@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectLog
+  Name:             Keyman.Developer.System.Project.ProjectLog
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -16,7 +16,7 @@
   History:          11 May 2015 - mcdurdin - I4706 - V9.0 - Update compile logging for silent and warning-as-error cleanness
                     
 *)
-unit ProjectLog;   // I4706
+unit Keyman.Developer.System.Project.ProjectLog;   // I4706
 
 interface
 

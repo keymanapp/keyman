@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectUI
+  Name:             Keyman.Developer.UI.Project.ProjectUI
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -16,12 +16,12 @@
   History:          04 May 2015 - mcdurdin - I4687 - V9.0 - Split project UI actions into separate classes
                     
 *)
-unit ProjectUI;   // I4687
+unit Keyman.Developer.UI.Project.ProjectUI;   // I4687
 
 interface
 
 uses
-  ProjectFileUI;
+  Keyman.Developer.UI.Project.ProjectFileUI;
 
 function GetGlobalProjectUI: TProjectUI;
 function LoadGlobalProjectUI(AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
@@ -32,7 +32,7 @@ implementation
 uses
   System.SysUtils,
 
-  Project;
+  Keyman.Developer.System.Project.Project;
 
 function GetGlobalProjectUI: TProjectUI;
 begin

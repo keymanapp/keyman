@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectSaver
+  Name:             Keyman.Developer.System.Project.ProjectSaver
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -31,7 +31,7 @@
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     
 *)
-unit ProjectSaver;  // I3306
+unit Keyman.Developer.System.Project.ProjectSaver;  // I3306
 
 interface
 
@@ -42,7 +42,7 @@ uses
   Xml.XMLDoc,
   Xml.XMLIntf,
 
-  ProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
   utilsystem;
 
 type
@@ -64,7 +64,7 @@ uses
   System.Win.ComObj,
 
   OnlineConstants,
-  ProjectFiles;
+  Keyman.Developer.System.Project.ProjectFiles;
 
 { TProjectSaver }
 

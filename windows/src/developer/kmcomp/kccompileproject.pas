@@ -28,10 +28,10 @@ implementation
 uses
   System.SysUtils,
 
-  kmnProjectFile,
-  kpsProjectFile,
-  ProjectLog,
-  ProjectFile;
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectFile;
 
 type
   TProjectConsole = class(TProject)

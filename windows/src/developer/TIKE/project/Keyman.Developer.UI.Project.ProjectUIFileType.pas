@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectUIFileType
+  Name:             Keyman.Developer.UI.Project.ProjectUIFileType
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -16,15 +16,15 @@
   History:          04 May 2015 - mcdurdin - I4687 - V9.0 - Split project UI actions into separate classes
                     
 *)
-unit ProjectUIFileType;   // I4687
+unit Keyman.Developer.UI.Project.ProjectUIFileType;   // I4687
 
 interface
 
 uses
   System.Classes,
   System.Contnrs,
-  ProjectFile,
-  ProjectFileUI;
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFileUI;
 
 type
   TProjectFileUIType = class
@@ -54,9 +54,9 @@ implementation
 uses
   System.SysUtils,
 
-  Project,
-  ProjectFiles,
-  ProjectFileType;
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.System.Project.ProjectFileType;
 
 var
   FRegisteredFileUITypes: TProjectFileUITypeList = nil;

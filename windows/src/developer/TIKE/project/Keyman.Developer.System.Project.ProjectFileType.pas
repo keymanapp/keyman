@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectFileType
+  Name:             Keyman.Developer.System.Project.ProjectFileType
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -19,7 +19,7 @@
                     19 Nov 2007 - mcdurdin - I1157 - const string parameters
                     04 May 2015 - mcdurdin - I4687 - V9.0 - Split project UI actions into separate classes
 *)
-unit ProjectFileType;
+unit Keyman.Developer.System.Project.ProjectFileType;
 
 interface
 
@@ -28,7 +28,7 @@ uses
   System.Contnrs,
   System.SysUtils,
 
-  ProjectFile;
+  Keyman.Developer.System.Project.ProjectFile;
 
 type
   TProjectFileType = class
@@ -62,8 +62,8 @@ var
 implementation
 
 uses
-  Project,
-  ProjectFiles;
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFiles;
 
 var
   FRegisteredFileTypes: TProjectFileTypeList = nil;

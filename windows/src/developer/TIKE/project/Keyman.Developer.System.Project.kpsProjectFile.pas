@@ -1,5 +1,5 @@
 (*
-  Name:             kpsProjectFile
+  Name:             Keyman.Developer.System.Project.kpsProjectFile
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -33,7 +33,7 @@
                     11 May 2015 - mcdurdin - I4706 - V9.0 - Update compile logging for silent and warning-as-error cleanness
                     06 Jun 2015 - mcdurdin - I4737 - Clean package should also clean installer
 *)
-unit kpsProjectFile;   // I4687   // I4688   // I4692
+unit Keyman.Developer.System.Project.kpsProjectFile;   // I4687   // I4688   // I4692
 
 interface
 
@@ -42,10 +42,10 @@ uses
   Xml.XMLIntf,
 
   KPSFile,
-  ProjectLog,
-  ProjectFile,
-  ProjectFiles,
-  ProjectFileType;
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.System.Project.ProjectFileType;
 
 type
   TkpsProjectFile = class(TOpenableProjectFile)
@@ -87,7 +87,7 @@ uses
   Winapi.ShellApi,
   Winapi.Windows,
 
-  Project,
+  Keyman.Developer.System.Project.Project,
 
   CompilePackage,
   CompilePackageInstaller,

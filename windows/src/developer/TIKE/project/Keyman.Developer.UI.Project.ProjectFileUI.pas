@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectFileUI
+  Name:             Keyman.Developer.UI.Project.ProjectFileUI
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -21,15 +21,15 @@
                     27 May 2015 - mcdurdin - I4654 - Project display crashes if project render output file is locked [CrashID:tike.exe_9.0.489.0_0045876A_EFCreateError]
                     
 *)
-unit ProjectFileUI;   // I4687
+unit Keyman.Developer.UI.Project.ProjectFileUI;   // I4687
 
 interface
 
 uses
   System.Classes,
   VCL.Menus,
-  ProjectFile,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectLog,
   TempFileManager;
 
 type
@@ -103,7 +103,7 @@ uses
 
   utilhttp,
 
-  ProjectLoader,
+  Keyman.Developer.System.Project.ProjectLoader,
   UfrmMessages;
 
 { MRU functions }

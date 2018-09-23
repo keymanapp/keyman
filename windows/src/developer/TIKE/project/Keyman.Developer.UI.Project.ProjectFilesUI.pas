@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectFilesUI
+  Name:             Keyman.Developer.UI.Project.ProjectFilesUI
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -16,7 +16,7 @@
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
                     12 May 2015 - mcdurdin - I4708 - CrashID:tike.exe_9.0.500.0_00967F1C_EInvalidCast
 *)
-unit ProjectFilesUI;
+unit Keyman.Developer.UI.Project.ProjectFilesUI;
 
 interface
 
@@ -28,9 +28,9 @@ uses
   Winapi.ShellApi,
   Winapi.Windows,
 
-  ProjectFile,
-  ProjectFiles,
-  ProjectFileUI,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.UI.Project.ProjectFileUI,
   UfrmMDIChild;
 
 type
@@ -70,8 +70,8 @@ uses
   Vcl.Controls,
   Vcl.Dialogs,
 
-  ProjectFileType,
-  ProjectUIFileType,
+  Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMain,
   UfrmMDIEditor,
   utilexecute;

@@ -1,5 +1,5 @@
 (*
-  Name:             kmnProjectFileUI
+  Name:             Keyman.Developer.UI.Project.kmnProjectFileUI
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
   Description:      
@@ -15,18 +15,18 @@
   Notes:            
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
-unit kmnProjectFileUI;
+unit Keyman.Developer.UI.Project.kmnProjectFileUI;
 
 interface
 
 uses
   System.UITypes,
   Menus,
-  ProjectFilesUI,
-  ProjectFileUI,
-  ProjectUIFileType,
+  Keyman.Developer.UI.Project.ProjectFilesUI,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMessages,
-  kmnProjectFile;
+  Keyman.Developer.System.Project.kmnProjectFile;
 
 type
   TkmnProjectFileUI = class(TOpenableProjectFileUI)

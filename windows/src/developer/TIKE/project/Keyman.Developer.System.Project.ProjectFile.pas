@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectFile
+  Name:             Keyman.Developer.System.Project.ProjectFile
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -60,7 +60,7 @@
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     
 *)
-unit ProjectFile;  // I3306   // I4687
+unit Keyman.Developer.System.Project.ProjectFile;  // I3306   // I4687
 
 interface
 
@@ -77,7 +77,7 @@ uses
   Xml.xmlintf,
 
   mrulist,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectLog,
   TempFileManager;
 
 type
@@ -311,10 +311,10 @@ uses
 
   compile,
 
-  Project,
-  ProjectFileType,
-  ProjectLoader,
-  ProjectSaver,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.Project.ProjectLoader,
+  Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles,
   RegistryKeys,
 

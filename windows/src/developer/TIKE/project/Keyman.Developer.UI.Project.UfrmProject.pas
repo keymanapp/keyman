@@ -1,5 +1,5 @@
 (*
-  Name:             UfrmProject
+  Name:             Keyman.Developer.UI.Project.UfrmProject
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -47,7 +47,7 @@
                     06 Jun 2015 - mcdurdin - I4735 - Add clean and build single file commands to project
                     09 Aug 2015 - mcdurdin - I2986 - Ctrl+N, Ctrl+O not working in Developer Project view
 *)
-unit UfrmProject;  // I3306  // I3309
+unit Keyman.Developer.UI.Project.UfrmProject;  // I3306  // I3309
 
 interface
 
@@ -56,7 +56,7 @@ uses
   System.Types,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, ProjectFile,
+  StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile,
   KeymanDeveloperUtils, UserMessages,
   Keyman.Developer.UI.UframeCEFHost;
 
@@ -104,12 +104,12 @@ uses
 
   dmActionsMain,
   KeymanDeveloperOptions,
-  kmnProjectFile,
-  kpsProjectFile,
-  Project,
-  ProjectUI,
-  ProjectFileUI,
-  ProjectFileType,
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.System.Project.ProjectFileType,
   typinfo,
   ErrorControlledRegistry,
   UfrmEditor,

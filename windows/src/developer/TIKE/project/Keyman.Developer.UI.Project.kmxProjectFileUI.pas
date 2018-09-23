@@ -1,5 +1,5 @@
 (*
-  Name:             kmxProjectFileUI
+  Name:             Keyman.Developer.UI.Project.kmxProjectFileUI
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
   Description:      
@@ -15,7 +15,7 @@
   Notes:            
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
-unit kmxProjectFileUI;
+unit Keyman.Developer.UI.Project.kmxProjectFileUI;
 
 interface
 
@@ -23,11 +23,11 @@ uses
   System.SysUtils,
   Vcl.Menus,
 
-  kmxProjectFile,
-  ProjectFile,
-  ProjectFileUI,
-  ProjectFilesUI,
-  ProjectFileType,
+  Keyman.Developer.System.Project.kmxProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectFilesUI,
+  Keyman.Developer.System.Project.ProjectFileType,
   UfrmMessages,
   UfrmEditor;
 
@@ -52,7 +52,7 @@ implementation
 
 uses
   KeymanDeveloperUtils,
-  ProjectUIFileType,
+  Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMain;
 
 procedure TkmxProjectFileUI.BuildMenu(Menu: TPopupMenu);
