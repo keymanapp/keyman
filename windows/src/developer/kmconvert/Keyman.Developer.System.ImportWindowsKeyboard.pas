@@ -215,8 +215,9 @@ var
   FLanguageID: Word;
 begin
   FLanguageID := LOWORD(StrToInt('$'+FSourceKLID));
-  if GetLocaleInfo(FLanguageID, LOCALE_SISO639LANGNAME, buf, 8) > 0 then
-    FBCP47Tags := buf;
+  if GetLocaleInfo(FLanguageID, LOCALE_SISO639LANGNAME, buf, 8) > 0
+    then Result := buf
+    else Result := '';
 end;
 
 procedure TImportWindowsKeyboard.InjectSystemStores(const KeyboardFilename, OSKFilename, IconFilename, TouchLayoutFilename: string);

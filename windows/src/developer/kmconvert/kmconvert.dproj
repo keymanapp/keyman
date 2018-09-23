@@ -86,8 +86,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <Debugger_RunParams>import-windows -klid 00000401</Debugger_RunParams>
-        <Debugger_CWD>c:\temp\test</Debugger_CWD>
+        <Debugger_RunParams>import-windows -klid 00000409</Debugger_RunParams>
+        <Debugger_CWD>c:\temp\ikp</Debugger_CWD>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
