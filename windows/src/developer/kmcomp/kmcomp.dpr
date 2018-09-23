@@ -104,7 +104,9 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  TextFileFormat in '..\TIKE\main\TextFileFormat.pas';
+  TextFileFormat in '..\TIKE\main\TextFileFormat.pas',
+  Keyman.Developer.System.Project.kmnProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
+  Keyman.Developer.System.Project.kpsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas';
 
 {$R icons.RES}
 {$R version.res}

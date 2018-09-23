@@ -42,7 +42,6 @@ uses
   Xml.XMLIntf,
 
   KPSFile,
-  Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFiles,
   Keyman.Developer.System.Project.ProjectFileType;
@@ -58,17 +57,12 @@ type
     function GetOutputFilename: string;
     function GetTargetFilename: string;
     function GetTargetInstallerFilename: string;
-    procedure SelfMessage(Sender: TObject; msg: string; State: TProjectLogState);   // I4706
   protected
     function GetRelativeOrder: Integer; override;
     procedure GetFileParameters; override;
   public
     procedure Load(node: IXMLNode; LoadState: Boolean); override;   // I4698
     procedure Save(node: IXMLNode; SaveState: Boolean); override;   // I4698
-
-    function CompilePackageInstaller(APack: TKPSFile; FSilent: Boolean): Boolean;
-    function CompilePackage(APack: TKPSFile; FSilent: Boolean): Boolean;
-    function Clean: Boolean;
 
     property WarnAsError: Boolean read FWarnAsError write FWarnAsError;   // I4706
 
@@ -84,99 +78,13 @@ implementation
 
 uses
   System.Variants,
-  Winapi.ShellApi,
-  Winapi.Windows,
 
   Keyman.Developer.System.Project.Project,
-
-  CompilePackage,
-  CompilePackageInstaller,
-  PackageInfo,
-  utilexecute;
+  PackageInfo;
 
 {-------------------------------------------------------------------------------
  - TkmnProjectFile                                                             -
  -------------------------------------------------------------------------------}
-
-function TkpsProjectFile.CompilePackage(APack: TKPSFile; FSilent: Boolean): Boolean;
-var
-  pack: TKPSFile;
-begin
-  HasCompileWarning := False;   // I4706
-  if APack = nil then
-  begin
-    pack := TKPSFile.Create;
-    pack.FileName := FileName;
-    pack.LoadXML;
-  end
-  else
-    pack := APack;
-
-  try
-    try
-      Result := DoCompilePackage(pack, SelfMessage, FSilent, TargetFilename);
-      if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
-        Result := False;
-
-      if Result then
-        Log(plsInfo, '''' + FileName + ''' compiled successfully to '''+TargetFileName+'''.')
-      else
-      begin
-        if FileExists(TargetFilename) then
-          System.SysUtils.DeleteFile(TargetFilename);
-        Log(plsError, '''' + FileName + ''' was not compiled successfully.');
-      end;
-    except
-      on E:Exception do
-      begin
-        Log(plsError, E.Message);
-        Result := False;
-      end;
-    end;
-
-  finally
-    if APack = nil then
-      pack.Free;
-  end;
-end;
-
-function TkpsProjectFile.CompilePackageInstaller(APack: TKPSFile; FSilent: Boolean): Boolean;
-var
-  pack: TKPSFile;
-begin
-  HasCompileWarning := False;   // I4706
-
-  if APack = nil then
-  begin
-    pack := TKPSFile.Create;
-    pack.FileName := FileName;
-    pack.LoadXML;
-  end
-  else
-    pack := APack;
-
-  try
-    try
-      Result := DoCompilePackageInstaller(pack, SelfMessage, FSilent, '', TargetInstallerFilename, False);
-      if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
-        Result := False;
-
-      if Result
-        then Log(plsInfo, '''' + FileName + ''' compiled successfully.')
-        else Log(plsError, '''' + FileName + ''' was not compiled successfully.');
-    except
-      on E:Exception do
-      begin
-        Log(plsError, E.Message);
-        Result := False;
-      end;
-    end;
-
-  finally
-    if APack = nil then
-      pack.Free;
-  end;
-end;
 
 procedure TkpsProjectFile.GetFileParameters;
 var
@@ -260,20 +168,6 @@ begin
   if FHeader_Name <> '' then node.AddChild('Name').NodeValue := FHeader_Name;
   if FHeader_Copyright <> '' then node.AddChild('Copyright').NodeValue := FHeader_Copyright;
   if FHeader_Version <> '' then node.AddChild('Version').NodeValue := FHeader_Version;
-end;
-
-procedure TkpsProjectFile.SelfMessage(Sender: TObject; msg: string; State: TProjectLogState);   // I4706
-begin
-  if State = plsWarning then
-    HasCompileWarning := True;
-  Log(State, msg);
-end;
-
-function TkpsProjectFile.Clean: Boolean;
-begin
-  CleanFile(OutputFileName);
-  CleanFile(TargetInstallerFilename);   // I4737
-  Result := True;
 end;
 
 initialization
