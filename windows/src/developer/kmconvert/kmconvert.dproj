@@ -150,34 +150,19 @@
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\compile.pas"/>
         <DCCReference Include="..\TIKE\main\RedistFiles.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="..\TIKE\project\Project.pas">
-            <ModuleName>Keyman.Developer.System.Project.Project</ModuleName>
-        </DCCReference>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.Project.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.ProjectLoader.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\compile\CompileKeymanWeb.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
-        <DCCReference Include="..\TIKE\compile\KeymanWebKeyCodes.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmxfileutils.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
-        <DCCReference Include="..\..\global\delphi\charmap\UnicodeData.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\ADOX_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\ADODB_TLB.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
-        <DCCReference Include="..\TIKE\main\KeymanDeveloperOptions.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompilePackage.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\CompilePackageInstaller.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\kmpinffile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>

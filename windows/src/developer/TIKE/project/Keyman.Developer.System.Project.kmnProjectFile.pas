@@ -112,7 +112,6 @@ uses
   KeyboardParser,
   kmxfileconsts,
   KeyboardFonts,
-  KeymanDeveloperOptions,
   Keyman.System.KeyboardUtils,
   utilsystem;
 
