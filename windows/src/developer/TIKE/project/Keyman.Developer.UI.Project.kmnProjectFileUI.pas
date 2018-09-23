@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.UI.Project.kmnProjectFileUI
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 May 2015
 
   Modified Date:    4 May 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
 unit Keyman.Developer.UI.Project.kmnProjectFileUI;
@@ -26,7 +26,8 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMessages,
-  Keyman.Developer.System.Project.kmnProjectFile;
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.System.Project.kmnProjectFileAction;
 
 type
   TkmnProjectFileUI = class(TOpenableProjectFileUI)
@@ -44,7 +45,7 @@ type
     function InstallKeyboard: Boolean;
     function UninstallKeyboard: Boolean;
     function PackageFile(FSilent: Boolean): Boolean;
-    function GetProjectFile: TkmnProjectFile;
+    function GetProjectFile: TkmnProjectFileAction;
 
     function GetDebug: Boolean;
     procedure SetDebug(const Value: Boolean);
@@ -55,7 +56,7 @@ type
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
     procedure BuildMenu(Menu: TPopupMenu); override;
     property Debug: Boolean read GetDebug write SetDebug;
-    property ProjectFile: TkmnProjectFile read GetProjectFile;
+    property ProjectFile: TkmnProjectFileAction read GetProjectFile;
   end;
 
 implementation
@@ -203,9 +204,9 @@ begin
   Result := ProjectFile.Debug;
 end;
 
-function TkmnProjectFileUI.GetProjectFile: TkmnProjectFile;
+function TkmnProjectFileUI.GetProjectFile: TkmnProjectFileAction;
 begin
-  Result := FOwner as TkmnProjectFile;
+  Result := FOwner as TkmnProjectFileAction;
 end;
 
 function TkmnProjectFileUI.PackageFile(FSilent: Boolean): Boolean;
@@ -355,7 +356,7 @@ begin
 end;
 
 initialization
-  RegisterProjectFileUIType(TkmnProjectFile, TkmnProjectFileUI);
+  RegisterProjectFileUIType(TkmnProjectFileAction, TkmnProjectFileUI);
 end.
 
 

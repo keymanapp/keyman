@@ -129,11 +129,25 @@ procedure RegisterProjectFileType(AExtension: string; AProjectFileClass: TProjec
 var
   ft: TProjectFileType;
 begin
+  if not Assigned(FRegisteredFileTypes) then
+    FRegisteredFileTypes := TProjectFileTypeList.Create;
+
+  // We can have ProjectFileAction classes that inherit from ProjectFile, so in those
+  // circumstances we want to capture the bottom-most class registration and obviously
+  // we don't want multiple classes registered for the same extension.
+  for ft in FRegisteredFileTypes do
+  begin
+    if ft.Extension = AExtension then
+    begin
+      if AProjectFileClass.InheritsFrom(ft.ProjectFileClass) then
+        ft.ProjectFileClass := AProjectFileClass;
+      Exit;
+    end;
+  end;
+
   ft := TProjectFileType.Create;
   ft.Extension := AExtension;
   ft.ProjectFileClass := AProjectFileClass;
-  if not Assigned(FRegisteredFileTypes) then
-    FRegisteredFileTypes := TProjectFileTypeList.Create;
   FRegisteredFileTypes.Add(ft);
 end;
 

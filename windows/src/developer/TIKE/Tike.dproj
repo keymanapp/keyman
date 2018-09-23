@@ -509,6 +509,7 @@
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.UI.FontUtils.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFileAction.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

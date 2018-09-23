@@ -28,7 +28,7 @@ implementation
 uses
   System.SysUtils,
 
-  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.ProjectFile;
@@ -50,7 +50,7 @@ function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADe
 var
   i: Integer;
   Found: Boolean;
-  kmn: TkmnProjectFile;
+  kmn: TkmnProjectFileAction;
   kps: TkpsProjectFile;
 
   function Matches(AFile: TProjectFile; AClass: TProjectFileClass): Boolean;
@@ -69,9 +69,9 @@ begin
     FullySilent := AFullySilent;
     Silent := ASilent;
     for i := 0 to Files.Count - 1 do
-      if Matches(Files[i], TkmnProjectFile) then
+      if Matches(Files[i], TkmnProjectFileAction) then
       begin
-        kmn := Files[i] as TkmnProjectFile;
+        kmn := Files[i] as TkmnProjectFileAction;
         kmn.Debug := ADebug;
         kmn.WarnAsError := AWarnAsError;
         if AClean then
