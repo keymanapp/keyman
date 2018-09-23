@@ -34,6 +34,7 @@ type
     procedure InjectSystemStores(const KeyboardFilename, OSKFilename,
       IconFilename, TouchLayoutFilename: string);
     function ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
+    function FindBCP47TagForKLID: string;
   public
     function Execute: Boolean; overload;
 
@@ -51,16 +52,21 @@ implementation
 
 uses
   System.Classes,
+  System.Math,
   System.SysUtils,
   System.Win.Registry,
+  Vcl.Graphics,
   Winapi.Windows,
 
+  BCP47Tag,
   Keyman.Developer.System.ImportKeyboardDLL,
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
+  Keyman.System.Util.RenderLanguageIcon,
   KeyboardParser,
   kmxfileconsts,
   RegistryKeys,
-  UKeymanTargets;
+  UKeymanTargets,
+  utilicon;
 
 { TImportWindowsKeyboard }
 
@@ -165,6 +171,8 @@ begin
     // Set languages in package
     //
 
+    if FBCP47Tags = '' then
+      FBCP47Tags := FindBCP47TagForKLID;
     FTemplate.BCP47Tags := FBCP47Tags;
 
     //
@@ -199,6 +207,16 @@ begin
   end;
 
   Result := True;
+end;
+
+function TImportWindowsKeyboard.FindBCP47TagForKLID: string;
+var
+  buf: array[0..8] of char;
+  FLanguageID: Word;
+begin
+  FLanguageID := LOWORD(StrToInt('$'+FSourceKLID));
+  if GetLocaleInfo(FLanguageID, LOCALE_SISO639LANGNAME, buf, 8) > 0 then
+    FBCP47Tags := buf;
 end;
 
 procedure TImportWindowsKeyboard.InjectSystemStores(const KeyboardFilename, OSKFilename, IconFilename, TouchLayoutFilename: string);
@@ -282,9 +300,28 @@ end;
 
 function TImportWindowsKeyboard.GenerateIcon(
   const IconFilename: string): Boolean;
+var
+  FTag: string;
+  n: Integer;
+  b: array[0..0] of Vcl.Graphics.TBitmap;
 begin
-  //TODO
-  Result := True;
+  // We need to use the BCP47 tag that we have received and render that, for now
+
+  n := Min(Pos(' ', FBCP47Tags), Pos('-', FBCP47Tags));
+  if n > 0
+    then FTag := Copy(FBCP47Tags, 1, n-1)
+    else FTag := FBCP47Tags;
+
+  b[0] := Vcl.Graphics.TBitmap.Create;
+  try
+    b[0].SetSize(16, 16);
+    b[0].PixelFormat := pf32bit;
+    // TODO multiple sizes?, colour?
+    DrawLanguageIcon(b[0].Canvas, 0, 0, UpperCase(FTag));
+    Result := ConvertBitmapsToAlphaIcon(b, IconFilename);
+  finally
+    b[0].Free;
+  end;
 end;
 
 function TImportWindowsKeyboard.ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;

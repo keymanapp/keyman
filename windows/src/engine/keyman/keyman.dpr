@@ -112,7 +112,7 @@ uses
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
   UfrmScriptError in '..\..\global\delphi\general\UfrmScriptError.pas' {frmScriptError},
   OnScreenKeyboardData in '..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas',
-  LangSwitchUtils in 'langswitch\LangSwitchUtils.pas',
+  Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',

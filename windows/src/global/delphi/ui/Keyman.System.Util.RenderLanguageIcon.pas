@@ -1,4 +1,4 @@
-unit LangSwitchUtils;
+unit Keyman.System.Util.RenderLanguageIcon;
 
 interface
 

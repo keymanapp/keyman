@@ -92,7 +92,9 @@ uses
   TouchLayout in '..\TIKE\oskbuilder\TouchLayout.pas',
   TouchLayoutDefinitions in '..\TIKE\oskbuilder\TouchLayoutDefinitions.pas',
   TouchLayoutUtils in '..\TIKE\oskbuilder\TouchLayoutUtils.pas',
-  KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas';
+  KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas',
+  Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
+  utilicon in '..\..\global\delphi\general\utilicon.pas';
 
 begin
   try
