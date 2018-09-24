@@ -6,6 +6,7 @@ import os
 import json
 from enum import Enum, auto
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
+from keyman_config.install_kmp import user_keyman_dir
 
 class InstallArea(Enum):
     IA_OS = auto()
@@ -36,8 +37,7 @@ def get_installed_kmp(area):
     check_paths = []
     if area == InstallArea.IA_USER:
         home = os.path.expanduser("~")
-        datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-        check_paths = [ os.path.join(datahome, "keyman"), os.path.join(home, ".kmfl") ]
+        check_paths = [ user_keyman_dir(), os.path.join(home, ".kmfl") ]
     elif area == InstallArea.IA_SHARED:
         check_paths = [ "/usr/local/share/keyman" ]
     elif area == InstallArea.IA_OS:

@@ -41,6 +41,14 @@ from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 # /usr/local/shared/keyman/kbid and link the files
 # to dirs in uls/doc and uls/fonts
 
+def user_keyman_dir():
+	home = os.path.expanduser("~")
+	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+	return os.path.join(datahome, "keyman")
+
+def user_keyboard_dir(keyboardid):
+	return os.path.join(user_keyman_dir(), keyboardid)
+
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
 
@@ -212,9 +220,7 @@ def install_kmp_shared(inputfile, online=False):
 def install_kmp_user(inputfile, online=False):
 	do_install_to_ibus = False
 	keyboardid, ext = os.path.splitext(os.path.basename(inputfile))
-	home = os.path.expanduser("~")
-	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-	kbdir=os.path.join(datahome, "keyman", keyboardid)
+	kbdir=user_keyboard_dir(keyboardid)
 	if not os.path.isdir(kbdir):
 		os.makedirs(kbdir)
 

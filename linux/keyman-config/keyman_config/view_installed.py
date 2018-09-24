@@ -14,6 +14,7 @@ from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.install_kmp import user_keyboard_dir
 
 class KeyboardBox(Gtk.Box):
     def __init__(self, kmp, window, area):
@@ -22,9 +23,7 @@ class KeyboardBox(Gtk.Box):
 
         self.kmp = kmp
         if area == InstallArea.IA_USER:
-            home = os.path.expanduser("~")
-            datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-            self.kbhome = os.path.join(datahome, "keyman", self.kmp["id"])
+            self.kbhome = user_keyboard_dir(self.kmp["id"])
             self.kbdoc = self.kbhome
         elif area == InstallArea.IA_SHARED:
             self.kbhome = os.path.join("/usr/local/share/keyman", self.kmp["id"])
@@ -95,6 +94,7 @@ class KeyboardBox(Gtk.Box):
         dialog.destroy()
         if response == Gtk.ResponseType.YES:
             logging.info("Uninstalling keyboard" + self.kmp["name"])
+            # can only uninstall with the gui from user area
             uninstall_kmp(self.kmp["id"])
             logging.info("need to refresh window after uninstalling a keyboard")
             self.parent.refresh_installed_kmp()

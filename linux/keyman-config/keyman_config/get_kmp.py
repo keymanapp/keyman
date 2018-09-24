@@ -23,11 +23,9 @@ def get_keyboard_data(keyboardid):
 	api_url = "https://api.keyman.com/keyboard/" + keyboardid
 	logging.debug("At URL %s", api_url)
 	home = str(Path.home())
-	cache_dir = os.path.join(home, ".local/share/keyman")
+	cache_dir = keyman_cache_dir()
 	current_dir = os.getcwd()
 	expire_after = datetime.timedelta(days=1)
-	if not os.path.isdir(cache_dir):
-		os.makedirs(cache_dir)
 	os.chdir(cache_dir)
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
@@ -43,6 +41,15 @@ def get_keyboard_data(keyboardid):
 def get_download_folder():
 	"""
 	Folder where downloaded files will be saved.
+
+	Returns:
+	    str: path of user keyman cache folder
+	"""
+	return keyman_cache_dir()
+
+def keyman_cache_dir()
+	"""
+	User keyman cache folder
 
 	Returns:
 	    str: path of user keyman cache folder
