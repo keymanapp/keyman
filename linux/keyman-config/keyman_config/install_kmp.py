@@ -124,6 +124,21 @@ def process_keyboard_data(kbid, kbdir):
 		return 1
 	return 0
 
+def check_keyman_dir(basedir, error_message):
+	# check if keyman subdir exists
+	keyman_dir = os.path.join(basedir, "keyman")
+	if os.path.isdir(keyman_dir):
+		# Check for write access of keyman dir to be able to create subdir
+		if not os.access(keyman_dir, os.X_OK | os.W_OK):
+			logging.error(error_message)
+			exit(3)
+	else:
+		# Check for write access of basedir and create keyman subdir if we can
+		if not os.access(basedir, os.X_OK | os.W_OK):
+			logging.error(error_message)
+			exit(3)
+		os.mkdir(keyman_dir)
+
 def install_kmp_shared(inputfile, online=False):
 	"""
 	Install a kmp file to /usr/local/share/keyman
@@ -133,15 +148,9 @@ def install_kmp_shared(inputfile, online=False):
 		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
 	"""
 	do_install_to_ibus = False
-	if not os.access('/usr/local/share/keyman', os.X_OK | os.W_OK): # Check for write access of keyman dir
-		logging.error("You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman")
-		exit(3)
-	if not os.access('/usr/local/share/doc/keyman', os.X_OK | os.W_OK): # Check for write access of keyman doc dir
-		logging.error("You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc")
-		exit(3)
-	if not os.access('/usr/local/share/fonts/keyman', os.X_OK | os.W_OK): # Check for write access of keyman fonts
-		logging.error("You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
-		exit(3)
+	check_keyman_dir('/usr/local/share', "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman")
+	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
+	check_keyman_dir('/usr/local/share/fonts', "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
 
 	kbid, ext = os.path.splitext(os.path.basename(inputfile))
 	kbdir = os.path.join('/usr/local/share/keyman', kbid)
