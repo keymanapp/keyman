@@ -143,34 +143,48 @@ class ViewInstalledWindow(Gtk.Window):
         Gtk.Window.__init__(self, title="Keyman keyboard packages")
         init_accel(self)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
 
         self.s = Gtk.ScrolledWindow()
-        vbox.pack_start(self.s, True, True, 0)
+        vbox.pack_start(self.s, True, True, 12)
 
         hbox = Gtk.Box(spacing=6)
-        vbox.pack_start(hbox, False, False, 0)
+        vbox.pack_start(hbox, False, False, 12)
 
         self.grid = KmpGrid(self)
         self.s.add(self.grid)
 
+        bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+
         button = Gtk.Button.new_with_mnemonic("_Refresh")
         button.connect("clicked", self.on_refresh_clicked)
-        hbox.pack_start(button, False, False, 0)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 12)
 
         button = Gtk.Button.new_with_mnemonic("_Download keyboard...")
         button.connect("clicked", self.on_download_clicked)
-        hbox.pack_start(button, False, False, 0)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 12)
 
         button = Gtk.Button.new_with_mnemonic("_Install keyboard...")
         button.connect("clicked", self.on_installfile_clicked)
-        hbox.pack_start(button, False, False, 0)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 5)
+
+        hbox.pack_start(bbox, False, False, 12)
+
+        bbox2 = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        bbox2.set_layout(Gtk.ButtonBoxStyle.END)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
-        hbox.pack_end(button, False, False, 0)
+        bbox2.pack_end(button, False, False, 12)
+        hbox.pack_end(bbox2, False, False, 12)
+
+
         bind_accelerator(self.accelerators, button, '<Control>q')
         bind_accelerator(self.accelerators, button, '<Control>w')
+
 
         self.add(vbox)
 

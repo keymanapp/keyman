@@ -53,9 +53,9 @@ class InstallKmpWindow(Gtk.Window):
         Gtk.Window.__init__(self, title=windowtitle)
         init_accel(self)
 
-        self.set_border_width(3)
+        self.set_border_width(12)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
 
         mainhbox = Gtk.Box()
 
@@ -112,7 +112,7 @@ class InstallKmpWindow(Gtk.Window):
             mainhbox.pack_start(image, False, False, 0)
 
             self.page1 = Gtk.Box()
-            self.page1.set_border_width(10)
+            self.page1.set_border_width(12)
 
             grid = Gtk.Grid()
             self.page1.add(grid)
