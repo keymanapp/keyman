@@ -120,6 +120,7 @@
         </DCCReference>
         <DCCReference Include="dialogs\UfrmNew.pas">
             <Form>frmNew</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\UfrmStartup.pas">
             <Form>frmStartup</Form>

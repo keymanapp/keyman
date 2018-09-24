@@ -418,18 +418,7 @@ end;
 
 function TKeyboardProjectTemplate.DataPath: string;
 begin
-  Result := ExtractFilePath(ParamStr(0));
-  // TODO: use KeymanDebugPaths
-  if DirectoryExists(Result + 'data') then
-    Exit(Result + 'data\');
-
-  // Probably running from source, so in Win32\Debug or similar, so
-  // traverse up a couple of directories.
-  Result := Result + '..\..\data\';
-  if DirectoryExists(Result) then
-     Exit;
-
-  raise EKeyboardProjectTemplate.Create('Cannot find template data path relative to executable');
+  Result := GetRedistProjectTemplatePath;
 end;
 
 procedure TKeyboardProjectTemplate.Transform(const SourceFile: string; DestFile: string = '');
