@@ -44,13 +44,14 @@ def get_download_folder():
 	Folder where downloaded files will be saved.
 
 	Returns:
-	    str: path of user keyman cache folder
+	    str: path where downloaded files will be saved
 	"""
 	return keyman_cache_dir()
 
 def keyman_cache_dir():
 	"""
 	User keyman cache folder
+	It will be created if it doesn't already exist
 
 	Returns:
 	    str: path of user keyman cache folder

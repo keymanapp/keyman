@@ -75,11 +75,10 @@ def download_source(kbid, kbdir, sourcePath):
 	kmn_url = base_url + "/source/" + kbid + ".kmn"
 	response = requests.get(kmn_url)
 	if response.status_code == 200:
-		kmndownloadfile = os.path.join(kbdir, kbid + ".kmn")
-		with open(kmndownloadfile, 'wb') as f:
+		kmn_file = os.path.join(kbdir, kbid + ".kmn")
+		with open(kmn_file, 'wb') as f:
 			f.write(response.content)
 			logging.info("Installing %s.kmn as keyman file", kbid)
-		kmn_file = os.path.join(kbdir, kbid + ".kmn")
 		logging.info("Compiling kmn file")
 		subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
 		kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
