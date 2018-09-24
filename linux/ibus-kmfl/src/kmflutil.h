@@ -83,6 +83,9 @@ typedef struct
     gchar * keyboard_description;
     gchar * keyboard_layout;
     gchar * keyboard_license;
+    gchar * keyboard_visualkeyboard;
+    gchar * keyboard_keyboardversion;
+    gchar * keyboard_ldmlfile;
 	
 } KInputMethod;
 

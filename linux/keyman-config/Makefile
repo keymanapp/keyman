@@ -1,8 +1,6 @@
 #!/usr/bin/make
 
-VERSION=`cat ../VERSION`
-
-default: man
+default: clean version man
 	python3 setup.py build
 
 install: # run as sudo
@@ -30,21 +28,24 @@ uninstall: # run as sudo
 	rm -f /usr/local/bin/km-package-uninstall
 
 clean:
-	-rm -rf dist make_deb build
+	-rm -rf dist make_deb build keyman_config/version.py
 
-devdist:
+devdist: version
 	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
 
-dist: clean
+dist: clean version
 	python3 setup.py sdist
 
-deb: clean devdist man
-	-mkdir make_deb
-	cd make_deb && tar xf ../dist/keyman_config-$(VERSION).tar.gz && \
-		mv keyman_config-$(VERSION) keyman-config-$(VERSION) && \
-		tar cfz keyman-config_$(VERSION).orig.tar.gz keyman-config-$(VERSION) && \
-		cd keyman-config-$(VERSION) && cp -a ../../debian .
-	cd make_deb/keyman-config-$(VERSION) && debuild -us -uc
+deb: dist
+	@VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
+	@echo VERSION is $(shell cat /tmp/keyman_version)
+	@mkdir -p make_deb
+	cd make_deb && tar xf ../dist/keyman_config-$(shell cat /tmp/keyman_version).tar.gz && \
+		mv keyman_config-$(shell cat /tmp/keyman_version) keyman-config-$(shell cat /tmp/keyman_version) && \
+		tar cfz keyman-config_$(shell cat /tmp/keyman_version).orig.tar.gz keyman-config-$(shell cat /tmp/keyman_version) && \
+		cd keyman-config-$(shell cat /tmp/keyman_version) && cp -a ../../debian . && dch -v$(shell cat /tmp/keyman_version)-1 ""
+	cd make_deb/keyman-config-$(shell cat /tmp/keyman_version) && debuild -us -uc
+	rm /tmp/keyman_version
 
 man:
 	mkdir -p debian/man
@@ -55,3 +56,5 @@ man:
 	help2man -N ./km-package-list-installed -o debian/man/km-package-list-installed.1 -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
 	help2man -N ./km-package-uninstall -o debian/man/km-package-uninstall.1 -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
 
+version:
+	cd .. && ./scripts/reconf.sh keyman-config

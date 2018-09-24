@@ -6,6 +6,7 @@ import subprocess
 import sys
 import os.path
 from shutil import rmtree
+from keyman_config.get_kmp import user_keyboard_dir, user_keyman_font_dir
 
 def uninstall_from_ibus(kmnfile):
 	if sys.version_info.major == 3 and sys.version_info.minor < 6:
@@ -79,9 +80,7 @@ def uninstall_kmp_user(keyboardid):
 	Args:
 		keyboardid (str): Keyboard ID
 	"""
-	home = os.path.expanduser("~")
-	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-	kbdir=os.path.join(datahome, "keyman", keyboardid)
+	kbdir=user_keyboard_dir(keyboardid)
 	if not os.path.isdir(kbdir):
 		logging.error("Keyboard directory for %s does not exist. Aborting", keyboardid)
 		exit(3)
@@ -90,7 +89,7 @@ def uninstall_kmp_user(keyboardid):
 	uninstall_from_ibus(kmnfile)
 	rmtree(kbdir)
 	logging.info("Removed user keyman directory: %s", kbdir)
-	fontdir=os.path.join(datahome, "fonts", "keyman", keyboardid)
+	fontdir=os.path.join(user_keyman_font_dir(), keyboardid)
 	if os.path.isdir(fontdir):
 		rmtree(fontdir)
 		logging.info("Removed user keyman font directory: %s", fontdir)
@@ -98,7 +97,7 @@ def uninstall_kmp_user(keyboardid):
 
 
 
-def uninstall_kmp(keyboardid, sharedarea):
+def uninstall_kmp(keyboardid, sharedarea=False):
 	"""
 	Uninstall a kmp
 
