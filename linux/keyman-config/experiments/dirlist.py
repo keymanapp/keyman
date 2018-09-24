@@ -7,15 +7,14 @@ import requests
 import requests_cache
 import os
 import time
+from keyman_config.get_kmp import keyman_cache_dir
 
 def get_keyboard_dir_page(kb_url):
     logging.info("Getting keyboard list")
     logging.debug("At URL %s", kb_url)
-    home = os.path.expanduser("~")
-    datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-    cache_dir = os.path.join(datahome, "keyman")
+    cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
-    expire_after = datetime.timedelta(days=1)
+    expire_after = datetime.timedelta(days=7)
     if not os.path.isdir(cache_dir):
         os.makedirs(cache_dir)
     os.chdir(cache_dir)

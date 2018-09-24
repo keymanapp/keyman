@@ -12,7 +12,7 @@ from dirlist import list_keyboards
 #from keymankeyboards import get_api_keyboards
 
 #from keyman_config import get_kmp, install_kmp
-from keyman_config.get_kmp import get_keyboard_data, get_kmp_file
+from keyman_config.get_kmp import get_keyboard_data, get_kmp_file, keyman_cache_dir
 from keyman_config.install_kmp import get_metadata, get_infdata, extract_kmp
 
 #TODO check for kmn and check if it is compilable
@@ -22,11 +22,9 @@ def get_kmn(kbid, sourcePath):
 	base_url = "https://raw.github.com/keymanapp/keyboards/master/" + sourcePath
 	kmn_url = base_url + "/source/" + kbid + ".kmn"
 
-	home = os.path.expanduser("~")
-	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
-	cache_dir = os.path.join(datahome, "keyman")
+	cache_dir = keyman_cache_dir()
 	current_dir = os.getcwd()
-	expire_after = datetime.timedelta(days=1)
+	expire_after = datetime.timedelta(days=7)
 	if not os.path.isdir(cache_dir):
 		os.makedirs(cache_dir)
 	os.chdir(cache_dir)
@@ -65,7 +63,7 @@ def main():
 
 
 			for kbid in keyboarddata:
-				kbdata = get_keyboard_data(kbid)
+				kbdata = get_keyboard_data(kbid, True)
 				print(kbid)
 				if kbdata:
 					if 'packageFilename' in kbdata:

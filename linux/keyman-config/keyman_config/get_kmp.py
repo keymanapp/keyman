@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 
 
-def get_keyboard_data(keyboardid):
+def get_keyboard_data(keyboardid, weekCache=False):
 	"""
 	Get Keyboard data from web api.
 
@@ -26,7 +26,10 @@ def get_keyboard_data(keyboardid):
 	home = str(Path.home())
 	cache_dir = keyman_cache_dir()
 	current_dir = os.getcwd()
-	expire_after = datetime.timedelta(days=1)
+	if weekCache:
+		expire_after = datetime.timedelta(days=7)
+	else:
+		expire_after = datetime.timedelta(days=1)
 	os.chdir(cache_dir)
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
@@ -110,14 +113,13 @@ def download_kmp_file(url, kmpfile, cache=False):
 	downloadfile = None
 
 	if cache:
-		home = str(Path.home())
-		cache_dir = os.path.join(home, ".local/share/keyman")
+		cache_dir = keyman_cache_dir()
 		current_dir = os.getcwd()
-		expire_after = datetime.timedelta(days=1)
+		expire_after = datetime.timedelta(days=7)
 		if not os.path.isdir(cache_dir):
 			os.makedirs(cache_dir)
 		os.chdir(cache_dir)
-		requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
+		requests_cache.install_cache(cache_name='keyman_kmp_cache', backend='sqlite', expire_after=expire_after)
 		now = time.ctime(int(time.time()))
 
 	response = requests.get(url) #, stream=True)
