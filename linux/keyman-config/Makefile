@@ -37,13 +37,13 @@ dist: clean version
 	python3 setup.py sdist
 
 deb: dist
-	VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
+	@VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
 	@echo VERSION is $(shell cat /tmp/keyman_version)
 	@mkdir -p make_deb
 	cd make_deb && tar xf ../dist/keyman_config-$(shell cat /tmp/keyman_version).tar.gz && \
 		mv keyman_config-$(shell cat /tmp/keyman_version) keyman-config-$(shell cat /tmp/keyman_version) && \
 		tar cfz keyman-config_$(shell cat /tmp/keyman_version).orig.tar.gz keyman-config-$(shell cat /tmp/keyman_version) && \
-		cd keyman-config-$(shell cat /tmp/keyman_version) && cp -a ../../debian .
+		cd keyman-config-$(shell cat /tmp/keyman_version) && cp -a ../../debian . && dch -v$(shell cat /tmp/keyman_version)-1 ""
 	cd make_deb/keyman-config-$(shell cat /tmp/keyman_version) && debuild -us -uc
 	rm /tmp/keyman_version
 
