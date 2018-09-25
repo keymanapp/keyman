@@ -1,4 +1,4 @@
-inherited frmNewBasicProjectParameters: TfrmNewBasicProjectParameters
+inherited frmNewProjectParameters: TfrmNewProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Project'

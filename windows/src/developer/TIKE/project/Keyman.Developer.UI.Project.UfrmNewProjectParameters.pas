@@ -1,4 +1,4 @@
-unit Keyman.Developer.UI.Project.UfrmNewBasicProjectParameters;
+unit Keyman.Developer.UI.Project.UfrmNewProjectParameters;
 
 interface
 
@@ -22,7 +22,7 @@ uses
   UKeymanTargets;
 
 type
-  TfrmNewBasicProjectParameters = class(TTikeForm)
+  TfrmNewProjectParameters = class(TTikeForm)
     lblFileName: TLabel;
     lblPath: TLabel;
     editFileName: TEdit;
@@ -82,7 +82,7 @@ type
     property KeyboardID: string read GetKeyboardID;
   end;
 
-function ShowNewBasicProject(Owner: TComponent): Boolean;
+function ShowNewProjectParameters(Owner: TComponent): Boolean;
 
 implementation
 
@@ -109,12 +109,12 @@ uses
 
 {$R *.dfm}
 
-function ShowNewBasicProject(Owner: TComponent): Boolean;
+function ShowNewProjectParameters(Owner: TComponent): Boolean;
 var
-  f: TfrmNewBasicProjectParameters;
+  f: TfrmNewProjectParameters;
   kpt: TKeyboardProjectTemplate;
 begin
-  f := TfrmNewBasicProjectParameters.Create(Owner);
+  f := TfrmNewProjectParameters.Create(Owner);
   try
     Result := f.ShowModal = mrOk;
     if not Result then
@@ -146,7 +146,7 @@ end;
 
 { TfrmNewBasicProjectParameters }
 
-procedure TfrmNewBasicProjectParameters.FormCreate(Sender: TObject);
+procedure TfrmNewProjectParameters.FormCreate(Sender: TObject);
 var
   i: TKeymanTarget;
 begin
@@ -165,13 +165,13 @@ begin
   EnableControls;
 end;
 
-procedure TfrmNewBasicProjectParameters.FormDestroy(Sender: TObject);
+procedure TfrmNewProjectParameters.FormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(pack);
 end;
 
-procedure TfrmNewBasicProjectParameters.cmdKeyboardAddLanguageClick(
+procedure TfrmNewProjectParameters.cmdKeyboardAddLanguageClick(
   Sender: TObject);
 var
   k: TPackageKeyboard;
@@ -199,7 +199,7 @@ begin
   end;
 end;
 
-procedure TfrmNewBasicProjectParameters.cmdKeyboardEditLanguageClick(
+procedure TfrmNewProjectParameters.cmdKeyboardEditLanguageClick(
   Sender: TObject);
 var
   k: TPackageKeyboard;
@@ -228,7 +228,7 @@ begin
   end;
 end;
 
-procedure TfrmNewBasicProjectParameters.cmdKeyboardRemoveLanguageClick(
+procedure TfrmNewProjectParameters.cmdKeyboardRemoveLanguageClick(
   Sender: TObject);
 var
   k: TPackageKeyboard;
@@ -244,20 +244,20 @@ begin
   EnableControls;
 end;
 
-procedure TfrmNewBasicProjectParameters.cmdOKClick(Sender: TObject);
+procedure TfrmNewProjectParameters.cmdOKClick(Sender: TObject);
 begin
   if Validate then
     ModalResult := mrOk;
 end;
 
-procedure TfrmNewBasicProjectParameters.editKeyboardNameChange(Sender: TObject);
+procedure TfrmNewProjectParameters.editKeyboardNameChange(Sender: TObject);
 begin
   inherited;
   if not editFileName.Modified then
     editFileName.Text := TKeyboardUtils.CleanKeyboardID(Trim(editKeyboardName.Text));
 end;
 
-procedure TfrmNewBasicProjectParameters.EnableControls;
+procedure TfrmNewProjectParameters.EnableControls;
 var
   e: Boolean;
 begin
@@ -274,32 +274,32 @@ begin
     gridKeyboardLanguages.FixedRows := 1;
 end;
 
-function TfrmNewBasicProjectParameters.GetAuthor: string;
+function TfrmNewProjectParameters.GetAuthor: string;
 begin
   Result := Trim(editAuthor.Text);
 end;
 
-function TfrmNewBasicProjectParameters.GetBasePath: string;
+function TfrmNewProjectParameters.GetBasePath: string;
 begin
   Result := Trim(editPath.Text);
 end;
 
-function TfrmNewBasicProjectParameters.GetCopyright: string;
+function TfrmNewProjectParameters.GetCopyright: string;
 begin
   Result := Trim(editCopyright.Text);
 end;
 
-function TfrmNewBasicProjectParameters.GetKeyboardID: string;
+function TfrmNewProjectParameters.GetKeyboardID: string;
 begin
   Result := Trim(LowerCase(editFileName.Text));
 end;
 
-function TfrmNewBasicProjectParameters.GetKeyboardName: string;
+function TfrmNewProjectParameters.GetKeyboardName: string;
 begin
   Result := Trim(editKeyboardName.Text);
 end;
 
-function TfrmNewBasicProjectParameters.GetBCP47Tags: string;
+function TfrmNewProjectParameters.GetBCP47Tags: string;
 var
   lang: TPackageKeyboardLanguage;
 begin
@@ -311,7 +311,7 @@ begin
   Result := Result.Trim;
 end;
 
-function TfrmNewBasicProjectParameters.GetTargets: TKeymanTargets;
+function TfrmNewProjectParameters.GetTargets: TKeymanTargets;
 var
   i: Integer;
 begin
@@ -321,37 +321,37 @@ begin
       Include(Result, TKeymanTarget(i));
 end;
 
-function TfrmNewBasicProjectParameters.GetVersion: string;
+function TfrmNewProjectParameters.GetVersion: string;
 begin
   Result := Trim(editVersion.Text);
 end;
 
-procedure TfrmNewBasicProjectParameters.gridKeyboardLanguagesClick(
+procedure TfrmNewProjectParameters.gridKeyboardLanguagesClick(
   Sender: TObject);
 begin
   EnableControls;
 end;
 
-procedure TfrmNewBasicProjectParameters.gridKeyboardLanguagesDblClick(
+procedure TfrmNewProjectParameters.gridKeyboardLanguagesDblClick(
   Sender: TObject);
 begin
   if SelectedKeyboardLanguage <> nil then
     cmdKeyboardEditLanguage.Click;
 end;
 
-function TfrmNewBasicProjectParameters.Validate: Boolean;
+function TfrmNewProjectParameters.Validate: Boolean;
 begin
   Result := TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text));
 end;
 
 { Languages Grid }
 
-function TfrmNewBasicProjectParameters.SelectedKeyboard: TPackageKeyboard;
+function TfrmNewProjectParameters.SelectedKeyboard: TPackageKeyboard;
 begin
   Result := pack.Keyboards[0];
 end;
 
-function TfrmNewBasicProjectParameters.SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+function TfrmNewProjectParameters.SelectedKeyboardLanguage: TPackageKeyboardLanguage;
 var
   k: TPackageKeyboard;
 begin
@@ -365,7 +365,7 @@ begin
   Result := gridKeyboardLanguages.Objects[0, gridKeyboardLanguages.Row] as TPackageKeyboardLanguage;
 end;
 
-procedure TfrmNewBasicProjectParameters.LanguageGrid_Fill;
+procedure TfrmNewProjectParameters.LanguageGrid_Fill;
 var
   k: TPackageKeyboard;
   i: Integer;

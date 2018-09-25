@@ -80,7 +80,7 @@ uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
-  Keyman.Developer.UI.Project.UfrmNewBasicProjectParameters,
+  Keyman.Developer.UI.Project.UfrmNewProjectParameters,
   UfrmMain,
   utilsystem;
 
@@ -104,7 +104,7 @@ begin
     kptUnknown:
       Assert(False, 'Should not be able to have a project type of unknown here');
     kptBasic:
-      Result := ShowNewBasicProject(Owner);
+      Result := ShowNewProjectParameters(Owner);
     kptBlank:
       begin
         FGlobalProject.Save;
