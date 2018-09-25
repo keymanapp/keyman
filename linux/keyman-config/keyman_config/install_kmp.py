@@ -21,8 +21,13 @@ from keyman_config.convertico import checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 
 #TODO userdir install
-# special processing for kmn
-# what errors need abort and uninstall?
+# special processing for kmn if needed
+#TODO gui review
+# review what errors need abort and uninstall and
+#    where there should be user feedback to gui
+#TODO optionally standardise throughout on variable names
+# packageID for kmps and keyboardID for keyboards
+# see https://docs.google.com/document/d/1sj7W6pCiN-_iRss5iRdib1aHaSTmYoLIueQSKJeNy8Q/edit#heading=h.mq0rc28mf031
 
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
