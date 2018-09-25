@@ -19,7 +19,7 @@ from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.kmpmetadata import get_fonts
 from keyman_config.welcome import WelcomeView
 from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.get_kmp import get_download_folder
+from keyman_config.get_kmp import get_download_folder, user_keyboard_dir
 from keyman_config.check_mime_type import check_mime_type
 from keyman_config.accelerators import bind_accelerator, init_accel
 
@@ -266,7 +266,7 @@ class InstallKmpWindow(Gtk.Window):
         if self.viewwindow:
             self.viewwindow.refresh_installed_kmp()
         keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-        welcome_file = os.path.join("/usr/local/share/doc/keyman", keyboardid, "welcome.htm")
+        welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
         if os.path.isfile(welcome_file):
             uri_path = pathlib.Path(welcome_file).as_uri()
             logging.debug(uri_path)

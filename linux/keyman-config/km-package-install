@@ -8,6 +8,7 @@ from keyman_config import __version__
 
 def main():
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')
+	parser.add_argument('-s', action='store_true', help='Install to shared area /usr/local')
 	parser.add_argument('-f', metavar='<kmpfile>', help='Keyman kmp file')
 	parser.add_argument('-k', metavar='<keyboardid>', help='Keyman keyboard id')
 	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
@@ -33,7 +34,7 @@ def main():
 	if args.f:
 		name, ext = os.path.splitext(args.f)
 		if ext != ".kmp":
-			logging.error("km-package-install: Input file", args.f, "is not a kmp file.")
+			logging.error("km-package-install: Input file %s is not a kmp file.", args.f)
 			logging.error("km-package-install -f <kmpfile>")
 			sys.exit(2)
 
@@ -42,12 +43,12 @@ def main():
 			logging.error("km-package-install -f <kmpfile>")
 			sys.exit(2)
 
-		install_kmp(args.f)
+		install_kmp(args.f, False, args.s)
 	elif args.k:
 		installed_kmp_ver = get_kmp_version(args.k)
 		kbdata = get_keyboard_data(args.k)
 		if not kbdata:
-			logging.error("km-package-install: error: Could not download keyboard data for", args.k)
+			logging.error("km-package-install: error: Could not download keyboard data for %s", args.k)
 			sys.exit(3)
 		if installed_kmp_ver:
 			if kbdata['version'] == installed_kmp_ver:
@@ -55,11 +56,11 @@ def main():
 				sys.exit(1)
 			elif float(kbdata['version']) > float(installed_kmp_ver):
 				logging.error("km-package-install: A newer version of %s keyboard is available. Uninstalling old version %s then downloading and installing new version %s.", args.k, installed_kmp_ver, kbdata['version'])
-				uninstall_kmp(args.k)
+				uninstall_kmp(args.k, args.s)
 
 		kmpfile = get_kmp(args.k)
 		if kmpfile:
-			install_kmp(kmpfile, True)
+			install_kmp(kmpfile, True, args.s)
 		else:
 			logging.error("km-package-install: error: Could not download keyboard package %s", args.k)
 			sys.exit(2)

@@ -126,15 +126,16 @@ class KeyboardDetailsView(Gtk.Window):
         label8.set_halign(Gtk.Align.END)
         grid.attach_next_to(label8, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = label8
-        label = Gtk.Label()
-        welcome_file = os.path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
-        if os.path.isfile(welcome_file):
-            label.set_text("Installed")
-        else:
-            label.set_text("Not installed")
-        label.set_halign(Gtk.Align.START)
-        label.set_selectable(True)
-        grid.attach_next_to(label, label8, Gtk.PositionType.RIGHT, 1, 1)
+        #TODO need to know which area keyboard is installed in to show this
+        # label = Gtk.Label()
+        # welcome_file = os.path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
+        # if os.path.isfile(welcome_file):
+        #     label.set_text("Installed")
+        # else:
+        #     label.set_text("Not installed")
+        # label.set_halign(Gtk.Align.START)
+        # label.set_selectable(True)
+        # grid.attach_next_to(label, label8, Gtk.PositionType.RIGHT, 1, 1)
 
         label9 = Gtk.Label()
         # stored in kmx

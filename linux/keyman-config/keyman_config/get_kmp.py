@@ -10,6 +10,7 @@ import requests_cache
 import os
 from pathlib import Path
 
+
 def get_keyboard_data(keyboardid):
 	"""
 	Get Keyboard data from web api.
@@ -23,11 +24,9 @@ def get_keyboard_data(keyboardid):
 	api_url = "https://api.keyman.com/keyboard/" + keyboardid
 	logging.debug("At URL %s", api_url)
 	home = str(Path.home())
-	cache_dir = os.path.join(home, ".local/share/keyman")
+	cache_dir = keyman_cache_dir()
 	current_dir = os.getcwd()
 	expire_after = datetime.timedelta(days=1)
-	if not os.path.isdir(cache_dir):
-		os.makedirs(cache_dir)
 	os.chdir(cache_dir)
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
@@ -45,6 +44,16 @@ def get_download_folder():
 	Folder where downloaded files will be saved.
 
 	Returns:
+	    str: path where downloaded files will be saved
+	"""
+	return keyman_cache_dir()
+
+def keyman_cache_dir():
+	"""
+	User keyman cache folder
+	It will be created if it doesn't already exist
+
+	Returns:
 	    str: path of user keyman cache folder
 	"""
 	home = os.path.expanduser("~")
@@ -53,6 +62,21 @@ def get_download_folder():
 	if not os.path.isdir(km_cache):
 		os.mkdir(km_cache)
 	return km_cache
+
+def user_keyman_dir():
+	home = os.path.expanduser("~")
+	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+	return os.path.join(datahome, "keyman")
+
+def user_keyman_font_dir():
+	home = os.path.expanduser("~")
+	datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+	return os.path.join(datahome, "fonts", "keyman")
+
+
+def user_keyboard_dir(keyboardid):
+	return os.path.join(user_keyman_dir(), keyboardid)
+
 
 def get_kmp_file(kbdata):
 	"""
