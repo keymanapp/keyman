@@ -1,0 +1,8 @@
+ibus-kmfl (1.0.8-1) unstable; urgency=low
+
+  * changed IBusEngineDesc to include layout and license information
+  * default to "us" layout if no layout is specified
+  * fix bug when keyboard version was greater than 7.0
+  * initial release to Debian
+  
+ -- Doug Rintoul <doug_rintoul@sil.org>  Wed, 12 Oct 2016 10:22:01 -0700
