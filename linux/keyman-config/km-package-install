@@ -34,7 +34,7 @@ def main():
 	if args.f:
 		name, ext = os.path.splitext(args.f)
 		if ext != ".kmp":
-			logging.error("km-package-install: Input file", args.f, "is not a kmp file.")
+			logging.error("km-package-install: Input file %s is not a kmp file.", args.f)
 			logging.error("km-package-install -f <kmpfile>")
 			sys.exit(2)
 
@@ -48,7 +48,7 @@ def main():
 		installed_kmp_ver = get_kmp_version(args.k)
 		kbdata = get_keyboard_data(args.k)
 		if not kbdata:
-			logging.error("km-package-install: error: Could not download keyboard data for", args.k)
+			logging.error("km-package-install: error: Could not download keyboard data for %s", args.k)
 			sys.exit(3)
 		if installed_kmp_ver:
 			if kbdata['version'] == installed_kmp_ver:
