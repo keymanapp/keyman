@@ -133,11 +133,12 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+      String kbRTL = keyboardInfo.get(KMManager.KMKey_KeyboardRTL);
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
       if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, kbRTL);
       if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, kbRTL);
 
       finish();
     } else {
@@ -167,6 +168,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String kbVersion = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_KeyboardVersion, "1.0");
       String isCustom = "N";
       String kbFont = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_Font, "");
+      String kbRTL = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
 
       kbInfo = new HashMap<String, String>();
       kbInfo.put(KMManager.KMKey_PackageID, pkgID);
@@ -177,6 +179,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
       kbInfo.put(KMManager.KMKey_CustomKeyboard, isCustom);
       kbInfo.put(KMManager.KMKey_Font, kbFont);
+      kbInfo.put(KMManager.KMKey_KeyboardRTL, kbRTL);
     } catch (JSONException e) {
       kbInfo = null;
       Log.e("getKeyboardInfo", "JSON Error: " + e);
@@ -212,6 +215,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           String kbVersion = "1.0";
           String isCustom = "N";
           String kbFont = "";
+          String kbRTL = KMManager.KMDefault_KeyboardRTL;
           JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
           JSONObject keyboard = null;
 
@@ -223,6 +227,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             kbName = keyboard.getString(KMManager.KMKey_Name);
             kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
             kbFont = keyboard.optString(KMManager.KMKey_Font, "");
+            kbRTL = keyboard.optString(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
 
             kbKey = String.format("%s_%s", langID, kbID);
             HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -232,6 +237,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
             hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
             hashMap.put(KMManager.KMKey_Font, kbFont);
+            hashMap.put(KMManager.KMKey_KeyboardRTL, kbRTL);
             keyboardsInfo.put(kbKey, hashMap);
 
             if (keyboardModifiedDates.get(kbID) == null) {
@@ -244,6 +250,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               kbName = keyboard.getString(KMManager.KMKey_Name);
               kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
               kbFont = keyboard.optString(KMManager.KMKey_Font, "");
+              kbRTL = keyboard.optString(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
 
               kbKey = String.format("%s_%s", langID, kbID);
               HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -252,6 +259,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
               hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
               hashMap.put(KMManager.KMKey_Font, kbFont);
+              hashMap.put(KMManager.KMKey_KeyboardRTL, kbRTL);
               keyboardsInfo.put(kbKey, hashMap);
 
               if (keyboardModifiedDates.get(kbID) == null) {

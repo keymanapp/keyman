@@ -20,6 +20,7 @@
         android:ems="10"
         android:inputType="textMultiLine|textNoSuggestions"
         android:hint="@string/textview_hint"
+        android:textDirection="anyRtl"
         android:gravity="top"
         android:scrollbars="vertical">
 

@@ -67,6 +67,7 @@ final class KMKeyboard extends WebView {
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
+  private boolean isRTL = false;
   private static FirebaseAnalytics mFirebaseAnalytics;
 
   protected boolean keyboardSet = false;
@@ -138,7 +139,7 @@ final class KMKeyboard extends WebView {
 
           setKeyboard(KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID,
             KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
-            KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
+            KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null, KMManager.KMDefault_KeyboardRTL);
         }
         return true;
       }
@@ -302,6 +303,7 @@ final class KMKeyboard extends WebView {
 
     String keyboardName = "";
     String languageName = "";
+    String keyboardRTL = KMManager.KMDefault_KeyboardRTL;
     keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
     setKeyboardRoot(packageID);
@@ -315,6 +317,9 @@ final class KMKeyboard extends WebView {
       if (kbInfo != null) {
         keyboardName = kbInfo.get(KMManager.KMKey_KeyboardName).replace("'", "\\'");
         languageName = kbInfo.get(KMManager.KMKey_LanguageName).replace("'", "\\'");
+        keyboardRTL = (kbInfo.get(KMManager.KMKey_KeyboardRTL) != null) ?
+          kbInfo.get(KMManager.KMKey_KeyboardRTL) : KMManager.KMDefault_KeyboardRTL;
+
         txtFont = getFontFilename(kbInfo.get(KMManager.KMKey_Font));
         oskFont = getFontFilename(kbInfo.get(KMManager.KMKey_OskFont));
 
@@ -357,6 +362,8 @@ final class KMKeyboard extends WebView {
     this.keyboardID = keyboardID;
     this.keyboardName = keyboardName;
     this.keyboardVersion = keyboardVersion;
+    this.isRTL = Boolean.parseBoolean(keyboardRTL);
+
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -374,7 +381,8 @@ final class KMKeyboard extends WebView {
     return retVal;
   }
 
-  public boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+  public boolean setKeyboard(String packageID, String keyboardID, String languageID,
+                             String keyboardName, String languageName, String kFont, String kOskFont, String keyboardRTL) {
     if (packageID == null || keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
       return false;
     }
@@ -389,6 +397,7 @@ final class KMKeyboard extends WebView {
       languageID = KMManager.KMDefault_LanguageID;
       keyboardName = KMManager.KMDefault_KeyboardName;
       languageName = KMManager.KMDefault_LanguageName;
+      keyboardRTL = KMManager.KMDefault_KeyboardRTL;
       kFont = KMManager.KMDefault_KeyboardFont;
       kOskFont = kFont;
       retVal = false;
@@ -458,6 +467,8 @@ final class KMKeyboard extends WebView {
     this.keyboardID = keyboardID;
     this.keyboardName = keyboardName;
     this.keyboardVersion = keyboardVersion;
+    this.isRTL = (keyboardRTL != null) ? Boolean.parseBoolean(keyboardRTL) : Boolean.parseBoolean(KMManager.KMDefault_KeyboardRTL);
+
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -484,6 +495,10 @@ final class KMKeyboard extends WebView {
 
     return this.isChiral;
 
+  }
+
+  public boolean getRTL() {
+    return this.isRTL;
   }
 
   // Set the base path of the keyboard depending on the package ID

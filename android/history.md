@@ -7,8 +7,9 @@
 * Change default keyboard from `european` to `sil_euro_latin` (#1112)
 * Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
 * Add splash screen (#1151)
-* Update app to use Material Design theme
+* Update app to use Material Design theme (#681)
 * Fix globe button when pausing WebBrowser (#1213)
+* Handle RTL metadata on keyboard downloads (#1209)
 
 ## 2018-08-23 10.0.505 stable
 * Validate keyboard ID when downloading keyboard from keman cloud (#1121)

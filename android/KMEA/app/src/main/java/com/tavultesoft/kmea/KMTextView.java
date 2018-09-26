@@ -12,6 +12,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 
 import android.app.Activity;
 import android.content.ContextWrapper;
+import android.os.Build;
 import android.view.ContextThemeWrapper;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -180,6 +182,21 @@ public final class KMTextView extends AppCompatEditText {
       if (activeView != null && activeView.equals(this)) {
         if (KMManager.InAppKeyboardLoaded) {
           KMTextView textView = (KMTextView) activeView;
+
+          // Can set direction for Android SDK 17+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (KMManager.InAppKeyboard.getRTL()) {
+              textView.setTextDirection(View.TEXT_DIRECTION_RTL);
+            } else {
+              textView.setTextDirection(View.TEXT_DIRECTION_LTR);
+            }
+          } else {
+            if (KMManager.InAppKeyboard.getRTL()) {
+              textView.setGravity(Gravity.RIGHT);
+            } else {
+              textView.setGravity(Gravity.LEFT);
+            }
+          }
           int selStart = textView.getSelectionStart();
           int selEnd = textView.getSelectionEnd();
           KMManager.updateText(KeyboardType.KEYBOARD_TYPE_INAPP, textView.getText().toString());
