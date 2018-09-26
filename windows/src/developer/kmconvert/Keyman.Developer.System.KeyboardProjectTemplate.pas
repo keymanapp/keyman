@@ -209,6 +209,7 @@ begin
     if FCopyright <> '' then
       kp.SetSystemStoreValue(ssCopyright, FCopyright);
     kp.SetSystemStoreValue(ssVersion, SKeymanKeyboardVersion);
+    kp.SetSystemStoreValue(ssKeyboardVersion, FVersion);
     kp.SetSystemStoreValue(ssTargets, KeymanTargetsToString(FTargets));
 
     if HasIcon then

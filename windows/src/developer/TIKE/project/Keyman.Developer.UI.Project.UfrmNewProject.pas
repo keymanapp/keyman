@@ -81,6 +81,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
+  Keyman.Developer.UI.ImportWindowsKeyboardDialogManager,
   UfrmMain,
   utilsystem;
 
@@ -114,6 +115,8 @@ begin
         frmKeymanDeveloper.ShowProject;
         Result := True;
       end;
+    kptImportWindowsKeyboard:
+      Result := ShowImportWindowsKeyboard(Owner);
   end;
 end;
 
@@ -146,6 +149,8 @@ begin
     Result := kptBasic
   else if lvItems.Selected.Caption = 'Blank' then
     Result := kptBlank
+  else if lvItems.Selected.Caption = 'Import Windows Keyboard' then
+    Result := kptImportWindowsKeyboard
   else
     Result := kptUnknown;
 end;

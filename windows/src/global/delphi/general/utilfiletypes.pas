@@ -84,7 +84,7 @@ type
   end;
 
 type
-  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank);
+  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank, kptImportWindowsKeyboard);
 
 implementation
 
