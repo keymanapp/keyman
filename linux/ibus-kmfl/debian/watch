@@ -1,2 +1,2 @@
-version=3
-http://sf.net/kmfl/ibus-kmfl-(.+)\.tar\.gz debian uupdate
+version=4
+https://downloads.keyman.com/linux/alpha/10\.99\.(.+)/ibus-kmfl-(.+)\.tar\.gz debian uupdate
