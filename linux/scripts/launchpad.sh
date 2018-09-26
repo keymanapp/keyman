@@ -4,9 +4,8 @@
 
 # must be run from linux dir
 
-# parameters: [UPLOAD="yes"] [LAUNCHPAD_ID="<me>"] [PROJECT="<project>"] [DIST="<dist>"] ./scripts/launchpad.sh
+# parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
-# LAUNCHPAD_ID="<me>" to set the launchpad id to dput to
 # PROJECT="<project>" only upload this project
 # DIST="<dist>" only upload for this distribution
 
@@ -14,14 +13,9 @@
 set -e
 
 if [ "${UPLOAD}" == "yes" ]; then
-    SIM=
+    SIM=""
 else
     SIM="-s -u"
-fi
-
-if [ "${LAUNCHPAD_ID}" == "" ]; then
-    echo "you must set your LAUNCHPAD_ID in the enviroment for dputting"
-    exit 1
 fi
 
 if [ ! `which xmllint` ]; then
@@ -71,7 +65,7 @@ for proj in ${projects}; do
     done
     cd ..
     for dist in ${distributions}; do
-        dput ${SIM} ppa:${LAUNCHPAD_ID}/keyman-daily ${proj}_${version}-1~${dist}_source.changes
+        dput ${SIM} ppa:keymanapp/keyman-daily ${proj}_${version}-1~${dist}_source.changes
     done
     cd ${BASEDIR}
 done
