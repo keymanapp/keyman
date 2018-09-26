@@ -4,12 +4,20 @@
 
 # must be run from linux dir
 
-# parameters: [LAUNCHPAD_ID="<me>"] [PROJECT="<project>"] ./scripts/launchpad.sh
+# parameters: [UPLOAD="yes"] [LAUNCHPAD_ID="<me>"] [PROJECT="<project>"] [DIST="<dist>"] ./scripts/launchpad.sh
+# UPLOAD="yes" do the dput for real
 # LAUNCHPAD_ID="<me>" to set the launchpad id to dput to
 # PROJECT="<project>" only upload this project
+# DIST="<dist>" only upload for this distribution
 
 
 set -e
+
+if [ "${UPLOAD}" == "yes" ]; then
+    SIM=
+else
+    SIM="-s -u"
+fi
 
 if [ "${LAUNCHPAD_ID}" == "" ]; then
     echo "you must set your LAUNCHPAD_ID in the enviroment for dputting"
@@ -22,14 +30,18 @@ if [ ! `which xmllint` ]; then
 fi
 
 if [ "${PROJECT}" != "" ]; then
-    projects="$PROJECT"
+    projects="${PROJECT}"
 else
     projects="kmflcomp libkmfl ibus-kmfl keyman-config"
 fi
 
+if [ "${DIST}" != "" ]; then
+    distributions="${DIST}"
+else
+    distributions="xenial bionic cosmic"
+fi
 
 BASEDIR=`pwd`
-dists="xenial bionic cosmic"
 
 rm -rf launchpad
 mkdir -p launchpad
@@ -49,11 +61,17 @@ for proj in ${projects}; do
     rm ../${proj}*.debian.tar.xz
     cd ../launchpad/${proj}-${version}
     echo `pwd`
-    dch -v ${version}-1 "source package for PPA"
+    cp debian/changelog ../${proj}-changelog
     #TODO separate source builds and dputs for each of $dists?
-    dch -r ""
-    debuild -d -S -sa -Zxz -us -uc
+    for dist in ${distributions}; do
+        cp ../${proj}-changelog debian/changelog
+        dch -v ${version}-1~${dist} "source package for PPA"
+        dch -D ${dist} -r ""
+        debuild -d -S -sa -Zxz -us -uc
+    done
     cd ..
-    dput -s -u ppa:${LAUNCHPAD_ID}/keyman-daily ${proj}_${version}-1_source.changes
+    for dist in ${distributions}; do
+        dput ${SIM} ppa:${LAUNCHPAD_ID}/keyman-daily ${proj}_${version}-1~${dist}_source.changes
+    done
     cd ${BASEDIR}
 done
