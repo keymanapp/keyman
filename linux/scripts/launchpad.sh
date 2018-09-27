@@ -15,7 +15,7 @@ set -e
 if [ "${UPLOAD}" == "yes" ]; then
     SIM=""
 else
-    SIM="-s -u"
+    SIM="-s"
 fi
 
 if [ ! `which xmllint` ]; then
@@ -61,7 +61,7 @@ for proj in ${projects}; do
         cp ../${proj}-changelog debian/changelog
         dch -v ${version}-1~${dist} "source package for PPA"
         dch -D ${dist} -r ""
-        debuild -d -S -sa -Zxz -us -uc
+        debuild -d -S -sa -Zxz
     done
     cd ..
     for dist in ${distributions}; do
