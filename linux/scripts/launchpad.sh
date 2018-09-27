@@ -42,18 +42,23 @@ mkdir -p launchpad
 
 for proj in ${projects}; do
     cd ${proj}
+    if [ "${proj}" == "keyman-config" ]; then
+        tarname="keyman_config"
+    else
+        tarname="${proj}"
+    fi
     version=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -`
     echo "${proj} version is ${version}"
     uscan
-    mv ../${proj}-${version} ../launchpad
-    mv ../${proj}_${version}.orig.tar.gz ../launchpad
-    if [ "${proj}" == "keyman-config" ]; then
-        mv ../keyman_config-${version}.tar.gz ../launchpad
-    else
-        mv ../${proj}-${version}.tar.gz ../launchpad
-    fi
-    rm ../${proj}*.debian.tar.xz
-    cd ../launchpad/${proj}-${version}
+    cd ..
+    mv ${proj}-${version} launchpad
+    mv ${proj}_${version}.orig.tar.gz launchpad
+    mv ${tarname}-${version}.tar.gz launchpad
+    rm ${proj}*.debian.tar.xz
+    cd launchpad
+    wget -N https://downloads.keyman.com/linux/alpha/${version}/SHA256SUMS
+    sha256sum -c --ignore-missing SHA256SUMS |grep ${tarname}
+    cd ${proj}-${version}
     echo `pwd`
     cp debian/changelog ../${proj}-changelog
     #TODO separate source builds and dputs for each of $dists?
