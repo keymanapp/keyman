@@ -1,7 +1,11 @@
 # Keyman Developer Version History
 
 ## 11.0 alpha
-* Refactor how keyboard_info metdata is generated (#1158)
+* Refactor how keyboard_info metadata is generated (#1158)
+* New Feature: New Project from template and Import Keyboard (#1210)
+* New Feature: kmconvert command line utility (#1207)
+* New code editor using open source Monaco component (#1153, #1154 and others)
+* Tidy up of installer to make future upgrades easier (#1175)
 
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release
