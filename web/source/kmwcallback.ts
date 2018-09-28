@@ -3,8 +3,8 @@
 /// <reference path="kmwbase.ts" />
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2017-2018 SIL International
 ***/
 
 namespace com.keyman {
@@ -1355,6 +1355,16 @@ namespace com.keyman {
       this.resetVKShift();
 
       this.keymanweb.osk._Show();
+    };
+
+    setNumericLayer() {
+      var i;
+      for(i=0; i<this.keymanweb.osk.layers.length; i++) {
+        if (this.keymanweb.osk.layers[i].id == 'numeric') {
+          this.keymanweb.osk.layerId = 'numeric';
+          this.keymanweb.osk._Show();
+        }
+      }
     };
 
     /**

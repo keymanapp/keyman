@@ -9,6 +9,7 @@
 * Add splash screen (#1151)
 * Update app to use Material Design theme (#681)
 * Fix globe button when pausing WebBrowser (#1213)
+* Change system keyboard to "numeric" layer for digit/phone number text fields (#1218)
 * Handle RTL metadata on keyboard downloads (#1209)
 
 ## 2018-08-23 10.0.505 stable
