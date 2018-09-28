@@ -4,6 +4,7 @@
 # different identifiers for the various folders
 KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build_xml
 KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build_cef
+KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build_templates
 
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
 
