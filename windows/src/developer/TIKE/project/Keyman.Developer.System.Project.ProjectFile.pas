@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectFile
+  Name:             Keyman.Developer.System.Project.ProjectFile
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -60,7 +60,7 @@
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     
 *)
-unit ProjectFile;  // I3306   // I4687
+unit Keyman.Developer.System.Project.ProjectFile;  // I3306   // I4687
 
 interface
 
@@ -77,7 +77,7 @@ uses
   Xml.xmlintf,
 
   mrulist,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectLog,
   TempFileManager;
 
 type
@@ -309,12 +309,10 @@ uses
   System.StrUtils,
   System.Variants,
 
-  compile,
-
-  Project,
-  ProjectFileType,
-  ProjectLoader,
-  ProjectSaver,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.Project.ProjectLoader,
+  Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles,
   RegistryKeys,
 
@@ -1134,6 +1132,12 @@ begin
 end;
 
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
+const // from compile.pas
+  CERR_FATAL   = $00008000;
+  CERR_ERROR   = $00004000;
+  CERR_WARNING = $00002000;
+  CERR_MEMORY  = $00001000;
+  CWARN_Info =   $0000208A;
 var
   errtype: string;
   FLogState: TProjectLogState;
@@ -1142,10 +1146,10 @@ begin
 
   if msgcode <> CWARN_Info then
     case msgcode and $F000 of
-      $1000: begin errtype := 'fatal';   FLogState := plsFatal; end;
-      $2000: begin errtype := 'warning'; FLogState := plsWarning; end;
-      $4000: begin errtype := 'error';   FLogState := plsError; end;
-      $8000: begin errtype := 'fatal';   FLogState := plsFatal; end;
+      CERR_MEMORY: begin errtype := 'fatal';   FLogState := plsFatal; end;
+      CERR_WARNING: begin errtype := 'warning'; FLogState := plsWarning; end;
+      CERR_ERROR: begin errtype := 'error';   FLogState := plsError; end;
+      CERR_FATAL: begin errtype := 'fatal';   FLogState := plsFatal; end;
     end;
 
   if FLogState = plsWarning then   // I4706

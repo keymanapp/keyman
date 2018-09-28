@@ -1,5 +1,5 @@
 (*
-  Name:             kvkProjectFile
+  Name:             Keyman.Developer.System.Project.kvkProjectFile
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -17,16 +17,16 @@
                     04 May 2015 - mcdurdin - I4687 - V9.0 - Split project UI actions into separate classes
                     04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
-unit kvkProjectFile;   // I4682   // I4687
+unit Keyman.Developer.System.Project.kvkProjectFile;   // I4682   // I4687
 
 interface
 
 uses
   System.SysUtils,
 
-  ProjectFile,
-  ProjectFiles,
-  ProjectFileType;
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.System.Project.ProjectFileType;
 
 type
   TkvkProjectFile = class;

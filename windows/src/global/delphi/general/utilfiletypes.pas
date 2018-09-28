@@ -83,6 +83,9 @@ type
     class function IsPackageOptionsFile(const Filename: string): Boolean; static;
   end;
 
+type
+  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank, kptImportWindowsKeyboard);
+
 implementation
 
 uses

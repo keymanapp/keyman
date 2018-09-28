@@ -1,5 +1,5 @@
 (*
-  Name:             UfrmProjectSettings
+  Name:             Keyman.Developer.UI.Project.UfrmProjectSettings
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -18,7 +18,7 @@
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     
 *)
-unit UfrmProjectSettings;   // I4688
+unit Keyman.Developer.UI.Project.UfrmProjectSettings;   // I4688
 
 interface
 
@@ -54,7 +54,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Project;
+  Keyman.Developer.System.Project.Project;
 
 procedure TfrmProjectSettings.cmdOKClick(Sender: TObject);
 begin

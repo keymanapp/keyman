@@ -37,7 +37,7 @@ uses
 
   CompilePackageInstaller,
   kpsfile,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectLog,
   SysUtils;
 
 type

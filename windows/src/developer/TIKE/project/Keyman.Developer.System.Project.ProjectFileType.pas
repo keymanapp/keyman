@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectFileType
+  Name:             Keyman.Developer.System.Project.ProjectFileType
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -19,7 +19,7 @@
                     19 Nov 2007 - mcdurdin - I1157 - const string parameters
                     04 May 2015 - mcdurdin - I4687 - V9.0 - Split project UI actions into separate classes
 *)
-unit ProjectFileType;
+unit Keyman.Developer.System.Project.ProjectFileType;
 
 interface
 
@@ -28,7 +28,7 @@ uses
   System.Contnrs,
   System.SysUtils,
 
-  ProjectFile;
+  Keyman.Developer.System.Project.ProjectFile;
 
 type
   TProjectFileType = class
@@ -62,8 +62,8 @@ var
 implementation
 
 uses
-  Project,
-  ProjectFiles;
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFiles;
 
 var
   FRegisteredFileTypes: TProjectFileTypeList = nil;
@@ -129,11 +129,25 @@ procedure RegisterProjectFileType(AExtension: string; AProjectFileClass: TProjec
 var
   ft: TProjectFileType;
 begin
+  if not Assigned(FRegisteredFileTypes) then
+    FRegisteredFileTypes := TProjectFileTypeList.Create;
+
+  // We can have ProjectFileAction classes that inherit from ProjectFile, so in those
+  // circumstances we want to capture the bottom-most class registration and obviously
+  // we don't want multiple classes registered for the same extension.
+  for ft in FRegisteredFileTypes do
+  begin
+    if ft.Extension = AExtension then
+    begin
+      if AProjectFileClass.InheritsFrom(ft.ProjectFileClass) then
+        ft.ProjectFileClass := AProjectFileClass;
+      Exit;
+    end;
+  end;
+
   ft := TProjectFileType.Create;
   ft.Extension := AExtension;
   ft.ProjectFileClass := AProjectFileClass;
-  if not Assigned(FRegisteredFileTypes) then
-    FRegisteredFileTypes := TProjectFileTypeList.Create;
   FRegisteredFileTypes.Add(ft);
 end;
 

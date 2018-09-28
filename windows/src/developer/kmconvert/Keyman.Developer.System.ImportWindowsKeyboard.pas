@@ -10,6 +10,7 @@ type
   private
     FBaseKeyboardID: string;
     FBaseName: string;
+    FProjectFilename: string;
 
     { Options }
     FSourceKLID: string;
@@ -34,9 +35,13 @@ type
     procedure InjectSystemStores(const KeyboardFilename, OSKFilename,
       IconFilename, TouchLayoutFilename: string);
     function ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
-    function FindBCP47TagForKLID: string;
-  public
+    function FindBCP47TagForKLID: string; overload;
+ public
     function Execute: Boolean; overload;
+
+    class function FindBCP47TagForKLID(KLID: string): string; overload;
+    class function GetKLIDDetails(const KLID: string; var Name,
+      KeyboardID: string): Boolean; static;
 
     property SourceKLID: string read FSourceKLID write SetSourceKLID;
     property DestinationPath: string read FDestinationPath write SetDestinationPath;
@@ -46,6 +51,8 @@ type
     property Version: string read FVersion write SetVersion;
     property BCP47Tags: string read FBCP47Tags write SetBCP47Tags;
     property Author: string read FAuthor write SetAuthor;
+
+    property ProjectFilename: string read FProjectFilename;
   end;
 
 implementation
@@ -62,11 +69,11 @@ uses
   Keyman.Developer.System.ImportKeyboardDLL,
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
   Keyman.System.Util.RenderLanguageIcon,
+  KeymanVersion,
   KeyboardParser,
   kmxfileconsts,
   RegistryKeys,
-  UKeymanTargets,
-  utilicon;
+  UKeymanTargets;
 
 { TImportWindowsKeyboard }
 
@@ -77,21 +84,26 @@ begin
 end;
 
 function TImportWindowsKeyboard.LoadKLIDDetails: Boolean;
+begin
+  Result := GetKLIDDetails(FSourceKLID, FBaseName, FBaseKeyboardID);
+end;
+
+class function TImportWindowsKeyboard.GetKLIDDetails(const KLID: string; var Name, KeyboardID: string): Boolean;
 var
   r: TRegistry;
 begin
   r := TRegistry.Create;
   try
     r.RootKey := HKEY_LOCAL_MACHINE;
-    if not r.OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM + '\' + FSourceKLID) then
+    if not r.OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM + '\' + KLID) then
       Exit(False);
 
     if not r.ValueExists(SRegValue_KeyboardLayoutFile) or not
         r.ValueExists(SRegValue_KeyboardLayoutText) then
       Exit(False);
 
-    FBaseKeyboardID := ChangeFileExt(r.ReadString(SRegValue_KeyboardLayoutFile), '');
-    FBaseName := r.ReadString(SRegValue_KeyboardLayoutText);
+    KeyboardID := ChangeFileExt(r.ReadString(SRegValue_KeyboardLayoutFile), '');
+    Name := r.ReadString(SRegValue_KeyboardLayoutText);
   finally
     r.Free;
   end;
@@ -185,6 +197,8 @@ begin
         Exit(Fail('Unable to generate template: '+E.Message));
     end;
 
+    FProjectFilename := FTemplate.ProjectFilename;
+
     // Run importkeyboard into destination file; this replaces the keyboard template
     // file that has been generated
     if not ImportKeyboard(FTemplate.KeyboardFilename, FTemplate.OSKFilename) then
@@ -209,15 +223,20 @@ begin
   Result := True;
 end;
 
-function TImportWindowsKeyboard.FindBCP47TagForKLID: string;
+class function TImportWindowsKeyboard.FindBCP47TagForKLID(KLID: string): string;
 var
   buf: array[0..8] of char;
   FLanguageID: Word;
 begin
-  FLanguageID := LOWORD(StrToInt('$'+FSourceKLID));
+  FLanguageID := LOWORD(StrToInt('$'+KLID));
   if GetLocaleInfo(FLanguageID, LOCALE_SISO639LANGNAME, buf, 8) > 0
     then Result := buf
     else Result := '';
+end;
+
+function TImportWindowsKeyboard.FindBCP47TagForKLID: string;
+begin
+  Result := FindBCP47TagForKLID(FSourceKLID);
 end;
 
 procedure TImportWindowsKeyboard.InjectSystemStores(const KeyboardFilename, OSKFilename, IconFilename, TouchLayoutFilename: string);
@@ -236,12 +255,13 @@ begin
     // entirely by kp.Features.Add -- which could cause this to fall over a little
     // if we change filenames for any reason in the future
     kp.SetSystemStoreValue(ssName, Format(FNameTemplate, [FBaseName]));
+    kp.SetSystemStoreValue(ssVersion, SKeymanKeyboardVersion);
     kp.SetSystemStoreValue(ssVisualKeyboard, ExtractFileName(OSKFilename));
     kp.SetSystemStoreValue(ssBitmap, ExtractFilename(IconFilename));
     kp.SetSystemStoreValue(ssLayoutFile, ExtractFileName(TouchLayoutFilename));
     kp.SetSystemStoreValue(ssCopyright, FCopyright);
     if FVersion <> '' then
-      kp.SetSystemStoreValue(ssVersion, FVersion);
+      kp.SetSystemStoreValue(ssKeyboardVersion, FVersion);
     if FAuthor <> '' then
       kp.InitialComment := kp.InitialComment + 'Run by: ' + FAuthor + #13#10;
 
@@ -304,7 +324,9 @@ function TImportWindowsKeyboard.GenerateIcon(
 var
   FTag: string;
   n: Integer;
-  b: array[0..0] of Vcl.Graphics.TBitmap;
+  ico: TIcon;
+  b: array[0..1] of Vcl.Graphics.TBitmap;
+  iconInfo: TIconInfo;
 begin
   // We need to use the BCP47 tag that we have received and render that, for now
 
@@ -314,14 +336,32 @@ begin
     else FTag := FBCP47Tags;
 
   b[0] := Vcl.Graphics.TBitmap.Create;
+  b[1] := Vcl.Graphics.TBitmap.Create;
   try
     b[0].SetSize(16, 16);
     b[0].PixelFormat := pf32bit;
-    // TODO multiple sizes?, colour?
+
+    b[1].SetSize(16, 16);
+    b[1].PixelFormat := pf1bit;
+    b[1].Canvas.Brush.Color := clBlack;
+    b[1].Canvas.FillRect(Rect(0,0,16,16));
+
     DrawLanguageIcon(b[0].Canvas, 0, 0, UpperCase(FTag));
-    Result := ConvertBitmapsToAlphaIcon(b, IconFilename);
+    ico := TIcon.Create;
+    try
+      FillChar(iconInfo, sizeof(iconInfo), 0);
+      iconInfo.fIcon := True;
+      iconInfo.hbmMask := b[1].Handle;
+      iconInfo.hbmColor := b[0].Handle;
+      ico.Handle := CreateIconIndirect(iconInfo);
+      ico.SaveToFile(IconFilename);
+    finally
+      ico.Free;
+    end;
+    Result := True;
   finally
     b[0].Free;
+    b[1].Free;
   end;
 end;
 

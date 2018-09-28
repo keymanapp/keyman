@@ -1,5 +1,5 @@
 (*
-  Name:             kvkProjectFileUI
+  Name:             Keyman.Developer.UI.Project.kvkProjectFileUI
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
   Description:      
@@ -15,7 +15,7 @@
   Notes:            
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
-unit kvkProjectFileUI;
+unit Keyman.Developer.UI.Project.kvkProjectFileUI;
 
 interface
 
@@ -23,12 +23,12 @@ uses
   System.SysUtils,
   Vcl.Menus,
 
-  kvkProjectFile,
-  ProjectFile,
-  ProjectFileUI,
-  ProjectFilesUI,
-  ProjectUIFileType,
-  ProjectFileType,
+  Keyman.Developer.System.Project.kvkProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectFilesUI,
+  Keyman.Developer.UI.Project.ProjectUIFileType,
+  Keyman.Developer.System.Project.ProjectFileType,
   UfrmMessages,
   UfrmEditor;
 

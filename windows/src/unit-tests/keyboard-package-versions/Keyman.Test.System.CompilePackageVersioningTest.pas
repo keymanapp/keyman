@@ -4,7 +4,7 @@ interface
 
 uses
   DUnitX.TestFramework,
-  ProjectLog;
+  Keyman.Developer.System.Project.ProjectLog;
 
 type
 
@@ -38,8 +38,8 @@ uses
   System.SysUtils,
   compile,
   CompilePackage,
-  kmnProjectFile,
-  ProjectFile,
+  Keyman.Developer.System.Project.kmnProjectFileAction,
+  Keyman.Developer.System.Project.ProjectFile,
   kpsfile;
 
 type
@@ -71,8 +71,8 @@ begin
   p := TProjectConsole.Create(FRoot+'\test-1.0\test-1.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
-      if p.Files[i] is TkmnProjectFile then
-        Assert.IsTrue((p.Files[i] as TkmnProjectFile).CompileKeyboard, 'Could not compile keyboard');
+      if p.Files[i] is TkmnProjectFileAction then
+        Assert.IsTrue((p.Files[i] as TkmnProjectFileAction).CompileKeyboard, 'Could not compile keyboard');
   finally
     p.Free;
   end;
@@ -80,8 +80,8 @@ begin
   p := TProjectConsole.Create(FRoot+'\test-2.0\test-2.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
-      if p.Files[i] is TkmnProjectFile then
-        Assert.IsTrue((p.Files[i] as TkmnProjectFile).CompileKeyboard, 'Could not compile keyboard');
+      if p.Files[i] is TkmnProjectFileAction then
+        Assert.IsTrue((p.Files[i] as TkmnProjectFileAction).CompileKeyboard, 'Could not compile keyboard');
   finally
     p.Free;
   end;

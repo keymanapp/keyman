@@ -85,7 +85,7 @@ implementation
 uses
   Keyman.Developer.System.HelpTopics,
 
-  Project,
+  Keyman.Developer.System.Project.Project,
   shlobj,
   utilsystem;
 

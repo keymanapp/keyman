@@ -1,5 +1,5 @@
 (*
-  Name:             kpsProjectFileUI
+  Name:             Keyman.Developer.UI.Project.kpsProjectFileUI
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
   Description:      
@@ -15,7 +15,7 @@
   Notes:            
   History:          04 May 2015 - mcdurdin - I4694 - V9.0 - Split UI actions from non-UI actions in projects
 *)
-unit kpsProjectFileUI;
+unit Keyman.Developer.UI.Project.kpsProjectFileUI;
 
 interface
 
@@ -23,10 +23,10 @@ uses
   System.UITypes,
   KPSFile,
   Menus,
-  ProjectFile,
-  ProjectFilesUI,
-  ProjectFileUI,
-  kpsProjectFile;
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFilesUI,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.System.Project.kpsProjectFileAction;
 
 type
   TkpsProjectFileUI = class(TOpenableProjectFileUI)
@@ -42,12 +42,12 @@ type
     function CompilePackageInstaller(FSilent: Boolean): Boolean;
 
     function GetPack: TKPSFile;
-    function GetProjectFile: TkpsProjectFile;
+    function GetProjectFile: TkpsProjectFileAction;
     function TestPackageState(FCompiledName: string; FSilent: Boolean): Boolean;
   public
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
     procedure BuildMenu(Menu: TPopupMenu); override;
-    property ProjectFile: TkpsProjectFile read GetProjectFile;
+    property ProjectFile: TkpsProjectFileAction read GetProjectFile;
   end;
 
 implementation
@@ -59,8 +59,8 @@ uses
   Dialogs,
   dmActionsMain,
   Controls,
-  Project,
-  ProjectUIFileType,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.UI.Project.ProjectUIFileType,
   UfrmMain,
   UfrmMessages,
   UfrmMDIEditor,
@@ -129,9 +129,9 @@ begin
     else Result := nil;
 end;
 
-function TkpsProjectFileUI.GetProjectFile: TkpsProjectFile;
+function TkpsProjectFileUI.GetProjectFile: TkpsProjectFileAction;
 begin
-  Result := FOwner as TkpsProjectFile;
+  Result := FOwner as TkpsProjectFileAction;
 end;
 
 function TkpsProjectFileUI.InstallPackage: Boolean;
@@ -248,5 +248,5 @@ begin
 end;
 
 initialization
-  RegisterProjectFileUIType(TkpsProjectFile, TkpsProjectFileUI);
+  RegisterProjectFileUIType(TkpsProjectFileAction, TkpsProjectFileUI);
 end.

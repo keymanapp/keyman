@@ -76,10 +76,10 @@ uses
   KeyboardParser,
   KeymanVersion,
   kmxfileconsts,
-  kmnProjectFile,
-  kpsProjectFile,
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFile,
   PackageInfo,
-  ProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
   RedistFiles,
   TouchLayout,
   utilfiletypes,
@@ -209,6 +209,7 @@ begin
     if FCopyright <> '' then
       kp.SetSystemStoreValue(ssCopyright, FCopyright);
     kp.SetSystemStoreValue(ssVersion, SKeymanKeyboardVersion);
+    kp.SetSystemStoreValue(ssKeyboardVersion, FVersion);
     kp.SetSystemStoreValue(ssTargets, KeymanTargetsToString(FTargets));
 
     if HasIcon then
@@ -418,18 +419,7 @@ end;
 
 function TKeyboardProjectTemplate.DataPath: string;
 begin
-  Result := ExtractFilePath(ParamStr(0));
-  // TODO: use KeymanDebugPaths
-  if DirectoryExists(Result + 'data') then
-    Exit(Result + 'data\');
-
-  // Probably running from source, so in Win32\Debug or similar, so
-  // traverse up a couple of directories.
-  Result := Result + '..\..\data\';
-  if DirectoryExists(Result) then
-     Exit;
-
-  raise EKeyboardProjectTemplate.Create('Cannot find template data path relative to executable');
+  Result := GetRedistProjectTemplatePath;
 end;
 
 procedure TKeyboardProjectTemplate.Transform(const SourceFile: string; DestFile: string = '');

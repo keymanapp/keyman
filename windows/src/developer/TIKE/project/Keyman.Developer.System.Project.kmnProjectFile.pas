@@ -1,5 +1,5 @@
 (*
-  Name:             kmnProjectFile
+  Name:             Keyman.Developer.System.Project.kmnProjectFile
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -49,7 +49,7 @@
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     
 *)
-unit kmnProjectFile;  // I3306   // I4687   // I4688   // I4692
+unit Keyman.Developer.System.Project.kmnProjectFile;  // I3306   // I4687   // I4688   // I4692
 
 interface
 
@@ -57,9 +57,9 @@ uses
   System.SysUtils,
   Xml.XMLIntf,
 
-  ProjectFile,
-  ProjectFiles,
-  ProjectFileType,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.System.Project.ProjectFileType,
   UKeymanTargets;
 
 type
@@ -78,15 +78,13 @@ type
     function GetOutputFilename: string;
     function GetTargetFilename: string;
     function GetJSTargetFilename: string;
-    function CompileVisualKeyboard(const AKVKSourceFile, AKVKTargetFile: string): Boolean;
   protected
     function GetRelativeOrder: Integer; override;
     procedure GetFileParameters; override;
+
+    property KVKFileName: string read FKVKFileName;
+    property IsDebug: Boolean read FDebug;
   public
-
-    function CompileKeyboard: Boolean;
-    function Clean: Boolean;
-
     procedure Load(node: IXMLNode; LoadState: Boolean); override;   // I4698
     procedure Save(node: IXMLNode; SaveState: Boolean); override;   // I4698
     procedure LoadState(node: IXMLNode); override;   // I4698
@@ -111,17 +109,11 @@ uses
   System.Variants,
   Winapi.Windows,
 
-  CompileKeymanWeb,
-  compile,
   KeyboardParser,
-  kmxfile,
   kmxfileconsts,
   KeyboardFonts,
-  KeymanDeveloperOptions,
   Keyman.System.KeyboardUtils,
-  ProjectLog,
-  utilsystem,
-  VisualKeyboard;
+  utilsystem;
 
 {-------------------------------------------------------------------------------
  - TkmnProjectFile                                                             -
@@ -142,133 +134,6 @@ procedure TkmnProjectFile.SaveState(node: IXMLNode);   // I4698
 begin
   inherited SaveState(node);
   node.AddChild('Debug').NodeValue := FDebug;
-end;
-
-function TkmnProjectFile.Clean: Boolean;
-var
-  FJS: string;
-begin
-  CleanFile(OutputFileName);
-
-  if FTargets * KMXKeymanTargets <> [] then
-    CleanFile(ExtractFilePath(FileName) + ExtractFileName(ChangeFileExt(FKVKFileName, '.kvk')), True);
-
-  if FTargets * KMWKeymanTargets <> [] then
-  begin
-    FJS := TKeyboardUtils.GetKeymanWebCompiledFileName(FileName);
-    CleanFile(FJS); // keyboard-x.y.js
-    CleanFile(ChangeFileExt(FJS, '') + '_load.js'); // keyboard-x.y_load.js
-    CleanFile(ChangeFileExt(FJS, '.json'), True); // keyboard-x.y_load.js
-  end;
-
-  Result := True;
-end;
-
-function TkmnProjectFile.CompileVisualKeyboard(const AKVKSourceFile, AKVKTargetFile: string): Boolean;
-begin
-  with TVisualKeyboard.Create do
-  try
-    try
-      LoadFromFile(AKVKSourceFile);
-    except
-      on E:Exception do
-      begin
-        OwnerProject.Log(plsError, AKVKSourceFile, 'Invalid visual keyboard: '+E.Message);
-        Exit(False);
-      end;
-    end;
-    if not SameFileName(AKVKSourceFile, AKVKTargetFile) then
-      try
-        Header.AssociatedKeyboard := ChangeFileExt(ExtractFileName(Self.FileName), '');
-        SaveToFile(AKVKTargetFile, kvksfBinary);
-      except
-        on E:Exception do
-        begin
-          OwnerProject.Log(plsError, AKVKSourceFile, 'Could not save visual keyboard '+AKVKSourceFile+' to '+AKVKTargetFile+': '+E.ClassName+','+E.Message);
-          Exit(False);
-        end;
-      end;
-  finally
-    Free;
-  end;
-  Result := True;
-end;
-
-
-function TkmnProjectFile.CompileKeyboard: Boolean;
-var
-  KMXFileName: String;
-  FOutFileName: string;
-  ckw: TCompileKeymanWeb;
-  FKVKSourceFile: string;
-  FKVKTargetFile: string;
-begin
-  TProject.CompilerMessageFile := Self;
-  HasCompileWarning := False;   // I4706
-
-  FKVKSourceFile := ExtractFilePath(FileName) + ExtractFileName(FKVKFileName);
-  FKVKTargetFile := OwnerProject.GetTargetFileName(ChangeFileExt(FKVKSourceFile, '.kvk'), FileName, FileVersion);
-
-  try
-    if FTargets * KMXKeymanTargets <> [] then
-    begin
-      if FDebug
-        then Log(plsInfo, 'Compiling ' + FileName + ' with debug symbols for Windows, MacOSX...')   // I4504   // I4823
-        else Log(plsInfo, 'Compiling ' + FileName + ' for Windows, MacOSX...');   // I4504
-
-      //compile the keyboard
-      KMXFileName := TargetFileName;
-      ForceDirectories(ExtractFileDir(KMXFileName));
-      //KMXFileName := ChangeFileExt(FileName, '.kmx');
-      Result := CompileKeyboardFile(PChar(FileName), PChar(KMXFileName), FDebug,
-        OwnerProject.Options.CompilerWarningsAsErrors, OwnerProject.Options.WarnDeprecatedCode,   // I4865   // I4866
-        ProjectCompilerMessage) > 0;
-
-      if Result then
-      begin
-        if FKVKFileName <> '' then
-          Result := CompileVisualKeyboard(FKVKSourceFile, FKVKTargetFile);
-      end;
-
-      if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
-
-      if Result
-        then Log(plsInfo, '''' + FileName + ''' compiled successfully for Windows to '''+KMXFileName+'''.')   // I4504
-        else Log(plsError, '''' + FileName + ''' was not compiled successfully for Windows.')   // I4504
-    end
-    else
-      Result := True;   // I4564
-
-    // compile keyboard to web
-    if Result and (FTargets * KMWKeymanTargets <> []) then
-    begin
-      if FDebug
-        then Log(plsInfo, 'Compiling ' + FileName + ' with debug symbols for Web, iOS, Android, WinPhone...')   // I4504   // I4823
-        else Log(plsInfo, 'Compiling ' + FileName + ' for Web, iOS, Android, WinPhone...');   // I4504
-
-      ckw := TCompileKeymanWeb.Create;
-      try
-        FOutFilename := GetJSTargetFileName;
-        ForceDirectories(ExtractFileDir(FOutFileName));
-
-        if FKVKFileName <> '' then
-          Result := CompileVisualKeyboard(FKVKSourceFile, FKVKTargetFile);
-
-        if Result then
-          Result := ckw.Compile(OwnerProject, FileName, FOutFileName, FDebug, ProjectCompilerMessage);   // I3681   // I4140   // I4865   // I4866
-
-        if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
-
-        if Result
-          then Log(plsInfo, '''' + FileName + ''' compiled successfully for Web, iOS, Android, WinPhone to '''+FOutFileName+'''.')   // I4140   // I4504
-          else Log(plsError, '''' + FileName + ''' was not compiled successfully for Web, iOS, Android, WinPhone.');   // I4140   // I4504
-      finally
-        ckw.Free;
-      end;
-    end;
-  finally
-    TProject.CompilerMessageFile := nil;
-  end;
 end;
 
 procedure TkmnProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698

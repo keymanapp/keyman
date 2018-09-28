@@ -37,7 +37,7 @@ function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsErro
 implementation
 
 uses
-  ProjectLog;
+  Keyman.Developer.System.Project.ProjectLog;
 
 type
   TKCCompilePackage = class

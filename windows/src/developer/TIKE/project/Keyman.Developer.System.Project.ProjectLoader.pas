@@ -1,5 +1,5 @@
 (*
-  Name:             ProjectLoader
+  Name:             Keyman.Developer.System.Project.ProjectLoader
   Copyright:        Copyright (C) SIL International.
   Documentation:    
   Description:      
@@ -24,7 +24,7 @@
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     
 *)
-unit ProjectLoader;
+unit Keyman.Developer.System.Project.ProjectLoader;
 
 interface
 
@@ -35,7 +35,7 @@ uses
   Xml.XMLDoc,
   Xml.XMLIntf,
 
-  ProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
   utilsystem;
 
 type
@@ -57,10 +57,10 @@ uses
   System.Variants,
   System.Win.ComObj,
 
-  kmnProjectFile,
-  kpsProjectFile,
-  ProjectFiles,
-  ProjectFileType;
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  Keyman.Developer.System.Project.ProjectFileType;
 
 { TProjectLoader }
 
