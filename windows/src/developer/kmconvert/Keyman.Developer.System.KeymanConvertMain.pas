@@ -8,9 +8,12 @@ implementation
 
 uses
   System.SysUtils,
+
   Keyman.Developer.System.KMConvertParameters,
   Keyman.Developer.System.ImportWindowsKeyboard,
-  Keyman.Developer.System.KeyboardProjectTemplate;
+  Keyman.Developer.System.KeyboardProjectTemplate,
+  ResourceStrings,
+  VersionInfo;
 
 function DoRun: Boolean; forward;
 
@@ -68,6 +71,13 @@ begin
   end;
 end;
 
+procedure WriteBanner;
+begin
+  writeln(DevApplicationTitle + ' Conversion Utility');
+  writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
+  writeln;
+end;
+
 function DoRun: Boolean;
 var
   FParameters: TKMConvertParameters;
@@ -79,9 +89,13 @@ begin
 
   if not FParameters.CheckParams then
   begin
+    WriteBanner;
     FParameters.WriteUsage;
     Exit;
   end;
+
+  if not FParameters.NoLogo then
+    WriteBanner;
 
   case FParameters.Mode of
     cmImportWindows:

@@ -12,7 +12,6 @@ type
     KLID: string;
     Destination: string;
     KeyboardID: string;
-    Prefix: string;
     Name: string;
     Copyright: string;
     Version: string;
@@ -20,6 +19,7 @@ type
     Author: string;
     Targets: TKeymanTargets;
     Mode: TKMConvertMode;
+    NoLogo: Boolean;
   private
     function CheckParam(name, value: string): Boolean;
   public
@@ -55,12 +55,20 @@ begin
   i := 2;
   while i < ParamCount do
   begin
-    if not CheckParam(ParamStr(i), ParamStr(i+1)) then
+    if ParamStr(i) = '-nologo' then
     begin
-      writeln('Invalid parameter: '+ParamStr(i));
-      Exit(False);
+      NoLogo := True;
+      Inc(i);
+      Continue;
     end;
-    Inc(i, 2);
+    if CheckParam(ParamStr(i), ParamStr(i+1)) then
+    begin
+      Inc(i, 2);
+      Continue;
+    end;
+
+    writeln('Invalid parameter: '+ParamStr(i));
+    Exit(False);
   end;
 
   Result := True;
@@ -75,6 +83,7 @@ begin
   writeln('  Creates a blank keyboard project in the repository template format');
   writeln;
   writeln('Parameters:');
+  writeln('  -nologo              Don''t show the program description and copyright banner');
   writeln('  -klid <source-klid>  The KLID of the keyboard to import, per LoadKeyboardLayout');
   writeln('  -o <destination>     The target folder to write the keyboard project into, defaults to "."');
   writeln('  -id <keyboard_id>    The id of the keyboard to create');
@@ -94,7 +103,6 @@ begin
   if name = '-klid' then KLID := value
   else if name = '-o' then Destination := value
   else if name = '-id' then KeyboardID := value
-  else if name = '-prefix' then Prefix := value
   else if name = '-name' then Self.Name := value
   else if name = '-copyright' then Copyright := value
   else if name = '-version' then Version := value

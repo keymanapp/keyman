@@ -5,12 +5,13 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res dirs icons
-    $(DCC32) kmconvert.dpr
-    $(TDS2DBG) kmconvert.exe 
-    $(MAKEJCLDBG) kmconvert.map
-    $(COPY) kmconvert.exe $(PROGRAM)\developer
-    if exist kmconvert.dbg $(COPY) kmconvert.dbg $(DEBUGPATH)\developer
-
+    $(DELPHI_MSBUILD) kmconvert.dproj /p:Platform=Win32
+    
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmconvert.exe 
+    $(MAKEJCLDBG) $(WIN32_TARGET_PATH)\kmconvert.map
+    $(COPY) $(WIN32_TARGET_PATH)\kmconvert.exe $(PROGRAM)\developer
+    if exist $(WIN32_TARGET_PATH)\kmconvert.dbg $(COPY) $(WIN32_TARGET_PATH)\kmconvert.dbg $(DEBUGPATH)\developer
+    
 icons:
     rc icons.rc
 
