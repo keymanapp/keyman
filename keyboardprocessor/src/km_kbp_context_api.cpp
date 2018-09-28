@@ -14,10 +14,10 @@ namespace kbp
 
 class context : public std::list<km_kbp_context_item>
 {
-  std::vector<value_type> _pres;
+  std::vector<value_type> mutable _pres;
 
 public:
-  const_pointer data()
+  const_pointer data() const
   {
     _pres.assign(begin(), end());
     return _pres.data();
@@ -101,7 +101,7 @@ km_kbp_status km_kbp_context_set(km_kbp_context *ctxt, km_kbp_context_item const
 }
 
 
-km_kbp_context_item const * km_kbp_context_get(km_kbp_context *ctxt)
+km_kbp_context_item const * km_kbp_context_get(km_kbp_context const *ctxt)
 {
   return ctxt->data();
 }

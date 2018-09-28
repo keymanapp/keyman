@@ -486,7 +486,7 @@ km_kbp_option const *km_kbp_state_environment(km_kbp_state const *);
 
 ```c
 */
-km_kbp_option_set km_kpb_state_options(km_kbp_state const *);
+km_kbp_option_set *km_kpb_state_options(km_kbp_state const *);
 
 /*
 ```
