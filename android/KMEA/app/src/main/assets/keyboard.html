@@ -126,6 +126,12 @@
       kmw.resetContext();
     }
 
+    // Tell KMW to switch to "numeric" layer
+    function setNumericLayer() {
+      var kmw=window['keyman'];
+      kmw.setNumericLayer();
+    }
+
     function updateKMText(text) {
       if(text == undefined) {
           text = '';
