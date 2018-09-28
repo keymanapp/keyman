@@ -128,7 +128,7 @@
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\project\ProjectLog.pas"/>
+        <DCCReference Include="..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>

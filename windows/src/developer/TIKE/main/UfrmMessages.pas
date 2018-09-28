@@ -98,9 +98,9 @@ uses
   UfrmMain,
   UfrmMDIEditor,
   dmActionsMain,
-  Project,
-  ProjectFile,
-  ProjectFileUI;
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFileUI;
 
 {$R *.DFM}
 

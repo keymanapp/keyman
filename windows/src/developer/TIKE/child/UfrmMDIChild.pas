@@ -36,7 +36,7 @@ interface
 uses
   System.Types,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ProjectFile, ProjectFileUI, CharacterMapSettings, Contnrs,
+  StdCtrls, ExtCtrls, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.UI.Project.ProjectFileUI, CharacterMapSettings, Contnrs,
   CharMapInsertMode, UfrmTike, TextFileFormat;
 
 type

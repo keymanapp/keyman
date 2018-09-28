@@ -61,7 +61,7 @@ type
     property SystemKeyboardName: string read GetSystemKeyboardName write SetSystemKeyboardName;
   end;
 
-function SelectSystemKeyboard(FOwner: TCustomForm; var FKeyboardName: string): Boolean;
+function SelectSystemKeyboard(FOwner: TComponent; var FKeyboardName: string): Boolean;
 
 function LoadSystemKeyboard(var FLoadedSystemKeyboard: Boolean; FKeyboardName: string): HKL;
 
@@ -80,7 +80,7 @@ uses
   
 {$R *.DFM}
 
-function SelectSystemKeyboard(FOwner: TCustomForm; var FKeyboardName: string): Boolean;
+function SelectSystemKeyboard(FOwner: TComponent; var FKeyboardName: string): Boolean;
 begin
   Result := False;
 

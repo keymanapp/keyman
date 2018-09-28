@@ -37,6 +37,11 @@ const
     ktMobile, ktTablet
   ];
 
+  // Supports .kvks
+  KeymanTargetsUsingKVK: TKeymanTargets = [
+    ktWindows, ktMacosx, ktLinux, ktDesktop, ktWeb
+  ];
+
   // Other targets?
   //
 
@@ -45,6 +50,14 @@ const
     'windows', 'macosx', 'linux',
     'web', 'iphone', 'ipad', 'androidphone', 'androidtablet',
     'mobile', 'desktop', 'tablet');
+
+  // Friendly names for targets, e.g. for documentation
+
+  SKeymanTargetNames: array[TKeymanTarget] of string = (
+    'All',
+    'Windows', 'macOS', 'Linux',
+    'Web', 'iPhone', 'iPad', 'Android phone', 'Android tablet',
+    'Mobile devices', 'Desktop devices', 'Tablet devices');
 
 function KeymanTargetsToString(ATargets: TKeymanTargets): string;
 function StringToKeymanTargets(ATargets: string): TKeymanTargets;

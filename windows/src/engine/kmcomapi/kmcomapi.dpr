@@ -129,7 +129,6 @@ uses
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
-  utilicon in '..\..\global\delphi\general\utilicon.pas',
   KPInstallPackageStartMenu in '..\..\global\delphi\general\KPInstallPackageStartMenu.pas',
   KPUninstallPackageStartMenu in '..\..\global\delphi\general\KPUninstallPackageStartMenu.pas',
   utilwow64 in '..\..\global\delphi\general\utilwow64.pas',
@@ -154,7 +153,8 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas';
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  utilicon in '..\..\global\delphi\general\utilicon.pas';
 
 {$R *.TLB}
 

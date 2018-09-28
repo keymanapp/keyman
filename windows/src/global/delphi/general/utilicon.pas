@@ -29,6 +29,7 @@ uses
   kmxfile;
 
 function ConvertKeyboardBitmapToAlphaIcon(ki: TKeyboardInfo; const IconFileName: string): Boolean;
+function ConvertBitmapsToAlphaIcon(b: array of Vcl.Graphics.TBitmap; const IconFileName: string): Boolean;
 function GetTrayIconSize: TPoint;   // I4314
 
 {$R 'tip_icon_base.res' 'tip_icon_base.rc'}
@@ -42,8 +43,7 @@ uses
   Winapi.ActiveX,
   Winapi.Windows,
   Winapi.GDIPAPI,
-  Winapi.GDIPObj,
-  utilolepicture;
+  Winapi.GDIPObj;
 
 procedure MergeImagesIntoIcon(bmp: array of TGPBitmap; const Filename: string); forward;
 function CreateIconInFrame(SourceBitmap: TGPBitmap; const SourceFrameResourceName: string; FX, FY: Integer; FWidth, FHeight, FScale: Integer): TGPBitmap; forward;
@@ -77,6 +77,43 @@ begin
     Win32Error: RaiseLastOSError;
     else raise Exception.Create('GDI Error: '+GetEnumName(Typeinfo(TStatus), Ord(status)));
   end;
+end;
+
+function ConvertBitmapsToAlphaIcon(b: array of Vcl.Graphics.TBitmap; const IconFileName: string): Boolean;
+var
+  bmp: array of TGPBitmap;
+  i: Integer;
+  gdiptoken: Cardinal;
+  StartupInput: TGdiplusStartupInput;
+begin
+  StartupInput.DebugEventCallback := nil;
+  StartupInput.SuppressBackgroundThread := False;
+  StartupInput.SuppressExternalCodecs   := False;
+  StartupInput.GdiplusVersion := 1;
+
+  GDIPCheck(GdiPlusStartup(gdiptoken, @StartupInput, nil));
+  try
+    SetLength(bmp, Length(b));
+    for i := 0 to High(bmp) do
+      bmp[i] := nil;
+
+    try
+      for i := 0 to High(b) do
+      begin
+        bmp[i] := TGPBitmap.Create(b[i].Handle, b[i].Palette);
+        GDIPCheck(bmp[i].GetLastStatus);
+      end;
+
+      MergeImagesIntoIcon(bmp, IconFileName);
+
+    finally
+      for i := 0 to High(bmp) do
+        FreeAndNil(bmp[i]);
+    end;
+  finally
+    GdiplusShutdown(gdiptoken);
+  end;
+  Result := True;
 end;
 
 function ConvertKeyboardBitmapToAlphaIcon(ki: TKeyboardInfo; const IconFileName: string): Boolean;

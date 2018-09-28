@@ -39,7 +39,7 @@ interface
 uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  UfrmMDIChild, ProjectFile, UserMessages;
+  UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile, UserMessages;
 
 type
   TfrmTikeEditor = class(TfrmTikeChild)
@@ -129,7 +129,7 @@ uses
   dmActionsMain,
   KeymanDeveloperUtils,
   KMDevResourceStrings,
-  Project,
+  Keyman.Developer.System.Project.Project,
   UfrmMain,
   WideStrUtils;
 
