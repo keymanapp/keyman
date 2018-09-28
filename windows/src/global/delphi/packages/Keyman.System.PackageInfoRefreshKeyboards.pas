@@ -207,6 +207,9 @@ function TPackageInfoRefreshKeyboards.IsKeyboardFileByContent(f: TPackageContent
 var
   id: string;
 begin
+  if not FileExists(f.FileName) then
+    Exit(True);
+
   id := TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(f.FileName);
   // Look for Keyboard_<id>
   with TStringStream.Create('', TEncoding.UTF8) do
