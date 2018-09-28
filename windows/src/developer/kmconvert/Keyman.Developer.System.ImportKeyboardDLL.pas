@@ -791,32 +791,41 @@ begin
 end;
 
 procedure TLoader.Main(var KMN, KVKS: string);
+type
+  PHKL = ^HKL;
 var
+  hq, hp: PHKL;
   cKeyboards: Cardinal;
-  rghkl: array of HKL;
   i: Integer;
   hkl: THandle;
 begin
+  hkl := 0;
   inputHKL := IntToHex(StrToInt('$'+inputHKL), 8);
 
-  cKeyboards := GetKeyboardLayoutList(0, rghkl[0]);
-  SetLength(rghkl, cKeyboards);
-  GetKeyboardLayoutList(cKeyboards, rghkl[0]);
-
-  hkl := LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
-  if hkl = 0 then
-    raise EImportKeyboardDLL.CreateFmt('The keyboard %s could not be loaded (error %d, %s)',
-      [inputHKL, GetLastError, SysErrorMessage(GetLastError)]);
-
+  { Load the layout (if not already loaded) and determine if it should be unloaded again }
+  hp := nil;
+  cKeyboards := GetKeyboardLayoutList(0, hp^);
+  hp := PHKL(AllocMem(cKeyboards * sizeof(HKL)));
   try
+    GetKeyboardLayoutList(cKeyboards, hp^);
+
+    hkl := LoadKeyboardLayout(inputHKL, KLF_NOTELLSHELL);
+    if hkl = 0 then
+      raise EImportKeyboardDLL.CreateFmt('The keyboard %s could not be loaded (error %d, %s)',
+        [inputHKL, GetLastError, SysErrorMessage(GetLastError)]);
+
     ScanKeyboard(hkl);
   finally
-    for i := 0 to High(rghkl) do
-      if hkl = rghkl[i] then
-        hkl := 0;
+    hq := hp;
+    for i := 0 to cKeyboards - 1 do
+      if hq^ = hkl
+        then hkl := 0
+        else Inc(hq);
 
     if hkl <> 0 then
       UnloadKeyboardLayout(hkl);
+
+    FreeMem(hp);
   end;
 
   KMN := WriteOutputKMNFile;

@@ -270,7 +270,14 @@ uses
   Keyman.UI.FontUtils in '..\..\global\delphi\general\Keyman.UI.FontUtils.pas',
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in 'project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
-  Keyman.Developer.System.Project.kpsProjectFileAction in 'project\Keyman.Developer.System.Project.kpsProjectFileAction.pas';
+  Keyman.Developer.System.Project.kpsProjectFileAction in 'project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
+  Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
+  Keyman.Developer.UI.Project.UfrmNewProject in 'project\Keyman.Developer.UI.Project.UfrmNewProject.pas' {frmNewProject},
+  Keyman.Developer.System.KeyboardProjectTemplate in '..\kmconvert\Keyman.Developer.System.KeyboardProjectTemplate.pas',
+  Keyman.Developer.UI.ImportWindowsKeyboardDialogManager in 'main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas',
+  Keyman.Developer.System.ImportWindowsKeyboard in '..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas',
+  Keyman.Developer.System.ImportKeyboardDLL in '..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas',
+  Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -297,8 +304,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  ShowStartup;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+      ShowStartup;
       Application.Run;
     end;
   finally

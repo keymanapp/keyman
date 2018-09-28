@@ -121,6 +121,7 @@ type
     procedure ppReadOnlyIconsPaint(Sender: TObject);
   private
     FReadOnlyIcons: array of TIcon;
+    FRSP21318IsPngIcon: Boolean;
     FEdit: TBitmapEditorCurrentEdit;
 
     X1, Y1: Integer;
@@ -693,7 +694,11 @@ procedure TframeBitmapEditor.ppReadOnlyIconsPaint(Sender: TObject);
 var
   i, x: Integer;
 begin
+  if FRSP21318IsPngIcon then
+    Exit;
+
   x := 8;
+
   for i := 0 to High(FReadOnlyIcons) do
   begin
     ppReadOnlyIcons.Canvas.Draw(x, 8, FReadOnlyIcons[i]);
@@ -807,22 +812,44 @@ begin
   end;
 end;
 
+function IsPNGSignature(const buf: array of byte): Boolean;
+begin
+  Result :=
+    (buf[0] = $89) and
+    (buf[1] = $50) and
+    (buf[2] = $4E) and
+    (buf[3] = $47);
+end;
+
 function TframeBitmapEditor.CheckIfIconCanBeEdited(s: TStream): Boolean;
 var
   p: Int64;
   ci: TCursorOrIcon;
   header: TIconRec;
+  buf: array[0..3] of byte;
 begin
   p := s.Position;
   try
-    s.ReadBuffer(ci, SizeOf(TCursorOrIcon));
-    Result := (ci.wType = rc3_Icon) and (ci.Count = 1);
-    if Result then
-    begin
-      // We need to read the header of that icon
-      s.Read(header, SizeOf(header));
-      Result := (header.Width = 16) and (header.Height = 16);
-    end;
+    if s.Read(ci, SizeOf(TCursorOrIcon)) <> SizeOf(TCursorOrIcon) then
+      Exit(False);
+
+    if (ci.wType <> rc3_Icon) or (ci.Count <> 1) then
+      Exit(False);
+
+    // We need to read the header of that icon
+    if not s.Read(header, SizeOf(header)) = sizeof(header) then
+      Exit(False);
+
+    if (header.Width <> 16) or (header.Height <> 16) then
+      Exit(False);
+
+    // Check that it's not a PNG format image
+    s.Position := header.DIBOffset;
+    if s.Read(buf, 4) <> 4 then
+      Exit(False);
+
+    FRSP21318IsPngIcon := IsPNGSignature(buf);
+    Result := not FRSP21318IsPngIcon;
   finally
     s.Position := p;
   end;
@@ -838,20 +865,25 @@ begin
     if not FIconCanBeEdited then
       LoadReadOnlyIcon(Stream);
 
-    Transparency := True;
-    FBitmaps[bebEdit].Canvas.Brush.Color := TransparentReplacementColour;  // I2634
-    FBitmaps[bebEdit].Canvas.FillRect(Rect(0,0,16,16));
-    FIcon := TIcon.Create;
-    try
+    if not FRSP21318IsPngIcon then
+    begin
+      Transparency := True;
+      FBitmaps[bebEdit].Canvas.Brush.Color := TransparentReplacementColour;  // I2634
+      FBitmaps[bebEdit].Canvas.FillRect(Rect(0,0,16,16));
+      FIcon := TIcon.Create;
       try
-        FIcon.LoadFromStream(Stream);
-      except
-        on E:EInvalidGraphic do
-          ShowMessage(E.Message);
+        try
+          FIcon.LoadFromStream(Stream);
+          DrawIconEx(FBitmaps[bebEdit].Canvas.Handle, 0, 0, FIcon.Handle, 16, 16, 0, 0, DI_NORMAL);
+        except
+          on E:EOutOfResources do
+            ShowMessage(E.Message);
+          on E:EInvalidGraphic do
+            ShowMessage(E.Message);
+        end;
+      finally
+        FIcon.Free;
       end;
-      DrawIconEx(FBitmaps[bebEdit].Canvas.Handle, 0, 0, FIcon.Handle, 16, 16, 0, 0, DI_NORMAL);
-    finally
-      FIcon.Free;
     end;
   end
   else
