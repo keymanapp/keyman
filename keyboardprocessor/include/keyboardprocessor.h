@@ -321,7 +321,7 @@ typedef struct {
 
 typedef struct km_kbp_option_set km_kbp_option_set;
 
-#define KM_KBP_OPTIONS_END { 0, }
+#define KM_KBP_OPTIONS_END { 0, 0 }
 
 /*
 ```
@@ -330,13 +330,13 @@ typedef struct km_kbp_option_set km_kbp_option_set;
 
 ```c
 */
-size_t km_kbp_options_set_length(km_kbp_option_set);
+size_t km_kbp_options_set_size(km_kbp_option_set const *);
 
 /*
 ```
 ```c
 */
-km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set,
+km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set *,
                                                const char *key);
 /*
 ```
@@ -347,9 +347,9 @@ void km_kbp_options_set_update(km_kbp_option_set, km_kbp_option *);
 ```
 ```c
 */
-size_t km_kbp_options_set_to_json(km_kbp_option_set, char *buf, size_t space);
-
-
+km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *,
+                                         char *buf,
+                                         size_t *space);
 /*
 ```
 ### Keyboards
