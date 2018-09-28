@@ -47,14 +47,19 @@ mkdir -p dist
 
 # configure and make dist for autotool projects
 for proj in ${autotool_projects}; do
-	cd $proj
+    echo "configure $proj"
+    cd $proj
+    oldvers=`cat VERSION`
+    vers=`./configure -version|grep kmfl|grep -Po "${proj} configure \K[^a-z]*"`
+    echo "$vers" > VERSION
     rm -rf ../build-$proj
     mkdir -p ../build-$proj
     cd ../build-$proj
     ../$proj/configure
     make dist
     mv *.tar.gz ../dist
-	cd $BASEDIR
+    cd $BASEDIR
+    echo "$oldvers" > VERSION
 done
 
 
