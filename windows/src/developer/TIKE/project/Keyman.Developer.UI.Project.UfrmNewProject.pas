@@ -178,7 +178,7 @@ begin
   case ProjectType of
     kptUnknown: lblDescription.Caption := '';
     kptBasic: lblDescription.Caption :=
-      'Creates a keyboard project that matches the layout used in '+
+      'Creates a keyboard project that matches the folder structure used in '+
       'the Keyman keyboards repository and includes all basic files '+
       'needed for a keyboard project.';
     kptBlank: lblDescription.Caption :=
