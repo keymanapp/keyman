@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     w = ViewInstalledWindow()
     w.connect("destroy", Gtk.main_quit)
-    w.resize(800, 450)
+    w.resize(360, 640)
     w.show_all()
     Gtk.main()

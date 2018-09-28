@@ -137,56 +137,13 @@ class KmpGrid(Gtk.Grid):
                 prevbox = kbbox
         return (prevbox, shade)
 
-class ViewInstalledWindow(Gtk.Window):
+
+
+class ViewInstalledWindowBase(Gtk.Window):
     def __init__(self):
         self.accelerators = None
         Gtk.Window.__init__(self, title="Keyman keyboard packages")
         init_accel(self)
-
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-
-        self.s = Gtk.ScrolledWindow()
-        vbox.pack_start(self.s, True, True, 12)
-
-        hbox = Gtk.Box(spacing=6)
-        vbox.pack_start(hbox, False, False, 12)
-
-        self.grid = KmpGrid(self)
-        self.s.add(self.grid)
-
-        bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
-
-        button = Gtk.Button.new_with_mnemonic("_Refresh")
-        button.connect("clicked", self.on_refresh_clicked)
-        bbox.add(button)
-        # hbox.pack_start(button, False, False, 12)
-
-        button = Gtk.Button.new_with_mnemonic("_Download keyboard...")
-        button.connect("clicked", self.on_download_clicked)
-        bbox.add(button)
-        # hbox.pack_start(button, False, False, 12)
-
-        button = Gtk.Button.new_with_mnemonic("_Install keyboard...")
-        button.connect("clicked", self.on_installfile_clicked)
-        bbox.add(button)
-        # hbox.pack_start(button, False, False, 5)
-
-        hbox.pack_start(bbox, False, False, 12)
-
-        bbox2 = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
-        bbox2.set_layout(Gtk.ButtonBoxStyle.END)
-
-        button = Gtk.Button.new_with_mnemonic("_Close")
-        button.connect("clicked", self.on_close_clicked)
-        bbox2.pack_end(button, False, False, 12)
-        hbox.pack_end(bbox2, False, False, 12)
-
-
-        bind_accelerator(self.accelerators, button, '<Control>q')
-        bind_accelerator(self.accelerators, button, '<Control>w')
-
-
-        self.add(vbox)
 
     def refresh_installed_kmp(self):
         logging.debug("Refreshing grid")
@@ -213,6 +170,7 @@ class ViewInstalledWindow(Gtk.Window):
         logging.debug("Install from file clicked")
         dlg = Gtk.FileChooserDialog("Choose a kmp file..", self, Gtk.FileChooserAction.OPEN,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        dlg.resize(640, 480)
         filter_text = Gtk.FileFilter()
         filter_text.set_name("KMP files")
         filter_text.add_pattern("*.kmp")
@@ -227,6 +185,128 @@ class ViewInstalledWindow(Gtk.Window):
             else:
                 w.destroy()
         dlg.destroy()
+
+class ViewInstalledWindow(ViewInstalledWindowBase):
+    def __init__(self):
+        ViewInstalledWindowBase.__init__(self)
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
+        self.s = Gtk.ScrolledWindow()
+        vbox.pack_start(self.s, True, True, 12)
+
+        hbox = Gtk.Box(spacing=6)
+        vbox.pack_start(hbox, False, False, 12)
+
+        self.grid = KmpGrid(self)
+        self.s.add(self.grid)
+
+        bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+
+        button = Gtk.Button.new_with_mnemonic("_Refresh")
+        button.set_tooltip_text("Refresh keyboard list")
+        button.connect("clicked", self.on_refresh_clicked)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 12)
+
+        button = Gtk.Button.new_with_mnemonic("_Download")
+        button.set_tooltip_text("Download and install a keyboard package from the Keyman website")
+        button.connect("clicked", self.on_download_clicked)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 12)
+
+        button = Gtk.Button.new_with_mnemonic("_Install")
+        button.set_tooltip_text("Install a keyboard package from a file")
+        button.connect("clicked", self.on_installfile_clicked)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 5)
+
+        hbox.pack_start(bbox, False, False, 12)
+
+        bbox2 = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        bbox2.set_layout(Gtk.ButtonBoxStyle.END)
+
+        button = Gtk.Button.new_with_mnemonic("_Close")
+        button.set_tooltip_text("Close window")
+        button.connect("clicked", self.on_close_clicked)
+        bbox2.pack_end(button, False, False, 12)
+        hbox.pack_end(bbox2, False, False, 12)
+
+
+        bind_accelerator(self.accelerators, button, '<Control>q')
+        bind_accelerator(self.accelerators, button, '<Control>w')
+
+        self.add(vbox)
+
+class NewViewInstalledWindow(ViewInstalledWindowBase):
+    def __init__(self):
+        ViewInstalledWindowBase.__init__(self)
+
+# window is split left/right hbox
+# right is ButtonBox
+#     possibly 2 ButtonBox in a vbox
+#         top one with _Remove, _About, ?_Welcome? or ?Read_Me?
+#         bottom one with _Download, _Install, Re_fresh, _Close
+# left is GtkTreeView - does it need to be inside anything else apart from the hbox?
+#     with liststore which defines columns
+#         GdkPixbuf icon
+#         gchararray name
+#         gchararray version
+#         gchararray welcomefile (hidden) (or just use area and packageID?)
+#         gchararray packageID (hidden)
+#         enum? area (user, shared, system) (icon or hidden?)
+# changing selected item in treeview changes what buttons are activated
+# on selected_item_changed signal set the data that the buttons will use in their callbacks
+# see https://developer.gnome.org/gtk3/stable/TreeWidget.html#TreeWidget
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
+        self.s = Gtk.ScrolledWindow()
+        vbox.pack_start(self.s, True, True, 12)
+
+        hbox = Gtk.Box(spacing=6)
+        vbox.pack_start(hbox, False, False, 12)
+
+        self.grid = KmpGrid(self)
+        self.s.add(self.grid)
+
+        bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+
+        button = Gtk.Button.new_with_mnemonic("_Refresh")
+        button.set_tooltip_text("Refresh keyboard list")
+        button.connect("clicked", self.on_refresh_clicked)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 12)
+
+        button = Gtk.Button.new_with_mnemonic("_Download")
+        button.set_tooltip_text("Download and install a keyboard package from the Keyman website")
+        button.connect("clicked", self.on_download_clicked)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 12)
+
+        button = Gtk.Button.new_with_mnemonic("_Install")
+        button.set_tooltip_text("Install a keyboard package from a file")
+        button.connect("clicked", self.on_installfile_clicked)
+        bbox.add(button)
+        # hbox.pack_start(button, False, False, 5)
+
+        hbox.pack_start(bbox, False, False, 12)
+
+        bbox2 = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        bbox2.set_layout(Gtk.ButtonBoxStyle.END)
+
+        button = Gtk.Button.new_with_mnemonic("_Close")
+        button.set_tooltip_text("Close window")
+        button.connect("clicked", self.on_close_clicked)
+        bbox2.pack_end(button, False, False, 12)
+        hbox.pack_end(bbox2, False, False, 12)
+
+
+        bind_accelerator(self.accelerators, button, '<Control>q')
+        bind_accelerator(self.accelerators, button, '<Control>w')
+
+        self.add(vbox)
+
 
 if __name__ == '__main__':
     w = ViewInstalledWindow()
