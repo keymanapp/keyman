@@ -2,8 +2,6 @@ program kmconvert;
 
 {$APPTYPE CONSOLE}
 
-{$R *.res}
-
 uses
   System.SysUtils,
   Keyman.Developer.System.KeymanConvertMain in 'Keyman.Developer.System.KeymanConvertMain.pas',
@@ -96,6 +94,10 @@ uses
   Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   utilicon in '..\..\global\delphi\general\utilicon.pas',
   ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas';
+
+{$R icons.RES}
+{$R version.res}
+{$R manifest.res}
 
 begin
   try
