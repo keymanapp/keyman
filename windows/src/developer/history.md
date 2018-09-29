@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-09-28 10.0.1204 stable
+* Fix crash in Keyman Developer package editor when a compiled .js keyboard is missing (#1224)
+
 ## 2018-09-12 10.0.1202 stable
 * Refactor how keyboard_info metadata is generated (#1174)
 
