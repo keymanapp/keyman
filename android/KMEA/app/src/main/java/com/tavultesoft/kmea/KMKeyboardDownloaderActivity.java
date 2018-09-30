@@ -137,6 +137,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private String kbVersion = "1.0";
     private String kbIsCustom = isCustom ? "Y" : "N";
+    private String kbIsRTL = "false";
     private String font = "";
     private String oskFont = "";
 
@@ -309,6 +310,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       font = keyboard.optString(KMManager.KMKey_Font);
       oskFont = keyboard.optString(KMManager.KMKey_OskFont);
 
+      kbIsRTL = keyboard.optString(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
+
       notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_STARTED, 0);
 
       String destination = context.getDir("data", Context.MODE_PRIVATE).toString() +
@@ -358,6 +361,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         keyboardInfo.put(KMManager.KMKey_LanguageName, langName);
         keyboardInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
         keyboardInfo.put(KMManager.KMKey_CustomKeyboard, kbIsCustom);
+        keyboardInfo.put(KMManager.KMKey_KeyboardRTL, kbIsRTL);
         keyboardInfo.put(KMManager.KMKey_Font, font);
         if (oskFont != null)
           keyboardInfo.put(KMManager.KMKey_OskFont, oskFont);

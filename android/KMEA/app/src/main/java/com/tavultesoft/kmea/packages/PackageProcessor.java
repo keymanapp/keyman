@@ -131,6 +131,7 @@ public class PackageProcessor {
         keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
         keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
         keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
+        keyboards[i].put(KMManager.KMKey_KeyboardRTL, String.valueOf(jsonKeyboard.optBoolean("rtl", false)));
         if (jsonKeyboard.has("displayFont")) {
           keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
         }

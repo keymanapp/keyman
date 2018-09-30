@@ -161,11 +161,12 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
       String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+      String kbRTL = keyboardInfo.get(KMManager.KMKey_KeyboardRTL);
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
       if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, kbRTL);
       if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, kbRTL);
 
       finish();
     } else {

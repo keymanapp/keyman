@@ -11,6 +11,7 @@
         android:layout_alignParentTop="true"
         android:ems="10"
         android:inputType="textMultiLine"
+        android:textDirection="anyRtl"
         android:gravity="top"
         android:scrollbars="vertical" >
 

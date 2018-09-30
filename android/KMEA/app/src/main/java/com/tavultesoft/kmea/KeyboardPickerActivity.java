@@ -103,6 +103,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
         context, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
       kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
+      kbInfo.put(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);
 
@@ -324,11 +325,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
+    String kbRTL = kbInfo.get(KMManager.KMKey_KeyboardRTL);
     if (KMManager.InAppKeyboard != null) {
-      KMManager.InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+      KMManager.InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
     }
     if (KMManager.SystemKeyboard != null) {
-      KMManager.SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+      KMManager.SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
     }
   }
 
@@ -509,6 +511,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
       if (pkgID == null || pkgID.isEmpty()) {
         kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      }
+
+      String kbRTL = kbInfo.get(KMManager.KMKey_KeyboardRTL);
+      if (kbRTL == null || kbRTL.isEmpty()) {
+        kbInfo.put(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
       }
       return kbInfo;
     }

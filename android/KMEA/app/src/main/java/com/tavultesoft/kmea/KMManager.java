@@ -132,6 +132,7 @@ public final class KMManager {
   public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+  public static final String KMDefault_KeyboardRTL = "false";
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -531,6 +532,7 @@ public final class KMManager {
         newKbInfo.put(KMManager.KMKey_KeyboardVersion,
           getLatestKeyboardFileVersion(context, KMManager.KMDefault_UndefinedPackageID,
             KMManager.KMDefault_KeyboardID));
+        newKbInfo.put(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
         kbList.set(0, newKbInfo);
@@ -555,6 +557,13 @@ public final class KMManager {
         String latestKbVersion = getLatestKeyboardFileVersion(context, pkgID, kbID);
         if ((latestKbVersion != null) && (kbVersion == null || !kbVersion.equals(latestKbVersion))) {
           kbInfo.put(KMManager.KMKey_KeyboardVersion, latestKbVersion);
+          kbList.set(i, kbInfo);
+          shouldUpdateList = true;
+        }
+
+        String kbRTL = kbInfo.get(KMManager.KMKey_KeyboardRTL);
+        if (kbRTL == null) {
+          kbInfo.put(KMManager.KMKey_KeyboardRTL, KMManager.KMDefault_KeyboardRTL);
           kbList.set(i, kbInfo);
           shouldUpdateList = true;
         }
@@ -650,6 +659,7 @@ public final class KMManager {
     params.putString("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
     params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
     params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
+    params.putString("keyboardRTL", keyboardInfo.get(KMManager.KMKey_KeyboardRTL));
     params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
     mFirebaseAnalytics.logEvent("km_add_keyboard", params);
 
@@ -673,15 +683,16 @@ public final class KMManager {
     return (result1 || result2);
   }
 
-  public static boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+  public static boolean setKeyboard(String packageID, String keyboardID, String languageID,
+                                    String keyboardName, String languageName, String kFont, String kOskFont, String rtl) {
     boolean result1 = false;
     boolean result2 = false;
 
     if (InAppKeyboard != null && InAppKeyboardLoaded)
-      result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+      result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, rtl);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
-      result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+      result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, rtl);
 
     return (result1 || result2);
   }
@@ -698,7 +709,8 @@ public final class KMManager {
     String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
     String kFont = keyboardInfo.get(KMManager.KMKey_Font);
     String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-    return setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+    String kbRTL = keyboardInfo.get(KMKey_KeyboardRTL);
+    return setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
   }
 
   public static void switchToNextKeyboard(Context context) {
@@ -717,11 +729,12 @@ public final class KMManager {
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
+    String kbRTL = kbInfo.get(KMManager.KMKey_KeyboardRTL);
     if (InAppKeyboard != null) {
-      InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+      InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
     }
     if (SystemKeyboard != null) {
-      SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+      SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
     }
   }
 
@@ -1030,7 +1043,7 @@ public final class KMManager {
     shouldAllowSetKeyboard = value;
     if (shouldAllowSetKeyboard == false) {
       setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
-        KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+        KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null, KMDefault_KeyboardRTL);
     }
   }
 
@@ -1272,10 +1285,11 @@ public final class KMManager {
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-            InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+            String kbRTL = keyboardInfo.get(KMManager.KMKey_KeyboardRTL);
+            InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
           } else {
             InAppKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
-              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null, KMDefault_KeyboardRTL);
           }
         }
 
@@ -1446,10 +1460,11 @@ public final class KMManager {
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-            SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+            String kbRTL = keyboardInfo.get(KMManager.KMKey_KeyboardRTL);
+            SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont, kbRTL);
           } else {
             SystemKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
-              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null, KMDefault_KeyboardRTL);
           }
         }
 

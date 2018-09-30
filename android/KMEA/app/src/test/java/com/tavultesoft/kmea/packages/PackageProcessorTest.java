@@ -44,8 +44,14 @@ public class PackageProcessorTest {
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
+  private static final String TEST_ARABIC_IZZA_KMP_NAME = "arabic_izza";
+  private static final File TEST_ARABIC_IZZA_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v12" + File.separator + TEST_ARABIC_IZZA_KMP_NAME + ".kmp");
+  private static final File TEST_ARABIC_IZZA_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "packages" +
+    File.separator + TEST_ARABIC_IZZA_KMP_NAME);
+
   private static File tempPkg;
   private static File tempPkgAlt;
+  private static File tempPkgArabic;
   private static File tempPkgUndefinedVer;
 
   // Each test gets a fresh version of the extracted package.
@@ -79,6 +85,16 @@ public class PackageProcessorTest {
     }
   }
 
+  // Some tests wish to validate keyboard RTL
+  public void extractArabicTestPackage() {
+    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    try {
+      tempPkgArabic = PackageProcessor.unzipKMP(TEST_ARABIC_IZZA_KMP_FILE);
+    } catch (IOException e) {
+      System.err.println(e);
+    }
+  }
+
   /**
    * Post-test cleanup.  While the temp/ directory is .gitignore'd, this provides an extra layer
    * of safety from polluting the repo file path.
@@ -89,7 +105,9 @@ public class PackageProcessorTest {
     FileUtils.deleteDirectory(tempPkg);
     FileUtils.deleteQuietly(tempPkgAlt);
     FileUtils.deleteQuietly(tempPkgUndefinedVer);
+    FileUtils.deleteQuietly(tempPkgArabic);
     FileUtils.deleteDirectory(TEST_GFF_KMP_TARGET);
+    FileUtils.deleteDirectory(TEST_ARABIC_IZZA_KMP_TARGET);
   }
 
   @Test
@@ -137,6 +155,7 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
+    amharic.put(KMManager.KMKey_KeyboardRTL, "false");
     amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
     amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
@@ -149,10 +168,37 @@ public class PackageProcessorTest {
     geez.put(KMManager.KMKey_LanguageID, "gez");
     geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
     geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
+    geez.put(KMManager.KMKey_KeyboardRTL, "false");
     geez.put(KMManager.KMKey_CustomKeyboard, "Y");
     geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     Assert.assertEquals(geez, keyboards[1]);
+  }
+
+  @Test
+  public void test_load_ARABIC_keyboard() throws Exception {
+    extractArabicTestPackage();
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkgArabic);
+    FileUtils.moveDirectory(tempPkgArabic, TEST_ARABIC_IZZA_KMP_TARGET);
+
+    Assert.assertNotNull(json);
+
+    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0), "arabic_izza");
+    Assert.assertEquals(1, keyboards.length);
+
+    HashMap<String, String> arabic = new HashMap<String, String>();
+    arabic.put(KMManager.KMKey_PackageID, "arabic_izza");
+    arabic.put(KMManager.KMKey_KeyboardName, "Arabic Izza");
+    arabic.put(KMManager.KMKey_KeyboardID, "arabic_izza");
+    arabic.put(KMManager.KMKey_LanguageID, "ar-DZ");
+    arabic.put(KMManager.KMKey_LanguageName, "ar-DZ");
+    arabic.put(KMManager.KMKey_KeyboardVersion, "1.2");
+    arabic.put(KMManager.KMKey_KeyboardRTL, "true");
+    arabic.put(KMManager.KMKey_CustomKeyboard, "Y");
+    arabic.put(KMManager.KMKey_CustomHelpLink, TEST_ARABIC_IZZA_KMP_TARGET + File.separator + "welcome.htm");
+
+    Assert.assertEquals(arabic, keyboards[0]);
+
   }
 
   @Test

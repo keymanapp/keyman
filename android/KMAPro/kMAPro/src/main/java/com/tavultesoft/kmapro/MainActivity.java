@@ -773,6 +773,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       String kbVersion = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+      String kbRTL = keyboardInfo.get(KMManager.KMKey_KeyboardRTL);
       if (languageID.contains(";")) {
         String[] ids = languageID.split("\\;");
         String[] names = languageName.split("\\;");
@@ -791,9 +792,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           kbInfo.put(KMManager.KMKey_Font, kFont);
           kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
+          kbInfo.put(KMManager.KMKey_KeyboardRTL, kbRTL);
           if (i == 0) {
             if (KMManager.addKeyboard(this, kbInfo)) {
-              KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
+              KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont, kbRTL);
             }
           } else {
             KMManager.addKeyboard(this, kbInfo);
@@ -801,7 +803,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
       } else {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, kbRTL);
         }
       }
     } else {
@@ -822,7 +824,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
           String kFont = keyboardInfo.get(KMManager.KMKey_Font);
           String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          String kbRTL = keyboardInfo.get(KMManager.KMKey_KeyboardRTL);
+          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont, kbRTL);
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
