@@ -1,0 +1,25 @@
+{
+  "name": "keyman-lmlayer-prototype",
+  "version": "0.20181001.0",
+  "description": "Description ",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eddieantonio/keyman-lmlayer-prototype.git"
+  },
+  "author": "Eddie Antonio Santos <easantos@ualberta.ca> (http://eddieantonio.ca/)",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/eddieantonio/keyman-lmlayer-prototype/issues"
+  },
+  "homepage": "https://github.com/eddieantonio/keyman-lmlayer-prototype#readme",
+  "devDependencies": {
+    "ava": "^0.25.0"
+  },
+  "dependencies": {
+    "webworker-threads": "^0.7.17"
+  }
+}
