@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -24,9 +26,12 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -50,6 +55,8 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONObject;
+
+import static android.content.Context.VIBRATOR_SERVICE;
 
 public final class KMManager {
 
@@ -1611,6 +1618,20 @@ public final class KMManager {
       DisplayMetrics dms = context.getResources().getDisplayMetrics();
       int kbWidth = (int) (dms.widthPixels / dms.density);
       return kbWidth;
+    }
+
+    @JavascriptInterface
+    public void beepKeyboard() {
+      int duration = 150; // milliseconds
+
+      Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+      if (v != null && v.hasVibrator()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+         v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+      } else {
+        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
+      }
     }
 
     // Store the current keyboard chirality status from KMW in InAppKeyboard
