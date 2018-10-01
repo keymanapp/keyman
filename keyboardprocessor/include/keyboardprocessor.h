@@ -87,10 +87,22 @@ extern "C"
 #endif
 // Basic types
 //
-typedef uint16_t    km_kbp_cp;  // code point
-typedef uint32_t    km_kbp_usv; // Unicode Scalar Value
-typedef uint16_t    km_kbp_virtual_key;
+typedef uint16_t    km_kbp_cp;          // code point
+typedef uint32_t    km_kbp_usv;         // Unicode Scalar Value
+typedef uint16_t    km_kbp_virtual_key; // A virtual key code.
+typedef uint32_t    km_kbp_status;      // Status return code.
 
+
+// Opaque object types.
+//
+typedef struct km_kbp_context     km_kpb_context;
+typedef struct km_kbp_keyboard    km_kbp_keyboard;
+typedef struct km_kbp_state       km_kbp_state;
+typedef struct km_kbp_option_set  km_kbp_option_set;
+
+// Forward declarations
+//
+typedef struct km_kbp_option  km_kbp_option;
 
 /*```
 ### Error Handling
@@ -100,7 +112,6 @@ fail will always return a status value and all results are returned via
 outparams passed to the function.
 ```c
 */
-typedef uint32_t km_kbp_status;
 enum km_kbp_status_codes {
   KM_KBP_STATUS_OK = 0,
   KM_KBP_STATUS_NO_MEM = 1,
@@ -137,8 +148,6 @@ Contexts are always owned by their state.  They maybe set to a list of
 context_items or interrogated for their current list of context items.
 ```c
 */
-typedef struct km_kbp_context km_kpb_context;
-
 enum km_kbp_context_type {
   KM_KBP_CT_END,
   KM_KBP_CT_CHAR,
@@ -311,6 +320,46 @@ add upto the same number of the supplied items to the front of the context.
 void km_kbp_context_shrink(km_kbp_context *, size_t num,
                            km_kbp_context_item const* prefix);
 
+
+/*
+```
+### Action Items
+These provide the results of processing a key event to the glue code and should
+be processed by the Platform layer to issue commands to the platform text
+services framework to acheive the expected effect.
+```c
+*/
+typedef struct {
+  uint8_t   type;
+  uint8_t   __reserved[3];
+  union {
+    km_kbp_virtual_key  vkey;       // VKEY types
+    km_kbp_usv          character;  // CHAR type
+    uintptr_t           marker;     // MARKER type
+    km_kbp_option const * option;    // OPT types
+  };
+} km_kbp_action_item;
+
+enum km_kbp_action_type {
+  KM_KBP_IT_END         = 0,  // Marks end of action items list.
+  KM_KBP_IT_VKEYDOWN    = 1,  // A virtual key has been pressed.
+  KM_KBP_IT_VKEYUP      = 2,  // A virtual key has been released.
+  KM_KBP_IT_VSHIFTDOWN  = 3,  // A shifted virtual key has been pressed.
+  KM_KBP_IT_VSHIFTUP    = 4,  // A shifted virtual key has been released.
+  KM_KBP_IT_CHAR        = 5,  // A Unicode caharcter has been generated.
+  KM_KBP_IT_MARKER      = 6,  // Correlates to kmn's "deadkey" markers.
+  KM_KBP_IT_BELL        = 7,  // The keyboard has triggered a terminal Bell.
+  KM_KBP_IT_BACK        = 8,  // Delete a the character to the left of the
+                              //  insertion point.
+  KM_KBP_IT_PERSIST_OPT = 10, // The indicated option needs to be stored.
+  KM_KBP_IT_RESET_OPT   = 11, // Set the indicated option from the last
+                              //  persisted value or defaults. This includes
+                              //  the pristine value from environment or
+                              //  keyboard options.
+  KM_KBP_IT_MAX_TYPE_ID
+};
+
+
 /*
 ```
 ### Options
@@ -328,13 +377,10 @@ in the appropriate place. For RESET it should do the same but the read the
 current default and update the options set.
 ```c
 */
-
-typedef struct {
+struct km_kbp_option {
   char const *  key;
   char const *  value;
-} km_kbp_option;
-
-typedef struct km_kbp_option_set km_kbp_option_set;
+};
 
 #define KM_KBP_OPTIONS_END { 0, 0 }
 
@@ -408,72 +454,76 @@ null. On return it will hold how many bytes were used.
 km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const * opts,
                                          char *buf,
                                          size_t *space);
+
+
 /*
 ```
 ### Keyboards
+A keyboard is a set of rules and transforms in a Processor specific format for
+transforming key events into action items. The keyboard is parsed and loaded by
+the processsor and made available in an immutable fasion for use with any number
+of state objects.
 ```c
 */
-typedef struct km_kbp_keyboard  km_kbp_keyboard;
-
 typedef struct {
-  char const *    version_string;
-  char const *    id;
-  char const *    folder_path;
-  size_t          n_options;
-  km_kbp_option   default_options[];
+  char const *    version_string;   // Processor specific version string.
+  char const *    id;               // Keyman keyboard ID string.
+  char const *    folder_path;      // Path to the unpacked folder containing
+                                    // the keyboard and associated resources.
+  km_kbp_option_set const * default_options;
 } km_kbp_keyboard_attrs;
 
 /*
 ```
+### `km_kbp_keyboard_load`
+##### Description:
+Parse and load keyboard from the supplied path and a pointer to the loaded keyboard
+into the out paramter.
+##### Status:
+- __KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+- __KM_KBP_STATUS_IO_ERROR__:
+In the event the keyboard file is unparseable for any reason
+- __KM_KBP_STATUS_INVALID_ARGUMENT__:
+In the event the file doesn't exist or is inaccesible.
+- __KM_KBP_STATUS_OS_ERROR__: An unkown OS error condition occured during load.
+##### Parameters:
+- __kb_path__: C string containing a valid path to the keyboard file.
+- __keyboard__: A pointer to result variable: A pointer to the opaque
+`km_kbp_keyboard` object returned by the Processor.
+
 ```c
 */
 km_kbp_status km_kbp_keyboard_load(char const *kb_path,
-                                   km_kbp_keyboard const **keyboard);
+                                   km_kbp_keyboard **keyboard);
 
 /*
 ```
+### `km_kbp_keyboard_dispose`
+##### Description:
+Free the allocated memory belonging to a `km_kbp_keyboard` object previously
+returned by `km_kbp_keyboard_load`.
+##### Parameters:
+- __keyboard__: A pointer to the opaque `km_kbp_keyboard` object to be
+disposed of.
+
 ```c
 */
-void km_kbp_keyboard_dispose(km_kbp_keyboard const *);
+void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard);
 
 /*
 ```
+### `km_kbp_keyboard_get_attrs`
+##### Description:
+Get access to the keyboard's attributes.
+##### Return:
+A pointer to a `km_kbp_keyboard_attrs` structure.
+##### Parameters:
+- __keyboard__: A pointer to the opaque `km_kbp_keyboard` object to be queried.
+
 ```c
 */
-km_kbp_keyboard_attrs const *km_kbp_keyboard_get_attrs(km_kbp_keyboard const *);
-
-
-/*
-```
-### Action Items
-These provide the results of processing a key event to the glue code.
-```c
-*/
-typedef struct {
-  uint8_t   type;
-  uint8_t   __reserved[3];
-  union {
-    km_kbp_virtual_key  vkey;       // VKEY types
-    km_kbp_usv          character;  // CHAR type
-    uintptr_t           marker;     // MARKER type
-    char const *        options;    // OPT types
-  };
-} km_kbp_action_item;
-
-enum km_kbp_action_type {
-  KM_KBP_IT_END         = 0, // Marks end of action items list.
-  KM_KBP_IT_VKEYDOWN    = 1,
-  KM_KBP_IT_VKEYUP      = 2,
-  KM_KBP_IT_VSHIFTDOWN  = 3,
-  KM_KBP_IT_VSHIFTUP    = 4,
-  KM_KBP_IT_CHAR        = 5,
-  KM_KBP_IT_MARKER      = 6, // correlates to kmn's "deadkey" markers.
-  KM_KBP_IT_BELL        = 7,
-  KM_KBP_IT_BACK        = 8,
-  KM_KBP_IT_PERSIST_OPT = 10,
-  KM_KBP_IT_RESET_OPT   = 11,
-  KM_KBP_IT_MAX_TYPE_ID
-};
+km_kbp_keyboard_attrs const *
+km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard);
 
 
 /*
@@ -481,8 +531,6 @@ enum km_kbp_action_type {
 ### State
 ```c
 */
-typedef struct km_kbp_state km_kbp_state;
-
 enum km_kbp_state_flag {
   KM_KBP_FLAG_DEADKEY = 1,
   KM_KBP_FLAG_SURROGATE = 2
