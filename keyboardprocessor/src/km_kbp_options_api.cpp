@@ -27,21 +27,28 @@ km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const * opts,
                                                const char *key)
 {
   auto i = opts->find(key);
-  opts->_last_lookup = i == opts->end()
-    ? km_kbp_option {nullptr, nullptr}
-    : km_kbp_option {i->first.c_str(), i->second.c_str()};
+  if ( i == opts->end())
+    return nullptr;
 
-    return &opts->_last_lookup;
+  opts->_last_lookup = km_kbp_option {i->first.c_str(), i->second.c_str()};
+  return &opts->_last_lookup;
 }
 
 
-void km_kbp_options_set_update(km_kbp_option_set *opts, km_kbp_option const *opt)
+km_kbp_status km_kbp_options_set_update(km_kbp_option_set *opts, km_kbp_option const *opt)
 {
-  while(opt->key)
-    opts++->emplace(opt->key, opt->value);
+  try
+  {
+    while(opt->key)
+      opts++->emplace(opt->key, opt->value);
+  }
+  catch (std::bad_alloc) { return KM_KBP_STATUS_NO_MEM; }
+
+  return KM_KBP_STATUS_OK;
 }
 
-
+// This simple function doesn't need to use the json pretty printer for such a
+//  simple list of key:value pairs but it's a good introduction to it.
 km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *opts, char *buf, size_t *space)
 {
   std::stringstream _buf;
@@ -67,7 +74,10 @@ km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *opts, char *bu
   // Fetch the finished doc and copy it to the buffer if there enough space.
   auto const doc = _buf.str();
   if (buf && *space > doc.size())
+  {
     std::copy(doc.begin(), doc.end(), buf);
+    buf[doc.size()] = 0;
+  }
 
   // Return space needed/used.
   *space = doc.size();

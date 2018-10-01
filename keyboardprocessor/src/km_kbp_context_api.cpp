@@ -70,7 +70,7 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
     for (;i != e && ci->type != KM_KBP_CT_END; ++ci, ++i)
     {
       if (ci->type == KM_KBP_CT_CHAR)
-        *i = ci->data.character;
+        *i = ci->character;
     }
 
     return buf_size - (e - i);
@@ -81,7 +81,7 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
 
     do
       if (ci->type == KM_KBP_CT_CHAR)
-        ++n += int(ci->data.character >= 0x10000);
+        ++n += int(ci->character >= 0x10000);
     while(ci++->type != KM_KBP_CT_END);
     return n;
   }

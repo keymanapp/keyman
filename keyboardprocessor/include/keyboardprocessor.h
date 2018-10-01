@@ -12,21 +12,27 @@
 
 
 ## Glossary
-- __Engine:__ the code that implements the Keyman Keyboard Processor API
 - __Platform layer:__
 the code that consumes the Keyman Keyboard Processor API, and provides the
 operating system-specific handling of keystroke events and integration with
 applications.
 - __Client Application:__
-the application that has the focus and receives text events from the Client.
+the application that has the focus and receives text events from the Platform
+layer.
 - __Context:__ Text preceding the insertion point
-- __Marker:__
-- __Keyboard:__
-- __Option:__
+- __Marker:__ Positional state that can be placed in the Context.
+- __Keyboard:__ A set of rules for execution my an Engine
+- __Option:__ A variable in a dynamic or static key value store.
 - __Processor:__
-- __State:__
+The componennt that can parse, and execute a particular keyboard.
+- __State:__ An object that hold internal state of the Processor for a given
+insertion point
 - __Action:__
+A directive output by the processor detailing how the Platform layer should
+transform the Client Application's text buffer.
 - __(Keyboard) Event:__
+A virtual key board event and modifier map recevied from the platform to be
+processed with the state object for this Client application.
 
 
 ## Design decisions in support of requirements:
@@ -71,6 +77,10 @@ All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
 #include <stdint.h>
 #include <stdlib.h>
 
+#define KM_KBP_LIB_CURRENT  0
+#define KM_KBP_LIB_AGE      0
+#define KM_KBP_LIB_REVISION 0
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -92,11 +102,11 @@ outparams passed to the function.
 */
 typedef uint32_t km_kbp_status;
 enum km_kbp_status_codes {
-  KM_KBP_STATUS_OK,
-  KM_KBP_STATUS_NO_MEM,
-  KM_KBP_STATUS_IO_ERROR,
-  KM_KBP_STATUS_INVALID_ARGUMENT,
-  KM_KBP_STATUS_KEY_ERROR,
+  KM_KBP_STATUS_OK = 0,
+  KM_KBP_STATUS_NO_MEM = 1,
+  KM_KBP_STATUS_IO_ERROR = 2,
+  KM_KBP_STATUS_INVALID_ARGUMENT = 3,
+  KM_KBP_STATUS_KEY_ERROR = 4,
   KM_KBP_STATUS_OS_ERROR = 0x80000000
 };
 
@@ -111,19 +121,19 @@ this only permits failure codes to be passed.
 ### Context
 The context is the text to the left of the insertion point (caret, cursor).
 The context is constructed by the Platform layer, typically by interrogating the
-Client Application.  The context may be updated by caching output of keystroke
-events, which can be done by the Engine.  If the Platform layer code caches the
-context, the context should be reset when a context state change is detected.
-Context state changes can occur when the user uses the mouse to move the
-insertion  point, uses cursor keys, switches applications or input fields, or
-presses hotkeys such as Ctrl+N to start a new document. The full set of context
-state change triggers is up to the Platform layer.
+Client Application.  The context will be updated by the engine for keystroke
+events.  If the Platform layer code caches the context, the context should be
+reset when a context state change is detected. Context state changes can occur
+when the user uses the mouse to move the insertion point, uses cursor keys,
+switches applications or input fields, or presses hotkeys such as Ctrl+N to
+start a new document. The full set of context state change triggers is up to the
+Platform layer.
 
 Context can also contain positional Markers (also known as 'deadkeys' in kmn
 keyboards), which are transitory state flags that are erased whenever a context
 state change is detected. Markers are always controlled by the Engine.
 
-Contexts are always owned by their state.  The maybe set to a list of
+Contexts are always owned by their state.  They maybe set to a list of
 context_items or interrogated for their current list of context items.
 ```c
 */
@@ -141,7 +151,7 @@ typedef struct {
   union {
     km_kbp_usv  character;
     uint32_t    marker;
-  } data;
+  };
 } km_kbp_context_item;
 /*
 ```
@@ -174,7 +184,7 @@ km_kbp_context_items_from_utf16(km_kbp_cp const *text,
 Convert an context item array into an UTF-16 encoded string placing it into
 the supplied buffer of specified size, and return the number codepoints
 actually used in the conversion. If null is passed as the buffer the number
-codepoints that are needed is returned. This will strip markers from the
+codeunits required is returned. This will strip markers from the
 context during the conversion.
 ##### Return:
 Number of code points needed.
@@ -304,13 +314,18 @@ void km_kbp_context_shrink(km_kbp_context *, size_t num,
 /*
 ```
 ### Options
-A state’s options defaults are set from the keyboard at creation time and it’s
-the environment. The glue code is then is expected to apply any persisted
-options it is maintaining.  During processing when the glue code finds a PERSIST
-action type it should call identify_option_src to find out which store the
-option comes from, read the updated value from the state’s option list and store
-the updated option in the appropriate place. For RESET it should do the same but
-the read the current default and update the options set.
+A state’s default options are set from the keyboard at creation time and the
+environment. The Platform layer is then is expected to apply any persisted
+options it is maintaining.  Options are passed into and out of API functions as
+simple C arrays of `km_kbp_option` terminated with a `KM_KBP_OPTIONS_END`
+sentinal value. A state's options are exposed and manipulatable via the
+`km_kbp_option_set` API. All options are string values.
+
+During processing when the glue code finds a PERSIST action type it should call
+identify_option_src on the state to find out which store the option comes from,
+read the updated value from the state’s option list and store the updated option
+in the appropriate place. For RESET it should do the same but the read the
+current default and update the options set.
 ```c
 */
 
@@ -327,27 +342,70 @@ typedef struct km_kbp_option_set km_kbp_option_set;
 ```
 ### `km_kbp_options_set_length`
 ##### Description:
+Return the cardinality of a `km_kbp_option_set`.
+##### Return:
+The number of items in the supplied `km_kbp_option_set`
+##### Parameters:
+- __opts__: An opaque pointer to an `km_kbp_option_set`.
 
 ```c
 */
-size_t km_kbp_options_set_size(km_kbp_option_set const *);
+size_t km_kbp_options_set_size(km_kbp_option_set const *opts);
 
 /*
 ```
+### `km_kbp_options_set_lookup`
+##### Description:
+Lookup an option based on it's key, in an option set.
+##### Return:
+A pointer the `km_kbp_option` or `0` if not present.
+##### Parameters:
+- __opts__: An opaque pointer to an `km_kbp_option_set`.
+- __key__: A C string that matches the key in the target `km_kbp_option`.
+
 ```c
 */
-km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set *,
+km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const *opts,
                                                const char *key);
+
 /*
 ```
+### `km_kbp_options_set_update`
+##### Description:
+Add or overwrite one or more options from a list of `km_kbp_option`s.
+##### Status:
+__KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+##### Parameters:
+- __opts__: An opaque pointer to an `km_kbp_option_set`.
+- __new_opts__: A C array of `km_kbp_option` objects to update or add. Must be
+terminated with `KM_KBP_OPTIONS_END`.
+
 ```c
 */
-void km_kbp_options_set_update(km_kbp_option_set, km_kbp_option *);
+km_kbp_status km_kbp_options_set_update(km_kbp_option_set * opts,
+                                        km_kbp_option const *new_opts);
+
 /*
 ```
+### `km_kbp_options_set_to_json`
+##### Description:
+Export the contents of a `km_kbp_options_set` to a JSON formated document and
+place it in the supplied buffer, reporting how much space was used. If null is
+passed as the buffer the number of bytes required is returned. If there is
+insufficent space to hold the document the contents of the buffer is undefined.
+##### Status:
+__KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+##### Parameters:
+- __opts__: An opaque pointer to an `km_kbp_option_set`.
+- __buf__: A pointer to the buffer to place the C string containing the JSON
+document into, can be null.
+- __space__: A pointer to a size_t variable. This variable must contain the
+number of bytes available in the buffer pointed to by `buf`, unless `buf` is
+null. On return it will hold how many bytes were used.
+
 ```c
 */
-km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *,
+km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const * opts,
                                          char *buf,
                                          size_t *space);
 /*
@@ -393,13 +451,13 @@ These provide the results of processing a key event to the glue code.
 */
 typedef struct {
   uint8_t   type;
-  uint8_t   reserved[3];
+  uint8_t   __reserved[3];
   union {
     km_kbp_virtual_key  vkey;       // VKEY types
     km_kbp_usv          character;  // CHAR type
     uintptr_t           marker;     // MARKER type
     char const *        options;    // OPT types
-  } data;
+  };
 } km_kbp_action_item;
 
 enum km_kbp_action_type {
