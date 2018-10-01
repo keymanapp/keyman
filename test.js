@@ -10,6 +10,7 @@ test('Can provide context to LMLayer', async t => {
     transform: { insert: 'D', deleteLeft: 0, deleteRight: 0 },
     context: { left: '' }
   });
+
   let {suggestions} = message;
 
   t.deepEqual(suggestions, [

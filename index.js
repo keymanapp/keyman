@@ -14,10 +14,11 @@ exports.LMLayer = class LMLayer {
   predictWithContext({transform, context, _token}) {
     let token = this._currentToken++;
 
-    let promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (this._promises.has(token)) {
         reject(`Existing request with token ${token}`);
       }
+      this._promises.set(token, resolve);
 
       this._worker.postMessage({
         kind: 'predict',
@@ -25,11 +26,7 @@ exports.LMLayer = class LMLayer {
         transform,
         context
       });
-
-      this._promises.set(token, resolve);
     });
-
-    return promise;
   }
 
   /**
@@ -45,8 +42,8 @@ exports.LMLayer = class LMLayer {
     }
 
     if (kind === 'suggestions') {
-      accept(event.data);
       this._promises.delete(token);
+      accept(event.data);
     } else {
       throw new Error(`Unknown message kind: ${kind}`);
     }
