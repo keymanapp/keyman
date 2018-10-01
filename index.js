@@ -1,4 +1,4 @@
-const {Worker} = require('webworker-threads');
+const Worker = require('tiny-worker');
 
 exports.LMLayer = class LMLayer {
   constructor() {
