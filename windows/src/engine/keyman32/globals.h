@@ -249,7 +249,13 @@ extern UINT
   wm_keymanshift,
   wm_keymanim_close,
   wm_keymanim_contextchanged,
-  wm_test_keyman_functioning;
+  wm_test_keyman_functioning,
+  wm_keyman_ignore;     // used to mask out messages that we don't want the target app to process, e.g. key events
+
+extern BOOL 
+  flag_ShouldSerializeInput,
+  flag_DevEnv_CtrlTabStarted,
+  flag_IsDevEnvProcess;
 
 void UpdateActiveWindows();
 
@@ -264,5 +270,8 @@ void Globals_UninitProcess();
 PKEYMAN64THREADDATA ThreadGlobals();
 BOOL Globals_ProcessInitialised();
 
+/* Debug flags */
+
+BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
 
 #endif

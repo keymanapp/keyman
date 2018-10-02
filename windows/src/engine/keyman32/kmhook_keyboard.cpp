@@ -140,7 +140,7 @@ BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD Shift
         //ReportActiveKeyboard(_td, 0);
         Globals::PostControllers(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
         PostDummyKeyEvent();   // I4124   // I4844
-        keybd_event(VK_SHIFT, 0xFF, KEYEVENTF_KEYUP, 0);    // I4203
+        keybd_event(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);    // I4203
         return TRUE;
       }
       
