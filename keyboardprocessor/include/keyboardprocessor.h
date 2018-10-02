@@ -319,20 +319,20 @@ typedef struct {
 
 enum km_kbp_action_type {
   KM_KBP_IT_END         = 0,  // Marks end of action items list.
-  KM_KBP_IT_VKEYDOWN    = 1,  // A virtual key has been pressed.
-  KM_KBP_IT_VKEYUP      = 2,  // A virtual key has been released.
-  KM_KBP_IT_VSHIFTDOWN  = 3,  // A shifted virtual key has been pressed.
-  KM_KBP_IT_VSHIFTUP    = 4,  // A shifted virtual key has been released.
-  KM_KBP_IT_CHAR        = 5,  // A Unicode caharcter has been generated.
-  KM_KBP_IT_MARKER      = 6,  // Correlates to kmn's "deadkey" markers.
-  KM_KBP_IT_BELL        = 7,  // The keyboard has triggered a terminal Bell.
-  KM_KBP_IT_BACK        = 8,  // Delete a the character to the left of the
+  KM_KBP_IT_CHAR        = 1,  // A Unicode caharcter has been generated.
+  KM_KBP_IT_MARKER      = 2,  // Correlates to kmn's "deadkey" markers.
+  KM_KBP_IT_ALERT       = 3,  // The keyboard has triggered a alert/beep/bell.
+  KM_KBP_IT_BACK        = 4,  // Delete a the character to the left of the
                               //  insertion point.
-  KM_KBP_IT_PERSIST_OPT = 10, // The indicated option needs to be stored.
-  KM_KBP_IT_RESET_OPT   = 11, // Set the indicated option from the last
+  KM_KBP_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
+  KM_KBP_IT_RESET_OPT   = 6,  // Set the indicated option from the last
                               //  persisted value or defaults. This includes
                               //  the pristine value from environment or
                               //  keyboard options.
+  KM_KBP_IT_VKEYDOWN    = 7,  // A virtual key has been pressed.
+  KM_KBP_IT_VKEYUP      = 8,  // A virtual key has been released.
+  KM_KBP_IT_VSHIFTDOWN  = 9,  // A shifted virtual key has been pressed.
+  KM_KBP_IT_VSHIFTUP    = 10, // A shifted virtual key has been released.
   KM_KBP_IT_MAX_TYPE_ID
 };
 
@@ -520,17 +520,6 @@ Option stores.
 
 ```c
 */
-enum km_kbp_state_flag {
-  KM_KBP_FLAG_DEADKEY = 1,
-  KM_KBP_FLAG_SURROGATE = 2
-};
-
-
-enum km_kbp_option_src {
-  KM_KBP_OPT_KEYBOARD,
-  KM_KBP_OPT_ENVIRONMENT
-};
-
 
 /*
 ```
@@ -554,13 +543,6 @@ km_kbp_state *km_kbp_state_clone(km_kbp_state *);
 ```c
 */
 void km_kbp_state_dispose(km_kbp_state *);
-
-/*
-```
-
-```c
-*/
-uint32_t km_kbp_state_flags(km_kbp_state *);
 
 /*
 ```
@@ -598,25 +580,27 @@ km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *,
 
 ```c
 */
+km_kbp_status km_kpb_state_to_json(km_kbp_state const *,
+                                        char *buf,
+                                        size_t *space);
 
 /*
 ```
 ### Processor
 ```c
 */
-enum km_kbp_attr {
-  KM_KBP_CURRENT     = 0,  // Current API number supported.
-  KM_KBP_REVISION    = 1,  // Implementation number of current API.
-  KM_KBP_AGE         = 2,  // Oldest API number supported.
-  KM_KBP_TECH        = 3,  // Keyboard specification language KMN or LDML.
-  KM_KBP_MAX_CONTEXT = 4,  // Maximum context size supported by processor.
-  KM_KBP_MAX_ATTR_ID
-};
-typedef uint16_t km_kbp_attrs[KM_KBP_MAX_ATTR_ID];
+typedef struct {
+  size_t      max_context;  // Maximum context size supported by processor.
+  uint16_t    current;      // Current API number supported.
+  uint16_t    revision;     // Implementation number of current API.
+  uint16_t    age;          // Oldest API number supported.
+  uint8_t     technology;    // Keyboard specification language KMN or LDML.
+} km_kbp_attr;
 
 enum km_kbp_tech_value {
-  KM_KBP_TECH_KMN  = 0,
-  KM_KBP_TECH_LDML = 1
+  KM_KBP_TECH_UNSPECIFIED = 0,
+  KM_KBP_TECH_KMN         = 1,
+  KM_KBP_TECH_LDML        = 2
 };
 
 
@@ -624,7 +608,7 @@ enum km_kbp_tech_value {
 ```
 ```c
 */
-km_kbp_attrs const *  km_kbp_get_engine_attrs();
+km_kbp_attr const *  km_kbp_get_engine_attrs();
 
 
 /*
