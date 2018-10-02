@@ -44,14 +44,9 @@ exports.LMLayer = class LMLayer {
   _onmessage(event) {
     const {kind, token} = event.data;
 
-    let accept = this._promises.get(token);
-
-    if (!accept) {
-      throw new Error(`No promise associated with token: ${token}`);
-    }
+    let accept = this._keepPromise(token);
 
     if (kind === 'suggestions') {
-      this._promises.delete(token);
       accept(event.data);
     } else {
       throw new Error(`Unknown message kind: ${kind}`);
@@ -66,6 +61,24 @@ exports.LMLayer = class LMLayer {
       reject(`Existing request with token ${token}`);
     }
     this._promises.set(token, resolve);
+  }
+
+  /**
+   * Fetch a promise's resolution function.
+   */
+  _keepPromise(token) {
+    let accept = this._promises.get(token);
+
+    if (!accept) {
+      throw new Error(`No promise associated with token: ${token}`);
+    }
+
+    // This acts like the resolve function, BUT, it removes the promise from
+    // the store -- because it's resolved!
+    return (resolvedValue) => {
+      this._promises.delete(token);
+      return accept(resolvedValue);
+    };
   }
 
   /**
