@@ -1620,17 +1620,19 @@ public final class KMManager {
       return kbWidth;
     }
 
+    // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void beepKeyboard() {
-      int duration = 150; // milliseconds
+      int duration = 500; // milliseconds
 
       Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
       if (v != null && v.hasVibrator()) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-         v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+          VibrationEffect effect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE);
+          v.vibrate(effect);
+        } else {
+          v.vibrate(duration);
         }
-      } else {
-        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
       }
     }
 
@@ -1744,6 +1746,22 @@ public final class KMManager {
       DisplayMetrics dms = context.getResources().getDisplayMetrics();
       int kbWidth = (int) (dms.widthPixels / dms.density);
       return kbWidth;
+    }
+
+    // This annotation is required in Jelly Bean and later:
+    @JavascriptInterface
+    public void beepKeyboard() {
+      int duration = 500; // milliseconds
+
+      Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+      if (v != null && v.hasVibrator()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          VibrationEffect effect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE);
+          v.vibrate(effect);
+        } else {
+          v.vibrate(duration);
+        }
+      }
     }
 
     // Store the current keyboard chirality status from KMW in SystemKeyboard
