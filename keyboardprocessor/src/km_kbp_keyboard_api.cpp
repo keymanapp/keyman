@@ -14,7 +14,8 @@ namespace std {
 }
 
 namespace km {
-namespace kbp {
+namespace kbp
+{
 
   class keyboard : public km_kbp_keyboard_attrs
   {
@@ -35,7 +36,8 @@ namespace kbp {
     id = _keyboard_id.c_str();
     folder_path = _folder_path.c_str();
   }
-}}
+}
+}
 
 struct km_kbp_keyboard : public km::kbp::keyboard {};
 

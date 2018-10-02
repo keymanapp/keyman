@@ -11,6 +11,15 @@
 7. Idempotent
 
 
+## Design decisions in support of requirements:
+- Use C or C99 types and calling convention for the interface, it has the
+  broadest language FFI support. [1,2]
+- Have client (platform glue) code load keyboards, manage & pass state. [3,4,7]
+- Provide query calls to return static attributes data for keyboards and
+  engine [5,6]
+- Provide get/set calls for client accessible keyboard state information [3,4]
+
+
 ## Glossary
 - __Platform layer:__
 the code that consumes the Keyman Keyboard Processor API, and provides the
@@ -24,50 +33,18 @@ layer.
 - __Keyboard:__ A set of rules for execution my an Engine
 - __Option:__ A variable in a dynamic or static key value store.
 - __Processor:__
-The componennt that can parse, and execute a particular keyboard.
+The component that implements this API and  can parse and execute a particular
+keyboard.
 - __State:__ An object that hold internal state of the Processor for a given
 insertion point
 - __Action:__
 A directive output by the processor detailing how the Platform layer should
-transform the Client Application's text buffer.
-- __(Keyboard) Event:__
+transform the Client Application's text buffer. There may be several items
+produced by a single keyboard event.
+- __Keyboard Event:__
 A virtual key board event and modifier map recevied from the platform to be
 processed with the state object for this Client application.
 
-
-## Design decisions in support of requirements:
-- Use C or C99 types and calling convention for the interface, it has the
-  broadest language FFI support. [1,2]
-- Have client (platform glue) code load keyboards, manage & pass state. [3,4,7]
-- Provide query calls to return static attributes data for keyboards and
-  engine [5,6]
-- Provide get/set calls for client accessible keyboard state information [3,4]
-
-### Open decisions:
-Text encoding for passing string data:
-- __UTF-8__
-Fits in existing C style strings, good space for BMP characters, good for
-interchange, but extra processing for per character access.
-- __UTF-16__
-Best space compromise for BMP characters, surrogates.
-- __UTF-32__
-Worst BMP space use, but no processing overhead for indexing, no
-multibyte issues.
-- __All of the above let the client specify__
-Least attractive but we do have a fast UTF encoder/decoder available
-from graphite.
-- __Native C/C++ multibyte widechar support__
-Used to have issues but might be worth investigation.
-
-Naming style:
-- __Underscore__: All_names_are_lower_case
-- __Camelcase__: AllWordsAreCapitalised
-- __Drooping Camelcase__: exceptTheFirst
-
-UTF-16 has been picked as Windows Win32 uses UTF-16 for wide character strings
-as does MacOS NString. For a naming style the Underscore sytle has been chosen
-because it loosely matches the C/C++ stdlib conventions and is a common well
-understood style.
 
 ## API
 ### Namespace
@@ -367,8 +344,8 @@ A state’s default options are set from the keyboard at creation time and the
 environment. The Platform layer is then is expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
 simple C arrays of `km_kbp_option` terminated with a `KM_KBP_OPTIONS_END`
-sentinal value. A state's options are exposed and manipulatable via the
-`km_kbp_option_set` API. All options are string values.
+sentinel value. A state's options are exposed and manipulatable via the
+`km_kbp_option_set` API. All option values are of type C string.
 
 During processing when the glue code finds a PERSIST action type it should call
 identify_option_src on the state to find out which store the option comes from,
@@ -529,6 +506,9 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard);
 /*
 ```
 ### State
+A State object keeps all per keyboard related state including context and dynamic
+Option stores.
+
 ```c
 */
 enum km_kbp_state_flag {
