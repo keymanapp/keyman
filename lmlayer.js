@@ -6,7 +6,7 @@ self.onmessage = function (event) {
   const {method, token} = event.data;
   if (method === 'predict') {
     postMessage({
-      kind: 'suggestions',
+      method: 'suggestions',
       token,
       suggestions: [
         { insert: 'Derek', deleteLeft: 1, deleteRight: 0 },

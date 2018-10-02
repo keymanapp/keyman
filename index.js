@@ -42,14 +42,14 @@ exports.LMLayer = class LMLayer {
    * Handles the wrapped worker's onmessage events.
    */
   _onmessage(event) {
-    const {kind, token} = event.data;
+    const {method, token} = event.data;
 
     let accept = this._keepPromise(token);
 
-    if (kind === 'suggestions') {
+    if (method === 'suggestions') {
       accept(event.data);
     } else {
-      throw new Error(`Unknown message kind: ${kind}`);
+      throw new Error(`Unknown message: ${method}`);
     }
   }
 
