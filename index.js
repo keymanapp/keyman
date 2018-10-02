@@ -23,7 +23,7 @@ exports.LMLayer = class LMLayer {
     let token = customToken || this._nextToken();
 
     return new Promise((resolve, reject) => {
-      this._promises.record(token, resolve, reject);
+      this._promises.track(token, resolve, reject);
       this._cast('predict', {
         token, transform, context
       });
@@ -79,7 +79,7 @@ class PromiseStore {
   /**
    * Associate a token with its respective resolve and reject callbacks.
    */
-  record(token, resolve, reject) {
+  track(token, resolve, reject) {
     if (this._promises.has(token)) {
       reject(`Existing request with token ${token}`);
     }
