@@ -49,8 +49,9 @@ exports.LMLayer = class LMLayer {
     if (method === 'suggestions') {
       accept(event.data);
     } else {
-      let reject = this._promises.break(token);
-      reject(new Error(`Unknown message: ${method}`));
+      this._promises.break(token,
+        new Error(`Unknown message: ${method}`)
+      );
     }
   }
 
@@ -108,22 +109,14 @@ class PromiseStore {
   }
 
   /**
-   * Fetch a promise's reject function.
-   *
-   * Calling the reject functino will stop tracking the promise.
+   * Instantly reject and forget a promise associated with the token.
    */
-  break(token) {
+  break(token, error) {
     let callbacks = this._promises.get(token);
     if (!callbacks) {
       throw new Error(`No promise associated with token: ${token}`);
     }
-    let accept = callbacks.reject;
-
-    // This acts like the resolve function, BUT, it removes the promise from
-    // the store -- because it's resolved!
-    return (error) => {
-      this._promises.delete(token);
-      return accept(error);
-    };
+    this._promises.delete(token);
+    callbacks.reject(error);
   }
 }
