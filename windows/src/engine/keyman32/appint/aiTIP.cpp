@@ -125,7 +125,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: Enter VirtualKey=%s lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d", Debug_VirtualKey((WORD) wParam), lParam, isUp, extended, Updateable, Preserved);
 
-  if(_td->LastKey == wParam && scan == 0) {   // I4642
+  if(_td->LastKey == wParam && (scan == 0 || scan == 0xFE)) {   // I4642
     scan = _td->LastScanCode;
     SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: Scan code was zero so using cached scan code %x", scan);
   }

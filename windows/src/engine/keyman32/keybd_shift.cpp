@@ -105,33 +105,16 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
   in the current Keyman keyboard, because without the dummy prefix key, faking the release of the 
   Alt key will activate the mainmenu of the current application.
 */
-void keybd_sendprefix(LPINPUT pInputs, int *n, BOOL *FPrefix)
+void keybd_sendprefix(LPINPUT pInputs, int *n)
 {
-  if(*FPrefix)
-  {
-    do_keybd_event(pInputs, n, _VK_PREFIX, 0xFF, 0, 0);   // I4548   // I4844
-    do_keybd_event(pInputs, n, _VK_PREFIX, 0xFF, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
-    *FPrefix = FALSE;
-  }
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending prefix down+up");
+  do_keybd_event(pInputs, n, _VK_PREFIX, 0xFF, 0, 0);   // I4548   // I4844
+  do_keybd_event(pInputs, n, _VK_PREFIX, 0xFF, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
 }
 
-void keybd_sendshift(LPINPUT pInputs, int *n, BYTE vkey, BOOL FReset, BOOL *FPrefix) {
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending key%s - vkey=%s", FReset ? "down" : "up", Debug_VirtualKey(vkey));
-  keybd_sendprefix(pInputs, n, FPrefix);
-	do_keybd_event(pInputs, n, vkey, 0xFF, FReset ? 0 : KEYEVENTF_KEYUP, 0);   // I4548
-}
-
-BYTE MapGetAsyncKeyStateToByte(WORD vk) {
-  SHORT r = GetAsyncKeyState(vk);
-  return (r & 1) | ((r & 0x8000) >> 8);
-}
-
-void GetAsyncKeyboardShiftState(BYTE *kbd) {
-  const WORD vks[] = { VK_CONTROL, VK_LCONTROL, VK_RCONTROL, VK_MENU, VK_LMENU, VK_RMENU, VK_SHIFT, VK_LSHIFT, VK_RSHIFT, 0 };
-  memset(kbd, 0, 256);
-  for (int i = 0; vks[i]; i++) {
-    kbd[vks[i]] = MapGetAsyncKeyStateToByte(vks[i]);
-  }
+void keybd_sendshift(LPINPUT pInputs, int *n, BYTE vkey, BOOL isDown) {
+	SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending key%s - vkey=%s", isDown ? "down" : "up", Debug_VirtualKey(vkey));
+	do_keybd_event(pInputs, n, vkey, 0xFF, isDown ? 0 : KEYEVENTF_KEYUP, 0);   // I4548
 }
 
 /**
@@ -145,26 +128,48 @@ void GetAsyncKeyboardShiftState(BYTE *kbd) {
               FReset   are we clearing or resetting the modifier state?
               kbd      pointer to keyboard state (256 byte array)
  
-  There must be enough space in pInputs to contain 6 x up + 6 x down + 1 prefix-down + 1 prefix-up event = 14 events, 
+  There must be enough space in pInputs to contain 6 x up + 6 x down + 2 prefix-down + 2 prefix-up event = 16 events, 
   to support both the clear and reset calls.
-
-  There is a potential for a race here because the user may release a modifier
-  key between our test for the key state and when we SendInput, in which case the key will be 
-  incorrectly re-pressed in the reset phase. This window of time is very small; we can improve the
-  odds by using GetAsyncKeyboardShiftState (which reads the key state at the current instant, as 
-  opposed to at the start of the current key event).
 */
-void keybd_shift(LPINPUT pInputs, int *n, BOOL FReset, LPBYTE kbd) {
-  const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
-  BOOL FPrefix = !FReset;
 
-  if (!FReset) {
-    GetAsyncKeyboardShiftState(kbd);
-  }
+void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE kbd) {
+  const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
+  BOOL hasSentPrefix = FALSE;
+
+  GetKeyboardState(kbd);
 
   for (int i = 0; i < _countof(modifiers); i++) {
     if (kbd[modifiers[i]] & 0x80) {
-      keybd_sendshift(pInputs, n, modifiers[i], FReset, &FPrefix);
+      if (!hasSentPrefix) {
+        keybd_sendprefix(pInputs, n);
+        hasSentPrefix = TRUE;
+      }
+      keybd_sendshift(pInputs, n, modifiers[i], FALSE);
     }
   }
 }
+
+void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE kbd) {
+  const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
+  BOOL needsPrefix = FALSE;
+
+  for (int i = 0; i < _countof(modifiers); i++) {
+    if (kbd[modifiers[i]] & 0x80) {
+      keybd_sendshift(pInputs, n, modifiers[i], TRUE);
+      needsPrefix = TRUE;
+    }
+  }
+
+  if (needsPrefix) {
+    keybd_sendprefix(pInputs, n);
+  }
+}
+
+void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd) {
+  if (isReset) {
+    keybd_shift_reset(pInputs, n, kbd);
+  } else {
+    keybd_shift_release(pInputs, n, kbd);
+  }
+}
+

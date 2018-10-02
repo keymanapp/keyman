@@ -285,6 +285,25 @@ BOOL InitThread(HWND hwnd)
   return _td->FInitialised = TRUE;
 }
 
+/*
+  Compatibility flags. Search for the use of these for
+  more documentation on why they exist.
+*/
+void Initialise_Flag_ShouldSerializeInput() {
+  flag_ShouldSerializeInput = Reg_GetDebugFlag(REGSZ_Flag_ShouldSerializeInput, TRUE);
+}
+
+void Initialise_Flag_IsDevEnvProcess() {
+  char buf[MAX_PATH], fname[_MAX_FNAME], ext[_MAX_EXT];
+  if (GetModuleFileName(NULL, buf, MAX_PATH) > 0) {
+    if (_splitpath_s(buf, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT) == 0) {
+      if (!_strcmpi(fname, "devenv") && !_strcmpi(ext, ".exe")) {
+        flag_IsDevEnvProcess = TRUE;
+      }
+    }
+  }
+}
+
 BOOL InitialiseProcess(HWND hwnd) 
 {
 	if(InterlockedExchange(&FStartedInitialise, TRUE))
@@ -297,8 +316,12 @@ BOOL InitialiseProcess(HWND hwnd)
 	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ProcessID=%d ThreadID=%d CmdLine=%s", GetCurrentProcessId(), GetCurrentThreadId(),
 		GetCommandLine());
 
+  Initialise_Flag_ShouldSerializeInput();
+  Initialise_Flag_IsDevEnvProcess();
+
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
 
+  wm_keyman_ignore = RegisterWindowMessage("WM_KEYMAN_IGNORE");
 	wm_kmmessage = RegisterWindowMessage(RWM_KMMESSAGE);
 	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
 	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
