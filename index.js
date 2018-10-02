@@ -5,7 +5,6 @@ const Worker = require('tiny-worker');
  */
 exports.LMLayer = class LMLayer {
   constructor() {
-
     // Worker state
     this._worker = new Worker('lmlayer.js');
     this._worker.onmessage = this._onmessage.bind(this);
@@ -18,17 +17,13 @@ exports.LMLayer = class LMLayer {
   }
 
   /**
-   * Sends a context, transform, and token to the LMLayer.
+   * [async] Sends a context, transform, and token to the LMLayer.
    */
-  predictWithContext({transform, context, _token}) {
-    let token = this._nextToken();
+  predictWithContext({transform, context, customToken}) {
+    let token = customToken || this._nextToken();
 
     return new Promise((resolve, reject) => {
-      if (this._promises.has(token)) {
-        reject(`Existing request with token ${token}`);
-      }
-      this._promises.set(token, resolve);
-
+      this._recordPromise(token, resolve, reject);
       this._cast('predict', {
         token, transform, context
       });
@@ -61,6 +56,16 @@ exports.LMLayer = class LMLayer {
     } else {
       throw new Error(`Unknown message kind: ${kind}`);
     }
+  }
+
+  /**
+   * Associate a token with its respective resolve and reject callbacks.
+   */
+  _recordPromise(token, resolve, reject) {
+    if (this._promises.has(token)) {
+      reject(`Existing request with token ${token}`);
+    }
+    this._promises.set(token, resolve);
   }
 
   /**
