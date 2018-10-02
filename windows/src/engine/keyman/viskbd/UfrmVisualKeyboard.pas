@@ -293,7 +293,7 @@ uses
   ErrorControlledRegistry,
   KeymanDesktopShell,
   RegistryKeys,
-  LangSwitchUtils,
+  Keyman.System.Util.RenderLanguageIcon,
   UfrmHelp,
   UfrmKeyman7Main,
   UnicodeData,

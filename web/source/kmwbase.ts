@@ -16,8 +16,8 @@
 /// <reference path="kmwuimanager.ts" />
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2017-2018 SIL International
 ***/
 namespace com.keyman {
   export class KeymanBase {
@@ -402,6 +402,15 @@ namespace com.keyman {
      */
     ['resetContext']() {
       this.interface.resetContext();
+    };
+
+    /**
+     * Function     setNumericLayer
+     * Scope        Public
+     * Description  Set OSK to numeric layer if it exists
+     */
+    ['setNumericLayer']() {
+      this.interface.setNumericLayer();
     };
 
     /**

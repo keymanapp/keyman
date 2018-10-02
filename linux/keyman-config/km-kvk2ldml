@@ -42,7 +42,7 @@ def main():
 
     kvkData = parse_kvk_file(args.kvkfile)
 
-    if args.print:
+    if args.p:
         print_kvk(kvkData, args.keys)
 
     if args.o:

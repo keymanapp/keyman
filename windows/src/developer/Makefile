@@ -3,7 +3,7 @@
 #
 
 
-TARGETS=kmcmpdll kmcomp tike samples setup inst
+TARGETS=kmcmpdll kmcomp kmconvert tike samples setup inst
 MANIFESTS=kmcomp tike setup
 
 !include ..\Header.mak
@@ -20,6 +20,10 @@ kmcmpdll:
 
 kmcomp: kmcmpdll
     cd $(ROOT)\src\developer\kmcomp
+    $(MAKE) $(TARGET)
+
+kmconvert:
+    cd $(ROOT)\src\developer\kmconvert
     $(MAKE) $(TARGET)
 
 tike: kmcmpdll

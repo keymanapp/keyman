@@ -60,6 +60,7 @@ function GetHelpURL: string;   // I4841
 function GetRedistUIPath: string;
 function GetRedistAddinsPath: string;
 function GetRedistSetupPath: string;
+function GetRedistProjectTemplatePath: string;
 function GetWixPath: string;
 function GetStockKCTPath: string;
 function GetDebugKMCmpDllPath: string;
@@ -121,6 +122,11 @@ end;
 function GetWixPath: string;
 begin
   Result := GetDebugPath('Debug_WixPath', ExtractFilePath(ParamStr(0))+'wix\');
+end;
+
+function GetRedistProjectTemplatePath: string;
+begin
+  Result := GetDebugPath('Debug_RedistTemplatePath', ExtractFilePath(ParamStr(0))+'projects\templates\');
 end;
 
 function GetDebugKMCmpDllPath: string;

@@ -224,11 +224,12 @@ uses
   OnlineConstants,
   OnlineUpdateCheck,
   Printers,
-  Project,
-  ProjectFile,
-  ProjectFileType,
-  ProjectFileUI,
-  ProjectUI,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.Project.UfrmNewProject,
   GlobalProxySettings,
   RegistryKeys,
   TextFileFormat,
@@ -250,8 +251,8 @@ uses
   UfrmOptions,
   UfrmOSKEditor,
   UfrmPackageEditor,
-  UfrmProject,
-  UfrmProjectSettings,
+  Keyman.Developer.UI.Project.UfrmProject,
+  Keyman.Developer.UI.Project.UfrmProjectSettings,
   UfrmStartup,
   Upload_Settings,
   utilfiletypes, UfrmMDIChild;
@@ -478,18 +479,13 @@ end;
 
 procedure TmodActionsMain.actProjectNewExecute(Sender: TObject);
 begin
-  with frmKeymanDeveloper do
-  begin
-    FGlobalProject.Save;
-    ProjectForm.Free;
-    FreeGlobalProjectUI;
-    LoadGlobalProjectUI('');
-    ShowProject;
-  end;
+  // TODO: Close all existing editor forms
+  ShowNewProjectForm(frmKeymanDeveloper);
 end;
 
 procedure TmodActionsMain.actProjectOpenAccept(Sender: TObject);
 begin
+  // TODO: Close all existing editor forms
   OpenProject(actProjectOpen.Dialog.FileName);
 end;
 

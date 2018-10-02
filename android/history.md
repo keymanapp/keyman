@@ -8,6 +8,8 @@
 * Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
 * Add splash screen (#1151)
 * Update app to use Material Design theme
+* Fix globe button when pausing WebBrowser (#1213)
+* Change system keyboard to "numeric" layer for digit/phone number text fields (#1218)
 
 ## 2018-08-23 10.0.505 stable
 * Validate keyboard ID when downloading keyboard from keman cloud (#1121)

@@ -61,6 +61,9 @@
               <Directory Id="dirRedist" Name="Redist">
                 <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
+              <Directory Id="dirProjects" Name="Projects">
+                <Directory Id="dirProjectsTemplates" Name="Templates" />
+              </Directory>
             </Directory>
           </Directory>
         </Directory>
@@ -180,6 +183,10 @@
         <File Name="kmcomp.exe" KeyPath="yes" />
       </Component>
       
+      <Component>
+        <File Name="kmconvert.exe" KeyPath="yes" />
+      </Component>
+
       <Component>
         <File Name="kmcmpdll.dll" KeyPath="yes" />
       </Component>

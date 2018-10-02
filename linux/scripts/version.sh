@@ -9,17 +9,17 @@ version()
     local next=$((num+1))
     echo "next tag number ${next}"
 
-    local current_tag=`git tag -l --points-at HEAD|grep ${num}`
+    local current_tag=`git tag -l --points-at HEAD|grep "linux"|grep ${num}`
 
     if [ -n "${current_tag}" ]; then
         echo "tag is on current commit, use $num"
         newvers="${catvers}.${num}"
     else
         #echo "tag is not on current commit"
-        local prev_tag=`git tag --contains HEAD~1|grep ${num}`
+        local prev_tag=`git tag --contains HEAD~1|grep "linux"|grep ${num}`
         if [ -n "${prev_tag}" ]; then
             #echo "tag is on previous commit"
-            local prev_log=`git log --oneline HEAD~1..HEAD|grep "Merge pull"`
+            local prev_log=`git log --oneline HEAD~1..HEAD|grep "linux"|grep "Merge pull"`
             if [ -n "${prev_log}" ]; then
                 echo "latest commit was a merge PR, use $num"
                 newvers="${catvers}.${num}"

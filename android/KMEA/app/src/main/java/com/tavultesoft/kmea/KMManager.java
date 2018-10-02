@@ -1061,6 +1061,18 @@ public final class KMManager {
     KeyboardPickerActivity.showLanguageList(context);
   }
 
+  public static void setNumericLayer(KeyboardType kbType) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+        InAppKeyboard.loadUrl("javascript:setNumericLayer()");
+      }
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+        SystemKeyboard.loadUrl("javascript:setNumericLayer()");
+      }
+    }
+  }
+
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
     String kmText = "";
