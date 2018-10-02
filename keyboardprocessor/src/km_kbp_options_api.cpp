@@ -7,14 +7,15 @@
 
 #include <keyboardprocessor.h>
 
-#include "utfcodec.hpp"
+#include "option.hpp"
 #include "json.hpp"
 
 
-struct km_kbp_option_set : public std::unordered_map<std::string, std::string>
+struct km_kbp_option_set : public km::kbp::option_set
 {
   km_kbp_option_set(km_kbp_option_scope s)
-  : _last_lookup {s, nullptr, nullptr}
+  : option_set(s),
+    _last_lookup {s, nullptr, nullptr}
   {}
 
   km_kbp_option const * cache_lookup(char const * k, char const * v) const {
@@ -49,8 +50,7 @@ km_kbp_status km_kbp_options_set_update(km_kbp_option_set *opts, km_kbp_option c
 {
   try
   {
-    while(opt->key)
-      opts++->emplace(opt->key, opt->value);
+    opts->update(opt);
   }
   catch (std::bad_alloc) { return KM_KBP_STATUS_NO_MEM; }
 
