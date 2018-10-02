@@ -10,11 +10,22 @@
 #include "utfcodec.hpp"
 #include "json.hpp"
 
+
 struct km_kbp_option_set : public std::unordered_map<std::string, std::string>
 {
+  km_kbp_option_set(km_kbp_option_scope s)
+  : _last_lookup {s, nullptr, nullptr}
+  {}
+
+  km_kbp_option const * cache_lookup(char const * k, char const * v) const {
+    _last_lookup.key = k;
+    _last_lookup.value = v;
+    return &_last_lookup;
+  }
+
+private:
   km_kbp_option mutable _last_lookup;
 };
-
 
 
 size_t km_kbp_options_set_size(km_kbp_option_set const *opts)
@@ -27,11 +38,10 @@ km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const * opts,
                                                const char *key)
 {
   auto i = opts->find(key);
-  if ( i == opts->end())
+  if (i == opts->end())
     return nullptr;
 
-  opts->_last_lookup = km_kbp_option {i->first.c_str(), i->second.c_str()};
-  return &opts->_last_lookup;
+  return opts->cache_lookup(i->first.c_str(), i->second.c_str());
 }
 
 

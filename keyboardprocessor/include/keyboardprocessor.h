@@ -347,19 +347,28 @@ simple C arrays of `km_kbp_option` terminated with a `KM_KBP_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
 `km_kbp_option_set` API. All option values are of type C string.
 
-During processing when the glue code finds a PERSIST action type it should call
-identify_option_src on the state to find out which store the option comes from,
-read the updated value from the state’s option list and store the updated option
-in the appropriate place. For RESET it should do the same but the read the
-current default and update the options set.
+During processing when the glue code finds a PERSIST action type it should
+store the updated option in the appropriate place, based on it's scope.
+For RESET the processor will apply the pristine value from the original scope,
+the Platform layer should update that only if it manages a previously persisted
+value.
 ```c
 */
-struct km_kbp_option {
-  char const *  key;
-  char const *  value;
+
+enum km_kbp_option_scope {
+  KM_KBP_OPT_UNKNOWN,
+  KM_KBP_OPT_KEYBOARD,
+  KM_KBP_OPT_ENVIRONMENT
 };
 
-#define KM_KBP_OPTIONS_END { 0, 0 }
+struct km_kbp_option {
+  km_kbp_option_scope scope;  // Scope which an option belongs to.
+  char const *        key;
+  char const *        value;
+};
+
+#define KM_KBP_OPTIONS_END { 0, 0, 0 }
+
 
 /*
 ```
@@ -565,7 +574,7 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *);
 
 ```c
 */
-km_kbp_option const *km_kbp_state_environment(km_kbp_state const *);
+//km_kbp_option const *km_kbp_state_environment(km_kbp_state const *);
 
 /*
 ```
@@ -579,17 +588,15 @@ km_kbp_option_set *km_kpb_state_options(km_kbp_state const *);
 
 ```c
 */
-km_kbp_option_src km_kpb_state_identify_option_src(km_kbp_state const *,
-                                                   km_kbp_option const *);
+km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *,
+                                                     size_t *num_items);
+/*```
+*/
 
 /*
 ```
 
 ```c
-*/
-km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *,
-                                                     size_t *num_items);
-/*```
 */
 
 /*
