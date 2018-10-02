@@ -51,19 +51,19 @@ exports.LMLayer = class LMLayer {
 
 
   /**
-   * Throw an asynchronous method call (a "cast") over to the Web Worker.
+   * Send a message (a "cast") over to the Web Worker.
    */
-  _cast(method, payload) {
-    this._worker.postMessage({ method, ...payload });
+  _cast(message, payload) {
+    this._worker.postMessage({message, ...payload});
   }
 
   /**
    * Handles the wrapped worker's onmessage events.
    */
   _onmessage(event) {
-    const {method, token} = event.data;
+    const {message, token} = event.data;
 
-    if (method === 'ready') {
+    if (message === 'ready') {
       let configuration = event.data.configuration || {};
       this._configuration = configuration;
       this._resolveInitialized && this._resolveInitialized(configuration);
@@ -72,11 +72,11 @@ exports.LMLayer = class LMLayer {
 
     let accept = this._promises.keep(token);
 
-    if (method === 'suggestions') {
+    if (message === 'suggestions') {
       accept(event.data);
     } else {
       this._promises.break(token,
-        new Error(`Unknown message: ${method}`)
+        new Error(`Unknown message: ${message}`)
       );
     }
   }

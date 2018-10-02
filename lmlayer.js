@@ -5,11 +5,11 @@
  */
 
 self.onmessage = function (event) {
-  const {method, token} = event.data;
+  const {message, token} = event.data;
 
-  if (method === 'predict') {
+  if (message === 'predict') {
     // XXX: cause the other end to reject the promise, because of a
-    // token/method mismatch. This is for testing purposes.
+    // token/message mismatch. This is for testing purposes.
     if (token === null) {
       cast('invalid', {token});
       return;
@@ -37,5 +37,5 @@ cast('ready', {
  * Send a message to the keyboard.
  */
 function cast(message, parameters) {
-  postMessage({method: message, ...parameters });
+  postMessage({message, ...parameters });
 }

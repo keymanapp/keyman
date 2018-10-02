@@ -18,27 +18,34 @@ Communication protocol between keyboard and asynchronous worker
 
 We have decided that everything to the right of the `KeymanWeb` will be in a
 Web Worker. However, communication can happen only through
-[`postMessage(payload)`][postMessage] commands,
-where `payload` is a serializable object (via the [structured clone][]
+[`postMessage(data)`][postMessage] commands,
+where `data` is a serializable object (via the [structured clone][]
 algorithm).
 
 What serializable object can we send that will adhere to the [open-closed principle]?
 
+### Messages
+
 The idea is to use a [discriminated union][]. The protocol involves
-plain JavaScript objects with one property called `method` that can take
+plain JavaScript objects with one property called `message` that takes
 a finite set of `string` values.
 
-These string values indicate what method should be called. The rest of
-the properties in the object are the parameters to method.
+These string values indicate what message should be sent. The rest of
+the properties in the object are the parameters send with the message.
 
 ```javascript
 {
-    method: 'predict',
-    // method-specific properties here
+    message: 'predict',
+    // message-specific properties here
 }
 ```
 
 See also: [XML-RPC][]
+
+Messages are **not** methods. That is, there is no assumption that
+a client will receive a reply when a message is sent. However, some
+pairs of messages, such as `predict` and `suggestions`, lightly assume
+request/response semantics.
 
 [discriminated union]: http://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
 [open-closed principle]: https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle
@@ -62,8 +69,8 @@ to Keyman. There are a few requirements on the concrete type of the
 
  1. Tokens MUST be serializable via the [structured clone][] algorithm;
  2. Tokens MUST be usable as a key in a [`Map`][Map object] object.
- 3. Tokens MUST be unique across methods. That is, tokens MUST NOT be
-    duplicated for between different methods.
+ 3. Tokens MUST be unique across messages. That is, tokens MUST NOT be
+    duplicated for between different messages.
 
 It is up to Keyman to create unambiguous tokens that can be uniquely
 identified through the round-trip process.
@@ -81,7 +88,7 @@ An asynchronous message to predict after typing 'D':
 
 ```javascript
 {
-    method: 'predict',
+    message: 'predict',
 
     token: 1,
     transform: {
