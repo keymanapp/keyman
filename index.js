@@ -1,18 +1,27 @@
 const Worker = require('tiny-worker');
 
+/**
+ * Encapuslates the underlying Web Worker through asynchronous calls.
+ */
 exports.LMLayer = class LMLayer {
   constructor() {
+
+    // Worker state
     this._worker = new Worker('lmlayer.js');
     this._worker.onmessage = this._onmessage.bind(this);
+
+    // Keep track of individual requests to make a nice async/await API.
     this._promises = new Map();
-    this._currentToken = 0;
+
+    // Keep track of tokens.
+    this._currentToken = Number.MIN_SAFE_INTEGER;
   }
 
   /**
    * Sends a context, transform, and token to the LMLayer.
    */
   predictWithContext({transform, context, _token}) {
-    let token = this._currentToken++;
+    let token = this._nextToken();
 
     return new Promise((resolve, reject) => {
       if (this._promises.has(token)) {
@@ -20,13 +29,18 @@ exports.LMLayer = class LMLayer {
       }
       this._promises.set(token, resolve);
 
-      this._worker.postMessage({
-        kind: 'predict',
-        token,
-        transform,
-        context
+      this._cast('predict', {
+        token, transform, context
       });
     });
+  }
+
+
+  /**
+   * Throw an asynchronous method call (a "cast") over to the Web Worker.
+   */
+  _cast(method, payload) {
+    this._worker.postMessage({ method, ...payload });
   }
 
   /**
@@ -47,5 +61,16 @@ exports.LMLayer = class LMLayer {
     } else {
       throw new Error(`Unknown message kind: ${kind}`);
     }
+  }
+
+  /**
+   * Returns the next token. Note: mutates state.
+   */
+  _nextToken() {
+    let token = this._currentToken++;
+    if (!Number.isSafeInteger(token)) {
+      throw new RangeError('Ran out of usable tokens');
+    }
+    return token;
   }
 };

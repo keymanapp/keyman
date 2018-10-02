@@ -3,8 +3,8 @@
  */
 
 self.onmessage = function (event) {
-  const {kind, token} = event.data;
-  if (kind === 'predict') {
+  const {method, token} = event.data;
+  if (method === 'predict') {
     postMessage({
       kind: 'suggestions',
       token,
