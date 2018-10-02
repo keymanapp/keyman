@@ -6,12 +6,15 @@ const EMPTY_CONTEXT = { left: '' };
 
 
 test('Can provide context to LMLayer', async t => {
-  t.plan(1);
+  t.plan(2);
 
   const lm = new LMLayer;
 
-  // Wait for the language model to initialize.
-  await lm.initialize();
+  // Wait for the language model to initialize and declare its configuration.
+  let configuration = await lm.initialize();
+  // The model should as for 32 code units of context to the left of the
+  // cursor.
+  t.is(configuration.leftContextCodeUnits, 32);
 
   // Now tell it the user typed 'D'.
   let message = await lm.predictWithContext({
