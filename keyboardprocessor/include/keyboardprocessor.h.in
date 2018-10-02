@@ -54,9 +54,9 @@ All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
 #include <stdint.h>
 #include <stdlib.h>
 
-#define KM_KBP_LIB_CURRENT  0
-#define KM_KBP_LIB_AGE      0
-#define KM_KBP_LIB_REVISION 0
+#define KM_KBP_LIB_CURRENT  @lib_curr@
+#define KM_KBP_LIB_AGE      @lib_age@
+#define KM_KBP_LIB_REVISION @lib_rev@
 
 #if defined(__cplusplus)
 extern "C"
@@ -572,8 +572,6 @@ km_kbp_option_set *km_kpb_state_options(km_kbp_state const *);
 */
 km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *,
                                                      size_t *num_items);
-/*```
-*/
 
 /*
 ```
