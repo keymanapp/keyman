@@ -27,3 +27,11 @@ self.onmessage = function (event) {
     throw new Error('invalid message');
   }
 };
+
+// Ready! Send desired configuration.
+postMessage({
+  method: 'ready',
+  configuration: {
+    leftContextCodeUnits: 32
+  }
+});

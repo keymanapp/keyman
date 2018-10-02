@@ -15,17 +15,24 @@ exports.LMLayer = class LMLayer {
     // Keep track of tokens.
     this._currentToken = Number.MIN_SAFE_INTEGER;
 
-    // Is the model initialized?
-    this._initialized = false;
+    // State related to model initialization and configuration.
+    this._configuration = null;
+    this._resolveInitialized = null;
   }
 
   /**
    * [async] Waits for the model's initialization.
    */
   initialize() {
-    if (this._initialized) {
-      return Promise.resolve();
+    if (this._configuration) {
+      return Promise.resolve(this._configuration);
     }
+
+    // This means we're still waiting for the ready signal from
+    // the model.
+    return new Promise((resolve, _reject) => {
+      this._resolveInitialized = resolve;
+    });
   }
 
   /**
@@ -55,6 +62,13 @@ exports.LMLayer = class LMLayer {
    */
   _onmessage(event) {
     const {method, token} = event.data;
+
+    if (method === 'ready') {
+      let configuration = event.data.configuration || {};
+      this._configuration = configuration;
+      this._resolveInitialized && this._resolveInitialized(configuration);
+      return;
+    }
 
     let accept = this._promises.keep(token);
 
