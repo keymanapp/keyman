@@ -107,31 +107,22 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
 */
 void keybd_sendprefix(LPINPUT pInputs, int *n)
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending prefix down+up");
-  do_keybd_event(pInputs, n, _VK_PREFIX, 0xFF, 0, 0);   // I4548   // I4844
-  do_keybd_event(pInputs, n, _VK_PREFIX, 0xFF, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
-}
-
-void keybd_sendshift(LPINPUT pInputs, int *n, BYTE vkey, BOOL isDown) {
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendshift: sending key%s - vkey=%s", isDown ? "down" : "up", Debug_VirtualKey(vkey));
-	do_keybd_event(pInputs, n, vkey, 0xFF, isDown ? 0 : KEYEVENTF_KEYUP, 0);   // I4548
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendprefix: sending prefix down+up");
+  do_keybd_event(pInputs, n, _VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);   // I4548   // I4844
+  do_keybd_event(pInputs, n, _VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
 }
 
 /**
-  keybd_shift evaluates the current keyboard modifier state and queues key events in order to
-  initially set modifiers to "up" and, after the output key events are queued, resets the modifiers
-  to their initial state.
+  keybd_shift_release records the current keyboard state and then releases any modifier
+  keys. If a modifier key must be released, it first sends a dummy prefix key to prevent
+  isolated modifier key actions such as Alt opening up a menu.
 
   Parameters: pInputs  array of INPUT structures which we will fill with our key events.
-              n        pointer to current index into pInput, which we increment for each key 
+              n        pointer to current index into pInput, which we increment for each key
                        event we add
-              FReset   are we clearing or resetting the modifier state?
-              kbd      pointer to keyboard state (256 byte array)
- 
-  There must be enough space in pInputs to contain 6 x up + 6 x down + 2 prefix-down + 2 prefix-up event = 16 events, 
-  to support both the clear and reset calls.
+              kbd      pointer to keyboard state (256 byte array), in which we will store
+                       the initial modifier state for later restoration by keybd_shift_reset
 */
-
 void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE kbd) {
   const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL hasSentPrefix = FALSE;
@@ -144,18 +135,31 @@ void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE kbd) {
         keybd_sendprefix(pInputs, n);
         hasSentPrefix = TRUE;
       }
-      keybd_sendshift(pInputs, n, modifiers[i], FALSE);
+      SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_shift_release: sending keyup vkey=%s", Debug_VirtualKey(modifiers[i]));
+      do_keybd_event(pInputs, n, modifiers[i], SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
   }
 }
 
+/**
+  keybd_shift_reset returns the modifiers to their original pressed state and, if any modifier
+  key presses are emitted, emits also a dummy 'prefix' keystroke in order to prevent default 
+  modifier actions such as Alt opening up a menu.
+
+  Parameters: pInputs  array of INPUT structures which we will fill with our key events.
+              n        pointer to current index into pInput, which we increment for each key
+                       event we add
+              kbd      pointer to keyboard state (256 byte array), previously set by 
+                       keybd_shift_release
+*/
 void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE kbd) {
   const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL needsPrefix = FALSE;
 
   for (int i = 0; i < _countof(modifiers); i++) {
     if (kbd[modifiers[i]] & 0x80) {
-      keybd_sendshift(pInputs, n, modifiers[i], TRUE);
+      SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_shift_reset: sending keydown vkey=%s", Debug_VirtualKey(modifiers[i]));
+      do_keybd_event(pInputs, n, modifiers[i], SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       needsPrefix = TRUE;
     }
   }
@@ -165,6 +169,21 @@ void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE kbd) {
   }
 }
 
+/**
+  keybd_shift evaluates the current keyboard modifier state and queues key events in order to
+  initially set modifiers to "up" and, after the output key events are queued, resets the modifiers
+  to their initial state.
+
+  Parameters: pInputs  array of INPUT structures which we will fill with our key events.
+              n        pointer to current index into pInput, which we increment for each key
+                       event we add
+              isReset  are we clearing or resetting the modifier state?
+              kbd      pointer to keyboard state (256 byte array) that owner must maintain but
+                       that we will fill
+
+  There must be enough space in pInputs to contain 6 x up + 6 x down + 2 prefix-down + 2 prefix-up event = 16 events,
+  to support both the clear and reset calls.
+*/
 void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd) {
   if (isReset) {
     keybd_shift_reset(pInputs, n, kbd);

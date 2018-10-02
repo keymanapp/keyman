@@ -215,7 +215,7 @@ BOOL AIWin2000Unicode::PostKeys()
         pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = (WORD)Queue[n].dwData & 0xFF;  // I3242 - noted as unclean but was not cause of the issue  // I3438   // I3527
 
-        pInputs[i].ki.wScan = 0xFF;
+        pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
         pInputs[i].ki.dwFlags = ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
 
         pInputs[i].ki.time = 0;
@@ -242,7 +242,7 @@ BOOL AIWin2000Unicode::PostKeys()
       {
         pInputs[i].type = INPUT_KEYBOARD;
         pInputs[i].ki.wVk = (WORD) Queue[n].dwData & 0xFF;  // I3242 - noted as unclean but was not cause of the issue  // I3438   // I3527
-        pInputs[i].ki.wScan = 0xFF;
+        pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
         pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
         pInputs[i].ki.time = 0;
         pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378
@@ -281,14 +281,14 @@ BOOL AIWin2000Unicode::PostKeys()
 
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = VK_BACK;
-      pInputs[i].ki.wScan = 0xFF;
+      pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
       pInputs[i].ki.dwFlags = ((Queue[n].dwData & 0x0100) ? KEYEVENTF_EXTENDEDKEY : 0);
       pInputs[i].ki.time = 0;
       pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378
 
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = VK_BACK;
-      pInputs[i].ki.wScan = 0xFF;
+      pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
       pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & 0x0100) ? KEYEVENTF_EXTENDEDKEY : 0);
       pInputs[i].ki.time = 0;
       pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378

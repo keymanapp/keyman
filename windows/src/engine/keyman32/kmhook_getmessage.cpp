@@ -142,12 +142,13 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		if(!InitialiseProcess(mp->hwnd)) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-	if(mp->message == WM_CHAR || mp->message == WM_SYSCHAR || mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP) 
-    if(ShouldDebug(sdmMessage)) DebugMessage(mp, wParam);
+  if (mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST && ShouldDebug(sdmMessage)) {
+    DebugMessage(mp, wParam);
+  }
 
   if ((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
-    if (scan != 0xFE) {
+    if (scan != SCAN_FLAG_SERIALIZED_USER_KEY_EVENT) {
       _td->LastScanCode = scan;
       _td->LastKey = mp->wParam;
     }
@@ -171,15 +172,19 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     */
     
     if (flag_ShouldSerializeInput && _td->lpActiveKeyboard && 
-        !IsDevEnvCtrlTabSequence((wParam & PM_REMOVE) == PM_REMOVE, mp)) {
-      if (scan < 0xFE && mp->wParam != VK_PACKET && mp->wParam != VK_PROCESSKEY) {
-        if ((wParam & PM_REMOVE) == PM_REMOVE) {
-          // We only want to send this input once -- with PM_NOREMOVE, we will be
-          // processing the same message multiple times
+        !IsDevEnvCtrlTabSequence(wParam & PM_REMOVE, mp)) {
+      if (scan < SCAN_FLAG_SERIALIZED_USER_KEY_EVENT && mp->wParam != VK_PACKET && mp->wParam != VK_PROCESSKEY) {
+        if (wParam & PM_REMOVE) {
+          // We only want to send this input once -- with PM_NOREMOVE, we see the
+          // same message multiple times. Note: we have to bit test PM_REMOVE despite what is 
+          // written in GetMsgProc documentation at 
+          // https://msdn.microsoft.com/en-us/library/windows/desktop/ms644981(v=vs.85).aspx 
+          // because we have seen undocumented situations where other flags are passed in 
+          // to wParam, e.g. 0x0003
           INPUT input;
           input.type = INPUT_KEYBOARD;
           input.ki.wVk = (WORD)mp->wParam;
-          input.ki.wScan = 0xFE;
+          input.ki.wScan = SCAN_FLAG_SERIALIZED_USER_KEY_EVENT;
           input.ki.time = mp->time;
           input.ki.dwExtraInfo = mp->lParam;  // We'll copy this back later
           input.ki.dwFlags =
@@ -199,7 +204,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     case VK_MENU:
     case VK_CONTROL:
     case VK_SHIFT:
-      if (scan != 0xFF) {   // I4793
+      if (scan != SCAN_FLAG_KEYMAN_KEY_EVENT) {   // I4793
         ProcessModifierChange((UINT)mp->wParam, mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP, KEYMSG_FLAG_EXTENDED(mp->lParam));
       }
       break;
@@ -207,10 +212,10 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     // 4 Aug 2003 - mcdurdin - Stuff any Keyman wm_key* message with the correct scancode
     if (mp->wParam != VK_BACK) {
-      if (scan == 0xFE) {
+      if (scan == SCAN_FLAG_SERIALIZED_USER_KEY_EVENT) {
         mp->lParam = GetMessageExtraInfo();
         SetMessageExtraInfo(0);
-      } else if(scan == 0xFF) {
+      } else if(scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {
         mp->lParam = (mp->lParam & 0xFF00FFFFL) | (MapVirtualKey((UINT)mp->wParam, 0) << 16);
       }
     }

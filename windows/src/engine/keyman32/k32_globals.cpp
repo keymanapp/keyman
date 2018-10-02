@@ -76,8 +76,9 @@
 
 
 UINT 
+  //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
-  wm_keyman_ignore = 0,
+  wm_keyman_ignore = 0,     // used to mask out messages that we don't want the target app to process, e.g. key events
 	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
 	wm_kmmessage = 0,					// message to Keyman window   // I4412

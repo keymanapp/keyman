@@ -1043,6 +1043,6 @@ BOOL ShouldAttachToProcess()
 
 
 void PostDummyKeyEvent() {  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
-  keybd_event(_VK_PREFIX, 0xFF, 0, 0); // I3250 - is this unnecessary?
-  keybd_event(_VK_PREFIX, 0xFF, KEYEVENTF_KEYUP, 0); // I3250 - is this unnecessary?
+  keybd_event(_VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0); // I3250 - is this unnecessary?
+  keybd_event(_VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0); // I3250 - is this unnecessary?
 }

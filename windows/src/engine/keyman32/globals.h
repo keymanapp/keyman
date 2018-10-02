@@ -250,7 +250,7 @@ extern UINT
   wm_keymanim_close,
   wm_keymanim_contextchanged,
   wm_test_keyman_functioning,
-  wm_keyman_ignore;
+  wm_keyman_ignore;     // used to mask out messages that we don't want the target app to process, e.g. key events
 
 extern BOOL 
   flag_ShouldSerializeInput,
