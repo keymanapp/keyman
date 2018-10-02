@@ -27,7 +27,7 @@ test('Can reject when predictions crash', async t => {
   const lm = new LMLayer;
   try {
     await lm.predictWithContext({
-      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: NaN
+      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
     });
     t.fail();
   } catch (_e) {

@@ -60,8 +60,10 @@ its contents; it simply uses it to identify a request and pass it back
 to Keyman. There are a few requirements on the concrete type of the
 `Token`:
 
- 1. It MUST be serializable via the [structured clone][] algorithm;
- 2. It MUST be usable as a key in a [`Map`][Map object] object.
+ 1. Tokens MUST be serializable via the [structured clone][] algorithm;
+ 2. Tokens MUST be usable as a key in a [`Map`][Map object] object.
+ 3. Tokens MUST be unique across methods. That is, tokens MUST NOT be
+    duplicated for between different methods.
 
 It is up to Keyman to create unambiguous tokens that can be uniquely
 identified through the round-trip process.
