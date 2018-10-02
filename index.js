@@ -14,6 +14,18 @@ exports.LMLayer = class LMLayer {
 
     // Keep track of tokens.
     this._currentToken = Number.MIN_SAFE_INTEGER;
+
+    // Is the model initialized?
+    this._initialized = false;
+  }
+
+  /**
+   * [async] Waits for the model's initialization.
+   */
+  initialize() {
+    if (this._initialized) {
+      return Promise.resolve();
+    }
   }
 
   /**
