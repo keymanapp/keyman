@@ -101,3 +101,50 @@ An asynchronous message to predict after typing 'D':
     ]
 }
 ```
+
+Message types
+-------------
+
+Currently there are three message types:
+
+Message       | Direction          | Parameters          | Expected reply      | Uses token
+--------------|--------------------|---------------------|---------------------|---------------
+`ready`       | LMLayer → keyboard | configuration       | No                  | No
+`predict`     | keyboard → LMLayer | transform, contexts | Yes — `suggestions` | Yes
+`suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
+
+
+### Message: `ready`
+
+Must be sent from the LMLayer to the keyboard when the LMLayer's model
+is finished initializing. It will send `configuration`, which is
+a plain JavaScript object requesting configuration from the keyboard.
+
+The keyboard SHOULD NOT send any messages to the LMLayer before it
+receives the `ready` message.
+
+There are only two options defined so far:
+
+```javascript
+let configuration = {
+    /**
+     * How many UTF-16 code units maximum to send as the context to the
+     * left of the cursor ("left" in the Unicode character stream).
+     *
+     * Affects the `context` property sent in `predict` messages.
+     *
+     * TODO: Will this ever bisect graphical cluster boundaries?
+     */
+    leftContextCodeUnits: 32, 
+
+    /**
+     * How many UTF-16 code units maximum to send as the context to the
+     * right of the cursor ("right" in the Unicode character stream).
+     *
+     * Affects the `context` property sent in `predict` messages.
+     *
+     * TODO: Will this ever bisect graphical cluster boundaries?
+     */
+    rightContextCodeUnits: 32, 
+};
+```
