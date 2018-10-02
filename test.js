@@ -10,10 +10,15 @@ test('Can provide context to LMLayer', async t => {
 
   const lm = new LMLayer;
 
+  // Wait for the language model to initialize.
+  await lm.initialize();
+
+  // Now tell it the user typed 'D'.
   let message = await lm.predictWithContext({
     transform: TYPE_D, context: EMPTY_CONTEXT
   });
 
+  // This dummy language model will always suggest 'Derek' as its return.
   let {suggestions} = message;
   t.deepEqual(suggestions, [
     { insert: 'Derek', deleteLeft: 1, deleteRight: 0 }
