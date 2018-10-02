@@ -11,27 +11,31 @@ self.onmessage = function (event) {
     // XXX: cause the other end to reject the promise, because of a
     // token/method mismatch. This is for testing purposes.
     if (token === null) {
-      postMessage({ method: 'invalid', token });
+      cast('invalid', {token});
       return;
     }
 
-    postMessage({
-      method: 'suggestions',
+    cast('suggestions', {
       token,
       suggestions: [
         { insert: 'Derek', deleteLeft: 1, deleteRight: 0 },
       ]
     });
-    return;
   } else {
     throw new Error('invalid message');
   }
 };
 
 // Ready! Send desired configuration.
-postMessage({
-  method: 'ready',
+cast('ready', {
   configuration: {
     leftContextCodeUnits: 32
   }
 });
+
+/**
+ * Send a message to the keyboard.
+ */
+function cast(message, parameters) {
+  postMessage({method: message, ...parameters });
+}
