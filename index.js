@@ -10,7 +10,7 @@ exports.LMLayer = class LMLayer {
     this._worker.onmessage = this._onmessage.bind(this);
 
     // Keep track of individual requests to make a nice async/await API.
-    this._promises = new Map();
+    this._promises = new PromiseStore;
 
     // Keep track of tokens.
     this._currentToken = Number.MIN_SAFE_INTEGER;
@@ -23,7 +23,7 @@ exports.LMLayer = class LMLayer {
     let token = customToken || this._nextToken();
 
     return new Promise((resolve, reject) => {
-      this._recordPromise(token, resolve, reject);
+      this._promises.record(token, resolve, reject);
       this._cast('predict', {
         token, transform, context
       });
@@ -44,41 +44,13 @@ exports.LMLayer = class LMLayer {
   _onmessage(event) {
     const {method, token} = event.data;
 
-    let accept = this._keepPromise(token);
+    let accept = this._promises.keep(token);
 
     if (method === 'suggestions') {
       accept(event.data);
     } else {
       throw new Error(`Unknown message: ${method}`);
     }
-  }
-
-  /**
-   * Associate a token with its respective resolve and reject callbacks.
-   */
-  _recordPromise(token, resolve, reject) {
-    if (this._promises.has(token)) {
-      reject(`Existing request with token ${token}`);
-    }
-    this._promises.set(token, resolve);
-  }
-
-  /**
-   * Fetch a promise's resolution function.
-   */
-  _keepPromise(token) {
-    let accept = this._promises.get(token);
-
-    if (!accept) {
-      throw new Error(`No promise associated with token: ${token}`);
-    }
-
-    // This acts like the resolve function, BUT, it removes the promise from
-    // the store -- because it's resolved!
-    return (resolvedValue) => {
-      this._promises.delete(token);
-      return accept(resolvedValue);
-    };
   }
 
   /**
@@ -92,3 +64,45 @@ exports.LMLayer = class LMLayer {
     return token;
   }
 };
+
+
+/**
+ * Associate tokens with promises.
+ *
+ * You can .track() them, and then .keep() them. You may also .break() them.
+ */
+class PromiseStore {
+  constructor() {
+    this._promises = new Map();
+  }
+
+  /**
+   * Associate a token with its respective resolve and reject callbacks.
+   */
+  record(token, resolve, reject) {
+    if (this._promises.has(token)) {
+      reject(`Existing request with token ${token}`);
+    }
+    this._promises.set(token, resolve);
+  }
+
+  /**
+   * Fetch a promise's resolution function.
+   *
+   * Calling the resolution function will stop tracking the promise.
+   */
+  keep(token) {
+    let accept = this._promises.get(token);
+
+    if (!accept) {
+      throw new Error(`No promise associated with token: ${token}`);
+    }
+
+    // This acts like the resolve function, BUT, it removes the promise from
+    // the store -- because it's resolved!
+    return (resolvedValue) => {
+      this._promises.delete(token);
+      return accept(resolvedValue);
+    };
+  }
+}
