@@ -56,6 +56,13 @@ type
     procedure cmdKeyboardEditLanguageClick(Sender: TObject);
     procedure cmdKeyboardRemoveLanguageClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure editCopyrightChange(Sender: TObject);
+    procedure editVersionChange(Sender: TObject);
+    procedure editAuthorChange(Sender: TObject);
+    procedure clbTargetsClickCheck(Sender: TObject);
+    procedure editPathChange(Sender: TObject);
+    procedure editFileNameChange(Sender: TObject);
+    procedure cmdBrowseClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer; // Used temporarily for storing language list
@@ -178,6 +185,33 @@ begin
   FreeAndNil(pack);
 end;
 
+procedure TfrmNewProjectParameters.clbTargetsClickCheck(Sender: TObject);
+begin
+  EnableControls;
+end;
+
+procedure TfrmNewProjectParameters.cmdBrowseClick(Sender: TObject);
+var
+  FPathName, FFolderName, FProjectName: string;
+begin
+  inherited;
+  if dlgSave.Execute then
+  begin
+    FPathName := ExtractFilePath(ExtractFileDir(dlgSave.FileName));
+    FFolderName := ExtractFileName(ExtractFileDir(dlgSave.FileName));
+    FProjectName := ChangeFileExt(ExtractFileName(dlgSave.FileName), '');
+    if not SameText(FFolderName, FProjectName) then
+    begin
+      if MessageDlg('The project will be saved at "'+FPathName+FFolderName+'\'+FProjectName+'\'+FProjectName+'.kpj". Continue?',
+          mtConfirmation, mbOkCancel, 0) = mrCancel then
+        Exit;
+      FPathName := FPathName+FFolderName;
+    end;
+    editPath.Text := ExcludeTrailingPathDelimiter(FPathName);
+    editFileName.Text := FProjectName;
+  end;
+end;
+
 procedure TfrmNewProjectParameters.cmdKeyboardAddLanguageClick(
   Sender: TObject);
 var
@@ -257,11 +291,36 @@ begin
     ModalResult := mrOk;
 end;
 
+procedure TfrmNewProjectParameters.editAuthorChange(Sender: TObject);
+begin
+  EnableControls;
+end;
+
+procedure TfrmNewProjectParameters.editCopyrightChange(Sender: TObject);
+begin
+  EnableControls;
+end;
+
+procedure TfrmNewProjectParameters.editFileNameChange(Sender: TObject);
+begin
+  EnableControls;
+end;
+
 procedure TfrmNewProjectParameters.editKeyboardNameChange(Sender: TObject);
 begin
-  inherited;
   if not editFileName.Modified then
     editFileName.Text := TKeyboardUtils.CleanKeyboardID(Trim(editKeyboardName.Text));
+  EnableControls;
+end;
+
+procedure TfrmNewProjectParameters.editPathChange(Sender: TObject);
+begin
+  EnableControls;
+end;
+
+procedure TfrmNewProjectParameters.editVersionChange(Sender: TObject);
+begin
+  EnableControls;
 end;
 
 procedure TfrmNewProjectParameters.EnableControls;
@@ -270,7 +329,8 @@ var
 begin
   e := (Trim(editKeyboardName.Text) <> '') and
     (Trim(editPath.Text) <> '') and
-    (Trim(editFileName.Text) <> '');
+    TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text)) and
+    (GetTargets <> []);
   cmdOK.Enabled := e;
 
   e := gridKeyboardLanguages.RowCount > 1;

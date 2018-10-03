@@ -13,9 +13,9 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   object lblFileName: TLabel
     Left = 12
     Top = 275
-    Width = 50
+    Width = 64
     Height = 13
-    Caption = '&File Name:'
+    Caption = '&Keyboard ID:'
     FocusControl = editFileName
   end
   object lblPath: TLabel
@@ -55,7 +55,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 92
     Width = 37
     Height = 13
-    Caption = '&Author:'
+    Caption = 'A&uthor:'
     FocusControl = editAuthor
   end
   object lblTargets: TLabel
@@ -75,11 +75,12 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     FocusControl = gridKeyboardLanguages
   end
   object editFileName: TEdit
-    Left = 64
+    Left = 120
     Top = 272
-    Width = 205
+    Width = 149
     Height = 21
     TabOrder = 10
+    OnChange = editFileNameChange
   end
   object cmdBrowse: TButton
     Left = 275
@@ -88,13 +89,15 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 21
     Caption = '&Browse...'
     TabOrder = 11
+    OnClick = cmdBrowseClick
   end
   object editPath: TEdit
-    Left = 64
+    Left = 120
     Top = 245
-    Width = 289
+    Width = 233
     Height = 21
     TabOrder = 9
+    OnChange = editPathChange
   end
   object editKeyboardName: TEdit
     Left = 120
@@ -111,6 +114,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 21
     TabOrder = 1
     Text = #169
+    OnChange = editCopyrightChange
   end
   object editVersion: TEdit
     Left = 120
@@ -119,6 +123,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 21
     TabOrder = 2
     Text = '1.0'
+    OnChange = editVersionChange
   end
   object editAuthor: TEdit
     Left = 120
@@ -126,6 +131,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 205
     Height = 21
     TabOrder = 3
+    OnChange = editAuthorChange
   end
   object cmdOK: TButton
     Left = 463
@@ -152,6 +158,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 116
     Width = 205
     Height = 97
+    OnClickCheck = clbTargetsClickCheck
     ItemHeight = 13
     TabOrder = 4
   end
