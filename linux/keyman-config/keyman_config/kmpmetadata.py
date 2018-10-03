@@ -121,7 +121,7 @@ def determine_filetype(kblist, filename):
 	name, ext = os.path.splitext(filename)
 	if ext.lower() == ".ico":
 		return KMFileTypes.KM_ICON
-	elif ext.lower() == ".kmn" or ext.lower() == ".kvks":
+	elif ext.lower() == ".kmn":
 		return KMFileTypes.KM_SOURCE
 	elif ext.lower() == ".kvks":
 		return KMFileTypes.KM_OSK_SOURCE
