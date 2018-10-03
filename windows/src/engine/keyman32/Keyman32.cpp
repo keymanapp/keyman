@@ -218,6 +218,7 @@ void DoChangeWindowMessageFilter()
 		return;
 
 	DoCWMF(wm_keyman);   // I3594
+  DoCWMF(wm_keyman_keyevent);
     DoCWMF(wm_kmmessage);   // I4412
     DoCWMF(wm_keymankeydown);
     DoCWMF(wm_keymankeyup);
@@ -293,17 +294,6 @@ void Initialise_Flag_ShouldSerializeInput() {
   flag_ShouldSerializeInput = Reg_GetDebugFlag(REGSZ_Flag_ShouldSerializeInput, TRUE);
 }
 
-void Initialise_Flag_IsDevEnvProcess() {
-  char buf[MAX_PATH], fname[_MAX_FNAME], ext[_MAX_EXT];
-  if (GetModuleFileName(NULL, buf, MAX_PATH) > 0) {
-    if (_splitpath_s(buf, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT) == 0) {
-      if (!_strcmpi(fname, "devenv") && !_strcmpi(ext, ".exe")) {
-        flag_IsDevEnvProcess = TRUE;
-      }
-    }
-  }
-}
-
 BOOL InitialiseProcess(HWND hwnd) 
 {
 	if(InterlockedExchange(&FStartedInitialise, TRUE))
@@ -317,11 +307,9 @@ BOOL InitialiseProcess(HWND hwnd)
 		GetCommandLine());
 
   Initialise_Flag_ShouldSerializeInput();
-  Initialise_Flag_IsDevEnvProcess();
 
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
-
-  wm_keyman_ignore = RegisterWindowMessage("WM_KEYMAN_IGNORE");
+  wm_keyman_keyevent = RegisterWindowMessage("WM_KEYMAN_KEYEVENT");
 	wm_kmmessage = RegisterWindowMessage(RWM_KMMESSAGE);
 	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
 	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
@@ -375,7 +363,7 @@ BOOL UninitHooks()
 {
   BOOL RetVal = TRUE;
 
-  if(Globals::get_hhookGetMessage() && !UnhookWindowsHookEx(Globals::get_hhookGetMessage())) 
+  if(Globals::get_hhookGetMessage() && !UnhookWindowsHookEx(Globals::get_hhookGetMessage()))
       RetVal = FALSE;
   else
       *Globals::hhookGetMessage() = NULL;

@@ -250,12 +250,10 @@ extern UINT
   wm_keymanim_close,
   wm_keymanim_contextchanged,
   wm_test_keyman_functioning,
-  wm_keyman_ignore;     // used to mask out messages that we don't want the target app to process, e.g. key events
+  wm_keyman_keyevent;   // for serialized input 
 
-extern BOOL 
-  flag_ShouldSerializeInput,
-  flag_DevEnv_CtrlTabStarted,
-  flag_IsDevEnvProcess;
+extern BOOL
+  flag_ShouldSerializeInput;
 
 void UpdateActiveWindows();
 

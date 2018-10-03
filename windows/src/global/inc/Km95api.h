@@ -40,7 +40,6 @@ extern "C" {
 #define KM_ENABLEUI		2
 // These messages should be sent to a window
 //#define KM_GETUISTATE	3
-#define KM_EXIT			4		// Never use this flag: internal to Keyman
 #define KM_FOCUSCHANGED	5		// Never use this flag: internal to Keyman
 #define KM_ACTIVECHANGED 6  // Never use this flag: internal to Keyman
 #define KM_EXITFLUSH  8 // Disconnects GetMessage hook 
