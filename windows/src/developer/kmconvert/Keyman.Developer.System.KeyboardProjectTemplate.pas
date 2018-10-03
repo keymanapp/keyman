@@ -32,8 +32,10 @@ type
     function GetProjectFilename: string;
     function GetTouchLayoutFilename: string;
 
-    function HasTouchLayout: Boolean;
+    function HasIcon: Boolean;
+    function HasKMX: Boolean;
     function HasKVKS: Boolean;
+    function HasTouchLayout: Boolean;
 
     procedure WriteKMN;
     procedure WriteKPS;
@@ -43,7 +45,6 @@ type
     procedure WriteRepositoryMetadata;
     procedure WriteDocumentation;
     procedure WriteKeyboardInfo;
-    function HasIcon: Boolean;
     procedure Transform(const SourceFile: string; DestFile: string = '');
     function DataPath: string;
     procedure SetKeyboardLanguages(kps: TkpsFile);
@@ -164,19 +165,24 @@ begin
   Result := GetFilename(FTouchLayoutFilename);
 end;
 
+function TKeyboardProjectTemplate.HasIcon: Boolean;
+begin
+  Result := (KMXKeymanTargets+[ktAny]) * FTargets <> [];
+end;
+
+function TKeyboardProjectTemplate.HasKMX: Boolean;
+begin
+  Result := (KMXKeymanTargets+[ktAny]) * FTargets <> [];
+end;
+
 function TKeyboardProjectTemplate.HasKVKS: Boolean;
 begin
-  Result := KeymanTargetsUsingKVK * FTargets <> [];
+  Result := (KeymanTargetsUsingKVK+[ktAny]) * FTargets <> [];
 end;
 
 function TKeyboardProjectTemplate.HasTouchLayout: Boolean;
 begin
-  Result := TouchKeymanTargets * FTargets <> [];
-end;
-
-function TKeyboardProjectTemplate.HasIcon: Boolean;
-begin
-  Result := KMXKeymanTargets * FTargets <> [];
+  Result := (TouchKeymanTargets+[ktAny]) * FTargets <> [];
 end;
 
 procedure TKeyboardProjectTemplate.WriteDocumentation;
@@ -276,9 +282,12 @@ begin
     kps.FileName := GetPackageFilename;
 
     // Add .kmx
-    f := TPackageContentFile.Create(kps);
-    f.FileName := FBasePath + FKeyboardID + '\build\' + FKeyboardID + Ext_KeymanFile;
-    kps.Files.Add(f);
+    if HasKMX then
+    begin
+      f := TPackageContentFile.Create(kps);
+      f.FileName := FBasePath + FKeyboardID + '\build\' + FKeyboardID + Ext_KeymanFile;
+      kps.Files.Add(f);
+    end;
 
     // Add .js
     if HasTouchLayout then

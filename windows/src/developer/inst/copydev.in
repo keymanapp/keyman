@@ -2,9 +2,9 @@
 
 # We use different directories so that heat generates
 # different identifiers for the various folders
-KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build_xml
-KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build_cef
-KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build_templates
+KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build\xml
+KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
+KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
 
@@ -38,7 +38,7 @@ heat-templates:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_TEMPLATES)
     mkdir $(KEYMAN_WIX_TEMP_TEMPLATES)
     xcopy $(KEYMAN_DEVELOPER_TEMPLATES_ROOT)\* $(KEYMAN_WIX_TEMP_TEMPLATES)\ /s
-    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_TEMPLATES) -o templates.wxs -ag -cg Templates -dr dirProjectsTemplates -var var.TemplatesSourceDir -wx -nologo
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_TEMPLATES) -o templates.wxs -ag -cg Templates -dr dirProjects -var var.TemplatesSourceDir -wx -nologo
     # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
     -rmdir /s/q $(KEYMAN_WIX_TEMP_TEMPLATES)
 
