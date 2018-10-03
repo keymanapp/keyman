@@ -928,7 +928,9 @@ final class KMKeyboard extends WebView {
 
     dismissHelpBubble();
     //keyPreviewWindow.setAnimationStyle(R.style.KeyPreviewAnim);
-    keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
+    if (keyPreviewWindow != null) {
+      keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
+    }
   }
 
   protected void dismissKeyPreview(long delay) {
