@@ -64,6 +64,8 @@ public final class KMManager {
 
   private static FirebaseAnalytics mFirebaseAnalytics;
 
+  private static int KM_VIBRATE_DURATION = 100; // milliseconds
+
   // Keyboard types
   public enum KeyboardType {
     KEYBOARD_TYPE_UNDEFINED,
@@ -1623,15 +1625,13 @@ public final class KMManager {
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void beepKeyboard() {
-      int duration = 500; // milliseconds
-
       Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
       if (v != null && v.hasVibrator()) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          VibrationEffect effect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE);
+          VibrationEffect effect = VibrationEffect.createOneShot(KM_VIBRATE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE);
           v.vibrate(effect);
         } else {
-          v.vibrate(duration);
+          v.vibrate(KM_VIBRATE_DURATION);
         }
       }
     }
@@ -1751,15 +1751,13 @@ public final class KMManager {
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
     public void beepKeyboard() {
-      int duration = 500; // milliseconds
-
       Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
       if (v != null && v.hasVibrator()) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          VibrationEffect effect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE);
+          VibrationEffect effect = VibrationEffect.createOneShot(KM_VIBRATE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE);
           v.vibrate(effect);
         } else {
-          v.vibrate(duration);
+          v.vibrate(KM_VIBRATE_DURATION);
         }
       }
     }
