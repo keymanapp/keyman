@@ -4,15 +4,16 @@ import argparse
 import logging
 import os
 import json
-from enum import Enum, auto
+import gi
+from gi.repository import GObject
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
 from keyman_config.get_kmp import user_keyman_dir
 
-class InstallArea(Enum):
-    IA_OS = auto()
-    IA_SHARED = auto()
-    IA_USER = auto()
-    IA_UNKNOWN = auto()
+class InstallArea(GObject.GEnum):
+    IA_OS = 1
+    IA_SHARED = 2
+    IA_USER = 3
+    IA_UNKNOWN = 99
 
 def get_installed_kmp(area):
     """
@@ -127,7 +128,7 @@ def get_kmp_version(keyboardid):
             if version < user_version:
                 version = user_version
         else:
-            version = shared_version
+            version = user_version
 
     return version
 

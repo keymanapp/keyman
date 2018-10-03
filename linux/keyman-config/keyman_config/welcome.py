@@ -32,17 +32,17 @@ class WelcomeView(Gtk.Window):
         s.add(self.webview)
         vbox.pack_start(s, True, True, 0)
 
-        hbox = Gtk.Box(spacing=6)
-        vbox.pack_start(hbox, False, False, 0)
+        hbox = Gtk.Box(spacing=12)
+        vbox.pack_start(hbox, False, False, 6)
 
         button = Gtk.Button.new_with_mnemonic("Open in _Web browser")
         button.connect("clicked", self.on_openweb_clicked)
         button.set_tooltip_text("Open in the default web browser to do things like printing")
-        hbox.pack_start(button, False, False, 0)
+        hbox.pack_start(button, False, False, 12)
 
         button = Gtk.Button.new_with_mnemonic("_OK")
         button.connect("clicked", self.on_ok_clicked)
-        hbox.pack_end(button, False, False, 0)
+        hbox.pack_end(button, False, False, 12)
         bind_accelerator(self.accelerators, button, '<Control>w')
 
         self.add(vbox)

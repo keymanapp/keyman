@@ -41,7 +41,7 @@ class DownloadKmpWindow(Gtk.Window):
         vbox.pack_start(s, True, True, 0)
 
         bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
-        bbox.set_layout(Gtk.ButtonBoxStyle.END)
+        #bbox.set_layout(Gtk.ButtonBoxStyle.END)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
@@ -55,7 +55,7 @@ class DownloadKmpWindow(Gtk.Window):
         logging.info("Downloading kmp file to %s", downloadfile)
         if download_kmp_file(url, downloadfile):
             logging.info("File downloaded")
-            w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow)
+            w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow, downloadwindow=self)
             if w.checkcontinue:
                 w.show_all()
             return True
