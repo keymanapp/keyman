@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -24,9 +26,12 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -51,11 +56,15 @@ import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONObject;
 
+import static android.content.Context.VIBRATOR_SERVICE;
+
 public final class KMManager {
 
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
+
+  private static int KM_VIBRATE_DURATION = 100; // milliseconds
 
   // Keyboard types
   public enum KeyboardType {
@@ -1613,6 +1622,20 @@ public final class KMManager {
       return kbWidth;
     }
 
+    // This annotation is required in Jelly Bean and later:
+    @JavascriptInterface
+    public void beepKeyboard() {
+      Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+      if (v != null && v.hasVibrator()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          VibrationEffect effect = VibrationEffect.createOneShot(KM_VIBRATE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE);
+          v.vibrate(effect);
+        } else {
+          v.vibrate(KM_VIBRATE_DURATION);
+        }
+      }
+    }
+
     // Store the current keyboard chirality status from KMW in InAppKeyboard
     @JavascriptInterface
     public void setIsChiral(boolean isChiral) {
@@ -1723,6 +1746,20 @@ public final class KMManager {
       DisplayMetrics dms = context.getResources().getDisplayMetrics();
       int kbWidth = (int) (dms.widthPixels / dms.density);
       return kbWidth;
+    }
+
+    // This annotation is required in Jelly Bean and later:
+    @JavascriptInterface
+    public void beepKeyboard() {
+      Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+      if (v != null && v.hasVibrator()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          VibrationEffect effect = VibrationEffect.createOneShot(KM_VIBRATE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE);
+          v.vibrate(effect);
+        } else {
+          v.vibrate(KM_VIBRATE_DURATION);
+        }
+      }
     }
 
     // Store the current keyboard chirality status from KMW in SystemKeyboard

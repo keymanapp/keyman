@@ -664,7 +664,7 @@ namespace com.keyman {
      * Function     beep          KB      
      * Scope        Public
      * @param       {Object}      Pelem     element to flash
-     * Description  Flash body as substitute for audible beep
+     * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
      */    
     beep(Pelem: HTMLElement|Document): void {
       this.resetContextCache();
@@ -692,6 +692,10 @@ namespace com.keyman {
       if(this._BeepTimeout == 0) {
         this._BeepTimeout = 1;
         window.setTimeout(this.beepReset.bind(this), 50);
+      }
+
+      if ('beepKeyboard' in this.keymanweb) {
+        this.keymanweb['beepKeyboard']();
       }
     }
 
