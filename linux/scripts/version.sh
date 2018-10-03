@@ -4,7 +4,7 @@ version()
 {
     local catvers=`cat VERSION`
     local datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
-    local num=`git describe --abbrev=0| cut -d '.' -f3`
+    local num=`git describe --abbrev=0 --match=linux-release-*| cut -d '.' -f3`
     echo "current tag number ${num}"
     local next=$((num+1))
     echo "next tag number ${next}"
