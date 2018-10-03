@@ -41,7 +41,7 @@ uses
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
-  ProjectLog in '..\..\developer\TIKE\project\ProjectLog.pas',
+  Keyman.Developer.System.Project.ProjectLog in '..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',

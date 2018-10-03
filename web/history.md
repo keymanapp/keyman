@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 11.0 alpha
+* Add `setNumericLayer()` for embedded platforms to change OSK to numeric layer.
+
 ## 2018-07-06 10.0.103 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
 

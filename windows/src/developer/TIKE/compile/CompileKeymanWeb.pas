@@ -107,7 +107,7 @@ uses
   compile,
   kmxfile,
   kmxfileconsts,
-  ProjectFile;
+  Keyman.Developer.System.Project.ProjectFile;
 
 type
   TSentinelRecordAny = record

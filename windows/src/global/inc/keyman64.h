@@ -104,6 +104,21 @@
 #define KR_PRE_REFRESH	1
 #define KR_REFRESH		2
 
+/* WM_KEY* message analysis */
+
+#define KEYMSG_LPARAM_SCAN(lParam) ((BYTE)(((lParam) & 0xFF0000) >> 16))
+#define KEYMSG_FLAG_EXTENDED(lParam) (HIWORD(lParam) & KF_EXTENDED ? 1 : 0)
+#define KEYMSG_FLAG_DLGMODE(lParam) (HIWORD(lParam) & KF_DLGMODE ? 1 : 0)
+#define KEYMSG_FLAG_MENUMODE(lParam) (HIWORD(lParam) & KF_MENUMODE ? 1 : 0)
+#define KEYMSG_FLAG_ALTDOWN(lParam) (HIWORD(lParam) & KF_ALTDOWN ? 1 : 0)
+#define KEYMSG_FLAG_REPEAT(lParam) (HIWORD(lParam) & KF_REPEAT ? 1 : 0)
+#define KEYMSG_FLAG_UP(lParam) (HIWORD(lParam) & KF_UP ? 1 : 0)
+
+// TODO: Deprecate overloading of scancodes and use dwExtraInfo instead
+#define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
+
+#define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
+
 /***************************************************************************/ 
 
 typedef struct tagSTORE
@@ -336,7 +351,7 @@ extern "C" PWSTR  _declspec(dllexport) WINAPI GetSystemStore(LPKEYBOARD kb, DWOR
 
 DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 
-void keybd_shift(LPINPUT pInputs, int *n, BOOL FReset, LPBYTE kbd);
+void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 

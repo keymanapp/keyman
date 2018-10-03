@@ -609,24 +609,16 @@ end;
 
 procedure TKeymanControl.Do_Keyman_Exit;
 var
-  dwResult: DWORD;
   hSnap: THandle;
   te: THREADENTRY32;
 const
-  KM_EXIT = 4;
-  KM_EXITFLUSH = 5;
+  KM_EXITFLUSH = 8;
 begin
 
   if wm_keyman = 0 then
     wm_keyman := RegisterWindowMessage('wm_keyman');
 
   FKeyman_StartExit; // I3092
-
-  { Tell all threads that it is time to exit.  This is important to do before we shutdown
-    because we have got a per-thread keyboard hook that needs to be detached before we
-    lose our message hooks. }
-
-  SendMessageTimeout(HWND_BROADCAST, wm_keyman, KM_EXIT, 0, SMTO_NORMAL, 1000, @dwResult);  // I3309
 
   { Tell Keyman to shut down its hooks }
 

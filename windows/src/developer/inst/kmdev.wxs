@@ -61,6 +61,7 @@
               <Directory Id="dirRedist" Name="Redist">
                 <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
+              <Directory Id="dirProjects" Name="Projects" />
             </Directory>
           </Directory>
         </Directory>
@@ -180,6 +181,10 @@
         <File Name="kmcomp.exe" KeyPath="yes" />
       </Component>
       
+      <Component>
+        <File Name="kmconvert.exe" KeyPath="yes" />
+      </Component>
+
       <Component>
         <File Name="kmcmpdll.dll" KeyPath="yes" />
       </Component>
@@ -319,6 +324,7 @@
       <ComponentGroupRef Id="AppData" />
       <ComponentGroupRef Id="XML" />
       <ComponentGroupRef Id="CEF" />
+      <ComponentGroupRef Id="Templates" />
       
       <MergeRef Id='keymanengine' />
     </Feature>

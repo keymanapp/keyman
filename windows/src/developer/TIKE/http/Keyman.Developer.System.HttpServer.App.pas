@@ -35,8 +35,8 @@ uses
   Xml.XMLDoc,
   Xml.XMLIntf,
 
-  ProjectFile,
-  ProjectSaver,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles;
 
 { TAppHttpServer }

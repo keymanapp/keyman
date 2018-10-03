@@ -37,7 +37,9 @@ unit CompilePackageInstaller;  // I3306
 
 interface
 
-uses Windows, kpsfile, kmpinffile, PackageInfo, CompilePackage, Projectlog, jwaMsi, jwaMsiQuery, SysUtils;
+uses Windows, kpsfile, kmpinffile, PackageInfo, CompilePackage,
+  Keyman.Developer.System.Project.Projectlog,
+  jwaMsi, jwaMsiQuery, SysUtils;
 
 function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean = True; ALicense: string = ''): Boolean;   // I4598   // I4688
 function DoCompileMSIInstaller(FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename, ARedistSetupPath, ALicense: string): Boolean;  // I2562

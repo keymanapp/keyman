@@ -1,2 +1,2 @@
-version=3
-http://sf.net/kmfl/kmflcomp-(.+)\.tar\.gz debian uupdate
+version=4
+https://downloads.keyman.com/linux/alpha/([\.\d]+)/kmflcomp-(.+)\.tar\.gz debian uupdate

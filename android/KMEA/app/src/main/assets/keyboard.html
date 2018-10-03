@@ -26,6 +26,7 @@
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
+      kmw['beepKeyboard'] = beepKeyboard;
       var ta = document.getElementById('ta');
       kmw['setActiveElement'](ta);
 
@@ -59,6 +60,10 @@
       }
       //window.console.log('Keyboard width = '+oskWidth);
       return oskWidth;
+    }
+
+    function beepKeyboard() {
+      window.jsInterface.beepKeyboard();
     }
 
     // Query KMW if a given keyboard uses chiral modifiers.
@@ -124,6 +129,12 @@
     function resetContext() {
       var kmw=window['keyman'];
       kmw.resetContext();
+    }
+
+    // Tell KMW to switch to "numeric" layer
+    function setNumericLayer() {
+      var kmw=window['keyman'];
+      kmw.setNumericLayer();
     }
 
     function updateKMText(text) {

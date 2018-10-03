@@ -222,7 +222,7 @@ begin
     writeln('');
     writeln('          -s       silent; don''t print information-level messages');
     writeln('          -ss      fully silent; don''t print anything (except fatal errors)');
-    writeln('          -nologo  don''t print the compiler description and registration');
+    writeln('          -nologo  don''t print the compiler description');
     writeln('          -c       clean target (only for .kpj)');
     writeln('          -d       include debug information');
     writeln('          -w       treat warnings as errors');

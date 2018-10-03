@@ -107,8 +107,18 @@
 #define REGSZ_KeyboardHotkeysAreToggle "hotkeys are toggles"
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
 
+/* 
+  Debug flags
+  These are all stored in HKCU\Software\Keyman\Debug
+*/
 
-/* Enable/disable deep TSF integration */
+#define REGSZ_Keyman_Debug  REGSZ_KeymanCU "\\Debug"
+
+/* DWORD: Enable/disable serialized input, default 1 */
+
+#define REGSZ_Flag_ShouldSerializeInput "Flag_ShouldSerializeInput"
+
+/* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
 

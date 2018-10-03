@@ -332,8 +332,6 @@ public class WebBrowserActivity extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
     if (webView != null) {
-      webView.resumeTimers();
-
       if (didFinishLoading) {
         String fontFilename = KMManager.getKeyboardTextFontFilename();
         if (!loadedFont.equals(fontFilename)) {
@@ -346,9 +344,6 @@ public class WebBrowserActivity extends AppCompatActivity {
   @Override
   protected void onPause() {
     super.onPause();
-    if (webView != null) {
-      webView.pauseTimers();
-    }
   }
 
   @Override

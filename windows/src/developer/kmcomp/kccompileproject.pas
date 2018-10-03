@@ -28,10 +28,10 @@ implementation
 uses
   System.SysUtils,
 
-  kmnProjectFile,
-  kpsProjectFile,
-  ProjectLog,
-  ProjectFile;
+  Keyman.Developer.System.Project.kmnProjectFileAction,
+  Keyman.Developer.System.Project.kpsProjectFileAction,
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectFile;
 
 type
   TProjectConsole = class(TProject)
@@ -50,8 +50,8 @@ function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADe
 var
   i: Integer;
   Found: Boolean;
-  kmn: TkmnProjectFile;
-  kps: TkpsProjectFile;
+  kmn: TkmnProjectFileAction;
+  kps: TkpsProjectFileAction;
 
   function Matches(AFile: TProjectFile; AClass: TProjectFileClass): Boolean;
   begin
@@ -69,9 +69,9 @@ begin
     FullySilent := AFullySilent;
     Silent := ASilent;
     for i := 0 to Files.Count - 1 do
-      if Matches(Files[i], TkmnProjectFile) then
+      if Matches(Files[i], TkmnProjectFileAction) then
       begin
-        kmn := Files[i] as TkmnProjectFile;
+        kmn := Files[i] as TkmnProjectFileAction;
         kmn.Debug := ADebug;
         kmn.WarnAsError := AWarnAsError;
         if AClean then
@@ -84,9 +84,9 @@ begin
       end;
 
     for i := 0 to Files.Count - 1 do
-      if Matches(Files[i], TkpsProjectFile) then
+      if Matches(Files[i], TkpsProjectFileAction) then
       begin
-        kps := Files[i] as TkpsProjectFile;
+        kps := Files[i] as TkpsProjectFileAction;
         kps.WarnAsError := AWarnAsError;
         if AClean then
         begin
@@ -97,15 +97,6 @@ begin
         Found := True;
       end;
 
-(*    if HasKPPFile and not AClean then
-      for i := 0 to Files.Count - 1 do
-        if Matches(Files[i], TkpsProjectFile) then
-        begin
-          kps := Files[i] as TkpsProjectFile;
-          kps.WarnAsError := AWarnAsError;
-          if not kps.CompilePackageInstaller(nil, False) then Exit;
-          Found := True;
-        end;*)
   finally
     Free;
   end;

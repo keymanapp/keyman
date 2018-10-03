@@ -3,8 +3,8 @@
 /// <reference path="kmwbase.ts" />
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2017-2018 SIL International
 ***/
 
 namespace com.keyman {
@@ -664,7 +664,7 @@ namespace com.keyman {
      * Function     beep          KB      
      * Scope        Public
      * @param       {Object}      Pelem     element to flash
-     * Description  Flash body as substitute for audible beep
+     * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
      */    
     beep(Pelem: HTMLElement|Document): void {
       this.resetContextCache();
@@ -692,6 +692,10 @@ namespace com.keyman {
       if(this._BeepTimeout == 0) {
         this._BeepTimeout = 1;
         window.setTimeout(this.beepReset.bind(this), 50);
+      }
+
+      if ('beepKeyboard' in this.keymanweb) {
+        this.keymanweb['beepKeyboard']();
       }
     }
 
@@ -1355,6 +1359,16 @@ namespace com.keyman {
       this.resetVKShift();
 
       this.keymanweb.osk._Show();
+    };
+
+    setNumericLayer() {
+      var i;
+      for(i=0; i<this.keymanweb.osk.layers.length; i++) {
+        if (this.keymanweb.osk.layers[i].id == 'numeric') {
+          this.keymanweb.osk.layerId = 'numeric';
+          this.keymanweb.osk._Show();
+        }
+      }
     };
 
     /**

@@ -76,7 +76,9 @@
 
 
 UINT 
+  //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
+  wm_keyman_keyevent = 0,   // for serialized input
 	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
 	wm_kmmessage = 0,					// message to Keyman window   // I4412
@@ -96,6 +98,8 @@ UINT
 
 //HWND hwndIM = 0, hwndIMOldFocus = 0;
 
+BOOL
+  flag_ShouldSerializeInput = TRUE;
 
 static DWORD dwTlsIndex = TLS_OUT_OF_INDEXES;
 static CRITICAL_SECTION csGlobals;
@@ -670,4 +674,14 @@ BOOL IsSysTrayWindow(HWND hwnd)
 		!strcmp(buf, "TrayNotifyWnd") ||
 		!strcmp(buf, "Shell_TrayWnd") ||
     !strcmp(buf, "NotifyIconOverflowWindow"));  // I2866
+}
+
+BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault) {
+  RegistryReadOnly r(HKEY_CURRENT_USER);
+  if (r.OpenKeyReadOnly(REGSZ_Keyman_Debug)) {
+    if (r.ValueExists(pszFlagRegistrySetting)) {
+      return !!r.ReadInteger(pszFlagRegistrySetting);
+    }
+  }
+  return bDefault;
 }
