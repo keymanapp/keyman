@@ -114,8 +114,10 @@
 #define KEYMSG_FLAG_REPEAT(lParam) (HIWORD(lParam) & KF_REPEAT ? 1 : 0)
 #define KEYMSG_FLAG_UP(lParam) (HIWORD(lParam) & KF_UP ? 1 : 0)
 
-#define SCAN_FLAG_SERIALIZED_USER_KEY_EVENT 0xFE
+// TODO: Deprecate overloading of scancodes and use dwExtraInfo instead
 #define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
+
+#define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
 
 /***************************************************************************/ 
 

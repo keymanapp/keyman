@@ -78,7 +78,7 @@
 UINT 
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
-  wm_keyman_ignore = 0,     // used to mask out messages that we don't want the target app to process, e.g. key events
+  wm_keyman_keyevent = 0,   // for serialized input
 	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
 	wm_kmmessage = 0,					// message to Keyman window   // I4412
@@ -99,9 +99,7 @@ UINT
 //HWND hwndIM = 0, hwndIMOldFocus = 0;
 
 BOOL
-  flag_ShouldSerializeInput = TRUE,
-  flag_DevEnv_CtrlTabStarted = FALSE,
-  flag_IsDevEnvProcess = FALSE;
+  flag_ShouldSerializeInput = TRUE;
 
 static DWORD dwTlsIndex = TLS_OUT_OF_INDEXES;
 static CRITICAL_SECTION csGlobals;
