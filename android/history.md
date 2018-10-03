@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2018-10-03 10.0.506 stable
+* Fix crash that can occur when displaying preview key (#1230)
+
 ## 2018-08-23 10.0.505 stable
 * Validate keyboard ID when downloading keyboard from Keyman cloud (#1121)
 
