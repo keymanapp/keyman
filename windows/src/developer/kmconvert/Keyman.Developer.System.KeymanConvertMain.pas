@@ -8,6 +8,7 @@ implementation
 
 uses
   System.SysUtils,
+  Winapi.ActiveX,
 
   Keyman.Developer.System.KMConvertParameters,
   Keyman.Developer.System.ImportWindowsKeyboard,
@@ -19,10 +20,15 @@ function DoRun: Boolean; forward;
 
 procedure Run;
 begin
-  if DoRun then
-    ExitCode := 0
-  else
-    ExitCode := 1;
+  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
+  try
+    if DoRun then
+      ExitCode := 0
+    else
+      ExitCode := 1;
+  finally
+    CoUninitialize;
+  end;
 end;
 
 function DoImportWindowsKeyboard(FParameters: TKMConvertParameters): Boolean;
