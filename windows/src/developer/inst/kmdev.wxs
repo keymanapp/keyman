@@ -61,9 +61,7 @@
               <Directory Id="dirRedist" Name="Redist">
                 <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
-              <Directory Id="dirProjects" Name="Projects">
-                <Directory Id="dirProjectsTemplates" Name="Templates" />
-              </Directory>
+              <Directory Id="dirProjects" Name="Projects" />
             </Directory>
           </Directory>
         </Directory>
@@ -326,6 +324,7 @@
       <ComponentGroupRef Id="AppData" />
       <ComponentGroupRef Id="XML" />
       <ComponentGroupRef Id="CEF" />
+      <ComponentGroupRef Id="Templates" />
       
       <MergeRef Id='keymanengine' />
     </Feature>
