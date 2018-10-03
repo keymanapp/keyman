@@ -1,31 +1,12 @@
 #include <cassert>
 #include <algorithm>
 #include <iterator>
-#include <list>
 #include <vector>
 
 #include <keyboardprocessor.h>
 
-#include <utfcodec.hpp>
-
-namespace km {
-namespace kbp
-{
-
-class context : public std::list<km_kbp_context_item>
-{
-  std::vector<value_type> mutable _pres;
-
-public:
-  const_pointer data() const
-  {
-    _pres.assign(begin(), end());
-    return _pres.data();
-  }
-};
-
-}
-}
+#include "context.hpp"
+#include "utfcodec.hpp"
 
 struct km_kbp_context : public km::kbp::context {};
 
@@ -70,7 +51,7 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
     for (;i != e && ci->type != KM_KBP_CT_END; ++ci, ++i)
     {
       if (ci->type == KM_KBP_CT_CHAR)
-        *i = ci->data.character;
+        *i = ci->character;
     }
 
     return buf_size - (e - i);
@@ -81,7 +62,7 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
 
     do
       if (ci->type == KM_KBP_CT_CHAR)
-        ++n += int(ci->data.character >= 0x10000);
+        ++n += int(ci->character >= 0x10000);
     while(ci++->type != KM_KBP_CT_END);
     return n;
   }
