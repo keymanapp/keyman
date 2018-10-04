@@ -28,7 +28,7 @@ __pycache__
 build-*
 deb-*
 builddebs
-make_deb
+keyman-config/make_deb
 tmp/
 dist/
 *~
@@ -54,5 +54,7 @@ ibus-kmfl/m4/visibility.m4
 ibus-kmfl/m4/wchar_t.m4
 ibus-kmfl/m4/wint_t.m4
 ibus-kmfl/m4/xsize.m4
-keyman-config/debian/man
 keyman-config/build
+keyman-config/debian/man
+keyman-config/experiments/*.txt
+test.sh
