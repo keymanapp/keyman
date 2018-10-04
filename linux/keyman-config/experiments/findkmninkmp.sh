@@ -10,13 +10,3 @@ do
 #		echo "no kmn in $file"
 	fi
 done
-
-#for file in `find ~/.cache/keyman -name "*.kmp"`
-#do
-#	unzip -q -t "$file" *.kmn 2>&1 
-#	if [ "$?" == "0" ]; then
-#		echo "$file"
-##	else
-##		echo "no kmn in $file"
-#	fi
-#done

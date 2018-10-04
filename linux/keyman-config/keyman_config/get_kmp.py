@@ -17,6 +17,7 @@ def get_keyboard_data(keyboardid, weekCache=False):
 
 	Args:
 		keyboardid (str): Keyboard ID
+		weekCache (bool) : cache data for 1 week, default is 1 day
 	Returns:
 		dict: Keyboard data
 	"""
@@ -87,6 +88,7 @@ def get_kmp_file(kbdata, cache=False):
 
 	Args:
 		kbdata (dict): Keyboard data
+		cache (bool): Whether to cache the kmp file web request
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
@@ -107,6 +109,7 @@ def download_kmp_file(url, kmpfile, cache=False):
 		kmpfile (str): Where to save the kmp file.
 			currently it does no checks on this location
 			assumes that is in users keyman cache dir
+		cache(bool): Whether to cache the kmp file web request for a week
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
