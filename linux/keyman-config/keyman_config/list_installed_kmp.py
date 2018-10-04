@@ -4,15 +4,15 @@ import argparse
 import logging
 import os
 import json
-from enum import Enum, auto
+from enum import Enum
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
 from keyman_config.get_kmp import user_keyman_dir
 
 class InstallArea(Enum):
-    IA_OS = auto()
-    IA_SHARED = auto()
-    IA_USER = auto()
-    IA_UNKNOWN = auto()
+    IA_OS = 1
+    IA_SHARED = 2
+    IA_USER = 3
+    IA_UNKNOWN = 99
 
 def get_installed_kmp(area):
     """
