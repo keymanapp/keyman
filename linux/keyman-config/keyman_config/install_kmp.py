@@ -11,6 +11,7 @@ import zipfile
 from os import listdir, makedirs
 from shutil import copy2, rmtree
 from ast import literal_eval
+from enum import Enum
 
 import requests
 
@@ -22,12 +23,26 @@ from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 
 #TODO userdir install
 # special processing for kmn if needed
-#TODO gui review
-# review what errors need abort and uninstall and
-#    where there should be user feedback to gui
 #TODO optionally standardise throughout on variable names
 # packageID for kmps and keyboardID for keyboards
 # see https://docs.google.com/document/d/1sj7W6pCiN-_iRss5iRdib1aHaSTmYoLIueQSKJeNy8Q/edit#heading=h.mq0rc28mf031
+
+class InstallStatus(Enum):
+	Continue = 0
+	Warning = 1
+	Abort = 2
+
+class InstallError(Exception):
+    """Exception raised for errors in KMP installation.
+
+    Attributes:
+        status -- InstallStatus for what to do when the error occurrs
+        message -- explanation of the error
+    """
+
+    def __init__(self, status, message):
+        self.status = status
+        self.message = message
 
 def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
@@ -88,15 +103,14 @@ def download_source(kbid, kbdir, sourcePath):
 		subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
 		kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
 		if not os.path.isfile(kmfl_file):
-			logging.warning("Could not compile %s to %s so not installing keyboard.", kmn_file, kmfl_file)
+			message = "Could not compile %s to %s so not installing keyboard." % (kmn_file, kmfl_file)
 			os.remove(kmn_file)
 			rmtree(kbdir)
-			return 1
-		do_install_to_ibus = True
+			raise InstallError(InstallStatus.Abort, message)
 	else:
-		logging.warning("install_kmp.py: warning: no kmn source file for %s so not installing keyboard.", kbid)
+		message = "install_kmp.py: warning: no kmn source file for %s so not installing keyboard." % (kbid)
 		rmtree(kbdir)
-		return 1
+		raise InstallError(InstallStatus.Abort, message)
 	icodownloadfile = os.path.join(kbdir, kbid + ".ico")
 	if not os.path.isfile(icodownloadfile):
 		ico_url = base_url + "/source/" + kbid + ".ico"
@@ -108,7 +122,6 @@ def download_source(kbid, kbdir, sourcePath):
 			checkandsaveico(icodownloadfile)
 		else:
 			logging.warning("install_kmp.py: warning: no ico source file for %s", kbid)
-	return 0
 
 def process_keyboard_data(kbid, kbdir):
 	kbdata = get_keyboard_data(kbid)
@@ -116,17 +129,15 @@ def process_keyboard_data(kbid, kbdir):
 		if not os.path.isdir(kbdir):
 			os.makedirs(kbdir)
 		if 'sourcePath' in kbdata:
-			ret = download_source(kbid, kbdir, kbdata['sourcePath'])
-			if ret > 0:
-				return ret
+			download_source(kbid, kbdir, kbdata['sourcePath'])
+
 		with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
 			json.dump(kbdata, outfile)
 			logging.info("Installing api data file %s.json as keyman file", kbid)
 	else:
-		logging.error("install_kmp.py: error: cannot download keyboard data so not installing.")
+		message = "install_kmp.py: error: cannot download keyboard data so not installing."
 		rmtree(kbdir)
-		return 1
-	return 0
+		raise InstallError(InstallStatus.Abort, message)
 
 def check_keyman_dir(basedir, error_message):
 	# check if keyman subdir exists
@@ -134,13 +145,11 @@ def check_keyman_dir(basedir, error_message):
 	if os.path.isdir(keyman_dir):
 		# Check for write access of keyman dir to be able to create subdir
 		if not os.access(keyman_dir, os.X_OK | os.W_OK):
-			logging.error(error_message)
-			exit(3)
+			raise InstallError(InstallStatus.Abort, error_message)
 	else:
 		# Check for write access of basedir and create keyman subdir if we can
 		if not os.access(basedir, os.X_OK | os.W_OK):
-			logging.error(error_message)
-			exit(3)
+			raise InstallError(InstallStatus.Abort, error_message)
 		os.mkdir(keyman_dir)
 
 def install_kmp_shared(inputfile, online=False):
@@ -168,15 +177,12 @@ def install_kmp_shared(inputfile, online=False):
 	if keyboards:
 		logging.info("Installing %s", info['name']['description'])
 		if online:
-			ret = process_keyboard_data(kmpid, kmpdir)
-			if ret > 0:
-				return
+			process_keyboard_data(kmpid, kmpdir)
 			if len(keyboards) > 1:
 				for kb in keyboards:
 					if kb['id'] != kmpid:
-						ret = process_keyboard_data(kb['id'], kmpdir)
-						if ret > 0:
-							return
+						process_keyboard_data(kb['id'], kmpdir)
+			do_install_to_ibus = True
 
 		for f in files:
 			fpath = os.path.join(kmpdir, f['name'])
@@ -215,6 +221,8 @@ def install_kmp_shared(inputfile, online=False):
 		for o in os.listdir(kmpdir):
 			logging.info(o)
 		rmtree(kmpdir)
+		message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
+		raise InstallError(InstallStatus.Abort, message)
 
 def install_kmp_user(inputfile, online=False):
 	do_install_to_ibus = False
@@ -229,15 +237,12 @@ def install_kmp_user(inputfile, online=False):
 	if keyboards:
 		logging.info("Installing %s", info['name']['description'])
 		if online:
-			ret = process_keyboard_data(kmpid, kmpdir)
-			if ret > 0:
-				return
+			process_keyboard_data(kmpid, kmpdir)
 			if len(keyboards) > 1:
 				for kb in keyboards:
 					if kb['id'] != kmpid:
-						ret = process_keyboard_data(kb['id'], kmpdir)
-						if ret > 0:
-							return
+						process_keyboard_data(kb['id'], kmpdir)
+			do_install_to_ibus = True
 
 		for f in files:
 			fpath = os.path.join(kmpdir, f['name'])
@@ -264,6 +269,7 @@ def install_kmp_user(inputfile, online=False):
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
 		if do_install_to_ibus:
+			kmn_file = os.path.join(kmpdir, kmpid + ".kmn")
 			install_to_ibus(kmn_file)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
@@ -271,6 +277,8 @@ def install_kmp_user(inputfile, online=False):
 		for o in os.listdir(kmpdir):
 			logging.info(o)
 		rmtree(kmpdir)
+		message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
+		raise InstallError(InstallStatus.Abort, message)
 
 
 
@@ -293,6 +301,18 @@ def install_to_ibus(kmn_file):
 		else:
 			dconfwriteresult = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
 				stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
+		if (dconfwriteresult.returncode == 0):
+			# restart IBus to be sure the keyboard is installed
+			ibusrestartresult = subprocess.run(["ibus", "restart"])
+			if (ibusrestartresult.returncode != 0):
+				message = "install_kmp.py: error %d: Could not restart IBus." % (ibusrestartresult.returncode)
+				raise InstallError(InstallStatus.Continue, message)
+		else:
+			message = "install_kmp.py: error %d: Could not install the keyboad to IBus." % (dconfwriteresult.returncode)
+			raise InstallError(InstallStatus.Continue, message)
+	else:
+		message = "install_kmp.py: error %d: Could not read dconf preload-engines entry so cannot install to IBus" % (dconfreadresult.returncode)
+		raise InstallError(InstallStatus.Continue, message)
 
 
 
