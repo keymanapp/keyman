@@ -263,34 +263,34 @@ class InstallKmpWindow(Gtk.Window):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            install_kmp(self.kmpfile, self.online):
+            install_kmp(self.kmpfile, self.online)
+            if self.viewwindow:
+                self.viewwindow.refresh_installed_kmp()
+            keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
+            welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
+            if os.path.isfile(welcome_file):
+                uri_path = pathlib.Path(welcome_file).as_uri()
+                logging.debug(uri_path)
+                w = WelcomeView(uri_path, self.kbname)
+                w.resize(800, 600)
+                w.show_all()
+            else:
+                dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+                dialog.run()
+                dialog.destroy()
         except InstallError as e:
             if e.status == InstallStatus.Abort:
-                message = "Keyboard " + self.kbname + " could not be installed"
+                message = "Keyboard " + self.kbname + " could not be installed.\n\nError Message:\n%s" % (e.message)
                 logging.error(message)
+                message_type = Gtk.MessageType.ERROR
             else:
-                message = "Keyboard " + self.kbname + " could not be installed"
+                message = "Keyboard " + self.kbname + " could not be installed fully.\n\nWarning Message:\n%s" % (e.message)
                 logging.warning(message)
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
+                message_type = Gtk.MessageType.WARNING
+            dialog = Gtk.MessageDialog(self, 0, message_type,
                 Gtk.ButtonsType.OK, message)
             dialog.run()
-            logging.debug("INFO dialog closed")
-            dialog.destroy()
-        if self.viewwindow:
-            self.viewwindow.refresh_installed_kmp()
-        keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-        welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
-        if os.path.isfile(welcome_file):
-            uri_path = pathlib.Path(welcome_file).as_uri()
-            logging.debug(uri_path)
-            w = WelcomeView(uri_path, self.kbname)
-            w.resize(800, 600)
-            w.show_all()
-        else:
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
-                Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
-            dialog.run()
-            logging.debug("INFO dialog closed")
             dialog.destroy()
         if not self.endonclose:
             self.close()
