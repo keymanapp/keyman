@@ -110,7 +110,6 @@ def download_source(kbid, kbdir, sourcePath):
 			os.remove(kmn_file)
 			rmtree(kbdir)
 			raise InstallError(InstallStatus.Abort, message)
-		do_install_to_ibus = True
 	else:
 		message = "install_kmp.py: warning: no kmn source file for %s so not installing keyboard." % (kbid)
 		rmtree(kbdir)
@@ -186,6 +185,7 @@ def install_kmp_shared(inputfile, online=False):
 				for kb in keyboards:
 					if kb['id'] != kmpid:
 						process_keyboard_data(kb['id'], kmpdir)
+			do_install_to_ibus = True
 
 		for f in files:
 			fpath = os.path.join(kmpdir, f['name'])
@@ -245,6 +245,7 @@ def install_kmp_user(inputfile, online=False):
 				for kb in keyboards:
 					if kb['id'] != kmpid:
 						process_keyboard_data(kb['id'], kmpdir)
+			do_install_to_ibus = True
 
 		for f in files:
 			fpath = os.path.join(kmpdir, f['name'])
@@ -271,6 +272,7 @@ def install_kmp_user(inputfile, online=False):
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
 		if do_install_to_ibus:
+			kmn_file = os.path.join(kmpdir, kmpid + ".kmn")
 			install_to_ibus(kmn_file)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
