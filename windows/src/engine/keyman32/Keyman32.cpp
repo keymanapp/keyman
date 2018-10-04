@@ -218,6 +218,7 @@ void DoChangeWindowMessageFilter()
 		return;
 
 	DoCWMF(wm_keyman);   // I3594
+  DoCWMF(wm_keyman_keyevent);
     DoCWMF(wm_kmmessage);   // I4412
     DoCWMF(wm_keymankeydown);
     DoCWMF(wm_keymankeyup);
@@ -285,6 +286,14 @@ BOOL InitThread(HWND hwnd)
   return _td->FInitialised = TRUE;
 }
 
+/*
+  Compatibility flags. Search for the use of these for
+  more documentation on why they exist.
+*/
+void Initialise_Flag_ShouldSerializeInput() {
+  flag_ShouldSerializeInput = Reg_GetDebugFlag(REGSZ_Flag_ShouldSerializeInput, TRUE);
+}
+
 BOOL InitialiseProcess(HWND hwnd) 
 {
 	if(InterlockedExchange(&FStartedInitialise, TRUE))
@@ -297,8 +306,10 @@ BOOL InitialiseProcess(HWND hwnd)
 	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ProcessID=%d ThreadID=%d CmdLine=%s", GetCurrentProcessId(), GetCurrentThreadId(),
 		GetCommandLine());
 
-	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
+  Initialise_Flag_ShouldSerializeInput();
 
+	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
+  wm_keyman_keyevent = RegisterWindowMessage("WM_KEYMAN_KEYEVENT");
 	wm_kmmessage = RegisterWindowMessage(RWM_KMMESSAGE);
 	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
 	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
@@ -352,7 +363,7 @@ BOOL UninitHooks()
 {
   BOOL RetVal = TRUE;
 
-  if(Globals::get_hhookGetMessage() && !UnhookWindowsHookEx(Globals::get_hhookGetMessage())) 
+  if(Globals::get_hhookGetMessage() && !UnhookWindowsHookEx(Globals::get_hhookGetMessage()))
       RetVal = FALSE;
   else
       *Globals::hhookGetMessage() = NULL;
@@ -1020,6 +1031,6 @@ BOOL ShouldAttachToProcess()
 
 
 void PostDummyKeyEvent() {  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
-  keybd_event(_VK_PREFIX, 0xFF, 0, 0); // I3250 - is this unnecessary?
-  keybd_event(_VK_PREFIX, 0xFF, KEYEVENTF_KEYUP, 0); // I3250 - is this unnecessary?
+  keybd_event(_VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0); // I3250 - is this unnecessary?
+  keybd_event(_VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0); // I3250 - is this unnecessary?
 }

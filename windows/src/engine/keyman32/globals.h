@@ -249,7 +249,11 @@ extern UINT
   wm_keymanshift,
   wm_keymanim_close,
   wm_keymanim_contextchanged,
-  wm_test_keyman_functioning;
+  wm_test_keyman_functioning,
+  wm_keyman_keyevent;   // for serialized input 
+
+extern BOOL
+  flag_ShouldSerializeInput;
 
 void UpdateActiveWindows();
 
@@ -264,5 +268,8 @@ void Globals_UninitProcess();
 PKEYMAN64THREADDATA ThreadGlobals();
 BOOL Globals_ProcessInitialised();
 
+/* Debug flags */
+
+BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
 
 #endif

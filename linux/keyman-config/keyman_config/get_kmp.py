@@ -11,12 +11,13 @@ import os
 from pathlib import Path
 
 
-def get_keyboard_data(keyboardid):
+def get_keyboard_data(keyboardid, weekCache=False):
 	"""
 	Get Keyboard data from web api.
 
 	Args:
 		keyboardid (str): Keyboard ID
+		weekCache (bool) : cache data for 1 week, default is 1 day
 	Returns:
 		dict: Keyboard data
 	"""
@@ -26,7 +27,10 @@ def get_keyboard_data(keyboardid):
 	home = str(Path.home())
 	cache_dir = keyman_cache_dir()
 	current_dir = os.getcwd()
-	expire_after = datetime.timedelta(days=1)
+	if weekCache:
+		expire_after = datetime.timedelta(days=7)
+	else:
+		expire_after = datetime.timedelta(days=1)
 	os.chdir(cache_dir)
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
@@ -78,12 +82,13 @@ def user_keyboard_dir(keyboardid):
 	return os.path.join(user_keyman_dir(), keyboardid)
 
 
-def get_kmp_file(kbdata):
+def get_kmp_file(kbdata, cache=False):
 	"""
 	Get info from keyboard data to download kmp then download it.
 
 	Args:
 		kbdata (dict): Keyboard data
+		cache (bool): Whether to cache the kmp file web request
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
@@ -93,9 +98,9 @@ def get_kmp_file(kbdata):
 
 	kmp_url = "https://downloads.keyman.com/keyboards/" + kbdata['id'] + "/" + kbdata['version'] + "/" + kbdata['packageFilename']
 	downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
-	return download_kmp_file(kmp_url, downloadfile)
+	return download_kmp_file(kmp_url, downloadfile, cache)
 
-def download_kmp_file(url, kmpfile):
+def download_kmp_file(url, kmpfile, cache=False):
 	"""
 	Download kmp file.
 
@@ -104,12 +109,30 @@ def download_kmp_file(url, kmpfile):
 		kmpfile (str): Where to save the kmp file.
 			currently it does no checks on this location
 			assumes that is in users keyman cache dir
+		cache(bool): Whether to cache the kmp file web request for a week
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
 	logging.info("Download URL: %s", url)
 	downloadfile = None
+
+	if cache:
+		cache_dir = keyman_cache_dir()
+		current_dir = os.getcwd()
+		expire_after = datetime.timedelta(days=7)
+		if not os.path.isdir(cache_dir):
+			os.makedirs(cache_dir)
+		os.chdir(cache_dir)
+		requests_cache.install_cache(cache_name='keyman_kmp_cache', backend='sqlite', expire_after=expire_after)
+		now = time.ctime(int(time.time()))
+
 	response = requests.get(url) #, stream=True)
+
+	if cache:
+		logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+		os.chdir(current_dir)
+		requests_cache.core.uninstall_cache()
+
 	if response.status_code == 200:
 		with open(kmpfile, 'wb') as f:
 			f.write(response.content)

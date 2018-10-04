@@ -3,9 +3,13 @@ unit Keyman.Developer.System.ImportWindowsKeyboard;
 interface
 
 uses
+  System.SysUtils,
+
   Keyman.Developer.System.KeyboardProjectTemplate;
 
 type
+  EImportWindowsKeyboard = class(Exception);
+
   TImportWindowsKeyboard = class
   private
     FBaseKeyboardID: string;
@@ -36,6 +40,7 @@ type
       IconFilename, TouchLayoutFilename: string);
     function ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
     function FindBCP47TagForKLID: string; overload;
+    function GetProjectFilename: string;
  public
     function Execute: Boolean; overload;
 
@@ -52,7 +57,7 @@ type
     property BCP47Tags: string read FBCP47Tags write SetBCP47Tags;
     property Author: string read FAuthor write SetAuthor;
 
-    property ProjectFilename: string read FProjectFilename;
+    property ProjectFilename: string read GetProjectFilename;
   end;
 
 implementation
@@ -60,7 +65,6 @@ implementation
 uses
   System.Classes,
   System.Math,
-  System.SysUtils,
   System.Win.Registry,
   Vcl.Graphics,
   Winapi.Windows,
@@ -73,7 +77,8 @@ uses
   KeyboardParser,
   kmxfileconsts,
   RegistryKeys,
-  UKeymanTargets;
+  UKeymanTargets,
+  utilfiletypes;
 
 { TImportWindowsKeyboard }
 
@@ -108,6 +113,27 @@ begin
     r.Free;
   end;
   Result := True;
+end;
+
+function TImportWindowsKeyboard.GetProjectFilename: string;
+var
+  FTemplate: TKeyboardProjectTemplate;
+begin
+  if FProjectFilename = '' then
+  begin
+    // Lookup the KLID in the registry and read basic details
+    if not LoadKLIDDetails then
+      raise EImportWindowsKeyboard.Create('The keyboard identified by '+FSourceKLID+' could not be found.');
+
+    FTemplate := TKeyboardProjectTemplate.Create(FDestinationPath, Format(FKeyboardIDTemplate, [FBaseKeyboardID]), KMXKeymanTargets + [ktWeb]);
+    try
+      Result := FTemplate.ProjectFilename;
+    finally
+      FTemplate.Free;
+    end;
+  end
+  else
+    Result := FProjectFIlename;
 end;
 
 procedure TImportWindowsKeyboard.SetAuthor(const Value: string);

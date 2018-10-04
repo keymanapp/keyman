@@ -8,6 +8,7 @@ implementation
 
 uses
   System.SysUtils,
+  Winapi.ActiveX,
 
   Keyman.Developer.System.KMConvertParameters,
   Keyman.Developer.System.ImportWindowsKeyboard,
@@ -19,16 +20,29 @@ function DoRun: Boolean; forward;
 
 procedure Run;
 begin
-  if DoRun then
-    ExitCode := 0
-  else
-    ExitCode := 1;
+  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
+  try
+    if DoRun then
+      ExitCode := 0
+    else
+      ExitCode := 1;
+  finally
+    CoUninitialize;
+  end;
 end;
 
 function DoImportWindowsKeyboard(FParameters: TKMConvertParameters): Boolean;
 var
   iwk: TImportWindowsKeyboard;
+  FTargetFolder: string;
+  v: Integer;
 begin
+  if not TryStrToInt('$'+FParameters.KLID, v) then
+  begin
+    writeln('ERROR: The format of the input parameter -klid '+FParameters.KLID+' is incorrect');
+    Exit(False);
+  end;
+
   iwk := TImportWindowsKeyboard.Create;
   try
     iwk.SourceKLID := FParameters.KLID;
@@ -39,6 +53,14 @@ begin
     iwk.Version := FParameters.Version;
     iwk.BCP47Tags := FParameters.BCP47Tags;
     iwk.Author := FParameters.Author;
+
+    FTargetFolder := ExtractFileDir(iwk.ProjectFilename);
+    if DirectoryExists(FTargetFolder) then
+    begin
+      writeln('ERROR: The directory "'+FTargetFolder+'" already exists.');
+      Exit(False);
+    end;
+
     Result := iwk.Execute;
   finally
     iwk.Free;
@@ -48,6 +70,7 @@ end;
 function DoCreateKeyboardTemplate(FParameters: TKMConvertParameters): Boolean;
 var
   kpt: TKeyboardProjectTemplate;
+  FTargetFolder: string;
 begin
   kpt := TKeyboardProjectTemplate.Create(FParameters.Destination, FParameters.KeyboardID, FParameters.Targets);
   try
@@ -56,6 +79,14 @@ begin
     kpt.Version := FParameters.Version;
     kpt.BCP47Tags := FParameters.BCP47Tags;
     kpt.Author := FParameters.Author;
+
+    FTargetFolder := ExtractFileDir(kpt.ProjectFilename);
+    if DirectoryExists(FTargetFolder) then
+    begin
+      writeln('ERROR: The directory "'+FTargetFolder+'" already exists.');
+      Exit(False);
+    end;
+
     try
       kpt.Generate;
     except

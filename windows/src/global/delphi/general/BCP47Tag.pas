@@ -77,8 +77,12 @@ uses
 { TBCP47Tag }
 
 procedure TBCP47Tag.Canonicalize;
+var
+  newTag: string;
 begin
-  SetTag(TCanonicalLanguageCodeUtils.FindBestTag(Tag));
+  newTag := TCanonicalLanguageCodeUtils.FindBestTag(Tag);
+  if newTag <> '' then
+    SetTag(newTag);
 end;
 
 procedure TBCP47Tag.Clear;
