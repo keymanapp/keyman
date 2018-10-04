@@ -127,7 +127,7 @@ def get_kmp_version(keyboardid):
             if version < user_version:
                 version = user_version
         else:
-            version = shared_version
+            version = user_version
 
     return version
 
