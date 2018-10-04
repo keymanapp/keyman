@@ -27,7 +27,7 @@ def main():
 		logging.error("km-package-install: error: too many arguments: either install a local kmp file or specify a keyboard id to download and install.")
 		sys.exit(2)
 
-	from keyman_config.install_kmp import install_kmp
+	from keyman_config.install_kmp import install_kmp, InstallError, InstallStatus
 	from keyman_config.list_installed_kmp import get_kmp_version
 	from keyman_config.get_kmp import get_keyboard_data, get_kmp
 
@@ -42,8 +42,14 @@ def main():
 			logging.error("km-package-install: Keyman kmp file %s not found.", args.f)
 			logging.error("km-package-install -f <kmpfile>")
 			sys.exit(2)
-
-		install_kmp(args.f, False, args.s)
+		try:
+			install_kmp(args.f, False, args.s)
+		except InstallError as e:
+			if e.status == InstallStatus.Abort:
+				logging.error("km-package-install: error: Failed to install file %s", args.f)
+				logging.error(e.message)
+			else:
+				logging.warning(e.message)
 	elif args.k:
 		installed_kmp_ver = get_kmp_version(args.k)
 		kbdata = get_keyboard_data(args.k)
@@ -60,7 +66,15 @@ def main():
 
 		kmpfile = get_kmp(args.k)
 		if kmpfile:
-			install_kmp(kmpfile, True, args.s)
+			try:
+				install_kmp(kmpfile, True, args.s)
+			except InstallError as e:
+				if e.status == InstallStatus.Abort:
+					logging.error("km-package-install: error: Failed to install keyboard %s", args.k)
+					logging.error(e.message)
+					sys.exit(3)
+				else:
+					logging.warning(e.message)
 		else:
 			logging.error("km-package-install: error: Could not download keyboard package %s", args.k)
 			sys.exit(2)

@@ -262,20 +262,26 @@ class InstallKmpWindow(Gtk.Window):
 
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
-        install_kmp(self.kmpfile, self.online)
-        if self.viewwindow:
-            self.viewwindow.refresh_installed_kmp()
-        keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-        welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
-        if os.path.isfile(welcome_file):
-            uri_path = pathlib.Path(welcome_file).as_uri()
-            logging.debug(uri_path)
-            w = WelcomeView(uri_path, self.kbname)
-            w.resize(800, 600)
-            w.show_all()
+        if install_kmp(self.kmpfile, self.online):
+            if self.viewwindow:
+                self.viewwindow.refresh_installed_kmp()
+            keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
+            welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
+            if os.path.isfile(welcome_file):
+                uri_path = pathlib.Path(welcome_file).as_uri()
+                logging.debug(uri_path)
+                w = WelcomeView(uri_path, self.kbname)
+                w.resize(800, 600)
+                w.show_all()
+            else:
+                dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+                dialog.run()
+                logging.debug("INFO dialog closed")
+                dialog.destroy()
         else:
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
-                Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+                Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " could not be installed")
             dialog.run()
             logging.debug("INFO dialog closed")
             dialog.destroy()
