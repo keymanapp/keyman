@@ -6,23 +6,23 @@ import logging
 import sys
 import os.path
 import magic
-from enum import Enum, auto
+from enum import Enum
 
 class KMFileTypes(Enum):
-	KM_ICON = auto()
-	KM_SOURCE = auto()
-	KM_OSK_SOURCE = auto()
-	KM_KMX = auto()
-	KM_OSK = auto()
-	KM_TOUCH = auto()
-	KM_FONT = auto()
-	KM_DOC = auto()
-	KM_META = auto()
-	KM_IMAGE = auto()
-	KM_TECKIT = auto()
-	KM_CC = auto()
-	KM_XML = auto()
-	KM_UNKNOWN = auto()
+	KM_ICON = 1
+	KM_SOURCE = 2
+	KM_OSK_SOURCE = 3
+	KM_KMX = 4
+	KM_OSK = 5
+	KM_TOUCH = 6
+	KM_FONT = 7
+	KM_DOC = 8
+	KM_META = 9
+	KM_IMAGE = 10
+	KM_TECKIT = 11
+	KM_CC = 12
+	KM_XML = 13
+	KM_UNKNOWN = 99
 
 
 def print_info(info):

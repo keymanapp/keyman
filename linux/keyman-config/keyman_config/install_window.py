@@ -14,7 +14,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit', '3.0')
 from gi.repository import Gtk, WebKit
 from distutils.version import StrictVersion
-from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata
+from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
 from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.kmpmetadata import get_fonts
 from keyman_config.welcome import WelcomeView
@@ -37,12 +37,13 @@ def find_keyman_image(image_file):
 
 class InstallKmpWindow(Gtk.Window):
 
-    def __init__(self, kmpfile, online=False, viewkmp=None):
+    def __init__(self, kmpfile, online=False, viewkmp=None, downloadwindow=None):
         logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
         self.kmpfile = kmpfile
         self.online = online
         self.endonclose = False
         self.viewwindow = viewkmp
+        self.download = downloadwindow
         self.accelerators = None
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         installed_kmp_ver = get_kmp_version(keyboardid)
@@ -53,9 +54,9 @@ class InstallKmpWindow(Gtk.Window):
         Gtk.Window.__init__(self, title=windowtitle)
         init_accel(self)
 
-        self.set_border_width(3)
+        self.set_border_width(12)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
 
         mainhbox = Gtk.Box()
 
@@ -112,7 +113,7 @@ class InstallKmpWindow(Gtk.Window):
             mainhbox.pack_start(image, False, False, 0)
 
             self.page1 = Gtk.Box()
-            self.page1.set_border_width(10)
+            self.page1.set_border_width(12)
 
             grid = Gtk.Grid()
             self.page1.add(grid)
@@ -262,22 +263,37 @@ class InstallKmpWindow(Gtk.Window):
 
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
-        install_kmp(self.kmpfile, self.online)
-        if self.viewwindow:
-            self.viewwindow.refresh_installed_kmp()
-        keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-        welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
-        if os.path.isfile(welcome_file):
-            uri_path = pathlib.Path(welcome_file).as_uri()
-            logging.debug(uri_path)
-            w = WelcomeView(uri_path, self.kbname)
-            w.resize(800, 600)
-            w.show_all()
-        else:
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
-                Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+        try:
+            install_kmp(self.kmpfile, self.online)
+            if self.viewwindow:
+                self.viewwindow.refresh_installed_kmp()
+            if self.download:
+                self.download.close()
+            keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
+            welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
+            if os.path.isfile(welcome_file):
+                uri_path = pathlib.Path(welcome_file).as_uri()
+                logging.debug(uri_path)
+                w = WelcomeView(uri_path, self.kbname)
+                w.resize(800, 600)
+                w.show_all()
+            else:
+                dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+                dialog.run()
+                dialog.destroy()
+        except InstallError as e:
+            if e.status == InstallStatus.Abort:
+                message = "Keyboard " + self.kbname + " could not be installed.\n\nError Message:\n%s" % (e.message)
+                logging.error(message)
+                message_type = Gtk.MessageType.ERROR
+            else:
+                message = "Keyboard " + self.kbname + " could not be installed fully.\n\nWarning Message:\n%s" % (e.message)
+                logging.warning(message)
+                message_type = Gtk.MessageType.WARNING
+            dialog = Gtk.MessageDialog(self, 0, message_type,
+                Gtk.ButtonsType.OK, message)
             dialog.run()
-            logging.debug("INFO dialog closed")
             dialog.destroy()
         if not self.endonclose:
             self.close()

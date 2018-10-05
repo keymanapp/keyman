@@ -70,6 +70,9 @@ ibus-kmfl/m4/threadlib.m4
 ibus-kmfl/po/Makefile.in.in
 ibus-kmfl/po/Makevars.template
 ibus-kmfl/po/Rules-quot
+upload/
+launchpad
+launchpad-*
 keyman-config/build
 keyman-config/debian/man
 keyman-config/experiments/*.txt
