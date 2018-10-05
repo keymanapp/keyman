@@ -12,8 +12,6 @@
 #include "keyboard.hpp"
 
 
-struct km_kbp_keyboard : public km::kbp::keyboard {};
-
 
 km_kbp_status km_kbp_keyboard_load(char const *kb_path,
                                    km_kbp_keyboard **keyboard)

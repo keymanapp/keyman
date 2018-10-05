@@ -33,3 +33,5 @@ namespace kbp
   }
 }
 }
+
+struct km_kbp_keyboard : public km::kbp::keyboard {};

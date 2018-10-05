@@ -11,38 +11,20 @@
 #include "json.hpp"
 
 
-struct km_kbp_option_set : public km::kbp::option_set
-{
-  km_kbp_option_set(km_kbp_option_scope s)
-  : option_set(s),
-    _last_lookup {s, nullptr, nullptr}
-  {}
-
-  km_kbp_option const * cache_lookup(char const * k, char const * v) const {
-    _last_lookup.key = k;
-    _last_lookup.value = v;
-    return &_last_lookup;
-  }
-
-private:
-  km_kbp_option mutable _last_lookup;
-};
-
-
 size_t km_kbp_options_set_size(km_kbp_option_set const *opts)
 {
-  return opts->size();
+  return opts->target.size();
 }
 
 
 km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const * opts,
                                                const char *key)
 {
-  auto i = opts->find(key);
-  if (i == opts->end())
+  auto i = opts->target.find(key);
+  if (i == opts->target.end())
     return nullptr;
 
-  return opts->cache_lookup(i->first.c_str(), i->second.c_str());
+  return opts->export_option(i->first.c_str(), i->second.c_str());
 }
 
 

@@ -8,7 +8,6 @@
 #include "context.hpp"
 #include "utfcodec.hpp"
 
-struct km_kbp_context : public km::kbp::context {};
 
 km_kbp_status
 km_kbp_context_items_from_utf16(km_kbp_cp const *text,

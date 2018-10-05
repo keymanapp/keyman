@@ -20,3 +20,5 @@ public:
 
 }
 }
+
+struct km_kbp_context : public km::kbp::context {};
