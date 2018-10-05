@@ -674,32 +674,71 @@ typedef struct {
   size_t      max_context;  // Maximum context size supported by processor.
   uint16_t    current;      // Current API number supported.
   uint16_t    revision;     // Implementation number of current API.
-  uint16_t    age;          // Oldest API number supported.
-  uint8_t     technology;    // Keyboard specification language KMN or LDML.
+  uint16_t    age;          // current - age == Oldest API number supported.
+  uint16_t    technology;   // A bit field specifiying which Keyboard
+                            //  technologies the engine supports.
+  char const *vendor;       // Implementor of the processor.
 } km_kbp_attr;
 
 enum km_kbp_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
-  KM_KBP_TECH_KMN         = 1,
-  KM_KBP_TECH_LDML        = 2
+  KM_KBP_TECH_KMN         = 1 << 0,
+  KM_KBP_TECH_LDML        = 1 << 2
 };
 
 
 /*
 ```
+### `km_kbp_get_engine_attrs`
+##### Description:
+Get access processors attributes describing version and technology implemented.
+##### Return:
+A pointer to a `km_kbp_attr` structure.
 ```c
 */
-km_kbp_attr const *  km_kbp_get_engine_attrs();
+km_kbp_attr const * km_kbp_get_engine_attrs();
 
+
+enum km_kbp_modifier_state {
+  KM_KBP_MODIFIER_LSHIFT    = 1 << 0,
+  KM_KBP_MODIFIER_RSHIFT    = 1 << 1,
+  KM_KBP_MODIFIER_LALT      = 1 << 2,
+  KM_KBP_MODIFIER_RALT      = 1 << 3,
+  KM_KBP_MODIFIER_LCTRL     = 1 << 4,
+  KM_KBP_MODIFIER_RCTRL     = 1 << 5,
+  KM_KBP_MODIFLER_LSUPER    = 1 << 6,   // Windows key, cmd key on Mac OS.
+  KM_KBP_MODIFLER_RSUPER    = 1 << 7,
+  KM_KBP_MODIFIER_CAPSLOCK  = 1 << 8,
+  KM_KBP_MODIFIER_SHIFTLOCK = 1 << 9,
+};
 
 /*
 ```
+### `km_kbp_process_event`
+##### Description:
+Run the keyboard on a state object with the provided virtual key and modifer
+key state. Update the sate object as appropriate and fill out it's action list.
+##### Status:
+- __KM_KBP_STATUS_NO_MEM__:
+In the event memory is unavailable to allocate a state  object.
+- __KM_KBP_STATUS_INVALID_ARGUMENT__:
+In the event the `state` pointer is null or an invalid virtual key or modifier
+state is passed.
+
+##### Parameters:
+- __state__: A pointer to the opaque `km_kbp_state` object.
+- __vk__: A virtual key to be processed.
+- __modifier_state__:
+The combinations of modifier keys set at the time key `vk` was pressed.
+
 ```c
 */
-bool km_kbp_process_event(km_kbp_virtual_key vk, uint32_t modifier_state,
-                          km_kbp_state *state);
+km_kbp_status km_kbp_process_event(km_kbp_state *state,
+                          km_kbp_virtual_key vk, uint16_t modifier_state);
 
 
 #if defined(__cplusplus)
 } // extern "C"
 #endif
+/*```
+*/
