@@ -1,9 +1,7 @@
-const Worker = require('tiny-worker');
-
 /**
  * Encapsulates the underlying Web Worker through asynchronous calls.
  */
-exports.LMLayer = class LMLayer {
+class LMLayer {
   constructor() {
     // Worker state
     this._worker = new Worker('lmlayer.js');
@@ -101,7 +99,7 @@ exports.LMLayer = class LMLayer {
     }
     return token;
   }
-};
+}
 
 
 /**
@@ -155,4 +153,10 @@ class PromiseStore {
     this._promises.delete(token);
     callbacks.reject(error);
   }
+}
+
+if (typeof module !== 'undefined') {
+  // In Node JS
+  global.Worker = require('tiny-worker');
+  exports.LMLayer = LMLayer;
 }

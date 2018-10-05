@@ -61,6 +61,8 @@ function cast(message, parameters) {
  */
 function loadModelClass() {
   importScripts('./models/en-x-test-derek.js');
+  if (typeof Model !== 'undefined')
+    return Model;
   return global.Model;
 }
 
