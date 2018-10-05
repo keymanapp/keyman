@@ -21,6 +21,7 @@ namespace kbp
     keyboard(std::filesystem::path const &);
   };
 
+  inline
   keyboard::keyboard(std::filesystem::path const & path)
   : _keyboard_id(path.stem()),
     _version_string("3.145"),

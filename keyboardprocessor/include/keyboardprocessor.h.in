@@ -1,3 +1,4 @@
+#pragma once
 /*
 # Keyman Keyboard Processor API
 
@@ -72,7 +73,7 @@ typedef uint32_t    km_kbp_status;      // Status return code.
 
 // Opaque object types.
 //
-typedef struct km_kbp_context     km_kpb_context;
+typedef struct km_kbp_context     km_kbp_context;
 typedef struct km_kbp_keyboard    km_kbp_keyboard;
 typedef struct km_kbp_state       km_kbp_state;
 typedef struct km_kbp_option_set  km_kbp_option_set;
@@ -181,7 +182,7 @@ Number of code points needed.
 
 ```c
 */
-size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *,
+size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
                                      km_kbp_cp *buf, size_t buf_size);
 
 /*
@@ -362,9 +363,9 @@ enum km_kbp_option_scope {
 };
 
 struct km_kbp_option {
-  km_kbp_option_scope scope;  // Scope which an option belongs to.
-  char const *        key;
-  char const *        value;
+  char const *  key;
+  char const *  value;
+  uint8_t       scope;  // Scope which an option belongs to.
 };
 
 #define KM_KBP_OPTIONS_END { 0, 0, 0 }
