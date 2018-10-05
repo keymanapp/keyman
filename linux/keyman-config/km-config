@@ -23,9 +23,8 @@ if __name__ == '__main__':
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
     from keyman_config.view_installed import ViewInstalledWindow
-
     w = ViewInstalledWindow()
+    w.resize(576, 324)
     w.connect("destroy", Gtk.main_quit)
-    w.resize(800, 450)
     w.show_all()
     Gtk.main()

@@ -24,7 +24,7 @@ class DownloadKmpWindow(Gtk.Window):
         self.viewwindow = view
         init_accel(self)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         s = Gtk.ScrolledWindow()
         # TODO update (or remove) user_agent once website supports Linux kmp packages
@@ -40,13 +40,14 @@ class DownloadKmpWindow(Gtk.Window):
         s.add(webview)
         vbox.pack_start(s, True, True, 0)
 
-        hbox = Gtk.Box(spacing=6)
-        vbox.pack_start(hbox, False, False, 0)
+        bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        #bbox.set_layout(Gtk.ButtonBoxStyle.END)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
-        hbox.pack_end(button, False, False, 0)
+        bbox.pack_end(button, False, False, 12)
         bind_accelerator(self.accelerators, button, '<Control>w')
+        vbox.pack_start(bbox, False, False, 12)
 
         self.add(vbox)
 
@@ -54,7 +55,7 @@ class DownloadKmpWindow(Gtk.Window):
         logging.info("Downloading kmp file to %s", downloadfile)
         if download_kmp_file(url, downloadfile):
             logging.info("File downloaded")
-            w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow)
+            w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow, downloadwindow=self)
             if w.checkcontinue:
                 w.show_all()
             return True
