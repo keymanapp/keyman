@@ -148,3 +148,14 @@ let configuration = {
     rightContextCodeUnits: 32, 
 };
 ```
+
+TODO
+====
+
+ - [ ] make TinyWorker's `self` inherit from the global scope?
+ - [ ] write documentation for new initialization messages
+ - [ ] make simple `index.html` that demos a dummy model
+ - [ ] enable continuous integration
+ - [ ] TypeScript!
+ - [ ] Figure out what a `Context` will be
+ - [ ] Refactor `LMLayer` with state pattern?
