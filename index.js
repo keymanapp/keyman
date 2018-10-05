@@ -1,7 +1,7 @@
 const Worker = require('tiny-worker');
 
 /**
- * Encapuslates the underlying Web Worker through asynchronous calls.
+ * Encapsulates the underlying Web Worker through asynchronous calls.
  */
 exports.LMLayer = class LMLayer {
   constructor() {

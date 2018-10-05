@@ -5,13 +5,13 @@ const TYPE_D = { insert: 'D', deleteLeft: 0, deleteRight: 0 };
 const EMPTY_CONTEXT = { left: '' };
 
 
-test('Can provide context to LMLayer', async t => {
+test('It provide context to LMLayer', async t => {
   t.plan(2);
 
   const lm = new LMLayer;
 
   // Wait for the language model to initialize and declare its configuration.
-  let configuration = await lm.initialize();
+  let configuration = await lm.initialize({ model: 'en-x-derek' });
   // The model should as for 32 code units of context to the left of the
   // cursor.
   t.is(configuration.leftContextCodeUnits, 32);
@@ -28,8 +28,7 @@ test('Can provide context to LMLayer', async t => {
   ]);
 });
 
-
-test('Can reject when predictions crash', async t => {
+test('It should not be able to predict() before initialized', async t => {
   t.plan(1);
 
   const lm = new LMLayer;
@@ -38,7 +37,22 @@ test('Can reject when predictions crash', async t => {
       transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
     });
     t.fail();
-  } catch (_e) {
+  } catch (e) {
+    t.regex(e.message, /(not |un)initialized/i);
+  }
+});
+
+test('It should reject when predictions crash', async t => {
+  t.plan(1);
+
+  const lm = new LMLayer;
+  try {
+    await lm.predictWithContext({
+      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
+    });
+    t.fail();
+  } catch (e) {
+    t.regex(e.message, /invalid/i);
     t.pass();
   }
 });
