@@ -23,11 +23,7 @@ class ViewInstalledWindowBase(Gtk.Window):
         init_accel(self)
 
     def refresh_installed_kmp(self):
-        logging.debug("Refreshing grid")
-        self.s.remove(self.s.get_child())
-        self.grid = KmpGrid(self)
-        self.s.add_with_viewport(self.grid)
-        self.s.show_all()
+        pass
 
     def on_close_clicked(self, button):
         logging.debug("Close application clicked")
@@ -128,10 +124,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.uninstall_button.connect("clicked", self.on_uninstall_clicked)
         bbox_top.add(self.uninstall_button)
 
-        button = Gtk.Button.new_with_mnemonic("_About")
-        button.set_tooltip_text("About keyboard package")
-        button.connect("clicked", self.on_about_clicked)
-        bbox_top.add(button)
+        self.about_button = Gtk.Button.new_with_mnemonic("_About")
+        self.about_button.set_tooltip_text("About keyboard package")
+        self.about_button.connect("clicked", self.on_about_clicked)
+        bbox_top.add(self.about_button)
 
         self.help_button = Gtk.Button.new_with_mnemonic("_Help")
         self.help_button.set_tooltip_text("Help for keyboard package")
@@ -211,6 +207,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def on_tree_selection_changed(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
+            self.uninstall_button.set_tooltip_text("Uninstall keyboard package " + model[treeiter][1])
+            self.help_button.set_tooltip_text("Help for keyboard package " + model[treeiter][1])
+            self.about_button.set_tooltip_text("About keyboard package " + model[treeiter][1])
             logging.debug("You selected", model[treeiter][1], "version", model[treeiter][2])
             if model[treeiter][4] == InstallArea.IA_USER:
                 logging.debug("Enabling uninstall button for", model[treeiter][3], "in", model[treeiter][4])
