@@ -1,9 +1,9 @@
 /* vim:set et sts=4: */
 
 /*
- * KMFL Input Method for IBUS (The Input Bus)
+ * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009-2018 SIL International
+ * Copyright (C) 2018 SIL International
  *
  * kmflutil is dual licensed under the MIT or GPL licenses as described below.
  *
@@ -58,7 +58,7 @@
 #include <glib/gprintf.h>
 #include <string.h>
 
-#include "kmflutil.h"
+#include "keymanutil.h"
 
 #define N_(text) text
 static gchar * get_dirname(const gchar * path)
@@ -92,6 +92,7 @@ GList * kmfl_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
             }
 
             // Only .kmfl and .kmn extensions are valid keyboard files
+	    // Now only .kmx
             else if (S_ISREG(filestat.st_mode)
                 && ((g_str_has_suffix(absfn, ".kmfl") && kmfl_check_keyboard(absfn) == 0) 
                 || g_str_has_suffix(absfn, ".kmn"))) {
@@ -119,6 +120,7 @@ GList * kmfl_get_keyboard_list( const gchar * path)
 
 gchar * kmfl_get_icon_file(KInputMethod * im)
 {
+	// Now there will only be the .png which will have been extracted from the .kmx during installation
     const char * icon_file = kmfl_icon_file(im->keyboard_number);
     gchar * full_path_to_icon_file=NULL;
     struct stat filestat;
@@ -148,6 +150,8 @@ gchar * kmfl_get_icon_file(KInputMethod * im)
 
 gchar * kmfl_get_ldml_file(KInputMethod * im)
 {
+	// kvk details from the json?
+	// or will it be available in the keyboardprocessor API?
     gchar * full_path_to_ldml_file=NULL, *p, *filename;
     struct stat filestat;
 
@@ -183,6 +187,8 @@ gchar * kmfl_get_ldml_file(KInputMethod * im)
 
 void kmfl_get_keyboard_info(KInputMethod * im) 
 {
+	// either get these from json?
+	// or the keyboardprocessor API from the kmx?
     char buf[1024];
     KMSI * p_kmsi;
 
@@ -251,7 +257,7 @@ void kmfl_free_keyboard_info(KInputMethod * im)
 
 
 static IBusEngineDesc *
-ibus_kmfl_engine_new (gchar * file_name,
+ibus_keyman_engine_new (gchar * file_name,
                       gchar *lang,
                       gchar *name,
                       gchar *author,
@@ -261,10 +267,13 @@ ibus_kmfl_engine_new (gchar * file_name,
                       gchar *layout,
                       gchar *license)
 {
+	// anything else to add to the engine description that we can get from
+	// either json or keyboardprocessor API?
+	// esp languages
     IBusEngineDesc *engine;
     gchar * desc = g_strdup_printf("%s\n%s", description, copyright);
     
-    engine = ibus_engine_desc_new (file_name,
+    engine = ibus_engine_desc_new (file_name, // any proposal for 
                                    name,
                                    desc ? desc : "",
                                    lang,
@@ -277,7 +286,7 @@ ibus_kmfl_engine_new (gchar * file_name,
 }
 
 GList * 
-ibus_kmfl_add_engines(GList * engines, GList * keyboard_list)
+ibus_keyman_add_engines(GList * engines, GList * keyboard_list)
 {
     GList *p;
     for (p=keyboard_list; p != NULL; p = p->next) {
@@ -298,13 +307,13 @@ ibus_kmfl_add_engines(GList * engines, GList * keyboard_list)
 }
 
 GList *
-ibus_kmfl_list_engines (void)
+ibus_keyman_list_engines (void)
 {
     GList *engines = NULL;
     GList *keyboard_list;
     gchar *local_keyboard_path;
 
-    keyboard_list = kmfl_get_keyboard_list("/usr/share/kmfl");
+    keyboard_list = kmfl_get_keyboard_list("/usr/share/kmfl"); // not this any more
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
@@ -316,13 +325,13 @@ ibus_kmfl_list_engines (void)
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
-    local_keyboard_path= g_strdup_printf("%s/.kmfl", getenv("HOME"));
+    local_keyboard_path= g_strdup_printf("%s/.kmfl", getenv("HOME")); // not this any more
     keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_free(local_keyboard_path);
     g_list_free(keyboard_list);
 
-    local_keyboard_path= g_strdup_printf("%s/.local/share/keyman", getenv("HOME"));
+    local_keyboard_path= g_strdup_printf("%s/.local/share/keyman", getenv("HOME")); // use XDG env var instead
     keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_free(local_keyboard_path);
@@ -332,21 +341,21 @@ ibus_kmfl_list_engines (void)
 }
 
 IBusComponent *
-ibus_kmfl_get_component (void)
+ibus_keyman_get_component (void)
 {
     GList *engines, *p;
     IBusComponent *component;
 
-    component = ibus_component_new ("org.freedesktop.IBus.KMFL",
-                                    N_("KMFL"),
-                                    "0.1.0",
+    component = ibus_component_new ("org.freedesktop.IBus.Keyman",
+                                    N_("Keyman"),
+                                    "10.99.0",
                                     "GPL",
                                     "Doug Rintoul <doug_rintoul@sil.org",
-                                    "http://kmfl.sourceforge.org",
+                                    "http://www.keyman.com",
                                     "",
-                                    "ibus-kmfl");
+                                    "ibus-keyman");
 
-    engines = ibus_kmfl_list_engines ();
+    engines = ibus_keyman_list_engines ();
 
     for (p = engines; p != NULL; p = p->next) {
         ibus_component_add_engine (component, (IBusEngineDesc *) p->data);
@@ -480,7 +489,7 @@ int main ()
     setlocale (LC_ALL, "");
     ibus_init ();
 
-    component = ibus_kmfl_get_component ();
+    component = ibus_keyman_get_component ();
 
     output = g_string_new ("");
 

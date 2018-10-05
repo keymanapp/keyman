@@ -2,7 +2,7 @@
 #
 # ibus-keyman - The Keyman engine for IBus
 #
-# Copyright (c) 2009 Doug Rintoul <doug_rintoul@sil.org>
+# Copyright (c) 2018 SIL International
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ libexec_PROGRAMS = ibus-engine-keyman
 ibus_engine_keyman_SOURCES = \
 	keymanutil.c \
 	keymanutil.h \
+	kmpdetails.c \
+	kmpdetails.h
 	main.c \
 	engine.c \
 	engine.h \

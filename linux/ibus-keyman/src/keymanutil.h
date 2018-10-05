@@ -1,9 +1,9 @@
 /* vim:set et sts=4: */
 
 /*
- * KMFL Input Method for IBUS (The Input Bus)
+ * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009-2018 SIL International
+ * Copyright (C) 2018 SIL International
  *
  * kmflutil is dual licensed under the MIT or GPL licenses as described below.
  *
@@ -49,12 +49,12 @@
  *
  */
 
-#ifndef __KMFLUTIL_H__
-#define __KMFLUTIL_H__
+#ifndef __KEYMANUTIL_H__
+#define __KEYMANUTIL_H__
 
 #include <ibus.h>
-#include <kmfl/kmfl.h>
-#include <kmfl/libkmfl.h>
+//#include <kmfl/kmfl.h>
+//#include <kmfl/libkmfl.h>
 
 typedef enum {OUTPUT_STRING, ERASE_CHAR, FORWARD_KEYEVENT, OUTPUT_BEEP} kmfl_opcodes;
 
@@ -89,12 +89,12 @@ typedef struct
 	
 } KInputMethod;
 
-void             ibus_kmfl_init             (void);
-GList           *ibus_kmfl_list_engines     (void);
-IBusComponent   *ibus_kmfl_get_component    (void);
+void             ibus_keyman_init             (void);
+GList           *ibus_keyman_list_engines     (void);
+IBusComponent   *ibus_keyman_get_component    (void);
 KInputMethod 	*kinput_open_im				(const gchar * keyboard_filename);
 KInputContext   *kmfl_create_ic             (KInputMethod *im);
 void             kmfl_destroy_ic            (KInputContext *ic);
 void 			 kinput_close_im			(KInputMethod * im);
-void 			 kmfl_get_keyboard_info		(KInputMethod * im);
+void 			 keyman_get_keyboard_info		(KInputMethod * im);
 #endif

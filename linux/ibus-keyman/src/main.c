@@ -1,9 +1,9 @@
 /* vim:set et sts=4: */
 
 /*
- * KMFL Input Method for IBUS (The Input Bus)
+ * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009 SIL International
+ * Copyright (C) 2018 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,7 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "kmflutil.h"
+#include "keymanutil.h"
 #include "engine.h"
 #include "keyman-service.h"
 
@@ -69,7 +69,7 @@ start_component (void)
     bus = ibus_bus_new ();
     g_signal_connect (bus, "disconnected", G_CALLBACK (ibus_disconnected_cb), NULL);
 
-    component = ibus_kmfl_get_component ();
+    component = ibus_keyman_get_component ();
 
     factory = ibus_factory_new (ibus_bus_get_connection (bus));
 
@@ -81,11 +81,11 @@ start_component (void)
 #else
         const gchar *engine_name = engine->name;
 #endif  /* !IBUS_CHECK_VERSION(1,3,99) */
-        ibus_factory_add_engine (factory, engine_name, IBUS_TYPE_KMFL_ENGINE);
+        ibus_factory_add_engine (factory, engine_name, IBUS_TYPE_KEYMAN_ENGINE);
     }
 
     if (ibus) {
-        ibus_bus_request_name (bus, "org.freedesktop.IBus.KMFL", 0);
+        ibus_bus_request_name (bus, "org.freedesktop.IBus.Keyman", 0);
     }
     else {
         ibus_bus_register_component (bus, component);
@@ -105,7 +105,7 @@ print_engines_xml (void)
 
     ibus_init ();
 
-    component = ibus_kmfl_get_component ();
+    component = ibus_keyman_get_component ();
     output = g_string_new ("");
 
     ibus_component_output_engines (component, output, 0);
@@ -124,9 +124,9 @@ main (gint argc, gchar **argv)
 
     setlocale (LC_ALL, "");
 
-    context = g_option_context_new ("- ibus KMFL engine component");
+    context = g_option_context_new ("- ibus Keyman engine component");
 
-    g_option_context_add_main_entries (context, entries, "ibus-kmfl");
+    g_option_context_add_main_entries (context, entries, "ibus-keyman");
 
     if (!g_option_context_parse (context, &argc, &argv, &error)) {
         g_print ("Option parsing failed: %s\n", error->message);
