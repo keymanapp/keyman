@@ -46,6 +46,8 @@ test('It should reject when predictions crash', async t => {
   t.plan(1);
 
   const lm = new LMLayer;
+  let configuration = await lm.initialize({ model: 'en-x-derek' });
+
   try {
     await lm.predictWithContext({
       transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
@@ -53,7 +55,6 @@ test('It should reject when predictions crash', async t => {
     t.fail();
   } catch (e) {
     t.regex(e.message, /invalid/i);
-    t.pass();
   }
 });
 
