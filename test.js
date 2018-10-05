@@ -46,7 +46,7 @@ test('It should reject when predictions crash', async t => {
   t.plan(1);
 
   const lm = new LMLayer;
-  let configuration = await lm.initialize({ model: 'en-x-derek' });
+  await lm.initialize({ model: 'en-x-derek' });
 
   try {
     await lm.predict({

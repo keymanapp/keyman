@@ -4,9 +4,9 @@
  * The real LMLayer will be far better engineered!
  */
 
- let model;
+let model;
 
-  
+
 self.onmessage = function (event) {
   const {message, token} = event.data;
 
@@ -27,7 +27,7 @@ self.onmessage = function (event) {
     }
 
     let rawSuggestions = model.predict();
-    
+
     // Sort in-place according to weight.
     rawSuggestions.sort((a, b) => a.weight - b.weight);
 
@@ -40,8 +40,8 @@ self.onmessage = function (event) {
         displayAs = internal.transform.insert;
       }
 
-      return { displayAs, ...internal.transform }
-    })
+      return { displayAs, ...internal.transform };
+    });
 
     cast('suggestions', { token, suggestions });
   } else {
@@ -63,3 +63,5 @@ function loadModelClass() {
   importScripts('./models/en-x-test-derek.js');
   return global.Model;
 }
+
+/*global importScripts*/
