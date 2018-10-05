@@ -10,7 +10,6 @@ from keyman_config import __version__
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Keyman keyboards installation and information')
-    parser.add_argument('--alt', action='store_true', help='alternative gui')
     parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
     parser.add_argument('-v', action='store_true', help='verbose logging')
     parser.add_argument('-vv', action='store_true', help='very verbose logging')
@@ -23,14 +22,9 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
-    if args.alt:
-        from keyman_config.view_installed import ViewInstalledWindow
-        w = ViewInstalledWindow()
-        w.resize(360, 640)
-    else:
-        from keyman_config.view_installed import NewViewInstalledWindow
-        w = NewViewInstalledWindow()
-        w.resize(576, 324)
+    from keyman_config.view_installed import ViewInstalledWindow
+    w = ViewInstalledWindow()
+    w.resize(576, 324)
     w.connect("destroy", Gtk.main_quit)
     w.show_all()
     Gtk.main()
