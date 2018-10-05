@@ -10,6 +10,7 @@ py = import('python3')
 python = py.find_python()
 
 inc = include_directories('include', is_system: true)
+subdir('doc')
 subdir('include')
 subdir('src')
 subdir('tests')
