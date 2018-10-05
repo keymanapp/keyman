@@ -7,6 +7,9 @@ namespace std {
   using namespace std::experimental;
 }
 
+// Forward declartions
+class json;
+
 namespace km {
 namespace kbp
 {
@@ -35,3 +38,5 @@ namespace kbp
 }
 
 struct km_kbp_keyboard : public km::kbp::keyboard {};
+
+json & operator << (json &, km::kbp::keyboard const &);

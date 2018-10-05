@@ -2,6 +2,9 @@
 
 #include <keyboardprocessor.h>
 
+// Forward declarations
+class json;
+
 namespace km {
 namespace kbp
 {
@@ -17,6 +20,8 @@ namespace kbp
 
 }
 }
+
+json & operator << (json &, km::kbp::option_set const &);
 
 
 // Adaptor between internal km::kbp::option_set object and API definitiion.
