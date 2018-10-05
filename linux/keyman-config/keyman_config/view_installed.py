@@ -252,16 +252,16 @@ class NewViewInstalledWindow(ViewInstalledWindowBase):
 #         GdkPixbuf icon
 #         gchararray name
 #         gchararray version
-#         gchararray welcomefile (hidden) (or just use area and packageID?)
 #         gchararray packageID (hidden)
 #         enum? area (user, shared, system) (icon or hidden?)
+#         gchararray welcomefile (hidden) (or just use area and packageID?)
 # changing selected item in treeview changes what buttons are activated
 # on selected_item_changed signal set the data that the buttons will use in their callbacks
 # see https://developer.gnome.org/gtk3/stable/TreeWidget.html#TreeWidget
 
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         s = Gtk.ScrolledWindow()
-        hbox.pack_start(s, True, True, 6)
+        hbox.pack_start(s, True, True, 0)
 
         self.store = Gtk.ListStore(GdkPixbuf.Pixbuf, #icon
             str,    # name
@@ -343,7 +343,7 @@ class NewViewInstalledWindow(ViewInstalledWindowBase):
 
         vbox.pack_end(bbox_bottom, False, False, 12)
 
-        hbox.pack_end(vbox, False, False, 6)
+        hbox.pack_start(vbox, False, False, 12)
         self.add(hbox)
 
     def addlistitems(self, installed_kmp, store, install_area):
