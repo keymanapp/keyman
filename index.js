@@ -23,14 +23,20 @@ exports.LMLayer = class LMLayer {
   /**
    * [async] Waits for the model's initialization.
    */
-  initialize() {
+  initialize(acceptConfiguration) {
     if (this._configuration) {
       return Promise.resolve(this._configuration);
     }
 
-    // This means we're still waiting for the ready signal from
-    // the model.
+
+    // _onMessage() will resolve this Promise.
     return new Promise((resolve, _reject) => {
+      this._cast('initialize', {
+        configuration: {
+          maxLeftContextCodeUnits: 32,
+          supportsRightContexts: false,
+        }
+      });
       this._resolveInitialized = resolve;
     });
   }

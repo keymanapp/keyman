@@ -4,10 +4,20 @@
  * The real LMLayer will be far better engineered!
  */
 
+ let model;
+
+  
 self.onmessage = function (event) {
   const {message, token} = event.data;
 
-  if (message === 'predict') {
+  // Import the model.
+
+  if (message === 'initialize') {
+    const Model = loadModelClass();
+    model = new Model(event.data.configuration);
+    // Ready! Send desired configuration.
+    cast('ready', { configuration: model.configuration });
+  } else if (message === 'predict') {
     // XXX: cause the other end to reject the promise, because of a
     // token/message mismatch. This is for testing purposes.
     if (token === null) {
@@ -15,27 +25,26 @@ self.onmessage = function (event) {
       return;
     }
 
+    let rawSuggestions = model.predict();
     cast('suggestions', {
-      token,
-      suggestions: [
-        { insert: 'Derek', deleteLeft: 1, deleteRight: 0 },
-      ]
+      token, suggestions: rawSuggestions
     });
   } else {
     throw new Error('invalid message');
   }
 };
 
-// Ready! Send desired configuration.
-cast('ready', {
-  configuration: {
-    leftContextCodeUnits: 32
-  }
-});
-
 /**
  * Send a message to the keyboard.
  */
 function cast(message, parameters) {
   postMessage({message, ...parameters });
+}
+
+/**
+ * Load the models into the current namespace.
+ */
+function loadModelClass() {
+  importScripts('./models/en-x-test-derek.js');
+  return global.Model;
 }
