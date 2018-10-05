@@ -17,7 +17,7 @@ test('It provide context to LMLayer', async t => {
   t.is(configuration.leftContextCodeUnits, 32);
 
   // Now tell it the user typed 'D'.
-  let message = await lm.predictWithContext({
+  let message = await lm.predict({
     transform: TYPE_D, context: EMPTY_CONTEXT
   });
 
@@ -33,7 +33,7 @@ test('It should not be able to predict() before initialized', async t => {
 
   const lm = new LMLayer;
   try {
-    await lm.predictWithContext({
+    await lm.predict({
       transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
     });
     t.fail();
@@ -49,7 +49,7 @@ test('It should reject when predictions crash', async t => {
   let configuration = await lm.initialize({ model: 'en-x-derek' });
 
   try {
-    await lm.predictWithContext({
+    await lm.predict({
       transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
     });
     t.fail();

@@ -38,7 +38,11 @@ exports.LMLayer = class LMLayer {
   /**
    * [async] Sends a context, transform, and token to the LMLayer.
    */
-  predictWithContext({transform, context, customToken}) {
+  predict({transform, context, customToken}) {
+    if (!this._configuration) {
+      return Promise.reject(new Error('Model is not initialized.'))
+    }
+
     let token = customToken === undefined ? this._nextToken() : customToken;
 
     return new Promise((resolve, reject) => {
