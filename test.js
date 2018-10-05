@@ -24,7 +24,7 @@ test('It provide context to LMLayer', async t => {
   // This dummy language model will always suggest 'Derek' as its return.
   let {suggestions} = message;
   t.deepEqual(suggestions, [
-    { insert: 'Derek', deleteLeft: 1, deleteRight: 0 }
+    { insert: 'Derek', deleteLeft: 1, deleteRight: 0, displayAs: 'Derek' }
   ]);
 });
 

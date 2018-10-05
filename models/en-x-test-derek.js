@@ -1,3 +1,6 @@
+/**
+ * This is a dummy model that always predicts "Derek".
+ */
 class Model {
   constructor(configuration) {
     this.configuration = {
@@ -6,12 +9,16 @@ class Model {
   }
 
   predict(_) {
+    let transform = { insert: 'Derek', deleteLeft: 1, deleteRight: 0 };
+
     return [
-      { insert: 'Derek', deleteLeft: 1, deleteRight: 0 },
+      { transform, weight: 0 }
     ];
   }
 }
 
+// TODO: shouldn't this be running in the same scope as the original?
+// TODO: test in a browser!
 if (typeof global !== 'undefined') {
     global.Model = Model;
 }

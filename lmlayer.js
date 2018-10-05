@@ -17,6 +17,7 @@ self.onmessage = function (event) {
     model = new Model(event.data.configuration);
     // Ready! Send desired configuration.
     cast('ready', { configuration: model.configuration });
+
   } else if (message === 'predict') {
     // XXX: cause the other end to reject the promise, because of a
     // token/message mismatch. This is for testing purposes.
@@ -26,9 +27,23 @@ self.onmessage = function (event) {
     }
 
     let rawSuggestions = model.predict();
-    cast('suggestions', {
-      token, suggestions: rawSuggestions
-    });
+    
+    // Sort in-place according to weight.
+    rawSuggestions.sort((a, b) => a.weight - b.weight);
+
+    // Convert the internal suggestion format to the one required by the keyboard.
+    let suggestions = rawSuggestions.map((internal) => {
+      let displayAs = internal.displayAs;
+
+      // Try to make up a display string.
+      if (displayAs === null || displayAs === undefined) {
+        displayAs = internal.transform.insert;
+      }
+
+      return { displayAs, ...internal.transform }
+    })
+
+    cast('suggestions', { token, suggestions });
   } else {
     throw new Error('invalid message');
   }
