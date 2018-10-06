@@ -7,7 +7,7 @@ import sys
 from keyman_config import __version__
 
 def main():
-	parser = argparse.ArgumentParser(description='Download Keyman keyboard package to ~/Downloads')
+	parser = argparse.ArgumentParser(description='Download Keyman keyboard package to ~/.cache/keyman')
 	parser.add_argument('id', help='Keyman keyboard id')
 	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
 	parser.add_argument('-v', action='store_true', help='verbose logging')
