@@ -24,6 +24,7 @@ implementation
 
 uses
   System.Classes,
+  System.StrUtils,
   System.Variants,
   Winapi.Windows,
 
@@ -90,6 +91,7 @@ var
   ckw: TCompileKeymanWeb;
   FKVKSourceFile: string;
   FKVKTargetFile: string;
+  TargetNames: string;
 begin
   TProject.CompilerMessageFile := Self;
   HasCompileWarning := False;   // I4706
@@ -100,9 +102,8 @@ begin
   try
     if Targets * KMXKeymanTargets <> [] then
     begin
-      if Debug
-        then Log(plsInfo, 'Compiling ' + FileName + ' with debug symbols for Windows, MacOSX...')   // I4504   // I4823
-        else Log(plsInfo, 'Compiling ' + FileName + ' for Windows, MacOSX...');   // I4504
+      TargetNames := KeymanTargetsToNames(Targets * KMXKeymanTargets);
+      Log(plsInfo, Format('Compiling ''%s'' %sfor %s...', [Filename, IfThen(Debug, 'with debug symbols ', ''), TargetNames]));
 
       //compile the keyboard
       KMXFileName := TargetFileName;
@@ -121,8 +122,8 @@ begin
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
       if Result
-        then Log(plsInfo, '''' + FileName + ''' compiled successfully for Windows to '''+KMXFileName+'''.')   // I4504
-        else Log(plsError, '''' + FileName + ''' was not compiled successfully for Windows.')   // I4504
+        then Log(plsInfo, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, KMXFileName]))   // I4504
+        else Log(plsError, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]));   // I4504
     end
     else
       Result := True;   // I4564
@@ -130,9 +131,8 @@ begin
     // compile keyboard to web
     if Result and (Targets * KMWKeymanTargets <> []) then
     begin
-      if Debug
-        then Log(plsInfo, 'Compiling ' + FileName + ' with debug symbols for Web, iOS, Android, WinPhone...')   // I4504   // I4823
-        else Log(plsInfo, 'Compiling ' + FileName + ' for Web, iOS, Android, WinPhone...');   // I4504
+      TargetNames := KeymanTargetsToNames(Targets * KMWKeymanTargets);
+      Log(plsInfo, Format('Compiling ''%s'' %sfor %s...', [Filename, IfThen(Debug, 'with debug symbols ', ''), TargetNames]));
 
       ckw := TCompileKeymanWeb.Create;
       try
@@ -147,9 +147,9 @@ begin
 
         if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
-        if Result
-          then Log(plsInfo, '''' + FileName + ''' compiled successfully for Web, iOS, Android, WinPhone to '''+FOutFileName+'''.')   // I4140   // I4504
-          else Log(plsError, '''' + FileName + ''' was not compiled successfully for Web, iOS, Android, WinPhone.');   // I4140   // I4504
+      if Result
+        then Log(plsInfo, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, FOutFileName]))   // I4504
+        else Log(plsError, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]));   // I4504
       finally
         ckw.Free;
       end;
