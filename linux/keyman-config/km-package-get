@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 import sys
 
 from keyman_config import __version__
@@ -21,8 +22,10 @@ def main():
 	else:
 		logging.basicConfig(format='%(levelname)s:%(message)s')
 
-	from keyman_config.get_kmp import get_kmp
+	from keyman_config.get_kmp import get_kmp, keyman_cache_dir
 	get_kmp(args.id)
+	if os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
+		os.remove(os.path.join(keyman_cache_dir(), 'kmpdirlist'))
 
 if __name__ == "__main__":
 	main()
