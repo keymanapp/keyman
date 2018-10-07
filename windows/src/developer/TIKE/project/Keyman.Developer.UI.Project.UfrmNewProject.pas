@@ -108,11 +108,7 @@ begin
       Result := ShowNewProjectParameters(Owner);
     kptBlank:
       begin
-        FGlobalProject.Save;
-        frmKeymanDeveloper.ProjectForm.Free;
-        FreeGlobalProjectUI;
-        LoadGlobalProjectUI('');
-        frmKeymanDeveloper.ShowProject;
+        frmKeymanDeveloper.OpenProject('');
         Result := True;
       end;
     kptImportWindowsKeyboard:
