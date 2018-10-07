@@ -496,12 +496,36 @@ end;
 procedure TframeTextEditor.LoadFromStream(AStream: TStream);
 var
   s: TStringList;
+  buffer: TBytes;
+  encoding: TEncoding;
+  p: Int64;
+  BufferLength, PreambleLength: Integer;
 begin
   FLoading := True;
   try
+    { Sniff the buffer preamble }
+    p := AStream.Position;
+    SetLength(buffer, 16);
+    BufferLength := AStream.Read(buffer, 16);
+    SetLength(buffer, BufferLength);
+    encoding := nil;
+    PreambleLength := TEncoding.GetBufferEncoding(buffer, encoding, TEncoding.UTF8);
+    AStream.Position := p + PreambleLength;
+
     s := TStringList.Create;
     try
-      s.LoadFromStream(AStream); // prolog determines encoding  // I3337
+      p := AStream.Position;
+      try
+        s.LoadFromStream(AStream, encoding); // prolog determines encoding  // I3337
+      except
+        on E:EEncodingError do
+        begin
+          // Reload as ANSI, because not valid UTF-8
+          AStream.Position := p;
+          s.LoadFromStream(AStream, TEncoding.Default);
+        end;
+      end;
+
       if s.Encoding = TEncoding.UTF8 then  // I3337   // I3636
         TextFileFormat := tffUTF8
       else if s.Encoding = TEncoding.Unicode then  // I3337   // I3636
