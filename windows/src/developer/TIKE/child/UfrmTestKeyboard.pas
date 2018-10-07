@@ -110,7 +110,7 @@ uses
   UfrmMessages,
   keyman32_int,
   UfrmMain,
-  utilstr;
+  utilstr, Unicode;
 
 {$R *.DFM}
 
@@ -408,7 +408,7 @@ var
   ch: WideString;
 begin
   if memo.SelText = '' then
-    ch := Copy(memo.Text, memo.SelStart-1, 1) //TODO: Supplementary pairs
+    ch := Unicode.CopyChar(memo.Text, memo.SelStart-1, 1)
   else
     ch := Copy(memo.SelText, 1, 16);
 
