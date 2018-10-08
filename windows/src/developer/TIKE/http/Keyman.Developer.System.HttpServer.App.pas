@@ -231,6 +231,8 @@ procedure TAppHttpResponder.RespondSettings(doc: string; AContext: TIdContext;
   procedure RespondEditorSettings;
   var
     root: TJSONObject;
+    offset: Integer;
+    theme: TJSONObject;
   begin
     // Respond as JSON
 
@@ -238,11 +240,32 @@ procedure TAppHttpResponder.RespondSettings(doc: string; AContext: TIdContext;
     try
       // Basic settings - tabs
 
-      // TODO: This is technically not thread safe.
+      // TODO: FKeymanDeveloperOptins is technically not thread safe.
       root.AddPair('useTabChar', TJSONBool.Create(FKeymanDeveloperOptions.UseTabChar));
       root.AddPair('indentSize', TJSONNumber.Create(FKeymanDeveloperOptions.IndentSize));
 
-      // Theme data
+      // Specify a theme by name or as a JSON object, loaded from a custom theme file
+
+      if FKeymanDeveloperOptions.EditorTheme <> '' then
+      begin
+        if TKeymanDeveloperOptions.IsDefaultEditorTheme(FKeymanDeveloperOptions.EditorTheme) then
+        begin
+          root.AddPair('theme', FKeymanDeveloperOptions.EditorTheme);
+        end
+        else
+        begin
+          if FileExists(FKeymanDeveloperOptions.EditorTheme) then
+          begin
+            try
+              theme := LoadJSONFromFile(FKeymanDeveloperOptions.EditorTheme, offset);
+              if theme <> nil then
+                root.AddPair('theme', theme);
+            except
+              on E:Exception do ; // We will ignore file and json errors and use default theme
+            end;
+          end;
+        end;
+      end;
 
       AResponseInfo.ContentType := 'application/json';
       AResponseInfo.CharSet := 'UTF-8';

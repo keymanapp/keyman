@@ -88,6 +88,7 @@ type
 
     procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
+    procedure WMUser_SyntaxColourChange(var Message: TMessage); message WM_USER_SYNTAXCOLOURCHANGE;
     procedure FireCommand(const commands: TStringList);
     procedure LoadFileInBrowser(const AData: string);
     procedure UpdateInsertState(const AMode: string);
@@ -744,6 +745,11 @@ begin
     FireCommand(params);
   end;
   params.Free;
+end;
+
+procedure TframeTextEditor.WMUser_SyntaxColourChange(var Message: TMessage);
+begin
+  ExecuteCommand('reloadSettings');
 end;
 
 procedure TframeTextEditor.WMUser_TextEditor_Command(var Message: TMessage);

@@ -28,8 +28,6 @@ async function loadSettings() {
     mode = 'keyman';
   }
 
-  const settings = loadSettings();
-  
   /**
     Initialize the editor
   */
@@ -38,99 +36,83 @@ async function loadSettings() {
     'vs': '../lib/monaco/min/vs'
   } });
 
-  settings.then(function(_settings){
-    require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
+  require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
 
-      _settings = $.extend({
-        useTabChar: false,
-        indentSize: 4
-      }, _settings);
+    //
+    // Register Keyman .kmn tokens provider and language formatter
+    // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
+    //
+    
+    monaco.languages.register({ id: 'keyman' });
+    monaco.languages.setMonarchTokensProvider('keyman', _language.language);
+    
+    //
+    // Create editor and load source file
+    //
 
-      //
-      // Define a custom theme
-      //
+    editor = monaco.editor.create(document.getElementById('editor'), {
+      language: mode,
+      minimap: {
+        enabled: false
+      },
+      glyphMargin: true,
+      lineNumbersMinChars: 2,
+      disableMonospaceOptimizations: true
+    });
 
-      if(_settings.theme) {
-        //monaco.editor.setTheme();
+    $.get("/app/source/file",
+      {
+        Filename: filename
+      },
+      function (response) {
+        context.loading = true;
+        editor.setValue(response);
+        context.loading = false;
+      },
+      "text"
+    );
+    
+    //
+    // Set initial fonts
+    //
+    
+    context.setFonts({
+      codeFont: { name: params.get('codeFontName'), size: params.get('codeFontSize') },
+      charFont: { name: params.get('charFontName'), size: params.get('charFontSize') }
+    });
+    
+    //
+    // Setup callbacks
+    //
+
+    const model = editor.getModel();
+
+    context.reloadSettings();
+
+    model.onDidChangeContent(() => {
+      // Even when loading, we post back the data to the backend so we have an original version
+      $.post("/app/source/file", {
+        Filename: filename,
+        Data: model.getValue()
+        // delta.start, delta.end, delta.lines, delta.action
+      });
+      if (!context.loading) {
+        context.highlightError(); // clear the selected error
+        command('modified');
+        updateState();
       }
+    });
 
-      //
-      // Register Keyman .kmn tokens provider and language formatter
-      // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
-      //
-      
-      monaco.languages.register({ id: 'keyman' });
-      monaco.languages.setMonarchTokensProvider('keyman', _language.language);
-      
-      //
-      // Create editor and load source file
-      //
-
-      editor = monaco.editor.create(document.getElementById('editor'), {
-        language: mode,
-        minimap: {
-          enabled: false
-        },
-        glyphMargin: true,
-        useTabStops: _settings.useTabChar,
-        lineNumbersMinChars: 2,
-        disableMonospaceOptimizations: true
-      });
-
-      $.get("/app/source/file",
-        {
-          Filename: filename
-        },
-        function (response) {
-          context.loading = true;
-          editor.setValue(response);
-          context.loading = false;
-        },
-        "text"
-      );
-      
-      //
-      // Set initial fonts
-      //
-      
-      context.setFonts({
-        codeFont: { name: params.get('codeFontName'), size: params.get('codeFontSize') },
-        charFont: { name: params.get('charFontName'), size: params.get('charFontSize') }
-      });
-      
-      //
-      // Setup callbacks
-      //
-
-      const model = editor.getModel();
-      model.updateOptions({
-        tabSize: _settings.indentSize
-      });
-
-      model.onDidChangeContent(() => {
-        // Even when loading, we post back the data to the backend so we have an original version
-        $.post("/app/source/file", {
-          Filename: filename,
-          Data: model.getValue()
-          // delta.start, delta.end, delta.lines, delta.action
-        });
-        if (!context.loading) {
-          context.highlightError(); // clear the selected error
-          command('modified');
-          updateState();
-        }
-      });
-
-      editor.onDidChangeCursorPosition(updateState);
-      editor.onDidChangeCursorSelection(updateState);
-      editor.onMouseDown(e => {
-        if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
-          return;
-        }
-        command('breakpoint-clicked,'+(e.target.position.lineNumber-1));
-      });
+    editor.onDidChangeCursorPosition(updateState);
+    editor.onDidChangeCursorSelection(updateState);
+    editor.onMouseDown(e => {
+      if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+        return;
+      }
+      command('breakpoint-clicked,'+(e.target.position.lineNumber-1));
     });
   });
+
   //
   // Search and replace interfaces 
   //
@@ -307,6 +289,45 @@ async function loadSettings() {
       lineHeight: lineHeight
     });
   };
+
+  //
+  // Themes and settings
+  //
+
+  context.reloadSettings = function () {
+    loadSettings().then(function(_settings) {
+      _settings = $.extend({
+        useTabChar: false,
+        indentSize: 4
+      }, _settings);
+
+      //
+      // Define a custom theme if specified in the settings
+      //
+
+      var themeName = 'vs';
+
+      if(_settings.theme) {
+        if(typeof _settings.theme == 'string') {
+          themeName = _settings.theme;
+        } else {
+          themeName = 'keyman-custom';
+          monaco.editor.defineTheme(themeName, _settings.theme);
+        }
+      }
+
+      monaco.editor.setTheme(themeName);
+
+      editor.updateOptions({
+        useTabStops: _settings.useTabChar
+      });
+
+      editor.model.updateOptions({
+        tabSize: _settings.indentSize
+      });
+    });
+  }
+
 
   //
   // Printing

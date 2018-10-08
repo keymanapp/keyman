@@ -47,46 +47,18 @@ type
   TfrmOptions = class(TTikeForm)
     pages: TPageControl;
     tabEditor: TTabSheet;
-    tabColours: TTabSheet;
     cmdCancel: TButton;
     cmdOK: TButton;
     chkUseTab: TCheckBox;
     editIndentSize: TEdit;
     lblIndentSize: TLabel;
-    panCol1: TPaintPanel;
-    lbColours: TListBox;
-    panCol2: TPaintPanel;
-    panCol3: TPaintPanel;
-    panCol4: TPaintPanel;
-    panCol5: TPaintPanel;
-    panCol6: TPaintPanel;
-    panCol7: TPaintPanel;
-    panCol8: TPaintPanel;
-    panCol9: TPaintPanel;
-    panCol10: TPaintPanel;
-    panCol11: TPaintPanel;
-    panCol12: TPaintPanel;
-    panCol13: TPaintPanel;
-    panCol14: TPaintPanel;
-    panCol15: TPaintPanel;
-    panCol16: TPaintPanel;
-    cmdResetSelected: TButton;
-    cmdResetAll: TButton;
-    gbColourStyle: TGroupBox;
-    chkColoursBold: TCheckBox;
-    chkColoursItalic: TCheckBox;
-    chkColoursUnderline: TCheckBox;
-    chkUseSyntaxHighlighting: TCheckBox;
     cmdDefaultFont: TButton;
     dlgFonts: TFontDialog;
     panFontSample: TPanel;
-    chkPlainBG: TCheckBox;
-    chkPlainFG: TCheckBox;
     cmdQuotedFont: TButton;
     panQuotedFontSample: TPanel;
     chkLinkFontSizes: TCheckBox;
     tabGeneral: TTabSheet;
-    pmSyntaxExample: TMemo;
     gbStartup: TGroupBox;
     chkShowStartupDialog: TCheckBox;
     tabDebugger: TTabSheet;
@@ -117,6 +89,10 @@ type
     cmdSMTPSettings: TButton;
     chkOpenKeyboardFilesInSourceView: TCheckBox;
     cmdResetToolWindows: TButton;
+    cbEditorTheme: TComboBox;
+    lblEditorTheme: TLabel;
+    lblEditorCustomTheme: TLabel;
+    dlgBrowseEditorTheme: TOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -127,9 +103,9 @@ type
     procedure editWebHostDefaultPortKeyPress(Sender: TObject; var Key: Char);
     procedure cmdSMTPSettingsClick(Sender: TObject);
     procedure cmdResetToolWindowsClick(Sender: TObject);
+    procedure cbEditorThemeClick(Sender: TObject);
   private
     FDefaultFont, FQuotedFont: TFont;
-    panCol: array[1..16] of TPaintPanel;
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -142,8 +118,11 @@ implementation
 {$R *.DFM}
 
 uses
+  System.JSON,
+
   Keyman.Developer.System.HelpTopics,
 
+  JsonUtil,
   JvDockControlForm,
   OnlineConstants,
   RedistFiles,
@@ -160,36 +139,15 @@ uses
 
 { General functions }
 
+
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
   deffont, altfont: string;
+  i: Integer;
 begin
   inherited;
 
   pages.ActivePage := tabGeneral;
-
-  { Initialise Colours tab }
-  panCol[1] := panCol1;
-  panCol[2] := panCol2;
-  panCol[3] := panCol3;
-  panCol[4] := panCol4;
-  panCol[5] := panCol5;
-  panCol[6] := panCol6;
-  panCol[7] := panCol7;
-  panCol[8] := panCol8;
-  panCol[9] := panCol9;
-  panCol[10] := panCol10;
-  panCol[11] := panCol11;
-  panCol[12] := panCol12;
-  panCol[13] := panCol13;
-  panCol[14] := panCol14;
-  panCol[15] := panCol15;
-  panCol[16] := panCol16;
-
-  lbColours.ItemIndex := 0;
-
-  chkUseSyntaxHighlighting.Checked := False;
-  chkUseSyntaxHighlighting.Enabled := False;
 
   { Initialise Editor tab }
 
@@ -198,9 +156,13 @@ begin
   SetFontFromString(FDefaultFont, '');
   SetFontFromString(FQuotedFont, '');
 
+  for i := 0 to High(SDefaultEditorThemes) do
+    cbEditorTheme.Items.Add(SDefaultEditorThemes[i].Desc);
+  cbEditorTheme.Items.Add('Custom...');
+
   with FKeymanDeveloperOptions do
   begin
-    chkUseOldDebugger.Checked := UseOldDebugger; // or not chkUseOldDebugger.Enabled;
+    chkUseOldDebugger.Checked := UseOldDebugger;
     chkUseTab.Checked := UseTabChar;
     chkLinkFontSizes.Checked := LinkFontSizes;
 
@@ -209,9 +171,7 @@ begin
     chkDebuggerShowStoreOffset.Checked :=      DebuggerShowStoreOffset;
     chkDebuggerAutoRecompile.Checked :=        DebuggerAutoRecompileWithDebugInfo;
 
-    chkShowStartupDialog.Checked := ShowStartupDialog;// or not chkShowStartupDialog.Enabled;
-
-    //chkShowStartupHelperDialog.Checked := ShowStartupHelperDialog;
+    chkShowStartupDialog.Checked := ShowStartupDialog;
 
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
@@ -226,23 +186,19 @@ begin
 
     editWebHostDefaultPort.Text := IntToStr(WebHostDefaultPort);   // I4021
 
-//    cbTheme.ItemIndex := cbTheme.Items.IndexOf(DisplayTheme);   // I4796
+    lblEditorCustomTheme.Caption := '';
+    if EditorTheme = '' then
+      cbEditorTheme.ItemIndex := 0
+    else if IsDefaultEditorTheme(EditorTheme) then
+      cbEditorTheme.ItemIndex := DefaultEditorThemeItemIndex(EditorTheme)
+    else
+    begin
+      cbEditorTheme.ItemIndex := cbEditorTheme.Items.Count - 1; // custom
+      lblEditorCustomTheme.Caption := EditorTheme;
+    end;
   end;
 
   editDatabasePath.Text := FUnicodeData.DBPath;
-
-{  with TRegistryErrorControlled.Create do
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_KeymanDeveloper) then
-      chkFileAssociations.Checked :=
-        not ValueExists(SRegValue_NoCheckAssociations) or
-        (ReadString(SRegValue_NoCheckAssociations) = '0')
-    else
-      chkFileAssociations.Checked := True;
-  finally
-    Free;
-  end;}
 
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -265,8 +221,6 @@ begin
 
   chkCharMapDisableDatabaseLookups.Checked := True;
   chkCharMapDisableDatabaseLookups.Enabled := False;
-  //cmdCharMapRebuildDatabase.Enabled := False;
-  //gbCharMapCharacterDatabase.Enabled := False;
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
@@ -290,6 +244,9 @@ begin
     UseTabChar := chkUseTab.Checked;
     IndentSize := StrToIntDef(editIndentSize.Text, 4);
     LinkFontSizes := chkLinkFontSizes.Checked;
+    if cbEditorTheme.ItemIndex = cbEditorTheme.Items.Count - 1
+      then EditorTheme := lblEditorCustomTheme.Caption
+      else EditorTheme := SDefaultEditorThemes[cbEditorTheme.ItemIndex].Name;
 
     DebuggerBreakWhenExitingLine       := chkDebuggerBreakWhenExitingLine.Checked;
     DebuggerSingleStepAfterBreak       := chkDebuggerSingleStepAfterBreak.Checked;
@@ -322,8 +279,8 @@ begin
     Free;
   end;
 
-  for i := 0 to frmKeymanDeveloper.MDIChildCount - 1 do
-    PostMessage(frmKeymanDeveloper.MDIChildren[i].Handle, WM_USER_SYNTAXCOLOURCHANGE, 0, 0);
+  for i := 0 to Screen.FormCount - 1 do
+    PostMessage(Screen.Forms[i].Handle, WM_USER_SYNTAXCOLOURCHANGE, 0, 0);
 
   ModalResult := mrOk;
 end;
@@ -387,6 +344,45 @@ begin
   begin
     Key := #0;
   end;
+end;
+
+procedure TfrmOptions.cbEditorThemeClick(Sender: TObject);
+var
+  j: TJSONObject;
+  offset: Integer;
+begin
+  inherited;
+  if cbEditorTheme.ItemIndex = cbEditorTheme.Items.Count - 1 then
+  begin
+    dlgBrowseEditorTheme.FileName := lblEditorCustomTheme.Caption;
+    if not dlgBrowseEditorTheme.Execute then
+    begin
+      cbEditorTheme.ItemIndex := 0;
+      lblEditorCustomTheme.Caption := '';
+      Exit;
+    end;
+
+    // Validate the theme file, somewhat anyway
+
+    try
+      j := LoadJSONFromFile(dlgBrowseEditorTheme.FileName, offset);
+      if j = nil then
+        raise Exception.CreateFmt('An error was encountered at offset %d', [offset]);
+      j.Free;
+    except
+      on E:Exception do
+      begin
+        ShowMessage('The file '+dlgBrowseEditorTheme.FileName+' is not a valid JSON file: '+E.Message);
+        cbEditorTheme.ItemIndex := 0;
+        lblEditorCustomTheme.Caption := '';
+        Exit;
+      end;
+    end;
+
+    lblEditorCustomTheme.Caption := dlgBrowseEditorTheme.FileName;
+  end
+  else
+    lblEditorCustomTheme.Caption := '';
 end;
 
 procedure TfrmOptions.cmdCharMapRebuildDatabaseClick(Sender: TObject);
