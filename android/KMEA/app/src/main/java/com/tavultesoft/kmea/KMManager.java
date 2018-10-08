@@ -12,12 +12,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -26,14 +24,10 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.text.InputType;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -49,6 +43,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -56,15 +51,11 @@ import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONObject;
 
-import static android.content.Context.VIBRATOR_SERVICE;
-
 public final class KMManager {
 
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
-
-  private static int KM_VIBRATE_DURATION = 100; // milliseconds
 
   // Keyboard types
   public enum KeyboardType {
@@ -1593,47 +1584,10 @@ public final class KMManager {
     }
   }
 
-  private static final class KMInAppKeyboardJSHandler {
-    private Context context;
+  private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
 
     KMInAppKeyboardJSHandler(Context context) {
-      this.context = context;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public String getDeviceType() {
-      return context.getResources().getString(R.string.device_type);
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardHeight() {
-      int kbHeight = context.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      kbHeight -= kbHeight % 20;
-      return kbHeight;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardWidth() {
-      DisplayMetrics dms = context.getResources().getDisplayMetrics();
-      int kbWidth = (int) (dms.widthPixels / dms.density);
-      return kbWidth;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public void beepKeyboard() {
-      Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-      if (v != null && v.hasVibrator()) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          VibrationEffect effect = VibrationEffect.createOneShot(KM_VIBRATE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE);
-          v.vibrate(effect);
-        } else {
-          v.vibrate(KM_VIBRATE_DURATION);
-        }
-      }
+      super(context);
     }
 
     // Store the current keyboard chirality status from KMW in InAppKeyboard
@@ -1719,47 +1673,9 @@ public final class KMManager {
     }
   }
 
-  private static final class KMSystemKeyboardJSHandler {
-    private Context context;
-
+  private static final class KMSystemKeyboardJSHandler extends KMKeyboardJSHandler {
     KMSystemKeyboardJSHandler(Context context) {
-      this.context = context;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public String getDeviceType() {
-      return context.getResources().getString(R.string.device_type);
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardHeight() {
-      int kbHeight = context.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      kbHeight -= kbHeight % 20;
-      return kbHeight;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardWidth() {
-      DisplayMetrics dms = context.getResources().getDisplayMetrics();
-      int kbWidth = (int) (dms.widthPixels / dms.density);
-      return kbWidth;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public void beepKeyboard() {
-      Vibrator v = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
-      if (v != null && v.hasVibrator()) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          VibrationEffect effect = VibrationEffect.createOneShot(KM_VIBRATE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE);
-          v.vibrate(effect);
-        } else {
-          v.vibrate(KM_VIBRATE_DURATION);
-        }
-      }
+      super(context);
     }
 
     // Store the current keyboard chirality status from KMW in SystemKeyboard
