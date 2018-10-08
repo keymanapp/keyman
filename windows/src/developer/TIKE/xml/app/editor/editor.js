@@ -10,6 +10,10 @@ window.editorGlobalContext = {
   loading: false
 };
 
+async function loadSettings() {
+  return await $.getJSON('/app/settings/editor');
+}
+
 (function(context) {
   var editor = null;
   var errorRange = null;
@@ -19,91 +23,114 @@ window.editorGlobalContext = {
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
-
+  
   if(!mode) {
     mode = 'keyman';
   }
 
-
+  const settings = loadSettings();
+  
   /**
     Initialize the editor
   */
 
-  require.config({ paths: { 'vs': '../lib/monaco/min/vs' } });
-  require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
-    
-    //
-    // Register Keyman .kmn tokens provider and language formatter
-    // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
-    //
-    
-    monaco.languages.register({ id: 'keyman' });
-    monaco.languages.setMonarchTokensProvider('keyman', _language.language);
-    
-    //
-    // Create editor and load source file
-    //
+  require.config({ paths: { 
+    'vs': '../lib/monaco/min/vs'
+  } });
 
-    editor = monaco.editor.create(document.getElementById('editor'), {
-      language: mode,
-      minimap: {
-        enabled: false
-      },
-      glyphMargin: true,
-      lineNumbersMinChars: 2,
-      disableMonospaceOptimizations: true
-    });
+  settings.then(function(_settings){
+    require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
 
-    $.get("/app/source/file",
-      {
-        Filename: filename
-      },
-      function (response) {
-        context.loading = true;
-        editor.setValue(response);
-        context.loading = false;
-      },
-      "text"
-    );
-    
-    //
-    // Set initial fonts
-    //
-    
-    context.setFonts({
-      codeFont: { name: params.get('codeFontName'), size: params.get('codeFontSize') },
-      charFont: { name: params.get('charFontName'), size: params.get('charFontSize') }
-    });
-    
-    //
-    // Setup callbacks
-    //
+      _settings = $.extend({
+        useTabChar: false,
+        indentSize: 4
+      }, _settings);
 
-    const model = editor.getModel();
-    model.onDidChangeContent(() => {
-      // Even when loading, we post back the data to the backend so we have an original version
-      $.post("/app/source/file", {
-        Filename: filename,
-        Data: model.getValue()
-        // delta.start, delta.end, delta.lines, delta.action
+      //
+      // Define a custom theme
+      //
+
+      if(_settings.theme) {
+        //monaco.editor.setTheme();
+      }
+
+      //
+      // Register Keyman .kmn tokens provider and language formatter
+      // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
+      //
+      
+      monaco.languages.register({ id: 'keyman' });
+      monaco.languages.setMonarchTokensProvider('keyman', _language.language);
+      
+      //
+      // Create editor and load source file
+      //
+
+      editor = monaco.editor.create(document.getElementById('editor'), {
+        language: mode,
+        minimap: {
+          enabled: false
+        },
+        glyphMargin: true,
+        useTabStops: _settings.useTabChar,
+        lineNumbersMinChars: 2,
+        disableMonospaceOptimizations: true
       });
-      if (!context.loading) {
-        context.highlightError(); // clear the selected error
-        command('modified');
-        updateState();
-      }
-    });
 
-    editor.onDidChangeCursorPosition(updateState);
-    editor.onDidChangeCursorSelection(updateState);
-    editor.onMouseDown(e => {
-      if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
-        return;
-      }
-      command('breakpoint-clicked,'+(e.target.position.lineNumber-1));
+      $.get("/app/source/file",
+        {
+          Filename: filename
+        },
+        function (response) {
+          context.loading = true;
+          editor.setValue(response);
+          context.loading = false;
+        },
+        "text"
+      );
+      
+      //
+      // Set initial fonts
+      //
+      
+      context.setFonts({
+        codeFont: { name: params.get('codeFontName'), size: params.get('codeFontSize') },
+        charFont: { name: params.get('charFontName'), size: params.get('charFontSize') }
+      });
+      
+      //
+      // Setup callbacks
+      //
+
+      const model = editor.getModel();
+      model.updateOptions({
+        tabSize: _settings.indentSize
+      });
+
+      model.onDidChangeContent(() => {
+        // Even when loading, we post back the data to the backend so we have an original version
+        $.post("/app/source/file", {
+          Filename: filename,
+          Data: model.getValue()
+          // delta.start, delta.end, delta.lines, delta.action
+        });
+        if (!context.loading) {
+          context.highlightError(); // clear the selected error
+          command('modified');
+          updateState();
+        }
+      });
+
+      editor.onDidChangeCursorPosition(updateState);
+      editor.onDidChangeCursorSelection(updateState);
+      editor.onMouseDown(e => {
+        if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+          return;
+        }
+        command('breakpoint-clicked,'+(e.target.position.lineNumber-1));
+      });
     });
   });
-
   //
   // Search and replace interfaces 
   //

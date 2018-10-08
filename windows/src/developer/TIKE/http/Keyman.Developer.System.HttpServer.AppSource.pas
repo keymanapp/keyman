@@ -91,6 +91,7 @@ begin
 
   if ARequestInfo.Document = '/app/source/file' then
   begin
+    // TODO: We should be passing a token to the browser for future POST security
     Filename := ARequestInfo.Params.Values['Filename'];
 
     if ARequestInfo.CommandType = hcGET then

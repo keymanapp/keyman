@@ -20,6 +20,8 @@ type
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure RespondHelp(doc: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+    procedure RespondSettings(doc: string; AContext: TIdContext;
+      ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
     constructor Create;
     procedure ProcessRequest(AContext: TIdContext;
@@ -30,11 +32,14 @@ implementation
 
 uses
   System.Classes,
+  System.JSON,
   System.SysUtils,
   System.Variants,
   Xml.XMLDoc,
   Xml.XMLIntf,
 
+  JsonUtil,
+  KeymanDeveloperOptions,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles;
@@ -220,6 +225,42 @@ begin
     RespondState;
 end;
 
+procedure TAppHttpResponder.RespondSettings(doc: string; AContext: TIdContext;
+  ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+
+  procedure RespondEditorSettings;
+  var
+    root: TJSONObject;
+  begin
+    // Respond as JSON
+
+    root := TJSONObject.Create;
+    try
+      // Basic settings - tabs
+
+      // TODO: This is technically not thread safe.
+      root.AddPair('useTabChar', TJSONBool.Create(FKeymanDeveloperOptions.UseTabChar));
+      root.AddPair('indentSize', TJSONNumber.Create(FKeymanDeveloperOptions.IndentSize));
+
+      // Theme data
+
+      AResponseInfo.ContentType := 'application/json';
+      AResponseInfo.CharSet := 'UTF-8';
+      AResponseInfo.ContentText := JSONToString(root);
+    finally
+      root.Free;
+    end;
+  end;
+
+begin
+  if doc = 'settings/editor' then
+  begin
+    RespondEditorSettings;
+  end
+  else
+    Respond404(AContext, ARequestInfo, AResponseInfo);
+end;
+
 constructor TAppHttpResponder.Create;
 begin
   FAppRoot := ExtractFilePath(ParamStr(0)) + 'xml\app\';
@@ -252,6 +293,11 @@ begin
   else if Copy(doc, 1, 5) = 'help/' then
   begin
     RespondHelp(doc, AContext, ARequestInfo, AResponseInfo);
+    Exit;
+  end
+  else if Copy(doc, 1, 9) = 'settings/' then
+  begin
+    RespondSettings(doc, AContext, ARequestInfo, AResponseInfo);
     Exit;
   end
   else
