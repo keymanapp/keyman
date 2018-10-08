@@ -23,11 +23,11 @@ _km-package-uninstall_completions()
     shared=""
     case "${prev}" in
         "-s")
-            for file in `find /usr/local/share/keyman/ -name *.kmx`; do kbid="`basename ${file} .kmx`"; shared="${shared} ${kbid}"; done
+            for file in `ls -d /usr/local/share/keyman/*/`; do kbid="`basename ${file}`"; shared="${shared} ${kbid}"; done
             COMPREPLY=($(compgen -W "${shared}" -- ${cur}))
             ;;
         *)
-        for file in `find ~/.local/share/keyman/ -name *.kmx`; do kbid="`basename ${file} .kmx`"; words="${words} ${kbid}"; done
+        for file in `ls -d ~/.local/share/keyman/*/`; do kbid="`basename ${file}`"; words="${words} ${kbid}"; done
         COMPREPLY=($(compgen -W "${words}" -- ${cur}))
         ;;
     esac
