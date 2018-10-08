@@ -24,13 +24,16 @@ def get_keyboard_dir_page(kb_url):
 	os.chdir(cache_dir)
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
-	response = requests.get(kb_url)
-	logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
-	os.chdir(current_dir)
-	requests_cache.core.uninstall_cache()
-	if response.status_code == 200:
-		return response.text
-	else:
+	try:
+		response = requests.get(kb_url)
+		logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+		os.chdir(current_dir)
+		requests_cache.core.uninstall_cache()
+		if response.status_code == 200:
+			return response.text
+		else:
+			return None
+	except:
 		return None
 
 
@@ -40,16 +43,22 @@ def get_dir_list():
 	soup = BeautifulSoup(page, 'html.parser')
 	return [url + node.get('href') for node in soup.find_all('a')]
 
+def write_kmpdirlist(kmpdirfile):
+	with open(os.path.join(kmpdirfile), 'wt') as kmpdirlist:
+		for file in get_dir_list():
+			#logging.debug(file)
+			kb = os.path.basename(os.path.dirname(file))
+			if kb != "keyboards":
+				print(kb, file=kmpdirlist)
+
 def list_keyboards():
-	if not os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
-		with open(os.path.join(keyman_cache_dir(), 'kmpdirlist'), 'wt') as kmpdirlist:
-			for file in get_dir_list():
-				#logging.debug(file)
-				kb = os.path.basename(os.path.dirname(file))
-				if kb != "keyboards":
-					print(kb, file=kmpdirlist)
+	kmpdirfile = os.path.join(keyman_cache_dir(), 'kmpdirlist')
+	if not os.path.exists(kmpdirfile):
+		write_kmpdirlist(kmpdirfile)
 	else:
 		logging.debug("kmpdirlist already exists")
+		if os.path.getsize(kmpdirfile) == 0:
+			write_kmpdirlist(kmpdirfile)
 
 def main():
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')

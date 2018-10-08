@@ -16,7 +16,7 @@ _km-package-install_completions()
     case "${prev}" in
         "-k")
             words=""
-            if [[ ! -e ~/.cache/keyman/kmpdirlist ]] ; then
+            if [[ ! -s ~/.cache/keyman/kmpdirlist ]] ; then
                 if [[ -e ./km-package-install ]]; then
                     python3 -c "from imp import load_source;load_source('km_package_install', './km-package-install');from km_package_install import list_keyboards;list_keyboards()"
                 else
