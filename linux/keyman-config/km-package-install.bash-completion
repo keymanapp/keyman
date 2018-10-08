@@ -6,7 +6,7 @@ _km-package-install_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h --help -v -vv --version -k -f -s"
+    opts="-h --help -v --verbose -vv --veryverbose --version -k --keyboardid -f --file -s --shared"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -14,7 +14,7 @@ _km-package-install_completions()
     fi
 
     case "${prev}" in
-        "-k")
+        "-k"|"--keyboardid")
             words=""
             if [[ ! -s ~/.cache/keyman/kmpdirlist ]] ; then
                 if [[ -e ./km-package-install ]]; then

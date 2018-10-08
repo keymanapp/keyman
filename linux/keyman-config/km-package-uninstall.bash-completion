@@ -6,7 +6,7 @@ _km-package-uninstall_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h -s -v -vv --version"
+    opts="-h --help -s --shared -v --verbose -vv --veryverbose --version"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -22,13 +22,13 @@ _km-package-uninstall_completions()
     words=""
     shared=""
     case "${prev}" in
-        "-s")
+        "-s"|"--shared")
             for file in `ls -d /usr/local/share/keyman/*/`; do kbid="`basename ${file}`"; shared="${shared} ${kbid}"; done
             COMPREPLY=($(compgen -W "${shared}" -- ${cur}))
             ;;
         *)
-        for file in `ls -d ~/.local/share/keyman/*/`; do kbid="`basename ${file}`"; words="${words} ${kbid}"; done
-        COMPREPLY=($(compgen -W "${words}" -- ${cur}))
+            for file in `ls -d ~/.local/share/keyman/*/`; do kbid="`basename ${file}`"; words="${words} ${kbid}"; done
+            COMPREPLY=($(compgen -W "${words}" -- ${cur}))
         ;;
     esac
 }

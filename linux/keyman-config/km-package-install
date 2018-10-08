@@ -62,12 +62,12 @@ def list_keyboards():
 
 def main():
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')
-	parser.add_argument('-s', action='store_true', help='Install to shared area /usr/local')
-	parser.add_argument('-f', metavar='<kmpfile>', help='Keyman kmp file')
-	parser.add_argument('-k', metavar='<keyboardid>', help='Keyman keyboard id')
+	parser.add_argument('-s', '--shared', action='store_true', help='Install to shared area /usr/local')
+	parser.add_argument('-f', '--file', metavar='<kmpfile>', help='Keyman kmp file')
+	parser.add_argument('-k', '--keyboardid', metavar='<keyboardid>', help='Keyman keyboard id')
 	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
-	parser.add_argument('-v', action='store_true', help='verbose logging')
-	parser.add_argument('-vv', action='store_true', help='very verbose logging')
+	parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
+	parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
 	args = parser.parse_args()
 	if args.v:

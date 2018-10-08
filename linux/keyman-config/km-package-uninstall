@@ -9,10 +9,10 @@ from keyman_config import __version__
 def main():
 	parser = argparse.ArgumentParser(description='Uninstall Keyman keyboard package.')
 	parser.add_argument('id', help='Keyman keyboard id')
-	parser.add_argument('-s', action='store_true', help='Uninstall from shared area /usr/local')
+	parser.add_argument('-s', '--shared', action='store_true', help='Uninstall from shared area /usr/local')
 	parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
-	parser.add_argument('-v', action='store_true', help='verbose logging')
-	parser.add_argument('-vv', action='store_true', help='very verbose logging')
+	parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
+	parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
 	args = parser.parse_args()
 	if args.v:

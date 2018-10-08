@@ -12,10 +12,10 @@ def main():
     parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
     parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
-    parser.add_argument('-o', metavar='LDMLFILE', help='output LDML file location')
+    parser.add_argument('-o', '--output', metavar='LDMLFILE', help='output LDML file location')
     parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
-    parser.add_argument('-v', action='store_true', help='verbose logging')
-    parser.add_argument('-vv', action='store_true', help='very verbose logging')
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
+    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
     args = parser.parse_args()
     if args.v:

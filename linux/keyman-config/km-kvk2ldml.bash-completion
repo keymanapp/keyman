@@ -1,12 +1,12 @@
 #/usr/bin/env bash
 
-_km-package-list-installed_completions()
+_km-kvk2ldml_completions()
 {
     local cur prev opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h --help -l --long -v --verbose -vv --veryverbose --version -u --user -o --os -s --shared"
+    opts="-h --help -p --print -k --keys -o --output -v --verbose -vv --veryverbose --version"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -14,4 +14,4 @@ _km-package-list-installed_completions()
     fi
 }
 
-complete -F _km-package-list-installed_completions km-package-list-installed
+complete -F _km-kvk2ldml_completions km-kvk2ldml
