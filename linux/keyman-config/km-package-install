@@ -52,7 +52,6 @@ def list_keyboards():
 		logging.debug("kmpdirlist already exists")
 
 def main():
-	list_keyboards()
 	parser = argparse.ArgumentParser(description='Install a Keyman keyboard, either a local .kmp file or specify a keyboard id to download and install')
 	parser.add_argument('-s', action='store_true', help='Install to shared area /usr/local')
 	parser.add_argument('-f', metavar='<kmpfile>', help='Keyman kmp file')
