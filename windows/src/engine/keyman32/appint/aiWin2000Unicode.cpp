@@ -310,9 +310,16 @@ BOOL AIWin2000Unicode::PostKeys()
   SetLastError(0);
 
   if(i > 0) {   // I4452
+#ifdef USE_KEYEVENTSENDERTHREAD
+    // TODO: use circular buffer
+    memcpy(Globals::InputBuf(), pInputs, i * sizeof(INPUT));
+    *Globals::nInputBuf() = i;
+    Globals::SignalKeyEvent();
+#else
     if(SendInput(i, pInputs, sizeof(INPUT)) == 0) {
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: failed to SendInput with error %d", GetLastError());
+      DebugLastError("SendInput");
     }
+#endif
   }
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input finished");

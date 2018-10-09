@@ -43,10 +43,10 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep)
           SendDebugMessage(0, sdmGlobal, 0, "MiniDumpWriteDump not available");
         else
         {
-          if(!(*mdwd)(GetCurrentProcess(), GetCurrentProcessId(), hFile, 
-            (MINIDUMP_TYPE) (MiniDumpWithDataSegs | MiniDumpWithHandleData),
-            &mei, NULL, NULL))
-            SendDebugMessageFormat(0, sdmGlobal, 0, "MiniDumpWriteDump failed with error %d", GetLastError());
+          if (!(*mdwd)(GetCurrentProcess(), GetCurrentProcessId(), hFile,
+              (MINIDUMP_TYPE)(MiniDumpWithDataSegs | MiniDumpWithHandleData),
+              &mei, NULL, NULL))
+            DebugLastError("MiniDumpWriteDump");
           else
           {
             SendDebugMessageFormat(0, sdmGlobal, 0, "Minidump written to %s", filename);

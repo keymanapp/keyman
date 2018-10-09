@@ -336,7 +336,7 @@ HBITMAP LoadBitmapFile(LPBYTE data, DWORD sz)
     
     if(hIcon == 0)
     {
-  		SendDebugMessageFormat(0, sdmLoad, 0, "LoadKeyboard: icon not loaded: %x", GetLastError());
+      DebugLastError("MakeIconFromResource");
       return 0;
     }
     hDC = GetDC(GetDesktopWindow());

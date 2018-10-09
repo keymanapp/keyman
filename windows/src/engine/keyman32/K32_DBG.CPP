@@ -64,18 +64,7 @@ extern void GetWindowsVersion(char *buf);
 
 void InitDebuggingEx(PKEYMAN64THREADDATA _td)
 {
-	RegistryReadOnly reg(HKEY_CURRENT_USER);
-	if(reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
-		_td->debug_KeymanLog = reg.ValueExists(REGSZ_Debug) && reg.ReadInteger(REGSZ_Debug);
-    _td->debug_ToConsole = reg.ValueExists(REGSZ_DebugToConsole) && reg.ReadInteger(REGSZ_DebugToConsole);   // I3951
-  }
-	else {
-		_td->debug_KeymanLog = FALSE;
-    _td->debug_ToConsole = FALSE;   // I3951
-  }
-  
-
-	if(_td->debug_KeymanLog)
+	if(Globals::get_debug_KeymanLog())
 	{
 		if(_td->debug_hLogMailSlot != 0 && _td->debug_hLogMailSlot != INVALID_HANDLE_VALUE)
         CloseHandle(_td->debug_hLogMailSlot);
@@ -130,7 +119,7 @@ void InitDebugging()
 	InitDebuggingEx(_td);
 	_td->debug_DebugInit = TRUE;
 
-	if(_td->debug_KeymanLog)
+	if(Globals::get_debug_KeymanLog())
 	{
 		VS_FIXEDFILEINFO *ffi;
 		DWORD sz;
@@ -188,7 +177,7 @@ BOOL ShouldDebug_1() //TSDMState state)
   if(!_td) return FALSE;
 
   TestInitDebug(_td);
-	return _td->debug_KeymanLog;
+	return Globals::get_debug_KeymanLog();
 }
 
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...)
@@ -248,7 +237,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return 0;
 
-	if(_td->debug_KeymanLog)
+	if(Globals::get_debug_KeymanLog())
 	{
 		OVERLAPPED ov;
 		DWORD cbWritten; 
@@ -338,6 +327,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
         file, line,                      //"SourceFile" TAB
         msg);                            //"Message"
     }                                       
+
 #ifdef _FILELOG                        
 		if(_td->debug_fp)
 		{
@@ -345,10 +335,22 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
 			fputs("\n", (FILE*)_td->debug_fp);
 		}
 #endif
-    if(_td->debug_ToConsole) {   // I3951
+
+    if(Globals::get_debug_ToConsole()) {   // I3951
       OutputDebugString(windowinfo);   // I3570   // I3951
       OutputDebugString("\n");   // I3570   // I3951
     }
+
+#ifdef DEBUG_PROCMON_LOGGING
+    HANDLE hProcMon = OpenProcMonHandle();
+    if (hProcMon != NULL) {
+      /* Log to procmon */
+      PWSTR windowinfoW = strtowstr(windowinfo);
+      DWORD nb;
+      DeviceIoControl(hProcMon, IOCTL_EXTERNAL_LOG_DEBUGOUT, windowinfoW, (DWORD)wcslen(windowinfoW) * 2, NULL, 0, &nb, NULL);
+      delete windowinfoW;
+    }
+#endif
 
 		if(_td->debug_hLogMailSlot != 0)
     {
@@ -373,8 +375,10 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
 				    &cbWritten, 
 				    &ov)) break;
         default:
-          UninitDebuggingEx();
-          _td->debug_KeymanLog = FALSE;  /// Failed again - we could log to system log I guess
+          OutputDebugString("Keyman32: Failed to write to debug mailslot. Disabling logging to mailslot on this thread.\n");
+          UninitDebuggingEx();          // Close and zero handles
+          _td->debug_DebugInit = TRUE;  // Avoids attempting to reconnect to mailslot
+          _td->debug_Error = TRUE;      // Disables debugging to mailslot on this thread
         }
       }
     }
@@ -464,14 +468,13 @@ BOOL DebugSignalPause(BOOL fIsUp)
   return FALSE;
 }
 
-void DebugLastError_1(char *file, int line, char *func, char *date)
+void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func)
 {
-  DWORD err = GetLastError();
   if(ShouldDebug(sdmDebug))
   {
     char msg[256];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL);
-    SendDebugMessageFormat_1(NULL, sdmDebug, 0, "ERROR %d in %s [%s:%d]: %s", err, func, file, line, date, msg);
+    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL) == 0) msg[0] = 0;
+    SendDebugMessageFormat_1(NULL, sdmDebug, 0, file, line, "ERROR %d in %s calling %s: %s", err, func, context, msg);
   }
 }
 
@@ -504,3 +507,56 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];
 }
+
+#ifdef DEBUG_PROCMON_LOGGING
+
+//
+// Connecting to ProcMon
+//
+
+#define FILE_DEVICE_PROCMON_LOG     0x00009535
+#define IOCTL_EXTERNAL_LOG_DEBUGOUT (ULONG) CTL_CODE( FILE_DEVICE_PROCMON_LOG, 0x81, METHOD_BUFFERED, FILE_WRITE_ACCESS )
+
+HANDLE OpenProcMonHandle() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return NULL;
+  }
+
+  HANDLE hProcMon = _td->hProcMon;
+  if (hProcMon == NULL) {
+    hProcMon = CreateFile(
+      "\\\\.\\Global\\ProcmonDebugLogger",
+      GENERIC_WRITE,
+      FILE_SHARE_WRITE,
+      NULL,
+      OPEN_EXISTING,
+      FILE_ATTRIBUTE_NORMAL,
+      0);
+    if (hProcMon == NULL) {
+      // todo: report error
+      return NULL;
+    }
+    _td->hProcMon = hProcMon;
+  }
+
+  return hProcMon;
+}
+
+BOOL CloseProcMonHandle() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return NULL;
+  }
+
+  if (_td->hProcMon == NULL) {
+    // never allocated, so nothing to close
+    return TRUE;
+  }
+
+  BOOL fResult = CloseHandle(_td->hProcMon);
+  _td->hProcMon = NULL;
+  return fResult;
+}
+
+#endif

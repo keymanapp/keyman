@@ -314,11 +314,11 @@ void ProcessDebugMessage(HWND hwnd, WPARAM wParam, LPARAM lParam);
 #define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
 #define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
 #define ShouldDebug(state) ShouldDebug_1()
-#define DebugLastError() (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,__DATE__))
-
+#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
+#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
 int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg);
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...);
-void DebugLastError_1(char *file, int line, char *func, char *date);
+void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func);
 void DebugMessage(LPMSG msg, WPARAM wParam);
 void DebugShift(char *function, char *point);
 BOOL DebugSignalPause(BOOL fIsUp);
@@ -398,6 +398,8 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd);
 void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
 BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
+
+#include "keyeventsenderthread.h"
 
 #endif
 

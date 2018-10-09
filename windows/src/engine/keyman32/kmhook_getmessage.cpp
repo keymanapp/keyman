@@ -517,7 +517,7 @@ BOOL IsFocusedThread()
   gti.cbSize = sizeof(GUITHREADINFO);
   if(!GetGUIThreadInfo(0, &gti))
   {
-    DebugLastError();
+    DebugLastError("GetGUIThreadInfo");
     return FALSE;
   }
   return gti.hwndFocus == GetFocus();

@@ -208,3 +208,4 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
 }
+

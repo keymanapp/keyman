@@ -120,6 +120,9 @@
     <ClCompile Include="k32_lowlevelkeyboardhook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="keyeventsenderthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -202,6 +205,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="k32_tsf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keyeventsenderthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

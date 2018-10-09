@@ -253,6 +253,7 @@
     <ClCompile Include="k32_tsf.cpp" />
     <ClCompile Include="keybd_shift.cpp" />
     <ClCompile Include="keyboardoptions.cpp" />
+    <ClCompile Include="keyeventsenderthread.cpp" />
     <ClCompile Include="KEYMAN32.CPP">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -368,6 +369,7 @@
     <ClInclude Include="..\..\global\inc\keyman64.h" />
     <ClInclude Include="..\..\global\inc\keymanapi.h" />
     <ClInclude Include="..\..\global\inc\keymancontrol.h" />
+    <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
     <ClInclude Include="..\..\global\inc\Km95api.h" />
     <ClInclude Include="..\..\global\inc\rc4.h" />

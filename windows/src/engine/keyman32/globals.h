@@ -135,6 +135,18 @@ public:
   static BOOL Lock();
   static BOOL Unlock();
   static BOOL CheckControllers();
+
+#ifdef USE_KEYEVENTSENDERTHREAD
+  static BOOL SignalKeyEvent();
+  static INPUT *InputBuf();
+  static DWORD *nInputBuf();
+#endif
+
+  /* Debugging */
+
+  static BOOL get_debug_KeymanLog();
+  static BOOL get_debug_ToConsole();
+  static void LoadDebugSettings();
 };
 
 /* External interface functions */
@@ -218,7 +230,7 @@ typedef struct tagKEYMAN64THREADDATA
 
   void *debug_fp;
   HANDLE debug_hLogMailSlot, debug_hLogEvent;
-  BOOL debug_DebugInit, debug_KeymanLog, debug_ToConsole;   // I3951
+  BOOL debug_DebugInit;   // I3951
   char debug_buf[64];
 
    // I3617   // I3618
@@ -232,6 +244,11 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TSFFailed;
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
+
+#ifdef DEBUG_PROCMON_LOGGING
+  HANDLE hProcMon;
+#endif
+  BOOL debug_Error;
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT 

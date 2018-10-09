@@ -65,6 +65,9 @@
 #include "accctrl.h"
 #include "sddl.h"
 
+#include <VersionHelpers.h>
+// TODO: replace GetVersion, GetVersionEx calls with IsWindowsXYOrGreater
+
 /***************************************************************************/
 /*                                                                         */
 /* Thread-local storage                                                    */
@@ -74,6 +77,9 @@
 //__declspec(align(4)) LONG RefreshTag_Process = 0;
 //__declspec(align(4)) LONG FInRefreshKeyboards = 0;
 
+#ifdef USE_KEYEVENTSENDERTHREAD
+void InitKeyEventSenderThread();
+#endif
 
 UINT 
   //TODO: consolidate these messages -- they are probably not all required now
@@ -137,11 +143,18 @@ PKEYMAN64THREADDATA Globals_InitThread()
   return lpvData;
 }
 
+#ifdef DEBUG_PROCMON_LOGGING
+extern BOOL CloseProcMonHandle();
+#endif
+
 void Globals_UninitThread()
 {
   if(!Globals_ProcessInitialised()) return;
 
   CloseTSF();   // I3933
+#ifdef DEBUG_PROCMON_LOGGING
+  CloseProcMonHandle();
+#endif
 
   EnterCriticalSection(&csGlobals);
   if(dwTlsIndex != TLS_OUT_OF_INDEXES)
@@ -268,6 +281,18 @@ static wchar_t
 __declspec(align(4)) static LONG
   f_RefreshTag = 0;
 
+static BOOL 
+  f_debug_KeymanLog = FALSE, 
+  f_debug_ToConsole = FALSE;
+
+#ifdef USE_KEYEVENTSENDERTHREAD
+static INPUT
+  f_inputBuf[1024] = { 0 };
+
+static DWORD
+  f_nInputBuf = 0;
+#endif
+
 #pragma data_seg()
 /***************************************************************************/
 
@@ -334,6 +359,14 @@ wchar_t *Globals::get_BaseKeyboardNameAlt()  { return f_BaseKeyboardNameAlt;   }
 
 BOOL Globals::get_MnemonicDeadkeyConversionMode() { return f_MnemonicDeadkeyConversionMode; }   // I4583   // I4552
 
+BOOL Globals::get_debug_KeymanLog() { return f_debug_KeymanLog; }
+BOOL Globals::get_debug_ToConsole() { return f_debug_ToConsole; }
+
+#ifdef USE_KEYEVENTSENDERTHREAD
+INPUT *Globals::InputBuf() { return f_inputBuf; }
+DWORD *Globals::nInputBuf() { return &f_nInputBuf; }
+#endif
+
 void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt) {   // I4583
   wcscpy_s(f_BaseKeyboardName, baseKeyboardName);
   wcscpy_s(f_BaseKeyboardNameAlt, baseKeyboardNameAlt);
@@ -379,6 +412,57 @@ BOOL SetObjectToLowIntegrity(HANDLE hObject, SE_OBJECT_TYPE type = SE_KERNEL_OBJ
 }
 #pragma warning(default: 4996)
 
+/**
+ Allows metro-style applications to access objects shared across the system
+*/
+void GrantPermissionToAllApplicationPackages(HANDLE handle, DWORD dwAccessPermissions) {
+  // ALL APPLICATION PACKAGES group is introduced in Windows 8
+  if (!IsWindows8OrGreater())
+    return;
+
+  PACL pOldDACL = NULL, pNewDACL = NULL;
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  EXPLICIT_ACCESS ea;
+  SECURITY_INFORMATION si = DACL_SECURITY_INFORMATION;
+
+  // Get a pointer to the existing DACL.
+  DWORD dwRes = GetSecurityInfo(handle, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &pSD);
+  if (ERROR_SUCCESS != dwRes) {
+    DebugLastError0(dwRes, "GetSecurityInfo");
+    return;
+  }
+
+  // Initialize an EXPLICIT_ACCESS structure for the new ACE. 
+  ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
+  ea.grfAccessPermissions = dwAccessPermissions;
+  ea.grfAccessMode = SET_ACCESS;
+  ea.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+
+  ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
+  ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+  ea.Trustee.ptstrName = "ALL APPLICATION PACKAGES";
+
+  // Create a new ACL that merges the new ACE into the existing DACL.
+  dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
+  if (ERROR_SUCCESS != dwRes) {
+    DebugLastError0(dwRes, "SetEntriesInAcl");
+    goto Cleanup;
+  }
+
+  // Attach the new ACL as the object's DACL.
+  dwRes = SetSecurityInfo(handle, SE_FILE_OBJECT, si, NULL, NULL, pNewDACL, NULL);
+  if (ERROR_SUCCESS != dwRes) {
+    DebugLastError0(dwRes, "SetSecurityInfo");
+    goto Cleanup;
+  }
+
+Cleanup:
+  if (pSD != NULL)
+    LocalFree((HLOCAL)pSD);
+  if (pNewDACL != NULL)
+    LocalFree((HLOCAL)pNewDACL);
+}
+
 BOOL Globals::Lock()
 {
   if(f_hLockMutex == 0)
@@ -398,6 +482,12 @@ BOOL Globals::InitHandles()  // I3040
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
   if(f_hLockMutex == 0) return FALSE;
   SetObjectToLowIntegrity(f_hLockMutex);
+  GrantPermissionToAllApplicationPackages(f_hLockMutex, MUTEX_MODIFY_STATE);
+
+#ifdef USE_KEYEVENTSENDERTHREAD
+  InitKeyEventSenderThread();
+#endif
+
   return TRUE;
 }
 
@@ -498,7 +588,7 @@ void Globals::PostControllers(UINT msg, WPARAM wParam, LPARAM lParam)
 	 SendDebugMessageFormat(GetFocus(), sdmGlobal, 0, "PostControllers [%x : %x, %x]", msg, wParam, lParam);
 	for(int i = 0; i < f_MaxControllers; i++) {
   	if(!PostMessage(f_ControllerWindow[i], msg, wParam, lParam)) {
-  	  SendDebugMessageFormat(f_ControllerWindow[i], sdmGlobal, 0, "PostControllers[%d] failed with %x", i, GetLastError());
+      DebugLastError("PostMessage");
     }
   }
   Unlock();
@@ -524,7 +614,7 @@ void Globals::PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
   }
 
 	if(!PostMessage(f_ControllerWindow[0], msg, wParam, lParam)) {
-	  SendDebugMessageFormat(f_ControllerWindow[0], sdmGlobal, 0, "PostMasterController failed with %x", GetLastError());
+    DebugLastError("PostMessage");
   }
   Unlock();
 }
@@ -556,7 +646,7 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
   SetLastError(ERROR_SUCCESS);
   DWORD_PTR dwResult = 0;
 	if(!SendMessageTimeout(hwnd, msg, wParam, lParam, SMTO_BLOCK, 100, &dwResult)) {
-  	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController failed with %x", GetLastError());
+    DebugLastError("SendMessageTimeout");
   } else {
 	  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController returned %x", dwResult);
   }
@@ -685,3 +775,46 @@ BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault) {
   }
   return bDefault;
 }
+
+void Globals::LoadDebugSettings() {
+  RegistryReadOnly reg(HKEY_CURRENT_USER);
+  if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+    f_debug_KeymanLog = reg.ValueExists(REGSZ_Debug) && reg.ReadInteger(REGSZ_Debug);
+    f_debug_ToConsole = reg.ValueExists(REGSZ_DebugToConsole) && reg.ReadInteger(REGSZ_DebugToConsole);   // I3951
+  }
+  else {
+    f_debug_KeymanLog = FALSE;
+    f_debug_ToConsole = FALSE;   // I3951
+  }
+}
+
+#ifdef USE_KEYEVENTSENDERTHREAD
+#ifdef _WIN64
+#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent_x64"
+#else
+#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent_x86"
+#endif
+
+HANDLE f_hKeyEvent = 0;
+
+BOOL Globals::SignalKeyEvent() {
+  if (f_hKeyEvent == 0) {
+    f_hKeyEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, GLOBAL_KEY_EVENT_NAME);
+    if (f_hKeyEvent == 0) {
+      DebugLastError("OpenEvent");
+      return FALSE;
+    }
+  }
+  if (!SetEvent(f_hKeyEvent)) {
+    DebugLastError("SetEvent");
+    return FALSE;
+  }
+  return TRUE;
+}
+
+void InitKeyEventSenderThread() {
+  f_hKeyEvent = CreateEvent(NULL, FALSE, FALSE, GLOBAL_KEY_EVENT_NAME);
+  SetObjectToLowIntegrity(f_hKeyEvent);
+  GrantPermissionToAllAppicationPackages(f_hKeyEvent, EVENT_MODIFY_STATE);
+}
+#endif
