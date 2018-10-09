@@ -54,7 +54,7 @@
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
                     23 Feb 2016 - mcdurdin - I4978 - Keyboard options do not apply correctly because they are set twice accidentally
 */
-#include "keyman64.h"   // I3583   // I4287
+#include "pch.h"   // I3583   // I4287
 
 extern const int VKContextReset[256];
 

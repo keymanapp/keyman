@@ -30,7 +30,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "keyman64.h"
+#include "pch.h"
 #include "kbd.h"	/* DDK kbdlayout */ 
 
 //#pragma warning ( disable : 4200 )

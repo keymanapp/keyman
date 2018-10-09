@@ -45,10 +45,11 @@
                     14 May 2015 - mcdurdin - I4714 - V9.0 - Keyboard and language hotkeys don't always work
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
-#include "keyman64.h"   // I5136
+#include "pch.h"   // I5136
 #include "accctrl.h"
 #include "aclapi.h"
 #include "sddl.h"
+#include "SharedBuffers.h"
 
 // I3594  // I4220
 
@@ -129,53 +130,32 @@ BOOL SelectKeyboard(DWORD KeymanID)
 	return TRUE;
 }
 
-BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD KeymanID, BOOL foreground)   // I3933   // I3949   // I4271
+
+BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD dwIdentity, BOOL foreground)   // I3933   // I3949   // I4271
 {
-  WCHAR buf[256];
-  
-  //atom format: LANGID|CLSID|GUIDPRofile
-
-  if(GlobalGetAtomNameW((ATOM)KeymanID, buf, 255) == 0) {
-    // This could happen if the atom is deleted before we get to it, e.g. if the app has hung
-    return FALSE; 
-  }
-
-  if(foreground) {   // I4271
-    GlobalDeleteAtom((ATOM)KeymanID);
-  } else if(IsFocusedThread()) {
+  if (!foreground && IsFocusedThread()) {
     return FALSE;   // I4277
   }
 
-  buf[255] = 0; // for safety
-  
-  LPWSTR pszCLSID = wcschr(buf,L'|');
-  if(!pszCLSID) return FALSE;
-  *pszCLSID = 0;
-  pszCLSID++;
-  
-  LPWSTR pszGUIDProfile = wcschr(pszCLSID,L'|');
-  if(!pszGUIDProfile) return FALSE;
-  *pszGUIDProfile = 0;
-  pszGUIDProfile++;
+  ISharedBufferManager *sbm = GetThreadSharedBufferManager();
+  if (!sbm) {
+    return FALSE;
+  }
 
-  GUID guidProfile;
-  IID iidCLSID;
-  LANGID langID;
-
-  langID = (LANGID) _wtoi(buf);
-  if(IIDFromString(pszCLSID, &iidCLSID) != NOERROR) return FALSE;
-  if(CLSIDFromString(pszGUIDProfile, &guidProfile) != NOERROR) return FALSE;
+  SelectKeyboardBuffer skb;
+  if(!sbm->ReadSelectKeyboardBuffer(dwIdentity, &skb)) {
+    return FALSE;
+  }
 
   if(!OpenTSF(_td)) return FALSE;
 
   BOOL bResult = FALSE;
 
-  SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Selecting language %x [%d]", langID, foreground);
-  HRESULT hr = _td->pInputProcessorProfiles->ChangeCurrentLanguage(langID);
-  if(SUCCEEDED(hr))
-  {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Activating profile %ws %ws for %x", pszCLSID, pszGUIDProfile, langID);
-    hr = _td->pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, langID, iidCLSID, guidProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
+  SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Selecting language identity=%d %x [%d]", dwIdentity, skb.LangID, foreground);
+  HRESULT hr = _td->pInputProcessorProfiles->ChangeCurrentLanguage(skb.LangID);
+  if(SUCCEEDED(hr)) {
+    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Activating profile");
+    hr = _td->pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, skb.LangID, skb.CLSID, skb.GUIDProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
     bResult = SUCCEEDED(hr);
   }
 

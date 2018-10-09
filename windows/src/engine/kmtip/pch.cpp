@@ -1,7 +1,7 @@
 //
-// precomp.cpp
+// pch.cpp
 //
 // Stub for vc precompiled header.
 //
 
-#include "globals.h"
+#include "pch.h"

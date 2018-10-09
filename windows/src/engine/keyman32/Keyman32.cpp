@@ -113,7 +113,8 @@
 //			start with it!)
 //
 
-#include "keyman64.h"
+#include "pch.h"
+#include "serialkeyeventserver.h"
 
 /*
  If DEBUG is defined, give information in the map file about PRIVATE (=static)
@@ -128,6 +129,8 @@
 LRESULT CALLBACK kmnKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
 int MapVirtualKeys(int keyCode, UINT shiftFlags);
 int KPostMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+HINSTANCE g_hInstance;
 
 /*******************************************************************************************/ 
 /*                                                                                         */ 
@@ -148,7 +151,7 @@ BOOL ShouldAttachToProcess();
 BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved) 
 {
   UNREFERENCED_PARAMETER(reserved);
-  UNREFERENCED_PARAMETER(hinstDll);
+  g_hInstance = hinstDll;
 	switch(fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
@@ -206,8 +209,9 @@ BOOL (WINAPI * PChangeWindowMessageFilter)(UINT, DWORD) = NULL;
 
 void DoCWMF(UINT msg)
 {
-	if(!(*PChangeWindowMessageFilter)(msg, MSGFLT_ADD))
-		SendDebugMessageFormat(0, sdmGlobal, 0, "Failed to ChangeWindowMessageFilter for %d = %d", msg, GetLastError());
+  if (!(*PChangeWindowMessageFilter)(msg, MSGFLT_ADD)) {
+    DebugLastError("ChangeWindowMessageFilter");
+  }
 }
 
 void DoChangeWindowMessageFilter()
@@ -393,10 +397,11 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_ResetInitialisation()  // I30
   return TRUE;
 }
 
-
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL FSingleApp)
 {
 	HINSTANCE hinst;
+
+  Globals::LoadDebugSettings();
 
 	if(Globals::get_Keyman_Initialised())
  	{
@@ -429,7 +434,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 
   if(!Globals::InitHandles())  // I3040
   {
-    SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed to create global handles.  GetLastError = %d", GetLastError());
+    DebugLastError("Globals::InitHandles");
     // SetLastError: Globals::InitHandles will return a windows error code  // I3143   // I3523
     return FALSE;
   }
@@ -441,10 +446,17 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 		return FALSE;	/* Failed to verify certificate */ 
 	}
 
+#ifdef USE_SERIALKEYEVENTSERVER
+#ifndef _WIN64
+  ISerialKeyEventServer::Startup();
+#endif
+#endif
+
   InitHooks();
 
-	SendDebugMessageFormat(Handle, sdmGlobal, 0, "GetMessage=%x CallWndProc=%x GetLastError=%d", 
-    Globals::get_hhookGetMessage(), Globals::get_hhookCallWndProc(), GetLastError());
+  DWORD dwLastError = GetLastError();
+  SendDebugMessageFormat(Handle, sdmGlobal, 0, "GetMessage=%x CallWndProc=%x GetLastError=%d",
+    Globals::get_hhookGetMessage(), Globals::get_hhookCallWndProc(), dwLastError);
 
 #ifndef _WIN64
 	SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyboard_LL=%x",    // I4124
@@ -480,6 +492,12 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
     SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_Exit called from thread %d that did not initialise (which was %d)", GetCurrentThreadId(), Globals::get_InitialisingThread());
     return FALSE;
   }
+
+#ifdef USE_SERIALKEYEVENTSERVER
+#ifndef _WIN64
+  ISerialKeyEventServer::Shutdown();
+#endif
+#endif
 
   *Globals::InitialisingThread() = 0;
 

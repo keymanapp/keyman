@@ -72,6 +72,10 @@
 #define STRICT
 #endif
 
+#ifndef USE_SERIALKEYEVENTSERVER
+#define USE_SERIALKEYEVENTSERVER
+#endif
+
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>
@@ -314,11 +318,11 @@ void ProcessDebugMessage(HWND hwnd, WPARAM wParam, LPARAM lParam);
 #define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
 #define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
 #define ShouldDebug(state) ShouldDebug_1()
-#define DebugLastError() (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,__DATE__))
-
+#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
+#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
 int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg);
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...);
-void DebugLastError_1(char *file, int line, char *func, char *date);
+void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func);
 void DebugMessage(LPMSG msg, WPARAM wParam);
 void DebugShift(char *function, char *point);
 BOOL DebugSignalPause(BOOL fIsUp);
@@ -351,7 +355,7 @@ extern "C" PWSTR  _declspec(dllexport) WINAPI GetSystemStore(LPKEYBOARD kb, DWOR
 
 DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 
-void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd);
+void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 

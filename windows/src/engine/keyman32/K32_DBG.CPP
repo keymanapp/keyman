@@ -43,7 +43,7 @@
                     24 Apr 2014 - mcdurdin - I4196 - V9.0 - wm_kmmoreposting must be refactored for TIP work as it is not sequential
                     09 Aug 2015 - mcdurdin - I4843 - Log reported modifier state as well as Keyman current modifier state
 */
-#include "keyman64.h"
+#include "pch.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <evntprov.h>
@@ -83,7 +83,6 @@ void InitDebuggingEx(PKEYMAN64THREADDATA _td) {
     _td->debug_ToConsole = FALSE;   // I3951
   }
   
-
 	if(_td->debug_KeymanLog) {
     DWORD dwErr = EventRegister(&guid_EtwProviderId, NULL, NULL, &_td->etwRegHandle);
     if (dwErr != ERROR_SUCCESS) {
@@ -99,7 +98,7 @@ void InitDebugging() {
 	InitDebuggingEx(_td);
 	_td->debug_DebugInit = TRUE;
 
-	if(_td->debug_KeymanLog)
+	if(Globals::get_debug_KeymanLog())
 	{
 		VS_FIXEDFILEINFO *ffi;
 		DWORD sz;
@@ -293,7 +292,6 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
         GetKeyboardLayout(0),            //"ActiveHKL" TAB
         file, line,                      //"SourceFile" TAB
         msg);                            //"Message"
-
       OutputDebugString(windowinfo);   // I3570   // I3951
       OutputDebugString("\n");   // I3570   // I3951
     }
@@ -427,14 +425,16 @@ BOOL DebugSignalPause(BOOL fIsUp)
   return FALSE;
 }
 
-void DebugLastError_1(char *file, int line, char *func, char *date)
+void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func)
 {
-  DWORD err = GetLastError();
   if(ShouldDebug(sdmDebug))
   {
     char msg[256];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL);
-    SendDebugMessageFormat_1(NULL, sdmDebug, 0, "ERROR %d in %s [%s:%d]: %s", err, func, file, line, date, msg);
+    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL) == 0) msg[0] = 0;
+    for (char *p = msg; *p; p++) {
+      if (*p == '\r' || *p == '\n') *p = ' ';
+    }
+    SendDebugMessageFormat_1(NULL, sdmDebug, 0, file, line, "ERROR %d in %s calling %s: %s", err, func, context, msg);
   }
 }
 
@@ -467,3 +467,56 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];
 }
+
+#ifdef DEBUG_PROCMON_LOGGING
+
+//
+// Connecting to ProcMon
+//
+
+#define FILE_DEVICE_PROCMON_LOG     0x00009535
+#define IOCTL_EXTERNAL_LOG_DEBUGOUT (ULONG) CTL_CODE( FILE_DEVICE_PROCMON_LOG, 0x81, METHOD_BUFFERED, FILE_WRITE_ACCESS )
+
+HANDLE OpenProcMonHandle() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return NULL;
+  }
+
+  HANDLE hProcMon = _td->hProcMon;
+  if (hProcMon == NULL) {
+    hProcMon = CreateFile(
+      "\\\\.\\Global\\ProcmonDebugLogger",
+      GENERIC_WRITE,
+      FILE_SHARE_WRITE,
+      NULL,
+      OPEN_EXISTING,
+      FILE_ATTRIBUTE_NORMAL,
+      0);
+    if (hProcMon == NULL) {
+      // todo: report error
+      return NULL;
+    }
+    _td->hProcMon = hProcMon;
+  }
+
+  return hProcMon;
+}
+
+BOOL CloseProcMonHandle() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return NULL;
+  }
+
+  if (_td->hProcMon == NULL) {
+    // never allocated, so nothing to close
+    return TRUE;
+  }
+
+  BOOL fResult = CloseHandle(_td->hProcMon);
+  _td->hProcMon = NULL;
+  return fResult;
+}
+
+#endif

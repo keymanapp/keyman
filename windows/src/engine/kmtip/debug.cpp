@@ -44,7 +44,7 @@
                     09 Aug 2015 - mcdurdin - I4843 - Log reported modifier state as well as Keyman current modifier state
 */
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 #include <stdio.h>
 #include <stdarg.h>

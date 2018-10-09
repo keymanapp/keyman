@@ -24,7 +24,7 @@
                     10 Jun 2014 - mcdurdin - I4262 - V9.0 - TSF deadkeys do not function correctly
                     28 Mar 2016 - mcdurdin - I4933 - Compat issue with Firefox 42 and IE and Keyman 9 TSF
 */
-#include "globals.h"   // I4262
+#include "pch.h"   // I4262
 #include "kmtip.h"
 #include "keyman64.h"
 #include "keymanapi.h"

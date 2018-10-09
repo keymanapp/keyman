@@ -22,7 +22,8 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 // I4326
-#include "keyman64.h"
+#include "pch.h"
+#include "serialkeyeventserver.h"
 
 #ifdef _WIN64
 #error k32_lowlevelkeyboardhook.cpp is not required for win64.
@@ -135,47 +136,50 @@ LRESULT _kmnLowLevelKeyboardProc(
   if(IsLanguageSwitchWindowVisible()) {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: Sending to language switch window %x %x", wParam, lParam);
     SendToLanguageSwitchWindow(hs->vkCode, hs->flags);
-    return ProcessLanguageSwitchShiftKey(hs->vkCode, isUp);
+    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
   }
+  else if (KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState)) {
+    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
+  }
+  else {
 
-  if(KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState))
-    return ProcessLanguageSwitchShiftKey(hs->vkCode, isUp);
+    /*
+    Process keyboard hotkeys
+    */
 
-  /*
-  Process keyboard hotkeys
-  */
+    DWORD hk = (DWORD)hs->vkCode | FHotkeyShiftState;
 
-  DWORD hk = (DWORD) hs->vkCode | FHotkeyShiftState;
+    Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
 
-  Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
+    /*
+    Search for an interface or language hotkey
+    */
 
-	/*
-	Search for an interface or language hotkey
-	*/
-		
-  // TODO: deprecate KeymanUIDisabled, FSingleThread
+    // TODO: deprecate KeymanUIDisabled, FSingleThread
 
-  if(hotkeys) {   // I4641
-	  Hotkey *hotkey = hotkeys->GetHotkey(hk);
-	  if(hotkey) {
-		  if(isUp) {
-        if(hotkey->HotkeyType == hktInterface) {
-			    SendDebugMessageFormat(0, sdmGlobal, 0, "Hotkey matched = {HotkeyValue: %x, Target: %d}", 
-				    hotkey->HotkeyValue,
-				    hotkey->Target);
-			    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
-        } else {
-			    SendDebugMessageFormat(0, sdmGlobal, 0, "Hotkey matched = {HotkeyValue: %x, hkl: %x}", 
-				    hotkey->HotkeyValue,
-				    hotkey->hkl);
-          
-          // Send the hotkey value to the master controller, rather than the language HKL or profile GUID, because
-          // this is cheaper than constructing a string and posting it across.
-          
-          Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_LANGUAGEHOTKEY, 0), (LPARAM) hotkey->HotkeyValue);   // I4451
+    if (hotkeys) {   // I4641
+      Hotkey *hotkey = hotkeys->GetHotkey(hk);
+      if (hotkey) {
+        if (isUp) {
+          if (hotkey->HotkeyType == hktInterface) {
+            SendDebugMessageFormat(0, sdmGlobal, 0, "Hotkey matched = {HotkeyValue: %x, Target: %d}",
+              hotkey->HotkeyValue,
+              hotkey->Target);
+            Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
+          }
+          else {
+            SendDebugMessageFormat(0, sdmGlobal, 0, "Hotkey matched = {HotkeyValue: %x, hkl: %x}",
+              hotkey->HotkeyValue,
+              hotkey->hkl);
+
+            // Send the hotkey value to the master controller, rather than the language HKL or profile GUID, because
+            // this is cheaper than constructing a string and posting it across.
+
+            Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_LANGUAGEHOTKEY, 0), (LPARAM)hotkey->HotkeyValue);   // I4451
+          }
         }
-		  }
-	    return 1;
+        return 1;
+      }
     }
   }
 
@@ -194,12 +198,14 @@ LRESULT _kmnLowLevelKeyboardProc(
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
-        PostThreadMessage(GetWindowThreadProcessId(hwnd, NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+#ifdef USE_SERIALKEYEVENTSERVER
+        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+#else
+        PostThreadMessage(GetWindowThreadProcessId(GetForegroundWindow(), NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+#endif
         return 1;
       }
-      else {
-        SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing");
-      }
+      //else SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // too noisy 
     }
     else {
       SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Failed to get Gui thread info with error %d", GetLastError());
@@ -208,3 +214,4 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
 }
+

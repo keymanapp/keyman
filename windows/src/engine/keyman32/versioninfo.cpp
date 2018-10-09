@@ -19,7 +19,7 @@
                     04 May 2010 - mcdurdin - I2357 - Version info update for Windows 7
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 #pragma warning(disable: 4996)
 void GetWindowsVersion(char *buf)

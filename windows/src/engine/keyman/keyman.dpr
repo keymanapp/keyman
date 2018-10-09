@@ -139,7 +139,8 @@ uses
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   Keyman.System.DebugLogClient in '..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas',
-  Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas';
+  Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas',
+  Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}

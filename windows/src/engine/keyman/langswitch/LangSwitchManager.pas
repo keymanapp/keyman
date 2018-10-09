@@ -246,6 +246,7 @@ uses
 //  System.StrUtils,
 
   Keyman.System.DebugLogClient,
+  Keyman.System.SharedBuffers,
   glossary,
   InterfaceHotkeys,
   kmint,
@@ -766,15 +767,17 @@ end;
 
 procedure TLangSwitchKeyboard_TIP.Activate(hwnd: THandle);
 var
-  s: string;
-  FAtom: ATOM;
+  skb: TSelectKeyboardBuffer;
+  FIdentity: DWORD;
 begin
-//  Assert(FValid);   // I4715
   FManager.SetActiveItem(Self);   // I3933
-  s := IntToStr(FProfile.langid) + '|' + GUIDToString(TGUID(FProfile.clsid)) + '|' + GUIDToString(TGUID(FProfile.guidProfile));
-  FAtom := GlobalAddAtom(PChar(s));
-  TDebugLogClient.Instance.WriteMessage('TLangSwitchKeyboard_TIP.Activate hwnd=%x keyboard=%s', [hwnd, s]);   // I4674
-  PostMessage(hwnd, wm_keyman_control_internal, KMCI_SELECTKEYBOARD_TSF, FAtom);   // I3933
+  skb.LangID := FProfile.langid;
+  skb.CLSID := FProfile.clsid;
+  skb.GUIDProfile := FProfile.guidProfile;
+  FIdentity := TSharedBufferManager.Identity.WriteSelectKeyboardBuffer(skb);
+  TDebugLogClient.Instance.WriteMessage('TLangSwitchKeyboard_TIP.Activate identity=%d hwnd=%x keyboard=%s %s', [
+    FIdentity, hwnd, GuidToString(skb.CLSID), GuidToString(skb.GUIDProfile)]);   // I4674
+  PostMessage(hwnd, wm_keyman_control_internal, KMCI_SELECTKEYBOARD_TSF, FIdentity);   // I3933
 end;
 
 function ExpandRegString(sz: string): string;   // I3950

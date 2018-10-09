@@ -27,11 +27,7 @@
 //
 // Server registration code.
 //
-
-#include <windows.h>
-#include <ole2.h>
-#include "msctf.h"
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 #include "registry.h"
 

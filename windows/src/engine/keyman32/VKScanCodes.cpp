@@ -16,7 +16,7 @@
   History:          11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     17 Dec 2013 - mcdurdin - I4006 - V9.0 - Remove old aiDefault code
 */
-#include "keyman64.h"   // I4006
+#include "pch.h"   // I4006
 
 UINT USVirtualKeyToScanCode[256] = 
 {

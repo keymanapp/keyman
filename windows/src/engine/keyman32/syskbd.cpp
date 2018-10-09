@@ -34,7 +34,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "keyman64.h"
+#include "pch.h"
 
 extern WCHAR CharFromVK_NT(WORD *VKey, UINT ShiftFlags);   // I4582
 

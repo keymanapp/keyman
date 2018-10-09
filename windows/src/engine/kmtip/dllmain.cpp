@@ -22,7 +22,7 @@
 // DllMain module entry point.
 //
 
-#include "globals.h"
+#include "pch.h"
 
 //+---------------------------------------------------------------------------
 //

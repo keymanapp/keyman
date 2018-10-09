@@ -58,6 +58,11 @@
 #define GLOBAL_MsgStackSize 80
 #define GLOBAL_MaxKeyboards 32
 
+#ifdef USE_SERIALKEYEVENTSERVER
+#include "serialkeyeventclient.h"
+#include "SharedBuffers.h"
+#endif
+
 class Globals
 {
 public:
@@ -137,6 +142,12 @@ public:
   static BOOL Lock();
   static BOOL Unlock();
   static BOOL CheckControllers();
+
+  /* Debugging */
+
+  static BOOL get_debug_KeymanLog();
+  static BOOL get_debug_ToConsole();
+  static void LoadDebugSettings();
 };
 
 /* External interface functions */
@@ -233,6 +244,16 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TSFFailed;
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
+
+#ifdef USE_SERIALKEYEVENTSERVER
+  ISerialKeyEventClient *pSerialKeyEventClient;
+#endif
+
+#ifdef DEBUG_PROCMON_LOGGING
+  HANDLE hProcMon;
+#endif
+  BOOL debug_Error;
+  ISharedBufferManager *pSharedBufferManager;
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT 
@@ -255,6 +276,8 @@ extern UINT
 
 extern BOOL
   flag_ShouldSerializeInput;
+
+extern HINSTANCE g_hInstance;
 
 void UpdateActiveWindows();
 
