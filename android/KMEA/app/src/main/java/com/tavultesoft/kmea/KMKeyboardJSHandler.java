@@ -11,10 +11,12 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public abstract class KMKeyboardJSHandler {
   private Context context;
+  private KMKeyboard k = null;
   private static int KM_VIBRATE_DURATION = 100; // milliseconds
 
-  KMKeyboardJSHandler(Context context) {
+  KMKeyboardJSHandler(Context context, KMKeyboard k) {
     this.context = context;
+    this.k = k;
   }
 
   // This annotation is required in Jelly Bean and later:
@@ -55,7 +57,11 @@ public abstract class KMKeyboardJSHandler {
 
   // Store the current keyboard chirality status from KMW in the Keyboard
   @JavascriptInterface
-  public abstract void setIsChiral(boolean isChiral);
+  public void setIsChiral(boolean isChiral) {
+    if (k != null) {
+      k.setChirality(isChiral);
+    }
+  }
 
   // Insert the selected string s
   @JavascriptInterface

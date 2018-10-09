@@ -225,7 +225,7 @@ public final class KMManager {
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
-      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
+      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
       InAppKeyboard.loadKeyboard();
     }
   }
@@ -240,7 +240,7 @@ public final class KMManager {
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
-      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext), "jsInterface");
+      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
       SystemKeyboard.loadKeyboard();
     }
   }
@@ -1586,14 +1586,8 @@ public final class KMManager {
 
   private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
 
-    KMInAppKeyboardJSHandler(Context context) {
-      super(context);
-    }
-
-    // Store the current keyboard chirality status from KMW in InAppKeyboard
-    @JavascriptInterface
-    public void setIsChiral(boolean isChiral) {
-      InAppKeyboard.setChirality(isChiral);
+    KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
+      super(context, k);
     }
 
     // This annotation is required in Jelly Bean and later:
@@ -1674,14 +1668,8 @@ public final class KMManager {
   }
 
   private static final class KMSystemKeyboardJSHandler extends KMKeyboardJSHandler {
-    KMSystemKeyboardJSHandler(Context context) {
-      super(context);
-    }
-
-    // Store the current keyboard chirality status from KMW in SystemKeyboard
-    @JavascriptInterface
-    public void setIsChiral(boolean isChiral) {
-      SystemKeyboard.setChirality(isChiral);
+    KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
+      super(context, k);
     }
 
     // This annotation is required in Jelly Bean and later:
