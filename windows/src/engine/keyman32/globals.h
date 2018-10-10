@@ -137,7 +137,6 @@ public:
   static BOOL CheckControllers();
 
 #ifdef USE_KEYEVENTSENDERTHREAD
-  static BOOL SignalKeyEvent();
   static INPUT *InputBuf();
   static DWORD *nInputBuf();
 #endif
@@ -271,6 +270,8 @@ extern UINT
 
 extern BOOL
   flag_ShouldSerializeInput;
+
+extern HINSTANCE g_hInstance;
 
 void UpdateActiveWindows();
 

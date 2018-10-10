@@ -474,6 +474,9 @@ void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func
   {
     char msg[256];
     if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL) == 0) msg[0] = 0;
+    for (char *p = msg; *p; p++) {
+      if (*p == '\r' || *p == '\n') *p = ' ';
+    }
     SendDebugMessageFormat_1(NULL, sdmDebug, 0, file, line, "ERROR %d in %s calling %s: %s", err, func, context, msg);
   }
 }

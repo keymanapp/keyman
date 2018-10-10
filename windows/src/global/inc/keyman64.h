@@ -72,6 +72,10 @@
 #define STRICT
 #endif
 
+#ifndef USE_KEYEVENTSENDERTHREAD
+#define USE_KEYEVENTSENDERTHREAD
+#endif
+
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>

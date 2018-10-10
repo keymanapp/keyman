@@ -61,12 +61,7 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 */
 #include "keyman64.h"
-#include "aclapi.h"
-#include "accctrl.h"
-#include "sddl.h"
-
-#include <VersionHelpers.h>
-// TODO: replace GetVersion, GetVersionEx calls with IsWindowsXYOrGreater
+#include "security.h"
 
 /***************************************************************************/
 /*                                                                         */
@@ -287,7 +282,7 @@ static BOOL
 
 #ifdef USE_KEYEVENTSENDERTHREAD
 static INPUT
-  f_inputBuf[1024] = { 0 };
+  f_inputBuf[MAX_KEYEVENT_INPUTS] = { 0 };
 
 static DWORD
   f_nInputBuf = 0;
@@ -376,91 +371,6 @@ void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL 
   strcpy_s(f_BaseKeyboard, baseKeyboard);
   f_SimulateAltGr = simulateAltGr;
   f_MnemonicDeadkeyConversionMode = mnemonicDeadkeyConversionMode;
-}
-
-LPCWSTR LOW_INTEGRITY_SDDL_SACL_W = L"S:(ML;;NW;;;LW)";
- 
-#define LABEL_SECURITY_INFORMATION (0x00000010L)
-
-#pragma warning(disable: 4996)
-BOOL SetObjectToLowIntegrity(HANDLE hObject, SE_OBJECT_TYPE type = SE_KERNEL_OBJECT)
-{
-  BOOL bRet = FALSE;
-  DWORD dwErr = ERROR_SUCCESS;
-  PSECURITY_DESCRIPTOR pSD = NULL;
-  PACL pSacl = NULL;
-  BOOL fSaclPresent = FALSE;
-  BOOL fSaclDefaulted = FALSE;
-
-  if(LOBYTE(LOWORD(GetVersion())) < 6) return TRUE;
- 
-  if(ConvertStringSecurityDescriptorToSecurityDescriptorW(LOW_INTEGRITY_SDDL_SACL_W, SDDL_REVISION_1, &pSD, NULL))
-  {
-    if(GetSecurityDescriptorSacl(pSD, &fSaclPresent, &pSacl, &fSaclDefaulted))
-    {
-      dwErr = SetSecurityInfo(
-                hObject, type, LABEL_SECURITY_INFORMATION,
-                NULL, NULL, NULL, pSacl);
- 
-      bRet = (ERROR_SUCCESS == dwErr);
-    }
- 
-    LocalFree(pSD);
-  }
- 
-  return bRet;
-}
-#pragma warning(default: 4996)
-
-/**
- Allows metro-style applications to access objects shared across the system
-*/
-void GrantPermissionToAllApplicationPackages(HANDLE handle, DWORD dwAccessPermissions) {
-  // ALL APPLICATION PACKAGES group is introduced in Windows 8
-  if (!IsWindows8OrGreater())
-    return;
-
-  PACL pOldDACL = NULL, pNewDACL = NULL;
-  PSECURITY_DESCRIPTOR pSD = NULL;
-  EXPLICIT_ACCESS ea;
-  SECURITY_INFORMATION si = DACL_SECURITY_INFORMATION;
-
-  // Get a pointer to the existing DACL.
-  DWORD dwRes = GetSecurityInfo(handle, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &pSD);
-  if (ERROR_SUCCESS != dwRes) {
-    DebugLastError0(dwRes, "GetSecurityInfo");
-    return;
-  }
-
-  // Initialize an EXPLICIT_ACCESS structure for the new ACE. 
-  ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
-  ea.grfAccessPermissions = dwAccessPermissions;
-  ea.grfAccessMode = SET_ACCESS;
-  ea.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-
-  ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
-  ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-  ea.Trustee.ptstrName = "ALL APPLICATION PACKAGES";
-
-  // Create a new ACL that merges the new ACE into the existing DACL.
-  dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
-  if (ERROR_SUCCESS != dwRes) {
-    DebugLastError0(dwRes, "SetEntriesInAcl");
-    goto Cleanup;
-  }
-
-  // Attach the new ACL as the object's DACL.
-  dwRes = SetSecurityInfo(handle, SE_FILE_OBJECT, si, NULL, NULL, pNewDACL, NULL);
-  if (ERROR_SUCCESS != dwRes) {
-    DebugLastError0(dwRes, "SetSecurityInfo");
-    goto Cleanup;
-  }
-
-Cleanup:
-  if (pSD != NULL)
-    LocalFree((HLOCAL)pSD);
-  if (pNewDACL != NULL)
-    LocalFree((HLOCAL)pNewDACL);
 }
 
 BOOL Globals::Lock()
@@ -787,34 +697,3 @@ void Globals::LoadDebugSettings() {
     f_debug_ToConsole = FALSE;   // I3951
   }
 }
-
-#ifdef USE_KEYEVENTSENDERTHREAD
-#ifdef _WIN64
-#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent_x64"
-#else
-#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent_x86"
-#endif
-
-HANDLE f_hKeyEvent = 0;
-
-BOOL Globals::SignalKeyEvent() {
-  if (f_hKeyEvent == 0) {
-    f_hKeyEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, GLOBAL_KEY_EVENT_NAME);
-    if (f_hKeyEvent == 0) {
-      DebugLastError("OpenEvent");
-      return FALSE;
-    }
-  }
-  if (!SetEvent(f_hKeyEvent)) {
-    DebugLastError("SetEvent");
-    return FALSE;
-  }
-  return TRUE;
-}
-
-void InitKeyEventSenderThread() {
-  f_hKeyEvent = CreateEvent(NULL, FALSE, FALSE, GLOBAL_KEY_EVENT_NAME);
-  SetObjectToLowIntegrity(f_hKeyEvent);
-  GrantPermissionToAllAppicationPackages(f_hKeyEvent, EVENT_MODIFY_STATE);
-}
-#endif

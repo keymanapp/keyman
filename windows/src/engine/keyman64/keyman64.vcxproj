@@ -276,6 +276,7 @@
     </ClCompile>
     <ClCompile Include="..\..\global\vc\registry.cpp" />
     <ClCompile Include="..\keyman32\preservedkeymap.cpp" />
+    <ClCompile Include="..\keyman32\security.cpp" />
     <ClCompile Include="..\keyman32\selectkeyboard.cpp" />
     <ClCompile Include="..\keyman32\syskbd.cpp" />
     <ClCompile Include="..\keyman32\syskbdnt.cpp">
@@ -337,6 +338,7 @@
     <ClInclude Include="..\..\global\inc\rc4.h" />
     <ClInclude Include="..\..\global\inc\registration.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
+    <ClInclude Include="..\keyman32\security.h" />
     <ClInclude Include="..\keyman32\syskbd.h" />
     <ClInclude Include="..\..\global\inc\testkeymanfunctioning.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />

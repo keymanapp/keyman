@@ -186,24 +186,12 @@ LRESULT _kmnLowLevelKeyboardProc(
   */
 
   if (flag_ShouldSerializeInput) {
-    GUITHREADINFO gui = { 0 };
-    gui.cbSize = sizeof(GUITHREADINFO);
-    if (GetGUIThreadInfo(NULL, &gui)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Active=%x Focus=%x Key=%s flags=%x",
-        gui.hwndActive, gui.hwndFocus, Debug_VirtualKey((WORD)hs->vkCode), LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-
-      HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
-      if (!IsConsoleWindow(hwnd)) {
-        PostThreadMessage(GetWindowThreadProcessId(hwnd, NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-        return 1;
-      }
-      else {
-        SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing");
-      }
-    }
-    else {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Failed to get Gui thread info with error %d", GetLastError());
-    }
+#ifdef USE_KEYEVENTSENDERTHREAD
+    PostThreadMessage(idKeyEventSenderThread, wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+#else
+    PostThreadMessage(GetWindowThreadProcessId(GetForegroundWindow(), NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+#endif
+    return 1;
   }
 
   return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);

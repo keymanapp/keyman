@@ -108,7 +108,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 		cp = (CWPSTRUCT *)lParam;
     if(!Globals::get_Keyman_Initialised())
     {
-      DebugLastError("get_Keyman_Initialised");
+      //DebugLastError("get_Keyman_Initialised");
     }
 	  else 
 	  {

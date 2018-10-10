@@ -311,10 +311,7 @@ BOOL AIWin2000Unicode::PostKeys()
 
   if(i > 0) {   // I4452
 #ifdef USE_KEYEVENTSENDERTHREAD
-    // TODO: use circular buffer
-    memcpy(Globals::InputBuf(), pInputs, i * sizeof(INPUT));
-    *Globals::nInputBuf() = i;
-    Globals::SignalKeyEvent();
+    SignalKeyEventSenderThread(pInputs, i);
 #else
     if(SendInput(i, pInputs, sizeof(INPUT)) == 0) {
       DebugLastError("SendInput");

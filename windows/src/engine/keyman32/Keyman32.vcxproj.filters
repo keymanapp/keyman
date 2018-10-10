@@ -123,6 +123,9 @@
     <ClCompile Include="keyeventsenderthread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="security.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -209,6 +212,9 @@
     </ClInclude>
     <ClInclude Include="keyeventsenderthread.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="security.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
