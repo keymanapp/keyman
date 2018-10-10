@@ -82,6 +82,8 @@ type
     procedure SetBCP47Tags(const Value: string);
     procedure SetKeyboardID(const Value: string);
     procedure SetKeyboardName(const Value: string);
+  protected
+    function GetHelpTopic: string; override;
   public
     property KeyboardName: string read GetKeyboardName write SetKeyboardName;
     property Copyright: string read GetCopyright;
@@ -105,6 +107,8 @@ uses
   UfrmMain,
   utilstr,
   utilsystem,
+  Keyman.Developer.System.HelpTopics,
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.KeyboardProjectTemplate,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
@@ -348,6 +352,11 @@ end;
 function TfrmNewProjectParameters.GetCopyright: string;
 begin
   Result := Trim(editCopyright.Text);
+end;
+
+function TfrmNewProjectParameters.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_NewProjectParameters;
 end;
 
 function TfrmNewProjectParameters.GetKeyboardID: string;

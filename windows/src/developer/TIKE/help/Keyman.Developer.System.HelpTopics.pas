@@ -21,8 +21,8 @@ const
   SHelpTopic_Context_Messages = 'context/messages';
   SHelpTopic_Context_MustIncludeDebug = 'context/must-include-debug';
   SHelpTopic_Context_New = 'context/new';
-  SHelpTopic_Context_NewProject = 'context/new-project'; //TODO: Add it
-  SHelpTopic_Context_NewBasicProject = 'context/new-basic-project'; //TODO: Add it
+  SHelpTopic_Context_NewProject = 'context/new-project';
+  SHelpTopic_Context_NewProjectParameters = 'context/new-project-parameters';
   SHelpTopic_Context_NewFileDetails = 'context/new-file-details';
   SHelpTopic_Context_OnScreenKeyboardEditor = 'context/keyboard-editor#toc-on-screen-tab';
   SHelpTopic_Context_Options = 'context/options';
