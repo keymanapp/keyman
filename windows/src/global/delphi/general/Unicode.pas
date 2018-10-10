@@ -49,6 +49,10 @@ function IsUTF8Stream(Stream: TStream): Boolean; deprecated;  // I3310
 function IsUTF16Stream(Stream: TStream): Boolean; deprecated;  // I3310
 function IsUTF16FileEx(const FFileName: WideString; FFalseOnBOM: Boolean = False): Boolean; deprecated;  // I3310
 
+// Copies len Unicode codepoints from the UTF-16 string starting at code unit offset n
+// Handles surrogate pairs. Returned string length may be between len and len*2
+function CopyChar(s: string; n, len: Integer): string;
+
 const UTF8Signature: ansistring = #$EF#$BB#$BF deprecated;  // I3310
 const UTF16Signature: ansistring = #$FF#$FE deprecated;  // I3310
 const UTF16SignatureW: WideString = #$FEFF deprecated;  // I3310
@@ -458,6 +462,32 @@ begin
 end;
 {$WARN EXPLICIT_STRING_CAST_LOSS DEFAULT}
 {$WARN EXPLICIT_STRING_CAST DEFAULT}
+
+function CopyChar(s: string; n, len: Integer): string;
+var
+  ch: Char;
+begin
+  Result := '';
+
+  if n <= 0 then
+    Exit('');
+
+  while len > 0 do
+  begin
+    if n > Length(s) then
+      Exit;
+    ch := s[n];
+    if Uni_IsSurrogate1(ch) and (n < Length(s)) and Uni_IsSurrogate2(s[n+1]) then
+    begin
+      Inc(n);
+      Result := Result + ch + s[n];
+    end
+    else
+      Result := Result + ch;
+    Inc(n);
+    Dec(len);
+  end;
+end;
 
 end.
 
