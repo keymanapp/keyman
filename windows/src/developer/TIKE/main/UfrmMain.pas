@@ -362,8 +362,11 @@ type
 
     property ActiveChildIndex: Integer read GetActiveChildIndex write SetActiveChildIndex;
 
+    function BeforeOpenProject: Boolean;
+    procedure OpenProject(const ProjectFilename: string);
     procedure ShowProject;
     function ProjectForm: TfrmProject;
+    procedure ToggleProject;
 
     procedure ShowDebug(AShow: Boolean);
 
@@ -887,6 +890,16 @@ begin
   ProjectForm.SetGlobalProject;
 end;
 
+procedure TfrmKeymanDeveloper.ToggleProject;
+var
+  frmProject: TfrmProject;
+begin
+  frmProject := ProjectForm;
+  if Assigned(frmProject) and (ActiveChild = frmProject)
+    then PostMessage(frmProject.Handle, WM_CLOSE, 0, 0)
+    else ShowProject;
+end;
+
 procedure TfrmKeymanDeveloper.InitDock;
 begin
   AppStorage := TJvAppRegistryStorage.Create(self);
@@ -1163,6 +1176,32 @@ end;
 function TfrmKeymanDeveloper.OpenKVKEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmOSKEditor);
+end;
+
+function TfrmKeymanDeveloper.BeforeOpenProject: Boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to FChildWindows.Count - 1 do
+    if not FChildWindows[i].CloseQuery then
+      Exit(False);
+
+  Result := True;
+end;
+
+procedure TfrmKeymanDeveloper.OpenProject(const ProjectFilename: string);
+var
+  i: Integer;
+begin
+  // Close child windows
+  for i := 0 to FChildWindows.Count - 1 do
+    FChildWindows[i].Close;
+
+  FGlobalProject.Save;
+  ProjectForm.Free;
+  FreeGlobalProjectUI;
+  LoadGlobalProjectUI('');
+  ShowProject;
 end;
 
 function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;

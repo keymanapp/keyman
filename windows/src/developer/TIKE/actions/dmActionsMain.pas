@@ -479,13 +479,15 @@ end;
 
 procedure TmodActionsMain.actProjectNewExecute(Sender: TObject);
 begin
-  // TODO: Close all existing editor forms
+  if not frmKeymanDeveloper.BeforeOpenProject then
+    Exit;
   ShowNewProjectForm(frmKeymanDeveloper);
 end;
 
 procedure TmodActionsMain.actProjectOpenAccept(Sender: TObject);
 begin
-  // TODO: Close all existing editor forms
+  if not frmKeymanDeveloper.BeforeOpenProject then
+    Exit;
   OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
@@ -767,16 +769,8 @@ begin
 end;
 
 procedure TmodActionsMain.actViewProjectExecute(Sender: TObject);
-var
-  frmProject: TfrmProject;
 begin
-  with frmKeymanDeveloper do
-  begin
-    frmProject := ProjectForm;
-    if Assigned(frmProject) and (ActiveChild = frmProject)
-      then PostMessage(frmProject.Handle, WM_CLOSE, 0, 0)
-      else ShowProject;
-  end;
+  frmKeymanDeveloper.ToggleProject;
 end;
 
 procedure TmodActionsMain.actViewProjectUpdate(Sender: TObject);
