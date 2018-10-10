@@ -6,10 +6,6 @@ Prototype of NRC language model layer for Keyman.
 I'm developing and experimenting with the API and how different API
 designs will practically work.
 
-Current status (Tue Oct  2 09:45:10 MDT 2018):
-
- - [ ] Developing communication protocol between keyboard and Web Worker.
-
 
 Communication protocol between keyboard and asynchronous worker
 ---------------------------------------------------------------
@@ -105,13 +101,78 @@ An asynchronous message to predict after typing 'D':
 Message types
 -------------
 
-Currently there are three message types:
+Currently there are four message types:
 
 Message       | Direction          | Parameters          | Expected reply      | Uses token
 --------------|--------------------|---------------------|---------------------|---------------
+`initialize`  | keyboard → LMLayer | initialization      | Yes — `ready`       | No
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
 `predict`     | keyboard → LMLayer | transform, contexts | Yes — `suggestions` | Yes
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
+
+
+### Message: `initialize`
+
+Must be sent from the keyboard to the LMLayer so that the LMLayer
+initializes a model. It will send `initialization` which is a plain
+JavaScript object specify the path to the model, as well configurations
+and platform restrictions.
+
+The keyboard **MUST NOT** send any messages to the LMLayer prior to
+sending `initialize`. The keyboard **SHOULD** wait until receiving the
+`ready` message from the LMLayer before sending another message.
+
+These are the configurations, and platform restrictions sent to
+initialize the LMLayer and its model.
+
+```javascript
+let initialization = {
+  /**
+   * [REQUIRED]
+   * Path to the model. There are no concrete restrictions on the path
+   * to the model, so long as the LMLayer can succesfully use it to
+   * initialize the model.
+   *
+   * type: string
+   */
+   model: './models/en_CA-x-testing',
+
+  /**
+   * Whether the platform supports right contexts.
+   * The absense of this rule implies false.
+   *
+   * type: bool
+   */
+  supportsRightContexts: false,
+
+  /**
+   * Whether the platform supports deleting to the right.
+   * The absence of this rule implies false.
+   *
+   * type: bool
+   */
+  supportsDeleteRight: false,
+
+  /**
+   * [REQUIRED]
+   * The maximum amount of code units that the keyboard will provide to
+   * the left of the cursor.
+   *
+   * type: number
+   */
+  maxLeftContextCodeUnits: 32,
+
+  /**
+   * The maximum amount of code units that the keyboard will provide to
+   * the right of the cursor.
+   * The absence of this rule implies 0. See also,
+   * supportsRightContexts.
+   *
+   * type: number
+   */
+  maxRightContextCodeUnits: 32,
+};
+```
 
 
 ### Message: `ready`
@@ -119,9 +180,6 @@ Message       | Direction          | Parameters          | Expected reply      |
 Must be sent from the LMLayer to the keyboard when the LMLayer's model
 is finished initializing. It will send `configuration`, which is
 a plain JavaScript object requesting configuration from the keyboard.
-
-The keyboard SHOULD NOT send any messages to the LMLayer before it
-receives the `ready` message.
 
 There are only two options defined so far:
 
@@ -135,7 +193,7 @@ let configuration = {
      *
      * TODO: Will this ever bisect graphical cluster boundaries?
      */
-    leftContextCodeUnits: 32, 
+    leftContextCodeUnits: 32,
 
     /**
      * How many UTF-16 code units maximum to send as the context to the
@@ -145,17 +203,27 @@ let configuration = {
      *
      * TODO: Will this ever bisect graphical cluster boundaries?
      */
-    rightContextCodeUnits: 32, 
+    rightContextCodeUnits: 32,
 };
 ```
+
+
+### Message: `predict`
+
+...
+
+
+### Message: `suggestions`
+
+...
+
 
 TODO
 ====
 
- - [ ] make TinyWorker's `self` inherit from the global scope?
- - [ ] write documentation for new initialization messages
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] enable continuous integration
  - [ ] TypeScript!
  - [ ] Figure out what a `Context` will be
+ - [ ] make TinyWorker's `self` inherit from the global scope?
  - [ ] Refactor `LMLayer` with state pattern?
