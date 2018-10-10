@@ -147,6 +147,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     DebugMessage(mp, wParam);
   }
 
+  #ifndef USE_KEYEVENTSENDERTHREAD
   /*
     Serializes all input events onto the current focused window thread by repeating any externally generated events. This
     is required to ensure that we can get the correct modifier state when we need to push a modifier release/set around
@@ -186,6 +187,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
+#endif
 
   if ((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
@@ -212,6 +214,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   }
 
   // I1337 - move mousewheel message checking before the PM_REMOVE handling - otherwise we can't pre-modify the message
+  // TODO: Move to WH_MOUSE_LL proc in main process
 	if(mp->message == WM_MOUSEWHEEL)
 	{
 		HWND hwndMouseWheel = FindWindow("TfrmVisualKeyboard", NULL);

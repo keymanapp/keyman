@@ -9,6 +9,6 @@ void ShutdownConsumer();
 
 BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs);
 
-extern DWORD idKeyEventSenderThread;
+extern HWND hwndKeyEventSender;
 
 #endif

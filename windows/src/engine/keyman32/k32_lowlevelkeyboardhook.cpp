@@ -187,7 +187,7 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   if (flag_ShouldSerializeInput) {
 #ifdef USE_KEYEVENTSENDERTHREAD
-    PostThreadMessage(idKeyEventSenderThread, wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+    PostMessage(hwndKeyEventSender, wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
 #else
     PostThreadMessage(GetWindowThreadProcessId(GetForegroundWindow(), NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
 #endif
