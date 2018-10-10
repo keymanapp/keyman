@@ -141,7 +141,9 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		if(!InitialiseProcess(mp->hwnd)) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-  if (mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST && ShouldDebug(sdmMessage)) {
+  if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) || mp->message == wm_keymankeydown || mp->message == wm_keymankeyup ||
+    mp->message == wm_keyman_keyevent) 
+    && ShouldDebug(sdmMessage)) {
     DebugMessage(mp, wParam);
   }
 
