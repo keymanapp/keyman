@@ -1,6 +1,6 @@
 # Keyman Desktop Version History
 
-## 2018-10-05 11.0 alpha
+## 11.0 alpha
 * Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1229)
 
 ## 2018-06-28 10.0.1200 stable
