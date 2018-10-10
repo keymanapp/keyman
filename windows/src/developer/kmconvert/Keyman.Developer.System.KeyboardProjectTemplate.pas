@@ -24,6 +24,7 @@ type
     FCopyright: string;
     FVersion: string;
     FBCP47Tags: string;
+    FIncludeIcon: Boolean;
     function GetFilename(Base: string): string;
     function GetIconFilename: string;
     function GetKeyboardFilename: string;
@@ -57,6 +58,7 @@ type
     property Author: string read FAuthor write FAuthor;
     property Version: string read FVersion write FVersion;
     property BCP47Tags: string read FBCP47Tags write FBCP47Tags;
+    property IncludeIcon: Boolean read FIncludeIcon write FIncludeIcon;
 
     property KeyboardFilename: string read GetKeyboardFilename;
     property ProjectFilename: string read GetProjectFilename;
@@ -136,7 +138,9 @@ end;
 
 function TKeyboardProjectTemplate.GetIconFilename: string;
 begin
-  Result := GetFilename(FIconFilename);
+  if FIncludeIcon
+    then Result := GetFilename(FIconFilename)
+    else Result := '';
 end;
 
 function TKeyboardProjectTemplate.GetKeyboardFilename: string;
@@ -167,7 +171,7 @@ end;
 
 function TKeyboardProjectTemplate.HasIcon: Boolean;
 begin
-  Result := (KMXKeymanTargets+[ktAny]) * FTargets <> [];
+  Result := FIncludeIcon and ((KMXKeymanTargets+[ktAny]) * FTargets <> []);
 end;
 
 function TKeyboardProjectTemplate.HasKMX: Boolean;
