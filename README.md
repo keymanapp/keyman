@@ -1,6 +1,8 @@
 Keyman LMLayer prototype
 ========================
 
+[![Build Status](https://travis-ci.org/eddieantonio/keyman-lmlayer-prototype.svg?branch=master)](https://travis-ci.org/eddieantonio/keyman-lmlayer-prototype)
+
 Prototype of NRC language model layer for Keyman.
 
 I'm developing and experimenting with the API and how different API
@@ -221,7 +223,6 @@ TODO
 ====
 
  - [ ] make simple `index.html` that demos a dummy model
- - [ ] enable continuous integration
  - [ ] make an `error` initialization message.
  - [ ] TypeScript!
  - [ ] Figure out what a `Context` will be
