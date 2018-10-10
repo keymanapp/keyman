@@ -407,7 +407,10 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 	else if(msg->message == wm_keymankeyup)
     wsprintf(ds, "DebugMessage(%x, wm_keymankeyup: %s lParam: %X) [message flags: %x time: %d]", msg->hwnd, 
       Debug_VirtualKey((WORD) msg->wParam), msg->lParam, wParam, msg->time);
-	else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
+  else if (msg->message == wm_keyman_keyevent)
+    wsprintf(ds, "DebugMessage(%x, wm_keyman_keyevent: %s lParam: %X) [message flags: %x time: %d]", msg->hwnd,
+      Debug_VirtualKey((WORD)msg->wParam), msg->lParam, wParam, msg->time);
+  else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
     wsprintf(ds, "DebugMessage(%x, %s, wParam: %s, lParam: %X) [message flags: %x time: %d extra: %x]", 
       msg->hwnd, 
       msgnames[msg->message-WM_KEYDOWN],

@@ -59,7 +59,8 @@ type
 
     ssRedistIEUpdateRequired,
     ssMustRestart,
-    ssRedistRequired
+    ssRedistRequired,
+    ssCheckForUpdatesError
     );
 
 const
@@ -100,8 +101,9 @@ const
 
     'You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.',
 
-    'A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website.'
+    'A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website.',
 
+    'The online update check failed with an error: %0:s'
     );
 
 implementation

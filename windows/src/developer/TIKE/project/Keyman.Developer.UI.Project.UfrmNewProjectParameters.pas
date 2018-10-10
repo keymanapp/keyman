@@ -111,7 +111,6 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.KeyboardProjectTemplate,
-  Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   Keyman.System.KeyboardUtils;
 
@@ -146,11 +145,7 @@ begin
       kpt.BCP47Tags := f.BCP47Tags;
       kpt.Generate;
 
-      FGlobalProject.Save;
-      frmKeymanDeveloper.ProjectForm.Free;
-      FreeGlobalProjectUI;
-      LoadGlobalProjectUI(kpt.ProjectFilename);
-      frmKeymanDeveloper.ShowProject;
+      frmKeymanDeveloper.OpenProject(kpt.ProjectFilename);
       Result := True;
 
     finally

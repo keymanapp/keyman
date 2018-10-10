@@ -54,6 +54,13 @@ ibus-kmfl/m4/visibility.m4
 ibus-kmfl/m4/wchar_t.m4
 ibus-kmfl/m4/wint_t.m4
 ibus-kmfl/m4/xsize.m4
+ibus-kmfl/m4/extern-inline.m4
+ibus-kmfl/m4/fcntl-o.m4
+ibus-kmfl/m4/intlmacosx.m4
+ibus-kmfl/m4/threadlib.m4
+upload/
+launchpad
+launchpad-*
 keyman-config/build
 keyman-config/debian/man
 keyman-config/experiments/*.txt

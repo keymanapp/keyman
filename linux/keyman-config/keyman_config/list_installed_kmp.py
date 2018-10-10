@@ -4,11 +4,12 @@ import argparse
 import logging
 import os
 import json
-from enum import Enum
+import gi
+from gi.repository import GObject
 from keyman_config.kmpmetadata import parsemetadata, parseinfdata
 from keyman_config.get_kmp import user_keyman_dir
 
-class InstallArea(Enum):
+class InstallArea(GObject.GEnum):
     IA_OS = 1
     IA_SHARED = 2
     IA_USER = 3

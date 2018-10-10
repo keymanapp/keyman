@@ -703,7 +703,7 @@ begin
   if FTextFileFormat <> Value then
   begin
     FTextFileFormat := Value;
-    if FTextFileFormat = tffANSI then
+    if (FTextFileFormat = tffANSI) and modWebHttpServer.AppSource.IsSourceRegistered(FFileName) then
     begin
       // Recode to ANSI
       FSource := string(AnsiString(modWebHttpServer.AppSource.GetSource(FFileName)));

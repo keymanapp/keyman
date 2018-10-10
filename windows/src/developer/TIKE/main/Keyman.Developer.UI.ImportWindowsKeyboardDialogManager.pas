@@ -15,8 +15,6 @@ uses
   Vcl.Dialogs,
 
   Keyman.Developer.System.ImportWindowsKeyboard,
-  Keyman.Developer.System.Project.Project,
-  Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
   UfrmMain,
   UfrmSelectSystemKeyboard;
@@ -83,12 +81,7 @@ begin
     f.Free;
   end;
 
-  // TODO: Refactor this hunk of junk code below that is repeated all over the place
-  FGlobalProject.Save;
-  frmKeymanDeveloper.ProjectForm.Free;
-  FreeGlobalProjectUI;
-  LoadGlobalProjectUI(ProjectFilename);
-  frmKeymanDeveloper.ShowProject;
+  frmKeymanDeveloper.OpenProject(ProjectFilename);
   Result := True;
 end;
 
