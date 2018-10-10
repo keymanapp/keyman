@@ -92,7 +92,7 @@ unit-tests:
 # release
 # ----------------------------------------------------------------------
 
-release: clean-pathdefines test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean
+release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean
     cd $(ROOT)\src
     $(MAKE) global-versions
     $(MAKE) disable-search
@@ -104,6 +104,13 @@ release: clean-pathdefines test-releasebuildcheck test-uiaccess test-klog test-r
 clean-pathdefines: test-releasebuildcheck
     # test-releasebuildcheck builds devtools for us
     $(PROGRAM)\buildtools\devtools -ri
+
+#
+# Test that the CEF file path is accessible from env var KEYMAN_CEF4DELPHI_ROOT
+#
+test-release-cef-path:
+    @if not exist $(KEYMAN_CEF4DELPHI_ROOT)\libcef.dll echo The environment variable KEYMAN_CEF4DELPHI_ROOT is invalid. File libcef.dll could not be found.
+    @if not exist $(KEYMAN_CEF4DELPHI_ROOT)\libcef.dll exit 1
 
 #
 # Test that certificate checking is enabled and that certificate is accessible
