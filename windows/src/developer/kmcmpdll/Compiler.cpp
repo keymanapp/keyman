@@ -146,8 +146,7 @@ DWORD process_set_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR 
 
 BOOL IsValidKeyboardVersion(WCHAR *dpString);   // I4140
 
-HANDLE UTF16TempFromANSI(HANDLE hInfile);
-HANDLE UTF16TempFromUTF8(HANDLE hInfile);
+HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble);
 
 const PWCHAR LineTokens[] = {
 	L"SVNBHBGMNSCCLLCMLB", L"store", L"VERSION ", L"NAME ",
@@ -335,11 +334,11 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 	}
 	SetFilePointer(hInfile, 0, NULL, FILE_BEGIN);
 	if(str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-		hInfile = UTF16TempFromUTF8(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, TRUE);
 	else if(str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
 		SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
 	else
-		hInfile = UTF16TempFromANSI(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, FALSE);  // Will fall back to ansi for invalid UTF-8
   if(hInfile == INVALID_HANDLE_VALUE)   // I3228   // I3510
   {
     return CERR_CannotCreateTempfile;
@@ -419,11 +418,11 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
 	}
 	SetFilePointer(hInfile, 0, NULL, FILE_BEGIN);
 	if(str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-		hInfile = UTF16TempFromUTF8(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, TRUE);
 	else if(str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
 		SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
 	else
-		hInfile = UTF16TempFromANSI(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, FALSE);
 
 	CodeConstants = new NamedCodeConstants;
 	err = CompileKeyboardHandle(hInfile, pfkBuffer);
@@ -3420,7 +3419,7 @@ HANDLE CreateTempFile()
 }
 
 ///////////////////
-HANDLE UTF16TempFromUTF8(HANDLE hInfile)
+HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 {
 	HANDLE hOutfile = CreateTempFile();
   if(hOutfile == INVALID_HANDLE_VALUE)     // I3228   // I3510
@@ -3429,59 +3428,52 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile)
     return INVALID_HANDLE_VALUE;
   }
 
-	PBYTE buf, p, q;
+	PBYTE buf, p;
 	PWSTR outbuf, poutbuf;
 	DWORD len, len2;
+  WCHAR prolog = 0xFEFF;
+  WriteFile(hOutfile, &prolog, 2, &len2, NULL);
 
-	SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
-	len = GetFileSize(hInfile, NULL) - 3;
-	buf = new BYTE[8193];
-	outbuf = new WCHAR[8193];
-	// read in buffer as UTF8 and write out buffer as WCHAR...
-	q = buf;
-	outbuf[0] = 0xFEFF;
-	WriteFile(hOutfile, outbuf, 2, &len2, NULL);
-	while(ReadFile(hInfile, q, 8192-(int)(q-buf), &len, NULL) && len > 0)
-	{
-	  len += (q-buf);   // I1011 - fix buf length so that buffer does not get clobbered (idiot)
-		buf[len] = 0; p = buf; poutbuf = outbuf;  
-
-		ConversionResult n = ConvertUTF8toUTF16(&p, &buf[len], (UTF16 **) &poutbuf, (const UTF16 *) &outbuf[8192], lenientConversion);
-		WriteFile(hOutfile, outbuf, (int)(poutbuf-outbuf)*2, &len2, NULL);
-		memmove(buf, p, len-(int)(p-buf));
-		q = &buf[len-(int)(p-buf)];
-	}
-	CloseHandle(hInfile);
-	delete buf;
-	SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN);
-	return hOutfile;
-}
-
-HANDLE UTF16TempFromANSI(HANDLE hInfile)
-{
-	HANDLE hOutfile = CreateTempFile();
-  if(hOutfile == INVALID_HANDLE_VALUE)     // I3228   // I3510
-  {
-    CloseHandle(hInfile);
-    return INVALID_HANDLE_VALUE;
+  len = GetFileSize(hInfile, NULL);
+  if (hasPreamble) {
+    SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
+    len -= 3;
   }
 
-	PCHAR buf = new char[8193];
-	PWSTR outbuf;
-	DWORD len;
-	// read in buffer as ANSI and write out buffer as WCHAR...
-	buf[0] = '\xFF';
-	buf[1] = '\xFE';
-	WriteFile(hOutfile, buf, 2, &len, NULL);
-	while(ReadFile(hInfile, buf, 8192, &len, NULL) && len > 0)
-	{
-		buf[len] = 0;
-		outbuf = strtowstr(buf);
-		WriteFile(hOutfile, outbuf, wcslen(outbuf)*2, &len, NULL);
-		delete outbuf;
-	}
-	CloseHandle(hInfile);
+  buf = new BYTE[len + 1]; // null terminated
+  outbuf = new WCHAR[len + 1];
+  if (ReadFile(hInfile, buf, len, &len2, NULL)) {
+    buf[len2] = 0;
+    p = buf;
+    poutbuf = outbuf;
+    if (hasPreamble) {
+      // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a 
+      // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
+      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
+      WriteFile(hOutfile, outbuf, (int)(poutbuf - outbuf) * 2, &len2, NULL);
+    }
+    else {
+      // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
+      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
+      if (cr == sourceIllegal) {
+        // Not a valid UTF-8 file, so fall back to ANSI
+        //AddCompileMessage(CINFO_NonUnicodeFile); 
+        // note, while this message is defined, for now we will not emit it 
+        // because we don't support HINT/INFO messages yet and we don't want
+        // this to cause a blocking compile at this stage
+        poutbuf = strtowstr((PSTR)buf);
+        WriteFile(hOutfile, poutbuf, wcslen(poutbuf) * 2, &len2, NULL);
+        delete poutbuf;
+      }
+      else {
+        WriteFile(hOutfile, outbuf, (int)(poutbuf - outbuf) * 2, &len2, NULL);
+      }
+    }
+  }
+
+  CloseHandle(hInfile);
 	delete buf;
+  delete outbuf;
 	SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN);
 	return hOutfile;
 }

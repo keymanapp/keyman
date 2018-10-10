@@ -1958,7 +1958,7 @@ end;
 
 function TfrmKeymanWizard.DoOpenFile: Boolean;
 begin
-  Result := DoOpenFileFormat(tffANSI, False);   // I3637
+  Result := DoOpenFileFormat(tffUTF8, False);   // I3637
 end;
 
 function TfrmKeymanWizard.DoOpenFileFormat(FFormat: TTextFileFormat; FUseFormat: Boolean): Boolean;   // I3637
@@ -1975,10 +1975,15 @@ begin
   try
     if FileExists(FileName) then
     begin
-      if FUseFormat then
-        LoadFromFile(FileName, TextFileFormatToEncoding(FFormat))   // I3637
-      else
-        LoadFromFile(FileName); // Let prolog determine encoding  // I3337
+      try
+        if FUseFormat then
+          LoadFromFile(FileName, TextFileFormatToEncoding(FFormat))   // I3637
+        else
+          LoadFromFile(FileName, TEncoding.UTF8); // Let prolog determine encoding  // I3337
+      except
+        on E:EEncodingError do
+          LoadFromFile(FileName, TEncoding.Default);
+      end;
       FLastFileCharSet := Encoding;// LastFileCharSet;
     end
     else
