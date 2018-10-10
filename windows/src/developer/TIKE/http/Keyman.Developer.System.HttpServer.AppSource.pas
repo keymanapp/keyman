@@ -42,6 +42,7 @@ type
 
     procedure RegisterSource(const Filename, Data: string; Update: Boolean = False);
     procedure UnregisterSource(const Filename: string);
+    function IsSourceRegistered(const Filename: string): Boolean;
     function GetSource(const Filename: string): string;
     procedure SetSource(const Filename, Data: string);
   end;
@@ -247,6 +248,13 @@ function TAppSourceHttpResponder.GetSource(const Filename: string): string;
 begin
   Assert(TryGetSource(Filename, Result),
     'TAppSourceHttpResponder.GetSource was asked for a file that was not registered: '+Filename);
+end;
+
+function TAppSourceHttpResponder.IsSourceRegistered(const Filename: string): Boolean;
+var
+  Data: string;
+begin
+  Result := TryGetSource(Filename, Data);
 end;
 
 procedure TAppSourceHttpResponder.RegisterSource(const Filename, Data: string; Update: Boolean);

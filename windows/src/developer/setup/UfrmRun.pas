@@ -453,7 +453,7 @@ begin
       except
         on E:Exception do // I1440 - avoid update check failure stopping install
         begin
-          LogError(E.Message);
+          LogError(FInstallInfo.Text(ssCheckForUpdatesError, [E.Message]));
         end;
       end;
     end;

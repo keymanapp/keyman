@@ -454,7 +454,7 @@ end;
 procedure TfrmDebug.memoKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  UpdateCharacterGrid;   // I4808
+  memoSelMove(memo);
 end;
 
 procedure TfrmDebug.memoLostFocus(Sender: TObject);
@@ -1484,12 +1484,12 @@ procedure TfrmDebug.memoChange(Sender: TObject);
 begin
   LastSelStart := memo.SelStart;
   UpdateDeadkeys;
-  UpdateCharacterGrid;   // I4808
+  memoSelMove(memo);
 end;
 
 procedure TfrmDebug.memoClick(Sender: TObject);
 begin
-  UpdateCharacterGrid;   // I4808
+  memoSelMove(memo);
 end;
 
 {-------------------------------------------------------------------------------
@@ -1592,7 +1592,7 @@ begin
   begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
     if memo.SelText = ''
-      then ch := Copy(memo.Text, memo.SelStart-1, 1) //TODO: supplementary pair support
+      then ch := Unicode.CopyChar(memo.Text, memo.SelStart-1, 1)
       else ch := Copy(memo.SelText, 1, 16);
 
     if ch = ''

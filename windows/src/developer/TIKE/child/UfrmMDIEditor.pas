@@ -189,7 +189,10 @@ begin
     case MessageDlg('The file '+s+' has changed.'+#13#10+'Do you wish to save changes?',
       mtConfirmation, mbYesNoCancel, 0) of
     mrYes:
-      CanClose := modActionsMain.actFileSave.Execute;
+      begin
+        frmKeymanDeveloper.ActiveChild := Self;
+        CanClose := modActionsMain.actFileSave.Execute;
+      end;
     mrNo:
       CanClose := True;
     mrCancel:

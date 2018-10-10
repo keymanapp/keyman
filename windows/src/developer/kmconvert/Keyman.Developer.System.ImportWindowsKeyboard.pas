@@ -204,6 +204,7 @@ begin
     FTemplate.Copyright := FCopyright;
     FTemplate.Author := FAuthor;
     FTemplate.Version := FVersion;
+    FTemplate.IncludeIcon := True;
 
     //
     // Set languages in package

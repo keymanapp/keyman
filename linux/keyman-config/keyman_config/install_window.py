@@ -37,12 +37,13 @@ def find_keyman_image(image_file):
 
 class InstallKmpWindow(Gtk.Window):
 
-    def __init__(self, kmpfile, online=False, viewkmp=None):
+    def __init__(self, kmpfile, online=False, viewkmp=None, downloadwindow=None):
         logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
         self.kmpfile = kmpfile
         self.online = online
         self.endonclose = False
         self.viewwindow = viewkmp
+        self.download = downloadwindow
         self.accelerators = None
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         installed_kmp_ver = get_kmp_version(keyboardid)
@@ -53,9 +54,9 @@ class InstallKmpWindow(Gtk.Window):
         Gtk.Window.__init__(self, title=windowtitle)
         init_accel(self)
 
-        self.set_border_width(3)
+        self.set_border_width(12)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
 
         mainhbox = Gtk.Box()
 
@@ -112,7 +113,7 @@ class InstallKmpWindow(Gtk.Window):
             mainhbox.pack_start(image, False, False, 0)
 
             self.page1 = Gtk.Box()
-            self.page1.set_border_width(10)
+            self.page1.set_border_width(12)
 
             grid = Gtk.Grid()
             self.page1.add(grid)
@@ -266,6 +267,8 @@ class InstallKmpWindow(Gtk.Window):
             install_kmp(self.kmpfile, self.online)
             if self.viewwindow:
                 self.viewwindow.refresh_installed_kmp()
+            if self.download:
+                self.download.close()
             keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
             welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
             if os.path.isfile(welcome_file):

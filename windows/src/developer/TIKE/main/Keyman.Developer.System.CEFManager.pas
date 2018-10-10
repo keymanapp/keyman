@@ -75,7 +75,7 @@ begin
   // Read this https://www.briskbard.com/index.php?lang=en&pageid=cef
   GlobalCEFApp := TCefApplication.Create;
 
-   GlobalCEFApp.CheckCEFFiles := False;
+  GlobalCEFApp.CheckCEFFiles := False;
 
   // We run in debug mode when TIKE debug mode flag is set, so that we can
   // debug the CEF interactions more easily
