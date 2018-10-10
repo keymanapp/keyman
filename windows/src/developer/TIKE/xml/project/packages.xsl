@@ -91,17 +91,6 @@
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
         
-        <xsl:if test="/KeymanDeveloperProject/Modules/Module[ID='BrandingPack']">
-          |
-          <xsl:call-template name="button">
-            <xsl:with-param name="caption">Build package installers</xsl:with-param>
-            <xsl:with-param name="command">keyman:package_compileallinstallers</xsl:with-param>
-            <xsl:with-param name="enabled">
-              <xsl:if test="not(KeymanDeveloperProject/Files/File[FileType='.kps' and not (ParentFileID)])">false</xsl:if>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-
         <br />
         <br />
 
