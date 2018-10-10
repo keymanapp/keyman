@@ -21,9 +21,7 @@
                     13 Dec 2012 - mcdurdin - I3641 - V9.0 - compiler dll buffer overrun bugs
 */
 
-#define STRICT
-#include <windows.h>
-#include <stdio.h>
+#include "pch.h"
 #include <io.h>
 #include <limits.h>
 #include "NamedCodeConstants.h"

@@ -126,6 +126,9 @@
     <ClCompile Include="security.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -215,6 +218,9 @@
     </ClInclude>
     <ClInclude Include="security.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -34,7 +34,7 @@
                     28 Mar 2016 - mcdurdin - I4933 - Compat issue with Firefox 42 and IE and Keyman 9 TSF
 */
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 #include "editsess.h"
 #include "Compiler.h"

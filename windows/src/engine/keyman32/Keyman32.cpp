@@ -113,7 +113,7 @@
 //			start with it!)
 //
 
-#include "keyman64.h"
+#include "pch.h"
 
 /*
  If DEBUG is defined, give information in the map file about PRIVATE (=static)

@@ -114,6 +114,9 @@
     <ClCompile Include="..\keyman32\security.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\keyman32\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Keyman64.RC">
@@ -242,6 +245,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\keyman32\security.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

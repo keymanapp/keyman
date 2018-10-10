@@ -60,7 +60,7 @@
                     06 Feb 2015 - mcdurdin - I4583 - V9.0 - Remove altgr lookup test from keyman32 and put it into the registry
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 */
-#include "keyman64.h"
+#include "pch.h"
 #include "security.h"
 
 /***************************************************************************/

@@ -22,7 +22,7 @@
                     14 May 2010 - mcdurdin - I2374 - Fix crash in some situations
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 void Addin_Release()
 {

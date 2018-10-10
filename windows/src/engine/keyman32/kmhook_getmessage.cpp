@@ -62,7 +62,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
    // I3583   // I4287
-#include "keyman64.h"
+#include "pch.h"
 
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam);

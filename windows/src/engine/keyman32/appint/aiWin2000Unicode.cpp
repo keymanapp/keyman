@@ -40,7 +40,7 @@
                     31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
-#include "keyman64.h"   // I4128   // I4287
+#include "pch.h"   // I4128   // I4287
 
 #define KEYMAN_MOREPOST	"WM_KMMOREPOST"
 

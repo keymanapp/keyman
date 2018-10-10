@@ -73,9 +73,8 @@
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>keyman64.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>./Keyman32.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
       <AssemblerListingLocation>./</AssemblerListingLocation>
       <ObjectFileName>./</ObjectFileName>
@@ -136,9 +135,8 @@
       <ExceptionHandling>
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>keyman64.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>./Keyman32.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
       <AssemblerListingLocation>./</AssemblerListingLocation>
       <ObjectFileName>./</ObjectFileName>
@@ -308,6 +306,10 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="preservedkeymap.cpp" />
     <ClCompile Include="security.cpp" />
     <ClCompile Include="selectkeyboard.cpp" />
@@ -363,6 +365,7 @@
     <ClInclude Include="capsstate.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="hotkeys.h" />
     <ClInclude Include="k32_tsf.h" />
     <ClInclude Include="KBD.H" />

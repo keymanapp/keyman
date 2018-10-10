@@ -31,7 +31,7 @@
 // ITfKeyEventSink implementation.
 //
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 
 #include "Vkeys.h"

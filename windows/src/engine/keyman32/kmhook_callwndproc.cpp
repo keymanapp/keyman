@@ -44,7 +44,7 @@
                     22 Apr 2015 - mcdurdin - I4674 - V9.0 - Hotkeys do not always work consistently
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 /*
 *	kmnCallWndProc

@@ -24,7 +24,7 @@
                     10 Feb 2015 - mcdurdin - I4592 - V9.0 - If a computer does not have US keyboard installed, then AltGr rules can go wrong
 */
    // I3623   // I4169   // I4575   // I4575
-#include "keyman64.h"
+#include "pch.h"
 
 WORD USVKToScanCodeToLayoutVK(WORD VKey);   // I3762
 

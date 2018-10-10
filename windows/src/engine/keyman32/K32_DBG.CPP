@@ -43,7 +43,7 @@
                     24 Apr 2014 - mcdurdin - I4196 - V9.0 - wm_kmmoreposting must be refactored for TIP work as it is not sequential
                     09 Aug 2015 - mcdurdin - I4843 - Log reported modifier state as well as Keyman current modifier state
 */
-#include "keyman64.h"
+#include "pch.h"
 #include <stdio.h>
 #include <stdarg.h>
 //#define _FILELOG

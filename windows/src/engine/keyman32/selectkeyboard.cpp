@@ -45,7 +45,7 @@
                     14 May 2015 - mcdurdin - I4714 - V9.0 - Keyboard and language hotkeys don't always work
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
-#include "keyman64.h"   // I5136
+#include "pch.h"   // I5136
 #include "accctrl.h"
 #include "aclapi.h"
 #include "sddl.h"
