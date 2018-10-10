@@ -10,16 +10,15 @@ let model;
 self.onmessage = function (event) {
   const {message, token} = event.data;
 
-  // Import the model.
-
   if (message === 'initialize') {
+    // import the model.
     const Model = loadModelClass();
     model = new Model(event.data.configuration);
     // Ready! Send desired configuration.
     cast('ready', { configuration: model.configuration });
 
   } else if (message === 'predict') {
-    // XXX: cause the other end to reject the promise, because of a
+    // XXX: induce the other end to reject the promise, because of a
     // token/message mismatch. This is for testing purposes.
     if (token === null) {
       cast('invalid', {token});
@@ -62,7 +61,7 @@ function cast(message, parameters) {
 function loadModelClass() {
   importScripts('./models/en-x-test-derek.js');
   if (typeof Model !== 'undefined')
-    return Model;
+    return Model; // eslint-disable-line no-undef
   return global.Model;
 }
 

@@ -155,8 +155,8 @@ let initialization = {
 
   /**
    * [REQUIRED]
-   * The maximum amount of code units that the keyboard will provide to
-   * the left of the cursor.
+   * The maximum amount of UTF-16 code units that the keyboard will
+   * provide to the left of the cursor.
    *
    * type: number
    */
@@ -164,9 +164,8 @@ let initialization = {
 
   /**
    * The maximum amount of code units that the keyboard will provide to
-   * the right of the cursor.
-   * The absence of this rule implies 0. See also,
-   * supportsRightContexts.
+   * the right of the cursor. The absence of this rule implies 0.
+   * See also, supportsRightContexts.
    *
    * type: number
    */
@@ -178,7 +177,7 @@ let initialization = {
 ### Message: `ready`
 
 Must be sent from the LMLayer to the keyboard when the LMLayer's model
-is finished initializing. It will send `configuration`, which is
+as a response to `initialize`. It will send `configuration`, which is
 a plain JavaScript object requesting configuration from the keyboard.
 
 There are only two options defined so far:
@@ -223,7 +222,10 @@ TODO
 
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] enable continuous integration
+ - [ ] make an `error` initialization message.
  - [ ] TypeScript!
  - [ ] Figure out what a `Context` will be
  - [ ] make TinyWorker's `self` inherit from the global scope?
+ - [ ] work on `registerModel(m: Model)` protocol
+ - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
  - [ ] Refactor `LMLayer` with state pattern?
