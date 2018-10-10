@@ -131,7 +131,8 @@ uses
   ErrorControlledRegistry,
   ExternalExceptionHandler,
   UfrmMain,
-  uCEFApplication;
+  uCEFApplication,
+  VersionInfo;
 
 {$R *.DFM}
 
@@ -287,27 +288,19 @@ end;
 procedure TframeCEFHost.cefConsoleMessage(Sender: TObject;
   const browser: ICefBrowser; level: Cardinal; const message, source: ustring;
   line: Integer; out Result: Boolean);
+var
+  id: string;
+  I: Integer;
 begin
-  try
-    with TStringList.Create do
-    try
-      Text := '???'; //todo: get from browser
-      LogExceptionToExternalHandler(
-        'script_'+Self.ClassName+'_ScriptError',
-        'Error occurred at line '+IntToStr(line)+' of '+source,
-        message,
-        'CEF'#13#10#13#10+Text);
-    finally
-      Free;
-    end;
-  except
-    on E:Exception do
-      LogExceptionToExternalHandler(
-        'script_'+Self.ClassName+'_ScriptError',
-        'Error occurred at line '+IntToStr(line)+' of '+source,
-        message,
-        'Exception '+E.Message+' trying to load for review');   // I4687
-  end;
+  id := LowerCase(ExtractFileName(ParamStr(0)))+'_'+GetVersionString+'_script_';
+  if Assigned(Owner)
+    then id := id + Owner.ClassName
+    else id := id + 'unknown';
+
+  I := string(source).LastDelimiter('/');
+  id := id + '_' + string(source).SubString(I + 1) + '_' + IntToStr(line);
+
+  LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(line)+' of '+source, message, '');
 
   Result := True;
 end;
