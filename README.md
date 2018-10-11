@@ -21,8 +21,8 @@ Communication protocol between keyboard and asynchronous worker
 
 ![Sequence diagram of obtaining a prediction](./docs/predictive-text-sequence.png)
 
-We have decided that everything to the right of the `KeymanWeb` will be in a
-Web Worker. However, communication can happen only through
+We have decided that everything to the right of the `KeymanWeb` will be
+in a Web Worker. However, communication can happen only through
 [`postMessage(data)`][postMessage] commands,
 where `data` is a serializable object (via the [structured clone][]
 algorithm).
@@ -101,11 +101,11 @@ An asynchronous message to predict after typing 'D':
         deleteLeft: 0,
         deleteRight: 0
     },
-    contexts: {
+    context: {
       left: '',
-      right: ''
+      right: '',
       startOfBuffer: true,
-      endOfBuffer: true 
+      endOfBuffer: true
     },
 }
 ```
@@ -119,7 +119,7 @@ Message       | Direction          | Parameters          | Expected reply      |
 --------------|--------------------|---------------------|---------------------|---------------
 `initialize`  | keyboard → LMLayer | initialization      | Yes — `ready`       | No
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
-`predict`     | keyboard → LMLayer | transform, contexts | Yes — `suggestions` | Yes
+`predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
 
 
@@ -230,7 +230,7 @@ token **MUST** be unique across all prediction events. The LMLayer
 message. The `suggestions` message **MUST** contain the corresponding
 token as sent in the initial `predict` message.
 
-The keyboard **MUST** send the `contexts` parameter. The keyboard
+The keyboard **MUST** send the `context` parameter. The keyboard
 **SHOULD** send the `transform` parameter. The keyboard **MUST** send
 a unique token.
 
@@ -251,19 +251,53 @@ of their original input.
 however the semantics **MUST** remain the same—the prediction happens
 from the perspective before the `transform` has been applied.
 
-The contexts are the text surrounding the insertion point.
+The context is the text surrounding the insertion point, _before_ the
+transform is applied to the buffer.
 
 ```javascript
-let contexts = [
-  // TO BE DESCRIBED;
-];
+let context = {
+  /**
+   * Up to maxLeftContextCodeUnits code units of Unicode scalar value
+   * (i. e., characters) to the left of the insertion point in the
+   * buffer. If there is nothing to the left of the buffer, this returns
+   * an empty string.
+   *
+   * type: USVString
+   */
+  left: "I'm a little ",
+
+  /**
+   * [OPTIONAL]
+   * Up to maxRightContextCodeUnits code units of Unicode scalar value
+   * (i. e., characters) to the right of the insertion point in the
+   * buffer. If there is nothing to the right of the buffer, this returns
+   * an empty string.
+   *
+   * type: USVString
+   */
+  right: '',
+
+  /**
+   * Whether the insertion point is at the start of the buffer.
+   *
+   * type: boolean
+   */
+  startOfBuffer: false,
+
+  /**
+   * Whether the insertion point is at the end of the buffer.
+   *
+   * type: boolean
+   */
+  endOfBuffer: true
+};
 ```
 
 The transform parameter describes how the input event will change the
 buffer.
 
 ```javascript
-let transform = [
+let transform = {
   /**
    * The Unicode scalar values (i.e., characters) to be inserted at the
    * cursor position.
@@ -272,7 +306,8 @@ let transform = [
    *
    * type: USVString <https://heycam.github.io/webidl/#idl-USVString>
    */
-  insert: 'A',
+  insert: 't',
+
   /**
    * The number of code units to delete to the left of the cursor.
    *
@@ -281,6 +316,7 @@ let transform = [
    * type: number (integer values only)
    */
   delete: 0,
+
   /**
    * [OPTIONAL]
    * The number of code units to delete to the right of the cursor.
@@ -288,7 +324,7 @@ let transform = [
    * type: number (integer values only)
    */
   deleteRight: 0,
-];
+};
 ```
 
 
@@ -301,10 +337,11 @@ TODO
 ====
 
  - [x] Change `context` to `contexts`.
- - [ ] Figure out what a `Context` will be
+ - [x] Change `contexts` to `context`....
+ - [] Figure out what a `Context` will be
  - [x] Implement hack to make `global` inherit from `self`
  - [x] Define on `self.registerModel(factory: (c) => Model)` protocol
- - [ ] Describe `contexts`
+ - [x] Describe `contexts`
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] make an `error` initialization message.
  - [ ] TypeScript!
