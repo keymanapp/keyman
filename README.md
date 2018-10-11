@@ -336,19 +336,13 @@ let transform = {
 TODO
 ====
 
- - [x] Change `context` to `contexts`.
- - [x] Change `contexts` to `context`....
- - [x] Figure out what a `Context` will be
- - [x] Implement hack to make `global` inherit from `self`
- - [x] Define on `self.registerModel(factory: (c) => Model)` protocol
- - [x] Describe `contexts`
- - [x] Implement loading a model from a file.
+ - [ ] Do word segmentation
+ - [ ] Determine the exact arguments given to the model's `predict()`
+       method.
  - [ ] Document `suggestions`
+ - [ ] TypeScript!
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] make an `error` initialization message.
- - [ ] TypeScript!
- - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
- - [x] Refactor `LMLayer` with state pattern?
- - [ ] Let `loadModel()` actually use the `path` argument.
  - [ ] LOGLIKEIHOOD IN THE TRANSFORM!
- - [ ] `possibleTransforms` where `transform` is an alias for `possibleTransforms[0]1
+ - [ ] `possibleTransforms` where `transform` is an alias for `possibleTransforms[0]`
+ - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
