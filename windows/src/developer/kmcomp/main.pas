@@ -233,7 +233,7 @@ begin
     writeln('          -vd      validate infile against distribution schema');
     writeln('          -m       merge information from infile (can be .kmp and .js) into .keyboard_info output file');
     writeln('          -m-validate-id  validate the id against the .js, .kmx and .kmp filenames when merging');
-    writeln('          -json-extract   print json data .keyboard_info for build script integration');
+    writeln('          -extract-keyboard-info   print json data .keyboard_info for build script integration');
     writeln('          -source-path    specify path to add to the sourcePath field in the .keyboard_info output file');
     writeln('          -schema-path    specify path to the keyboard_info json schema definitions');
     writeln('                          if not specified, then defaults to same folder as kmcomp.exe');
