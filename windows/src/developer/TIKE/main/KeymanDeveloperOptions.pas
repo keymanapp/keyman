@@ -58,6 +58,7 @@ type
     FTestEmailAddresses: string;   // I4506
     FOpenKeyboardFilesInSourceView: Boolean;   // I4751
     FDisplayTheme: string;
+    FEditorTheme: string;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -69,10 +70,15 @@ type
   public
     procedure Read;
     procedure Write;
+
+    class function DefaultEditorThemeItemIndex(s: string): Integer;
+    class function IsDefaultEditorTheme(s: string): Boolean;
+
     property UseTabChar: Boolean read FUseTabChar write FUseTabChar;
     property IndentSize: Integer read FIndentSize write FIndentSize;
     property LinkFontSizes: Boolean read FLinkFontSizes write FLinkFontSizes;
     property UseOldDebugger: Boolean read FUseOldDebugger write FUseOldDebugger;
+    property EditorTheme: string read FEditorTheme write FEditorTheme;
 
     property CharMapAutoLookup: Boolean read FCharMapAutoLookup write FCharMapAutoLookup;
     property CharMapDisableDatabaseLookups: Boolean read FCharMapDisableDatabaseLookups write FCharMapDisableDatabaseLookups;
@@ -100,6 +106,18 @@ type
 function FKeymanDeveloperOptions: TKeymanDeveloperOptions;
 //procedure CreateKeymanDeveloperOptions;
 //procedure DestroyKeymanDeveloperOptions;
+
+type
+  TDefaultEditorTheme = record
+    Name: string;
+    Desc: string;
+  end;
+const
+  SDefaultEditorThemes: array[0..2] of TDefaultEditorTheme = (
+    (Name: 'vs'; Desc: 'Light (vs)'),
+    (Name: 'vs-dark'; Desc: 'Dark (vs-dark)'),
+    (Name: 'hc-black'; Desc: 'High Constrast (hc-black)')
+  );
 
 implementation
 
@@ -152,6 +170,7 @@ begin
     FLinkFontSizes  := regReadBool(SRegValue_IDEOptLinkFontSizes,   True);
     FIndentSize     := regReadInt (SRegValue_IDEOptIndentSize,      4);
     FUseOldDebugger := regReadBool(SRegValue_IDEOptUseOldDebugger,  False);
+    FEditorTheme    := regReadString(SRegValue_IDEOptEditorTheme,   '');
 
     FDebuggerBreakWhenExitingLine  := regReadBool(SRegValue_IDEOptDebuggerBreakWhenExitingLine, True);
     FDebuggerSingleStepAfterBreak  := regReadBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, False);
@@ -190,6 +209,7 @@ begin
     regWriteBool(SRegValue_IDEOptLinkFontSizes,   FLinkFontSizes);
     regWriteInt (SRegValue_IDEOptIndentSize,      FIndentSize);
     regWriteBool(SRegValue_IDEOptUseOldDebugger,  FUseOldDebugger);
+    regWriteString(SRegValue_IDEOptEditorTheme,   FEditorTheme);
 
     regWriteBool(SRegValue_IDEOptDebuggerBreakWhenExitingLine, FDebuggerBreakWhenExitingLine);
     regWriteBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, FDebuggerSingleStepAfterBreak);
@@ -261,6 +281,22 @@ begin
     Result := reg.ReadString(nm);
   except
   end;
+end;
+
+class function TKeymanDeveloperOptions.DefaultEditorThemeItemIndex(s: string): Integer;
+var
+  i: Integer;
+begin
+  for i := Low(SDefaultEditorThemes) to High(SDefaultEditorThemes) do
+    if SDefaultEditorThemes[i].Name = s then
+      Exit(i);
+
+  Result := -1;
+end;
+
+class function TKeymanDeveloperOptions.IsDefaultEditorTheme(s: string): Boolean;
+begin
+  Result := DefaultEditorThemeItemIndex(s) >= 0;
 end;
 
 initialization
