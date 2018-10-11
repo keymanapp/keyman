@@ -265,11 +265,15 @@ let transform = [
    * The Unicode scalar values (i.e., characters) to be inserted at the
    * cursor position.
    *
+   * Corresponds to `s` in com.keyman.KeyboardInterface.output.
+   *
    * type: USVString <https://heycam.github.io/webidl/#idl-USVString>
    */
   insert: 'A',
   /**
    * The number of code units to delete to the left of the cursor.
+   *
+   * Cooresponds to `dn` in com.keyman.KeyboardInterface.output.
    *
    * type: number (integer values only)
    */
@@ -296,10 +300,11 @@ TODO
  - [x] Change `context` to `contexts`.
  - [ ] Figure out what a `Context` will be
  - [x] Implement hack to make `global` inherit from `self`
- - [ ] Define on `self.registerModel(m: Model)` protocol
+ - [x] Define on `self.registerModel(factory: (c) => Model)` protocol
  - [ ] Describe `contexts`
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] make an `error` initialization message.
  - [ ] TypeScript!
  - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
- - [ ] Refactor `LMLayer` with state pattern?
+ - [x] Refactor `LMLayer` with state pattern?
+ - [ ] Let `loadModel()` actually use the `path` argument.
