@@ -54,8 +54,8 @@ request/response semantics.
 
 ### Tokens
 
-Tokens uniquely identify an input event, such as a keypress. Since
-Keyman should ask for an asynchronous prediction on most keypresses, the
+Tokens uniquely identify an input event, such as a key press. Since
+Keyman should ask for an asynchronous prediction on most key presses, the
 token is intended to associate a prediction and its response with
 a particular input; Keyman is free to ignore prediction responses if
 they are for outdated input events.
@@ -211,7 +211,70 @@ let configuration = {
 
 ### Message: `predict`
 
-...
+Sent from the keyboard to the LMLayer whenever a new prediction should
+be generated. This is typically initiated by a key press event. The
+keyboard **SHOULD** track each `predict` message using a *token*. The
+token **MUST** be unique across all prediction events. The LMLayer
+**SHOULD** respond to each `predict` message with a `suggestions`
+message. The `suggestions` message **MUST** contain the corresponding
+token as sent the initial `predict` message.
+
+The keyboard **MUST** send the `contexts` parameter. The keyboard
+**SHOULD** send `transform` parameter. The keyboard **MUST** send
+a unique token.
+
+The semantics of the `predict` message **MUST** be from the
+perspective of this sequence of events:
+
+ 1. After the input event is received by the keyboard.
+ 2. Before the keyboard applies the associated `transform` to the buffer.
+
+**NOTE**: The keyboard **MAY** apply the `transform` associated with the
+input event before receiving the corresponding `suggestions` message
+from the LMLayer. The intention is that once the suggests are displayed,
+the typist may select one of the suggestions in the place of the effects
+of their original input.
+
+**NOTE**: The keyboard **MAY** send the `predict` message after the
+`transform` associated with the input event is applied to the buffer,
+however the semantics **MUST** remain the same—the prediction happens
+from the perspective before the `transform` has been applied.
+
+The contexts are the text surrounding the insertion point.
+
+```javascript
+let contexts = [
+  // TO BE DESCRIBED;
+];
+```
+
+The transform parameter describes how the input event will change the
+buffer.
+
+```javascript
+let transform = [
+  /**
+   * The Unicode scalar values (i.e., characters) to be inserted at the
+   * cursor position.
+   *
+   * type: USVString <https://heycam.github.io/webidl/#idl-USVString>
+   */
+  insert: 'A',
+  /**
+   * The number of code units to delete to the left of the cursor.
+   *
+   * type: number (integer values only)
+   */
+  delete: 0,
+  /**
+   * [OPTIONAL]
+   * The number of code units to delete to the right of the cursor.
+   *
+   * type: number (integer values only)
+   */
+  deleteRight: 0,
+];
+```
 
 
 ### Message: `suggestions`
