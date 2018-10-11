@@ -287,7 +287,7 @@ TODO
 
  - [ ] Change `context` to `contexts`.
  - [ ] Figure out what a `Context` will be
- - [ ] Implement hack to make `global` inherit from `self`
+ - [x] Implement hack to make `global` inherit from `self`
  - [ ] Define on `self.registerModel(m: Model)` protocol
  - [ ] Describe `contexts`
  - [ ] make simple `index.html` that demos a dummy model

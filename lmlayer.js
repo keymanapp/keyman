@@ -65,4 +65,14 @@ function loadModelClass() {
   return global.Model;
 }
 
+/**
+ * HACK: on Node.JS + tiny-worker, ensure code imported with importScripts()
+ * has access to the same things defined on self in this file.
+ */
+if (typeof global !== 'undefined') {
+  let globalPrototype = Object.getPrototypeOf(global);
+  Object.setPrototypeOf(self, globalPrototype);
+  Object.setPrototypeOf(global, self);
+}
+
 /*global importScripts*/

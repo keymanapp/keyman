@@ -18,7 +18,6 @@ class Model {
 }
 
 // TODO: shouldn't this be running in the same scope as the original?
-// TODO: test in a browser!
 if (typeof global !== 'undefined') {
-    global.Model = Model;
+  global.Model = Model;
 }
