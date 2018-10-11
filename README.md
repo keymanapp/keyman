@@ -8,6 +8,13 @@ Prototype of NRC language model layer for Keyman.
 I'm developing and experimenting with the API and how different API
 designs will practically work.
 
+>  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+>  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+>  "OPTIONAL" in this document are to be interpreted as described in
+>  [RFC 2119].
+
+[RFC 2119]: https://www.ietf.org/rfc/rfc2119.txt
+
 
 Communication protocol between keyboard and asynchronous worker
 ---------------------------------------------------------------
@@ -65,12 +72,12 @@ its contents; it simply uses it to identify a request and pass it back
 to Keyman. There are a few requirements on the concrete type of the
 `Token`:
 
- 1. Tokens MUST be serializable via the [structured clone][] algorithm;
- 2. Tokens MUST be usable as a key in a [`Map`][Map object] object.
- 3. Tokens MUST be unique across messages. That is, tokens MUST NOT be
-    duplicated for between different messages.
+ 1. Tokens **MUST** be serializable via the [structured clone][] algorithm;
+ 2. Tokens **MUST** be usable as a key in a [`Map`][Map object] object.
+ 3. Tokens **MUST** be unique across messages. That is, tokens **MUST
+    NOT** be duplicated between different messages.
 
-It is up to Keyman to create unambiguous tokens that can be uniquely
+It is up to the keyboard to create unambiguous tokens that can be uniquely
 identified through the round-trip process.
 
 In the following examples, I'll use the subset of `number` values that
@@ -121,8 +128,9 @@ JavaScript object specify the path to the model, as well configurations
 and platform restrictions.
 
 The keyboard **MUST NOT** send any messages to the LMLayer prior to
-sending `initialize`. The keyboard **SHOULD** wait until receiving the
-`ready` message from the LMLayer before sending another message.
+sending `initialize`. The keyboard **SHOULD NOT** send another message
+to the keyboard until it receives `ready` message from the LMLayer
+before sending another message.
 
 These are the configurations, and platform restrictions sent to
 initialize the LMLayer and its model.
