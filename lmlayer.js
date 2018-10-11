@@ -25,6 +25,7 @@ self.onmessage = function (event) {
       return;
     }
 
+    // TODO: rip contexts out of message.
     let rawSuggestions = model.predict();
 
     // Sort in-place according to weight.

@@ -293,7 +293,7 @@ let transform = [
 TODO
 ====
 
- - [ ] Change `context` to `contexts`.
+ - [x] Change `context` to `contexts`.
  - [ ] Figure out what a `Context` will be
  - [x] Implement hack to make `global` inherit from `self`
  - [ ] Define on `self.registerModel(m: Model)` protocol
