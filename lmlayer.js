@@ -23,16 +23,7 @@ self.onmessage = function (event) {
   const {message, token} = event.data;
 
   if (message === 'initialize') {
-    // import the model.
-    loadModelClass();
-    if (createModel === undefined) {
-      throw new Error('Did not register a model!');
-    }
-
-    model = createModel(event.data.configuration);
-    // Ready! Send desired configuration.
-    cast('ready', { configuration: model.configuration });
-
+    onMessageUninitialized(event);
   } else if (message === 'predict') {
     // XXX: induce the other end to reject the promise, because of a
     // token/message mismatch. This is for testing purposes.
@@ -64,6 +55,27 @@ self.onmessage = function (event) {
     throw new Error('invalid message');
   }
 };
+
+/**
+ * Handles message when uninitialzed.
+ */
+function onMessageUninitialized(event) {
+  const {message} = event.data;
+  
+  if (message !== 'initialize') {
+    throw new Error('invalid message');
+  }
+
+  // import the model.
+  loadModelClass();
+  if (createModel === undefined) {
+    throw new Error('Did not register a model!');
+  }
+
+  model = createModel(event.data.configuration);
+  // Ready! Send desired configuration.
+  cast('ready', { configuration: model.configuration });
+}
 
 /**
  * Send a message to the keyboard.
