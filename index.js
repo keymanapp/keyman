@@ -42,7 +42,7 @@ class LMLayer {
   /**
    * [async] Sends a context, transform, and token to the LMLayer.
    */
-  predict({transform, contexts, customToken}) {
+  predict({transform, context, customToken}) {
     if (!this._configuration) {
       return Promise.reject(new Error('Model is not initialized.'));
     }
@@ -52,7 +52,7 @@ class LMLayer {
     return new Promise((resolve, reject) => {
       this._promises.track(token, resolve, reject);
       this._cast('predict', {
-        token, transform, contexts
+        token, transform, context
       });
     });
   }

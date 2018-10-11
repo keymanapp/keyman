@@ -101,9 +101,12 @@ An asynchronous message to predict after typing 'D':
         deleteLeft: 0,
         deleteRight: 0
     },
-    contexts: [
-        // TO BE DETERMINED
-    ]
+    contexts: {
+      left: '',
+      right: ''
+      startOfBuffer: true,
+      endOfBuffer: true 
+    },
 }
 ```
 
@@ -308,3 +311,5 @@ TODO
  - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
  - [x] Refactor `LMLayer` with state pattern?
  - [ ] Let `loadModel()` actually use the `path` argument.
+ - [ ] LOGLIKEIHOOD IN THE TRANSFORM!
+ - [ ] `possibleTransforms` where `transform` is an alias for `possibleTransforms[0]1

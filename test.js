@@ -2,7 +2,7 @@ import test from 'ava';
 import {LMLayer} from './';
 
 const TYPE_D = { insert: 'D', deleteLeft: 0, deleteRight: 0 };
-const EMPTY_CONTEXT = { left: '', right: '', probability: 0.00 };
+const EMPTY_CONTEXT = { left: '', right: '', startOfBuffer: true, endOfBuffer: true };
 
 
 test('It provide context to LMLayer', async t => {
@@ -18,7 +18,7 @@ test('It provide context to LMLayer', async t => {
 
   // Now tell it the user typed 'D'.
   let message = await lm.predict({
-    transform: TYPE_D, contexts: [EMPTY_CONTEXT]
+    transform: TYPE_D, context: EMPTY_CONTEXT
   });
 
   // This dummy language model will always suggest 'Derek' as its return.
@@ -34,7 +34,7 @@ test('It should not be able to predict() before initialized', async t => {
   const lm = new LMLayer;
   try {
     await lm.predict({
-      transform: TYPE_D, contexts: [EMPTY_CONTEXT], customToken: null
+      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
     });
     t.fail();
   } catch (e) {
@@ -50,11 +50,10 @@ test('It should reject when predictions crash', async t => {
 
   try {
     await lm.predict({
-      transform: TYPE_D, contexts: [EMPTY_CONTEXT], customToken: null
+      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
     });
     t.fail();
   } catch (e) {
     t.regex(e.message, /invalid/i);
   }
 });
-
