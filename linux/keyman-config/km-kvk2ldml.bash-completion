@@ -1,0 +1,17 @@
+#/usr/bin/env bash
+
+_km-kvk2ldml_completions()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-h --help -p --print -k --keys -o --output -v --verbose -vv --veryverbose --version"
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+}
+
+complete -F _km-kvk2ldml_completions km-kvk2ldml
