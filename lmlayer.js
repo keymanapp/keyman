@@ -4,7 +4,6 @@
  * The real LMLayer will be far better engineered!
  */
 
-let model;
 let createModel;
 let onMessage = onMessageWhenUninitialized;
 
@@ -36,19 +35,14 @@ self.onmessage = function (event) {
  * Handles message when uninitialzed.
  */
 function onMessageWhenUninitialized(event) {
-  const {message} = event.data;
-  
+  const {message, configuration} = event.data;
+
   if (message !== 'initialize') {
     throw new Error('invalid message');
   }
 
-  // import the model.
-  loadModelClass();
-  if (createModel === undefined) {
-    throw new Error('Did not register a model!');
-  }
-
-  model = createModel(event.data.configuration);
+  // Import the model.
+  let model = loadModel(configuration.path, configuration);
   transitionToReadyState(model);
 
   // Ready! Send desired configuration.
@@ -103,10 +97,19 @@ function cast(message, parameters) {
 }
 
 /**
- * Load the models into the current namespace.
+ * Loads the model from a separate file.
  */
-function loadModelClass(_path /* string */) {
+function loadModel(_path /* : string */, configuration /* : Configuration */) {
   importScripts('./models/en-x-test-derek.js');
+  /**
+   * The model MUST call registerModel() which ultimately defines
+   * createModel() to a function.
+   */
+  if (createModel === undefined) {
+    throw new Error('Did not register a model!');
+  }
+
+  return createModel(configuration);
 }
 
 /**
