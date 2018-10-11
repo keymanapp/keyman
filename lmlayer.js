@@ -4,12 +4,20 @@
  * The real LMLayer will be far better engineered!
  */
 
-let createModel;
+/**
+ * The function that handles messages from the keyboard.
+ */
 let onMessage = onMessageWhenUninitialized;
 
 /**
+ * When defined by registerModel(), you can call this function to instantiate
+ * a new model.
+ */
+let createModel;
+
+/**
  * Model definition files must call registerModel() once in order to register
- * an function that returns an initialized Model instance to the LMLayer. The
+ * a function that returns an initialized Model instance to the LMLayer. The
  * LMLayer may then use the registered Model instance to perform predictions.
  */
 self.registerModel = function registerModel(modelFactory /* (c: Configuration) => Model */) {
@@ -32,7 +40,9 @@ self.onmessage = function (event) {
 };
 
 /**
- * Handles message when uninitialzed.
+ * Handles message when uninitialized.
+ *
+ * Responds only to the `initialize` message.
  */
 function onMessageWhenUninitialized(event) {
   const {message, configuration} = event.data;
@@ -51,8 +61,13 @@ function onMessageWhenUninitialized(event) {
 
 /**
  * Call this to transition to the 'ready' state.
+ *
+ * Sets the onMessage handler to the ready handler, with a model.
  */
 function transitionToReadyState(model) {
+  /**
+   * Responds to `predict` messages with a `suggestions` message.
+   */
   onMessage = function onMessageWhenReady(event) {
     const {message, token} = event.data;
 
