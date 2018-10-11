@@ -57,3 +57,37 @@ test('It should reject when predictions crash', async t => {
     t.regex(e.message, /invalid/i);
   }
 });
+
+/**
+ * This is the 'teapots' test we use when describing n-grams.
+ */
+test('It should load a model from a file path', async t => {
+  t.plan(1);
+
+  const lm = new LMLayer;
+
+  // Wait for the language model to initialize.
+  await lm.initialize({ model: './models/en-x-test-teapot.js' });
+
+  // Now tell it that the user typed "t" in a buffer
+  // that reads "I'm a little "
+  let message = await lm.predict({
+    transform: {
+      insert: 't',
+      deleteLeft: 0,
+      deleteRight: 0
+    },
+    context: {
+      left: "I'm a little ",
+      right: undefined,
+      startOfBuffer: false,
+      endOfBuffer: true
+    }
+  });
+
+  // This dummy language model will always suggest 'Derek' as its return.
+  let {suggestions} = message;
+  t.deepEqual(suggestions, [
+    { insert: 'teapot', deleteLeft: 1, deleteRight: 0, displayAs: '🍵' }
+  ]);
+});
