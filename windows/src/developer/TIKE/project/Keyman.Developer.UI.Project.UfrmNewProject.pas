@@ -108,11 +108,7 @@ begin
       Result := ShowNewProjectParameters(Owner);
     kptBlank:
       begin
-        FGlobalProject.Save;
-        frmKeymanDeveloper.ProjectForm.Free;
-        FreeGlobalProjectUI;
-        LoadGlobalProjectUI('');
-        frmKeymanDeveloper.ShowProject;
+        frmKeymanDeveloper.OpenProject('');
         Result := True;
       end;
     kptImportWindowsKeyboard:
@@ -157,7 +153,7 @@ end;
 
 function TfrmNewProject.GetHelpTopic: string;
 begin
-  Result := SHelpTopic_Context_New;
+  Result := SHelpTopic_Context_NewProject;
 end;
 
 procedure TfrmNewProject.lvItemsDblClick(Sender: TObject);
@@ -183,6 +179,9 @@ begin
       'needed for a keyboard project.';
     kptBlank: lblDescription.Caption :=
       'Creates a blank, untitled project.';
+    kptImportWindowsKeyboard: lblDescription.Caption :=
+      'Creates a new keyboard project, importing from a Windows system keyboard '+
+      'and generating all the basic files needed for a keyboard project.';
   end;
 end;
 

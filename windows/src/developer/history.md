@@ -4,8 +4,12 @@
 * Refactor how keyboard_info metadata is generated (#1158)
 * New Feature: New Project from template and Import Keyboard (#1210)
 * New Feature: kmconvert command line utility (#1207)
-* New code editor using open source Monaco component (#1153, #1154 and others)
+* New code editor using open source Monaco component (#1153, #1154, #1252)
 * Tidy up of installer to make future upgrades easier (#1175)
+* Support Linux targets (#1239)
+* Opening or creating a project now closes current editor files (#1242)
+* Projects can now include other related files such as history.md (#1243)
+* Keyman Developer now treats files as UTF-8 by default (#1244)
 
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release

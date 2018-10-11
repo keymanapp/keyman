@@ -66,6 +66,30 @@ LPARAM LLKHFFlagstoWMKeymanKeyEventFlags(PKBDLLHOOKSTRUCT hs) {
     ((hs->flags & LLKHF_UP) ? KEYEVENTF_KEYUP : 0);
 }
 
+/*
+  We don't attempt to serialize input to the console windows because they 
+  behave somewhat differently to normal windows. For now, this should be 
+  sufficient. In the future, we may want to find a way to interrogate the 
+  focused process to find out which window actually has focus for posting
+  messages, because we appear to post the messages to the wrong thread
+  for console windows.
+*/
+BOOL IsConsoleWindow(HWND hwnd) {
+  static HWND last_hwnd = 0;
+  static BOOL last_isConsoleWindow = FALSE;
+  
+  if (last_hwnd == hwnd) {
+    return last_isConsoleWindow;
+  }
+
+  char buf[64];
+
+  last_hwnd = hwnd;
+  last_isConsoleWindow = GetClassName(hwnd, buf, 64) && !strcmp(buf, "ConsoleWindowClass");
+
+  return last_isConsoleWindow;
+}
+
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode, 
   _In_  WPARAM wParam, 
@@ -162,8 +186,24 @@ LRESULT _kmnLowLevelKeyboardProc(
   */
 
   if (flag_ShouldSerializeInput) {
-    PostThreadMessage(GetWindowThreadProcessId(GetForegroundWindow(), NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-    return 1;
+    GUITHREADINFO gui = { 0 };
+    gui.cbSize = sizeof(GUITHREADINFO);
+    if (GetGUIThreadInfo(NULL, &gui)) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Active=%x Focus=%x Key=%s flags=%x",
+        gui.hwndActive, gui.hwndFocus, Debug_VirtualKey((WORD)hs->vkCode), LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+
+      HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
+      if (!IsConsoleWindow(hwnd)) {
+        PostThreadMessage(GetWindowThreadProcessId(hwnd, NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+        return 1;
+      }
+      else {
+        SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing");
+      }
+    }
+    else {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Failed to get Gui thread info with error %d", GetLastError());
+    }
   }
 
   return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);

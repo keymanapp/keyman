@@ -62,7 +62,10 @@ end;
 initialization
   RegisterProjectFileType('*', TShellProjectFile);
   RegisterProjectFileType('.bmp', TOpenableProjectFile);
+  RegisterProjectFileType('.ico', TOpenableProjectFile);
   RegisterProjectFileType('.txt', TOpenableProjectFile);
+  RegisterProjectFileType('.md', TOpenableProjectFile);
+  RegisterProjectFileType('.keyboard_info', TOpenableProjectFile);
   RegisterProjectFileType('.htm', TOpenableProjectFile);   // I1769
   RegisterProjectFileType('.html', TOpenableProjectFile);  // I1769
   RegisterProjectFileType('.xml', TOpenableProjectFile);   // I1769

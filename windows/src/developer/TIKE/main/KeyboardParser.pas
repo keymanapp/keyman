@@ -328,7 +328,7 @@ const
   KeyboardFeatureTargets: array[TKeyboardParser_FeatureID] of TKeymanTargets = (   // I4504
     // Due to Delphi compiler limitation, need to copy the target values, can't
     // use the defined constants.
-    [ktWindows, ktMacosx, ktDesktop], //KMXKeymanTargets
+    [ktWindows, ktMacosx, ktLinux, ktDesktop], //KMXKeymanTargets
     [ktAny, ktWindows, ktMacosx, ktLinux, ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktDesktop, ktTablet], //AllKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //TouchKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //KMWKeymanTargets
