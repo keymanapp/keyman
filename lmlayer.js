@@ -7,25 +7,27 @@
 let model;
 let createModel;
 
-createModel = function (configuration) {
-  return new Model(configuration);
-};
-
 /**
- * Model definition files call registerModel() in order to register an
- * initialized Model instance to the LMLayer. The LMLayer may then use the
- * registered Model instance to perform predictions.
+ * Model definition files must call registerModel() once in order to register
+ * an function that returns an initialized Model instance to the LMLayer. The
+ * LMLayer may then use the registered Model instance to perform predictions.
  */
 self.registerModel = function registerModel(modelFactory /* (c: Configuration) => Model */) {
   createModel = modelFactory;
 };
 
+/**
+ * Handles messages from the keyboard.
+ */
 self.onmessage = function (event) {
   const {message, token} = event.data;
 
   if (message === 'initialize') {
     // import the model.
     loadModelClass();
+    if (createModel === undefined) {
+      throw new Error('Did not register a model!');
+    }
 
     model = createModel(event.data.configuration);
     // Ready! Send desired configuration.
@@ -73,11 +75,8 @@ function cast(message, parameters) {
 /**
  * Load the models into the current namespace.
  */
-function loadModelClass() {
+function loadModelClass(_path /* string */) {
   importScripts('./models/en-x-test-derek.js');
-  if (typeof Model !== 'undefined')
-    return Model; // eslint-disable-line no-undef
-  return global.Model;
 }
 
 /**
