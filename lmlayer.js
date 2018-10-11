@@ -49,49 +49,51 @@ function onMessageWhenUninitialized(event) {
   }
 
   model = createModel(event.data.configuration);
-  onMessage = onMessageWhenReady; 
+  transitionToReadyState(model);
 
   // Ready! Send desired configuration.
   cast('ready', { configuration: model.configuration });
 }
 
 /**
- * Handles messages when ready to predict.
+ * Call this to transition to the 'ready' state.
  */
-function onMessageWhenReady(event) {
-  const {message, token} = event.data;
+function transitionToReadyState(model) {
+  onMessage = function onMessageWhenReady(event) {
+    const {message, token} = event.data;
 
-  if (message !== 'predict') {
-    throw new Error('invalid message');
-  }
-
-  // XXX: induce the other end to reject the promise, because of a
-  // token/message mismatch. This is for testing purposes.
-  if (token === null) {
-    cast('invalid', {token});
-    return;
-  }
-
-  // TODO: rip contexts out of message.
-  let rawSuggestions = model.predict();
-
-  // Sort in-place according to weight.
-  rawSuggestions.sort((a, b) => a.weight - b.weight);
-
-  // Convert the internal suggestion format to the one required by the keyboard.
-  let suggestions = rawSuggestions.map((internal) => {
-    let displayAs = internal.displayAs;
-
-    // Try to make up a display string.
-    if (displayAs === null || displayAs === undefined) {
-      displayAs = internal.transform.insert;
+    if (message !== 'predict') {
+      throw new Error('invalid message');
     }
 
-    return { displayAs, ...internal.transform };
-  });
+    // XXX: induce the other end to reject the promise, because of a
+    // token/message mismatch. This is for testing purposes.
+    if (token === null) {
+      cast('invalid', {token});
+      return;
+    }
 
-  cast('suggestions', { token, suggestions });
-};
+    // TODO: rip contexts out of message.
+    let rawSuggestions = model.predict();
+
+    // Sort in-place according to weight.
+    rawSuggestions.sort((a, b) => a.weight - b.weight);
+
+    // Convert the internal suggestion format to the one required by the keyboard.
+    let suggestions = rawSuggestions.map((internal) => {
+      let displayAs = internal.displayAs;
+
+      // Try to make up a display string.
+      if (displayAs === null || displayAs === undefined) {
+        displayAs = internal.transform.insert;
+      }
+
+      return { displayAs, ...internal.transform };
+    });
+
+    cast('suggestions', { token, suggestions });
+  };
+}
 
 /**
  * Send a message to the keyboard.
