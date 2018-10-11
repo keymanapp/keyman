@@ -78,7 +78,7 @@ are interpretable as [31-bit signed integers][Smi].
 
 [Map object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Key_equality
 [Smi]: https://github.com/thlorenz/v8-perf/blob/master/data-types.md#efficiently-representing-values-and-tagging
-
+[Tokens]: #tokens
 
 ### Example
 
@@ -213,14 +213,14 @@ let configuration = {
 
 Sent from the keyboard to the LMLayer whenever a new prediction should
 be generated. This is typically initiated by a key press event. The
-keyboard **SHOULD** track each `predict` message using a *token*. The
+keyboard **SHOULD** track each `predict` message using a [token][Tokens]. The
 token **MUST** be unique across all prediction events. The LMLayer
 **SHOULD** respond to each `predict` message with a `suggestions`
 message. The `suggestions` message **MUST** contain the corresponding
-token as sent the initial `predict` message.
+token as sent in the initial `predict` message.
 
 The keyboard **MUST** send the `contexts` parameter. The keyboard
-**SHOULD** send `transform` parameter. The keyboard **MUST** send
+**SHOULD** send the `transform` parameter. The keyboard **MUST** send
 a unique token.
 
 The semantics of the `predict` message **MUST** be from the
@@ -231,7 +231,7 @@ perspective of this sequence of events:
 
 **NOTE**: The keyboard **MAY** apply the `transform` associated with the
 input event before receiving the corresponding `suggestions` message
-from the LMLayer. The intention is that once the suggests are displayed,
+from the LMLayer. The intention is that once the suggestions are displayed,
 the typist may select one of the suggestions in the place of the effects
 of their original input.
 
@@ -285,11 +285,13 @@ let transform = [
 TODO
 ====
 
+ - [ ] Change `context` to `contexts`.
+ - [ ] Figure out what a `Context` will be
+ - [ ] Implement hack to make `global` inherit from `self`
+ - [ ] Define on `self.registerModel(m: Model)` protocol
+ - [ ] Describe `contexts`
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] make an `error` initialization message.
  - [ ] TypeScript!
- - [ ] Figure out what a `Context` will be
- - [ ] make TinyWorker's `self` inherit from the global scope?
- - [ ] work on `registerModel(m: Model)` protocol
  - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
  - [ ] Refactor `LMLayer` with state pattern?
