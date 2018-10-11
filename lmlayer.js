@@ -6,6 +6,7 @@
 
 let model;
 let createModel;
+let onMessage = onMessageWhenUninitialized;
 
 /**
  * Model definition files must call registerModel() once in order to register
@@ -18,23 +19,23 @@ self.registerModel = function registerModel(modelFactory /* (c: Configuration) =
 
 /**
  * Handles messages from the keyboard.
+ *
+ * Does some error checking, then delegates to onMessage().
  */
 self.onmessage = function (event) {
   const {message} = event.data;
-
-  if (message === 'initialize') {
-    onMessageUninitialized(event);
-  } else if (message === 'predict') {
-    onMessageWhenReady(event);
-  } else {
-    throw new Error('invalid message');
+  if (!message) {
+    throw new Error('Message did not have a `message` attribute', event.data);
   }
+
+  /* Delegate to the current onMessage() handler. */
+  return onMessage(event);
 };
 
 /**
  * Handles message when uninitialzed.
  */
-function onMessageUninitialized(event) {
+function onMessageWhenUninitialized(event) {
   const {message} = event.data;
   
   if (message !== 'initialize') {
@@ -48,6 +49,8 @@ function onMessageUninitialized(event) {
   }
 
   model = createModel(event.data.configuration);
+  onMessage = onMessageWhenReady; 
+
   // Ready! Send desired configuration.
   cast('ready', { configuration: model.configuration });
 }
