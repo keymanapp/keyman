@@ -2,7 +2,7 @@ import test from 'ava';
 import {LMLayer} from './';
 
 const TYPE_D = { insert: 'D', deleteLeft: 0, deleteRight: 0 };
-const EMPTY_CONTEXT = { left: '' };
+const EMPTY_CONTEXT = { left: '', right: '', probability: 0.00 };
 
 
 test('It provide context to LMLayer', async t => {
