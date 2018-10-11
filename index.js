@@ -21,7 +21,7 @@ class LMLayer {
   /**
    * [async] Waits for the model's initialization.
    */
-  initialize(_acceptConfiguration) {
+  initialize({model, configuration }) {
     if (this._configuration) {
       return Promise.resolve(this._configuration);
     }
@@ -30,9 +30,11 @@ class LMLayer {
     // _onMessage() will resolve this Promise.
     return new Promise((resolve, _reject) => {
       this._cast('initialize', {
+        model, 
         configuration: {
           maxLeftContextCodeUnits: 32,
           supportsRightContexts: false,
+          ...configuration
         }
       });
       this._resolveInitialized = resolve;

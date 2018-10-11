@@ -11,7 +11,7 @@ test('It provide context to LMLayer', async t => {
   const lm = new LMLayer;
 
   // Wait for the language model to initialize and declare its configuration.
-  let configuration = await lm.initialize({ model: 'en-x-derek' });
+  let configuration = await lm.initialize({ model: './models/en-x-test-derek.js' });
   // The model should as for 32 code units of context to the left of the
   // cursor.
   t.is(configuration.leftContextCodeUnits, 32);
@@ -46,7 +46,7 @@ test('It should reject when predictions crash', async t => {
   t.plan(1);
 
   const lm = new LMLayer;
-  await lm.initialize({ model: 'en-x-derek' });
+  await lm.initialize({ model: './models/en-x-test-derek.js' });
 
   try {
     await lm.predict({

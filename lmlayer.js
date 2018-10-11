@@ -52,7 +52,7 @@ function onMessageWhenUninitialized(event) {
   }
 
   // Import the model.
-  let model = loadModel(configuration.path, configuration);
+  let model = loadModel(event.data.model, configuration);
   transitionToReadyState(model);
 
   // Ready! Send desired configuration.
@@ -69,7 +69,7 @@ function transitionToReadyState(model) {
    * Responds to `predict` messages with a `suggestions` message.
    */
   onMessage = function onMessageWhenReady(event) {
-    const {message, token} = event.data;
+    const {message, token, transform, context} = event.data;
 
     if (message !== 'predict') {
       throw new Error('invalid message');
@@ -82,10 +82,9 @@ function transitionToReadyState(model) {
       return;
     }
 
-    // TODO: rip contexts out of message.
-    let rawSuggestions = model.predict();
+    let rawSuggestions = model.predict(context, transform);
 
-    // Sort in-place according to weight.
+    // Sort in-place according to weight, ascending.
     rawSuggestions.sort((a, b) => a.weight - b.weight);
 
     // Convert the internal suggestion format to the one required by the keyboard.
@@ -114,8 +113,8 @@ function cast(message, parameters) {
 /**
  * Loads the model from a separate file.
  */
-function loadModel(_path /* : string */, configuration /* : Configuration */) {
-  importScripts('./models/en-x-test-derek.js');
+function loadModel(path /* : string */, configuration /* : Configuration */) {
+  importScripts(path);
   /**
    * The model MUST call registerModel() which ultimately defines
    * createModel() to a function.

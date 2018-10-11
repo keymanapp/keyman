@@ -338,10 +338,12 @@ TODO
 
  - [x] Change `context` to `contexts`.
  - [x] Change `contexts` to `context`....
- - [] Figure out what a `Context` will be
+ - [x] Figure out what a `Context` will be
  - [x] Implement hack to make `global` inherit from `self`
  - [x] Define on `self.registerModel(factory: (c) => Model)` protocol
  - [x] Describe `contexts`
+ - [x] Implement loading a model from a file.
+ - [ ] Document `suggestions`
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] make an `error` initialization message.
  - [ ] TypeScript!
