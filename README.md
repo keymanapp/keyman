@@ -330,6 +330,28 @@ let transform = {
 
 ### Message: `suggestions`
 
+The `suggestions` message is sent from the LMLayer to the keyboard. This
+message sends a ranked array of suggestions, in descending order of
+probability (i.e., entry `0` is most likely, followed by entry `1`,
+etc.). This message **MUST** be in response to a `predict` message, and
+it **MUST** respond with the corresponding [token].
+
+#### Timing
+
+Each suggestion provides a `transform`. This transform is applied
+_after_ the transform associated with the input event that initiated
+this prediction. That is, the suggested transform applies to the buffer
+after the transform associated with the input event.
+
+Rephrased in somewhat mathematical terms:
+Let 𝑥 ∈ 𝐵 be the input text buffer. Let 𝑇<sub>𝑖</sub> be the transform
+associated with an input event that maps a text buffer 𝐵 → 𝐵. Let
+𝑇<sub>𝑠</sub> be a transform suggested through the LMLayer. 𝑦 ∈ 𝐵 is the
+text buffer after the suggestion transform has been applied.  The
+correct sequence of applications should be as follows:
+
+> 𝑦 = 𝑇<sub>𝑠</sub>(𝑇<sub>𝑖</sub>(𝑥))
+
 ...
 
 
