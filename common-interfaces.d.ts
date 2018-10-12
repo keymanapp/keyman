@@ -8,12 +8,12 @@
  * 
  * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString
  */
-declare type USVString = string;
+type USVString = string;
 
 /**
  * TODO: ...
  */
-declare interface Transform {
+interface Transform {
   insert: USVString;
   deleteLeft: number;
   deleteRight: number;
@@ -22,7 +22,7 @@ declare interface Transform {
 /**
  * TODO: ...
  */
-declare interface Context {
+interface Context {
   left: USVString;
   right?: USVString;
   startOfBuffer: boolean;

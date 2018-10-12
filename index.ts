@@ -56,7 +56,6 @@ class LMLayer {
       return Promise.resolve(this._configuration);
     }
 
-
     // _onMessage() will resolve this Promise.
     return new Promise((resolve, _reject) => {
       this._cast('initialize', {
@@ -68,7 +67,7 @@ class LMLayer {
         }
       });
       this._resolveInitialized = resolve;
-    });
+    }) as Promise<Configuration>;
   }
 
   /**
@@ -146,7 +145,6 @@ interface PromiseCallbacks {
  * You can .track() them, and then .keep() them. You may also .break() them.
  */
 class PromiseStore {
-
   private _promises: Map<Token, PromiseCallbacks>;
 
   constructor() {
@@ -198,7 +196,12 @@ class PromiseStore {
 
 if (typeof module !== 'undefined') {
   // In Node JS, monkey-patch Worker to the global object.
-  // @ts-ignore
   global.Worker = require('tiny-worker');
   exports.LMLayer = LMLayer;
+}
+
+declare module NodeJS  {
+  interface Global {
+      Worker: typeof Worker;
+  }
 }
