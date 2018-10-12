@@ -10,7 +10,10 @@ type Token = number;
  */
 type MessageKind = 'initialize' | 'ready' | 'predict' | 'suggestions';
 
-type Message = InitializeMessage | ReadyMessage;
+type Message = InitializeMessage
+             | ReadyMessage
+             | PredictMessage
+             | SuggestionsMessage;
 
 interface InitializeMessage {
   message: 'initialize';
@@ -79,3 +82,30 @@ interface PredictMessage {
   context: Context;
   transform: Transform;
 } 
+
+interface SuggestionsMessage {
+  message: 'suggestions';
+  token: Token;
+  /**
+   * An ordered array of [[Suggestion]] objects.
+   * The suggestions are ordered from most probable, to least
+   * probable. In practice, only a handful of suggestions can
+   * be display on the screen, depending on the language. Plan
+   * to produce the top three suggestions.
+   */
+  suggestions: Suggestion[];
+}
+
+/**
+ * A suggested change. Bundles the suggested [[Transform]], along
+ * with a way to display it on the screen.
+ */
+interface Suggestion {
+  transform: Transform;
+  /**
+   * A string to display the suggestion to the typist.
+   * This should aid the typist understand what the transform
+   * will do to their text.
+   */
+  displayAs: string;
+}
