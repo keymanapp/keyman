@@ -6,14 +6,14 @@ import sys
 import os
 from keyman_config import __version__
 
-from bs4 import BeautifulSoup
 import datetime
-import requests
-import requests_cache
 import time
-from keyman_config.get_kmp import keyman_cache_dir
 
 def get_keyboard_dir_page(kb_url):
+	import requests
+	import requests_cache
+	from keyman_config.get_kmp import keyman_cache_dir
+
 	logging.info("Getting keyboard list")
 	logging.debug("At URL %s", kb_url)
 	cache_dir = keyman_cache_dir()
@@ -38,6 +38,8 @@ def get_keyboard_dir_page(kb_url):
 
 
 def get_dir_list():
+	from bs4 import BeautifulSoup
+
 	url = "https://downloads.keyman.com/keyboards/"
 	page = get_keyboard_dir_page(url)
 	soup = BeautifulSoup(page, 'html.parser')
@@ -52,6 +54,7 @@ def write_kmpdirlist(kmpdirfile):
 				print(kb, file=kmpdirlist)
 
 def list_keyboards():
+	from keyman_config.get_kmp import keyman_cache_dir
 	kmpdirfile = os.path.join(keyman_cache_dir(), 'kmpdirlist')
 	if not os.path.exists(kmpdirfile):
 		write_kmpdirlist(kmpdirfile)
@@ -81,12 +84,13 @@ def main():
 		logging.error("km-package-install: error: too many arguments: either install a local kmp file or specify a keyboard id to download and install.")
 		sys.exit(2)
 
+	from keyman_config.install_kmp import install_kmp, InstallError, InstallStatus
+	from keyman_config.list_installed_kmp import get_kmp_version
+	from keyman_config.get_kmp import get_keyboard_data, get_kmp, keyman_cache_dir
+
 	if os.path.exists(os.path.join(keyman_cache_dir(), 'kmpdirlist')):
 		os.remove(os.path.join(keyman_cache_dir(), 'kmpdirlist'))
 
-	from keyman_config.install_kmp import install_kmp, InstallError, InstallStatus
-	from keyman_config.list_installed_kmp import get_kmp_version
-	from keyman_config.get_kmp import get_keyboard_data, get_kmp
 
 	def try_install_kmp(inputfile, arg, online=False, sharedarea=False):
 		try:
