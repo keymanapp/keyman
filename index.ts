@@ -6,11 +6,6 @@ interface Configuration {
   // TODO 
 }
 
-// TODO: these should be opaque types
-type Token = number;
-
-type MessageKind = 'initialize' | 'ready' | 'predict' | 'suggestions';
-
 interface InitializeParameters {
   model: string;
   configuration: Configuration;
