@@ -97,6 +97,38 @@ interface SuggestionsMessage {
 }
 
 /**
+ * The context is the text surrounding the insertion point,
+ * before any transforms are applied to the text buffer.
+ */
+interface Context {
+  /**
+   * Up to maxLeftContextCodeUnits code units of Unicode scalar value
+   * (i. e., characters) to the left of the insertion point in the
+   * buffer. If there is nothing to the left of the buffer, this returns
+   * an empty string.
+   */
+  left: USVString;
+
+  /**
+   * Up to maxRightContextCodeUnits code units of Unicode scalar value
+   * (i. e., characters) to the right of the insertion point in the
+   * buffer. If there is nothing to the right of the buffer, this returns
+   * an empty string.
+   */
+  right?: USVString;
+
+  /**
+   * Whether the insertion point is at the start of the buffer.
+   */
+  startOfBuffer: boolean;
+
+  /**
+   * Whether the insertion point is at the end of the buffer.
+   */
+  endOfBuffer: boolean;
+}
+
+/**
  * A suggested change. Bundles the suggested [[Transform]], along
  * with a way to display it on the screen.
  */
