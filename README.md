@@ -336,6 +336,36 @@ probability (i.e., entry `0` is most likely, followed by entry `1`,
 etc.). This message **MUST** be in response to a `predict` message, and
 it **MUST** respond with the corresponding [token].
 
+```javascript
+/**
+ * `suggestions` is an ordered array of suggestion objects.
+ * Each suggestion is a transform bundled with a `displayAs` property.
+ */
+let suggestions = [
+  {
+    /**
+     * Same object as an input event transform.
+     * Note that the transform is applied AFTER the input event
+     * transform.
+     */
+    transform: {
+      insert: 'teapot',
+      deleteLeft: 1,
+      deleteRight: 0
+    },
+
+    /**
+     * A string to display the suggestion to the typist.
+     * This should aid the typist understand what the transform will do
+     * to their text.
+     *
+     * type: string
+     */
+    displayAs: '🍵'
+  }
+];
+```
+
 #### Timing
 
 Each suggestion provides a `transform`. This transform is applied
@@ -351,8 +381,6 @@ text buffer after the suggestion transform has been applied.  The
 correct sequence of applications should be as follows:
 
 > 𝑦 = 𝑇<sub>𝑠</sub>(𝑇<sub>𝑖</sub>(𝑥))
-
-...
 
 
 TODO
