@@ -2,17 +2,6 @@
  * Sample implementation of the "keyboard", for testing the LMLayer.
  */
 
-interface Configuration {
-  /**
-   * TODO: ...
-   */
-  leftContextCodeUnits: number;
-}
-
-interface RequestedConfiguration {
-  // TODO
-}
-
 interface InitializeParameters {
   model: string;
   configuration?: Configuration;

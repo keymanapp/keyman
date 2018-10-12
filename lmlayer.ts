@@ -4,23 +4,60 @@
  * The real LMLayer will be far better engineered!
  */
 
+type Weight = number;
+
+// TODO: In a DedicatedWorkerGlobalScope.
+interface LMLayerWorkerGlobalScope extends DedicatedWorkerGlobalScope {
+  registerModel(factory: ModelFactory): void;
+}
+
+interface RequestedConfiguration {
+  // TODO
+}
+
+interface Configuration {
+  /**
+   * TODO: ...
+   */
+  leftContextCodeUnits: number;
+}
+
+ /**
+  * TODO: ...
+  */
+interface Model {
+  readonly configuration: Configuration;
+  predict(...args: any): InternalSuggestion[];
+}
+
+/**
+ * TODO: ...
+ */
+interface InternalSuggestion {
+  transform: Transform;
+  displayAs?: string;
+  weight: Weight;
+}
+
 /**
  * The function that handles messages from the keyboard.
  */
 let onMessage = onMessageWhenUninitialized;
 
+type ModelFactory = (c: RequestedConfiguration) => Model;
+
 /**
  * When defined by registerModel(), you can call this function to instantiate
  * a new model.
  */
-let createModel;
+let createModel: ModelFactory | undefined;
 
 /**
  * Model definition files must call registerModel() once in order to register
  * a function that returns an initialized Model instance to the LMLayer. The
  * LMLayer may then use the registered Model instance to perform predictions.
  */
-self.registerModel = function registerModel(modelFactory /* (c: Configuration) => Model */) {
+(self as LMLayerWorkerGlobalScope).registerModel = function registerModel(modelFactory: ModelFactory) {
   createModel = modelFactory;
 };
 
@@ -29,10 +66,10 @@ self.registerModel = function registerModel(modelFactory /* (c: Configuration) =
  *
  * Does some error checking, then delegates to onMessage().
  */
-self.onmessage = function (event) {
+(self as DedicatedWorkerGlobalScope).onmessage = function (event) {
   const {message} = event.data;
   if (!message) {
-    throw new Error('Message did not have a `message` attribute', event.data);
+    throw new Error(`Message did not have a 'message' attribute: ${event.data}`);
   }
 
   /* Delegate to the current onMessage() handler. */
@@ -44,12 +81,13 @@ self.onmessage = function (event) {
  *
  * Responds only to the `initialize` message.
  */
-function onMessageWhenUninitialized(event) {
-  const {message, configuration} = event.data;
+function onMessageWhenUninitialized(event: MessageEvent) {
+  const {message} = event.data as Message;
 
   if (message !== 'initialize') {
     throw new Error('invalid message');
   }
+  const {configuration} = event.data;
 
   // Import the model.
   let model = loadModel(event.data.model, configuration);
@@ -64,7 +102,7 @@ function onMessageWhenUninitialized(event) {
  *
  * Sets the onMessage handler to the ready handler, with a model.
  */
-function transitionToReadyState(model) {
+function transitionToReadyState(model: Model) {
   /**
    * Responds to `predict` messages with a `suggestions` message.
    */
@@ -78,6 +116,7 @@ function transitionToReadyState(model) {
     // XXX: induce the other end to reject the promise, because of a
     // token/message mismatch. This is for testing purposes.
     if (token === null) {
+      // @ts-ignore
       cast('invalid', {token});
       return;
     }
@@ -106,14 +145,14 @@ function transitionToReadyState(model) {
 /**
  * Send a message to the keyboard.
  */
-function cast(message, parameters) {
+function cast(message: MessageKind, parameters: {}) {
   postMessage({message, ...parameters });
 }
 
 /**
  * Loads the model from a separate file.
  */
-function loadModel(path /* : string */, configuration /* : Configuration */) {
+function loadModel(path : string , configuration: RequestedConfiguration) {
   importScripts(path);
   /**
    * The model MUST call registerModel() which ultimately defines
