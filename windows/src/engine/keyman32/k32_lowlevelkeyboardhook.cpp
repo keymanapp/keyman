@@ -201,15 +201,11 @@ LRESULT _kmnLowLevelKeyboardProc(
 #endif
         return 1;
       }
-      else {
-        //SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // noisy 
-      }
+      //else SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // too noisy 
     }
     else {
       SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Failed to get Gui thread info with error %d", GetLastError());
     }
-    
-    return 1;
   }
 
   return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
