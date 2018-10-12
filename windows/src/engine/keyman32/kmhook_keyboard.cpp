@@ -74,6 +74,7 @@ BOOL InLanguageSwitchKeySequence = FALSE;
 HWND hwndLanguageSwitch = 0;
 		
 BOOL ForegroundWindowIsRDP() {   // I4197
+  //TODO: Cache result
   DWORD dwProcessId;
   HWND hwnd = GetForegroundWindow();
   if(hwnd == NULL) {

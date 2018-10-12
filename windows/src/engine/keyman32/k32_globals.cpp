@@ -392,11 +392,7 @@ BOOL Globals::InitHandles()  // I3040
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
   if(f_hLockMutex == 0) return FALSE;
   SetObjectToLowIntegrity(f_hLockMutex);
-  GrantPermissionToAllApplicationPackages(f_hLockMutex, MUTEX_MODIFY_STATE);
-
-#ifdef USE_KEYEVENTSENDERTHREAD
-  InitKeyEventSenderThread();
-#endif
+  GrantPermissionToAllApplicationPackages(f_hLockMutex, MUTEX_ALL_ACCESS);
 
   return TRUE;
 }
