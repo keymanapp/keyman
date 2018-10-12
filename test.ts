@@ -1,7 +1,7 @@
 import test from 'ava';
 import {LMLayer} from './';
 
-const TYPE_D = { insert: 'D', deleteLeft: 0, deleteRight: 0 };
+const TYPE_D = { insert: 'D', delete: 0, deleteRight: 0 };
 const EMPTY_CONTEXT = { left: '', right: '', startOfBuffer: true, endOfBuffer: true };
 
 
@@ -24,7 +24,10 @@ test('It provide context to LMLayer', async t => {
   // This dummy language model will always suggest 'Derek' as its return.
   let {suggestions} = message;
   t.deepEqual(suggestions, [
-    { insert: 'Derek', deleteLeft: 1, deleteRight: 0, displayAs: 'Derek' }
+    {
+      transform: {insert: 'Derek', delete: 1, deleteRight: 0},
+      displayAs: 'Derek'
+    }
   ]);
 });
 
@@ -33,9 +36,7 @@ test('It should not be able to predict() before initialized', async t => {
 
   const lm = new LMLayer;
   try {
-    await lm.predict({
-      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
-    });
+    await lm.predict({ transform: TYPE_D, context: EMPTY_CONTEXT });
     t.fail();
   } catch (e) {
     t.regex(e.message, /(not |un)initialized/i);
@@ -50,7 +51,9 @@ test('It should reject when predictions crash', async t => {
 
   try {
     await lm.predict({
-      transform: TYPE_D, context: EMPTY_CONTEXT, customToken: null
+      transform: TYPE_D, context: EMPTY_CONTEXT,
+      // @ts-ignore
+      customToken: null
     });
     t.fail();
   } catch (e) {
@@ -74,7 +77,7 @@ test('It should load a model from a file path', async t => {
   let message = await lm.predict({
     transform: {
       insert: 't',
-      deleteLeft: 0,
+      delete: 0,
       deleteRight: 0
     },
     context: {
@@ -88,6 +91,11 @@ test('It should load a model from a file path', async t => {
   // This dummy language model will always suggest 'Derek' as its return.
   let {suggestions} = message;
   t.deepEqual(suggestions, [
-    { insert: 'teapot', deleteLeft: 1, deleteRight: 0, displayAs: '🍵' }
+    {
+      transform: {
+        insert: 'teapot', delete: 1, deleteRight: 0,
+      },
+      displayAs: '🍵'
+    }
   ]);
 });

@@ -3,12 +3,19 @@
  */
 
 interface Configuration {
-  // TODO 
+  /**
+   * TODO: ...
+   */
+  leftContextCodeUnits: number;
+}
+
+interface RequestedConfiguration {
+  // TODO
 }
 
 interface InitializeParameters {
   model: string;
-  configuration: Configuration;
+  configuration?: Configuration;
 }
 
 interface PredictParameters {
@@ -20,9 +27,9 @@ interface PredictParameters {
 /**
  * Encapsulates the underlying Web Worker through asynchronous calls.
  */
-class LMLayer {
+export class LMLayer {
   private _worker: Worker;
-  private _promises: PromiseStore;
+  private _promises: PromiseStore<SuggestionsMessage>;
   private _currentToken: number;
   private _configuration: Configuration | null;
   private _resolveInitialized: Function | null;
@@ -80,7 +87,7 @@ class LMLayer {
       this._cast('predict', {
         token, transform, context
       });
-    });
+    }) as Promise<SuggestionsMessage>;
   }
 
 
@@ -127,10 +134,10 @@ class LMLayer {
   }
 }
 
-type Resolve = (value?: {} | PromiseLike<any>) => void;
+type Resolve<T> = (value?: T | PromiseLike<T>) => void;
 type Reject = (reason?: any) => void;
-interface PromiseCallbacks {
-  resolve: Resolve;
+interface PromiseCallbacks<T> {
+  resolve: Resolve<T>;
   reject: Reject;
 }
 
@@ -139,8 +146,8 @@ interface PromiseCallbacks {
  *
  * You can .track() them, and then .keep() them. You may also .break() them.
  */
-class PromiseStore {
-  private _promises: Map<Token, PromiseCallbacks>;
+class PromiseStore<T> {
+  private _promises: Map<Token, PromiseCallbacks<T>>;
 
   constructor() {
     this._promises = new Map();
@@ -149,7 +156,7 @@ class PromiseStore {
   /**
    * Associate a token with its respective resolve and reject callbacks.
    */
-  track(token: Token, resolve: Resolve, reject: Reject) {
+  track(token: Token, resolve: Resolve<T>, reject: Reject) {
     if (this._promises.has(token)) {
       reject(`Existing request with token ${token}`);
     }
@@ -170,7 +177,7 @@ class PromiseStore {
 
     // This acts like the resolve function, BUT, it removes the promise from
     // the store -- because it's resolved!
-    return (resolvedValue: {}) => {
+    return (resolvedValue: T) => {
       this._promises.delete(token);
       return accept(resolvedValue);
     };
@@ -191,6 +198,7 @@ class PromiseStore {
 
 if (typeof module !== 'undefined') {
   // In Node JS, monkey-patch Worker to the global object.
+  // @ts-ignore
   global.Worker = require('tiny-worker');
   exports.LMLayer = LMLayer;
 }
