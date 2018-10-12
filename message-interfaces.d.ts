@@ -42,7 +42,7 @@ interface InitializeMessage {
     /**
      * The maximum amount of code units that the keyboard will provide to
      * the right of the cursor. The absence of this rule implies 0.
-     * See also, supportsRightContexts.
+     * See also, [[supportsRightContexts]].
      */
     maxRightContextCodeUnits: 32,
   }
@@ -76,52 +76,6 @@ interface ReadyMessage {
 interface PredictMessage {
   message: 'predict';
   token: Token;
-  context: {
-    /**
-     * Up to maxLeftContextCodeUnits code units of Unicode scalar value
-     * (i. e., characters) to the left of the insertion point in the
-     * buffer. If there is nothing to the left of the buffer, this returns
-     * an empty string.
-     */
-    left: USVString;
-  
-    /**
-     * Up to maxRightContextCodeUnits code units of Unicode scalar value
-     * (i. e., characters) to the right of the insertion point in the
-     * buffer. If there is nothing to the right of the buffer, this returns
-     * an empty string.
-     */
-    right?: USVString;
-  
-    /**
-     * Whether the insertion point is at the start of the buffer.
-     */
-    startOfBuffer: boolean;
-  
-    /**
-     * Whether the insertion point is at the end of the buffer.
-     */
-    endOfBuffer: boolean;
-  };
-  transform: {
-    /**
-     * The Unicode scalar values (i.e., characters) to be inserted at the
-     * cursor position.
-     *
-     * Corresponds to `s` in com.keyman.KeyboardInterface.output.
-     */
-    insert: USVString;
-  
-    /**
-     * The number of code units to delete to the left of the cursor.
-     *
-     * Corresponds to `dn` in com.keyman.KeyboardInterface.output.
-     */
-    delete: number,
-  
-    /**
-     * The number of code units to delete to the right of the cursor.
-     */
-    deleteRight?: number,
-  };
+  context: Context;
+  transform: Transform;
 } 

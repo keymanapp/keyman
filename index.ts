@@ -21,11 +21,11 @@ interface PredictParameters {
  * Encapsulates the underlying Web Worker through asynchronous calls.
  */
 class LMLayer {
-  _worker: Worker;
-  _promises: PromiseStore;
-  _currentToken: number;
-  _configuration: Configuration | null;
-  _resolveInitialized: Function | null;
+  private _worker: Worker;
+  private _promises: PromiseStore;
+  private _currentToken: number;
+  private _configuration: Configuration | null;
+  private _resolveInitialized: Function | null;
 
   constructor() {
     // Worker state
