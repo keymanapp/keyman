@@ -8,22 +8,8 @@ interface Configuration {
 
 // TODO: these should be opaque types
 type Token = number;
-type USVString = string;
 
 type MessageKind = 'initialize' | 'ready' | 'predict' | 'suggestions';
-
-interface Transform {
-  insert: USVString;
-  deleteLeft: number;
-  deleteRight: number;
-}
-
-interface Context {
-  left: USVString;
-  right?: USVString;
-  startOfBuffer: boolean;
-  endOfBuffer: boolean;
-}
 
 interface InitializeParameters {
   model: string;

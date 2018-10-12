@@ -390,7 +390,7 @@ TODO
  - [ ] Determine the exact arguments given to the model's `predict()`
        method.
  - [ ] Document `suggestions`
- - [ ] TypeScript!
+ - [~] TypeScript!
  - [ ] make simple `index.html` that demos a dummy model
  - [ ] make an `error` initialization message.
  - [ ] LOGLIKEIHOOD IN THE TRANSFORM!
