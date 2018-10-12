@@ -127,7 +127,7 @@ function transitionToReadyState(model: Model) {
     rawSuggestions.sort((a, b) => a.weight - b.weight);
 
     // Convert the internal suggestion format to the one required by the keyboard.
-    let suggestions = rawSuggestions.map((internal) => {
+    let suggestions: Suggestion[] = rawSuggestions.map((internal) => {
       let displayAs = internal.displayAs;
 
       // Try to make up a display string.
@@ -135,7 +135,10 @@ function transitionToReadyState(model: Model) {
         displayAs = internal.transform.insert;
       }
 
-      return { displayAs, ...internal.transform };
+      return {
+        transform: internal.transform,
+        displayAs
+      };
     });
 
     cast('suggestions', { token, suggestions });

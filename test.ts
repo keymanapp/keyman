@@ -5,7 +5,7 @@ const TYPE_D = { insert: 'D', delete: 0, deleteRight: 0 };
 const EMPTY_CONTEXT = { left: '', right: '', startOfBuffer: true, endOfBuffer: true };
 
 
-test('It provide context to LMLayer', async t => {
+test('It provides context to LMLayer', async t => {
   t.plan(2);
 
   const lm = new LMLayer;

@@ -10,7 +10,7 @@ registerModel(function (_configuration) {
     }
 
     predict(_) {
-      let transform = { insert: 'Derek', deleteLeft: 1, deleteRight: 0 };
+      let transform = { insert: 'Derek', delete: 1, deleteRight: 0 };
 
       return [
         { transform, weight: 0 }

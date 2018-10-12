@@ -9,7 +9,7 @@ registerModel(function () {
         {
           transform: {
             insert: 'teapot',
-            deleteLeft: transform.insert.length,
+            delete: transform.insert.length,
             deleteRight: 0,
           },
           displayAs: '🍵',
