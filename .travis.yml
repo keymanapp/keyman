@@ -3,3 +3,5 @@ language: node_js
 node_js:
 - stable
 - '10'
+before_install:
+- npm install -g typescript@3.1

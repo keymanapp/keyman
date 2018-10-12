@@ -1,7 +1,51 @@
 /**
+ * Sample implementation of the "keyboard", for testing the LMLayer.
+ */
+
+interface Configuration {
+  // TODO 
+}
+
+// TODO: these should be opaque types
+type Token = number;
+type USVString = string;
+
+type MessageKind = 'initialize' | 'ready' | 'predict' | 'suggestions';
+
+interface Transform {
+  insert: USVString;
+  deleteLeft: number;
+  deleteRight: number;
+}
+
+interface Context {
+  left: USVString;
+  right?: USVString;
+  startOfBuffer: boolean;
+  endOfBuffer: boolean;
+}
+
+interface InitializeParameters {
+  model: string;
+  configuration: Configuration;
+}
+
+interface PredictParameters {
+  transform: Transform;
+  context: Context;
+  customToken?: Token;
+}
+
+/**
  * Encapsulates the underlying Web Worker through asynchronous calls.
  */
 class LMLayer {
+  _worker: Worker;
+  _promises: PromiseStore;
+  _currentToken: number;
+  _configuration: Configuration | null;
+  _resolveInitialized: Function | null;
+
   constructor() {
     // Worker state
     this._worker = new Worker('lmlayer.js');
@@ -21,7 +65,7 @@ class LMLayer {
   /**
    * [async] Waits for the model's initialization.
    */
-  initialize({model, configuration }) {
+  initialize({model, configuration }: InitializeParameters) {
     if (this._configuration) {
       return Promise.resolve(this._configuration);
     }
@@ -44,7 +88,7 @@ class LMLayer {
   /**
    * [async] Sends a context, transform, and token to the LMLayer.
    */
-  predict({transform, context, customToken}) {
+  predict({transform, context, customToken}: PredictParameters) {
     if (!this._configuration) {
       return Promise.reject(new Error('Model is not initialized.'));
     }
@@ -63,14 +107,14 @@ class LMLayer {
   /**
    * Send a message (a "cast") over to the Web Worker.
    */
-  _cast(message, payload) {
+  _cast(message: MessageKind, payload: object) {
     this._worker.postMessage({message, ...payload});
   }
 
   /**
    * Handles the wrapped worker's onmessage events.
    */
-  _onmessage(event) {
+  _onmessage(event: MessageEvent) {
     const {message, token} = event.data;
 
     if (message === 'ready') {
@@ -94,7 +138,7 @@ class LMLayer {
   /**
    * Returns the next token. Note: mutates state.
    */
-  _nextToken() {
+  _nextToken(): Token {
     let token = this._currentToken++;
     if (!Number.isSafeInteger(token)) {
       throw new RangeError('Ran out of usable tokens');
@@ -103,6 +147,12 @@ class LMLayer {
   }
 }
 
+type Resolve = (value?: {} | PromiseLike<any>) => void;
+type Reject = (reason?: any) => void;
+interface PromiseCallbacks {
+  resolve: Resolve;
+  reject: Reject;
+}
 
 /**
  * Associate tokens with promises.
@@ -110,6 +160,9 @@ class LMLayer {
  * You can .track() them, and then .keep() them. You may also .break() them.
  */
 class PromiseStore {
+
+  private _promises: Map<Token, PromiseCallbacks>;
+
   constructor() {
     this._promises = new Map();
   }
@@ -117,7 +170,7 @@ class PromiseStore {
   /**
    * Associate a token with its respective resolve and reject callbacks.
    */
-  track(token, resolve, reject) {
+  track(token: Token, resolve: Resolve, reject: Reject) {
     if (this._promises.has(token)) {
       reject(`Existing request with token ${token}`);
     }
@@ -129,7 +182,7 @@ class PromiseStore {
    *
    * Calling the resolution function will stop tracking the promise.
    */
-  keep(token) {
+  keep(token: Token) {
     let callbacks = this._promises.get(token);
     if (!callbacks) {
       throw new Error(`No promise associated with token: ${token}`);
@@ -138,7 +191,7 @@ class PromiseStore {
 
     // This acts like the resolve function, BUT, it removes the promise from
     // the store -- because it's resolved!
-    return (resolvedValue) => {
+    return (resolvedValue: {}) => {
       this._promises.delete(token);
       return accept(resolvedValue);
     };
@@ -147,7 +200,7 @@ class PromiseStore {
   /**
    * Instantly reject and forget a promise associated with the token.
    */
-  break(token, error) {
+  break(token: Token, error: Error) {
     let callbacks = this._promises.get(token);
     if (!callbacks) {
       throw new Error(`No promise associated with token: ${token}`);
@@ -158,7 +211,8 @@ class PromiseStore {
 }
 
 if (typeof module !== 'undefined') {
-  // In Node JS
+  // In Node JS, monkey-patch Worker to the global object.
+  // @ts-ignore
   global.Worker = require('tiny-worker');
   exports.LMLayer = LMLayer;
 }

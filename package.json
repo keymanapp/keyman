@@ -4,7 +4,7 @@
   "description": "Description ",
   "main": "index.js",
   "scripts": {
-    "test": "ava"
+    "test": "tsc && ava"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
     "ava": "^0.25.0"
   },
   "dependencies": {
+    "@types/node": "^10.11.7",
     "tiny-worker": "^2.1.2"
   }
 }
