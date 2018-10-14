@@ -5,13 +5,9 @@
 
 #define KEYEVENT_WINDOW_CLASS "Keyman_KeyEventConsumerWnd"
 
-#ifdef _WIN64
-#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent_x64"
-#define GLOBAL_KEY_MUTEX_NAME "KeymanEngine_KeyMutex_x64"
-#else
-#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent_x86"
-#define GLOBAL_KEY_MUTEX_NAME "KeymanEngine_KeyMutex_x86"
-#endif
+#define GLOBAL_FILE_MAPPING_NAME "KeymanEngine_KeyEvent_FileMapping"
+#define GLOBAL_KEY_EVENT_NAME "KeymanEngine_KeyEvent"
+#define GLOBAL_KEY_MUTEX_NAME "KeymanEngine_KeyMutex"
 
 /*
   All input is posted to the key event sender window, which then uses SendInput to post
@@ -48,50 +44,116 @@
 // TODO: refactor this into the KeyEventConsumer class and provide getters for them
 HWND f_hwndKeyEventSender = 0;
 
-class KeyEventConsumer {
-private:
+/**
+  The INPUT structure and the KEYBDINPUT structure both vary in size between x86 and x64
+  because of the presence of the ULONG_PTR member dwExtraInfo. Thus we need to maintain an
+  equal sized structure between the two platforms for shared memory, and copy into INPUT
+  structures before sending the input.
+*/
+struct CSDINPUT {
+  WORD      wVk;
+  WORD      wScan;
+  DWORD     dwFlags;
+  DWORD     time;
+  ULONGLONG extraInfo;
+};
 
-  DWORD idThread;
-  HANDLE hThread, hThreadExitEvent;
-  HANDLE m_hKeyEvent, m_hKeyMutex;
+struct ConsumerSharedData {
+  DWORD nInputs;
+  CSDINPUT inputs[MAX_KEYEVENT_INPUTS];
+};
+
+class KeyEventConsumer {
+
+private:
+  // Process shared data
+  DWORD m_idThread;
+  HANDLE m_hThread, m_hThreadExitEvent;
+
+  // Thread Local data
+  HANDLE m_hKeyEvent, m_hKeyMutex, m_hMMF;
   HWND m_hwnd;
+  PINPUT m_pInputs;
+  ConsumerSharedData *m_pCSD;
+
+  //////////////////////////////////////////////////////
+  // Main thread
+  //////////////////////////////////////////////////////
 
 public:
+
   KeyEventConsumer() {
+    // We create the file mapping and global data on the main thread but release it on the 
+    // local thread. This ensures that these objects are available for other processes to
+    // open even if we haven't completed startup of the local thread.
     if (!InitSharedData()) {
       return;
     }
 
-    hThreadExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (!hThreadExitEvent) {
+    m_hThreadExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (!m_hThreadExitEvent) {
       DebugLastError("CreateEvent");
       return;
     }
 
-    hThread = CreateThread(NULL, 0, KeyEventConsumerThread, (LPVOID)this, 0, &idThread);
-    if (!hThread) {
+    m_hThread = CreateThread(NULL, 0, KeyEventConsumerThread, (LPVOID)this, 0, &m_idThread);
+    if (!m_hThread) {
       DebugLastError("CreateThread");
     }
   }
 
   ~KeyEventConsumer() {
-    if (hThreadExitEvent != NULL) {
-      if (!SetEvent(hThreadExitEvent)) {
+    if (m_hThreadExitEvent != NULL) {
+      if (!SetEvent(m_hThreadExitEvent)) {
         DebugLastError("SetEvent");
       }
-      if (!CloseHandle(hThreadExitEvent)) {
-        DebugLastError("CloseHandle(hThreadExitEvent)");
+
+      if (m_hThread != NULL) {
+        // Wait for the thread to terminate so we know that we'll not receive
+        // additional events after this object is destroyed
+        if (WaitForSingleObject(m_hThread, 5000) != WAIT_OBJECT_0) {
+          DebugLastError("WaitForSingleObject(m_hThread)");
+        }
+
+        if (!CloseHandle(m_hThread)) {
+          DebugLastError("CloseHandle(m_hThread)");
+        }
+      }
+
+      if (!CloseHandle(m_hThreadExitEvent)) {
+        DebugLastError("CloseHandle(m_hThreadExitEvent)");
       }
     }
-    if (hThread != NULL && !CloseHandle(hThread)) {
-      DebugLastError("CloseHandle(hThread)");
-    }
-
-    CloseSharedData();
   }
 
+private:
+
+  //////////////////////////////////////////////////////
+  // Global shared data management
+  //////////////////////////////////////////////////////
+
+  /**
+    This function is called by the main thread. We create the file mapping and global data on the main thread but
+    release it on the local thread. This ensures that these objects are available for other processes to open
+    even if we haven't completed startup of the local thread.
+  */
   BOOL InitSharedData() {
-    // TODO: Create mmf
+    m_hMMF = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE | SEC_COMMIT, 0, sizeof(ConsumerSharedData), GLOBAL_FILE_MAPPING_NAME);
+    if (!m_hMMF) {
+      DebugLastError("CreateFileMapping");
+      return FALSE;
+    }
+
+    if (!SetObjectToLowIntegrity(m_hMMF) ||
+      !GrantPermissionToAllApplicationPackages(m_hMMF, FILE_MAP_ALL_ACCESS)) {
+      return FALSE;
+    }
+
+    m_pCSD = (ConsumerSharedData *)MapViewOfFile(m_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(ConsumerSharedData));
+    if (!m_pCSD) {
+      DebugLastError("MapViewOfFile");
+      return FALSE;
+    }
 
     m_hKeyEvent = CreateEvent(NULL, FALSE, FALSE, GLOBAL_KEY_EVENT_NAME);
     if (!m_hKeyEvent) {
@@ -99,11 +161,8 @@ public:
       return FALSE;
     }
 
-    if (!SetObjectToLowIntegrity(m_hKeyEvent)) {
-      return FALSE;
-    }
-
-    if (!GrantPermissionToAllApplicationPackages(m_hKeyEvent, EVENT_MODIFY_STATE)) {
+    if (!SetObjectToLowIntegrity(m_hKeyEvent) ||
+      !GrantPermissionToAllApplicationPackages(m_hKeyEvent, EVENT_MODIFY_STATE)) {
       return FALSE;
     }
 
@@ -112,12 +171,9 @@ public:
       DebugLastError("CreateMutex");
       return FALSE;
     }
-    
-    if (!SetObjectToLowIntegrity(m_hKeyMutex)) {
-      return FALSE;
-    }
-      
-    if(!GrantPermissionToAllApplicationPackages(m_hKeyMutex, MUTEX_ALL_ACCESS)) {
+
+    if (!SetObjectToLowIntegrity(m_hKeyMutex) ||
+      !GrantPermissionToAllApplicationPackages(m_hKeyMutex, MUTEX_ALL_ACCESS)) {
       return FALSE;
     }
 
@@ -125,20 +181,35 @@ public:
   }
 
   BOOL CloseSharedData() {
-    // TODO: Close mmf
     BOOL bRet = TRUE;
-    if (!CloseHandle(m_hKeyEvent)) {
-      DebugLastError("CloseHandle(m_hKeyEvent)");
-      bRet = FALSE;
-    }
-    if (!CloseHandle(m_hKeyMutex)) {
+
+    if (m_hKeyMutex != NULL && !CloseHandle(m_hKeyMutex)) {
       DebugLastError("CloseHandle(m_hKeyMutex)");
       bRet = FALSE;
     }
+
+    if (m_hKeyEvent != NULL && !CloseHandle(m_hKeyEvent)) {
+      DebugLastError("CloseHandle(m_hKeyEvent)");
+      bRet = FALSE;
+    }
+
+    if (m_pCSD != NULL && !UnmapViewOfFile((LPCVOID)m_pCSD)) {
+      DebugLastError("CloseHandle(m_pCSD)");
+      bRet = FALSE;
+    }
+
+    if (m_hMMF != NULL && !CloseHandle(m_hMMF)) {
+      DebugLastError("CloseHandle(m_hMMF)");
+      bRet = FALSE;
+    }
+
     return bRet;
   }
 
-private:
+  //////////////////////////////////////////////////////
+  // Local thread
+  //////////////////////////////////////////////////////
+
   /**
     Stub callback thread procedure
   */
@@ -153,21 +224,26 @@ private:
   */
   DWORD ThreadMain() {
     if (!InitThread()) {
-      return 0;
+      return 1;
     }
 
     MessageLoop();
 
     CleanupThread();
 
+    CloseSharedData();
+
     return 0;
   }
-  
+
   /**
     Create listener window which serializes input events and
-    sends out input to the target focus window
+    sends out input to the target focus window, and setup local
+    buffers
   */
   BOOL InitThread() {
+    m_pInputs = new INPUT[MAX_KEYEVENT_INPUTS];
+
     WNDCLASS wndClass = { 0 };
     wndClass.lpfnWndProc = KeyEventConsumerWndProc;
     wndClass.cbClsExtra = sizeof(this);
@@ -198,13 +274,24 @@ private:
     if (!DestroyWindow(m_hwnd)) {
       DebugLastError("DestroyWindow");
     }
+
     if (!UnregisterClass(KEYEVENT_WINDOW_CLASS, g_hInstance)) {
       DebugLastError("UnregisterClass");
     }
+
+    if (m_pInputs != NULL) {
+      delete m_pInputs;
+    }
   }
 
+  /**
+    Main message loop for thread. Terminates on error or when
+    m_hThreadExitEvent is signaled. Sleeps until either a 
+    window message is received or a key event is signaled from
+    a client app.
+  */
   void MessageLoop() {
-    HANDLE events[2] = { hThreadExitEvent, m_hKeyEvent };
+    HANDLE events[2] = { m_hThreadExitEvent, m_hKeyEvent };
     while (TRUE) {
       switch (MsgWaitForMultipleObjectsEx(2, events, INFINITE, QS_ALLINPUT, 0)) {
       case WAIT_OBJECT_0:
@@ -233,11 +320,11 @@ private:
   BOOL ProcessQueuedKeyEvents() {
     SendDebugMessage(0, sdmDebug, 0, "Processing queued key events");
 
-    HANDLE handles[2] = { hThreadExitEvent, m_hKeyMutex };
+    HANDLE handles[2] = { m_hThreadExitEvent, m_hKeyMutex };
 
     //
     // Wait for access to the shared data (must also watch out for 
-    // shutdown event so we don't stall forever here
+    // shutdown event so we don't stall forever here)
     //
     switch (WaitForMultipleObjects(2, handles, FALSE, INFINITE)) {
     case WAIT_OBJECT_0:
@@ -251,23 +338,37 @@ private:
     }
 
     //
-    // Read the shared data from the buffer and send the input
+    // Copy the shared data from the buffer
     //
-    DWORD *pn = Globals::nInputBuf();
-    INPUT *pi = Globals::InputBuf();
-    if (*pn > 0) {
-      if (SendInput(*pn, pi, sizeof(INPUT)) == 0) {
-        DebugLastError("SendInput");
-      }
-
-      *pn = 0;
+    DWORD nInputs = m_pCSD->nInputs;
+    for (DWORD i = 0; i < nInputs; i++) {
+      m_pInputs[i].type = INPUT_KEYBOARD;
+      m_pInputs[i].ki.wVk = m_pCSD->inputs[i].wVk;
+      m_pInputs[i].ki.wScan = m_pCSD->inputs[i].wScan;
+      m_pInputs[i].ki.dwFlags = m_pCSD->inputs[i].dwFlags;
+      m_pInputs[i].ki.time = m_pCSD->inputs[i].time;
+      m_pInputs[i].ki.dwExtraInfo = (ULONG_PTR) m_pCSD->inputs[i].extraInfo;
     }
 
     //
-    // Allow the focused application to generate more events
+    // Reset the shared buffer and ensure the data is written out of cache for
+    // multiprocessor systems
+    //
+    m_pCSD->nInputs = 0;
+    MemoryBarrier();
+
+    //
+    // Release mutex early to allow the focused application to generate more events
     //
     if (!ReleaseMutex(m_hKeyMutex)) {
       DebugLastError("ReleaseMutex");
+    }
+
+    //
+    // Send the input to the system input queue
+    //
+    if (SendInput(nInputs, m_pInputs, sizeof(INPUT)) == 0) {
+      DebugLastError("SendInput");
     }
 
     return TRUE;
@@ -328,6 +429,7 @@ private:
 };
 
 // TODO: find a good name for this class, thread et al, rename file to "<keyeventsender>server.cpp" where <keyeventsender> is the new class name
+#ifndef _WIN64
 KeyEventConsumer *consumer = NULL;
 
 void StartupConsumer() {
@@ -338,6 +440,18 @@ void ShutdownConsumer() {
   delete consumer;
 }
 
+#else
+
+// We only need one consumer on Win32
+void StartupConsumer() {
+}
+
+void ShutdownConsumer() {
+}
+
+
+#endif // !_WIN64
+
 //
 // Client application functionality
 //
@@ -345,12 +459,27 @@ void ShutdownConsumer() {
 // TODO: Turn this into a class as well, and move to a "<keyeventsender>client.cpp" (see above)
 HANDLE f_hKeyEvent = 0;
 HANDLE f_hKeyMutex = 0;
+HANDLE f_hMMF = 0;
+ConsumerSharedData *f_pCSD = NULL;
 
 /**
   Provide a copy of the input data to the Key Event Sender thread and signal it
   to send the input back to the client application.
 */
 BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs) {
+  //
+  // Check inputs
+  //
+  if (nInputs > MAX_KEYEVENT_INPUTS) {
+    SendDebugMessageFormat(0, sdmGlobal, 0, "Too many INPUT events for queue (%d)", nInputs);
+    nInputs = MAX_KEYEVENT_INPUTS;
+  }
+
+  if (nInputs == 0) {
+    // Don't need to signal sender, nothing to send
+    return TRUE;
+  }
+
   //
   // Initialisation
   //
@@ -360,26 +489,39 @@ BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs) {
       DebugLastError("OpenEvent");
       return FALSE;
     }
-  }
-
-  if (f_hKeyMutex == 0) {
     f_hKeyMutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, GLOBAL_KEY_MUTEX_NAME);
     if (f_hKeyMutex == 0) {
       DebugLastError("OpenMutex");
+      CloseHandle(f_hKeyEvent);
+      f_hKeyEvent = 0;
+      return FALSE;
+    }
+    f_hMMF = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GLOBAL_FILE_MAPPING_NAME);
+    if (f_hMMF == 0) {
+      DebugLastError("OpenFileMapping");
+      CloseHandle(f_hKeyEvent);
+      CloseHandle(f_hKeyMutex);
+      f_hKeyEvent = 0;
+      f_hKeyMutex = 0;
+      return FALSE;
+    }
+    f_pCSD = (ConsumerSharedData *)MapViewOfFile(f_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(ConsumerSharedData));
+    if (!f_pCSD) {
+      DebugLastError("MapViewOfFile");
+      CloseHandle(f_hKeyEvent);
+      CloseHandle(f_hKeyMutex);
+      CloseHandle(f_hMMF);
+      f_hKeyEvent = 0;
+      f_hKeyMutex = 0;
+      f_hMMF = 0;
       return FALSE;
     }
   }
 
   //
-  // Check inputs
-  //
-  if (nInputs > MAX_KEYEVENT_INPUTS) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Too many INPUT events for queue (%d)", nInputs);
-    nInputs = MAX_KEYEVENT_INPUTS;
-  }
-
-  //
-  // Capture the mutex and copy input buffer into global shared buffer
+  // Capture the mutex and copy input buffer into global shared buffer. We have a fairly
+  // short buffer here to avoid stalling the active application for too long if for some 
+  // reason Keyman's consumer thread is not responding.
   //
   switch (WaitForSingleObject(f_hKeyMutex, 500)) {
   case WAIT_OBJECT_0:
@@ -396,18 +538,25 @@ BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs) {
     return FALSE;
   }
 
-  memcpy(Globals::InputBuf(), pInputs, nInputs * sizeof(INPUT));
-  *Globals::nInputBuf() = nInputs;
+  //
+  // Copy the INPUT objects into our cross-platform-safe structure
+  //
+  f_pCSD->nInputs = nInputs;
+  for (DWORD i = 0; i < nInputs; i++) {
+    f_pCSD->inputs[i].wVk = pInputs[i].ki.wVk;
+    f_pCSD->inputs[i].wScan = pInputs[i].ki.wScan;
+    f_pCSD->inputs[i].dwFlags = pInputs[i].ki.dwFlags;
+    f_pCSD->inputs[i].time = pInputs[i].ki.time;
+    f_pCSD->inputs[i].extraInfo = pInputs[i].ki.dwExtraInfo;
+  }
 
   //
-  // Force CPU to complete all memory operations before we signal
-  // the host
+  // Force CPU to complete all memory operations before we signal the host
   //
   MemoryBarrier();
 
   //
-  // Release the mutex and signal the host application to process
-  // the input
+  // Release the mutex and signal the host application to process the input
   //
   if (!ReleaseMutex(f_hKeyMutex)) {
     DebugLastError("ReleaseMutex");

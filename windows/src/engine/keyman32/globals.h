@@ -136,11 +136,6 @@ public:
   static BOOL Unlock();
   static BOOL CheckControllers();
 
-#ifdef USE_KEYEVENTSENDERTHREAD
-  static INPUT *InputBuf();
-  static DWORD *nInputBuf();
-#endif
-
   /* Debugging */
 
   static BOOL get_debug_KeymanLog();

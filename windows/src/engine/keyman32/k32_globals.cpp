@@ -72,10 +72,6 @@
 //__declspec(align(4)) LONG RefreshTag_Process = 0;
 //__declspec(align(4)) LONG FInRefreshKeyboards = 0;
 
-#ifdef USE_KEYEVENTSENDERTHREAD
-void InitKeyEventSenderThread();
-#endif
-
 UINT 
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
@@ -280,14 +276,6 @@ static BOOL
   f_debug_KeymanLog = FALSE, 
   f_debug_ToConsole = FALSE;
 
-#ifdef USE_KEYEVENTSENDERTHREAD
-static INPUT
-  f_inputBuf[MAX_KEYEVENT_INPUTS] = { 0 };
-
-static DWORD
-  f_nInputBuf = 0;
-#endif
-
 #pragma data_seg()
 /***************************************************************************/
 
@@ -356,11 +344,6 @@ BOOL Globals::get_MnemonicDeadkeyConversionMode() { return f_MnemonicDeadkeyConv
 
 BOOL Globals::get_debug_KeymanLog() { return f_debug_KeymanLog; }
 BOOL Globals::get_debug_ToConsole() { return f_debug_ToConsole; }
-
-#ifdef USE_KEYEVENTSENDERTHREAD
-INPUT *Globals::InputBuf() { return f_inputBuf; }
-DWORD *Globals::nInputBuf() { return &f_nInputBuf; }
-#endif
 
 void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt) {   // I4583
   wcscpy_s(f_BaseKeyboardName, baseKeyboardName);
