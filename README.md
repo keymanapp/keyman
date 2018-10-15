@@ -16,6 +16,9 @@ designs will practically work.
 [RFC 2119]: https://www.ietf.org/rfc/rfc2119.txt
 
 
+Note: I'm using the term **keyboard** as a synonym for **KeymanWeb**.
+
+
 Communication protocol between keyboard and asynchronous worker
 ---------------------------------------------------------------
 
@@ -383,17 +386,30 @@ correct sequence of applications should be as follows:
 > 𝑦 = 𝑇<sub>𝑠</sub>(𝑇<sub>𝑖</sub>(𝑥))
 
 
+#### Late suggestions
+
+Sometimes, a `suggestions` message may arrive after an input event has
+already invalidated its request. This is called a **"late" suggestion**.
+The LMLayer **MAY** send late suggestions. Consequently, the keyboard
+**MAY** discard the late suggestions. There is no requirement for the
+keyboard to acknowledge late suggestions, or for the LMLayer to avoid
+sending late `suggestions` messages. In either case, a `suggestions`
+message can be identified as appropriate or "late" via its `token`
+property.
+
+
 TODO
 ====
 
+ - [x] Document `suggestions`
+ - [x] TypeScript!
+ - [ ] make simple `index.html` that demos a dummy model
+ - [ ] Update class definitions in README from TypeScript sources.
  - [ ] Do word segmentation
  - [ ] Determine the exact arguments given to the model's `predict()`
        method.
- - [ ] Update class definitions from actual values.
- - [ ] Document `suggestions`
- - [x] TypeScript!
- - [ ] make simple `index.html` that demos a dummy model
- - [ ] make an `error` initialization message.
+ - [ ] Make an `error` initialization message.
+ - [ ] Make a `cancel` message.
  - [ ] LOGLIKEIHOOD IN THE TRANSFORM!
  - [ ] `possibleTransforms` where `transform` is an alias for `possibleTransforms[0]`
  - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
