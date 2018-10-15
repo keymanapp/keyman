@@ -244,7 +244,7 @@ typedef struct tagKEYMAN64THREADDATA
   BYTE LastScanCode;   // I4642
 
 #ifdef USE_SERIALKEYEVENTSERVER
-  SerialKeyEventClient *pSerialKeyEventClient;
+  ISerialKeyEventClient *pSerialKeyEventClient;
 #endif
 
 #ifdef DEBUG_PROCMON_LOGGING

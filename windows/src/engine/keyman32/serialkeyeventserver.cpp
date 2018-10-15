@@ -4,6 +4,8 @@
 
 #ifdef USE_SERIALKEYEVENTSERVER
 
+#ifndef _WIN64
+
 /*
   All input is posted to the key event sender window, which then uses SendInput to post
   final input to the target thread. Because SendInput calls in UWP apps will fail silently
@@ -37,10 +39,8 @@
 //
 
 // TODO: refactor this into the SerialKeyEventServer class and provide getters for them
-HWND f_hwndKeyEventSender = 0;
 
-
-class SerialKeyEventServer {
+class SerialKeyEventServer: public ISerialKeyEventServer {
 
 private:
   // Process shared data
@@ -101,6 +101,11 @@ public:
         DebugLastError("CloseHandle(m_hThreadExitEvent)");
       }
     }
+  }
+
+  virtual HWND GetWindow() const {
+    // At destruction time, m_hwnd may be NULL
+    return m_hwnd;
   }
 
 private:
@@ -239,8 +244,6 @@ private:
 
     SetClassLongPtr(m_hwnd, 0, (LONG_PTR)this);
 
-    f_hwndKeyEventSender = m_hwnd;
-
     return TRUE;
   }
 
@@ -248,7 +251,12 @@ private:
     Cleanup when thread main finishes
   */
   void CleanupThread() {
-    if (!DestroyWindow(m_hwnd)) {
+    // Slightly naive way of locking out m_hwnd use
+    HWND hwnd = m_hwnd;
+    m_hwnd = NULL;
+    MemoryBarrier();
+
+    if (!DestroyWindow(hwnd)) {
       DebugLastError("DestroyWindow");
     }
 
@@ -405,26 +413,15 @@ private:
   }
 };
 
-#ifndef _WIN64
-SerialKeyEventServer *g_SerialKeyEventServer = NULL;
+ISerialKeyEventServer *ISerialKeyEventServer::sm_server = NULL;
 
-void StartupSerialKeyEventServer() {
-  g_SerialKeyEventServer = new SerialKeyEventServer();
+void ISerialKeyEventServer::Startup() {
+  ISerialKeyEventServer::sm_server = new SerialKeyEventServer();
 }
 
-void ShutdownSerialKeyEventServer() {
-  delete g_SerialKeyEventServer;
+void ISerialKeyEventServer::Shutdown() {
+  delete ISerialKeyEventServer::sm_server;
 }
-
-#else
-
-// We only need one server, on Win32
-void StartupSerialKeyEventServer() {
-}
-
-void ShutdownSerialKeyEventServer() {
-}
-
 
 #endif // !_WIN64
 

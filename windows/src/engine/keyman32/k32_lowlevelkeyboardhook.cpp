@@ -196,7 +196,7 @@ LRESULT _kmnLowLevelKeyboardProc(
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
 #ifdef USE_SERIALKEYEVENTSERVER
-        PostMessage(f_hwndKeyEventSender, wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
 #else
         PostThreadMessage(GetWindowThreadProcessId(GetForegroundWindow(), NULL), wm_keyman_keyevent, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
 #endif

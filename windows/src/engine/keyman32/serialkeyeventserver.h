@@ -4,9 +4,24 @@
 
 #include "serialkeyeventcommon.h"
 
-void StartupSerialKeyEventServer();
-void ShutdownSerialKeyEventServer();
+#ifndef _WIN64
 
-extern HWND f_hwndKeyEventSender;
+class ISerialKeyEventServer {
+private:
+  static ISerialKeyEventServer *sm_server;
+
+public:
+  virtual ~ISerialKeyEventServer() {}
+  virtual HWND GetWindow() const = 0;
+
+  static ISerialKeyEventServer *GetServer() {
+    return sm_server;
+  }
+
+  static void Startup();
+  static void Shutdown();
+};
+
+#endif
 
 #endif

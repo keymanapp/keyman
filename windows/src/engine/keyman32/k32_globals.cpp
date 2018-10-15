@@ -127,13 +127,14 @@ PKEYMAN64THREADDATA Globals_InitThread()
         TlsSetValue(dwTlsIndex, lpvData);
         lpvData->ActiveKeymanID = KEYMANID_NONKEYMAN;
         lpvData->CurrentAddin = -1;
-#ifdef USE_SERIALKEYEVENTSERVER
-        lpvData->pSerialKeyEventClient = new SerialKeyEventClient();
-#endif
     }
     else SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
   }
   LeaveCriticalSection(&csGlobals);
+
+#ifdef USE_SERIALKEYEVENTSERVER
+  ISerialKeyEventClient::Startup();
+#endif
   return lpvData;
 }
 
@@ -151,6 +152,7 @@ void Globals_UninitThread()
 #endif
 
 #ifdef USE_SERIALKEYEVENTSERVER
+  ISerialKeyEventClient::Startup();
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td) {
     delete _td->pSerialKeyEventClient;

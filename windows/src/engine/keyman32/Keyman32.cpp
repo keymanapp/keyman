@@ -447,7 +447,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 	}
 
 #ifdef USE_SERIALKEYEVENTSERVER
-  StartupSerialKeyEventServer();
+#ifndef _WIN64
+  ISerialKeyEventServer::Startup();
+#endif
 #endif
 
   InitHooks();
@@ -492,7 +494,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
   }
 
 #ifdef USE_SERIALKEYEVENTSERVER
-  ShutdownSerialKeyEventServer();
+#ifndef _WIN64
+  ISerialKeyEventServer::Shutdown();
+#endif
 #endif
 
   *Globals::InitialisingThread() = 0;
