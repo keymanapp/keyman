@@ -52,6 +52,8 @@
 #ifndef _globals_h
 #define _globals_h
 
+#include <evntprov.h>
+
 #define GLOBAL_ContextStackSize 80
 #define GLOBAL_MsgStackSize 80
 #define GLOBAL_MaxKeyboards 32
@@ -216,13 +218,12 @@ typedef struct tagKEYMAN64THREADDATA
   int CurrentAddin;
   HWND CurrenthWnd;
 
-  void *debug_fp;
-  HANDLE debug_hLogMailSlot, debug_hLogEvent;
   BOOL debug_DebugInit, debug_KeymanLog, debug_ToConsole;   // I3951
   char debug_buf[64];
 
    // I3617   // I3618
 
+  REGHANDLE etwRegHandle;
 
   /* TSF Manager Globals */
 

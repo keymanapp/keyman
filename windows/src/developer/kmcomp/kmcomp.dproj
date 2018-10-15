@@ -130,7 +130,6 @@
         <DCCReference Include="..\..\global\delphi\general\utilkeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\TIKE\main\UfrmTike.pas">
             <Form>TikeForm</Form>

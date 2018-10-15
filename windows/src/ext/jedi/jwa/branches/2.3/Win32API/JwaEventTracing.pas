@@ -2001,7 +2001,7 @@ function FlushTrace; external advapi32 name 'FlushTrace'+AWSuffix;
 {$ENDIF WINXP_UP}
 function ControlTraceW; external advapi32 name 'ControlTraceW';
 function ControlTraceA; external advapi32 name 'ControlTraceA';
-function ControlTrace; external advapi32 name 'ControlTraceA'+AWSuffix;
+function ControlTrace; external advapi32 name 'ControlTrace'+AWSuffix;
 
 function QueryAllTracesW; external advapi32 name 'QueryAllTracesW';
 function QueryAllTracesA; external advapi32 name 'QueryAllTracesA';

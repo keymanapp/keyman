@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.3</ProjectVersion>
+        <ProjectVersion>18.4</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -175,7 +175,6 @@
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>

@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<instrumentationManifest
+    xmlns="http://schemas.microsoft.com/win/2004/08/events"
+    xmlns:win="http://manifests.microsoft.com/win/2004/08/windows/events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    >
+
+  <instrumentation>
+    <events>
+
+      <!-- resourceFileName and messageFileName must be set at install time -->
+      
+      <provider name="Keyman-Debug-ETWProvider"
+          guid="{DA621615-E08B-4283-918E-D2502D3757AE}"
+          symbol="ProviderGuid"
+          resourceFileName="c:\program files (x86)\common files\keyman\keyman engine\keyman32.dll"
+          messageFileName="c:\program files (x86)\common files\keyman\keyman engine\keyman32.dll"
+          message="$(string.Provider.Name)"
+                >
+
+        <maps>
+          <valueMap name="Platform">
+            <map value="1" message="$(string.Map.x86)"/>
+            <map value="2" message="$(string.Map.x64)"/>
+          </valueMap>
+
+          <bitMap name="ShiftState">
+            <map value="0x1" message="$(string.Map.LCTRL)"/>
+            <map value="0x2" message="$(string.Map.RCTRL)"/>
+            <map value="0x4" message="$(string.Map.LALT)"/>
+            <map value="0x8" message="$(string.Map.RALT)"/>
+            <map value="0x10" message="$(string.Map.SHIFT)"/>
+            <map value="0x20" message="$(string.Map.CTRL)"/>
+            <map value="0x40" message="$(string.Map.ALT)"/>
+            <map value="0x100" message="$(string.Map.CAPSLOCK)"/>
+            <map value="0x200" message="$(string.Map.NOTCAPSOCK)"/>
+            <map value="0x400" message="$(string.Map.NUMLOCK)"/>
+            <map value="0x800" message="$(string.Map.NOTNUMLOCK)"/>
+            <map value="0x1000" message="$(string.Map.SCROLLLOCK)"/>
+            <map value="0x2000" message="$(string.Map.NOTSCROLLLOCK)"/>
+            <map value="0x4000" message="$(string.Map.ISVIRTUALKEY)"/>
+            <map value="0x8000" message="$(string.Map.VIRTUALCHARKEY)"/>
+          </bitMap>
+        </maps>
+
+        <channels>
+          <channel name="Keyman-Debug-ETWProvider/Debug" chid="C1" type="Debug"  />
+        </channels>
+        
+        <templates>
+          <!-- This template must match the EventDataDescCreate calls in K32_DBG.CPP and Keyman.System.DebugLogClient.pas -->
+          <template tid="DebugEntryTemplate">
+            <data name="Platform" inType="win:UInt32" map="Platform" />
+            <data name="Process" inType="win:UnicodeString" />
+            <data name="PID" inType="win:UInt32" />
+            <data name="TID" inType="win:UInt32" />
+            <data name="ShiftState" inType="win:UInt32" map="ShiftState" />
+            <data name="ActualShiftState" inType="win:UInt32" map="ShiftState" />
+            <data name="TickCount" inType="win:UInt32" />
+            <data name="FocusHWND" inType="win:UInt32" />
+            <data name="ActiveHKL" inType="win:UInt32" />
+            <data name="SourceFile" inType="win:UnicodeString" />
+            <data name="SourceLine" inType="win:UInt32" />
+            <data name="Message" inType="win:UnicodeString" />
+          </template>
+
+        </templates>
+
+        <events>
+          <!-- DebugEvent is defined in Keyman.System.DebugLogClient.pas and needs to be updated if this changes -->
+          <event value="1"
+              channel="C1"
+              level="win:Informational"
+              template="DebugEntryTemplate"
+              symbol="DebugEvent"
+              message="$(string.EventMessage)" />
+        </events>
+      </provider>
+    </events>
+  </instrumentation>
+
+  <localization>
+    <resources culture="en-US">
+      <stringTable>
+
+        <string id="Provider.Name" value="Keyman-Debug-ETWProvider"/>
+
+        <string id="EventMessage" value="[%1] [%2] [%3] [%4] (%5 %6) %7 %8 %9 %10:%11 %12" />
+        <string id="Map.x86" value="x86" />
+        <string id="Map.x64" value="x64" />
+
+        <string id="Map.LCTRL" value="LCTRL" />
+        <string id="Map.RCTRL" value="RCTRL" />
+        <string id="Map.LALT" value="LALT" />
+        <string id="Map.RALT" value="RALT" />
+        <string id="Map.SHIFT" value="SHIFT" />
+        <string id="Map.CTRL" value="CTRL" />
+        <string id="Map.ALT" value="ALT" />
+        <string id="Map.CAPSLOCK" value="CAPSLOCK" />
+        <string id="Map.NOTCAPSOCK" value="NOTCAPSOCK" />
+        <string id="Map.NUMLOCK" value="NUMLOCK" />
+        <string id="Map.NOTNUMLOCK" value="NOTNUMLOCK" />
+        <string id="Map.SCROLLLOCK" value="SCROLLLOCK" />
+        <string id="Map.NOTSCROLLLOCK" value="NOTSCROLLLOCK" />
+        <string id="Map.ISVIRTUALKEY" value="ISVIRTUALKEY" />
+        <string id="Map.VIRTUALCHARKEY" value="VIRTUALCHARKEY" />
+      </stringTable>
+    </resources>
+  </localization>
+
+</instrumentationManifest>

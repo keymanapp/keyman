@@ -113,6 +113,9 @@
     <ResourceCompile Include="Keyman64.RC">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="..\keyman32\keyman-debug-etw.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\keyman32\addins.h">
@@ -232,6 +235,9 @@
     <ClInclude Include="..\keyman32\vkscancodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\keyman32\keyman-debug-etw.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\global\res\bmp\arrow.bmp">
@@ -239,6 +245,9 @@
     </None>
     <None Include="..\..\global\res\bmp\mask.bmp">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\keyman32\keyman-debug-etw.man">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
 </Project>

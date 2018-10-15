@@ -35,7 +35,6 @@ uses
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',

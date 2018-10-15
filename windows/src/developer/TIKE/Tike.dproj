@@ -313,13 +313,11 @@
         <DCCReference Include="debug\UfrmDebugStatus_Child.pas">
             <Form>frmDebugStatus_Child</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\debug\DebugManager.pas"/>
         <DCCReference Include="..\..\global\delphi\online\OnlineUpdateCheck.pas"/>
         <DCCReference Include="..\..\global\delphi\online\UfrmOnlineUpdateNewVersion.pas">
             <Form>frmOnlineUpdateNewVersion</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="kct\MessageDefaults.pas"/>
         <DCCReference Include="main\UfrmDownloadProgress.pas">
             <Form>frmDownloadProgress</Form>
