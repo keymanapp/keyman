@@ -4,6 +4,8 @@
  * The real LMLayer will be far better engineered!
  */
 
+// https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html#-reference-lib-
+
 type Weight = number;
 
 // TODO: In a DedicatedWorkerGlobalScope.

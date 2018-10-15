@@ -50,7 +50,7 @@ export class LMLayer {
     // _onMessage() will resolve this Promise.
     return new Promise((resolve, _reject) => {
       this._cast('initialize', {
-        model, 
+        model,
         configuration: {
           maxLeftContextCodeUnits: 32,
           supportsRightContexts: false,
