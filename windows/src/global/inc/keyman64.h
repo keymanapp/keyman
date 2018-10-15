@@ -403,8 +403,6 @@ void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand);   // I3933   
 void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
 BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
 
-#include "keyeventsenderthread.h"
-
 #endif
 
 #endif	// _KEYMAN64_H

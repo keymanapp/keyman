@@ -2,12 +2,10 @@
 
 #ifdef USE_KEYEVENTSENDERTHREAD
 
-#define MAX_KEYEVENT_INPUTS 256
+#include "serialkeyeventcommon.h"
 
 void StartupConsumer();
 void ShutdownConsumer();
-
-BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs);
 
 extern HWND f_hwndKeyEventSender;
 

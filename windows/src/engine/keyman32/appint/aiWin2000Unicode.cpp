@@ -41,6 +41,7 @@
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
 #include "pch.h"   // I4128   // I4287
+#include "serialkeyeventclient.h"
 
 #define KEYMAN_MOREPOST	"WM_KMMOREPOST"
 

@@ -114,6 +114,7 @@
 //
 
 #include "pch.h"
+#include "serialkeyeventserver.h"
 
 /*
  If DEBUG is defined, give information in the map file about PRIVATE (=static)

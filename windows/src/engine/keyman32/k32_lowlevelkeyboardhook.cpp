@@ -23,6 +23,7 @@
 */
 // I4326
 #include "pch.h"
+#include "serialkeyeventserver.h"
 
 #ifdef _WIN64
 #error k32_lowlevelkeyboardhook.cpp is not required for win64.
