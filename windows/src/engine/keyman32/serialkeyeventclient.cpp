@@ -12,7 +12,7 @@
 HANDLE f_hKeyEvent = 0;
 HANDLE f_hKeyMutex = 0;
 HANDLE f_hMMF = 0;
-ConsumerSharedData *f_pCSD = NULL;
+SerialKeyEventSharedData *f_pCSD = NULL;
 
 /**
   Provide a copy of the input data to the Key Event Sender thread and signal it
@@ -57,7 +57,7 @@ BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs) {
       f_hKeyMutex = 0;
       return FALSE;
     }
-    f_pCSD = (ConsumerSharedData *)MapViewOfFile(f_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(ConsumerSharedData));
+    f_pCSD = (SerialKeyEventSharedData *)MapViewOfFile(f_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SerialKeyEventSharedData));
     if (!f_pCSD) {
       DebugLastError("MapViewOfFile");
       CloseHandle(f_hKeyEvent);
@@ -73,7 +73,7 @@ BOOL SignalKeyEventSenderThread(PINPUT pInputs, DWORD nInputs) {
   //
   // Capture the mutex and copy input buffer into global shared buffer. We have a fairly
   // short buffer here to avoid stalling the active application for too long if for some 
-  // reason Keyman's consumer thread is not responding.
+  // reason Keyman's g_SerialKeyEventServer thread is not responding.
   //
   switch (WaitForSingleObject(f_hKeyMutex, 500)) {
   case WAIT_OBJECT_0:

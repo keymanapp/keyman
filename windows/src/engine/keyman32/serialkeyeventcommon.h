@@ -24,7 +24,7 @@ struct CSDINPUT {
   ULONGLONG extraInfo;
 };
 
-struct ConsumerSharedData {
+struct SerialKeyEventSharedData {
   DWORD nInputs;
   CSDINPUT inputs[MAX_KEYEVENT_INPUTS];
 };

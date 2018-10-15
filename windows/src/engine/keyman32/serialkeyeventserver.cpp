@@ -36,11 +36,11 @@
 // This runs only in the host applications keyman.exe and keymanx64.exe
 //
 
-// TODO: refactor this into the KeyEventConsumer class and provide getters for them
+// TODO: refactor this into the SerialKeyEventServer class and provide getters for them
 HWND f_hwndKeyEventSender = 0;
 
 
-class KeyEventConsumer {
+class SerialKeyEventServer {
 
 private:
   // Process shared data
@@ -51,7 +51,7 @@ private:
   HANDLE m_hKeyEvent, m_hKeyMutex, m_hMMF;
   HWND m_hwnd;
   PINPUT m_pInputs;
-  ConsumerSharedData *m_pCSD;
+  SerialKeyEventSharedData *m_pSharedData;
 
   //////////////////////////////////////////////////////
   // Main thread
@@ -59,7 +59,7 @@ private:
 
 public:
 
-  KeyEventConsumer() {
+  SerialKeyEventServer() {
     // We create the file mapping and global data on the main thread but release it on the 
     // local thread. This ensures that these objects are available for other processes to
     // open even if we haven't completed startup of the local thread.
@@ -73,13 +73,13 @@ public:
       return;
     }
 
-    m_hThread = CreateThread(NULL, 0, KeyEventConsumerThread, (LPVOID)this, 0, &m_idThread);
+    m_hThread = CreateThread(NULL, 0, ServerThreadProc, (LPVOID)this, 0, &m_idThread);
     if (!m_hThread) {
       DebugLastError("CreateThread");
     }
   }
 
-  ~KeyEventConsumer() {
+  ~SerialKeyEventServer() {
     if (m_hThreadExitEvent != NULL) {
       if (!SetEvent(m_hThreadExitEvent)) {
         DebugLastError("SetEvent");
@@ -115,7 +115,7 @@ private:
     even if we haven't completed startup of the local thread.
   */
   BOOL InitSharedData() {
-    m_hMMF = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE | SEC_COMMIT, 0, sizeof(ConsumerSharedData), GLOBAL_FILE_MAPPING_NAME);
+    m_hMMF = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE | SEC_COMMIT, 0, sizeof(SerialKeyEventSharedData), GLOBAL_FILE_MAPPING_NAME);
     if (!m_hMMF) {
       DebugLastError("CreateFileMapping");
       return FALSE;
@@ -126,8 +126,8 @@ private:
       return FALSE;
     }
 
-    m_pCSD = (ConsumerSharedData *)MapViewOfFile(m_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(ConsumerSharedData));
-    if (!m_pCSD) {
+    m_pSharedData = (SerialKeyEventSharedData *)MapViewOfFile(m_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SerialKeyEventSharedData));
+    if (!m_pSharedData) {
       DebugLastError("MapViewOfFile");
       return FALSE;
     }
@@ -170,8 +170,8 @@ private:
       bRet = FALSE;
     }
 
-    if (m_pCSD != NULL && !UnmapViewOfFile((LPCVOID)m_pCSD)) {
-      DebugLastError("CloseHandle(m_pCSD)");
+    if (m_pSharedData != NULL && !UnmapViewOfFile((LPCVOID)m_pSharedData)) {
+      DebugLastError("CloseHandle(m_pSharedData)");
       bRet = FALSE;
     }
 
@@ -190,10 +190,10 @@ private:
   /**
     Stub callback thread procedure
   */
-  static DWORD WINAPI KeyEventConsumerThread(
+  static DWORD WINAPI ServerThreadProc(
     _In_ LPVOID lpParameter
   ) {
-    return ((KeyEventConsumer *)lpParameter)->ThreadMain();
+    return ((SerialKeyEventServer *)lpParameter)->ThreadMain();
   }
 
   /**
@@ -222,7 +222,7 @@ private:
     m_pInputs = new INPUT[MAX_KEYEVENT_INPUTS];
 
     WNDCLASS wndClass = { 0 };
-    wndClass.lpfnWndProc = KeyEventConsumerWndProc;
+    wndClass.lpfnWndProc = ServerWndProc;
     wndClass.cbClsExtra = sizeof(this);
     wndClass.lpszClassName = KEYEVENT_WINDOW_CLASS;
     wndClass.hInstance = g_hInstance;
@@ -317,21 +317,21 @@ private:
     //
     // Copy the shared data from the buffer
     //
-    DWORD nInputs = m_pCSD->nInputs;
+    DWORD nInputs = m_pSharedData->nInputs;
     for (DWORD i = 0; i < nInputs; i++) {
       m_pInputs[i].type = INPUT_KEYBOARD;
-      m_pInputs[i].ki.wVk = m_pCSD->inputs[i].wVk;
-      m_pInputs[i].ki.wScan = m_pCSD->inputs[i].wScan;
-      m_pInputs[i].ki.dwFlags = m_pCSD->inputs[i].dwFlags;
-      m_pInputs[i].ki.time = m_pCSD->inputs[i].time;
-      m_pInputs[i].ki.dwExtraInfo = (ULONG_PTR) m_pCSD->inputs[i].extraInfo;
+      m_pInputs[i].ki.wVk = m_pSharedData->inputs[i].wVk;
+      m_pInputs[i].ki.wScan = m_pSharedData->inputs[i].wScan;
+      m_pInputs[i].ki.dwFlags = m_pSharedData->inputs[i].dwFlags;
+      m_pInputs[i].ki.time = m_pSharedData->inputs[i].time;
+      m_pInputs[i].ki.dwExtraInfo = (ULONG_PTR) m_pSharedData->inputs[i].extraInfo;
     }
 
     //
     // Reset the shared buffer and ensure the data is written out of cache for
     // multiprocessor systems
     //
-    m_pCSD->nInputs = 0;
+    m_pSharedData->nInputs = 0;
     MemoryBarrier();
 
     //
@@ -352,15 +352,15 @@ private:
   }
 
   /**
-    Stub window proc that calls the consumer wndproc
+    Stub window proc that calls the g_SerialKeyEventServer wndproc
   */
-  static LRESULT CALLBACK KeyEventConsumerWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    KeyEventConsumer *consumer = (KeyEventConsumer *)GetClassLongPtr(hwnd, 0);
-    if (consumer == NULL) {
+  static LRESULT CALLBACK ServerWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    SerialKeyEventServer *server = (SerialKeyEventServer *)GetClassLongPtr(hwnd, 0);
+    if (server == NULL) {
       return DefWindowProc(hwnd, msg, wParam, lParam);
     }
       
-    return consumer->WndProc(hwnd, msg, wParam, lParam);
+    return server->WndProc(hwnd, msg, wParam, lParam);
   }
 
   /**
@@ -405,25 +405,24 @@ private:
   }
 };
 
-// TODO: find a good name for this class, thread et al, rename file to "<keyeventsender>server.cpp" where <keyeventsender> is the new class name
 #ifndef _WIN64
-KeyEventConsumer *consumer = NULL;
+SerialKeyEventServer *g_SerialKeyEventServer = NULL;
 
-void StartupConsumer() {
-  consumer = new KeyEventConsumer();
+void StartupSerialKeyEventServer() {
+  g_SerialKeyEventServer = new SerialKeyEventServer();
 }
 
-void ShutdownConsumer() {
-  delete consumer;
+void ShutdownSerialKeyEventServer() {
+  delete g_SerialKeyEventServer;
 }
 
 #else
 
-// We only need one consumer on Win32
-void StartupConsumer() {
+// We only need one server, on Win32
+void StartupSerialKeyEventServer() {
 }
 
-void ShutdownConsumer() {
+void ShutdownSerialKeyEventServer() {
 }
 
 

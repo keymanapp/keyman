@@ -4,8 +4,8 @@
 
 #include "serialkeyeventcommon.h"
 
-void StartupConsumer();
-void ShutdownConsumer();
+void StartupSerialKeyEventServer();
+void ShutdownSerialKeyEventServer();
 
 extern HWND f_hwndKeyEventSender;
 
