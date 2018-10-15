@@ -48,7 +48,7 @@ BOOL SetObjectToLowIntegrity(HANDLE hObject, SE_OBJECT_TYPE type)
  IPC and synchronization
  See https://stackoverflow.com/questions/17761826/assigning-folder-permissions-to-all-application-packages-group
 */
-BOOL GrantPermissionToAllApplicationPackages(HANDLE handle, DWORD dwAccessPermissions) {
+BOOL GrantPermissionToAllApplicationPackages(HANDLE handle, DWORD dwAccessPermissions, SE_OBJECT_TYPE type) {
   // ALL APPLICATION PACKAGES group is introduced in Windows 8
   if (!IsWindows8OrGreater())
     return TRUE;
@@ -62,7 +62,7 @@ BOOL GrantPermissionToAllApplicationPackages(HANDLE handle, DWORD dwAccessPermis
   DWORD cbSid = SECURITY_MAX_SID_SIZE;
 
   // Get a pointer to the existing DACL.
-  DWORD dwRes = GetSecurityInfo(handle, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &pSD);
+  DWORD dwRes = GetSecurityInfo(handle, type, DACL_SECURITY_INFORMATION, NULL, NULL, &pOldDACL, NULL, &pSD);
   if (ERROR_SUCCESS != dwRes) {
     DebugLastError0(dwRes, "GetSecurityInfo");
     goto Cleanup;
@@ -99,7 +99,7 @@ BOOL GrantPermissionToAllApplicationPackages(HANDLE handle, DWORD dwAccessPermis
   }
 
   // Attach the new ACL as the object's DACL.
-  dwRes = SetSecurityInfo(handle, SE_FILE_OBJECT, si, NULL, NULL, pNewDACL, NULL);
+  dwRes = SetSecurityInfo(handle, type, si, NULL, NULL, pNewDACL, NULL);
   if (ERROR_SUCCESS != dwRes) {
     DebugLastError0(dwRes, "SetSecurityInfo");
     goto Cleanup;

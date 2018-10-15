@@ -76,9 +76,17 @@ void InitDebuggingEx(PKEYMAN64THREADDATA _td)
 				OPEN_EXISTING, 
 				FILE_FLAG_OVERLAPPED | FILE_ATTRIBUTE_NORMAL, 
 				(HANDLE) NULL);
-
+    if (_td->debug_hLogMailSlot == INVALID_HANDLE_VALUE) {
+      // Cannot use DebugLastError functionality because we are trying to initialise it
+      OutputDebugString("Keyman k32_dbg: CreateFile(mailslot) failed\n");
+    }
+  
     if(_td->debug_hLogEvent) CloseHandle(_td->debug_hLogEvent);
 		_td->debug_hLogEvent = CreateEvent(NULL, FALSE, FALSE, "Tavultesoft_KeymanEngine_DebugWrite");
+    if (_td->debug_hLogEvent == NULL) {
+      // Cannot use DebugLastError functionality because we are trying to initialise it
+      OutputDebugString("Keyman k32_dbg: CreateEvent failed\n");
+    }
 
 		/*
 		FILE *fp = fopen("c:\\keyman.log", "at");
