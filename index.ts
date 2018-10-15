@@ -189,7 +189,6 @@ if (typeof module !== 'undefined') {
   // In Node JS, monkey-patch Worker to the global object.
   // @ts-ignore
   global.Worker = require('tiny-worker');
-  exports.LMLayer = LMLayer;
 }
 
 declare module NodeJS  {
