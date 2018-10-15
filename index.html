@@ -17,10 +17,14 @@
     </script>
 
     <h1> LMLayer Demo </h1>
+    <script>
+        // HACK! index.js will require this.
+        var exports = {};
+    </script>
     <script src="index.js"></script>
     <script>
         lm = new LMLayer;
-        lm.initialize()
+        lm.initialize({ model: './models/en-x-test-teapot.js' })
             .then(conf => console.log('Initialized! Config:', conf));
     </script>
 
@@ -37,7 +41,10 @@
         var output = document.querySelector('#buffer');
         var suggestions = document.querySelector('#suggestions');
 
-        input.addEventListener('change', function (event) {
+        input.addEventListener('input', function (event) {
+            // event.data gives insertion
+            // inputType: insertText
+            // inputType: deleteContentBackward
             debugger;
             lm.predict({
                 context: {},
