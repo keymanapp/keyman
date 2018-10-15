@@ -141,52 +141,44 @@ before sending another message.
 These are the configurations, and platform restrictions sent to
 initialize the LMLayer and its model.
 
-```javascript
-let initialization = {
+```typescript
+interface InitializeMessage {
+  message: 'initialize';
+
   /**
-   * [REQUIRED]
    * Path to the model. There are no concrete restrictions on the path
-   * to the model, so long as the LMLayer can succesfully use it to
+   * to the model, so long as the LMLayer can successfully use it to
    * initialize the model.
-   *
-   * type: string
    */
-   model: './models/en_CA-x-testing',
+  model: string;
 
-  /**
-   * Whether the platform supports right contexts.
-   * The absense of this rule implies false.
-   *
-   * type: bool
-   */
-  supportsRightContexts: false,
+  configuration: {
+    /**
+     * Whether the platform supports right contexts.
+     * The absence of this rule implies false.
+     */
+    supportsRightContexts?: false,
 
-  /**
-   * Whether the platform supports deleting to the right.
-   * The absence of this rule implies false.
-   *
-   * type: bool
-   */
-  supportsDeleteRight: false,
+    /**
+     * Whether the platform supports deleting to the right.
+     * The absence of this rule implies false.
+     */
+    supportsDeleteRight?: false,
 
-  /**
-   * [REQUIRED]
-   * The maximum amount of UTF-16 code units that the keyboard will
-   * provide to the left of the cursor.
-   *
-   * type: number
-   */
-  maxLeftContextCodeUnits: 32,
+    /**
+     * The maximum amount of UTF-16 code units that the keyboard will
+     * provide to the left of the cursor.
+     */
+    maxLeftContextCodeUnits: 32,
 
-  /**
-   * The maximum amount of code units that the keyboard will provide to
-   * the right of the cursor. The absence of this rule implies 0.
-   * See also, supportsRightContexts.
-   *
-   * type: number
-   */
-  maxRightContextCodeUnits: 32,
-};
+    /**
+     * The maximum amount of code units that the keyboard will provide to
+     * the right of the cursor. The absence of this rule implies 0.
+     * See also, [[supportsRightContexts]].
+     */
+    maxRightContextCodeUnits: 32,
+  }
+}
 ```
 
 
@@ -198,17 +190,20 @@ a plain JavaScript object requesting configuration from the keyboard.
 
 There are only two options defined so far:
 
-```javascript
-let configuration = {
+```typescript
+interface ReadyMessage {
+  message: 'ready';
+  configuration: {
     /**
      * How many UTF-16 code units maximum to send as the context to the
      * left of the cursor ("left" in the Unicode character stream).
      *
      * Affects the `context` property sent in `predict` messages.
      *
-     * TODO: Will this ever bisect graphical cluster boundaries?
+     * While the left context MUST NOT bisect surrogate pairs, they MAY
+     * bisect graphical clusters.
      */
-    leftContextCodeUnits: 32,
+    leftContextCodeUnits: number,
 
     /**
      * How many UTF-16 code units maximum to send as the context to the
@@ -216,10 +211,12 @@ let configuration = {
      *
      * Affects the `context` property sent in `predict` messages.
      *
-     * TODO: Will this ever bisect graphical cluster boundaries?
+     * While the left context MUST NOT bisect surrogate pairs, they MAY
+     * bisect graphical clusters.
      */
-    rightContextCodeUnits: 32,
-};
+    rightContextCodeUnits: number,
+  };
+}
 ```
 
 
@@ -257,77 +254,62 @@ from the perspective before the `transform` has been applied.
 The context is the text surrounding the insertion point, _before_ the
 transform is applied to the buffer.
 
-```javascript
-let context = {
+```typescript
+interface Context {
   /**
    * Up to maxLeftContextCodeUnits code units of Unicode scalar value
    * (i. e., characters) to the left of the insertion point in the
    * buffer. If there is nothing to the left of the buffer, this returns
    * an empty string.
-   *
-   * type: USVString
    */
-  left: "I'm a little ",
+  left: USVString;
 
   /**
-   * [OPTIONAL]
    * Up to maxRightContextCodeUnits code units of Unicode scalar value
    * (i. e., characters) to the right of the insertion point in the
    * buffer. If there is nothing to the right of the buffer, this returns
    * an empty string.
-   *
-   * type: USVString
    */
-  right: '',
+  right?: USVString;
 
   /**
    * Whether the insertion point is at the start of the buffer.
-   *
-   * type: boolean
    */
-  startOfBuffer: false,
+  startOfBuffer: boolean;
 
   /**
    * Whether the insertion point is at the end of the buffer.
-   *
-   * type: boolean
    */
-  endOfBuffer: true
-};
+  endOfBuffer: boolean;
+}
 ```
 
 The transform parameter describes how the input event will change the
 buffer.
 
-```javascript
-let transform = {
+```typescript
+interface Transform {
   /**
    * The Unicode scalar values (i.e., characters) to be inserted at the
    * cursor position.
    *
    * Corresponds to `s` in com.keyman.KeyboardInterface.output.
-   *
-   * type: USVString <https://heycam.github.io/webidl/#idl-USVString>
    */
-  insert: 't',
+  insert: USVString;
 
   /**
    * The number of code units to delete to the left of the cursor.
    *
-   * Cooresponds to `dn` in com.keyman.KeyboardInterface.output.
-   *
-   * type: number (integer values only)
+   * Corresponds to `dn` in com.keyman.KeyboardInterface.output.
    */
-  delete: 0,
+  delete: number;
 
   /**
-   * [OPTIONAL]
    * The number of code units to delete to the right of the cursor.
-   *
-   * type: number (integer values only)
+   * Not available on all platforms.
    */
-  deleteRight: 0,
-};
+  deleteRight?: number;
+}
 ```
 
 
@@ -339,35 +321,42 @@ probability (i.e., entry `0` is most likely, followed by entry `1`,
 etc.). This message **MUST** be in response to a `predict` message, and
 it **MUST** respond with the corresponding [token].
 
-```javascript
+```typescript
 /**
  * `suggestions` is an ordered array of suggestion objects.
  * Each suggestion is a transform bundled with a `displayAs` property.
  */
+let suggestions = Suggestion[];
+
+interface Suggestion {
+  /**
+   * Same object as an input event transform.
+   * Note that the transform is applied AFTER the input event
+   * transform.
+   */
+  transform: Transform;
+  /**
+   * A string to display the suggestion to the typist.
+   * This should aid the typist understand what the transform
+   * will do to their text.
+   */
+  displayAs: string;
+}
+```
+
+```javascript
 let suggestions = [
   {
-    /**
-     * Same object as an input event transform.
-     * Note that the transform is applied AFTER the input event
-     * transform.
-     */
     transform: {
       insert: 'teapot',
       deleteLeft: 1,
       deleteRight: 0
     },
-
-    /**
-     * A string to display the suggestion to the typist.
-     * This should aid the typist understand what the transform will do
-     * to their text.
-     *
-     * type: string
-     */
     displayAs: '🍵'
   }
 ];
 ```
+
 
 #### Timing
 
@@ -404,7 +393,7 @@ TODO
  - [x] Document `suggestions`
  - [x] TypeScript!
  - [ ] make simple `index.html` that demos a dummy model
- - [ ] Update class definitions in README from TypeScript sources.
+ - [x] Update class definitions in README from TypeScript sources.
  - [ ] Do word segmentation
  - [ ] Determine the exact arguments given to the model's `predict()`
        method.

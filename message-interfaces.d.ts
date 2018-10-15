@@ -1,6 +1,6 @@
 /**
  * A token
- * 
+ *
  * TODO: this should be an opaque type!
  */
 type Token = number;
@@ -60,7 +60,8 @@ interface ReadyMessage {
      *
      * Affects the `context` property sent in `predict` messages.
      *
-     * TODO: Will this ever bisect graphical cluster boundaries?
+     * While the left context MUST NOT bisect surrogate pairs, they MAY
+     * bisect graphical clusters.
      */
     leftContextCodeUnits: number,
 
@@ -70,7 +71,8 @@ interface ReadyMessage {
      *
      * Affects the `context` property sent in `predict` messages.
      *
-     * TODO: Will this ever bisect graphical cluster boundaries?
+     * While the left context MUST NOT bisect surrogate pairs, they MAY
+     * bisect graphical clusters.
      */
     rightContextCodeUnits: number,
   };
@@ -81,7 +83,7 @@ interface PredictMessage {
   token: Token;
   context: Context;
   transform: Transform;
-} 
+}
 
 interface SuggestionsMessage {
   message: 'suggestions';
