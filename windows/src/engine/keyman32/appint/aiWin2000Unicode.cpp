@@ -311,8 +311,8 @@ BOOL AIWin2000Unicode::PostKeys()
   SetLastError(0);
 
   if(i > 0) {   // I4452
-#ifdef USE_KEYEVENTSENDERTHREAD
-    SignalKeyEventSenderThread(pInputs, i);
+#ifdef USE_SERIALKEYEVENTSERVER
+    _td->pSerialKeyEventClient->SignalServer(pInputs, i);
 #else
     if(SendInput(i, pInputs, sizeof(INPUT)) == 0) {
       DebugLastError("SendInput");

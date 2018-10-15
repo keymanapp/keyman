@@ -108,13 +108,16 @@
     <ClCompile Include="..\keyman32\hookutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\keyman32\keyeventsenderthread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\keyman32\security.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\keyman32\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\serialkeyeventclient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\serialkeyeventserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -241,13 +244,19 @@
     <ClInclude Include="..\keyman32\vkscancodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\keyman32\keyeventsenderthread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\keyman32\security.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\keyman32\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\serialkeyeventclient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\serialkeyeventcommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\serialkeyeventserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

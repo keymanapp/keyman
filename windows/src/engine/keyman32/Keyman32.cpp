@@ -446,7 +446,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 		return FALSE;	/* Failed to verify certificate */ 
 	}
 
-#ifdef USE_KEYEVENTSENDERTHREAD
+#ifdef USE_SERIALKEYEVENTSERVER
   StartupSerialKeyEventServer();
 #endif
 
@@ -491,7 +491,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
     return FALSE;
   }
 
-#ifdef USE_KEYEVENTSENDERTHREAD
+#ifdef USE_SERIALKEYEVENTSERVER
   ShutdownSerialKeyEventServer();
 #endif
 

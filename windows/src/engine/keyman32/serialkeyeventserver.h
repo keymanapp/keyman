@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef USE_KEYEVENTSENDERTHREAD
+#ifdef USE_SERIALKEYEVENTSERVER
 
 #include "serialkeyeventcommon.h"
 

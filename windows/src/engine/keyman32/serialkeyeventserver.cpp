@@ -2,7 +2,7 @@
 #include "serialkeyeventserver.h"
 #include "security.h"
 
-#ifdef USE_KEYEVENTSENDERTHREAD
+#ifdef USE_SERIALKEYEVENTSERVER
 
 /*
   All input is posted to the key event sender window, which then uses SendInput to post

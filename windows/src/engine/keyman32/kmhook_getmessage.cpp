@@ -147,7 +147,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     DebugMessage(mp, wParam);
   }
 
-  #ifndef USE_KEYEVENTSENDERTHREAD
+  #ifndef USE_SERIALKEYEVENTSERVER
   /*
     Serializes all input events onto the current focused window thread by repeating any externally generated events. This
     is required to ensure that we can get the correct modifier state when we need to push a modifier release/set around
