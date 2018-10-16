@@ -13,11 +13,9 @@
       <provider name="Keyman-Debug-ETWProvider"
           guid="{DA621615-E08B-4283-918E-D2502D3757AE}"
           symbol="ProviderGuid"
-          resourceFileName="c:\program files (x86)\common files\keyman\keyman engine\keyman32.dll"
-          messageFileName="c:\program files (x86)\common files\keyman\keyman engine\keyman32.dll"
-          message="$(string.Provider.Name)"
-                >
-
+          resourceFileName="#keyman32.dll"
+          messageFileName="#keyman32.dll"
+          message="$(string.Provider.Name)">
         <maps>
           <valueMap name="Platform">
             <map value="1" message="$(string.Map.x86)"/>

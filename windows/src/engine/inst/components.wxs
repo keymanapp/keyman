@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Fragment>
     <ComponentGroup Id="KeymanEngineComponents" Directory="INSTALLDIR" Source="..\..\..\bin\engine\">
       <Component Id="kmcomapi.dll" Guid="{6272B8A9-B41E-49B1-A65B-23BCFDB42167}" SharedDllRefCount="yes">
@@ -195,6 +196,14 @@
         </File>
         <!-- we will register post-install? -->
       </Component>
+
+      <Component Id="etw" Guid="{2AA8D519-C9B7-4995-9496-D87DD2EF2B7D}">
+        <!-- The file id needs to be short to avoid an overflow in the XmlFile table during link time -->
+        <File Id="etw" Name="keyman-debug-etw.man" KeyPath="yes" Source="..\keyman32\keyman-debug-etw.man">
+          <util:EventManifest MessageFile="[keyman32.dll]" ResourceFile="[keyman32.dll]" />
+        </File>
+      </Component>
+      
     </ComponentGroup>
   </Fragment>
 </Wix>

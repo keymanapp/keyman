@@ -34,7 +34,8 @@ msm:
     $(MAKE) -fdownload.mak prepareredist
     $(MAKE) -fdownload.mak candle
     
-    $(WIXLIGHT) keymanengine.wixobj components.wixobj -o keymanengine.msm
+    # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
+    $(WIXLIGHT) -sw1072 -ext WixUtilExtension keymanengine.wixobj components.wixobj -o keymanengine.msm
 
 copy:    
     #
