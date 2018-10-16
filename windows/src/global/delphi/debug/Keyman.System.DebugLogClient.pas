@@ -118,17 +118,17 @@ begin
 
   // These must match the manifest template in keyman-debug-etw.man
   EventDataDescCreate(Descriptors[0], @dwPlatform, sizeof(DWORD)); // <data name = "Platform" inType = "Platform" / >
-  EventDataDescCreate(&Descriptors[1], PChar(sProcessName), (Length(sProcessName) + 1) * sizeof(WCHAR)); //  <data name = "Process" inType = "win:UnicodeString" / >
-  EventDataDescCreate(&Descriptors[2], @pid, sizeof(DWORD)); //  <data name = "PID" inType = "win:UInt32" / >
-  EventDataDescCreate(&Descriptors[3], @tid, sizeof(DWORD)); //  <data name = "TID" inType = "win:UInt32" / >
-  EventDataDescCreate(&Descriptors[4], @dwDummy, sizeof(DWORD)); //  <data name = "ShiftState" inType = "ShiftState" / >
-  EventDataDescCreate(&Descriptors[5], @dwDummy, sizeof(DWORD)); //  <data name = "ActualShiftState" inType = "ShiftState" / >
-  EventDataDescCreate(&Descriptors[6], @dwTickCount, sizeof(DWORD)); //  <data name = "TickCount" inType = "win:UInt32" / >
-  EventDataDescCreate(&Descriptors[7], @dwDummy, sizeof(DWORD)); //  <data name = "FocusHWND" inType = "win:UInt32" / >
-  EventDataDescCreate(&Descriptors[8], @dwDummy, sizeof(DWORD)); //  <data name = "ActiveHKL" inType = "win:UInt32" / >
-  EventDataDescCreate(&Descriptors[9], PChar(sDummy), sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
-  EventDataDescCreate(&Descriptors[10], @dwDummy, sizeof(DWORD)); //  <data name = "SourceLine" inType = "win:UInt32" / >
-  EventDataDescCreate(&Descriptors[11], PChar(sMsg), (Length(sMsg)+1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
+  EventDataDescCreate(Descriptors[1], PChar(sProcessName), (Length(sProcessName) + 1) * sizeof(WCHAR)); //  <data name = "Process" inType = "win:UnicodeString" / >
+  EventDataDescCreate(Descriptors[2], @pid, sizeof(DWORD)); //  <data name = "PID" inType = "win:UInt32" / >
+  EventDataDescCreate(Descriptors[3], @tid, sizeof(DWORD)); //  <data name = "TID" inType = "win:UInt32" / >
+  EventDataDescCreate(Descriptors[4], @dwDummy, sizeof(DWORD)); //  <data name = "ShiftState" inType = "ShiftState" / >
+  EventDataDescCreate(Descriptors[5], @dwDummy, sizeof(DWORD)); //  <data name = "ActualShiftState" inType = "ShiftState" / >
+  EventDataDescCreate(Descriptors[6], @dwTickCount, sizeof(DWORD)); //  <data name = "TickCount" inType = "win:UInt32" / >
+  EventDataDescCreate(Descriptors[7], @dwDummy, sizeof(DWORD)); //  <data name = "FocusHWND" inType = "win:UInt32" / >
+  EventDataDescCreate(Descriptors[8], @dwDummy, sizeof(DWORD)); //  <data name = "ActiveHKL" inType = "win:UInt32" / >
+  EventDataDescCreate(Descriptors[9], PChar(sDummy), sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
+  EventDataDescCreate(Descriptors[10], @dwDummy, sizeof(DWORD)); //  <data name = "SourceLine" inType = "win:UInt32" / >
+  EventDataDescCreate(Descriptors[11], PChar(sMsg), (Length(sMsg)+1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
 
   status := EventWrite(FRegHandle, @DebugEvent, MAX_DESCRIPTORS, @Descriptors[0]);
   if ERROR_SUCCESS <> status then
