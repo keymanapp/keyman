@@ -93,8 +93,7 @@ var
   FShouldDebugLastTick: Cardinal = 0;
 
 const
-  // GUID that identifies your trace session.
-  // Remember to create your own session GUID.
+  // GUID that identifies our trace session.
   SessionGuid: TGUID = '{FADEA67E-0EE9-452B-AF04-22E342D1227A}';
 
 function GetDebugManager(AOwner: HWND): TDebugLogManager;
@@ -124,8 +123,6 @@ constructor TDebugLogManager.Create(AOwner: HWND);
 var
   BufferSize: ULONG;
   status: ULONG;
-//  BOOL TraceOn = TRUE;
-//  BOOL bTraceAlreadyStarted = FALSE;
 begin
   FOwner := AOwner;
 
@@ -151,9 +148,7 @@ begin
   pSessionProperties.MaximumFileSize := 1;  // 1 MB
   pSessionProperties.LoggerNameOffset := sizeof(EVENT_TRACE_PROPERTIES);
   pSessionProperties.LogFileNameOffset := sizeof(EVENT_TRACE_PROPERTIES) + sizeof(LOGSESSION_NAME);
-  StrPCopy(PWideChar(PByte(pSessionProperties) + pSessionProperties.LoggerNameOffset), LOGSESSION_NAME);
   StrPCopy(PWideChar(PByte(pSessionProperties) + pSessionProperties.LogFileNameOffset), FDebugLogFileName);
-//  StringCbCopy((LPWSTR)((char*)pSessionProperties + pSessionProperties->LogFileNameOffset), sizeof(LOGFILE_PATH), LOGFILE_PATH);
 
   status := StartTrace(@FSessionHandle, PWideChar(LOGSESSION_NAME), pSessionProperties^);
   if ERROR_ALREADY_EXISTS = status then
