@@ -375,6 +375,7 @@ const
   SRegValue_IDEOptUseSyntaxHighlighting = 'use syntax highlighting';               // CU
   SRegValue_IDEOptToolbarVisible   = 'toolbar visible';                            // CU
   SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
+  SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
 
   SRegValue_IDEOptShowStartupDialog       = 'show startup dialog';                 // CU
   //SRegValue_IDEOptShowStartupHelperDialog = 'show startup helper dialog';          // CU

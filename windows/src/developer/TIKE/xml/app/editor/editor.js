@@ -10,6 +10,10 @@ window.editorGlobalContext = {
   loading: false
 };
 
+async function loadSettings() {
+  return await $.getJSON('/app/settings/editor');
+}
+
 (function(context) {
   var editor = null;
   var errorRange = null;
@@ -19,19 +23,21 @@ window.editorGlobalContext = {
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
-
+  
   if(!mode) {
     mode = 'keyman';
   }
-
 
   /**
     Initialize the editor
   */
 
-  require.config({ paths: { 'vs': '../lib/monaco/min/vs' } });
+  require.config({ paths: { 
+    'vs': '../lib/monaco/min/vs'
+  } });
+
   require(['vs/editor/editor.main','language.keyman'], function (_editor, _language) {
-    
+
     //
     // Register Keyman .kmn tokens provider and language formatter
     // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
@@ -80,6 +86,9 @@ window.editorGlobalContext = {
     //
 
     const model = editor.getModel();
+
+    context.reloadSettings();
+
     model.onDidChangeContent(() => {
       // Even when loading, we post back the data to the backend so we have an original version
       $.post("/app/source/file", {
@@ -280,6 +289,45 @@ window.editorGlobalContext = {
       lineHeight: lineHeight
     });
   };
+
+  //
+  // Themes and settings
+  //
+
+  context.reloadSettings = function () {
+    loadSettings().then(function(_settings) {
+      _settings = $.extend({
+        useTabChar: false,
+        indentSize: 4
+      }, _settings);
+
+      //
+      // Define a custom theme if specified in the settings
+      //
+
+      var themeName = 'vs';
+
+      if(_settings.theme) {
+        if(typeof _settings.theme == 'string') {
+          themeName = _settings.theme;
+        } else {
+          themeName = 'keyman-custom';
+          monaco.editor.defineTheme(themeName, _settings.theme);
+        }
+      }
+
+      monaco.editor.setTheme(themeName);
+
+      editor.updateOptions({
+        useTabStops: _settings.useTabChar
+      });
+
+      editor.model.updateOptions({
+        tabSize: _settings.indentSize
+      });
+    });
+  }
+
 
   //
   // Printing

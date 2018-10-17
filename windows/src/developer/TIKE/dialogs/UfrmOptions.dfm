@@ -2,7 +2,6 @@ inherited frmOptions: TfrmOptions
   Left = 336
   Top = 191
   HelpContext = 1241
-  ActiveControl = lbColours
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
   Caption = 'Options'
@@ -20,15 +19,11 @@ inherited frmOptions: TfrmOptions
     Top = 8
     Width = 425
     Height = 392
-    ActivePage = tabColours
+    ActivePage = tabEditor
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbStartup: TGroupBox
         Left = 8
         Top = 8
@@ -114,10 +109,6 @@ inherited frmOptions: TfrmOptions
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object lblIndentSize: TLabel
         Left = 8
         Top = 60
@@ -125,6 +116,21 @@ inherited frmOptions: TfrmOptions
         Height = 13
         Caption = '&Indent size'
         FocusControl = editIndentSize
+      end
+      object lblEditorTheme: TLabel
+        Left = 3
+        Top = 162
+        Width = 62
+        Height = 13
+        Caption = 'Editor &theme:'
+      end
+      object lblEditorCustomTheme: TLabel
+        Left = 120
+        Top = 186
+        Width = 187
+        Height = 13
+        AutoSize = False
+        Caption = '(custom theme filename)'
       end
       object chkUseTab: TCheckBox
         Left = 8
@@ -153,7 +159,7 @@ inherited frmOptions: TfrmOptions
       object panFontSample: TPanel
         Left = 120
         Top = 96
-        Width = 125
+        Width = 187
         Height = 25
         BevelOuter = bvLowered
         Caption = '<font name>'
@@ -171,7 +177,7 @@ inherited frmOptions: TfrmOptions
       object panQuotedFontSample: TPanel
         Left = 120
         Top = 128
-        Width = 125
+        Width = 187
         Height = 25
         BevelOuter = bvLowered
         Caption = '<font name>'
@@ -185,391 +191,19 @@ inherited frmOptions: TfrmOptions
         Caption = '&Link quoted font size to primary font size'
         TabOrder = 6
       end
-    end
-    object tabColours: TTabSheet
-      Caption = 'Colours'
-      ImageIndex = 1
-      object panCol1: TPaintPanel
-        Left = 176
-        Top = 8
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clBlack
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 0
-      end
-      object lbColours: TListBox
-        Left = 4
-        Top = 24
-        Width = 121
-        Height = 145
-        ItemHeight = 13
-        TabOrder = 1
-      end
-      object panCol2: TPaintPanel
-        Tag = 1
-        Left = 204
-        Top = 8
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clMaroon
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 2
-      end
-      object panCol3: TPaintPanel
-        Tag = 2
-        Left = 232
-        Top = 8
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clGreen
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 3
-      end
-      object panCol4: TPaintPanel
-        Tag = 3
-        Left = 260
-        Top = 8
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clOlive
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 4
-      end
-      object panCol5: TPaintPanel
-        Tag = 4
-        Left = 176
-        Top = 36
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clNavy
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 5
-      end
-      object panCol6: TPaintPanel
-        Tag = 5
-        Left = 204
-        Top = 36
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clPurple
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 6
-      end
-      object panCol7: TPaintPanel
-        Tag = 6
-        Left = 232
-        Top = 36
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clTeal
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
+      object cbEditorTheme: TComboBox
+        Left = 120
+        Top = 159
+        Width = 187
+        Height = 21
+        Style = csDropDownList
         TabOrder = 7
-      end
-      object panCol8: TPaintPanel
-        Tag = 7
-        Left = 260
-        Top = 36
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clGray
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 8
-      end
-      object panCol9: TPaintPanel
-        Tag = 8
-        Left = 176
-        Top = 64
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clSilver
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 9
-      end
-      object panCol10: TPaintPanel
-        Tag = 9
-        Left = 204
-        Top = 64
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clRed
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 10
-      end
-      object panCol11: TPaintPanel
-        Tag = 10
-        Left = 232
-        Top = 64
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clLime
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 11
-      end
-      object panCol12: TPaintPanel
-        Tag = 11
-        Left = 260
-        Top = 64
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clYellow
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 12
-      end
-      object panCol13: TPaintPanel
-        Tag = 12
-        Left = 176
-        Top = 92
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clBlue
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentCtl3D = False
-        ParentFont = False
-        TabOrder = 13
-      end
-      object panCol14: TPaintPanel
-        Tag = 13
-        Left = 204
-        Top = 92
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clFuchsia
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 14
-      end
-      object panCol15: TPaintPanel
-        Tag = 14
-        Left = 232
-        Top = 92
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clAqua
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 15
-      end
-      object panCol16: TPaintPanel
-        Tag = 15
-        Left = 260
-        Top = 92
-        Width = 25
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = 'FG'
-        Color = clWhite
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 16
-      end
-      object cmdResetSelected: TButton
-        Left = 4
-        Top = 176
-        Width = 85
-        Height = 25
-        Caption = '&Reset selected'
-        TabOrder = 17
-      end
-      object cmdResetAll: TButton
-        Left = 4
-        Top = 208
-        Width = 85
-        Height = 25
-        Caption = 'Reset &all'
-        TabOrder = 18
-      end
-      object gbColourStyle: TGroupBox
-        Left = 296
-        Top = 4
-        Width = 113
-        Height = 77
-        Caption = 'Text attributes'
-        TabOrder = 19
-        object chkColoursBold: TCheckBox
-          Left = 8
-          Top = 16
-          Width = 41
-          Height = 17
-          Caption = '&Bold'
-          TabOrder = 0
-        end
-        object chkColoursItalic: TCheckBox
-          Left = 8
-          Top = 34
-          Width = 45
-          Height = 17
-          Caption = '&Italic'
-          TabOrder = 1
-        end
-        object chkColoursUnderline: TCheckBox
-          Left = 8
-          Top = 52
-          Width = 69
-          Height = 17
-          Caption = '&Underline'
-          TabOrder = 2
-        end
-      end
-      object pmSyntaxExample: TMemo
-        Left = 132
-        Top = 124
-        Width = 277
-        Height = 113
-        Cursor = crIBeam
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          'c Syntax Highlighting'
-          'NAME "Syntax Highlight"'
-          ''
-          'begin Unicode > use(main)'
-          ''
-          'U+00FC + '#39'A'#39' > U+1124'
-          'd225 + '#39'B'#39' > beep')
-        ParentFont = False
-        ReadOnly = True
-        ScrollBars = ssVertical
-        TabOrder = 20
-      end
-      object chkUseSyntaxHighlighting: TCheckBox
-        Left = 4
-        Top = 4
-        Width = 137
-        Height = 17
-        Caption = 'Use &Syntax Highlighting'
-        Checked = True
-        State = cbChecked
-        TabOrder = 21
-      end
-      object chkPlainBG: TCheckBox
-        Left = 296
-        Top = 84
-        Width = 117
-        Height = 17
-        Caption = '&Plain background'
-        TabOrder = 22
-      end
-      object chkPlainFG: TCheckBox
-        Left = 296
-        Top = 103
-        Width = 113
-        Height = 17
-        Caption = 'Plain &foreground'
-        TabOrder = 23
+        OnClick = cbEditorThemeClick
       end
     end
     object tabDebugger: TTabSheet
       Caption = 'Debugger'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbDebuggerSettings: TGroupBox
         Left = 8
         Top = 8
@@ -646,10 +280,6 @@ inherited frmOptions: TfrmOptions
     object tabCharMap: TTabSheet
       Caption = 'Character Map'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbCharMapCharacterLookups: TGroupBox
         Left = 8
         Top = 8
@@ -754,5 +384,13 @@ inherited frmOptions: TfrmOptions
     Title = 'Browse for Unicode Data Files'
     Left = 132
     Top = 404
+  end
+  object dlgBrowseEditorTheme: TOpenDialog
+    DefaultExt = 'json'
+    Filter = 'Custom theme JSON (*.json)|*.json|All files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Title = 'Browse for Editor Theme'
+    Left = 212
+    Top = 403
   end
 end
