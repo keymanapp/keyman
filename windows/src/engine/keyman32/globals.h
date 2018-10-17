@@ -58,6 +58,7 @@
 
 #ifdef USE_SERIALKEYEVENTSERVER
 #include "serialkeyeventclient.h"
+#include "SharedBuffers.h"
 #endif
 
 class Globals
@@ -251,6 +252,7 @@ typedef struct tagKEYMAN64THREADDATA
   HANDLE hProcMon;
 #endif
   BOOL debug_Error;
+  ISharedBufferManager *pSharedBufferManager;
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT 

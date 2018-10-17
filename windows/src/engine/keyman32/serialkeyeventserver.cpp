@@ -81,7 +81,7 @@ public:
     }
   }
 
-  ~SerialKeyEventServer() {
+  virtual ~SerialKeyEventServer() {
     if (m_hThreadExitEvent != NULL) {
       if (!SetEvent(m_hThreadExitEvent)) {
         DebugLastError("SetEvent");

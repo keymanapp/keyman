@@ -305,6 +305,7 @@
     <ClCompile Include="..\keyman32\selectkeyboard.cpp" />
     <ClCompile Include="..\keyman32\serialkeyeventclient.cpp" />
     <ClCompile Include="..\keyman32\serialkeyeventserver.cpp" />
+    <ClCompile Include="..\keyman32\SharedBuffers.cpp" />
     <ClCompile Include="..\keyman32\syskbd.cpp" />
     <ClCompile Include="..\keyman32\syskbdnt.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
@@ -369,6 +370,7 @@
     <ClInclude Include="..\keyman32\serialkeyeventclient.h" />
     <ClInclude Include="..\keyman32\serialkeyeventcommon.h" />
     <ClInclude Include="..\keyman32\serialkeyeventserver.h" />
+    <ClInclude Include="..\keyman32\SharedBuffers.h" />
     <ClInclude Include="..\keyman32\syskbd.h" />
     <ClInclude Include="..\..\global\inc\testkeymanfunctioning.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />

@@ -5,17 +5,22 @@ interface
 uses
   Winapi.Windows,
   Winapi.Messages,
-
   System.Classes,
   System.SysUtils,
 
+  Keyman.System.SharedBuffers,
   LangSwitchManager;
 
 type
   TGlobalKeyboardChangeManager = class(TThread)
-  private
+  private type
+    TLastKeyboard = record
+      TIP: TSelectKeyboardBuffer;
+      Keyboard: HKL;
+    end;
+  private var
     FWindow: HWND;
-    FLastKeyboard: string;
+    FLastKeyboard: TLastKeyboard;
     procedure WndProc(var Message: TMessage);
     procedure ProcessChange(Mode: Integer; Param: NativeUInt);
   protected
@@ -68,36 +73,38 @@ procedure TGlobalKeyboardChangeManager.PostChange(
 var
   TIP: TLangSwitchKeyboard_TIP;
   WinKB: TLangSwitchKeyboard_WinKeyboard;
-  s: string;
-  FAtom: Word;
+  lk: TLastKeyboard;
+  FIdentity: DWORD;
 begin
+  lk := FLastKeyboard;
+
   if Keyboard is TLangSwitchKeyboard_TIP then
   begin
     TIP := Keyboard as TLangSwitchKeyboard_TIP;
 
-    // ATOM construction copied from TLangSwitchKeyboard
-    s := IntToStr(TIP.Profile.langid) + '|' + GUIDToString(TGUID(TIP.Profile.clsid)) + '|' + GUIDToString(TGUID(TIP.Profile.guidProfile));
+    lk.TIP.LangID := TIP.Profile.langid;
+    lk.TIP.CLSID := TIP.Profile.clsid;
+    lk.TIP.GUIDProfile := TIP.Profile.guidProfile;
+    TDebugManager.WriteMessage('TGlobalKeyboardChangeManager.PostChange TIP', []);
 
-    TDebugManager.WriteMessage('TGlobalKeyboardChangeManager.PostChange: '+s, []);
-
-    if s <> FLastKeyboard then
+    if not CompareMem(@lk, @FLastKeyboard, SizeOf(TLastKeyboard)) then
     begin
-      FAtom := GlobalAddAtom(PChar(s));
-      FLastKeyboard := s;
-      PostMessage(FWindow, WM_USER_CHANGE, KMCI_SELECTKEYBOARD_BACKGROUND_TSF, FAtom);
+      FLastKeyboard := lk;
+      FIdentity := TSharedBufferManager.Identity.WriteSelectKeyboardBuffer(lk.TIP);
+      PostMessage(FWindow, WM_USER_CHANGE, KMCI_SELECTKEYBOARD_BACKGROUND_TSF, FIdentity);
     end;
   end
   else if Keyboard is TLangSwitchKeyboard_WinKeyboard then
   begin
     WinKB := Keyboard as TLangSwitchKeyboard_WinKeyboard;
-    s := IntToStr(WinKB.HKL);
+    lk.Keyboard := WinKB.HKL;
 
-    TDebugManager.WriteMessage('TGlobalKeyboardChangeManager.PostChange: '+s, []);
+    TDebugManager.WriteMessage('TGlobalKeyboardChangeManager.PostChange HKL', []);
 
-    if s <> FLastKeyboard then
+    if not CompareMem(@lk, @FLastKeyboard, SizeOf(TLastKeyboard)) then
     begin
-      FLastKeyboard := s;
-      PostMessage(FWindow, WM_USER_CHANGE, KMCI_SELECTKEYBOARD_BACKGROUND, WinKB.HKL);
+      FLastKeyboard := lk;
+      PostMessage(FWindow, WM_USER_CHANGE, KMCI_SELECTKEYBOARD_BACKGROUND, lk.Keyboard);
     end;
   end
   else
@@ -110,8 +117,6 @@ end;
 procedure TGlobalKeyboardChangeManager.ProcessChange(Mode: Integer; Param: NativeUInt);
 begin
   SendMessageTimeout(HWND_BROADCAST, wm_keyman_control_internal, Mode, Param, SMTO_ABORTIFHUNG, 250, nil);
-  if Mode = KMCI_SELECTKEYBOARD_BACKGROUND_TSF then
-    GlobalDeleteAtom(Param);
 end;
 
 procedure TGlobalKeyboardChangeManager.WndProc(var Message: TMessage);

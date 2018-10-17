@@ -157,6 +157,7 @@ void Globals_UninitThread()
   if (_td) {
     delete _td->pSerialKeyEventClient;
   }
+  CloseThreadSharedBufferManager();
 #endif
 
   EnterCriticalSection(&csGlobals);

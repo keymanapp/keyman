@@ -314,6 +314,7 @@
     <ClCompile Include="selectkeyboard.cpp" />
     <ClCompile Include="serialkeyeventclient.cpp" />
     <ClCompile Include="serialkeyeventserver.cpp" />
+    <ClCompile Include="SharedBuffers.cpp" />
     <ClCompile Include="syskbd.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -381,6 +382,7 @@
     <ClInclude Include="security.h" />
     <ClInclude Include="serialkeyeventclient.h" />
     <ClInclude Include="serialkeyeventcommon.h" />
+    <ClInclude Include="SharedBuffers.h" />
     <ClInclude Include="syskbd.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
     <ClInclude Include="vkscancodes.h" />

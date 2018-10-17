@@ -43,6 +43,7 @@ unit DebugManager;  // I3306
 interface
 
 uses
+  Accctrl,
   Windows,
   Classes,
   SysUtils,
@@ -87,11 +88,11 @@ type
   end;
 
 function GetDebugManager(AOwner: HWND): TDebugManager;
+function SetObjectToLowIntegrity(hObject: THandle; _type: SE_OBJECT_TYPE = SE_KERNEL_OBJECT): BOOL;
 
 implementation
 
 uses
-  Accctrl,
   AclApi,
   ErrorControlledRegistry,
   RegistryKeys,

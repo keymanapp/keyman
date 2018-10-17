@@ -120,6 +120,9 @@
     <ClCompile Include="..\keyman32\serialkeyeventserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\keyman32\SharedBuffers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Keyman64.RC">
@@ -257,6 +260,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\keyman32\serialkeyeventserver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\SharedBuffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
