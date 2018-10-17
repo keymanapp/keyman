@@ -95,7 +95,7 @@
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
               </Component>
-
+              
               <Component>
                 <File Name="desktop_resources.dll" Source="..\..\desktop\inst\desktop_resources.dll" KeyPath="yes" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#desktop_resources.dll],0" />

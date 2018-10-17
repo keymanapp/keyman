@@ -163,7 +163,6 @@
         <DCCReference Include="..\..\global\delphi\ui\UfrmWebContainer.pas">
             <Form>frmWebContainer</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
         <DCCReference Include="util\UfrmDownloadProgress.pas">
             <Form>frmDownloadProgress</Form>
@@ -391,15 +390,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

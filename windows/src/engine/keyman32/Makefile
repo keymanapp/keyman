@@ -26,5 +26,7 @@ backup:
 
 install:
     $(COPY) $(PROGRAM)\engine\keyman32.dll "$(INSTALLPATH_KEYMANENGINE)\keyman32.dll"
+    echo You may want to manually tweak keyman-debug-etw.man and fill in $(INSTALLPATH_KEYMANENGINE)\keyman32.dll
+    echo and then run wevtutil im keyman-debug-etw.man to get the latest event tracing
 
 !include ..\..\Target.mak

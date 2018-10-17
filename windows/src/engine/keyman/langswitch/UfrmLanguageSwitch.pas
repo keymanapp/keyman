@@ -146,7 +146,7 @@ implementation
 uses
   System.Math,
 
-  DebugManager,
+  Keyman.System.DebugLogClient,
   KeymanControlMessages,
   keymanapi_TLB,
   UfrmKeyman7Main,
@@ -261,7 +261,7 @@ procedure TfrmLanguageSwitch.FormKeyDown(Sender: TObject; var Key: Word;
   end;
 
 begin
-  TDebugManager.WriteMessage('TfrmLanguageSwitch.FormKeyDown ENTER: %d [%d %d]', [Key, FSelectedLanguage, FSelectedKeyboard]);
+  TDebugLogClient.Instance.WriteMessage('TfrmLanguageSwitch.FormKeyDown ENTER: %d [%d %d]', [Key, FSelectedLanguage, FSelectedKeyboard]);
   try
     if FSelectedLanguage = -1 then FSelectedLanguage := 0;
     if FSelectedKeyboard = -1 then FSelectedKeyboard := 0;
@@ -362,7 +362,7 @@ begin
       EndCanvas;
     end;
   finally
-    TDebugManager.WriteMessage('TfrmLanguageSwitch.FormKeyDown EXIT: %d [%d %d]', [Key, FSelectedLanguage, FSelectedKeyboard]);
+    TDebugLogClient.Instance.WriteMessage('TfrmLanguageSwitch.FormKeyDown EXIT: %d [%d %d]', [Key, FSelectedLanguage, FSelectedKeyboard]);
   end;
   Key := 0;
 end;
@@ -389,7 +389,7 @@ begin
 
   DrawLayer;  // I2677
 
-  TDebugManager.WriteMessage('TfrmLanguageSwitch.FormShow EXIT: [%d %d]', [FSelectedLanguage, FSelectedKeyboard]);
+  TDebugLogClient.Instance.WriteMessage('TfrmLanguageSwitch.FormShow EXIT: [%d %d]', [FSelectedLanguage, FSelectedKeyboard]);
 end;
 
 procedure TfrmLanguageSwitch.GetColors(y: Integer; var cc: array of Cardinal);

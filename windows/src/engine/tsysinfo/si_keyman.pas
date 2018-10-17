@@ -123,6 +123,8 @@ begin
   AddFiles(regnode, CSIDL_PROGRAM_FILES_COMMON, SFolderKeymanRoot);
   regnode := xmlAddChild(subnode,'AppData-Files-Keyman');
   AddFiles(regnode, CSIDL_APPDATA, SFolderKeymanRoot);
+  regnode := xmlAddChild(subnode,'Local-AppData-Files-Keyman');
+  AddFiles(regnode, CSIDL_LOCAL_APPDATA, SFolderKeymanRoot);
   regnode := xmlAddChild(subnode,'Common-AppData-Files-Keyman');
   AddFiles(regnode, CSIDL_COMMON_APPDATA, SFolderKeymanRoot);
 

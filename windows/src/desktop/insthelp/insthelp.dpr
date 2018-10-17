@@ -7,7 +7,6 @@ uses
   klog in '..\..\global\delphi\general\klog.pas',
   utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',

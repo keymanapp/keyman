@@ -245,7 +245,7 @@ uses
 
 //  System.StrUtils,
 
-  DebugManager,
+  Keyman.System.DebugLogClient,
   glossary,
   InterfaceHotkeys,
   kmint,
@@ -361,18 +361,18 @@ var
   ppEnum: IEnumTfInputProcessorProfiles;
   FItem: TLangSwitchKeyboard;
 begin
-  TDebugManager.WriteMessage('[EnumTSFKeyboards] ENTER -------------', []);
+  TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards] ENTER -------------', []);
   Assert(Assigned(FProfileMgr));  // I2864   // I4220
 
   for I := 0 to FLanguages.Count - 1 do
   begin
-    TDebugManager.WriteMessage('[EnumTSFKeyboards] LangID=%x', [FLanguages[i].LangID]);
+    TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards] LangID=%x', [FLanguages[i].LangID]);
     FProfileMgr.EnumProfiles(FLanguages[i].LangID, ppEnum);
     hr := ppEnum.Next(1, profile, pcFetch);
     while hr = S_OK do
     begin
       try
-        TDebugManager.WriteMessage('[EnumTSFKeyboards] LangID=%x type=%d hkl=%x flags=%x', [FLanguages[i].LangID, profile.dwProfileType, profile.HKL, profile.dwFlags]);
+        TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards] LangID=%x type=%d hkl=%x flags=%x', [FLanguages[i].LangID, profile.dwProfileType, profile.HKL, profile.dwFlags]);
 
         if (profile.dwFlags and TF_IPP_FLAG_ENABLED) = 0 then   // I4207
         begin
@@ -382,12 +382,12 @@ begin
         if profile.dwProfileType = TF_PROFILETYPE_KEYBOARDLAYOUT then
         begin
           FItem := TLangSwitchKeyboard_WinKeyboard.Create(Self, FLanguages[i], profile.HKL); //, (profile.dwFlags and TF_IPP_FLAG_ACTIVE) = TF_IPP_FLAG_ACTIVE);   // I3961
-          TDebugManager.WriteMessage('[EnumTSFKeyboards]   Creating WinKeyboard hkl=%x, valid=%s', [profile.HKL, BoolToStr(FItem.Valid)]);   // I4648
+          TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards]   Creating WinKeyboard hkl=%x, valid=%s', [profile.HKL, BoolToStr(FItem.Valid)]);   // I4648
         end
         else if (profile.catid = GUID_TFCAT_TIP_KEYBOARD) then  // I2826   // I3933   // I4005
         begin
           FItem := TLangSwitchKeyboard_TIP.Create(Self, FLanguages[i], profile);   // I3961
-          TDebugManager.WriteMessage('[EnumTSFKeyboards]   Creating TSF TIP guid=%s keymanid=%d, valid=%s', [GuidToString(profile.guidProfile), FItem.KeymanID, BoolToStr(FItem.Valid)]);   // I4648
+          TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards]   Creating TSF TIP guid=%s keymanid=%d, valid=%s', [GuidToString(profile.guidProfile), FItem.KeymanID, BoolToStr(FItem.Valid)]);   // I4648
         end
         else
         begin
@@ -402,7 +402,7 @@ begin
       end;
     end;
   end;
-  TDebugManager.WriteMessage('[EnumTSFKeyboards] EXIT ---------------', []);
+  TDebugLogClient.Instance.WriteMessage('[EnumTSFKeyboards] EXIT ---------------', []);
 end;
 
 procedure TLangSwitchManager.Refresh;   // I3933
@@ -682,7 +682,7 @@ procedure TLangSwitchKeyboard_WinKeyboard.Activate(hwnd: THandle);
 begin
 //  Assert(FValid);   // I4715
   FManager.SetActiveItem(Self);   // I3933
-  TDebugManager.WriteMessage('TLangSwitchKeyboard_WinKeyboard.Activate hwnd=%x keyboard=%x', [hwnd, FHKL]);   // I4674
+  TDebugLogClient.Instance.WriteMessage('TLangSwitchKeyboard_WinKeyboard.Activate hwnd=%x keyboard=%x', [hwnd, FHKL]);   // I4674
   PostMessage(hwnd, wm_keyman_control_internal, KMCI_SELECTKEYBOARD, FHKL);   // I3933
 end;
 
@@ -773,7 +773,7 @@ begin
   FManager.SetActiveItem(Self);   // I3933
   s := IntToStr(FProfile.langid) + '|' + GUIDToString(TGUID(FProfile.clsid)) + '|' + GUIDToString(TGUID(FProfile.guidProfile));
   FAtom := GlobalAddAtom(PChar(s));
-  TDebugManager.WriteMessage('TLangSwitchKeyboard_TIP.Activate hwnd=%x keyboard=%s', [hwnd, s]);   // I4674
+  TDebugLogClient.Instance.WriteMessage('TLangSwitchKeyboard_TIP.Activate hwnd=%x keyboard=%s', [hwnd, s]);   // I4674
   PostMessage(hwnd, wm_keyman_control_internal, KMCI_SELECTKEYBOARD_TSF, FAtom);   // I3933
 end;
 

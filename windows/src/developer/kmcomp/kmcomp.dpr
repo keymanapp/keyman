@@ -31,7 +31,6 @@ uses
   utilkeyboard in '..\..\global\delphi\general\utilkeyboard.pas',
   unicode in '..\..\global\delphi\general\unicode.pas',
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   UfrmTike in '..\TIKE\main\UfrmTike.pas' {TikeForm: TTntForm},
   CompilePackageInstaller in '..\..\global\delphi\general\CompilePackageInstaller.pas',

@@ -93,7 +93,6 @@
         <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="TntDialogHelp.pas"/>
         <DCCReference Include="httpuploader_messageprocessor_windows.pas"/>
         <DCCReference Include="SetupForm.pas"/>

@@ -30,7 +30,7 @@ type
 implementation
 
 uses
-  DebugManager,
+  Keyman.System.DebugLogClient,
   UfrmKeyman7Main;
 
 const
@@ -78,7 +78,7 @@ begin
     // ATOM construction copied from TLangSwitchKeyboard
     s := IntToStr(TIP.Profile.langid) + '|' + GUIDToString(TGUID(TIP.Profile.clsid)) + '|' + GUIDToString(TGUID(TIP.Profile.guidProfile));
 
-    TDebugManager.WriteMessage('TGlobalKeyboardChangeManager.PostChange: '+s, []);
+    TDebugLogClient.Instance.WriteMessage('TGlobalKeyboardChangeManager.PostChange: '+s, []);
 
     if s <> FLastKeyboard then
     begin
@@ -92,7 +92,7 @@ begin
     WinKB := Keyboard as TLangSwitchKeyboard_WinKeyboard;
     s := IntToStr(WinKB.HKL);
 
-    TDebugManager.WriteMessage('TGlobalKeyboardChangeManager.PostChange: '+s, []);
+    TDebugLogClient.Instance.WriteMessage('TGlobalKeyboardChangeManager.PostChange: '+s, []);
 
     if s <> FLastKeyboard then
     begin
