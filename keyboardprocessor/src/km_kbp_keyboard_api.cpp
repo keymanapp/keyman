@@ -8,11 +8,11 @@
 #include <vector>
 
 #include <keyboardprocessor.h>
+#include <json.hpp>
 
 #include "keyboard.hpp"
+#include "option.hpp"
 
-
-struct km_kbp_keyboard : public km::kbp::keyboard {};
 
 
 km_kbp_status km_kbp_keyboard_load(char const *kb_path,
@@ -39,4 +39,16 @@ km_kbp_keyboard_attrs const *
 km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard)
 {
   return keyboard;
+}
+
+json & operator << (json & j, km::kbp::keyboard const & kb)
+{
+  j << json::object
+      << "id" << kb.id
+      << "folder" << kb.folder_path
+      << "version" << kb.version_string
+      << "options" << kb.default_options->target
+      << "rules" << json::array << json::close;
+
+  return j << json::close;
 }

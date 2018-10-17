@@ -1,6 +1,11 @@
+#pragma once
+
 #include <unordered_map>
 
 #include <keyboardprocessor.h>
+
+// Forward declarations
+class json;
 
 namespace km {
 namespace kbp
@@ -12,22 +17,36 @@ namespace kbp
   public:
     option_set(km_kbp_option_scope s) : _scope(s) {}
 
-    option_set(km_kbp_option_scope s, km_kbp_option const * opt);
-
-    void update(km_kbp_option const * opt);
-
     auto scope() const noexcept { return _scope; }
   };
 
-  option_set::option_set(km_kbp_option_scope s, km_kbp_option const * opt)
-  : option_set(s)
-  {
-    update(opt);
+}
+}
+
+json & operator << (json &, km::kbp::option_set const &);
+
+
+// Adaptor between internal km::kbp::option_set object and API definitiion.
+struct km_kbp_option_set
+{
+  km::kbp::option_set   & target;
+
+  km_kbp_option_set(km::kbp::option_set & tgt) : target(tgt) {}
+
+  km_kbp_option const * export_option(char const * k, char const * v) const {
+    _last_lookup.key = k;
+    _last_lookup.value = v;
+    return &_last_lookup;
   }
 
-  void option_set::update(km_kbp_option const * opt)
-  {
-    while(opt->key) emplace(opt->key, opt->value);
-  }
-}
+  void update(km_kbp_option const * opt);
+
+private:
+  km_kbp_option mutable  _last_lookup;
+};
+
+inline
+void km_kbp_option_set::update(km_kbp_option const * opt)
+{
+  for (;opt->key; ++opt)  target.emplace(opt->key, opt->value);
 }

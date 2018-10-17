@@ -1,3 +1,5 @@
+#pragma once
+
 #include <experimental/filesystem>
 #include <string>
 
@@ -6,6 +8,9 @@
 namespace std {
   using namespace std::experimental;
 }
+
+// Forward declartions
+class json;
 
 namespace km {
 namespace kbp
@@ -21,6 +26,7 @@ namespace kbp
     keyboard(std::filesystem::path const &);
   };
 
+  inline
   keyboard::keyboard(std::filesystem::path const & path)
   : _keyboard_id(path.stem()),
     _version_string("3.145"),
@@ -30,5 +36,10 @@ namespace kbp
     id = _keyboard_id.c_str();
     folder_path = _folder_path.c_str();
   }
+
 }
 }
+
+struct km_kbp_keyboard : public km::kbp::keyboard {};
+
+json & operator << (json &, km::kbp::keyboard const &);

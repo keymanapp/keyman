@@ -6,9 +6,9 @@
 #include <keyboardprocessor.h>
 
 #include "context.hpp"
+#include "json.hpp"
 #include "utfcodec.hpp"
 
-struct km_kbp_context : public km::kbp::context {};
 
 km_kbp_status
 km_kbp_context_items_from_utf16(km_kbp_cp const *text,
@@ -121,4 +121,33 @@ void km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
 
   while(num-- && ci->type != KM_KBP_CT_END)
     ctxt->emplace_front(*ci++);
+}
+
+
+json & operator << (json & j, km::kbp::context const & ctxt) {
+  j << json::array;
+  for (auto & i: ctxt)  j << i;
+  return j << json::close;
+}
+
+json & operator << (json & j, km_kbp_context_item const & i)
+{
+  utf8::codeunit_t cps[5] = {0,};
+  int8_t l;
+
+  switch (i.type)
+  {
+    case KM_KBP_CT_CHAR:
+      utf8::codec::put(cps, i.character, l);
+      j << &cps[0];
+      break;
+    case KM_KBP_CT_MARKER:
+      j << i.marker;
+      break;
+    default:
+      j << json::flat << json::object
+          << "invalid type" << i.type
+          << json::close;
+  }
+  return j;
 }

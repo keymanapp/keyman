@@ -11,38 +11,20 @@
 #include "json.hpp"
 
 
-struct km_kbp_option_set : public km::kbp::option_set
-{
-  km_kbp_option_set(km_kbp_option_scope s)
-  : option_set(s),
-    _last_lookup {s, nullptr, nullptr}
-  {}
-
-  km_kbp_option const * cache_lookup(char const * k, char const * v) const {
-    _last_lookup.key = k;
-    _last_lookup.value = v;
-    return &_last_lookup;
-  }
-
-private:
-  km_kbp_option mutable _last_lookup;
-};
-
-
 size_t km_kbp_options_set_size(km_kbp_option_set const *opts)
 {
-  return opts->size();
+  return opts->target.size();
 }
 
 
 km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const * opts,
                                                const char *key)
 {
-  auto i = opts->find(key);
-  if (i == opts->end())
+  auto i = opts->target.find(key);
+  if (i == opts->target.end())
     return nullptr;
 
-  return opts->cache_lookup(i->first.c_str(), i->second.c_str());
+  return opts->export_option(i->first.c_str(), i->second.c_str());
 }
 
 
@@ -57,23 +39,20 @@ km_kbp_status km_kbp_options_set_update(km_kbp_option_set *opts, km_kbp_option c
   return KM_KBP_STATUS_OK;
 }
 
-// This simple function doesn't need to use the json pretty printer for such a
-//  simple list of key:value pairs but it's a good introduction to it.
+// This function doesn't need to use the json pretty printer for such a simple
+//  list of key:value pairs but it's a good introduction to it.
 km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *opts, char *buf, size_t *space)
 {
+  assert(opts);
+  if (!opts)
+    return KM_KBP_STATUS_INVALID_ARGUMENT;
+
   std::stringstream _buf;
   json jo(_buf);
 
   try
   {
-    // Pretty print the document.
-    jo << json::array;
-    for (auto & opt: *opts)
-      jo << json::flat << json::object
-        << opt.first
-        << opt.second
-        << json::close;
-    jo << json::close;
+    jo << opts->target;
   }
   catch (std::bad_alloc)
   {
@@ -92,4 +71,26 @@ km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *opts, char *bu
   // Return space needed/used.
   *space = doc.size();
   return KM_KBP_STATUS_OK;
+}
+
+namespace
+{
+  constexpr char const * const scope_name_lut[] = {
+    "unknown",
+    "enviroment",
+    "keyboard"
+  };
+}
+
+json & operator << (json &j, km::kbp::option_set const &opts)
+{
+  j << json::object
+    << "scope" << scope_name_lut[opts.scope()]
+    << "options" << json::object;
+  for (auto & opt: opts)
+    j << opt.first << opt.second;
+  j << json::close;
+  j << json::close;
+
+  return j;
 }
