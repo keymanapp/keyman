@@ -7,12 +7,12 @@ enum km_kbp_modifier_state {
   KM_KBP_MODIFIER_CTRL        = 1 << 5,
   KM_KBP_MODIFIER_ALT         = 1 << 6,
   KM_KBP_MODIFIER_CAPS        = 1 << 7,
-  KM_KBP_MODIFLER_NOCAPS      = 1 << 8,
+  KM_KBP_MODIFIER_NOCAPS      = 1 << 8,
   KM_KBP_MODIFIER_NUMLOCK     = 1 << 9,
   KM_KBP_MODIFIER_NONUMLOCK   = 1 << 10,
-  KM_KBP_MODIFIER_SCROLLOCK   = 1<< 1,
-  KM_KBP_MODIFIER_NOSCROLLOCK = 1<< 1,
-  KM_KBP_MODIFIER_VIRTUALKEY  = 1<< 1,
+  KM_KBP_MODIFIER_SCROLLOCK   = 1 << 11,
+  KM_KBP_MODIFIER_NOSCROLLOCK = 1 << 12,
+  KM_KBP_MODIFIER_VIRTUALKEY  = 1 << 13,
 };
 
 enum km_kbp_modifier_mask {
