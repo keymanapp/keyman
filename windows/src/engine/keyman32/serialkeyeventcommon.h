@@ -2,7 +2,15 @@
 
 #ifdef USE_SERIALKEYEVENTSERVER
 
+// We permit up to 256 input events in a single transaction
+// This allows roughly 120 characters to be output from a single
+// Keyman rule, less a bit of space for modifier shenanigans
 #define MAX_KEYEVENT_INPUTS 256
+
+// We need to reserve space for up to 6 modifier key events + 2 prefix key events
+// at the end of the buffer in order to make sure that we can reset the modifier
+// state at the end of the output. This value depends on keybd_shift behaviour
+#define MAX_KEYEVENT_INPUTS_MODIFIERS 8 
 
 #define KEYEVENT_WINDOW_CLASS "Keyman_KeyEventConsumerWnd"
 

@@ -48,8 +48,10 @@ private:
   HANDLE m_hThread, m_hThreadExitEvent;
 
   // Thread Local data
+  BYTE m_ModifierKeyboardState[256];
   HANDLE m_hKeyEvent, m_hKeyMutex, m_hMMF;
   HWND m_hwnd;
+  int m_nInputs;
   PINPUT m_pInputs;
   SerialKeyEventSharedData *m_pSharedData;
 
@@ -226,6 +228,8 @@ private:
   BOOL InitThread() {
     m_pInputs = new INPUT[MAX_KEYEVENT_INPUTS];
 
+    GetKeyboardState(m_ModifierKeyboardState);
+
     WNDCLASS wndClass = { 0 };
     wndClass.lpfnWndProc = ServerWndProc;
     wndClass.cbClsExtra = sizeof(this);
@@ -325,15 +329,7 @@ private:
     //
     // Copy the shared data from the buffer
     //
-    DWORD nInputs = m_pSharedData->nInputs;
-    for (DWORD i = 0; i < nInputs; i++) {
-      m_pInputs[i].type = INPUT_KEYBOARD;
-      m_pInputs[i].ki.wVk = m_pSharedData->inputs[i].wVk;
-      m_pInputs[i].ki.wScan = m_pSharedData->inputs[i].wScan;
-      m_pInputs[i].ki.dwFlags = m_pSharedData->inputs[i].dwFlags;
-      m_pInputs[i].ki.time = m_pSharedData->inputs[i].time;
-      m_pInputs[i].ki.dwExtraInfo = (ULONG_PTR) m_pSharedData->inputs[i].extraInfo;
-    }
+    PrepareInjectedInput();
 
     //
     // Reset the shared buffer and ensure the data is written out of cache for
@@ -352,11 +348,34 @@ private:
     //
     // Send the input to the system input queue
     //
-    if (SendInput(nInputs, m_pInputs, sizeof(INPUT)) == 0) {
+    if (SendInput(m_nInputs, m_pInputs, sizeof(INPUT)) == 0) {
       DebugLastError("SendInput");
     }
+    m_nInputs = 0;
 
     return TRUE;
+  }
+
+  /**
+    Add modifier state adjustment events and then copy the new input 
+    events from the shared buffer
+  */
+  void PrepareInjectedInput() {
+    DWORD nInputs = min(m_pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
+
+    m_nInputs = 0;
+    keybd_shift(m_pInputs, &m_nInputs, FALSE, m_ModifierKeyboardState);
+
+    for (DWORD i = 0; i < nInputs && m_nInputs < MAX_KEYEVENT_INPUTS - MAX_KEYEVENT_INPUTS_MODIFIERS; i++, m_nInputs++) {
+      m_pInputs[m_nInputs].type = INPUT_KEYBOARD;
+      m_pInputs[m_nInputs].ki.wVk = m_pSharedData->inputs[i].wVk;
+      m_pInputs[m_nInputs].ki.wScan = m_pSharedData->inputs[i].wScan;
+      m_pInputs[m_nInputs].ki.dwFlags = m_pSharedData->inputs[i].dwFlags;
+      m_pInputs[m_nInputs].ki.time = m_pSharedData->inputs[i].time;
+      m_pInputs[m_nInputs].ki.dwExtraInfo = (ULONG_PTR)m_pSharedData->inputs[i].extraInfo;
+    }
+
+    keybd_shift(m_pInputs, &m_nInputs, TRUE, m_ModifierKeyboardState);
   }
 
   /**
@@ -407,9 +426,52 @@ private:
       input.ki.dwFlags = lParam & 0xFFFF;
 
       SendInput(1, &input, sizeof(INPUT));
+
+      UpdateLocalModifierState(
+        (BYTE) input.ki.wVk, 
+        input.ki.dwFlags & KEYEVENTF_EXTENDEDKEY ? TRUE : FALSE,
+        (BYTE) input.ki.wScan,
+        input.ki.dwFlags & KEYEVENTF_KEYUP ? TRUE : FALSE);
     }
 
     return DefWindowProc(hwnd, msg, wParam, lParam);
+  }
+
+  /**
+   When a physical key event is received by the serializer, we know that this will 
+   reflect the key state that the app sees at the time that the input is sent. 
+   We maintain a local modifier state here rather than using GetKeyState because that
+   ensures that we are keeping the keyboard state consistent with our version of 
+   reality.
+  */
+  void UpdateLocalModifierState(BYTE bVk, BOOL fIsExtendedKey, BYTE bScan, BOOL fIsUp) {
+    switch (bVk) {
+    case VK_CONTROL:
+      // Left and right control are distinguished by a 0xE0 prefix byte
+      bVk = fIsExtendedKey ? VK_RCONTROL : VK_LCONTROL;
+      break;
+    case VK_MENU:
+      // Left and right alt are distinguished by a 0xE0 prefix byte
+      bVk = fIsExtendedKey ? VK_RMENU : VK_LMENU;
+      break;
+    case VK_SHIFT:
+      // Left and right shift are distinguished by scan code alone
+      bVk = bScan == 0x36 ? VK_RSHIFT : VK_LSHIFT;
+      break;
+    case VK_LCONTROL:
+    case VK_RCONTROL:
+    case VK_LSHIFT:
+    case VK_RSHIFT:
+    case VK_LMENU:
+    case VK_RMENU:
+      // These are technically not needed but perhaps some app will send them through SendInput
+      // and we'll have to deal with them?
+      break;
+    default:
+      return;
+    }
+
+    m_ModifierKeyboardState[bVk] = fIsUp ? 0 : 0x80;
   }
 };
 

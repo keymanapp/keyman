@@ -355,7 +355,7 @@ extern "C" PWSTR  _declspec(dllexport) WINAPI GetSystemStore(LPKEYBOARD kb, DWOR
 
 DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 
-void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd);
+void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 
