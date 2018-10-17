@@ -13,4 +13,5 @@ configure_file(
 inc = include_directories('.')
 
 install_headers(join_paths(meson.current_build_dir(), 'keyboardprocessor.h'),
+                'keyboardprocessor_vkeys.h',
                 subdir: 'keyman')
