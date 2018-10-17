@@ -5,7 +5,7 @@
 namespace
 {
 
-char const table[2][256][4] = {
+constexpr char const table[2][256][4] = {
   {
     "","","","","","","","","","\t","","","","\015","","",
     "","","","","","","","","","","","\033","","","","",
@@ -43,6 +43,16 @@ char const table[2][256][4] = {
     "","","","","","","","","","","","","","","","",
   }
 };
+
+constexpr km_kbp_attr const engine_attrs = {
+  256,
+  KM_KBP_LIB_CURRENT,
+  KM_KBP_LIB_AGE,
+  KM_KBP_LIB_REVISION,
+  KM_KBP_TECH_UNSPECIFIED,
+  "SIL International"
+};
+
 }
 
 km_kbp_status km_kbp_process_event(km_kbp_state *state,
@@ -92,4 +102,10 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
   }
 
   return KM_KBP_STATUS_OK;
+}
+
+
+km_kbp_attr const * km_kbp_get_engine_attrs()
+{
+  return &engine_attrs;
 }
