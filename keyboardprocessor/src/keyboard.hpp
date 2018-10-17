@@ -36,6 +36,7 @@ namespace kbp
     id = _keyboard_id.c_str();
     folder_path = _folder_path.c_str();
   }
+
 }
 }
 

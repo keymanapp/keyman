@@ -31,7 +31,7 @@ struct km_kbp_option_set
 {
   km::kbp::option_set   & target;
 
-  km_kbp_option_set(km::kbp::option_set & target) : target(target) {}
+  km_kbp_option_set(km::kbp::option_set & tgt) : target(tgt) {}
 
   km_kbp_option const * export_option(char const * k, char const * v) const {
     _last_lookup.key = k;

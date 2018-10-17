@@ -16,13 +16,13 @@ using action = km_kbp_action_item;
 class state
 {
 protected:
-    option_set const  _env;
-    option_set        _run;
-    keyboard const &  _kb;
-    context           _ctxt;
+    option_set const      _env;
+    option_set            _run;
+    kbp::keyboard const & _kb;
+    kbp::context          _ctxt;
 
 public:
-    state(keyboard const & kb, option_set const & opts);
+    state(kbp::keyboard const & kb, option_set const & opts);
     state(state const &) = default;
     state(state const &&) = delete;
 
@@ -32,7 +32,7 @@ public:
     option_set &          options() noexcept        { return _run; }
     option_set const &    options() const noexcept  { return _run; }
 
-    kbp::keyboard const & keyboard() const noexcept { return _kb; }
+    kbp::keyboard const &  keyboard() const noexcept      { return _kb; }
 
     option_set const &    environment() const noexcept { return _env; }
 };
