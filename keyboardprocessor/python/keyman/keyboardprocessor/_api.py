@@ -42,10 +42,10 @@ def __map_oserror(code: Status) -> str:
 
 __exceptions_map = [
     (None, '{0!s}: Success'),
-    (MemoryError, '{0!s}: memory allocation failed in: {1!s}'),
-    (RuntimeError, '{0!s}: IO Error: {2!s}'),
-    (ValueError, '{0!s}: Invalid argument passed to: {1!s}'),
-    (LookupError, '{0!s}: Item does not exist in: {2!s}'),
+    (MemoryError, '{0!s}: memory allocation failed.'),
+    (RuntimeError, '{0!s}: IO Error: {1!s}'),
+    (ValueError, '{0!s}: Invalid argument passed.'),
+    (LookupError, '{0!s}: Item does not exist in: {1!s}'),
     (OSError, __map_oserror)]
 
 
@@ -53,7 +53,7 @@ def status_code(code: Status, func, args):
     if code == StatusCode.OK: return args
     exc, msg = __exceptions_map[code]
     if callable(msg): msg = msg(code)
-    raise exc(msg.format(libkbp._name, func._name_, *args))
+    raise exc(msg.format(libkbp._name, *args))
 
 
 def null_check(code, func, args):
