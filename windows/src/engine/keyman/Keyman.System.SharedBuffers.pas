@@ -41,57 +41,9 @@ type
 implementation
 
 uses
-  AclApi,
-  Accctrl,
-  System.SysUtils;
+  System.SysUtils,
 
-const LOW_INTEGRITY_SDDL_SACL_W: WideString = 'S:(ML;;NW;;;LW)';
-const LABEL_SECURITY_INFORMATION = $00000010;
-const SDDL_REVISION_1 = 1;
-
-function ConvertStringSecurityDescriptorToSecurityDescriptor(
-    {IN} StringSecurityDescriptor: LPCWSTR;
-    {IN} StringSDRevision: DWORD;
-    {OUT} var SecurityDescriptor: PSECURITY_DESCRIPTOR;
-    {OUT} SecurityDescriptorSize: PULONG {OPTIONAL}
-    ): BOOL; stdcall; external 'advapi32.dll' name 'ConvertStringSecurityDescriptorToSecurityDescriptorW';
-
-function SetObjectToLowIntegrity(hObject: THandle; _type: SE_OBJECT_TYPE = SE_KERNEL_OBJECT): BOOL;
-var
-  dwErr: DWORD;
-  pSD: PSECURITY_DESCRIPTOR;
-  pSacl: PACL;
-  fSaclPresent: BOOL;
-  fSaclDefaulted: BOOL;
-begin
-  //BOOL bRet = FALSE;
-  //dwErr := ERROR_SUCCESS;
-  Result := False;
-
-  pSD := nil;
-  pSacl := nil;
-  fSaclPresent := FALSE;
-  fSaclDefaulted := FALSE;
-
-  if LOBYTE(LOWORD(GetVersion())) >= 6 then
-  begin
-    if ConvertStringSecurityDescriptorToSecurityDescriptor(PWideChar(LOW_INTEGRITY_SDDL_SACL_W), SDDL_REVISION_1, pSD, nil) then
-    begin
-      if GetSecurityDescriptorSacl(pSD, fSaclPresent, pSacl, fSaclDefaulted) then
-      begin
-        dwErr := SetSecurityInfo(
-                hObject, _type, LABEL_SECURITY_INFORMATION,
-                nil, nil, nil, pSacl);
-        Result := ERROR_SUCCESS = dwErr;
-      end;
-    end;
-
-    LocalFree(Cardinal(pSD));
-  end
-  else
-    Result := True;
-end;
-
+  Keyman.System.Security;
 
 { TSharedBufferManager }
 
@@ -104,7 +56,9 @@ begin
     RaiseLastOSError;
 
   SetObjectToLowIntegrity(hMMF);
-//  TODO:     not GrantPermissionToAllApplicationPackages(m_hMMF, FILE_MAP_ALL_ACCESS) then
+  // Most apps only need read access. TODO: reduce general access permission to READ for other processes;
+  // but doing so for application packages is a good start
+  GrantPermissionToAllApplicationPackages(hMMF, FILE_MAP_READ);
 
   pSharedData := PSharedBuffer(MapViewOfFile(hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(TSharedBuffer)));
   if not Assigned(pSharedData) then

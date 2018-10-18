@@ -11,13 +11,13 @@ private:
   
 public:
   SharedBufferManager() {
-    m_hMMF = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GLOBAL_SHAREDBUFFER_FILE_MAPPING_NAME);
+    m_hMMF = OpenFileMapping(FILE_MAP_READ, FALSE, GLOBAL_SHAREDBUFFER_FILE_MAPPING_NAME);
     if (!m_hMMF) {
       DebugLastError("OpenFileMapping");
       return;
     }
 
-    m_pSharedData = (SharedBuffer *)MapViewOfFile(m_hMMF, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(SharedBuffer));
+    m_pSharedData = (SharedBuffer *)MapViewOfFile(m_hMMF, FILE_MAP_READ, 0, 0, sizeof(SharedBuffer));
     if (!m_pSharedData) {
       DebugLastError("MapViewOfFile");
       return;
