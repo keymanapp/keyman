@@ -90,22 +90,22 @@ class ContextType(IntEnum):
 
 class ContextItem(Structure):
     class __ContextValue(Union):
-        _fields_ = (('character', c_char_p),
-                    ('marker',    c_char_p))
+        _fields_ = (('character', USV),
+                    ('marker',    c_uint32))
     _anonymous_ = ('value',)
     _fields_ = (('type',  c_uint8),
                 ('value', __ContextValue))
 
 
 __method('context_items', 'from_utf16', Status,
-         (POINTER(CP), Dir.IN, 'text'),
-         (POINTER(ContextItem), Dir.OUT, 'context_items'),
+         (c_void_p, Dir.IN, 'text'),
+         (POINTER(POINTER(ContextItem)), Dir.OUT, 'context_items'),
          errcheck=status_code)
 
 __method('context_items', 'to_utf16', c_size_t,
          (POINTER(ContextItem), Dir.IN, 'context_items'),
-         (POINTER(CP), Dir.OUT | Dir.OPT, 'buffer'),
-         (c_size_t, Dir.OPT, 'buffer_size'))
+         (c_void_p, Dir.IN | Dir.OPT, 'buffer'),
+         (c_size_t, Dir.IN | Dir.OPT, 'buffer_size'))
 
 __method('context_items', 'dispose', None,
          (POINTER(ContextItem), Dir.IN, 'context_items'))
