@@ -446,10 +446,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 		return FALSE;	/* Failed to verify certificate */ 
 	}
 
-#ifdef USE_SERIALKEYEVENTSERVER
 #ifndef _WIN64
   ISerialKeyEventServer::Startup();
-#endif
 #endif
 
   InitHooks();
@@ -493,10 +491,8 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
     return FALSE;
   }
 
-#ifdef USE_SERIALKEYEVENTSERVER
 #ifndef _WIN64
   ISerialKeyEventServer::Shutdown();
-#endif
 #endif
 
   *Globals::InitialisingThread() = 0;

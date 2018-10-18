@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef USE_SERIALKEYEVENTSERVER
-
 #include "serialkeyeventcommon.h"
 
 class ISerialKeyEventClient {
@@ -18,5 +16,3 @@ public:
   static void Startup();
   static void Shutdown();
 };
-
-#endif

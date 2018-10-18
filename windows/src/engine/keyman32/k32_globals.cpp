@@ -132,33 +132,23 @@ PKEYMAN64THREADDATA Globals_InitThread()
   }
   LeaveCriticalSection(&csGlobals);
 
-#ifdef USE_SERIALKEYEVENTSERVER
   ISerialKeyEventClient::Startup();
-#endif
+
   return lpvData;
 }
-
-#ifdef DEBUG_PROCMON_LOGGING
-extern BOOL CloseProcMonHandle();
-#endif
 
 void Globals_UninitThread()
 {
   if(!Globals_ProcessInitialised()) return;
 
   CloseTSF();   // I3933
-#ifdef DEBUG_PROCMON_LOGGING
-  CloseProcMonHandle();
-#endif
 
-#ifdef USE_SERIALKEYEVENTSERVER
   ISerialKeyEventClient::Startup();
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td) {
     delete _td->pSerialKeyEventClient;
   }
   CloseThreadSharedBufferManager();
-#endif
 
   EnterCriticalSection(&csGlobals);
   if(dwTlsIndex != TLS_OUT_OF_INDEXES)

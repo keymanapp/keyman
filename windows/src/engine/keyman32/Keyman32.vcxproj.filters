@@ -243,6 +243,9 @@
     <ClInclude Include="SharedBuffers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="serialkeyeventserver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="keyman-debug-etw.man" />

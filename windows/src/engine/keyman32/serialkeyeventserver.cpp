@@ -2,8 +2,6 @@
 #include "serialkeyeventserver.h"
 #include "security.h"
 
-#ifdef USE_SERIALKEYEVENTSERVER
-
 #ifndef _WIN64
 
 /*
@@ -486,5 +484,3 @@ void ISerialKeyEventServer::Shutdown() {
 }
 
 #endif // !_WIN64
-
-#endif

@@ -397,6 +397,7 @@
     <ClInclude Include="security.h" />
     <ClInclude Include="serialkeyeventclient.h" />
     <ClInclude Include="serialkeyeventcommon.h" />
+    <ClInclude Include="serialkeyeventserver.h" />
     <ClInclude Include="SharedBuffers.h" />
     <ClInclude Include="syskbd.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />

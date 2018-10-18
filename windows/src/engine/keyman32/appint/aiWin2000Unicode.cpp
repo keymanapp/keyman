@@ -301,13 +301,7 @@ BOOL AIWin2000Unicode::PostKeys()
   SetLastError(0);
 
   if(i > 0) {   // I4452
-#ifdef USE_SERIALKEYEVENTSERVER
     _td->pSerialKeyEventClient->SignalServer(pInputs, i);
-#else
-    if(SendInput(i, pInputs, sizeof(INPUT)) == 0) {
-      DebugLastError("SendInput");
-    }
-#endif
   }
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input finished");

@@ -58,10 +58,8 @@
 #define GLOBAL_MsgStackSize 80
 #define GLOBAL_MaxKeyboards 32
 
-#ifdef USE_SERIALKEYEVENTSERVER
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
-#endif
 
 class Globals
 {
@@ -245,15 +243,11 @@ typedef struct tagKEYMAN64THREADDATA
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
 
-#ifdef USE_SERIALKEYEVENTSERVER
-  ISerialKeyEventClient *pSerialKeyEventClient;
-#endif
+  /* Serialized key events */
 
-#ifdef DEBUG_PROCMON_LOGGING
-  HANDLE hProcMon;
-#endif
-  BOOL debug_Error;
+  ISerialKeyEventClient *pSerialKeyEventClient;
   ISharedBufferManager *pSharedBufferManager;
+
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT 

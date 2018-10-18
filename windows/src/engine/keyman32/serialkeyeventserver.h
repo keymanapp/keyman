@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef USE_SERIALKEYEVENTSERVER
-
 #include "serialkeyeventcommon.h"
 
 #ifndef _WIN64
@@ -21,7 +19,5 @@ public:
   static void Startup();
   static void Shutdown();
 };
-
-#endif
 
 #endif

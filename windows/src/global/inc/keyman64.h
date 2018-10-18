@@ -72,10 +72,6 @@
 #define STRICT
 #endif
 
-#ifndef USE_SERIALKEYEVENTSERVER
-#define USE_SERIALKEYEVENTSERVER
-#endif
-
 #include <windows.h>
 #include <assert.h>
 #include <msctf.h>

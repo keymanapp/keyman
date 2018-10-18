@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef USE_SERIALKEYEVENTSERVER
-
 // We permit up to 256 input events in a single transaction
 // This allows roughly 120 characters to be output from a single
 // Keyman rule, less a bit of space for modifier shenanigans
@@ -36,5 +34,3 @@ struct SerialKeyEventSharedData {
   DWORD nInputs;
   CSDINPUT inputs[MAX_KEYEVENT_INPUTS];
 };
-
-#endif

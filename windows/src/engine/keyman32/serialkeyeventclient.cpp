@@ -2,8 +2,6 @@
 #include "serialkeyeventclient.h"
 #include "security.h"
 
-#ifdef USE_SERIALKEYEVENTSERVER
-
 //
 // Client application functionality
 //
@@ -164,5 +162,3 @@ void ISerialKeyEventClient::Shutdown() {
     _td->pSerialKeyEventClient = NULL;
   }
 }
-
-#endif
