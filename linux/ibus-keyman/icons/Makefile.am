@@ -20,13 +20,13 @@
 # Boston, MA  02111-1307  USA
 
 icons_DATA = \
-	ibus-kmfl.svg \
+	ibus-keyman.svg \
 	default.png \
 	$(NULL)
 
 iconsdir = $(datadir)/keyman/icons
 
 EXTRA_DIST = \
-	ibus-kmfl.svg \
+	ibus-keyman.svg \
 	default.png \
 	$(NULL)
