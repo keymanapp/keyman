@@ -54,6 +54,7 @@ All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
 */
 #include <stdint.h>
 #include <stdlib.h>
+#include <keyboardprocessor_bits.h>
 #include <keyboardprocessor_vkeys.h>
 
 #define KM_KBP_LIB_CURRENT  @lib_curr@
@@ -161,6 +162,7 @@ decoded.
 
 ```c
 */
+KMN_API
 km_kbp_status
 km_kbp_context_items_from_utf16(km_kbp_cp const *text,
                                 km_kbp_context_item **out_ptr);
@@ -183,6 +185,7 @@ Number of code points needed.
 
 ```c
 */
+KMN_API
 size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
                                      km_kbp_cp *buf, size_t buf_size);
 
@@ -198,6 +201,7 @@ returned by `km_kbp_context_items_from_utf16`.
 
 ```c
 */
+KMN_API
 void km_kbp_context_items_dispose(km_kbp_context_item *);
 
 /*
@@ -217,6 +221,7 @@ the context internally.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_context_set(km_kbp_context *, km_kbp_context_item const *);
 
 /*
@@ -233,6 +238,7 @@ context's current items. It will be terminated with an item of type
 
 ```c
 */
+KMN_API
 km_kbp_context_item const * km_kbp_context_get(km_kbp_context *);
 
 /*
@@ -245,6 +251,7 @@ Clear the context.
 
 ```c
 */
+KMN_API
 void km_kbp_context_clear(km_kbp_context *);
 
 /*
@@ -259,6 +266,7 @@ The number of items in the context
 
 ```c
 */
+KMN_API
 size_t km_kbp_context_length(km_kbp_context *);
 
 /*
@@ -278,6 +286,7 @@ the context internally.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_context_append(km_kbp_context *,
                                     km_kbp_context_item const *);
 
@@ -296,6 +305,7 @@ add upto the same number of the supplied items to the front of the context.
 
 ```c
 */
+KMN_API
 void km_kbp_context_shrink(km_kbp_context *, size_t num,
                            km_kbp_context_item const* prefix);
 
@@ -384,6 +394,7 @@ The number of items in the supplied `km_kbp_option_set`
 
 ```c
 */
+KMN_API
 size_t km_kbp_options_set_size(km_kbp_option_set const *opts);
 
 /*
@@ -399,6 +410,7 @@ A pointer the `km_kbp_option` or `0` if not present.
 
 ```c
 */
+KMN_API
 km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const *opts,
                                                const char *key);
 
@@ -416,6 +428,7 @@ terminated with `KM_KBP_OPTIONS_END`.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_options_set_update(km_kbp_option_set * opts,
                                         km_kbp_option const *new_opts);
 
@@ -439,6 +452,7 @@ null. On return it will hold how many bytes were used.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const * opts,
                                          char *buf,
                                          size_t *space);
@@ -481,6 +495,7 @@ In the event the file doesn't exist or is inaccesible.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_keyboard_load(char const *kb_path,
                                    km_kbp_keyboard **keyboard);
 
@@ -496,6 +511,7 @@ disposed of.
 
 ```c
 */
+KMN_API
 void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard);
 
 /*
@@ -510,6 +526,7 @@ A pointer to a `km_kbp_keyboard_attrs` structure.
 
 ```c
 */
+KMN_API
 km_kbp_keyboard_attrs const *
 km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard);
 
@@ -548,6 +565,7 @@ returned by the Processor, initalised to maintain state for `keyboard`.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
                                   km_kbp_option const *env,
                                   km_kbp_state ** out);
@@ -572,6 +590,7 @@ returned by the Processor, cloned from the existing object `state`.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_state_clone(km_kbp_state const *state, km_kbp_state ** out);
 
 /*
@@ -587,6 +606,7 @@ invalid.
 
 ```c
 */
+KMN_API
 void km_kbp_state_dispose(km_kbp_state *state);
 
 /*
@@ -601,6 +621,7 @@ A pointer to a `km_kbp_context` object.
 
 ```c
 */
+KMN_API
 km_kbp_context *km_kbp_state_context(km_kbp_state *state);
 
 /*
@@ -615,6 +636,7 @@ A pointer to a `km_kbp_option_set` object.
 
 ```c
 */
+KMN_API
 km_kbp_option_set *km_kpb_state_options(km_kbp_state *state);
 
 /*
@@ -634,6 +656,7 @@ information is required.
 
 ```c
 */
+KMN_API
 km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
                                                      size_t *num_items);
 
@@ -662,6 +685,7 @@ null. On return it will hold how many bytes were used.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kpb_state_to_json(km_kbp_state const *state,
                                         char *buf,
                                         size_t *space);
@@ -697,6 +721,7 @@ Get access processors attributes describing version and technology implemented.
 A pointer to a `km_kbp_attr` structure.
 ```c
 */
+KMN_API
 km_kbp_attr const * km_kbp_get_engine_attrs();
 
 /*
@@ -720,6 +745,7 @@ The combinations of modifier keys set at the time key `vk` was pressed.
 
 ```c
 */
+KMN_API
 km_kbp_status km_kbp_process_event(km_kbp_state *state,
                           km_kbp_virtual_key vk, uint16_t modifier_state);
 
