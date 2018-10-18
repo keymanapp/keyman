@@ -14,7 +14,10 @@ CP = c_uint16
 USV = c_uint32
 VirtualKey = c_uint16
 
-libkbp = ctypes.cdll.LoadLibrary(ctypes.util.find_library('kmnkbp0'))
+libpath = os.environ.get('PYKMNKBD_LIBRARY_PATH',
+                         ctypes.util.find_library("kmnkbp0"))
+
+libkbp = ctypes.cdll.LoadLibrary(libpath)
 
 
 # Error handling
@@ -58,7 +61,7 @@ def null_check(code, func, args):
     raise KeyError(args[1] + ': Not found in collection')
 
 
-class Dir(IntEnum):
+class Dir(IntFlag):
     IN = auto()
     OUT = auto()
     OPT = auto()
@@ -67,7 +70,7 @@ class Dir(IntEnum):
 def __method(iface: str, method: str, result,
              *args: Tuple[Any, Dir, str], **kwds):
     proto = CFUNCTYPE(result, *map(operator.itemgetter(0), args))
-    params = [a[1:] for a in args]
+    params = tuple(a[1:] for a in args)
     c_name = iface+'_'+method if iface else method
     f = proto(('km_kbp_' + c_name, libkbp), params)
     if 'errcheck' in kwds: f.errcheck = kwds.get('errcheck')
@@ -210,7 +213,9 @@ __method('keyboard', 'load', Status,
          (c_char_p, Dir.IN, 'path'),
          (POINTER(Keyboard_p), Dir.OUT, 'kb'),
          errcheck=status_code)
+
 __method('keyboard', 'dispose', None, (Keyboard_p, Dir.IN, 'kb'))
+
 __method('keyboard', 'get_attrs', POINTER(KeyboardAttrs),
          (Keyboard_p, Dir.IN, 'keyboard'))
 
@@ -221,22 +226,28 @@ State_p = c_void_p
 
 __method('state', 'create', Status,
          (Keyboard_p, Dir.IN, 'keyboard'),
-         (POINTER(Option), Dir.IN, 'env',)
+         (POINTER(Option), Dir.IN, 'env',),
          (POINTER(State_p), Dir.OUT, 'out'),
          errcheck=status_code)
+
 __method('state', 'clone', Status,
          (State_p, Dir.IN, 'state'),
          (POINTER(State_p), Dir.OUT, 'out'),
          errcheck=status_code)
+
 __method('state', 'dispose', None, (State_p, Dir.IN, 'state'))
+
 __method('state', 'context', Context_p, (State_p, Dir.IN, 'state'))
+
 __method('state', 'options', OptionSet_p, (State_p, Dir.IN, 'state'))
+
 __method('state', 'action_items', POINTER(ActionItem),
          (State_p, Dir.IN, 'state'),
          (POINTER(c_size_t), Dir.OUT, 'num_items'))
+
 __method('state', 'to_json', Status,
          (State_p, Dir.IN, 'state'),
-         (c_char_p, Dir.OUT | Dir.OPT, 'buffer'),
+         (c_char_p, Dir.IN | Dir.OPT, 'buffer'),
          (c_size_t, Dir.IN | Dir.OUT, 'space'),
          errcheck=status_code)
 
@@ -259,7 +270,8 @@ class Tech(IntFlag):
 
 
 __method(None, 'get_engine_attrs', POINTER(Attributes))
-__method(None, 'process_events', Status,
+
+__method(None, 'process_event', Status,
          (State_p, Dir.IN, 'state'),
          (VirtualKey, Dir.IN, 'vkey'),
          (c_uint16, Dir.IN, 'modifier_state'))

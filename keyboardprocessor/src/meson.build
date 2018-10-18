@@ -1,4 +1,4 @@
-defns = []
+defns = ['-DKMN_KBP_EXPORTING']
 
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
   warns = [

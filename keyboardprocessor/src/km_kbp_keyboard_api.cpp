@@ -30,7 +30,7 @@ km_kbp_status km_kbp_keyboard_load(char const *kb_path,
   return KM_KBP_STATUS_OK;
 }
 
-void km_kbp_keyboard_dispose(km_kbp_keyboard const *keyboard)
+void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard)
 {
   delete keyboard;
 }

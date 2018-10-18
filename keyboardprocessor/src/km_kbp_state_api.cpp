@@ -76,7 +76,7 @@ km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
   return state->actions.data();
 }
 
-km_kbp_status km_kpb_state_to_json(km_kbp_state const *state,
+km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
                                         char *buf,
                                         size_t *space)
 {

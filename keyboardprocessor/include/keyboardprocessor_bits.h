@@ -1,3 +1,5 @@
+#pragma once
+
 // Define API function declspec/attributes and how each supported compiler or OS
 // allows us to specify them.
 #if defined __GNUC__
@@ -24,10 +26,10 @@
   #define _kmn_static_flag
 #endif
 
-#if defined GRAPHITE2_STATIC
+#if defined KMN_KBP_STATIC
   #define KMN_API             _kmn_tag_fn(_kmn_static_flag)
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_static_flag)
-#elif defined GRAPHITE2_EXPORTING
+#elif defined KMN_KBP_EXPORTING
   #define KMN_API             _kmn_tag_fn(_kmn_export_flag)
   #define KMN_DEPRECATED_API  _kmn_tag_fn(_kmn_deprecated_flag _kmn_and _kmn_export_flag)
 #else
