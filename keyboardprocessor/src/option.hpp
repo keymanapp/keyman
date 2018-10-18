@@ -10,12 +10,12 @@ class json;
 namespace km {
 namespace kbp
 {
-  class option_set : public std::unordered_map<std::string, std::string>
+  class options_set : public std::unordered_map<std::string, std::string>
   {
     km_kbp_option_scope _scope;
 
   public:
-    option_set(km_kbp_option_scope s) : _scope(s) {}
+    options_set(km_kbp_option_scope s) : _scope(s) {}
 
     auto scope() const noexcept { return _scope; }
   };
@@ -23,15 +23,15 @@ namespace kbp
 }
 }
 
-json & operator << (json &, km::kbp::option_set const &);
+json & operator << (json &, km::kbp::options_set const &);
 
 
-// Adaptor between internal km::kbp::option_set object and API definitiion.
-struct km_kbp_option_set
+// Adaptor between internal km::kbp::options_set object and API definitiion.
+struct km_kbp_options_set
 {
-  km::kbp::option_set   & target;
+  km::kbp::options_set   & target;
 
-  km_kbp_option_set(km::kbp::option_set & tgt) : target(tgt) {}
+  km_kbp_options_set(km::kbp::options_set & tgt) : target(tgt) {}
 
   km_kbp_option const * export_option(char const * k, char const * v) const {
     _last_lookup.key = k;
@@ -46,7 +46,7 @@ private:
 };
 
 inline
-void km_kbp_option_set::update(km_kbp_option const * opt)
+void km_kbp_options_set::update(km_kbp_option const * opt)
 {
   for (;opt->key; ++opt)  target.emplace(opt->key, opt->value);
 }

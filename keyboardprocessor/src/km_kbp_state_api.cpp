@@ -23,8 +23,8 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
   constexpr km_kbp_option const end = KM_KBP_OPTIONS_END;
-  auto opts = km::kbp::option_set(KM_KBP_OPT_ENVIRONMENT);
-  km_kbp_option_set {opts}.update(env ? env : &end);
+  auto opts = km::kbp::options_set(KM_KBP_OPT_ENVIRONMENT);
+  km_kbp_options_set {opts}.update(env ? env : &end);
   *out = new km_kbp_state(static_cast<km::kbp::keyboard const &>(*keyboard),
                             opts);
   return KM_KBP_STATUS_OK;
@@ -54,7 +54,7 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *state)
   return static_cast<km_kbp_context *>(&state->context());
 }
 
-km_kbp_option_set *km_kpb_state_options(km_kbp_state *state)
+km_kbp_options_set *km_kbp_state_options(km_kbp_state *state)
 {
   assert(state);
   if (!state) return nullptr;

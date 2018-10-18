@@ -175,18 +175,21 @@ class Option(Structure):
 
 Option.END = Option(None, None)
 
-__method('option_set', 'length', c_size_t, (OptionSet_p, Dir.IN, 'opts'))
-__method('option_set', 'lookup', POINTER(Option),
+__method('options_set', 'size', c_size_t, (OptionSet_p, Dir.IN, 'opts'))
+
+__method('options_set', 'lookup', POINTER(Option),
          (OptionSet_p, Dir.IN, 'opts'),
          (c_char_p, Dir.IN, 'key'),
          errcheck=null_check)
-__method('option_set', 'update', Status,
+
+__method('options_set', 'update', Status,
          (OptionSet_p, Dir.IN, 'opts'),
          (POINTER(Option), Dir.IN, 'new_opts'),
          errcheck=status_code)
-__method('option_set', 'to_json', Status,
+
+__method('options_set', 'to_json', Status,
          (OptionSet_p, Dir.IN, 'opts'),
-         (c_char_p, Dir.OUT | Dir.OPT, 'buffer'),
+         (c_char_p, Dir.IN | Dir.OPT, 'buffer'),
          (c_size_t, Dir.IN | Dir.OUT, 'space'),
          errcheck=status_code)
 

@@ -11,13 +11,13 @@
 #include "json.hpp"
 
 
-size_t km_kbp_options_set_size(km_kbp_option_set const *opts)
+size_t km_kbp_options_set_size(km_kbp_options_set const *opts)
 {
   return opts->target.size();
 }
 
 
-km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const * opts,
+km_kbp_option const *km_kbp_options_set_lookup(km_kbp_options_set const * opts,
                                                const char *key)
 {
   auto i = opts->target.find(key);
@@ -28,7 +28,7 @@ km_kbp_option const *km_kbp_options_set_lookup(km_kbp_option_set const * opts,
 }
 
 
-km_kbp_status km_kbp_options_set_update(km_kbp_option_set *opts, km_kbp_option const *opt)
+km_kbp_status km_kbp_options_set_update(km_kbp_options_set *opts, km_kbp_option const *opt)
 {
   try
   {
@@ -41,7 +41,7 @@ km_kbp_status km_kbp_options_set_update(km_kbp_option_set *opts, km_kbp_option c
 
 // This function doesn't need to use the json pretty printer for such a simple
 //  list of key:value pairs but it's a good introduction to it.
-km_kbp_status km_kbp_options_set_to_json(km_kbp_option_set const *opts, char *buf, size_t *space)
+km_kbp_status km_kbp_options_set_to_json(km_kbp_options_set const *opts, char *buf, size_t *space)
 {
   assert(opts);
   if (!opts)
@@ -82,7 +82,7 @@ namespace
   };
 }
 
-json & operator << (json &j, km::kbp::option_set const &opts)
+json & operator << (json &j, km::kbp::options_set const &opts)
 {
   j << json::object
     << "scope" << scope_name_lut[opts.scope()]
