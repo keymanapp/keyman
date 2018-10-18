@@ -73,17 +73,7 @@ enum {NO_DEBUG_WINDOWS=100, UNABLE_TO_CREATE_FILE_MAPPING, UNABLE_TO_MAP_VIEW_OF
 extern void GetWindowsVersion(char *buf);
 
 void InitDebuggingEx(PKEYMAN64THREADDATA _td) {
-	RegistryReadOnly reg(HKEY_CURRENT_USER);
-	if(reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
-		_td->debug_KeymanLog = reg.ValueExists(REGSZ_Debug) && reg.ReadInteger(REGSZ_Debug);
-    _td->debug_ToConsole = reg.ValueExists(REGSZ_DebugToConsole) && reg.ReadInteger(REGSZ_DebugToConsole);   // I3951
-  }
-	else {
-		_td->debug_KeymanLog = FALSE;
-    _td->debug_ToConsole = FALSE;   // I3951
-  }
-  
-	if(_td->debug_KeymanLog) {
+	if(Globals::get_debug_KeymanLog()) {
     DWORD dwErr = EventRegister(&guid_EtwProviderId, NULL, NULL, &_td->etwRegHandle);
     if (dwErr != ERROR_SUCCESS) {
       OutputDebugString("Keyman k32_dbg: Failed to EventRegister");//TODO: Build a helper function with GLE?
@@ -152,7 +142,7 @@ BOOL ShouldDebug_1() {
 
   if (!_td->debug_DebugInit) InitDebuggingEx(_td);
   _td->debug_DebugInit = TRUE;
-	return _td->debug_KeymanLog;
+  return Globals::get_debug_KeymanLog();
 }
 
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...)
@@ -217,7 +207,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
     return 0;
   }
 
-	if(_td->debug_KeymanLog) {
+	if(Globals::get_debug_KeymanLog()) {
     GUITHREADINFO gti;
     char
       //sClassName[32], sWindowText[32], 
@@ -238,7 +228,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
 
 		if(strlen(msg) > 256) msg[255] = 0;
 
-    if(_td->debug_ToConsole) {   // I3951
+    if(Globals::get_debug_ToConsole()) {   // I3951
       char windowinfo[1024];
       wsprintf(windowinfo,
         DEBUG_PLATFORM_STRING TAB //"Platform" TAB

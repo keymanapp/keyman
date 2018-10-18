@@ -227,7 +227,7 @@ typedef struct tagKEYMAN64THREADDATA
   int CurrentAddin;
   HWND CurrenthWnd;
 
-  BOOL debug_DebugInit, debug_KeymanLog, debug_ToConsole;   // I3951
+  BOOL debug_DebugInit;   // I3951
   char debug_buf[64];
 
    // I3617   // I3618
