@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Module Id="engine" Version="$(var.VERSION)" Language="1033">
     <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine" 
              Description="Keyman Engine $(var.RELEASE)" Comments="Contact:  Your local administrator" 
@@ -43,6 +44,13 @@
 
       <Directory Id="CommonAppDataFolder" Name="CADF">
         <Directory Id="CommonApp_KeymanRoot" Name="Keyman" >
+        
+          <Component Id="CommanApp_KeymanRoot_Permission" Guid="{DB6D3B5F-1792-453B-9D10-5A539AA76E28}">
+            <CreateFolder>
+              <util:PermissionEx User="Users" Read="yes"/>
+            </CreateFolder>
+          </Component>        
+          
           <Directory Id="CommonApp_TS_Keyman" Name="Keyman Engine">
             <Directory Id="CommonApp_TS_Keyman_Kbd" Name="Keyboard">
               <Directory Id="CommonApp_TS_Keyman_Kbd_Pkg" Name="_Package" />
@@ -82,9 +90,11 @@
     </Directory>
    
     <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="PreUninstall" />
+    <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="EnginePostInstall" />
 
     <InstallExecuteSequence>
       <Custom Action="PreUninstallA" After="InstallInitialize"><![CDATA[REMOVE="ALL" And Not REINSTALL And Not UPGRADINGPRODUCTCODE]]></Custom>
+      <Custom Action="EnginePostInstall" Before="InstallFinalize"><![CDATA[NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
 
     <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\inst\insthelper.dll" />
