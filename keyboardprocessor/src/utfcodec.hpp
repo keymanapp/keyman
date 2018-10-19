@@ -245,8 +245,8 @@ class _utf_sentinal_iterator : public _utf_iterator<C>
 public:
   _utf_sentinal_iterator(const void * us=0): _utf_iterator<C>(us) {}
 
-  bool operator == (const _utf_iterator<C> &) const throw() {
-    return *_utf_iterator<C>::cp == SENTINAL || _utf_iterator<C>::error();
+  operator bool () const noexcept {
+    return *static_cast<codeunit_type *>(*this) != SENTINAL;
   }
 };
 

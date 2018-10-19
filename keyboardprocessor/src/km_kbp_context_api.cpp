@@ -19,8 +19,8 @@ km_kbp_context_items_from_utf16(km_kbp_cp const *text,
 
   try
   {
-    for (auto i = utf16::const_sentinal_iterator(text), end = decltype(i)();
-         i != end; ++i)
+    for (auto i = utf16::const_sentinal_iterator(text);
+         i; ++i)
     {
       if(i.error())   return KM_KBP_STATUS_INVALID_ARGUMENT;
       res.emplace_back(km_kbp_context_item {KM_KBP_CT_CHAR, {0,}, {*i}});
@@ -44,16 +44,17 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
   assert(ci != nullptr);
   if (!ci) return 0;
 
-  if (buf)
+  if (buf && buf_size > 0)
   {
     auto i = utf16::iterator(buf);
-    auto const e = utf16::iterator(buf + buf_size);
+    buf_size /= sizeof *buf;
+    auto const e = utf16::iterator(buf + buf_size - 1);
     for (;i != e && ci->type != KM_KBP_CT_END; ++ci, ++i)
     {
       if (ci->type == KM_KBP_CT_CHAR)
         *i = ci->character;
     }
-
+    *i = 0;
     return buf_size - (e - i);
   }
   else
@@ -64,7 +65,7 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
       if (ci->type == KM_KBP_CT_CHAR)
         ++n += int(ci->character >= 0x10000);
     while(ci++->type != KM_KBP_CT_END);
-    return n;
+    return n+1;
   }
 }
 
