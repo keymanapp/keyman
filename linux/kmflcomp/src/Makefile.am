@@ -22,8 +22,8 @@ libkmflcomp_la_SOURCES = \
 
 EXTRA_DIST = compiler.h memman.h
 
-libkmflcomp_la_LDFLAGS = -lX11 -L/usr/X11R6/lib -Wl,--no-as-needed -version-info 1:0:1
+libkmflcomp_la_LDFLAGS = -Wl,--no-as-needed -version-info 1:0:1
 
-libkmflcomp_la_LIBADD = 
+libkmflcomp_la_LIBADD = -L/usr/X11R6/lib -lX11
 
 AM_YFLAGS = -d

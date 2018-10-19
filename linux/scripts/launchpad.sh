@@ -44,6 +44,7 @@ for proj in ${projects}; do
     cd ${proj}
     if [ "${proj}" == "keyman-config" ]; then
         tarname="keyman_config"
+        make clean
     else
         tarname="${proj}"
     fi
