@@ -58,4 +58,4 @@ lib = library('kmnkbp0',
     include_directories: inc,
     install: true)
 
-#kmnkbd = declare_dependency(link_with: lib, include_directories: inc)
+kmnkbp = declare_dependency(link_with: lib, include_directories: inc)

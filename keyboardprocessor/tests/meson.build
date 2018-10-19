@@ -14,3 +14,4 @@ endif
 
 subdir('unit/json')
 subdir('unit/utftest')
+subdir('unit/kmnkbd')
