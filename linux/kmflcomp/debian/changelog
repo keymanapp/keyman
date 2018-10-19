@@ -5,7 +5,7 @@ kmflcomp (10.99.32-1) experimental; urgency=medium
   * new upstream pre-release
     - add new symbols to d/libkmflcomp0.symbols
   * d/control remove build-dep on autotools-dev (compat 10)
-              update webpage 
+              update webpage
   * New upstream pre-release
   * added symbols in libkmflcomp0 so will require transition
   * I am now the maintainer as I am the one working
