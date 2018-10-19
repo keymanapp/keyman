@@ -67,11 +67,15 @@ extern "C"
 #endif
 // Basic types
 //
+#if defined(__cplusplus)
+typedef char16_t   km_kbp_cp;
+typedef char32_t   km_kbp_usv;
+#else
 typedef uint16_t    km_kbp_cp;          // code point
 typedef uint32_t    km_kbp_usv;         // Unicode Scalar Value
+#endif
 typedef uint16_t    km_kbp_virtual_key; // A virtual key code.
 typedef uint32_t    km_kbp_status;      // Status return code.
-
 
 // Opaque object types.
 //
