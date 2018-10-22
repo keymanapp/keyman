@@ -106,7 +106,7 @@
 #define REGSZ_SimulateAltGr     "simulate altgr"
 #define REGSZ_KeyboardHotkeysAreToggle "hotkeys are toggles"
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
-
+#define REGSZ_ZapVirtualKeyCode        "zap virtual key code"   // LM, defaults to 0x0E (_VK_PREFIX_DEFAULT)
 /* 
   Debug flags
   These are all stored in HKCU\Software\Keyman\Debug
