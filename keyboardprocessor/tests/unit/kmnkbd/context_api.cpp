@@ -61,18 +61,15 @@ int main(int argc, char * argv[])
   if (status != KM_KBP_STATUS_OK) return 100*__LINE__+status;
 
   km_kbp_cp ctxt_buffer[512] ={0,};
-  size_t n=0;
-  if ((n=km_kbp_context_items_to_utf16(ctxt1, nullptr, 0)) >= sizeof ctxt_buffer)
-    return __LINE__;
-  n=km_kbp_context_items_to_utf16(ctxt1, ctxt_buffer, sizeof ctxt_buffer);
-  if (initial_bmp_context != ctxt_buffer)
-    return __LINE__;
-
-  if ((n=km_kbp_context_items_to_utf16(ctxt2, nullptr, 0)) >= sizeof ctxt_buffer)
-    return __LINE__;
-  n=km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer, sizeof ctxt_buffer);
-  if (initial_smp_context != ctxt_buffer)
-    return __LINE__;
+  // First call measure space 2nd call do conversion.
+  auto n=km_kbp_context_items_to_utf16(ctxt1, nullptr, 0);
+  if (n >= sizeof ctxt_buffer/sizeof(km_kbp_cp))  return __LINE__;
+  n=km_kbp_context_items_to_utf16(ctxt1, ctxt_buffer,
+                                  sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  if (initial_bmp_context != ctxt_buffer) return __LINE__;
+  n=km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer,
+                                  sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  if (initial_smp_context != ctxt_buffer) return __LINE__;
 
   // Create a mock context object and set the items
   km_kbp_context mock_ctxt1, mock_ctxt2;
@@ -92,11 +89,11 @@ int main(int argc, char * argv[])
   // retreive context and check it's okay.
   km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt1),
                                 ctxt_buffer,
-                                sizeof ctxt_buffer);
+                                sizeof ctxt_buffer/sizeof(km_kbp_cp));
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
   km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt2),
                                 ctxt_buffer,
-                                sizeof ctxt_buffer);
+                                sizeof ctxt_buffer/sizeof(km_kbp_cp));
   if (initial_smp_context != ctxt_buffer) return __LINE__;
 
 

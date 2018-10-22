@@ -54,7 +54,6 @@ size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
   if (buf && buf_size > 0)
   {
     auto i = utf16::iterator(buf);
-    buf_size /= sizeof *buf;
     auto const e = utf16::iterator(buf + buf_size - 1);
     for (;i != e && ci->type != KM_KBP_CT_END; ++ci, ++i)
     {

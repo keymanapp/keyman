@@ -181,11 +181,11 @@ actually used in the conversion. If null is passed as the buffer the number
 codeunits required is returned. This will strip markers from the
 context during the conversion.
 ##### Return:
-Number of code points needed.
+Number of code points used if called with a buffer or needed if called without.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_kbp_context_item`.
 - __buf__: A pointer to the buffer to place the UTF-16 string into, can be null.
-- __buf_size__: The size of the supplied buffer.
+- __buf_size__: The size of the supplied buffer in codeunits.
 
 ```c
 */
