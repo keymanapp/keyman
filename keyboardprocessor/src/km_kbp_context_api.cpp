@@ -132,8 +132,9 @@ km_kbp_status km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
 
     if (ci)
     {
+      auto const ip = ctxt->begin();
       while(num-- && ci->type != KM_KBP_CT_END)
-        ctxt->emplace_front(*ci++);
+        ctxt->emplace(ip, *ci++);
     }
   } catch(std::bad_alloc) {
     return KM_KBP_STATUS_NO_MEM;
