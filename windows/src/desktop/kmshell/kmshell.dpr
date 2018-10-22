@@ -85,7 +85,7 @@ uses
   UfrmKeyboardOptions in 'main\UfrmKeyboardOptions.pas' {frmKeyboardOptions},
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
-  UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
+  UImportOlderVersionKeyboards10 in 'main\UImportOlderVersionKeyboards10.pas',
   MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   FixupLocaleDoctype in '..\..\global\delphi\general\FixupLocaleDoctype.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
@@ -155,7 +155,10 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
+  Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
+  UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
