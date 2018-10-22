@@ -39,7 +39,6 @@ namespace
 {
   inline
   size_t count_codepoints(std::u16string const &s) {
-    utf16::const_sentinal_iterator i(s.c_str());
     size_t n = 0;
     for (utf16::const_iterator i = s.c_str(); *i; ++i) ++n;
     return n;
@@ -82,28 +81,23 @@ int main(int argc, char * argv[])
   status = km_kbp_context_set(&mock_ctxt2, ctxt2);
   if (status != KM_KBP_STATUS_OK) return 100*__LINE__+status;
 
-  // Test lengths, these are complete characters, not utf16 codepoints.
-  if((n=km_kbp_context_length(&mock_ctxt1)) != bmp_ctxt_size)
-    return __LINE__;
-  if((n=km_kbp_context_length(&mock_ctxt2)) != smp_ctxt_size)
-    return __LINE__;
-
   // Delete the items lists
   km_kbp_context_items_dispose(ctxt1);
   km_kbp_context_items_dispose(ctxt2);
 
+  // Test lengths, these are Unicode Scalar Values, not utf16 codeunits.
+  if((n=km_kbp_context_length(&mock_ctxt1)) != bmp_ctxt_size) return __LINE__;
+  if((n=km_kbp_context_length(&mock_ctxt2)) != smp_ctxt_size) return __LINE__;
 
   // retreive context and check it's okay.
   km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt1),
                                 ctxt_buffer,
                                 sizeof ctxt_buffer);
-  if (initial_bmp_context != ctxt_buffer)
-    return __LINE__;
+  if (initial_bmp_context != ctxt_buffer) return __LINE__;
   km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt2),
                                 ctxt_buffer,
                                 sizeof ctxt_buffer);
-  if (initial_smp_context != ctxt_buffer)
-    return __LINE__;
+  if (initial_smp_context != ctxt_buffer) return __LINE__;
 
 
   return 0;
