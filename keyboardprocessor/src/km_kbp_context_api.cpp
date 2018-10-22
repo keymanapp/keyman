@@ -9,6 +9,13 @@
 #include "json.hpp"
 #include "utfcodec.hpp"
 
+km_kbp_context::const_pointer km_kbp_context::data() const
+{
+  _pres.assign(begin(), end());
+  _pres.emplace_back(km_kbp_context_item {KM_KBP_CT_END, {0,}, {0}});
+  return _pres.data();
+}
+
 
 km_kbp_status
 km_kbp_context_items_from_utf16(km_kbp_cp const *text,
@@ -118,9 +125,9 @@ km_kbp_status km_kbp_context_append(km_kbp_context *ctxt,
 km_kbp_status km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
                            km_kbp_context_item const * ci)
 {
-  ctxt->resize(ctxt->size() - std::max(num, ctxt->size()));
   try
   {
+    ctxt->resize(ctxt->size() - std::min(num, ctxt->size()));
 
     if (ci)
     {
