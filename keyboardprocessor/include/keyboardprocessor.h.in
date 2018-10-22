@@ -305,12 +305,12 @@ add upto the same number of the supplied items to the front of the context.
 - __num__: The number of items to remove from the end of context.
 - __context_items__: Pointer to the start of the `KM_KBP_CT_END` terminated array
     of `km_kbp_context_item` to add to the front. Upto `num` items will be
-    prepended.
+    prepended. This may be null if not required.
 
 ```c
 */
 KMN_API
-void km_kbp_context_shrink(km_kbp_context *, size_t num,
+km_kbp_status km_kbp_context_shrink(km_kbp_context *, size_t num,
                            km_kbp_context_item const* prefix);
 
 

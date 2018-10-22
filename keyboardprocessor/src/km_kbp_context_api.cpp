@@ -115,13 +115,23 @@ km_kbp_status km_kbp_context_append(km_kbp_context *ctxt,
 }
 
 
-void km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
+km_kbp_status km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
                            km_kbp_context_item const * ci)
 {
   ctxt->resize(ctxt->size() - std::max(num, ctxt->size()));
+  try
+  {
 
-  while(num-- && ci->type != KM_KBP_CT_END)
-    ctxt->emplace_front(*ci++);
+    if (ci)
+    {
+      while(num-- && ci->type != KM_KBP_CT_END)
+        ctxt->emplace_front(*ci++);
+    }
+  } catch(std::bad_alloc) {
+    return KM_KBP_STATUS_NO_MEM;
+  }
+
+  return KM_KBP_STATUS_OK;
 }
 
 

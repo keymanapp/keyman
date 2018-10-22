@@ -122,14 +122,16 @@ __method('context', 'clear', None, (Context_p, Dir.IN, 'context'))
 
 __method('context', 'length', c_size_t, (Context_p, Dir.IN, 'context'))
 
-__method('context', 'append', None,
+__method('context', 'append', Status,
          (Context_p, Dir.IN, 'context'),
-         (POINTER(ContextItem), Dir.IN, 'context_items'))
+         (POINTER(ContextItem), Dir.IN, 'context_items'),
+         errcheck=status_code)
 
-__method('context', 'shrink', None,
+__method('context', 'shrink', Status,
          (Context_p, Dir.IN, 'context'),
          (c_size_t, Dir.IN, 'num'),
-         (POINTER(ContextItem), Dir.IN, 'prefix'))
+         (POINTER(ContextItem), Dir.IN, 'prefix'),
+         errcheck=status_code)
 
 
 class ActionItem(Structure):
