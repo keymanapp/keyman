@@ -26,8 +26,6 @@ of the License or (at your option) any later version.
 */
 // JSON debug logging very basic test harness
 // Author: Tim Eves
-#include <codecvt>
-#include <locale>
 #include <string>
 
 #include <keyboardprocessor.h>
@@ -48,18 +46,25 @@ namespace
                         initial_smp_context = u"😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏";
   auto const bmp_ctxt_size = count_codepoints(initial_bmp_context),
              smp_ctxt_size = count_codepoints(initial_smp_context);
+  km_kbp_context_item test_marker_ctxt[2] = {
+    {KM_KBP_CT_MARKER, {0,}, 0xDEADBEEF},
+    {KM_KBP_CT_END, {0,}, 0}
+  };
+
 
 }
+
+#define   try_status(expr) \
+{auto __s = (expr); if (__s != KM_KBP_STATUS_OK) return 100*__LINE__+__s;}
 
 int main(int argc, char * argv[])
 {
   km_kbp_context_item *ctxt1, *ctxt2;
-  auto status = km_kbp_context_items_from_utf16(initial_bmp_context.data(), &ctxt1);
-  if (status != KM_KBP_STATUS_OK) return 100*__LINE__+status;
+  // Test UTF16 to context_item conversion.
+  try_status(km_kbp_context_items_from_utf16(initial_bmp_context.data(), &ctxt1));
+  try_status(km_kbp_context_items_from_utf16(initial_smp_context.data(), &ctxt2));
 
-  status = km_kbp_context_items_from_utf16(initial_smp_context.data(), &ctxt2);
-  if (status != KM_KBP_STATUS_OK) return 100*__LINE__+status;
-
+  // Check context_item to UTF16 conversion, roundtrip test.
   km_kbp_cp ctxt_buffer[512] ={0,};
   // First call measure space 2nd call do conversion.
   auto n=km_kbp_context_items_to_utf16(ctxt1, nullptr, 0);
@@ -67,16 +72,15 @@ int main(int argc, char * argv[])
   n=km_kbp_context_items_to_utf16(ctxt1, ctxt_buffer,
                                   sizeof ctxt_buffer/sizeof(km_kbp_cp));
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
+  // Test roundtripping SMP characters in surrogate pairs.
   n=km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer,
                                   sizeof ctxt_buffer/sizeof(km_kbp_cp));
   if (initial_smp_context != ctxt_buffer) return __LINE__;
 
   // Create a mock context object and set the items
   km_kbp_context mock_ctxt1, mock_ctxt2;
-  status = km_kbp_context_set(&mock_ctxt1, ctxt1);
-  if (status != KM_KBP_STATUS_OK) return 100*__LINE__+status;
-  status = km_kbp_context_set(&mock_ctxt2, ctxt2);
-  if (status != KM_KBP_STATUS_OK) return 100*__LINE__+status;
+  try_status(km_kbp_context_set(&mock_ctxt1, ctxt1));
+  try_status(km_kbp_context_set(&mock_ctxt2, ctxt2));
 
   // Delete the items lists
   km_kbp_context_items_dispose(ctxt1);
