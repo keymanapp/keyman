@@ -218,7 +218,6 @@ public:
     _utf_iterator(const void * us=0)    : cp(reinterpret_cast<C *>(const_cast<void *>(us))), sl(1) { }
 
     _utf_iterator   & operator ++ ()    { cp += abs(sl); return *this; }
-    _utf_iterator   operator ++ (int)   { _utf_iterator tmp(*this); operator++(); return tmp; }
 
     bool operator == (const _utf_iterator & rhs) const throw() { return cp >= rhs.cp; }
     bool operator != (const _utf_iterator & rhs) const throw() { return !operator==(rhs); }
