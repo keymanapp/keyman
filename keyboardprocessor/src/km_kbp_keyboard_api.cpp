@@ -26,7 +26,7 @@ km_kbp_status km_kbp_keyboard_load(char const *kb_path,
   // if (stat.type() != std::filesystem::file_type::regular)
   //   return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  *keyboard = static_cast<km_kbp_keyboard *>(new km::kbp::keyboard("/dev/null/unk_dummy.kmn"));
+  *keyboard = static_cast<km_kbp_keyboard *>(new km::kbp::keyboard("/dev/null/unk_dummy.kmx"));
   return KM_KBP_STATUS_OK;
 }
 

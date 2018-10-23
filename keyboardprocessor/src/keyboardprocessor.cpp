@@ -1,10 +1,18 @@
-// #include <keyboardprocessor.h>
+#include <keyboardprocessor.h>
 
 #include "state.hpp"
+
+// This is a test implementation of the keyboard processor API to enable
+// testing API clients against a basic keyboard and give them something to link
+// against and load.
+// TODO: Add a mecahnism to trigger output of PERSIST_OPT/ RESET_OPT actions
+//  items, options support and context matching.
 
 namespace
 {
 
+// An table of VKEY to character sequence mappings, one per shift state.
+// An empty string inidicates no mapping.
 constexpr char const table[2][256][4] = {
   {
     "","","","","","","","","","\t","","","","\015","","",

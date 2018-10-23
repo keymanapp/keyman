@@ -9,7 +9,7 @@
 ## Installing Python3
 ### Linux
 You will be able to install a python3 package in any reputable recent version
-of linux using it's package manager if it's not already installed.
+of linux using its package manager if it's not already installed.
 
 ### Mac OS X
 You can get the official installer from the official Python site:

@@ -26,6 +26,7 @@ enum km_kbp_modifier_mask {
   KM_KBP_MODIFIER_MASK_SCROLLLOCK  = 0x3000,
 };
 
+// These are Windows API VKEYs, using Keyman VKEY names.
 enum km_kpb_virtual_key {
   KM_KBP_VKEY__00,
   KM_KBP_VKEY_LBUTTON,

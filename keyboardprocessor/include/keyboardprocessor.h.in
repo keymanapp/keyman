@@ -153,7 +153,7 @@ typedef struct {
 Convert an UTF16 encoded Unicode string into an array of `km_kbp_context_item`
 structures. Allocates memory as needed.
 ##### Status:
-`KM_KBP_STATUS_NO_MEM`: In the event it cannot allocated enough memory for the
+`KM_KBP_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
 output buffer.
 `KM_KBP_STATUS_INVALID_ARGUMENT`: In the event the UTF16 string cannot be
 decoded.
@@ -676,7 +676,7 @@ insufficent space to hold the document, the contents of the buffer is undefined.
 __WARNING__: The structure and format of the JSON document while independantly
 versioned is not part of this API and is intended solely for use in diagnostics
 or by development and debugging tools which are aware of processor
-implmentation details.
+implementation details.
 ##### Status:
 __KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
 ##### Parameters:
