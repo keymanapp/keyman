@@ -162,10 +162,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           context.startActivity(i);
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(context.getResources().getString(R.string.title_add_keyboard));
+          dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
           dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
-          dialogBuilder.setMessage("\nCannot connect to Keyman server!\n");
-          dialogBuilder.setPositiveButton("OK", null);
+          dialogBuilder.setMessage("\n" + getString(R.string.cannot_connect) + "\n");
+          dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
           dialog.show();
         }
@@ -196,7 +196,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       public void run() {
         boolean shouldCheckUpdate = false;
         if (lastUpdateCheck == null) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+          SharedPreferences prefs = context.getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
           Long lastUpdateCheckTime = prefs.getLong("lastUpdateCheck", 0);
           if (lastUpdateCheckTime > 0) {
             lastUpdateCheck = Calendar.getInstance();
@@ -523,10 +523,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       context.startActivity(i);
     } else {
       AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-      dialogBuilder.setTitle(context.getResources().getString(R.string.title_add_keyboard));
+      dialogBuilder.setTitle(context.getString(R.string.title_add_keyboard));
       dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
-      dialogBuilder.setMessage("\nCannot connect to Keyman server!\n");
-      dialogBuilder.setPositiveButton("OK", null);
+      dialogBuilder.setMessage("\n" + context.getString(R.string.cannot_connect) + "\n");
+      dialogBuilder.setPositiveButton(context.getString(R.string.label_ok), null);
       AlertDialog dialog = dialogBuilder.create();
       dialog.show();
     }
@@ -544,7 +544,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         checkingUpdates = true;
         if (hasConnection) {
           progressDialog = new ProgressDialog(context);
-          progressDialog.setMessage("Checking keyboard updates...");
+          progressDialog.setMessage(context.getString(R.string.checking_keyboard_updates));
           progressDialog.setCancelable(false);
           if (!((AppCompatActivity) context).isFinishing()) {
             progressDialog.show();
@@ -560,7 +560,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         int ret = 0;
         if (hasConnection && !isCancelled()) {
           try {
-            String deviceType = context.getResources().getString(R.string.device_type);
+            String deviceType = context.getString(R.string.device_type);
             if (deviceType.equals("AndroidTablet")) {
               deviceType = "androidtablet";
             } else {
@@ -619,9 +619,9 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           failedUpdateCount = 0;
           updateCount = result;
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle("Keyboard Updates Available");
-          dialogBuilder.setMessage("Would you like to update keyboards now?");
-          dialogBuilder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+          dialogBuilder.setTitle(context.getString(R.string.keyboard_update_available));
+          dialogBuilder.setMessage(context.getString(R.string.confirm_update));
+          dialogBuilder.setPositiveButton(context.getString(R.string.label_update), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
               // Update keyboards
               if (KMManager.hasConnection(context)) {
@@ -640,7 +640,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
                     if (Float.valueOf(newKbVersion) > Float.valueOf(kbVersion)) {
                       if (updateProgress == null || !updateProgress.isShowing()) {
                         updateProgress = new ProgressDialog(context);
-                        updateProgress.setMessage("Updating keyboards...");
+                        updateProgress.setMessage(context.getString(R.string.updating_keyboards));
                         updateProgress.setCancelable(false);
                         updateProgress.show();
                       }
@@ -665,7 +665,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
             }
           });
 
-          dialogBuilder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+          dialogBuilder.setNegativeButton(context.getString(R.string.label_later), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
               lastUpdateCheck = Calendar.getInstance();
               checkingUpdates = false;

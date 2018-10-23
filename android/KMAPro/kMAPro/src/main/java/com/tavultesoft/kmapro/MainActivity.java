@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
                 downloadIntent.putExtra("receiver", resultReceiver);
 
                 progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setMessage("Downloading keyboard package\n" + filename + "...");
+                progressDialog.setMessage(getString(R.string.downloading_keyboard_package) + "\n" + filename + "...");
                 progressDialog.setCancelable(false);
                 progressDialog.show();
 
@@ -509,9 +509,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
-    dialogBuilder.setTitle(String.format("Text Size: %d", textSize));
+    dialogBuilder.setTitle(String.format(getString(R.string.text_size) + ": %d", textSize));
     dialogBuilder.setView(textSizeController);
-    dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         // Done
@@ -540,7 +540,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         textSize = progress + minTextSize;
         textView.setTextSize((float) textSize);
-        dialog.setTitle(String.format("Text Size: %d", textSize));
+        dialog.setTitle(String.format(getString(R.string.text_size) + ": %d", textSize));
       }
     });
 
@@ -568,16 +568,16 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void showClearTextDialog() {
     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_trash);
-    dialogBuilder.setTitle("Clear Text");
-    dialogBuilder.setMessage("\nAll text will be cleared\n");
-    dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    dialogBuilder.setTitle(getString(R.string.action_clear_text));
+    dialogBuilder.setMessage("\n" + getString(R.string.all_text_will_be_cleared) + "\n");
+    dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         textView.setText("");
       }
     });
 
-    dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    dialogBuilder.setNegativeButton(getString(R.string.label_cancel), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         // Cancel

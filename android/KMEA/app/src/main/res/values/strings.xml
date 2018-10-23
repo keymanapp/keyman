@@ -1,38 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <!-- Device type  -->
     <string name="device_type" translatable="false">AndroidMobile</string>
     
     <!-- Application name -->
     <string name="app_name" translatable="false">KMEA</string>
     
-    <!-- Title for settings  -->
-    <string name="action_settings" translatable="false">Settings</string>
-       
     <!-- Title for lists-->
     <string name="title_keyboards" translatable="false">Keyboards</string>
     <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
-    
+
     <!-- Button labels -->
-    <string name="label_action_button" translatable="false">Action Button</string>
-    <string name="label_done" translatable="false">Done</string>
     <string name="label_add" translatable="false">Add</string>
-    <string name="label_back" translatable="false">Back</string>
-    
+    <string name="label_cancel" translatable="false">Cancel</string>
+    <string name="label_close" translatable="false">Close</string>
+    <string name="label_download" translatable="false">Download</string>
+    <string name="label_install" translatable="false">Install</string>
+    <string name="label_later" translatable="false">Later</string>
+    <string name="label_ok" translatable="false">OK</string>
+    <string name="label_update" translatable="false">Update</string>
+
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
+    <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates...</string>
+    <string name="confirm_download" translatable="false">Would you like to download this keyboard?</string>
+    <string name="confirm_update" translatable="false">Would you like to update keyboards now?</string>
+    <string name="downloading_keyboard" translatable="false">Downloading keyboard...</string>
+    <string name="keyboard_update_available" translatable="false">Keyboard Updates Available</string>
+    <string name="loading" translatable="false">Loading...</string>
+    <string name="updating_keyboards" translatable="false">Updating keyboards...</string>
+
+    <!-- Keyboard Info -->
+    <string name="keyboard_version" translatable="false">Keyboard version</string>
+    <string name="help_link" translatable="false">Help link</string>
+
     <!-- Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>
     <string name="image_view" translatable="false">Image View</string>
     
     <!-- Popup menu labels -->
-    <string name="popup_menu_delete" translatable="false">Delete</string>
+    <string name="label_delete" translatable="false">Delete</string>
     
     <!-- Shared preferences name -->
     <string name="kma_prefs_name" translatable="false">KMAPreferences</string>
     
     <!-- Other strings -->
     <string name="help_bubble_text" translatable="false">Tap here to change keyboard</string>
-    <string name="trial_expired" translatable="false">Trial period has expired!</string>
-    <string name="reactivate" translatable="false">Reactivate</string>
-    
+
 </resources>

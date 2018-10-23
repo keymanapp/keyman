@@ -61,7 +61,7 @@ public class PackageActivity extends AppCompatActivity {
     try {
       tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
     } catch (Exception e) {
-      String message = "Failed to extract\n" + kmpFile.getAbsolutePath();
+      String message = getString(R.string.failed_to_extract) + "\n" + kmpFile.getAbsolutePath();
       showErrorDialog(context, pkgId, message);
     }
 
@@ -80,7 +80,7 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String titleStr = "Install Keyboard Package " + pkgVersion;
+    String titleStr = getString(R.string.install_keyboard_package) + pkgVersion;
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
@@ -161,12 +161,12 @@ public class PackageActivity extends AppCompatActivity {
             }
             cleanup();
           } else {
-            showErrorDialog(context, pkgId, "No new touch-optimized keyboards to install");
+            showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
           }
 
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
-          showErrorDialog(context, pkgId, "No valid touch-optimized keyboards to install");
+          showErrorDialog(context, pkgId, getString(R.string.no_valid_touch_keyboards_to_install));
         }
       }
     });
@@ -216,11 +216,11 @@ public class PackageActivity extends AppCompatActivity {
   private void showErrorDialog(Context context, String pkgId, String message) {
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
-    alertDialogBuilder.setTitle("Package " + pkgId + " failed to install");
+    alertDialogBuilder.setTitle(getString(R.string.title_package) + pkgId + getString(R.string.failed_to_install));
     alertDialogBuilder
       .setMessage(message)
       .setCancelable(false)
-      .setNeutralButton("Close",new DialogInterface.OnClickListener() {
+      .setNeutralButton(getString(R.string.label_close),new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog,int id) {
           if (dialog != null) {
             dialog.dismiss();

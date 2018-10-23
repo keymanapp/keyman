@@ -21,8 +21,8 @@ public class ConfirmDialogFragment extends DialogFragment {
 
     return new AlertDialog.Builder(getActivity())
       .setTitle(title)
-      .setMessage("Would you like to download this keyboard?")
-      .setPositiveButton("Download", new DialogInterface.OnClickListener() {
+      .setMessage(getString(R.string.confirm_download))
+      .setPositiveButton(getString(R.string.label_download), new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
           // Download keyboard
@@ -33,7 +33,7 @@ public class ConfirmDialogFragment extends DialogFragment {
           }
         }
       })
-      .setNegativeButton("Cancel",  new DialogInterface.OnClickListener() {
+      .setNegativeButton(getString(R.string.label_cancel),  new DialogInterface.OnClickListener() {
        public void onClick(DialogInterface dialog, int which) {
          // Cancel
          dialog.dismiss();

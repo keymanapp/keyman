@@ -153,7 +153,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       super.onPreExecute();
       if (showProgressDialog) {
         progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("Downloading keyboard...");
+        progressDialog.setMessage(context.getString(R.string.downloading_keyboard));
         progressDialog.setCancelable(false);
         if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
@@ -178,7 +178,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           throw new Exception(exceptionStr);
         }
 
-        String deviceType = context.getResources().getString(R.string.device_type);
+        String deviceType = context.getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
           deviceType = "androidtablet";
         } else {
