@@ -1,7 +1,7 @@
 {"$schema": "http://json-schema.org/draft-06/schema#",
-  "$id": "keyman/keyboardprocessor/doc/introspection.schema",
-  "title": "Keyboard Porcessor State object introspection",
-  "descritpion": "Internal data from a Keyboard Processor State object, sufficient for debugging and diagnostics",
+  "$id": "@replace_me_with_introspection_schema_uri@",
+  "title": "Keyboard Processor State object introspection",
+  "description": "Internal data from a Keyboard Processor State object, sufficient for debugging and diagnostics",
   "type": "object",
 
   "definitions": {
@@ -11,7 +11,7 @@
         "scope": { "enum": ["unknown", "environment", "keyboard"] },
         "options": {
           "type": "object",
-          "default": {},
+          "default": {}
         }
       },
       "required": ["scope", "options"]
