@@ -339,7 +339,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
       if (hasConnection && !loadFromCache) {
         progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("Loading...");
+        progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
         if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
@@ -362,7 +362,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         jsonObj = getCachedJSONObject(context);
       } else if (hasConnection) {
         try {
-          String deviceType = context.getResources().getString(R.string.device_type);
+          String deviceType = getString(R.string.device_type);
           if (deviceType.equals("AndroidTablet")) {
             deviceType = "androidtablet";
           } else {
