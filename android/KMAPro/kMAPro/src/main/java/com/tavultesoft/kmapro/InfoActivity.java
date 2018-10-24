@@ -58,7 +58,7 @@ public class InfoActivity extends AppCompatActivity {
     PackageInfo pInfo;
     try {
       pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-      ver = String.format("Version: %s", pInfo.versionName);
+      ver = String.format("%s: %s", getString(R.string.title_version), pInfo.versionName);
     } catch (NameNotFoundException e) {
       // Could not get version number
     }

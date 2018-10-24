@@ -61,7 +61,8 @@ public class PackageActivity extends AppCompatActivity {
     try {
       tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
     } catch (Exception e) {
-      String message = getString(R.string.failed_to_extract) + "\n" + kmpFile.getAbsolutePath();
+      String message = String.format("%s\n%s",
+        getString(R.string.failed_to_extract), kmpFile.getAbsolutePath());
       showErrorDialog(context, pkgId, message);
     }
 
@@ -80,7 +81,7 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String titleStr = getString(R.string.install_keyboard_package) + pkgVersion;
+    String titleStr = String.format("%s %s", getString(R.string.install_keyboard_package), pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
@@ -139,7 +140,8 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No welcome.htm so display minimal package information
-      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
+      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" :
+        String.format(" %s", getString(R.string.title_keyboard));
       String htmlString = String.format(
         "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
         pkgName, keyboardString);
@@ -216,11 +218,12 @@ public class PackageActivity extends AppCompatActivity {
   private void showErrorDialog(Context context, String pkgId, String message) {
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
-    alertDialogBuilder.setTitle(getString(R.string.title_package) + pkgId + getString(R.string.failed_to_install));
+    alertDialogBuilder.setTitle(String.format("%s %s %s",
+      getString(R.string.title_package), pkgId, getString(R.string.title_failed_to_install)));
     alertDialogBuilder
       .setMessage(message)
       .setCancelable(false)
-      .setNeutralButton(getString(R.string.label_close),new DialogInterface.OnClickListener() {
+      .setPositiveButton(getString(R.string.label_close),new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog,int id) {
           if (dialog != null) {
             dialog.dismiss();

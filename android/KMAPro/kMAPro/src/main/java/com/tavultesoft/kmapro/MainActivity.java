@@ -298,7 +298,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
                 downloadIntent.putExtra("receiver", resultReceiver);
 
                 progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setMessage(getString(R.string.downloading_keyboard_package) + "\n" + filename + "...");
+                String ellipsisStr = "\u2026";
+                progressDialog.setMessage(String.format("%s\n%s%s",
+                  getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
                 progressDialog.setCancelable(false);
                 progressDialog.show();
 
@@ -509,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
-    dialogBuilder.setTitle(String.format(getString(R.string.text_size) + ": %d", textSize));
+    dialogBuilder.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
     dialogBuilder.setView(textSizeController);
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
@@ -540,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         textSize = progress + minTextSize;
         textView.setTextSize((float) textSize);
-        dialog.setTitle(String.format(getString(R.string.text_size) + ": %d", textSize));
+        dialog.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
       }
     });
 

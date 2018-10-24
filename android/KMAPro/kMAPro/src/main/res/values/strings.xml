@@ -2,26 +2,30 @@
 <resources>
 
     <string name="app_name" translatable="false">Keyman</string>
-    <string name="splash_version" translatable="false">Version</string>
-    <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
+
     <string name="action_share" translatable="false">Share</string>
     <string name="action_web" translatable="false">Web Browser</string>
     <string name="action_text_size" translatable="false">Text Size</string>
     <string name="action_overflow" translatable="false">More</string>
     <string name="action_clear_text" translatable="false">Clear Text</string>
     <string name="action_info" translatable="false">Info</string>
+    <string name="title_version" translatable="false">Version</string>
+    <!-- &#8230; is the ellipsis character "..." -->
     <string name="textview_hint" translatable="false">Start typing here&#8230;</string>
 
-    <!-- Text Size -->
-    <string name="text_size" translatable="false">Text size</string>
+    <!-- Splash screen (version/copyright info currently disabled -->
+    <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
+
+    <!-- Text Size dialog -->
     <string name="ic_text_size_up" translatable="false">Text size up</string>
     <string name="ic_text_size_down" translatable="false">Text size down</string>
 
-
-    <!-- Clear Text -->
+    <!-- Clear Text dialog -->
     <string name="all_text_will_be_cleared" translatable="false">All text will be cleared</string>
 
-    <!-- Get started menu strings -->
+    <!-- Info screen reuses title_version -->
+
+    <!-- Get Started menu strings -->
     <string name="get_started" translatable="false">Get Started</string>
     <string name="add_a_keyboard" translatable="false">Add a keyboard for your language</string>
     <string name="enable_system_keyboard" translatable="false">Enable Keyman as system-wide keyboard</string>
@@ -38,11 +42,11 @@
     <string name="hint_url" translatable="false">Url</string>
 
     <!-- Keyboard Package strings -->
-    <string name="title_package" translatable="false">Package </string>
-    <string name="failed_to_install" translatable="false"> failed to install</string>
+    <string name="title_package" translatable="false">Package</string>
+    <string name="title_failed_to_install" translatable="false">failed to install</string>
     <string name="downloading_keyboard_package" translatable="false">Downloading keyboard package</string>
     <string name="failed_to_extract" translatable="false">Failed to extract</string>
-    <string name="install_keyboard_package"  translatable="false">Install Keyboard Package </string>
+    <string name="install_keyboard_package"  translatable="false">Install Keyboard Package</string>
     <string name="no_new_touch_keyboards_to_install" translatable="false">No new touch-optimized keyboards to install</string>
     <string name="no_valid_touch_keyboards_to_install" translatable="false">No valid touch-optimized keyboards to install</string>
 

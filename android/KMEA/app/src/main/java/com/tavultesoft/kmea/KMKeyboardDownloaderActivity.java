@@ -106,7 +106,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     Bundle args = new Bundle();
     String title = "";
     if (url != null) {
-      title = "Custom Keyboard: " + filename;
+      title = String.format("%s: %s", getString(R.string.custom_keyboard), filename);
     } else if (customKeyboard != null && customLanguage != null &&
         !customKeyboard.trim().isEmpty() && !customLanguage.trim().isEmpty()) {
       int kbIndex = KMManager.getKeyboardIndex(getApplicationContext(), customKeyboard, customLanguage);
@@ -117,10 +117,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         return; // false
       }
 
-      title = customLanguage + "_" + customKeyboard;
+      title = String.format("%s_%s", customLanguage, customKeyboard);
     } else {
       // Download keyboard from cloud server
-      title = langName + ": " + kbName;
+      title = String.format("%s: %s", langName, kbName);
     }
 
     DialogFragment dialog = new ConfirmDialogFragment();

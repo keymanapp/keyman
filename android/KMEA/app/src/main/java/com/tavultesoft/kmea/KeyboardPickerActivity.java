@@ -164,7 +164,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
           dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
-          dialogBuilder.setMessage("\n" + getString(R.string.cannot_connect) + "\n");
+          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
           dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
           dialog.show();
@@ -525,7 +525,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
       dialogBuilder.setTitle(context.getString(R.string.title_add_keyboard));
       dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
-      dialogBuilder.setMessage("\n" + context.getString(R.string.cannot_connect) + "\n");
+      dialogBuilder.setMessage(String.format("\n%s\n", context.getString(R.string.cannot_connect)));
       dialogBuilder.setPositiveButton(context.getString(R.string.label_ok), null);
       AlertDialog dialog = dialogBuilder.create();
       dialog.show();
@@ -619,7 +619,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           failedUpdateCount = 0;
           updateCount = result;
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(context.getString(R.string.keyboard_update_available));
+          dialogBuilder.setTitle(context.getString(R.string.keyboard_updates_available));
           dialogBuilder.setMessage(context.getString(R.string.confirm_update));
           dialogBuilder.setPositiveButton(context.getString(R.string.label_update), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
