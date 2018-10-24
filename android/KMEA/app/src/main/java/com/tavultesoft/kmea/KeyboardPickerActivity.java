@@ -163,7 +163,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
-          dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
           dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
           dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
@@ -524,7 +523,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     } else {
       AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
       dialogBuilder.setTitle(context.getString(R.string.title_add_keyboard));
-      dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
       dialogBuilder.setMessage(String.format("\n%s\n", context.getString(R.string.cannot_connect)));
       dialogBuilder.setPositiveButton(context.getString(R.string.label_ok), null);
       AlertDialog dialog = dialogBuilder.create();
