@@ -571,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_trash);
     dialogBuilder.setTitle(getString(R.string.action_clear_text));
-    dialogBuilder.setMessage("\n" + getString(R.string.all_text_will_be_cleared) + "\n");
+    dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.all_text_will_be_cleared)));
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
