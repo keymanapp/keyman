@@ -51,6 +51,14 @@ namespace com.keyman {
       this.keyman = keyman;
     }
 
+    ['getBCP47Components'](lgCode: string): string[] {
+      if(lgCode.indexOf('-')==-1) {
+        return [lgCode];
+      } else {
+        return lgCode.split('-');
+      }
+    }
+
     initDevices(): void {
       this.device = new Device();
       this.physicalDevice = new Device();
