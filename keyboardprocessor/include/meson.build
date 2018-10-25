@@ -1,3 +1,10 @@
+# Copyright:    © 2018 SIL International.
+# Description:  Cross platform build script to generate installable API header
+#               files with versioning information templated in.
+# Create Date:  2 Oct 2018
+# Authors:      Tim Eves (TSE)
+#
+
 ver = meson.project_version().split('.')
 
 cfg = configuration_data()

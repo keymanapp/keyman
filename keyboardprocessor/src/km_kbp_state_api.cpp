@@ -1,3 +1,13 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  Implementation of the state API functions using internal
+                data structures and functions.
+  Create Date:  5 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      5  Oct 2018 - TSE - Initial implementation.
+                18 Oct 2018 - TSE - Refactor out adaptor and internal classes
+                                    into state.hpp
+*/
 #include <cassert>
 #include <algorithm>
 #include <iterator>

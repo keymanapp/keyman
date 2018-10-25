@@ -1,3 +1,13 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  Implementation of the keyboard API functions using internal
+                data structures and functions.
+  Create Date:  1 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      1  Sep 2018 - TSE - Initial implementation.
+                5  Oct 2018 - TSE - Refactor out adaptor and internal classes
+                                    into keyboard.hpp
+*/
 #include <cassert>
 #include <algorithm>
 #include <experimental/filesystem>

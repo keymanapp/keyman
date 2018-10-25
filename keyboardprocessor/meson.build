@@ -1,3 +1,10 @@
+# Copyright:    © 2018 SIL International.
+# Description:  Cross platform build script to compile libkmnkbp, documentation
+#               and tests.
+# Create Date:  2 Oct 2018
+# Authors:      Tim Eves (TSE)
+#
+
 project('keyboardprocessor', 'cpp', 'c',
         version: '0.0.0',
         license: 'MIT',

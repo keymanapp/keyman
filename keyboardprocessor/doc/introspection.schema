@@ -1,5 +1,6 @@
 {"$schema": "http://json-schema.org/draft-06/schema#",
   "$id": "@replace_me_with_introspection_schema_uri@",
+  "$comment": "© 2018 SIL International. MIT Licensed",
   "title": "Keyboard Processor State object introspection",
   "description": "Internal data from a Keyboard Processor State object, sufficient for debugging and diagnostics",
   "type": "object",

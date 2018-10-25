@@ -1,3 +1,9 @@
+# Copyright:    © 2018 SIL International.
+# Description:  Cross platform build script to compile libkmnkbp.
+# Create Date:  2 Oct 2018
+# Authors:      Tim Eves (TSE)
+#
+
 defns = ['-DKMN_KBP_EXPORTING']
 
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'

@@ -1,3 +1,12 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  Internal option key value map class and adaptor class for
+                the API.
+  Create Date:  2 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_options_api.cpp
+*/
+
 #pragma once
 
 #include <unordered_map>

@@ -1,3 +1,11 @@
+# Copyright:    © 2018 SIL International.
+# Description:  Cross platform build script to compile unit tests.
+# Create Date:  2 Oct 2018
+# Authors:      Tim Eves (TSE)
+# History:      2  Oct 2018 - TSE - Added tests for utfcodec & json.
+#               19 Oct 2018 - TSE - Added kmnkbd directory for API unit tests.
+#
+
 cmpfiles = ['-c', 'import sys, filecmp; exit(not filecmp.cmp(*sys.argv[1:]))']
 stnds = join_paths(meson.source_root(), 'tests', 'standards')
 

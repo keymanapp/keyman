@@ -1,3 +1,10 @@
+# Copyright:    © 2018 SIL International.
+# Description:  Lowlevel C style python API. Intended to be wrapped by a more
+#               Pythonic higher level API.
+# Create Date:  18 Oct 2018
+# Authors:      Tim Eves (TSE)
+#
+
 import ctypes
 import ctypes.util
 import operator

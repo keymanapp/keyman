@@ -1,3 +1,15 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  API declarations for modifier keys, handy access masks and
+                Keyman VKEY names.  These follow the same keytop->code
+                associations as the Windows API. This is a separate header to
+                maintain readability of the primary API header.
+  Create Date:  17 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      17 Oct 2018 - TSE - Moved & refactored km_kbp_modifier_state
+                                    from keyboardprocessor.h.
+                                  - Added VKey and mask definitions.
+*/
 enum km_kbp_modifier_state {
   KM_KBP_MODIFIER_LCTRL       = 1 << 0,
   KM_KBP_MODIFIER_RCTRL       = 1 << 1,

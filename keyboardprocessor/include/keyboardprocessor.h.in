@@ -1,3 +1,11 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  Cross platform API C/C++ declarations for libkmnkbp keyboard
+                processor.
+  Create Date:  2 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      18 Oct 2018 - TSE - Finialised verion of API.
+*/
 #pragma once
 /*
 # Keyman Keyboard Processor API

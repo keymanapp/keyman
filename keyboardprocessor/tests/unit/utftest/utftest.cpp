@@ -1,3 +1,12 @@
+/*
+  Copyright:    © 2011,2018 SIL International.
+  Description:  Unit tests for the UTF{8,16,32} codec template library.
+  Create Date:  2011
+  Authors:      Tim Eves (TSE)
+  History:      28 Sep 2018 - TSE - Imported from graphite2 project.
+                25 Oct 2018 - TSE - Relicensed under the MIT license for
+                                    inclusion in the Keyman project.
+*/
 #include <iostream>
 #include "utfcodec.hpp"
 

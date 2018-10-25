@@ -1,3 +1,12 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  Cross platform support macros to define API function
+                declspec/attributes and how each supported compiler or OS
+                allows us to specify them.
+  Create Date:  18 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      18 Oct 2018 - TSE - Imported from graphite2 project.
+*/
 #pragma once
 
 // Define API function declspec/attributes and how each supported compiler or OS

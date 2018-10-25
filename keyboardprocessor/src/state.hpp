@@ -1,3 +1,11 @@
+/*
+  Copyright:    © 2018 SIL International.
+  Description:  Internal context class and adaptor class for the API.
+  Create Date:  17 Oct 2018
+  Authors:      Tim Eves (TSE)
+  History:      17 Oct 2018 - TSE - Refactored out of km_kbp_state_api.cpp
+*/
+
 #pragma once
 #include <vector>
 

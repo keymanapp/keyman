@@ -1,3 +1,10 @@
+# Copyright:    © 2018 SIL International.
+# Description:  Cross platform build script to extract and generate
+#               documentation for the API. This is speculative ATM.
+# Create Date:  5 Oct 2018
+# Authors:      Tim Eves (TSE)
+#
+
 hotdoc = find_program('hotdoc', required: false)
 installdir = join_paths(get_option('datadir'), 'doc', meson.project_name())
 
