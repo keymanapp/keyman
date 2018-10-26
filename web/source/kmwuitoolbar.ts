@@ -357,8 +357,6 @@ if(!window['keyman']['ui']['name']) {
 
             // While we could avoid duplicating keyboard entries that occur for multiple regions, we'll instead
             // allow them to display while distinguishing them more directly.  (That part is handled later.)
-            var match = false;
-            
             if(x.push) {
               x.push(Keyboards[j]);
             } else {
