@@ -355,19 +355,11 @@ if(!window['keyman']['ui']['name']) {
           if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
             var x = ui.languages[languageCode].keyboards;
 
-            // Avoid duplicating keyboard entries that occur for multiple regions!
-            // Or should we distinguish them more directly here?
+            // While we could avoid duplicating keyboard entries that occur for multiple regions, we'll instead
+            // allow them to display while distinguishing them more directly.  (That part is handled later.)
             var match = false;
-            // for(var k=0; k < x.length; k++) {
-            //   if(x[k]['InternalName'] == Keyboards[j]['InternalName']) {
-            //     match = true;
-            //     break;
-            //   }
-            // }
-
-            /*if(match) {
-              continue;
-            } else */if(x.push) {
+            
+            if(x.push) {
               x.push(Keyboards[j]);
             } else {
               ui.languages[languageCode].keyboards = x.concat(Keyboards[j]);
@@ -516,9 +508,9 @@ if(!window['keyman']['ui']['name']) {
           ui.langKeyboardListNodes[lang.id].style.display='none';
           
           for(var n in lang.keyboards) {
-            // TODO:  Consider appending the full BCP-47 code here for disambiguation?
             var itemNode = ui.createNode('li');
             kbdText = lang.keyboards[n]['Name'].replace(/\s?keyboard/i,'');
+            // We append the full BCP-47 code here for disambiguation when regional and/or script variants exist.
             kbdText = kbdText + " [" + lang.keyboards[n].LanguageCode + "]";
             aNode = ui.createNode('a', null, null, kbdText);
             aNode.href = '#';
