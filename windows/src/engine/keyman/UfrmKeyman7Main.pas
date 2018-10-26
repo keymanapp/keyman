@@ -148,6 +148,9 @@ uses
   Vcl.StdCtrls,
   Vcl.ImgList,
 
+  Keyman.System.DebugLogClient,
+  Keyman.System.DebugLogManager,
+
   keymanapi_TLB,
 //TOUCH    UfrmTouchKeyboard,
   GlobalKeyboardChangeManager,
@@ -155,7 +158,6 @@ uses
   KeymanTrayIcon,
   KeymanMenuItem,
   custinterfaces,
-  DebugManager,
   Menu_KeyboardItems,
   UserMessages,
   UfrmKeymanMenu,
@@ -240,7 +242,6 @@ type
     procedure WMUserParameterPass(var Message: TMessage); message WM_USER_ParameterPass;
     procedure WMUserSendFontChange(var Message: TMessage); message WM_USER_SendFontChange;
     procedure WMUserPlatformComms(var Message: TMessage); message WM_USER_PlatformComms;
-    procedure WMUserDebugNotify(var Message: TMessage); message WM_USER_DebugNotify;
     procedure WMUserVisualKeyboardClosed(var Message: TMessage); message WM_USER_VisualKeyboardClosed;   // I4243
     procedure SetTrayIcon(rp: TRunningProduct; kbd: IKeymanKeyboardInstalled);
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton;
@@ -378,7 +379,6 @@ uses
   UfrmHelp,
   UILanguages,
   UfrmOSKCharacterMap,
-  UfrmDebugNotify,
   utilstr,
   utilwow64,
   KeymanEngineControl,
@@ -715,7 +715,7 @@ begin
   end
   else if Message.Msg = wm_keyman_globalswitch then
   begin
-    TDebugManager.WriteMessage('wm_keyman_globalswitch for Application Handle: %x %x', [Message.wParam, Message.lParam]);
+    TDebugLogClient.Instance.WriteMessage('wm_keyman_globalswitch for Application Handle: %x %x', [Message.wParam, Message.lParam]);
 
     case Message.wParam of
       skHKL,      // A windows language has been selected so select the most appropriate Keyman keyboard
@@ -733,9 +733,9 @@ begin
       Exit;
     end;
 
-    TDebugManager.WriteMessage('wm_keyman_control for Application Handle: %x %x', [Message.wParam, Message.lParam]);
+    TDebugLogClient.Instance.WriteMessage('wm_keyman_control for Application Handle: %x %x', [Message.wParam, Message.lParam]);
     Message.Result := ProcessWMKeymanControl(LoWord(Message.WParam), HiWord(Message.WParam), Message.LParam);   // I3961
-    TDebugManager.WriteMessage('wm_keyman_control-exit for Application Handle: %x %x -> %x', [Message.wParam, Message.lParam, Message.Result]);   // I3961
+    TDebugLogClient.Instance.WriteMessage('wm_keyman_control-exit for Application Handle: %x %x -> %x', [Message.wParam, Message.lParam, Message.Result]);   // I3961
   end
   else
     Result := False;
@@ -748,21 +748,21 @@ begin
   gti.cbSize := SizeOf(gti);
   if not GetGUIThreadInfo(0, gti) then
   begin
-    TDebugManager.WriteLastError('UpdateFocusInfo', 'GetGUIThreadInfo');
+    TDebugLogClient.Instance.WriteLastError('UpdateFocusInfo', 'GetGUIThreadInfo');
     Exit;
   end;
 
-  TDebugManager.WriteMessage('UpdateFocusInfo: last focus=%x last active=%x', [FLastFocus, FLastActive]);
-  TDebugManager.WriteMessage('UpdateFocusInfo: new focus=%x new active=%x', [gti.hwndFocus, gti.hwndActive]);
+  TDebugLogClient.Instance.WriteMessage('UpdateFocusInfo: last focus=%x last active=%x', [FLastFocus, FLastActive]);
+  TDebugLogClient.Instance.WriteMessage('UpdateFocusInfo: new focus=%x new active=%x', [gti.hwndFocus, gti.hwndActive]);
 
   if IsControllerWindow(gti.hwndFocus) then  // I4731
-    TDebugManager.WriteMessage('UpdateFocusInfo: new focus is controller window, not updating', [])
+    TDebugLogClient.Instance.WriteMessage('UpdateFocusInfo: new focus is controller window, not updating', [])
   else if IsSysTrayWindow(gti.hwndFocus) then   // I4731
-    TDebugManager.WriteMessage('UpdateFocusInfo: new focus is systray window, not updating', [])
+    TDebugLogClient.Instance.WriteMessage('UpdateFocusInfo: new focus is systray window, not updating', [])
   else if IsControllerWindow(gti.hwndActive) then  // I4731
-    TDebugManager.WriteMessage('UpdateFocusInfo: new active is controller window, not updating', [])
+    TDebugLogClient.Instance.WriteMessage('UpdateFocusInfo: new active is controller window, not updating', [])
   else if IsSysTrayWindow(gti.hwndActive) then   // I4731
-    TDebugManager.WriteMessage('UpdateFocusInfo: new active is systray window, not updating', [])
+    TDebugLogClient.Instance.WriteMessage('UpdateFocusInfo: new active is systray window, not updating', [])
   else
   begin
     FLastFocus := gti.hwndFocus;
@@ -928,14 +928,14 @@ begin
   if Assigned(kbd) then
   begin
     case kbd.ItemType of
-      lsitWinKeyboard:    TDebugManager.WriteMessage('LanguageSwitchFormHidden: kbd assigned, type = lsitWinKeyboard, value = %x', [(kbd as TLangSwitchKeyboard_WinKeyboard).HKL]);
-      lsitTIP:            TDebugManager.WriteMessage('LanguageSwitchFormHidden: kbd assigned, type = lsitTIP, value = %s', [(kbd as TLangSwitchKeyboard_TIP).Caption]);
-      else                TDebugManager.WriteMessage('LanguageSwitchFormHidden: kbd assigned, type = somthing else', []);
+      lsitWinKeyboard:    TDebugLogClient.Instance.WriteMessage('LanguageSwitchFormHidden: kbd assigned, type = lsitWinKeyboard, value = %x', [(kbd as TLangSwitchKeyboard_WinKeyboard).HKL]);
+      lsitTIP:            TDebugLogClient.Instance.WriteMessage('LanguageSwitchFormHidden: kbd assigned, type = lsitTIP, value = %s', [(kbd as TLangSwitchKeyboard_TIP).Caption]);
+      else                TDebugLogClient.Instance.WriteMessage('LanguageSwitchFormHidden: kbd assigned, type = somthing else', []);
     end;
     kbd.Activate(hwnd);
   end
   else
-    TDebugManager.WriteMessage('LanguageSwitchFormHidden: kbd NOT assigned',[]);
+    TDebugLogClient.Instance.WriteMessage('LanguageSwitchFormHidden: kbd NOT assigned',[]);
 end;
 
 procedure TfrmKeyman7Main.ShowMenu(Sender: TObject; Location: TCustomisationMenuItemLocation; NearTray: Boolean; IconRect: TRect);   // I3990   // I3991
@@ -1155,18 +1155,6 @@ begin
   end;
 end;
 
-procedure TfrmKeyman7Main.WMUserDebugNotify(var Message: TMessage);
-begin
-  with TfrmDebugNotify.Create(Self) do
-  try
-    LogFileHandle := Message.LParam;
-    LogFileIndex := Message.WParam;
-    ShowModal;
-  finally
-    Free;
-  end;
-end;
-
 procedure TfrmKeyman7Main.WMUserSendFontChange(var Message: TMessage);
 begin
   PostMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
@@ -1377,7 +1365,7 @@ procedure TfrmKeyman7Main.ActivateKeyboard(Keyboard: TLangSwitchKeyboard);   // 
 var
   hwnd: THandle;
 begin
-  TDebugManager.WriteMessage('ActivateKeyboard: LastFocus=%x LastActive=%x Keyboard=%s KeymanID=%d', [FLastFocus, FLastActive, Keyboard.Caption, Keyboard.KeymanID]);   // I4674
+  TDebugLogClient.Instance.WriteMessage('ActivateKeyboard: LastFocus=%x LastActive=%x Keyboard=%s KeymanID=%d', [FLastFocus, FLastActive, Keyboard.Caption, Keyboard.KeymanID]);   // I4674
   hwnd := FLastFocus;
   AllowSetForegroundWindow(ASFW_ANY);   // I3933
   PostMessage(FLastActive, wm_keyman_control_internal, KMCI_SETFOREGROUND, FLastFocus);   // I3933
@@ -1405,23 +1393,23 @@ begin
   tid := GetWindowThreadProcessId(FLastFocus, nil);
   if tid = 0 then
   begin
-    TDebugManager.WriteLastError('SetLastFocus', 'GetWindowThreadProcessId');
+    TDebugLogClient.Instance.WriteLastError('SetLastFocus', 'GetWindowThreadProcessId');
     Exit;
   end;
 
   if not AttachThreadInput(tid, GetCurrentThreadId, TRUE) then
   begin
-    TDebugManager.WriteLastError('SetLastFocus', 'AttachThreadInput:1');
+    TDebugLogClient.Instance.WriteLastError('SetLastFocus', 'AttachThreadInput:1');
     Exit;
   end;
 
   //Windows.SetForegroundWindow(FLastFocus); //FLastActive);
   if Winapi.Windows.SetFocus(FLastFocus) = 0 then
-    TDebugManager.WriteLastError('SetLastFocus', 'SetFocus');
+    TDebugLogClient.Instance.WriteLastError('SetLastFocus', 'SetFocus');
 
   if not AttachThreadInput(tid, GetCurrentThreadId, FALSE) then
   begin
-    TDebugManager.WriteLastError('SetLastFocus', 'AttachThreadInput:2');
+    TDebugLogClient.Instance.WriteLastError('SetLastFocus', 'AttachThreadInput:2');
     Exit;
   end;
 end;

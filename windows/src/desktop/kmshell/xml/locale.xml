@@ -527,11 +527,11 @@ Do you want to try and start &Name; again now?</String>
 
 <!-- Warnings -->
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKDebuggingWarning" Version="7.0.230.0" Description="Warning upon starting debugging in the Options tab">&Name; debug information will be stored in a text file called keymanlog\system.log on your desktop.  You should exit &Name; before reading or deleting this file.
+<String Group="Formatted Messages" Type="FormatString" Id="SKDebuggingWarning" Version="7.0.230.0" Description="Warning upon starting debugging in the Options tab">&Name; debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit &Name; before attempting to delete this file.
 
-WARNING: This file can grow large very quickly.  Enabling debugging will slow down your system and should only be done if advised by technical support.
+WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.
 
-PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session, and delete the [desktop]\keymanlog\system.log file as soon as possible.</String>
+PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</String>
 
 <!-- Microsoft Office -->
 

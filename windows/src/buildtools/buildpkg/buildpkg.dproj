@@ -122,7 +122,6 @@
         <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>

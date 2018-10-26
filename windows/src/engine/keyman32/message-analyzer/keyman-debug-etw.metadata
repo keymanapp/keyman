@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AssetCollectionMetadata xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <UniqueId>116d8192-6f3e-44d4-b145-cd64203a3aff</UniqueId>
+  <GroupId>116d8192-6f3e-44d4-b145-cd64203a3aff</GroupId>
+  <Name>Keyman</Name>
+  <AssetType>SummaryViewAsset</AssetType>
+  <VersionNumber>0</VersionNumber>
+  <Author>mcdurdin</Author>
+  <PublishedDate>0001-01-01T00:00:00</PublishedDate>
+  <ModifiedDate>2018-10-17T05:49:12.7095085+11:00</ModifiedDate>
+  <Revision>0</Revision>
+  <Rating>0</Rating>
+</AssetCollectionMetadata>

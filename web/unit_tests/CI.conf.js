@@ -45,52 +45,59 @@ module.exports = function(config) {
   var CURRENT_MAC_LAUNCHERS = {
     bs_firefox_mac: {
       browser: 'firefox',
-      browser_version: '58',
+      browser_version: '62',
       os: 'OS X',
-      os_version: 'High Sierra'
+      os_version: 'Mojave'
     },
-    bs_safari_mac: {
+    bs_safari_mac_hs: {
       browser: 'safari',
       browser_version: '11.1',
       os: 'OS X',
       os_version: 'High Sierra'
     },
+    bs_safari_mac_m: {
+      browser: 'safari',
+      browser_version: '12',
+      os: 'OS X',
+      os_version: 'Mojave'
+    },
     bs_chrome_mac: {
       browser: 'chrome',
-      browser_version: '64.0',
+      browser_version: '70.0',
       os: 'OS X',
-      os_version: 'High Sierra'
+      os_version: 'Mojave'
     }
   };
 
-  
-  var CURRENT_IOS_LAUNCHERS = {
+  // BrowserStack does not appear to properly support automated JavaScript testing at this time.
+  // See https://www.browserstack.com/list-of-browsers-and-platforms?product=js_testing for the reference.
+  var CURRENT_IOS_LAUNCHERS = {}; /*{
     bs_iphoneX: {
-      device: 'iPhone 8 Plus', // Ideally, we'd use 'iPhone X', but BrowserStack's version is being problematic lately.
+      device: 'iPhone X', // Ideally, we'd use 'iPhone X', but BrowserStack's version is being problematic lately.
       real_mobile: true,
       os: 'ios',
       os_version: '11.0'
     },
-    bs_ipad5: {
+    bs_ipad6: {
       device: 'iPad 5th',
       real_mobile: true,
       os: 'ios',
       os_version: '11.0'
     }
-  };
+  };*/
 
   var CURRENT_WIN_LAUNCHERS = {
     bs_firefox_win: {
       os: 'Windows',
       os_version: '10',
       browser: 'firefox',
-      browser_version: '58.0'
+      browser_version: '62.0'
     },
     bs_chrome_win: {
       os: 'Windows',
       os_version: '10',
       browser: 'chrome',
-      browser_version: '64.0'
+      browser_version: '70.0'
     },
     bs_ie_win: {
       os: 'Windows',
@@ -102,7 +109,7 @@ module.exports = function(config) {
       os: 'Windows',
       os_version: '10',
       browser: 'edge',
-      browser_version: '16.0'
+      browser_version: '17.0'
     }
   }
 

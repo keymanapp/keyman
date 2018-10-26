@@ -5,7 +5,6 @@ program test_klog;
 uses
   SysUtils,
   klog in '..\..\global\delphi\general\klog.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas';

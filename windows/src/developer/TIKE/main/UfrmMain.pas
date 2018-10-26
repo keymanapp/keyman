@@ -414,7 +414,6 @@ uses
   Keyman.Developer.System.CEFManager,
 
   CharMapDropTool,
-  DebugManager,
   HTMLHelpViewer,
   KLog,
   keymanapi_TLB,
@@ -529,15 +528,6 @@ begin
   frmCharacterIdentifier.OnCancelFocus := CharMapCancelFocus;
 
   frmHelp := TfrmHelp.Create(Application);
-
-  KL.Log('GetDebugManager start');
-  try
-    GetDebugManager(Handle);
-  except
-    on E:Exception do
-      KL.LogError('GetDebugManager failed: '+E.Message);
-  end;
-  KL.Log('GetDebugManager finish');
 
   Application.OnActivate := AppOnActivate;
 

@@ -52,11 +52,10 @@ uses
   UfrmCharacterMapFilter in '..\..\global\delphi\charmap\UfrmCharacterMapFilter.pas' {frmCharacterMapFilter},
   FixedTrackbar in '..\..\global\delphi\comp\FixedTrackbar.pas',
   Menu_KeyboardItems in 'Menu_KeyboardItems.pas',
-  DebugManager in '..\..\global\delphi\debug\DebugManager.pas',
+  Keyman.System.DebugLogManager in '..\..\global\delphi\debug\Keyman.System.DebugLogManager.pas',
   PaintPanel in '..\..\global\delphi\comp\PaintPanel.pas',
   exImageList in '..\..\global\delphi\comp\exImageList.pas',
   utilhttp in '..\..\global\delphi\general\utilhttp.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   VistaMessages in 'VistaMessages.pas',
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
   VisualKeyboardExportXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas',
@@ -93,7 +92,6 @@ uses
   WebSoundControl in '..\..\global\delphi\general\WebSoundControl.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
-  UfrmDebugNotify in 'UfrmDebugNotify.pas' {frmDebugNotify},
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UfrmKeymanMenu in 'UfrmKeymanMenu.pas' {frmKeymanMenu},
   UILanguages in '..\..\desktop\kmshell\util\UILanguages.pas',
@@ -139,7 +137,9 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
-  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas';
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  Keyman.System.DebugLogClient in '..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas',
+  Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
