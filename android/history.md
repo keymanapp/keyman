@@ -7,10 +7,12 @@
 * Change default keyboard from `european` to `sil_euro_latin` (#1112)
 * Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
 * Add splash screen (#1151)
-* Update app to use Material Design theme
+* Update app to use Material Design theme (#681)
 * Fix globe button when pausing WebBrowser (#1213)
 * Change system keyboard to "numeric" layer for digit/phone number text fields (#1218)
 * Add feature to vibrate device when Keyman Web calls `beep` (#1227)
+* Add feature for system keyboard globe button to switch to next keyboard. 
+After reaching the last Keyman keyboard, switch to next system IME (#1283)
 
 ## 2018-10-03 10.0.506 stable
 * Fix crash that can occur when displaying preview key (#1230, #1234)

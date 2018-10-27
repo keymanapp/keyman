@@ -160,6 +160,18 @@ public final class KMManager {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
+  protected static IBinder getToken() {
+    final Dialog dialog = IMService.getWindow();
+    if (dialog == null) {
+      return null;
+    }
+    final Window window = dialog.getWindow();
+    if (window == null) {
+      return null;
+    }
+    return window.getAttributes().token;
+  }
+
   // Check if a keyboard namespace is reserved
   public static boolean isReservedNamespace(String packageID) {
     if (packageID.equals(KMDefault_UndefinedPackageID)) {
@@ -688,6 +700,10 @@ public final class KMManager {
   }
 
   public static void switchToNextKeyboard(Context context) {
+    switchToNextKeyboard(context, false);
+  }
+
+  public static void switchToNextKeyboard(Context context, boolean switchToNextIME) {
     int index = KeyboardPickerActivity.getCurrentKeyboardIndex(context);
     index++;
     HashMap<String, String> kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
@@ -706,6 +722,17 @@ public final class KMManager {
     if (InAppKeyboard != null) {
       InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
+
+    // Switch system keyboard to next IME so the user doesn't see
+    // SystemKeyboard.setKeyboard resetting to the first Keyman keyboard
+    if (index == 0 && switchToNextIME) {
+      InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+      // TODO: this method is deprecated in API level 28
+      // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
+      imm.switchToNextInputMethod(getToken(), false);
+    }
+
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
@@ -1406,18 +1433,6 @@ public final class KMManager {
       KMSystemKeyboardWebViewClient.context = context;
     }
 
-    private IBinder getToken() {
-      final Dialog dialog = IMService.getWindow();
-      if (dialog == null) {
-        return null;
-      }
-      final Window window = dialog.getWindow();
-      if (window == null) {
-        return null;
-      }
-      return window.getAttributes().token;
-    }
-
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
@@ -1489,11 +1504,7 @@ public final class KMManager {
             if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
             } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-              InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-              // TODO: this method is deprecated in API level 28
-              // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
-              imm.switchToNextInputMethod(getToken(), false);
+              switchToNextKeyboard(context, true);
             }
           } else {
             switchToNextKeyboard(context);
