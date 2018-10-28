@@ -79,7 +79,9 @@ void DePseudofy(WCHAR *pchText)   // I3564
 
 void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *pchText, ULONG cchText)
 {
-    ITfInsertAtSelection *pInsertAtSelection;
+  LogEnter();
+  
+  ITfInsertAtSelection *pInsertAtSelection;
     ITfRange *pRange;
     TF_SELECTION tfSelection;
 
@@ -126,7 +128,8 @@ Exit:
 
 void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n)
 {
-	TF_SELECTION tfSelection;
+  LogEnter();
+  TF_SELECTION tfSelection;
 	ULONG cFetched;
 	LONG outn;
 
@@ -164,6 +167,8 @@ char *debugstr(PWSTR buf) {
 
 BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n)   // I4933
 {
+  LogEnter();
+
   TF_SELECTION tfSelection = {0};
   TF_STATUS tfStatus = {0};
 	ULONG cFetched;

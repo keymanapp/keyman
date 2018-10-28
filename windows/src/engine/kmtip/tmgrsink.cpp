@@ -39,6 +39,7 @@
 
 STDAPI CKMTipTextService::OnInitDocumentMgr(ITfDocumentMgr *pDocMgr)
 {
+  LogEnter();
   return S_OK;
 }
 
@@ -52,7 +53,8 @@ STDAPI CKMTipTextService::OnInitDocumentMgr(ITfDocumentMgr *pDocMgr)
 
 STDAPI CKMTipTextService::OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr)
 {
-    return S_OK;
+  LogEnter();
+  return S_OK;
 }
 
 //+---------------------------------------------------------------------------
@@ -66,6 +68,32 @@ STDAPI CKMTipTextService::OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr)
 
 STDAPI CKMTipTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pDocMgrPrevFocus)
 {
+  LogEnter();
+
+  HWND hwndActive = NULL;
+  HWND hwndPrevious = NULL;
+
+  ITfContext *pContext;
+  if (pDocMgrFocus != NULL && SUCCEEDED(pDocMgrFocus->GetTop(&pContext))) {
+    ITfContextView *pView;
+    if (SUCCEEDED(pContext->GetActiveView(&pView))) {
+      pView->GetWnd(&hwndActive);
+      pView->Release();
+    }
+    pContext->Release();
+  }
+
+  if (pDocMgrPrevFocus != NULL && SUCCEEDED(pDocMgrPrevFocus->GetTop(&pContext))) {
+    ITfContextView *pView;
+    if (SUCCEEDED(pContext->GetActiveView(&pView))) {
+      pView->GetWnd(&hwndPrevious);
+      pView->Release();
+    }
+    pContext->Release();
+  }
+
+  SendDebugMessageFormat(L"OnSetFocus ... calling Keyman32Interface::SetFocus(%x, %x)", hwndActive, hwndPrevious);
+  Keyman32Interface::SetFocus(hwndActive, hwndPrevious);
 /* http://blogs.msdn.com/b/tsfaware/archive/2007/05/21/transitory-extensions.aspx
 bool isTransitory = false;
   ITfContext *pITfContext = NULL;
@@ -113,7 +141,8 @@ bool isTransitory = false;
 
 STDAPI CKMTipTextService::OnPushContext(ITfContext *pContext)
 {
-    return S_OK;
+  LogEnter();
+  return S_OK;
 }
 
 //+---------------------------------------------------------------------------
@@ -125,7 +154,8 @@ STDAPI CKMTipTextService::OnPushContext(ITfContext *pContext)
 
 STDAPI CKMTipTextService::OnPopContext(ITfContext *pContext)
 {
-    return S_OK;
+  LogEnter();
+  return S_OK;
 }
 
 //+---------------------------------------------------------------------------
@@ -137,10 +167,13 @@ STDAPI CKMTipTextService::OnPopContext(ITfContext *pContext)
 
 STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL fActivated)   // I3581
 {
+  LogEnter();
+
   guidActiveProfile = GUID_NULL;   // I4274
 
   if(IsEqualGUID(clsid, c_clsidKMTipTextService))
   {
+    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(c_clsidKMTipTextService, <GUID>, %d)", fActivated);
     if(fActivated) {
       guidActiveProfile = guidProfile;
       TIPNotifyActivate((GUID *)&guidProfile);
@@ -148,8 +181,10 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
     else TIPNotifyActivate(NULL);
     // --> go it!
   }
-  else
+  else {
+    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(<other-GUID>, <GUID>, %d)", fActivated);
     TIPNotifyActivate(NULL);
+  }
 
   return S_OK;
 }
@@ -163,8 +198,10 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
 
 BOOL CKMTipTextService::_InitThreadMgrSink()
 {
-    ITfSource *pSource;
-    BOOL fRet;
+  LogEnter();
+
+  ITfSource *pSource;
+  BOOL fRet;
 
   // Check registry for deep integration enable/disable flag   // I4375   // I4377
   // 0 = force disable
@@ -174,10 +211,10 @@ BOOL CKMTipTextService::_InitThreadMgrSink()
   _dwDeepIntegration = DEEPINTEGRATION_DEFAULT;
 
   RegistryReadOnly r(HKEY_LOCAL_MACHINE);
-  if(r.OpenKeyReadOnly(REGSZ_KeymanLM)) {
-    if(r.ValueExists(REGSZ_DeepTSFIntegration)) {
+  if (r.OpenKeyReadOnly(REGSZ_KeymanLM)) {
+    if (r.ValueExists(REGSZ_DeepTSFIntegration)) {
       _dwDeepIntegration = r.ReadInteger(REGSZ_DeepTSFIntegration);
-      if(_dwDeepIntegration > DEEPINTEGRATION_DEFAULT) _dwDeepIntegration = DEEPINTEGRATION_DEFAULT;
+      if (_dwDeepIntegration > DEEPINTEGRATION_DEFAULT) _dwDeepIntegration = DEEPINTEGRATION_DEFAULT;
     }
     r.CloseKey();
   }
@@ -186,49 +223,54 @@ BOOL CKMTipTextService::_InitThreadMgrSink()
   // Next, check for an app-specific deep integration flag   // I4933
   //
 
-  if(r.OpenKeyReadOnly(REGSZ_AppIntegration)) {
+  if (r.OpenKeyReadOnly(REGSZ_AppIntegration)) {
     char filename[MAX_PATH];
-    if(GetModuleFileName(NULL, filename, _countof(filename)) != 0) {
+    if (GetModuleFileName(NULL, filename, _countof(filename)) != 0) {
       LPSTR p = strrchr(filename, '\\');
-      if(p) {
+      if (p) {
         p++;
-        if(r.ValueExists(p)) {
+        if (r.ValueExists(p)) {
           _dwDeepIntegration = r.ReadInteger(p);
-          if(_dwDeepIntegration > DEEPINTEGRATION_DEFAULT) _dwDeepIntegration = DEEPINTEGRATION_DEFAULT;
+          if (_dwDeepIntegration > DEEPINTEGRATION_DEFAULT) _dwDeepIntegration = DEEPINTEGRATION_DEFAULT;
         }
       }
     }
   }
-  
-  if(_dwDeepIntegration == DEEPINTEGRATION_DEFAULT) {
+
+  if (_dwDeepIntegration == DEEPINTEGRATION_DEFAULT) {
     _dwDeepIntegration = DEEPINTEGRATION_ENABLE;
   }
 
-  
-    if (_pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource) != S_OK)
-        return FALSE;
+  HRESULT res;
+  res = _pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource);
+  if (res != S_OK) {
+    DebugLastError0(L"QueryInterface(ITfSource)", res);
+    return FALSE;
+  }
 
-    fRet = FALSE;
-    _dwActiveLanguageProfileNotifySinkCookie = TF_INVALID_COOKIE;   // I3581
+  fRet = FALSE;
+  _dwActiveLanguageProfileNotifySinkCookie = TF_INVALID_COOKIE;   // I3581
 
-    if (pSource->AdviseSink(IID_ITfThreadMgrEventSink, (ITfThreadMgrEventSink *)this, &_dwThreadMgrEventSinkCookie) != S_OK)
-    {
-        // make sure we don't try to Unadvise _dwThreadMgrEventSinkCookie later
-        _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
-        goto Exit;
-    }
+  res = pSource->AdviseSink(IID_ITfThreadMgrEventSink, (ITfThreadMgrEventSink *)this, &_dwThreadMgrEventSinkCookie);
+  if (res != S_OK) {
+    // make sure we don't try to Unadvise _dwThreadMgrEventSinkCookie later
+    DebugLastError0(L"AdviseSink(ITfThreadMgrEventSink)", res);
+    _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
+    goto Exit;
+  }
 
-    if (pSource->AdviseSink(IID_ITfActiveLanguageProfileNotifySink, (ITfActiveLanguageProfileNotifySink *)this, &_dwActiveLanguageProfileNotifySinkCookie) != S_OK)   // I3581
-    {
-      _dwActiveLanguageProfileNotifySinkCookie = TF_INVALID_COOKIE;
-      goto Exit;
-    }
+  res = pSource->AdviseSink(IID_ITfActiveLanguageProfileNotifySink, (ITfActiveLanguageProfileNotifySink *)this, &_dwActiveLanguageProfileNotifySinkCookie);
+  if (res != S_OK) {
+    DebugLastError0(L"AdviseSink(ITfActiveLanguageProfileNotifySink", res);
+    _dwActiveLanguageProfileNotifySinkCookie = TF_INVALID_COOKIE;
+    goto Exit;
+  }
 
-    fRet = TRUE;
+  fRet = TRUE;
 
 Exit:
-    pSource->Release();
-    return fRet;
+  pSource->Release();
+  return fRet;
 }
 
 //+---------------------------------------------------------------------------
@@ -240,17 +282,23 @@ Exit:
 
 void CKMTipTextService::_UninitThreadMgrSink()
 {
-    ITfSource *pSource;
+  LogEnter();
 
-    if (_pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource) == S_OK)
-    {
-      if (_dwThreadMgrEventSinkCookie != TF_INVALID_COOKIE)
-        pSource->UnadviseSink(_dwThreadMgrEventSinkCookie);
-      if (_dwActiveLanguageProfileNotifySinkCookie != TF_INVALID_COOKIE)   // I3581
-        pSource->UnadviseSink(_dwActiveLanguageProfileNotifySinkCookie);
-      pSource->Release();
+  ITfSource *pSource;
+
+  HRESULT res = _pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource);
+  if(res == S_OK) {
+    if (_dwThreadMgrEventSinkCookie != TF_INVALID_COOKIE) {
+      res = pSource->UnadviseSink(_dwThreadMgrEventSinkCookie);
+      if (res != S_OK) DebugLastError0(L"UnadviseSink(ThreadMgrEventSink)", res);
     }
+    if (_dwActiveLanguageProfileNotifySinkCookie != TF_INVALID_COOKIE) {  // I3581
+      pSource->UnadviseSink(_dwActiveLanguageProfileNotifySinkCookie);
+      if (res != S_OK) DebugLastError0(L"UnadviseSink(ActiveLanguageProfileNotifySink)", res);
+    }
+    pSource->Release();
+  }
 
-    _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
+  _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
 }
 
