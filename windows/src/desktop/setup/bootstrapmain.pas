@@ -98,6 +98,7 @@ uses
   Upload_Settings,
   ActiveX,
   SetupForm,
+  Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
   CommonControls,
