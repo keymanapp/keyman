@@ -108,8 +108,8 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
 void keybd_sendprefix(LPINPUT pInputs, int *n)
 {
   SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendprefix: sending prefix down+up");
-  do_keybd_event(pInputs, n, _VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);   // I4548   // I4844
-  do_keybd_event(pInputs, n, _VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
+  do_keybd_event(pInputs, n, (BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);   // I4548   // I4844
+  do_keybd_event(pInputs, n, (BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
 }
 
 /**
