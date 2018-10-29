@@ -13,6 +13,10 @@ project('keyboardprocessor', 'cpp', 'c',
 
 compiler = meson.get_compiler('cpp')
 
+if compiler.get_id() == 'msvc'
+  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
+endif
+
 py = import('python3')
 python = py.find_python()
 
