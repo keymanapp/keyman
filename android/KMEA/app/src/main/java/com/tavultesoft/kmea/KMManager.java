@@ -89,7 +89,7 @@ public final class KMManager {
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -728,9 +728,11 @@ public final class KMManager {
     if (index == 0 && switchToNextIME) {
       InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-      // TODO: this method is deprecated in API level 28
+      // TODO: this method is added in API level 16 and deprecated in API level 28
       // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
-      imm.switchToNextInputMethod(getToken(), false);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        imm.switchToNextInputMethod(getToken(), false);
+      }
     }
 
     if (SystemKeyboard != null) {

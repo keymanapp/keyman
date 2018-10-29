@@ -152,7 +152,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     });
 
-    final ImageButton addButton = (ImageButton) findViewById(R.id.right_button);
+    final ImageButton addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
@@ -172,6 +172,15 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     });
     if (!canAddNewKeyboard)
       addButton.setVisibility(View.GONE);
+
+    final ImageButton switchButton = (ImageButton) findViewById(R.id.keyboard_button);
+    switchButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        if (KMManager.SystemKeyboard != null) {
+          KMManager.switchToNextKeyboard(context, true);
+        }
+      }
+    });
 
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
