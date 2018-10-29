@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2018-10-29 10.0.1204 stable
+* Include Kannada user interface translation (#1287)
+
 ## 2018-09-12 10.0.1202 stable
 * Fix links to Keyman for macOS in help files (#1067)
 
