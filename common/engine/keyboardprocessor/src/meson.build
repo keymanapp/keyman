@@ -39,7 +39,7 @@ endif
 if compiler.get_id() == 'msvc'
   warns = []
   flags = []
-  defns = [
+  defns += [
     '-D_SCL_SECURE_NO_WARNINGS',
     '-D_CRT_SECURE_NO_WARNINGS',
     '-DUNICODE'
