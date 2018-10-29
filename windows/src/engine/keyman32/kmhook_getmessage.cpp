@@ -213,12 +213,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	_td->state.msg = *mp;
 	/*_td->state.PreviousNoRemove = (wParam & PM_REMOVE) == 0; I2908 */
 
-  UINT wm_msuim_msg_private = RegisterWindowMessage("MSUIM.Msg.Private");
-  if (mp->message == wm_msuim_msg_private) { //0xc049) {
-    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: MSUIM.Msg.Private wParam=%x lParam=%x", mp->wParam, mp->lParam);
-    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-  }
-
   // 16 April 2005, 7 May 2007 - mcdurdin - Check if Keyman is receiving messages (reimplement from v6.2) */
 	if(mp->message == wm_test_keyman_functioning && mp->wParam == TKF_PING)
 	{

@@ -28,7 +28,7 @@ type
   private
     class var FIdentity: TSharedBufferManager;
   private
-    FSelectKeyboardIdentity: Integer;
+    FSelectKeyboardIndex: Integer;
     hMMF: THandle;
     pSharedData: PSharedBuffer;
   public
@@ -69,12 +69,14 @@ destructor TSharedBufferManager.Destroy;
 begin
   if Assigned(pSharedData) then
   begin
-    UnmapViewOfFile(pSharedData);
+    if not UnmapViewOfFile(pSharedData) then
+      RaiseLastOSError;
   end;
 
   if hMMF <> 0 then
   begin
-    CloseHandle(hMMF);
+    if not CloseHandle(hMMF) then
+      RaiseLastOSError;
   end;
 
   inherited Destroy;
@@ -87,6 +89,15 @@ begin
   Result := FIdentity;
 end;
 
+//
+// This comes from the Windows SDK and is a simple way of guaranteeing
+// that the processor cache is flushed on a multiprocessor machine, so
+// that we can be assured that the circular buffer is coherent before
+// we notify the target thread. (Given that we post a message to the
+// target thread and don't use synchronisation primitives, this is
+// probably not going to be a problem anyway but it's the right way to
+// do it.
+//
 procedure MemoryBarrier; inline;
 var
   Barrier: LONG;
@@ -97,15 +108,15 @@ end;
 function TSharedBufferManager.WriteSelectKeyboardBuffer(
   skb: TSelectKeyboardBuffer): Integer;
 begin
-  Result := FSelectKeyboardIdentity;
+  Result := FSelectKeyboardIndex;
 
   pSharedData.SelectKeyboardBuffer[Result] := skb;
 
   MemoryBarrier;
 
-  Inc(FSelectKeyboardIdentity);
-  if FSelectKeyboardIdentity = MAX_SELECTKEYBOARDTSF_CIRCULARBUFFER_SIZE then
-    FSelectKeyboardIdentity := 0;
+  Inc(FSelectKeyboardIndex);
+  if FSelectKeyboardIndex = MAX_SELECTKEYBOARDTSF_CIRCULARBUFFER_SIZE then
+    FSelectKeyboardIndex := 0;
 end;
 
 initialization

@@ -137,17 +137,6 @@ private:
       return FALSE;
     }
 
-    m_hKeyEvent = CreateEvent(NULL, FALSE, FALSE, GLOBAL_KEY_EVENT_NAME);
-    if (!m_hKeyEvent) {
-      DebugLastError("CreateEvent");
-      return FALSE;
-    }
-
-    if (!SetObjectToLowIntegrity(m_hKeyEvent) ||
-      !GrantPermissionToAllApplicationPackages(m_hKeyEvent, EVENT_MODIFY_STATE)) {
-      return FALSE;
-    }
-
     m_hKeyMutex = CreateMutex(NULL, FALSE, GLOBAL_KEY_MUTEX_NAME);
     if (!m_hKeyMutex) {
       DebugLastError("CreateMutex");
@@ -156,6 +145,17 @@ private:
 
     if (!SetObjectToLowIntegrity(m_hKeyMutex) ||
       !GrantPermissionToAllApplicationPackages(m_hKeyMutex, MUTEX_ALL_ACCESS)) {
+      return FALSE;
+    }
+
+    m_hKeyEvent = CreateEvent(NULL, FALSE, FALSE, GLOBAL_KEY_EVENT_NAME);
+    if (!m_hKeyEvent) {
+      DebugLastError("CreateEvent");
+      return FALSE;
+    }
+
+    if (!SetObjectToLowIntegrity(m_hKeyEvent) ||
+      !GrantPermissionToAllApplicationPackages(m_hKeyEvent, EVENT_MODIFY_STATE)) {
       return FALSE;
     }
 
@@ -238,7 +238,7 @@ private:
       return FALSE;
     }
 
-    m_hwnd = CreateWindow(KEYEVENT_WINDOW_CLASS, "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, g_hInstance, NULL);
+    m_hwnd = CreateWindow(KEYEVENT_WINDOW_CLASS, "", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, g_hInstance, NULL);
     if (m_hwnd == NULL) {
       DebugLastError("CreateWindow");
       return FALSE;
@@ -281,13 +281,13 @@ private:
     HANDLE events[2] = { m_hThreadExitEvent, m_hKeyEvent };
     while (TRUE) {
       switch (MsgWaitForMultipleObjectsEx(2, events, INFINITE, QS_ALLINPUT, 0)) {
-      case WAIT_OBJECT_0:
+      case WAIT_OBJECT_0: // m_hThreadExitEvent signaled
         // Thread has been signalled, return
         return;
-      case WAIT_OBJECT_0 + 1:
+      case WAIT_OBJECT_0 + 1: // m_hKeyEvent signaled
         PostMessage(m_hwnd, WM_USER, 0, 0);
         break;
-      case WAIT_OBJECT_0 + 2:
+      case WAIT_OBJECT_0 + 2: // Windows message received
         MSG msg;
         while (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
           DispatchMessage(&msg);
@@ -314,10 +314,10 @@ private:
     // shutdown event so we don't stall forever here)
     //
     switch (WaitForMultipleObjects(2, handles, FALSE, INFINITE)) {
-    case WAIT_OBJECT_0:
+    case WAIT_OBJECT_0: // m_hThreadExitEvent signaled
       // thread exit has been signalled, we are shutting down
       return FALSE;
-    case WAIT_OBJECT_0 + 1:
+    case WAIT_OBJECT_0 + 1: // m_hKeyMutex ownership granted
       break;
     default:
       DebugLastError("WaitForMultipleObjects");
@@ -423,7 +423,9 @@ private:
       input.ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
       input.ki.dwFlags = lParam & 0xFFFF;
 
-      SendInput(1, &input, sizeof(INPUT));
+      if (!SendInput(1, &input, sizeof(INPUT))) {
+        DebugLastError("SendInput");
+      }
 
       UpdateLocalModifierState(
         (BYTE) input.ki.wVk, 

@@ -768,16 +768,16 @@ end;
 procedure TLangSwitchKeyboard_TIP.Activate(hwnd: THandle);
 var
   skb: TSelectKeyboardBuffer;
-  FIdentity: DWORD;
+  FIndex: DWORD;
 begin
   FManager.SetActiveItem(Self);   // I3933
   skb.LangID := FProfile.langid;
   skb.CLSID := FProfile.clsid;
   skb.GUIDProfile := FProfile.guidProfile;
-  FIdentity := TSharedBufferManager.Identity.WriteSelectKeyboardBuffer(skb);
+  FIndex := TSharedBufferManager.Identity.WriteSelectKeyboardBuffer(skb);
   TDebugLogClient.Instance.WriteMessage('TLangSwitchKeyboard_TIP.Activate identity=%d hwnd=%x keyboard=%s %s', [
-    FIdentity, hwnd, GuidToString(skb.CLSID), GuidToString(skb.GUIDProfile)]);   // I4674
-  PostMessage(hwnd, wm_keyman_control_internal, KMCI_SELECTKEYBOARD_TSF, FIdentity);   // I3933
+    FIndex, hwnd, GuidToString(skb.CLSID), GuidToString(skb.GUIDProfile)]);   // I4674
+  PostMessage(hwnd, wm_keyman_control_internal, KMCI_SELECTKEYBOARD_TSF, FIndex);   // I3933
 end;
 
 function ExpandRegString(sz: string): string;   // I3950

@@ -143,7 +143,8 @@ void Globals_UninitThread()
 
   CloseTSF();   // I3933
 
-  ISerialKeyEventClient::Startup();
+  ISerialKeyEventClient::Shutdown();
+
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td) {
     delete _td->pSerialKeyEventClient;
