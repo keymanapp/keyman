@@ -82,10 +82,12 @@ type
     FRunUpgrade7: Boolean;
     FRunUpgrade8: Boolean;   // I4293
     FRunUpgrade9: Boolean;
+    FRunUpgrade10: Boolean;
     FCanUpgrade6: Boolean;
     FCanUpgrade7: Boolean;
     FCanUpgrade8: Boolean;   // I4293
     FCanUpgrade9: Boolean;
+    FCanUpgrade10: Boolean;
     FCheckForUpdates: Boolean;
     FCheckForUpdatesInstall: Boolean;
     FStartAfterInstall: Boolean;
@@ -97,11 +99,12 @@ type
     procedure CheckVersion7Upgrade;
     procedure CheckVersion8Upgrade;   // I4293
     procedure CheckVersion9Upgrade;
+    procedure CheckVersion10Upgrade;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure Status(const Text: WideString = '');
     procedure SetupMSI;  // I2644
     procedure BackupKey(Root: HKEY; Path: WideString);  // I2642
-    procedure GetDefaultSettings;  // I2651
+    procedure GetDefaultSettings;
     { Private declarations }
   public
     procedure DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
@@ -114,14 +117,16 @@ type
 implementation
 
 uses
-  bootstrapmain,
+  System.Win.Registry,
   jwamsi,
+
+  bootstrapmain,
   OnlineConstants,
   SFX,
   SetupStrings,
+  Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
   RegistryHelpers,
-  Registry,
   ErrorControlledRegistry,
   UfrmHTML,
   UfrmInstallOptions,
@@ -465,6 +470,7 @@ begin
     FRunUpgrade7 := False;
     FRunUpgrade8 := False;   // I4293
     FRunUpgrade9 := False;
+    FRunUpgrade10 := False;
   end;
 
   GetRunTools.PromptForReboot := PromptForReboot;  // I3355   // I3500
@@ -484,7 +490,8 @@ begin
     GetRunTools.RunUpgrade6 := FRunUpgrade6;
     GetRunTools.RunUpgrade7 := FRunUpgrade7;
     GetRunTools.RunUpgrade8 := FRunUpgrade8;   // I4293
-    GetRUnTools.RunUpgrade9 := FRunUpgrade9;
+    GetRunTools.RunUpgrade9 := FRunUpgrade9;
+    GetRunTools.RunUpgrade10 := FRunUpgrade10;
 
     SetupMSI; // I2644
 
@@ -528,6 +535,7 @@ begin
   CheckVersion7Upgrade;
   CheckVersion8Upgrade;   // I4293
   CheckVersion9Upgrade;
+  CheckVersion10Upgrade;
 
   GetDefaultSettings;  // I2651
 
@@ -582,8 +590,8 @@ begin
     StartAfterInstall := FStartAfterInstall;
     CheckForUpdates := FCheckForUpdates;
     CheckForUpdatesInstall := FCheckForUpdatesInstall;
-    UpgradeKeyman := FRunUpgrade6 or FRunUpgrade7 or FRunUpgrade8 or FRunUpgrade9;   // I4293
-    CanUpgradeKeyman := FCanUpgrade6 or FCanUpgrade7 or FCanUpgrade8 or FCanUpgrade9;   // I4293
+    UpgradeKeyman := FRunUpgrade6 or FRunUpgrade7 or FRunUpgrade8 or FRunUpgrade9 or FRunUpgrade10;   // I4293
+    CanUpgradeKeyman := FCanUpgrade6 or FCanUpgrade7 or FCanUpgrade8 or FCanUpgrade9 or FCanUpgrade10;   // I4293
     if ShowModal = mrOk then
     begin
       FStartWithWindows := StartWithWindows;
@@ -594,6 +602,7 @@ begin
       FRunUpgrade7 := FCanUpgrade7 and UpgradeKeyman;
       FRunUpgrade8 := FCanUpgrade8 and UpgradeKeyman;
       FRunUpgrade9 := FCanUpgrade9 and UpgradeKeyman;   // I4293
+      FRunUpgrade10 := FCanUpgrade10 and UpgradeKeyman;
     end;
   finally
     Free;
@@ -843,6 +852,40 @@ begin
   end;
 end;
 
+procedure TfrmRunDesktop.CheckVersion10Upgrade;   // I4293
+var
+  str: TStringList;
+  n: Integer;
+begin
+  FCanUpgrade9 := False;
+  FRunUpgrade9 := False;
+
+  str := TStringList.Create;
+  n := 0;
+
+  with CreateHKLMRegistry do  // I2749
+  try
+    if OpenKeyReadOnly(SRegKey_KeymanEngine100_InstalledKeyboards_LM) then
+    begin
+      GetKeyNames(str);
+      Inc(n, str.Count);
+    end;
+  finally
+    Free;
+    str.Free;
+  end;
+
+  if n > 0 then
+  begin
+    FRunUpgrade10 := True;
+    FCanUpgrade10 := True;
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine100_InstalledKeyboards_LM); // I2642
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine100_InstalledPackages_LM);
+    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine100_CU);
+  end;
+end;
+
+
 procedure TfrmRunDesktop.WMUserFormShown(var Message: TMessage);
 begin
   if FContinueSetup then
@@ -884,6 +927,11 @@ begin
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman);
+      end
+      else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
+      begin
+        FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
+        FStartWithWindows := OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists('desktop_pro.pxx');
       end
       else if FCanUpgrade9 and OpenKeyReadOnly(SRegKey_KeymanEngine90_ProductOptions_Desktop_Pro_CU) then   // I4293
       begin

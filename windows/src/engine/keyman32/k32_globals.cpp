@@ -273,7 +273,10 @@ static wchar_t
   f_BaseKeyboardName[256] = L"",   // I4583
   f_BaseKeyboardNameAlt[64] = L"";   // I4583
 
-__declspec(align(4)) static LONG
+__declspec(align(8)) static UINT
+  f_vk_prefix = 0;
+
+__declspec(align(8)) static LONG
   f_RefreshTag = 0;
 
 static BOOL 
@@ -344,6 +347,9 @@ BOOL Globals::get_SimulateAltGr()         { return f_SimulateAltGr;         }   
 wchar_t *Globals::get_BaseKeyboardName()     { return f_BaseKeyboardName;      }   // I4583
 wchar_t *Globals::get_BaseKeyboardNameAlt()  { return f_BaseKeyboardNameAlt;   }   // I4583
 
+UINT Globals::get_vk_prefix() { return f_vk_prefix; }
+void Globals::set_vk_prefix(UINT value) { f_vk_prefix = value; }
+
 BOOL Globals::get_MnemonicDeadkeyConversionMode() { return f_MnemonicDeadkeyConversionMode; }   // I4583   // I4552
 
 BOOL Globals::get_debug_KeymanLog() { return f_debug_KeymanLog; }
@@ -358,6 +364,22 @@ void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL 
   strcpy_s(f_BaseKeyboard, baseKeyboard);
   f_SimulateAltGr = simulateAltGr;
   f_MnemonicDeadkeyConversionMode = mnemonicDeadkeyConversionMode;
+}
+
+/**
+  Loads settings that are globally applied at application startup. These cannot 
+  be changed until Keyman is restarted.
+*/
+BOOL Globals::InitSettings() {
+  f_vk_prefix = _VK_PREFIX_DEFAULT;
+  RegistryReadOnly reg(HKEY_LOCAL_MACHINE);
+  if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&
+      reg.ValueExists(REGSZ_ZapVirtualKeyCode)) {
+    f_vk_prefix = reg.ReadInteger(REGSZ_ZapVirtualKeyCode);
+    reg.CloseKey();
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - vk_prefix set in '" REGSZ_ZapVirtualKeyCode "' to %x" , f_vk_prefix);
+  }
+  return TRUE;
 }
 
 BOOL Globals::Lock()

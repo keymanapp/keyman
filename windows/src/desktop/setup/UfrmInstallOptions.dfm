@@ -14,6 +14,7 @@ object frmInstallOptions: TfrmInstallOptions
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 16
   object chkStartWithWindows: TCheckBox
@@ -53,9 +54,7 @@ object frmInstallOptions: TfrmInstallOptions
     Top = 127
     Width = 441
     Height = 17
-    Caption = 
-      'Upgrade Keyman Desktop 6, 7, 8 or 9 keyboards to Keyman Desktop ' +
-      '10'
+    Caption = 'Upgrade Keyman Desktop 6 - 10 keyboards to Keyman Desktop 11'
     TabOrder = 4
   end
   object cmdOK: TButton

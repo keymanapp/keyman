@@ -432,6 +432,11 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 
 	InitDebugging();
 
+  if (!Globals::InitSettings()) {
+    SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed to initialise global settings.  GetLastError = %d", GetLastError());
+    return FALSE;
+  }
+
   if(!Globals::InitHandles())  // I3040
   {
     DebugLastError("Globals::InitHandles");
@@ -1045,6 +1050,6 @@ BOOL ShouldAttachToProcess()
 
 
 void PostDummyKeyEvent() {  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
-  keybd_event(_VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0); // I3250 - is this unnecessary?
-  keybd_event(_VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0); // I3250 - is this unnecessary?
+  keybd_event((BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0); // I3250 - is this unnecessary?
+  keybd_event((BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0); // I3250 - is this unnecessary?
 }

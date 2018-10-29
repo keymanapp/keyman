@@ -117,9 +117,9 @@ public class BookmarksActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        dialogBuilder.setTitle("Add Bookmark");
+        dialogBuilder.setTitle(getString(R.string.add_bookmark));
         dialogBuilder.setView(getLayoutInflater().inflate(R.layout.add_bookmark_dialog_layout, null));
-        dialogBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(getString(R.string.label_add), new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
             EditText titleField = (EditText) mDialog.findViewById(R.id.title);
             EditText urlField = (EditText) mDialog.findViewById(R.id.url);
@@ -154,7 +154,7 @@ public class BookmarksActivity extends AppCompatActivity {
           }
         });
 
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        dialogBuilder.setNegativeButton(getString(R.string.label_cancel), new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
             // Cancel
           }

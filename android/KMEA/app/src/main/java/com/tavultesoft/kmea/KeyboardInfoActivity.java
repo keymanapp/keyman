@@ -70,7 +70,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     infoList = new ArrayList<HashMap<String, String>>();
     String icon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
-    hashMap.put(titleKey, "Keyboard version");
+    hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
@@ -79,7 +79,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     if (!isCustomKeyboard || customHelpLink != null) {
       icon = String.valueOf(R.drawable.ic_arrow_forward);
       hashMap = new HashMap<String, String>();
-      hashMap.put(titleKey, "Help link");
+      hashMap.put(titleKey, getString(R.string.help_link));
       hashMap.put(subtitleKey, "");
       hashMap.put(iconKey, icon);
       infoList.add(hashMap);

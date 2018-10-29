@@ -266,25 +266,6 @@ public final class KMManager {
       parent.removeView(SystemKeyboard);
     keyboardLayout.addView(SystemKeyboard);
     
-    /*
-    final RelativeLayout overlayLayout = new RelativeLayout(appContext);
-    overlayLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-    LayoutInflater inflater = (LayoutInflater) appContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    RelativeLayout overlayView = (RelativeLayout) inflater.inflate(R.layout.overlay_layout, null, false);
-    overlayView.setLayoutParams(SystemKeyboard.getLayoutParams());
-    overlayView.setBackgroundColor(Color.argb(192, 0, 0, 0));
-    overlayView.setClickable(true);
-    overlayLayout.addView(overlayView);
-    Button activateButton = (Button) overlayView.findViewById(R.id.button1);
-    activateButton.setOnClickListener(new OnClickListener(){
-      @Override
-      public void onClick(View v) {
-        mainLayout.removeView(overlayLayout);
-        Toast.makeText(context, "Reactivated", Toast.LENGTH_LONG).show();
-      }
-    });
-    */
-
     mainLayout.addView(keyboardLayout);
     //mainLayout.addView(overlayLayout);
     return mainLayout;
@@ -1507,7 +1488,7 @@ public final class KMManager {
           SystemKeyboard.showHelpBubble(context, fx, fy);
         }
       } else if (url.indexOf("showKeyPreview") >= 0) {
-        String deviceType = context.getResources().getString(R.string.device_type);
+        String deviceType = context.getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
           return false;
         }

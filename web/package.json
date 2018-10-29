@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "google-closure-compiler": "^20171203.0.0",
     "google-closure-library": "^20171203.0.0",
-    "karma": "^2.0.0",
+    "karma": "^2.0.5",
     "karma-browserstack-launcher": "^1.3.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
@@ -35,9 +35,9 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-safari-launcher": "^1.0.0",
     "karma-teamcity-reporter": "^1.1.0",
-    "mocha": "^5.0.0",
-    "modernizr": "^3.5.0",
-    "typescript": "^2.6.2"
+    "mocha": "^5.2.0",
+    "modernizr": "^3.6.0",
+    "typescript": "^2.9.2"
   },
   "scripts": {
     "tsc": "tsc",
