@@ -28,7 +28,7 @@ namespace kbp
   {
     std::string const _keyboard_id;
     std::string const _version_string;
-    std::filesystem::path const _folder_path;
+    std::string const _folder_path;
 
   public:
     keyboard(std::filesystem::path const &);
@@ -36,9 +36,9 @@ namespace kbp
 
   inline
   keyboard::keyboard(std::filesystem::path const & path)
-  : _keyboard_id(path.stem()),
+  : _keyboard_id(path.stem().string()),
     _version_string("3.145"),
-    _folder_path(path.parent_path())
+    _folder_path(path.parent_path().string())
   {
     version_string = _version_string.c_str();
     id = _keyboard_id.c_str();

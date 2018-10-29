@@ -86,6 +86,7 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
         break;
 
       default:
+      {
         auto shift_state = modifier_state & KM_KBP_MODIFIER_SHIFT;
         // Only process further one of the shift states has something to output.
         if (table[0][vk][0] || table[1][vk][0])
@@ -96,7 +97,7 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
           {
             km_kbp_usv usv = *c;
             state->context().emplace_back(km_kbp_context_item {KM_KBP_CT_CHAR,{0,},{usv}});
-            state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_CHAR, {0,}, {.character = usv}});
+            state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_CHAR, {0,}, {usv}});
           }
           state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}});
 
@@ -107,6 +108,7 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
         state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_ALERT, {0,}, {0}});
         state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}});
         break;
+      }
     }
   }
   catch (std::bad_alloc)
