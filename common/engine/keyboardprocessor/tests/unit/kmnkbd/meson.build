@@ -7,5 +7,5 @@
 
 ctxt = executable('context-api', 'context_api.cpp',
     include_directories: [inc, libsrc],
-    dependencies: [kmnkbp])
+    objects: lib.extract_objects('km_kbp_context_api.cpp', 'json.cpp'))
 test('context-api', ctxt)
