@@ -28,6 +28,7 @@ heat-xml:
     mkdir $(KEYMAN_WIX_TEMP_XML)
     xcopy $(ROOT)\src\developer\TIKE\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
     -del /f /s /q $(KEYMAN_WIX_TEMP_XML)\Thumbs.db
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)\app\node_modules 
     -for /f %i in ('dir /a:d /s /b $(KEYMAN_WIX_TEMP_XML)\.vs') do rd /s /q %i
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_XML) -o xml.wxs -ag -cg XML -dr INSTALLDIR -var var.XmlSourceDir -wx -nologo
     # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again

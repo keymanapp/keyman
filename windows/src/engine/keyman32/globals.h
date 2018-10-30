@@ -58,6 +58,9 @@
 #define GLOBAL_MsgStackSize 80
 #define GLOBAL_MaxKeyboards 32
 
+#include "serialkeyeventclient.h"
+#include "SharedBuffers.h"
+
 class Globals
 {
 public:
@@ -120,6 +123,9 @@ public:
 
   static BOOL get_MnemonicDeadkeyConversionMode();   // I4583   // I4552
 
+  static UINT get_vk_prefix();
+  static void set_vk_prefix(UINT value);
+
   static void SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt);   // I4583
 
 	static BOOL IsControllerWindow(HWND hwnd);
@@ -134,9 +140,16 @@ public:
   static BOOL IsControllerProcess();
 
   static BOOL InitHandles();
+  static BOOL InitSettings();
   static BOOL Lock();
   static BOOL Unlock();
   static BOOL CheckControllers();
+
+  /* Debugging */
+
+  static BOOL get_debug_KeymanLog();
+  static BOOL get_debug_ToConsole();
+  static void LoadDebugSettings();
 };
 
 /* External interface functions */
@@ -218,7 +231,7 @@ typedef struct tagKEYMAN64THREADDATA
   int CurrentAddin;
   HWND CurrenthWnd;
 
-  BOOL debug_DebugInit, debug_KeymanLog, debug_ToConsole;   // I3951
+  BOOL debug_DebugInit;   // I3951
   char debug_buf[64];
 
    // I3617   // I3618
@@ -233,6 +246,12 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TSFFailed;
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
+
+  /* Serialized key events */
+
+  ISerialKeyEventClient *pSerialKeyEventClient;
+  ISharedBufferManager *pSharedBufferManager;
+
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT 
@@ -255,6 +274,8 @@ extern UINT
 
 extern BOOL
   flag_ShouldSerializeInput;
+
+extern HINSTANCE g_hInstance;
 
 void UpdateActiveWindows();
 

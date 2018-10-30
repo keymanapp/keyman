@@ -1,7 +1,13 @@
 # Keyman Desktop Version History
 
 ## 11.0 alpha
-* Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1229)
+* Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1226, #1229, #1236)
+* Debug logging now uses Event Tracing for Windows (#1261)
+* Introduce support for Metro-style (UWP) applications such as Edge, Skype (#1265)
+* Fixed conflicts with Game Bar (#1272)
+* Added Kannada localization (#1273)
+* Added SIL logo to startup (#1194)
+* Removed hard coded version numbers, versioned paths and registry settings for simpler future upgrades (#1171, 1175)
 
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release

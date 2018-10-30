@@ -1,4 +1,4 @@
-
+#include "pch.h"
 #include "virtualcharkeys.h"
 
 BOOL VKeyMayBeVCKey[256] = {

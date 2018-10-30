@@ -73,6 +73,7 @@ uses
   GetOsVersion,
   IniFiles,
   kmpinffile,
+  Keyman.System.UpgradeRegistryKeys,
   KPInstallFontKMShell,
   KPInstallPackageStartMenu,
   KPUninstallPackageStartMenu,

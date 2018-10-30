@@ -212,6 +212,11 @@
                     <File Id="locale_vec" Source="..\..\desktop\kmshell\locale\vec\locale.xml" />
                   </Component>
                 </Directory>
+                <Directory Id="dir_locale_kan_knda_in" Name="kan-Knda-IN">
+                  <Component>
+                    <File Id="locale_kan_knda_in" Source="..\..\desktop\kmshell\locale\kan-Knda-IN\locale.xml" />
+                  </Component>
+                </Directory>
               </Directory>
 
             </Directory>
@@ -256,6 +261,7 @@
       <ComponentRef Id="locale_ta" />
       <ComponentRef Id="locale_tr" />
       <ComponentRef Id="locale_vec" />
+      <ComponentRef Id="locale_kan_knda_in" />
 
       <MergeRef Id='keymanengine' />
     </Feature>

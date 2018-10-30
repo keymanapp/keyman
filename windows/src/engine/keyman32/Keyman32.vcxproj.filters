@@ -120,6 +120,21 @@
     <ClCompile Include="k32_lowlevelkeyboardhook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="security.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serialkeyeventclient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serialkeyeventserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedBuffers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -208,6 +223,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keyman-debug-etw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keyeventsenderthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="security.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialkeyeventclient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialkeyeventcommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedBuffers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialkeyeventserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

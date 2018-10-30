@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=group-helper-rsp19902 kmcomp
+TARGETS=group-helper-rsp19902 kmcomp shared-data
 
 test: 
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -19,6 +19,10 @@ group-helper-rsp19902:
 
 kmcomp:
     cd $(ROOT)\src\test\unit-tests\kmcomp
+    $(MAKE) $(TARGET)
+    
+shared-data:
+    cd $(ROOT)\src\test\unit-tests\shared-data
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

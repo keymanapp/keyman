@@ -24,7 +24,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
    // I5136
-#include "keyman64.h"
+#include "pch.h"
 
 #ifdef _WIN64
 #error hotkeys.cpp is not required for win64.

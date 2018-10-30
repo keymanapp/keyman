@@ -19,7 +19,7 @@
                     31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
-#include "keyman64.h"
+#include "pch.h"
 
 /**
   do_keybd_event adds a keyboard event into the keyboard event queue.
@@ -108,8 +108,8 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
 void keybd_sendprefix(LPINPUT pInputs, int *n)
 {
   SendDebugMessageFormat(0, sdmAIDefault, 0, "keybd_sendprefix: sending prefix down+up");
-  do_keybd_event(pInputs, n, _VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);   // I4548   // I4844
-  do_keybd_event(pInputs, n, _VK_PREFIX, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
+  do_keybd_event(pInputs, n, (BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);   // I4548   // I4844
+  do_keybd_event(pInputs, n, (BYTE) Globals::get_vk_prefix(), SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);   // I4548   // I4844
 }
 
 /**
@@ -123,11 +123,9 @@ void keybd_sendprefix(LPINPUT pInputs, int *n)
               kbd      pointer to keyboard state (256 byte array), in which we will store
                        the initial modifier state for later restoration by keybd_shift_reset
 */
-void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE kbd) {
+void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE const kbd) {
   const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL hasSentPrefix = FALSE;
-
-  GetKeyboardState(kbd);
 
   for (int i = 0; i < _countof(modifiers); i++) {
     if (kbd[modifiers[i]] & 0x80) {
@@ -152,7 +150,7 @@ void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE kbd) {
               kbd      pointer to keyboard state (256 byte array), previously set by 
                        keybd_shift_release
 */
-void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE kbd) {
+void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE const kbd) {
   const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL needsPrefix = FALSE;
 
@@ -184,7 +182,7 @@ void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE kbd) {
   There must be enough space in pInputs to contain 6 x up + 6 x down + 2 prefix-down + 2 prefix-up event = 16 events,
   to support both the clear and reset calls.
 */
-void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE kbd) {
+void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd) {
   if (isReset) {
     keybd_shift_reset(pInputs, n, kbd);
   } else {

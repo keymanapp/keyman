@@ -1,13 +1,6 @@
 
-#include <ctype.h>
-#include <stdio.h>
+#include "pch.h"
 
-#include <string.h>
-#include <windows.h>
-
-// Keyman includes
-
-#include <keyman64.h>
 #include <compfile.h>
 #include <compiler.h>
 #include <comperr.h>

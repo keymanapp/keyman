@@ -132,6 +132,8 @@ class function TKeymanPaths.KeyboardsInstallPath(const filename: string): string
 begin
   with TRegistry.Create do  // I2890
   try
+    // TODO: We only want to use %CommonAppData%\Keyman now for all keyboards
+    // So we should eliminate use of RootKeyboardAdminPath and S_FallbackKeyboardPath
     RootKey := HKEY_LOCAL_MACHINE;
     if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootKeyboardAdminPath) then
     begin

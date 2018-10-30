@@ -17,7 +17,7 @@
                     31 May 2010 - mcdurdin - I2397 - Assertion failure - keyboard options loading twice
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
 */
-#include "keyman64.h"
+#include "pch.h"
 #include "registry.h"
 
 void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);

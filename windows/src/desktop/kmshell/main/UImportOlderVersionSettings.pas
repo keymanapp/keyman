@@ -29,9 +29,11 @@ procedure FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdate
 implementation
 
 uses
-  SysUtils,
+  System.SysUtils,
+
   Hints,
   InterfaceHotkeys,
+  Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
   kmint,
   keymanapi_TLB,

@@ -25,7 +25,7 @@
 // ITfThreadMgrEventSink implementation.
 //
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 #include "registry.h"
 

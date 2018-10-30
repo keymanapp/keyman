@@ -29,11 +29,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <windows.h>
-#include <ole2.h>
-#include <olectl.h>
-#include <msctf.h>
-
 #define assert(x)
 
 //
