@@ -14,7 +14,7 @@
 #include <keyboardprocessor.h>
 
 namespace std {
-  using namespace std::experimental;
+  namespace filesystem = std::experimental::filesystem;
 }
 
 // Forward declartions
@@ -43,6 +43,7 @@ namespace kbp
     version_string = _version_string.c_str();
     id = _keyboard_id.c_str();
     folder_path = _folder_path.c_str();
+    default_options = nullptr;
   }
 
 }
