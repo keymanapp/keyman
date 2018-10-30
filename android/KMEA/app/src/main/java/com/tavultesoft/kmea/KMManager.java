@@ -703,7 +703,7 @@ public final class KMManager {
     switchToNextKeyboard(context, false);
   }
 
-  public static void switchToNextKeyboard(Context context, boolean switchToNextIME) {
+  public static void switchToNextKeyboard(Context context, boolean advanceToNextInputMode) {
     int index = KeyboardPickerActivity.getCurrentKeyboardIndex(context);
     index++;
     HashMap<String, String> kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
@@ -725,18 +725,22 @@ public final class KMManager {
 
     // Switch system keyboard to next IME so the user doesn't see
     // SystemKeyboard.setKeyboard resetting to the first Keyman keyboard
-    if (index == 0 && switchToNextIME) {
-      InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-      // TODO: this method is added in API level 16 and deprecated in API level 28
-      // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-        imm.switchToNextInputMethod(getToken(), false);
-      }
+    if (index == 0 && advanceToNextInputMode) {
+      advanceToNextInputMode();
     }
 
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+    }
+  }
+
+  public static void advanceToNextInputMode() {
+    InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+    // TODO: this method is added in API level 16 and deprecated in API level 28
+    // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      imm.switchToNextInputMethod(getToken(), false);
     }
   }
 
