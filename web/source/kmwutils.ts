@@ -51,7 +51,9 @@ namespace com.keyman {
       this.keyman = keyman;
     }
 
-    ['getBCP47Components'](lgCode: string): string[] {
+    // Possible alternative:  https://www.npmjs.com/package/language-tags
+    // This would necessitate linking in a npm module into compiled KeymanWeb, though.
+    ['getLanguageCodes'](lgCode: string): string[] {
       if(lgCode.indexOf('-')==-1) {
         return [lgCode];
       } else {
