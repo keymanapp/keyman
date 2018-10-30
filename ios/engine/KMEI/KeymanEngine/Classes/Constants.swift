@@ -35,11 +35,11 @@ public enum Key {
 
 public enum Defaults {
   private static let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
-  public static let keyboard = InstallableKeyboard(id: "european2",
-                                                   name: "EuroLatin2 Keyboard",
+  public static let keyboard = InstallableKeyboard(id: "sil_euro_latin",
+                                                   name: "EuroLatin (SIL)",
                                                    languageID: "en",
                                                    languageName: "English",
-                                                   version: "1.6",
+                                                   version: "1.8",
                                                    isRTL: false,
                                                    font: font,
                                                    oskFont: nil,
