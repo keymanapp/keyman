@@ -90,7 +90,7 @@ typedef uint32_t    km_kbp_status;      // Status return code.
 typedef struct km_kbp_context     km_kbp_context;
 typedef struct km_kbp_keyboard    km_kbp_keyboard;
 typedef struct km_kbp_state       km_kbp_state;
-typedef struct km_kbp_options_set  km_kbp_options_set;
+typedef struct km_kbp_options_set km_kbp_options_set;
 
 // Forward declarations
 //
@@ -148,7 +148,7 @@ enum km_kbp_context_type {
 
 typedef struct {
   uint8_t   type;
-  uint8_t   reserved[3];
+  uint8_t   _reserved[3];
   union {
     km_kbp_usv  character;
     uint32_t    marker;
@@ -332,7 +332,7 @@ services framework to acheive the expected effect.
 */
 typedef struct {
   uint8_t   type;
-  uint8_t   __reserved[3];
+  uint8_t   _reserved[3];
   union {
     uintptr_t           marker;     // MARKER type
     km_kbp_option const * option;    // OPT types

@@ -21,6 +21,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-fvisibility=hidden',
     '-fvisibility-inlines-hidden'
   ]
+  links = ['-lstdc++fs']
 
   if compiler.get_id() == 'clang'
     warns += [
@@ -38,11 +39,12 @@ endif
 if compiler.get_id() == 'msvc'
   warns = []
   flags = []
-  defns = [
+  defns += [
     '-D_SCL_SECURE_NO_WARNINGS',
     '-D_CRT_SECURE_NO_WARNINGS',
     '-DUNICODE'
   ]
+  links = []
 endif
 
 pkg = import('pkgconfig')
@@ -59,7 +61,7 @@ lib = library('kmnkbp0',
     'km_kbp_state_api.cpp',
     'json.cpp',
     cpp_args: defns + warns + flags,
-    link_args: ['-lstdc++fs'],
+    link_args: links,
     version: meson.project_version(),
     include_directories: inc,
     install: true)

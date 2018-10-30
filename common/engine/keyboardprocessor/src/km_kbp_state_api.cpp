@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <iterator>
 #include <list>
+#include <sstream>
 #include <utility>
 #include <vector>
 

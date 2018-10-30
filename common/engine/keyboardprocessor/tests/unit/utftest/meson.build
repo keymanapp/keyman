@@ -4,5 +4,5 @@
 # Authors:      Tim Eves (TSE)
 #
 
-e = executable('utftest', 'utftest.cpp', include_directories: [inc, libsrc])
+e = executable('utftest', 'utftest.cpp', include_directories: [libsrc])
 test('utftest', e)

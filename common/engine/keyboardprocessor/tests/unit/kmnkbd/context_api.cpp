@@ -30,8 +30,8 @@ namespace
   auto const bmp_ctxt_size = count_codepoints(initial_bmp_context),
              smp_ctxt_size = count_codepoints(initial_smp_context);
   km_kbp_context_item test_marker_ctxt[2] = {
-    {KM_KBP_CT_MARKER, {0,}, 0xDEADBEEF},
-    {KM_KBP_CT_END, {0,}, 0}
+    {KM_KBP_CT_MARKER, {0,}, {0xDEADBEEF}},
+    {KM_KBP_CT_END, {0,}, {0}}
   };
 
 
@@ -40,7 +40,7 @@ namespace
 #define   try_status(expr) \
 {auto __s = (expr); if (__s != KM_KBP_STATUS_OK) return 100*__LINE__+__s;}
 
-int main(int argc, char * argv[])
+int main(int, char * [])
 {
   km_kbp_context_item *ctxt1, *ctxt2;
   // Test UTF16 to context_item conversion.
