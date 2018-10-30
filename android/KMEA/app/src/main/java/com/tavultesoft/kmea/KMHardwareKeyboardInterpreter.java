@@ -88,7 +88,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     187,    //        public static final int KEYCODE_EQUALS = 70;
     219,    //        public static final int KEYCODE_LEFT_BRACKET = 71;
     221,    //        public static final int KEYCODE_RIGHT_BRACKET = 72;
-    220,    //        public static final int KEYCODE_BACKSLASH = 73;
+    220,    //        public static final int KEYCODE_BACKSLASH = 73; Note special case below
     186,    //        public static final int KEYCODE_SEMICOLON = 74;
     222,    //        public static final int KEYCODE_APOSTROPHE = 75;
     191,    //        public static final int KEYCODE_SLASH = 76;
@@ -101,6 +101,12 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     0,      //        public static final int KEYCODE_NOTIFICATION = 83;
     0       //        public static final int KEYCODE_SEARCH = 84;
   };
+
+  // Special case for Android US layout overloading AZERTY K_oE2 (102nd key)
+  // Use scan code to distinguish from KEYCODE_BACKSLASH
+  // Reference: https://source.android.com/devices/input/keyboard-devices
+  private final int SCAN_CODE_KEY_102ND = 86;
+  private final int CODE_KEY_102ND = 226; // code KMW expects for K_oE2
 
   private final Context context;
   private final KMManager.KeyboardType keyboardType;
@@ -161,8 +167,15 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
       return false;
     }
 
+    int code;
+    if ((keyCode == KeyEvent.KEYCODE_BACKSLASH ) && (event.getScanCode() == SCAN_CODE_KEY_102ND) ) {
+      code = CODE_KEY_102ND;
+    } else {
+      code = keyCodeMap[keyCode];
+    }
+
     // Send keystroke to KeymanWeb for processing: will return true to swallow the keystroke
-    return KMManager.executeHardwareKeystroke(keyCodeMap[keyCode], keymanModifiers, keyboardType, Lstates);
+    return KMManager.executeHardwareKeystroke(code, keymanModifiers, keyboardType, Lstates);
   }
 
   @Override
