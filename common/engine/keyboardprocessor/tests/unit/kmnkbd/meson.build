@@ -12,5 +12,11 @@ keyb = executable('keyboard-api', 'keyboard_api.cpp',
     include_directories: [inc, libsrc],
     link_args: links,
     objects: lib.extract_objects('km_kbp_keyboard_api.cpp', 'json.cpp', 'km_kbp_options_api.cpp'))
+opts = executable('options-api', 'options_api.cpp',
+    include_directories: [inc, libsrc],
+    link_args: links,
+    objects: lib.extract_objects('km_kbp_options_api.cpp', 'json.cpp'))
+
 test('context-api', ctxt)
 test('keyboard-api', keyb)
+test('options-api', opts)
