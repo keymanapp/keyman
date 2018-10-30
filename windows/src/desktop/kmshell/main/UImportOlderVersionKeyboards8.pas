@@ -38,7 +38,9 @@ uses
   System.Win.ComObj,
   Winapi.ActiveX,
   Winapi.MsCTF,
+
   input_installlayoutortip,
+  Keyman.System.UpgradeRegistryKeys,
   keyman_msctf,
   UImportOlderVersionKeyboards,
   utilexecute,

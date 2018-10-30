@@ -5,13 +5,14 @@
 1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
 2. Install [Delphi 10.2](#delphi-setup-requirements).
 3. Install [git](https://git-scm.com/download/win).
-4. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
-5. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
-6. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
-7. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `USERDEFINES`, 
+4. Install [nodejs](https://nodejs.org/en/download/).
+5. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
+6. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
+7. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
+8. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `USERDEFINES`, 
    `GIT_BASH_FOR_KEYMAN`.
-8. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
-9. In order to run Keyman Developer in the development build, you need to specify where the 
+9. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
+10. In order to run Keyman Developer in the development build, you need to specify where the 
    https://github.com/keymanapp/CEF4Delphi_binary repo is on your system, with the registry setting `HKCU\Software\Keyman\Debug`, 
    `Debug_CEFPath`.
 

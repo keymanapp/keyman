@@ -73,25 +73,25 @@ public class GetStartedActivity extends AppCompatActivity {
 
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, context.getResources().getString(R.string.add_a_keyboard));
+    hashMap.put(textKey, getString(R.string.add_a_keyboard));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, context.getResources().getString(R.string.enable_system_keyboard));
+    hashMap.put(textKey, getString(R.string.enable_system_keyboard));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, context.getResources().getString(R.string.set_keyman_as_default));
+    hashMap.put(textKey, getString(R.string.set_keyman_as_default));
     hashMap.put(isEnabledKey, "false");
     list.add(hashMap);
 
     hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, context.getResources().getString(R.string.more_info));
+    hashMap.put(textKey, getString(R.string.more_info));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
 

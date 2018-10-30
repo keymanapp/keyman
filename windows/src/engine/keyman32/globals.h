@@ -120,6 +120,9 @@ public:
 
   static BOOL get_MnemonicDeadkeyConversionMode();   // I4583   // I4552
 
+  static UINT get_vk_prefix();
+  static void set_vk_prefix(UINT value);
+
   static void SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt);   // I4583
 
 	static BOOL IsControllerWindow(HWND hwnd);
@@ -134,6 +137,7 @@ public:
   static BOOL IsControllerProcess();
 
   static BOOL InitHandles();
+  static BOOL InitSettings();
   static BOOL Lock();
   static BOOL Unlock();
   static BOOL CheckControllers();
