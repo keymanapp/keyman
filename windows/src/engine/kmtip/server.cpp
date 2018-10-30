@@ -27,7 +27,7 @@
 // COM server exports.
 //
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 #include "registry.h"
 

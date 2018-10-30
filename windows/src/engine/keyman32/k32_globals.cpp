@@ -60,10 +60,8 @@
                     06 Feb 2015 - mcdurdin - I4583 - V9.0 - Remove altgr lookup test from keyman32 and put it into the registry
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 */
-#include "keyman64.h"
-#include "aclapi.h"
-#include "accctrl.h"
-#include "sddl.h"
+#include "pch.h"
+#include "security.h"
 
 /***************************************************************************/
 /*                                                                         */
@@ -73,7 +71,6 @@
 
 //__declspec(align(4)) LONG RefreshTag_Process = 0;
 //__declspec(align(4)) LONG FInRefreshKeyboards = 0;
-
 
 UINT 
   //TODO: consolidate these messages -- they are probably not all required now
@@ -134,6 +131,9 @@ PKEYMAN64THREADDATA Globals_InitThread()
     else SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
   }
   LeaveCriticalSection(&csGlobals);
+
+  ISerialKeyEventClient::Startup();
+
   return lpvData;
 }
 
@@ -142,6 +142,14 @@ void Globals_UninitThread()
   if(!Globals_ProcessInitialised()) return;
 
   CloseTSF();   // I3933
+
+  ISerialKeyEventClient::Shutdown();
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (_td) {
+    delete _td->pSerialKeyEventClient;
+  }
+  CloseThreadSharedBufferManager();
 
   EnterCriticalSection(&csGlobals);
   if(dwTlsIndex != TLS_OUT_OF_INDEXES)
@@ -271,6 +279,10 @@ __declspec(align(8)) static UINT
 __declspec(align(8)) static LONG
   f_RefreshTag = 0;
 
+static BOOL 
+  f_debug_KeymanLog = FALSE, 
+  f_debug_ToConsole = FALSE;
+
 #pragma data_seg()
 /***************************************************************************/
 
@@ -340,6 +352,9 @@ void Globals::set_vk_prefix(UINT value) { f_vk_prefix = value; }
 
 BOOL Globals::get_MnemonicDeadkeyConversionMode() { return f_MnemonicDeadkeyConversionMode; }   // I4583   // I4552
 
+BOOL Globals::get_debug_KeymanLog() { return f_debug_KeymanLog; }
+BOOL Globals::get_debug_ToConsole() { return f_debug_ToConsole; }
+
 void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt) {   // I4583
   wcscpy_s(f_BaseKeyboardName, baseKeyboardName);
   wcscpy_s(f_BaseKeyboardNameAlt, baseKeyboardNameAlt);
@@ -350,40 +365,6 @@ void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL 
   f_SimulateAltGr = simulateAltGr;
   f_MnemonicDeadkeyConversionMode = mnemonicDeadkeyConversionMode;
 }
-
-LPCWSTR LOW_INTEGRITY_SDDL_SACL_W = L"S:(ML;;NW;;;LW)";
- 
-#define LABEL_SECURITY_INFORMATION (0x00000010L)
-
-#pragma warning(disable: 4996)
-BOOL SetObjectToLowIntegrity(HANDLE hObject, SE_OBJECT_TYPE type = SE_KERNEL_OBJECT)
-{
-  BOOL bRet = FALSE;
-  DWORD dwErr = ERROR_SUCCESS;
-  PSECURITY_DESCRIPTOR pSD = NULL;
-  PACL pSacl = NULL;
-  BOOL fSaclPresent = FALSE;
-  BOOL fSaclDefaulted = FALSE;
-
-  if(LOBYTE(LOWORD(GetVersion())) < 6) return TRUE;
- 
-  if(ConvertStringSecurityDescriptorToSecurityDescriptorW(LOW_INTEGRITY_SDDL_SACL_W, SDDL_REVISION_1, &pSD, NULL))
-  {
-    if(GetSecurityDescriptorSacl(pSD, &fSaclPresent, &pSacl, &fSaclDefaulted))
-    {
-      dwErr = SetSecurityInfo(
-                hObject, type, LABEL_SECURITY_INFORMATION,
-                NULL, NULL, NULL, pSacl);
- 
-      bRet = (ERROR_SUCCESS == dwErr);
-    }
- 
-    LocalFree(pSD);
-  }
- 
-  return bRet;
-}
-#pragma warning(default: 4996)
 
 /**
   Loads settings that are globally applied at application startup. These cannot 
@@ -420,6 +401,8 @@ BOOL Globals::InitHandles()  // I3040
     f_hLockMutex = CreateMutex(NULL, FALSE, "Tavultesoft_KeymanEngine_GlobalLock");
   if(f_hLockMutex == 0) return FALSE;
   SetObjectToLowIntegrity(f_hLockMutex);
+  GrantPermissionToAllApplicationPackages(f_hLockMutex, MUTEX_ALL_ACCESS);
+
   return TRUE;
 }
 
@@ -520,7 +503,7 @@ void Globals::PostControllers(UINT msg, WPARAM wParam, LPARAM lParam)
 	 SendDebugMessageFormat(GetFocus(), sdmGlobal, 0, "PostControllers [%x : %x, %x]", msg, wParam, lParam);
 	for(int i = 0; i < f_MaxControllers; i++) {
   	if(!PostMessage(f_ControllerWindow[i], msg, wParam, lParam)) {
-  	  SendDebugMessageFormat(f_ControllerWindow[i], sdmGlobal, 0, "PostControllers[%d] failed with %x", i, GetLastError());
+      DebugLastError("PostMessage");
     }
   }
   Unlock();
@@ -546,7 +529,7 @@ void Globals::PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
   }
 
 	if(!PostMessage(f_ControllerWindow[0], msg, wParam, lParam)) {
-	  SendDebugMessageFormat(f_ControllerWindow[0], sdmGlobal, 0, "PostMasterController failed with %x", GetLastError());
+    DebugLastError("PostMessage");
   }
   Unlock();
 }
@@ -578,7 +561,7 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
   SetLastError(ERROR_SUCCESS);
   DWORD_PTR dwResult = 0;
 	if(!SendMessageTimeout(hwnd, msg, wParam, lParam, SMTO_BLOCK, 100, &dwResult)) {
-  	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController failed with %x", GetLastError());
+    DebugLastError("SendMessageTimeout");
   } else {
 	  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController returned %x", dwResult);
   }
@@ -706,4 +689,16 @@ BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault) {
     }
   }
   return bDefault;
+}
+
+void Globals::LoadDebugSettings() {
+  RegistryReadOnly reg(HKEY_CURRENT_USER);
+  if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+    f_debug_KeymanLog = reg.ValueExists(REGSZ_Debug) && reg.ReadInteger(REGSZ_Debug);
+    f_debug_ToConsole = reg.ValueExists(REGSZ_DebugToConsole) && reg.ReadInteger(REGSZ_DebugToConsole);   // I3951
+  }
+  else {
+    f_debug_KeymanLog = FALSE;
+    f_debug_ToConsole = FALSE;   // I3951
+  }
 }

@@ -24,7 +24,7 @@
                     04 Nov 2012 - mcdurdin - I3529 - V9.0 - Merge of I3284 - Fix blocking of Ctrl+Shift passthrough to other hooks
                     31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
 */
-#include "keyman64.h"
+#include "pch.h"
 
 static BYTE kbstate[256];
 extern BOOL FShouldIgnoreNextKey[256];

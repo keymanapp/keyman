@@ -22,7 +22,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 extern "C" BOOL _declspec(dllexport) WINAPI GetKeymanInfo( LPKEYMANINFO ki )
 {

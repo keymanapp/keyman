@@ -66,7 +66,7 @@
                     10 Aug 2015 - mcdurdin - I4838 - Backspace and Delete don't work in the keyboard debugger
                     28 Mar 2016 - mcdurdin - I4933 - Compat issue with Firefox 42 and IE and Keyman 9 TSF
 */
-#include "keyman64.h"   // I4575
+#include "pch.h"   // I4575
 
 BOOL fOutputKeystroke;
 

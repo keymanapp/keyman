@@ -25,7 +25,7 @@
                     04 Nov 2012 - mcdurdin - I3526 - V9.0 - Merge of I3191 - Corruption of keyboard selection cache between x86 and x64
                     28 May 2014 - mcdurdin - I4220 - V9.0 - Remove references to LoadKeyboardLayout, Preload, Substitutes, etc. and use only TSF
 */
-#include "keyman64.h"
+#include "pch.h"
    // I4220
 #ifndef SM_IMMENABLED
 #define SM_IMMENABLED 82

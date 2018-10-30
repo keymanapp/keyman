@@ -16,7 +16,7 @@
   History:          30 Nov 2010 - mcdurdin - I2543 - Support switching to TSF TIPs
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 typedef HRESULT (WINAPI *PTF_CREATEINPUTPROCESSORPROFILES)(ITfInputProcessorProfiles**);
 

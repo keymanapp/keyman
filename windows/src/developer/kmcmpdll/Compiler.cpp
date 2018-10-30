@@ -64,15 +64,7 @@
                     23 Feb 2016 - mcdurdin - I4982 - Defined character constants cannot be referenced correctly in other stores
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
 */
-#include <ctype.h>
-#include <stdio.h>
-
-#include <string.h>
-#include <windows.h>
-
-// Keyman includes
-
-#include <keyman64.h>
+#include "pch.h"
 
 #include <compfile.h>
 #include <compiler.h>
