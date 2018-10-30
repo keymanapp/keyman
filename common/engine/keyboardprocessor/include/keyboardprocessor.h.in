@@ -90,7 +90,7 @@ typedef uint32_t    km_kbp_status;      // Status return code.
 typedef struct km_kbp_context     km_kbp_context;
 typedef struct km_kbp_keyboard    km_kbp_keyboard;
 typedef struct km_kbp_state       km_kbp_state;
-typedef struct km_kbp_options_set  km_kbp_options_set;
+typedef struct km_kbp_options_set km_kbp_options_set;
 
 // Forward declarations
 //

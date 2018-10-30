@@ -40,7 +40,7 @@ namespace
 #define   try_status(expr) \
 {auto __s = (expr); if (__s != KM_KBP_STATUS_OK) return 100*__LINE__+__s;}
 
-int main(int argc, char * argv[])
+int main(int, char * [])
 {
   km_kbp_context_item *ctxt1, *ctxt2;
   // Test UTF16 to context_item conversion.
