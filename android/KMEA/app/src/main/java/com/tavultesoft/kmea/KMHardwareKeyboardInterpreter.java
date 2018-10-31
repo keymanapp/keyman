@@ -220,12 +220,12 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     0,      //        public static final int KEY_RIGHTALT = 0x64;
     0,      //        padding?
     36,     //        public static final int KEY_HOME = 0x66;
-    38,     //        public static final int KEY_UP = 0x67;
+    0,      //        public static final int KEY_UP = 0x67;
     33,     //        public static final int KEY_PAGEUP = 0x68; // ???
-    37,     //        public static final int KEY_LEFT = 0x69;
-    39,     //        public static final int KEY_RIGHT = 0x6A;
+    0,      //        public static final int KEY_LEFT = 0x69;
+    0,      //        public static final int KEY_RIGHT = 0x6A;
     35,     //        public static final int KEY_END = 0x6B;
-    40,     //        public static final int KEY_DOWN = 0x6C;
+    0,      //        public static final int KEY_DOWN = 0x6C;
     34      //        public static final int KEY_PAGEDOWN = 0x6D;
 
   };
