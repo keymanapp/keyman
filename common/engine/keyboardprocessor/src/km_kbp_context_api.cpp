@@ -169,10 +169,10 @@ json & operator << (json & j, km_kbp_context_item const & i)
   {
     case KM_KBP_CT_CHAR:
       utf8::codec::put(cps, i.character, l);
-      j << &cps[0];
+      j << json::string(&cps[0]);
       break;
     case KM_KBP_CT_MARKER:
-      j << i.marker;
+      j << json::integer_u(i.marker);
       break;
     default:
       j << json::flat << json::object
