@@ -47,11 +47,11 @@ interface Configuration {
 }
 
  /**
-  * TODO: ...
+  * TODO: I still have to define the internal API for models.
   */
 interface Model {
   readonly configuration: Configuration;
-  predict(...args: any): InternalSuggestion[];
+  predict(...args: any[]): InternalSuggestion[];
 }
 
 /**
@@ -191,15 +191,3 @@ function loadModel(path : string , configuration: RequestedConfiguration) {
 
   return createModel(configuration);
 }
-
-/**
- * HACK: on Node.JS + tiny-worker, ensure code imported with importScripts()
- * has access to the same things defined on self in this file.
- */
-if (typeof global !== 'undefined') {
-  let globalPrototype = Object.getPrototypeOf(global);
-  Object.setPrototypeOf(self, globalPrototype);
-  Object.setPrototypeOf(global, self);
-}
-
-/*global importScripts*/

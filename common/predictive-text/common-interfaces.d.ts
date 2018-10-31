@@ -20,16 +20,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**
- * A JavaScript string with the restriction that it must only
- * contain Unicode scalar values.
- *
- * This means that any lone high surrogate must be paired with
- * a low surrogate, if it exists. Lone surrogate code units are
- * forbidden.
- *
- * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString
- */
+/**	
+ * A JavaScript string with the restriction that it must only	
+ * contain Unicode scalar values.	
+ *	
+ * This means that any lone high surrogate must be paired with	
+ * a low surrogate, if it exists. Lone surrogate code units are	
+ * forbidden.	
+ *	
+ * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString	
+ */	
 type USVString = string;
 
 /**

@@ -5,7 +5,8 @@
     "outDir": "build/",
     "inlineSources": true,
     "sourceMap": true,
-    "target": "es5"
+    "target": "es5",
+    "lib": ["webworker", "es6"]
   },
   "include" : [
     "./*.ts"
