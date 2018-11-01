@@ -94,7 +94,7 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-splash</Debugger_RunParams>
+        <Debugger_RunParams>-c</Debugger_RunParams>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -178,7 +178,6 @@
         <DCCReference Include="render\WelcomeXMLRenderer.pas"/>
         <DCCReference Include="main\ValidateKeymanInstalledSystemKeyboards.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\engine\kmcomapi\util\keymanerrorcodes.pas"/>
         <DCCReference Include="install\uninstall.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanControlMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\hints\HintConsts.pas"/>
@@ -301,6 +300,12 @@
         <DCCReference Include="main\UImportOlderVersionKeyboards9.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards9Plus.pas"/>
+        <DCCReference Include="install\Keyman.Configuration.UI.MitigationForWin10_1803.pas">
+            <Form>;
+
+{$R VERSION.RES</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
