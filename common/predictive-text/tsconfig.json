@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "module": "none",
+    "outDir": "build/",
+    "inlineSources": true,
+    "sourceMap": true,
+    "target": "es5",
+    "lib": ["webworker", "es6"]
+  },
+  "include" : [
+    "./*.ts"
+  ]
+}
