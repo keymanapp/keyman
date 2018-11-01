@@ -244,7 +244,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-    if (keyCode > 84 || keyCode < 0) {
+    if (keyCode > KeyEvent.KEYCODE_SEARCH || keyCode < KeyEvent.KEYCODE_UNKNOWN) {
       // The key is outside the range of keys we understand
       return false;
     }
@@ -287,7 +287,9 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
       return false;
     }
 
-    int code = scanCodeMap[event.getScanCode()];
+    // Range check scanCode. If it's beyond our expected range, just use "0"
+    int scanCode = event.getScanCode();
+    int code = (scanCode < scanCodeMap.length) ? scanCodeMap[scanCode] : 0 ;
     if (code == 0) {
       // Not an alphanumeric, punctuation or enter/tab/space key
       return false;
