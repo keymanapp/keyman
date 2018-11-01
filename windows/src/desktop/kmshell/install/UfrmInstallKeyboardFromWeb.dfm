@@ -12,7 +12,6 @@ inherited frmInstallKeyboardFromWeb: TfrmInstallKeyboardFromWeb
   inherited web: TKeymanEmbeddedWB
     Width = 740
     Height = 400
-    Silent = False
     ExplicitWidth = 816
     ExplicitHeight = 395
     ControlData = {
