@@ -127,6 +127,7 @@ uses
   System.Types,
   Vcl.Themes,
 
+  Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
 
@@ -149,6 +150,7 @@ begin
     Exit(False);
 
   kmcom.Keyboards[n].Languages.Install(ISOCode);
+  CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
   Result := True;
 end;
@@ -265,7 +267,9 @@ begin
     WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
   end
   else
+  begin
     InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
+  end;
 
   FKeyboardID := FKeyboard.ID;
   FKeyboard := nil;
