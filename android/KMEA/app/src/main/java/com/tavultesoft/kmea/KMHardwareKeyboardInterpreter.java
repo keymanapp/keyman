@@ -114,11 +114,13 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
    *
    * Maps relevant Linux key code (LKC) to the standard key codes used by Keyman keyboards
    * Table: https://source.android.com/devices/input/keyboard-devices
+   *
+   * Limitations: Intentionally not assigning number pad keys
    */
   private static final
   int scanCodeMap[] = {
     0,      //        padding = 0x00;
-    0,      //        public static final int KEY_ESC = 0x01; ???
+    0,      //        public static final int KEY_ESC = 0x01;
     '1',    //        public static final int KEY_1 = 0x02;
     '2',    //        public static final int KEY_2 = 0x03;
     '3',    //        public static final int KEY_3 = 0x04;
@@ -146,7 +148,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     219,    //        public static final int KEY_LEFTBRACE = 0x1A;
     221,    //        public static final int KEY_RIGHTBRACE = 0x1B;
     13,     //        public static final int KEY_ENTER = 0x1C;
-    0,      //        public static final int KEY_LEFTCTRL = 0x1D; // ???
+    0,      //        public static final int KEY_LEFTCTRL = 0x1D;
     'A',    //        public static final int KEY_A = 0x1E;
     'S',    //        public static final int KEY_S = 0x1F;
     'D',    //        public static final int KEY_D = 0x20;
@@ -172,62 +174,63 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     190,    //        public static final int KEY_DOT = 0x34;
     191,    //        public static final int KEY_SLASH = 0x35;
     0,      //        public static final int KEY_RIGHTSHIFT = 0x36;
-    106,    //        public static final int KEY_KPASTERISK = 0x37; // ???
+    0,      //        public static final int KEY_KPASTERISK = 0x37;
     0,      //        public static final int KEY_LEFTALT = 0x38;
     32,     //        public static final int KEY_SPACE = 0x39;
-    0,      //        public static final int KEY_CAPSLOCK = 0x3A; // ???
-    0,      //        public static final int KEY_F1 = 0x3B; // ???
-    0,      //        public static final int KEY_F2 = 0x3C; // ???
-    0,      //        public static final int KEY_F3 = 0x3D; // ???
-    0,      //        public static final int KEY_F4 = 0x3E; // ???
-    0,      //        public static final int KEY_F5 = 0x3F; // ???
-    0,      //        public static final int KEY_F6 = 0x40; // ???
-    0,      //        public static final int KEY_F7 = 0x41; // ???
-    0,      //        public static final int KEY_F8 = 0x42; // ???
-    0,      //        public static final int KEY_F9 = 0x43; // ???
-    0,      //        public static final int KEY_F10 = 0x44; // ???
-    0,      //        public static final int KEY_NUMLOCK = 0x45; // ???
-    0,      //        public static final int KEY_SCROLLLOCK = 0x46; // ???
-    103,    //        public static final int KEY_KP7 = 0x47; // ???
-    104,    //        public static final int KEY_KP8 = 0x48; // ???
-    105,    //        public static final int KEY_KP9 = 0x49; // ???
-    109,    //        public static final int KEY_KPMINUS = 0x4A; // ???
-    100,    //        public static final int KEY_KP4 = 0x4B; // ???
-    101,    //        public static final int KEY_KP5 = 0x4C; // ???
-    102,    //        public static final int KEY_KP6 = 0x4D; // ???
-    107,    //        public static final int KEY_KPPLUS = 0x4E; // ???
-    97,     //        public static final int KEY_KP1 = 0x4F; // ???
-    98,     //        public static final int KEY_KP2 = 0x50; // ???
-    99,     //        public static final int KEY_KP3 = 0x51; // ???
-    96,     //        public static final int KEY_KP0 = 0x52; // ???
-    110,    //        public static final int KEY_KPDOT = 0x53; // ???
+    0,      //        public static final int KEY_CAPSLOCK = 0x3A;
+    0,      //        public static final int KEY_F1 = 0x3B;
+    0,      //        public static final int KEY_F2 = 0x3C;
+    0,      //        public static final int KEY_F3 = 0x3D;
+    0,      //        public static final int KEY_F4 = 0x3E;
+    0,      //        public static final int KEY_F5 = 0x3F;
+    0,      //        public static final int KEY_F6 = 0x40;
+    0,      //        public static final int KEY_F7 = 0x41;
+    0,      //        public static final int KEY_F8 = 0x42;
+    0,      //        public static final int KEY_F9 = 0x43;
+    0,      //        public static final int KEY_F10 = 0x44;
+    0,      //        public static final int KEY_NUMLOCK = 0x45;
+    0,      //        public static final int KEY_SCROLLLOCK = 0x46;
+    0,      //        public static final int KEY_KP7 = 0x47;
+    0,      //        public static final int KEY_KP8 = 0x48;
+    0,      //        public static final int KEY_KP9 = 0x49;
+    0,      //        public static final int KEY_KPMINUS = 0x4A;
+    0,      //        public static final int KEY_KP4 = 0x4B;
+    0,      //        public static final int KEY_KP5 = 0x4C;
+    0,      //        public static final int KEY_KP6 = 0x4D;
+    0,      //        public static final int KEY_KPPLUS = 0x4E;
+    0,      //        public static final int KEY_KP1 = 0x4F;
+    0,      //        public static final int KEY_KP2 = 0x50;
+    0,      //        public static final int KEY_KP3 = 0x51;
+    0,      //        public static final int KEY_KP0 = 0x52;
+    0,      //        public static final int KEY_KPDOT = 0x53;
     0,      //        padding 0x54;
-    0,      //        public static final int KEY_ZENKAKUHANKAKU = 0x55; // ???
+    0,      //        public static final int KEY_ZENKAKUHANKAKU = 0x55;
     226,    //        public static final int KEY_102ND = 0x56;
-    0,      //        public static final int KEY_F11 = 0x57; // ???
-    0,      //        public static final int KEY_F12 = 0x58; // ???
-    0,      //        public static final int KEY_RO =  0x59; // ???
-    0,      //        public static final int KEY_KATAKANA =  0x5A; // ???
-    0,      //        public static final int KEY_HIRGANA =  0x5B; // ???
-    0,      //        public static final int KEY_HENKAN =  0x5C; // ???
-    0,      //        public static final int KEY_KATAKANAHIRAGANA =  0x5D; // ???
-    0,      //        public static final int KEY_MUHENKAN =  0x5E; // ???
-    0,      //        public static final int KEY_KPJPCOMMA =  0x5F; // ???
-    13,     //        public static final int KEY_KPENTER = 0x60; // reuse ENTER ???
-    0,      //        public static final int KEY_RIGHTCTRL = 0x61; // ???
-    111,    //        public static final int KEY_KPSLASH = 0x62; // ???
-    0,      //        public static final int KEY_SYSRQ = 0x63; // ???
+    0,      //        public static final int KEY_F11 = 0x57;
+    0,      //        public static final int KEY_F12 = 0x58;
+    0,      //        public static final int KEY_RO =  0x59;
+    0,      //        public static final int KEY_KATAKANA =  0x5A;
+    0,      //        public static final int KEY_HIRGANA =  0x5B;
+    0,      //        public static final int KEY_HENKAN =  0x5C;
+    0,      //        public static final int KEY_KATAKANAHIRAGANA =  0x5D;
+    0,      //        public static final int KEY_MUHENKAN =  0x5E;
+    0,      //        public static final int KEY_KPJPCOMMA =  0x5F;
+    0,      //        public static final int KEY_KPENTER = 0x60;
+    0,      //        public static final int KEY_RIGHTCTRL = 0x61;
+    0,      //        public static final int KEY_KPSLASH = 0x62;
+    0,      //        public static final int KEY_SYSRQ = 0x63;
     0,      //        public static final int KEY_RIGHTALT = 0x64;
-    0,      //        padding?
-    36,     //        public static final int KEY_HOME = 0x66;
+    0,      //        padding 0x55;
+    0,      //        public static final int KEY_HOME = 0x66;
     0,      //        public static final int KEY_UP = 0x67;
-    33,     //        public static final int KEY_PAGEUP = 0x68; // ???
+    0,      //        public static final int KEY_PAGEUP = 0x68;
     0,      //        public static final int KEY_LEFT = 0x69;
     0,      //        public static final int KEY_RIGHT = 0x6A;
-    35,     //        public static final int KEY_END = 0x6B;
+    0,      //        public static final int KEY_END = 0x6B;
     0,      //        public static final int KEY_DOWN = 0x6C;
-    34      //        public static final int KEY_PAGEDOWN = 0x6D;
+    0       //        public static final int KEY_PAGEDOWN = 0x6D;
 
+    // Many more KEYS currently not used by KMW...
   };
 
   private final Context context;
