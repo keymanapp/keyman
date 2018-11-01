@@ -1,3 +1,4 @@
+// See #1285 for detail
 unit Keyman.Configuration.UI.MitigationForWin10_1803;
 
 interface
@@ -22,7 +23,7 @@ uses
   utilexecute;
 
 const
-  SLearnMoreURL = 'https://keyman.com/';  // TODO
+  SLearnMoreURL = 'https://keyman.com/go/desktop/10.0/issue-1285';
 
 
 procedure CheckForMitigationWarningFor_Win10_1803(ASilent: Boolean; const ALogFile: string);
