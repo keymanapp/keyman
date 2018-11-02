@@ -101,6 +101,14 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         switcherView.setVisibility(View.GONE);
       }
     }
+    switcherView.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        KMManager.advanceToNextInputMode();
+        if (dismissOnSelect) {
+          finish();
+        }
+      }
+    });
 
     listView = (ListView) findViewById(R.id.listView);
     keyboardsList = getKeyboardsList(context);
@@ -185,14 +193,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     if (!canAddNewKeyboard) {
       addButton.setVisibility(View.GONE);
     }
-
-    switchButton = (ImageButton) findViewById(R.id.keyboard_button);
-    switchButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        KMManager.advanceToNextInputMode();
-        finish();
-      }
-    });
 
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
