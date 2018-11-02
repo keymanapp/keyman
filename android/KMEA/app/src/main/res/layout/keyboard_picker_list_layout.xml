@@ -9,38 +9,55 @@
 
     <include layout="@layout/keyboard_picker_toolbar" />
 
-    <include layout="@layout/list_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/keyboard_picker_appbar"/>
-
-    <LinearLayout
-        android:id="@+id/fabs"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="right">
+        android:id="@+id/keyboard_switcher_appbar"
+        android:layout_margin="3dp"
+        android:padding="4dp"
+        android:layout_below="@+id/keyboard_picker_appbar"
+        android:weightSum="2"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/switcher_bar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/title_switch_keyboard"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/keyboard_button"
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_keyboard_white"
-            app:fabSize="normal"
-            app:useCompatPadding="true" />
+            android:layout_marginRight="12dp"
+            app:fabSize="mini"/>
+    </RelativeLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add_button"
-            style="?android:attr/actionButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/image_button"
-            android:src="@drawable/ic_add_white"
-            app:fabSize="normal"
-            app:useCompatPadding="true" />
+    <include layout="@layout/list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/keyboard_switcher_appbar"/>
 
-    </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_button"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        app:useCompatPadding="true"
+        android:contentDescription="@string/image_button"
+        android:src="@drawable/ic_add_white"
+        app:fabSize="normal" />
 
 </RelativeLayout>

@@ -11,6 +11,7 @@
     <string name="title_keyboards" translatable="false">Keyboards</string>
     <string name="title_keyboard" translatable="false">Keyboard</string>
     <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
+    <string name="title_switch_keyboard" translatable="false">Switch to Next Keyboard</string>
 
     <!-- Button labels -->
     <string name="label_add" translatable="false">Add</string>

@@ -54,6 +54,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private static ImageButton addButton = null;
+  private static ImageButton switchButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
@@ -152,7 +154,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     });
 
-    final ImageButton addButton = (ImageButton) findViewById(R.id.add_button);
+    addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
@@ -173,12 +175,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     if (!canAddNewKeyboard)
       addButton.setVisibility(View.GONE);
 
-    final ImageButton switchButton = (ImageButton) findViewById(R.id.keyboard_button);
+    switchButton = (ImageButton) findViewById(R.id.keyboard_button);
+    switchButton.setEnabled(KMManager.SystemKeyboard != null);
     switchButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        if (KMManager.SystemKeyboard != null) {
-          KMManager.switchToNextKeyboard(context, true);
-        }
+        KMManager.advanceToNextInputMode();
+        finish();
       }
     });
 

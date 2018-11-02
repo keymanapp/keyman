@@ -160,18 +160,6 @@ public final class KMManager {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
-  protected static IBinder getToken() {
-    final Dialog dialog = IMService.getWindow();
-    if (dialog == null) {
-      return null;
-    }
-    final Window window = dialog.getWindow();
-    if (window == null) {
-      return null;
-    }
-    return window.getAttributes().token;
-  }
-
   // Check if a keyboard namespace is reserved
   public static boolean isReservedNamespace(String packageID) {
     if (packageID.equals(KMDefault_UndefinedPackageID)) {
@@ -700,10 +688,6 @@ public final class KMManager {
   }
 
   public static void switchToNextKeyboard(Context context) {
-    switchToNextKeyboard(context, false);
-  }
-
-  public static void switchToNextKeyboard(Context context, boolean advanceToNextInputMode) {
     int index = KeyboardPickerActivity.getCurrentKeyboardIndex(context);
     index++;
     HashMap<String, String> kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
@@ -723,15 +707,21 @@ public final class KMManager {
       InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
 
-    // Switch system keyboard to next IME so the user doesn't see
-    // SystemKeyboard.setKeyboard resetting to the first Keyman keyboard
-    if (index == 0 && advanceToNextInputMode) {
-      advanceToNextInputMode();
-    }
-
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
+  }
+
+  protected static IBinder getToken() {
+    final Dialog dialog = IMService.getWindow();
+    if (dialog == null) {
+      return null;
+    }
+    final Window window = dialog.getWindow();
+    if (window == null) {
+      return null;
+    }
+    return window.getAttributes().token;
   }
 
   public static void advanceToNextInputMode() {
@@ -1510,7 +1500,7 @@ public final class KMManager {
             if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
             } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-              switchToNextKeyboard(context, true);
+              switchToNextKeyboard(context);
             }
           } else {
             switchToNextKeyboard(context);
