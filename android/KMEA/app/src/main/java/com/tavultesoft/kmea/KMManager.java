@@ -118,6 +118,7 @@ public final class KMManager {
   public static final String KMKey_CustomKeyboard = "CustomKeyboard";
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
+  public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -713,6 +714,9 @@ public final class KMManager {
   }
 
   protected static IBinder getToken() {
+    if (IMService == null) {
+      return null;
+    }
     final Dialog dialog = IMService.getWindow();
     if (dialog == null) {
       return null;
@@ -1051,6 +1055,7 @@ public final class KMManager {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+      i.putExtra(KMKey_DisplayKeyboardSwitcher, false);
       context.startActivity(i);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
@@ -1058,6 +1063,7 @@ public final class KMManager {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
       i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      i.putExtra(KMKey_DisplayKeyboardSwitcher, true);
       context.startActivity(i);
     }
   }

@@ -48,12 +48,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public final class KeyboardPickerActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private static View switcherView = null;
   private static ImageButton addButton = null;
   private static ImageButton switchButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
@@ -91,6 +93,14 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+    switcherView = (RelativeLayout) findViewById(R.id.keyboard_switcher_appbar);
+    Bundle bundle = getIntent().getExtras();
+    if (bundle != null) {
+      if (!bundle.getBoolean(KMManager.KMKey_DisplayKeyboardSwitcher)) {
+        switcherView.setVisibility(View.GONE);
+      }
+    }
 
     listView = (ListView) findViewById(R.id.listView);
     keyboardsList = getKeyboardsList(context);
@@ -172,11 +182,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         }
       }
     });
-    if (!canAddNewKeyboard)
+    if (!canAddNewKeyboard) {
       addButton.setVisibility(View.GONE);
+    }
 
     switchButton = (ImageButton) findViewById(R.id.keyboard_button);
-    switchButton.setEnabled(KMManager.SystemKeyboard != null);
     switchButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         KMManager.advanceToNextInputMode();
