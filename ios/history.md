@@ -4,6 +4,7 @@
 * Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
 * Bookmark add button is enabled only when title/url fields have text (#1073)
 * Removed deprecated code to to support keyman:// scheme for ad-hoc distribution (#1160)
+* Updated the default keyboard to SIL EuroLatin (#1101)
 
 ## 2018-08-02 10.0.208 stable 
 * Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159) 
