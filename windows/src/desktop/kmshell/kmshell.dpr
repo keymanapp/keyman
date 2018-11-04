@@ -57,7 +57,6 @@ uses
   WelcomeXMLRenderer in 'render\WelcomeXMLRenderer.pas',
   ValidateKeymanInstalledSystemKeyboards in 'main\ValidateKeymanInstalledSystemKeyboards.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  keymanerrorcodes in '..\..\engine\kmcomapi\util\keymanerrorcodes.pas',
   uninstall in 'install\uninstall.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
@@ -158,7 +157,8 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
   Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
-  UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas';
+  UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
+  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
