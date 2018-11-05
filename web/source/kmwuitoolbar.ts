@@ -335,8 +335,12 @@ if(!window['keyman']['ui']['name']) {
         for(var j=0; j<Keyboards.length; j++)
         {         
           if(Keyboards[j]['RegionCode'] != i) continue;              // Not this region
-          if(Keyboards[j]['LanguageCode'] == languageCode) continue; // Same language as previous keyboard
-          languageCode = Keyboards[j]['LanguageCode'];
+
+          // Get JUST the language code for this section.  BCP-47 codes can include more!
+          var bcpSubtags: string[] = keymanweb['util'].getLanguageCodes(Keyboards[j]['LanguageCode']);
+          if(bcpSubtags[0] == languageCode) continue; // Same language as previous keyboard
+          languageCode = bcpSubtags[0];
+
           max++;
         }   
         max = Number(((max+3)/4).toFixed(0));   // Get number of entries per column
@@ -346,16 +350,24 @@ if(!window['keyman']['ui']['name']) {
         for(var j=0; j<Keyboards.length; j++)
         {           
           if(Keyboards[j]['RegionCode'] != i) continue;      // Not this region
-          if(Keyboards[j]['LanguageCode'] == languageCode)   // Same language as previous keyboard, so add it to that entry
-          {
+
+          var bcpSubtags: string[] = keymanweb['util'].getLanguageCodes(Keyboards[j]['LanguageCode']);
+          if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
             var x = ui.languages[languageCode].keyboards;
-            if(x.push) x.push(Keyboards[j]);
-            else ui.languages[languageCode].keyboards = x.concat(Keyboards[j]);
+
+            // While we could avoid duplicating keyboard entries that occur for multiple regions, we'll instead
+            // allow them to display while distinguishing them more directly.  (That part is handled later.)
+            if(x.push) {
+              x.push(Keyboards[j]);
+            } else {
+              ui.languages[languageCode].keyboards = x.concat(Keyboards[j]);
+            }
+
             continue;
           }
           
           // Add a new language entry          
-          languageCode = Keyboards[j]['LanguageCode']; 
+          languageCode = bcpSubtags[0]; 
           ui.languages[languageCode] = { id: Keyboards[j]['LanguageCode'], name: Keyboards[j]['LanguageName'], keyboards: [Keyboards[j]] };
   
           // Start a new column if necessary          
@@ -496,6 +508,8 @@ if(!window['keyman']['ui']['name']) {
           for(var n in lang.keyboards) {
             var itemNode = ui.createNode('li');
             kbdText = lang.keyboards[n]['Name'].replace(/\s?keyboard/i,'');
+            // We append the full BCP-47 code here for disambiguation when regional and/or script variants exist.
+            kbdText = kbdText + " [" + lang.keyboards[n].LanguageCode + "]";
             aNode = ui.createNode('a', null, null, kbdText);
             aNode.href = '#';
             aNode.title = '';

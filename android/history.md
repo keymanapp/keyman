@@ -11,6 +11,7 @@
 * Fix globe button when pausing WebBrowser (#1213)
 * Change system keyboard to "numeric" layer for digit/phone number text fields (#1218)
 * Add feature to vibrate device when Keyman Web calls `beep` (#1227)
+* Add support for extra key found on European hardware keyboards (#1291)
 * Add feature for keyboard picker to switch to next keyboard (#1283)
 
 ## 2018-10-03 10.0.506 stable
