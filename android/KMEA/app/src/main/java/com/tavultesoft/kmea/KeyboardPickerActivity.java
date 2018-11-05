@@ -40,24 +40,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public final class KeyboardPickerActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
-  private static View switcherView = null;
   private static ImageButton addButton = null;
-  private static ImageButton switchButton = null;
+  private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
@@ -94,14 +92,14 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    switcherView = (RelativeLayout) findViewById(R.id.keyboard_switcher_appbar);
+    closeButton = (Button) findViewById(R.id.close_keyman_button);
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       if (!bundle.getBoolean(KMManager.KMKey_DisplayKeyboardSwitcher)) {
-        switcherView.setVisibility(View.GONE);
+        closeButton.setVisibility(View.GONE);
       }
     }
-    switcherView.setOnClickListener(new View.OnClickListener() {
+    closeButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         KMManager.advanceToNextInputMode();
         if (dismissOnSelect) {
