@@ -87,7 +87,7 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
 
       default:
       {
-        auto shift_state = modifier_state & KM_KBP_MODIFIER_SHIFT;
+        auto shift_state = bool(modifier_state & KM_KBP_MODIFIER_SHIFT);
         // Only process further one of the shift states has something to output.
         if (table[0][vk][0] || table[1][vk][0])
         {

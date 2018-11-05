@@ -40,7 +40,9 @@ struct km_kbp_options_set
 {
   km::kbp::options_set   & target;
 
-  km_kbp_options_set(km::kbp::options_set & tgt) : target(tgt) {}
+  km_kbp_options_set(km::kbp::options_set & tgt)
+  : target(tgt), _last_lookup {0, 0, uint8_t(tgt.scope())}
+  {}
 
   km_kbp_option const * export_option(char const * k, char const * v) const {
     _last_lookup.key = k;
@@ -57,5 +59,5 @@ private:
 inline
 void km_kbp_options_set::update(km_kbp_option const * opt)
 {
-  for (;opt->key; ++opt)  target.emplace(opt->key, opt->value);
+  for (;opt->key; ++opt)  target[opt->key] = opt->value;
 }

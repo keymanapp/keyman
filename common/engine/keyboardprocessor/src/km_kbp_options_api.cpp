@@ -74,12 +74,12 @@ km_kbp_status km_kbp_options_set_to_json(km_kbp_options_set const *opts, char *b
   auto const doc = _buf.str();
   if (buf && *space > doc.size())
   {
-    std::copy(doc.begin(), doc.end(), buf);
+    doc.copy(buf, *space);
     buf[doc.size()] = 0;
   }
 
   // Return space needed/used.
-  *space = doc.size();
+  *space = doc.size()+1;
   return KM_KBP_STATUS_OK;
 }
 
@@ -87,8 +87,8 @@ namespace
 {
   constexpr char const * const scope_name_lut[] = {
     "unknown",
+    "keyboard",
     "enviroment",
-    "keyboard"
   };
 }
 

@@ -127,7 +127,7 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
   }
 
   // Return space needed/used.
-  *space = doc.size();
+  *space = doc.size()+1;
   return KM_KBP_STATUS_OK;
 
 }
