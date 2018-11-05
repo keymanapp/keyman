@@ -89,7 +89,9 @@ public final class KMManager {
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction inappKbGlobeKeyLongpressAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU; // TODO: GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+  private static GlobeKeyAction sysKbGlobeKeyLongpressAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -1236,9 +1238,19 @@ public final class KMManager {
   }
 
   public static GlobeKeyAction getGlobeKeyAction(KeyboardType kbType) {
+    return getGlobeKeyAction(kbType, false);
+  }
+
+  public static GlobeKeyAction getGlobeKeyAction(KeyboardType kbType, boolean longpress) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (longpress) {
+        return inappKbGlobeKeyLongpressAction;
+      }
       return inappKbGlobeKeyAction;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (longpress) {
+        return sysKbGlobeKeyLongpressAction;
+      }
       return sysKbGlobeKeyAction;
     } else {
       return GlobeKeyAction.GLOBE_KEY_ACTION_DO_NOTHING;
@@ -1246,10 +1258,22 @@ public final class KMManager {
   }
 
   public static void setGlobeKeyAction(KeyboardType kbType, GlobeKeyAction action) {
+    setGlobeKeyAction(kbType, action, false);
+  }
+
+  public static void setGlobeKeyAction(KeyboardType kbType, GlobeKeyAction action, boolean longpress) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      inappKbGlobeKeyAction = action;
+      if (longpress) {
+        inappKbGlobeKeyLongpressAction = action;
+      } else {
+        inappKbGlobeKeyAction = action;
+      }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      sysKbGlobeKeyAction = action;
+      if (longpress) {
+        sysKbGlobeKeyLongpressAction = action;
+      } else {
+        sysKbGlobeKeyAction = action;
+      }
     }
   }
 
