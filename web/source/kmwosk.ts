@@ -2583,26 +2583,14 @@ if(!window['keyman']['initialized']) {
       // Highlight the touched key
       osk.highlightKey(key,true);
 
-      // Handle option key
-      /*if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
+      // Special function keys need immediate action
+      if(keyName == 'K_LOPT' || keyName == 'K_ROPT')
       {
-        console.warn("osk touchHold " + key.id + ", keyPending is " + osk.keyPending);
-        if (osk.keyPending) {
-          console.warn('normal globe press');
-          osk.highlightKey(osk.keyPending, false);
-          osk.clickKey(osk.keyPending);
-          osk.touchCount--;
-        } else {
-          if ('showLongpressKeyboardList' in keymanweb) {
-            console.warn('showLongpressKeyboardList found');
-            keymanweb['showLongpressKeyboardList']();
-          }
-        }
-        console.warn('setting osk.keyPending to ' + key);
-        osk.keyPending = key;
+        window.setTimeout(function(){osk.clickKey(key);},0);
+        osk.keyPending = null;
       }
       // Also backspace, to allow delete to repeat while key held
-      else */if(keyName == 'K_BKSP') {
+      else if(keyName == 'K_BKSP') {
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
         osk.clickKey(key);
@@ -2611,7 +2599,6 @@ if(!window['keyman']['initialized']) {
         osk.keyPending = null;
       } else {
         if(osk.keyPending) {
-          console.warn('else -> osk.keyPending');
           osk.highlightKey(osk.keyPending,false);
           osk.clickKey(osk.keyPending);
           osk.clearPopup();

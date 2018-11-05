@@ -287,37 +287,15 @@
    * @param {Object}  key   base key element
    */            
   osk.touchHold = function(key)
-  {
-    console.warn("osk.touchHold");
-    var keyIdComponents = key.id.split('-');
-    var keyName=keyIdComponents[keyIdComponents.length-1];
-
+  {        
     if(key.subKeys && (typeof(window['oskCreatePopup']) == 'function'))
     {
       var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(osk._DivVKbd)+key.offsetWidth/2,
-          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(osk._DivVKbd);
-
-      if(device.formFactor == 'phone') {
-          osk.prependBaseKey(key);
-      }
+          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(osk._DivVKbd);      
+      
+      if(device.formFactor == 'phone') osk.prependBaseKey(key);
       osk.popupBaseKey = key; osk.popupPending=true;      
       window['oskCreatePopup'](key.subKeys,xBase,yBase,key.offsetWidth,key.offsetHeight);
-    } else if ((keyName.indexOf('K_LOPT') >= 0) || (keyName.indexOf('K_ROPT') >= 0)) {
-        console.warn("osk.touchHold on " + key.id);
-        osk.subkeyDelayTimer = window.setTimeout(
-            function()
-            {
-                osk.clearPopup();
-                if ('showLongpressKeyboardList' in keymanweb) {
-                    console.warn('showLongpressKeyboardList found');
-                    keymanweb['showLongpressKeyboardList']();
-                } else {
-                    console.warn('showLongpressKeyboardList not found. call clickKey...');
-                    osk.clickKey(key);
-                }
-            },
-            osk.popupDelay
-        );
     }
   };
 

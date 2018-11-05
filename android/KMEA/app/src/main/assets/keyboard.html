@@ -23,7 +23,6 @@
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
       kmw['showKeyboardList'] = showMenu;
-      kmw['showLongpressKeyboardList'] = showLongpressMenu;
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
@@ -195,10 +194,6 @@
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
       window.location.hash = 'globeKeyAction' + fragmentToggle;
-    }
-
-    function showLongpressMenu() {
-      window.console.log('KMEA to show longpress menu');
     }
 
     function hideKeyboard() {
