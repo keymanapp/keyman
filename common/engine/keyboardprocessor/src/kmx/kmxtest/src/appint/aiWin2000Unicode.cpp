@@ -57,6 +57,10 @@ AIWin2000Unicode::~AIWin2000Unicode()
 void AIWin2000Unicode::ReadContext()
 {
 }
+
+void AIWin2000Unicode::SetContext(WCHAR *ctxt) {
+  context->Set(ctxt);
+}
 	
 void AIWin2000Unicode::AddContext(WCHAR ch)  //I2436
 {
@@ -143,14 +147,22 @@ BOOL AIWin2000Unicode::PostKeys()
   for(; n < QueueSize; n++)
   {
 	  switch(Queue[n].ItemType) {
-	  case QIT_VKEYDOWN:
+    case QIT_CAPSLOCK:
+      if (Queue[n].dwData == 0) {
+        wprintf(L"CAPSLOCK off\n");
+      }
+      else {
+        wprintf(L"CAPSLOCK on\n");
+      }
+      break;
+    case QIT_VKEYDOWN:
 		  if((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
   		
 		  /* 6.0.153.0: Fix repeat state for virtual keys */
 
       if((Queue[n].dwData & QVK_KEYMASK) <= VK__MAX)  // I3438
       {
-        printf("KEYDOWN: %x (flags=%x)\n", Queue[n].dwData & 0xFF, (Queue[n].dwData & QVK_FLAGMASK) >> 16);
+        wprintf(L"KEYDOWN: %x (flags=%x)\n", Queue[n].dwData & 0xFF, (Queue[n].dwData & QVK_FLAGMASK) >> 16);
       }
 
 		  break;
@@ -159,27 +171,27 @@ BOOL AIWin2000Unicode::PostKeys()
 
       if((Queue[n].dwData & QVK_KEYMASK) <= VK__MAX)  // I3438
       {
-        printf("KEYUP: %x (flags=%x)\n", Queue[n].dwData & 0xFF, (Queue[n].dwData & QVK_FLAGMASK) >> 16);
+        wprintf(L"KEYUP: %x (flags=%x)\n", Queue[n].dwData & 0xFF, (Queue[n].dwData & QVK_FLAGMASK) >> 16);
       }
 
 		  break;
 	  case QIT_VSHIFTDOWN:
-      printf("VSHIFTDOWN\n");
+      wprintf(L"VSHIFTDOWN\n");
 		  break;
 	  case QIT_VSHIFTUP:
-      printf("VSHIFTUP\n");
+      wprintf(L"VSHIFTUP\n");
       break;
 	  case QIT_CHAR:
-      wprintf(L"CHAR %x (%lc)\n", Queue[n].dwData, Queue[n].dwData);
+      wprintf(L"CHAR %x (%c)\n", Queue[n].dwData, Queue[n].dwData);
       break;
 	  case QIT_DEADKEY:
-      printf("DEADKEY\n");
+      wprintf(L"DEADKEY\n");
 		  break;
 	  case QIT_BELL:
-      printf("BELL\n");
+      wprintf(L"BELL\n");
 		  break;
 	  case QIT_BACK:
-      printf("BKSP (%x)\n", Queue[n].dwData);
+      wprintf(L"BKSP (%x)\n", Queue[n].dwData);
 		  if(Queue[n].dwData == BK_DEADKEY) break;
       if(Queue[n].dwData == BK_SUPP2) break;  // I1389 - supp chars on vista default to single backspace //TODO: eliminate BK_SUPP2
       break;

@@ -52,6 +52,7 @@ public:
   virtual void AddContext(WCHAR ch);  //I2436
 	virtual WCHAR *ContextBuf(int n);
 	virtual WCHAR *ContextBufMax(int n);
+  void SetContext(PWCHAR ctxt);
 
 	/* Queue and sending functions */
 	

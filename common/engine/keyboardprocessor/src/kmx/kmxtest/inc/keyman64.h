@@ -305,7 +305,6 @@ PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 #ifndef _KEYMAN64_LIGHT
 #include "syskbd.h"
 #include "vkscancodes.h"
-#include "rc4.h"
 
 #include "crc32.h"
 

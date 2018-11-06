@@ -26,29 +26,17 @@
 */
 #include "pch.h"
 
-static BYTE kbstate[256];
-extern BOOL FShouldIgnoreNextKey[256];
-
-//extern "C" void FAR PASCAL keybd_event(void);
-
-
 void ResetCapsLock(void)
 {
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
-
-	if(!_td->lpActiveKeyboard) return;
-
 	SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: enter");
 
-	if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSALWAYSOFF) 
+	if(g_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF) 
 	{
 		SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: caps lock should be always off");
 		if(GetKeyState(VK_CAPITAL) & 1)
 		{
 			SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: caps lock is on, switching off caps lock");
-			keybd_event(VK_CAPITAL, 0x3A, 0, 0);
-			keybd_event(VK_CAPITAL, 0x3A, 0 | KEYEVENTF_KEYUP, 0);
+      GetApp()->QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
 	SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: exit");
@@ -57,24 +45,18 @@ void ResetCapsLock(void)
 
 void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 {
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
-	if(!_td->lpActiveKeyboard) return;		// pass through to window
-
-	if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSONONLY)
+	if(g_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
 	{
 		if(FIsUp && !(GetKeyState(VK_CAPITAL) & 1))		// I267 - 24/11/2006 invert GetKeyState test
 		{
-			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
-			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+      GetApp()->QueueAction(QIT_CAPSLOCK, 1);
 		}
 	}
-	else if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSALWAYSOFF)
+	else if(g_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF)
 	{
 		if(!FIsUp && (GetKeyState(VK_CAPITAL) & 1))  
 		{												// I267 - 24/11/2006 invert GetKeyState test
-			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
-			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+      GetApp()->QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
 }
@@ -82,18 +64,13 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 
 void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
 {
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
-	if(!_td->lpActiveKeyboard) return;		// pass through to window
-			
 	if((GetKeyState(VK_CAPITAL) & 1) == 0) return;
 
-	if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_SHIFTFREESCAPS)
+	if(g_keyboard.Keyboard->dwFlags & KF_SHIFTFREESCAPS)
 	{
 		if(!FIsUp)
 		{
-			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
-			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+      GetApp()->QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
 }

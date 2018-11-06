@@ -1,5 +1,8 @@
 
 #include "pch.h"
+#include <stdlib.h>
+#include <io.h>
+#include <fcntl.h>
 
 AIWin2000Unicode *g_app = NULL;
 INTKEYBOARDINFO g_keyboard = { 0 };
@@ -11,6 +14,8 @@ char g_baseKeyboard[16] = "kbdus.dll";
 wchar_t g_baseLayout[260] = L"", g_baseLayoutAlt[34] = L"";
 BOOL g_simulateAltGr = FALSE;
 char g_platform[128] = "windows desktop hardware native"; // TODO
+WCHAR g_context[512] = L"";
+int g_contextLength = 0;
 
 struct KeyEvent {
   UINT vkey;
@@ -317,16 +322,16 @@ const char *VKeyNames[256] = {
 
 
 void print_default_environment() {
-  printf("  env.simulate_altgr=%d\n", g_simulateAltGr);
-  printf("  env.base_keyboard=%s\n", g_baseKeyboard);
-  printf("  env.base_layout=%ls\n", g_baseLayout);
-  printf("  env.base_layout_alt=%ls\n", g_baseLayoutAlt);
-  printf("  env.platform=%s\n", g_platform);
+  wprintf(L"  env.simulate_altgr=%d\n", g_simulateAltGr);
+  wprintf(L"  env.base_keyboard=%hs\n", g_baseKeyboard);
+  wprintf(L"  env.base_layout=%s\n", g_baseLayout);
+  wprintf(L"  env.base_layout_alt=%s\n", g_baseLayoutAlt);
+  wprintf(L"  env.platform=%hs\n", g_platform);
 }
 
 BOOL addOption(char *val) {
   //TODO
-  printf("TODO: support %s\n", val);
+  wprintf(L"TODO: support %hs\n", val);
   return TRUE;
 }
 
@@ -501,13 +506,56 @@ BOOL setKeys(char *val) {
   return TRUE;
 }
 
+BOOL addContext(DWORD ch) {
+  if (ch > 0x10FFFF) return FALSE;
+  if (ch >= 0x10000) {
+    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
+    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate2(ch);
+  }
+  else {
+    g_context[g_contextLength++] = (WCHAR) ch;
+  }
+  g_context[g_contextLength] = 0;
+  return TRUE;
+}
+
+BOOL addContextDeadkey(DWORD dk) {
+  g_context[g_contextLength++] = UC_SENTINEL;
+  g_context[g_contextLength++] = CODE_DEADKEY;
+  g_context[g_contextLength++] = (WCHAR) (dk + 1);
+  g_context[g_contextLength] = 0;
+  return TRUE;
+}
+
 BOOL setContext(char *val) {
+  while (*val) {
+    if (*val == '\\') {
+      val++;
+      if (*val == '\\') {
+        if (!addContext(*val)) return FALSE;
+      }
+      else if (*val == 'u') {
+        val++;
+        char *p = NULL;
+        if (!addContext(strtol(val, &p, 16))) return FALSE;
+        val = p;
+      }
+      else if (*val == 'd') {
+        val++;
+        char *p = NULL;
+        if (!addContextDeadkey(strtol(val, &p, 10))) return FALSE;
+        val = p;
+      }
+    }
+  }
   return TRUE;
 }
 
 int main(int argc, char *argv[]) {
   char *filename = NULL;
   BOOL invalid = FALSE;
+
+  _setmode(_fileno(stdout), _O_U16TEXT);
 
   for (int i = 1; i < argc-1; i += 2) {
     char *arg = argv[i], *val = argv[i + 1];
@@ -531,16 +579,16 @@ int main(int argc, char *argv[]) {
   }
 
   if (invalid || g_nKeyEvents == 0 || filename == NULL) {
-    printf("Usage: kmxtest -kmx <file.kmx> -context context -keys key-sequence -d a=b\n");
-    printf("  file.kmx must exist. No translation is done for mnemonic layout, etc.\n");
-    printf("  context should be a string of unicode characters and/or deadkeys:\n");
-    printf("    e.g. \"ABC\\u1234\\dxxxx\" (where xxxx is the integer deadkey value or deadkey name if keyboard is compiled with debug)\n");
-    printf("  key-sequence is one or more Keyman keystrokes:\n");
-    printf("    e.g. \"[SHIFT K_A] [K_B]\"\n");
-    printf("  -d allows for definition of environment and keyboard options\n");
-    printf("    keyboard option is opt.store_name=\"value\"\n");
-    printf("    environment is env.name=\"\"\n");
-    printf("    default environment is:\n");
+    wprintf(L"Usage: kmxtest -kmx <file.kmx> -context context -keys key-sequence -d a=b\n");
+    wprintf(L"  file.kmx must exist. No translation is done for mnemonic layout, etc.\n");
+    wprintf(L"  context should be a string of unicode characters and/or deadkeys:\n");
+    wprintf(L"    e.g. \"ABC\\u1234\\dxxxx\\d{name}\" (where xxxx is the integer deadkey value or {name} is the deadkey name if keyboard is compiled with debug)\n");
+    wprintf(L"  key-sequence is one or more Keyman keystrokes:\n");
+    wprintf(L"    e.g. \"[SHIFT K_A] [K_B]\"\n");
+    wprintf(L"  -d allows for definition of environment and keyboard options\n");
+    wprintf(L"    keyboard option is opt.store_name=\"value\"\n");
+    wprintf(L"    environment is env.name=\"\"\n");
+    wprintf(L"    default environment is:\n");
 
     print_default_environment();
     return 2;
@@ -554,20 +602,31 @@ int main(int argc, char *argv[]) {
   // run;
 
   if (!LoadlpKeyboard(filename)) {
-    printf("Failed to load %s\n", filename);
+    wprintf(L"Failed to load %hs\n", filename);
     return 1;
   }
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
 
+  g_app->SetContext(g_context);
+
+  wprintf(L"============ Starting test ============\n");
+
   for (int i = 0; i < g_nKeyEvents; i++) {
-    printf("== [%d] == %x\n", i, g_keyEvents[i].vkey);
+    if (g_keyEvents[i].vkey < 256) {
+      wprintf(L"[%d] == %hs\n", i, VKeyNames[g_keyEvents[i].vkey]);
+    } 
+    else {
+      wprintf(L"[%d] == %x\n", i, g_keyEvents[i].vkey);
+    }
     _td->state.vkey = g_keyEvents[i].vkey;
     _td->state.charCode = VKeyToChar(g_keyEvents[i].vkey);
     g_shiftState = g_keyEvents[i].modifiers;
     
     ProcessHook();
   }
+
+  wprintf(L"============ Stopping test ============\n");
 
   delete g_app;
   return 0;

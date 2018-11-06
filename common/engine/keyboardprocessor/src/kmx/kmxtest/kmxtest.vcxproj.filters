@@ -57,9 +57,6 @@
     <ClCompile Include="src\appint\appint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\rc4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,9 +120,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\rc4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\registry.h">
