@@ -58,12 +58,40 @@ processed with the state object for this Client application.
 ## API
 ### Namespace
 All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
+
+### API idioms
+Almost all calls marshalling variable length agregate data in or out of an API
+object take the form:
+> km_kbp_status *fn_name*(object_ref, buffer_ptr, size_ptr)
+
+where the buffer is nullable and all other arguments are requried will result
+in an `KM_KBP_STATUS_INVALID_ARGUMENT` status being returned if nulled. When
+`buffer` is `nullptr` or `0` the function will place the size of the required
+buffer in the variable pointed to by `size_ptr`.
+
+Calls which result in the allocation of resources, regardless of resulting
+ownership are of the form:
+> km_kbp_status *fn_name*(object_ref, out_ptr)
+
+where `out_ptr` is a valid pointer to a caller allocated variable to hold the
+resulting ouput. This is often a reference to a created object. All arguments
+are requried will result in an `KM_KBP_STATUS_INVALID_ARGUMENT` status being
+returned if nulled.
+
+For accessors to fixed size attributes of an object these will take the form:
+> attr_value __fn_name__(object_ref)
+
+`object_ref` is required to be valid and will result in a nonsense value being
+returned if `nullptr` or `0`.
+
+All dispose calls are designed to accept null as a valid value and will do
+nothing in that event.
 ```c
 */
 #include <stdint.h>
 #include <stdlib.h>
-#include <keyboardprocessor_bits.h>
-#include <keyboardprocessor_vkeys.h>
+#include <keyman/keyboardprocessor_bits.h>
+#include <keyman/keyboardprocessor_vkeys.h>
 
 #define KM_KBP_LIB_CURRENT  @lib_curr@
 #define KM_KBP_LIB_AGE      @lib_age@
@@ -110,6 +138,8 @@ enum km_kbp_status_codes {
   KM_KBP_STATUS_IO_ERROR = 2,
   KM_KBP_STATUS_INVALID_ARGUMENT = 3,
   KM_KBP_STATUS_KEY_ERROR = 4,
+  KM_KBP_STATUS_INSUFFICENT_BUFFER = 5,
+  KM_KBP_STATUS_INVALID_UTF = 6,
   KM_KBP_STATUS_OS_ERROR = 0x80000000
 };
 
@@ -154,6 +184,8 @@ typedef struct {
     uint32_t    marker;
   };
 } km_kbp_context_item;
+
+#define KM_KBP_CONTEXT_ITEM_END {KM_KBP_CT_END, {0,}, {0,}}
 /*
 ```
 ### `km_kbp_context_items_from_utf16`
@@ -161,16 +193,17 @@ typedef struct {
 Convert an UTF16 encoded Unicode string into an array of `km_kbp_context_item`
 structures. Allocates memory as needed.
 ##### Status:
-`KM_KBP_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
-output buffer.
-`KM_KBP_STATUS_INVALID_ARGUMENT`: In the event the UTF16 string cannot be
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
+  output buffer.
+- `KM_KBP_STATUS_INVALID_UTF`: In the event the UTF16 string cannot be
 decoded.
 ##### Parameters:
 - __text__: a pointer to a null terminated array of utf16 encoded data.
 - __out_ptr__: a pointer to the result variable:
     A pointer to the  start of the `km_kbp_context_item` array containing the
-    representation of the input string. Terminated with a type
-    of `KM_KBP_CT_END`
+    representation of the input string.
+    Terminated with a type of `KM_KBP_CT_END`.
 
 ```c
 */
@@ -189,17 +222,24 @@ actually used in the conversion. If null is passed as the buffer the number
 codeunits required is returned. This will strip markers from the
 context during the conversion.
 ##### Return:
-Number of code points used if called with a buffer or needed if called without.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
+  buf_size will contain the space required. The contents of the buffer are
+  undefined.
 ##### Parameters:
 - __context_items__: A pointer to the start of an array `km_kbp_context_item`.
-- __buf__: A pointer to the buffer to place the UTF-16 string into, can be null.
-- __buf_size__: The size of the supplied buffer in codeunits.
+    Must be terminated with a type of `KM_KBP_CT_END`.
+- __buf__: A pointer to the buffer to place the UTF-16 string into. May be be
+    null to request size calculation.
+- __buf_size__: a pointer to the result variable:
+    A pointer the size of the supplied buffer in codeunits or filled with the
+    size required if `buf` is null.
 
 ```c
 */
 KMN_API
-size_t km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
-                                     km_kbp_cp *buf, size_t buf_size);
+km_kbp_status km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
+                                            km_kbp_cp *buf, size_t *buf_size);
 
 /*
 ```
@@ -223,8 +263,9 @@ void km_kbp_context_items_dispose(km_kbp_context_item *);
 Replace the contents of the current context with a new sequence of
 context_items
 ##### Status:
-`KM_KBP_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
-the context internally.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
+  the context internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object
 - __context_items__: A pointer to  the start of the `km_kbp_context_item` array
@@ -240,18 +281,24 @@ km_kbp_status km_kbp_context_set(km_kbp_context *, km_kbp_context_item const *);
 ```
 ### `km_kbp_context_get`
 ##### Description:
-Get a pointer the the context's internal list of items.
+Get a array of the the context's items and give ownership of that array
+to the caller.  This must be disposed of by caller using
+`km_kbp_context_items_dispose`.
 ##### Return:
-A pointer to the start of the `km_kbp_context_item` array containing the
-context's current items. It will be terminated with an item of type
-`KM_KBP_CT_END`.
+`KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
-- __context__: A pointer to an opaque context object
+- __context_items__: A pointer to the start of an array `km_kbp_context_item`.
+- __out__: a pointer to the result variable:
+    A pointer to the  start of the `km_kbp_context_item` array containing a
+    copy of the context.
+    Terminated with a type of `KM_KBP_CT_END`.
+    Ownership transfers to caller.
 
 ```c
 */
 KMN_API
-km_kbp_context_item const * km_kbp_context_get(km_kbp_context const *);
+km_kbp_status km_kbp_context_get(km_kbp_context const *,
+                                 km_kbp_context_item ** out);
 
 /*
 ```
@@ -272,7 +319,8 @@ void km_kbp_context_clear(km_kbp_context *);
 ##### Description:
 Return the number of items in the context.
 ##### Return:
-The number of items in the context
+The number of items in the context, and will return 0 if passed a null context
+pointer.
 ##### Parameters:
 - __context__: A pointer to an opaque context object
 
@@ -289,12 +337,13 @@ Add more items to the end (insertion point) of the context. If these exceed the
 maximum context length the same number of items will be dropped from the
 context's beginning.
 ##### Status:
-`KM_KBP_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
-the context internally.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
+  the context internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object
-- __context_items__: Pointer to the start of the `KM_KBP_CT_END` terminated array
-    of `km_kbp_context_item`
+- __context_items__: A pointer to the start of the `KM_KBP_CT_END` terminated
+    array of `km_kbp_context_item` to append.
 
 ```c
 */
@@ -308,12 +357,16 @@ km_kbp_status km_kbp_context_append(km_kbp_context *,
 ##### Description:
 Remove a specified number of items from the end of the context, optionaly
 add upto the same number of the supplied items to the front of the context.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: in the event it cannot allocated enough memory to grow
+  the context internally.
 ##### Parameters:
 - __context__: A pointer to an opaque context object.
 - __num__: The number of items to remove from the end of context.
-- __context_items__: Pointer to the start of the `KM_KBP_CT_END` terminated array
-    of `km_kbp_context_item` to add to the front. Upto `num` items will be
-    prepended. This may be null if not required.
+- __context_items__: Pointer to the start of the `KM_KBP_CT_END` terminated
+    array of `km_kbp_context_item` to add to the front. Upto `num` items will
+    be prepended. This may be null if not required.
 
 ```c
 */

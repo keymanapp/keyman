@@ -50,18 +50,21 @@ int main(int, char * [])
   // Check context_item to UTF16 conversion, roundtrip test.
   km_kbp_cp ctxt_buffer[512] ={0,};
   // First call measure space 2nd call do conversion.
-  auto n=km_kbp_context_items_to_utf16(ctxt1, nullptr, 0);
-  if (n >= sizeof ctxt_buffer/sizeof(km_kbp_cp))  return __LINE__;
-  n=km_kbp_context_items_to_utf16(ctxt1, ctxt_buffer,
-                                  sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  size_t ctxt_size = sizeof ctxt_buffer/sizeof(km_kbp_cp);
+  try_status(km_kbp_context_items_to_utf16(ctxt1, nullptr, &ctxt_size));
+  if (ctxt_size > sizeof ctxt_buffer/sizeof(km_kbp_cp))  return __LINE__;
+  try_status(km_kbp_context_items_to_utf16(ctxt1, ctxt_buffer, &ctxt_size));
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
+
   // Test roundtripping SMP characters in surrogate pairs.
-  n=km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer,
-                                  sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
+  try_status(km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer, &ctxt_size));
   if (initial_smp_context != ctxt_buffer) return __LINE__;
   // Test buffer overrun protection.
-  n=km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer, smp_ctxt_size/3);
-  if (n != smp_ctxt_size/3) return __LINE__;
+  ctxt_size=smp_ctxt_size/3;
+  if (km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer, &ctxt_size)
+      != KM_KBP_STATUS_INSUFFICENT_BUFFER)
+    return __LINE__;
 
   // Create a mock context object and set the items
   km_kbp_context mock_ctxt1, mock_ctxt2;
@@ -73,22 +76,26 @@ int main(int, char * [])
   km_kbp_context_items_dispose(ctxt2);
 
   // Test lengths, these are Unicode Scalar Values, not utf16 codeunits.
-  if((n=km_kbp_context_length(&mock_ctxt1)) != bmp_ctxt_size) return __LINE__;
-  if((n=km_kbp_context_length(&mock_ctxt2)) != smp_ctxt_size) return __LINE__;
+  if(km_kbp_context_length(&mock_ctxt1) != bmp_ctxt_size) return __LINE__;
+  if(km_kbp_context_length(&mock_ctxt2) != smp_ctxt_size) return __LINE__;
 
   // retreive context and check it's okay.
-  km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt1),
-                                ctxt_buffer,
-                                sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  km_kbp_context_item *tmp_ctxt;
+  try_status(km_kbp_context_get(&mock_ctxt1, &tmp_ctxt));
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
+  try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
+  km_kbp_context_items_dispose(tmp_ctxt);
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
-  km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt2),
-                                ctxt_buffer,
-                                sizeof ctxt_buffer/sizeof(km_kbp_cp));
+
+  try_status(km_kbp_context_get(&mock_ctxt2, &tmp_ctxt));
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
+  try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
+  km_kbp_context_items_dispose(tmp_ctxt);
   if (initial_smp_context != ctxt_buffer) return __LINE__;
 
   // Call km_kbp_context_clear
   km_kbp_context_clear(&mock_ctxt2);
-  if((n=km_kbp_context_length(&mock_ctxt2)) != 0) return __LINE__;
+  if(km_kbp_context_length(&mock_ctxt2) != 0) return __LINE__;
 
   // Mutation tests
   try_status(km_kbp_context_shrink(&mock_ctxt1, 42, nullptr));
@@ -105,9 +112,9 @@ int main(int, char * [])
   km_kbp_context_items_dispose(ctxt2);
 
   // Check it matches. The marker will be elided during the conversion.
-  km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt1),
-                                ctxt_buffer,
-                                sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
+  try_status(km_kbp_context_get(&mock_ctxt1, &tmp_ctxt));
+  try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Hello World!") != ctxt_buffer) return __LINE__;
 
   // Test shrink and prepend, delete more than we provide to prepend.
@@ -115,9 +122,9 @@ int main(int, char * [])
   // We delete 7 characters plus 1 marker hence 8 and not 7 as expected if you
   //  go bye the test string above.
   try_status(km_kbp_context_shrink(&mock_ctxt1, 8, ctxt1));
-  km_kbp_context_items_to_utf16(km_kbp_context_get(&mock_ctxt1),
-                                ctxt_buffer,
-                                sizeof ctxt_buffer/sizeof(km_kbp_cp));
+  ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
+  try_status(km_kbp_context_get(&mock_ctxt1, &tmp_ctxt));
+  try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Bye, Hello") != ctxt_buffer) return __LINE__;
 
   return 0;
