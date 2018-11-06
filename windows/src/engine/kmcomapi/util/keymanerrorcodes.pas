@@ -116,7 +116,7 @@ const
     {KMN_W_KeyboardInstall_InvalidIcon} (Message: 'The icon for keyboard %0:s was not converted due to an error: %1:s'; Source: 'InstallKeyboard'; HelpContext: 0; Args: 'Keyboard name,Error String'),  // The icon for keyboard %0:s was not converted due to an error: %1:s
     {KMN_W_TSF_COMError} (Message: 'Error %0:s updating TSF'; Source: 'TSF'; HelpContext: 0; Args: 'Error message'),  // Error %0:s updating TSF
     {KMN_W_InstallPackage_KVK_Error} (Message: 'The visual keyboard %1:s for %0:s could not be installed because of an error: %2:s'; Source: 'InstallPackage'; HelpContext: 0; Args: 'Keyboard filename,Visual Keyboard filename, Error message'),  // The visual keyboard %1:s for %0:s could not be installed because of an error: %2:s
-    {KMN_W_ProfileInstall_Win10_1803_MitigationApplied} (Message: 'Your edition of Windows 10 does not currently support installing Keyman keyboard layouts for %0:s.'#13#10#13#10'Keyman has installed this keyboard layout for %1:s instead.'; Source: 'InstallKeyboardLanguageProfile'; HelpContext: 0; Args: 'Bad language,Good language')  // The language %0:s does not currently support Keyman in your edition of Windows 10. Keyman has installed the keyboard in language %1:s instead.
+    {KMN_W_ProfileInstall_Win10_1803_MitigationApplied} (Message: 'Your edition of Windows 10 does not currently support installing Keyman keyboard layouts for %0:s.'#13#10#13#10'Keyman has installed this keyboard layout for %1:s instead.'; Source: 'InstallKeyboardLanguageProfile'; HelpContext: 0; Args: 'Original language,Replacement language')  // The language %0:s does not currently support Keyman in your edition of Windows 10. Keyman has installed the keyboard in language %1:s instead.
 { End Message Info }
   );
 
