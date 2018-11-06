@@ -19,7 +19,7 @@ keyboard::keyboard(std::filesystem::path const & path)
 {
   version_string = _version_string.c_str();
   id = _keyboard_id.c_str();
-  folder_path = _folder_path.c_str();
+  folder_path = _folder_path.native().c_str();
   default_options = _default_opts.data();
 }
 

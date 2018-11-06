@@ -30,7 +30,7 @@ namespace kbp
   {
     std::string const                         _keyboard_id;
     std::string const                         _version_string;
-    std::filesystem::path::string_type const  _folder_path;
+    std::filesystem::path              const  _folder_path;
     std::vector<km_kbp_option_item>           _default_opts;
 
   public:
