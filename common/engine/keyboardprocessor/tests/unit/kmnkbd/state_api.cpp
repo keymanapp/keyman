@@ -33,7 +33,7 @@ namespace
     KM_KBP_OPTIONS_END
   };
 
-constexpr char const *doc1_expected ="\
+constexpr char const *doc1_expected = u8"\
 {\n\
     \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
@@ -69,7 +69,7 @@ constexpr char const *doc1_expected ="\
     ]\n\
 }\n";
 
-constexpr char const *doc2_expected = "\
+constexpr char const *doc2_expected = u8"\
 {\n\
     \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
