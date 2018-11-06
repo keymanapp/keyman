@@ -25,9 +25,10 @@
 
 
 
-km_kbp_status km_kbp_keyboard_load(char const *kb_path,
+km_kbp_status km_kbp_keyboard_load(km_kbp_path_name kb_path,
                                    km_kbp_keyboard **keyboard)
 {
+  assert(keyboard);
   if (!keyboard)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
@@ -45,20 +46,14 @@ void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard)
   delete keyboard;
 }
 
-km_kbp_keyboard_attrs const *
-km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard)
+km_kbp_status
+km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
+                          km_kbp_keyboard_attrs const **out)
 {
-  return keyboard;
-}
+  assert(keyboard); assert(out);
+  if (!keyboard || !out)
+    return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-json & operator << (json & j, km::kbp::keyboard const & kb)
-{
-  j << json::object
-      << "id" << kb.id
-      << "folder" << kb.folder_path
-      << "version" << kb.version_string
-      << "options" << kb.default_options->target
-      << "rules" << json::array << json::close;
-
-  return j << json::close;
+  *out = keyboard;
+  return KM_KBP_STATUS_OK;
 }

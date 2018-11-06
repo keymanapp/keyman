@@ -23,6 +23,7 @@
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__
+  typedef wchar_t  const * km_kbp_path_name;
   #if defined __GNUC__  // These three will be redefined for Windows
     #undef _kmn_export_flag
     #undef _kmn_import_flag
@@ -35,6 +36,8 @@
   #define _kmn_export_flag     dllexport
   #define _kmn_import_flag     dllimport
   #define _kmn_static_flag
+#else
+  typedef char const * km_kbp_path_name;
 #endif
 
 #if defined KMN_KBP_STATIC

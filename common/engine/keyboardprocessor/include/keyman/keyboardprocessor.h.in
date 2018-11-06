@@ -517,7 +517,8 @@ place it in the supplied buffer, reporting how much space was used. If null is
 passed as the buffer the number of bytes required is returned. If there is
 insufficent space to hold the document the contents of the buffer is undefined.
 ##### Status:
-__KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
 - __opts__: An opaque pointer to an `km_kbp_options`.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
@@ -544,11 +545,11 @@ of state objects.
 ```c
 */
 typedef struct {
-  char const *    version_string;   // Processor specific version string.
-  char const *    id;               // Keyman keyboard ID string.
-  char const *    folder_path;      // Path to the unpacked folder containing
+  char const *      version_string;   // Processor specific version string.
+  char const *      id;               // Keyman keyboard ID string.
+  km_kbp_path_name  folder_path;      // Path to the unpacked folder containing
                                     // the keyboard and associated resources.
-  km_kbp_options const * default_options;
+  km_kbp_option_item const * default_options;
 } km_kbp_keyboard_attrs;
 
 /*
@@ -560,9 +561,9 @@ into the out paramter.
 ##### Status:
 - __KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
 - __KM_KBP_STATUS_IO_ERROR__:
-In the event the keyboard file is unparseable for any reason
+    In the event the keyboard file is unparseable for any reason
 - __KM_KBP_STATUS_INVALID_ARGUMENT__:
-In the event the file doesn't exist or is inaccesible.
+    In the event the file doesn't exist or is inaccesible or `keyboard` is null.
 - __KM_KBP_STATUS_OS_ERROR__: An unkown OS error condition occured during load.
 ##### Parameters:
 - __kb_path__: C string containing a valid path to the keyboard file.
@@ -572,7 +573,7 @@ In the event the file doesn't exist or is inaccesible.
 ```c
 */
 KMN_API
-km_kbp_status km_kbp_keyboard_load(char const *kb_path,
+km_kbp_status km_kbp_keyboard_load(km_kbp_path_name kb_path,
                                    km_kbp_keyboard **keyboard);
 
 /*
@@ -595,16 +596,19 @@ void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard);
 ### `km_kbp_keyboard_get_attrs`
 ##### Description:
 Get access to the keyboard's attributes.
-##### Return:
-A pointer to a `km_kbp_keyboard_attrs` structure.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque `km_kbp_keyboard` object to be queried.
+- __out__: A pointer to the result:
+    A pointer to a `km_kbp_keyboard_attrs` structure.
 
 ```c
 */
 KMN_API
-km_kbp_keyboard_attrs const *
-km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard);
+km_kbp_status
+km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
+                          km_kbp_keyboard_attrs const **out);
 
 
 /*
