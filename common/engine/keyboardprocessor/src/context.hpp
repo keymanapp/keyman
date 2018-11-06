@@ -10,7 +10,7 @@
 #include <list>
 #include <vector>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 // Forward declarations
 class json;
@@ -32,8 +32,4 @@ json & operator << (json &, km_kbp_context_item const &);
 
 struct km_kbp_context : public km::kbp::context
 {
-  std::vector<value_type> mutable _pres;
-
-public:
-  const_pointer data() const;
 };

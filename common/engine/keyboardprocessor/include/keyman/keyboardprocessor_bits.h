@@ -6,6 +6,8 @@
   Create Date:  18 Oct 2018
   Authors:      Tim Eves (TSE)
   History:      18 Oct 2018 - TSE - Imported from graphite2 project.
+                 6 Oct 2018 - TSE - Move into keyman folder.
+
 */
 #pragma once
 

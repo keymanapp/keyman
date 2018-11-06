@@ -8,7 +8,7 @@
 #include <cstring>
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "state.hpp"
 

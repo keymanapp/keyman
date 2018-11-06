@@ -10,7 +10,7 @@
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "state.hpp"
 

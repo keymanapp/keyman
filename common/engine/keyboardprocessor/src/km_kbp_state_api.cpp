@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 #include <utfcodec.hpp>
 #include <json.hpp>
 

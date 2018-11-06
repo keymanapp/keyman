@@ -11,7 +11,7 @@
 #include <experimental/filesystem>
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "option.hpp"
 

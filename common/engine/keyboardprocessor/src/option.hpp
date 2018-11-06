@@ -11,7 +11,7 @@
 
 #include <unordered_map>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 // Forward declarations
 class json;

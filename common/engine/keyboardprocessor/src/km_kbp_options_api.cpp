@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "option.hpp"
 #include "json.hpp"
@@ -88,7 +88,7 @@ namespace
   constexpr char const * const scope_name_lut[] = {
     "unknown",
     "keyboard",
-    "enviroment",
+    "environment",
   };
 }
 

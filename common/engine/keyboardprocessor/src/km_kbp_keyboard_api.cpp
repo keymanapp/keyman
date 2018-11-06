@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 #include <json.hpp>
 
 #include "keyboard.hpp"

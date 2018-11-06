@@ -5,6 +5,8 @@
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
   History:      18 Oct 2018 - TSE - Finialised verion of API.
+                 6 Oct 2018 - TSE - Move into keyman folder.
+
 */
 #pragma once
 /*

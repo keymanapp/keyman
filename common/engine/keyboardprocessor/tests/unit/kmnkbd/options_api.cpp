@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "option.hpp"
 

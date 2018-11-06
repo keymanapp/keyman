@@ -6,7 +6,7 @@
 */
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 #include <experimental/filesystem>
 
 namespace std {

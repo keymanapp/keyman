@@ -11,7 +11,7 @@
 */
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "context.hpp"
 #include "utfcodec.hpp"

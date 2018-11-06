@@ -9,7 +9,7 @@
 #pragma once
 #include <vector>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "context.hpp"
 #include "option.hpp"
