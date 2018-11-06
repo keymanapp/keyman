@@ -627,11 +627,10 @@ Option stores.
 Create a keyboard processor state object, maintaining state for the keyboard in
 the environment passed.
 ##### Status:
-- __KM_KBP_STATUS_NO_MEM__:
-In the event memory is unavailable to allocate a state  object.
-- __KM_KBP_STATUS_INVALID_ARGUMENT__:
-In the event the `keyboard` or `out` pointer  are null.
-
+- `KM_KBP_STATUS_NO_MEM`:
+  In the event memory is unavailable to allocate a state  object.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+  In the event the `keyboard` or `out` pointer  are null.
 ##### Parameters:
 - __keyboard__:
 A pointer to the opaque `km_kbp_keyboard` object this object  will hold state
@@ -827,7 +826,7 @@ The combinations of modifier keys set at the time key `vk` was pressed.
 */
 KMN_API
 km_kbp_status km_kbp_process_event(km_kbp_state *state,
-                          km_kbp_virtual_key vk, uint16_t modifier_state);
+                                   km_kbp_virtual_key vk, uint16_t modifier_state);
 
 #if defined(__cplusplus)
 } // extern "C"

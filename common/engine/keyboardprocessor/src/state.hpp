@@ -24,30 +24,27 @@ using action = km_kbp_action_item;
 class state
 {
 protected:
-    options const      _env;
-    options            _run;
-    kbp::keyboard const & _kb;
     kbp::context          _ctxt;
+    kbp::options          _options;
+    kbp::keyboard const & _kb;
 
 public:
-    state(kbp::keyboard const & kb, options const & opts);
+    state(kbp::keyboard const & kb, km_kbp_option_item const * env);
     state(state const &) = default;
     state(state const &&) = delete;
 
     kbp::context       &  context() noexcept            { return _ctxt; }
     kbp::context const &  context() const noexcept      { return _ctxt; }
 
-    options &          options() noexcept        { return _run; }
-    options const &    options() const noexcept  { return _run; }
+    kbp::options &          options() noexcept        { return _options; }
+    kbp::options const &    options() const noexcept  { return _options; }
 
     kbp::keyboard const &  keyboard() const noexcept      { return _kb; }
-
-    options const &    environment() const noexcept { return _env; }
 };
 
 inline
-state::state(kbp::keyboard const & kb, options const & opts)
-: _env(std::move(opts)), _run(KM_KBP_OPT_UNKNOWN), _kb(kb)
+state::state(kbp::keyboard const & kb, km_kbp_option_item const * env)
+: _options(kb.default_options, env), _kb(kb)
 {}
 
 }
@@ -56,10 +53,8 @@ state::state(kbp::keyboard const & kb, options const & opts)
 struct km_kbp_state : public km::kbp::state
 {
   template<typename... Args>
-  km_kbp_state(Args&&... args)
-  : km::kbp::state(std::forward<Args>(args)...),
-    run_opts_adaptor(_run) {}
+  km_kbp_state(Args&&... args) : km::kbp::state(std::forward<Args>(args)...)
+  {}
 
-  km_kbp_options run_opts_adaptor;
   std::vector<km_kbp_action_item> actions;
 };

@@ -24,6 +24,7 @@ namespace kbp
   struct option : public km_kbp_option_item
   {
     option(): km_kbp_option_item KM_KBP_OPTIONS_END {}
+    option(option const &);
     option(option &&);
     option(km_kbp_option_scope, std::u16string const &,
            std::u16string const &);
@@ -32,6 +33,11 @@ namespace kbp
 
     option & operator=(option && rhs);
   };
+
+  inline
+  option::option(option const & rhs)
+  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value)
+  {}
 
   inline
   option::option(option && rhs)
@@ -82,7 +88,7 @@ namespace kbp
   json & operator << (json &j, km::kbp::options const &opts);
 
   inline
-  options::options(km_kbp_option_item const *env, km_kbp_option_item const *kb_defs)
+  options::options(km_kbp_option_item const *kb_defs, km_kbp_option_item const *env)
   : _scopes {kb_defs, env}
   {}
 

@@ -24,7 +24,7 @@ keyboard::keyboard(std::filesystem::path const & path)
 }
 
 
-json & operator << (json & j, km::kbp::keyboard const & kb)
+json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
 {
   j << json::object
       << "id" << kb.id
