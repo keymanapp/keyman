@@ -23,8 +23,8 @@ namespace kbp
 // efficient data structure such as a ring buffer or bounded queue.
 using context = std::list<km_kbp_context_item>;
 
-}
-}
+} // namespace kbp
+} // namespace km
 
 json & operator << (json &, km::kbp::context const &);
 json & operator << (json &, km_kbp_context_item const &);

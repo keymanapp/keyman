@@ -40,7 +40,8 @@ namespace kbp
   };
 
   json & operator << (json &, km::kbp::keyboard const &);
-}
-}
+
+} // namespace kbp
+} // namespace km
 
 struct km_kbp_keyboard : public km::kbp::keyboard {};

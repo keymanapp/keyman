@@ -47,8 +47,8 @@ state::state(kbp::keyboard const & kb, km_kbp_option_item const * env)
 : _options(kb.default_options, env), _kb(kb)
 {}
 
-}
-}
+} // namespace kbp
+} // namespace km
 
 struct km_kbp_state : public km::kbp::state
 {
