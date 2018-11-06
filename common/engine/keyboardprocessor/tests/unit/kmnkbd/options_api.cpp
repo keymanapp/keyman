@@ -16,53 +16,53 @@
 
 namespace
 {
-  km_kbp_option const test_env[] =
+  km_kbp_option_item const test_env[] =
   {
     {u"isdummy",   u"yes", 0},
     {u"testing",   u"maybe", 0},
     KM_KBP_OPTIONS_END
   };
 
-  km_kbp_option const test_kb[] =
+  km_kbp_option_item const test_kb[] =
   {
     {u"hello",     u"world", 0},
     KM_KBP_OPTIONS_END
   };
 
-  km_kbp_option test_opts[] =
+  km_kbp_option_item test_opts[] =
   {
     {u"isdummy",   u"no", KM_KBP_OPT_ENVIRONMENT},
     {u"hello",     u"globe", KM_KBP_OPT_KEYBOARD},
     KM_KBP_OPTIONS_END
   };
 
-  km_kbp_option bad_key_opts[] =
+  km_kbp_option_item bad_key_opts[] =
   {
     {u"isdumber",   u"yes!", KM_KBP_OPT_ENVIRONMENT},
     KM_KBP_OPTIONS_END
   };
 
-  km_kbp_option bad_scope_opts[] =
+  km_kbp_option_item bad_scope_opts[] =
   {
     {u"hello",   u"!", KM_KBP_OPT_UNKNOWN},
     KM_KBP_OPTIONS_END
   };
 
-  km_kbp_option const empty_options_list[] = {KM_KBP_OPTIONS_END};
+  km_kbp_option_item const empty_options_list[] = {KM_KBP_OPTIONS_END};
 
-  km::kbp::options_set mock_options(test_env, test_kb);
-  km::kbp::options_set empty_options(empty_options_list, empty_options_list);
-  km_kbp_options_set * api_mock_options = static_cast<km_kbp_options_set *>(
+  km::kbp::options mock_options(test_env, test_kb);
+  km::kbp::options empty_options(empty_options_list, empty_options_list);
+  km_kbp_options * api_mock_options = static_cast<km_kbp_options *>(
                                               &mock_options),
-                     * api_empty_options = static_cast<km_kbp_options_set *>(
+                     * api_empty_options = static_cast<km_kbp_options *>(
                                               &empty_options);
 
-  std::string get_json_doc(km_kbp_options_set * const opts)
+  std::string get_json_doc(km_kbp_options * const opts)
   {
     size_t sz = 0;
-    try_status(km_kbp_options_set_to_json(opts, nullptr, &sz));
+    try_status(km_kbp_options_to_json(opts, nullptr, &sz));
     std::string buf(sz-1, 0);
-    try_status(km_kbp_options_set_to_json(opts, &buf[0], &sz));
+    try_status(km_kbp_options_to_json(opts, &buf[0], &sz));
 
     return buf;
   }
@@ -71,7 +71,7 @@ namespace
   bool _assert_lookup_equals(std::u16string const key, std::u16string value, km_kbp_option_scope scope)
   {
     km_kbp_cp const * ret = nullptr;
-    auto s = km_kbp_options_set_lookup(api_mock_options, scope,
+    auto s = km_kbp_options_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
     return s == KM_KBP_STATUS_OK && ret == value;
@@ -110,11 +110,11 @@ constexpr char const *mock_json = "\
 
 int main(int, char * [])
 {
-  // Simple sanity tests on an empty options_set.
+  // Simple sanity tests on an empty options.
   if (km_kbp_options_list_size(empty_options_list) != 0)
     return __LINE__;
   km_kbp_cp const *value;
-  auto s = km_kbp_options_set_lookup(api_empty_options,
+  auto s = km_kbp_options_lookup(api_empty_options,
                                      KM_KBP_OPT_ENVIRONMENT,
                                      u"isdummy", &value);
   if (s != KM_KBP_STATUS_KEY_ERROR) return __LINE__;
@@ -123,16 +123,16 @@ int main(int, char * [])
   // Lets update data.
   assert_lookup_equals(u"isdummy", u"yes", KM_KBP_OPT_ENVIRONMENT);
   assert_lookup_equals(u"hello", u"world", KM_KBP_OPT_KEYBOARD);
-  try_status(km_kbp_options_set_update(api_mock_options, test_opts));
+  try_status(km_kbp_options_update(api_mock_options, test_opts));
   assert_lookup_equals(u"isdummy", u"no", KM_KBP_OPT_ENVIRONMENT);
   assert_lookup_equals(u"hello", u"globe", KM_KBP_OPT_KEYBOARD);
 
   // Test writing of non-exitent keys
-  if (km_kbp_options_set_update(api_mock_options, bad_key_opts)
+  if (km_kbp_options_update(api_mock_options, bad_key_opts)
       != KM_KBP_STATUS_KEY_ERROR)
     return __LINE__;
 
-  if (km_kbp_options_set_update(api_mock_options, bad_scope_opts)
+  if (km_kbp_options_update(api_mock_options, bad_scope_opts)
       != KM_KBP_STATUS_INVALID_ARGUMENT)
     return __LINE__;
 

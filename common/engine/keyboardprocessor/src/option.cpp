@@ -27,7 +27,7 @@ namespace
 
 
 option::option(km_kbp_option_scope s, std::u16string const & k, std::u16string const & v)
-: km_kbp_option { new km_kbp_cp[k.size()+1], new km_kbp_cp[v.size()+1],
+: km_kbp_option_item { new km_kbp_cp[k.size()+1], new km_kbp_cp[v.size()+1],
                 uint8_t(s) }
 {
   std::copy_n(k.c_str(), k.size()+1, const_cast<km_kbp_cp *>(key));
@@ -35,7 +35,7 @@ option::option(km_kbp_option_scope s, std::u16string const & k, std::u16string c
 }
 
 
-char16_t const * options_set::lookup(km_kbp_option_scope scope,
+char16_t const * options::lookup(km_kbp_option_scope scope,
                                      std::u16string const & key) const noexcept
 {
   // Search first in the updated values
@@ -46,16 +46,16 @@ char16_t const * options_set::lookup(km_kbp_option_scope scope,
   }
 
   // Then in the pristine copies.
-  km_kbp_option const * opt = _scopes[scope-1];
+  km_kbp_option_item const * opt = _scopes[scope-1];
   while (opt->key && key != opt->key) ++opt;
   return opt->key ? opt->value : nullptr;
 }
 
 
-km_kbp_option const * options_set::assign(km_kbp_option_scope scope, std::u16string const & key,
+km_kbp_option_item const * options::assign(km_kbp_option_scope scope, std::u16string const & key,
                                        std::u16string const & value)
 {
-  km_kbp_option const * opt = _scopes[scope-1];
+  km_kbp_option_item const * opt = _scopes[scope-1];
   while (opt->key && key != opt->key) ++opt;
   if (!opt->key)  return nullptr;
 
@@ -73,7 +73,7 @@ km_kbp_option const * options_set::assign(km_kbp_option_scope scope, std::u16str
 }
 
 
-void options_set::reset(km_kbp_option_scope scope, std::u16string const & key)
+void options::reset(km_kbp_option_scope scope, std::u16string const & key)
 {
   for (auto i = _saved.begin(); i == _saved.end(); ++i)
   {
@@ -102,7 +102,7 @@ json & operator << (json &j, char16_t const *u16str) {
 }
 
 
-json & km::kbp::operator << (json &j, options_set const &opts)
+json & km::kbp::operator << (json &j, options const &opts)
 {
   j << json::object;
   auto n = 0;

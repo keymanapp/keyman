@@ -27,7 +27,7 @@ namespace
     return buf;
   }
 
-  km_kbp_option test_env_opts[] =
+  km_kbp_option_item test_env_opts[] =
   {
     {"hello",     "world", 0},
     KM_KBP_OPTIONS_END
@@ -115,7 +115,7 @@ bool action_items(km_kbp_state const * state,
   return true;
 }
 
-}
+} // namespace
 
 int main(int, char * [])
 {
@@ -147,9 +147,9 @@ int main(int, char * [])
     return __LINE__;
 
   // Overwrite some data.
-  km_kbp_option new_opt[] = {{"hello", "globe", 0}, KM_KBP_OPTIONS_END};
+  km_kbp_option_item new_opt[] = {{"hello", "globe", 0}, KM_KBP_OPTIONS_END};
   try_status(
-    km_kbp_options_set_update(km_kbp_state_options(test_clone), new_opt));
+    km_kbp_options_update(km_kbp_state_options(test_clone), new_opt));
 
   // Test the engine
   auto attrs = km_kbp_get_engine_attrs();
@@ -183,7 +183,7 @@ int main(int, char * [])
   if (doc1 != doc1_expected)  return __LINE__;
   if (doc2 != doc2_expected)  return __LINE__;
 
-  // Destory them
+  // Destroy them
   km_kbp_state_dispose(test_state);
   km_kbp_state_dispose(test_clone);
 

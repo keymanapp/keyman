@@ -20,7 +20,7 @@
 #include "option.hpp"
 #include "json.hpp"
 
-size_t km_kbp_options_list_size(km_kbp_option const *opts)
+size_t km_kbp_options_list_size(km_kbp_option_item const *opts)
 {
   assert(opts);
   if (!opts)  return 0;
@@ -32,7 +32,7 @@ size_t km_kbp_options_list_size(km_kbp_option const *opts)
 }
 
 
-km_kbp_status km_kbp_options_set_lookup(km_kbp_options_set const *opts,
+km_kbp_status km_kbp_options_lookup(km_kbp_options const *opts,
                                         uint8_t scope, km_kbp_cp const *key,
                                         km_kbp_cp const **value_out)
 {
@@ -47,7 +47,7 @@ km_kbp_status km_kbp_options_set_lookup(km_kbp_options_set const *opts,
 }
 
 
-km_kbp_status km_kbp_options_set_update(km_kbp_options_set *opts, km_kbp_option const *opt)
+km_kbp_status km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item const *opt)
 {
   assert(opts); assert(opt);
   if (!opts || !opt)  return KM_KBP_STATUS_INVALID_ARGUMENT;
@@ -71,7 +71,7 @@ km_kbp_status km_kbp_options_set_update(km_kbp_options_set *opts, km_kbp_option 
 
 // This function doesn't need to use the json pretty printer for such a simple
 //  list of key:value pairs but it's a good introduction to it.
-km_kbp_status km_kbp_options_set_to_json(km_kbp_options_set const *opts, char *buf, size_t *space)
+km_kbp_status km_kbp_options_to_json(km_kbp_options const *opts, char *buf, size_t *space)
 {
   assert(opts); assert(space);
   if (!opts || !space)

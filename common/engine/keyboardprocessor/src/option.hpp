@@ -21,9 +21,9 @@ class json;
 namespace km {
 namespace kbp
 {
-  struct option : public km_kbp_option
+  struct option : public km_kbp_option_item
   {
-    option(): km_kbp_option KM_KBP_OPTIONS_END {}
+    option(): km_kbp_option_item KM_KBP_OPTIONS_END {}
     option(option &&);
     option(km_kbp_option_scope, std::u16string const &,
            std::u16string const &);
@@ -35,7 +35,7 @@ namespace kbp
 
   inline
   option::option(option && rhs)
-  : km_kbp_option { rhs.key, rhs.value, rhs.scope }
+  : km_kbp_option_item { rhs.key, rhs.value, rhs.scope }
   {
     rhs.key = nullptr;
     rhs.value = nullptr;
@@ -61,28 +61,28 @@ namespace kbp
 
 
 
-  class options_set
+  class options
   {
-    km_kbp_option const * _scopes[KM_KBP_OPT_MAX_SCOPES-1];
+    km_kbp_option_item const * _scopes[KM_KBP_OPT_MAX_SCOPES-1];
     std::vector<option>   _saved;
 
   public:
-    options_set(km_kbp_option const *env, km_kbp_option const *kb_defs);
+    options(km_kbp_option_item const *env, km_kbp_option_item const *kb_defs);
 
     char16_t const *      lookup(km_kbp_option_scope scope,
                                  std::u16string const & key) const noexcept;
-    km_kbp_option const * assign(km_kbp_option_scope scope, std::u16string const & key,
+    km_kbp_option_item const * assign(km_kbp_option_scope scope, std::u16string const & key,
                                            std::u16string const & value);
     void                  reset(km_kbp_option_scope scope,
                                 std::u16string const & key);
 
-    friend json & operator << (json &j, km::kbp::options_set const &opts);
+    friend json & operator << (json &j, km::kbp::options const &opts);
   };
 
-  json & operator << (json &j, km::kbp::options_set const &opts);
+  json & operator << (json &j, km::kbp::options const &opts);
 
   inline
-  options_set::options_set(km_kbp_option const *env, km_kbp_option const *kb_defs)
+  options::options(km_kbp_option_item const *env, km_kbp_option_item const *kb_defs)
   : _scopes {kb_defs, env}
   {}
 
@@ -90,5 +90,5 @@ namespace kbp
 } // namespace km
 
 
-// Adaptor between internal km::kbp::options_set object and API definitiion.
-struct km_kbp_options_set: public km::kbp::options_set {};
+// Adaptor between internal km::kbp::options object and API definitiion.
+struct km_kbp_options: public km::kbp::options {};

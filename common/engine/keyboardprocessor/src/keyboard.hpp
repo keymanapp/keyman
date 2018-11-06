@@ -31,7 +31,7 @@ namespace kbp
     std::string const _keyboard_id;
     std::string const _version_string;
     std::string const _folder_path;
-    options_set       _default_opts;
+    options       _default_opts;
 
   public:
     keyboard(std::filesystem::path const &);
@@ -48,7 +48,7 @@ namespace kbp
     version_string = _version_string.c_str();
     id = _keyboard_id.c_str();
     folder_path = _folder_path.c_str();
-    default_options = new km_kbp_options_set(_default_opts);
+    default_options = new km_kbp_options(_default_opts);
   }
 
   inline
