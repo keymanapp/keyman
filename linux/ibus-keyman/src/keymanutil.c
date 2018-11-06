@@ -49,8 +49,6 @@
  *
  */
 
-
-
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -60,6 +58,12 @@
 
 
 #include "keymanutil.h"
+
+// Globally loaded keyboards
+#define MAX_KEYBOARDS	64		// maximum number of keyboards that can be loaded
+KInputKeyboard *p_installed_kbd[MAX_KEYBOARDS]={NULL};
+unsigned int n_keyboards=0;
+
 
 #define N_(text) text
 static gchar * get_dirname(const gchar * path)
@@ -384,6 +388,8 @@ void kinput_close_im(KInputMethod * im)
     g_free(im);
 }
 
+// reimplement
+#if 0
 void output_string(void *contrack, char *ptr) {
     KInputContext * ic = (KInputContext *)contrack;
     g_debug("DAR: output_string - ic->cmds=%p", ic->cmds);
@@ -394,7 +400,6 @@ void output_string(void *contrack, char *ptr) {
         ic->cmds = g_list_append(ic->cmds, cmd);
     }
 }
-
 void erase_char(void *contrack) {
     KInputContext * ic = (KInputContext *)contrack;
     g_debug("DAR: erase_char - ic->cmds=%p", ic->cmds);
@@ -427,11 +432,14 @@ void output_beep(void *contrack) {
     cmd->cmdarg=NULL;
     ic->cmds = g_list_append(ic->cmds, cmd);    
 }
+#endif
 
 
 /*
  * Create an input context
  */
+// not relevant now, context managed by state
+#if 0
 KInputContext *
 keyman_create_ic(KInputMethod *im)
 {
@@ -469,18 +477,131 @@ keyman_destroy_ic(KInputContext *ic)
         g_list_free(ic->cmds);
         ic->cmds=NULL;
     }
-    
 }
+#endif
+
+KInputKeyboard * keyman_load_keyboard_from_file(const gchar *filename)
+{
+	KInputKeyboard *p_kbd = NULL;
+	g_message("DAR: kmfl_load_keyboard_from_file %s\n",filename);
+#if 0
+	FILE *fp;
+	char version_string[6]={0};
+	unsigned int filelen, kbver=0;
+	struct stat fstat;
+	const char * extension;
+    int errcode;
+
+	DBGMSG(1,"DAR: kmfl_load_keyboard_from_file %s\n",filename);
+
+    extension = strrchr(filename, '.');
+    
+    // Get the file size
+    if(stat(filename,&fstat) != 0) 
+        return NULL;
+    filelen = fstat.st_size;
+
+    // Allocate memory for the installed keyboard
+    if((p_kbd=(XKEYBOARD *)malloc(filelen)) == NULL) 
+        return NULL;
+
+    // Open the file
+    if((fp=fopen(filename,"rb")) != NULL) 
+    {
+        if (fread(p_kbd, 1, filelen, fp) != filelen)
+        {
+            fclose(fp);
+            return NULL;
+        }
+        fclose(fp);
+        memcpy(version_string,p_kbd->version,4); // Copy to ensure terminated
+        kbver = (unsigned)atoi(version_string);
+    }
+    // Check the loaded file is valid and has the correct version
+    if((memcmp(p_kbd->id,"KMFL",4) != 0) 
+        || (p_kbd->version[4] != *FILE_VERSION)
+        || (kbver < (unsigned)atoi(BASE_VERSION))
+        || (kbver > (unsigned)atoi(LAST_VERSION)))
+    {
+        DBGMSG(1, "Invalid version %s\n", version_string);
+        free(p_kbd); 
+        return NULL;
+    }
+
+    DBGMSG(1,"DAR: kmfl_load_keyboard_from_file - %s loaded\n",filename);
+#endif
+
+    return p_kbd;
+}
+
 
 int keyman_load_keyboard(const gchar *keyboard_filename)
 {
+	KInputKeyboard *p_kbd;
+	int keyboard_number;
+	
+	// Check number of installed keyboards
+	if(n_keyboards >= MAX_KEYBOARDS) return -1;
+	
+	// initialize the installed keyboards array
+	if(n_keyboards == 0)
+		memset(p_installed_kbd, 0, sizeof(KInputKeyboard *) * MAX_KEYBOARDS);
+	
+	p_kbd = keyman_load_keyboard_from_file(keyboard_filename);
+
+	if (p_kbd == NULL)
+		return -1;
+
+	// Find an empty slot
+	for (keyboard_number=0;keyboard_number < MAX_KEYBOARDS; keyboard_number++)
+		if (p_installed_kbd[keyboard_number] == NULL)
+			break;
+		
+	// Sanity check
+	if (keyboard_number == MAX_KEYBOARDS) {
+		g_warning("Could not find an empty keyboard slot even though there was supposed to be one\n");
+		free(p_kbd);
+		return -1;
+	}
+	
+	// Copy pointer and increment number of installed keyboards
+    p_kbd->keyboard_filename = g_strdup(keyboard_filename);
+	p_installed_kbd[keyboard_number] = p_kbd;
+	
+	n_keyboards++;
+	g_message("Keyboard %s loaded\n",p_kbd->name);
+
+	return keyboard_number;	
+}
+
+// Unload a keyboard that has been installed
+int keyman_unload_keyboard(int keyboard_number) 
+{
+    KInputKeyboard *p_kbd=p_installed_kbd[keyboard_number];
+
+    if (p_kbd == NULL) 
+        return -1;
+
+    // // Enumerate instances and ensure that no instances are using this keyboard
+    // for(p=p_first_instance; p; p=p->next)
+    // {
+    //     if(p->keyboard_number == keyboard_number) return 1;
+    // }
+
+        
+    // Remove keyboard from list and free memory
+    g_message("Keyboard %s unloaded\n",p_kbd->name);
+    g_free(p_kbd->name);
+    g_free(p_kbd->keyboard_filename);
+    g_free(p_kbd);
+
+    p_installed_kbd[keyboard_number]=NULL;
+
+    n_keyboards--;
+
     return 0;
 }
 
-void keyman_unload_keyboard(int keyboard_number)
-{
-    return;
-}
 int keyman_check_keyboard(gchar *absfn)
 {
     return 0;

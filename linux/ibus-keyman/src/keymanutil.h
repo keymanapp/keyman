@@ -74,6 +74,8 @@ typedef struct
 typedef struct
 {
     km_kbp_state *p_state;
+    gchar * keyboard_filename;
+    gchar * name;
 } KInputKeyboard;
 
 typedef struct 
@@ -99,12 +101,12 @@ void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
 KInputMethod    *kinput_open_im             (const gchar * keyboard_filename);
-KInputContext   *keyman_create_ic           (KInputMethod *im);
-void             keyman_destroy_ic          (KInputContext *ic);
+//KInputContext   *keyman_create_ic           (KInputMethod *im);
+//void             keyman_destroy_ic          (KInputContext *ic);
 void             kinput_close_im            (KInputMethod * im);
 void             keyman_get_keyboard_info   (KInputMethod * im);
 int              keyman_load_keyboard       (const gchar *keyboard_filename);
-void             keyman_unload_keyboard     (int keyboard_number);
+int              keyman_unload_keyboard     (int keyboard_number);
 int              keyman_check_keyboard      (gchar *absfn);
 const gchar     *keyman_icon_file           (int keyboard_number);
 #endif
