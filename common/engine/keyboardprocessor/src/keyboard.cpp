@@ -28,7 +28,7 @@ json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
 {
   j << json::object
       << "id" << kb.id
-      << "folder" << kb.folder_path
+      << "folder" <<  kb._folder_path.string()
       << "version" << kb.version_string
       << "rules" << json::array << json::close;
 
