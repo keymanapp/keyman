@@ -121,8 +121,6 @@
     <ClCompile Include="src\appint\aiWin2000Unicode.cpp" />
     <ClCompile Include="src\appint\appint.cpp" />
     <ClCompile Include="src\capsstate.cpp" />
-    <ClCompile Include="src\common\registry.cpp" />
-    <ClCompile Include="src\common\unicode.cpp" />
     <ClCompile Include="src\common\xstring.cpp" />
     <ClCompile Include="src\K32_DBG.CPP" />
     <ClCompile Include="src\K32_load.cpp" />
@@ -136,37 +134,22 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\syskbd.cpp" />
-    <ClCompile Include="src\syskbdnt.cpp" />
-    <ClCompile Include="src\syskbdnt64.cpp" />
     <ClCompile Include="src\versioninfo.cpp" />
-    <ClCompile Include="src\VKScanCodes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\aiWin2000Unicode.h" />
     <ClInclude Include="inc\appint.h" />
     <ClInclude Include="inc\capsstate.h" />
-    <ClInclude Include="inc\Comperr.h" />
-    <ClInclude Include="inc\Compfile.h" />
     <ClInclude Include="inc\Compiler.h" />
-    <ClInclude Include="inc\compv4.h" />
-    <ClInclude Include="inc\crc32.h" />
-    <ClInclude Include="inc\debugstore.h" />
     <ClInclude Include="inc\globals.h" />
-    <ClInclude Include="inc\hotkeys.h" />
-    <ClInclude Include="inc\KBD.H" />
     <ClInclude Include="inc\keyboardoptions.h" />
     <ClInclude Include="inc\keyman64.h" />
     <ClInclude Include="inc\keymanversion.h" />
     <ClInclude Include="inc\keymanversion_build.h" />
     <ClInclude Include="inc\keystate.h" />
     <ClInclude Include="inc\kmxtest.h" />
-    <ClInclude Include="inc\onlineconstants.h" />
     <ClInclude Include="inc\pch.h" />
-    <ClInclude Include="inc\registry.h" />
-    <ClInclude Include="inc\syskbd.h" />
     <ClInclude Include="inc\unicode.h" />
-    <ClInclude Include="inc\vkscancodes.h" />
     <ClInclude Include="inc\xstring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,48 +4,330 @@
 #include <io.h>
 #include <fcntl.h>
 
+struct KMXTest_KeyEvent {
+  UINT vkey;
+  UINT modifiers;
+};
+
+struct KMXTest_ModifierNames {
+  char *name;
+  UINT flag;
+};
+
+struct KMXTest_ChToVKey {
+  UINT vkey;
+  BOOL shifted;
+};
+
+/* Globals - to refactor */
+
 AIWin2000Unicode *g_app = NULL;
 INTKEYBOARDINFO g_keyboard = { 0 };
 KEYMAN64THREADDATA g_ThreadData = { 0 };
 BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
 DWORD g_shiftState = 0;
-BOOL g_mnemonicDeadkeyConversionMode = FALSE;
-char g_baseKeyboard[16] = "kbdus.dll";
-wchar_t g_baseLayout[260] = L"", g_baseLayoutAlt[34] = L"";
-BOOL g_simulateAltGr = FALSE;
-char g_platform[128] = "windows desktop hardware native"; // TODO
+int g_nKeyEvents = 0;
+KMXTest_KeyEvent g_keyEvents[1024] = { 0 };
+
+/* Context - to refactor */
 WCHAR g_context[512] = L"";
 int g_contextLength = 0;
 
-struct KeyEvent {
-  UINT vkey;
-  UINT modifiers;
-};
+/* Keyboard options - to refactor */
+KMXTest_KeyboardOption g_keyboardOption[1024] = { 0 };
+int g_keyboardOptionCount = 0;
 
-int g_nKeyEvents = 0;
-KeyEvent g_keyEvents[1024] = { 0 };
+/* Options - to refactor */
+BOOL    g_mnemonicDeadkeyConversionMode = FALSE;
+wchar_t g_baseLayout[260] = L"kbdus.dll",
+        g_baseLayoutAlt[34] = L"en-US";
+BOOL    g_simulateAltGr = FALSE, 
+        g_baseLayoutGivesCtrlRAltForRAlt = FALSE;
+char    g_platform[128] = "windows desktop hardware native"; // TODO
 
-struct ModifierNames {
-  char *name;
-  UINT flag;
-};
+/* Constants - to refactor */
+extern const struct KMXTest_ModifierNames s_modifierNames[];
+extern const char *VKeyNames[];
+extern const struct KMXTest_ChToVKey chToVKey[];
 
-const struct ModifierNames ModifierNames[] = {
-  {"LCTRL", 0x0001},		// Left Control flag
-  {"RCTRL", 0x0002},		// Right Control flag
-  {"LALT", 0x0004},		// Left Alt flag
-  {"RALT", 0x0008},		// Right Alt flag
-  {"SHIFT", 0x0010},		// Either shift flag
-  {"CTRL", 0x0020},		// Either ctrl flag
-  {"ALT", 0x0040},		// Either alt flag
-  {"CAPS", 0x0100},		// Caps lock on
-  {"NCAPS", 0x0200},		// Caps lock NOT on
-  {"NUMLOCK", 0x0400},		// Num lock on
-  {"NNUMLOCK", 0x0800},		// Num lock NOT on
-  {"SCROLL", 0x1000},		// Scroll lock on
-  {"NSCROLL", 0x2000},		// Scroll lock NOT on
-  {NULL, 0}
-};
+void print_default_environment() {
+  wprintf(L"  env.simulate_altgr=%d\n", g_simulateAltGr);
+  wprintf(L"  env.base_layout=%s\n", g_baseLayout);
+  wprintf(L"  env.base_layout_alt=%s\n", g_baseLayoutAlt);
+  wprintf(L"  env.platform=%hs\n", g_platform);
+}
+
+BOOL addKeyboardOption(char *storeName, char *value) {
+  PWSTR p = strtowstr(storeName);
+  wcscpy_s(g_keyboardOption[g_keyboardOptionCount].name, p);
+  delete p;
+  
+  p = strtowstr(value);
+  wcscpy_s(g_keyboardOption[g_keyboardOptionCount++].value, p);
+  delete p;
+  return TRUE;
+}
+
+BOOL addOption(char *val) {
+  char *p = strchr(val, '=');
+  if (!p) {
+    return FALSE;
+  }
+  int len = (int)(p - val);
+  p++;
+  PWSTR wp = strtowstr(p);
+
+  if (!_strnicmp(val, "env.simulate_altgr", len)) {
+    g_simulateAltGr = !!atoi(p);
+  }
+  else if (!_strnicmp(val, "env.base_layout", len)) {
+    wcscpy_s(g_baseLayout, wp);
+  }
+  else if (!_strnicmp(val, "env.base_layout_alt", len)) {
+    wcscpy_s(g_baseLayoutAlt, wp);
+  }
+  else if (!_strnicmp(val, "env.platform", len)) {
+    strcpy_s(g_platform, p);
+  }
+  else if (!_strnicmp(val, "opt.", 4)) {
+    *(p - 1) = 0;
+    if (!addKeyboardOption(val + 4, p)) {
+      *(p - 1) = '=';
+      return FALSE;
+    }
+    *(p - 1) = '=';
+  }
+  else {
+    return FALSE;
+  }
+  delete wp;
+  return TRUE;
+}
+
+BOOL addKey(char *val, int len) {
+  DWORD ShiftState = 0;
+  char *p = strchr(val, ' ');
+  while (p) {
+    for (int i = 0; s_modifierNames[i].name; i++) {
+      if (!_strnicmp(val, s_modifierNames[i].name, (int)(p - val))) {
+        ShiftState |= s_modifierNames[i].flag;
+      }
+    }
+    val = p;
+    p = strchr(p + 1, ' ');
+  }
+  for (int i = 0; i < 256; i++) {
+    if (!_strcmpi(val, VKeyNames[i])) {
+      g_keyEvents[g_nKeyEvents].vkey = i;
+      g_keyEvents[g_nKeyEvents++].modifiers = ShiftState;
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+char VKeyToChar(UINT vk) {
+  for (int i = 0; chToVKey[i].vkey; i++) {
+    if (chToVKey[i].vkey == vk) {
+      return i + 32;
+    }
+  }
+  return 0;
+}
+
+BOOL addKey(char ch) {
+  if (ch > 127 || ch < 32) return FALSE;
+  g_keyEvents[g_nKeyEvents].vkey = chToVKey[ch-32].vkey;
+  g_keyEvents[g_nKeyEvents++].modifiers = chToVKey[ch-32].shifted ? K_SHIFTFLAG : 0;
+  return TRUE;
+}
+
+BOOL setKeys(char *val) {
+  while (*val) {
+    if (*val == '[') {
+      val++;
+      if (*val == '[') {
+        if (!addKey(*val)) return FALSE;
+        val++;
+      }
+      else {
+        char *p = strchr(val, ']');
+        if (!p) {
+          return FALSE;
+        }
+        if (!addKey(val, (int)(p - val))) return FALSE;
+        val = p + 1;
+      }
+    }
+    else if (*val >= 32 && *val < 127) {
+      if (!addKey(*val)) return FALSE;
+      val++;
+    }
+    else {
+      return FALSE;
+    }
+   
+  }
+  return TRUE;
+}
+
+BOOL addContext(DWORD ch) {
+  if (ch > 0x10FFFF) return FALSE;
+  if (ch >= 0x10000) {
+    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
+    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate2(ch);
+  }
+  else {
+    g_context[g_contextLength++] = (WCHAR) ch;
+  }
+  g_context[g_contextLength] = 0;
+  return TRUE;
+}
+
+BOOL addContextDeadkey(DWORD dk) {
+  g_context[g_contextLength++] = UC_SENTINEL;
+  g_context[g_contextLength++] = CODE_DEADKEY;
+  g_context[g_contextLength++] = (WCHAR) (dk + 1);
+  g_context[g_contextLength] = 0;
+  return TRUE;
+}
+
+BOOL setContext(char *val) {
+  while (*val) {
+    if (*val == '\\') {
+      val++;
+      if (*val == '\\') {
+        if (!addContext(*val)) return FALSE;
+      }
+      else if (*val == 'u') {
+        val++;
+        char *p = NULL;
+        if (!addContext(strtol(val, &p, 16))) return FALSE;
+        val = p;
+      }
+      else if (*val == 'd') {
+        val++;
+        char *p = NULL;
+        if (!addContextDeadkey(strtol(val, &p, 10))) return FALSE;
+        val = p;
+      }
+    }
+  }
+  return TRUE;
+}
+
+int main(int argc, char *argv[]) {
+  char *filename = NULL;
+  BOOL invalid = FALSE;
+
+  _setmode(_fileno(stdout), _O_U16TEXT);
+
+  for (int i = 1; i < argc-1; i += 2) {
+    char *arg = argv[i], *val = argv[i + 1];
+    if (!strcmp(arg, "-kmx")) {
+      filename = val;
+    }
+    else if (!strcmp(arg, "-context")) {
+      invalid = !setContext(val);
+    } 
+    else if (!strcmp(arg, "-keys")) {
+      invalid = !setKeys(val);
+    }
+    else if (!strcmp(arg, "-d")) {
+      invalid = !addOption(val);
+    }
+    else {
+      invalid = TRUE;
+    }
+
+    if (invalid) break;
+  }
+
+  if (invalid || g_nKeyEvents == 0 || filename == NULL) {
+    wprintf(L"Usage: kmxtest -kmx <file.kmx> -context context -keys key-sequence -d a=b\n");
+    wprintf(L"  file.kmx must exist. No translation is done for mnemonic layout, etc.\n");
+    wprintf(L"  context should be a string of unicode characters and/or deadkeys:\n");
+    wprintf(L"    e.g. \"ABC\\u1234\\dxxxx\\d{name}\" (where xxxx is the integer deadkey value or {name} is the deadkey name if keyboard is compiled with debug)\n");
+    wprintf(L"  key-sequence is one or more Keyman keystrokes:\n");
+    wprintf(L"    e.g. \"[SHIFT K_A] [K_B]\"\n");
+    wprintf(L"  -d allows for definition of environment and keyboard options\n");
+    wprintf(L"    keyboard option is opt.store_name=\"value\"\n");
+    wprintf(L"    environment is env.name=\"\"\n");
+    wprintf(L"    default environment is:\n");
+
+    print_default_environment();
+    return 2;
+  }
+
+
+  g_app = new AIWin2000Unicode();
+
+  g_ThreadData.IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
+  g_ThreadData.miniContext = new WCHAR[GLOBAL_ContextStackSize];
+  // run;
+
+  if (!LoadlpKeyboard(filename)) {
+    wprintf(L"Failed to load %hs\n", filename);
+    return 1;
+  }
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+
+  g_app->SetContext(g_context);
+
+  wprintf(L"============ Starting test ============\n");
+
+  for (int i = 0; i < g_nKeyEvents; i++) {
+    if (g_keyEvents[i].vkey < 256) {
+      wprintf(L"[%d] == %hs\n", i, VKeyNames[g_keyEvents[i].vkey]);
+    } 
+    else {
+      wprintf(L"[%d] == %x\n", i, g_keyEvents[i].vkey);
+    }
+    _td->state.vkey = g_keyEvents[i].vkey;
+    _td->state.charCode = VKeyToChar(g_keyEvents[i].vkey);
+    g_shiftState = g_keyEvents[i].modifiers;
+    
+    ProcessHook();
+  }
+
+  wprintf(L"============ Stopping test ============\n");
+
+  delete g_app;
+  return 0;
+}
+
+AIWin2000Unicode *GetApp() {
+  return g_app;
+}
+
+LPINTKEYBOARDINFO GetKeyboard() {
+  return &g_keyboard;
+}
+
+PKEYMAN64THREADDATA ThreadGlobals() {
+  return &g_ThreadData;
+}
+
+BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd) 
+{
+	if(!kbd) return TRUE;
+	delete kbd;
+	return TRUE;
+}
+
+BOOL ConvertStringToGuid(WCHAR *buf, GUID *guid)   // I3581
+{
+  return IIDFromString(buf, guid) == S_OK;
+}
+
+PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
+{
+  for (DWORD i = 0; i < kb->cxStoreArray; i++)
+    if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
+
+  return NULL;
+}
 
 const char *VKeyNames[256] = {
   // Key Codes
@@ -319,50 +601,37 @@ const char *VKeyNames[256] = {
     "K_?FF"				// &HFF
 };
 
-
-
-void print_default_environment() {
-  wprintf(L"  env.simulate_altgr=%d\n", g_simulateAltGr);
-  wprintf(L"  env.base_keyboard=%hs\n", g_baseKeyboard);
-  wprintf(L"  env.base_layout=%s\n", g_baseLayout);
-  wprintf(L"  env.base_layout_alt=%s\n", g_baseLayoutAlt);
-  wprintf(L"  env.platform=%hs\n", g_platform);
-}
-
-BOOL addOption(char *val) {
-  //TODO
-  wprintf(L"TODO: support %hs\n", val);
-  return TRUE;
-}
-
-BOOL addKey(char *val, int len) {
-  DWORD ShiftState = 0;
-  char *p = strchr(val, ' ');
-  while (p) {
-    for (int i = 0; ModifierNames[i].name; i++) {
-      if (!_strnicmp(val, ModifierNames[i].name, (int)(p - val))) {
-        ShiftState |= ModifierNames[i].flag;
-      }
-    }
-    val = p;
-    p = strchr(p + 1, ' ');
-  }
-  for (int i = 0; i < 256; i++) {
-    if (!_strcmpi(val, VKeyNames[i])) {
-      g_keyEvents[g_nKeyEvents].vkey = i;
-      g_keyEvents[g_nKeyEvents++].modifiers = ShiftState;
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-struct ChToVKey {
-  UINT vkey;
-  BOOL shifted;
+const struct KMXTest_ModifierNames s_modifierNames[14] = {
+  {"LCTRL", 0x0001},		// Left Control flag
+  {"RCTRL", 0x0002},		// Right Control flag
+  {"LALT", 0x0004},		// Left Alt flag
+  {"RALT", 0x0008},		// Right Alt flag
+  {"SHIFT", 0x0010},		// Either shift flag
+  {"CTRL", 0x0020},		// Either ctrl flag
+  {"ALT", 0x0040},		// Either alt flag
+  {"CAPS", 0x0100},		// Caps lock on
+  {"NCAPS", 0x0200},		// Caps lock NOT on
+  {"NUMLOCK", 0x0400},		// Num lock on
+  {"NNUMLOCK", 0x0800},		// Num lock NOT on
+  {"SCROLL", 0x1000},		// Scroll lock on
+  {"NSCROLL", 0x2000},		// Scroll lock NOT on
+  {NULL, 0}
 };
 
-struct ChToVKey chToVKey[] = {
+#define VK_COLON	0xBA
+#define VK_EQUAL	0xBB
+#define VK_COMMA	0xBC
+#define VK_HYPHEN	0xBD
+#define VK_PERIOD	0xBE
+#define	VK_SLASH	0xBF
+#define VK_ACCENT	0xC0
+#define VK_LBRKT	0xDB
+#define VK_BKSLASH	0xDC
+#define VK_RBRKT	0xDD
+#define VK_QUOTE	0xDE
+#define VK_xDF		0xDF
+
+const struct KMXTest_ChToVKey chToVKey[] = {
   {VK_SPACE},     // 
   {'1', 1},       // !
   {VK_QUOTE, 1},  // "
@@ -460,256 +729,3 @@ struct ChToVKey chToVKey[] = {
   {VK_ACCENT, 1},
   {0, 0}
 };
-
-char VKeyToChar(UINT vk) {
-  for (int i = 0; chToVKey[i].vkey; i++) {
-    if (chToVKey[i].vkey == vk) {
-      return i + 32;
-    }
-  }
-  return 0;
-}
-
-BOOL addKey(char ch) {
-  if (ch > 127 || ch < 32) return FALSE;
-  g_keyEvents[g_nKeyEvents].vkey = chToVKey[ch-32].vkey;
-  g_keyEvents[g_nKeyEvents++].modifiers = chToVKey[ch-32].shifted ? K_SHIFTFLAG : 0;
-  return TRUE;
-}
-
-BOOL setKeys(char *val) {
-  while (*val) {
-    if (*val == '[') {
-      val++;
-      if (*val == '[') {
-        if (!addKey(*val)) return FALSE;
-        val++;
-      }
-      else {
-        char *p = strchr(val, ']');
-        if (!p) {
-          return FALSE;
-        }
-        if (!addKey(val, (int)(p - val))) return FALSE;
-        val = p + 1;
-      }
-    }
-    else if (*val >= 32 && *val < 127) {
-      if (!addKey(*val)) return FALSE;
-      val++;
-    }
-    else {
-      return FALSE;
-    }
-   
-  }
-  return TRUE;
-}
-
-BOOL addContext(DWORD ch) {
-  if (ch > 0x10FFFF) return FALSE;
-  if (ch >= 0x10000) {
-    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
-    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate2(ch);
-  }
-  else {
-    g_context[g_contextLength++] = (WCHAR) ch;
-  }
-  g_context[g_contextLength] = 0;
-  return TRUE;
-}
-
-BOOL addContextDeadkey(DWORD dk) {
-  g_context[g_contextLength++] = UC_SENTINEL;
-  g_context[g_contextLength++] = CODE_DEADKEY;
-  g_context[g_contextLength++] = (WCHAR) (dk + 1);
-  g_context[g_contextLength] = 0;
-  return TRUE;
-}
-
-BOOL setContext(char *val) {
-  while (*val) {
-    if (*val == '\\') {
-      val++;
-      if (*val == '\\') {
-        if (!addContext(*val)) return FALSE;
-      }
-      else if (*val == 'u') {
-        val++;
-        char *p = NULL;
-        if (!addContext(strtol(val, &p, 16))) return FALSE;
-        val = p;
-      }
-      else if (*val == 'd') {
-        val++;
-        char *p = NULL;
-        if (!addContextDeadkey(strtol(val, &p, 10))) return FALSE;
-        val = p;
-      }
-    }
-  }
-  return TRUE;
-}
-
-int main(int argc, char *argv[]) {
-  char *filename = NULL;
-  BOOL invalid = FALSE;
-
-  _setmode(_fileno(stdout), _O_U16TEXT);
-
-  for (int i = 1; i < argc-1; i += 2) {
-    char *arg = argv[i], *val = argv[i + 1];
-    if (!strcmp(arg, "-kmx")) {
-      filename = val;
-    }
-    else if (!strcmp(arg, "-context")) {
-      invalid = !setContext(val);
-    } 
-    else if (!strcmp(arg, "-keys")) {
-      invalid = !setKeys(val);
-    }
-    else if (!strcmp(arg, "-d")) {
-      invalid = !addOption(val);
-    }
-    else {
-      invalid = TRUE;
-    }
-
-    if (invalid) break;
-  }
-
-  if (invalid || g_nKeyEvents == 0 || filename == NULL) {
-    wprintf(L"Usage: kmxtest -kmx <file.kmx> -context context -keys key-sequence -d a=b\n");
-    wprintf(L"  file.kmx must exist. No translation is done for mnemonic layout, etc.\n");
-    wprintf(L"  context should be a string of unicode characters and/or deadkeys:\n");
-    wprintf(L"    e.g. \"ABC\\u1234\\dxxxx\\d{name}\" (where xxxx is the integer deadkey value or {name} is the deadkey name if keyboard is compiled with debug)\n");
-    wprintf(L"  key-sequence is one or more Keyman keystrokes:\n");
-    wprintf(L"    e.g. \"[SHIFT K_A] [K_B]\"\n");
-    wprintf(L"  -d allows for definition of environment and keyboard options\n");
-    wprintf(L"    keyboard option is opt.store_name=\"value\"\n");
-    wprintf(L"    environment is env.name=\"\"\n");
-    wprintf(L"    default environment is:\n");
-
-    print_default_environment();
-    return 2;
-  }
-
-
-  g_app = new AIWin2000Unicode();
-
-  g_ThreadData.IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-  g_ThreadData.miniContext = new WCHAR[GLOBAL_ContextStackSize];
-  // run;
-
-  if (!LoadlpKeyboard(filename)) {
-    wprintf(L"Failed to load %hs\n", filename);
-    return 1;
-  }
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-
-  g_app->SetContext(g_context);
-
-  wprintf(L"============ Starting test ============\n");
-
-  for (int i = 0; i < g_nKeyEvents; i++) {
-    if (g_keyEvents[i].vkey < 256) {
-      wprintf(L"[%d] == %hs\n", i, VKeyNames[g_keyEvents[i].vkey]);
-    } 
-    else {
-      wprintf(L"[%d] == %x\n", i, g_keyEvents[i].vkey);
-    }
-    _td->state.vkey = g_keyEvents[i].vkey;
-    _td->state.charCode = VKeyToChar(g_keyEvents[i].vkey);
-    g_shiftState = g_keyEvents[i].modifiers;
-    
-    ProcessHook();
-  }
-
-  wprintf(L"============ Stopping test ============\n");
-
-  delete g_app;
-  return 0;
-}
-
-AIWin2000Unicode *GetApp() {
-  return g_app;
-}
-
-LPINTKEYBOARDINFO GetKeyboard() {
-  return &g_keyboard;
-}
-
-PKEYMAN64THREADDATA ThreadGlobals() {
-  return &g_ThreadData;
-}
-
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd) 
-{
-	if(!kbd) return TRUE;
-	delete kbd;
-	return TRUE;
-}
-
-BOOL ConvertStringToGuid(WCHAR *buf, GUID *guid)   // I3581
-{
-  return IIDFromString(buf, guid) == S_OK;
-}
-
-void LoadBaseLayoutSettings() {   // I4552   // I4583
-  char underlyingLayout[16];
-  wchar_t baseLayout[MAX_PATH];
-  DWORD dwUnderlyingLayout = 0;
-
-	RegistryReadOnly *reg = new RegistryReadOnly(HKEY_CURRENT_USER);
-
-	if(reg->OpenKeyReadOnly(REGSZ_KeymanCU)) {
-		if(reg->ReadString(REGSZ_UnderlyingLayout, underlyingLayout, 15)) {
-      dwUnderlyingLayout = strtoul(underlyingLayout, NULL, 16);   // I4516   // I4581
-      wsprintf(underlyingLayout, "%08x", dwUnderlyingLayout);   // I3759   // I4581
-    } else {
-			underlyingLayout[0] = 0;
-    }
-
-    strcpy_s(g_baseKeyboard, underlyingLayout);
-    g_simulateAltGr = reg->ReadInteger(REGSZ_SimulateAltGr);
-    g_mnemonicDeadkeyConversionMode = !reg->ValueExists(REGSZ_DeadkeyConversionMode) || reg->ReadInteger(REGSZ_DeadkeyConversionMode);
-	} else {
-    strcpy_s(g_baseKeyboard, "");
-    g_simulateAltGr = FALSE;
-    g_mnemonicDeadkeyConversionMode = FALSE;
-  }
-
-	delete reg;
-
-  reg = new RegistryReadOnly(HKEY_LOCAL_MACHINE);
-  if(underlyingLayout[0] &&   // I4660
-      reg->OpenKeyReadOnly(REGSZ_SystemKeyboardLayouts) && 
-      reg->OpenKeyReadOnly(underlyingLayout) && 
-      reg->ReadString(L"layout file", baseLayout, MAX_PATH)) {
-    wchar_t langName[16], countryName[16], baseLayoutAlt[34];
-
-    if(GetLocaleInfoW(LOWORD(dwUnderlyingLayout), LOCALE_SISO639LANGNAME, langName, _countof(langName)) > 0 &&
-      GetLocaleInfoW(LOWORD(dwUnderlyingLayout), LOCALE_SISO3166CTRYNAME, countryName, _countof(countryName)) > 0) {   // I4588   // I4786
-      wsprintfW(baseLayoutAlt, L"%s-%s", langName, countryName);
-      wcscpy_s(g_baseLayout, baseLayout);
-      wcscpy_s(g_baseLayoutAlt, baseLayoutAlt);
-    } else {
-      wcscpy_s(g_baseLayout, baseLayout);
-      wcscpy_s(g_baseLayoutAlt, L"en-US");
-    }
-  } else {
-    wcscpy_s(g_baseLayout, L"kbdus.dll");
-    wcscpy_s(g_baseLayoutAlt, L"en-US");
-  }
-
-  delete reg;
-}
-
-PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
-{
-  for (DWORD i = 0; i < kb->cxStoreArray; i++)
-    if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
-
-  return NULL;
-}

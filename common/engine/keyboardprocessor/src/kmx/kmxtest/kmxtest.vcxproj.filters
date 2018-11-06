@@ -36,31 +36,13 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\syskbd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\syskbdnt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\syskbdnt64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\versioninfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VKScanCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\appint\aiWin2000Unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\appint\appint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\common\registry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\common\unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\common\xstring.cpp">
@@ -74,31 +56,10 @@
     <ClInclude Include="inc\capsstate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Comperr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Compfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\Compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\compv4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\crc32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\debugstore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\hotkeys.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\KBD.H">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\keyboardoptions.h">
@@ -116,22 +77,10 @@
     <ClInclude Include="inc\keystate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\onlineconstants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\registry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\syskbd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\unicode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\vkscancodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\xstring.h">

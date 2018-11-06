@@ -56,14 +56,6 @@
 #ifndef _KEYMAN64_H
 #define _KEYMAN64_H
 
-#ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-#endif
-
-#ifndef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
-#endif
-
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
 #endif
@@ -74,29 +66,7 @@
 
 #include <windows.h>
 #include <assert.h>
-#include <msctf.h>
 #include "compiler.h"
-
-#ifdef _WIN64
-#define LIBRARY_NAME "KEYMAN64"
-#else
-#define LIBRARY_NAME "KEYMAN32"
-#endif
-
-#define NOT_IMPLEMENTED assert(FALSE)
-
-
-#define ERROR_APP_MASK 0x20000000L
-#define ERROR_KEYMAN_ALREADY_INIT (ERROR_APP_MASK | 0x00000001L)
-#define ERROR_KEYMAN_SHUTTING_DOWN (ERROR_APP_MASK | 0x00000002L)
-#define ERROR_KEYMAN_TLS_OUT_OF_INDEXES (ERROR_APP_MASK | 0x00000003L)
-#define ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED (ERROR_APP_MASK | 0x00000004L)
-#define ERROR_KEYMAN_CORRUPT (ERROR_APP_MASK | 0x00000005L)
-#define ERROR_KEYMAN_CANNOT_REINITIALISE_THREAD (ERROR_APP_MASK | 0x00000006L)
-#define ERROR_KEYMAN_CANNOT_LOAD_PRODUCTS (ERROR_APP_MASK | 0x00000007L)
-#define ERROR_KEYMAN_THREAD_DATA_NOT_READY (ERROR_APP_MASK | 0x00000008L)
-#define ERROR_KEYMAN_KEYBOARD_NOT_ACTIVE (ERROR_APP_MASK | 0x00000009L)
-#define ERROR_KEYMAN_TOO_MANY_CONTROLLERS (ERROR_APP_MASK | 0x0000000AL)
 
 /***************************************************************************/ 
 
@@ -137,7 +107,7 @@ typedef struct tagKEYBOARD
 	
 	DWORD dwCheckSum;		// As stored in keyboard
 	DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-	DWORD IsRegistered;		// layout id, from same registry key
+	DWORD IsRegistered;		// layout id, from same key
 	DWORD version;			// keyboard version
 
 	DWORD cxStoreArray;		// in array entries
@@ -161,59 +131,20 @@ typedef struct tagKEYBOARD
 	HBITMAP	hBitmap;		// handle to the bitmap in the file;
 } KEYBOARD, *LPKEYBOARD;
 
-typedef BOOL (WINAPI *IMDLLHOOKProc)(HWND hwndFocus, WORD KeyStroke, WCHAR KeyChar, DWORD shiftFlags);
-
-typedef struct tagIMDLLHOOK
-{
-	char name[32];
-	DWORD storeno;
-	IMDLLHOOKProc function;
-} IMDLLHOOK, *LPIMDLLHOOK;
-	
-typedef struct tagIMDLL
-{
-	char        Filename[256];
-	HMODULE		hModule;
-	DWORD       nHooks;
-	LPIMDLLHOOK Hooks;
-} IMDLL, *LPIMDLL;
-
 typedef struct tagINTKEYBOARDOPTIONS
 {
   PWCHAR Value;
   PWCHAR OriginalStore;
 } INTKEYBOARDOPTIONS, *LPINTKEYBOARDOPTIONS;
 
-typedef struct tagINTKEYBOARDPROFILE
-{
-  WCHAR Locale[LOCALE_NAME_MAX_LENGTH];
-  LANGID LangID;
-  GUID Guid;
-} INTKEYBOARDPROFILE, *LPINTKEYBOARDPROFILE;
-
 // The members of this structure, from first through to IMDLLs, must match KEYBOARDINFO from keymanapi.h
 typedef struct tagINTKEYBOARDINFO
 {
 	DWORD      KeymanID;
-	DWORD      __filler_Hotkey;
-  DWORD      __filler; // makes same as KEYBOARDINFO   // I4462
 	char       Name[256];
 	LPKEYBOARD Keyboard;
-	DWORD      nIMDLLs;
-	LPIMDLL    IMDLLs;
-	int        __filler2; // makes same as KEYBOARDINFO
   LPINTKEYBOARDOPTIONS KeyboardOptions;
-  int        nProfiles;
-  LPINTKEYBOARDPROFILE Profiles;
 } INTKEYBOARDINFO, *LPINTKEYBOARDINFO;
-
-typedef struct tagINI
-{
-	int MsgStackSize;
-	int MaxKeyboards;
-	int ContextStackSize;
-} INI;
-
 
 typedef struct tagKMSTATE
 {
@@ -238,17 +169,10 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr);
 #define ShowDlgItem(hdlg, id, fShow ) ShowWindow( GetDlgItem( (hdlg), (id) ), (fShow) ? SW_SHOW : SW_HIDE )
 #define EnableDlgItem(hdlg, id, fEnable ) EnableWindow( GetDlgItem( (hdlg), (id) ), (fEnable) )
 
-BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf);
 BOOL LoadlpKeyboard(PSTR keyboardName);
 
 PSTR wstrtostr(PWSTR in);
 PWSTR strtowstr(PSTR in);
-
-WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags);
-
-void SelectApplicationIntegration();   // I4287
-
-void PostDummyKeyEvent();  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
 
 /* Debugging functions */
 
@@ -258,7 +182,6 @@ typedef enum ATSDMState { sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sd
 
 void InitDebugging();
 void UninitDebugging();
-void ProcessDebugMessage(HWND hwnd, WPARAM wParam, LPARAM lParam);
 
 #define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
 #define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
@@ -279,35 +202,23 @@ BOOL ShouldDebug_1(); // TSDMState state);
 
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
-#ifndef _KEYMAN64_LIGHT
-
-#ifndef _WIN64   // I4326
-#include "hotkeys.h"
-#endif
-
 #include "appint.h"
 #include "aiwin2000unicode.h"
 #include "globals.h"
 
 #include "capsstate.h"
 #include "keystate.h"
-#endif
-
-#include "registry.h"
-
-#ifndef _KEYMAN64_LIGHT
 #include "keyboardoptions.h"
-#endif
 
-#include "unicode.h"
+#define Uni_IsSurrogate1(ch) ((ch) >= 0xD800 && (ch) <= 0xDBFF)
+#define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
+#define Uni_IsSMP(ch) ((ch) >= 0x10000)
+
+#define Uni_SurrogateToUTF32(ch, cl) (((ch) - 0xD800) * 0x400 + ((cl) - 0xDC00) + 0x10000)
+
+#define Uni_UTF32ToSurrogate1(ch)	(((ch) - 0x10000) / 0x400 + 0xD800)
+#define Uni_UTF32ToSurrogate2(ch)	(((ch) - 0x10000) % 0x400 + 0xDC00)
+
 #include "xstring.h"
-
-#ifndef _KEYMAN64_LIGHT
-#include "syskbd.h"
-#include "vkscancodes.h"
-
-#include "crc32.h"
-
-#endif
 
 #endif	// _KEYMAN64_H

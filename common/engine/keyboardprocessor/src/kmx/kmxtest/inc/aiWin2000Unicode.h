@@ -30,12 +30,6 @@ class AIWin2000Unicode:public AppIntegration
 {
 private:
 
-	BYTE kbstate[256];
-	BOOL FUnicharOkay;
-	
-	BOOL PostKeys();
-
-
 protected:
   AppContext *context;
 
@@ -47,8 +41,6 @@ public:
 
 	/* Context functions */
 
-	virtual void ReadContext();
-	virtual void ResetContext();
   virtual void AddContext(WCHAR ch);  //I2436
 	virtual WCHAR *ContextBuf(int n);
 	virtual WCHAR *ContextBufMax(int n);
@@ -57,7 +49,6 @@ public:
 	/* Queue and sending functions */
 	
 	virtual BOOL SendActions();   // I4196
-	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags);
 };
 
 #endif

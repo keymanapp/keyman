@@ -1,30 +1,4 @@
-/*
-  Name:             keystate
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      11 Mar 2009
-
-  Modified Date:    6 Feb 2015
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          11 Mar 2009 - mcdurdin - I1894 - Fix threading bugs introduced in I1888
-                    11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
-                    12 Mar 2010 - mcdurdin - I934 - x64 - Complete
-                    12 Mar 2010 - mcdurdin - I2229 - Remove hints and warnings
-                    04 May 2010 - mcdurdin - I2351 - Robustness - verify _td return value
-                    03 Feb 2015 - mcdurdin - I4551 - V9.0 - If Ctrl+Alt simulates RAlt is on, then Ctrl+Alt rules don’t work at all (both should work).
-                    06 Feb 2015 - mcdurdin - I4583 - V9.0 - Remove altgr lookup test from keyman32 and put it into the registry
-*/
 #include "pch.h"   // I4551
-
-BYTE kbstate[256];
-
 
 #define MAX_RSHIFT 24
 #define MAX_KSHIFT 18
@@ -146,15 +120,12 @@ BOOL IsEquivalentShift(UINT rshift, UINT kshift) {
   // Time of truth: is it a valid state?
   //
 
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
   switch(states[rshift][kshift]) {
     case 0: return FALSE;
     case 1: return TRUE;
-    case 2: return KeyboardGivesCtrlRAltForRAlt();  // This state is used when TSF gives us a bogus RALT instead of LCtrl+RAlt
+    case 2: return g_baseLayoutGivesCtrlRAltForRAlt;  // This state is used when TSF gives us a bogus RALT instead of LCtrl+RAlt
     case 4: return g_simulateAltGr;   // I4583
-    case 6: return KeyboardGivesCtrlRAltForRAlt() || g_simulateAltGr;   // I4583
+    case 6: return g_baseLayoutGivesCtrlRAltForRAlt || g_simulateAltGr;   // I4583
   }
 
   return FALSE; // should never happen

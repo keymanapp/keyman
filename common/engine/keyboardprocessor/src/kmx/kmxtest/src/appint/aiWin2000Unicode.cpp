@@ -54,10 +54,6 @@ AIWin2000Unicode::~AIWin2000Unicode()
 
 /* Context functions */
 
-void AIWin2000Unicode::ReadContext()
-{
-}
-
 void AIWin2000Unicode::SetContext(WCHAR *ctxt) {
   context->Set(ctxt);
 }
@@ -65,11 +61,6 @@ void AIWin2000Unicode::SetContext(WCHAR *ctxt) {
 void AIWin2000Unicode::AddContext(WCHAR ch)  //I2436
 {
   context->Add(ch);
-}
-
-void AIWin2000Unicode::ResetContext()
-{
-	context->Reset();
 }
 
 WCHAR *AIWin2000Unicode::ContextBuf(int n)
@@ -82,13 +73,6 @@ WCHAR *AIWin2000Unicode::ContextBufMax(int n)
 	return context->BufMax(n);
 }
 	
-BYTE SavedKbdState[256];
-
-BOOL AIWin2000Unicode::SendActions()   // I4196
-{
-	return PostKeys();
-}
-
 BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 {
 	int result = AppIntegration::QueueAction(ItemType, dwData);
@@ -121,20 +105,9 @@ BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 	return result;
 }
 
-BOOL AIWin2000Unicode::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags)
-{
-  UNREFERENCED_PARAMETER(ItemType);
-  UNREFERENCED_PARAMETER(Group);
-  UNREFERENCED_PARAMETER(Rule);
-  UNREFERENCED_PARAMETER(fcontext);
-  UNREFERENCED_PARAMETER(foutput);
-  UNREFERENCED_PARAMETER(dwExtraFlags);
-	return TRUE;
-}
-
 // I1512 - SendInput with VK_PACKET for greater robustness
 
-BOOL AIWin2000Unicode::PostKeys()
+BOOL AIWin2000Unicode::SendActions()
 {	
   if(QueueSize == 0) 
 	{

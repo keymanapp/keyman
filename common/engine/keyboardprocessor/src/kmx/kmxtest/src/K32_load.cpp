@@ -42,32 +42,6 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
 
 HBITMAP LoadBitmapFileEx(PBYTE filebase);
 
-BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
-{
-  // TODO: Select keyboard based on mnemonicDeadkeyConversionMode property
-	int n = 0;
-	RegistryReadOnly *reg = Reg_GetKeymanInstalledKeyboard(kbname);
-	if(!reg) return FALSE;
-
-	__try
-	{
-    // We need to test if the user is in deadkey conversion mode    // I4552
-    if(g_mnemonicDeadkeyConversionMode && reg->ValueExists(REGSZ_KeymanFile_MnemonicOverride_Deadkey)) {
-      n = reg->ReadString(REGSZ_KeymanFile_MnemonicOverride_Deadkey, buf, nbuf);
-    }
-    else if(reg->ValueExists(REGSZ_KeymanFile_MnemonicOverride)) {   // I4169
-  		n = reg->ReadString(REGSZ_KeymanFile_MnemonicOverride, buf, nbuf);
-    } else {
-		  n = reg->ReadString(REGSZ_KeymanFile, buf, nbuf);
-    }
-	}
-	__finally
-	{
-		delete reg;
-	}
-	return n;
-}
-
 BOOL LoadlpKeyboard(PSTR KeyboardName)
 {
 	//char buf[256];
