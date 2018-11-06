@@ -390,7 +390,7 @@ typedef struct {
   uint8_t   _reserved[3];
   union {
     uintptr_t           marker;     // MARKER type
-    km_kbp_option const * option;    // OPT types
+    km_kbp_option const * option;   // OPT types
     km_kbp_usv          character;  // CHAR type
     km_kbp_virtual_key  vkey;       // VKEY types
   };
@@ -435,14 +435,15 @@ value.
 */
 
 enum km_kbp_option_scope {
-  KM_KBP_OPT_UNKNOWN,
-  KM_KBP_OPT_KEYBOARD,
-  KM_KBP_OPT_ENVIRONMENT
+  KM_KBP_OPT_UNKNOWN      = 0,
+  KM_KBP_OPT_KEYBOARD     = 1,
+  KM_KBP_OPT_ENVIRONMENT  = 2,
+  KM_KBP_OPT_MAX_SCOPES
 };
 
 struct km_kbp_option {
-  char const *  key;
-  char const *  value;
+  km_kbp_cp const *  key;
+  km_kbp_cp const *  value;
   uint8_t       scope;  // Scope which an option belongs to.
 };
 
@@ -451,47 +452,55 @@ struct km_kbp_option {
 
 /*
 ```
-### `km_kbp_options_set_size`
+### `km_kbp_options_list_size`
 ##### Description:
-Return the cardinality of a `km_kbp_options_set`.
+Return the length of a terminated `km_kbp_option`.
 ##### Return:
-The number of items in the supplied `km_kbp_options_set`
+The number of items in the supplied `km_kbp_options_set` or 0 is `opts` is null.
 ##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options_set`.
+- __opts__: A pointer to a `KM_KBP_OPTIONS_END` terminated array of
+    `km_kbp_option` values.
 
 ```c
 */
 KMN_API
-size_t km_kbp_options_set_size(km_kbp_options_set const *opts);
+size_t km_kbp_options_list_size(km_kbp_option const *opts);
 
 /*
 ```
 ### `km_kbp_options_set_lookup`
 ##### Description:
 Lookup an option based on it's key, in an option set.
-##### Return:
-A pointer the `km_kbp_option` or `0` if not present.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
 - __opts__: An opaque pointer to an `km_kbp_options_set`.
+- __scope__: Which key-value store to interrogate.
 - __key__: A C string that matches the key in the target `km_kbp_option`.
+- __value__: A pointer to the result variable:
+  A pointer to the UTF-16 string value or null if the key doesn't exist.
 
 ```c
 */
 KMN_API
-km_kbp_option const *km_kbp_options_set_lookup(km_kbp_options_set const *opts,
-                                               const char *key);
+km_kbp_status km_kbp_options_set_lookup(km_kbp_options_set const *opts,
+                                        uint8_t scope, km_kbp_cp const *key,
+                                        km_kbp_cp const **value);
 
 /*
 ```
 ### `km_kbp_options_set_update`
 ##### Description:
-Add or overwrite one or more options from a list of `km_kbp_option`s.
+Overwrite one or more options from a list of `km_kbp_option`s.
 ##### Status:
-__KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
+- `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
 - __opts__: An opaque pointer to an `km_kbp_options_set`.
 - __new_opts__: A C array of `km_kbp_option` objects to update or add. Must be
-terminated with `KM_KBP_OPTIONS_END`.
+    terminated with `KM_KBP_OPTIONS_END`.
 
 ```c
 */
@@ -557,8 +566,8 @@ In the event the file doesn't exist or is inaccesible.
 - __KM_KBP_STATUS_OS_ERROR__: An unkown OS error condition occured during load.
 ##### Parameters:
 - __kb_path__: C string containing a valid path to the keyboard file.
-- __keyboard__: A pointer to result variable: A pointer to the opaque
-`km_kbp_keyboard` object returned by the Processor.
+- __keyboard__: A pointer to result variable:
+    A pointer to the opaque km_kbp_keyboard` object returned by the Processor.
 
 ```c
 */
@@ -574,7 +583,7 @@ Free the allocated memory belonging to a `km_kbp_keyboard` object previously
 returned by `km_kbp_keyboard_load`.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque `km_kbp_keyboard` object to be
-disposed of.
+    disposed of.
 
 ```c
 */
@@ -775,7 +784,7 @@ typedef struct {
 enum km_kbp_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
   KM_KBP_TECH_KMN         = 1 << 0,
-  KM_KBP_TECH_LDML        = 1 << 2
+  KM_KBP_TECH_LDML        = 1 << 1
 };
 
 
@@ -815,7 +824,6 @@ The combinations of modifier keys set at the time key `vk` was pressed.
 KMN_API
 km_kbp_status km_kbp_process_event(km_kbp_state *state,
                           km_kbp_virtual_key vk, uint16_t modifier_state);
-
 
 #if defined(__cplusplus)
 } // extern "C"
