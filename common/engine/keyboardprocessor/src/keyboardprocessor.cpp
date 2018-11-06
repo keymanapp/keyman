@@ -81,7 +81,7 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
     {
       case KM_KBP_VKEY_BKSP:
         state->context().pop_back();
-        state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_BACK, {0,}, {0}});
+        state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_BACK, {0,}, {1}});
         state->actions.emplace_back(km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}});
         break;
 

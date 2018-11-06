@@ -162,7 +162,7 @@ int main(int, char * [])
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('l')}}}));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0));
-  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}}));
+  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {1}}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
                                   KM_KBP_MODIFIER_SHIFT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}}));
