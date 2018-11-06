@@ -54,9 +54,8 @@
 
 #include <ibus.h>
 #include <keyman/keyboardprocessor.h>
-//#include <kmfl/kmfl.h>
-//#include <kmfl/libkmfl.h>
 
+#if 0
 typedef enum {OUTPUT_STRING, ERASE_CHAR, FORWARD_KEYEVENT, OUTPUT_BEEP} kmfl_opcodes;
 
 typedef struct
@@ -67,9 +66,15 @@ typedef struct
 
 typedef struct 
 {
-    KMSI * p_kmsi;
+    //KMSI * p_kmsi;
     GList * cmds;
 } KInputContext;
+#endif
+
+typedef struct
+{
+    km_kbp_state *p_state;
+} KInputKeyboard;
 
 typedef struct 
 {
@@ -90,12 +95,16 @@ typedef struct
 	
 } KInputMethod;
 
-void             ibus_keyman_init             (void);
-GList           *ibus_keyman_list_engines     (void);
-IBusComponent   *ibus_keyman_get_component    (void);
-KInputMethod 	*kinput_open_im				(const gchar * keyboard_filename);
-KInputContext   *kmfl_create_ic             (KInputMethod *im);
-void             kmfl_destroy_ic            (KInputContext *ic);
-void 			 kinput_close_im			(KInputMethod * im);
-void 			 keyman_get_keyboard_info		(KInputMethod * im);
+void             ibus_keyman_init           (void);
+GList           *ibus_keyman_list_engines   (void);
+IBusComponent   *ibus_keyman_get_component  (void);
+KInputMethod    *kinput_open_im             (const gchar * keyboard_filename);
+KInputContext   *keyman_create_ic           (KInputMethod *im);
+void             keyman_destroy_ic          (KInputContext *ic);
+void             kinput_close_im            (KInputMethod * im);
+void             keyman_get_keyboard_info   (KInputMethod * im);
+int              keyman_load_keyboard       (const gchar *keyboard_filename);
+void             keyman_unload_keyboard     (int keyboard_number);
+int              keyman_check_keyboard      (gchar *absfn);
+const gchar     *keyman_icon_file           (int keyboard_number);
 #endif

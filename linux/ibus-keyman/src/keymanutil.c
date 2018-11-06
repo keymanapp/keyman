@@ -58,6 +58,7 @@
 #include <glib/gprintf.h>
 #include <string.h>
 
+
 #include "keymanutil.h"
 
 #define N_(text) text
@@ -72,7 +73,7 @@ static gchar * get_dirname(const gchar * path)
     }
 }
 
-GList * kmfl_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
+GList * keyman_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
 {
 //    g_message("KMFL: getting from dir: %s", path);
     DIR *dir = opendir(path);
@@ -87,16 +88,14 @@ GList * kmfl_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
             if (S_ISDIR(filestat.st_mode))
             {
                 if(strcmp(file->d_name, ".") != 0 && strcmp(file->d_name, "..") != 0)
-                    keyboard_list = kmfl_get_keyboard_fromdir(keyboard_list, absfn);
+                    keyboard_list = keyman_get_keyboard_fromdir(keyboard_list, absfn);
                 g_free(absfn);
             }
 
-            // Only .kmfl and .kmn extensions are valid keyboard files
-	    // Now only .kmx
+            // Only .kmx extensions are valid keyboard files
             else if (S_ISREG(filestat.st_mode)
-                && ((g_str_has_suffix(absfn, ".kmfl") && kmfl_check_keyboard(absfn) == 0) 
-                || g_str_has_suffix(absfn, ".kmn"))) {
-
+                && (g_str_has_suffix(absfn, ".kmx") && keyman_check_keyboard(absfn) == 0))
+            {
                 keyboard_list=g_list_append(keyboard_list, absfn);
             }
             else
@@ -111,17 +110,18 @@ GList * kmfl_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
     return keyboard_list;
 }
 
-GList * kmfl_get_keyboard_list( const gchar * path)
+GList * keyman_get_keyboard_list( const gchar * path)
 {
     GList * keyboard_list=NULL;
-    keyboard_list = kmfl_get_keyboard_fromdir(keyboard_list, path);
+    keyboard_list = keyman_get_keyboard_fromdir(keyboard_list, path);
     return keyboard_list;
 }
 
-gchar * kmfl_get_icon_file(KInputMethod * im)
+gchar * keyman_get_icon_file(KInputMethod * im)
 {
-	// Now there will only be the .png which will have been extracted from the .kmx during installation
-    const char * icon_file = kmfl_icon_file(im->keyboard_number);
+    // Now there will only be the .png which will have been extracted from the .kmx during installation
+#if 0
+    const char * icon_file = keyman_icon_file(im->keyboard_number);
     gchar * full_path_to_icon_file=NULL;
     struct stat filestat;
     char * valid_extensions[]= {"", ".png", ".bmp", ".jpg", NULL};
@@ -146,9 +146,11 @@ gchar * kmfl_get_icon_file(KInputMethod * im)
          full_path_to_icon_file=g_strdup("/usr/share/kmfl/icons/default.png");
 
     return full_path_to_icon_file;
+#endif
+    return NULL;
 }
 
-gchar * kmfl_get_ldml_file(KInputMethod * im)
+gchar * keyman_get_ldml_file(KInputMethod * im)
 {
 	// kvk details from the json?
 	// or will it be available in the keyboardprocessor API?
@@ -185,10 +187,11 @@ gchar * kmfl_get_ldml_file(KInputMethod * im)
     return full_path_to_ldml_file;
 }
 
-void kmfl_get_keyboard_info(KInputMethod * im) 
+void keyman_get_keyboard_info(KInputMethod * im) 
 {
 	// either get these from json?
 	// or the keyboardprocessor API from the kmx?
+    #if 0
     char buf[1024];
     KMSI * p_kmsi;
 
@@ -236,9 +239,10 @@ void kmfl_get_keyboard_info(KInputMethod * im)
     kmfl_delete_keyboard_instance(p_kmsi);
     im->keyboard_icon_filename = kmfl_get_icon_file(im);
     im->keyboard_ldmlfile = kmfl_get_ldml_file(im);
+    #endif
 }
 
-void kmfl_free_keyboard_info(KInputMethod * im)
+void keyman_free_keyboard_info(KInputMethod * im)
 {
     g_assert(im != NULL);  
     g_free(im->keyboard_filename);  
@@ -293,14 +297,14 @@ ibus_keyman_add_engines(GList * engines, GList * keyboard_list)
         gchar * keyboard_filename = (gchar *) p->data;
         KInputMethod im;
         
-        im.keyboard_number = kmfl_load_keyboard(keyboard_filename);
+        im.keyboard_number = keyman_load_keyboard(keyboard_filename);
         if (im.keyboard_number >=0) {
             im.keyboard_filename = g_strdup(keyboard_filename);
 
-            kmfl_get_keyboard_info(&im);
-            engines = g_list_append (engines, ibus_kmfl_engine_new (keyboard_filename, im.keyboard_language, im.keyboard_name, im.keyboard_author, im.keyboard_icon_filename, im.keyboard_copyright, im.keyboard_description, im.keyboard_layout, im.keyboard_license));
+            keyman_get_keyboard_info(&im);
+            engines = g_list_append (engines, ibus_keyman_engine_new (keyboard_filename, im.keyboard_language, im.keyboard_name, im.keyboard_author, im.keyboard_icon_filename, im.keyboard_copyright, im.keyboard_description, im.keyboard_layout, im.keyboard_license));
             g_free(p->data);
-            kmfl_free_keyboard_info(&im);
+            keyman_free_keyboard_info(&im);
         }
     }
     return engines;
@@ -313,27 +317,17 @@ ibus_keyman_list_engines (void)
     GList *keyboard_list;
     gchar *local_keyboard_path;
 
-    keyboard_list = kmfl_get_keyboard_list("/usr/share/kmfl"); // not this any more
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
+    keyboard_list = keyman_get_keyboard_list("/usr/share/keyman");
+    engines = ibus_keyman_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
-    keyboard_list = kmfl_get_keyboard_list("/usr/share/keyman");
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
+    keyboard_list = keyman_get_keyboard_list("/usr/local/share/keyman");
+    engines = ibus_keyman_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
-    keyboard_list = kmfl_get_keyboard_list("/usr/local/share/keyman");
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
-    g_list_free(keyboard_list);
-
-    local_keyboard_path= g_strdup_printf("%s/.kmfl", getenv("HOME")); // not this any more
-    keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
-    g_free(local_keyboard_path);
-    g_list_free(keyboard_list);
-
-    local_keyboard_path= g_strdup_printf("%s/.local/share/keyman", getenv("HOME")); // use XDG env var instead
-    keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
+    local_keyboard_path= g_strdup_printf("%s/keyman", getenv("XDG_DATA_HOME"));
+    keyboard_list = keyman_get_keyboard_list(local_keyboard_path);
+    engines = ibus_keyman_add_engines(engines, keyboard_list);
     g_free(local_keyboard_path);
     g_list_free(keyboard_list);
 
@@ -370,13 +364,13 @@ KInputMethod * kinput_open_im(const gchar * keyboard_filename)
     KInputMethod * im = g_new(KInputMethod, 1);
     
     if (im != NULL) {
-        im->keyboard_number = kmfl_load_keyboard(keyboard_filename);
+        im->keyboard_number = keyman_load_keyboard(keyboard_filename);
         if (im->keyboard_number < 0) {
             g_free(im);
             im = NULL;
         } else {
             im->keyboard_filename = g_strdup(keyboard_filename);
-            kmfl_get_keyboard_info(im) ;
+            keyman_get_keyboard_info(im) ;
         }
     }
     return im;
@@ -385,8 +379,8 @@ KInputMethod * kinput_open_im(const gchar * keyboard_filename)
 void kinput_close_im(KInputMethod * im)
 {
     g_assert(im != NULL);
-    kmfl_free_keyboard_info(im);
-    kmfl_unload_keyboard(im->keyboard_number);
+    keyman_free_keyboard_info(im);
+    keyman_unload_keyboard(im->keyboard_number);
     g_free(im);
 }
 
@@ -439,14 +433,14 @@ void output_beep(void *contrack) {
  * Create an input context
  */
 KInputContext *
-kmfl_create_ic(KInputMethod *im)
+keyman_create_ic(KInputMethod *im)
 {
     KInputContext * ic;
-    g_debug("DAR: kmfl_create_ic");
+    g_debug("DAR: keyman_create_ic");
     ic = g_new(KInputContext, 1);
     ic->cmds = NULL;
-    ic->p_kmsi=kmfl_make_keyboard_instance(ic);
-    kmfl_attach_keyboard(ic->p_kmsi, im->keyboard_number);
+    //ic->p_kmsi=kmfl_make_keyboard_instance(ic);
+    //kmfl_attach_keyboard(ic->p_kmsi, im->keyboard_number);
 
     return ic;
 }
@@ -456,12 +450,12 @@ kmfl_create_ic(KInputMethod *im)
  * Destroy an input context
  */
 void
-kmfl_destroy_ic(KInputContext *ic)
+keyman_destroy_ic(KInputContext *ic)
 {
     GList * p;
-    g_debug("DAR: kmfl_destroy_ic");
-    kmfl_detach_keyboard(ic->p_kmsi);
-    kmfl_delete_keyboard_instance(ic->p_kmsi);
+    g_debug("DAR: keyman_destroy_ic");
+    //kmfl_detach_keyboard(ic->p_kmsi);
+    //kmfl_delete_keyboard_instance(ic->p_kmsi);
     
     if (ic->cmds) {
         for (p=ic->cmds; p != NULL; p = p->next) {
@@ -477,6 +471,25 @@ kmfl_destroy_ic(KInputContext *ic)
     }
     
 }
+
+int keyman_load_keyboard(const gchar *keyboard_filename)
+{
+    return 0;
+}
+
+void keyman_unload_keyboard(int keyboard_number)
+{
+    return;
+}
+int keyman_check_keyboard(gchar *absfn)
+{
+    return 0;
+}
+const gchar *keyman_icon_file(int keyboard_number)
+{
+    return NULL;
+}
+
 
 #ifdef DEBUG
 #include <locale.h>
