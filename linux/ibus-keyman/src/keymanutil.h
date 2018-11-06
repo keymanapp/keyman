@@ -53,6 +53,7 @@
 #define __KEYMANUTIL_H__
 
 #include <ibus.h>
+#include <keyman/keyboardprocessor.h>
 //#include <kmfl/kmfl.h>
 //#include <kmfl/libkmfl.h>
 

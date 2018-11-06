@@ -5,6 +5,7 @@ default: # builds only
 
 reconf:
 	./scripts/reconf.sh
+	meson ../common/engine/keyboardprocessor keyboardprocessor
 
 configure:
 	CONFIGUREONLY="yes" ./scripts/build.sh
@@ -45,3 +46,4 @@ releasedeb: reconf origdist cow debnocow # it will prompt for sudo if required f
 
 nightlydist: reconf sources
 	echo "Built nightly source release in dist/"
+

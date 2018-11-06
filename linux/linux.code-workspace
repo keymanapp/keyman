@@ -6,6 +6,9 @@
 		{
 			"path": "../onboard-keyman"
 		},
+		{
+			"path": "/opt/Repos/github-lsdev/keyman/common"
+		}
 	],
 	"settings": {
 		"C_Cpp.default.includePath": "/usr/include/glib-2.0;/usr/include/json-glib-1.0",

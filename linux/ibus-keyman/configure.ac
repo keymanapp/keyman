@@ -53,7 +53,17 @@ PKG_CHECK_MODULES(IBUS, [
     ibus-1.0 >= 1.2.0
 ])
 
-# check kmfl
+# check Json glib
+PKG_CHECK_MODULES(JSON_GLIB, [
+    json-glib-1.0 >= 1.4.0
+])
+
+# check Keyman keyboard processor
+
+PKG_CHECK_MODULES(KEYMAN_PROC, [
+    keyman_kmn_processor >= 0.0.0
+])
+
 
 # check env
 AC_PATH_PROG(ENV, env)

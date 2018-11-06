@@ -27,6 +27,7 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "keymanutil.h"
 #include "keyman-service.h"
@@ -217,7 +218,7 @@ ibus_keyman_engine_constructor (GType                   type,
     }
 
     if (im == NULL) {
-        g_warning ("Can not find kmfl keymap %s", engine_name);
+        g_warning ("Can not find Keyman keymap %s", engine_name);
         g_object_unref (kmfl);
         return NULL;
     }
