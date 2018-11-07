@@ -40,7 +40,9 @@ struct _IBusKeymanEngine {
 	IBusEngine parent;
 
     /* members */
-    //TODO replace KInputContext   *context;
+    km_kbp_keyboard *keyboard;
+    km_kbp_state    *state;
+    km_kbp_option   *options; // array of km_kbp_option
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -178,7 +180,7 @@ ibus_keyman_engine_init (IBusKeymanEngine *kmfl)
 
     kmfl->table = ibus_lookup_table_new (9, 0, TRUE, TRUE);
     g_object_ref_sink(kmfl->table);
-    kmfl->context = NULL;
+//    kmfl->context = NULL;
 }
 
 static GObject*
@@ -186,17 +188,17 @@ ibus_keyman_engine_constructor (GType                   type,
                               guint                   n_construct_params,
                               GObjectConstructParam  *construct_params)
 {
-    IBusKeymanEngine *kmfl;
+    IBusKeymanEngine *keyman;
     KInputMethod *im;
     const gchar *engine_name;
     
     g_debug("DAR: ibus_keyman_engine_constructor");
     
-    kmfl = (IBusKeymanEngine *) G_OBJECT_CLASS (parent_class)->constructor (type,
+    keyman = (IBusKeymanEngine *) G_OBJECT_CLASS (parent_class)->constructor (type,
                                                        n_construct_params,
                                                        construct_params);
 
-    engine_name = ibus_engine_get_name ((IBusEngine *) kmfl);
+    engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
     g_assert (engine_name);
     g_message("DAR: ibus_keyman_engine_constructor %s", engine_name);
 
@@ -219,58 +221,70 @@ ibus_keyman_engine_constructor (GType                   type,
 
     if (im == NULL) {
         g_warning ("Can not find Keyman keymap %s", engine_name);
-        g_object_unref (kmfl);
+        g_object_unref (keyman);
         return NULL;
     }
 
-    kmfl->context = kmfl_create_ic (im);
-    kmfl->display  = XOpenDisplay(NULL);
+    keyman->options = g_new(km_kbp_option, 1); 
+    //keyman->options[0] = KM_KBP_OPTIONS_END; ???
 
-    return (GObject *) kmfl;
+    km_kbp_status status_keyboard = km_kbp_keyboard_load(engine_name, &(keyman->keyboard));
+
+    km_kbp_status status_state = km_kbp_state_create(keyman->keyboard,
+                                  keyman->options,
+                                  &(keyman->state));
+
+    keyman->display  = XOpenDisplay(NULL);
+
+    return (GObject *) keyman;
 }
 
 
 static void
-ibus_keyman_engine_destroy (IBusKeymanEngine *kmfl)
+ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
 {
     const gchar *engine_name;
     
     g_debug("DAR: ibus_keyman_engine_destroy");
-    engine_name = ibus_engine_get_name ((IBusEngine *) kmfl);
+    engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
     g_assert (engine_name);
     g_message("DAR: ibus_keyman_engine_destroy %s", engine_name);
 
-    if (kmfl->prop_list) {
-        g_debug("DAR: unref kmfl->prop_list");
-        g_object_unref (kmfl->prop_list);
-        kmfl->prop_list = NULL;
+    if (keyman->prop_list) {
+        g_debug("DAR: unref keyman->prop_list");
+        g_object_unref (keyman->prop_list);
+        keyman->prop_list = NULL;
     }
 
-    if (kmfl->status_prop) {
-        g_debug("DAR: unref kmfl->status_prop");
-        g_object_unref (kmfl->status_prop);
-        kmfl->status_prop = NULL;
+    if (keyman->status_prop) {
+        g_debug("DAR: unref keyman->status_prop");
+        g_object_unref (keyman->status_prop);
+        keyman->status_prop = NULL;
     }
 
-    if (kmfl->table) {
-        g_debug("DAR: unref kmfl->table");
-        g_object_unref (kmfl->table);
-        kmfl->table = NULL;
+    if (keyman->table) {
+        g_debug("DAR: unref keyman->table");
+        g_object_unref (keyman->table);
+        keyman->table = NULL;
+    }
+    if (keyman->state) {
+        km_kbp_state_dispose(keyman->state);
+        keyman->state = NULL;
     }
 
-    if (kmfl->context) {
-        kmfl_destroy_ic (kmfl->context);
-        kmfl->context = NULL;
+    if (keyman->keyboard) {
+        km_kbp_keyboard_dispose(keyman->keyboard);
+        keyman->keyboard = NULL;
     }
-    
-    if (kmfl->display) {
-        XCloseDisplay(kmfl->display);
-        kmfl->display = NULL;
+
+    if (keyman->display) {
+        XCloseDisplay(keyman->display);
+        keyman->display = NULL;
     }
-    
+
     g_hash_table_remove(im_table, engine_name);
      
-    IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)kmfl);
+    IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
 static void
@@ -307,6 +321,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                                     guint           state)
 {
     IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    #if 0
     
     if (state & IBUS_RELEASE_MASK)
         return FALSE;
@@ -372,6 +387,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         kmfl->context->cmds=NULL;
         return TRUE;
     }
+    #endif
     
     return FALSE;
  }

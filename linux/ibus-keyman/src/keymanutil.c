@@ -59,10 +59,11 @@
 
 #include "keymanutil.h"
 
-// Globally loaded keyboards
+//Globally loaded keyboards
 #define MAX_KEYBOARDS	64		// maximum number of keyboards that can be loaded
 KInputKeyboard *p_installed_kbd[MAX_KEYBOARDS]={NULL};
 unsigned int n_keyboards=0;
+static GHashTable      *im_keyboards = NULL;
 
 
 #define N_(text) text
@@ -195,6 +196,19 @@ void keyman_get_keyboard_info(KInputMethod * im)
 {
 	// either get these from json?
 	// or the keyboardprocessor API from the kmx?
+
+    im->keyboard_name = g_strdup("dummy");
+    im->keyboard_author = g_strdup("Keyman");
+    im->keyboard_copyright = g_strdup("2018 SIL International");
+    im->keyboard_language=g_strdup("en");
+    im->keyboard_description=g_strdup("Dummy keyboard to test API");
+    im->keyboard_license = g_strdup("MIT");
+    im->keyboard_visualkeyboard=g_strdup("");
+    im->keyboard_keyboardversion=g_strdup("1.0");
+    im->keyboard_layout=g_strdup("us");
+    im->keyboard_icon_filename=g_strdup("");
+    im->keyboard_ldmlfile=g_strdup("");
+
     #if 0
     char buf[1024];
     KMSI * p_kmsi;

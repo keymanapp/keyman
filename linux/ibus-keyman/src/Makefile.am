@@ -55,13 +55,14 @@ ibus_engine_keyman_SOURCES = \
 	keymanutil.c \
 	keymanutil.h \
 	kmpdetails.c \
-	kmpdetails.h
+	kmpdetails.h \
 	main.c \
 	engine.c \
 	engine.h \
 	keyman-service.c \
 	keyman-service.h \
 	$(NULL)
+
 ibus_engine_keyman_CFLAGS = \
 	@IBUS_CFLAGS@ \
 	@JSON_GLIB_CFLAGS@ \

@@ -122,6 +122,7 @@ void kmp_keyboards_foreach (JsonArray *array,
     g_free(name);
 }
 
+#if DEBUG
 
 int
 main (gint argc, gchar **argv)
@@ -219,3 +220,5 @@ main (gint argc, gchar **argv)
 
     return EXIT_SUCCESS;
 }
+
+#endif
