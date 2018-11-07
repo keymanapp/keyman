@@ -42,7 +42,6 @@ struct _IBusKeymanEngine {
     /* members */
     km_kbp_keyboard *keyboard;
     km_kbp_state    *state;
-    km_kbp_option   *options; // array of km_kbp_option
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -225,13 +224,12 @@ ibus_keyman_engine_constructor (GType                   type,
         return NULL;
     }
 
-    keyman->options = g_new(km_kbp_option, 1); 
-    //keyman->options[0] = KM_KBP_OPTIONS_END; ???
+    km_kbp_option_item options[1] = {KM_KBP_OPTIONS_END};
 
     km_kbp_status status_keyboard = km_kbp_keyboard_load(engine_name, &(keyman->keyboard));
 
     km_kbp_status status_state = km_kbp_state_create(keyman->keyboard,
-                                  keyman->options,
+                                  options,
                                   &(keyman->state));
 
     keyman->display  = XOpenDisplay(NULL);
