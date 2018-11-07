@@ -63,8 +63,6 @@
 #define MAX_KEYBOARDS	64		// maximum number of keyboards that can be loaded
 KInputKeyboard *p_installed_kbd[MAX_KEYBOARDS]={NULL};
 unsigned int n_keyboards=0;
-static GHashTable      *im_keyboards = NULL;
-
 
 #define N_(text) text
 static gchar * get_dirname(const gchar * path)
@@ -155,10 +153,50 @@ gchar * keyman_get_icon_file(KInputMethod * im)
     return NULL;
 }
 
+gchar * keyman_get_kvk_file(KInputMethod * im)
+{
+    gchar *p, *filename, *full_path_to_kvk_file;
+    gchar *kmx_file, *kvk_file;
+    struct stat filestat;
+
+    kmx_file  = g_path_get_basename(im->keyboard_filename);
+    p=rindex(kmx_file,'.');
+    if (p==NULL)
+    {
+        g_debug("WDG: couldn't find . in kmx filename %s", kmx_file);
+        g_free(kmx_file);
+        return g_strdup("");
+    }
+    if (strncmp(p, ".kmx", 4) != 0)
+    {
+        g_debug("WDG: keyboard is not a kmx. Filename: %s", kmx_file);
+        g_free(kmx_file);
+        return g_strdup("");
+    }
+    filename = g_strndup(kmx_file, p-kmx_file);
+    full_path_to_kvk_file=g_strdup_printf("%s/%s.kvk", get_dirname(im->keyboard_filename), filename);
+    // don't forget to stat for the file before returning
+    stat(full_path_to_kvk_file, &filestat);
+
+    if (!S_ISREG(filestat.st_mode)) {
+        g_debug("WDG: couldn't find kvk file %s", full_path_to_kvk_file);
+        kvk_file=g_strdup("");
+    }
+    else
+    {
+        kvk_file=g_strdup_printf("%s.kvk", filename);
+    }
+    g_free(full_path_to_kvk_file);
+    g_free(filename);
+    return kvk_file;
+}
+
+
 gchar * keyman_get_ldml_file(KInputMethod * im)
 {
 	// kvk details from the json?
 	// or will it be available in the keyboardprocessor API?
+    // just use same name as kmx different extension for now
     gchar * full_path_to_ldml_file=NULL, *p, *filename;
     struct stat filestat;
 
@@ -196,18 +234,17 @@ void keyman_get_keyboard_info(KInputMethod * im)
 {
 	// either get these from json?
 	// or the keyboardprocessor API from the kmx?
-
     im->keyboard_name = g_strdup("dummy");
     im->keyboard_author = g_strdup("Keyman");
     im->keyboard_copyright = g_strdup("2018 SIL International");
     im->keyboard_language=g_strdup("en");
     im->keyboard_description=g_strdup("Dummy keyboard to test API");
     im->keyboard_license = g_strdup("MIT");
-    im->keyboard_visualkeyboard=g_strdup("");
+    im->keyboard_visualkeyboard=keyman_get_kvk_file(im);
     im->keyboard_keyboardversion=g_strdup("1.0");
     im->keyboard_layout=g_strdup("us");
     im->keyboard_icon_filename=g_strdup("");
-    im->keyboard_ldmlfile=g_strdup("");
+    im->keyboard_ldmlfile=keyman_get_ldml_file(im);
 
     #if 0
     char buf[1024];
