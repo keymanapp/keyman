@@ -1,5 +1,5 @@
 <?xml version=\"1.0\" encoding=\"utf-8\"?>
-<!-- filename: kmfl.xml -->
+<!-- filename: keyman.xml -->
 <component>
 	<name>org.freedesktop.IBus.Keyman</name>
 	<description>Keyman Component</description>

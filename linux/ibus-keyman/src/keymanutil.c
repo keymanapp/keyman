@@ -150,7 +150,7 @@ gchar * keyman_get_icon_file(KInputMethod * im)
 
     return full_path_to_icon_file;
 #endif
-    return NULL;
+    return keyman_icon_file(im->keyboard_number);
 }
 
 gchar * keyman_get_kvk_file(KInputMethod * im)
@@ -190,6 +190,19 @@ gchar * keyman_get_kvk_file(KInputMethod * im)
     g_free(filename);
     return kvk_file;
 }
+
+gchar *keyman_icon_file(int keyboard_number)
+{
+    gchar *kmx_file, *filename, *icon_file, *p;
+    kmx_file  = g_path_get_basename(p_installed_kbd[keyboard_number]->keyboard_filename);
+    p=rindex(kmx_file,'.');
+    filename = g_strndup(kmx_file, p-kmx_file);
+    icon_file=g_strdup_printf("%s.ico.png", filename);
+    g_free(filename);
+    g_free(kmx_file);
+    return icon_file;
+}
+
 
 
 gchar * keyman_get_ldml_file(KInputMethod * im)
@@ -234,7 +247,7 @@ void keyman_get_keyboard_info(KInputMethod * im)
 {
 	// either get these from json?
 	// or the keyboardprocessor API from the kmx?
-    im->keyboard_name = g_strdup("dummy");
+    im->keyboard_name = g_strdup_printf("dummy%d", im->keyboard_number);
     im->keyboard_author = g_strdup("Keyman");
     im->keyboard_copyright = g_strdup("2018 SIL International");
     im->keyboard_language=g_strdup("en");
@@ -533,7 +546,7 @@ keyman_destroy_ic(KInputContext *ic)
 
 KInputKeyboard * keyman_load_keyboard_from_file(const gchar *filename)
 {
-	KInputKeyboard *p_kbd = NULL;
+	KInputKeyboard *p_kbd = g_new(KInputKeyboard, 1);
 	g_message("DAR: kmfl_load_keyboard_from_file %s\n",filename);
 #if 0
 	FILE *fp;
@@ -617,6 +630,7 @@ int keyman_load_keyboard(const gchar *keyboard_filename)
 	
 	// Copy pointer and increment number of installed keyboards
     p_kbd->keyboard_filename = g_strdup(keyboard_filename);
+    p_kbd->name = g_strdup_printf("dummy%d", keyboard_number);
 	p_installed_kbd[keyboard_number] = p_kbd;
 	
 	n_keyboards++;
@@ -656,10 +670,6 @@ int keyman_unload_keyboard(int keyboard_number)
 int keyman_check_keyboard(gchar *absfn)
 {
     return 0;
-}
-const gchar *keyman_icon_file(int keyboard_number)
-{
-    return NULL;
 }
 
 
