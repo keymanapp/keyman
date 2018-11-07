@@ -24,19 +24,24 @@ version
 echo "version: ${newvers}"
 
 BASEDIR=`pwd`
-autotool_projects="kmflcomp libkmfl ibus-kmfl"
-extra_project="keyman-config"
+#autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
+autotool_projects=""
+extra_projects="keyboardprocessor keyman-config"
 
 if [ "$1" != "" ]; then
-    if [ ! -d "$1" ]; then
+    if [ "$1" == "keyboardprocessor" ]; then
+        extra_projects="keyboardprocessor"
+        autotool_projects=""
+    elif [ ! -d "$1" ]; then
         echo "project $1 does not exist"
         exit 1
     fi
     if [ "$1" == "keyman-config" ]; then
+        extra_projects="keyman-config"
         autotool_projects=""
     else
         autotool_projects="$1"
-        extra_project=""
+        extra_projects=""
     fi
 fi
 
@@ -52,11 +57,17 @@ for proj in ${autotool_projects}; do
     fi
 done
 
-if [ "${extra_project}" == "keyman-config" ]; then
-    cd keyman-config/keyman_config
-    sed "s/_VERSION_/${newvers}/g" version.py.in > version.py
-fi
-cd $BASEDIR
+for proj in ${extra_projects}; do
+    if [ "${proj}" == "keyboardprocessor" ]; then
+        rm -rf keyboardprocessor
+        meson ../common/engine/keyboardprocessor keyboardprocessor
+    fi
+    if [ "${proj}" == "keyman-config" ]; then
+        cd keyman-config/keyman_config
+        sed "s/_VERSION_/${newvers}/g" version.py.in > version.py
+    fi
+    cd $BASEDIR
+done
 
 # reset VERSION file
 echo "${oldvers}" > VERSION

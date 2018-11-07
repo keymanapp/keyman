@@ -5,7 +5,6 @@ default: # builds only
 
 reconf:
 	./scripts/reconf.sh
-	meson ../common/engine/keyboardprocessor keyboardprocessor
 
 configure:
 	CONFIGUREONLY="yes" ./scripts/build.sh

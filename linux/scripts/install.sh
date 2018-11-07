@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install kmflcomp, libkmfl, ibus-kmfl and keyman-config
+# Install keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl, ibus-keyman and keyman-config
 
 # It must be run from the keyman/linux directory
 
@@ -35,7 +35,11 @@ if [ -f "/usr/share/ibus/component/kmfl.xml" ] && [ "${SUDOINSTALL}" == "yes" ];
 	fi
 fi
 
-for proj in kmflcomp libkmfl ibus-kmfl; do
+cd keyboardprocessor
+ninja install
+cd $BASEDIR
+
+for proj in kmflcomp libkmfl ibus-kmfl ibus-keyman; do
 	cd build-$proj
 	if [[ "${SUDOINSTALL}" == "uninstall" ]]; then
 		if [ ! -f Makefile ]; then

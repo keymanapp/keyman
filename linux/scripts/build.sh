@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Build KMFL in the required order: kmflcomp libkmfl ibus-kmfl
+# Build KMFL in the required order: keyboardprocessor kmflcomp libkmfl ibus-kmfl ibus-keyman
 
 # It must be run from the keyman/linux directory
 
@@ -18,7 +18,28 @@ if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
 	exit 1
 fi
 
-for proj in kmflcomp libkmfl ibus-kmfl; do
+if [[ "${BUILDONLY}" == "no" ]]; then
+	if [[ "${INSTALLDIR}" != "/usr/local" ]]; then
+		if [ ! -d keyboardprocessor ]; then
+			meson ../common/engine/keyboardprocessor keyboardprocessor
+		fi
+		cd keyboardprocessor
+		echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
+		meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
+		cd $BASEDIR
+	else
+		echo "INSTALLDIR is ${INSTALLDIR} and not reconfiguring keyboardprocessor"
+	fi
+fi
+
+if [[ "${CONFIGUREONLY}" == "no" ]]; then
+	echo "building keyboardprocessor"
+	cd keyboardprocessor
+	ninja
+	cd $BASEDIR
+fi
+
+for proj in kmflcomp libkmfl ibus-kmfl ibus-keyman; do
 	if [ ! -f $proj/configure ]; then
 		echo "$proj is not set up with autoreconf. First run 'make reconf' or 'make devreconf'"
 		exit 1
@@ -30,10 +51,17 @@ for proj in kmflcomp libkmfl ibus-kmfl; do
 	cd build-$proj
 	if [[ "${BUILDONLY}" == "no" ]]; then
 		echo "Configuring $proj"
-		if [[ "${INSTALLDIR}" == "/tmp/kmfl" ]]; then # don't install ibus-kmfl into ibus
-			../$proj/configure CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
-		else	# install ibus-kmfl into ibus
-			../$proj/configure CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
+		if [[ "${INSTALLDIR}" == "/tmp/kmfl" ]]; then # don't install ibus-kmfl or ibus-keyman into ibus
+			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/include -I\$(top_builddir)/../../common/engine/keyboardprocessor/include" \
+				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
+				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/src -lkmnkbp0" \
+				LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" --prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus
+		else	# install ibus-kmfl and ibus-keyman into ibus
+			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/include -I\$(top_builddir)/../../common/engine/keyboardprocessor/include" \
+				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
+				LDFLAGS="-L`pwd`/../build-kmflcomp/src" \
+				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/src -lkmnkbp0" \
+				--prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
 		fi
 		if [ -d ../$proj/include ]; then
 			echo "copying $proj include files to kmfl dir"
