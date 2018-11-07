@@ -54,6 +54,8 @@ pkg.generate(
     description: 'Keyman processor for KMN keyboards.')
 
 lib = library('kmnkbp0',
+    'option.cpp',
+    'keyboard.cpp',
     'keyboardprocessor.cpp',
     'km_kbp_context_api.cpp',
     'km_kbp_keyboard_api.cpp',

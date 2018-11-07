@@ -8,7 +8,7 @@
 #include <cstring>
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 #include "state.hpp"
 
@@ -27,37 +27,29 @@ namespace
     return buf;
   }
 
-  km_kbp_option test_env_opts[] =
+  km_kbp_option_item test_env_opts[] =
   {
-    {"hello",     "world", 0},
+    {u"hello",     u"world", 0},
     KM_KBP_OPTIONS_END
   };
 
-constexpr char const *doc1_expected ="\
+constexpr char const *doc1_expected = u8"\
 {\n\
     \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
         \"folder\" : \"\",\n\
         \"version\" : \"3.145\",\n\
-        \"options\" : {\n\
-            \"scope\" : \"keyboard\",\n\
-            \"options\" : {}\n\
-        },\n\
         \"rules\" : []\n\
     },\n\
     \"options\" : {\n\
+        \"keyboard\" : {},\n\
         \"environment\" : {\n\
-            \"scope\" : \"enviroment\",\n\
-            \"options\" : {\n\
-                \"hello\" : \"world\"\n\
-            }\n\
+            \"hello\" : \"world\"\n\
         },\n\
-        \"dynamic\" : {\n\
-            \"scope\" : \"unknown\",\n\
-            \"options\" : {\n\
-                \"hello\" : \"globe\"\n\
-            }\n\
+        \"saved\" : {\n\
+            \"keyboard\" : {},\n\
+            \"environment\" : {}\n\
         }\n\
     },\n\
     \"context\" : [\n\
@@ -71,35 +63,35 @@ constexpr char const *doc1_expected ="\
         \"S\",\n\
         \"I\",\n\
         \"L\"\n\
+    ],\n\
+    \"actions\" : [\n\
+        { \"character\" : \"L\" }\n\
     ]\n\
 }\n";
 
-constexpr char const *doc2_expected = "\
+constexpr char const *doc2_expected = u8"\
 {\n\
     \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
         \"folder\" : \"\",\n\
         \"version\" : \"3.145\",\n\
-        \"options\" : {\n\
-            \"scope\" : \"keyboard\",\n\
-            \"options\" : {}\n\
-        },\n\
         \"rules\" : []\n\
     },\n\
     \"options\" : {\n\
+        \"keyboard\" : {},\n\
         \"environment\" : {\n\
-            \"scope\" : \"enviroment\",\n\
-            \"options\" : {\n\
-                \"hello\" : \"world\"\n\
-            }\n\
+            \"hello\" : \"world\"\n\
         },\n\
-        \"dynamic\" : {\n\
-            \"scope\" : \"unknown\",\n\
-            \"options\" : {}\n\
+        \"saved\" : {\n\
+            \"keyboard\" : {},\n\
+            \"environment\" : {\n\
+                \"hello\" : \"globe\"\n\
+            }\n\
         }\n\
     },\n\
-    \"context\" : []\n\
+    \"context\" : [],\n\
+    \"actions\" : []\n\
 }\n";
 
 #define assert(expr) {if (!(expr)) return __LINE__; }
@@ -115,14 +107,14 @@ bool action_items(km_kbp_state const * state,
   return true;
 }
 
-}
+} // namespace
 
 int main(int, char * [])
 {
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr,
                * test_clone = nullptr;
-  try_status(km_kbp_keyboard_load("dummy.mock", &test_kb));
+  try_status(km_kbp_keyboard_load(std::filesystem::path("dummy.mock").c_str(), &test_kb));
 
   // Simple sanity tests.
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
@@ -147,9 +139,11 @@ int main(int, char * [])
     return __LINE__;
 
   // Overwrite some data.
-  km_kbp_option new_opt[] = {{"hello", "globe", 0}, KM_KBP_OPTIONS_END};
+  km_kbp_option_item new_opt[] = {
+    {u"hello", u"globe", KM_KBP_OPT_ENVIRONMENT},
+    KM_KBP_OPTIONS_END};
   try_status(
-    km_kbp_options_set_update(km_kbp_state_options(test_clone), new_opt));
+    km_kbp_options_update(km_kbp_state_options(test_clone), new_opt));
 
   // Test the engine
   auto attrs = km_kbp_get_engine_attrs();
@@ -168,7 +162,7 @@ int main(int, char * [])
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('l')}}}));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0));
-  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}}));
+  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {1}}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
                                   KM_KBP_MODIFIER_SHIFT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}}));
@@ -183,7 +177,7 @@ int main(int, char * [])
   if (doc1 != doc1_expected)  return __LINE__;
   if (doc2 != doc2_expected)  return __LINE__;
 
-  // Destory them
+  // Destroy them
   km_kbp_state_dispose(test_state);
   km_kbp_state_dispose(test_clone);
 

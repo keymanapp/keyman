@@ -5,6 +5,8 @@
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
   History:      18 Oct 2018 - TSE - Finialised verion of API.
+                 6 Oct 2018 - TSE - Move into keyman folder.
+
 */
 #pragma once
 /*
@@ -118,11 +120,11 @@ typedef uint32_t    km_kbp_status;      // Status return code.
 typedef struct km_kbp_context     km_kbp_context;
 typedef struct km_kbp_keyboard    km_kbp_keyboard;
 typedef struct km_kbp_state       km_kbp_state;
-typedef struct km_kbp_options_set km_kbp_options_set;
+typedef struct km_kbp_options km_kbp_options;
 
 // Forward declarations
 //
-typedef struct km_kbp_option  km_kbp_option;
+typedef struct km_kbp_option_item  km_kbp_option_item;
 
 /*```
 ### Error Handling
@@ -388,9 +390,10 @@ typedef struct {
   uint8_t   _reserved[3];
   union {
     uintptr_t           marker;     // MARKER type
-    km_kbp_option const * option;    // OPT types
+    km_kbp_option_item const * option;   // OPT types
     km_kbp_usv          character;  // CHAR type
     km_kbp_virtual_key  vkey;       // VKEY types
+    size_t              erased;     // BACK type
   };
 } km_kbp_action_item;
 
@@ -420,9 +423,9 @@ enum km_kbp_action_type {
 A state’s default options are set from the keyboard at creation time and the
 environment. The Platform layer is then is expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
-simple C arrays of `km_kbp_option` terminated with a `KM_KBP_OPTIONS_END`
+simple C arrays of `km_kbp_option_item` terminated with a `KM_KBP_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
-`km_kbp_options_set` API. All option values are of type C string.
+`km_kbp_options` API. All option values are of type C string.
 
 During processing when the glue code finds a PERSIST action type it should
 store the updated option in the appropriate place, based on it's scope.
@@ -433,14 +436,15 @@ value.
 */
 
 enum km_kbp_option_scope {
-  KM_KBP_OPT_UNKNOWN,
-  KM_KBP_OPT_KEYBOARD,
-  KM_KBP_OPT_ENVIRONMENT
+  KM_KBP_OPT_UNKNOWN      = 0,
+  KM_KBP_OPT_KEYBOARD     = 1,
+  KM_KBP_OPT_ENVIRONMENT  = 2,
+  KM_KBP_OPT_MAX_SCOPES
 };
 
-struct km_kbp_option {
-  char const *  key;
-  char const *  value;
+struct km_kbp_option_item {
+  km_kbp_cp const *  key;
+  km_kbp_cp const *  value;
   uint8_t       scope;  // Scope which an option belongs to.
 };
 
@@ -449,66 +453,75 @@ struct km_kbp_option {
 
 /*
 ```
-### `km_kbp_options_set_size`
+### `km_kbp_options_list_size`
 ##### Description:
-Return the cardinality of a `km_kbp_options_set`.
+Return the length of a terminated `km_kbp_option_item`.
 ##### Return:
-The number of items in the supplied `km_kbp_options_set`
+The number of items in the supplied `km_kbp_options` or 0 is `opts` is null.
 ##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options_set`.
+- __opts__: A pointer to a `KM_KBP_OPTIONS_END` terminated array of
+    `km_kbp_option_item` values.
 
 ```c
 */
 KMN_API
-size_t km_kbp_options_set_size(km_kbp_options_set const *opts);
+size_t km_kbp_options_list_size(km_kbp_option_item const *opts);
 
 /*
 ```
-### `km_kbp_options_set_lookup`
+### `km_kbp_options_lookup`
 ##### Description:
 Lookup an option based on it's key, in an option set.
-##### Return:
-A pointer the `km_kbp_option` or `0` if not present.
-##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options_set`.
-- __key__: A C string that matches the key in the target `km_kbp_option`.
-
-```c
-*/
-KMN_API
-km_kbp_option const *km_kbp_options_set_lookup(km_kbp_options_set const *opts,
-                                               const char *key);
-
-/*
-```
-### `km_kbp_options_set_update`
-##### Description:
-Add or overwrite one or more options from a list of `km_kbp_option`s.
 ##### Status:
-__KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options_set`.
-- __new_opts__: A C array of `km_kbp_option` objects to update or add. Must be
-terminated with `KM_KBP_OPTIONS_END`.
+- __opts__: An opaque pointer to an `km_kbp_options`.
+- __scope__: Which key-value store to interrogate.
+- __key__: A C string that matches the key in the target `km_kbp_option_item`.
+- __value__: A pointer to the result variable:
+  A pointer to the UTF-16 string value or null if the key doesn't exist.
 
 ```c
 */
 KMN_API
-km_kbp_status km_kbp_options_set_update(km_kbp_options_set * opts,
-                                        km_kbp_option const *new_opts);
+km_kbp_status km_kbp_options_lookup(km_kbp_options const *opts,
+                                        uint8_t scope, km_kbp_cp const *key,
+                                        km_kbp_cp const **value);
 
 /*
 ```
-### `km_kbp_options_set_to_json`
+### `km_kbp_options_update`
 ##### Description:
-Export the contents of a `km_kbp_options_set` to a JSON formated document and
+Overwrite one or more options from a list of `km_kbp_option_item`s.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
+- `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
+##### Parameters:
+- __opts__: An opaque pointer to an `km_kbp_options`.
+- __new_opts__: A C array of `km_kbp_option_item` objects to update or add. Must be
+    terminated with `KM_KBP_OPTIONS_END`.
+
+```c
+*/
+KMN_API
+km_kbp_status km_kbp_options_update(km_kbp_options * opts,
+                                        km_kbp_option_item const *new_opts);
+
+/*
+```
+### `km_kbp_options_to_json`
+##### Description:
+Export the contents of a `km_kbp_options` to a JSON formated document and
 place it in the supplied buffer, reporting how much space was used. If null is
 passed as the buffer the number of bytes required is returned. If there is
 insufficent space to hold the document the contents of the buffer is undefined.
 ##### Status:
-__KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options_set`.
+- __opts__: An opaque pointer to an `km_kbp_options`.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
 document into, can be null.
 - __space__: A pointer to a size_t variable. This variable must contain the
@@ -518,7 +531,7 @@ null. On return it will hold how many bytes were used.
 ```c
 */
 KMN_API
-km_kbp_status km_kbp_options_set_to_json(km_kbp_options_set const * opts,
+km_kbp_status km_kbp_options_to_json(km_kbp_options const * opts,
                                          char *buf,
                                          size_t *space);
 
@@ -533,11 +546,11 @@ of state objects.
 ```c
 */
 typedef struct {
-  char const *    version_string;   // Processor specific version string.
-  char const *    id;               // Keyman keyboard ID string.
-  char const *    folder_path;      // Path to the unpacked folder containing
+  char const *      version_string;   // Processor specific version string.
+  char const *      id;               // Keyman keyboard ID string.
+  km_kbp_path_name  folder_path;      // Path to the unpacked folder containing
                                     // the keyboard and associated resources.
-  km_kbp_options_set const * default_options;
+  km_kbp_option_item const * default_options;
 } km_kbp_keyboard_attrs;
 
 /*
@@ -549,19 +562,19 @@ into the out paramter.
 ##### Status:
 - __KM_KBP_STATUS_NO_MEM__: In the event an internal memory allocation fails.
 - __KM_KBP_STATUS_IO_ERROR__:
-In the event the keyboard file is unparseable for any reason
+    In the event the keyboard file is unparseable for any reason
 - __KM_KBP_STATUS_INVALID_ARGUMENT__:
-In the event the file doesn't exist or is inaccesible.
+    In the event the file doesn't exist or is inaccesible or `keyboard` is null.
 - __KM_KBP_STATUS_OS_ERROR__: An unkown OS error condition occured during load.
 ##### Parameters:
 - __kb_path__: C string containing a valid path to the keyboard file.
-- __keyboard__: A pointer to result variable: A pointer to the opaque
-`km_kbp_keyboard` object returned by the Processor.
+- __keyboard__: A pointer to result variable:
+    A pointer to the opaque km_kbp_keyboard` object returned by the Processor.
 
 ```c
 */
 KMN_API
-km_kbp_status km_kbp_keyboard_load(char const *kb_path,
+km_kbp_status km_kbp_keyboard_load(km_kbp_path_name kb_path,
                                    km_kbp_keyboard **keyboard);
 
 /*
@@ -572,7 +585,7 @@ Free the allocated memory belonging to a `km_kbp_keyboard` object previously
 returned by `km_kbp_keyboard_load`.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque `km_kbp_keyboard` object to be
-disposed of.
+    disposed of.
 
 ```c
 */
@@ -584,16 +597,19 @@ void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard);
 ### `km_kbp_keyboard_get_attrs`
 ##### Description:
 Get access to the keyboard's attributes.
-##### Return:
-A pointer to a `km_kbp_keyboard_attrs` structure.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 ##### Parameters:
 - __keyboard__: A pointer to the opaque `km_kbp_keyboard` object to be queried.
+- __out__: A pointer to the result:
+    A pointer to a `km_kbp_keyboard_attrs` structure.
 
 ```c
 */
 KMN_API
-km_kbp_keyboard_attrs const *
-km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard);
+km_kbp_status
+km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
+                          km_kbp_keyboard_attrs const **out);
 
 
 /*
@@ -612,17 +628,16 @@ Option stores.
 Create a keyboard processor state object, maintaining state for the keyboard in
 the environment passed.
 ##### Status:
-- __KM_KBP_STATUS_NO_MEM__:
-In the event memory is unavailable to allocate a state  object.
-- __KM_KBP_STATUS_INVALID_ARGUMENT__:
-In the event the `keyboard` or `out` pointer  are null.
-
+- `KM_KBP_STATUS_NO_MEM`:
+  In the event memory is unavailable to allocate a state  object.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`:
+  In the event the `keyboard` or `out` pointer  are null.
 ##### Parameters:
 - __keyboard__:
 A pointer to the opaque `km_kbp_keyboard` object this object  will hold state
 for.
 - __env__:
-The array KM_KBP_OPTIONS_END terminated of `km_kbp_option` key/value pairs used
+The array KM_KBP_OPTIONS_END terminated of `km_kbp_option_item` key/value pairs used
 to initialise the environment.
 - __out__:
 A pointer to result variable: A pointer to the opaque `km_kbp_state` object
@@ -632,7 +647,7 @@ returned by the Processor, initalised to maintain state for `keyboard`.
 */
 KMN_API
 km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
-                                  km_kbp_option const *env,
+                                  km_kbp_option_item const *env,
                                   km_kbp_state ** out);
 
 /*
@@ -645,7 +660,6 @@ Clone an existing `km_kbp_state` object.
 In the event memory is unavailable to allocate a state  object.
 - __KM_KBP_STATUS_INVALID_ARGUMENT__:
 In the event the `state` or `out` pointer  are null.
-
 ##### Parameters:
 - __state__:
 A pointer to the opaque `km_kbp_state` object to be cloned.
@@ -693,16 +707,16 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *state);
 ```
 ### `km_kpb_state_options`
 ##### Description:
-Get access to the state object's `km_kbp_options_set`.
+Get access to the state object's `km_kbp_options`.
 ##### Return:
-A pointer to a `km_kbp_options_set` object.
+A pointer to a `km_kbp_options` object.
 ##### Parameters:
 - __state__: A pointer to the opaque `km_kbp_state` object to be queried.
 
 ```c
 */
 KMN_API
-km_kbp_options_set *km_kbp_state_options(km_kbp_state *state);
+km_kbp_options *km_kbp_state_options(km_kbp_state *state);
 
 /*
 ```
@@ -773,7 +787,7 @@ typedef struct {
 enum km_kbp_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
   KM_KBP_TECH_KMN         = 1 << 0,
-  KM_KBP_TECH_LDML        = 1 << 2
+  KM_KBP_TECH_LDML        = 1 << 1
 };
 
 
@@ -812,8 +826,7 @@ The combinations of modifier keys set at the time key `vk` was pressed.
 */
 KMN_API
 km_kbp_status km_kbp_process_event(km_kbp_state *state,
-                          km_kbp_virtual_key vk, uint16_t modifier_state);
-
+                                   km_kbp_virtual_key vk, uint16_t modifier_state);
 
 #if defined(__cplusplus)
 } // extern "C"
