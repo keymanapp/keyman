@@ -27,13 +27,25 @@ fi
 if [ -f "/usr/share/ibus/component/kmfl.xml" ] && [ "${SUDOINSTALL}" == "yes" ]; then
 	if grep -Fq "/usr/lib/ibus" /usr/share/ibus/component/kmfl.xml
 	then
-		echo "component file is ibus-kmfl package version so move it"
+		echo "component file is in ibus-kmfl package version so move it"
 		echo "run 'sudo make uninstall' to put it back"
 		mv /usr/share/ibus/component/kmfl.xml /usr/share/doc/ibus-kmfl/
 	else
 		echo "component file is local one so overwrite it"
 	fi
 fi
+
+if [ -f "/usr/share/ibus/component/keyman.xml" ] && [ "${SUDOINSTALL}" == "yes" ]; then
+	if grep -Fq "/usr/lib/ibus" /usr/share/ibus/component/keyman.xml
+	then
+		echo "component file is in ibus-keyman package version so move it"
+		echo "run 'sudo make uninstall' to put it back"
+		mv /usr/share/ibus/component/keyman.xml /usr/share/doc/ibus-keyman/
+	else
+		echo "component file is local one so overwrite it"
+	fi
+fi
+
 
 cd keyboardprocessor
 ninja install
@@ -82,3 +94,7 @@ if [ -f "/usr/share/doc/ibus-kmfl/kmfl.xml" ] && [ "${SUDOINSTALL}" == "uninstal
 	mv /usr/share/doc/ibus-kmfl/kmfl.xml /usr/share/ibus/component/
 fi
 
+if [ -f "/usr/share/doc/ibus-keyman/keyman.xml" ] && [ "${SUDOINSTALL}" == "uninstall" ]; then
+	echo "putting ibus-keyman package component file back"
+	mv /usr/share/doc/ibus-keyman/keyman.xml /usr/share/ibus/component/
+fi
