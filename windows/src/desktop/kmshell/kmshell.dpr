@@ -58,7 +58,6 @@ uses
   WelcomeXMLRenderer in 'render\WelcomeXMLRenderer.pas',
   ValidateKeymanInstalledSystemKeyboards in 'main\ValidateKeymanInstalledSystemKeyboards.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  keymanerrorcodes in '..\..\engine\kmcomapi\util\keymanerrorcodes.pas',
   uninstall in 'install\uninstall.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
@@ -156,7 +155,8 @@ uses
   Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
   Keyman.System.Standards.LibPalasoAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas';
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

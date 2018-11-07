@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2018-11-02 10.0.1205 stable
+* Mitigation for issue with Windows 10 1803, 1809 where keyboards installed with Amharic, Tigrinya and Sinhala languages do not work
+
 ## 2018-10-29 10.0.1204 stable
 * Include Kannada user interface translation (#1287)
 
