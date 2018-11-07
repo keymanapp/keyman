@@ -80,7 +80,7 @@ BOOL ProcessGroup(LPGROUP gp)
 
 	if(++_td->state.LoopTimes > 50)
 	{
-		SendDebugMessage(0, sdmKeyboard, 0, "Aborting output: state.LoopTimes exceeded.");
+    DebugLog("Aborting output: state.LoopTimes exceeded.");
 		_td->state.StopOutput = TRUE;
 		return FALSE;
 	}
@@ -100,9 +100,7 @@ BOOL ProcessGroup(LPGROUP gp)
 	 with standard searching techniques - the ContextMatch may be difficult.
 	*/
 
-  if(ShouldDebug(sdmKeyboard))
-	  SendDebugMessageFormat(0, sdmKeyboard, 0, "state.vkey: %s shiftFlags: %x; charCode: %X", 
-      Debug_VirtualKey(_td->state.vkey), g_shiftState, _td->state.charCode);   // I4582
+  DebugLog("state.vkey: %s shiftFlags: %x; charCode: %X", Debug_VirtualKey(_td->state.vkey), g_shiftState, _td->state.charCode);   // I4582
 
 	if(gp)
 	{
@@ -141,8 +139,7 @@ BOOL ProcessGroup(LPGROUP gp)
 		 Context is not kept for virtual keys being output.
 		*/
 
-		if(ShouldDebug(sdmKeyboard)) SendDebugMessageFormat(0, sdmKeyboard, 0, 
-			"No match was found in group %d of %d", sdmfI, g_keyboard.Keyboard->cxGroupArray);
+    DebugLog("No match was found in group %d of %d", sdmfI, g_keyboard.Keyboard->cxGroupArray);
 
 		if(!gp || (_td->state.charCode == 0 && gp->fUsingKeys))   // I4585
         // 7.0.241.0: I1133 - Fix mismatched parentheses on state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
@@ -159,7 +156,7 @@ BOOL ProcessGroup(LPGROUP gp)
         }
 				app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
       } else if(!fIsBackspace) {   // I4024   // I4128   // I4287   // I4290
-        SendDebugMessageFormat(0, sdmKeyboard, 0, " ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
+        DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         fOutputKeystroke = TRUE;
         return FALSE;
       }
@@ -212,7 +209,7 @@ BOOL ProcessGroup(LPGROUP gp)
 		return TRUE;
 	}
 
-	SendDebugMessageFormat(0, sdmKeyboard, 0, "match found in rule %d", i);
+  DebugLog("match found in rule %d", i);
 
 	_td->state.NoMatches = FALSE;
 
@@ -359,7 +356,7 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr)
 
 			case CODE_CALL:
 				p++;
-        SendDebugMessageFormat(0, sdmKeyboard, 0, "CallDLL not supported [store=%d].\n", *p-1);
+        DebugLog("CallDLL not supported [store=%d].\n", *p-1);
 				FoundUse = TRUE;
 				break; 
 			case CODE_USE:					// use another group

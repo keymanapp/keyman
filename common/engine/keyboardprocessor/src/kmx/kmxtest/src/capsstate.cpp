@@ -28,18 +28,18 @@
 
 void ResetCapsLock(void)
 {
-	SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: enter");
+	DebugLog("ResetCapsLock: enter");
 
 	if(g_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF) 
 	{
-		SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: caps lock should be always off");
+		DebugLog("ResetCapsLock: caps lock should be always off");
 		if(GetKeyState(VK_CAPITAL) & 1)
 		{
-			SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: caps lock is on, switching off caps lock");
+			DebugLog("ResetCapsLock: caps lock is on, switching off caps lock");
       GetApp()->QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
-	SendDebugMessageFormat(0, sdmGlobal, 0, "ResetCapsLock: exit");
+	DebugLog("ResetCapsLock: exit");
 }
 
 

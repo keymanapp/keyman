@@ -36,9 +36,6 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\versioninfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\appint\aiWin2000Unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

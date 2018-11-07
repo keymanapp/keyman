@@ -43,26 +43,20 @@ void AppContext::Add(WCHAR ch)
 {
 	if(pos == MAXCONTEXT - 1)
 	{
-//    SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: MAXCONTEXT[%d]: %ws", pos, CurContext);
 		memmove(CurContext, &CurContext[1], MAXCONTEXT*2 - 2); pos--;
 	}
 
 	CurContext[pos++] = ch;
 	CurContext[pos] = 0;
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
+  DebugLog("AppContext: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
 WCHAR *AppContext::Buf(int n)
 {
 	WCHAR *p;
 
-	//SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::Buf(%d)", n);
-	//if(n == 0) return wcschr(CurContext, 0);
-	//if(*CurContext == 0) return NULL;
-
 	for(p = wcschr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
-	//for(p = wcschr(CurContext, 0); n > 0 && p > CurContext; p--, n--);
 
 	if(n > 0) return NULL;
 	return p;
@@ -89,20 +83,15 @@ void AppContext::Delete()
   } else if (CharIsSurrogatePair()) {
     pos--;
   }
-	//SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::Delete");
 
 	if(pos > 0) pos--;
 	CurContext[pos] = 0;
-	//if(--pos < 0) pos = 0;
-	//SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Delete");
 }
 
 void AppContext::Reset()
 {
 	pos = 0;
 	CurContext[0] = 0;
-
-//	SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Reset");
 }
 
 void AppContext::Get(WCHAR *buf, int bufsize)
@@ -119,7 +108,7 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 
 void AppContext::CopyFrom(AppContext *source)   // I3575
 {
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
+  DebugLog("AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
   wcscpy_s(CurContext, _countof(CurContext), source->CurContext);
 	pos = source->pos;
 }
@@ -165,7 +154,6 @@ AppActionQueue::AppActionQueue()
 
 void AppActionQueue::ResetQueue()
 {
-	//SendDebugMessageFormat(0, sdmAIDefault, 0, "App::ResetQueue");
 	QueueSize = 0;   // I4262
 }
 
@@ -182,7 +170,7 @@ BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
 
 	QueueSize++;
 
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "App::QueueAction: %s %x", ItemTypes[ItemType], dwData);
+  DebugLog("App::QueueAction: %s %x", ItemTypes[ItemType], dwData);
 
 	return TRUE;
 }

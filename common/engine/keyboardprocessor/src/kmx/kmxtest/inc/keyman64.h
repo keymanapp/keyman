@@ -176,29 +176,11 @@ PWSTR strtowstr(PSTR in);
 
 /* Debugging functions */
 
-#ifndef SendDebugMessage
-   // I4379
-typedef enum ATSDMState { sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sdmGlobal, sdmMenu, sdmDebug, sdmLoad, sdmOther } TSDMState;
-
-void InitDebugging();
-void UninitDebugging();
-
-#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
-#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
-#define ShouldDebug(state) ShouldDebug_1()
-#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
-#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg);
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...);
-void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func);
-void DebugShift(char *function, char *point);
-BOOL DebugSignalPause(BOOL fIsUp);
+#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
+int DebugLog_1(char *file, int line, char *function, char *fmt, ...);
 char *Debug_VirtualKey(WORD vk);
 char *Debug_UnicodeString(PWSTR s, int x = 0);
-
-BOOL ShouldDebug_1(); // TSDMState state);
-
-#endif
+inline BOOL ShouldDebug();
 
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 

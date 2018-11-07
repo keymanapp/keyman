@@ -17,9 +17,6 @@ typedef struct tagKEYMAN64THREADDATA
 	  FInitialised,
     FInitialising;
 
-  BOOL debug_DebugInit;   // I3951
-  char debug_buf[64];
-
   /* TSF Manager Globals */
 
   WPARAM LastKey;   // I4642
