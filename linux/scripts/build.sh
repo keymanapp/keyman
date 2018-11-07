@@ -19,17 +19,13 @@ if [[ "${CONFIGUREONLY}" != "no" && "${BUILDONLY}" != "no" ]]; then
 fi
 
 if [[ "${BUILDONLY}" == "no" ]]; then
-	if [[ "${INSTALLDIR}" != "/usr/local" ]]; then
-		if [ ! -d keyboardprocessor ]; then
-			meson ../common/engine/keyboardprocessor keyboardprocessor
-		fi
-		cd keyboardprocessor
-		echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
-		meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
-		cd $BASEDIR
-	else
-		echo "INSTALLDIR is ${INSTALLDIR} and not reconfiguring keyboardprocessor"
+	if [ ! -d keyboardprocessor ]; then
+		meson ../common/engine/keyboardprocessor keyboardprocessor
 	fi
+	cd keyboardprocessor
+	echo "reconfiguring keyboardprocessor meson with prefix ${INSTALLDIR}"
+	meson configure -Dprefix=${INSTALLDIR} && ninja reconfigure
+	cd $BASEDIR
 fi
 
 if [[ "${CONFIGUREONLY}" == "no" ]]; then
