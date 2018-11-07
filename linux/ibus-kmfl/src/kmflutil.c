@@ -308,21 +308,11 @@ ibus_kmfl_list_engines (void)
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
-    keyboard_list = kmfl_get_keyboard_list("/usr/share/keyman");
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
-    g_list_free(keyboard_list);
-
-    keyboard_list = kmfl_get_keyboard_list("/usr/local/share/keyman");
+    keyboard_list = kmfl_get_keyboard_list("/usr/local/share/kmfl");
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
     local_keyboard_path= g_strdup_printf("%s/.kmfl", getenv("HOME"));
-    keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
-    engines = ibus_kmfl_add_engines(engines, keyboard_list);
-    g_free(local_keyboard_path);
-    g_list_free(keyboard_list);
-
-    local_keyboard_path= g_strdup_printf("%s/.local/share/keyman", getenv("HOME"));
     keyboard_list = kmfl_get_keyboard_list(local_keyboard_path);
     engines = ibus_kmfl_add_engines(engines, keyboard_list);
     g_free(local_keyboard_path);
