@@ -85,8 +85,6 @@ BOOL ProcessGroup(LPGROUP gp)
 		return FALSE;
 	}
 
-	_td->state.NoMatches = TRUE;
-
 	/*
 	 The rule matching loop.
 
@@ -146,51 +144,20 @@ BOOL ProcessGroup(LPGROUP gp)
 		{
       BOOL fIsBackspace = _td->state.vkey == VK_BACK && (g_shiftState & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
-      if(/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
-        	//if(_td->state.msg.message == wm_keymankeydown) 
-				  //	_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
+      if(fIsBackspace) {   // I4838   // I4933
         PWCHAR pdeletecontext = app->ContextBuf(1);   // I4933
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
+          app->QueueAction(QIT_INVALIDATECONTEXT, 0);
           fOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
         }
 				app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
-      } else if(!fIsBackspace) {   // I4024   // I4128   // I4287   // I4290
+      } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
+        app->QueueAction(QIT_INVALIDATECONTEXT, 0);
         fOutputKeystroke = TRUE;
         return FALSE;
       }
-			  //fOutputKeystroke = TRUE; return FALSE; // Don't swallow keystroke   // I3577
-        ///SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = TRUE; IsTIP = TRUE");
-
-			/*
-             If the key is not a character key (white keys), or not processing, then we must init the stack -
-             unknown keys do things like moving position in the context, so must clear.
-            */
-			if(fIsBackspace)   // I4128
-			{
-				/*
-				 Must have special handling for VK_BACK: delete a character from the context stack
-				 This only fires if the keyboard has no rule for backspace.
-				*/
-
-//				if(_td->state.msg.message == wm_keymankeydown)    // I4933
-	//				_td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
-			}
-			else
-			{
-				//app->NoSetShift = FALSE;
-
-				DWORD dw = _td->state.vkey;
-				if(dw == 0x05) dw = VK_RETURN;    // I649 - VK_ENTER and K_NPENTER
-
-				if(_td->state.isExtended) dw |= QVK_EXTENDED;	// Extended key flag  // I3438
-
-				app->QueueAction(QIT_VSHIFTDOWN, g_shiftState);  // 15/05/2001 - fixing I201 -- enabled line
-        app->QueueAction(QIT_VKEYDOWN, dw);
-        app->QueueAction(QIT_VKEYUP, dw);
-  		  app->QueueAction(QIT_VSHIFTUP, g_shiftState);
-			}
 		}
 		else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0)
 		{
@@ -200,9 +167,6 @@ BOOL ProcessGroup(LPGROUP gp)
 		else if (_td->state.charCode != 0 && _td->state.charCode != 0xFFFF && gp->fUsingKeys)
 		{
 			/* No rule found, is a character key */ 
-			// 7.0.239.0: I994 - Workaround output order issues - we will use the TSF to output all characters...
-			// if(app->Type1() == AIType_TIP) { fOutputKeystroke = TRUE; return FALSE; } // Don't swallow keystroke
-
 			app->QueueAction(QIT_CHAR, _td->state.charCode);
 		}
 
@@ -210,8 +174,6 @@ BOOL ProcessGroup(LPGROUP gp)
 	}
 
   DebugLog("match found in rule %d", i);
-
-	_td->state.NoMatches = FALSE;
 
 	/*
 	 Save the context that will be used for output when the 'context' keyword is used.

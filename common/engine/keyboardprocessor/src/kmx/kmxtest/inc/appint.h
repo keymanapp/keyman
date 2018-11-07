@@ -42,6 +42,8 @@ typedef struct
 #define QIT_BACK		7
 #define QIT_CAPSLOCK  8
 
+#define QIT_MAX     8
+
 #define QVK_EXTENDED 0x00010000 // Flag for QIT_VKEYDOWN to indicate an extended key
 #define QVK_KEYMASK  0x0000FFFF
 #define QVK_FLAGMASK 0xFFFF0000

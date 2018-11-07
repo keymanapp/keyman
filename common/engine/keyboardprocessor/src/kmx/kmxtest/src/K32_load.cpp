@@ -120,9 +120,6 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 	ReadFile(hFile, filebase, sz, &sz, NULL);
 	CloseHandle(hFile);
 
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
 	if(*LPDWORD(filebase) != FILEID_COMPILED)
 	{
 		delete buf; 
