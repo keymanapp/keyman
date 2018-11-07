@@ -5,6 +5,7 @@
  * [kmflcomp](./kmflcomp) - KMFL keyboard compiler
  * [libkmfl](./libkmfl) - core library
  * [ibus-kmfl](./ibus-kmfl) - IBUS integration to use KMFL
+ * [ibus-keyman](./ibus-keyman) - IBUS integration to use .kmx Keyman keyboards
  * scim\_kmfl\_imengine - deprecated SCIM engine to use KMFL
 
  See [license information](./LICENSE.md) about licensing.
@@ -14,7 +15,7 @@
 - It is helpful to be using the [packages.sil.org](http://packages.sil.org)  repo
 
 - Install packages required for building and developing KMFL
-`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools`
+`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson`
 
 
 ### Compiling from Command Line
@@ -23,12 +24,12 @@
 
 ##### Tmp install
 
-Run `make tmpinstall` to build and install kmflcomp, libkmfl and ibus-kmfl to `/tmp/kmfl`
+Run `make tmpinstall` to build and install keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl and ibus-keyman to `/tmp/kmfl`
 
-This is only for testing the build, not for running ibus-kmfl in ibus
+This is only for testing the build, not for running ibus-kmfl or ibus-keyman in ibus
 
 
-##### Installing for ibus to use ibus-kmfl
+##### Installing for ibus to use ibus-kmfl or ibus-keyman
 
 - The process to build and install everything is:
 
@@ -43,8 +44,10 @@ This is only for testing the build, not for running ibus-kmfl in ibus
 
     * This will install to /usr/local
         * and `/usr/share/ibus/component/kmfl.xml` and `/usr/share/kmfl/icons`
+        * and `/usr/share/ibus/component/keyman.xml` and `/usr/share/keyman/icons`
 
     * If you already have the ibus-kmfl package installed then it will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
+    * If you already have the ibus-keyman package installed then it will move the file `/usr/share/ibus/component/keyman.xml` to `/usr/share/doc/ibus-keyman/`
 
         * run `make uninstall` to uninstall everything and put it back again
 
@@ -52,10 +55,12 @@ This is only for testing the build, not for running ibus-kmfl in ibus
 
  * libkmfl requires kmfl.h header from kmflcomp
  * ibus-kfml requires kmfl.h and headers and lib from libkmfl
+ * ibus-keyman requires headers and lib from keyboardprocessor
  
  So 
   * kmflcomp must be built and installed before libkmfl
   * libkmfl must be built and installed before ibus-kmfl
+  * keyboardprocessor must be built before ibus-keyman
   
  For each project run `./configure && make && make install`.
  

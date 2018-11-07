@@ -24,8 +24,7 @@ version
 echo "version: ${newvers}"
 
 BASEDIR=`pwd`
-#autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
-autotool_projects=""
+autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
 extra_projects="keyboardprocessor keyman-config"
 
 if [ "$1" != "" ]; then
