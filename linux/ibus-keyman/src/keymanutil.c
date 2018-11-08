@@ -123,34 +123,21 @@ GList * keyman_get_keyboard_list( const gchar * path)
 gchar * keyman_get_icon_file(KInputMethod * im)
 {
     // Now there will only be the .png which will have been extracted from the .kmx during installation
-#if 0
-    const char * icon_file = keyman_icon_file(im->keyboard_number);
-    gchar * full_path_to_icon_file=NULL;
     struct stat filestat;
-    char * valid_extensions[]= {"", ".png", ".bmp", ".jpg", NULL};
-    int valid_extension_index;
-            
-    if (strlen(icon_file) > 0) {
-        for (valid_extension_index=0; valid_extensions[valid_extension_index] != NULL; valid_extension_index++) {
-            full_path_to_icon_file=g_strdup_printf("%s/%s%s", get_dirname(im->keyboard_filename), icon_file, valid_extensions[valid_extension_index]);
+    gchar *filename, *full_path_to_icon_file, *p;
 
-            stat(full_path_to_icon_file, &filestat);
+    p=rindex(im->keyboard_filename,'.');
+    filename = g_strndup(im->keyboard_filename, p-(im->keyboard_filename));
+    full_path_to_icon_file=g_strdup_printf("%s.ico.png", filename);
+    g_free(filename);
+    stat(full_path_to_icon_file, &filestat);
 
-            if (S_ISREG(filestat.st_mode)) {
-                break;
-            } else {
-                g_free(full_path_to_icon_file);
-                full_path_to_icon_file=NULL;
-            }
-        }
+    if (!S_ISREG(filestat.st_mode)) {
+        g_free(full_path_to_icon_file);
+        full_path_to_icon_file=g_strdup("/usr/share/keyman/icons/default.png");
     }
 
-    if (full_path_to_icon_file==NULL)
-         full_path_to_icon_file=g_strdup("/usr/share/kmfl/icons/default.png");
-
     return full_path_to_icon_file;
-#endif
-    return keyman_icon_file(im->keyboard_number);
 }
 
 gchar * keyman_get_kvk_file(KInputMethod * im)
@@ -190,19 +177,6 @@ gchar * keyman_get_kvk_file(KInputMethod * im)
     g_free(filename);
     return kvk_file;
 }
-
-gchar *keyman_icon_file(int keyboard_number)
-{
-    gchar *kmx_file, *filename, *icon_file, *p;
-    kmx_file  = g_path_get_basename(p_installed_kbd[keyboard_number]->keyboard_filename);
-    p=rindex(kmx_file,'.');
-    filename = g_strndup(kmx_file, p-kmx_file);
-    icon_file=g_strdup_printf("%s.ico.png", filename);
-    g_free(filename);
-    g_free(kmx_file);
-    return icon_file;
-}
-
 
 
 gchar * keyman_get_ldml_file(KInputMethod * im)
@@ -256,7 +230,7 @@ void keyman_get_keyboard_info(KInputMethod * im)
     im->keyboard_visualkeyboard=keyman_get_kvk_file(im);
     im->keyboard_keyboardversion=g_strdup("1.0");
     im->keyboard_layout=g_strdup("us");
-    im->keyboard_icon_filename=g_strdup("");
+    im->keyboard_icon_filename = keyman_get_icon_file(im);
     im->keyboard_ldmlfile=keyman_get_ldml_file(im);
 
     #if 0

@@ -108,5 +108,4 @@ void             keyman_get_keyboard_info   (KInputMethod * im);
 int              keyman_load_keyboard       (const gchar *keyboard_filename);
 int              keyman_unload_keyboard     (int keyboard_number);
 int              keyman_check_keyboard      (gchar *absfn);
-gchar           *keyman_icon_file           (int keyboard_number);
 #endif
