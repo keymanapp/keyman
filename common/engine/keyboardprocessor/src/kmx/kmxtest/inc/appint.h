@@ -89,11 +89,8 @@ public:
 class AppIntegration:public AppActionQueue
 {
 protected:
-	HWND hwnd;
 	int FShiftFlags;
 public:
-	AppIntegration();
-
 	/* Context functions */
 	
   virtual void AddContext(WCHAR ch) = 0;  //I2436

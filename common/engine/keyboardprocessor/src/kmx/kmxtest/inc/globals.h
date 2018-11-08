@@ -15,8 +15,6 @@ typedef struct tagKEYMAN64THREADDATA
    
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
-extern HINSTANCE g_hInstance;
-
 /* Thread Local Data */
 
 PKEYMAN64THREADDATA ThreadGlobals();
@@ -34,6 +32,6 @@ extern wchar_t g_baseLayout[260], g_baseLayoutAlt[34];
 extern INTKEYBOARDINFO g_keyboard;
 extern KMXTest_KeyboardOption g_keyboardOption[1024];
 extern int g_keyboardOptionCount;
-
+extern BOOL g_capsLock;
 
 #endif

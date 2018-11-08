@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <io.h>
 #include <fcntl.h>
+#include <corecrt_wstring.h>
+#include <string.h>
 
 struct KMXTest_KeyEvent {
   UINT vkey;
@@ -46,6 +48,7 @@ wchar_t g_baseLayout[260] = L"kbdus.dll",
 BOOL    g_simulateAltGr = FALSE, 
         g_baseLayoutGivesCtrlRAltForRAlt = FALSE;
 char    g_platform[128] = "windows desktop hardware native"; // TODO
+BOOL    g_capsLock = FALSE;
 
 /* Constants - to refactor */
 extern const struct KMXTest_ModifierNames s_modifierNames[];
@@ -58,6 +61,7 @@ void print_default_environment() {
   wprintf(L"  env.base_layout=%s\n", g_baseLayout);
   wprintf(L"  env.base_layout_alt=%s\n", g_baseLayoutAlt);
   wprintf(L"  env.platform=%hs\n", g_platform);
+  wprintf(L"  env.caps_lock=%d\n", g_capsLock);
 }
 
 BOOL addKeyboardOption(char *storeName, char *value) {
@@ -94,6 +98,9 @@ BOOL addOption(char *val) {
   }
   else if (!_strnicmp(val, "env.platform", len)) {
     strcpy_s(g_platform, p);
+  }
+  else if (!_strnicmp(val, "env.caps_lock", len)) {
+    g_capsLock = !!atoi(p);
   }
   else if (!_strnicmp(val, "opt.", 4)) {
     *(p - 1) = 0;
@@ -320,11 +327,6 @@ BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd)
 	if(!kbd) return TRUE;
 	delete kbd;
 	return TRUE;
-}
-
-BOOL ConvertStringToGuid(WCHAR *buf, GUID *guid)   // I3581
-{
-  return IIDFromString(buf, guid) == S_OK;
 }
 
 PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)

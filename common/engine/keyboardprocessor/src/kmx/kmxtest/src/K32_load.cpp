@@ -3,6 +3,7 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
+#include <share.h>
 
 BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
@@ -84,7 +85,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 {
 	DWORD sz;
 	LPBYTE buf;
-	HANDLE hFile;
+  FILE *fp;
 	LPKEYBOARD kbp;
   PBYTE filebase;
 
@@ -94,14 +95,28 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 		return FALSE;
 	}
 
-	hFile = CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if(hFile == INVALID_HANDLE_VALUE)
+  fp = _fsopen(fileName, "rb", _SH_DENYWR);
+  if(fp == NULL)
 	{
 		DebugLog("Could not open file");
 		return FALSE;
 	}
 
-	sz = GetFileSize(hFile, NULL);
+  if (fseek(fp, 0, SEEK_END) != 0) {
+    fclose(fp);
+    return FALSE;
+  }
+
+  sz = ftell(fp);
+  if (sz < 0) {
+    fclose(fp);
+    return FALSE;
+  }
+
+  if (fseek(fp, 0, SEEK_SET) != 0) {
+    fclose(fp);
+    return FALSE;
+  }
 
 #ifdef _WIN64
 	buf = new BYTE[sz*3];
@@ -111,7 +126,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 
 	if(!buf)
 	{
-		CloseHandle(hFile);
+    fclose(fp);
 		DebugLog("Not allocmem");
 		return FALSE;
 	}
@@ -121,8 +136,12 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 	filebase = buf;
 #endif
 
-	ReadFile(hFile, filebase, sz, &sz, NULL);
-	CloseHandle(hFile);
+  if (fread(filebase, 1, sz, fp) < sz) {
+    fclose(fp);
+    return FALSE;
+  }
+
+  fclose(fp);
 
 	if(*LPDWORD(filebase) != FILEID_COMPILED)
 	{
@@ -246,8 +265,6 @@ LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
 LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 {
-  UNREFERENCED_PARAMETER(dwFileSize);
-
   DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
   PCOMP_GROUP cgp;
@@ -260,8 +277,6 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
 	kbp->dpStoreArray = (LPSTORE) (base + ckbp->dpStoreArray);
 	kbp->dpGroupArray = (LPGROUP) (base + ckbp->dpGroupArray);
-
-	kbp->hBitmap = NULL;
 
 	for(sp = kbp->dpStoreArray, csp = (PCOMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)
 	{

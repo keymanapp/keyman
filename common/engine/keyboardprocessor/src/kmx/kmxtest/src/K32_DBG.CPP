@@ -3,6 +3,7 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
+#include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -13,19 +14,48 @@ inline BOOL ShouldDebug() {
 #define TAB "\t"
 #define NL  "\n"
 
+#include <chrono>
+#define _USE_WINDOWS
+
+#ifdef _USE_WINDOWS
+#define DECLSPEC_IMPORT __declspec(dllimport)
+#define WINBASEAPI DECLSPEC_IMPORT
+#define VOID void
+#define WINAPI      __stdcall
+
+extern "C"
+__declspec(dllimport)
+void
+__stdcall
+OutputDebugStringA(
+  char *lpOutputString
+);
+
+#else
+  #include <syslog.h>
+#endif
+
+// simulation of Windows GetTickCount()
+unsigned long
+GetTickCount()
+{
+  using namespace std::chrono;
+  return (unsigned long) duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
 int DebugLog_1(char *file, int line, char *function, char *fmt, ...)
 {
 	char fmtbuf[256];
 
 	va_list vars;
 	va_start(vars, fmt);
-	vsnprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
+	vsnprintf_s(fmtbuf, sizeof(fmtbuf) / sizeof(fmtbuf[0]), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
 
 	if(g_debug_KeymanLog) {
     if(g_debug_ToConsole) {   // I3951
       char windowinfo[1024];
-      wsprintf(windowinfo,
+      sprintf(windowinfo,
         "%d" TAB     //"TickCount" TAB
         "%s:%d" TAB  //"SourceFile" TAB
         "%s" TAB     //"Function"
@@ -35,7 +65,11 @@ int DebugLog_1(char *file, int line, char *function, char *fmt, ...)
         file, line,       //"SourceFile" TAB
         function,         //"Function" TAB
         fmtbuf);          //"Message"
-      OutputDebugString(windowinfo);
+#ifdef _USE_WINDOWS
+      OutputDebugStringA(windowinfo);
+#else
+      syslog(LOG_DEBUG, "%s", windowinfo);
+#endif
     }
 	}
 
@@ -51,10 +85,10 @@ char *Debug_VirtualKey(WORD vk) {
   }
 
   if (vk < 256) {
-    wsprintf(buf, "['%s' 0x%x]", VKeyNames[vk], vk);
+    sprintf(buf, "['%s' 0x%x]", VKeyNames[vk], vk);
   }
   else {
-    wsprintf(buf, "[0x%x]", vk);
+    sprintf(buf, "[0x%x]", vk);
   }
   return buf;
 }
@@ -68,7 +102,7 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   char *q;
   for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
   {
-    wsprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
+    sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
   }
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];

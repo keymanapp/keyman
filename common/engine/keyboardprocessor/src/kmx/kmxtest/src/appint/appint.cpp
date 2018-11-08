@@ -3,6 +3,8 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
+#include <stdlib.h>
+#include <corecrt_wstring.h>
 
 const LPSTR ItemTypes[QIT_MAX+1] = {
 	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
@@ -138,7 +140,7 @@ BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
 {
 	if(QueueSize > MAXACTIONQUEUE - 1)
 	{
-		MessageBeep(0xFFFFFFFF);
+    DebugLog("App::QueueAction: queue size exceeded");
 		return FALSE;
 	}
 
@@ -152,9 +154,3 @@ BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
 	return TRUE;
 }
 
-/* AppIntegration */
-
-AppIntegration::AppIntegration()
-{
-	hwnd = NULL;
-}
