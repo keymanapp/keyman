@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,18 +25,22 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -113,6 +118,7 @@ public final class KMManager {
   public static final String KMKey_CustomKeyboard = "CustomKeyboard";
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
+  public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -701,8 +707,34 @@ public final class KMManager {
     if (InAppKeyboard != null) {
       InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
+
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+    }
+  }
+
+  protected static IBinder getToken() {
+    if (IMService == null) {
+      return null;
+    }
+    final Dialog dialog = IMService.getWindow();
+    if (dialog == null) {
+      return null;
+    }
+    final Window window = dialog.getWindow();
+    if (window == null) {
+      return null;
+    }
+    return window.getAttributes().token;
+  }
+
+  public static void advanceToNextInputMode() {
+    InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+    // TODO: this method is added in API level 16 and deprecated in API level 28
+    // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      imm.switchToNextInputMethod(getToken(), false);
     }
   }
 
@@ -1023,6 +1055,7 @@ public final class KMManager {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+      i.putExtra(KMKey_DisplayKeyboardSwitcher, false);
       context.startActivity(i);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
@@ -1030,6 +1063,7 @@ public final class KMManager {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
       i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      i.putExtra(KMKey_DisplayKeyboardSwitcher, true);
       context.startActivity(i);
     }
   }
