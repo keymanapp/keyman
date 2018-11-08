@@ -33,6 +33,8 @@
 #include "keyman-service.h"
 #include "engine.h"
 
+#define Keyman_Pass_Backspace_To_IBus 254
+
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
 
@@ -101,6 +103,7 @@ static void ibus_keyman_engine_commit_string
 
 static IBusEngineClass *parent_class = NULL;
 static GHashTable      *im_table = NULL;
+
 
 GType
 ibus_keyman_engine_get_type (void)
@@ -467,9 +470,11 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         XCloseDisplay(m_display);
     }
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
-    // Let the application handle user generated backspaces after resetting the kmfl history
-    if (keyval == IBUS_BackSpace) {
+    // // Let the application handle user generated backspaces after resetting the kmfl history
+    if (keycode == Keyman_Pass_Backspace_To_IBus) {
         //clear_history(keyman->state);
+        g_message("IBUS_BackSpace");
+        return FALSE;
     }
 
     if (keycode_to_vk[keycode] == 0) // key we don't handle
@@ -511,6 +516,15 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action");
+                g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
+
+                if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
+                    g_message("deleting surrounding text %ld chars", action_items[i].erased);
+                    ibus_engine_delete_surrounding_text(engine, action_items[i].erased * -1, action_items[i].erased);
+                } else {
+                    g_message("forwarding backspace");
+                    forward_key(keyman, Keyman_Pass_Backspace_To_IBus, 0);
+                }
                 break;
             case KM_KBP_IT_PERSIST_OPT:
                 g_message("PERSIST_OPT action");
