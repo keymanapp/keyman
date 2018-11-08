@@ -1,44 +1,6 @@
 /*
-  Name:             AIWin2000Unicode
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      22 Jan 2007
-
-  Modified Date:    9 Aug 2015
+  Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          22 Jan 2007 - mcdurdin - Fix for K_NPENTER
-                    13 Jul 2007 - mcdurdin - I934 - Prep fox x64
-                    23 Aug 2007 - mcdurdin - I719 - Fix Alt+LeftShift and Word interactions
-                    14 Jun 2008 - mcdurdin - I1389 - Supp chars on Vista+ default to single BKSP
-                    20 Jul 2008 - mcdurdin - I1546 - Language switch not working with some keyboard IDs
-                    16 Jan 2009 - mcdurdin - I1512 - SendInput support
-                    27 Jan 2009 - mcdurdin - I1797 - Add fallback for AIWin2000 app integration
-                    11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
-                    12 Mar 2010 - mcdurdin - I934 - x64 - Complete
-                    12 Mar 2010 - mcdurdin - I2229 - Remove hints and warnings
-                    15 Jun 2010 - mcdurdin - I2426 - Remove incorrectl KEYMAN_CHARFLAG
-                    24 Jun 2010 - mcdurdin - I2436 - Add space to context for AIWin2000Unicode when not matched
-                    27 Aug 2012 - mcdurdin - I3438 - V9.0 - Add support for custom virtual keys Created
-                    18 Feb 2012 - mcdurdin - I3242 - Arrow keys do not function correctly in Internet Explorer
-                    26 Feb 2012 - mcdurdin - I2787 - Reset keyboard state for a key when key down is sent to avoid confusion for Chrome
-                    04 Nov 2012 - mcdurdin - I3527 - V9.0 - Merge of I3242 - Arrow keys do not function correctly in Internet Explorer
-                    04 Nov 2012 - mcdurdin - I3528 - V9.0 - Merge of I2787 - Reset keyboard state for a key when key down is sent to avoid confusion for Chrome
-                    17 Dec 2013 - mcdurdin - I4006 - V9.0 - Remove old aiDefault code
-                    24 Apr 2014 - mcdurdin - I4196 - V9.0 - wm_kmmoreposting must be refactored for TIP work as it is not sequential
-                    01 May 2014 - mcdurdin - I4128 - V9.0 - Shift states still not working with unprocessed keys in V9
-                    23 Jun 2014 - mcdurdin - I4287 - V9.0 - Remove extraneous AppIntegration class type tests
-                    13 Aug 2014 - mcdurdin - I4370 - Deadkeys are still not working in Winword TIP mode
-                    14 Aug 2014 - mcdurdin - I4378 - V9.0 - Rapid typing in legacy mode breaks Keyman input
-                    13 Oct 2014 - mcdurdin - I4452 - V9.0 - Chinese keyboard is not working correctly
-                    31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
-                    09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
 #include "pch.h"   // I4128   // I4287
 

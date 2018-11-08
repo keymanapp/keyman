@@ -1,4 +1,7 @@
-
+/*
+  Copyright:        Copyright (C) 2003-2018 SIL International.
+  Authors:          mcdurdin
+*/
 #include "pch.h"
 #include <stdlib.h>
 #include <io.h>
@@ -37,8 +40,7 @@ int g_contextLength = 0;
 KMXTest_KeyboardOption g_keyboardOption[1024] = { 0 };
 int g_keyboardOptionCount = 0;
 
-/* Options - to refactor */
-BOOL    g_mnemonicDeadkeyConversionMode = FALSE;
+/* Environment - to refactor */
 wchar_t g_baseLayout[260] = L"kbdus.dll",
         g_baseLayoutAlt[34] = L"en-US";
 BOOL    g_simulateAltGr = FALSE, 
@@ -52,6 +54,7 @@ extern const struct KMXTest_ChToVKey chToVKey[];
 
 void print_default_environment() {
   wprintf(L"  env.simulate_altgr=%d\n", g_simulateAltGr);
+  wprintf(L"  env.base_layout_gives_ctrl_ralt_for_ralt=%d\n", g_baseLayoutGivesCtrlRAltForRAlt);
   wprintf(L"  env.base_layout=%s\n", g_baseLayout);
   wprintf(L"  env.base_layout_alt=%s\n", g_baseLayoutAlt);
   wprintf(L"  env.platform=%hs\n", g_platform);
@@ -79,6 +82,9 @@ BOOL addOption(char *val) {
 
   if (!_strnicmp(val, "env.simulate_altgr", len)) {
     g_simulateAltGr = !!atoi(p);
+  }
+  else if (!_strnicmp(val, "env.base_layout_gives_ctrl_ralt_for_ralt", len)) {
+    g_baseLayoutGivesCtrlRAltForRAlt = !!atoi(p);
   }
   else if (!_strnicmp(val, "env.base_layout", len)) {
     wcscpy_s(g_baseLayout, wp);

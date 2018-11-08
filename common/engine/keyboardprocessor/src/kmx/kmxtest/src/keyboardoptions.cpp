@@ -1,21 +1,6 @@
 /*
-  Name:             keyboardoptions
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      25 May 2010
-
-  Modified Date:    28 Nov 2012
+  Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          25 May 2010 - mcdurdin - I1632 - Keyboard Options
-                    31 May 2010 - mcdurdin - I2397 - Assertion failure - keyboard options loading twice
-                    28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
 */
 #include "pch.h"
 

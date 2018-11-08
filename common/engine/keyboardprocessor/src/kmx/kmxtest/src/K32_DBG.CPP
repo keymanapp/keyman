@@ -1,3 +1,7 @@
+/*
+  Copyright:        Copyright (C) 2003-2018 SIL International.
+  Authors:          mcdurdin
+*/
 #include "pch.h"
 #include <stdio.h>
 #include <stdarg.h>

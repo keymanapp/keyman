@@ -1,19 +1,6 @@
 /*
-  Name:             xstring
-  Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      27 Aug 2012
-
-  Modified Date:    27 Aug 2012
+  Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          27 Aug 2012 - mcdurdin - I3439 - V9.0 - Refactor xstring support in C++ code
 */
 #include "pch.h"
 
@@ -137,17 +124,6 @@ int xstrpos(PWSTR p1, PWSTR p)
 	for(i = 0; p < p1; p = incxstr(p), i++);
 	return i;
 }
-
-/*PWSTR xstrchr(PWSTR buf, int x)
-{
-	int clow, chigh;
-	if(x < 0x10000) { chigh = x; clow = -1; }
-	else { chigh = Uni_UTF32ToSurrogate1(x); clow = Uni_UTF32ToSurrogate2(x); }
-
-	for(; *buf; buf = incxstr(buf))
-		if(*buf == chigh && (*(buf+1) == clow || clow == -1)) return buf;
-	return NULL;
-}*/
 
 PWSTR xstrchr(PWSTR buf, PWSTR chr)
 {

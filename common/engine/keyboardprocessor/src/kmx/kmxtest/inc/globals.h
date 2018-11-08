@@ -28,7 +28,6 @@ struct KMXTest_KeyboardOption {
 };
 
 extern BOOL g_debug_ToConsole, g_debug_KeymanLog;
-extern BOOL g_mnemonicDeadkeyConversionMode;
 extern DWORD g_shiftState;
 extern BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
 extern wchar_t g_baseLayout[260], g_baseLayoutAlt[34];

@@ -148,13 +148,11 @@ typedef struct tagINTKEYBOARDINFO
 
 typedef struct tagKMSTATE
 {
-	BOOL NoMatches;
 	BOOL StopOutput;
 	int LoopTimes;
   BOOL isExtended;
 	WORD vkey; // I934
 	WCHAR charCode;   // I4582
-	BOOL windowunicode;   // I4287
 } KMSTATE;
    // I3616
 enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
