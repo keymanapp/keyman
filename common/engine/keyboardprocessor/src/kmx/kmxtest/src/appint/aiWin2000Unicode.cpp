@@ -55,11 +55,13 @@ BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 		break;
 
 	case QIT_BACK:
-		if(dwData == BK_BACKSPACE)
+		if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
 			while(context->CharIsDeadkey()) context->Delete();
+
 		//if(dwData == CODE_DEADKEY) break;
 		context->Delete();
-		if(dwData == BK_BACKSPACE)
+
+		if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
 			while(context->CharIsDeadkey()) context->Delete();
 		break;
 	}
@@ -141,6 +143,9 @@ BOOL AIWin2000Unicode::SendActions()
 
 
 BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
+  //LogOutput();
+  //console_log(L"--------------\n");
+
   wchar_t output[512] = L"", *p;
 
   wcscpy(output, g_context);
@@ -215,12 +220,13 @@ BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
         assert(p > output);
         p = decxstr(p);
         assert(*p == UC_SENTINEL && *(p + 1) == CODE_DEADKEY);
-        *p = 0;
       }
       else if (Queue[n].dwData != BK_SUPP2) {
+        assert(p > output);
         p = decxstr(p);
       }
-      
+      *p = 0;
+
       break;
     }
   }
@@ -237,4 +243,63 @@ BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
   write_console(!result, L"expected = %hs\n", Debug_UnicodeString(expectedOutput, 0));
 
   return result;
+}
+
+
+void AIWin2000Unicode::LogOutput() {
+  int i = 0, n = 0;
+
+  for (; n < QueueSize; n++)
+  {
+    switch (Queue[n].ItemType) {
+    case QIT_CAPSLOCK:
+      //TODO: add Caps Event
+      if (Queue[n].dwData == 0) {
+        console_log(L"CAPSLOCK off\n");
+      }
+      else {
+        console_log(L"CAPSLOCK on\n");
+      }
+      break;
+    case QIT_VKEYDOWN:
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+
+      /* 6.0.153.0: Fix repeat state for virtual keys */
+
+      if ((Queue[n].dwData & QVK_KEYMASK) <= VK__MAX)  // I3438
+      {
+        console_log(L"KEYDOWN: %x (flags=%x)\n", Queue[n].dwData & 0xFF, (Queue[n].dwData & QVK_FLAGMASK) >> 16);
+      }
+
+      break;
+    case QIT_VKEYUP:
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+
+      if ((Queue[n].dwData & QVK_KEYMASK) <= VK__MAX)  // I3438
+      {
+        console_log(L"KEYUP: %x (flags=%x)\n", Queue[n].dwData & 0xFF, (Queue[n].dwData & QVK_FLAGMASK) >> 16);
+      }
+
+      break;
+    case QIT_VSHIFTDOWN:
+      console_log(L"VSHIFTDOWN\n");
+      break;
+    case QIT_VSHIFTUP:
+      console_log(L"VSHIFTUP\n");
+      break;
+    case QIT_CHAR:
+      console_log(L"CHAR %x (%c)\n", Queue[n].dwData, Queue[n].dwData);
+      break;
+    case QIT_DEADKEY:
+      console_log(L"DEADKEY\n");
+      break;
+    case QIT_BELL:
+      // TODO
+      console_log(L"BELL\n");
+      break;
+    case QIT_BACK:
+      console_log(L"BKSP (%x)\n", Queue[n].dwData);
+      break;
+    }
+  }
 }

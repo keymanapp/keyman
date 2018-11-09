@@ -481,6 +481,7 @@ PWSTR strtowstr(PSTR in);
 int DebugLog_1(char *file, int line, char *function, char *fmt, ...);
 char *Debug_VirtualKey(WORD vk);
 char *Debug_UnicodeString(PWSTR s, int x = 0);
+char *Debug_ModifierName(UINT modifiers);
 inline BOOL ShouldDebug();
 
 #define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)

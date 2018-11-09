@@ -31,11 +31,12 @@ class AIWin2000Unicode:public AppIntegration
 private:
 
 protected:
-  AppContext *context;
 
 public:
 	AIWin2000Unicode();
 	~AIWin2000Unicode();
+
+  AppContext *context;
 
 	virtual BOOL QueueAction(int ItemType, DWORD dwData);
 
@@ -51,7 +52,8 @@ public:
 	virtual BOOL SendActions();   // I4196
 
   /* Tests */
-  
+  void LogOutput();
+
   BOOL CheckOutput(wchar_t *expectedOutput);
 };
 

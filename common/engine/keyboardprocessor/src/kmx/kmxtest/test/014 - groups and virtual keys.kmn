@@ -6,15 +6,15 @@ store(&VERSION) '9.0'
 
 begin Unicode > use(UMain)
 
-store(&MnemonicLayout) "1"
+store(&MnemonicLayout) "0"
 
 c ----------------------------------------------
 
 group(UMain) using keys 
-  + ['a'] > U+03B1
-  + [CTRL  '2'] > deadkey(MacronBug)
-  + [ALT  '2'] > deadkey(MacronBug)
-  + [SHIFT    '2'] > deadkey(BreveBug)
+  + [K_A] > U+03B1
+  + [CTRL  K_2] > deadkey(MacronBug)
+  + [ALT  K_2] > deadkey(MacronBug)
+  + [SHIFT    K_2] > deadkey(BreveBug)
       
   match > use(DK1)
  

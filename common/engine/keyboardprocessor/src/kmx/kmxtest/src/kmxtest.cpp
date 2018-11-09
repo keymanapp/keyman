@@ -283,13 +283,6 @@ int main(int argc, char *argv[]) {
 
   _setmode(_fileno(stdout), _O_U16TEXT);
 
-  
-  for (int i = 1; i < argc; i++) {
-    console_log(L"\"%hs\" ", argv[i]);
-  }
-  console_log(L"\n");
-  //
-
   for (int i = 1; i < argc-1; i += 2) {
     char *arg = argv[i], *val = argv[i + 1];
     if (!strcmp(arg, "-kmx")) {
@@ -311,6 +304,13 @@ int main(int argc, char *argv[]) {
       g_silent = TRUE;
       i--;
     }
+    else if (!strcmp(arg, "-q")) {
+      i--;
+      for (int j = 1; j < argc; j++) {
+        console_log(L"\"%hs\" ", argv[j]);
+      }
+      console_log(L"\n");
+    }
     else {
       invalid = TRUE;
     }
@@ -322,8 +322,9 @@ int main(int argc, char *argv[]) {
 
   if (invalid || g_nKeyEvents == 0 || filename == NULL) {
 
-    wprintf(L"Usage: kmxtest [-s] -kmx <file.kmx> [-context context] -keys key-sequence [-expected-output output] [-d a=b]...\n");
+    wprintf(L"Usage: kmxtest [-s] [-q] -kmx <file.kmx> [-context <context>] -keys <key-sequence> [-expected-output <output>] [-d a=b]...\n");
     wprintf(L"  -s silent\n");
+    wprintf(L"  -q print the command line\n");
     wprintf(L"  file.kmx must exist. No translation is done for mnemonic layout, etc.\n");
     wprintf(L"  context, output should be a string of unicode characters and/or deadkeys:\n");
     wprintf(L"    e.g. \"ABC\\u1234\\dxxxx\\d{name}\" (where xxxx is the integer deadkey value or {name} is the deadkey name if keyboard is compiled with debug)\n");
@@ -356,12 +357,10 @@ int main(int argc, char *argv[]) {
   console_log(L"============ Starting test ============\n");
 
   for (int i = 0; i < g_nKeyEvents; i++) {
-    if (g_keyEvents[i].vkey < 256) {
-      console_log(L"[%d] %x + %hs\n", i, g_keyEvents[i].modifiers, VKeyNames[g_keyEvents[i].vkey]);
-    } 
-    else {
-      console_log(L"[%d] %x + %x\n", i, g_keyEvents[i].modifiers, g_keyEvents[i].vkey);
-    }
+    wchar_t local_context[512];
+    g_app->context->Get(local_context, 512);
+    console_log(L"%d: '%hs' + [%hs %hs]\n", i, Debug_UnicodeString(local_context), Debug_ModifierName(g_keyEvents[i].modifiers), Debug_VirtualKey(g_keyEvents[i].vkey));
+
     _td->state.vkey = g_keyEvents[i].vkey;
     _td->state.charCode = VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey);
     g_shiftState = g_keyEvents[i].modifiers;

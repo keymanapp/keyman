@@ -215,7 +215,7 @@ BOOL ProcessGroup(LPGROUP gp)
 	p = kkp->dpOutput;
 	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
 	{
-		for(p = _td->miniContext; *p; p = incxstr(p))
+		for(p = decxstr(wcschr(_td->miniContext, 0)); p >= _td->miniContext; p = decxstr(p))
 		{
 			if(*p == UC_SENTINEL)
 				switch(*(p+1))

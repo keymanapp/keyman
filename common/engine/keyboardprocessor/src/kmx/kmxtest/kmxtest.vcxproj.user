@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>"-kmx" "014a.kmx" "-context" "" "-keys" "[K_A][SHIFT K_2][K_A][LCTRL K_2][K_A]" "-expected-output" "\u03B1\u1FB0\u1FB1"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>"-kmx" "014 - groups and virtual keys.kmx" "-keys" "[K_A][SHIFT K_2][K_A][LCTRL K_2][K_A]" "-expected-output" "\u03B1\u1FB0\u1FB1"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\test</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
