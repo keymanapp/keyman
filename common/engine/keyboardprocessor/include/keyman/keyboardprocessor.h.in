@@ -227,6 +227,32 @@ km_kbp_context_items_from_utf16(km_kbp_cp const *text,
 
 /*
 ```
+### `km_kbp_context_items_from_utf8`
+##### Description:
+Convert an UTF8 encoded Unicode string into an array of `km_kbp_context_item`
+structures. Allocates memory as needed.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
+  output buffer.
+- `KM_KBP_STATUS_INVALID_UTF`: In the event the UTF8 string cannot be
+decoded.
+##### Parameters:
+- __text__: a pointer to a null terminated array of utf8 encoded data.
+- __out_ptr__: a pointer to the result variable:
+    A pointer to the  start of the `km_kbp_context_item` array containing the
+    representation of the input string.
+    Terminated with a type of `KM_KBP_CT_END`.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_context_items_from_utf8(char const *text,
+                                km_kbp_context_item **out_ptr);
+
+/*
+```
 ### `km_kbp_context_items_to_utf16`
 ##### Description:
 Convert a context item array into a UTF-16 encoded string placing it into
