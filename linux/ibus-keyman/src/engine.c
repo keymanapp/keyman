@@ -33,7 +33,7 @@
 #include "keyman-service.h"
 #include "engine.h"
 
-#define Keyman_Pass_Backspace_To_IBus 254
+#define Keyman_Pass_Backspace_To_IBus 254 // unused keycode to forward backspace back to ibus
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
@@ -190,8 +190,13 @@ ibus_keyman_engine_constructor (GType                   type,
                               GObjectConstructParam  *construct_params)
 {
     IBusKeymanEngine *keyman;
+    IBusEngine *engine;
+    IBusText *text;
     KInputMethod *im;
     const gchar *engine_name;
+    gchar *surrounding_text;
+    guint cursor_pos, anchor_pos;
+    km_kbp_context_item *context_items;
     
     g_debug("DAR: ibus_keyman_engine_constructor");
     
@@ -199,7 +204,8 @@ ibus_keyman_engine_constructor (GType                   type,
                                                        n_construct_params,
                                                        construct_params);
 
-    engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
+    engine = (IBusEngine *) keyman;
+    engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
     g_message("DAR: ibus_keyman_engine_constructor %s", engine_name);
 
@@ -240,6 +246,17 @@ ibus_keyman_engine_constructor (GType                   type,
     if (status_state != KM_KBP_STATUS_OK)
     {
         g_warning("problem creating km_kbp_state");
+    }
+    //km_kbp_state_context(keyman->state);
+    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
+    {
+        g_message("getting initial context");
+        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
+        g_message("initial context is:%s", surrounding_text);
+        km_kbp_context_items_from_utf8(surrounding_text, &context_items);
+        g_free(surrounding_text);
+        km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
     }
 
     keyman->display  = XOpenDisplay(NULL);
@@ -314,13 +331,20 @@ int is_key_pressed(Display * display, char *key_vec, KeySym keysym)
     return key_vec[keycode >> 3] & (1 << (keycode & 7));
 }
 
-static void forward_key(IBusKeymanEngine *engine, unsigned int keysym, unsigned int state)
+static void forward_keysym(IBusKeymanEngine *engine, unsigned int keysym, unsigned int state)
 {
     unsigned char keycode;
-    g_debug("DAR: forward_key");
+    g_debug("DAR: forward_keysym");
     keycode = XKeysymToKeycode(engine->display, keysym);
     ibus_engine_forward_key_event((IBusEngine *)engine, keysym, keycode-8, state);
 }
+
+static void forward_keycode(IBusKeymanEngine *engine, unsigned char keycode, unsigned int state)
+{
+    g_debug("DAR: forward_keycode no keysym");
+    ibus_engine_forward_key_event((IBusEngine *)engine, 0, keycode, state);
+}
+
 
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMHardwareKeyboardInterpreter.java
 // uses kernel keycodes which are X11 keycode - 8
@@ -523,7 +547,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     ibus_engine_delete_surrounding_text(engine, action_items[i].erased * -1, action_items[i].erased);
                 } else {
                     g_message("forwarding backspace");
-                    forward_key(keyman, Keyman_Pass_Backspace_To_IBus, 0);
+                    forward_keycode(keyman, Keyman_Pass_Backspace_To_IBus, 0);
                 }
                 break;
             case KM_KBP_IT_PERSIST_OPT:
@@ -593,29 +617,55 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     return TRUE;
  }
 
+static void reset_context(IBusEngine *engine)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
+    IBusText *text;
+    gchar *surrounding_text;
+    guint cursor_pos, anchor_pos;
+    km_kbp_context_item *context_items;
+
+    g_message("reset_context");
+    km_kbp_context_clear(km_kbp_state_context(keyman->state));
+    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
+    {
+        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
+        g_message("new context is:%s", surrounding_text);
+        km_kbp_context_items_from_utf8(surrounding_text, &context_items);
+        g_free(surrounding_text);
+        km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
+    }
+}
+
 static void
 ibus_keyman_engine_focus_in (IBusEngine *engine)
 {
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
-    ibus_engine_register_properties (engine, kmfl->prop_list);
+    g_message("ibus_keyman_engine_focus_in");
+    ibus_engine_register_properties (engine, keyman->prop_list);
 
+    reset_context(engine);
     parent_class->focus_in (engine);
 }
 
 static void
 ibus_keyman_engine_focus_out (IBusEngine *engine)
 {
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
+    g_message("ibus_keyman_engine_focus_out");
+    km_kbp_context_clear(km_kbp_state_context(keyman->state));
     parent_class->focus_out (engine);
 }
 
 static void
 ibus_keyman_engine_reset (IBusEngine *engine)
 {
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
+    g_message("ibus_keyman_engine_reset");
     parent_class->reset (engine);
     ibus_keyman_engine_focus_in (engine);
 }
@@ -624,7 +674,7 @@ static void
 ibus_keyman_engine_enable (IBusEngine *engine)
 {
     const gchar *engine_name;
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
     KInputMethod *im;
 
     engine_name = ibus_engine_get_name (engine);
@@ -644,7 +694,7 @@ static void
 ibus_keyman_engine_disable (IBusEngine *engine)
 {
     const gchar *engine_name;
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
@@ -662,35 +712,40 @@ ibus_keyman_engine_disable (IBusEngine *engine)
 static void
 ibus_keyman_engine_page_up (IBusEngine *engine)
 {
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
+    g_message("ibus_keyman_engine_page_up");
+    reset_context(engine);
     parent_class->page_up (engine);
 }
 
 static void
 ibus_keyman_engine_page_down (IBusEngine *engine)
 {
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
+    g_message("ibus_keyman_engine_page_down");
+    reset_context(engine);
     parent_class->page_down (engine);
 }
 
 static void
 ibus_keyman_engine_cursor_up (IBusEngine *engine)
 {
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
+    g_message("ibus_keyman_engine_cursor_up");
+    reset_context(engine);
     parent_class->cursor_up (engine);
 }
 
 static void
 ibus_keyman_engine_cursor_down (IBusEngine *engine)
 {
+    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
-    IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
+    g_message("ibus_keyman_engine_cursor_down");
+    reset_context(engine);
     parent_class->cursor_down (engine);
 }
 
@@ -699,6 +754,7 @@ ibus_keyman_engine_property_activate (IBusEngine  *engine,
                                     const gchar *prop_name,
                                     guint        prop_state)
 {
+    g_message("ibus_keyman_engine_property_activate");
     parent_class->property_activate (engine, prop_name, prop_state);
 }
 

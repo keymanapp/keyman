@@ -521,7 +521,7 @@ keyman_destroy_ic(KInputContext *ic)
 KInputKeyboard * keyman_load_keyboard_from_file(const gchar *filename)
 {
 	KInputKeyboard *p_kbd = g_new(KInputKeyboard, 1);
-	g_message("DAR: kmfl_load_keyboard_from_file %s\n",filename);
+	g_message("DAR: keyman_load_keyboard_from_file %s\n",filename);
 #if 0
 	FILE *fp;
 	char version_string[6]={0};
