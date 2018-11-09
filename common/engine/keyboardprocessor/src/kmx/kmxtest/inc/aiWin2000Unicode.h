@@ -49,6 +49,10 @@ public:
 	/* Queue and sending functions */
 	
 	virtual BOOL SendActions();   // I4196
+
+  /* Tests */
+  
+  BOOL CheckOutput(wchar_t *expectedOutput);
 };
 
 #endif

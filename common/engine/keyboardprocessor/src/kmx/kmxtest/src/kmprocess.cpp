@@ -29,6 +29,12 @@ BOOL ProcessHook()
 {
   AIWin2000Unicode *app = GetApp();
   LPKEYBOARD kbd = GetKeyboard()->Keyboard;
+
+  if (kbd->StartGroup[BEGIN_UNICODE] == -1) {
+    // TODO: flag an error
+    return FALSE;
+  }
+
   LPGROUP gp = &kbd->dpGroupArray[kbd->StartGroup[BEGIN_UNICODE]];
 
 	fOutputKeystroke = FALSE;
@@ -36,7 +42,7 @@ BOOL ProcessHook()
 	ProcessGroup(gp);
 
   app->SetCurrentShiftState(g_shiftState);
-	app->SendActions();   // I4196
+	//app->SendActions();   // I4196
 
 	return !fOutputKeystroke;
 }

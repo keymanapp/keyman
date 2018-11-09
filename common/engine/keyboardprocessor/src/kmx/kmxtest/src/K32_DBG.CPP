@@ -51,6 +51,7 @@ int DebugLog_1(char *file, int line, char *function, char *fmt, ...)
 	va_start(vars, fmt);
 	vsnprintf_s(fmtbuf, sizeof(fmtbuf) / sizeof(fmtbuf[0]), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
+  va_end(vars);
 
 	if(g_debug_KeymanLog) {
     if(g_debug_ToConsole) {   // I3951
@@ -100,10 +101,20 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   __declspec(thread) static char bufout[2][128 * 7];
   WCHAR *p;
   char *q;
+  bufout[x][0] = 0;
   for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
   {
     sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
   }
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];
+}
+
+void write_console(BOOL error, wchar_t *fmt, ...) {
+  if (!g_silent || error) {
+    va_list vars;
+    va_start(vars, fmt);
+    vwprintf(fmt, vars);
+    va_end(vars);
+  }
 }

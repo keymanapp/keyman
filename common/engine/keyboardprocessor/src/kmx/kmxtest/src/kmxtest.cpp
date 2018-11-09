@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <corecrt_wstring.h>
 #include <string.h>
+#include <stdarg.h>
 
 struct KMXTest_KeyEvent {
   UINT vkey;
@@ -33,10 +34,15 @@ BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
 DWORD g_shiftState = 0;
 int g_nKeyEvents = 0;
 KMXTest_KeyEvent g_keyEvents[1024] = { 0 };
+BOOL g_silent = FALSE;
 
 /* Context - to refactor */
 WCHAR g_context[512] = L"";
 int g_contextLength = 0;
+
+/* Expected output */
+WCHAR g_expectedOutput[512] = L"";
+int g_expectedOutputLength = 0;
 
 /* Keyboard options - to refactor */
 KMXTest_KeyboardOption g_keyboardOption[1024] = { 0 };
@@ -63,6 +69,8 @@ void print_default_environment() {
   wprintf(L"  env.platform=%hs\n", g_platform);
   wprintf(L"  env.caps_lock=%d\n", g_capsLock);
 }
+
+void ValidateOptions();
 
 BOOL addKeyboardOption(char *storeName, char *value) {
   PWSTR p = strtowstr(storeName);
@@ -118,30 +126,59 @@ BOOL addOption(char *val) {
 }
 
 BOOL addKey(char *val, int len) {
+  char *buf = new char[len + 1];
+  strncpy(buf, val, len);
+  buf[len] = 0;
+  val = buf;
+
   DWORD ShiftState = 0;
   char *p = strchr(val, ' ');
-  while (p) {
-    for (int i = 0; s_modifierNames[i].name; i++) {
-      if (!_strnicmp(val, s_modifierNames[i].name, (int)(p - val))) {
+  while (p && *p) {
+    int i;
+    for (i = 0; s_modifierNames[i].name; i++) {
+      if (!_strnicmp(val, s_modifierNames[i].name, __max(strlen(s_modifierNames[i].name), (unsigned int)(p - val)))) {
         ShiftState |= s_modifierNames[i].flag;
+        break;
       }
     }
-    val = p;
-    p = strchr(p + 1, ' ');
+    if (!s_modifierNames[i].name) {
+      console_error(L"invalid modifier: [%hs]\n", buf);
+      delete buf;
+      return FALSE;
+    }
+    val = p + 1;
+    p = strchr(val, ' ');
   }
   for (int i = 0; i < 256; i++) {
     if (!_strcmpi(val, VKeyNames[i])) {
       g_keyEvents[g_nKeyEvents].vkey = i;
       g_keyEvents[g_nKeyEvents++].modifiers = ShiftState;
+      delete buf;
       return TRUE;
     }
   }
+  console_error(L"invalid key: [%hs]\n", buf);
+  delete buf;
   return FALSE;
 }
 
-char VKeyToChar(UINT vk) {
+char VKeyToChar(UINT modifiers, UINT vk) {
+  // We only map SHIFT and UNSHIFTED
+  // TODO: Map CAPS LOCK correctly
+  if (modifiers != 0 && modifiers != K_SHIFTFLAG) {
+    return 0;
+  }
+
+  BOOL shifted = modifiers == K_SHIFTFLAG ? 1 : 0;
+
+  if (vk == VK_SPACE) {
+    // Override for space because it is the same for
+    // shifted and unshifted.
+    return 32;
+  }
+
   for (int i = 0; chToVKey[i].vkey; i++) {
-    if (chToVKey[i].vkey == vk) {
+    if (chToVKey[i].vkey == vk && chToVKey[i].shifted == shifted) {
       return i + 32;
     }
   }
@@ -179,54 +216,65 @@ BOOL setKeys(char *val) {
     else {
       return FALSE;
     }
-   
   }
   return TRUE;
 }
 
-BOOL addContext(DWORD ch) {
+BOOL addXStringChar(wchar_t *x, int *xl, DWORD ch) {
   if (ch > 0x10FFFF) return FALSE;
   if (ch >= 0x10000) {
-    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
-    g_context[g_contextLength++] = (WCHAR) Uni_UTF32ToSurrogate2(ch);
+    x[(*xl)++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
+    x[(*xl)++] = (WCHAR) Uni_UTF32ToSurrogate2(ch);
   }
   else {
-    g_context[g_contextLength++] = (WCHAR) ch;
+    x[(*xl)++] = (WCHAR) ch;
   }
-  g_context[g_contextLength] = 0;
+  x[*xl] = 0;
   return TRUE;
 }
 
-BOOL addContextDeadkey(DWORD dk) {
-  g_context[g_contextLength++] = UC_SENTINEL;
-  g_context[g_contextLength++] = CODE_DEADKEY;
-  g_context[g_contextLength++] = (WCHAR) (dk + 1);
-  g_context[g_contextLength] = 0;
+BOOL addXStringDeadkey(wchar_t *x, int *xl, DWORD dk) {
+  x[(*xl)++] = UC_SENTINEL;
+  x[(*xl)++] = CODE_DEADKEY;
+  x[(*xl)++] = (WCHAR) (dk + 1);
+  x[(*xl)] = 0;
   return TRUE;
 }
 
-BOOL setContext(char *val) {
+BOOL setXString(wchar_t *x, int *xl, char *val) {
   while (*val) {
     if (*val == '\\') {
       val++;
       if (*val == '\\') {
-        if (!addContext(*val)) return FALSE;
+        if (!addXStringChar(x, xl, *val)) return FALSE;
       }
       else if (*val == 'u') {
         val++;
         char *p = NULL;
-        if (!addContext(strtol(val, &p, 16))) return FALSE;
+        if (!addXStringChar(x, xl, strtol(val, &p, 16))) return FALSE;
         val = p;
       }
       else if (*val == 'd') {
         val++;
         char *p = NULL;
-        if (!addContextDeadkey(strtol(val, &p, 10))) return FALSE;
+        if (!addXStringDeadkey(x, xl, strtol(val, &p, 10))) return FALSE;
         val = p;
       }
     }
+    else {
+      if (!addXStringChar(x, xl, *val)) return FALSE;
+      val++;
+    }
   }
   return TRUE;
+}
+
+BOOL setExpectedOutput(char *val) {
+  return setXString(g_expectedOutput, &g_expectedOutputLength, val);
+}
+
+BOOL setContext(char *val) {
+  return setXString(g_context, &g_contextLength, val);
 }
 
 int main(int argc, char *argv[]) {
@@ -235,10 +283,20 @@ int main(int argc, char *argv[]) {
 
   _setmode(_fileno(stdout), _O_U16TEXT);
 
+  
+  for (int i = 1; i < argc; i++) {
+    console_log(L"\"%hs\" ", argv[i]);
+  }
+  console_log(L"\n");
+  //
+
   for (int i = 1; i < argc-1; i += 2) {
     char *arg = argv[i], *val = argv[i + 1];
     if (!strcmp(arg, "-kmx")) {
       filename = val;
+    }
+    else if (!strcmp(arg, "-expected-output")) {
+      invalid = !setExpectedOutput(val);
     }
     else if (!strcmp(arg, "-context")) {
       invalid = !setContext(val);
@@ -249,17 +307,25 @@ int main(int argc, char *argv[]) {
     else if (!strcmp(arg, "-d")) {
       invalid = !addOption(val);
     }
+    else if (!strcmp(arg, "-s")) {
+      g_silent = TRUE;
+      i--;
+    }
     else {
       invalid = TRUE;
     }
-
-    if (invalid) break;
+    if (invalid) {
+      console_error(L"Invalid argument %d: '%hs' = '%hs'\n", i, arg, val);
+      break;
+    }
   }
 
   if (invalid || g_nKeyEvents == 0 || filename == NULL) {
-    wprintf(L"Usage: kmxtest -kmx <file.kmx> -context context -keys key-sequence -d a=b\n");
+
+    wprintf(L"Usage: kmxtest [-s] -kmx <file.kmx> [-context context] -keys key-sequence [-expected-output output] [-d a=b]...\n");
+    wprintf(L"  -s silent\n");
     wprintf(L"  file.kmx must exist. No translation is done for mnemonic layout, etc.\n");
-    wprintf(L"  context should be a string of unicode characters and/or deadkeys:\n");
+    wprintf(L"  context, output should be a string of unicode characters and/or deadkeys:\n");
     wprintf(L"    e.g. \"ABC\\u1234\\dxxxx\\d{name}\" (where xxxx is the integer deadkey value or {name} is the deadkey name if keyboard is compiled with debug)\n");
     wprintf(L"  key-sequence is one or more Keyman keystrokes:\n");
     wprintf(L"    e.g. \"[SHIFT K_A] [K_B]\"\n");
@@ -272,7 +338,6 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
-
   g_app = new AIWin2000Unicode();
 
   g_ThreadData.IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
@@ -280,7 +345,7 @@ int main(int argc, char *argv[]) {
   // run;
 
   if (!LoadlpKeyboard(filename)) {
-    wprintf(L"Failed to load %hs\n", filename);
+    console_error(L"Failed to load %hs\n", filename);
     return 1;
   }
 
@@ -288,26 +353,39 @@ int main(int argc, char *argv[]) {
 
   g_app->SetContext(g_context);
 
-  wprintf(L"============ Starting test ============\n");
+  console_log(L"============ Starting test ============\n");
 
   for (int i = 0; i < g_nKeyEvents; i++) {
     if (g_keyEvents[i].vkey < 256) {
-      wprintf(L"[%d] == %hs\n", i, VKeyNames[g_keyEvents[i].vkey]);
+      console_log(L"[%d] %x + %hs\n", i, g_keyEvents[i].modifiers, VKeyNames[g_keyEvents[i].vkey]);
     } 
     else {
-      wprintf(L"[%d] == %x\n", i, g_keyEvents[i].vkey);
+      console_log(L"[%d] %x + %x\n", i, g_keyEvents[i].modifiers, g_keyEvents[i].vkey);
     }
     _td->state.vkey = g_keyEvents[i].vkey;
-    _td->state.charCode = VKeyToChar(g_keyEvents[i].vkey);
+    _td->state.charCode = VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey);
     g_shiftState = g_keyEvents[i].modifiers;
     
-    ProcessHook();
+    BOOL outputKeystroke = !ProcessHook();
+    console_log(L"outputKeystroke = %d\n", outputKeystroke);
   }
 
-  wprintf(L"============ Stopping test ============\n");
+
+  int result = g_app->CheckOutput(g_expectedOutput) ? 0 : 1;
+  if (result == 1) {
+    console_error(L"Output did not match expected output\n");
+  } else {
+    console_log(L"Output matched expected output\n");
+  }
+  ValidateOptions();
+
+  console_log(L"============ Stopping test ============\n");
 
   delete g_app;
-  return 0;
+  return result;
+}
+
+void ValidateOptions() {
 }
 
 AIWin2000Unicode *GetApp() {
@@ -615,8 +693,8 @@ const struct KMXTest_ModifierNames s_modifierNames[14] = {
   {"LALT", 0x0004},		// Left Alt flag
   {"RALT", 0x0008},		// Right Alt flag
   {"SHIFT", 0x0010},		// Either shift flag
-  {"CTRL", 0x0020},		// Either ctrl flag
-  {"ALT", 0x0040},		// Either alt flag
+  {"CTRL-do-not-use", 0x0020},		// Either ctrl flag -- don't use this for inputs
+  {"ALT-do-not-use", 0x0040},		// Either alt flag -- don't use this for inputs
   {"CAPS", 0x0100},		// Caps lock on
   {"NCAPS", 0x0200},		// Caps lock NOT on
   {"NUMLOCK", 0x0400},		// Num lock on

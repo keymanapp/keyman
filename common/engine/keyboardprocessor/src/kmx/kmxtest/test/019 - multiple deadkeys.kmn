@@ -1,0 +1,14 @@
+c Description: Tests a multiple deadkey rule in Unicode
+c keys: [SHIFT K_6][K_A]
+c expected: \u00E2
+c context: 
+
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys 
+
++ '^' > 'c' deadkey(1) deadkey(2) 'b'
+
+'c' dk(1) dk(2) 'b' + 'a' >  U+00E2

@@ -483,6 +483,13 @@ char *Debug_VirtualKey(WORD vk);
 char *Debug_UnicodeString(PWSTR s, int x = 0);
 inline BOOL ShouldDebug();
 
+#define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
+#define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
+
+void write_console(BOOL error, wchar_t *fmt, ...);
+
+/* Utility */
+
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
 #include "appint.h"
