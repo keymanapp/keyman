@@ -47,10 +47,6 @@ public:
 	virtual WCHAR *ContextBufMax(int n);
   void SetContext(PWCHAR ctxt);
 
-	/* Queue and sending functions */
-	
-	virtual BOOL SendActions();   // I4196
-
   /* Tests */
   void LogOutput();
 

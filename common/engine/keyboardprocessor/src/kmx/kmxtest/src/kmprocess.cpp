@@ -4,14 +4,6 @@
 */
 #include "pch.h"   // I4575
 
-BOOL fOutputKeystroke;
-
-char *getcontext_debug() {
-  //return "";
-  AIWin2000Unicode *app = GetApp();
-	return Debug_UnicodeString(app->ContextBufMax(128));
-}
-
 /*
 *	BOOL ProcessHook();
 *
@@ -37,12 +29,11 @@ BOOL ProcessHook()
 
   LPGROUP gp = &kbd->dpGroupArray[kbd->StartGroup[BEGIN_UNICODE]];
 
-	fOutputKeystroke = FALSE;
+	BOOL fOutputKeystroke = FALSE;
    
-	ProcessGroup(gp);
+	ProcessGroup(gp, &fOutputKeystroke);
 
   app->SetCurrentShiftState(g_shiftState);
-	//app->SendActions();   // I4196
 
 	return !fOutputKeystroke;
 }
@@ -61,7 +52,7 @@ BOOL ProcessHook()
 *	has a lot of crucial code in it!
 */
 
-BOOL ProcessGroup(LPGROUP gp)
+BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 {
 	DWORD i;
 	LPKEY kkp = NULL;
@@ -158,21 +149,21 @@ BOOL ProcessGroup(LPGROUP gp)
         PWCHAR pdeletecontext = app->ContextBuf(1);   // I4933
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           app->QueueAction(QIT_INVALIDATECONTEXT, 0);
-          fOutputKeystroke = TRUE;   // I4933
+          *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
         }
 				app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
         app->QueueAction(QIT_INVALIDATECONTEXT, 0);
-        fOutputKeystroke = TRUE;
+        *pOutputKeystroke = TRUE;
         return FALSE;
       }
 		}
 		else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0)
 		{
 			/* NoMatch rule found, and is a character key */ 
-			PostString(gp->dpNoMatch, g_keyboard.Keyboard, NULL);
+			PostString(gp->dpNoMatch, g_keyboard.Keyboard, NULL, pOutputKeystroke);
 		}
 		else if (_td->state.charCode != 0 && _td->state.charCode != 0xFFFF && gp->fUsingKeys)
 		{
@@ -235,11 +226,11 @@ BOOL ProcessGroup(LPGROUP gp)
 
 	/* Use PostString to post the rest of the output string. */
 
-	if(PostString(p, g_keyboard.Keyboard, NULL) == psrCheckMatches)
+	if(PostString(p, g_keyboard.Keyboard, NULL, pOutputKeystroke) == psrCheckMatches)
 	{
 		if(gp->dpMatch && *gp->dpMatch)
 		{
-			PostString(gp->dpMatch, g_keyboard.Keyboard, NULL);
+			PostString(gp->dpMatch, g_keyboard.Keyboard, NULL, pOutputKeystroke);
 		}
 	}
 
@@ -263,7 +254,7 @@ BOOL ProcessGroup(LPGROUP gp)
 *	to the active application, via the Keyman PostKey buffer.
 */
 
-int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr)
+int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
 {
 	PWSTR p, q, temp;
   LPSTORE s;
@@ -333,7 +324,7 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr)
 				break; 
 			case CODE_USE:					// use another group
 			  p++;
-			  ProcessGroup(&lpkb->dpGroupArray[*p-1]);
+			  ProcessGroup(&lpkb->dpGroupArray[*p-1], pOutputKeystroke);
 			  if(_td->state.StopOutput) return psrPostMessages;
 				FoundUse = TRUE;
 			  break;
@@ -347,7 +338,7 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr)
 
 				n = _td->IndexStack[*p - 1];
 				for(temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
-				PostString(temp, lpkb, incxstr(temp));
+				PostString(temp, lpkb, incxstr(temp), pOutputKeystroke);
 				break;
       case CODE_SETOPT:
         p++;

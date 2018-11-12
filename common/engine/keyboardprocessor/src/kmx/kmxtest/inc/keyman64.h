@@ -463,9 +463,9 @@ enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
 
 BOOL ProcessHook();	// returns FALSE on error or key not matched [only for AITip]
-BOOL ProcessGroup(LPGROUP gp);
+BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke);
 BOOL ContextMatch(LPKEY kkp);
-int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr);
+int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke);
 
 #define ShowDlgItem(hdlg, id, fShow ) ShowWindow( GetDlgItem( (hdlg), (id) ), (fShow) ? SW_SHOW : SW_HIDE )
 #define EnableDlgItem(hdlg, id, fEnable ) EnableWindow( GetDlgItem( (hdlg), (id) ), (fEnable) )

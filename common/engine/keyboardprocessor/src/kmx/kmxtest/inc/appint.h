@@ -100,7 +100,6 @@ public:
 	/* Queue and sending functions */
 	
 	void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
-	virtual BOOL SendActions() = 0;   // I4196
 };
 
 extern const LPSTR ItemTypes[];
