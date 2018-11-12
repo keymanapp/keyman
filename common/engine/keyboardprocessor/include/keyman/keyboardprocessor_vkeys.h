@@ -9,6 +9,8 @@
   History:      17 Oct 2018 - TSE - Moved & refactored km_kbp_modifier_state
                                     from keyboardprocessor.h.
                                   - Added VKey and mask definitions.
+                 6 Oct 2018 - TSE - Move into keyman folder.
+
 */
 enum km_kbp_modifier_state {
   KM_KBP_MODIFIER_LCTRL       = 1 << 0,
@@ -266,7 +268,7 @@ enum km_kpb_virtual_key {
   KM_KBP_VKEY_oDF,
   KM_KBP_VKEY_oE0,
   KM_KBP_VKEY_oE1,
-  KM_KBP_VKEY_oE2,
+  KM_KBP_VKEY_oE2,  // 102nd key on European layouts
   KM_KBP_VKEY_oE3,
   KM_KBP_VKEY_oE4,
   KM_KBP_VKEY__E5,
