@@ -57,7 +57,7 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry,
   Keyman.System.Standards.ISO6393ToBCP47Registry,
   Keyman.System.Standards.LCIDToBCP47Registry,
-  Keyman.System.Standards.LibPalasoAllTagsRegistry,
+  Keyman.System.Standards.NRSIAllTagsRegistry,
 
   utilstr;
 
@@ -117,7 +117,7 @@ begin
   if not Assigned(FAllTags) then
   begin
     FAllTags := TDictionary<string,TArray<string>>.Create;
-    TLibPalasoAllTagsMap.Fill(FAllTags);
+    TNRSIAllTagsMap.Fill(FAllTags);
   end;
 end;
 
