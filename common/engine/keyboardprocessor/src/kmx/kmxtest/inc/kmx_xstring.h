@@ -1,3 +1,7 @@
+#pragma once
+
+#include "kmx_base.h"
+
 PWSTR incxstr(PWSTR p);
 PWSTR decxstr(PWSTR p);
 int xstrlen(PWSTR p);

@@ -1,112 +1,17 @@
-/*
-  Name:             Keyman64
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      1 Aug 2006
 
-  Modified Date:    9 Aug 2015
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+#pragma once
 
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          01 Aug 2006 - mcdurdin - Remove HWND parameter from SelectKeyboard
-                    23 Aug 2006 - mcdurdin - Add version 7.0 system stores - VISUALKEYBOARD, KMW_RTL, KMW_HELPFILE, KMW_HELPTEXT, KMW_EMBEDJS
-                    14 Sep 2006 - mcdurdin - Add IsSysTrayWindow function
-                    30 May 2007 - mcdurdin - I864 - Log exceptions in hookprocs
-                    13 Jul 2007 - mcdurdin - I934 - Prep for x64
-                    05 Nov 2007 - mcdurdin - I1087 - Add hotkeys to switch languages (Pro)
-                    27 Mar 2008 - mcdurdin - I1358 - Add TSS_WINDOWSLANGUAGES
-                    27 Mar 2008 - mcdurdin - I1287 - switch keyboard and language together
-                    14 Jun 2008 - mcdurdin - I1389 - BKSP single backspace for Vista+
-                    27 Jan 2009 - mcdurdin - I1797 - AIWin2000 fallback
-                    30 Jan 2009 - mcdurdin - I1835 - Improve refresh, debug performance
-                    11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
-                    12 Mar 2010 - mcdurdin - I934 - x64 - Complete
-                    12 Mar 2010 - mcdurdin - I2229 - Remove hints and warnings
-                    22 Mar 2010 - mcdurdin - Compiler tidyup
-                    29 Mar 2010 - mcdurdin - I1089 - One keyboard - all applications
-                    29 Mar 2010 - mcdurdin - I2265 - Keyboard switching reliability
-                    06 Apr 2010 - mcdurdin - I2271 - Select Keyboard tidy up
-                    04 May 2010 - mcdurdin - I2355 - Resolve deadlocks loading keyman32.dll
-                    04 May 2010 - mcdurdin - I2349 - Pause key for debug log switch
-                    04 May 2010 - mcdurdin - I2353 - DebugLastError function
-                    25 May 2010 - mcdurdin - I1632 - Keyboard Options
-                    01 Dec 2012 - mcdurdin - I3613 - V9.0 - System shadow keyboards obsolete, strip out remaining code
-                    01 Dec 2012 - mcdurdin - I3616 - V9.0 - Language association obsolete, strip out code
-                    07 Nov 2013 - mcdurdin - I3949 - V9.0 - Keyboard selection and notification needs consolidation
-                    17 Dec 2013 - mcdurdin - I4006 - V9.0 - Remove old aiDefault code
-                    06 Mar 2014 - mcdurdin - I4124 - V9.0 - Language switch dialog is not working in v9
-                    16 Apr 2014 - mcdurdin - I4169 - V9.0 - Mnemonic layouts should be recompiled to positional based on user-selected base keyboard
-                    28 May 2014 - mcdurdin - I4220 - V9.0 - Remove references to LoadKeyboardLayout, Preload, Substitutes, etc. and use only TSF
-                    16 Jun 2014 - mcdurdin - I4271 - V9.0 - Switch language for all applications is not working
-                    23 Jun 2014 - mcdurdin - I4287 - V9.0 - Remove extraneous AppIntegration class type tests
-                    03 Aug 2014 - mcdurdin - I4326 - V9.0 - Switch-off hotkey not working, then keyboard hotkey stopped working (win 8.1 jeremy) [High]
-                    13 Aug 2014 - mcdurdin - I4370 - Deadkeys are still not working in Winword TIP mode
-                    14 Aug 2014 - mcdurdin - I4379 - V9.0 - kmtip should use the Keyman debug logging framework
-                    16 Oct 2014 - mcdurdin - I4462 - V9.0 - Keyman had a mismatch between KEYBOARDINFO and INTKEYBOARDINFO
-                    03 Feb 2015 - mcdurdin - I4582 - V9.0 - Most underlying layout code in Keyman32 is now obsolete and needs to be removed
-                    09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
-*/
-/***************************************************************************/   // I4006   // I4169
-
-#ifndef _KEYMAN64_H
-#define _KEYMAN64_H
-
-/*
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
-#endif
-
-#ifndef STRICT
-#define STRICT
-#endif
-
-#include <windows.h>
-*/
-
-typedef unsigned long       DWORD;
-typedef int                 BOOL;
-typedef unsigned char       BYTE;
-typedef unsigned short      WORD;
-
-typedef wchar_t WCHAR;    // wc,   16-bit UNICODE character
-typedef _Null_terminated_ WCHAR *NWPSTR, *LPWSTR, *PWSTR;
-typedef WCHAR *PWCHAR, *LPWCH, *PWCH;
-
-typedef char CHAR;
-typedef CHAR *PCHAR, *LPCH, *PCH;
-typedef _Null_terminated_ CHAR *NPSTR, *LPSTR, *PSTR;
-
-#define far
-#define near
-
-typedef unsigned int        UINT;
-
-typedef BYTE near           *PBYTE;
-typedef BYTE far            *LPBYTE;
-typedef WORD near           *PWORD;
-typedef WORD far            *LPWORD;
-typedef DWORD near          *PDWORD;
-typedef DWORD far           *LPDWORD;
-
-
-#ifndef FALSE
-#define FALSE               0
-#endif
-
-#ifndef TRUE
-#define TRUE                1
-#endif
-
+#include <assert.h>
+#include "kmx_base.h"
+#include "kmx_file.h"
+#include "kmx_context.h"
+#include "kmx_actions.h"
+#include "kmx_xstring.h"
 
 #ifndef VK_LBUTTON
 
 /*
- * Virtual Keys, Standard Set
+ * TODO: replace with the definitions from KPAPI: Virtual Keys, Standard Set
  */
 #define VK_LBUTTON        0x01
 #define VK_RBUTTON        0x02
@@ -374,9 +279,6 @@ typedef DWORD far           *LPDWORD;
 #endif
 
 
-#include <assert.h>
-#include "compiler.h"
-
 
 /***************************************************************************/ 
 
@@ -493,14 +395,6 @@ void write_console(BOOL error, wchar_t *fmt, ...);
 
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
-#include "appint.h"
-#include "aiwin2000unicode.h"
-#include "globals.h"
-
-#include "capsstate.h"
-#include "keystate.h"
-#include "keyboardoptions.h"
-
 #define Uni_IsSurrogate1(ch) ((ch) >= 0xD800 && (ch) <= 0xDBFF)
 #define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
 #define Uni_IsSMP(ch) ((ch) >= 0x10000)
@@ -510,6 +404,47 @@ PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 #define Uni_UTF32ToSurrogate1(ch)	(((ch) - 0x10000) / 0x400 + 0xD800)
 #define Uni_UTF32ToSurrogate2(ch)	(((ch) - 0x10000) % 0x400 + 0xDC00)
 
-#include "xstring.h"
 
-#endif	// _KEYMAN64_H
+void ResetCapsLock(void);
+void KeyCapsLockPress(BOOL FIsUp);
+void KeyShiftPress(BOOL FIsUp);
+
+BOOL IsEquivalentShift(UINT rshift, UINT kshift);
+
+void LoadKeyboardOptions(LPINTKEYBOARDINFO kp);
+void FreeKeyboardOptions(LPINTKEYBOARDINFO kp);
+void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
+void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
+void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
+
+#define GLOBAL_ContextStackSize 80
+
+/* External interface functions */
+
+typedef struct tagKEYMAN64THREADDATA
+{
+  LPWORD IndexStack;
+  LPWSTR miniContext;
+
+  KMSTATE state;
+
+} KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
+
+/* Thread Local Data */
+
+PKEYMAN64THREADDATA ThreadGlobals();
+
+/* Temporary globals */
+
+struct KMXTest_KeyboardOption {
+  wchar_t name[128], value[128];
+};
+
+extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
+extern DWORD g_shiftState;
+extern BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
+extern wchar_t g_baseLayout[260], g_baseLayoutAlt[34], g_context[512];
+extern INTKEYBOARDINFO g_keyboard;
+extern KMXTest_KeyboardOption g_keyboardOption[1024];
+extern int g_keyboardOptionCount;
+extern BOOL g_capsLock;

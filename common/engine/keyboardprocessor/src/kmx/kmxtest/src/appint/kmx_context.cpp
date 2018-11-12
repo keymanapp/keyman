@@ -124,33 +124,4 @@ BOOL AppContext::CharIsSurrogatePair()
     Uni_IsSurrogate2(CurContext[pos - 1]);
 }
 
-/* AppActionQueue */
-
-AppActionQueue::AppActionQueue()
-{ 
-	ResetQueue();
-}
-
-void AppActionQueue::ResetQueue()
-{
-	QueueSize = 0;   // I4262
-}
-
-BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
-{
-	if(QueueSize > MAXACTIONQUEUE - 1)
-	{
-    DebugLog("App::QueueAction: queue size exceeded");
-		return FALSE;
-	}
-
-	Queue[QueueSize].ItemType = ItemType;
-	Queue[QueueSize].dwData   = dwData;
-
-	QueueSize++;
-
-  DebugLog("App::QueueAction: %s %x", ItemTypes[ItemType], dwData);
-
-	return TRUE;
-}
 

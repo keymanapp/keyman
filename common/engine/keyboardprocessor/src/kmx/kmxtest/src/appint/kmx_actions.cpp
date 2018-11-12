@@ -4,9 +4,16 @@
 */
 #include "pch.h"   // I4128   // I4287
 
+
+void AIWin2000Unicode::ResetQueue()
+{
+  QueueSize = 0;   // I4262
+}
+
 AIWin2000Unicode::AIWin2000Unicode()
 {
-	context = new AppContext;
+  ResetQueue();
+  context = new AppContext;
 }
 
 AIWin2000Unicode::~AIWin2000Unicode()
@@ -37,7 +44,18 @@ WCHAR *AIWin2000Unicode::ContextBufMax(int n)
 	
 BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 {
-	int result = AppIntegration::QueueAction(ItemType, dwData);
+  if (QueueSize > MAXACTIONQUEUE - 1)
+  {
+    DebugLog("App::QueueAction: queue size exceeded");
+    return FALSE;
+  }
+
+  Queue[QueueSize].ItemType = ItemType;
+  Queue[QueueSize].dwData = dwData;
+
+  QueueSize++;
+
+  int result = TRUE;
 	
 	switch(ItemType)
 	{

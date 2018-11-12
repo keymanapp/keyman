@@ -120,16 +120,16 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\appint\aiWin2000Unicode.cpp" />
-    <ClCompile Include="src\appint\appint.cpp" />
-    <ClCompile Include="src\capsstate.cpp" />
-    <ClCompile Include="src\common\xstring.cpp" />
-    <ClCompile Include="src\K32_DBG.CPP" />
-    <ClCompile Include="src\K32_load.cpp" />
-    <ClCompile Include="src\keyboardoptions.cpp" />
+    <ClCompile Include="src\appint\kmx_actions.cpp" />
+    <ClCompile Include="src\appint\kmx_context.cpp" />
+    <ClCompile Include="src\kmx_capslock.cpp" />
+    <ClCompile Include="src\common\kmx_xstring.cpp" />
+    <ClCompile Include="src\kmx_debug.CPP" />
+    <ClCompile Include="src\kmx_file.cpp" />
+    <ClCompile Include="src\kmx_options.cpp" />
     <ClCompile Include="src\kmxtest.cpp" />
-    <ClCompile Include="src\keystate.cpp" />
-    <ClCompile Include="src\kmprocess.cpp" />
+    <ClCompile Include="src\kmx_modifiers.cpp" />
+    <ClCompile Include="src\kmx_processor.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -138,20 +138,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\aiWin2000Unicode.h" />
-    <ClInclude Include="inc\appint.h" />
-    <ClInclude Include="inc\capsstate.h" />
-    <ClInclude Include="inc\Compiler.h" />
-    <ClInclude Include="inc\globals.h" />
-    <ClInclude Include="inc\keyboardoptions.h" />
-    <ClInclude Include="inc\keyman64.h" />
-    <ClInclude Include="inc\keymanversion.h" />
-    <ClInclude Include="inc\keymanversion_build.h" />
-    <ClInclude Include="inc\keystate.h" />
+    <ClInclude Include="inc\kmx_actions.h" />
+    <ClInclude Include="inc\kmx_base.h" />
+    <ClInclude Include="inc\kmx_context.h" />
+    <ClInclude Include="inc\kmx_file.h" />
+    <ClInclude Include="inc\kmx_processor.h" />
     <ClInclude Include="inc\kmxtest.h" />
     <ClInclude Include="inc\pch.h" />
-    <ClInclude Include="inc\unicode.h" />
-    <ClInclude Include="inc\xstring.h" />
+    <ClInclude Include="inc\kmx_xstring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

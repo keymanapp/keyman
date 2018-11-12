@@ -1,39 +1,11 @@
 /*
-  Name:             Compiler
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      4 Jan 2007
-
-  Modified Date:    24 Aug 2015
+  Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          04 Jan 2007 - mcdurdin - Add CODE_NOTANY
-                    22 Mar 2010 - mcdurdin - Compiler tidyup
-                    25 May 2010 - mcdurdin - I1632 - Keyboard Options
-                    24 Oct 2013 - mcdurdin - I3933 - V9.0 - Keyman tray icon menu is not showing installed keyboards
-                    19 Mar 2014 - mcdurdin - I4140 - V9.0 - Add keyboard version information to keyboards
-                    16 Jun 2014 - mcdurdin - I4271 - V9.0 - Switch language for all applications is not working
-                    31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
-                    24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
-                    24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
 */
 
-#ifndef	_COMPILER_H
-#define _COMPILER_H
+#pragma once
 
-
-
-/* WM_UNICHAR */ 
-
-#define WM_UNICHAR		0x0109
-#define UNICODE_NOCHAR	0xFFFF
+#include "kmx_base.h"
 
 /* */
 
@@ -50,9 +22,6 @@
 #define	ALTFLAG 0x8000
 
 /* Miscellaneous flags and defines */ 
-
-#define UM_DRAWICONS	0x01
-#define NUL '\0'
 
 #define MAXGROUPS	128
 
@@ -73,55 +42,18 @@
 #define VERSION_MIN	VERSION_50
 #define VERSION_MAX	VERSION_100
 
-/*
- Special flag for WM_CHAR/WM_KEY???/WM_SYSKEY???: says that key has been
- processed by Keyman.
-*/
-
-//#define KEYMAN_CHARFLAG 0x0000000L
-#define KEYMAN_CHARFLAG   0x02000000L
-
-#define CHAR_TRANSTATE    0x00000001L			// Flag for WM_CHAR: key is down, first repeat
-#define KEYUP_TRANSTATE	  0xC0000001L			// Flag for WM_KEYUP: key is up, first repeat
-#define KEYDOWN_TRANSTATE 0x00000001L			// Flag for WM_KEYDOWN: key is down, first rpt
-#define ALT_TRANSTATE     0x20000000L			// Flag for WM_KEYBOARD messages: alt is down
-
-#define IDM_DISABLEKEY	0xFF00
-
-#define WINDOWS_VERSION_3_1		0x030A
-#define WINDOWS_VERSION_3_11	0x030B
-#define WINDOWS_VERSION_4_0		0x035F
-#define WINDOWS_VERSION_95		0x035F
-
-#define HKLM HKEY_LOCAL_MACHINE
-#define HKCU HKEY_CURRENT_USER
-
 //
-// DEBUGINFO states
+// Backspace types
 //
-#define KDS_KEYBOARD	0x0001
-#define KDS_PROGRAM		0x0002
-#define KDS_MESSAGE		0x0004
-#define KDS_INTERNAT	0x0008
 
-#define KDS_CONTROL		0x8000
-
+#define BK_DEFAULT    0
 #define BK_DEADKEY		1
 #define BK_BACKSPACE	2
-#define BK_SUPP2      3 // I1389 - Second backspace for supplementary pairs - so we can ignore it on Vista, etc
-/*
- A blank key (in a group without "using keys") cannot be '0' as that is
- used for error testing and blanking out unused keys and you don't really
- want that tested!
-*/
-
-#define BLANKKEY				0xFF		// Blank key
+#define BK_SUPP2      3 // TODO: eliminate I1389 - Second backspace for supplementary pairs - so we can ignore it on Vista, etc
 
 // Different begin types
 #define BEGIN_ANSI		0
 #define BEGIN_UNICODE	1
-
-//#define lpuch		(LPBYTE)				
 
 #define TSS_NONE				0
 #define TSS_BITMAP				1
@@ -340,6 +272,4 @@ typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
-
-#endif		// _COMPILER_H
 
