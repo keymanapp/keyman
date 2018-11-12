@@ -130,7 +130,7 @@ km_kbp_options_to_json(km_kbp_options const *opts, char *buf, size_t *space)
 }
 
 void
-km_kbp_cp_dispose(km_kbp_cp *cp)
+km_kbp_cp_dispose(km_kbp_cp const *cp)
 {
   delete [] cp;
 }

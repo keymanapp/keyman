@@ -10,7 +10,6 @@
                                     mutation functions.
 */
 #include <string>
-#include <codecvt>
 #include <keyman/keyboardprocessor.h>
 
 #include "context.hpp"

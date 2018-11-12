@@ -74,7 +74,11 @@ namespace
     auto s = km_kbp_options_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
-    return s == KM_KBP_STATUS_OK && ret == value;
+    bool v = s == KM_KBP_STATUS_OK && ret == value;
+    if (s == KM_KBP_STATUS_OK) {
+      km_kbp_cp_dispose(ret);
+    }
+    return v;
   }
 
 constexpr char const *empty_json = "\

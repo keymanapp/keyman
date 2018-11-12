@@ -883,7 +883,7 @@ returned by `km_kbp_options_lookup`.
 */
 KMN_API
 void
-km_kbp_cp_dispose(km_kbp_cp *cp);
+km_kbp_cp_dispose(km_kbp_cp const *cp);
 
 /*
 ```
