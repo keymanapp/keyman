@@ -40,11 +40,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -54,6 +54,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private static ImageButton addButton = null;
+  private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
@@ -89,6 +91,22 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+    closeButton = (Button) findViewById(R.id.close_keyman_button);
+    Bundle bundle = getIntent().getExtras();
+    if (bundle != null) {
+      if (!bundle.getBoolean(KMManager.KMKey_DisplayKeyboardSwitcher)) {
+        closeButton.setVisibility(View.GONE);
+      }
+    }
+    closeButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        KMManager.advanceToNextInputMode();
+        if (dismissOnSelect) {
+          finish();
+        }
+      }
+    });
 
     listView = (ListView) findViewById(R.id.listView);
     keyboardsList = getKeyboardsList(context);
@@ -152,7 +170,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     });
 
-    final ImageButton addButton = (ImageButton) findViewById(R.id.right_button);
+    addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
@@ -170,8 +188,9 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         }
       }
     });
-    if (!canAddNewKeyboard)
+    if (!canAddNewKeyboard) {
       addButton.setVisibility(View.GONE);
+    }
 
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);

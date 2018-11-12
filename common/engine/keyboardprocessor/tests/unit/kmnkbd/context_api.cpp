@@ -10,7 +10,6 @@
                                     mutation functions.
 */
 #include <string>
-
 #include <keyman/keyboardprocessor.h>
 
 #include "context.hpp"
@@ -79,7 +78,7 @@ int main(int, char * [])
   if(km_kbp_context_length(&mock_ctxt1) != bmp_ctxt_size) return __LINE__;
   if(km_kbp_context_length(&mock_ctxt2) != smp_ctxt_size) return __LINE__;
 
-  // retreive context and check it's okay.
+  // retrieve bmp context and check it's okay.
   km_kbp_context_item *tmp_ctxt;
   try_status(km_kbp_context_get(&mock_ctxt1, &tmp_ctxt));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
@@ -87,6 +86,7 @@ int main(int, char * [])
   km_kbp_context_items_dispose(tmp_ctxt);
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
 
+  // retrieve smp context and check it's okay.
   try_status(km_kbp_context_get(&mock_ctxt2, &tmp_ctxt));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
   try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));

@@ -19,7 +19,7 @@ namespace std {
   namespace filesystem = std::experimental::filesystem;
 }
 
-// Forward declartions
+// Forward declarations
 class json;
 
 namespace km {
@@ -28,8 +28,8 @@ namespace kbp
 
   class keyboard : public km_kbp_keyboard_attrs
   {
-    std::string const                         _keyboard_id;
-    std::string const                         _version_string;
+    std::u16string const                      _keyboard_id;
+    std::u16string const                      _version_string;
     std::filesystem::path              const  _folder_path;
     std::vector<km_kbp_option_item>           _default_opts;
 

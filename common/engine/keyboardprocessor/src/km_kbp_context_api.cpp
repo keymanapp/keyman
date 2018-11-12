@@ -115,6 +115,7 @@ km_kbp_status km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
       }
     }
     *i = 0; // null terminate the UTF16 string.
+
     *sz_ptr = buf_size - (e - i);
 
     return ci->type == KM_KBP_CT_END
@@ -157,8 +158,16 @@ km_kbp_status km_kbp_context_get(km_kbp_context const *ctxt,
   assert(ctxt); assert(out_ptr);
   if (!ctxt || !out_ptr)   return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  *out_ptr = new km_kbp_context_item[ctxt->size()];
+  try
+  {
+    *out_ptr = new km_kbp_context_item[ctxt->size() + 1];
+  }
+  catch (std::bad_alloc)
+  {
+    return KM_KBP_STATUS_NO_MEM;
+  }
   std::copy(ctxt->begin(), ctxt->end(), *out_ptr);
+  (*out_ptr)[ctxt->size()].type = KM_KBP_CT_END;
 
   return KM_KBP_STATUS_OK;
 }
