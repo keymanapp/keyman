@@ -3,7 +3,8 @@
   "version": "0.20181001.0",
   "description": "Keyman/Predictive Text integration layer",
   "scripts": {
-    "test": "mocha",
+    "test": "bash ./unit_tests/test.sh",
+    "mocha": "mocha",
     "tsc": "tsc"
   },
   "repository": {
