@@ -33,7 +33,6 @@ init_dependencies ( ) {
 
 # Defaults
 get_OS
-get_browser_set_for_OS
 
 FLAGS=
 
@@ -56,8 +55,19 @@ done
 
 init_dependencies
 
+BASE_PATH=`dirname $BASH_SOURCE`
+
 # Run headless (browserless) tests.
 npm run mocha --recursive ./unit_tests/headless/*.js
+
+CODE=$?
+if [ $CODE -ne 0 ]; then
+  echo "DOMless tests failed!"
+  exit $CODE
+fi
+
+# Run browser-based tests.
+$BASE_PATH/in_browser/browser-test.sh $os_id
 
 CODE=$?
 
