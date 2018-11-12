@@ -14,13 +14,13 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
-
 #include <keyman/keyboardprocessor.h>
 
 #include "option.hpp"
 #include "json.hpp"
 
-size_t km_kbp_options_list_size(km_kbp_option_item const *opts)
+size_t
+km_kbp_options_list_size(km_kbp_option_item const *opts)
 {
   assert(opts);
   if (!opts)  return 0;
@@ -32,7 +32,8 @@ size_t km_kbp_options_list_size(km_kbp_option_item const *opts)
 }
 
 
-km_kbp_status km_kbp_options_lookup(km_kbp_options const *opts,
+km_kbp_status
+km_kbp_options_lookup(km_kbp_options const *opts,
                                         uint8_t scope, km_kbp_cp const *key,
                                         km_kbp_cp const **value_out)
 {
@@ -42,12 +43,34 @@ km_kbp_status km_kbp_options_lookup(km_kbp_options const *opts,
   if (scope == KM_KBP_OPT_UNKNOWN || scope > KM_KBP_OPT_MAX_SCOPES)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  *value_out = opts->lookup(km_kbp_option_scope(scope), key);
-  return *value_out ? KM_KBP_STATUS_OK : KM_KBP_STATUS_KEY_ERROR;
+  // Copy the internal value to our new buffer
+  km_kbp_cp const *internal_value = opts->lookup(km_kbp_option_scope(scope), key);
+  if (!internal_value)
+  {
+    return KM_KBP_STATUS_KEY_ERROR;
+  }
+  std::u16string const &value = internal_value;
+
+  km_kbp_cp *valuep;
+  try
+  {
+    valuep = new km_kbp_cp[value.size() + 1];
+  }
+  catch (std::bad_alloc)
+  {
+    return KM_KBP_STATUS_NO_MEM;
+  }
+  std::copy(value.begin(), value.end(), valuep);
+  valuep[value.size()] = u'\0';
+
+  *value_out = valuep;
+
+  return KM_KBP_STATUS_OK;
 }
 
 
-km_kbp_status km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item const *opt)
+km_kbp_status
+km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item const *opt)
 {
   assert(opts); assert(opt);
   if (!opts || !opt)  return KM_KBP_STATUS_INVALID_ARGUMENT;
@@ -62,7 +85,9 @@ km_kbp_status km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item con
       if (!opts->assign(km_kbp_option_scope(opt->scope), opt->key, opt->value))
         return KM_KBP_STATUS_KEY_ERROR;
     }
-  } catch (std::bad_alloc) {
+  } 
+  catch (std::bad_alloc)
+  {
     return KM_KBP_STATUS_NO_MEM;
   }
 
@@ -71,7 +96,8 @@ km_kbp_status km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item con
 
 // This function doesn't need to use the json pretty printer for such a simple
 //  list of key:value pairs but it's a good introduction to it.
-km_kbp_status km_kbp_options_to_json(km_kbp_options const *opts, char *buf, size_t *space)
+km_kbp_status
+km_kbp_options_to_json(km_kbp_options const *opts, char *buf, size_t *space)
 {
   assert(opts); assert(space);
   if (!opts || !space)
@@ -101,4 +127,10 @@ km_kbp_status km_kbp_options_to_json(km_kbp_options const *opts, char *buf, size
   // Return space needed/used.
   *space = doc.size()+1;
   return KM_KBP_STATUS_OK;
+}
+
+void
+km_kbp_cp_dispose(km_kbp_cp *cp)
+{
+  delete [] cp;
 }

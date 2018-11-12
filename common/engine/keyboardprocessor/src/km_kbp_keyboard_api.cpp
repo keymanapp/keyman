@@ -25,23 +25,32 @@
 
 
 
-km_kbp_status km_kbp_keyboard_load(km_kbp_path_name kb_path,
+km_kbp_status
+km_kbp_keyboard_load(km_kbp_path_name kb_path,
                                    km_kbp_keyboard **keyboard)
 {
   assert(keyboard);
   if (!keyboard)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  auto stat = std::filesystem::status(kb_path);
+  //auto stat = std::filesystem::status(kb_path);
   //
   // if (stat.type() != std::filesystem::file_type::regular)
   //   return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  *keyboard = static_cast<km_kbp_keyboard *>(new km::kbp::keyboard(kb_path));
+  try
+  {
+    *keyboard = static_cast<km_kbp_keyboard *>(new km::kbp::keyboard(kb_path));
+  }
+  catch (std::bad_alloc) 
+  {
+    return KM_KBP_STATUS_NO_MEM;
+  }
   return KM_KBP_STATUS_OK;
 }
 
-void km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard)
+void
+km_kbp_keyboard_dispose(km_kbp_keyboard *keyboard)
 {
   delete keyboard;
 }

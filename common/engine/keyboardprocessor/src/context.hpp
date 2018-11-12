@@ -9,7 +9,6 @@
 #pragma once
 #include <list>
 #include <vector>
-
 #include <keyman/keyboardprocessor.h>
 
 // Forward declarations
