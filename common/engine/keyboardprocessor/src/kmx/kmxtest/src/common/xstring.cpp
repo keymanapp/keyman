@@ -139,3 +139,29 @@ int xchrcmp(PWSTR ch1, PWSTR ch2)
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return wcsncmp(ch1, ch2, (int)(nch1-ch1));
 }
+
+PWSTR strtowstr(PSTR in)
+{
+  PWSTR result;
+  size_t len;
+
+  mbstowcs_s(&len, NULL, 0, in, strlen(in));
+  result = new WCHAR[len + 1];
+  mbstowcs_s(&len, result, len, in, strlen(in));
+  result[len] = 0;
+  return result;
+}
+
+
+PSTR wstrtostr(PWSTR in)
+{
+  PSTR result;
+  size_t len;
+
+  wcstombs_s(&len, NULL, 0, in, wcslen(in));
+  result = new CHAR[len + 1];
+  wcstombs_s(&len, result, len, in, wcslen(in));
+  result[len] = 0;
+  return result;
+}
+

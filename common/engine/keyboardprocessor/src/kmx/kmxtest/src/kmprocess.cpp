@@ -593,28 +593,3 @@ BOOL ContextMatch(LPKEY kkp)
 }
 
 
-PWSTR strtowstr(PSTR in)
-{
-    PWSTR result;
-    size_t len;
-
-    mbstowcs_s(&len, NULL, 0, in, strlen(in));
-    result = new WCHAR[len+1];
-    mbstowcs_s(&len, result, len, in, strlen(in));
-    result[len] = 0;
-    return result;
-}
-
-
-PSTR wstrtostr(PWSTR in)
-{
-    PSTR result;
-    size_t len;
-
-    wcstombs_s(&len, NULL, 0, in, wcslen(in));
-    result = new CHAR[len+1];
-    wcstombs_s(&len, result, len, in, wcslen(in));
-    result[len] = 0;
-    return result;
-}
-
