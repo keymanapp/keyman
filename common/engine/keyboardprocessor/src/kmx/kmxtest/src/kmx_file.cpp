@@ -3,7 +3,10 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
+
+#ifdef _MSC_VER
 #include <share.h>
+#endif
 
 /* TODO: use portable 64-bit check here */
 #ifdef _WIN64
@@ -92,7 +95,11 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 		return FALSE;
 	}
 
+#ifdef _MSC_VER
   fp = _fsopen(fileName, "rb", _SH_DENYWR);
+#else
+  fp = fopen(fileName, "rb");
+#endif
   if(fp == NULL)
 	{
 		DebugLog("Could not open file");
