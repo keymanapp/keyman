@@ -50,7 +50,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
 
 	va_list vars;
 	va_start(vars, fmt);
-	vsnprintf_s(fmtbuf, sizeof(fmtbuf) / sizeof(fmtbuf[0]), _TRUNCATE, fmt, vars);  // I2248   // I3547
+	vsnprintf(fmtbuf, sizeof(fmtbuf) / sizeof(fmtbuf[0]), fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
   va_end(vars);
 
