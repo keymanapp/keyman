@@ -13,7 +13,10 @@ inline BOOL ShouldDebug() {
 #define NL  "\n"
 
 #include <chrono>
+
+#ifdef _MSC_VER
 #define _USE_WINDOWS
+#endif
 
 #ifdef _USE_WINDOWS
 #define DECLSPEC_IMPORT __declspec(dllimport)
@@ -100,7 +103,10 @@ const struct Debug_ModifierNames s_modifierNames[14] = {
 };
 
 char *Debug_ModifierName(UINT modifiers) {
-  __declspec(thread) static char buf[256];
+#ifdef _MSC_VER
+  __declspec(thread)
+#endif 
+  static char buf[256];
   buf[0] = 0;
   for(int i = 0; s_modifierNames[i].name; i++)
     if (modifiers & s_modifierNames[i].flag) {
@@ -112,7 +118,10 @@ char *Debug_ModifierName(UINT modifiers) {
 }
 
 char *Debug_VirtualKey(WORD vk) {
-  __declspec(thread) static char buf[256];
+#ifdef _MSC_VER
+  __declspec(thread)
+#endif 
+  static char buf[256];
   if (!ShouldDebug()) {
     return "";
   }
@@ -130,7 +139,10 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   if (!ShouldDebug()) {
     return "";
   }
-  __declspec(thread) static char bufout[2][128 * 7];
+#ifdef _MSC_VER
+  __declspec(thread)
+#endif 
+  static char bufout[2][128 * 7];
   WCHAR *p;
   char *q;
   bufout[x][0] = 0;
@@ -146,7 +158,10 @@ char *Debug_UnicodeString(std::u16string s, int x) {
   if (!ShouldDebug()) {
     return "";
   }
-  __declspec(thread) static char bufout[2][128 * 7];
+#ifdef _MSC_VER
+  __declspec(thread)
+#endif 
+  static char bufout[2][128 * 7];
   auto p = s.begin();
   char *q;
   bufout[x][0] = 0;
