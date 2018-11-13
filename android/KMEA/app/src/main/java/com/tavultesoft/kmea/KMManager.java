@@ -1635,6 +1635,15 @@ public final class KMManager {
 
           int start = textView.getSelectionStart();
           int end = textView.getSelectionEnd();
+          // Workaround for Android TextView bug where end < start
+          // Reference: https://issuetracker.google.com/issues/36911048
+          if (end < start) {
+            Log.d(TAG, "Swapping TextView selection end:" + end + " and start:" + start);
+            int temp = end;
+            end = start;
+            start = temp;
+          }
+
           if (dn <= 0) {
             if (start == end) {
               if (!s.isEmpty() && s.charAt(0) == '\n') {
