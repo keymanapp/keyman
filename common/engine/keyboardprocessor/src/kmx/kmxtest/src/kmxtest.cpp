@@ -6,6 +6,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <string>
 #include "kmxtest.h"
 
 struct KMXTest_KeyEvent {
@@ -31,11 +32,11 @@ BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
 BOOL g_silent = FALSE;
 
 /* Context - to refactor */
-WCHAR g_context[512] = L"";
+WCHAR g_context[512] = u"";
 int g_contextLength = 0;
 
 /* Expected output */
-WCHAR g_expectedOutput[512] = L"";
+WCHAR g_expectedOutput[512] = u"";
 int g_expectedOutputLength = 0;
 
 /* Keyboard options - to refactor */
@@ -46,10 +47,10 @@ int g_keyboardOptionCount = 0;
 KMX_Environment g_environment = {
   FALSE, // g_simulateAltGr
   FALSE, // g_baseLayoutGivesCtrlRAltForRAlt
-  L"kbdus.dll", // g_baseLayout
-  L"en-US", // g_baseLayoutAlt
+  u"kbdus.dll", // g_baseLayout
+  u"en-US", // g_baseLayoutAlt
   FALSE, // g_capsLock
-  "windows desktop hardware native" // g_platform
+  u"windows desktop hardware native" // g_platform
 };
 
 /* Constants - to refactor */
@@ -60,9 +61,9 @@ extern const struct KMXTest_ChToVKey chToVKey[];
 void print_default_environment() {
   wprintf(L"  env.simulate_altgr=%d\n", g_environment.g_simulateAltGr);
   wprintf(L"  env.base_layout_gives_ctrl_ralt_for_ralt=%d\n", g_environment.g_baseLayoutGivesCtrlRAltForRAlt);
-  wprintf(L"  env.base_layout=%s\n", g_environment.g_baseLayout);
-  wprintf(L"  env.base_layout_alt=%s\n", g_environment.g_baseLayoutAlt);
-  wprintf(L"  env.platform=%hs\n", g_environment.g_platform);
+  wprintf(L"  env.base_layout=%s\n", g_environment.g_baseLayout.c_str());
+  wprintf(L"  env.base_layout_alt=%s\n", g_environment.g_baseLayoutAlt.c_str());
+  wprintf(L"  env.platform=%hs\n", g_environment.g_platform.c_str());
   wprintf(L"  env.caps_lock=%d\n", g_environment.g_capsLock);
 }
 
@@ -70,11 +71,17 @@ void ValidateOptions();
 
 BOOL addKeyboardOption(char *storeName, char *value) {
   PWSTR p = strtowstr(storeName);
-  wcscpy_s(g_keyboardOption[g_keyboardOptionCount].name, p);
+  std::u16string ps(p);
+  size_t sz = ps.copy(g_keyboardOption[g_keyboardOptionCount].name, sizeof(g_keyboardOption[g_keyboardOptionCount].name) / sizeof(g_keyboardOption[g_keyboardOptionCount].name[0]));
+  g_keyboardOption[g_keyboardOptionCount].name[sz] = 0;
+  //wcscpy_s(g_keyboardOption[g_keyboardOptionCount].name, p);
   delete p;
   
   p = strtowstr(value);
-  wcscpy_s(g_keyboardOption[g_keyboardOptionCount++].value, p);
+  ps.assign(p);
+  sz = ps.copy(g_keyboardOption[g_keyboardOptionCount].value, sizeof(g_keyboardOption[g_keyboardOptionCount].value) / sizeof(g_keyboardOption[g_keyboardOptionCount].value[0]));
+  g_keyboardOption[g_keyboardOptionCount].value[sz] = 0;
+  //wcscpy_s(g_keyboardOption[g_keyboardOptionCount++].value, p);
   delete p;
   return TRUE;
 }
@@ -95,13 +102,17 @@ BOOL addOption(char *val) {
     g_environment.g_baseLayoutGivesCtrlRAltForRAlt = !!atoi(p);
   }
   else if (!_strnicmp(val, "env.base_layout", len)) {
-    wcscpy_s(g_environment.g_baseLayout, wp);
+    //std::u16string c(wp);
+    g_environment.g_baseLayout.assign(wp);
+    //c.copy(g_environment.g_baseLayout,  wcscpy_s(g_environment.g_baseLayout, wp);
   }
   else if (!_strnicmp(val, "env.base_layout_alt", len)) {
-    wcscpy_s(g_environment.g_baseLayoutAlt, wp);
+    g_environment.g_baseLayoutAlt.assign(wp);
+    //wcscpy_s(g_environment.g_baseLayoutAlt, wp);
   }
   else if (!_strnicmp(val, "env.platform", len)) {
-    strcpy_s(g_environment.g_platform, p);
+    g_environment.g_platform.assign(wp);
+    //strcpy_s(g_environment.g_platform, p);
   }
   else if (!_strnicmp(val, "env.caps_lock", len)) {
     g_environment.g_capsLock = !!atoi(p);
@@ -216,7 +227,7 @@ BOOL setKeys(char *val) {
   return TRUE;
 }
 
-BOOL addXStringChar(wchar_t *x, int *xl, DWORD ch) {
+BOOL addXStringChar(km_kbp_cp *x, int *xl, DWORD ch) {
   if (ch > 0x10FFFF) return FALSE;
   if (ch >= 0x10000) {
     x[(*xl)++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
@@ -229,7 +240,7 @@ BOOL addXStringChar(wchar_t *x, int *xl, DWORD ch) {
   return TRUE;
 }
 
-BOOL addXStringDeadkey(wchar_t *x, int *xl, DWORD dk) {
+BOOL addXStringDeadkey(km_kbp_cp *x, int *xl, DWORD dk) {
   x[(*xl)++] = UC_SENTINEL;
   x[(*xl)++] = CODE_DEADKEY;
   x[(*xl)++] = (WCHAR) (dk + 1);
@@ -237,7 +248,7 @@ BOOL addXStringDeadkey(wchar_t *x, int *xl, DWORD dk) {
   return TRUE;
 }
 
-BOOL setXString(wchar_t *x, int *xl, char *val) {
+BOOL setXString(km_kbp_cp *x, int *xl, char *val) {
   while (*val) {
     if (*val == '\\') {
       val++;
@@ -349,7 +360,7 @@ int main(int argc, char *argv[]) {
   console_log(L"============ Starting test ============\n");
 
   for (int i = 0; i < g_nKeyEvents; i++) {
-    wchar_t local_context[512];
+    km_kbp_cp local_context[512];
     kmx.GetContext()->Get(local_context, 512);
     console_log(L"%d: '%hs' + [%hs %hs]\n", i, Debug_UnicodeString(local_context), Debug_ModifierName(g_keyEvents[i].modifiers), Debug_VirtualKey(g_keyEvents[i].vkey));
 

@@ -3,7 +3,87 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
+#include <vector>
+#include <iterator>
+#include <codecvt>
 
+const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
+  while (*p) {
+    if (*p == ch) return p;
+    p++;
+  }
+  return ch == 0 ? p : NULL;
+}
+
+const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
+  km_kbp_cp *o = dst;
+  while (*src) {
+    *dst++ = *src++;
+  }
+  *dst = 0;
+  return o;
+}
+
+size_t u16len(const km_kbp_cp *p) {
+  int i = 0;
+  while (*p) {
+    p++;
+    i++;
+  }
+  return i;
+}
+
+int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q) {
+  while (*p && *q) {
+    if (*p != *q) return *p - *q;
+    p++;
+    q++;
+  }
+  return *p - *q;
+}
+
+int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q) {
+  while (*p && *q) {
+    if (toupper(*p) != toupper(*q)) return *p - *q;
+    p++;
+    q++;
+  }
+  return *p - *q;
+}
+
+int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) {
+  while (*p && *q && count) {
+    if (*p != *q) return *p - *q;
+    p++;
+    q++;
+    count--;
+  }
+  if (count)
+    return *p - *q;
+  return 0;
+}
+
+km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
+  if (!p) {
+    p = *ctx;
+    if (!p) return NULL;
+  }
+
+  km_kbp_cp *q = p;
+  while (*q && *q != ch) {
+    q++;
+  }
+  if (*q) {
+    *q = 0;
+    q++;
+    while (*q == ch) q++;
+    *ctx = q;
+  }
+  else {
+    *ctx = NULL;
+  }
+  return p;
+}
 
 /*
 *	int xstrlen( LPBYTE p );
@@ -128,7 +208,7 @@ int xstrpos(PWSTR p1, PWSTR p)
 PWSTR xstrchr(PWSTR buf, PWSTR chr)
 {
   for(PWSTR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
-    if(!wcsncmp(buf, chr, (int)(q-buf)))
+    if(!u16ncmp(buf, chr, (int)(q-buf)))
       return buf;
   return NULL;
 }
@@ -137,18 +217,39 @@ int xchrcmp(PWSTR ch1, PWSTR ch2)
 {
   PWSTR nch1 = incxstr(ch1);
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
-  return wcsncmp(ch1, ch2, (int)(nch1-ch1));
+  return u16ncmp(ch1, ch2, (int)(nch1-ch1));
 }
+
+
+/*
+  This function exists because of a bug in Visual Studio 2015 and 2017:
+  https://social.msdn.microsoft.com/Forums/en-US/8f40dcd8-c67f-4eba-9134-a19b9178e481/vs-2015-rc-linker-stdcodecvt-error?forum=vcgeneral
+  https://stackoverflow.com/a/35103224/1836776
+*/
+#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
+std::string utf16_to_utf8(std::u16string utf16_string)
+{
+  std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+  auto p = reinterpret_cast<const int16_t *>(utf16_string.data());
+  return convert.to_bytes(p, p + utf16_string.size());
+}
+#else
+std::string utf16_to_utf8(std::u16string utf16_string)
+{
+  std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+  return convert.to_bytes(utf16_string);
+}
+#endif
 
 PWSTR strtowstr(PSTR in)
 {
-  PWSTR result;
-  size_t len;
+  km_kbp_cp *result;
 
-  mbstowcs_s(&len, NULL, 0, in, strlen(in));
-  result = new WCHAR[len + 1];
-  mbstowcs_s(&len, result, len, in, strlen(in));
-  result[len] = 0;
+  std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+  auto s = convert.from_bytes(in, strchr(in, 0));
+  result = new WCHAR[s.length() + 1];
+  s.copy(reinterpret_cast<int16_t *>(result), s.length());
+  result[s.length()] = 0;
   return result;
 }
 
@@ -156,12 +257,60 @@ PWSTR strtowstr(PSTR in)
 PSTR wstrtostr(PWSTR in)
 {
   PSTR result;
-  size_t len;
 
-  wcstombs_s(&len, NULL, 0, in, wcslen(in));
-  result = new CHAR[len + 1];
-  wcstombs_s(&len, result, len, in, wcslen(in));
-  result[len] = 0;
+  auto s = utf16_to_utf8(in);
+  result = new char[s.length() + 1];
+  s.copy(result, s.length());
+  result[s.length()] = 0;
   return result;
 }
 
+#if 0
+namespace kmx {
+  struct kmx_char {
+    uint8_t type;
+    union {
+      /* codepoint */           struct { uint32_t ch; } ch;
+      /* CODE_ANY */            struct { uint16_t store; } any;
+      /* CODE_INDEX */          struct { uint16_t store, context_offset; } index;
+      // CODE_CONTEXT, CODE_NUL have no params
+      /* CODE_USE */            struct { uint16_t group; } use;                     
+      // CODE_RETURN, CODE_BEEP have no params
+      /* CODE_DEADKEY */        struct { uint16_t deadkey; } deadkey;
+      /* CODE_EXTENDED */       struct { uint16_t modifier, vkey; } extended;
+      // CODE_EXTENDEDEND not used
+      // CODE_SWITCH, CODE_KEY deprecated
+      // CODE_CLEARCONTEXT deprecated
+      /* CODE_CALL */           struct { uint16_t store; } call;  // Not supported cross-platform
+      /* CODE_CONTEXTEX */      struct { uint16_t context_offset; } contextex;
+      /* CODE_NOTANY */         struct { uint16_t store; } notany;
+      /* CODE_SETOPT */         struct { uint16_t store1, store2; } setopt;
+      /* CODE_IFOPT */          struct { uint16_t store1, store2, op; } ifopt;
+      /* CODE_SAVEOPT */        struct { uint16_t store; } saveopt;
+      /* CODE_RESETOPT */       struct { uint16_t store; } resetopt;
+      /* CODE_IFSYSTEMSTORE */  struct { uint16_t store1, store2, op; } ifsystemstore;
+      /* CODE_SETSYSTEMSTORE */ struct { uint16_t store1, store2; } setsystemstore;
+    };
+  };
+
+  class kmx_string : public std::vector<kmx_char> {
+    kmx_string(km_kbp_cp *source);
+  };
+
+
+  kmx_string::kmx_string(km_kbp_cp *source) {
+    auto ss = std::u16string(source);
+    for (auto i = ss.begin(); i != ss.end(); i++) {
+      if (*i == UC_SENTINEL) {
+
+      }
+      else {
+
+      }
+      switch (*i) {
+
+      }
+    }
+  }
+};
+#endif

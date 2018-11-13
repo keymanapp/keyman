@@ -62,6 +62,6 @@ public:
   /* Tests */
   void LogOutput();
 
-  BOOL CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput);
+  BOOL CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput);
 };
 

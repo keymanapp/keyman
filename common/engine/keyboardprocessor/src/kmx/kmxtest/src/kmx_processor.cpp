@@ -197,9 +197,9 @@ BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 
 	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
 	if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
-    wcsncpy_s(miniContext, GLOBAL_ContextStackSize, m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)-1), GLOBAL_ContextStackSize);  // I3162   // I3536
+    u16cpy(miniContext, /*GLOBAL_ContextStackSize,*/ m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)-1) /*, GLOBAL_ContextStackSize*/);  // I3162   // I3536
 	else
-	  wcsncpy_s(miniContext, GLOBAL_ContextStackSize, m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)), GLOBAL_ContextStackSize);  // I3162   // I3536
+	  u16cpy(miniContext, /*GLOBAL_ContextStackSize,*/ m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)) /*, GLOBAL_ContextStackSize*/);  // I3162   // I3536
 
   miniContext[GLOBAL_ContextStackSize-1] = 0;
 
@@ -218,7 +218,7 @@ BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 	p = kkp->dpOutput;
 	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
 	{
-		for(p = decxstr(wcschr(miniContext, 0)); p >= miniContext; p = decxstr(p))
+		for(p = decxstr((WCHAR *) u16chr(miniContext, 0)); p >= miniContext; p = decxstr(p))
 		{
 			if(*p == UC_SENTINEL)
 				switch(*(p+1))
@@ -382,8 +382,8 @@ int KMX_Processor::PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pO
 
 BOOL KMX_Processor::IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
 {
-  BOOL bEqual = _wcsicmp(layoutName, g_environment.g_baseLayout) == 0 ||   // I4583
-                _wcsicmp(layoutName, g_environment.g_baseLayoutAlt) == 0;   // I4583
+  BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(g_environment.g_baseLayout.c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_kbp_cp*>(g_environment.g_baseLayoutAlt.c_str())) == 0;   // I4583
 
   return bEqual;
 }
@@ -392,18 +392,18 @@ BOOL KMX_Processor::IsMatchingPlatformString(PWCHAR platform)  // I3432
 {
   // TODO retrieve platform string from client environment
   return
-    _wcsicmp(platform, L"windows") == 0 ||
-    _wcsicmp(platform, L"desktop") == 0 ||
-    _wcsicmp(platform, L"hardware") == 0 ||
-    _wcsicmp(platform, L"native") == 0;
+    u16icmp(platform, u"windows") == 0 ||
+    u16icmp(platform, u"desktop") == 0 ||
+    u16icmp(platform, u"hardware") == 0 ||
+    u16icmp(platform, u"native") == 0;
 }
 
 BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
 {
-  PWCHAR t = new WCHAR[wcslen(s->dpString)+1];
-  wcscpy_s(t, wcslen(s->dpString)+1, s->dpString);
+  PWCHAR t = new WCHAR[u16len(s->dpString)+1];
+  u16cpy(t, /*wcslen(s->dpString)+1,*/ s->dpString);
   PWCHAR context = NULL;
-  PWCHAR platform = wcstok_s(t, L" ", &context);
+  PWCHAR platform = u16tok(t, u' ', &context);
   while(platform != NULL)
   {
     if(!IsMatchingPlatformString(platform))
@@ -412,7 +412,7 @@ BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
       delete t;
       return FALSE;
     }
-    platform = wcstok_s(NULL, L" ", &context);
+    platform = u16tok(NULL, u' ', &context);
   }
 
   s->dwSystemID = TSS_PLATFORM_MATCH;
@@ -468,7 +468,7 @@ BOOL KMX_Processor::ContextMatch(LPKEY kkp)
     	s = &g_keyboard.Keyboard->dpStoreArray[(*(pp+2))-1];  // I2590
       t = &g_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
       
-      bEqual = wcscmp(s->dpString, t->dpString) == 0;
+      bEqual = u16cmp(s->dpString, t->dpString) == 0;
       if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
       if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
     }
@@ -494,7 +494,7 @@ BOOL KMX_Processor::ContextMatch(LPKEY kkp)
         {
           PWCHAR ss = GetSystemStore(g_keyboard.Keyboard, dwSystemID);
           if(ss == NULL) return FALSE;
-          bEqual = wcscmp(ss, t->dpString) == 0;
+          bEqual = u16cmp(ss, t->dpString) == 0;
         }
       }
       

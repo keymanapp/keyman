@@ -66,17 +66,18 @@ BOOL KMX_Actions::QueueAction(int ItemType, DWORD dwData)
 }
 
 
-BOOL KMX_Actions::CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput) {
+BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput) {
   //LogOutput();
   //console_log(L"--------------\n");
 
-  wchar_t output[512] = L"", *p;
+  std::u16string output(initialContext);
+  //km_kbp_cp output[512] = u"", *p;
 
-  wcscpy(output, initialContext);
+  //wcscpy(output, initialContext);
   
   int i = 0, n = 0;
 
-  p = wcschr(output, 0);
+  //p = wcschr(output, 0);
 
   for (; n < QueueSize; n++)
   {
@@ -118,21 +119,19 @@ BOOL KMX_Actions::CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput) 
       break;
     case QIT_CHAR:
       if (Uni_IsSMP(Queue[n].dwData)) {
-        *p++ = (WCHAR) Uni_UTF32ToSurrogate1(Queue[n].dwData);
-        *p++ = (WCHAR) Uni_UTF32ToSurrogate2(Queue[n].dwData);
+        output.push_back((km_kbp_cp) Uni_UTF32ToSurrogate1(Queue[n].dwData));
+        output.push_back((km_kbp_cp) Uni_UTF32ToSurrogate2(Queue[n].dwData));
       }
       else {
-        *p++ = (WCHAR) Queue[n].dwData;
+        output.push_back((km_kbp_cp) Queue[n].dwData);
       }
-      *p = 0;
       console_log(L"CHAR %x (%c)\n", Queue[n].dwData, Queue[n].dwData);
       break;
     case QIT_DEADKEY:
       console_log(L"DEADKEY\n");
-      *p++ = UC_SENTINEL;
-      *p++ = CODE_DEADKEY;
-      *p++ = (WCHAR)(Queue[n].dwData + 1);
-      *p = 0;
+      output.push_back(UC_SENTINEL);
+      output.push_back(CODE_DEADKEY);
+      output.push_back((WCHAR)(Queue[n].dwData + 1));
       break;
     case QIT_BELL:
       // TODO
@@ -143,9 +142,13 @@ BOOL KMX_Actions::CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput) 
 
       switch (Queue[n].dwData) {
       case BK_DEADKEY:
-        assert(p > output);
-        p = decxstr(p);
-        assert(*p == UC_SENTINEL && *(p + 1) == CODE_DEADKEY);
+        assert(!output.empty());
+        output.pop_back(); // delete DK value
+        assert(!output.empty());
+        assert(output.back() == CODE_DEADKEY);
+        output.pop_back(); // delete CODE_DEADKEY
+        assert(output.back() == UC_SENTINEL);
+        output.pop_back();
         break;
       case BK_SUPP2:
         // TODO: eliminate BK_SUPP2
@@ -153,23 +156,30 @@ BOOL KMX_Actions::CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput) 
       case BK_BACKSPACE:
         // Delete deadkeys either side of our previous character
         // because this is a user-input backspace
-        while (p > output) {
-          p = decxstr(p);
-          if (*p != UC_SENTINEL || *(p + 1) != CODE_DEADKEY) break;
+        while (output.length() >= 3 && 
+            output[output.length() - 3] == UC_SENTINEL && 
+            output[output.length() - 2] == CODE_DEADKEY) {
+          output.pop_back();
+          output.pop_back();
+          output.pop_back();
         }
-        if (p > output) {
-          while (p > output) {
-            p = decxstr(p);
-            if (*p != UC_SENTINEL || *(p + 1) != CODE_DEADKEY) break;
+        if (output.length() > 0) {
+          output.pop_back();
+
+          while (output.length() >= 3 &&
+            output[output.length() - 3] == UC_SENTINEL &&
+            output[output.length() - 2] == CODE_DEADKEY) {
+            output.pop_back();
+            output.pop_back();
+            output.pop_back();
           }
-          p = incxstr(p);
         }
-        *p = 0;
         break;
       default:
-        assert(p > output);
-        p = decxstr(p);
-        *p = 0;
+        assert(!output.empty());
+        if (output.length() >= 3)
+          assert(output[output.length() - 3] != UC_SENTINEL);
+        output.pop_back();
         break;
       }
 
@@ -179,9 +189,9 @@ BOOL KMX_Actions::CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput) 
 
   QueueSize = 0;
 
-  BOOL result = !wcscmp(output, expectedOutput);
+  BOOL result = output == expectedOutput;
 
-  wchar_t _context[256];
+  km_kbp_cp _context[256];
   m_context->Get(_context, 256);
 
   write_console(!result, L"context = %hs\n", Debug_UnicodeString(_context, 0));

@@ -29,11 +29,12 @@ void KMX_Context::Add(WCHAR ch)
   DebugLog("KMX_Context: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
+
 WCHAR *KMX_Context::Buf(int n)
 {
 	WCHAR *p;
 
-	for(p = wcschr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
+	for(p = (WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
 
 	if(n > 0) return NULL;
 	return p;
@@ -41,7 +42,7 @@ WCHAR *KMX_Context::Buf(int n)
 
 WCHAR *KMX_Context::BufMax(int n)  // Used only by IMX DLLs
 {
-	WCHAR *p = wcschr(CurContext, 0);  // I3091
+	WCHAR *p = (WCHAR *) u16chr(CurContext, 0);  // I3091
 
 	if(CurContext == p || n == 0) return p; /* empty context or 0 characters requested, return pointer to end of context */  // I3091
 
@@ -86,7 +87,7 @@ void KMX_Context::Get(WCHAR *buf, int bufsize)
 void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
 {
   DebugLog("KMX_Context::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
-  wcscpy_s(CurContext, _countof(CurContext), source->CurContext);
+  u16cpy(CurContext, /*_countof(CurContext),*/ source->CurContext);
 	pos = source->pos;
 }
 

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <assert.h>
+#include <string>
 #include "kmx_base.h"
 #include "kmx_file.h"
 #include "kmx_context.h"
@@ -370,9 +371,9 @@ enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 
 struct KMX_Environment {
   BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
-  wchar_t g_baseLayout[260], g_baseLayoutAlt[34];
+  std::u16string g_baseLayout, g_baseLayoutAlt;
   BOOL g_capsLock;
-  char g_platform[260];
+  std::u16string g_platform;
 };
 
 extern KMX_Environment g_environment;
@@ -449,7 +450,8 @@ extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 int DebugLog_1(char *file, int line, char *function, char *fmt, ...);
 char *Debug_VirtualKey(WORD vk);
 char *Debug_UnicodeString(PWSTR s, int x = 0);
-char *Debug_ModifierName(UINT modifiers);
+char *Debug_UnicodeString(std::u16string s, int x = 0);
+  char *Debug_ModifierName(UINT modifiers);
 inline BOOL ShouldDebug();
 
 #define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)

@@ -21,3 +21,11 @@ int xchrcmp(PWSTR ch1, PWSTR ch2);
 
 PSTR wstrtostr(PWSTR in);
 PWSTR strtowstr(PSTR in);
+
+const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch);
+const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src);  // TODO: add buffer size, also u16ncpy version
+size_t u16len(const km_kbp_cp *p);
+int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q);
+int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q);
+int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count);
+km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx);

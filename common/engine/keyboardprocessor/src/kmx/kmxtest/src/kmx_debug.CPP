@@ -142,6 +142,22 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   return bufout[x];
 }
 
+char *Debug_UnicodeString(std::u16string s, int x) {
+  if (!ShouldDebug()) {
+    return "";
+  }
+  __declspec(thread) static char bufout[2][128 * 7];
+  auto p = s.begin();
+  char *q;
+  bufout[x][0] = 0;
+  for (p, q = bufout[x]; p != s.end(); p++)
+  {
+    sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
+  }
+  //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
+  return bufout[x];
+}
+
 void write_console(BOOL error, wchar_t *fmt, ...) {
   if (!g_silent || error) {
     va_list vars;

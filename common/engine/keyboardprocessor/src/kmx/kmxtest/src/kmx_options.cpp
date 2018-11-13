@@ -41,8 +41,8 @@ void KMX_Processor::SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int
     kp->KeyboardOptions[nStoreToSet].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToSet].dpString;
   }
    
-  kp->KeyboardOptions[nStoreToSet].Value = new WCHAR[wcslen(sp->dpString)+1];
-  wcscpy_s(kp->KeyboardOptions[nStoreToSet].Value, wcslen(sp->dpString)+1, sp->dpString);
+  kp->KeyboardOptions[nStoreToSet].Value = new WCHAR[u16len(sp->dpString)+1];
+  u16cpy(kp->KeyboardOptions[nStoreToSet].Value, /*u16len(sp->dpString)+1,*/ sp->dpString);
   kp->Keyboard->dpStoreArray[nStoreToSet].dpString = kp->KeyboardOptions[nStoreToSet].Value;
 }
 
@@ -64,11 +64,11 @@ void KMX_Processor::ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 
     // We'll go through the globally set options and populate them
     for (int n = 0; n < g_keyboardOptionCount; n++) {
-      if (kp->Keyboard->dpStoreArray[nStoreToReset].dpName != NULL && _wcsicmp(kp->Keyboard->dpStoreArray[nStoreToReset].dpName, g_keyboardOption[n].name) == 0)
+      if (kp->Keyboard->dpStoreArray[nStoreToReset].dpName != NULL && u16icmp(kp->Keyboard->dpStoreArray[nStoreToReset].dpName, g_keyboardOption[n].name) == 0)
       {
         PWCHAR val = g_keyboardOption[n].value;
-        kp->KeyboardOptions[nStoreToReset].Value = new WCHAR[wcslen(val) + 1];
-        wcscpy_s(kp->KeyboardOptions[nStoreToReset].Value, wcslen(val) + 1, val);
+        kp->KeyboardOptions[nStoreToReset].Value = new WCHAR[u16len(val) + 1];
+        u16cpy(kp->KeyboardOptions[nStoreToReset].Value, /*u16len(val) + 1,*/ val);
 
         kp->KeyboardOptions[nStoreToReset].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToReset].dpString;
         kp->Keyboard->dpStoreArray[nStoreToReset].dpString = kp->KeyboardOptions[nStoreToReset].Value;
@@ -110,11 +110,11 @@ void KMX_Processor::LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
   for (int n = 0; n < g_keyboardOptionCount; n++) {
     for(DWORD i = 0; i < kp->Keyboard->cxStoreArray; i++)
     {
-      if(kp->Keyboard->dpStoreArray[i].dpName != NULL && _wcsicmp(kp->Keyboard->dpStoreArray[i].dpName, g_keyboardOption[n].name) == 0)
+      if(kp->Keyboard->dpStoreArray[i].dpName != NULL && u16icmp(kp->Keyboard->dpStoreArray[i].dpName, g_keyboardOption[n].name) == 0)
       {
         PWCHAR val = g_keyboardOption[n].value;
-        kp->KeyboardOptions[i].Value = new WCHAR[wcslen(val)+1];
-        wcscpy_s(kp->KeyboardOptions[i].Value, wcslen(val)+1, val);
+        kp->KeyboardOptions[i].Value = new WCHAR[u16len(val)+1];
+        u16cpy(kp->KeyboardOptions[i].Value, /*u16len(val)+1,*/ val);
 
         kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
         kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value;
