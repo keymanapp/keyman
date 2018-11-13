@@ -3,8 +3,8 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
-#include <io.h>
-#include <fcntl.h>
+//#include <io.h>
+//#include <fcntl.h>
 #include <stdarg.h>
 #include <string>
 #include "kmxtest.h"
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
   char *filename = NULL;
   BOOL invalid = FALSE;
 
-  _setmode(_fileno(stdout), _O_U16TEXT);
+  //_setmode(_fileno(stdout), _O_U16TEXT);
 
   for (int i = 1; i < argc-1; i += 2) {
     char *arg = argv[i], *val = argv[i + 1];

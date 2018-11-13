@@ -158,7 +158,7 @@ char *Debug_UnicodeString(std::u16string s, int x) {
   return bufout[x];
 }
 
-void write_console(BOOL error, wchar_t *fmt, ...) {
+void write_console(BOOL error, const wchar_t *fmt, ...) {
   if (!g_silent || error) {
     va_list vars;
     va_start(vars, fmt);

@@ -448,8 +448,12 @@ extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 
 #ifdef _MSC_VER
 #define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
+#define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
+#define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
 #else 
 #define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
+#define console_error(msg,...) write_console(TRUE, (msg), ##__VA_ARGS__)
+#define console_log(msg,...) write_console(FALSE, (msg), ##__VA_ARGS__)
 #endif
 
 int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
@@ -459,8 +463,6 @@ char *Debug_UnicodeString(std::u16string s, int x = 0);
   char *Debug_ModifierName(UINT modifiers);
 inline BOOL ShouldDebug();
 
-#define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
-#define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
 
-void write_console(BOOL error, wchar_t *fmt, ...);
+void write_console(BOOL error, const wchar_t *fmt, ...);
 
