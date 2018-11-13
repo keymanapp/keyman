@@ -70,7 +70,7 @@ function run_test {
   test ! -z "$KEYS" || die "Missing 'keys' line in .kmn"
   test -z "$CONTEXT" && local CONTEXTPARAM=-context
 
-  ../Debug/kmxtest.exe $SILENT -kmx "$OUTFILE" $CONTEXTPARAM "$CONTEXT" -keys "$KEYS" -expected-output "$OUTPUT" || die "Failed testing $INFILE"
+  ../x64/Debug/kmxtest.exe $SILENT -kmx "$OUTFILE" $CONTEXTPARAM "$CONTEXT" -keys "$KEYS" -expected-output "$OUTPUT" || die "Failed testing $INFILE"
 }
 
 if [ -f "$1" ]; then
