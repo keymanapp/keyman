@@ -143,7 +143,9 @@ BOOL addKey(char *val, int len) {
   while (p && *p) {
     int i;
     for (i = 0; s_modifierNames[i].name; i++) {
-      if (!strncasecmp(val, s_modifierNames[i].name, __max(strlen(s_modifierNames[i].name), (unsigned int)(p - val)))) {
+      size_t len = strlen(s_modifierNames[i].name);
+      if (len < (size_t)(p - val)) len = (size_t)(p - val);
+      if (!strncasecmp(val, s_modifierNames[i].name, len)) {
         ShiftState |= s_modifierNames[i].flag;
         break;
       }
