@@ -1,9 +1,9 @@
 #pragma once
 
-typedef unsigned long       DWORD;
-typedef int                 BOOL;
-typedef unsigned char       BYTE;
-typedef unsigned short      WORD;
+typedef uint32_t            DWORD;
+typedef int32_t             BOOL;
+typedef uint8_t             BYTE;
+typedef uint16_t            WORD;
 
 
 #if defined(__cplusplus)
@@ -25,7 +25,7 @@ typedef CHAR *LPSTR, *PSTR;
 #define far
 #define near
 
-typedef unsigned int        UINT;
+typedef uint32_t             UINT;
 
 typedef BYTE near           *PBYTE;
 typedef BYTE far            *LPBYTE;

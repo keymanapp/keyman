@@ -35,14 +35,22 @@ function die {
   exit $rc
 }
 
+if [ -z "$KMXTEST" ]; then
+  KMXTEST=../x64/Debug/kmxtest.exe
+  #KMXTEST=../Debug/kmxtest.exe
+fi
 
-KEYBOARDROOT="/c/Projects/Keyman/keyboards"
-KMCOMP="$KEYBOARDROOT/tools/kmcomp.exe"
+if [ -z "$KMCOMP" ]; then
+  KEYBOARDROOT="/c/Projects/Keyman/keyboards"
+  KMCOMP="$KEYBOARDROOT/tools/kmcomp.exe"
+fi
 
-if [[ "${OSTYPE}" != "darwin"* ]]; then
-  KMCOMP_LAUNCHER=
-else
-  KMCOMP_LAUNCHER=wine
+if [ -z "$KMCOMP_LAUNCHER" ]; then
+  if [[ "${OSTYPE}" != "darwin"* ]]; then
+    KMCOMP_LAUNCHER=
+  else
+    KMCOMP_LAUNCHER=wine
+  fi
 fi
 
 function run_test {
@@ -70,7 +78,7 @@ function run_test {
   test ! -z "$KEYS" || die "Missing 'keys' line in .kmn"
   test -z "$CONTEXT" && local CONTEXTPARAM=-context
 
-  ../x64/Debug/kmxtest.exe $SILENT -kmx "$OUTFILE" $CONTEXTPARAM "$CONTEXT" -keys "$KEYS" -expected-output "$OUTPUT" || die "Failed testing $INFILE"
+  $KMXTEST $SILENT -kmx "$OUTFILE" $CONTEXTPARAM "$CONTEXT" -keys "$KEYS" -expected-output "$OUTPUT" || die "Failed testing $INFILE"
 }
 
 if [ -f "$1" ]; then

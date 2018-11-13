@@ -108,6 +108,7 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 
   if (fseek(fp, 0, SEEK_END) != 0) {
     fclose(fp);
+    DebugLog("Could not fseek file");
     return FALSE;
   }
 
@@ -119,6 +120,7 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 
   if (fseek(fp, 0, SEEK_SET) != 0) {
     fclose(fp);
+    DebugLog("Could not fseek(set) file");
     return FALSE;
   }
 
@@ -142,15 +144,16 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 
   if (fread(filebase, 1, sz, fp) < sz) {
     fclose(fp);
+    DebugLog("Could not read file");
     return FALSE;
   }
 
   fclose(fp);
 
-	if(*LPDWORD(filebase) != FILEID_COMPILED)
+	if(*LPDWORD(filebase) != DWORD(FILEID_COMPILED))
 	{
 		delete buf; 
-    DebugLog("Invalid file");
+    DebugLog("Invalid file [%x] [%x]", *LPDWORD(filebase), FILEID_COMPILED);
     return FALSE;
 	}
 
