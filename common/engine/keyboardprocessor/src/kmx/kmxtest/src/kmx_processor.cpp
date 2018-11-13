@@ -6,8 +6,8 @@
 
 
 KMX_Processor::KMX_Processor() : m_actions(&m_context) {
-  IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-  miniContext = new WCHAR[GLOBAL_ContextStackSize];
+  IndexStack = new KMX_WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
+  miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
 }
 
 KMX_Processor::~KMX_Processor() {
@@ -16,7 +16,7 @@ KMX_Processor::~KMX_Processor() {
 }
 
 /*
-*	BOOL ProcessEvent();
+*	KMX_BOOL ProcessEvent();
 *
 *	Parameters:	none
 *
@@ -28,7 +28,7 @@ KMX_Processor::~KMX_Processor() {
 *	process, and checks the state of Windows for the keyboard handling.
 */
 
-BOOL KMX_Processor::ProcessEvent(UINT vkey, DWORD modifiers, WCHAR charCode)
+KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode)
 {
   LPKEYBOARD kbd = g_keyboard.Keyboard;
 
@@ -43,7 +43,7 @@ BOOL KMX_Processor::ProcessEvent(UINT vkey, DWORD modifiers, WCHAR charCode)
 
   LPGROUP gp = &kbd->dpGroupArray[kbd->StartGroup[BEGIN_UNICODE]];
 
-	BOOL fOutputKeystroke = FALSE;
+	KMX_BOOL fOutputKeystroke = FALSE;
    
 	ProcessGroup(gp, &fOutputKeystroke);
 
@@ -53,7 +53,7 @@ BOOL KMX_Processor::ProcessEvent(UINT vkey, DWORD modifiers, WCHAR charCode)
 }
 
 /*
-*	PRIVATE BOOL ProcessGroup(LPGROUP gp);
+*	PRIVATE KMX_BOOL ProcessGroup(LPGROUP gp);
 *
 *	Parameters:	gp		Pointer to group to process inside
 *
@@ -66,11 +66,11 @@ BOOL KMX_Processor::ProcessEvent(UINT vkey, DWORD modifiers, WCHAR charCode)
 *	has a lot of crucial code in it!
 */
 
-BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
+KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 {
-	DWORD i;
+	KMX_DWORD i;
 	LPKEY kkp = NULL;
-	PWSTR p;
+	PKMX_WCHAR p;
 	int sdmfI;
 
     /*
@@ -155,10 +155,10 @@ BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 		if(!gp || (state.charCode == 0 && gp->fUsingKeys))   // I4585
         // 7.0.241.0: I1133 - Fix mismatched parentheses on state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
 		{
-      BOOL fIsBackspace = state.vkey == VK_BACK && (g_shiftState & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
+      KMX_BOOL fIsBackspace = state.vkey == VK_BACK && (g_shiftState & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
-        PWCHAR pdeletecontext = m_context.Buf(1);   // I4933
+        PKMX_WCHAR pdeletecontext = m_context.Buf(1);   // I4933
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
           m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           *pOutputKeystroke = TRUE;   // I4933
@@ -218,7 +218,7 @@ BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 	p = kkp->dpOutput;
 	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT)
 	{
-		for(p = decxstr((WCHAR *) u16chr(miniContext, 0)); p >= miniContext; p = decxstr(p))
+		for(p = decxstr((KMX_WCHAR *) u16chr(miniContext, 0)); p >= miniContext; p = decxstr(p))
 		{
 			if(*p == UC_SENTINEL)
 				switch(*(p+1))
@@ -250,11 +250,11 @@ BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 }
 
 /*
-*	int PostString( LPSTR str, BOOL *useMode, LPMSG mp, 
+*	int PostString( PKMX_CHAR str, KMX_BOOL *useMode, LPMSG mp, 
 *	LPKEYBOARD lpkb );
 *
 *	Parameters:	str		Pointer to string to send
-*				useMode	Pointer to BOOL about whether a "use" command was found
+*				useMode	Pointer to KMX_BOOL about whether a "use" command was found
 *				mp		Pointer to MSG structure to copy in outputting messages
 *				lpkb	Pointer to global keyboard structure
 *
@@ -266,13 +266,13 @@ BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 *	to the active application, via the Keyman PostKey buffer.
 */
 
-int KMX_Processor::PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
+int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke)
 {
-	PWSTR p, q, temp;
+	PKMX_WCHAR p, q, temp;
   LPSTORE s;
   int n1, n2;
 	int i, n, shift;
-	BOOL FoundUse = FALSE;
+	KMX_BOOL FoundUse = FALSE;
 
   // TODO: Refactor to use incxstr
 	for(p = str; *p && (p < endstr || !endstr); p++)
@@ -380,15 +380,15 @@ int KMX_Processor::PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pO
 }
 
 
-BOOL KMX_Processor::IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
+KMX_BOOL KMX_Processor::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(g_environment.g_baseLayout.c_str())) == 0 ||   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(g_environment.g_baseLayout.c_str())) == 0 ||   // I4583
                 u16icmp(layoutName, static_cast<const km_kbp_cp*>(g_environment.g_baseLayoutAlt.c_str())) == 0;   // I4583
 
   return bEqual;
 }
 
-BOOL KMX_Processor::IsMatchingPlatformString(PWCHAR platform)  // I3432
+KMX_BOOL KMX_Processor::IsMatchingPlatformString(PKMX_WCHAR platform)  // I3432
 {
   // TODO retrieve platform string from client environment
   return
@@ -398,12 +398,12 @@ BOOL KMX_Processor::IsMatchingPlatformString(PWCHAR platform)  // I3432
     u16icmp(platform, u"native") == 0;
 }
 
-BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
+KMX_BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
 {
-  PWCHAR t = new WCHAR[u16len(s->dpString)+1];
+  PKMX_WCHAR t = new KMX_WCHAR[u16len(s->dpString)+1];
   u16cpy(t, /*wcslen(s->dpString)+1,*/ s->dpString);
-  PWCHAR context = NULL;
-  PWCHAR platform = u16tok(t, u' ', &context);
+  PKMX_WCHAR context = NULL;
+  PKMX_WCHAR platform = u16tok(t, u' ', &context);
   while(platform != NULL)
   {
     if(!IsMatchingPlatformString(platform))
@@ -421,7 +421,7 @@ BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
 }
 
 /*
-*	BOOL ContextMatch( LPKEY kkp );
+*	KMX_BOOL ContextMatch( LPKEY kkp );
 *
 *	Parameters:	kkp		Rule to compare
 *
@@ -432,16 +432,16 @@ BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
 *	ContextMatch compares the context of a rule with the current context.
 */
 
-BOOL KMX_Processor::ContextMatch(LPKEY kkp)
+KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
 {
-	WORD /*i,*/ n;
-	PWSTR p, q, qbuf, temp;
-	LPWORD indexp;
+	KMX_WORD /*i,*/ n;
+	PKMX_WCHAR p, q, qbuf, temp;
+	PKMX_WORD indexp;
 	LPSTORE s, t;
-  BOOL bEqual;
+  KMX_BOOL bEqual;
 
 	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: ENTER [%d]", kkp->Line);
-	memset(IndexStack, 0, GLOBAL_ContextStackSize*sizeof(WORD));  // I3158   // I3524
+	memset(IndexStack, 0, GLOBAL_ContextStackSize*sizeof(KMX_WORD));  // I3158   // I3524
 	
 	p = kkp->dpContext;
 
@@ -461,7 +461,7 @@ BOOL KMX_Processor::ContextMatch(LPKEY kkp)
 		if(*p == 0) return TRUE;
 	}
 
-  for(PWCHAR pp = p; pp && *pp; pp = incxstr(pp))
+  for(PKMX_WCHAR pp = p; pp && *pp; pp = incxstr(pp))
   {
     if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFOPT)
     {
@@ -474,7 +474,7 @@ BOOL KMX_Processor::ContextMatch(LPKEY kkp)
     }
     else if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFSYSTEMSTORE)  // I3432
     {
-      DWORD dwSystemID = *(pp+2)-1;
+      KMX_DWORD dwSystemID = *(pp+2)-1;
       t = &g_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
       switch(dwSystemID)
       {
@@ -492,7 +492,7 @@ BOOL KMX_Processor::ContextMatch(LPKEY kkp)
         break;
       default:
         {
-          PWCHAR ss = GetSystemStore(g_keyboard.Keyboard, dwSystemID);
+          PKMX_WCHAR ss = GetSystemStore(g_keyboard.Keyboard, dwSystemID);
           if(ss == NULL) return FALSE;
           bEqual = u16cmp(ss, t->dpString) == 0;
         }
@@ -545,7 +545,7 @@ BOOL KMX_Processor::ContextMatch(LPKEY kkp)
           (temp ? (int)(temp-s->dpString) : 0));*/
         
         if(temp != NULL)  // I1622
-          *indexp = (WORD) xstrpos(temp, s->dpString);
+          *indexp = (KMX_WORD) xstrpos(temp, s->dpString);
 
 				else
 					return FALSE;
@@ -606,16 +606,16 @@ KMX_Context *KMX_Processor::GetContext() {
   return &m_context;
 }
 
-BOOL KMX_Processor::ReleaseKeyboardMemory(LPKEYBOARD kbd)
+KMX_BOOL KMX_Processor::ReleaseKeyboardMemory(LPKEYBOARD kbd)
 {
   if (!kbd) return TRUE;
   delete kbd;
   return TRUE;
 }
 
-PWSTR KMX_Processor::GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
+PKMX_WCHAR KMX_Processor::GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID)
 {
-  for (DWORD i = 0; i < kb->cxStoreArray; i++)
+  for (KMX_DWORD i = 0; i < kb->cxStoreArray; i++)
     if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
 
   return NULL;

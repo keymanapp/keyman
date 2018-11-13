@@ -20,7 +20,7 @@ KMX_Actions::~KMX_Actions()
 {
 }
 
-BOOL KMX_Actions::QueueAction(int ItemType, DWORD dwData)
+KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
 {
   if (QueueSize > MAXACTIONQUEUE - 1)
   {
@@ -43,11 +43,11 @@ BOOL KMX_Actions::QueueAction(int ItemType, DWORD dwData)
 	case QIT_DEADKEY:
 		m_context->Add(UC_SENTINEL);
     m_context->Add(CODE_DEADKEY);
-    m_context->Add((WORD) dwData);
+    m_context->Add((KMX_WORD) dwData);
 		break;
 
 	case QIT_CHAR:
-    m_context->Add((WORD) dwData);
+    m_context->Add((KMX_WORD) dwData);
 		break;
 
 	case QIT_BACK:
@@ -66,7 +66,7 @@ BOOL KMX_Actions::QueueAction(int ItemType, DWORD dwData)
 }
 
 
-BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput) {
+KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput) {
   //LogOutput();
   //console_log(L"--------------\n");
 
@@ -131,7 +131,7 @@ BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutp
       console_log(L"DEADKEY\n");
       output.push_back(UC_SENTINEL);
       output.push_back(CODE_DEADKEY);
-      output.push_back((WCHAR)(Queue[n].dwData + 1));
+      output.push_back((KMX_WCHAR)(Queue[n].dwData + 1));
       break;
     case QIT_BELL:
       // TODO
@@ -189,7 +189,7 @@ BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutp
 
   QueueSize = 0;
 
-  BOOL result = output == expectedOutput;
+  KMX_BOOL result = output == expectedOutput;
 
   km_kbp_cp _context[256];
   m_context->Get(_context, 256);

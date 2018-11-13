@@ -11,16 +11,16 @@
 #define Uni_UTF32ToSurrogate1(ch)	(((ch) - 0x10000) / 0x400 + 0xD800)
 #define Uni_UTF32ToSurrogate2(ch)	(((ch) - 0x10000) % 0x400 + 0xDC00)
 
-PWSTR incxstr(PWSTR p);
-PWSTR decxstr(PWSTR p);
-int xstrlen(PWSTR p);
-int xstrlen_ignoreifopt(PWSTR p);
-int xstrpos(PWSTR p1, PWSTR p);
-PWSTR xstrchr(PWSTR buf, PWSTR chr);
-int xchrcmp(PWSTR ch1, PWSTR ch2);
+PKMX_WCHAR incxstr(PKMX_WCHAR p);
+PKMX_WCHAR decxstr(PKMX_WCHAR p);
+int xstrlen(PKMX_WCHAR p);
+int xstrlen_ignoreifopt(PKMX_WCHAR p);
+int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p);
+PKMX_WCHAR xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr);
+int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2);
 
-PSTR wstrtostr(PWSTR in);
-PWSTR strtowstr(PSTR in);
+PKMX_CHAR wstrtostr(PKMX_WCHAR in);
+PKMX_WCHAR strtowstr(PKMX_CHAR in);
 
 const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch);
 const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src);  // TODO: add buffer size, also u16ncpy version

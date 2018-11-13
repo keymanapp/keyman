@@ -12,19 +12,19 @@
 class KMX_Context
 {
 private:
-	WCHAR CurContext[MAXCONTEXT];
+	KMX_WCHAR CurContext[MAXCONTEXT];
 	int pos;
 
 public:
 	KMX_Context();
   void CopyFrom(KMX_Context *source);
-	void Add(WCHAR ch);
+	void Add(KMX_WCHAR ch);
 	void Delete();
 	void Reset();
-	void Get(WCHAR *buf, int bufsize);
-	void Set(const WCHAR *buf);
-	WCHAR *BufMax(int n);
-	WCHAR *Buf(int n);
-	BOOL CharIsDeadkey();
-  BOOL CharIsSurrogatePair();
+	void Get(KMX_WCHAR *buf, int bufsize);
+	void Set(const KMX_WCHAR *buf);
+	KMX_WCHAR *BufMax(int n);
+	KMX_WCHAR *Buf(int n);
+	KMX_BOOL CharIsDeadkey();
+  KMX_BOOL CharIsSurrogatePair();
 };

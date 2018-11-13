@@ -285,68 +285,68 @@
 
 typedef struct tagSTORE
 {
-	DWORD dwSystemID;
-	PWSTR dpName;
-	PWSTR dpString;		
+	KMX_DWORD dwSystemID;
+	PKMX_WCHAR dpName;
+	PKMX_WCHAR dpString;		
 } STORE, *LPSTORE;
 
 
 typedef struct tagKEY
 {
-	WCHAR Key;
-	DWORD Line;
-	DWORD ShiftFlags;
-	PWSTR dpOutput;		
-	PWSTR dpContext;	
+	KMX_WCHAR Key;
+	KMX_DWORD Line;
+	KMX_DWORD ShiftFlags;
+	PKMX_WCHAR dpOutput;		
+	PKMX_WCHAR dpContext;	
 } KEY, *LPKEY;
 
 
 typedef struct tagGROUP
 {
-	PWSTR dpName;
+	PKMX_WCHAR dpName;
 	LPKEY dpKeyArray;		// [LPKEY] address of first item in key array
-	PWSTR dpMatch;		
-	PWSTR dpNoMatch;		
-	DWORD cxKeyArray;		// in array entries
-	BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
+	PKMX_WCHAR dpMatch;		
+	PKMX_WCHAR dpNoMatch;		
+	KMX_DWORD cxKeyArray;		// in array entries
+	KMX_BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 } GROUP, *LPGROUP;
 
 
 typedef struct tagKEYBOARD
 {
-	DWORD dwIdentifier;		// Keyman compiled keyboard id
+	KMX_DWORD dwIdentifier;		// Keyman compiled keyboard id
 
-	DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
+	KMX_DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
 	
-	DWORD dwCheckSum;		// As stored in keyboard
-	DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-	DWORD IsRegistered;		// layout id, from same key
-	DWORD version;			// keyboard version
+	KMX_DWORD dwCheckSum;		// As stored in keyboard
+	KMX_DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+	KMX_DWORD IsRegistered;		// layout id, from same key
+	KMX_DWORD version;			// keyboard version
 
-	DWORD cxStoreArray;		// in array entries
-	DWORD cxGroupArray;		// in array entries
+	KMX_DWORD cxStoreArray;		// in array entries
+	KMX_DWORD cxGroupArray;		// in array entries
 
 	LPSTORE dpStoreArray;	// [LPSTORE] address of first item in store array, from start of file
 	LPGROUP dpGroupArray;	// [LPGROUP] address of first item in group array, from start of file
 	
-	DWORD StartGroup[2];	// index of starting groups [2 of them]
+	KMX_DWORD StartGroup[2];	// index of starting groups [2 of them]
 							// Ansi=0, Unicode=1
 
-	DWORD dwFlags;			// Flags for the keyboard file
+	KMX_DWORD dwFlags;			// Flags for the keyboard file
 
-	DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+	KMX_DWORD dwHotKey;			// standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
 } KEYBOARD, *LPKEYBOARD;
 
 typedef struct tagINTKEYBOARDOPTIONS
 {
-  PWCHAR Value;
-  PWCHAR OriginalStore;
+  PKMX_WCHAR Value;
+  PKMX_WCHAR OriginalStore;
 } INTKEYBOARDOPTIONS, *LPINTKEYBOARDOPTIONS;
 
 // The members of this structure, from first through to IMDLLs, must match KEYBOARDINFO from keymanapi.h
 typedef struct tagINTKEYBOARDINFO
 {
-	DWORD      KeymanID;
+	KMX_DWORD      KeymanID;
 	char       Name[256];
 	LPKEYBOARD Keyboard;
   LPINTKEYBOARDOPTIONS KeyboardOptions;
@@ -354,11 +354,11 @@ typedef struct tagINTKEYBOARDINFO
 
 typedef struct tagKMSTATE
 {
-	BOOL StopOutput;
+	KMX_BOOL StopOutput;
 	int LoopTimes;
-  BOOL isExtended;
-	WORD vkey; // I934
-	WCHAR charCode;   // I4582
+  KMX_BOOL isExtended;
+	KMX_WORD vkey; // I934
+	KMX_WCHAR charCode;   // I4582
 } KMSTATE;
    // I3616
 enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
@@ -370,9 +370,9 @@ enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 /* Temporary globals */
 
 struct KMX_Environment {
-  BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
+  KMX_BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
   std::u16string g_baseLayout, g_baseLayoutAlt;
-  BOOL g_capsLock;
+  KMX_BOOL g_capsLock;
   std::u16string g_platform;
 };
 
@@ -380,51 +380,51 @@ extern KMX_Environment g_environment;
 
 class KMX_Processor {
 private:
-  LPWORD IndexStack;
-  LPWSTR miniContext;
+  PKMX_WORD IndexStack;
+  PKMX_WCHAR miniContext;
   KMSTATE state;
 
   KMX_Actions m_actions;
   KMX_Context m_context;
 
   INTKEYBOARDINFO g_keyboard = { 0 };
-  DWORD g_shiftState = 0;
+  KMX_DWORD g_shiftState = 0;
 
   /* File loading */
-  LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
-  BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
-  BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
-  BOOL VerifyChecksum(LPBYTE buf, DWORD sz);
-  PWCHAR StringOffset(PBYTE base, DWORD offset);
+  LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
+  KMX_BOOL LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard);
+  KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz);
+  KMX_BOOL VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz);
+  PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
-  LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
+  LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 #endif
 
-  BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
+  KMX_BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
 
   /* Keystroke Processing */
 
-  BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke);
-  BOOL ContextMatch(LPKEY kkp);
-  int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke);
+  KMX_BOOL ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke);
+  KMX_BOOL ContextMatch(LPKEY kkp);
+  int PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr, KMX_BOOL *pOutputKeystroke);
 
   /* Platform tests */
 
-  BOOL IsMatchingBaseLayout(PWCHAR layoutName);
-  BOOL IsMatchingPlatformString(PWCHAR platform);
-  BOOL IsMatchingPlatform(LPSTORE s);
+  KMX_BOOL IsMatchingBaseLayout(PKMX_WCHAR layoutName);
+  KMX_BOOL IsMatchingPlatformString(PKMX_WCHAR platform);
+  KMX_BOOL IsMatchingPlatform(LPSTORE s);
 
   /* Utility functions */
 
-  PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
+  PKMX_WCHAR  GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID);
 
   /* Caps Lock and modifier management */
 
   void ResetCapsLock(void);
-  void KeyCapsLockPress(BOOL FIsUp);
-  void KeyShiftPress(BOOL FIsUp);
+  void KeyCapsLockPress(KMX_BOOL FIsUp);
+  void KeyShiftPress(KMX_BOOL FIsUp);
 
-  BOOL IsEquivalentShift(UINT rshift, UINT kshift);
+  KMX_BOOL IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift);
 
   /* Keyboard options */
 
@@ -438,8 +438,8 @@ public:
   KMX_Processor();
   ~KMX_Processor();
 
-  BOOL Load(PSTR keyboardName);
-  BOOL ProcessEvent(UINT vkey, DWORD modifiers, WCHAR charCode);	// returns FALSE on error or key not matched
+  KMX_BOOL Load(PKMX_CHAR keyboardName);
+  KMX_BOOL ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode);	// returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
@@ -447,7 +447,7 @@ public:
 
 /* Debugging */
 
-extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
+extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 
 #ifdef _MSC_VER
 #define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
@@ -460,12 +460,12 @@ extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 #endif
 
 int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
-char *Debug_VirtualKey(WORD vk);
-char *Debug_UnicodeString(PWSTR s, int x = 0);
+char *Debug_VirtualKey(KMX_WORD vk);
+char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
 char *Debug_UnicodeString(std::u16string s, int x = 0);
-  char *Debug_ModifierName(UINT modifiers);
-inline BOOL ShouldDebug();
+  char *Debug_ModifierName(KMX_UINT modifiers);
+inline KMX_BOOL ShouldDebug();
 
 
-void write_console(BOOL error, const wchar_t *fmt, ...);
+void write_console(KMX_BOOL error, const wchar_t *fmt, ...);
 

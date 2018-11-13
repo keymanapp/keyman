@@ -4,7 +4,7 @@
 */
 #include "pch.h"
 
-const LPSTR ItemTypes[QIT_MAX+1] = {
+const PKMX_CHAR ItemTypes[QIT_MAX+1] = {
 	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
   "QIT_CHAR", "QIT_DEADKEY", "QIT_BELL", "QIT_BACK", "QIT_CAPSLOCK",
   "QIT_INVALIDATECONTEXT" };
@@ -16,7 +16,7 @@ KMX_Context::KMX_Context()
 	Reset();
 }
 
-void KMX_Context::Add(WCHAR ch)
+void KMX_Context::Add(KMX_WCHAR ch)
 {
 	if(pos == MAXCONTEXT - 1)
 	{
@@ -30,23 +30,23 @@ void KMX_Context::Add(WCHAR ch)
 }
 
 
-WCHAR *KMX_Context::Buf(int n)
+KMX_WCHAR *KMX_Context::Buf(int n)
 {
-	WCHAR *p;
+	KMX_WCHAR *p;
 
-	for(p = (WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
+	for(p = (KMX_WCHAR *) u16chr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
 
 	if(n > 0) return NULL;
 	return p;
 }
 
-WCHAR *KMX_Context::BufMax(int n)  // Used only by IMX DLLs
+KMX_WCHAR *KMX_Context::BufMax(int n)  // Used only by IMX DLLs
 {
-	WCHAR *p = (WCHAR *) u16chr(CurContext, 0);  // I3091
+	KMX_WCHAR *p = (KMX_WCHAR *) u16chr(CurContext, 0);  // I3091
 
 	if(CurContext == p || n == 0) return p; /* empty context or 0 characters requested, return pointer to end of context */  // I3091
 
-  WCHAR *q = p;  // I3091
+  KMX_WCHAR *q = p;  // I3091
 	for(; p > CurContext && (int)(q-p) < n; p = decxstr(p));  // I3091
 
   if((int)(q-p) > n) p = incxstr(p); /* Copes with deadkey or supplementary pair at start of returned buffer making it too long */  // I3091
@@ -72,9 +72,9 @@ void KMX_Context::Reset()
 	CurContext[0] = 0;
 }
 
-void KMX_Context::Get(WCHAR *buf, int bufsize)
+void KMX_Context::Get(KMX_WCHAR *buf, int bufsize)
 {
-	for(WCHAR *p = CurContext; *p && bufsize > 0; p++, bufsize--)
+	for(KMX_WCHAR *p = CurContext; *p && bufsize > 0; p++, bufsize--)
 	{
 		*buf = *p; buf++;
 		if(*p >= 0xD800 && *p <= 0xDBFF) { *buf = *(++p); bufsize--; buf++; }
@@ -92,10 +92,10 @@ void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
 }
 
 
-void KMX_Context::Set(const WCHAR *buf)
+void KMX_Context::Set(const KMX_WCHAR *buf)
 {
-	const WCHAR *p;
-	WCHAR *q;
+	const KMX_WCHAR *p;
+	KMX_WCHAR *q;
 	for(p = buf, q = CurContext; *p && (int)(q-CurContext) < MAXCONTEXT - 1; p++, q++)
 	{
 		*q = *p;
@@ -106,7 +106,7 @@ void KMX_Context::Set(const WCHAR *buf)
 	CurContext[MAXCONTEXT-1] = 0; 
 }
 
-BOOL KMX_Context::CharIsDeadkey()
+KMX_BOOL KMX_Context::CharIsDeadkey()
 {
 	if(pos < 3) // code_sentinel, deadkey, #, 0
 		return FALSE;
@@ -114,7 +114,7 @@ BOOL KMX_Context::CharIsDeadkey()
 		   CurContext[pos-2] == CODE_DEADKEY;
 }
 
-BOOL KMX_Context::CharIsSurrogatePair()
+KMX_BOOL KMX_Context::CharIsSurrogatePair()
 {
   if (pos < 2) // low_surrogate, high_surrogate
     return FALSE;

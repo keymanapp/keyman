@@ -7,12 +7,12 @@
 #define MAX_RSHIFT 24
 #define MAX_KSHIFT 18
 
-static DWORD legalKeyStates[MAX_KSHIFT] = {
+static KMX_DWORD legalKeyStates[MAX_KSHIFT] = {
   0, LCTRLFLAG, RCTRLFLAG, LALTFLAG, LALTFLAG|LCTRLFLAG, LALTFLAG|RCTRLFLAG, RALTFLAG, RALTFLAG|LCTRLFLAG, RALTFLAG|RCTRLFLAG,
   K_SHIFTFLAG, K_SHIFTFLAG|LCTRLFLAG, K_SHIFTFLAG|RCTRLFLAG, K_SHIFTFLAG|LALTFLAG, K_SHIFTFLAG|LALTFLAG|LCTRLFLAG, K_SHIFTFLAG|LALTFLAG|RCTRLFLAG, K_SHIFTFLAG|RALTFLAG, K_SHIFTFLAG|RALTFLAG|LCTRLFLAG, K_SHIFTFLAG|RALTFLAG|RCTRLFLAG
 };
 
-static DWORD legalRuleStates[MAX_RSHIFT] = {
+static KMX_DWORD legalRuleStates[MAX_RSHIFT] = {
   0, LCTRLFLAG, RCTRLFLAG, LALTFLAG, LALTFLAG|LCTRLFLAG, LALTFLAG|RCTRLFLAG, RALTFLAG, RALTFLAG|LCTRLFLAG, RALTFLAG|RCTRLFLAG,
   K_SHIFTFLAG, K_SHIFTFLAG|LCTRLFLAG, K_SHIFTFLAG|RCTRLFLAG, K_SHIFTFLAG|LALTFLAG, K_SHIFTFLAG|LALTFLAG|LCTRLFLAG, K_SHIFTFLAG|LALTFLAG|RCTRLFLAG, K_SHIFTFLAG|RALTFLAG, K_SHIFTFLAG|RALTFLAG|LCTRLFLAG, K_SHIFTFLAG|RALTFLAG|RCTRLFLAG,
   K_CTRLFLAG, K_ALTFLAG, K_CTRLFLAG|K_ALTFLAG, K_SHIFTFLAG|K_CTRLFLAG, K_SHIFTFLAG|K_ALTFLAG, K_SHIFTFLAG|K_CTRLFLAG|K_ALTFLAG
@@ -27,7 +27,7 @@ static DWORD legalRuleStates[MAX_RSHIFT] = {
 //
 // x = key states, y = rule states
 // CAPITAL LETTERS = RIGHT KEY, LOWER CASE LETTERS = LEFT KEY
-static BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
+static KMX_BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
   // Simulate RAlt ==>             *                             *
   //          0  c  C  a ac aC  A Ac AC  s sc sC sa sac saC sA sAc sAC    <-- Key states
   /* 0   */ { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0,  0,  0 },
@@ -64,7 +64,7 @@ static BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
 
 
 /*
-*	BOOL IsEquivalentShift( UINT rshift, UINT kshift );
+*	KMX_BOOL IsEquivalentShift( KMX_UINT rshift, KMX_UINT kshift );
 *
 *	Parameters:	rshift	Rule shift state flag set to compare.
 *				kshift  Current shift state flag set to compare.
@@ -75,7 +75,7 @@ static BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
 *	K_CTRLFLAG and K_ALTFLAG as well as specific keys correctly.
 */
 
-BOOL KMX_Processor::IsEquivalentShift(UINT rshift, UINT kshift) {
+KMX_BOOL KMX_Processor::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
   //
   // The rule shift must have ISVIRTUALKEY bit set for virt.keys
   //

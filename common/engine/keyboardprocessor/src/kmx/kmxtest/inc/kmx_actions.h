@@ -12,7 +12,7 @@
 typedef struct
 {
   int ItemType;
-  DWORD dwData;
+  KMX_DWORD dwData;
 } APPACTIONQUEUEITEM;
 
 // QueueAction ItemTypes
@@ -49,19 +49,19 @@ public:
 
 	/* Context functions */
 
-  /*void AddContext(WCHAR ch);  //I2436
-	WCHAR *ContextBuf(int n);
-	WCHAR *ContextBufMax(int n);
-  void SetContext(WCHAR *ctxt);*/
+  /*void AddContext(KMX_WCHAR ch);  //I2436
+	KMX_WCHAR *ContextBuf(int n);
+	KMX_WCHAR *ContextBufMax(int n);
+  void SetContext(KMX_WCHAR *ctxt);*/
 
   /* Queue functions */
   void ResetQueue();
-  BOOL IsQueueEmpty() { return QueueSize == 0; }
-  BOOL QueueAction(int ItemType, DWORD dwData);
+  KMX_BOOL IsQueueEmpty() { return QueueSize == 0; }
+  KMX_BOOL QueueAction(int ItemType, KMX_DWORD dwData);
 
   /* Tests */
   void LogOutput();
 
-  BOOL CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput);
+  KMX_BOOL CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput);
 };
 

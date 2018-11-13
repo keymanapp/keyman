@@ -5,7 +5,7 @@
 #include "pch.h"
 #include <stdarg.h>
 
-inline BOOL ShouldDebug() {
+inline KMX_BOOL ShouldDebug() {
   return g_debug_KeymanLog;
 }
 
@@ -80,7 +80,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
 
 struct Debug_ModifierNames {
   char *name;
-  UINT flag;
+  KMX_UINT flag;
 };
 
 extern const char *VKeyNames[256];
@@ -102,7 +102,7 @@ const struct Debug_ModifierNames s_modifierNames[14] = {
   {NULL, 0}
 };
 
-char *Debug_ModifierName(UINT modifiers) {
+char *Debug_ModifierName(KMX_UINT modifiers) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
@@ -117,7 +117,7 @@ char *Debug_ModifierName(UINT modifiers) {
   return "Unmodified";
 }
 
-char *Debug_VirtualKey(WORD vk) {
+char *Debug_VirtualKey(KMX_WORD vk) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
@@ -135,7 +135,7 @@ char *Debug_VirtualKey(WORD vk) {
   return buf;
 }
 
-char *Debug_UnicodeString(PWSTR s, int x) {
+char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
   if (!ShouldDebug()) {
     return "";
   }
@@ -143,7 +143,7 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   __declspec(thread)
 #endif 
   static char bufout[2][128 * 7];
-  WCHAR *p;
+  KMX_WCHAR *p;
   char *q;
   bufout[x][0] = 0;
   for (p = s, q = bufout[x]; *p && (p - s < 128); p++)
@@ -173,7 +173,7 @@ char *Debug_UnicodeString(std::u16string s, int x) {
   return bufout[x];
 }
 
-void write_console(BOOL error, const wchar_t *fmt, ...) {
+void write_console(KMX_BOOL error, const wchar_t *fmt, ...) {
   if (!g_silent || error) {
     va_list vars;
     va_start(vars, fmt);

@@ -10,12 +10,12 @@
 
 /* TODO: use portable 64-bit check here */
 #ifdef KMX_64BIT
-LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
+LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 #else
-LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
+LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 #endif
 
-BOOL KMX_Processor::Load(PSTR KeyboardName)
+KMX_BOOL KMX_Processor::Load(PKMX_CHAR KeyboardName)
 {
 	if(!LoadKeyboard(KeyboardName, &g_keyboard.Keyboard)) return FALSE;   // I5136
 
@@ -65,7 +65,7 @@ const unsigned long CRCTable[256] = {
  * and returns the updated value.
  */
 
-unsigned long CalculateBufferCRC(unsigned long count, BYTE *p)
+unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
 {
   unsigned long temp1;
   unsigned long temp2;
@@ -81,13 +81,13 @@ unsigned long CalculateBufferCRC(unsigned long count, BYTE *p)
 	return crc;
 }
 
-BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
+KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
 {
-	DWORD sz;
-	LPBYTE buf;
+	KMX_DWORD sz;
+	PKMX_BYTE buf;
   FILE *fp;
 	LPKEYBOARD kbp;
-  PBYTE filebase;
+  PKMX_BYTE filebase;
 
 	if(!fileName || !lpKeyboard)
 	{
@@ -125,9 +125,9 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
   }
 
 #ifdef KMX_64BIT
-	buf = new BYTE[sz*3];
+	buf = new KMX_BYTE[sz*3];
 #else
-	buf = new BYTE[sz];
+	buf = new KMX_BYTE[sz];
 #endif
 
 	if(!buf)
@@ -150,10 +150,10 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 
   fclose(fp);
 
-	if(*LPDWORD(filebase) != DWORD(FILEID_COMPILED))
+	if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
 	{
 		delete buf; 
-    DebugLog("Invalid file [%x] [%x]", *LPDWORD(filebase), FILEID_COMPILED);
+    DebugLog("Invalid file - signature is invalid");
     return FALSE;
 	}
 
@@ -174,10 +174,10 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 	return TRUE;
 }
 
-PWCHAR KMX_Processor::StringOffset(PBYTE base, DWORD offset)
+PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
 {
   if(offset == 0) return NULL;
-  return (PWCHAR)(base + offset);
+  return (PKMX_WCHAR)(base + offset);
 }
 
 #ifdef KMX_64BIT
@@ -187,7 +187,7 @@ PWCHAR KMX_Processor::StringOffset(PBYTE base, DWORD offset)
   * We know the base is dwFileSize * 3
   * After this function finishes, we still need to keep the original data
 */
-LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
+LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize)
 {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
 
@@ -217,7 +217,7 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
   
   PCOMP_STORE csp;
   LPSTORE sp;
-  DWORD i;
+  KMX_DWORD i;
 
   for(
     csp = (PCOMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0; 
@@ -237,7 +237,7 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
     i < kbp->cxGroupArray;
     i++, gp++, cgp++)
   {
-    gp->dpName = (PWCHAR)(base + cgp->dpName);
+    gp->dpName = (PKMX_WCHAR)(base + cgp->dpName);
     gp->dpKeyArray = (LPKEY) bufp;
     gp->cxKeyArray = cgp->cxKeyArray;
     bufp += sizeof(KEY) * gp->cxKeyArray;
@@ -247,7 +247,7 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
     PCOMP_KEY ckp;
     LPKEY kp;
-    DWORD j;
+    KMX_DWORD j;
 
     for(
       ckp = (PCOMP_KEY)(base + cgp->dpKeyArray), kp = gp->dpKeyArray, j = 0;
@@ -267,9 +267,9 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
 #else
 
-LPKEYBOARD KMX_Processor::FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
+LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize)
 {
-  DWORD i, j;
+  KMX_DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
   PCOMP_GROUP cgp;
   PCOMP_STORE csp;
@@ -292,13 +292,13 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize
 	{
     gp->dpName = StringOffset(base, cgp->dpName); 
 		gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-		if(cgp->dpMatch != NULL) gp->dpMatch = (PWSTR) (base + cgp->dpMatch);
-		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PWSTR) (base + cgp->dpNoMatch);
+		if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
+		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
 
 		for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
 		{
-			kp->dpOutput = (PWSTR) (base + ckp->dpOutput);
-			kp->dpContext = (PWSTR) (base + ckp->dpContext);
+			kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
+			kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
 		}
 	}
 
@@ -307,9 +307,9 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize
 
 #endif
 
-BOOL KMX_Processor::VerifyChecksum(LPBYTE buf, DWORD sz)
+KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz)
 {
-	DWORD tempcs;
+	KMX_DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
 
   ckbp = (PCOMP_KEYBOARD) buf;
@@ -320,9 +320,9 @@ BOOL KMX_Processor::VerifyChecksum(LPBYTE buf, DWORD sz)
 	return tempcs == CalculateBufferCRC(sz, buf);
 }
 
-BOOL KMX_Processor::VerifyKeyboard(LPBYTE filebase, DWORD sz)
+KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz)
 {
-  DWORD i;
+  KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
 

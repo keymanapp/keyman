@@ -10,33 +10,33 @@
 #include "kmxtest.h"
 
 struct KMXTest_KeyEvent {
-  UINT vkey;
-  UINT modifiers;
+  KMX_UINT vkey;
+  KMX_UINT modifiers;
 };
 
 struct KMXTest_ModifierNames {
   char *name;
-  UINT flag;
+  KMX_UINT flag;
 };
 
 struct KMXTest_ChToVKey {
-  UINT vkey;
-  BOOL shifted;
+  KMX_UINT vkey;
+  KMX_BOOL shifted;
 };
 
 /* Globals */
 
 int g_nKeyEvents = 0;
 KMXTest_KeyEvent g_keyEvents[1024] = { 0 };
-BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
-BOOL g_silent = FALSE;
+KMX_BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
+KMX_BOOL g_silent = FALSE;
 
 /* Context - to refactor */
-WCHAR g_context[512] = u"";
+KMX_WCHAR g_context[512] = u"";
 int g_contextLength = 0;
 
 /* Expected output */
-WCHAR g_expectedOutput[512] = u"";
+KMX_WCHAR g_expectedOutput[512] = u"";
 int g_expectedOutputLength = 0;
 
 /* Keyboard options - to refactor */
@@ -69,8 +69,8 @@ void print_default_environment() {
 
 void ValidateOptions();
 
-BOOL addKeyboardOption(char *storeName, char *value) {
-  PWSTR p = strtowstr(storeName);
+KMX_BOOL addKeyboardOption(char *storeName, char *value) {
+  PKMX_WCHAR p = strtowstr(storeName);
   std::u16string ps(p);
   size_t sz = ps.copy(g_keyboardOption[g_keyboardOptionCount].name, sizeof(g_keyboardOption[g_keyboardOptionCount].name) / sizeof(g_keyboardOption[g_keyboardOptionCount].name[0]));
   g_keyboardOption[g_keyboardOptionCount].name[sz] = 0;
@@ -86,14 +86,14 @@ BOOL addKeyboardOption(char *storeName, char *value) {
   return TRUE;
 }
 
-BOOL addOption(char *val) {
+KMX_BOOL addOption(char *val) {
   char *p = strchr(val, '=');
   if (!p) {
     return FALSE;
   }
   int len = (int)(p - val);
   p++;
-  PWSTR wp = strtowstr(p);
+  PKMX_WCHAR wp = strtowstr(p);
 
   if (!strncasecmp(val, "env.simulate_altgr", len)) {
     g_environment.g_simulateAltGr = !!atoi(p);
@@ -132,13 +132,13 @@ BOOL addOption(char *val) {
   return TRUE;
 }
 
-BOOL addKey(char *val, int len) {
+KMX_BOOL addKey(char *val, int len) {
   char *buf = new char[len + 1];
   strncpy(buf, val, len);
   buf[len] = 0;
   val = buf;
 
-  DWORD ShiftState = 0;
+  KMX_DWORD ShiftState = 0;
   char *p = strchr(val, ' ');
   while (p && *p) {
     int i;
@@ -171,14 +171,14 @@ BOOL addKey(char *val, int len) {
   return FALSE;
 }
 
-char VKeyToChar(UINT modifiers, UINT vk) {
+char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
   // We only map SHIFT and UNSHIFTED
   // TODO: Map CAPS LOCK correctly
   if (modifiers != 0 && modifiers != K_SHIFTFLAG) {
     return 0;
   }
 
-  BOOL shifted = modifiers == K_SHIFTFLAG ? 1 : 0;
+  KMX_BOOL shifted = modifiers == K_SHIFTFLAG ? 1 : 0;
 
   if (vk == VK_SPACE) {
     // Override for space because it is the same for
@@ -194,14 +194,14 @@ char VKeyToChar(UINT modifiers, UINT vk) {
   return 0;
 }
 
-BOOL addKey(char ch) {
+KMX_BOOL addKey(char ch) {
   if (ch > 127 || ch < 32) return FALSE;
   g_keyEvents[g_nKeyEvents].vkey = chToVKey[ch-32].vkey;
   g_keyEvents[g_nKeyEvents++].modifiers = chToVKey[ch-32].shifted ? K_SHIFTFLAG : 0;
   return TRUE;
 }
 
-BOOL setKeys(char *val) {
+KMX_BOOL setKeys(char *val) {
   while (*val) {
     if (*val == '[') {
       val++;
@@ -229,28 +229,28 @@ BOOL setKeys(char *val) {
   return TRUE;
 }
 
-BOOL addXStringChar(km_kbp_cp *x, int *xl, DWORD ch) {
+KMX_BOOL addXStringChar(km_kbp_cp *x, int *xl, KMX_DWORD ch) {
   if (ch > 0x10FFFF) return FALSE;
   if (ch >= 0x10000) {
-    x[(*xl)++] = (WCHAR) Uni_UTF32ToSurrogate1(ch);
-    x[(*xl)++] = (WCHAR) Uni_UTF32ToSurrogate2(ch);
+    x[(*xl)++] = (KMX_WCHAR) Uni_UTF32ToSurrogate1(ch);
+    x[(*xl)++] = (KMX_WCHAR) Uni_UTF32ToSurrogate2(ch);
   }
   else {
-    x[(*xl)++] = (WCHAR) ch;
+    x[(*xl)++] = (KMX_WCHAR) ch;
   }
   x[*xl] = 0;
   return TRUE;
 }
 
-BOOL addXStringDeadkey(km_kbp_cp *x, int *xl, DWORD dk) {
+KMX_BOOL addXStringDeadkey(km_kbp_cp *x, int *xl, KMX_DWORD dk) {
   x[(*xl)++] = UC_SENTINEL;
   x[(*xl)++] = CODE_DEADKEY;
-  x[(*xl)++] = (WCHAR) (dk + 1);
+  x[(*xl)++] = (KMX_WCHAR) (dk + 1);
   x[(*xl)] = 0;
   return TRUE;
 }
 
-BOOL setXString(km_kbp_cp *x, int *xl, char *val) {
+KMX_BOOL setXString(km_kbp_cp *x, int *xl, char *val) {
   while (*val) {
     if (*val == '\\') {
       val++;
@@ -278,17 +278,17 @@ BOOL setXString(km_kbp_cp *x, int *xl, char *val) {
   return TRUE;
 }
 
-BOOL setExpectedOutput(char *val) {
+KMX_BOOL setExpectedOutput(char *val) {
   return setXString(g_expectedOutput, &g_expectedOutputLength, val);
 }
 
-BOOL setContext(char *val) {
+KMX_BOOL setContext(char *val) {
   return setXString(g_context, &g_contextLength, val);
 }
 
 int main(int argc, char *argv[]) {
   char *filename = NULL;
-  BOOL invalid = FALSE;
+  KMX_BOOL invalid = FALSE;
 
   //_setmode(_fileno(stdout), _O_U16TEXT);
 
@@ -366,7 +366,7 @@ int main(int argc, char *argv[]) {
     kmx.GetContext()->Get(local_context, 512);
     console_log(L"%d: '%hs' + [%hs %hs]\n", i, Debug_UnicodeString(local_context), Debug_ModifierName(g_keyEvents[i].modifiers), Debug_VirtualKey(g_keyEvents[i].vkey));
 
-    BOOL outputKeystroke = !kmx.ProcessEvent(g_keyEvents[i].vkey, g_keyEvents[i].modifiers, VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey));
+    KMX_BOOL outputKeystroke = !kmx.ProcessEvent(g_keyEvents[i].vkey, g_keyEvents[i].modifiers, VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey));
     console_log(L"outputKeystroke = %d\n", outputKeystroke);
   }
 

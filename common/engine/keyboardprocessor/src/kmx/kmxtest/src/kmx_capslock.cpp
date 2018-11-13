@@ -21,7 +21,7 @@ void KMX_Processor::ResetCapsLock(void)
 }
 
 
-void KMX_Processor::KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
+void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
 {
 	if(g_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
 	{
@@ -40,7 +40,7 @@ void KMX_Processor::KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 }
 
 
-void KMX_Processor::KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
+void KMX_Processor::KeyShiftPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
 {
 	if(!g_environment.g_capsLock) return;
 

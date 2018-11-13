@@ -87,7 +87,7 @@ km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 }
 
 /*
-*	int xstrlen( LPBYTE p );
+*	int xstrlen( PKMX_BYTE p );
 *
 *	Parameters:	p	Pointer to string to get length of
 *
@@ -98,7 +98,7 @@ km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 *	xstrlen calculates the length of a string, ignoring some special chars.
 */
 
-PWSTR incxstr(PWSTR p)
+PKMX_WCHAR incxstr(PKMX_WCHAR p)
 {
 	if(*p == 0) return p;
 	if(*p != UC_SENTINEL)
@@ -129,7 +129,7 @@ PWSTR incxstr(PWSTR p)
 	}
 }
 
-PWSTR decxstr(PWSTR p)
+PKMX_WCHAR decxstr(PKMX_WCHAR p)
 {
 	p--;
 	if(*p == UC_SENTINEL_EXTENDEDEND)
@@ -182,7 +182,7 @@ PWSTR decxstr(PWSTR p)
 	return p;
 }
 
-int xstrlen_ignoreifopt(PWSTR p)
+int xstrlen_ignoreifopt(PKMX_WCHAR p)
 {
   int i;
   for(i = 0; *p; i++, p=incxstr(p))
@@ -192,31 +192,31 @@ int xstrlen_ignoreifopt(PWSTR p)
   return i;
 }
 
-int xstrlen(PWSTR p)
+int xstrlen(PKMX_WCHAR p)
 {
 	int i;
 	for(i = 0; *p; i++, p=incxstr(p));
 	return i;
 }
 
-int xstrpos(PWSTR p1, PWSTR p)
+int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
 {
   int i;
 	for(i = 0; p < p1; p = incxstr(p), i++);
 	return i;
 }
 
-PWSTR xstrchr(PWSTR buf, PWSTR chr)
+PKMX_WCHAR xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
 {
-  for(PWSTR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
+  for(PKMX_WCHAR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
     if(!u16ncmp(buf, chr, (int)(q-buf)))
       return buf;
   return NULL;
 }
 
-int xchrcmp(PWSTR ch1, PWSTR ch2)
+int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
 {
-  PWSTR nch1 = incxstr(ch1);
+  PKMX_WCHAR nch1 = incxstr(ch1);
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (int)(nch1-ch1));
 }
@@ -242,7 +242,7 @@ std::string utf16_to_utf8(std::u16string utf16_string)
 }
 #endif
 
-PWSTR strtowstr(PSTR in)
+PKMX_WCHAR strtowstr(PKMX_CHAR in)
 {
   km_kbp_cp *result;
 
@@ -252,7 +252,7 @@ PWSTR strtowstr(PSTR in)
   std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 #endif
   auto s = convert.from_bytes(in, strchr(in, 0));
-  result = new WCHAR[s.length() + 1];
+  result = new KMX_WCHAR[s.length() + 1];
 #if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
   s.copy(reinterpret_cast<int16_t *>(result), s.length());
 #else
@@ -263,9 +263,9 @@ PWSTR strtowstr(PSTR in)
 }
 
 
-PSTR wstrtostr(PWSTR in)
+PKMX_CHAR wstrtostr(PKMX_WCHAR in)
 {
-  PSTR result;
+  PKMX_CHAR result;
 
   auto s = utf16_to_utf8(in);
   result = new char[s.length() + 1];
