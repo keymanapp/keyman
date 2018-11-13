@@ -49,3 +49,13 @@ typedef DWORD far           *LPDWORD;
 #define strcasecmp _stricmp 
 #define strncasecmp _strnicmp 
 #endif
+
+#if __x86_64__
+/* 64-bit, g++ */
+#define KMX_64BIT
+#endif
+
+#if defined(_WIN64) && !defined(USE_64)
+/* 64-bit, Windows */
+#define KMX_64BIT
+#endif

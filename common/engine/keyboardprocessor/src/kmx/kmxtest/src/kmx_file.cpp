@@ -9,7 +9,7 @@
 #endif
 
 /* TODO: use portable 64-bit check here */
-#ifdef _WIN64
+#ifdef KMX_64BIT
 LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
 #else
 LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
@@ -122,7 +122,7 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
     return FALSE;
   }
 
-#ifdef _WIN64
+#ifdef KMX_64BIT
 	buf = new BYTE[sz*3];
 #else
 	buf = new BYTE[sz];
@@ -134,7 +134,7 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 		DebugLog("Not allocmem");
 		return FALSE;
 	}
-#ifdef _WIN64
+#ifdef KMX_64BIT
 	filebase = buf + sz*2;
 #else
 	filebase = buf;
@@ -156,7 +156,7 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 
 	if(!VerifyKeyboard(filebase, sz)) return FALSE;
 
-#ifdef _WIN64
+#ifdef KMX_64BIT
 	kbp = CopyKeyboard(buf, filebase, sz);
 #else
 	kbp = FixupKeyboard(buf, filebase, sz);
@@ -177,7 +177,7 @@ PWCHAR KMX_Processor::StringOffset(PBYTE base, DWORD offset)
   return (PWCHAR)(base + offset);
 }
 
-#ifdef _WIN64
+#ifdef KMX_64BIT
 
 /**
   CopyKeyboard will copy the data read into bufp from x86-sized structures into x64-sized structures starting at base
