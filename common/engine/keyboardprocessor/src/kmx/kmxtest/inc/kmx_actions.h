@@ -7,7 +7,7 @@
 
 #include "kmx_base.h"
 
-#define MAXACTIONQUEUE	1024
+#define MAXACTIONQUEUE  1024
 
 typedef struct
 {
@@ -16,14 +16,14 @@ typedef struct
 } APPACTIONQUEUEITEM;
 
 // QueueAction ItemTypes
-#define QIT_VKEYDOWN	0
-#define QIT_VKEYUP		1
-#define QIT_VSHIFTDOWN	2
-#define QIT_VSHIFTUP	3
-#define QIT_CHAR		4
-#define QIT_DEADKEY		5
-#define QIT_BELL		6
-#define QIT_BACK		7
+#define QIT_VKEYDOWN  0
+#define QIT_VKEYUP    1
+#define QIT_VSHIFTDOWN  2
+#define QIT_VSHIFTUP  3
+#define QIT_CHAR    4
+#define QIT_DEADKEY   5
+#define QIT_BELL    6
+#define QIT_BACK    7
 #define QIT_CAPSLOCK  8
 #define QIT_INVALIDATECONTEXT 9
 
@@ -38,20 +38,20 @@ class KMX_Actions
 private:
   KMX_Context *m_context;
   APPACTIONQUEUEITEM Queue[MAXACTIONQUEUE];
-  int FShiftFlags;
+  //int FShiftFlags;
   int QueueSize;
 
 public:
-	KMX_Actions(KMX_Context *context);
-	~KMX_Actions();
+  KMX_Actions(KMX_Context *context);
+  ~KMX_Actions();
 
-  void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
+  //void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
 
-	/* Context functions */
+  /* Context functions */
 
   /*void AddContext(KMX_WCHAR ch);  //I2436
-	KMX_WCHAR *ContextBuf(int n);
-	KMX_WCHAR *ContextBufMax(int n);
+  KMX_WCHAR *ContextBuf(int n);
+  KMX_WCHAR *ContextBufMax(int n);
   void SetContext(KMX_WCHAR *ctxt);*/
 
   /* Queue functions */

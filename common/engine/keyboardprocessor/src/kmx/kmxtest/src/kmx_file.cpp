@@ -17,11 +17,11 @@ LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 
 KMX_BOOL KMX_Processor::Load(PKMX_CHAR KeyboardName)
 {
-	if(!LoadKeyboard(KeyboardName, &g_keyboard.Keyboard)) return FALSE;   // I5136
+  if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
 
-  LoadKeyboardOptions(&g_keyboard);
-	
-	return TRUE;
+  LoadKeyboardOptions(&m_keyboard);
+  
+  return TRUE;
 }
 
 const unsigned long CRCTable[256] = {
@@ -69,31 +69,31 @@ unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
 {
   unsigned long temp1;
   unsigned long temp2;
-	unsigned long crc = 0xFFFFFFFFL;
+  unsigned long crc = 0xFFFFFFFFL;
 
-	while (count-- != 0)
-	{
+  while (count-- != 0)
+  {
     temp1 = ( crc >> 8 ) & 0x00FFFFFFL;
     temp2 = CRCTable[((int) crc ^ *p++) & 0xff];
     crc = temp1 ^ temp2;
   }
     
-	return crc;
+  return crc;
 }
 
 KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
 {
-	KMX_DWORD sz;
-	PKMX_BYTE buf;
+  KMX_DWORD sz;
+  PKMX_BYTE buf;
   FILE *fp;
-	LPKEYBOARD kbp;
+  LPKEYBOARD kbp;
   PKMX_BYTE filebase;
 
-	if(!fileName || !lpKeyboard)
-	{
-		DebugLog("Bad Filename");
-		return FALSE;
-	}
+  if(!fileName || !lpKeyboard)
+  {
+    DebugLog("Bad Filename");
+    return FALSE;
+  }
 
 #if defined(_WIN32) || defined(_WIN64) 
   fp = _fsopen(fileName, "rb", _SH_DENYWR);
@@ -101,10 +101,10 @@ KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
   fp = fopen(fileName, "rb");
 #endif
   if(fp == NULL)
-	{
-		DebugLog("Could not open file");
-		return FALSE;
-	}
+  {
+    DebugLog("Could not open file");
+    return FALSE;
+  }
 
   if (fseek(fp, 0, SEEK_END) != 0) {
     fclose(fp);
@@ -125,21 +125,21 @@ KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
   }
 
 #ifdef KMX_64BIT
-	buf = new KMX_BYTE[sz*3];
+  buf = new KMX_BYTE[sz*3];
 #else
-	buf = new KMX_BYTE[sz];
+  buf = new KMX_BYTE[sz];
 #endif
 
-	if(!buf)
-	{
+  if(!buf)
+  {
     fclose(fp);
-		DebugLog("Not allocmem");
-		return FALSE;
-	}
+    DebugLog("Not allocmem");
+    return FALSE;
+  }
 #ifdef KMX_64BIT
-	filebase = buf + sz*2;
+  filebase = buf + sz*2;
 #else
-	filebase = buf;
+  filebase = buf;
 #endif
 
   if (fread(filebase, 1, sz, fp) < sz) {
@@ -150,28 +150,28 @@ KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
 
   fclose(fp);
 
-	if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
-	{
-		delete buf; 
+  if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
+  {
+    delete buf; 
     DebugLog("Invalid file - signature is invalid");
     return FALSE;
-	}
+  }
 
-	if(!VerifyKeyboard(filebase, sz)) return FALSE;
+  if(!VerifyKeyboard(filebase, sz)) return FALSE;
 
 #ifdef KMX_64BIT
-	kbp = CopyKeyboard(buf, filebase, sz);
+  kbp = CopyKeyboard(buf, filebase, sz);
 #else
-	kbp = FixupKeyboard(buf, filebase, sz);
+  kbp = FixupKeyboard(buf, filebase, sz);
 #endif
 
   if(!kbp) return FALSE;
 
-	if(kbp->dwIdentifier != FILEID_COMPILED) { delete buf; DebugLog("errNotFileID"); return FALSE; }
+  if(kbp->dwIdentifier != FILEID_COMPILED) { delete buf; DebugLog("errNotFileID"); return FALSE; }
 
-	*lpKeyboard = kbp;
+  *lpKeyboard = kbp;
 
-	return TRUE;
+  return TRUE;
 }
 
 PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
@@ -279,28 +279,28 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
   LPGROUP gp;
   LPKEY kp;
 
-	kbp->dpStoreArray = (LPSTORE) (base + ckbp->dpStoreArray);
-	kbp->dpGroupArray = (LPGROUP) (base + ckbp->dpGroupArray);
+  kbp->dpStoreArray = (LPSTORE) (base + ckbp->dpStoreArray);
+  kbp->dpGroupArray = (LPGROUP) (base + ckbp->dpGroupArray);
 
-	for(sp = kbp->dpStoreArray, csp = (PCOMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)
-	{
+  for(sp = kbp->dpStoreArray, csp = (PCOMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)
+  {
     sp->dpName = StringOffset(base, csp->dpName);
-		sp->dpString = StringOffset(base, csp->dpString);
-	}
+    sp->dpString = StringOffset(base, csp->dpString);
+  }
 
-	for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
-	{
+  for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
+  {
     gp->dpName = StringOffset(base, cgp->dpName); 
-		gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
-		if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
-		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
+    gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
+    if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
+    if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
 
-		for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
-		{
-			kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
-			kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
-		}
-	}
+    for(kp = gp->dpKeyArray, ckp = (PCOMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++)
+    {
+      kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
+      kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
+    }
+  }
 
   return kbp;
 }
@@ -309,15 +309,15 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
 
 KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz)
 {
-	KMX_DWORD tempcs;
+  KMX_DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
 
   ckbp = (PCOMP_KEYBOARD) buf;
 
-	tempcs = ckbp->dwCheckSum;
+  tempcs = ckbp->dwCheckSum;
   ckbp->dwCheckSum = 0;
 
-	return tempcs == CalculateBufferCRC(sz, buf);
+  return tempcs == CalculateBufferCRC(sz, buf);
 }
 
 KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz)
@@ -326,29 +326,29 @@ KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz)
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
 
-	/* Check file version */ 
+  /* Check file version */ 
 
-	if(ckbp->dwFileVersion < VERSION_MIN || 
-	   ckbp->dwFileVersion > VERSION_MAX) 
-	{ 
-		/* Old or new version -- identify the desired program version */ 
-		if(VerifyChecksum(filebase, sz)) 
-		{ 
-			for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
-				if(csp->dwSystemID == TSS_COMPILEDVERSION)
-				{
+  if(ckbp->dwFileVersion < VERSION_MIN || 
+     ckbp->dwFileVersion > VERSION_MAX) 
+  { 
+    /* Old or new version -- identify the desired program version */ 
+    if(VerifyChecksum(filebase, sz)) 
+    { 
+      for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
+        if(csp->dwSystemID == TSS_COMPILEDVERSION)
+        {
           if(csp->dpString == 0)
             DebugLog("errWrongFileVersion:NULL");
           else
-					  DebugLog("errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
-					return FALSE;
-				}
-		}
-		DebugLog("errWrongFileVersion");
-		return FALSE; 
-	}
-	
-	if(!VerifyChecksum(filebase, sz)) { DebugLog("errBadChecksum"); return FALSE; }
+            DebugLog("errWrongFileVersion:%10.10ls", StringOffset(filebase, csp->dpString));
+          return FALSE;
+        }
+    }
+    DebugLog("errWrongFileVersion");
+    return FALSE; 
+  }
+  
+  if(!VerifyChecksum(filebase, sz)) { DebugLog("errBadChecksum"); return FALSE; }
 
   return TRUE;
 }

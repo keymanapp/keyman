@@ -64,15 +64,15 @@ static KMX_BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
 
 
 /*
-*	KMX_BOOL IsEquivalentShift( KMX_UINT rshift, KMX_UINT kshift );
+* KMX_BOOL IsEquivalentShift( KMX_UINT rshift, KMX_UINT kshift );
 *
-*	Parameters:	rshift	Rule shift state flag set to compare.
-*				kshift  Current shift state flag set to compare.
+* Parameters: rshift  Rule shift state flag set to compare.
+*       kshift  Current shift state flag set to compare.
 *
-*	Returns:	TRUE if the shift states are equivalent.
+* Returns:  TRUE if the shift states are equivalent.
 *
-*	IsEquivalentShift will compare rshift and kshift and check the generic
-*	K_CTRLFLAG and K_ALTFLAG as well as specific keys correctly.
+* IsEquivalentShift will compare rshift and kshift and check the generic
+* K_CTRLFLAG and K_ALTFLAG as well as specific keys correctly.
 */
 
 KMX_BOOL KMX_Processor::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
@@ -80,14 +80,14 @@ KMX_BOOL KMX_Processor::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
   // The rule shift must have ISVIRTUALKEY bit set for virt.keys
   //
 
-	if(rshift == 0) return FALSE;
+  if(rshift == 0) return FALSE;
 
   //
   // Test CAPS-specific rules
   //
 
-	if( (rshift & NOTCAPITALFLAG) && (kshift & CAPITALFLAG) ) return FALSE;
-	if( (rshift & CAPITALFLAG) && !(kshift & CAPITALFLAG) ) return FALSE;
+  if( (rshift & NOTCAPITALFLAG) && (kshift & CAPITALFLAG) ) return FALSE;
+  if( (rshift & CAPITALFLAG) && !(kshift & CAPITALFLAG) ) return FALSE;
 
   //
   // Ignore CAPS, NUM and SCROLL
@@ -127,9 +127,9 @@ KMX_BOOL KMX_Processor::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
   switch(states[rshift][kshift]) {
     case 0: return FALSE;
     case 1: return TRUE;
-    case 2: return g_environment.g_baseLayoutGivesCtrlRAltForRAlt;  // This state is used when TSF gives us a bogus RALT instead of LCtrl+RAlt
-    case 4: return g_environment.g_simulateAltGr;   // I4583
-    case 6: return g_environment.g_baseLayoutGivesCtrlRAltForRAlt || g_environment.g_simulateAltGr;   // I4583
+    case 2: return g_environment.baseLayoutGivesCtrlRAltForRAlt;  // This state is used when TSF gives us a bogus RALT instead of LCtrl+RAlt
+    case 4: return g_environment.simulateAltGr;   // I4583
+    case 6: return g_environment.baseLayoutGivesCtrlRAltForRAlt || g_environment.simulateAltGr;   // I4583
   }
 
   return FALSE; // should never happen

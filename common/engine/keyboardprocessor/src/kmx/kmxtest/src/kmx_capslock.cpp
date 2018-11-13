@@ -6,50 +6,50 @@
 
 void KMX_Processor::ResetCapsLock(void)
 {
-	DebugLog("ResetCapsLock: enter");
+  DebugLog("ResetCapsLock: enter");
 
-	if(g_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF) 
-	{
-		DebugLog("ResetCapsLock: caps lock should be always off");
-    if(g_environment.g_capsLock)
-		{
-			DebugLog("ResetCapsLock: caps lock is on, switching off caps lock");
+  if(m_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF) 
+  {
+    DebugLog("ResetCapsLock: caps lock should be always off");
+    if(g_environment.capsLock)
+    {
+      DebugLog("ResetCapsLock: caps lock is on, switching off caps lock");
       m_actions.QueueAction(QIT_CAPSLOCK, 0);
-		}
-	}
-	DebugLog("ResetCapsLock: exit");
+    }
+  }
+  DebugLog("ResetCapsLock: exit");
 }
 
 
 void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
 {
-	if(g_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
-	{
-		if(FIsUp && !g_environment.g_capsLock)		// I267 - 24/11/2006 invert GetKeyState test
-		{
+  if(m_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
+  {
+    if(FIsUp && !g_environment.capsLock)    // I267 - 24/11/2006 invert GetKeyState test
+    {
       m_actions.QueueAction(QIT_CAPSLOCK, 1);
-		}
-	}
-	else if(g_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF)
-	{
-		if(!FIsUp && g_environment.g_capsLock)
-		{												// I267 - 24/11/2006 invert GetKeyState test
+    }
+  }
+  else if(m_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF)
+  {
+    if(!FIsUp && g_environment.capsLock)
+    {                       // I267 - 24/11/2006 invert GetKeyState test
       m_actions.QueueAction(QIT_CAPSLOCK, 0);
-		}
-	}
+    }
+  }
 }
 
 
 void KMX_Processor::KeyShiftPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
 {
-	if(!g_environment.g_capsLock) return;
+  if(!g_environment.capsLock) return;
 
-	if(g_keyboard.Keyboard->dwFlags & KF_SHIFTFREESCAPS)
-	{
-		if(!FIsUp)
-		{
+  if(m_keyboard.Keyboard->dwFlags & KF_SHIFTFREESCAPS)
+  {
+    if(!FIsUp)
+    {
       m_actions.QueueAction(QIT_CAPSLOCK, 0);
-		}
-	}
+    }
+  }
 }
 
