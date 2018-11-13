@@ -246,10 +246,18 @@ PWSTR strtowstr(PSTR in)
 {
   km_kbp_cp *result;
 
+#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
   std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+#else 
+  std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+#endif
   auto s = convert.from_bytes(in, strchr(in, 0));
   result = new WCHAR[s.length() + 1];
+#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
   s.copy(reinterpret_cast<int16_t *>(result), s.length());
+#else
+  s.copy(result, s.length());
+#endif
   result[s.length()] = 0;
   return result;
 }
