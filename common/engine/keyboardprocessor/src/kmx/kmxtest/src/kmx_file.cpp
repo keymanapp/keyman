@@ -186,8 +186,6 @@ PWCHAR KMX_Processor::StringOffset(PBYTE base, DWORD offset)
 */
 LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 {
-  UNREFERENCED_PARAMETER(dwFileSize);
-
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
 
   /* Copy keyboard structure */
@@ -207,7 +205,6 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
   kbp->StartGroup[1] = ckbp->StartGroup[1];
   kbp->dwFlags = ckbp->dwFlags;
   kbp->dwHotKey = ckbp->dwHotKey;
-  kbp->hBitmap = 0; // will be built later
 
   kbp->dpStoreArray = (LPSTORE) bufp;
   bufp += sizeof(STORE) * kbp->cxStoreArray;

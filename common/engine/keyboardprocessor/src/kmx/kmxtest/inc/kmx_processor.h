@@ -396,6 +396,9 @@ private:
   BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
   BOOL VerifyChecksum(LPBYTE buf, DWORD sz);
   PWCHAR StringOffset(PBYTE base, DWORD offset);
+#ifdef KMX_64BIT
+  LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
+#endif
 
   BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
 
