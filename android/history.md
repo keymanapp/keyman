@@ -1,6 +1,9 @@
 # Keyman for Android
 
-## 2018-10-03 10.0.506 stable
+## 2018-11-14 10.0.508 stable
+* Fix crash that can occur when text selection ends before the starting position (#1313)
+
+## 2018-10-04 10.0.507 stable
 * Fix crash that can occur when displaying preview key (#1230)
 
 ## 2018-08-23 10.0.505 stable
