@@ -8,6 +8,7 @@
 
 import UIKit
 import WebKit
+import AudioToolbox
 
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
@@ -284,6 +285,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     } else if fragment.hasPrefix("ios-log:#iOS#") {
       let message = fragment.dropFirst(13)
       log.info("KMW Log: \(message)")
+    } else if fragment.hasPrefix("#beep-") {
+      beep(self)
+      delegate?.beep(self)
     } else {
       log.error("Unexpected KMW event: \(fragment)")
     }
@@ -292,6 +296,11 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
     // kmw adds w/2 to x.
     return CGRect(x: x - w / 2.0, y: y, width: w, height: h)
+  }
+  
+  public func beep(_ keymanWeb: KeymanWebViewController) {
+    // Does nothing on the iPod touch, but otherwise emits a brief vibration.
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
   }
 }
 

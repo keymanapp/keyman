@@ -38,6 +38,7 @@
                 kmw['hideKeyboard'] = hideKeyboard;
                 kmw['getOskHeight'] = getOskHeight;
                 kmw['getOskWidth'] = getOskWidth;
+                kmw['beepKeyboard'] = beepKeyboard;
                 kmw['setActiveElement']('ta');
             }
             
@@ -69,6 +70,14 @@
             
             function getOskHeight() {
                 return oskHeight;
+            }
+        
+            function beepKeyboard() {
+                fragmentToggle = (fragmentToggle + 1) % 100;
+                var beepHash = 'beep-'+ fragmentToggle;
+                if(typeof(window.webkit) != 'undefined') {
+                    window.webkit.messageHandlers.keyman.postMessage('#' + beepHash);
+                }
             }
             
             var keyboardOffset = 0;
