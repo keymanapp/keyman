@@ -1253,6 +1253,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       userData.synchronize()
     }
   }
+  
+  public func showKeyboard() {
+    keymanWebDelegate?.resumeKeyboard()
+  }
+  
+  public func hideKeyboard() {
+    keymanWebDelegate?.dismissKeyboard()
+    
+    dismissHelpBubble()
+    dismissSubKeys()
+    dismissKeyboardMenu()
+  }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.hideKeyboard(keymanWeb)
