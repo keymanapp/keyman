@@ -11,14 +11,14 @@ const LPSTR ItemTypes[QIT_MAX+1] = {
   "QIT_CHAR", "QIT_DEADKEY", "QIT_BELL", "QIT_BACK", "QIT_CAPSLOCK",
   "QIT_INVALIDATECONTEXT" };
 
-/* AppContext */
+/* KMX_Context */
 
-AppContext::AppContext()
+KMX_Context::KMX_Context()
 {
 	Reset();
 }
 
-void AppContext::Add(WCHAR ch)
+void KMX_Context::Add(WCHAR ch)
 {
 	if(pos == MAXCONTEXT - 1)
 	{
@@ -28,10 +28,10 @@ void AppContext::Add(WCHAR ch)
 	CurContext[pos++] = ch;
 	CurContext[pos] = 0;
 
-  DebugLog("AppContext: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
+  DebugLog("KMX_Context: Add(%x) [%d]: %s", ch, pos, Debug_UnicodeString(CurContext));
 }
 
-WCHAR *AppContext::Buf(int n)
+WCHAR *KMX_Context::Buf(int n)
 {
 	WCHAR *p;
 
@@ -41,7 +41,7 @@ WCHAR *AppContext::Buf(int n)
 	return p;
 }
 
-WCHAR *AppContext::BufMax(int n)  // Used only by IMX DLLs
+WCHAR *KMX_Context::BufMax(int n)  // Used only by IMX DLLs
 {
 	WCHAR *p = wcschr(CurContext, 0);  // I3091
 
@@ -55,7 +55,7 @@ WCHAR *AppContext::BufMax(int n)  // Used only by IMX DLLs
   return p;  // I3091
 }
 
-void AppContext::Delete()
+void KMX_Context::Delete()
 {
   if (CharIsDeadkey()) {
     pos -= 2;
@@ -67,13 +67,13 @@ void AppContext::Delete()
 	CurContext[pos] = 0;
 }
 
-void AppContext::Reset()
+void KMX_Context::Reset()
 {
 	pos = 0;
 	CurContext[0] = 0;
 }
 
-void AppContext::Get(WCHAR *buf, int bufsize)
+void KMX_Context::Get(WCHAR *buf, int bufsize)
 {
 	for(WCHAR *p = CurContext; *p && bufsize > 0; p++, bufsize--)
 	{
@@ -85,15 +85,15 @@ void AppContext::Get(WCHAR *buf, int bufsize)
 	//buf[bufsize-1] = 0; 
 }
 
-void AppContext::CopyFrom(AppContext *source)   // I3575
+void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
 {
-  DebugLog("AppContext::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
+  DebugLog("KMX_Context::CopyFrom source=%s; before copy, dest=%s", Debug_UnicodeString(source->CurContext, 0), Debug_UnicodeString(CurContext, 1));
   wcscpy_s(CurContext, _countof(CurContext), source->CurContext);
 	pos = source->pos;
 }
 
 
-void AppContext::Set(const WCHAR *buf)
+void KMX_Context::Set(const WCHAR *buf)
 {
 	const WCHAR *p;
 	WCHAR *q;
@@ -107,7 +107,7 @@ void AppContext::Set(const WCHAR *buf)
 	CurContext[MAXCONTEXT-1] = 0; 
 }
 
-BOOL AppContext::CharIsDeadkey()
+BOOL KMX_Context::CharIsDeadkey()
 {
 	if(pos < 3) // code_sentinel, deadkey, #, 0
 		return FALSE;
@@ -115,7 +115,7 @@ BOOL AppContext::CharIsDeadkey()
 		   CurContext[pos-2] == CODE_DEADKEY;
 }
 
-BOOL AppContext::CharIsSurrogatePair()
+BOOL KMX_Context::CharIsSurrogatePair()
 {
   if (pos < 2) // low_surrogate, high_surrogate
     return FALSE;

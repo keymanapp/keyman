@@ -5,44 +5,22 @@
 #include "pch.h"   // I4128   // I4287
 
 
-void AIWin2000Unicode::ResetQueue()
+void KMX_Actions::ResetQueue()
 {
   QueueSize = 0;   // I4262
 }
 
-AIWin2000Unicode::AIWin2000Unicode()
+KMX_Actions::KMX_Actions(KMX_Context *context)
 {
+  m_context = context;
   ResetQueue();
-  context = new AppContext;
 }
 
-AIWin2000Unicode::~AIWin2000Unicode()
+KMX_Actions::~KMX_Actions()
 {
-	delete context;
 }
 
-/* Context functions */
-
-void AIWin2000Unicode::SetContext(WCHAR *ctxt) {
-  context->Set(ctxt);
-}
-	
-void AIWin2000Unicode::AddContext(WCHAR ch)  //I2436
-{
-  context->Add(ch);
-}
-
-WCHAR *AIWin2000Unicode::ContextBuf(int n)
-{
-	return context->Buf(n);
-}
-
-WCHAR *AIWin2000Unicode::ContextBufMax(int n)
-{
-	return context->BufMax(n);
-}
-	
-BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
+BOOL KMX_Actions::QueueAction(int ItemType, DWORD dwData)
 {
   if (QueueSize > MAXACTIONQUEUE - 1)
   {
@@ -63,24 +41,24 @@ BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 		break;
 
 	case QIT_DEADKEY:
-		context->Add(UC_SENTINEL);
-		context->Add(CODE_DEADKEY);
-		context->Add((WORD) dwData);
+		m_context->Add(UC_SENTINEL);
+    m_context->Add(CODE_DEADKEY);
+    m_context->Add((WORD) dwData);
 		break;
 
 	case QIT_CHAR:
-		context->Add((WORD) dwData);
+    m_context->Add((WORD) dwData);
 		break;
 
 	case QIT_BACK:
 		if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
-			while(context->CharIsDeadkey()) context->Delete();
+			while(m_context->CharIsDeadkey()) m_context->Delete();
 
 		//if(dwData == CODE_DEADKEY) break;
-		context->Delete();
+    m_context->Delete();
 
 		if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
-			while(context->CharIsDeadkey()) context->Delete();
+			while(m_context->CharIsDeadkey()) m_context->Delete();
 		break;
 	}
 
@@ -88,13 +66,13 @@ BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
 }
 
 
-BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
+BOOL KMX_Actions::CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput) {
   //LogOutput();
   //console_log(L"--------------\n");
 
   wchar_t output[512] = L"", *p;
 
-  wcscpy(output, g_context);
+  wcscpy(output, initialContext);
   
   int i = 0, n = 0;
 
@@ -204,7 +182,7 @@ BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
   BOOL result = !wcscmp(output, expectedOutput);
 
   wchar_t _context[256];
-  context->Get(_context, 256);
+  m_context->Get(_context, 256);
 
   write_console(!result, L"context = %hs\n", Debug_UnicodeString(_context, 0));
   write_console(!result, L"output = %hs\n", Debug_UnicodeString(output, 0));
@@ -214,7 +192,7 @@ BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
 }
 
 
-void AIWin2000Unicode::LogOutput() {
+void KMX_Actions::LogOutput() {
   int i = 0, n = 0;
 
   for (; n < QueueSize; n++)

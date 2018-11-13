@@ -9,6 +9,7 @@
 #include <corecrt_wstring.h>
 #include <string.h>
 #include <stdarg.h>
+#include "kmxtest.h"
 
 struct KMXTest_KeyEvent {
   UINT vkey;
@@ -45,12 +46,14 @@ KMXTest_KeyboardOption g_keyboardOption[1024] = { 0 };
 int g_keyboardOptionCount = 0;
 
 /* Environment - to refactor */
-wchar_t g_baseLayout[260] = L"kbdus.dll",
-        g_baseLayoutAlt[34] = L"en-US";
-BOOL    g_simulateAltGr = FALSE, 
-        g_baseLayoutGivesCtrlRAltForRAlt = FALSE;
-char    g_platform[128] = "windows desktop hardware native"; // TODO
-BOOL    g_capsLock = FALSE;
+KMX_Environment g_environment = {
+  FALSE, // g_simulateAltGr
+  FALSE, // g_baseLayoutGivesCtrlRAltForRAlt
+  L"kbdus.dll", // g_baseLayout
+  L"en-US", // g_baseLayoutAlt
+  FALSE, // g_capsLock
+  "windows desktop hardware native" // g_platform
+};
 
 /* Constants - to refactor */
 extern const struct KMXTest_ModifierNames s_modifierNames[];
@@ -58,12 +61,12 @@ extern const char *VKeyNames[];
 extern const struct KMXTest_ChToVKey chToVKey[];
 
 void print_default_environment() {
-  wprintf(L"  env.simulate_altgr=%d\n", g_simulateAltGr);
-  wprintf(L"  env.base_layout_gives_ctrl_ralt_for_ralt=%d\n", g_baseLayoutGivesCtrlRAltForRAlt);
-  wprintf(L"  env.base_layout=%s\n", g_baseLayout);
-  wprintf(L"  env.base_layout_alt=%s\n", g_baseLayoutAlt);
-  wprintf(L"  env.platform=%hs\n", g_platform);
-  wprintf(L"  env.caps_lock=%d\n", g_capsLock);
+  wprintf(L"  env.simulate_altgr=%d\n", g_environment.g_simulateAltGr);
+  wprintf(L"  env.base_layout_gives_ctrl_ralt_for_ralt=%d\n", g_environment.g_baseLayoutGivesCtrlRAltForRAlt);
+  wprintf(L"  env.base_layout=%s\n", g_environment.g_baseLayout);
+  wprintf(L"  env.base_layout_alt=%s\n", g_environment.g_baseLayoutAlt);
+  wprintf(L"  env.platform=%hs\n", g_environment.g_platform);
+  wprintf(L"  env.caps_lock=%d\n", g_environment.g_capsLock);
 }
 
 void ValidateOptions();
@@ -89,22 +92,22 @@ BOOL addOption(char *val) {
   PWSTR wp = strtowstr(p);
 
   if (!_strnicmp(val, "env.simulate_altgr", len)) {
-    g_simulateAltGr = !!atoi(p);
+    g_environment.g_simulateAltGr = !!atoi(p);
   }
   else if (!_strnicmp(val, "env.base_layout_gives_ctrl_ralt_for_ralt", len)) {
-    g_baseLayoutGivesCtrlRAltForRAlt = !!atoi(p);
+    g_environment.g_baseLayoutGivesCtrlRAltForRAlt = !!atoi(p);
   }
   else if (!_strnicmp(val, "env.base_layout", len)) {
-    wcscpy_s(g_baseLayout, wp);
+    wcscpy_s(g_environment.g_baseLayout, wp);
   }
   else if (!_strnicmp(val, "env.base_layout_alt", len)) {
-    wcscpy_s(g_baseLayoutAlt, wp);
+    wcscpy_s(g_environment.g_baseLayoutAlt, wp);
   }
   else if (!_strnicmp(val, "env.platform", len)) {
-    strcpy_s(g_platform, p);
+    strcpy_s(g_environment.g_platform, p);
   }
   else if (!_strnicmp(val, "env.caps_lock", len)) {
-    g_capsLock = !!atoi(p);
+    g_environment.g_capsLock = !!atoi(p);
   }
   else if (!_strnicmp(val, "opt.", 4)) {
     *(p - 1) = 0;
@@ -339,28 +342,26 @@ int main(int argc, char *argv[]) {
 
   // run;
 
-  if (!kmx.LoadlpKeyboard(filename)) {
+  if (!kmx.Load(filename)) {
     console_error(L"Failed to load %hs\n", filename);
     return 1;
   }
 
-  PKEYMAN64THREADDATA _td = kmx.ThreadGlobals();
-
-  kmx.GetApp()->SetContext(g_context);
+  kmx.GetContext()->Set(g_context);
 
   console_log(L"============ Starting test ============\n");
 
   for (int i = 0; i < g_nKeyEvents; i++) {
     wchar_t local_context[512];
-    kmx.GetApp()->context->Get(local_context, 512);
+    kmx.GetContext()->Get(local_context, 512);
     console_log(L"%d: '%hs' + [%hs %hs]\n", i, Debug_UnicodeString(local_context), Debug_ModifierName(g_keyEvents[i].modifiers), Debug_VirtualKey(g_keyEvents[i].vkey));
 
-    BOOL outputKeystroke = !kmx.ProcessHook(g_keyEvents[i].vkey, g_keyEvents[i].modifiers, VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey));
+    BOOL outputKeystroke = !kmx.ProcessEvent(g_keyEvents[i].vkey, g_keyEvents[i].modifiers, VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey));
     console_log(L"outputKeystroke = %d\n", outputKeystroke);
   }
 
 
-  int result = kmx.GetApp()->CheckOutput(g_expectedOutput) ? 0 : 1;
+  int result = kmx.GetActions()->CheckOutput(g_context, g_expectedOutput) ? 0 : 1;
   if (result == 1) {
     console_error(L"Output did not match expected output\n");
   } else {
@@ -376,32 +377,6 @@ int main(int argc, char *argv[]) {
 void ValidateOptions() {
 }
 
-AIWin2000Unicode *KMX_Processor::GetApp() {
-  return &g_app;
-}
-
-LPINTKEYBOARDINFO KMX_Processor::GetKeyboard() {
-  return &g_keyboard;
-}
-
-PKEYMAN64THREADDATA KMX_Processor::ThreadGlobals() {
-  return &g_ThreadData;
-}
-
-BOOL KMX_Processor::ReleaseKeyboardMemory(LPKEYBOARD kbd) 
-{
-	if(!kbd) return TRUE;
-	delete kbd;
-	return TRUE;
-}
-
-PWSTR KMX_Processor::GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
-{
-  for (DWORD i = 0; i < kb->cxStoreArray; i++)
-    if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
-
-  return NULL;
-}
 
 const char *VKeyNames[256] = {
   // Key Codes

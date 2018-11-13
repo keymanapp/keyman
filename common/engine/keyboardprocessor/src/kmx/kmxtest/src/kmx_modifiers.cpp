@@ -127,9 +127,9 @@ BOOL KMX_Processor::IsEquivalentShift(UINT rshift, UINT kshift) {
   switch(states[rshift][kshift]) {
     case 0: return FALSE;
     case 1: return TRUE;
-    case 2: return g_baseLayoutGivesCtrlRAltForRAlt;  // This state is used when TSF gives us a bogus RALT instead of LCtrl+RAlt
-    case 4: return g_simulateAltGr;   // I4583
-    case 6: return g_baseLayoutGivesCtrlRAltForRAlt || g_simulateAltGr;   // I4583
+    case 2: return g_environment.g_baseLayoutGivesCtrlRAltForRAlt;  // This state is used when TSF gives us a bogus RALT instead of LCtrl+RAlt
+    case 4: return g_environment.g_simulateAltGr;   // I4583
+    case 6: return g_environment.g_baseLayoutGivesCtrlRAltForRAlt || g_environment.g_simulateAltGr;   // I4583
   }
 
   return FALSE; // should never happen

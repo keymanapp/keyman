@@ -9,15 +9,15 @@
 
 #define MAXCONTEXT 64
 
-class AppContext
+class KMX_Context
 {
 private:
 	WCHAR CurContext[MAXCONTEXT];
 	int pos;
 
 public:
-	AppContext();
-  void CopyFrom(AppContext *source);
+	KMX_Context();
+  void CopyFrom(KMX_Context *source);
 	void Add(WCHAR ch);
 	void Delete();
 	void Reset();

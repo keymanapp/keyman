@@ -366,39 +366,27 @@ enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 
 #define GLOBAL_ContextStackSize 80
 
-/* External interface functions */
-
-typedef struct tagKEYMAN64THREADDATA
-{
-  LPWORD IndexStack;
-  LPWSTR miniContext;
-
-  KMSTATE state;
-
-} KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
-
-/* Thread Local Data */
-
-
 /* Temporary globals */
 
-struct KMXTest_KeyboardOption {
-  wchar_t name[128], value[128];
+struct KMX_Environment {
+  BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
+  wchar_t g_baseLayout[260], g_baseLayoutAlt[34];
+  BOOL g_capsLock;
+  char g_platform[260];
 };
 
-extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
-
-extern BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
-extern wchar_t g_baseLayout[260], g_baseLayoutAlt[34], g_context[512];
-extern KMXTest_KeyboardOption g_keyboardOption[1024];
-extern int g_keyboardOptionCount;
-extern BOOL g_capsLock;
+extern KMX_Environment g_environment;
 
 class KMX_Processor {
 private:
-  AIWin2000Unicode g_app;
+  LPWORD IndexStack;
+  LPWSTR miniContext;
+  KMSTATE state;
+
+  KMX_Actions m_actions;
+  KMX_Context m_context;
+
   INTKEYBOARDINFO g_keyboard = { 0 };
-  KEYMAN64THREADDATA g_ThreadData = { 0 };
   DWORD g_shiftState = 0;
 
   /* File loading */
@@ -445,15 +433,17 @@ private:
 public:
   KMX_Processor();
   ~KMX_Processor();
-  BOOL LoadlpKeyboard(PSTR keyboardName);
-  BOOL ProcessHook(UINT vkey, DWORD modifiers, WCHAR charCode);	// returns FALSE on error or key not matched
-  PKEYMAN64THREADDATA ThreadGlobals();
 
-  AIWin2000Unicode *GetApp();
-  LPINTKEYBOARDINFO GetKeyboard();
+  BOOL Load(PSTR keyboardName);
+  BOOL ProcessEvent(UINT vkey, DWORD modifiers, WCHAR charCode);	// returns FALSE on error or key not matched
+
+  KMX_Actions *GetActions();
+  KMX_Context *GetContext();
 };
 
-/* Debugging functions */
+/* Debugging */
+
+extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 
 #define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
 int DebugLog_1(char *file, int line, char *function, char *fmt, ...);

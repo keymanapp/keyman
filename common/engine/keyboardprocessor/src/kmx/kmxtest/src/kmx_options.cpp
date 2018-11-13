@@ -3,6 +3,7 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
+#include "kmxtest.h" //TODO: refactor this away
 
 void KMX_Processor::FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
@@ -88,7 +89,7 @@ void KMX_Processor::SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 
   if (kp->Keyboard->dpStoreArray[nStoreToSave].dpName == NULL) return;
 
-  //TODO: GetApp()->QueueAction(QIT_SAVEOPTION, ...);
+  //TODO: GetActions()->QueueAction(QIT_SAVEOPTION, ...);
   /*RegistryFullAccess r(HKEY_CURRENT_USER);
   if(r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(key, TRUE))
   {

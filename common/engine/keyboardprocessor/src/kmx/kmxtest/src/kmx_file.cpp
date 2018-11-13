@@ -12,7 +12,7 @@ LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
 LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
 #endif
 
-BOOL KMX_Processor::LoadlpKeyboard(PSTR KeyboardName)
+BOOL KMX_Processor::Load(PSTR KeyboardName)
 {
 	if(!LoadKeyboard(KeyboardName, &g_keyboard.Keyboard)) return FALSE;   // I5136
 

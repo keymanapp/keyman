@@ -21,12 +21,6 @@
     <ClCompile Include="src\kmxtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\appint\kmx_actions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\appint\kmx_context.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\kmx_capslock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,7 +39,13 @@
     <ClCompile Include="src\kmx_processor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\kmx_xstring.cpp">
+    <ClCompile Include="src\kmx_actions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kmx_context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kmx_xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -33,27 +33,26 @@ typedef struct
 #define QVK_KEYMASK  0x0000FFFF
 #define QVK_FLAGMASK 0xFFFF0000
 
-class AIWin2000Unicode
+class KMX_Actions
 {
 private:
+  KMX_Context *m_context;
   APPACTIONQUEUEITEM Queue[MAXACTIONQUEUE];
   int FShiftFlags;
   int QueueSize;
 
 public:
-	AIWin2000Unicode();
-	~AIWin2000Unicode();
-
-  AppContext *context;
+	KMX_Actions(KMX_Context *context);
+	~KMX_Actions();
 
   void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
 
 	/* Context functions */
 
-  void AddContext(WCHAR ch);  //I2436
+  /*void AddContext(WCHAR ch);  //I2436
 	WCHAR *ContextBuf(int n);
 	WCHAR *ContextBufMax(int n);
-  void SetContext(WCHAR *ctxt);
+  void SetContext(WCHAR *ctxt);*/
 
   /* Queue functions */
   void ResetQueue();
@@ -63,6 +62,6 @@ public:
   /* Tests */
   void LogOutput();
 
-  BOOL CheckOutput(wchar_t *expectedOutput);
+  BOOL CheckOutput(wchar_t *initialContext, wchar_t *expectedOutput);
 };
 
