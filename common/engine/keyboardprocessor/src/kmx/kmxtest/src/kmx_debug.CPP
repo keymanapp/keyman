@@ -41,7 +41,7 @@ GetTickCount()
   return (unsigned long) duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-int DebugLog_1(char *file, int line, char *function, char *fmt, ...)
+int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...)
 {
 	char fmtbuf[256];
 

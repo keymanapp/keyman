@@ -6,6 +6,7 @@
 #include <vector>
 #include <iterator>
 #include <codecvt>
+#include <locale>
 
 const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {

@@ -446,8 +446,13 @@ public:
 
 extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 
+#ifdef _MSC_VER
 #define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
-int DebugLog_1(char *file, int line, char *function, char *fmt, ...);
+#else 
+#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
+#endif
+
+int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
 char *Debug_VirtualKey(WORD vk);
 char *Debug_UnicodeString(PWSTR s, int x = 0);
 char *Debug_UnicodeString(std::u16string s, int x = 0);
