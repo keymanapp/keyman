@@ -472,13 +472,30 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     }
 
     g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
-    
+
+    // // Let the application handle user generated backspaces after resetting the kmfl history
+    if (keycode == Keyman_Pass_Backspace_To_IBus) {
+        //clear_history(keyman->state);
+        g_message("IBUS_BackSpace");
+        return FALSE;
+    }
+
+    if (keycode_to_vk[keycode] == 0) // key we don't handle
+        return FALSE;
+
     // If a modifier key is pressed, check to see if it is a right modifier key
     // This is rather expensive so only do it if a shift state is active
     if (state & (IBUS_SHIFT_MASK | IBUS_CONTROL_MASK | IBUS_MOD1_MASK)) {
         Display * m_display  = XOpenDisplay(NULL);;
         char key_vec[32];
         XQueryKeymap(m_display, key_vec);
+
+        if (state & IBUS_MOD1_MASK) {
+            km_mod_state |= KM_KBP_MODIFIER_ALT;
+        }
+        if (state & IBUS_CONTROL_MASK) {
+            km_mod_state |= KM_KBP_MODIFIER_CTRL;
+        }
 
         if ((state & IBUS_MOD1_MASK) && is_key_pressed(m_display, key_vec, IBUS_Alt_R)) {
             km_mod_state |= KM_KBP_MODIFIER_RALT;
@@ -492,18 +509,19 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         //     right_modifier_state |= (IBUS_SHIFT_MASK << 8);
         // }
         XCloseDisplay(m_display);
+
+        if ((km_mod_state & KM_KBP_MODIFIER_ALT) && !(km_mod_state & KM_KBP_MODIFIER_RALT))
+        {
+            // Left alt so do not pass to keyman
+            return FALSE;
+        }
+        if ((km_mod_state & KM_KBP_MODIFIER_CTRL) && !(km_mod_state & KM_KBP_MODIFIER_RCTRL))
+        {
+            // Left ctrl so do not pass to keyman
+            return FALSE;
+        }
     }
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
-    // // Let the application handle user generated backspaces after resetting the kmfl history
-    if (keycode == Keyman_Pass_Backspace_To_IBus) {
-        //clear_history(keyman->state);
-        g_message("IBUS_BackSpace");
-        return FALSE;
-    }
-
-    if (keycode_to_vk[keycode] == 0) // key we don't handle
-        return FALSE;
-
     km_kbp_status event_status = km_kbp_process_event(keyman->state,
                                    keycode_to_vk[keycode], km_mod_state);
 
