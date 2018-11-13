@@ -3,11 +3,8 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
-#include <stdlib.h>
 #include <io.h>
 #include <fcntl.h>
-#include <corecrt_wstring.h>
-#include <string.h>
 #include <stdarg.h>
 #include "kmxtest.h"
 

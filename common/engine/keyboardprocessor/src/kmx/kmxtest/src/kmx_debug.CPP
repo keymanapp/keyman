@@ -3,8 +3,6 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
-#include <string.h>
-#include <stdio.h>
 #include <stdarg.h>
 
 inline BOOL ShouldDebug() {

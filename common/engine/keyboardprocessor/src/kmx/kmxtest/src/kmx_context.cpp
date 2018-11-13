@@ -3,8 +3,6 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
-#include <stdlib.h>
-#include <corecrt_wstring.h>
 
 const LPSTR ItemTypes[QIT_MAX+1] = {
 	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
