@@ -203,10 +203,10 @@ BOOL AIWin2000Unicode::CheckOutput(wchar_t *expectedOutput) {
 
   BOOL result = !wcscmp(output, expectedOutput);
 
-  wchar_t context[256];
-  GetApp()->context->Get(context, 256);
+  wchar_t _context[256];
+  context->Get(_context, 256);
 
-  write_console(!result, L"context = %hs\n", Debug_UnicodeString(context, 0));
+  write_console(!result, L"context = %hs\n", Debug_UnicodeString(_context, 0));
   write_console(!result, L"output = %hs\n", Debug_UnicodeString(output, 0));
   write_console(!result, L"expected = %hs\n", Debug_UnicodeString(expectedOutput, 0));
 

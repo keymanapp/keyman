@@ -25,15 +25,11 @@ struct KMXTest_ChToVKey {
   BOOL shifted;
 };
 
-/* Globals - to refactor */
+/* Globals */
 
-AIWin2000Unicode *g_app = NULL;
-INTKEYBOARDINFO g_keyboard = { 0 };
-KEYMAN64THREADDATA g_ThreadData = { 0 };
-BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
-DWORD g_shiftState = 0;
 int g_nKeyEvents = 0;
 KMXTest_KeyEvent g_keyEvents[1024] = { 0 };
+BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
 BOOL g_silent = FALSE;
 
 /* Context - to refactor */
@@ -339,38 +335,32 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
-  g_app = new AIWin2000Unicode();
+  KMX_Processor kmx;
 
-  g_ThreadData.IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-  g_ThreadData.miniContext = new WCHAR[GLOBAL_ContextStackSize];
   // run;
 
-  if (!LoadlpKeyboard(filename)) {
+  if (!kmx.LoadlpKeyboard(filename)) {
     console_error(L"Failed to load %hs\n", filename);
     return 1;
   }
 
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  PKEYMAN64THREADDATA _td = kmx.ThreadGlobals();
 
-  g_app->SetContext(g_context);
+  kmx.GetApp()->SetContext(g_context);
 
   console_log(L"============ Starting test ============\n");
 
   for (int i = 0; i < g_nKeyEvents; i++) {
     wchar_t local_context[512];
-    g_app->context->Get(local_context, 512);
+    kmx.GetApp()->context->Get(local_context, 512);
     console_log(L"%d: '%hs' + [%hs %hs]\n", i, Debug_UnicodeString(local_context), Debug_ModifierName(g_keyEvents[i].modifiers), Debug_VirtualKey(g_keyEvents[i].vkey));
 
-    _td->state.vkey = g_keyEvents[i].vkey;
-    _td->state.charCode = VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey);
-    g_shiftState = g_keyEvents[i].modifiers;
-    
-    BOOL outputKeystroke = !ProcessHook();
+    BOOL outputKeystroke = !kmx.ProcessHook(g_keyEvents[i].vkey, g_keyEvents[i].modifiers, VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey));
     console_log(L"outputKeystroke = %d\n", outputKeystroke);
   }
 
 
-  int result = g_app->CheckOutput(g_expectedOutput) ? 0 : 1;
+  int result = kmx.GetApp()->CheckOutput(g_expectedOutput) ? 0 : 1;
   if (result == 1) {
     console_error(L"Output did not match expected output\n");
   } else {
@@ -380,33 +370,32 @@ int main(int argc, char *argv[]) {
 
   console_log(L"============ Stopping test ============\n");
 
-  delete g_app;
   return result;
 }
 
 void ValidateOptions() {
 }
 
-AIWin2000Unicode *GetApp() {
-  return g_app;
+AIWin2000Unicode *KMX_Processor::GetApp() {
+  return &g_app;
 }
 
-LPINTKEYBOARDINFO GetKeyboard() {
+LPINTKEYBOARDINFO KMX_Processor::GetKeyboard() {
   return &g_keyboard;
 }
 
-PKEYMAN64THREADDATA ThreadGlobals() {
+PKEYMAN64THREADDATA KMX_Processor::ThreadGlobals() {
   return &g_ThreadData;
 }
 
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd) 
+BOOL KMX_Processor::ReleaseKeyboardMemory(LPKEYBOARD kbd) 
 {
 	if(!kbd) return TRUE;
 	delete kbd;
 	return TRUE;
 }
 
-PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
+PWSTR KMX_Processor::GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
 {
   for (DWORD i = 0; i < kb->cxStoreArray; i++)
     if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;

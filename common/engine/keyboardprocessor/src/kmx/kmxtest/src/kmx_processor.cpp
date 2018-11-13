@@ -4,6 +4,17 @@
 */
 #include "pch.h"   // I4575
 
+
+KMX_Processor::KMX_Processor() {
+  g_ThreadData.IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
+  g_ThreadData.miniContext = new WCHAR[GLOBAL_ContextStackSize];
+}
+
+KMX_Processor::~KMX_Processor() {
+  delete[] g_ThreadData.IndexStack;
+  delete[] g_ThreadData.miniContext;
+}
+
 /*
 *	BOOL ProcessHook();
 *
@@ -17,10 +28,14 @@
 *	process, and checks the state of Windows for the keyboard handling.
 */
 
-BOOL ProcessHook()
+BOOL KMX_Processor::ProcessHook(UINT vkey, DWORD modifiers, WCHAR charCode)
 {
-  AIWin2000Unicode *app = GetApp();
   LPKEYBOARD kbd = GetKeyboard()->Keyboard;
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+
+  _td->state.vkey = vkey;
+  _td->state.charCode = charCode;
+  g_shiftState = modifiers;
 
   if (kbd->StartGroup[BEGIN_UNICODE] == -1) {
     // TODO: flag an error
@@ -33,7 +48,7 @@ BOOL ProcessHook()
    
 	ProcessGroup(gp, &fOutputKeystroke);
 
-  app->SetCurrentShiftState(g_shiftState);
+  g_app.SetCurrentShiftState(g_shiftState);
 
 	return !fOutputKeystroke;
 }
@@ -52,7 +67,7 @@ BOOL ProcessHook()
 *	has a lot of crucial code in it!
 */
 
-BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
+BOOL KMX_Processor::ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 {
 	DWORD i;
 	LPKEY kkp = NULL;
@@ -67,7 +82,6 @@ BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 	*/
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  AIWin2000Unicode *app = GetApp();
   LPKEYBOARD kbd = GetKeyboard()->Keyboard;
 
 	sdmfI = -1;
@@ -146,16 +160,16 @@ BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
       BOOL fIsBackspace = _td->state.vkey == VK_BACK && (g_shiftState & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
-        PWCHAR pdeletecontext = app->ContextBuf(1);   // I4933
+        PWCHAR pdeletecontext = g_app.ContextBuf(1);   // I4933
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
-          app->QueueAction(QIT_INVALIDATECONTEXT, 0);
+          g_app.QueueAction(QIT_INVALIDATECONTEXT, 0);
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
         }
-				app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
+        g_app.QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
-        app->QueueAction(QIT_INVALIDATECONTEXT, 0);
+        g_app.QueueAction(QIT_INVALIDATECONTEXT, 0);
         *pOutputKeystroke = TRUE;
         return FALSE;
       }
@@ -168,7 +182,7 @@ BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 		else if (_td->state.charCode != 0 && _td->state.charCode != 0xFFFF && gp->fUsingKeys)
 		{
 			/* No rule found, is a character key */ 
-			app->QueueAction(QIT_CHAR, _td->state.charCode);
+      g_app.QueueAction(QIT_CHAR, _td->state.charCode);
 		}
 
 		return TRUE;
@@ -185,9 +199,9 @@ BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 
 	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
 	if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
-    wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, app->ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)-1), GLOBAL_ContextStackSize);  // I3162   // I3536
+    wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, g_app.ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)-1), GLOBAL_ContextStackSize);  // I3162   // I3536
 	else
-	  wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, app->ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)), GLOBAL_ContextStackSize);  // I3162   // I3536
+	  wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, g_app.ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)), GLOBAL_ContextStackSize);  // I3162   // I3536
 
   _td->miniContext[GLOBAL_ContextStackSize-1] = 0;
 
@@ -211,12 +225,12 @@ BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 			if(*p == UC_SENTINEL)
 				switch(*(p+1))
 				{
-			    case CODE_DEADKEY: app->QueueAction(QIT_BACK, BK_DEADKEY); break;
+			    case CODE_DEADKEY: g_app.QueueAction(QIT_BACK, BK_DEADKEY); break;
 					case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
         }
       else 
 			{
-				app->QueueAction(QIT_BACK, 0);
+        g_app.QueueAction(QIT_BACK, 0);
 			}
 		}
     p = kkp->dpOutput;
@@ -254,7 +268,7 @@ BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke)
 *	to the active application, via the Keyman PostKey buffer.
 */
 
-int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
+int KMX_Processor::PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
 {
 	PWSTR p, q, temp;
   LPSTORE s;
@@ -264,26 +278,25 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-  AIWin2000Unicode *app = GetApp();
 
   // TODO: Refactor to use incxstr
 	for(p = str; *p && (p < endstr || !endstr); p++)
-    {
-        if(*p == UC_SENTINEL)
-		    switch(*(++p))
-            {
-		    case CODE_EXTENDED:				// Start of a virtual key section w/shift codes
-			    p++;
+  {
+    if(*p == UC_SENTINEL)
+	   switch(*(++p))
+     {
+      case CODE_EXTENDED:				// Start of a virtual key section w/shift codes
+		    p++;
 				
 				shift = *p; //(*p<<8) | *(p+1);
-				app->QueueAction(QIT_VSHIFTDOWN, shift);
+        g_app.QueueAction(QIT_VSHIFTDOWN, shift);
 
 				p++;
 
-				app->QueueAction(QIT_VKEYDOWN, *p);
-				app->QueueAction(QIT_VKEYUP, *p);
+        g_app.QueueAction(QIT_VKEYDOWN, *p);
+        g_app.QueueAction(QIT_VKEYUP, *p);
 
-				app->QueueAction(QIT_VSHIFTUP, shift);
+        g_app.QueueAction(QIT_VSHIFTUP, shift);
 				
 				p++; // CODE_EXTENDEDEND
 				////// CODE_EXTENDEDEND will be incremented by loop
@@ -293,23 +306,23 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
 
 			case CODE_DEADKEY:				// A deadkey to be output
 			  p++;
-				app->QueueAction(QIT_DEADKEY, *p);
+        g_app.QueueAction(QIT_DEADKEY, *p);
 			  break;
 		  case CODE_BEEP:					// Sound an 'iconasterisk' beep
-			  app->QueueAction(QIT_BELL, 0);
+        g_app.QueueAction(QIT_BELL, 0);
 			  break;
 		  case CODE_CONTEXT:				// copy the context to the output
 			  for(q = _td->miniContext; *q; q++) {
-			    app->QueueAction(QIT_CHAR, *q);
+          g_app.QueueAction(QIT_CHAR, *q);
         }
 			  break;
 			case CODE_CONTEXTEX:
 				p++;
 				for(q = _td->miniContext, i = 0; *q && i < *p-1; i++, q=incxstr(q));
 				if(*q) {
-          app->QueueAction(QIT_CHAR, *q);
+          g_app.QueueAction(QIT_CHAR, *q);
           if(Uni_IsSurrogate1(*q) && Uni_IsSurrogate2(*(q+1))) {
-            app->QueueAction(QIT_CHAR, *(q+1));
+            g_app.QueueAction(QIT_CHAR, *(q+1));
           }
         }
 				break;
@@ -364,14 +377,15 @@ int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke)
         p+=2;
         break;
       }
-    else
-			app->QueueAction(QIT_CHAR, *p);
+    else {
+      g_app.QueueAction(QIT_CHAR, *p);
+    }
   }
 	return FoundUse ? psrPostMessages : psrCheckMatches;
 }
 
 
-BOOL IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
+BOOL KMX_Processor::IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
 {
   BOOL bEqual = _wcsicmp(layoutName, g_baseLayout) == 0 ||   // I4583
                 _wcsicmp(layoutName, g_baseLayoutAlt) == 0;   // I4583
@@ -379,7 +393,7 @@ BOOL IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
   return bEqual;
 }
 
-BOOL IsMatchingPlatformString(PWCHAR platform)  // I3432
+BOOL KMX_Processor::IsMatchingPlatformString(PWCHAR platform)  // I3432
 {
   // TODO retrieve platform string from client environment
   return
@@ -389,7 +403,7 @@ BOOL IsMatchingPlatformString(PWCHAR platform)  // I3432
     _wcsicmp(platform, L"native") == 0;
 }
 
-BOOL IsMatchingPlatform(LPSTORE s)  // I3432
+BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
 {
   PWCHAR t = new WCHAR[wcslen(s->dpString)+1];
   wcscpy_s(t, wcslen(s->dpString)+1, s->dpString);
@@ -423,7 +437,7 @@ BOOL IsMatchingPlatform(LPSTORE s)  // I3432
 *	ContextMatch compares the context of a rule with the current context.
 */
 
-BOOL ContextMatch(LPKEY kkp)
+BOOL KMX_Processor::ContextMatch(LPKEY kkp)
 {
 	WORD /*i,*/ n;
 	PWSTR p, q, qbuf, temp;
@@ -434,8 +448,7 @@ BOOL ContextMatch(LPKEY kkp)
 	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: ENTER [%d]", kkp->Line);
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
-  AIWin2000Unicode *app = GetApp();
-
+  
 	memset(_td->IndexStack, 0, GLOBAL_ContextStackSize*sizeof(WORD));  // I3158   // I3524
 	
 	p = kkp->dpContext;
@@ -451,7 +464,7 @@ BOOL ContextMatch(LPKEY kkp)
 	if(*p == UC_SENTINEL && *(p+1) == CODE_NUL)
 	{
 		// If context buf is longer than the context, then obviously not start of doc.
-		if(app->ContextBuf(xstrlen_ignoreifopt(p))) return FALSE;  // I2484 - Fix bug with if() following nul in same statement
+		if(g_app.ContextBuf(xstrlen_ignoreifopt(p))) return FALSE;  // I2484 - Fix bug with if() following nul in same statement
 		p = incxstr(p);
 		if(*p == 0) return TRUE;
 	}
@@ -498,7 +511,7 @@ BOOL ContextMatch(LPKEY kkp)
     }
   }
 
-	q = qbuf = app->ContextBuf(xstrlen_ignoreifopt(p));
+	q = qbuf = g_app.ContextBuf(xstrlen_ignoreifopt(p));
 	if(!q)
 	{
 		//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> context too short");

@@ -4,7 +4,7 @@
 */
 #include "pch.h"
 
-void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
+void KMX_Processor::FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -20,7 +20,7 @@ void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
   kp->KeyboardOptions = NULL;
 }
 
-void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
+void KMX_Processor::SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
 {
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -45,7 +45,7 @@ void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
   kp->Keyboard->dpStoreArray[nStoreToSet].dpString = kp->KeyboardOptions[nStoreToSet].Value;
 }
 
-void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
+void KMX_Processor::ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 {
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -78,7 +78,7 @@ void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
 }
 
 
-void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
+void KMX_Processor::SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
 {
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);
@@ -96,7 +96,7 @@ void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
   }*/
 }
 
-void LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
+void KMX_Processor::LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
   assert(kp != NULL);
   assert(kp->Keyboard != NULL);

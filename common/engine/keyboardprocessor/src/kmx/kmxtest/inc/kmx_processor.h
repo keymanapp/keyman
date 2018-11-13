@@ -362,60 +362,7 @@ typedef struct tagKMSTATE
    // I3616
 enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
-
-BOOL ProcessHook();	// returns FALSE on error or key not matched [only for AITip]
-BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke);
-BOOL ContextMatch(LPKEY kkp);
-int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke);
-
-#define ShowDlgItem(hdlg, id, fShow ) ShowWindow( GetDlgItem( (hdlg), (id) ), (fShow) ? SW_SHOW : SW_HIDE )
-#define EnableDlgItem(hdlg, id, fEnable ) EnableWindow( GetDlgItem( (hdlg), (id) ), (fEnable) )
-
-BOOL LoadlpKeyboard(PSTR keyboardName);
-
-PSTR wstrtostr(PWSTR in);
-PWSTR strtowstr(PSTR in);
-
-/* Debugging functions */
-
-#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
-int DebugLog_1(char *file, int line, char *function, char *fmt, ...);
-char *Debug_VirtualKey(WORD vk);
-char *Debug_UnicodeString(PWSTR s, int x = 0);
-char *Debug_ModifierName(UINT modifiers);
-inline BOOL ShouldDebug();
-
-#define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
-#define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
-
-void write_console(BOOL error, wchar_t *fmt, ...);
-
 /* Utility */
-
-PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
-
-#define Uni_IsSurrogate1(ch) ((ch) >= 0xD800 && (ch) <= 0xDBFF)
-#define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
-#define Uni_IsSMP(ch) ((ch) >= 0x10000)
-
-#define Uni_SurrogateToUTF32(ch, cl) (((ch) - 0xD800) * 0x400 + ((cl) - 0xDC00) + 0x10000)
-
-#define Uni_UTF32ToSurrogate1(ch)	(((ch) - 0x10000) / 0x400 + 0xD800)
-#define Uni_UTF32ToSurrogate2(ch)	(((ch) - 0x10000) % 0x400 + 0xDC00)
-
-
-void ResetCapsLock(void);
-void KeyCapsLockPress(BOOL FIsUp);
-void KeyShiftPress(BOOL FIsUp);
-
-BOOL IsEquivalentShift(UINT rshift, UINT kshift);
-
-void LoadKeyboardOptions(LPINTKEYBOARDINFO kp);
-void FreeKeyboardOptions(LPINTKEYBOARDINFO kp);
-void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
-void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
-void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
 
 #define GLOBAL_ContextStackSize 80
 
@@ -432,7 +379,6 @@ typedef struct tagKEYMAN64THREADDATA
 
 /* Thread Local Data */
 
-PKEYMAN64THREADDATA ThreadGlobals();
 
 /* Temporary globals */
 
@@ -441,10 +387,83 @@ struct KMXTest_KeyboardOption {
 };
 
 extern BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
-extern DWORD g_shiftState;
+
 extern BOOL g_simulateAltGr, g_baseLayoutGivesCtrlRAltForRAlt;
 extern wchar_t g_baseLayout[260], g_baseLayoutAlt[34], g_context[512];
-extern INTKEYBOARDINFO g_keyboard;
 extern KMXTest_KeyboardOption g_keyboardOption[1024];
 extern int g_keyboardOptionCount;
 extern BOOL g_capsLock;
+
+class KMX_Processor {
+private:
+  AIWin2000Unicode g_app;
+  INTKEYBOARDINFO g_keyboard = { 0 };
+  KEYMAN64THREADDATA g_ThreadData = { 0 };
+  DWORD g_shiftState = 0;
+
+  /* File loading */
+  LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
+  BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
+  BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
+  BOOL VerifyChecksum(LPBYTE buf, DWORD sz);
+  PWCHAR StringOffset(PBYTE base, DWORD offset);
+
+  BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
+
+  /* Keystroke Processing */
+
+  BOOL ProcessGroup(LPGROUP gp, BOOL *pOutputKeystroke);
+  BOOL ContextMatch(LPKEY kkp);
+  int PostString(PWSTR str, LPKEYBOARD lpkb, PWSTR endstr, BOOL *pOutputKeystroke);
+
+  /* Platform tests */
+
+  BOOL IsMatchingBaseLayout(PWCHAR layoutName);
+  BOOL IsMatchingPlatformString(PWCHAR platform);
+  BOOL IsMatchingPlatform(LPSTORE s);
+
+  /* Utility functions */
+
+  PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
+
+  /* Caps Lock and modifier management */
+
+  void ResetCapsLock(void);
+  void KeyCapsLockPress(BOOL FIsUp);
+  void KeyShiftPress(BOOL FIsUp);
+
+  BOOL IsEquivalentShift(UINT rshift, UINT kshift);
+
+  /* Keyboard options */
+
+  void LoadKeyboardOptions(LPINTKEYBOARDINFO kp);
+  void FreeKeyboardOptions(LPINTKEYBOARDINFO kp);
+  void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
+  void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
+  void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
+
+public:
+  KMX_Processor();
+  ~KMX_Processor();
+  BOOL LoadlpKeyboard(PSTR keyboardName);
+  BOOL ProcessHook(UINT vkey, DWORD modifiers, WCHAR charCode);	// returns FALSE on error or key not matched
+  PKEYMAN64THREADDATA ThreadGlobals();
+
+  AIWin2000Unicode *GetApp();
+  LPINTKEYBOARDINFO GetKeyboard();
+};
+
+/* Debugging functions */
+
+#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
+int DebugLog_1(char *file, int line, char *function, char *fmt, ...);
+char *Debug_VirtualKey(WORD vk);
+char *Debug_UnicodeString(PWSTR s, int x = 0);
+char *Debug_ModifierName(UINT modifiers);
+inline BOOL ShouldDebug();
+
+#define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
+#define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
+
+void write_console(BOOL error, wchar_t *fmt, ...);
+

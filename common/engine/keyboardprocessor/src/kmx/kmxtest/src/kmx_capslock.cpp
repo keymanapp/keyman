@@ -4,7 +4,7 @@
 */
 #include "pch.h"
 
-void ResetCapsLock(void)
+void KMX_Processor::ResetCapsLock(void)
 {
 	DebugLog("ResetCapsLock: enter");
 
@@ -14,33 +14,33 @@ void ResetCapsLock(void)
     if(g_capsLock)
 		{
 			DebugLog("ResetCapsLock: caps lock is on, switching off caps lock");
-      GetApp()->QueueAction(QIT_CAPSLOCK, 0);
+      g_app.QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
 	DebugLog("ResetCapsLock: exit");
 }
 
 
-void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
+void KMX_Processor::KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 {
 	if(g_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
 	{
 		if(FIsUp && !g_capsLock)		// I267 - 24/11/2006 invert GetKeyState test
 		{
-      GetApp()->QueueAction(QIT_CAPSLOCK, 1);
+      g_app.QueueAction(QIT_CAPSLOCK, 1);
 		}
 	}
 	else if(g_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF)
 	{
 		if(!FIsUp && g_capsLock)  
 		{												// I267 - 24/11/2006 invert GetKeyState test
-      GetApp()->QueueAction(QIT_CAPSLOCK, 0);
+      g_app.QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
 }
 
 
-void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
+void KMX_Processor::KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
 {
 	if(!g_capsLock) return;
 
@@ -48,7 +48,7 @@ void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
 	{
 		if(!FIsUp)
 		{
-      GetApp()->QueueAction(QIT_CAPSLOCK, 0);
+      g_app.QueueAction(QIT_CAPSLOCK, 0);
 		}
 	}
 }

@@ -5,16 +5,14 @@
 #include "pch.h"
 #include <share.h>
 
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz);
-BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
-
+/* TODO: use portable 64-bit check here */
 #ifdef _WIN64
 LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
 #else
 LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize);
 #endif
 
-BOOL LoadlpKeyboard(PSTR KeyboardName)
+BOOL KMX_Processor::LoadlpKeyboard(PSTR KeyboardName)
 {
 	if(!LoadKeyboard(KeyboardName, &g_keyboard.Keyboard)) return FALSE;   // I5136
 
@@ -80,7 +78,7 @@ unsigned long CalculateBufferCRC(unsigned long count, BYTE *p)
 	return crc;
 }
 
-BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
+BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 {
 	DWORD sz;
 	LPBYTE buf;
@@ -166,7 +164,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 	return TRUE;
 }
 
-PWCHAR StringOffset(PBYTE base, DWORD offset)
+PWCHAR KMX_Processor::StringOffset(PBYTE base, DWORD offset)
 {
   if(offset == 0) return NULL;
   return (PWCHAR)(base + offset);
@@ -179,7 +177,7 @@ PWCHAR StringOffset(PBYTE base, DWORD offset)
   * We know the base is dwFileSize * 3
   * After this function finishes, we still need to keep the original data
 */
-LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
+LPKEYBOARD KMX_Processor::CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 {
   UNREFERENCED_PARAMETER(dwFileSize);
 
@@ -262,7 +260,7 @@ LPKEYBOARD CopyKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
 #else
 
-LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
+LPKEYBOARD KMX_Processor::FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 {
   DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
@@ -302,7 +300,7 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize)
 
 #endif
 
-BOOL VerifyChecksum(LPBYTE buf, DWORD sz)
+BOOL KMX_Processor::VerifyChecksum(LPBYTE buf, DWORD sz)
 {
 	DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
@@ -315,7 +313,7 @@ BOOL VerifyChecksum(LPBYTE buf, DWORD sz)
 	return tempcs == CalculateBufferCRC(sz, buf);
 }
 
-BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz)
+BOOL KMX_Processor::VerifyKeyboard(LPBYTE filebase, DWORD sz)
 {
   DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;

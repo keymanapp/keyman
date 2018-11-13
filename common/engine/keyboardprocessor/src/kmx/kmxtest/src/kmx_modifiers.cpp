@@ -75,7 +75,7 @@ static BYTE states[MAX_RSHIFT][MAX_KSHIFT] = {
 *	K_CTRLFLAG and K_ALTFLAG as well as specific keys correctly.
 */
 
-BOOL IsEquivalentShift(UINT rshift, UINT kshift) {
+BOOL KMX_Processor::IsEquivalentShift(UINT rshift, UINT kshift) {
   //
   // The rule shift must have ISVIRTUALKEY bit set for virt.keys
   //
