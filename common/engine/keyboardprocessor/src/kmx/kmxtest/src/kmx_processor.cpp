@@ -2,11 +2,11 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"   // I4575
+#include "pch.h"
 
 
 KMX_Processor::KMX_Processor() : m_actions(&m_context) {
-  m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
+  m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
 }
 
@@ -37,7 +37,7 @@ KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCH
   m_modifiers = modifiers;
 
   if (kbd->StartGroup[BEGIN_UNICODE] == -1) {
-    // TODO: flag an error
+    DebugLog("Non-Unicode keyboards are not supported.");
     return FALSE;
   }
 
@@ -46,8 +46,6 @@ KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCH
   KMX_BOOL fOutputKeystroke = FALSE;
    
   ProcessGroup(gp, &fOutputKeystroke);
-
-  //m_actions.SetCurrentShiftState(m_modifiers);
 
   return !fOutputKeystroke;
 }
@@ -296,7 +294,6 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         p++; // CODE_EXTENDEDEND
         ////// CODE_EXTENDEDEND will be incremented by loop
 
-        //app->QueueAction(QIT_VSHIFTUP, shift);
         break;
 
       case CODE_DEADKEY:        // A deadkey to be output
@@ -440,23 +437,19 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
   LPSTORE s, t;
   KMX_BOOL bEqual;
 
-  //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: ENTER [%d]", kkp->Line);
-  memset(m_indexStack, 0, GLOBAL_ContextStackSize*sizeof(KMX_WORD));  // I3158   // I3524
+  memset(m_indexStack, 0, GLOBAL_ContextStackSize*sizeof(KMX_WORD));
   
   p = kkp->dpContext;
 
   if(*p == 0)
   {
-    //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT TRUE -> no rule context");
     return TRUE;
   }
-
-  /* 11 Aug 2003 - I25(v6) - mcdurdin - test for CODE_NUL */
 
   if(*p == UC_SENTINEL && *(p+1) == CODE_NUL)
   {
     // If context buf is longer than the context, then obviously not start of doc.
-    if(m_context.Buf(xstrlen_ignoreifopt(p))) return FALSE;  // I2484 - Fix bug with if() following nul in same statement
+    if(m_context.Buf(xstrlen_ignoreifopt(p))) return FALSE;
     p = incxstr(p);
     if(*p == 0) return TRUE;
   }
@@ -465,17 +458,17 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
   {
     if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFOPT)
     {
-      s = &m_keyboard.Keyboard->dpStoreArray[(*(pp+2))-1];  // I2590
-      t = &m_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
+      s = &m_keyboard.Keyboard->dpStoreArray[(*(pp+2))-1];
+      t = &m_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];
       
       bEqual = u16cmp(s->dpString, t->dpString) == 0;
-      if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
-      if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
+      if(*(pp+3) == 1 && bEqual) return FALSE;
+      if(*(pp+3) == 2 && !bEqual) return FALSE;
     }
-    else if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFSYSTEMSTORE)  // I3432
+    else if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFSYSTEMSTORE)
     {
       KMX_DWORD dwSystemID = *(pp+2)-1;
-      t = &m_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
+      t = &m_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];
       switch(dwSystemID)
       {
       case TSS_PLATFORM_MATCH:  // Cached platform result - a matching platform
@@ -498,25 +491,20 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
         }
       }
       
-      if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
-      if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
+      if(*(pp+3) == 1 && bEqual) return FALSE;
+      if(*(pp+3) == 2 && !bEqual) return FALSE;
     }
   }
 
   q = qbuf = m_context.Buf(xstrlen_ignoreifopt(p));
   if(!q)
   {
-    //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> context too short");
     return FALSE; // context buf is too short!
   }
   indexp = m_indexStack;
 
-  //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] Rule: %s", kkp->Line, format_unicode_debug(kkp->dpContext));
-  //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] Test: %s", kkp->Line, format_unicode_debug(q));
-
   for(; *p && *q; p = incxstr(p))
   {
-    //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: p:%x q:%x", *p, *q);
     *indexp = 0;
 
     if(*p == UC_SENTINEL)
@@ -526,8 +514,6 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
       case CODE_DEADKEY:
         if(*q != UC_SENTINEL || *(q+1) != CODE_DEADKEY || *(q+2) != *(p+2))
         {
-  //  SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> deadkeys don't match %x %x %x != %x %x %x",
-  //        *p, *(p+1), *(p+2), *q, *(q+1), *(q+2));
           return FALSE;
         }
         break;
@@ -535,16 +521,8 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
         s = &m_keyboard.Keyboard->dpStoreArray[(*(p+2))-1];
 
         temp = xstrchr(s->dpString, q);
-
-        /*SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard ,kkp->Line, "ContextMatch: CODE_ANY [%x %x %x %x %x %x %x %x %x %x] [%x %x %x] %d", 
-          s->dpString[0], s->dpString[1], s->dpString[2], 
-          s->dpString[3], s->dpString[4], s->dpString[5], 
-          s->dpString[6], s->dpString[7], s->dpString[8], 
-          s->dpString[9],
-          q[0], q[1], q[2],
-          (temp ? (int)(temp-s->dpString) : 0));*/
         
-        if(temp != NULL)  // I1622
+        if(temp != NULL)
           *indexp = (KMX_WORD) xstrpos(temp, s->dpString);
 
         else
@@ -553,7 +531,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
       case CODE_NOTANY:
         s = &m_keyboard.Keyboard->dpStoreArray[(*(p+2))-1];
 
-        if((temp = xstrchr(s->dpString, q)) != NULL)   // I1622
+        if((temp = xstrchr(s->dpString, q)) != NULL)
           return FALSE; 
 
         break;
@@ -572,31 +550,25 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
           if(xchrcmp(temp, q) != 0) return FALSE;
         break;
       case CODE_IFOPT:
-      case CODE_IFSYSTEMSTORE:  // I3432
+      case CODE_IFSYSTEMSTORE:
         indexp++;
         continue; // don't increment q
       default:
         return FALSE;
       }
     }
-    else if(xchrcmp(p, q) != 0) //GetSuppChar(p) != GetSuppChar(q)) 
+    else if(xchrcmp(p, q) != 0)
     {
-      //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(p));
-      //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(q));
-      //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> chrs don't match");
       return FALSE;
     }
     indexp++;
     q = incxstr(q);
   }
 
-  while(*p == UC_SENTINEL && (*(p+1) == CODE_IFOPT || *(p+1) == CODE_IFSYSTEMSTORE)) p = incxstr(p); // already tested  // I3432
+  while(*p == UC_SENTINEL && (*(p+1) == CODE_IFOPT || *(p+1) == CODE_IFSYSTEMSTORE)) p = incxstr(p); // already tested
 
-  //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT %s -> END OF FUNCTION",
-  //  *p == *q ? "TRUE" : "FALSE");
   return *p == *q; /*at least one must ==0 at this point*/
 }
-
 
 KMX_Actions *KMX_Processor::GetActions() {
   return &m_actions;

@@ -21,11 +21,11 @@ void KMX_Processor::ResetCapsLock(void)
 }
 
 
-void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
+void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)
 {
   if(m_keyboard.Keyboard->dwFlags & KF_CAPSONONLY)
   {
-    if(FIsUp && !g_environment.capsLock)    // I267 - 24/11/2006 invert GetKeyState test
+    if(FIsUp && !g_environment.capsLock)
     {
       m_actions.QueueAction(QIT_CAPSLOCK, 1);
     }
@@ -33,14 +33,14 @@ void KMX_Processor::KeyCapsLockPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
   else if(m_keyboard.Keyboard->dwFlags & KF_CAPSALWAYSOFF)
   {
     if(!FIsUp && g_environment.capsLock)
-    {                       // I267 - 24/11/2006 invert GetKeyState test
+    {
       m_actions.QueueAction(QIT_CAPSLOCK, 0);
     }
   }
 }
 
 
-void KMX_Processor::KeyShiftPress(KMX_BOOL FIsUp)  // I3284 - void   // I3529
+void KMX_Processor::KeyShiftPress(KMX_BOOL FIsUp)
 {
   if(!g_environment.capsLock) return;
 

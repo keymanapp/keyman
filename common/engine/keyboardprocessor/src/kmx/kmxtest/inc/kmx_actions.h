@@ -38,28 +38,19 @@ class KMX_Actions
 private:
   KMX_Context *m_context;
   APPACTIONQUEUEITEM Queue[MAXACTIONQUEUE];
-  //int FShiftFlags;
   int QueueSize;
 
 public:
   KMX_Actions(KMX_Context *context);
-  ~KMX_Actions();
-
-  //void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
-
-  /* Context functions */
-
-  /*void AddContext(KMX_WCHAR ch);  //I2436
-  KMX_WCHAR *ContextBuf(int n);
-  KMX_WCHAR *ContextBufMax(int n);
-  void SetContext(KMX_WCHAR *ctxt);*/
 
   /* Queue functions */
+
   void ResetQueue();
   KMX_BOOL IsQueueEmpty() { return QueueSize == 0; }
   KMX_BOOL QueueAction(int ItemType, KMX_DWORD dwData);
 
   /* Tests */
+
   void LogOutput();
 
   KMX_BOOL CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput);

@@ -275,6 +275,10 @@ PKMX_CHAR wstrtostr(PKMX_WCHAR in)
 }
 
 #if 0
+
+This is a proposed replacement for the xstr functions above. However, probably a bridge too far for 
+this PR.
+
 namespace kmx {
   struct kmx_char {
     uint8_t type;

@@ -3,29 +3,12 @@
   Authors:          mcdurdin
 */
 #include "pch.h"
-//#include <io.h>
-//#include <fcntl.h>
 #include <stdarg.h>
 #include <string>
 #include "kmxtest.h"
 
-struct KMXTest_KeyEvent {
-  KMX_UINT vkey;
-  KMX_UINT modifiers;
-};
-
-struct KMXTest_ModifierNames {
-  char *name;
-  KMX_UINT flag;
-};
-
-struct KMXTest_ChToVKey {
-  KMX_UINT vkey;
-  KMX_BOOL shifted;
-};
 
 /* Globals */
-
 int g_nKeyEvents = 0;
 KMXTest_KeyEvent g_keyEvents[1024] = { 0 };
 KMX_BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
@@ -74,14 +57,12 @@ KMX_BOOL addKeyboardOption(char *storeName, char *value) {
   std::u16string ps(p);
   size_t sz = ps.copy(g_keyboardOption[g_keyboardOptionCount].name, sizeof(g_keyboardOption[g_keyboardOptionCount].name) / sizeof(g_keyboardOption[g_keyboardOptionCount].name[0]));
   g_keyboardOption[g_keyboardOptionCount].name[sz] = 0;
-  //wcscpy_s(g_keyboardOption[g_keyboardOptionCount].name, p);
   delete p;
   
   p = strtowstr(value);
   ps.assign(p);
   sz = ps.copy(g_keyboardOption[g_keyboardOptionCount].value, sizeof(g_keyboardOption[g_keyboardOptionCount].value) / sizeof(g_keyboardOption[g_keyboardOptionCount].value[0]));
   g_keyboardOption[g_keyboardOptionCount].value[sz] = 0;
-  //wcscpy_s(g_keyboardOption[g_keyboardOptionCount++].value, p);
   delete p;
   return TRUE;
 }
@@ -102,17 +83,13 @@ KMX_BOOL addOption(char *val) {
     g_environment.baseLayoutGivesCtrlRAltForRAlt = !!atoi(p);
   }
   else if (!strncasecmp(val, "env.base_layout", len)) {
-    //std::u16string c(wp);
     g_environment.baseLayout.assign(wp);
-    //c.copy(g_environment.baseLayout,  wcscpy_s(g_environment.baseLayout, wp);
   }
   else if (!strncasecmp(val, "env.base_layout_alt", len)) {
     g_environment.baseLayoutAlt.assign(wp);
-    //wcscpy_s(g_environment.baseLayoutAlt, wp);
   }
   else if (!strncasecmp(val, "env.platform", len)) {
     g_environment.platform.assign(wp);
-    //strcpy_s(g_environment.platform, p);
   }
   else if (!strncasecmp(val, "env.caps_lock", len)) {
     g_environment.capsLock = !!atoi(p);
@@ -367,7 +344,7 @@ int main(int argc, char *argv[]) {
     console_log(L"%d: '%hs' + [%hs %hs]\n", i, Debug_UnicodeString(local_context), Debug_ModifierName(g_keyEvents[i].modifiers), Debug_VirtualKey(g_keyEvents[i].vkey));
 
     KMX_BOOL outputKeystroke = !kmx.ProcessEvent(g_keyEvents[i].vkey, g_keyEvents[i].modifiers, VKeyToChar(g_keyEvents[i].modifiers, g_keyEvents[i].vkey));
-    console_log(L"outputKeystroke = %d\n", outputKeystroke);
+    console_log(L"  outputKeystroke = %d\n", outputKeystroke);
   }
 
 

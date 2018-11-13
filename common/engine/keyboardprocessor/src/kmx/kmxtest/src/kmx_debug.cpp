@@ -169,7 +169,6 @@ char *Debug_UnicodeString(std::u16string s, int x) {
   {
     sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
   }
-  //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];
 }
 

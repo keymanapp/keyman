@@ -40,20 +40,6 @@ KMX_WCHAR *KMX_Context::Buf(int n)
   return p;
 }
 
-KMX_WCHAR *KMX_Context::BufMax(int n)  // Used only by IMX DLLs
-{
-  KMX_WCHAR *p = (KMX_WCHAR *) u16chr(CurContext, 0);  // I3091
-
-  if(CurContext == p || n == 0) return p; /* empty context or 0 characters requested, return pointer to end of context */  // I3091
-
-  KMX_WCHAR *q = p;  // I3091
-  for(; p > CurContext && (int)(q-p) < n; p = decxstr(p));  // I3091
-
-  if((int)(q-p) > n) p = incxstr(p); /* Copes with deadkey or supplementary pair at start of returned buffer making it too long */  // I3091
-
-  return p;  // I3091
-}
-
 void KMX_Context::Delete()
 {
   if (CharIsDeadkey()) {
@@ -79,9 +65,7 @@ void KMX_Context::Get(KMX_WCHAR *buf, int bufsize)
     *buf = *p; buf++;
     if(*p >= 0xD800 && *p <= 0xDBFF) { *buf = *(++p); bufsize--; buf++; }
   }
-  //wcsncpy(buf, CurContext, bufsize); 
   *buf = 0;
-  //buf[bufsize-1] = 0; 
 }
 
 void KMX_Context::CopyFrom(KMX_Context *source)   // I3575
@@ -102,13 +86,13 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
     if(*p >= 0xD800 && *p <= 0xDBFF) { *(++q) = *(++p); }
   }
   *q = 0;
-  pos = (int)(q-CurContext);  // I1129 - Irregular behaviour with context rules
+  pos = (int)(q-CurContext);
   CurContext[MAXCONTEXT-1] = 0; 
 }
 
 KMX_BOOL KMX_Context::CharIsDeadkey()
 {
-  if(pos < 3) // code_sentinel, deadkey, #, 0
+  if(pos < 3)
     return FALSE;
   return CurContext[pos-3] == UC_SENTINEL && 
        CurContext[pos-2] == CODE_DEADKEY;
@@ -116,7 +100,7 @@ KMX_BOOL KMX_Context::CharIsDeadkey()
 
 KMX_BOOL KMX_Context::CharIsSurrogatePair()
 {
-  if (pos < 2) // low_surrogate, high_surrogate
+  if (pos < 2)
     return FALSE;
 
   return Uni_IsSurrogate1(CurContext[pos - 2]) &&

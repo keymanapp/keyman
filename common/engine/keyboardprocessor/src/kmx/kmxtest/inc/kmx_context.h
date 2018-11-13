@@ -23,7 +23,6 @@ public:
   void Reset();
   void Get(KMX_WCHAR *buf, int bufsize);
   void Set(const KMX_WCHAR *buf);
-  KMX_WCHAR *BufMax(int n);
   KMX_WCHAR *Buf(int n);
   KMX_BOOL CharIsDeadkey();
   KMX_BOOL CharIsSurrogatePair();

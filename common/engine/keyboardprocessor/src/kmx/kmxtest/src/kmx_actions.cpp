@@ -49,7 +49,6 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
     if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
       while(m_context->CharIsDeadkey()) m_context->Delete();
 
-    //if(dwData == CODE_DEADKEY) break;
     m_context->Delete();
 
     if(dwData == BK_BACKSPACE)  // User pressed backspace so delete deadkeys
@@ -66,13 +65,8 @@ KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expected
   //console_log(L"--------------\n");
 
   std::u16string output(initialContext);
-  //km_kbp_cp output[512] = u"", *p;
-
-  //wcscpy(output, initialContext);
   
   int i = 0, n = 0;
-
-  //p = wcschr(output, 0);
 
   for (; n < QueueSize; n++)
   {
