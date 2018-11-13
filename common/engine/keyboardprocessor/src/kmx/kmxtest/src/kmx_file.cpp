@@ -4,7 +4,7 @@
 */
 #include "pch.h"
 
-#ifdef _MSC_VER
+#if defined(_WIN32) || defined(_WIN64) 
 #include <share.h>
 #endif
 
@@ -95,7 +95,7 @@ BOOL KMX_Processor::LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard)
 		return FALSE;
 	}
 
-#ifdef _MSC_VER
+#if defined(_WIN32) || defined(_WIN64) 
   fp = _fsopen(fileName, "rb", _SH_DENYWR);
 #else
   fp = fopen(fileName, "rb");

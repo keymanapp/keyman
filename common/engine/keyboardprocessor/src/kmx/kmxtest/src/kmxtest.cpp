@@ -95,29 +95,29 @@ BOOL addOption(char *val) {
   p++;
   PWSTR wp = strtowstr(p);
 
-  if (!_strnicmp(val, "env.simulate_altgr", len)) {
+  if (!strncasecmp(val, "env.simulate_altgr", len)) {
     g_environment.g_simulateAltGr = !!atoi(p);
   }
-  else if (!_strnicmp(val, "env.base_layout_gives_ctrl_ralt_for_ralt", len)) {
+  else if (!strncasecmp(val, "env.base_layout_gives_ctrl_ralt_for_ralt", len)) {
     g_environment.g_baseLayoutGivesCtrlRAltForRAlt = !!atoi(p);
   }
-  else if (!_strnicmp(val, "env.base_layout", len)) {
+  else if (!strncasecmp(val, "env.base_layout", len)) {
     //std::u16string c(wp);
     g_environment.g_baseLayout.assign(wp);
     //c.copy(g_environment.g_baseLayout,  wcscpy_s(g_environment.g_baseLayout, wp);
   }
-  else if (!_strnicmp(val, "env.base_layout_alt", len)) {
+  else if (!strncasecmp(val, "env.base_layout_alt", len)) {
     g_environment.g_baseLayoutAlt.assign(wp);
     //wcscpy_s(g_environment.g_baseLayoutAlt, wp);
   }
-  else if (!_strnicmp(val, "env.platform", len)) {
+  else if (!strncasecmp(val, "env.platform", len)) {
     g_environment.g_platform.assign(wp);
     //strcpy_s(g_environment.g_platform, p);
   }
-  else if (!_strnicmp(val, "env.caps_lock", len)) {
+  else if (!strncasecmp(val, "env.caps_lock", len)) {
     g_environment.g_capsLock = !!atoi(p);
   }
-  else if (!_strnicmp(val, "opt.", 4)) {
+  else if (!strncasecmp(val, "opt.", 4)) {
     *(p - 1) = 0;
     if (!addKeyboardOption(val + 4, p)) {
       *(p - 1) = '=';
@@ -143,7 +143,7 @@ BOOL addKey(char *val, int len) {
   while (p && *p) {
     int i;
     for (i = 0; s_modifierNames[i].name; i++) {
-      if (!_strnicmp(val, s_modifierNames[i].name, __max(strlen(s_modifierNames[i].name), (unsigned int)(p - val)))) {
+      if (!strncasecmp(val, s_modifierNames[i].name, __max(strlen(s_modifierNames[i].name), (unsigned int)(p - val)))) {
         ShiftState |= s_modifierNames[i].flag;
         break;
       }
@@ -157,7 +157,7 @@ BOOL addKey(char *val, int len) {
     p = strchr(val, ' ');
   }
   for (int i = 0; i < 256; i++) {
-    if (!_strcmpi(val, VKeyNames[i])) {
+    if (!strcasecmp(val, VKeyNames[i])) {
       g_keyEvents[g_nKeyEvents].vkey = i;
       g_keyEvents[g_nKeyEvents++].modifiers = ShiftState;
       delete buf;
