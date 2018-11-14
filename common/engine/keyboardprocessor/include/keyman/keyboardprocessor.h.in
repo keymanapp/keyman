@@ -850,8 +850,9 @@ typedef struct {
 
 enum km_kbp_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
-  KM_KBP_TECH_KMN         = 1 << 0,
-  KM_KBP_TECH_LDML        = 1 << 1
+  KM_KBP_TECH_MOCK        = 1 << 0,
+  KM_KBP_TECH_KMX         = 1 << 1,
+  KM_KBP_TECH_LDML        = 1 << 2
 };
 
 
@@ -863,11 +864,13 @@ Get access processors attributes describing version and technology implemented.
 ##### Return:
 A pointer to a `km_kbp_attr` structure. Do not modify the contents of this
 structure.
+##### Parameters:
+- __state__: An opaque pointer to an `km_kbp_state`.
 ```c
 */
 KMN_API
 km_kbp_attr const *
-km_kbp_get_engine_attrs();
+km_kbp_get_engine_attrs(km_kbp_state *state);
 
 /*
 ```

@@ -146,7 +146,7 @@ int main(int, char * [])
     km_kbp_options_update(km_kbp_state_options(test_clone), new_opt));
 
   // Test the engine
-  auto attrs = km_kbp_get_engine_attrs();
+  auto attrs = km_kbp_get_engine_attrs(test_state);
   // Check the lib supplies our required interface.
   if (attrs->current - attrs->age > KM_KBP_LIB_CURRENT
       || attrs->current < KM_KBP_LIB_CURRENT) return __LINE__;

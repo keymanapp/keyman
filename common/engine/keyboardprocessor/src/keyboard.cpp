@@ -9,6 +9,7 @@
 #include <codecvt>
 #include "keyboard.hpp"
 #include "json.hpp"
+#include "processor.hpp"
 
 using namespace km::kbp;
 
@@ -24,6 +25,17 @@ keyboard::keyboard(std::filesystem::path const & path)
   id = _keyboard_id.c_str();
   folder_path = _folder_path.native().c_str();
   default_options = _default_opts.data();
+
+  if (path.extension() == ".kmx" ||
+      path.extension() == ".KMX") { // Some legacy packages may include upper-case file extensions
+    _processor = new kmx_processor();
+  }
+  else if (path.extension() == ".mock") {
+    _processor = new mock_processor();
+  }
+  else {
+    _processor = new null_processor();
+  }
 }
 
 
