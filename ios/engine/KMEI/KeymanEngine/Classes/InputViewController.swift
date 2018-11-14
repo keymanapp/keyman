@@ -158,10 +158,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     super.viewWillDisappear(animated)
   }
 
-  open override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-    Manager.shared.inputViewWillRotate(to: toInterfaceOrientation, duration: duration)
-    super.willRotate(to: toInterfaceOrientation, duration: duration)
-  }
+//  open override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+//    Manager.shared.inputViewWillRotate(to: toInterfaceOrientation, duration: duration)
+//    super.willRotate(to: toInterfaceOrientation, duration: duration)
+//  }
 
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)

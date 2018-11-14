@@ -1427,12 +1427,17 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
 
-  // FIXME: This is deprecated. Use inputViewWillTransition()
-  func inputViewWillRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+  func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     dismissSubKeys()
     dismissKeyPreview()
     dismissKeyboardMenu()
-    resizeKeyboard(with: toInterfaceOrientation)
+    var orientation = UIInterfaceOrientation.portrait
+    if size.width > size.height {
+      orientation = UIInterfaceOrientation.landscapeLeft;
+    }
+    
+    resizeKeyboard(with: orientation)
+    
     if isKeymanHelpOn {
       helpBubbleView?.removeFromSuperview()
       let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
