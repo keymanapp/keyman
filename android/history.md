@@ -14,11 +14,14 @@
 * Add support for extra key found on European hardware keyboards (#1291)
 * Add feature for keyboard picker to switch to next keyboard (#1283)
 
-## 2018-10-03 10.0.506 stable
+## 2018-11-14 10.0.508 stable
+* Fix crash that can occur when text selection ends before the starting position (#1313)
+
+## 2018-10-04 10.0.507 stable
 * Fix crash that can occur when displaying preview key (#1230, #1234)
 
 ## 2018-08-23 10.0.505 stable
-* Validate keyboard ID when downloading keyboard from keman cloud (#1121)
+* Validate keyboard ID when downloading keyboard from Keyman cloud (#1121)
 
 ## 2018-08-22 10.0.504 stable
 * Fixes crash when installed keyboards list is invalid (#1119)
