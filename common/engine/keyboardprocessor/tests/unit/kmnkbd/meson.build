@@ -11,6 +11,17 @@ ctxt = executable('context-api', 'context_api.cpp',
 keyb = executable('keyboard-api', 'keyboard_api.cpp',
     include_directories: [inc, libsrc],
     link_args: links,
-    objects: lib.extract_objects('km_kbp_keyboard_api.cpp', 'json.cpp', 'km_kbp_options_api.cpp'))
+    objects: lib.extract_objects('km_kbp_keyboard_api.cpp', 'json.cpp', 'keyboard.cpp'))
+opts = executable('options-api', 'options_api.cpp',
+    include_directories: [inc, libsrc],
+    link_args: links,
+    objects: lib.extract_objects('km_kbp_options_api.cpp', 'option.cpp', 'json.cpp'))
+state = executable('state-api', 'state_api.cpp',
+    include_directories: [inc, libsrc],
+    link_args: links,
+    objects: lib.extract_all_objects())
+
 test('context-api', ctxt)
 test('keyboard-api', keyb)
+test('options-api', opts)
+test('state-api', state)

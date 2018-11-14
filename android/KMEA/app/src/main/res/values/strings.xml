@@ -16,6 +16,7 @@
     <string name="label_add" translatable="false">Add</string>
     <string name="label_cancel" translatable="false">Cancel</string>
     <string name="label_close" translatable="false">Close</string>
+    <string name="label_close_keyman" translatable="false">Close Keyman</string>
     <string name="label_download" translatable="false">Download</string>
     <string name="label_install" translatable="false">Install</string>
     <string name="label_later" translatable="false">Later</string>

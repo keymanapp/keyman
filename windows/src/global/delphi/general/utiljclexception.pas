@@ -20,17 +20,37 @@ implementation
 uses
   JclDebug,
   ExternalExceptionHandler,
+  VersionInfo,
   Vcl.Forms;
+
+function GenerateCrashID(Addr: Pointer; ExceptionObject: TObject): string;
+var
+  info: TJclLocationInfo;
+  func: string;
+begin
+  if GetLocationInfo(Addr, info)
+    then func := info.ProcedureName
+    else func := IntToHex(Integer(Addr), 8);
+
+  Result :=
+    ExtractFileName(ParamStr(0))+'_'+
+    GetVersionString+'_'+
+    func+'_'+
+    ExceptionObject.ClassName;
+end;
 
 procedure KeymanHandleException(E: Exception);
 var
   FExceptionMessageDetail : TStringList;
   i: Integer;
-
+  CrashID: string;
 begin
+  CrashID := GenerateCrashID(ExceptAddr, E);
+
   FExceptionMessageDetail := TStringList.Create;
   try
     FExceptionMessageDetail.Add('Timestamp=' + FormatDateTime('yyyy-mm-dd hh:nn', Now));
+    FExceptionMessageDetail.Add('CrashID='+CrashID);
     FExceptionMessageDetail.Add('Exception=' + E.ClassName);
     FExceptionMessageDetail.Add('Address=' + Format('%p', [ExceptAddr]));
     FExceptionMessageDetail.Add('Message='+E.Message);
@@ -43,6 +63,7 @@ begin
         FExceptionMessageDetail[i] := ':' + FExceptionMessageDetail[i];
 
     SendExceptionToExternalHandler(
+      CrashID,
       E,
       Application.Title,
       'Exception '+E.ClassName+' in '+ExtractFileName(ParamStr(0))+': '+E.Message,
