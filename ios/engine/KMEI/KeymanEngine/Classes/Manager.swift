@@ -180,8 +180,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     hold.delegate = self
     keymanWeb.view.addGestureRecognizer(hold)
 
+    reachability = Reachability(hostName: keymanHostName)
+    
     if(!Util.isSystemKeyboard) {
-      reachability = Reachability(hostName: keymanHostName)
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
                                              name: .reachabilityChanged, object: reachability)
       reachability.startNotifier()
