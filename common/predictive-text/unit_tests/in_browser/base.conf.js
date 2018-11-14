@@ -31,10 +31,12 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'unit_tests/in_browser/cases/**/*.js'//, // Where the tests actually reside.
-    //'unit_tests/in_browser/json/**/*.json', // Where pre-loaded JSON resides.
-    //{pattern: 'unit_tests/in_browser/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
-    //{pattern: 'unit_tests/in_browser/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
+    'unit_tests/in_browser/cases/**/*.js', // Where the tests actually reside.
+    
+    // We don't have anything in these locations... yet.  But they'll be useful for test resources.
+    'unit_tests/in_browser/json/**/*.json', // Where pre-loaded JSON resides.
+    {pattern: 'unit_tests/in_browser/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
+    {pattern: 'unit_tests/in_browser/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
   ],
 
   // list of files / patterns to exclude
@@ -44,8 +46,8 @@ module.exports = {
   // preprocess matching files before serving them to the browser
   // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
   preprocessors: {
-    'unit_tests/fixtures/**/*.html'	: ['html2js'],
-    'unit_tests/json/**/*.json' : ['json_fixtures']
+    'unit_tests/in_browser/fixtures/**/*.html'	: ['html2js'],
+    'unit_tests/in_browser/json/**/*.json' : ['json_fixtures']
   },
 
   // Settings to properly configure how JSON fixtures are automatically loaded by Karma.
