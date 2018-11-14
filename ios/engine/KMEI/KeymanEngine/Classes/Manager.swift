@@ -180,11 +180,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     hold.delegate = self
     keymanWeb.view.addGestureRecognizer(hold)
 
-    reachability = Reachability(hostName: keymanHostName)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
-                                           name: .reachabilityChanged, object: reachability)
-    reachability.startNotifier()
-
+    if(!Util.isSystemKeyboard) {
+      reachability = Reachability(hostName: keymanHostName)
+      NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
+                                             name: .reachabilityChanged, object: reachability)
+      reachability.startNotifier()
+    }
     /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
      * set the queue running, this should be perfectly fine.
      */
