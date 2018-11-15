@@ -18,10 +18,31 @@ describe('LMLayerWorker', function() {
   });
 
   describe('#constructor()', function() {
-    it.skip('should construct with zero arguments', function() {
-      // TODO: This is broken, because the LMLayerWorker needs
-      // to believe it's in a DedicatedWorkerGlobalScope.
-      assert.isOk(new LMLayerWorker);
+    it('should construct with zero arguments', function() {
+      // Create a new "sandboxed" LMLayer. It's only "sandboxed", in that it believes it's in a WebWorker.
+      var fs = require('fs');
+      var sourceCode = fs.readFileSync(require.resolve('../../worker'));
+      var sandbox = `(function (self) {
+        var exports = {}; // TypeScript CommonJS code generation will attempt to write to this.
+        var postMessage = self.postMessage;
+        ${sourceCode}
+        return LMLayerWorker;
+      })`;
+      var createSandbox = eval(sandbox);
+      var fakeSelf = {
+        postMessage: sinon.fake()
+      };
+      var WorkerInSandbox = createSandbox(fakeSelf);
+      let worker = new WorkerInSandbox();
+      assert.isOk(worker);
+      console.log(sandbox);
+
+      // Now try it out.
+      worker.onMessage({
+        message: 'initialize',
+        model: 'en-x-dummy'
+      });
+      assert(fakeSelf.postMessage.calledOnce);
     });
   });
 });
