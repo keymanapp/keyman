@@ -22,7 +22,7 @@ module.exports = function(config) {
       for(var name in arguments[i]) {
         mergedDefs[name] = arguments[i][name];
 
-        // Necessary for Karma to process it properly.
+        // Necessary for Karma to process our BrowserStack test environment configs properly.
         mergedDefs[name].base = 'BrowserStack';
       }
     }
