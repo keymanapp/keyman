@@ -164,16 +164,17 @@ interface InitializeMessage {
 
     /**
      * The maximum amount of UTF-16 code units that the keyboard will
-     * provide to the left of the cursor.
+     * provide to the left of the cursor, as an integer.
      */
-    maxLeftContextCodeUnits: 32,
+    maxLeftContextCodeUnits: number,
 
     /**
      * The maximum amount of code units that the keyboard will provide to
-     * the right of the cursor. The absence of this rule implies 0.
+     * the right of the cursor, as an integer. The absence of this rule
+     * implies 0.
      * See also, [[supportsRightContexts]].
      */
-    maxRightContextCodeUnits: 32,
+    maxRightContextCodeUnits?: number,
   }
 }
 ```
