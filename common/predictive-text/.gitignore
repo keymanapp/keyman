@@ -62,6 +62,9 @@ typings/
 
 # next.js build output
 .next
+
+# TypeScript generated files.
 index.js
 test.js
 lmlayer.js
+*.js.map
