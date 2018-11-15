@@ -4,7 +4,7 @@
 # It's designed to be called by this folder's ./test.sh.
 
 display_usage ( ) {
-    echo "test.sh os [-CI | -debug | -? | -h | -help] [-reporter <reporter>]"
+    echo "browser_test.sh os [-CI | -debug | -? | -h | -help] [-reporter <reporter>]"
     echo
     echo "  os                Should be one of the following:  win, mac, linux"
     echo ""
