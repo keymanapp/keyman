@@ -26,12 +26,29 @@
   * Encapsulates all the state required for the LMLayer's worker thread.
   */
 export class LMLayerWorker {
+  /**
+   * By default, it's self.postMessage(), but can be overridden
+   * so that this can be tested **outside of a Worker**.
+   */
   private _postMessage: typeof self.postMessage;
 
   constructor(options = {postMessage: null}) {
     this._postMessage = options.postMessage || self.postMessage;
   }
 
+  /**
+   * A function that can be set as self.onmessage (the Worker
+   * message handler).
+   * NOTE! You must bind it to a specific instance, e.g.:
+   * 
+   *   // Do this!
+   *   self.onmessage = worker.onMessage.bind(worker);
+   * 
+   * Incorrect:
+   * 
+   *   // Don't do this!
+   *   self.onmessage = worker.onMessage;
+   */
   onMessage() {
     this._postMessage({ message: 'ready' });
   }
