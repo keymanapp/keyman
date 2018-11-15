@@ -20,10 +20,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+ declare var self: DedicatedWorkerGlobalScope;
+
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
   */
 export class LMLayerWorker {
-  constructor() {
+  private _postMessage: typeof self.postMessage;
+
+  constructor(options = {postMessage: null}) {
+    this._postMessage = options.postMessage || self.postMessage;
+  }
+
+  onMessage() {
+    this._postMessage({ message: 'ready' });
   }
 }
