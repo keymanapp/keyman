@@ -244,10 +244,16 @@ from the LMLayer. The intention is that once the suggestions are displayed,
 the typist may select one of the suggestions in the place of the effects
 of their original input.
 
-**NOTE**: The keyboard **MAY** send the `predict` message after the
-`transform` associated with the input event is applied to the buffer,
-however the semantics **MUST** remain the same—the prediction happens
-from the perspective before the `transform` has been applied.
+**NOTE**: The keyboard **MAY** send the `predict` message after it has
+applied the `transform` associated with the input event to the buffer.
+Regardless of the actual sequence, the semantics **MUST** remain the
+same:the prediction happens from the perspective before the `transform`
+has been applied. Therefore, if the keyboard eagerly transforms the
+buffer before it has sent `predict` message, it must anticipate _undoing_
+the `transform` it has already applied if it is to apply a `transfrom`
+send in the `suggestions` message. The keyboard must act as if it has
+never applied the `transform` associated with the input event in the
+first place.
 
 The context is the text surrounding the insertion point, _before_ the
 transform is applied to the buffer.
