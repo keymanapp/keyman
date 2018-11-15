@@ -1,12 +1,12 @@
-Keyman LMLayer prototype
-========================
+Keyman/Language Modelling layer 
+================================
 
-[![Build Status](https://travis-ci.org/eddieantonio/keyman-lmlayer-prototype.svg?branch=master)](https://travis-ci.org/eddieantonio/keyman-lmlayer-prototype)
+This document introduces the protocol for communicating between
+KeymanWeb and the language modeling layer (i.e., the configurable
+prediction and suggestion engine, (henceforth referred to as the
+"LMLayer").
 
-Prototype of NRC language model layer for Keyman.
-
-I'm developing and experimenting with the API and how different API
-designs will practically work.
+Note: I'm using the term **keyboard** as a synonym for **KeymanWeb**.
 
 >  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
 >  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
@@ -14,9 +14,6 @@ designs will practically work.
 >  [RFC 2119].
 
 [RFC 2119]: https://www.ietf.org/rfc/rfc2119.txt
-
-
-Note: I'm using the term **keyboard** as a synonym for **KeymanWeb**.
 
 
 Communication protocol between keyboard and asynchronous worker
