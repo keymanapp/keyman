@@ -2,10 +2,10 @@ var assert = require('chai').assert;
 
 var worker = require('../../worker');
 
-describe('Dummy worker', function() {
-  describe('#hello()', function() {
-    it('should return "hello"', function() {
-      assert.equal(worker.hello(), 'hello');
+describe('LMLayerWorker', function() {
+  describe('#constructor()', function() {
+    it('should construct with zero arguments', function() {
+      assert.isOk(new worker.LMLayerWorker);
     });
   });
 });
