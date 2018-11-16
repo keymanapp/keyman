@@ -3,7 +3,6 @@
   Authors:          mcdurdin
 */
 #include <kmx/kmx_processor.h>
-#include <kmx/kmxtest.h> //TODO: refactor this away
 
 void KMX_Processor::FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {

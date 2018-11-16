@@ -79,39 +79,16 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
   return 0;
 }
 
-struct Debug_ModifierNames {
-  char *name;
-  KMX_UINT flag;
-};
-
-extern const char *VKeyNames[256];
-
-const struct Debug_ModifierNames s_modifierNames[14] = {
-  {" LCTRL", 0x0001},   // Left Control flag
-  {" RCTRL", 0x0002},   // Right Control flag
-  {" LALT", 0x0004},    // Left Alt flag
-  {" RALT", 0x0008},    // Right Alt flag
-  {" SHIFT", 0x0010},   // Either shift flag
-  {" CTRL", 0x0020},    // Either ctrl flag -- don't use this for inputs
-  {" ALT", 0x0040},   // Either alt flag -- don't use this for inputs
-  {" CAPS", 0x0100},    // Caps lock on
-  {" NCAPS", 0x0200},   // Caps lock NOT on
-  {" NUMLOCK", 0x0400},   // Num lock on
-  {" NNUMLOCK", 0x0800},    // Num lock NOT on
-  {" SCROLL", 0x1000},    // Scroll lock on
-  {" NSCROLL", 0x2000},   // Scroll lock NOT on
-  {NULL, 0}
-};
-
 char *Debug_ModifierName(KMX_UINT modifiers) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
   static char buf[256];
   buf[0] = 0;
-  for(int i = 0; s_modifierNames[i].name; i++)
-    if (modifiers & s_modifierNames[i].flag) {
-      strcat(buf, s_modifierNames[i].name);
+  for(int i = 0; s_modifier_names[i].name; i++)
+    if (modifiers & s_modifier_names[i].modifier) {
+      strcat(buf, " ");
+      strcat(buf, s_modifier_names[i].name);
     }
 
   if (*buf) return buf + 1;
@@ -128,7 +105,7 @@ char *Debug_VirtualKey(KMX_WORD vk) {
   }
 
   if (vk < 256) {
-    sprintf(buf, "['%s' 0x%x]", VKeyNames[vk], vk);
+    sprintf(buf, "['%s' 0x%x]", s_key_names[vk], vk);
   }
   else {
     sprintf(buf, "[0x%x]", vk);

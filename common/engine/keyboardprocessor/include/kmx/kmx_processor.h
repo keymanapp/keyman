@@ -446,6 +446,31 @@ public:
   KMX_Context *GetContext();
 };
 
+/* Keyboard Options - to refactor*/
+
+struct KMXTest_KeyboardOption {
+  km_kbp_cp name[128], value[128];
+};
+
+extern KMXTest_KeyboardOption g_keyboardOption[1024];
+extern int g_keyboardOptionCount;
+
+/* Global Constants */
+
+struct char_to_vkey {
+  km_kbp_virtual_key vk;
+  bool shifted;
+};
+
+struct modifier_names {
+  const char *name;
+  uint16_t modifier;
+};
+
+extern const struct char_to_vkey s_char_to_vkey[];
+extern const char *s_key_names[];
+extern const struct modifier_names s_modifier_names[];
+
 /* Debugging */
 
 extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;

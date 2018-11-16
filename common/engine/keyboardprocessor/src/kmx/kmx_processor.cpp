@@ -4,6 +4,32 @@
 */
 #include <kmx/kmx_processor.h>
 
+/* Globals */
+KMX_BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
+KMX_BOOL g_silent = FALSE;
+
+/* Keyboard options - to refactor */
+
+extern KMXTest_KeyboardOption g_keyboardOption[1024];
+extern int g_keyboardOptionCount;
+
+KMXTest_KeyboardOption g_keyboardOption[1024] = { 0 };
+int g_keyboardOptionCount = 0;
+
+/* Environment - to refactor */
+KMX_Environment g_environment = {
+  FALSE, // simulateAltGr
+  FALSE, // baseLayoutGivesCtrlRAltForRAlt
+  u"kbdus.dll", // baseLayout
+  u"en-US", // baseLayoutAlt
+  FALSE, // capsLock
+  u"windows desktop hardware native" // platform
+};
+
+
+/*
+* KMX_Processor
+*/
 
 KMX_Processor::KMX_Processor() : m_actions(&m_context) {
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];

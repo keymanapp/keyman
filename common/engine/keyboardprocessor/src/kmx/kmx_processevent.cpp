@@ -1,9 +1,6 @@
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "state.hpp"
-#include <kmx/kmxtest.h>
-
-extern const struct KMXTest_ChToVKey chToVKey[];
 
 std::string utf16_to_utf8(std::u16string utf16_string);
 
@@ -21,9 +18,6 @@ namespace km {
       p.replace_extension(".kmx");
       m_valid = (bool) kmx.Load(p.native().c_str());
     }
-    void kmx_processor::load_keyboard() {
-
-    }
 
     char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
       // We only map SHIFT and UNSHIFTED
@@ -40,8 +34,8 @@ namespace km {
         return 32;
       }
 
-      for (int i = 0; chToVKey[i].vkey; i++) {
-        if (chToVKey[i].vkey == vk && chToVKey[i].shifted == shifted) {
+      for (int i = 0; s_char_to_vkey[i].vk; i++) {
+        if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == shifted) {
           return i + 32;
         }
       }
