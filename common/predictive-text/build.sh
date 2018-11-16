@@ -54,7 +54,8 @@ while [[ $# -gt 0 ]] ; do
   shift # past the processed argument
 done
 
-npm run tsc
+# Build worker first; main file depends on it.
+npm run tsc -- -p ./worker/tsconfig.json && npm run tsc 
 
 if [ $? -ne 0 ]; then
   fail "Compilation failed."
