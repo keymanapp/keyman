@@ -1,79 +1,57 @@
 /*
   Copyright:    © 2018 SIL International.
-  Description:  Tests for kmx loading etc
+  Description:  Tests for kmx integration
   Create Date:  30 Oct 2018
   Authors:      Marc Durdin (MD), Tim Eves (TSE)
 */
-#include <cstdlib>
-#include <cstring>
 #include <string>
 #include <fstream>
-#include <iostream>
-#include <algorithm> 
 #include <sstream>
-#include <functional> 
 #include <cctype>
-#include <locale>
-#include <codecvt>
 #include <keyman/keyboardprocessor.h>
-
 #include "state.hpp"
 
 #define   try_status(expr) \
 {auto __s = (expr); if (__s != KM_KBP_STATUS_OK) std::exit(100*__LINE__+__s);}
-
-std::string utf16_to_utf8(std::u16string utf16_string);
-
-namespace
-{
-  
-
-  const std::string base = "tests/unit/kmx/";
-
-  int run_test(const std::string & file);
-  int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context);
-
-  struct key_event {
-    km_kbp_virtual_key vk;
-    uint16_t modifier_state;
-  };
-
-  struct char_to_vkey {
-    km_kbp_virtual_key vk;
-    bool shifted;
-  };
-
-  struct modifier_names {
-    const char *name;
-    uint16_t modifier;
-  };
-
-  extern const struct char_to_vkey s_char_to_vkey[];
-  extern const char *s_key_names[];
-  extern const struct modifier_names s_modifier_names[];
-
-  km_kbp_option_item test_env_opts[] =
-  {
-    {u"hello",     u"world", 0},
-    KM_KBP_OPTIONS_END
-  };
 
 #ifdef assert
 #undef assert
 #endif
 #define assert(expr) {if (!(expr)) std::exit(100*__LINE__); }
 
-bool action_items(km_kbp_state const * state,
-                  std::initializer_list<km_kbp_action_item> const & expected)
+std::string utf16_to_utf8(std::u16string utf16_string);
+
+namespace
 {
-  size_t n = 0;
-  auto act = km_kbp_state_action_items(state, &n);
 
-  for (auto &rhs: expected)
-    if (std::memcmp(act++, &rhs, sizeof rhs) != 0) return false;
+const std::string base = "tests/unit/kmx/";
 
-  return true;
-}
+int run_test(const std::string & file);
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context);
+
+struct key_event {
+  km_kbp_virtual_key vk;
+  uint16_t modifier_state;
+};
+
+struct char_to_vkey {
+  km_kbp_virtual_key vk;
+  bool shifted;
+};
+
+struct modifier_names {
+  const char *name;
+  uint16_t modifier;
+};
+
+extern const struct char_to_vkey s_char_to_vkey[];
+extern const char *s_key_names[];
+extern const struct modifier_names s_modifier_names[];
+
+km_kbp_option_item test_env_opts[] =
+{
+  KM_KBP_OPTIONS_END
+};
 
 // String trim functions from https://stackoverflow.com/a/217605/1836776
 // trim from start (in place)
@@ -191,8 +169,6 @@ key_event next_key(std::string &keys) {
 }
 
 void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
-  km::kbp::context *cp = const_cast<km::kbp::context*>(&state->context());
-
   switch (act.type)
   {
   case KM_KBP_IT_END:
@@ -202,15 +178,12 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
     //std::cout << "beep" << std::endl;
     break;
   case KM_KBP_IT_CHAR:
-    cp->emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {act.character} });
     //std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
   case KM_KBP_IT_MARKER:
-    cp->emplace_back(km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {(km_kbp_usv)act.marker} });
     //std::cout << "deadkey(" << act.marker << ")" << std::endl;
     break;
   case KM_KBP_IT_BACK:
-    cp->pop_back();
     break;
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_RESET_OPT:
@@ -231,12 +204,13 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
 int run_test(const std::string & file) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
+  
   int result = load_source(file, keys, expected, context);
   if (result != 0) return result;
 
-  std::cout << "keys = " << keys << std::endl;
-  std::cout << "expected = " << utf16_to_utf8(expected) << std::endl;
-  std::cout << "context = " << utf16_to_utf8(context) << std::endl;
+  //std::cout << "keys = " << keys << std::endl;
+  //std::cout << "expected = " << utf16_to_utf8(expected) << std::endl;
+  //std::cout << "context = " << utf16_to_utf8(context) << std::endl;
 
   // TODO: compile the keyboard using kmcomp
   km_kbp_keyboard * test_kb = nullptr;
@@ -255,42 +229,27 @@ int run_test(const std::string & file) {
 
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
-    //std::cout << "VK=" << p.vk << " mod=" << p.modifier_state << std::endl;
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
-    size_t n = 0;
-    //std::cout << "Context Length=" << test_state->context().size() << std::endl;
-    for (auto act = km_kbp_state_action_items(test_state, &n); act->type != KM_KBP_IT_END; act++) {
+    for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
       apply_action(test_state, *act);
     }
-    //std::cout << "Context Length=" << test_state->context().size() << std::endl;
   }
 
-  // Compare final output { TODO: not using context which could have been invalidated }
+  // Compare final output { TODO: don't use the inbuilt context, instead use the actions, starting with context }
   size_t n = 0;
   try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
-  /*for (int i = 0; citems[i].type != KM_KBP_CT_END; i++) {
-    std::cout << i << ": " << citems[i].type << " = " << citems[i].character << std::endl;
-  }*/
   try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-  //std::cout << n << std::endl;
   km_kbp_cp *buf = new km_kbp_cp[n];
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
-  //std::cout << utf16_to_utf8(buf) << std::endl;
   km_kbp_context_items_dispose(citems);
-
-  std::u16string value(buf);
   
-  std::cout << "VALUE=" << utf16_to_utf8(value) << std::endl;
+  //std::cout << "result = " << utf16_to_utf8(buf) << std::endl;
 
   // Destroy them
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
 
-  if (value == expected) {
-    return 0;
-  }
-
-  return __LINE__;
+  return (buf == expected) ? 0 : __LINE__;
 }
 
 std::u16string parse_source_string(std::string const & s) {
@@ -305,9 +264,7 @@ std::u16string parse_source_string(std::string const & s) {
         p++;
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 6);
-        std::cout << "S1=" << s1 << std::endl;
         v = std::stoul(s1, &n, 16);
-        std::cout << "v=" << v << std::endl;
         assert(v >= 0x20 && v <= 0x10FFFF);
         p += n-1;
         if (v < 0x10000) {
@@ -331,18 +288,18 @@ std::u16string parse_source_string(std::string const & s) {
 }
 
 int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context) {
-  const std::string
-    s_keys = "c keys: ",
-    s_expected = "c expected: ",
-    s_context = "c context: ";
+  const std::string s_keys = "c keys: ",
+                    s_expected = "c expected: ",
+                    s_context = "c context: ";
 
+  //std::cout << "load_source " << base + file + ".kmn" << std::endl;
 
-  std::cout << "load_source " << base + file + ".kmn" << std::endl;
-
-    // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
+  // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
   std::ifstream kmn(base + file + ".kmn");
   std::string line;
   while (std::getline(kmn, line)) {
+    trim(line);
+
     if (!line.length()) continue;
     if (line.compare(0, s_keys.length(), s_keys) == 0) {
       keys = line.substr(s_keys.length());
@@ -359,7 +316,9 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
       context = parse_source_string(line);
     }
   }
+
   if (keys == "") {
+    // We must at least have a key sequence to run the test
     return __LINE__;
   }
 
@@ -776,8 +735,6 @@ int main(int, char *[])
   if ((result = run_test("019 - multiple deadkeys")) != 0) return result;
   if ((result = run_test("020 - deadkeys and backspace")) != 0) return result;
   return result;
-  /*
-    return 0;*/
 }
 
 

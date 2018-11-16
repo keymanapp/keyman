@@ -1,5 +1,4 @@
 #include <keyman/keyboardprocessor.h>
-#include <iostream>
 #include "processor.hpp"
 #include "state.hpp"
 #include <kmx/kmxtest.h>
@@ -20,10 +19,7 @@ namespace km {
       std::filesystem::path p = kb.folder_path;
       p /= kb.id;
       p.replace_extension(".kmx");
-      //char *x = wstrtostr((PKMX_WCHAR) kb.id);
-      std::cout << p << std::endl;
       m_valid = (bool) kmx.Load(p.native().c_str());
-      //load_keyboard();
     }
     void kmx_processor::load_keyboard() {
 
@@ -80,9 +76,7 @@ namespace km {
         }
       }
 
-      std::cout << "CONTEXT = '" << utf16_to_utf8(ctxt) << "' VK=" << vk << " mod=" << modifier_state << " ch=" << ch << std::endl;
       kmx.GetContext()->Set(ctxt.c_str());
-
       kmx.GetActions()->ResetQueue();
       kmx.ProcessEvent(vk, modifier_state, ch);
 
@@ -102,24 +96,51 @@ namespace km {
         case QIT_VSHIFTUP:
           //TODO: eliminate??
           break;
-        case QIT_CHAR:
+        case QIT_CHAR:          
+          state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(km_kbp_usv)a.dwData} });
           state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {(km_kbp_usv)a.dwData} });
           break;
         case QIT_DEADKEY:
+          state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {(km_kbp_usv)a.dwData} });
           state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_MARKER, {0,}, {(uintptr_t)a.dwData} });
           break;
         case QIT_BELL:
           state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_ALERT, {0,}, {0} });
           break;
         case QIT_BACK:
-          // TODO: Support deadkey backspacing: see queue CheckOutput function
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} });
+          switch (a.dwData) {
+          case BK_SUPP2: break; //TODO eliminate
+          case BK_DEFAULT:
+            // This only happens if we know we have context to delete. Last item must be a character
+            assert(!state->context().empty() && state->context().back().type != KM_KBP_IT_MARKER);
+            if (!state->context().empty()) state->context().pop_back();
+            state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} });
+            break;
+          case BK_DEADKEY:
+            // This only happens if we know we have context to delete. Last item must be a deadkey
+            assert(!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER);
+            if (!state->context().empty()) state->context().pop_back();
+            break;
+          case BK_BACKSPACE:
+            // User-initiated backspace. We need to delete deadkeys from context, both sides of the character deleted
+            while (!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER) state->context().pop_back();
+            if (!state->context().empty()) {
+              state->context().pop_back();
+              while (!state->context().empty() && state->context().back().type == KM_KBP_IT_MARKER) state->context().pop_back();
+            }
+            // Even if context is empty, we send the backspace event, because we may not
+            // know the context.
+            state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} }); 
+            break;
+          default:
+            assert(false);
+          }
           break;
         case QIT_INVALIDATECONTEXT:
           // TODO: support invalidating the context
           break;
         default:
-          std::cout << "Unexpected item type " << a.ItemType << ", " << a.dwData << std::endl;
+          //std::cout << "Unexpected item type " << a.ItemType << ", " << a.dwData << std::endl;
           assert(false);
         }
       }
