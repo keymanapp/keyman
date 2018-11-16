@@ -35,6 +35,7 @@ KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCH
   m_state.vkey = vkey;
   m_state.charCode = charCode;
   m_modifiers = modifiers;
+  m_state.LoopTimes = 0;
 
   if (kbd->StartGroup[BEGIN_UNICODE] == -1) {
     DebugLog("Non-Unicode keyboards are not supported.");

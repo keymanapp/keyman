@@ -142,6 +142,8 @@ km_kbp_virtual_key const get_vk(std::string const & vk) {
 
 key_event const vkey_to_event(std::string const & vk_event) {
   // vkey format is MODIFIER MODIFIER K_NAME
+  //std::cout << "VK=" << vk_event << std::endl;
+
   std::stringstream f(vk_event);
   std::string s;
   uint16_t modifier_state = 0;
@@ -173,23 +175,23 @@ key_event next_key(std::string &keys) {
   char ch = keys[0];
   if (ch == '[') {
     if (keys.length() > 1 && keys[1] == '[') {
-      keys.erase(0, 1);
+      keys.erase(0, 2);
       return char_to_event(ch);
     }
     auto n = keys.find(']');
     assert(n != std::string::npos);
-    auto vkey = keys.substr(1, n - 2);
-    keys.erase(0, n);
+    auto vkey = keys.substr(1, n - 1);
+    keys.erase(0, n+1);
     return vkey_to_event(vkey);
   }
   else {
-    keys.erase(0);
+    keys.erase(0, 1);
     return char_to_event(ch);
   }
 }
 
 void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
-  auto cp = state->context();
+  km::kbp::context *cp = const_cast<km::kbp::context*>(&state->context());
 
   switch (act.type)
   {
@@ -197,16 +199,18 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
     assert(false);
     break;
   case KM_KBP_IT_ALERT:
-    std::cout << "beep" << std::endl;
+    //std::cout << "beep" << std::endl;
     break;
   case KM_KBP_IT_CHAR:
-    cp.emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {act.character} });
+    cp->emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {act.character} });
+    //std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
   case KM_KBP_IT_MARKER:
-    cp.emplace_back(km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {(km_kbp_usv)act.marker} });
+    cp->emplace_back(km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {(km_kbp_usv)act.marker} });
+    //std::cout << "deadkey(" << act.marker << ")" << std::endl;
     break;
   case KM_KBP_IT_BACK:
-    cp.pop_back();
+    cp->pop_back();
     break;
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_RESET_OPT:
@@ -216,6 +220,9 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
   case KM_KBP_IT_VKEYUP:
   case KM_KBP_IT_VSHIFTDOWN:
   case KM_KBP_IT_VSHIFTUP:
+    assert(false); // NOT SUPPORTED
+    break;
+  default:
     assert(false); // NOT SUPPORTED
     break;
   }
@@ -242,35 +249,46 @@ int run_test(const std::string & file) {
 
   // Setup context
   km_kbp_context_item *citems = nullptr;
-  try_status(km_kbp_context_items_from_utf16(u"", &citems)); //TODO
+  try_status(km_kbp_context_items_from_utf16(context.c_str(), &citems));
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
   km_kbp_context_items_dispose(citems);
 
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
-
+    //std::cout << "VK=" << p.vk << " mod=" << p.modifier_state << std::endl;
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
     size_t n = 0;
+    //std::cout << "Context Length=" << test_state->context().size() << std::endl;
     for (auto act = km_kbp_state_action_items(test_state, &n); act->type != KM_KBP_IT_END; act++) {
       apply_action(test_state, *act);
     }
+    //std::cout << "Context Length=" << test_state->context().size() << std::endl;
   }
 
-  // Compare final output
+  // Compare final output { TODO: not using context which could have been invalidated }
   size_t n = 0;
-  km_kbp_cp *buf = nullptr;
   try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
+  /*for (int i = 0; citems[i].type != KM_KBP_CT_END; i++) {
+    std::cout << i << ": " << citems[i].type << " = " << citems[i].character << std::endl;
+  }*/
   try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
-  buf = new km_kbp_cp[n];
+  //std::cout << n << std::endl;
+  km_kbp_cp *buf = new km_kbp_cp[n];
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
+  //std::cout << utf16_to_utf8(buf) << std::endl;
   km_kbp_context_items_dispose(citems);
 
   std::u16string value(buf);
   
+  std::cout << "VALUE=" << utf16_to_utf8(value) << std::endl;
 
   // Destroy them
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
+
+  if (value == expected) {
+    return 0;
+  }
 
   return __LINE__;
 }
@@ -286,9 +304,12 @@ std::u16string parse_source_string(std::string const & s) {
         // Unicode value
         p++;
         size_t n;
-        v = std::stoul(s.substr(p - s.begin(), 6), &n, 16);
+        std::string s1 = s.substr(p - s.begin(), 6);
+        std::cout << "S1=" << s1 << std::endl;
+        v = std::stoul(s1, &n, 16);
+        std::cout << "v=" << v << std::endl;
         assert(v >= 0x20 && v <= 0x10FFFF);
-        p += n;
+        p += n-1;
         if (v < 0x10000) {
           t += km_kbp_cp(v);
         }
@@ -314,6 +335,9 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
     s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ";
+
+
+  std::cout << "load_source " << base + file + ".kmn" << std::endl;
 
     // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
   std::ifstream kmn(base + file + ".kmn");
@@ -735,8 +759,25 @@ const struct modifier_names s_modifier_names[14] = {
 
 int main(int, char *[])
 {
-  int result = run_test("000");
+  int result;
+  if ((result = run_test("000 - null keyboard")) != 0) return result;
+  if ((result = run_test("001 - basic input UnicodeI")) != 0) return result;
+  if ((result = run_test("002 - basic input Unicode")) != 0) return result;
+  if ((result = run_test("004 - basic input (shift 2)")) != 0) return result;
+  if ((result = run_test("006 - vkey input (shift ctrl)")) != 0) return result;
+  if ((result = run_test("007 - vkey input (ctrl alt)")) != 0) return result;
+  if ((result = run_test("008 - vkey input (ctrl alt 2)")) != 0) return result;
+  if ((result = run_test("012 - ralt")) != 0) return result;
+  if ((result = run_test("013 - deadkeys")) != 0) return result;
+  if ((result = run_test("014 - groups and virtual keys")) != 0) return result;
+  if ((result = run_test("015 - ralt 2")) != 0) return result;
+  if ((result = run_test("017 - space mnemonic kbd")) != 0) return result;
+  if ((result = run_test("018 - nul testing")) != 0) return result;
+  if ((result = run_test("019 - multiple deadkeys")) != 0) return result;
+  if ((result = run_test("020 - deadkeys and backspace")) != 0) return result;
   return result;
   /*
     return 0;*/
 }
+
+

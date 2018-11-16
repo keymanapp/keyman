@@ -6,6 +6,8 @@
 
 extern const struct KMXTest_ChToVKey chToVKey[];
 
+std::string utf16_to_utf8(std::u16string utf16_string);
+
 namespace km {
   namespace kbp
   {
@@ -51,25 +53,78 @@ namespace km {
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
-
-      km_kbp_context_item *items;
-      km_kbp_status status = km_kbp_context_get(km_kbp_state_context(state), &items);
-      if (status != KM_KBP_STATUS_OK) return status;
-
-      /* Construct a context buffer from the items */
-      // for each context item, turn into (a) single km_kbp_cp, (b) pair of km_kbp_cp (SMP chr), or (c) UC_SENTINEL, CODE_DEADKEY, dk_value
-      //TODO kmx.GetContext()->Set(ctx);
-
-      km_kbp_context_items_dispose(items);
-
       // Convert VK to US char
       uint16_t ch = VKeyToChar(modifier_state, vk);
+
+      // Construct a context buffer from the items
+
+      std::u16string ctxt;
+      auto cp = state->context();
+      for (auto c = cp.begin(); c != cp.end(); c++) {
+        switch (c->type) {
+        case KM_KBP_CT_CHAR:
+          if (Uni_IsSMP(c->character)) {
+            ctxt += Uni_UTF32ToSurrogate1(c->character);
+            ctxt += Uni_UTF32ToSurrogate2(c->character);
+          }
+          else {
+            ctxt += (km_kbp_cp) c->character;
+          }
+          break;
+        case KM_KBP_CT_MARKER:
+          assert(c->marker > 0);
+          ctxt += UC_SENTINEL;
+          ctxt += CODE_DEADKEY;
+          ctxt += c->marker; 
+          break;
+        }
+      }
+
+      std::cout << "CONTEXT = '" << utf16_to_utf8(ctxt) << "' VK=" << vk << " mod=" << modifier_state << " ch=" << ch << std::endl;
+      kmx.GetContext()->Set(ctxt.c_str());
 
       kmx.GetActions()->ResetQueue();
       kmx.ProcessEvent(vk, modifier_state, ch);
 
-      //TODO build list of actions from kmx stored actions
-      // And run the actions
+      state->actions.clear();
+
+      for (auto i = 0; i < kmx.GetActions()->Length(); i++) {
+        auto a = kmx.GetActions()->Get(i);
+        switch (a.ItemType) {
+        case QIT_CAPSLOCK:
+          //TODO: add Caps Event
+          //dwData = 0 == off; 1 == on
+          //state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CAPSLOCK, {0,}, {0} });
+          break;
+        case QIT_VKEYDOWN:
+        case QIT_VKEYUP:
+        case QIT_VSHIFTDOWN:
+        case QIT_VSHIFTUP:
+          //TODO: eliminate??
+          break;
+        case QIT_CHAR:
+          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {(km_kbp_usv)a.dwData} });
+          break;
+        case QIT_DEADKEY:
+          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_MARKER, {0,}, {(uintptr_t)a.dwData} });
+          break;
+        case QIT_BELL:
+          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_ALERT, {0,}, {0} });
+          break;
+        case QIT_BACK:
+          // TODO: Support deadkey backspacing: see queue CheckOutput function
+          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} });
+          break;
+        case QIT_INVALIDATECONTEXT:
+          // TODO: support invalidating the context
+          break;
+        default:
+          std::cout << "Unexpected item type " << a.ItemType << ", " << a.dwData << std::endl;
+          assert(false);
+        }
+      }
+
+      state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
 
       return 0;
     }

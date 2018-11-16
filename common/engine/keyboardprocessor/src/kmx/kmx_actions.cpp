@@ -59,7 +59,6 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
   return result;
 }
 
-
 KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput) {
   //LogOutput();
   //console_log(L"--------------\n");

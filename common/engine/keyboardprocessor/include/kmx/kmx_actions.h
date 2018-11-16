@@ -13,7 +13,7 @@ typedef struct
 {
   int ItemType;
   KMX_DWORD dwData;
-} APPACTIONQUEUEITEM;
+} KMX_Action;
 
 // QueueAction ItemTypes
 #define QIT_VKEYDOWN  0
@@ -37,7 +37,7 @@ class KMX_Actions
 {
 private:
   KMX_Context *m_context;
-  APPACTIONQUEUEITEM Queue[MAXACTIONQUEUE];
+  KMX_Action Queue[MAXACTIONQUEUE];
   int QueueSize;
 
 public:
@@ -50,6 +50,9 @@ public:
   KMX_BOOL QueueAction(int ItemType, KMX_DWORD dwData);
 
   /* Tests */
+
+  int Length() { return QueueSize; }
+  KMX_Action Get(int index) { return Queue[index]; }
 
   void LogOutput();
 
