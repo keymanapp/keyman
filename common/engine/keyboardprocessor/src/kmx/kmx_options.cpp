@@ -2,8 +2,8 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"
-#include "kmxtest.h" //TODO: refactor this away
+#include <kmx/kmx_processor.h>
+#include <kmx/kmxtest.h> //TODO: refactor this away
 
 void KMX_Processor::FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {

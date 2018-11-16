@@ -2,11 +2,12 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"
+#include <kmx/kmx_processor.h>
 #include <stdarg.h>
+#include <iostream>
 
 inline KMX_BOOL ShouldDebug() {
-  return g_debug_KeymanLog;
+  return TRUE; // g_debug_KeymanLog;
 }
 
 #define TAB "\t"
@@ -68,7 +69,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
         function,         //"Function" TAB
         fmtbuf);          //"Message"
 #ifdef _USE_WINDOWS
-      OutputDebugStringA(windowinfo);
+      std::cout << windowinfo << std::endl; // OutputDebugStringA(windowinfo);
 #else
       syslog(LOG_DEBUG, "%s", windowinfo);
 #endif

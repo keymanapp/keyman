@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"   // I4551
+#include <kmx/kmx_processor.h>
 
 #define MAX_RSHIFT 24
 #define MAX_KSHIFT 18

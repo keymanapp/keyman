@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"
+#include <kmx/kmx_processor.h>
 
 
 KMX_Processor::KMX_Processor() : m_actions(&m_context) {

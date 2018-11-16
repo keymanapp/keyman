@@ -2,10 +2,10 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"
+#include <kmx/kmx_processor.h>
 #include <stdarg.h>
 #include <string>
-#include "kmxtest.h"
+#include <kmx/kmxtest.h>
 
 
 /* Globals */
@@ -41,6 +41,7 @@ extern const struct KMXTest_ModifierNames s_modifierNames[];
 extern const char *VKeyNames[];
 extern const struct KMXTest_ChToVKey chToVKey[];
 
+#if 0
 void print_default_environment() {
   wprintf(L"  env.simulate_altgr=%d\n", g_environment.simulateAltGr);
   wprintf(L"  env.base_layout_gives_ctrl_ralt_for_ralt=%d\n", g_environment.baseLayoutGivesCtrlRAltForRAlt);
@@ -363,6 +364,7 @@ int main(int argc, char *argv[]) {
 
 void ValidateOptions() {
 }
+#endif
 
 
 const char *VKeyNames[256] = {

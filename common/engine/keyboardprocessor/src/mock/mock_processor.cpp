@@ -73,7 +73,7 @@ namespace km {
   namespace kbp
   {
 
-    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) const {
+    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
       try
       {
         state->actions.clear();
@@ -125,5 +125,8 @@ namespace km {
     km_kbp_attr const * mock_processor::get_attrs() const {
       return &engine_attrs;
     }
+
+    km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
+    km_kbp_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }
   } // namespace kbp
 } // namespace km

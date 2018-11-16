@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"
+#include <kmx/kmx_processor.h>
 
 #if defined(_WIN32) || defined(_WIN64) 
 #include <share.h>
@@ -15,7 +15,7 @@ LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 #endif
 
-KMX_BOOL KMX_Processor::Load(PKMX_CHAR KeyboardName)
+KMX_BOOL KMX_Processor::Load(km_kbp_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
 
@@ -81,7 +81,7 @@ unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
   return crc;
 }
 
-KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
+KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
 {
   KMX_DWORD sz;
   PKMX_BYTE buf;
@@ -89,6 +89,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
   LPKEYBOARD kbp;
   PKMX_BYTE filebase;
 
+  DebugLog("Loading file %ws", fileName);
   if(!fileName || !lpKeyboard)
   {
     DebugLog("Bad Filename");
@@ -96,7 +97,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard)
   }
 
 #if defined(_WIN32) || defined(_WIN64) 
-  fp = _fsopen(fileName, "rb", _SH_DENYWR);
+  fp = _wfsopen(fileName, L"rb", _SH_DENYWR);
 #else
   fp = fopen(fileName, "rb");
 #endif

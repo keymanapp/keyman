@@ -3,11 +3,12 @@
 
 #include <assert.h>
 #include <string>
-#include "kmx_base.h"
-#include "kmx_file.h"
-#include "kmx_context.h"
-#include "kmx_actions.h"
-#include "kmx_xstring.h"
+#include <keyman/keyboardprocessor_bits.h>
+#include <kmx/kmx_base.h>
+#include <kmx/kmx_file.h>
+#include <kmx/kmx_context.h>
+#include <kmx/kmx_actions.h>
+#include <kmx/kmx_xstring.h>
 
 #ifndef VK_LBUTTON
 
@@ -392,7 +393,7 @@ private:
 
   /* File loading */
   LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-  KMX_BOOL LoadKeyboard(PKMX_CHAR fileName, LPKEYBOARD *lpKeyboard);
+  KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz);
   PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
@@ -438,7 +439,7 @@ public:
   KMX_Processor();
   ~KMX_Processor();
 
-  KMX_BOOL Load(PKMX_CHAR keyboardName);
+  KMX_BOOL Load(km_kbp_path_name keyboardName);
   KMX_BOOL ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();

@@ -28,16 +28,15 @@ keyboard::keyboard(std::filesystem::path const & path)
 
   if (path.extension() == ".kmx" ||
       path.extension() == ".KMX") { // Some legacy packages may include upper-case file extensions
-    _processor = new kmx_processor();
+    _processor = new kmx_processor(*this);
   }
   else if (path.extension() == ".mock") {
-    _processor = new mock_processor();
+    _processor = new mock_processor(*this);
   }
   else {
-    _processor = new null_processor();
+    _processor = new null_processor(*this);
   }
 }
-
 
 json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
 {

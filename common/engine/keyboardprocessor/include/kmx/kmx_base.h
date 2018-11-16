@@ -1,5 +1,8 @@
 #pragma once
 
+#include <keyman/keyboardprocessor_bits.h>
+#include <keyman/keyboardprocessor.h>
+
 #if defined(_WIN32) || defined(_WIN64) 
 #define snprintf _snprintf 
 #define vsnprintf _vsnprintf 
@@ -17,6 +20,7 @@
 #define KMX_64BIT
 #endif
 
+/*
 #if defined(__cplusplus)
 // FROM keyboardprocessor.h, to eliminate once we merge
 typedef char16_t   km_kbp_cp;
@@ -25,6 +29,7 @@ typedef char32_t   km_kbp_usv;
 typedef uint16_t    km_kbp_cp;          // code point
 typedef uint32_t    km_kbp_usv;         // Unicode Scalar Value
 #endif
+*/
 
 typedef uint32_t            KMX_DWORD;
 typedef int32_t             KMX_BOOL;

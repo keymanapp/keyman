@@ -2,7 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include "pch.h"
+#include <kmx/kmx_processor.h>
 #include <vector>
 #include <iterator>
 #include <codecvt>
@@ -222,6 +222,7 @@ int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
 }
 
 
+#if 0
 /*
   This function exists because of a bug in Visual Studio 2015 and 2017:
   https://social.msdn.microsoft.com/Forums/en-US/8f40dcd8-c67f-4eba-9134-a19b9178e481/vs-2015-rc-linker-stdcodecvt-error?forum=vcgeneral
@@ -241,6 +242,9 @@ std::string utf16_to_utf8(std::u16string utf16_string)
   return convert.to_bytes(utf16_string);
 }
 #endif
+#endif 
+
+std::string utf16_to_utf8(std::u16string utf16_string);
 
 PKMX_WCHAR strtowstr(PKMX_CHAR in)
 {

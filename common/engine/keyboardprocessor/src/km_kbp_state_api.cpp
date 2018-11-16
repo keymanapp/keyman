@@ -139,7 +139,7 @@ json & operator << (json & j, km_kbp_action_item const &act)
       break;
     case KM_KBP_IT_CHAR:
     case KM_KBP_IT_MARKER:
-      j << km_kbp_context_item {act.type, {0,}, {act.character}};
+      j << km_kbp_context_item {act.type, {0,}, {act.character}}; // TODO: is act.type correct here? it may map okay but this is bad practice to mix constants across types. Similarly using act.character instead of act.type
       break;
     case KM_KBP_IT_BACK:
       j << act.erased;
