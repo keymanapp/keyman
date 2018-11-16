@@ -262,21 +262,11 @@ namespace com.keyman {
       }
 
       var rx: RegExp;
-      if(typeof(sp['KL']) == 'undefined') {
-        sp['KL'] = lp['name'];
-      }
 
-      if(typeof(sp['KR']) == 'undefined') {
-        sp['KR'] = KeyboardManager.regions[rIndex];
-      }
-
-      if(typeof(sp['KRC']) == 'undefined') {
-        sp['KRC'] = KeyboardManager.regionCodes[rIndex];
-      }
-
-      if(typeof(sp['KN']) == 'undefined') {
-        sp['KN'] = kp['name'];
-      }
+      sp['KL'] = (typeof sp['KL'] === 'undefined') ? lp['name'] : sp['KL'];
+      sp['KR'] = (typeof sp['KR'] === 'undefined') ? KeyboardManager.regions[rIndex] : sp['KR'];
+      sp['KRC'] = (typeof sp['KRC'] === 'undefined') ? KeyboardManager.regionCodes[rIndex] : sp['KRC'];
+      sp['KN'] = (typeof sp['KN'] === 'undefined') ? kp['name'] : sp['KN'];
 
       if(typeof(sp['KF']) == 'undefined') {
         rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');
@@ -288,7 +278,7 @@ namespace com.keyman {
       } 
       
       // Font path defined by cloud entry
-      var fp, fontPath=options['fontBaseUri'];
+      var fontPath=options['fontBaseUri'];
       
       // or overridden locally, in page source
       if(this.keymanweb.options['fonts'] != '') {
@@ -309,13 +299,13 @@ namespace com.keyman {
       }
       
       // Add font specifiers where necessary and not overridden by user
-      if(typeof(sp['KFont']) == 'undefined' && typeof(lp['font']) != 'undefined') {
-        fp = sp['KFont'] = new KeyboardFont(lp['font'], fontPath);
+      if(typeof(lp['font']) != 'undefined') {
+        sp['KFont'] = (typeof sp['KFont'] === 'undefined') ? new KeyboardFont(lp['font'], fontPath) : sp['KFont'];
       }
 
       // Fixed OSK font issue Github #7 (9/1/2015)
-      if(typeof(sp['KOskFont']) == 'undefined' && typeof(lp['oskFont']) != 'undefined') {
-        fp = sp['KOskFont'] = new KeyboardFont(lp['oskFont'], fontPath);
+      if(typeof(lp['oskFont']) != 'undefined') {
+        sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? new KeyboardFont(lp['oskfont'], fontPath) : sp['KOskFont'];
       }           
 
       // Update the UI 

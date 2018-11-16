@@ -254,6 +254,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    // Is not implemented for this class, nor is resumeKeyboard().
+    // This class is used for System-level keyboards and would not have a
+    // practical way to be resumed after dismissal.
     dismissKeyboard()
   }
 
