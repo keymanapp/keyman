@@ -20,20 +20,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
- declare var self: DedicatedWorkerGlobalScope;
+ type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
   */
-export class LMLayerWorker {
+class LMLayerWorker {
   /**
    * By default, it's self.postMessage(), but can be overridden
    * so that this can be tested **outside of a Worker**.
    */
-  private _postMessage: typeof self.postMessage;
+  private _postMessage: PostMessage;
 
   constructor(options = {postMessage: null}) {
-    this._postMessage = options.postMessage || self.postMessage;
+    this._postMessage = options.postMessage || postMessage;
   }
 
   /**
@@ -52,4 +52,12 @@ export class LMLayerWorker {
   onMessage() {
     this._postMessage({ message: 'ready' });
   }
+}
+
+// Let LMLayerWorker be available both in browser and in Node.
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = { LMLayerWorker };
+} else {
+  //@ts-ignore
+  window.LMLayerWorker = LMLayerWorker;
 }
