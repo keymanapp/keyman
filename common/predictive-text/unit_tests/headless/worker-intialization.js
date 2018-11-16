@@ -13,8 +13,10 @@ describe('LMLayerWorker', function() {
       
       // Sending it the initialize it should notify us that it's initialized!
       worker.onMessage({
-        message: 'initialize',
-        model: 'en-x-dummy'
+        data: {
+          message: 'initialize',
+          model: 'en-x-dummy'
+        }
       });
       assert(fakePostMessage.called);
     });
@@ -29,10 +31,28 @@ describe('LMLayerWorker', function() {
 
       // Now try it out.
       worker.onMessage({
-        message: 'initialize',
-        model: 'en-x-dummy'
+        data: {
+          message: 'initialize',
+          model: 'en-x-dummy'
+        }
       });
       assert(fakePostMessage.calledOnce);
+    });
+  });
+
+  describe('#onMessage()', function() {
+    it('should fail if not given the `message` attribute', function () {
+      var worker = new LMLayerWorker({postMessage: sinon.fake()});
+      // Every message is a discriminated union with the tag being `message`.
+      // If it doesn't see message, something is deeply wrong,
+      // and it should loudly let us know.
+      assert.throws(function () {
+        worker.onMessage({
+          data: {
+            model: 'dummy attribute'
+          }
+        });
+      })
     });
   });
 
