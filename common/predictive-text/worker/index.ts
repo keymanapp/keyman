@@ -56,7 +56,7 @@ class LMLayerWorker {
 
 // Let LMLayerWorker be available both in browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = { LMLayerWorker };
+  module.exports = LMLayerWorker;
 } else {
   //@ts-ignore
   window.LMLayerWorker = LMLayerWorker;
