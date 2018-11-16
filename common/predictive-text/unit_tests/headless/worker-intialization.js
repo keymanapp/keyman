@@ -12,10 +12,8 @@ describe('LMLayerWorker', function() {
       
       // Sending it the initialize it should notify us that it's initialized!
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
-        model: 'en-x-dummy'
-      }));
-      assert(fakePostMessage.called);
+        message: 'initialize' }));
+      assert(fakePostMessage.calledOnce);
     });
 
     it('should work with zero arguments within a Web Worker', function() {
@@ -24,13 +22,9 @@ describe('LMLayerWorker', function() {
         postMessage: fakePostMessage = sinon.fake()
       });
       let worker = new WorkerInSandbox();
-      assert.isOk(worker);
 
       // Now try it out.
-      worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
-        model: 'en-x-dummy'
-      }));
+      worker.onMessage(createMessageEventWithData({ message: 'initialize' }));
       assert(fakePostMessage.calledOnce);
     });
   });
@@ -39,7 +33,7 @@ describe('LMLayerWorker', function() {
     it('should fail if not given the `message` attribute', function () {
       var worker = new LMLayerWorker({postMessage: sinon.fake()});
       // Every message is a discriminated union with the tag being `message`.
-      // If it doesn't see message, something is deeply wrong,
+      // If it doesn't see 'message', something is deeply wrong,
       // and it should loudly let us know.
       assert.throws(function () {
         worker.onMessage(createMessageEventWithData({
@@ -53,7 +47,10 @@ describe('LMLayerWorker', function() {
     it('should send back a "ready" message', function () {
       var fakePostMessage = sinon.fake();
       var worker = new LMLayerWorker({postMessage: fakePostMessage});
-      worker.onMessage(createMessageEventWithData({ model: 'en-x-dummy' }));
+      worker.onMessage(createMessageEventWithData({
+        message: 'initialize',
+        model: 'en-x-dummy'
+      }));
 
       assert(fakePostMessage.calledOnceWith({
         message: 'ready'
