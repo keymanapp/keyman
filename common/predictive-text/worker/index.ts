@@ -49,7 +49,11 @@ class LMLayerWorker {
    *   // Don't do this!
    *   self.onmessage = worker.onMessage;
    */
-  onMessage() {
+  onMessage(event: MessageEvent) {
+    const {message} = event.data;
+    if (!message) {
+      throw new Error(`Missing required 'message' attribute: ${event.data}`)
+    }
     this._postMessage({ message: 'ready' });
   }
 }
