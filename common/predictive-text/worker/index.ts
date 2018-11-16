@@ -54,7 +54,14 @@ class LMLayerWorker {
     if (!message) {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
-    this._postMessage({ message: 'ready' });
+    this._postMessage({
+      message: 'ready',
+      configuration: {
+        // Send a reasonable, but non-configurable amount for now.
+        leftContextCodeUnits: 64,
+        rightContextCodeUnits: 0,
+      }
+    });
   }
 }
 
