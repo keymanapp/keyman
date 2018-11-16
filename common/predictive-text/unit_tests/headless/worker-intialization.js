@@ -49,6 +49,18 @@ describe('LMLayerWorker', function() {
     });
   });
 
+  describe('Message: initialize', function () {
+    it('should send back a "ready" message', function () {
+      var fakePostMessage = sinon.fake();
+      var worker = new LMLayerWorker({postMessage: fakePostMessage});
+      worker.onMessage(createMessageEventWithData({ model: 'en-x-dummy' }));
+
+      assert(fakePostMessage.calledOnceWith({
+        message: 'ready'
+      }));
+    });
+  });
+
   /**
    * Creates a MessageEvent (for inter-worker communication), with the given data payload.
    * @param {*} data 
