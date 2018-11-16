@@ -136,6 +136,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     containerView!.backgroundColor = bgColor
     containerView!.addSubview(kmInputView)
     view.addSubview(containerView!)
+    
+    Manager.shared.initKeyboardSize()
+    Manager.shared.resizeKeyboard()
   }
 
   open override func viewDidAppear(_ animated: Bool) {
@@ -158,18 +161,15 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     super.viewWillDisappear(animated)
   }
 
-//  open override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-//    Manager.shared.inputViewWillRotate(to: toInterfaceOrientation, duration: duration)
-//    super.willRotate(to: toInterfaceOrientation, duration: duration)
+//  open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+//    Manager.shared.setKeyboardSize(size: size)
+//    super.viewWillTransition(to: size, with: coordinator)
+//    coordinator.animateAlongsideTransition(in: nil, animation: nil, completion: {
+//      _ in
+//      self.updateViewConstraints()
+//      Manager.shared.resizeKeyboard(with: size)
+//    })
 //  }
-
-  open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-    super.viewWillTransition(to: size, with: coordinator)
-    coordinator.animateAlongsideTransition(in: nil, animation: nil, completion: {
-      _ in
-      self.updateViewConstraints()
-    })
-  }
 
   open override func textDidChange(_ textInput: UITextInput?) {
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""

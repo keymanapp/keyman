@@ -31,6 +31,25 @@ class KeymanWebViewController: UIViewController {
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
+  open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    Manager.shared.viewWillTransition(to: size, with: coordinator)
+    
+    coordinator.animateAlongsideTransition(in: nil, animation: {
+      _ in
+      // What happens if we check this stuff at the rotation's end?
+      if let v = self.parent?.view! {
+        Manager.shared.resizeKeyboard(with: v.frame.size)
+      }
+    }, completion: {
+      _ in
+      if let v = self.parent?.view! {
+        Manager.shared.resizeKeyboard(with: v.frame.size)
+        self.updateViewConstraints()
+      }
+    })
+  }
 
   override func loadView() {
     let config = WKWebViewConfiguration()
@@ -45,6 +64,8 @@ class KeymanWebViewController: UIViewController {
 
     webView = WKWebView(frame: frame ?? .zero, configuration: config)
     webView.isOpaque = false
+    //webView.autoresizingMask = UIViewAutoresizing.flexibleWidth
+    webView.autoresizingMask = UIViewAutoresizing.flexibleHeight.union(.flexibleWidth)
     webView.translatesAutoresizingMaskIntoConstraints = false
     webView.backgroundColor = UIColor.clear
     webView.navigationDelegate = self

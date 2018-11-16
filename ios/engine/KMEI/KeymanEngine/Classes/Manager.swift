@@ -59,8 +59,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
-
+  
   public var isSystemKeyboard = false
+  
+  /// Stores the keyboard view's current size.
+  private var kbSize: CGSize = CGSize.zero
 
   // TODO: Change API to not disable removing as well
   /// Allow users to add new keyboards in the keyboard picker.
@@ -189,6 +192,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
+    
+    // The system isn't actually able to get the proper keyboard size data yet,
+    // so we need to clear the initialization done by this method.
+    kbSize = CGSize.zero
   }
 
   // MARK: - Keyboard management
@@ -879,18 +886,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // MARK: - View management
 
   public var keyboardHeight: CGFloat {
-    if isSystemKeyboard {
-      return keyboardHeight(isPortrait: InputViewController.isPortrait)
-    } else {
-      return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
-    }
+    return kbSize.height
   }
 
-  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
-    return keyboardHeight(isPortrait: orientation.isPortrait)
-  }
+//  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
+//    return initKeyboardHeight(isPortrait: orientation.isPortrait)
+//  }
 
-  func keyboardHeight(isPortrait: Bool) -> CGFloat {
+  func initKeyboardHeight(isPortrait: Bool) -> CGFloat {
     let parentHeight: CGFloat = keymanWeb.parent != nil ? keymanWeb.parent!.view.frame.height : CGFloat(100.0)
     if UIDevice.current.userInterfaceIdiom == .pad {
       if isPortrait {
@@ -910,9 +913,27 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   var keyboardWidth: CGFloat {
     return UIScreen.main.bounds.width
   }
+  
+  func initKeyboardSize() {
+    kbSize.width = UIScreen.main.bounds.width
+    
+    if isSystemKeyboard {
+      kbSize.height = initKeyboardHeight(isPortrait: InputViewController.isPortrait)
+    } else {
+      kbSize.height = initKeyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
+    }
+  }
+  
+  func setKeyboardSize(size: CGSize) {
+    kbSize = size
+  }
 
   var keyboardSize: CGSize {
-    return CGSize(width: keyboardWidth, height: keyboardHeight)
+    if kbSize.equalTo(CGSize.zero) {
+      initKeyboardSize()
+    }
+    
+    return kbSize
   }
 
   private var keymanScrollView: UIScrollView {
@@ -1088,21 +1109,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // Keyman interaction
-  private func resizeKeyboard() {
-    let newSize = keyboardSize
-
-    keymanWeb.frame = CGRect(origin: .zero, size: newSize)
-    keymanWeb.setOskWidth(Int(newSize.width))
-    keymanWeb.setOskHeight(Int(newSize.height))
+  func resizeKeyboard() {
+    resizeKeyboard(with: keyboardSize)
   }
 
-  func resizeKeyboard(with orientation: UIInterfaceOrientation) {
-    // TODO: Update to use new size instead of orientation since viewWillRotate() is deprecated
+  func resizeKeyboard(with size: CGSize) {
+    setKeyboardSize(size: size)
+    
     // TODO: Refactor to use resizeKeyboard()
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight(with: orientation)
-    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
-
+    let kbWidth = size.width
+    let kbHeight = size.height
+    
+    keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
     keymanWeb.setOskWidth(Int(kbWidth))
     keymanWeb.setOskHeight(Int(kbHeight))
   }
@@ -1431,12 +1449,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     dismissSubKeys()
     dismissKeyPreview()
     dismissKeyboardMenu()
-    var orientation = UIInterfaceOrientation.portrait
-    if size.width > size.height {
-      orientation = UIInterfaceOrientation.landscapeLeft;
-    }
-    
-    resizeKeyboard(with: orientation)
     
     if isKeymanHelpOn {
       helpBubbleView?.removeFromSuperview()
