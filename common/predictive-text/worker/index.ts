@@ -21,6 +21,7 @@
  */
 
  type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+ type Message = 'ready' | 'initialize';
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -54,14 +55,22 @@ class LMLayerWorker {
     if (!message) {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
-    this._postMessage({
-      message: 'ready',
+    this.cast('ready', {
       configuration: {
         // Send a reasonable, but non-configurable amount for now.
         leftContextCodeUnits: 64,
         rightContextCodeUnits: 0,
       }
     });
+  }
+
+  /**
+   * Sends back a message structured according to the protocol.
+   * @param message A message type.
+   * @param payload The message's payload. Can have any properties, except 'message'.
+   */
+  private cast(message: Message, payload: object) {
+    this._postMessage({ message, ...payload });
   }
 }
 
