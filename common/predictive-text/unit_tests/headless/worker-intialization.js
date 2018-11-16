@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-let {LMLayerWorker} = require('../../worker');
+let LMLayerWorker = require('../../worker');
 
 describe('LMLayerWorker', function() {
 
