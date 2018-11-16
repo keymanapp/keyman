@@ -6,18 +6,15 @@ let LMLayerWorker = require('../../worker');
 describe('LMLayerWorker', function() {
 
   describe('#constructor()', function() {
-
     it('should allow for the mocking of postMessage()', function () {
       var fakePostMessage = sinon.fake();
       var worker = new LMLayerWorker({postMessage: fakePostMessage});
       
       // Sending it the initialize it should notify us that it's initialized!
-      worker.onMessage({
-        data: {
-          message: 'initialize',
-          model: 'en-x-dummy'
-        }
-      });
+      worker.onMessage(createMessageEventWithData({
+        message: 'initialize',
+        model: 'en-x-dummy'
+      }));
       assert(fakePostMessage.called);
     });
 
@@ -30,12 +27,10 @@ describe('LMLayerWorker', function() {
       assert.isOk(worker);
 
       // Now try it out.
-      worker.onMessage({
-        data: {
-          message: 'initialize',
-          model: 'en-x-dummy'
-        }
-      });
+      worker.onMessage(createMessageEventWithData({
+        message: 'initialize',
+        model: 'en-x-dummy'
+      }));
       assert(fakePostMessage.calledOnce);
     });
   });
@@ -47,14 +42,20 @@ describe('LMLayerWorker', function() {
       // If it doesn't see message, something is deeply wrong,
       // and it should loudly let us know.
       assert.throws(function () {
-        worker.onMessage({
-          data: {
-            model: 'dummy attribute'
-          }
-        });
+        worker.onMessage(createMessageEventWithData({
+          model: 'dummy attribute'
+        }));
       })
     });
   });
+
+  /**
+   * Creates a MessageEvent (for inter-worker communication), with the given data payload.
+   * @param {*} data 
+   */
+  function createMessageEventWithData(data) {
+    return { data };
+  }
 
   /**
    * Evaluate the source code of the LMLayerWorker within a
