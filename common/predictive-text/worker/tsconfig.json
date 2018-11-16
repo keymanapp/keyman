@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "allowJs": false,
-    "module": "commonjs",
+    "module": "none",
+    "outFile": "./index.js",
     "inlineSources": true,
     "sourceMap": true,
     "lib": ["webworker", "es6"],
