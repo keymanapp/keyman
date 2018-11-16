@@ -52,9 +52,26 @@ describe('LMLayerWorker', function() {
         model: 'en-x-dummy'
       }));
 
-      assert(fakePostMessage.calledOnceWith({
+      assert(fakePostMessage.calledOnceWith(sinon.match({
         message: 'ready'
+      })));
+    });
+
+    it('should send back configuration', function () {
+      var fakePostMessage = sinon.fake();
+      var worker = new LMLayerWorker({postMessage: fakePostMessage});
+      worker.onMessage(createMessageEventWithData({
+        message: 'initialize',
+        model: 'en-x-dummy'
       }));
+
+      assert(fakePostMessage.calledOnceWith(sinon.match({
+        message: 'ready',
+        configuration: {
+          leftContextCodeUnits: sinon.match.number,
+          rightContextCodeUnits: sinon.match.number,
+        }
+      })));
     });
   });
 
