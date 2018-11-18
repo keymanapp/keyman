@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <string>
+#include <string.h>
 #include <keyman/keyboardprocessor_bits.h>
 #include <kmx/kmx_base.h>
 #include <kmx/kmx_file.h>

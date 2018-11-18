@@ -3,7 +3,6 @@
   Authors:          mcdurdin
 */
 #include <kmx/kmx_processor.h>
-#include <string.h>
 
 const PKMX_CHAR ItemTypes[QIT_MAX+1] = {
   "QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
