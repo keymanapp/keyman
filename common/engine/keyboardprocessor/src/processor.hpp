@@ -23,6 +23,7 @@ namespace kbp
   protected:
     km_kbp_keyboard_attrs const &  keyboard() const noexcept { return _kb; }
   public:
+    virtual ~abstract_processor() { };
     abstract_processor(km_kbp_keyboard_attrs const & kb) : _kb(kb)
 	{}
 
