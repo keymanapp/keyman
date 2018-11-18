@@ -316,25 +316,14 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
 
 } // namespace
 
-int main(int, char *[])
+int main(int argc, char *argv[])
 {
-  int result;
-  if ((result = run_test("000 - null keyboard")) != 0) return result;
-  if ((result = run_test("001 - basic input UnicodeI")) != 0) return result;
-  if ((result = run_test("002 - basic input Unicode")) != 0) return result;
-  if ((result = run_test("004 - basic input (shift 2)")) != 0) return result;
-  if ((result = run_test("006 - vkey input (shift ctrl)")) != 0) return result;
-  if ((result = run_test("007 - vkey input (ctrl alt)")) != 0) return result;
-  if ((result = run_test("008 - vkey input (ctrl alt 2)")) != 0) return result;
-  if ((result = run_test("012 - ralt")) != 0) return result;
-  if ((result = run_test("013 - deadkeys")) != 0) return result;
-  if ((result = run_test("014 - groups and virtual keys")) != 0) return result;
-  if ((result = run_test("015 - ralt 2")) != 0) return result;
-  if ((result = run_test("017 - space mnemonic kbd")) != 0) return result;
-  if ((result = run_test("018 - nul testing")) != 0) return result;
-  if ((result = run_test("019 - multiple deadkeys")) != 0) return result;
-  if ((result = run_test("020 - deadkeys and backspace")) != 0) return result;
-  return result;
+  for (int i = 1; i < argc; i++) {
+    int result;
+    std::cout << argv[i] << std::endl;
+    if ((result = run_test(argv[i])) != 0) return result;
+  }
+  return 0;
 }
 
 

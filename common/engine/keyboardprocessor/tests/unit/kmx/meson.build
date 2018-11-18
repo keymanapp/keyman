@@ -51,4 +51,4 @@ foreach kmn : kmns
   )
 endforeach
 
-test('kmx', kmx, depends: kmn_tests)
+test('kmx', kmx, depends: kmn_tests, args: [kmns])
