@@ -6,10 +6,6 @@
 #include <stdarg.h>
 #include <iostream>
 
-inline KMX_BOOL ShouldDebug() {
-  return TRUE; // g_debug_KeymanLog;
-}
-
 #define TAB "\t"
 #define NL  "\n"
 

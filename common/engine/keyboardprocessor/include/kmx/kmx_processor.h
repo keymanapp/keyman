@@ -219,7 +219,12 @@ char *Debug_VirtualKey(KMX_WORD vk);
 char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
 char *Debug_UnicodeString(std::u16string s, int x = 0);
   char *Debug_ModifierName(KMX_UINT modifiers);
-inline KMX_BOOL ShouldDebug();
+
+  //inline KMX_BOOL ShouldDebug();
+
+inline KMX_BOOL ShouldDebug() {
+  return TRUE; // g_debug_KeymanLog;
+}
 
 
 void write_console(KMX_BOOL error, const wchar_t *fmt, ...);
