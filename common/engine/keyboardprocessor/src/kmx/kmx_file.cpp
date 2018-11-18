@@ -136,7 +136,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   filebase = buf;
 #endif
 
-  if (fread(filebase, 1, sz, fp) < sz) {
+  if (fread(filebase, 1, sz, fp) < (size_t) sz) {
     fclose(fp);
     DebugLog("Could not read file");
     return FALSE;

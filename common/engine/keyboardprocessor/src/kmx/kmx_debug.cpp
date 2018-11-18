@@ -139,7 +139,7 @@ const char *Debug_UnicodeString(std::u16string s, int x) {
   auto p = s.begin();
   char *q;
   bufout[x][0] = 0;
-  for (p, q = bufout[x]; p != s.end(); p++)
+  for (q = bufout[x]; (int)(q-bufout[x]) < (128*7) && p != s.end(); p++)
   {
     sprintf(q, "U+%4.4X ", *p); q = strchr(q, 0);
   }

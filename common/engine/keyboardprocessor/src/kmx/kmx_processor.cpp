@@ -13,7 +13,7 @@ KMX_BOOL g_silent = FALSE;
 extern KMXTest_KeyboardOption g_keyboardOption[1024];
 extern int g_keyboardOptionCount;
 
-KMXTest_KeyboardOption g_keyboardOption[1024] = { 0, };
+KMXTest_KeyboardOption g_keyboardOption[1024] = { { 0, 0 }, };
 int g_keyboardOptionCount = 0;
 
 /* Environment - to refactor */
