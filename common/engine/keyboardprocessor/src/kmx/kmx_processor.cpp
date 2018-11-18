@@ -180,7 +180,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     if(!gp || (m_state.charCode == 0 && gp->fUsingKeys))   // I4585
         // 7.0.241.0: I1133 - Fix mismatched parentheses on m_state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
     {
-      KMX_BOOL fIsBackspace = m_state.vkey == VK_BACK && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
+      KMX_BOOL fIsBackspace = m_state.vkey == KM_KBP_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
         PKMX_WCHAR pdeletecontext = m_context.Buf(1);   // I4933

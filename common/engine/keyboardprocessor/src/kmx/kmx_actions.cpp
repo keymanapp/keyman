@@ -80,7 +80,7 @@ KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expected
       }
       break;
     case QIT_VKEYDOWN:         
-      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | KM_KBP_VKEY_ENTER; // I649  // I3438
 
       /* 6.0.153.0: Fix repeat state for virtual keys */
 
@@ -91,7 +91,7 @@ KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expected
 
       break;
     case QIT_VKEYUP:
-      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | KM_KBP_VKEY_ENTER; // I649  // I3438
 
       if ((Queue[n].dwData & QVK_KEYMASK) <= VK__MAX)  // I3438
       {
@@ -206,7 +206,7 @@ void KMX_Actions::LogOutput() {
       }
       break;
     case QIT_VKEYDOWN:
-      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | KM_KBP_VKEY_ENTER; // I649  // I3438
 
       /* 6.0.153.0: Fix repeat state for virtual keys */
 
@@ -217,7 +217,7 @@ void KMX_Actions::LogOutput() {
 
       break;
     case QIT_VKEYUP:
-      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | VK_RETURN; // I649  // I3438
+      if ((Queue[n].dwData & QVK_KEYMASK) == 0x05) Queue[n].dwData = (Queue[n].dwData & QVK_FLAGMASK) | KM_KBP_VKEY_ENTER; // I649  // I3438
 
       if ((Queue[n].dwData & QVK_KEYMASK) <= VK__MAX)  // I3438
       {

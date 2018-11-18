@@ -26,9 +26,9 @@ namespace km {
         return 0;
       }
 
-      KMX_BOOL shifted = modifiers == K_SHIFTFLAG ? 1 : 0;
+      bool shifted = modifiers == K_SHIFTFLAG;
 
-      if (vk == VK_SPACE) {
+      if (vk == KM_KBP_VKEY_SPACE) {
         // Override for space because it is the same for
         // shifted and unshifted.
         return 32;

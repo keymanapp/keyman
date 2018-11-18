@@ -94,6 +94,9 @@ constexpr char const *doc2_expected = u8"\
     \"actions\" : []\n\
 }\n";
 
+#ifdef assert
+#undef assert
+#endif
 #define assert(expr) {if (!(expr)) return __LINE__; }
 bool action_items(km_kbp_state const * state,
                   std::initializer_list<km_kbp_action_item> const & expected)
