@@ -13,7 +13,7 @@ KMX_BOOL g_silent = FALSE;
 extern KMXTest_KeyboardOption g_keyboardOption[1024];
 extern int g_keyboardOptionCount;
 
-KMXTest_KeyboardOption g_keyboardOption[1024] = { 0 };
+KMXTest_KeyboardOption g_keyboardOption[1024] = { 0, };
 int g_keyboardOptionCount = 0;
 
 /* Environment - to refactor */
@@ -63,7 +63,7 @@ KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCH
   m_modifiers = modifiers;
   m_state.LoopTimes = 0;
 
-  if (kbd->StartGroup[BEGIN_UNICODE] == -1) {
+  if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
     return FALSE;
   }

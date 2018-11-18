@@ -4,11 +4,6 @@
 */
 #include <kmx/kmx_processor.h>
 
-const PKMX_CHAR ItemTypes[QIT_MAX+1] = {
-  "QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
-  "QIT_CHAR", "QIT_DEADKEY", "QIT_BELL", "QIT_BACK", "QIT_CAPSLOCK",
-  "QIT_INVALIDATECONTEXT" };
-
 /* KMX_Context */
 
 KMX_Context::KMX_Context()

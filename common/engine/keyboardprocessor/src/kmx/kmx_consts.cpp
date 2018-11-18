@@ -2,36 +2,36 @@
 #include <kmx/kmx_processor.h>
 
 const struct char_to_vkey s_char_to_vkey[] = {
-  {KM_KBP_VKEY_SPACE},     // 
+  {KM_KBP_VKEY_SPACE, 0},     // 
   {'1', 1},       // !
   {KM_KBP_VKEY_QUOTE, 1},  // "
   {'3', 1},       // #
   {'4', 1},       // $
   {'5', 1},       // %
   {'7', 1},       // &
-  {KM_KBP_VKEY_QUOTE},     // '
+  {KM_KBP_VKEY_QUOTE, 0},     // '
   {'9', 1},       // (
   {'0', 1},       // )
   {'8', 1},       // *
   {KM_KBP_VKEY_EQUAL, 1},  // +
-  {KM_KBP_VKEY_COMMA},     // ,
-  {KM_KBP_VKEY_HYPHEN},    // -
-  {KM_KBP_VKEY_PERIOD},    // .
-  {KM_KBP_VKEY_SLASH},     // /
-  {'0'},
-  {'1'},
-  {'2'},
-  {'3'},
-  {'4'},
-  {'5'},
-  {'6'},
-  {'7'},
-  {'8'},
-  {'9'},
+  {KM_KBP_VKEY_COMMA, 0},     // ,
+  {KM_KBP_VKEY_HYPHEN, 0},    // -
+  {KM_KBP_VKEY_PERIOD, 0},    // .
+  {KM_KBP_VKEY_SLASH, 0},     // /
+  {'0', 0},
+  {'1', 0},
+  {'2', 0},
+  {'3', 0},
+  {'4', 0},
+  {'5', 0},
+  {'6', 0},
+  {'7', 0},
+  {'8', 0},
+  {'9', 0},
   {KM_KBP_VKEY_COLON, 1},  // :
-  {KM_KBP_VKEY_COLON},     // ;
+  {KM_KBP_VKEY_COLON, 0},     // ;
   {KM_KBP_VKEY_COMMA, 1},  // <
-  {KM_KBP_VKEY_EQUAL},     // =
+  {KM_KBP_VKEY_EQUAL, 0},     // =
   {KM_KBP_VKEY_PERIOD, 1}, // >
   {KM_KBP_VKEY_SLASH, 1},  // ?
   {'2', 1},       // @
@@ -61,38 +61,38 @@ const struct char_to_vkey s_char_to_vkey[] = {
   {'X', 1},
   {'Y', 1},
   {'Z', 1},
-  {KM_KBP_VKEY_LBRKT},
-  {KM_KBP_VKEY_BKSLASH},
-  {KM_KBP_VKEY_RBRKT},
+  {KM_KBP_VKEY_LBRKT, 0},
+  {KM_KBP_VKEY_BKSLASH, 0},
+  {KM_KBP_VKEY_RBRKT, 0},
   {'6', 1},
   {KM_KBP_VKEY_HYPHEN, 1},
-  {KM_KBP_VKEY_BKQUOTE},
-  {'A'},
-  {'B'},
-  {'C'},
-  {'D'},
-  {'E'},
-  {'F'},
-  {'G'},
-  {'H'},
-  {'I'},
-  {'J'},
-  {'K'},
-  {'L'},
-  {'M'},
-  {'N'},
-  {'O'},
-  {'P'},
-  {'Q'},
-  {'R'},
-  {'S'},
-  {'T'},
-  {'U'},
-  {'V'},
-  {'W'},
-  {'X'},
-  {'Y'},
-  {'Z'},
+  {KM_KBP_VKEY_BKQUOTE, 0},
+  {'A', 0},
+  {'B', 0},
+  {'C', 0},
+  {'D', 0},
+  {'E', 0},
+  {'F', 0},
+  {'G', 0},
+  {'H', 0},
+  {'I', 0},
+  {'J', 0},
+  {'K', 0},
+  {'L', 0},
+  {'M', 0},
+  {'N', 0},
+  {'O', 0},
+  {'P', 0},
+  {'Q', 0},
+  {'R', 0},
+  {'S', 0},
+  {'T', 0},
+  {'U', 0},
+  {'V', 0},
+  {'W', 0},
+  {'X', 0},
+  {'Y', 0},
+  {'Z', 0},
   {KM_KBP_VKEY_LBRKT, 1},
   {KM_KBP_VKEY_BKSLASH, 1},
   {KM_KBP_VKEY_RBRKT, 1},

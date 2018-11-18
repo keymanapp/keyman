@@ -112,7 +112,7 @@ key_event const vkey_to_event(std::string const & vk_event) {
   std::stringstream f(vk_event);
   std::string s;
   uint16_t modifier_state = 0;
-  km_kbp_virtual_key vk;
+  km_kbp_virtual_key vk = 0;
   while(std::getline(f, s, ' ')) {
     uint16_t modifier = get_modifier(s);
     if (modifier != 0) {
@@ -120,13 +120,13 @@ key_event const vkey_to_event(std::string const & vk_event) {
     }
     else {
       vk = get_vk(s);
-      assert(vk != 0);
       break;
     }
   }
 
   // The string should be empty at this point
   assert(!std::getline(f, s, ' '));
+  assert(vk != 0);
 
   return {
     vk,

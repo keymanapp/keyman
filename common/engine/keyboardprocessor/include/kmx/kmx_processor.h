@@ -127,7 +127,7 @@ private:
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz);
   PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
-  LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
+  LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
 #endif
 
   KMX_BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
@@ -215,10 +215,10 @@ extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 #endif
 
 int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
-char *Debug_VirtualKey(KMX_WORD vk);
-char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
-char *Debug_UnicodeString(std::u16string s, int x = 0);
-  char *Debug_ModifierName(KMX_UINT modifiers);
+const char *Debug_VirtualKey(KMX_WORD vk);
+const char *Debug_UnicodeString(PKMX_WCHAR s, int x = 0);
+const char *Debug_UnicodeString(std::u16string s, int x = 0);
+const char *Debug_ModifierName(KMX_UINT modifiers);
 
   //inline KMX_BOOL ShouldDebug();
 

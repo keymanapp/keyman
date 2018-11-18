@@ -8,13 +8,6 @@
 #include <share.h>
 #endif
 
-/* TODO: use portable 64-bit check here */
-#ifdef KMX_64BIT
-LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-#else
-LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-#endif
-
 KMX_BOOL KMX_Processor::Load(km_kbp_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
@@ -83,7 +76,7 @@ unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
 
 KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
 {
-  KMX_DWORD sz;
+  long sz;
   PKMX_BYTE buf;
   FILE *fp;
   LPKEYBOARD kbp;
@@ -161,7 +154,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
   if(!VerifyKeyboard(filebase, sz)) return FALSE;
 
 #ifdef KMX_64BIT
-  kbp = CopyKeyboard(buf, filebase, sz);
+  kbp = CopyKeyboard(buf, filebase);
 #else
   kbp = FixupKeyboard(buf, filebase, sz);
 #endif
@@ -188,7 +181,7 @@ PKMX_WCHAR KMX_Processor::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
   * We know the base is dwFileSize * 3
   * After this function finishes, we still need to keep the original data
 */
-LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize)
+LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
 

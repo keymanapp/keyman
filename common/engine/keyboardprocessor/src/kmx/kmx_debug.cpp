@@ -55,7 +55,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
     if(g_debug_ToConsole) {   // I3951
       char windowinfo[1024];
       sprintf(windowinfo,
-        "%d" TAB     //"TickCount" TAB
+        "%ld" TAB     //"TickCount" TAB
         "%s:%d" TAB  //"SourceFile" TAB
         "%s" TAB     //"Function"
         "%s" NL,     //"Message"
@@ -75,7 +75,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
   return 0;
 }
 
-char *Debug_ModifierName(KMX_UINT modifiers) {
+const char *Debug_ModifierName(KMX_UINT modifiers) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
@@ -91,7 +91,7 @@ char *Debug_ModifierName(KMX_UINT modifiers) {
   return "Unmodified";
 }
 
-char *Debug_VirtualKey(KMX_WORD vk) {
+const char *Debug_VirtualKey(KMX_WORD vk) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
@@ -109,7 +109,7 @@ char *Debug_VirtualKey(KMX_WORD vk) {
   return buf;
 }
 
-char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
+const char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
   if (!ShouldDebug()) {
     return "";
   }
@@ -128,7 +128,7 @@ char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
   return bufout[x];
 }
 
-char *Debug_UnicodeString(std::u16string s, int x) {
+const char *Debug_UnicodeString(std::u16string s, int x) {
   if (!ShouldDebug()) {
     return "";
   }

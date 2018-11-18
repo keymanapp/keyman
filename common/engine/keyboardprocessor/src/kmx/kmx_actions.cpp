@@ -65,7 +65,7 @@ KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expected
 
   std::u16string output(initialContext);
   
-  int i = 0, n = 0;
+  int n = 0;
 
   for (; n < QueueSize; n++)
   {
@@ -191,7 +191,7 @@ KMX_BOOL KMX_Actions::CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expected
 
 
 void KMX_Actions::LogOutput() {
-  int i = 0, n = 0;
+  int n = 0;
 
   for (; n < QueueSize; n++)
   {
