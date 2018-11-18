@@ -37,7 +37,7 @@ class KMX_Actions
 {
 private:
   KMX_Context *m_context;
-  KMX_Action Queue[MAXACTIONQUEUE];
+  KMX_Action Queue[MAXACTIONQUEUE]; //TODO turn into List
   int QueueSize;
 
 public:
@@ -48,14 +48,7 @@ public:
   void ResetQueue();
   KMX_BOOL IsQueueEmpty() { return QueueSize == 0; }
   KMX_BOOL QueueAction(int ItemType, KMX_DWORD dwData);
-
-  /* Tests */
-
   int Length() { return QueueSize; }
   KMX_Action Get(int index) { return Queue[index]; }
-
-  void LogOutput();
-
-  KMX_BOOL CheckOutput(km_kbp_cp *initialContext, km_kbp_cp *expectedOutput);
 };
 

@@ -253,16 +253,10 @@ struct COMP_KEYBOARD {
   KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
   
   KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
-  //KMX_DWORD StartGroupIndex;  // StartGroup current index
-
+  
   KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
 
   KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
-
-  //KMX_DWORD dpName;     // offset of name
-  //KMX_DWORD dpLanguageName; // offset of language name;
-  //KMX_DWORD dpCopyright;    // offset of copyright
-  //KMX_DWORD dpMessage;    // offset of message in Keyboard About box
 
   KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps

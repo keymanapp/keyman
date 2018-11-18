@@ -20,17 +20,6 @@
 #define KMX_64BIT
 #endif
 
-/*
-#if defined(__cplusplus)
-// FROM keyboardprocessor.h, to eliminate once we merge
-typedef char16_t   km_kbp_cp;
-typedef char32_t   km_kbp_usv;
-#else
-typedef uint16_t    km_kbp_cp;          // code point
-typedef uint32_t    km_kbp_usv;         // Unicode Scalar Value
-#endif
-*/
-
 typedef uint32_t            KMX_DWORD;
 typedef int32_t             KMX_BOOL;
 typedef uint8_t             KMX_BYTE;
