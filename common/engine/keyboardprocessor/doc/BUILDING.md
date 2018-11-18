@@ -5,6 +5,7 @@
 - Meson build system.
 - C++14 or later compiler.
 - lib std::fs
+- kmcomp (for tests) -- must be added to path
 
 ## Installing Python3
 ### Linux

@@ -10,37 +10,45 @@ kmx = executable('kmx', 'kmx.cpp',
     include_directories: [inc, libsrc],
     link_args: links,
     objects: lib.extract_all_objects())
+    
+kmns = [
+  '000 - null keyboard',
+  '001 - basic input UnicodeI',
+  '002 - basic input Unicode',
+  '003 - nul',
+  '004 - basic input (shift 2)',
+  '005 - nul with initial context',
+  '006 - vkey input (shift ctrl)',
+  '007 - vkey input (ctrl alt)',
+  '008 - vkey input (ctrl alt 2)',
+  '012 - ralt',
+  '013 - deadkeys',
+  '014 - groups and virtual keys',
+  '015 - ralt 2',
+  '017 - space mnemonic kbd',
+  '018 - nul testing',
+  '019 - multiple deadkeys',
+  '020 - deadkeys and backspace'
+]
 
-configure_file (input : 'kmn/000 - null keyboard.kmn', output: '000 - null keyboard.kmn', copy : true, install : true)
-configure_file (input : 'kmn/000 - null keyboard.kmx', output: '000 - null keyboard.kmx', copy : true, install : true)
-configure_file (input : 'kmn/001 - basic input UnicodeI.kmn', output: '001 - basic input UnicodeI.kmn', copy : true, install : true)
-configure_file (input : 'kmn/001 - basic input UnicodeI.kmx', output: '001 - basic input UnicodeI.kmx', copy : true, install : true)
-configure_file (input : 'kmn/002 - basic input Unicode.kmn', output: '002 - basic input Unicode.kmn', copy : true, install : true)
-configure_file (input : 'kmn/002 - basic input Unicode.kmx', output: '002 - basic input Unicode.kmx', copy : true, install : true)
-configure_file (input : 'kmn/004 - basic input (shift 2).kmn', output: '004 - basic input (shift 2).kmn', copy : true, install : true)
-configure_file (input : 'kmn/004 - basic input (shift 2).kmx', output: '004 - basic input (shift 2).kmx', copy : true, install : true)
-configure_file (input : 'kmn/006 - vkey input (shift ctrl).kmn', output: '006 - vkey input (shift ctrl).kmn', copy : true, install : true)
-configure_file (input : 'kmn/006 - vkey input (shift ctrl).kmx', output: '006 - vkey input (shift ctrl).kmx', copy : true, install : true)
-configure_file (input : 'kmn/007 - vkey input (ctrl alt).kmn', output: '007 - vkey input (ctrl alt).kmn', copy : true, install : true)
-configure_file (input : 'kmn/007 - vkey input (ctrl alt).kmx', output: '007 - vkey input (ctrl alt).kmx', copy : true, install : true)
-configure_file (input : 'kmn/008 - vkey input (ctrl alt 2).kmn', output: '008 - vkey input (ctrl alt 2).kmn', copy : true, install : true)
-configure_file (input : 'kmn/008 - vkey input (ctrl alt 2).kmx', output: '008 - vkey input (ctrl alt 2).kmx', copy : true, install : true)
-configure_file (input : 'kmn/012 - ralt.kmn', output: '012 - ralt.kmn', copy : true, install : true)
-configure_file (input : 'kmn/012 - ralt.kmx', output: '012 - ralt.kmx', copy : true, install : true)
-configure_file (input : 'kmn/013 - deadkeys.kmn', output: '013 - deadkeys.kmn', copy : true, install : true)
-configure_file (input : 'kmn/013 - deadkeys.kmx', output: '013 - deadkeys.kmx', copy : true, install : true)
-configure_file (input : 'kmn/014 - groups and virtual keys.kmn', output: '014 - groups and virtual keys.kmn', copy : true, install : true)
-configure_file (input : 'kmn/014 - groups and virtual keys.kmx', output: '014 - groups and virtual keys.kmx', copy : true, install : true)
-configure_file (input : 'kmn/015 - ralt 2.kmn', output: '015 - ralt 2.kmn', copy : true, install : true)
-configure_file (input : 'kmn/015 - ralt 2.kmx', output: '015 - ralt 2.kmx', copy : true, install : true)
-configure_file (input : 'kmn/017 - space mnemonic kbd.kmn', output: '017 - space mnemonic kbd.kmn', copy : true, install : true)
-configure_file (input : 'kmn/017 - space mnemonic kbd.kmx', output: '017 - space mnemonic kbd.kmx', copy : true, install : true)
-configure_file (input : 'kmn/018 - nul testing.kmn', output: '018 - nul testing.kmn', copy : true, install : true)
-configure_file (input : 'kmn/018 - nul testing.kmx', output: '018 - nul testing.kmx', copy : true, install : true)
-configure_file (input : 'kmn/019 - multiple deadkeys.kmn', output: '019 - multiple deadkeys.kmn', copy : true, install : true)
-configure_file (input : 'kmn/019 - multiple deadkeys.kmx', output: '019 - multiple deadkeys.kmx', copy : true, install : true)
-configure_file (input : 'kmn/020 - deadkeys and backspace.kmn', output: '020 - deadkeys and backspace.kmn', copy : true, install : true)
-configure_file (input : 'kmn/020 - deadkeys and backspace.kmx', output: '020 - deadkeys and backspace.kmx', copy : true, install : true)
+kmn_tests = []
+kmn_sources = []
 
+prog_kmcomp = find_program('kmcomp')
 
-test('kmx', kmx)
+foreach kmn : kmns 
+  kmn_tests += custom_target(
+    kmn + '.kmn',
+    output: kmn + '.kmx',
+    input: 'kmn/' + kmn + '.kmn',
+    command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
+  )
+  
+  kmn_sources += configure_file(
+    input: 'kmn/' + kmn + '.kmn',
+    output: kmn + '.kmn',
+    copy: true
+  )
+endforeach
+
+test('kmx', kmx, depends: kmn_tests)

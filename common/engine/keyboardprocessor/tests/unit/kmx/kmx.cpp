@@ -9,6 +9,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <iostream>
 #include <keyman/keyboardprocessor.h>
 #include "state.hpp"
 
@@ -195,6 +196,7 @@ int run_test(const std::string & file) {
   int result = load_source(file, keys, expected, context);
   if (result != 0) return result;
 
+  std::cout << "file = " << file << std::endl;
   //std::cout << "keys = " << keys << std::endl;
   //std::cout << "expected = " << utf16_to_utf8(expected) << std::endl;
   //std::cout << "context = " << utf16_to_utf8(context) << std::endl;
