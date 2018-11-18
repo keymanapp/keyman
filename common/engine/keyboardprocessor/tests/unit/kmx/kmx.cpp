@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 #include <keyman/keyboardprocessor.h>
 #include "state.hpp"
 
