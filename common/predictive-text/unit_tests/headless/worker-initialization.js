@@ -116,11 +116,16 @@ describe('LMLayerWorker', function() {
       });
 
       // Create some values that the function can't fake:
-      var fakeLeft = Math.round(Math.random() * 64);
-      var fakeRight = Math.round(Math.random() * 64);
+      var maxCodeUnit = 64;
+      var fakeLeft = Math.round(Math.random() * maxCodeUnit);
+      var fakeRight = Math.round(Math.random() * maxCodeUnit);
 
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
+        configuration: {
+          supportsRightContexts: true,
+          maxRightContextCodeUnits: maxCodeUnit
+        },
         // We can only send source code through the Structure Clones algorithm,
         // (we can't send mocks :c) so, send something that cannot
         // be easily faked, and we can determine if it's correct.
