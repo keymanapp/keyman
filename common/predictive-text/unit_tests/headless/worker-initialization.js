@@ -12,7 +12,8 @@ describe('LMLayerWorker', function() {
       
       // Sending it the initialize it should notify us that it's initialized!
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize' }));
+        message: 'initialize'
+      }));
       assert(fakePostMessage.calledOnce);
     });
 
@@ -40,6 +41,29 @@ describe('LMLayerWorker', function() {
           model: 'dummy attribute'
         }));
       })
+    });
+  });
+
+  describe('.install()', function () {
+    it('should create a new instance, installed on our global object', function () {
+      var fakeWorkerGlobal = {
+        onmessage: undefined,
+        postMessage: new sinon.fake()
+      };
+      // Instantiate and install a worker on our global object.
+      var worker = LMLayerWorker.install(fakeWorkerGlobal);
+      assert.typeOf(worker, LMLayerWorker);
+      // It should have installed a callback.
+      assert.isFunction(fakeWorkerGlobal.onmessage);
+
+      // Send a message; we should get something back.
+      worker.onMessage(createMessageEventWithData({
+       message: 'invalid-message',
+       model: 'en-x-dummy'
+      }));
+
+      // It called the postMessage() in its global scope. 
+      assert.isTrue(fakeWorkerGlobal.postMessage.calledOnce)
     });
   });
 
