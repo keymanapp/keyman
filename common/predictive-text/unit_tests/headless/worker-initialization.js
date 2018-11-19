@@ -100,6 +100,41 @@ describe('LMLayerWorker', function() {
         }
       })));
     });
+
+    it('should run the code for the model', function () {
+      var fakePostMessage;
+      var worker = new LMLayerWorker({
+        postMessage: fakePostMessage = sinon.fake(), // required, but ignored in this test case
+      });
+
+      // Create some values that the function can't fake:
+      var fakeLeft = Math.round(Math.random() * 64);
+      var fakeRight = Math.round(Math.random() * 64);
+
+      worker.onMessage(createMessageEventWithData({
+        message: 'initialize',
+        // We can only send source code through the Structure Clones algorithm,
+        // (we can't send mocks :c) so, send something that cannot
+        // be easily faked, and we can determine if it's correct.
+        model: `
+          return {
+            model: {},
+            configuration: {
+              leftContextCodeUnits: ${fakeLeft},
+              rightContextCodeUnits: ${fakeRight}
+            }
+          };
+        `
+      }));
+
+      assert(fakePostMessage.calledOnceWith(sinon.match({
+        message: 'ready',
+        configuration: {
+          leftContextCodeUnits: fakeLeft,
+          rightContextCodeUnits: fakeRight,
+        }
+      })), JSON.stringify(fakePostMessage.lastCall.args[0], null, 2));
+    });
   });
 
   describe('Message: predict', function () {
