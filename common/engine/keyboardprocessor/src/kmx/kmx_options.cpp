@@ -3,6 +3,110 @@
   Authors:          mcdurdin
 */
 #include <kmx/kmx_processor.h>
+#include <option.hpp>
+
+void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
+  int idx;
+  for (; s && *s; s = incxstr(s)) {
+    if (*s == UC_SENTINEL) {
+      switch (*(s + 1)) {
+      case CODE_IFOPT:
+      case CODE_SETOPT:
+      case CODE_SAVEOPT:
+      case CODE_RESETOPT:
+        idx = *(s + 2) - 1;
+        if (idx >= 0 && idx < _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
+          _kp->KeyboardOptions[idx].OriginalStore = _kp->Keyboard->dpStoreArray[idx].dpString;
+        }
+        break;
+      }
+    }
+  }
+}
+
+void KMX_Options::Load(std::vector<km_kbp_option_item> *opts) {
+
+  opts->clear();
+
+  // Scan all rules to find options references.
+
+  int i, j;
+  LPGROUP gp;
+  LPKEY kkp;
+  for (i = 0, gp = _kp->Keyboard->dpGroupArray; i < _kp->Keyboard->cxGroupArray; i++, gp++) {
+    for (j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
+      AddOptionsStoresFromXString(kkp->dpContext);
+      AddOptionsStoresFromXString(kkp->dpOutput);
+    }
+    AddOptionsStoresFromXString(gp->dpMatch);
+    AddOptionsStoresFromXString(gp->dpNoMatch);
+  }
+
+  LPINTKEYBOARDOPTIONS ko;
+  int n = 0;
+  for (i = 0, ko = _kp->KeyboardOptions; i < _kp->Keyboard->cxStoreArray; i++, ko++) {
+    if (ko->OriginalStore != NULL) {
+      n++;
+    }
+  }
+
+  if (n == 0) {
+    km_kbp_option_item opt = KM_KBP_OPTIONS_END;
+    opts->emplace_back(opt);
+    return;
+  }
+
+  // Setup the default options for KPAPI to maintain
+
+  LPSTORE sp;
+  for (n = 0, i = 0, ko = _kp->KeyboardOptions, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++, ko++) {
+    if (ko->OriginalStore == NULL) continue;
+    km_kbp_option_item opt;
+    opt.key = sp->dpName;
+    opt.value = sp->dpString;
+    opt.scope = KM_KBP_OPT_KEYBOARD;
+    opts->emplace_back(opt);
+    n++;
+  }
+
+  km_kbp_option_item opt = KM_KBP_OPTIONS_END;
+  opts->emplace_back(opt);
+}
+
+/*
+  auto p_options = options->get(KM_KBP_OPT_KEYBOARD);
+
+  for (auto it = p_options; it->key != NULL; it++) {
+    switch (it->scope) {
+    case KM_KBP_OPT_ENVIRONMENT:
+      // TODO load env
+      break;
+    case KM_KBP_OPT_KEYBOARD:
+      for (int i = 0; i < kp->Keyboard->cxStoreArray; i++) {
+        if (kp->Keyboard->dpStoreArray[i].dpName != NULL && u16icmp(kp->Keyboard->dpStoreArray[i].dpName, it->key) == 0)
+        {
+          PKMX_WCHAR val = it->value;
+          kp->KeyboardOptions[i].Value = new KMX_WCHAR[u16len(val) + 1];
+          u16cpy(kp->KeyboardOptions[i].Value, /*u16len(val)+1,* / val);
+
+          kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
+          kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value;
+          break;
+        }
+      }
+      // Do we log the missing option?
+      break;
+    }
+  }
+}
+*/
+
+/*km_kbp_option_item & KMX_Options::Get(std::u16string key) {
+  km_kbp_option_item x;
+  return x;
+  //return nullptr;
+}*/
+//void KMX_Options::Lookup
 
 void KMX_Processor::FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {

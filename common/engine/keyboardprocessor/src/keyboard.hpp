@@ -42,6 +42,8 @@ namespace kbp
 
     friend json & operator << (json &, km::kbp::keyboard const &);
 
+    std::vector<km_kbp_option_item> *default_opts() { return & _default_opts; }
+
     kbp::abstract_processor const &  processor() const noexcept { return *_processor; }
   };
 

@@ -1,6 +1,7 @@
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "state.hpp"
+#include "keyboard.hpp"
 
 std::string utf16_to_utf8(std::u16string utf16_string);
 
@@ -12,11 +13,16 @@ namespace km {
       return m_valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
     }
 
-    kmx_processor::kmx_processor(km_kbp_keyboard_attrs const & kb) : abstract_processor(kb) {
-      std::filesystem::path p = kb.folder_path;
-      p /= kb.id;
+    kmx_processor::kmx_processor(km_kbp_keyboard_attrs const * kb_) : abstract_processor(kb_) {
+      km::kbp::keyboard *kb = const_cast<km::kbp::keyboard *>(static_cast<km::kbp::keyboard const *>(kb_));
+
+      std::filesystem::path p = kb->folder_path;
+      p /= kb->id;
       p.replace_extension(".kmx");
       m_valid = (bool) kmx.Load(p.native().c_str());
+
+      //std::vector<km_kbp_option_item> * opts = ;
+      kmx.GetOptions()->Load(kb->default_opts());
     }
 
     char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {

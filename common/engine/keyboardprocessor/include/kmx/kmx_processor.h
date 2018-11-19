@@ -6,10 +6,6 @@
 #include <string.h>
 #include <keyman/keyboardprocessor_bits.h>
 #include <kmx/kmx_base.h>
-#include <kmx/kmx_file.h>
-#include <kmx/kmx_context.h>
-#include <kmx/kmx_actions.h>
-#include <kmx/kmx_xstring.h>
 
 /***************************************************************************/ 
 
@@ -93,6 +89,13 @@ typedef struct tagKMSTATE
    // I3616
 enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 
+
+#include <kmx/kmx_file.h>
+#include <kmx/kmx_context.h>
+#include <kmx/kmx_actions.h>
+#include <kmx/kmx_xstring.h>
+#include <kmx/kmx_options.h>
+
 /* Utility */
 
 #define GLOBAL_ContextStackSize 80
@@ -116,6 +119,7 @@ private:
 
   KMX_Actions m_actions;
   KMX_Context m_context;
+  KMX_Options m_options;
 
   INTKEYBOARDINFO m_keyboard = { 0 };
   KMX_DWORD m_modifiers = 0;
@@ -173,6 +177,8 @@ public:
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
+  KMX_Options *GetOptions();
+  LPINTKEYBOARDINFO GetKeyboard();
 };
 
 /* Keyboard Options - to refactor*/

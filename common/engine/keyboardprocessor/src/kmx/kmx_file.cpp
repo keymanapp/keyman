@@ -12,6 +12,7 @@ KMX_BOOL KMX_Processor::Load(km_kbp_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
 
+
   LoadKeyboardOptions(&m_keyboard);
   
   return TRUE;

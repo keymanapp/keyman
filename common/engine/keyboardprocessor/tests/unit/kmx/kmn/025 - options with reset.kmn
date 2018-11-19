@@ -4,7 +4,6 @@ c expected: foo.foo.no foo.
 c context: 
 c option: foo=1
 c expected option: foo=1
-c saved option: foo=1
 
 store(&version) '10.0'
 

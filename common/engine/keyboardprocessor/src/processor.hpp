@@ -19,12 +19,12 @@ namespace kbp
   class abstract_processor
   {
   private:
-    km_kbp_keyboard_attrs const & _kb;
+    km_kbp_keyboard_attrs const *_kb;
   protected:
-    km_kbp_keyboard_attrs const &  keyboard() const noexcept { return _kb; }
+    km_kbp_keyboard_attrs const * keyboard() const noexcept { return _kb; }
   public:
     virtual ~abstract_processor() { };
-    abstract_processor(km_kbp_keyboard_attrs const & kb) : _kb(kb)
+    abstract_processor(km_kbp_keyboard_attrs const * kb) : _kb(kb)
 	{}
 
 
@@ -36,11 +36,10 @@ namespace kbp
   class kmx_processor : public abstract_processor
   {
   private:
-    bool m_valid;
+    bool m_valid, m_init = false;
     KMX_Processor kmx;
-    void load_keyboard();
   public:
-    kmx_processor(km_kbp_keyboard_attrs const & kb);
+    kmx_processor(km_kbp_keyboard_attrs const * kb_);
     km_kbp_status process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state);
     km_kbp_attr const * get_attrs() const;
     km_kbp_status validate() const;
@@ -49,7 +48,7 @@ namespace kbp
   class mock_processor : public abstract_processor
   {
   public:
-    mock_processor(km_kbp_keyboard_attrs const & kb) : abstract_processor(kb) {
+    mock_processor(km_kbp_keyboard_attrs const * kb) : abstract_processor(kb) {
     }
     km_kbp_status process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state);
     km_kbp_attr const * get_attrs() const;
@@ -58,7 +57,7 @@ namespace kbp
 
   class null_processor : public mock_processor {
   public:
-    null_processor(km_kbp_keyboard_attrs const & kb) : mock_processor(kb) {
+    null_processor(km_kbp_keyboard_attrs const * kb) : mock_processor(kb) {
     }
     km_kbp_status validate() const;
   };

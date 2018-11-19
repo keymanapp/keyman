@@ -31,7 +31,7 @@ KMX_Environment g_environment = {
 * KMX_Processor
 */
 
-KMX_Processor::KMX_Processor() : m_actions(&m_context) {
+KMX_Processor::KMX_Processor() : m_actions(&m_context), m_options(&m_keyboard) {
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
 }
@@ -604,6 +604,15 @@ KMX_Actions *KMX_Processor::GetActions() {
 KMX_Context *KMX_Processor::GetContext() {
   return &m_context;
 }
+
+KMX_Options *KMX_Processor::GetOptions() {
+  return &m_options;
+}
+
+LPINTKEYBOARDINFO KMX_Processor::GetKeyboard() {
+  return &m_keyboard;
+}
+
 
 KMX_BOOL KMX_Processor::ReleaseKeyboardMemory(LPKEYBOARD kbd)
 {

@@ -73,7 +73,7 @@ namespace kbp
     std::vector<option>   _saved;
 
   public:
-    options(km_kbp_option_item const *env, km_kbp_option_item const *kb_defs);
+    options(km_kbp_option_item const *kb_defs, km_kbp_option_item const *env);
 
     char16_t const *      lookup(km_kbp_option_scope scope,
                                  std::u16string const & key) const noexcept;
