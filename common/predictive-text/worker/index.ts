@@ -63,6 +63,10 @@ class LMLayerWorker {
     if (!message) {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
+
+    // Load the model.
+    let model = this._importScripts(event.data.model);
+
     this.cast('ready', {
       configuration: {
         // Send a reasonable, but non-configurable amount for now.
