@@ -47,8 +47,8 @@ foreach kmn : kmns
   kmn_sources += configure_file(
     input: 'kmn/' + kmn + '.kmn',
     output: kmn + '.kmn',
-    copy: true
+    configuration: configuration_data()
   )
 endforeach
 
-test('kmx', kmx, depends: kmn_tests, args: [kmns])
+test('kmx', kmx, args: [kmns])

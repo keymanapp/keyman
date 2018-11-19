@@ -285,6 +285,13 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
   std::ifstream kmn(base + file + ".kmn");
+  // Find the test file if running kmx directly
+  if (!kmn.good()) {
+    kmn.open(file + ".kmn");
+  }
+  if (!kmn.good()) {
+    return __LINE__;
+  }
   std::string line;
   while (std::getline(kmn, line)) {
     trim(line);
