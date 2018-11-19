@@ -52,7 +52,7 @@ describe('LMLayerWorker', function() {
       };
       // Instantiate and install a worker on our global object.
       var worker = LMLayerWorker.install(fakeWorkerGlobal);
-      assert.typeOf(worker, LMLayerWorker);
+      assert.instanceOf(worker, LMLayerWorker);
       // It should have installed a callback.
       assert.isFunction(fakeWorkerGlobal.onmessage);
 

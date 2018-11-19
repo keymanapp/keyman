@@ -49,6 +49,8 @@ class LMLayerWorker {
    * 
    *   // Don't do this!
    *   self.onmessage = worker.onMessage;
+   * 
+   * See: .install();
    */
   onMessage(event: MessageEvent) {
     const {message} = event.data;
@@ -71,6 +73,19 @@ class LMLayerWorker {
    */
   private cast(message: Message, payload: object) {
     this._postMessage({ message, ...payload });
+  }
+
+  /**
+   * Creates a new instance of the LMLayerWorker, and installs
+   * all its functions within the provided Worker scope.
+   * 
+   * @param scope A global scope to install upon.
+   */
+  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
+    let worker = new LMLayerWorker({ postMessage: scope.postMessage });
+    scope.onmessage = worker.onMessage.bind(worker);
+
+    return worker;
   }
 }
 
