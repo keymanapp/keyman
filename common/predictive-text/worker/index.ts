@@ -21,7 +21,76 @@
  */
 
  type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
- type OutgoingMessage = 'ready' | 'suggestions';
+ type OutgoingMessageKind = 'ready' | 'suggestions';
+
+ type Message = InitializeMessage
+             | ReadyMessage
+             | PredictMessage;
+
+interface InitializeMessage {
+  message: 'initialize';
+  /**
+   * Source code of the model.
+   * TODO: write a description of what this source code should look like.
+   */
+  model: string;
+  configuration: {
+    /**
+     * Whether the platform supports deleting to the right.
+     * The absence of this rule implies false.
+     */
+    supportsDeleteRight?: boolean;
+
+    /**
+     * The maximum amount of UTF-16 code units that the keyboard will
+     * provide to the left of the cursor.
+     */
+    maxLeftContextCodeUnits: number;
+
+    /**
+     * The maximum amount of code units that the keyboard will provide to
+     * the right of the cursor. The absence of this setting
+     * implies that right contexts are unsupported and will
+     * never be supplied.
+     */
+    maxRightContextCodeUnits?: number;
+  }
+}
+
+interface ReadyMessage {
+  message: 'ready';
+  configuration: {
+    /**
+     * How many UTF-16 code units maximum to send as the context to the
+     * left of the cursor ("left" in the Unicode character stream).
+     *
+     * Affects the `context` property sent in `predict` messages.
+     *
+     * While the left context MUST NOT bisect surrogate pairs, they MAY
+     * bisect graphical clusters.
+     */
+    leftContextCodeUnits: number,
+
+    /**
+     * How many UTF-16 code units maximum to send as the context to the
+     * right of the cursor ("right" in the Unicode character stream).
+     *
+     * Affects the `context` property sent in `predict` messages.
+     *
+     * While the left context MUST NOT bisect surrogate pairs, they MAY
+     * bisect graphical clusters.
+     */
+    rightContextCodeUnits: number,
+  };
+}
+
+interface PredictMessage {
+  message: 'predict';
+  // TODO:
+  // token: Token;
+  // context: Context;
+  // transform: Transform;
+}
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -79,7 +148,7 @@ class LMLayerWorker {
    * @param message A message type.
    * @param payload The message's payload. Can have any properties, except 'message'.
    */
-  private cast(message: OutgoingMessage, payload: Object) {
+  private cast(message: OutgoingMessageKind, payload: Object) {
     this._postMessage({ message, ...payload });
   }
 
