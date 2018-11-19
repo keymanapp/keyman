@@ -88,21 +88,25 @@ describe('LMLayerWorker', function() {
       })));
     });
 
-    it.skip('should send back configuration', function () {
+    it('should send back configuration', function () {
       var fakePostMessage = sinon.fake();
       var worker = new LMLayerWorker({ postMessage: fakePostMessage });
+      var maxCodeUnits = 64;
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
-        model: dummyModelCode()
+        model: dummyModelCode(),
+        configuration: {
+          maxLeftContextCodeUnits: maxCodeUnits,
+        }
       }));
 
       assert(fakePostMessage.calledOnceWith(sinon.match({
         message: 'ready',
         configuration: {
-          leftContextCodeUnits: sinon.match.number,
-          rightContextCodeUnits: sinon.match.number,
+          leftContextCodeUnits: maxCodeUnits,
+          rightContextCodeUnits: 0,
         }
-      })));
+      })), JSON.stringify(fakePostMessage.lastCall.args[0], null, 2));
     });
 
     it('should run the code for the model', function () {
