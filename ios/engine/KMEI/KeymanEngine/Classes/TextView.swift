@@ -103,6 +103,10 @@ public class TextView: UITextView {
     resignFirstResponder()
     Manager.shared.keymanWeb.view.endEditing(true)
   }
+  
+  public func resumeKeyboard() {
+    becomeFirstResponder()
+  }
 
   public override var text: String! {
     get {

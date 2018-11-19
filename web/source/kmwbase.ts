@@ -548,6 +548,10 @@ namespace com.keyman {
     ['activatingUI'](state: boolean) {
       this.uiManager.setActivatingUI(state);
     } 
+
+    // Functions that might be added later
+    ['beepKeyboard']: () => void;
+    ['oninserttext']: (dn: number, s: string) => void;
   }
 }
 
