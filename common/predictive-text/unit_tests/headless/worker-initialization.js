@@ -65,7 +65,7 @@ describe('LMLayerWorker', function() {
 
       // Send a message; we should get something back.
       worker.onMessage(createMessageEventWithData({
-       message: 'invalid-message',
+       message: 'initialize',
        model: dummyModelCode()
       }));
 

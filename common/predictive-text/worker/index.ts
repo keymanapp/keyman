@@ -56,8 +56,14 @@ class LMLayerWorker {
    */
   onMessage(event: MessageEvent) {
     const {message} = event.data;
+    // We must have gotten a message!
     if (!message) {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
+    }
+
+    // ...that message must have been 'initialize'!
+    if (message !== 'initialize') {
+      throw new Error(`invalid message; expected 'initialize' but got ${message}`);
     }
 
     let {model, configuration} = this.loadModel(
@@ -73,7 +79,7 @@ class LMLayerWorker {
    * @param message A message type.
    * @param payload The message's payload. Can have any properties, except 'message'.
    */
-  private cast(message: OutgoingMessage, payload: object) {
+  private cast(message: OutgoingMessage, payload: Object) {
     this._postMessage({ message, ...payload });
   }
 
