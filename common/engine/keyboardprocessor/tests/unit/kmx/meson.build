@@ -37,8 +37,7 @@ kmn_sources = []
 prog_kmcomp = find_program('kmcomp')
 
 foreach kmn : kmns 
-  kmn_tests += custom_target(
-    kmn + '.kmn',
+  kmn_tests += configure_file(
     output: kmn + '.kmx',
     input: 'kmn/' + kmn + '.kmn',
     command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
