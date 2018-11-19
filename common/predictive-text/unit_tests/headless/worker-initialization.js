@@ -17,6 +17,22 @@ describe('LMLayerWorker', function() {
       assert(fakePostMessage.calledOnce);
     });
 
+    it('should allow for the mocking of importScripts()', function () {
+      var fakeImportScripts;
+      var worker = new LMLayerWorker({
+        postMessage: sinon.fake(), // required, but ignored in this test case
+        importScripts: fakeImportScripts = sinon.fake()
+      });
+      
+      // Sending it the initialize it should notify us that it's initialized!
+      worker.onMessage(createMessageEventWithData({
+        message: 'initialize',
+        model: 'en-x-dummy'
+      }));
+      assert.isTrue(fakeImportScripts.calledOnce);
+    });
+
+    // TODO: remove from here; convert into integration test
     it('should work with zero arguments within a Web Worker', function() {
       var fakePostMessage;
       var WorkerInSandbox = defineLMLayerWorkerWithinSandbox({
@@ -96,6 +112,12 @@ describe('LMLayerWorker', function() {
           rightContextCodeUnits: sinon.match.number,
         }
       })));
+    });
+  });
+
+  describe('Message: predict', function () {
+    it.skip('should predict from a local model', function () {
+      // will need import scripts figured out
     });
   });
 
