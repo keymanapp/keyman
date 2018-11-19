@@ -60,15 +60,13 @@ class LMLayerWorker {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
 
-    // TODO: Load the model.
+    // Load the model.
+    let modelCode = event.data.model;
+    let requestedConfiguration = event.data.configuration;
+    let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
 
-    this.cast('ready', {
-      configuration: {
-        // Send a reasonable, but non-configurable amount for now.
-        leftContextCodeUnits: 64,
-        rightContextCodeUnits: 0,
-      }
-    });
+    // TODO: validate configuration?
+    this.cast('ready', { configuration });
   }
 
   /**
