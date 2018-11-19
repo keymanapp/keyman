@@ -1,7 +1,8 @@
-describe('Array', function() {
-  describe('#indexOf()', function() {
-    it('should return -1 when the value is not present', function() {
-      assert.equal([1,2,3].indexOf(4), -1);
-    });
+var assert = chai.assert;
+describe('LMLayerWorkerCode', function() {
+  it('should exist!', function() {
+    assert.isFunction(LMLayerWorkerCode,
+      'Could not find LMLayerWorkerCode! Does embedded_worker.js exist?'
+    );
   });
 });
