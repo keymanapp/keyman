@@ -22,7 +22,7 @@
 
  type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
  type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
- type Message = 'ready' | 'initialize';
+ type OutgoingMessage = 'ready' | 'suggestions';
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -81,7 +81,7 @@ class LMLayerWorker {
    * @param message A message type.
    * @param payload The message's payload. Can have any properties, except 'message'.
    */
-  private cast(message: Message, payload: object) {
+  private cast(message: OutgoingMessage, payload: object) {
     this._postMessage({ message, ...payload });
   }
 
