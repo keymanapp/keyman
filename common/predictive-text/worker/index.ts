@@ -205,6 +205,9 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+} else if (typeof self !== 'undefined' && 'postMessage' in self) {
+  // Automatically install if we're in a Web Worker.
+  LMLayerWorker.install(self as DedicatedWorkerGlobalScope);
 } else {
   //@ts-ignore
   window.LMLayerWorker = LMLayerWorker;

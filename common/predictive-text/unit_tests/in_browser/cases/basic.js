@@ -17,7 +17,6 @@ describe('LMLayerWorker', function () {
       assert.isString(code);
 
       let blob = new Blob([code], { type: 'text/javascript' });
-      debugger;
       let uri = URL.createObjectURL(blob);
 
       let worker = new Worker(uri);
