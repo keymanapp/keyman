@@ -20,77 +20,92 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
- type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
- type OutgoingMessageKind = 'ready' | 'suggestions';
-
- type Message = InitializeMessage
-             | ReadyMessage
-             | PredictMessage;
+type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+type OutgoingMessageKind = 'ready' | 'suggestions';
 
 interface InitializeMessage {
-  message: 'initialize';
   /**
    * Source code of the model.
    * TODO: write a description of what this source code should look like.
    */
   model: string;
-  configuration: {
-    /**
-     * Whether the platform supports deleting to the right.
-     * The absence of this rule implies false.
-     */
-    supportsDeleteRight?: boolean;
+  /**
+   * The configuration that the keyboard can offer to the model.
+   */
+  configuration: RequestedConfiguration;
+}
 
-    /**
-     * The maximum amount of UTF-16 code units that the keyboard will
-     * provide to the left of the cursor.
-     */
-    maxLeftContextCodeUnits: number;
-
-    /**
-     * The maximum amount of code units that the keyboard will provide to
-     * the right of the cursor. The absence of this setting
-     * implies that right contexts are unsupported and will
-     * never be supplied.
-     */
-    maxRightContextCodeUnits?: number;
-  }
+interface InitializeMessage {
+  /**
+   * Source code of the model.
+   * TODO: write a description of what this source code should look like.
+   */
+  model: string;
+  /**
+   * The configuration that the keyboard can offer to the model.
+   */
+  configuration: RequestedConfiguration;
 }
 
 interface ReadyMessage {
-  message: 'ready';
-  configuration: {
-    /**
-     * How many UTF-16 code units maximum to send as the context to the
-     * left of the cursor ("left" in the Unicode character stream).
-     *
-     * Affects the `context` property sent in `predict` messages.
-     *
-     * While the left context MUST NOT bisect surrogate pairs, they MAY
-     * bisect graphical clusters.
-     */
-    leftContextCodeUnits: number,
-
-    /**
-     * How many UTF-16 code units maximum to send as the context to the
-     * right of the cursor ("right" in the Unicode character stream).
-     *
-     * Affects the `context` property sent in `predict` messages.
-     *
-     * While the left context MUST NOT bisect surrogate pairs, they MAY
-     * bisect graphical clusters.
-     */
-    rightContextCodeUnits: number,
-  };
+  configuration: ModelConfiguration;
 }
 
 interface PredictMessage {
-  message: 'predict';
   // TODO:
   // token: Token;
   // context: Context;
   // transform: Transform;
 }
+
+interface RequestedConfiguration {
+  /**
+   * Whether the platform supports deleting to the right.
+   * The absence of this rule implies false.
+   */
+  supportsDeleteRight?: boolean;
+
+  /**
+   * The maximum amount of UTF-16 code units that the keyboard will
+   * provide to the left of the cursor.
+   */
+  maxLeftContextCodeUnits: number;
+
+  /**
+   * The maximum amount of code units that the keyboard will provide to
+   * the right of the cursor. The absence of this setting
+   * implies that right contexts are unsupported and will
+   * never be supplied.
+   */
+  maxRightContextCodeUnits?: number;
+}
+
+interface ModelConfiguration {
+  /**
+   * How many UTF-16 code units maximum to send as the context to the
+   * left of the cursor ("left" in the Unicode character stream).
+   *
+   * Affects the `context` property sent in `predict` messages.
+   *
+   * While the left context MUST NOT bisect surrogate pairs, they MAY
+   * bisect graphical clusters.
+   */
+  leftContextCodeUnits: number;
+
+  /**
+   * How many UTF-16 code units maximum to send as the context to the
+   * right of the cursor ("right" in the Unicode character stream).
+   *
+   * Affects the `context` property sent in `predict` messages.
+   *
+   * While the left context MUST NOT bisect surrogate pairs, they MAY
+   * bisect graphical clusters.
+   */
+  rightContextCodeUnits: number;
+};
+
+// TODO:
+interface Model {};
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -135,8 +150,12 @@ class LMLayerWorker {
       throw new Error(`invalid message; expected 'initialize' but got ${message}`);
     }
 
+    let payload: InitializeMessage = event.data;
+
     let {model, configuration} = this.loadModel(
-      event.data.model, event.data.configuration || {}
+      // TODO: validate configuration, and provide valid configuration in tests.
+      // @ts-ignore
+      payload.model, payload.configuration || {}
     );
 
     // TODO: validate configuration?
@@ -161,9 +180,8 @@ class LMLayerWorker {
    * @param requestedConfiguration Configuration requested from
    *                               the keyboard.
    */
-  private loadModel(modelCode, requestedConfiguration) {
+  private loadModel(modelCode: string, requestedConfiguration: RequestedConfiguration) {
     let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
-    // Set values correctly
     configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
     configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
 
