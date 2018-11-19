@@ -470,8 +470,8 @@ enum km_kbp_option_scope {
 };
 
 struct km_kbp_option_item {
-  km_kbp_cp const *  key;
-  km_kbp_cp const *  value;
+  km_kbp_cp *   key;
+  km_kbp_cp *   value;
   uint8_t       scope;  // Scope which an option belongs to.
 };
 

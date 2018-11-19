@@ -28,7 +28,13 @@ kmns = [
   '017 - space mnemonic kbd',
   '018 - nul testing',
   '019 - multiple deadkeys',
-  '020 - deadkeys and backspace'
+  '020 - deadkeys and backspace',
+  
+  '021 - options',
+  '022 - options with preset',
+  '023 - options with save',
+  '024 - options with save and preset',
+  '025 - options with reset'
 ]
 
 kmn_tests = []

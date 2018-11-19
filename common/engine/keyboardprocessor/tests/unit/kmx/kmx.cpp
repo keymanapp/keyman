@@ -10,6 +10,7 @@
 #include <cctype>
 #include <algorithm>
 #include <iostream>
+#include <list>
 #include <keyman/keyboardprocessor.h>
 #include "state.hpp"
 
@@ -28,13 +29,27 @@ namespace
 
 const std::string base = "tests/unit/kmx/";
 
-int run_test(const std::string & file);
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context);
-
 struct key_event {
   km_kbp_virtual_key vk;
   uint16_t modifier_state;
 };
+
+typedef enum {
+  KOT_INPUT,
+  KOT_OUTPUT,
+  KOT_SAVED
+} kmx_option_type;
+
+struct kmx_option {
+  kmx_option_type type;
+  std::u16string key, value;
+};
+
+typedef std::list<kmx_option> kmx_options;
+
+int run_test(const std::string & file);
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options);
+
 
 km_kbp_option_item test_env_opts[] =
 {
@@ -192,8 +207,9 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
 int run_test(const std::string & file) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
+  kmx_options options;
   
-  int result = load_source(file, keys, expected, context);
+  int result = load_source(file, keys, expected, context, options);
   if (result != 0) return result;
 
   std::cout << "file = " << file << std::endl;
@@ -207,8 +223,35 @@ int run_test(const std::string & file) {
     
   try_status(km_kbp_keyboard_load(std::filesystem::path(base + file + ".kmx").c_str(), &test_kb));
 
-  // Setup state, environment, options
+  // Setup state, environment
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
+
+  // Setup options
+  km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
+
+  int i = 0;
+  for (auto it = options.begin(); it != options.end(); it++) {
+    if (it->type != KOT_INPUT) continue;
+
+    std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
+
+    keyboard_opts[i].key = new km_kbp_cp[it->key.length() + 1];
+    it->key.copy((char16_t * const)keyboard_opts[i].key, it->key.length());
+    keyboard_opts[i].key[it->key.length()] = 0;
+
+    keyboard_opts[i].value = new km_kbp_cp[it->value.length() + 1];
+    it->value.copy(keyboard_opts[i].value, it->value.length());
+    keyboard_opts[i].value[it->value.length()] = 0;
+
+    keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+    i++;
+  }
+
+  keyboard_opts[i] = KM_KBP_OPTIONS_END;
+
+  km_kbp_options_update(km_kbp_state_options(test_state), keyboard_opts);
+
+  delete keyboard_opts;
 
   // Setup context
   km_kbp_context_item *citems = nullptr;
@@ -231,6 +274,21 @@ int run_test(const std::string & file) {
   km_kbp_cp *buf = new km_kbp_cp[n];
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
+
+  // Test resultant options
+  // TODO: Use the actions KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT to determine saved state
+  auto opts = km_kbp_state_options(test_state);
+
+  for (auto it = options.begin(); it != options.end(); it++) {
+    if (it->type != KOT_OUTPUT) continue;
+    std::cout << "output option-key: " << utf16_to_utf8(it->key) << std::endl;
+    km_kbp_cp const *value;
+    try_status(km_kbp_options_lookup(opts, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+    if (it->value.compare(value) != 0) return __LINE__;
+    km_kbp_cp_dispose(value);
+  }
+  
+   km_kbp_state_options(test_state);
   
   //std::cout << "result = " << utf16_to_utf8(buf) << std::endl;
 
@@ -276,10 +334,36 @@ std::u16string parse_source_string(std::string const & s) {
   return t;
 }
 
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context) {
+bool parse_option_string(std::string line, kmx_options &options, kmx_option_type type) {
+  auto x = line.find('=');
+  if (x == std::string::npos) return false;
+  
+  kmx_option o;
+  
+  o.type = type;
+  o.key = parse_source_string(line.substr(0, x));
+  o.value = parse_source_string(line.substr(x + 1));
+
+  options.emplace_back(o);
+  return true;
+}
+
+bool is_token(const std::string token, std::string &line) {
+  if (line.compare(0, token.length(), token) == 0) {
+    line = line.substr(token.length());
+    trim(line);
+    return true;
+  }
+  return false;
+}
+
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options) {
   const std::string s_keys = "c keys: ",
                     s_expected = "c expected: ",
-                    s_context = "c context: ";
+                    s_context = "c context: ",
+                    s_option = "c option: ",
+                    s_option_expected = "c expected option: ",
+                    s_option_saved = "c saved option: ";
 
   //std::cout << "load_source " << base + file + ".kmn" << std::endl;
 
@@ -294,15 +378,20 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
       keys = line.substr(s_keys.length());
       trim(keys);
     }
-    else if (line.compare(0, s_expected.length(), s_expected) == 0) {
-      line = line.substr(s_expected.length());
-      trim(line);
+    else if(is_token(s_expected, line)) {
       expected = parse_source_string(line);
     }
-    else if (line.compare(0, s_context.length(), s_context) == 0) {
-      line = line.substr(s_context.length());
-      trim(line);
+    else if (is_token(s_context, line)) {
       context = parse_source_string(line);
+    }
+    else if (is_token(s_option, line)) {
+      if (!parse_option_string(line, options, KOT_INPUT)) return __LINE__;
+    }
+    else if (is_token(s_option_expected, line)) {
+      if (!parse_option_string(line, options, KOT_OUTPUT)) return __LINE__;
+    }
+    else if (is_token(s_option_saved, line)) {
+      if (!parse_option_string(line, options, KOT_SAVED)) return __LINE__;
     }
   }
 
