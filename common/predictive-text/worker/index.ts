@@ -62,8 +62,11 @@ class LMLayerWorker {
 
     // Load the model.
     let modelCode = event.data.model;
-    let requestedConfiguration = event.data.configuration;
+    let requestedConfiguration = event.data.configuration || {};
     let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
+    // Set values correctly
+    configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
+    configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
 
     // TODO: validate configuration?
     this.cast('ready', { configuration });
