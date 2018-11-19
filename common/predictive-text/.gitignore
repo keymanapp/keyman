@@ -68,3 +68,4 @@ index.js
 test.js
 lmlayer.js
 *.js.map
+embedded_worker.js
