@@ -47,7 +47,7 @@ describe('LMLayerWorker', function() {
         worker.onMessage(createMessageEventWithData({
           model: 'dummy attribute'
         }));
-      })
+      });
     });
   });
 
@@ -75,6 +75,19 @@ describe('LMLayerWorker', function() {
   });
 
   describe('Message: initialize', function () {
+    it('should disallow any other message', function () {
+      var worker = new LMLayerWorker({
+        postMessage: sinon.fake(), // required, but ignored
+      });
+
+      // It should not respond to 'predict'
+      assert.throws(function () {
+        worker.onMessage(createMessageEventWithData({
+          message: 'predict',
+        }));
+      }, /invalid message/i);
+    });
+
     it('should send back a "ready" message', function () {
       var fakePostMessage = sinon.fake();
       var worker = new LMLayerWorker({ postMessage: fakePostMessage });
