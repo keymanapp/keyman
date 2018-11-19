@@ -8,10 +8,7 @@ describe('LMLayerWorker', function() {
   describe('#constructor()', function() {
     it('should allow for the mocking of postMessage()', function () {
       var fakePostMessage = sinon.fake();
-      var worker = new LMLayerWorker({
-        postMessage: fakePostMessage,
-        importScripts: sinon.fake() // required, but ignored in this test case
-      });
+      var worker = new LMLayerWorker({ postMessage: fakePostMessage });
       
       // Sending it the initialize it should notify us that it's initialized!
       worker.onMessage(createMessageEventWithData({
@@ -20,27 +17,11 @@ describe('LMLayerWorker', function() {
       assert(fakePostMessage.calledOnce);
     });
 
-    it('should allow for the mocking of importScripts()', function () {
-      var fakeImportScripts;
-      var worker = new LMLayerWorker({
-        postMessage: sinon.fake(), // required, but ignored in this test case
-        importScripts: fakeImportScripts = sinon.fake()
-      });
-      
-      // Sending it the initialize it should notify us that it's initialized!
-      worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
-        model: 'en-x-dummy'
-      }));
-      assert.isTrue(fakeImportScripts.calledOnce);
-    });
-
     // TODO: remove from here; convert into integration test
     it.skip('should work with zero arguments within a Web Worker', function() {
       var fakePostMessage;
       var WorkerInSandbox = defineLMLayerWorkerWithinSandbox({
         postMessage: fakePostMessage = sinon.fake(),
-        importScripts: sinon.fake() // required, but ignored in this test case
       });
       let worker = new WorkerInSandbox();
 
@@ -54,7 +35,6 @@ describe('LMLayerWorker', function() {
     it('should fail if not given the `message` attribute', function () {
       var worker = new LMLayerWorker({
         postMessage: sinon.fake(), // required, but ignored in this test case
-        importScripts: sinon.fake() // required, but ignored in this test case
       });
       // Every message is a discriminated union with the tag being `message`.
       // If it doesn't see 'message', something is deeply wrong,
@@ -72,7 +52,6 @@ describe('LMLayerWorker', function() {
       var fakeWorkerGlobal = {
         onmessage: undefined,
         postMessage: new sinon.fake(),
-        importScripts: new sinon.fake()
       };
       // Instantiate and install a worker on our global object.
       var worker = LMLayerWorker.install(fakeWorkerGlobal);
@@ -94,10 +73,7 @@ describe('LMLayerWorker', function() {
   describe('Message: initialize', function () {
     it('should send back a "ready" message', function () {
       var fakePostMessage = sinon.fake();
-      var worker = new LMLayerWorker({
-        postMessage: fakePostMessage,
-        importScripts: new sinon.fake()
-      });
+      var worker = new LMLayerWorker({ postMessage: fakePostMessage });
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
         model: 'en-x-dummy'
@@ -110,10 +86,7 @@ describe('LMLayerWorker', function() {
 
     it('should send back configuration', function () {
       var fakePostMessage = sinon.fake();
-      var worker = new LMLayerWorker({
-        postMessage: fakePostMessage,
-        importScripts: new sinon.fake()
-      });
+      var worker = new LMLayerWorker({ postMessage: fakePostMessage });
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
         model: 'en-x-dummy'

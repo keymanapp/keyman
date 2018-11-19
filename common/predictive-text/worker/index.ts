@@ -21,7 +21,6 @@
  */
 
  type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
- type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
  type OutgoingMessage = 'ready' | 'suggestions';
 
  /**
@@ -33,14 +32,11 @@ class LMLayerWorker {
    * so that this can be tested **outside of a Worker**.
    */
   private _postMessage: PostMessage;
-  private _importScripts: ImportScripts;
 
   constructor(options = {
     postMessage: null,
-    importScripts: null
   }) {
     this._postMessage = options.postMessage || postMessage;
-    this._importScripts = options.importScripts || importScripts;
   }
 
   /**
@@ -64,8 +60,7 @@ class LMLayerWorker {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
 
-    // Load the model.
-    let model = this._importScripts(event.data.model);
+    // TODO: Load the model.
 
     this.cast('ready', {
       configuration: {
@@ -92,10 +87,7 @@ class LMLayerWorker {
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
-    let worker = new LMLayerWorker({ 
-      postMessage: scope.postMessage,
-      importScripts: scope.importScripts
-    });
+    let worker = new LMLayerWorker({ postMessage: scope.postMessage });
     scope.onmessage = worker.onMessage.bind(worker);
 
     return worker;
