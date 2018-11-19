@@ -60,13 +60,9 @@ class LMLayerWorker {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
 
-    // Load the model.
-    let modelCode = event.data.model;
-    let requestedConfiguration = event.data.configuration || {};
-    let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
-    // Set values correctly
-    configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
-    configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
+    let {model, configuration} = this.loadModel(
+      event.data.model, event.data.configuration || {}
+    );
 
     // TODO: validate configuration?
     this.cast('ready', { configuration });
@@ -79,6 +75,24 @@ class LMLayerWorker {
    */
   private cast(message: OutgoingMessage, payload: object) {
     this._postMessage({ message, ...payload });
+  }
+
+  /**
+   * Loads a model by executing the given source code, and
+   * passing in the appropriate configuration.
+   *
+   * @param modelCode Source code for a function that takes
+   *                  configuration, and returns { model, configuration }
+   * @param requestedConfiguration Configuration requested from
+   *                               the keyboard.
+   */
+  private loadModel(modelCode, requestedConfiguration) {
+    let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
+    // Set values correctly
+    configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
+    configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
+
+    return {model, configuration};
   }
 
   /**
