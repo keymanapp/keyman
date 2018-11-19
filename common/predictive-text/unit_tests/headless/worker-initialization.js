@@ -119,7 +119,7 @@ describe('LMLayerWorker', function() {
           leftContextCodeUnits: maxCodeUnits,
           rightContextCodeUnits: 0,
         }
-      })), JSON.stringify(fakePostMessage.lastCall.args[0], null, 2));
+      })), lastMessageAsString(fakePostMessage));
     });
 
     it('should run the code for the model', function () {
@@ -159,7 +159,7 @@ describe('LMLayerWorker', function() {
           leftContextCodeUnits: fakeLeft,
           rightContextCodeUnits: fakeRight,
         }
-      })), JSON.stringify(fakePostMessage.lastCall.args[0], null, 2));
+      })), lastMessageAsString(fakePostMessage));
     });
   });
 
@@ -200,5 +200,14 @@ describe('LMLayerWorker', function() {
       return LMLayerWorker;
     })`;
     return eval(sandbox)(self);
+  }
+
+  /**
+   * Returns the last message received in a pretty string format. 
+   * @param {sinon.SinonFake} fakePostMessage 
+   * @returns {string}
+   */
+  function lastMessageAsString(fakePostMessage) {
+    return JSON.stringify(fakePostMessage.lastCall.args[0], null, 2);
   }
 });
