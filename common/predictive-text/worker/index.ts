@@ -21,6 +21,7 @@
  */
 
  type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
  type Message = 'ready' | 'initialize';
 
  /**
@@ -32,9 +33,14 @@ class LMLayerWorker {
    * so that this can be tested **outside of a Worker**.
    */
   private _postMessage: PostMessage;
+  private _importScripts: ImportScripts;
 
-  constructor(options = {postMessage: null}) {
+  constructor(options = {
+    postMessage: null,
+    importScripts: null
+  }) {
     this._postMessage = options.postMessage || postMessage;
+    this._importScripts = options.importScripts || importScripts;
   }
 
   /**
@@ -82,7 +88,10 @@ class LMLayerWorker {
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
-    let worker = new LMLayerWorker({ postMessage: scope.postMessage });
+    let worker = new LMLayerWorker({ 
+      postMessage: scope.postMessage,
+      importScripts: scope.importScripts
+    });
     scope.onmessage = worker.onMessage.bind(worker);
 
     return worker;
