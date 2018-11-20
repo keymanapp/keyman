@@ -127,15 +127,15 @@ class LMLayerWorker {
    * A function that can be set as self.onmessage (the Worker
    * message handler).
    * NOTE! You must bind it to a specific instance, e.g.:
-   * 
+   *
    *   // Do this!
    *   self.onmessage = worker.onMessage.bind(worker);
-   * 
+   *
    * Incorrect:
-   * 
+   *
    *   // Don't do this!
    *   self.onmessage = worker.onMessage;
-   * 
+   *
    * See: .install();
    */
   onMessage(event: MessageEvent) {
@@ -168,7 +168,11 @@ class LMLayerWorker {
    * @param payload The message's payload. Can have any properties, except 'message'.
    */
   private cast(message: OutgoingMessageKind, payload: Object) {
-    this._postMessage({ message, ...payload });
+    // Chrome raises "TypeError: invalid invocation" if postMessage is called
+    // with any non-default value for `this`.  Yank it off of `this` so that
+    // we can call it on a "global" context, and make Chrome happy again.
+    let postMessage = this._postMessage;
+    postMessage({ message, ...payload });
   }
 
   /**
@@ -191,7 +195,7 @@ class LMLayerWorker {
   /**
    * Creates a new instance of the LMLayerWorker, and installs
    * all its functions within the provided Worker scope.
-   * 
+   *
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
