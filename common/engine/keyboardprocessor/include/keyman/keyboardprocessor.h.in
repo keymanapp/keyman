@@ -507,7 +507,7 @@ Lookup an option based on its key, in an options list.
   if the scope is invalid.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __opts__: An opaque pointer to an options object.
+- __state__: An opaque pointer to a state object.
 - __scope__: Which key-value store to interrogate.
 - __key__: A UTF-16 string that matches the key in the target `km_kbp_option_item`.
 - __value__: A pointer to the result variable:
@@ -519,7 +519,7 @@ Lookup an option based on its key, in an options list.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_lookup(km_kbp_options const *opts,
+km_kbp_options_lookup(km_kbp_state *state,
                       uint8_t scope,
                       km_kbp_cp const *key,
                       km_kbp_cp const **value);
@@ -535,7 +535,7 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options`.
+- __state__: An opaque pointer to a `km_kbp_state`.
 - __new_opts__: An array of `km_kbp_option_item` objects to update or add. Must be
     terminated with `KM_KBP_OPTIONS_END`.
 
@@ -543,7 +543,7 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_update(km_kbp_options *opts,
+km_kbp_options_update(km_kbp_state *state,
                       km_kbp_option_item const *new_opts);
 
 /*

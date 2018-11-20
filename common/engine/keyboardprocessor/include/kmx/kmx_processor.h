@@ -116,6 +116,7 @@ private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
   KMSTATE m_state;
+  km_kbp_state *m_state1;
 
   KMX_Actions m_actions;
   KMX_Context m_context;
@@ -160,35 +161,18 @@ private:
 
   KMX_BOOL IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift);
 
-  /* Keyboard options */
-
-  void LoadKeyboardOptions(LPINTKEYBOARDINFO kp);
-  void FreeKeyboardOptions(LPINTKEYBOARDINFO kp);
-  void SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead);
-  void ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset);
-  void SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave);
-
 public:
   KMX_Processor();
   ~KMX_Processor();
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
-  KMX_BOOL ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode);  // returns FALSE on error or key not matched
+  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
   KMX_Options *GetOptions();
   LPINTKEYBOARDINFO GetKeyboard();
 };
-
-/* Keyboard Options - to refactor*/
-
-struct KMXTest_KeyboardOption {
-  km_kbp_cp name[128], value[128];
-};
-
-extern KMXTest_KeyboardOption g_keyboardOption[1024];
-extern int g_keyboardOptionCount;
 
 /* Global Constants */
 

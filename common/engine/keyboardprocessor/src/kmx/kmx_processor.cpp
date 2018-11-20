@@ -8,14 +8,6 @@
 KMX_BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
 KMX_BOOL g_silent = FALSE;
 
-/* Keyboard options - to refactor */
-
-extern KMXTest_KeyboardOption g_keyboardOption[1024];
-extern int g_keyboardOptionCount;
-
-KMXTest_KeyboardOption g_keyboardOption[1024] = { { 0, 0 }, };
-int g_keyboardOptionCount = 0;
-
 /* Environment - to refactor */
 KMX_Environment g_environment = {
   FALSE, // simulateAltGr
@@ -54,9 +46,11 @@ KMX_Processor::~KMX_Processor() {
 * process, and checks the state of Windows for the keyboard handling.
 */
 
-KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode)
+KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode)
 {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
+
+  m_state1 = state;
 
   m_state.vkey = vkey;
   m_state.charCode = charCode;
@@ -73,6 +67,8 @@ KMX_BOOL KMX_Processor::ProcessEvent(KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCH
   KMX_BOOL fOutputKeystroke = FALSE;
    
   ProcessGroup(gp, &fOutputKeystroke);
+
+  m_state1 = nullptr;
 
   return !fOutputKeystroke;
 }
@@ -377,17 +373,17 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         n1 = *p - 1;
         p++;
         n2 = *p - 1;
-        SetKeyboardOption(&m_keyboard, n1, n2);
+        GetOptions()->Set(n1, n2);
         break;
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        ResetKeyboardOption(&m_keyboard, n1);
+        GetOptions()->Reset(km_kbp_state_options(m_state1), n1);
         break;
       case CODE_SAVEOPT:
         p++;
         n1 = *p - 1;
-        SaveKeyboardOption(&m_keyboard, n1);
+        GetOptions()->Save(m_state1, n1);
         break;
       case CODE_IFSYSTEMSTORE:
         p+=3;

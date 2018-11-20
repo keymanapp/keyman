@@ -4,6 +4,7 @@
 */
 #include <kmx/kmx_processor.h>
 #include <option.hpp>
+#include <state.hpp>
 
 void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   int idx;
@@ -24,9 +25,24 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   }
 }
 
-void KMX_Options::Load(std::vector<km_kbp_option_item> *opts) {
+void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
+  LPSTORE sp;
+  int i;
+  for (i = 0, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++) {
+    if (_kp->KeyboardOptions[i].OriginalStore != NULL && sp->dpName != NULL && u16icmp(sp->dpName, key.c_str()) == 0) {
+      Reset(options, i);
+      return;
+    }
+  }
+  // TODO: Do we need to flag missing item?
+}
+
+void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
 
   opts->clear();
+
+  _kp->KeyboardOptions = new INTKEYBOARDOPTIONS[_kp->Keyboard->cxStoreArray];
+  memset(_kp->KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * _kp->Keyboard->cxStoreArray);
 
   // Scan all rules to find options references.
 
@@ -73,156 +89,88 @@ void KMX_Options::Load(std::vector<km_kbp_option_item> *opts) {
   opts->emplace_back(opt);
 }
 
-/*
-  auto p_options = options->get(KM_KBP_OPT_KEYBOARD);
-
-  for (auto it = p_options; it->key != NULL; it++) {
-    switch (it->scope) {
-    case KM_KBP_OPT_ENVIRONMENT:
-      // TODO load env
-      break;
-    case KM_KBP_OPT_KEYBOARD:
-      for (int i = 0; i < kp->Keyboard->cxStoreArray; i++) {
-        if (kp->Keyboard->dpStoreArray[i].dpName != NULL && u16icmp(kp->Keyboard->dpStoreArray[i].dpName, it->key) == 0)
-        {
-          PKMX_WCHAR val = it->value;
-          kp->KeyboardOptions[i].Value = new KMX_WCHAR[u16len(val) + 1];
-          u16cpy(kp->KeyboardOptions[i].Value, /*u16len(val)+1,* / val);
-
-          kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
-          kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value;
-          break;
-        }
-      }
-      // Do we log the missing option?
-      break;
-    }
-  }
-}
-*/
-
-/*km_kbp_option_item & KMX_Options::Get(std::u16string key) {
-  km_kbp_option_item x;
-  return x;
-  //return nullptr;
-}*/
-//void KMX_Options::Lookup
-
-void KMX_Processor::FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
+KMX_Options::~KMX_Options()
 {
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
+  //TODO: move ownership of _kp->KeyboardOptions into this class (so we control lifetime of it here)
+  assert(_kp != NULL);
+  assert(_kp->Keyboard != NULL);
+  assert(_kp->KeyboardOptions != NULL);
 
-  for(KMX_DWORD i = 0; i < kp->Keyboard->cxStoreArray; i++)
-    if(kp->KeyboardOptions[i].Value)
+  for(KMX_DWORD i = 0; i < _kp->Keyboard->cxStoreArray; i++)
+    if(_kp->KeyboardOptions[i].Value)
     {
-      kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].OriginalStore;
-      delete kp->KeyboardOptions[i].Value;
+      _kp->Keyboard->dpStoreArray[i].dpString = _kp->KeyboardOptions[i].OriginalStore;
+      delete _kp->KeyboardOptions[i].Value;
     }
-  delete kp->KeyboardOptions;
-  kp->KeyboardOptions = NULL;
+  delete _kp->KeyboardOptions;
+  _kp->KeyboardOptions = NULL;
 }
 
-void KMX_Processor::SetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSet, int nStoreToRead)
+void KMX_Options::Set(int nStoreToSet, int nStoreToRead)
 {
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
+  assert(_kp != NULL);
+  assert(_kp->Keyboard != NULL);
+  assert(_kp->KeyboardOptions != NULL);
   assert(nStoreToSet >= 0);
-  assert(nStoreToSet < (int) kp->Keyboard->cxStoreArray);
+  assert(nStoreToSet < (int) _kp->Keyboard->cxStoreArray);
   assert(nStoreToRead >= 0);
-  assert(nStoreToRead < (int) kp->Keyboard->cxStoreArray);
+  assert(nStoreToRead < (int) _kp->Keyboard->cxStoreArray);
 
-  LPSTORE sp = &kp->Keyboard->dpStoreArray[nStoreToRead];
-  if(kp->KeyboardOptions[nStoreToSet].Value)
+  LPSTORE sp = &_kp->Keyboard->dpStoreArray[nStoreToRead];
+  if(_kp->KeyboardOptions[nStoreToSet].Value)
   {
-    delete kp->KeyboardOptions[nStoreToSet].Value;
-  }
-  else
-  {
-    kp->KeyboardOptions[nStoreToSet].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToSet].dpString;
+    delete _kp->KeyboardOptions[nStoreToSet].Value;
   }
    
-  kp->KeyboardOptions[nStoreToSet].Value = new KMX_WCHAR[u16len(sp->dpString)+1];
-  u16cpy(kp->KeyboardOptions[nStoreToSet].Value, /*u16len(sp->dpString)+1,*/ sp->dpString);
-  kp->Keyboard->dpStoreArray[nStoreToSet].dpString = kp->KeyboardOptions[nStoreToSet].Value;
+  _kp->KeyboardOptions[nStoreToSet].Value = new KMX_WCHAR[u16len(sp->dpString)+1];
+  u16cpy(_kp->KeyboardOptions[nStoreToSet].Value, /*u16len(sp->dpString)+1,*/ sp->dpString);
+  _kp->Keyboard->dpStoreArray[nStoreToSet].dpString = _kp->KeyboardOptions[nStoreToSet].Value;
 }
 
-void KMX_Processor::ResetKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToReset)
+void KMX_Options::Reset(km_kbp_options *options, int nStoreToReset)
 {
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
+  assert(_kp != NULL);
+  assert(_kp->Keyboard != NULL);
+  assert(_kp->KeyboardOptions != NULL);
   assert(nStoreToReset >= 0);
-  assert(nStoreToReset < (int) kp->Keyboard->cxStoreArray);
+  assert(nStoreToReset < (int) _kp->Keyboard->cxStoreArray);
 
-  if(kp->KeyboardOptions[nStoreToReset].Value)
+  if (_kp->KeyboardOptions[nStoreToReset].Value)
   {
-    kp->Keyboard->dpStoreArray[nStoreToReset].dpString = kp->KeyboardOptions[nStoreToReset].OriginalStore;
-    delete kp->KeyboardOptions[nStoreToReset].Value;
-    kp->KeyboardOptions[nStoreToReset].Value = NULL;
+    _kp->Keyboard->dpStoreArray[nStoreToReset].dpString = _kp->KeyboardOptions[nStoreToReset].OriginalStore;
+    delete _kp->KeyboardOptions[nStoreToReset].Value;
+    _kp->KeyboardOptions[nStoreToReset].Value = NULL;
+  }
 
-    if(kp->Keyboard->dpStoreArray[nStoreToReset].dpName == NULL) return;
+  if(_kp->Keyboard->dpStoreArray[nStoreToReset].dpName == NULL) return;
 
-    // We'll go through the globally set options and populate them
-    for (int n = 0; n < g_keyboardOptionCount; n++) {
-      if (kp->Keyboard->dpStoreArray[nStoreToReset].dpName != NULL && u16icmp(kp->Keyboard->dpStoreArray[nStoreToReset].dpName, g_keyboardOption[n].name) == 0)
-      {
-        PKMX_WCHAR val = g_keyboardOption[n].value;
-        kp->KeyboardOptions[nStoreToReset].Value = new KMX_WCHAR[u16len(val) + 1];
-        u16cpy(kp->KeyboardOptions[nStoreToReset].Value, /*u16len(val) + 1,*/ val);
-
-        kp->KeyboardOptions[nStoreToReset].OriginalStore = kp->Keyboard->dpStoreArray[nStoreToReset].dpString;
-        kp->Keyboard->dpStoreArray[nStoreToReset].dpString = kp->KeyboardOptions[nStoreToReset].Value;
-        return;
-      }
-    }
+  // Now we need to go back and get any saved value from KPAPI
+  km_kbp_cp const *internal_value = options->lookup(km_kbp_option_scope(KM_KBP_OPT_KEYBOARD), _kp->Keyboard->dpStoreArray[nStoreToReset].dpName);
+  if(internal_value) {
+    // Copy the value from KPAPI
+    _kp->KeyboardOptions[nStoreToReset].Value = new KMX_WCHAR[u16len(internal_value) + 1];
+    u16cpy(_kp->KeyboardOptions[nStoreToReset].Value, /*u16len(val) + 1,*/ internal_value);
+    _kp->Keyboard->dpStoreArray[nStoreToReset].dpString = _kp->KeyboardOptions[nStoreToReset].Value;
   }
 }
 
 
-void KMX_Processor::SaveKeyboardOption(LPINTKEYBOARDINFO kp, int nStoreToSave)
+void KMX_Options::Save(km_kbp_state *state, int nStoreToSave)
 {
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
+  assert(_kp != NULL);
+  assert(_kp->Keyboard != NULL);
+  assert(_kp->KeyboardOptions != NULL);
   assert(nStoreToSave >= 0);
-  assert(nStoreToSave < (int)kp->Keyboard->cxStoreArray);
+  assert(nStoreToSave < (int)_kp->Keyboard->cxStoreArray);
 
-  if (kp->Keyboard->dpStoreArray[nStoreToSave].dpName == NULL) return;
+  if (_kp->Keyboard->dpStoreArray[nStoreToSave].dpName == NULL) return;
 
+  // TSE QUERY: Does this happen here or with an ACTION? Or both?
+  state->options().assign(state, KM_KBP_OPT_KEYBOARD, _kp->Keyboard->dpStoreArray[nStoreToSave].dpName, _kp->Keyboard->dpStoreArray[nStoreToSave].dpString);
   //TODO: GetActions()->QueueAction(QIT_SAVEOPTION, ...);
   /*RegistryFullAccess r(HKEY_CURRENT_USER);
-  if(r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(kp->Name, TRUE) && r.OpenKey(key, TRUE))
+  if(r.OpenKey(REGSZ_KeymanActiveKeyboards, TRUE) && r.OpenKey(_kp->Name, TRUE) && r.OpenKey(key, TRUE))
   {
-    r.WriteString(kp->Keyboard->dpStoreArray[nStoreToSave].dpName, kp->Keyboard->dpStoreArray[nStoreToSave].dpString);
+    r.WriteString(_kp->Keyboard->dpStoreArray[nStoreToSave].dpName, _kp->Keyboard->dpStoreArray[nStoreToSave].dpString);
   }*/
-}
-
-void KMX_Processor::LoadKeyboardOptions(LPINTKEYBOARDINFO kp)
-{
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions == NULL);
-  
-  kp->KeyboardOptions = new INTKEYBOARDOPTIONS[kp->Keyboard->cxStoreArray];
-  memset(kp->KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * kp->Keyboard->cxStoreArray);
-
-  // We'll go through the globally set options and populate them
-  for (int n = 0; n < g_keyboardOptionCount; n++) {
-    for(KMX_DWORD i = 0; i < kp->Keyboard->cxStoreArray; i++)
-    {
-      if(kp->Keyboard->dpStoreArray[i].dpName != NULL && u16icmp(kp->Keyboard->dpStoreArray[i].dpName, g_keyboardOption[n].name) == 0)
-      {
-        PKMX_WCHAR val = g_keyboardOption[n].value;
-        kp->KeyboardOptions[i].Value = new KMX_WCHAR[u16len(val)+1];
-        u16cpy(kp->KeyboardOptions[i].Value, /*u16len(val)+1,*/ val);
-
-        kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
-        kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value;
-        break;
-      }
-    }
-  }
 }

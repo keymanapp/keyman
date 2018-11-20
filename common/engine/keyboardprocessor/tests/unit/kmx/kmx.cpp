@@ -216,53 +216,43 @@ int run_test(const std::string & file) {
   //std::cout << "expected = " << utf16_to_utf8(expected) << std::endl;
   //std::cout << "context = " << utf16_to_utf8(context) << std::endl;
 
-  // TODO: compile the keyboard using kmcomp
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
     
   try_status(km_kbp_keyboard_load(std::filesystem::path(base + file + ".kmx").c_str(), &test_kb));
 
   // Setup state, environment
-  // Setup options
-/*
-  km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
-
-  int i = 0;
-  for (auto it = options.begin(); it != options.end(); it++) {
-    if (it->type != KOT_INPUT) continue;
-
-    std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
-
-    keyboard_opts[i].key = new km_kbp_cp[it->key.length() + 1];
-    it->key.copy((char16_t * const)keyboard_opts[i].key, it->key.length());
-    keyboard_opts[i].key[it->key.length()] = 0;
-
-    keyboard_opts[i].value = new km_kbp_cp[it->value.length() + 1];
-    it->value.copy(keyboard_opts[i].value, it->value.length());
-    keyboard_opts[i].value[it->value.length()] = 0;
-
-    keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
-    i++;
-  }
-
-  keyboard_opts[i] = KM_KBP_OPTIONS_END;
-*/
 
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
 
-/*
-  for (int j = 0; j < i; j++) {
-    std::cout << "assigned option-key: " << keyboard_opts[j].scope << ", " << utf16_to_utf8(keyboard_opts[j].key) << ", " << utf16_to_utf8(keyboard_opts[j].value) << std::endl;
-  }
-*/
+  // Setup keyboard options
 
-  //try_status(km_kbp_options_update(km_kbp_state_options(test_state), keyboard_opts));
+  if (options.size() > 0) {
+    km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
 
-  //delete keyboard_opts;
+    int i = 0;
+    for (auto it = options.begin(); it != options.end(); it++) {
+      if (it->type != KOT_INPUT) continue;
 
-  auto opts = km_kbp_state_options(test_state);
-  for (auto it = opts->get(KM_KBP_OPT_KEYBOARD); it->key != NULL; it++) {
-    std::cout << "output value option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value) << std::endl;
+      std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
+
+      keyboard_opts[i].key = new km_kbp_cp[it->key.length() + 1];
+      it->key.copy((char16_t * const)keyboard_opts[i].key, it->key.length());
+      keyboard_opts[i].key[it->key.length()] = 0;
+
+      keyboard_opts[i].value = new km_kbp_cp[it->value.length() + 1];
+      it->value.copy(keyboard_opts[i].value, it->value.length());
+      keyboard_opts[i].value[it->value.length()] = 0;
+
+      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+      i++;
+    }
+
+    keyboard_opts[i] = KM_KBP_OPTIONS_END;
+
+    try_status(km_kbp_options_update(test_state, keyboard_opts));
+
+    delete keyboard_opts;
   }
 
   // Setup context
@@ -288,24 +278,17 @@ int run_test(const std::string & file) {
   km_kbp_context_items_dispose(citems);
 
   // Test resultant options
-  // TODO: Use the actions KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT to determine saved state
-//  auto opts = km_kbp_state_options(test_state);
-  //for (auto it = opts->get().begin(); it != opts->get().end(); it++) {
-    //std::cout << "output value option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value) << std::endl;
-  //}
-
+  // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
   
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type != KOT_OUTPUT) continue;
     std::cout << "output option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value);
     km_kbp_cp const *value;
-    try_status(km_kbp_options_lookup(opts, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+    try_status(km_kbp_options_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
     std::cout << " actual: " << utf16_to_utf8(value) << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
     km_kbp_cp_dispose(value);
   }
-  
-  //std::cout << "result = " << utf16_to_utf8(buf) << std::endl;
 
   // Destroy them
   km_kbp_state_dispose(test_state);
@@ -378,8 +361,6 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
     s_context = "c context: ",
     s_option = "c option: ",
     s_option_expected = "c expected option: ";
-
-  //std::cout << "load_source " << base + file + ".kmn" << std::endl;
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
   std::ifstream kmn(base + file + ".kmn");

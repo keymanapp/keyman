@@ -22,7 +22,7 @@ namespace km {
       m_valid = (bool) kmx.Load(p.native().c_str());
 
       //std::vector<km_kbp_option_item> * opts = ;
-      kmx.GetOptions()->Load(kb->default_opts());
+      kmx.GetOptions()->Init(kb->default_opts());
     }
 
     char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
@@ -46,6 +46,11 @@ namespace km {
         }
       }
       return 0;
+    }
+
+    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key) {
+      if(scope == KM_KBP_OPT_KEYBOARD)
+        kmx.GetOptions()->Load(km_kbp_state_options(state), key);
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
@@ -78,7 +83,7 @@ namespace km {
 
       kmx.GetContext()->Set(ctxt.c_str());
       kmx.GetActions()->ResetQueue();
-      kmx.ProcessEvent(vk, modifier_state, ch);
+      kmx.ProcessEvent(state, vk, modifier_state, ch);
 
       state->actions.clear();
 
