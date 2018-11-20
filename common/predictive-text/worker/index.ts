@@ -169,8 +169,12 @@ class LMLayerWorker {
    */
   private cast(message: OutgoingMessageKind, payload: Object) {
     // Chrome raises "TypeError: invalid invocation" if postMessage is called
-    // with any non-default value for `this`.  Yank it off of `this` so that
-    // we can call it on a "global" context, and make Chrome happy again.
+    // with any non-default value for `this`, i.e., this won't work:
+    //
+    //  this._postMessage({ foo: 'bar' });
+    //
+    // Yank it postMessage() off of `this` so that it's called on the
+    // "global" context, and everything works again.
     let postMessage = this._postMessage;
     postMessage({ message, ...payload });
   }
