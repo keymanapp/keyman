@@ -21,6 +21,8 @@
  */
 
  type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
+ type OutgoingMessage = 'ready' | 'suggestions';
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -31,9 +33,14 @@ class LMLayerWorker {
    * so that this can be tested **outside of a Worker**.
    */
   private _postMessage: PostMessage;
+  private _importScripts: ImportScripts;
 
-  constructor(options = {postMessage: null}) {
+  constructor(options = {
+    postMessage: null,
+    importScripts: null
+  }) {
     this._postMessage = options.postMessage || postMessage;
+    this._importScripts = options.importScripts || importScripts;
   }
 
   /**
@@ -48,9 +55,62 @@ class LMLayerWorker {
    * 
    *   // Don't do this!
    *   self.onmessage = worker.onMessage;
+   * 
+   * See: .install();
    */
-  onMessage() {
-    this._postMessage({ message: 'ready' });
+  onMessage(event: MessageEvent) {
+    const {message} = event.data;
+    if (!message) {
+      throw new Error(`Missing required 'message' attribute: ${event.data}`)
+    }
+
+    // Load the model.
+    let model = this._importScripts(event.data.model);
+
+    this.cast('ready', {
+      configuration: {
+        // Send a reasonable, but non-configurable amount for now.
+        leftContextCodeUnits: 64,
+        rightContextCodeUnits: 0,
+      }
+    });
+  }
+
+  /**
+   * Sends back a message structured according to the protocol.
+   * @param message A message type.
+   * @param payload The message's payload. Can have any properties, except 'message'.
+   */
+  private cast(message: OutgoingMessage, payload: object) {
+    this._postMessage({ message, ...payload });
+  }
+
+  /**
+   * Creates a new instance of the LMLayerWorker, and installs all its
+   * functions within the provided Worker global scope.
+   *
+   * In production, this is called within the Worker's scope as:
+   *
+   *    LMLayerWorker.install(self);
+   *
+   * ...and this will setup onmessage and postMessage() appropriately.
+   *
+   * During testing, this method is useful to mock an entire global scope,
+   *
+   *    var fakeScope = { postMessage: ... };
+   *    LMLayerWorker.install(fakeScope);
+   *    // now we can spy on methods in fakeScope!
+   *
+   * @param scope A global scope to install upon.
+   */
+  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
+    let worker = new LMLayerWorker({ 
+      postMessage: scope.postMessage,
+      importScripts: scope.importScripts
+    });
+    scope.onmessage = worker.onMessage.bind(worker);
+
+    return worker;
   }
 }
 
