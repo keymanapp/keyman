@@ -33,15 +33,17 @@ km_kbp_options_list_size(km_kbp_option_item const *opts)
 
 
 km_kbp_status
-km_kbp_options_lookup(km_kbp_options const *opts,
+km_kbp_options_lookup(km_kbp_state *state,
                                         uint8_t scope, km_kbp_cp const *key,
                                         km_kbp_cp const **value_out)
 {
-  assert(opts); assert(key); assert(value_out);
-  if (!opts || !key || !value_out)  return KM_KBP_STATUS_INVALID_ARGUMENT;
+  assert(state); assert(key); assert(value_out);
+  if (!state || !key || !value_out)  return KM_KBP_STATUS_INVALID_ARGUMENT;
 
   if (scope == KM_KBP_OPT_UNKNOWN || scope > KM_KBP_OPT_MAX_SCOPES)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
+
+  auto opts = km_kbp_state_options(state);
 
   // Copy the internal value to our new buffer
   km_kbp_cp const *internal_value = opts->lookup(km_kbp_option_scope(scope), key);
@@ -70,10 +72,12 @@ km_kbp_options_lookup(km_kbp_options const *opts,
 
 
 km_kbp_status
-km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item const *opt)
+km_kbp_options_update(km_kbp_state *state, km_kbp_option_item const *opt)
 {
-  assert(opts); assert(opt);
-  if (!opts || !opt)  return KM_KBP_STATUS_INVALID_ARGUMENT;
+  assert(state); assert(opt);
+  if (!state|| !opt)  return KM_KBP_STATUS_INVALID_ARGUMENT;
+
+  auto opts = km_kbp_state_options(state);
 
   try
   {
@@ -82,7 +86,7 @@ km_kbp_options_update(km_kbp_options *opts, km_kbp_option_item const *opt)
       if (opt->scope == KM_KBP_OPT_UNKNOWN || opt->scope > KM_KBP_OPT_MAX_SCOPES)
         return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-      if (!opts->assign(km_kbp_option_scope(opt->scope), opt->key, opt->value))
+      if (!opts->assign(state, km_kbp_option_scope(opt->scope), opt->key, opt->value))
         return KM_KBP_STATUS_KEY_ERROR;
     }
   } 

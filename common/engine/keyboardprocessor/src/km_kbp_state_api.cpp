@@ -39,6 +39,7 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
   {
     *out = new km_kbp_state(static_cast<km::kbp::keyboard const &>(*keyboard),
       env);
+
   }
   catch (std::bad_alloc)
   {

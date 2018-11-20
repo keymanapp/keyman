@@ -22,7 +22,7 @@ opts = executable('options-api', 'options_api.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],
     link_args: links,
-    objects: lib.extract_objects('km_kbp_options_api.cpp', 'option.cpp', 'json.cpp'))
+    objects: lib.extract_all_objects())
 state = executable('state-api', 'state_api.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],

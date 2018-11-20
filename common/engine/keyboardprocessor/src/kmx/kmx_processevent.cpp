@@ -1,6 +1,7 @@
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "state.hpp"
+#include "keyboard.hpp"
 
 std::string utf16_to_utf8(std::u16string utf16_string);
 
@@ -12,11 +13,16 @@ namespace km {
       return m_valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
     }
 
-    kmx_processor::kmx_processor(km_kbp_keyboard_attrs const & kb) : abstract_processor(kb) {
-      std::filesystem::path p = kb.folder_path;
-      p /= kb.id;
+    kmx_processor::kmx_processor(km_kbp_keyboard_attrs const * kb_) : abstract_processor(kb_) {
+      km::kbp::keyboard *kb = const_cast<km::kbp::keyboard *>(static_cast<km::kbp::keyboard const *>(kb_));
+
+      std::filesystem::path p = kb->folder_path;
+      p /= kb->id;
       p.replace_extension(".kmx");
       m_valid = (bool) kmx.Load(p.native().c_str());
+
+      //std::vector<km_kbp_option_item> * opts = ;
+      kmx.GetOptions()->Init(kb->default_opts());
     }
 
     char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
@@ -40,6 +46,11 @@ namespace km {
         }
       }
       return 0;
+    }
+
+    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key) {
+      if(scope == KM_KBP_OPT_KEYBOARD)
+        kmx.GetOptions()->Load(km_kbp_state_options(state), key);
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
@@ -72,7 +83,7 @@ namespace km {
 
       kmx.GetContext()->Set(ctxt.c_str());
       kmx.GetActions()->ResetQueue();
-      kmx.ProcessEvent(vk, modifier_state, ch);
+      kmx.ProcessEvent(state, vk, modifier_state, ch);
 
       state->actions.clear();
 

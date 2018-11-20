@@ -146,7 +146,7 @@ int main(int, char * [])
     {u"hello", u"globe", KM_KBP_OPT_ENVIRONMENT},
     KM_KBP_OPTIONS_END};
   try_status(
-    km_kbp_options_update(km_kbp_state_options(test_clone), new_opt));
+    km_kbp_options_update(test_clone, new_opt));
 
   // Test the engine
   auto attrs = km_kbp_get_engine_attrs(test_state);

@@ -36,3 +36,29 @@ cd build
 ninja
 meson test
 ```
+
+## Note on kmcomp
+kmcomp is the command-line compiler from Keyman Developer, available from https://keyman.com/ or
+in this repo in /windows/src/developer/kmcomp. The compiler is currently available as a Windows
+PE executable only, but it does run under WINE.
+
+### Windows
+The search path can be edited through System settings / Advanced system settings / 
+Environment Variables / User environment variables.
+
+If you have Keyman Developer installed, add %KeymanDeveloperPath% to your path. Otherwise, add 
+the path where you extracted the kmcomp archive.
+
+### Linux
+You need a wrapper `kmcomp` shell script:
+
+```
+#!/bin/bash
+wine `dirname "$0"`/kmcomp.exe "$@"
+```
+
+Place this in the same folder as you extracted kmcomp.exe, and `chmod +x kmcomp`. Add the folder
+to the path (e.g. `export PATH=/path/to/kmcomp:$PATH`, which you can add to `.bashrc`)
+
+### macOS
+TODO

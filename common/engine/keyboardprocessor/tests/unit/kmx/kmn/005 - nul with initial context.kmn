@@ -1,4 +1,4 @@
-c Description: Tests basic input with simple context rules (Unicode)
+c Description: Tests nul context with an initial context supplied
 c keys: [K_A][K_A]
 c expected: xdd
 c context: x
