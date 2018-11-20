@@ -69,7 +69,6 @@ typedef struct
     //KMSI * p_kmsi;
     GList * cmds;
 } KInputContext;
-#endif
 
 typedef struct
 {
@@ -77,10 +76,11 @@ typedef struct
     gchar * keyboard_filename;
     gchar * name;
 } KInputKeyboard;
+#endif
 
 typedef struct 
 {
-    int keyboard_number;
+    //int keyboard_number;
     gchar * keyboard_filename;
     gchar * keyboard_icon_filename;
     gchar * keyboard_id;
@@ -97,6 +97,9 @@ typedef struct
 	
 } KInputMethod;
 
+static GHashTable      *im_table;
+
+
 void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
@@ -104,8 +107,8 @@ KInputMethod    *kinput_open_im             (const gchar * keyboard_filename);
 //KInputContext   *keyman_create_ic           (KInputMethod *im);
 //void             keyman_destroy_ic          (KInputContext *ic);
 void             kinput_close_im            (KInputMethod * im);
-void             keyman_get_keyboard_info   (KInputMethod * im);
-int              keyman_load_keyboard       (const gchar *keyboard_filename);
-int              keyman_unload_keyboard     (int keyboard_number);
-int              keyman_check_keyboard      (gchar *absfn);
+//void             keyman_get_keyboard_info   (KInputMethod * im);
+//int              keyman_load_keyboard       (const gchar *keyboard_filename);
+//int              keyman_unload_keyboard     (int keyboard_number);
+//int              keyman_check_keyboard      (gchar *absfn);
 #endif

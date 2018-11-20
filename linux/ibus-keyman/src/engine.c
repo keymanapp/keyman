@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009 SIL International
+ * Copyright (C) 2009-2018 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,7 @@
 #include <ibus.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -102,8 +103,6 @@ static void ibus_keyman_engine_commit_string
                                              const gchar            *string);
 
 static IBusEngineClass *parent_class = NULL;
-static GHashTable      *im_table = NULL;
-
 
 GType
 ibus_keyman_engine_get_type (void)
@@ -192,7 +191,7 @@ ibus_keyman_engine_constructor (GType                   type,
     IBusKeymanEngine *keyman;
     IBusEngine *engine;
     IBusText *text;
-    KInputMethod *im;
+    //KInputMethod *im;
     const gchar *engine_name;
     gchar *surrounding_text;
     guint cursor_pos, anchor_pos;
@@ -209,6 +208,7 @@ ibus_keyman_engine_constructor (GType                   type,
     g_assert (engine_name);
     g_message("DAR: ibus_keyman_engine_constructor %s", engine_name);
 
+    #if 0
     if (im_table == NULL) {
         im_table = g_hash_table_new_full (g_str_hash,
                                           g_str_equal,
@@ -231,6 +231,7 @@ ibus_keyman_engine_constructor (GType                   type,
         g_object_unref (keyman);
         return NULL;
     }
+    #endif
 
     km_kbp_option_item options[1] = {KM_KBP_OPTIONS_END};
 
@@ -688,11 +689,12 @@ ibus_keyman_engine_reset (IBusEngine *engine)
     ibus_keyman_engine_focus_in (engine);
 }
 
+
+
 static void
 ibus_keyman_engine_enable (IBusEngine *engine)
 {
     const gchar *engine_name;
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
     KInputMethod *im;
 
     engine_name = ibus_engine_get_name (engine);
@@ -702,7 +704,6 @@ ibus_keyman_engine_enable (IBusEngine *engine)
     // own dbus name com.Keyman
     // expose properties LDMLFile and Name
     KeymanService *service = km_service_get_default();
-    //const gchar *ldmlfile = "";
     km_service_set_ldmlfile (service, im->keyboard_ldmlfile);
     km_service_set_name (service, im->keyboard_name);
     parent_class->enable (engine);

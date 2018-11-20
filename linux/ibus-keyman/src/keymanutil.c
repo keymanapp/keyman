@@ -59,10 +59,14 @@
 
 #include "keymanutil.h"
 
+#if 0
 //Globally loaded keyboards
 #define MAX_KEYBOARDS	64		// maximum number of keyboards that can be loaded
 KInputKeyboard *p_installed_kbd[MAX_KEYBOARDS]={NULL};
 unsigned int n_keyboards=0;
+#endif
+
+static GHashTable      *im_table = NULL;
 
 #define N_(text) text
 static gchar * get_dirname(const gchar * path)
@@ -97,7 +101,7 @@ GList * keyman_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
 
             // Only .kmx extensions are valid keyboard files
             else if (S_ISREG(filestat.st_mode)
-                && (g_str_has_suffix(absfn, ".kmx") && keyman_check_keyboard(absfn) == 0))
+                && (g_str_has_suffix(absfn, ".kmx")/* && keyman_check_keyboard(absfn) == 0*/))
             {
                 keyboard_list=g_list_append(keyboard_list, absfn);
             }
@@ -221,7 +225,7 @@ void keyman_get_keyboard_info(KInputMethod * im)
 {
 	// either get these from json?
 	// or the keyboardprocessor API from the kmx?
-    im->keyboard_name = g_strdup_printf("dummy%d", im->keyboard_number);
+    im->keyboard_name = g_strdup_printf("dummy");
     im->keyboard_author = g_strdup("Keyman");
     im->keyboard_copyright = g_strdup("2018 SIL International");
     im->keyboard_language=g_strdup("en");
@@ -316,11 +320,11 @@ ibus_keyman_engine_new (gchar * file_name,
 	// anything else to add to the engine description that we can get from
 	// either json or keyboardprocessor API?
 	// esp languages
-    IBusEngineDesc *engine;
+    IBusEngineDesc *engine_desc;
     gchar * desc = g_strdup_printf("%s\n%s", description, copyright);
     
-    engine = ibus_engine_desc_new (file_name, // any proposal for 
-                                   name,
+    engine_desc = ibus_engine_desc_new (file_name, // any other proposal for the "engine name" 
+                                   name, // longname
                                    desc ? desc : "",
                                    lang,
                                    license ? license : "",
@@ -328,7 +332,7 @@ ibus_keyman_engine_new (gchar * file_name,
                                    icon ? icon : "",
                                    layout);
 
-    return engine;
+    return engine_desc;
 }
 
 GList * 
@@ -337,17 +341,12 @@ ibus_keyman_add_engines(GList * engines, GList * keyboard_list)
     GList *p;
     for (p=keyboard_list; p != NULL; p = p->next) {
         gchar * keyboard_filename = (gchar *) p->data;
-        KInputMethod im;
-        
-        im.keyboard_number = keyman_load_keyboard(keyboard_filename);
-        if (im.keyboard_number >=0) {
-            im.keyboard_filename = g_strdup(keyboard_filename);
+        // TODO: get the other info from the filename from kmpdetails
+        KInputMethod im;        
+        im.keyboard_filename = g_strdup(keyboard_filename);
+        keyman_get_keyboard_info(&im);
+        engines = g_list_append (engines, ibus_keyman_engine_new (keyboard_filename, im.keyboard_language, im.keyboard_name, im.keyboard_author, im.keyboard_icon_filename, im.keyboard_copyright, im.keyboard_description, im.keyboard_layout, im.keyboard_license));
 
-            keyman_get_keyboard_info(&im);
-            engines = g_list_append (engines, ibus_keyman_engine_new (keyboard_filename, im.keyboard_language, im.keyboard_name, im.keyboard_author, im.keyboard_icon_filename, im.keyboard_copyright, im.keyboard_description, im.keyboard_layout, im.keyboard_license));
-            g_free(p->data);
-            keyman_free_keyboard_info(&im);
-        }
     }
     return engines;
 }
@@ -358,6 +357,13 @@ ibus_keyman_list_engines (void)
     GList *engines = NULL;
     GList *keyboard_list;
     gchar *local_keyboard_path;
+
+    if (im_table == NULL) {
+        im_table = g_hash_table_new_full (g_str_hash,
+                                          g_str_equal,
+                                          g_free,
+                                          (GDestroyNotify) keyman_free_keyboard_info);
+    }
 
     keyboard_list = keyman_get_keyboard_list("/usr/share/keyman");
     engines = ibus_keyman_add_engines(engines, keyboard_list);
@@ -386,7 +392,7 @@ ibus_keyman_get_component (void)
                                     N_("Keyman"),
                                     "10.99.0",
                                     "GPL",
-                                    "Doug Rintoul <doug_rintoul@sil.org",
+                                    "Daniel Glassey <wdg@debian.org>",
                                     "http://www.keyman.com",
                                     "",
                                     "ibus-keyman");
@@ -400,7 +406,7 @@ ibus_keyman_get_component (void)
     g_list_free (engines);
     return component;
 }
-
+#if 0
 KInputMethod * kinput_open_im(const gchar * keyboard_filename)
 {
     KInputMethod * im = g_new(KInputMethod, 1);
@@ -417,7 +423,8 @@ KInputMethod * kinput_open_im(const gchar * keyboard_filename)
     }
     return im;
 }
-
+#endif
+#if 0
 void kinput_close_im(KInputMethod * im)
 {
     g_assert(im != NULL);
@@ -425,7 +432,7 @@ void kinput_close_im(KInputMethod * im)
     keyman_unload_keyboard(im->keyboard_number);
     g_free(im);
 }
-
+#endif
 // reimplement
 #if 0
 void output_string(void *contrack, char *ptr) {
@@ -516,13 +523,11 @@ keyman_destroy_ic(KInputContext *ic)
         ic->cmds=NULL;
     }
 }
-#endif
 
 KInputKeyboard * keyman_load_keyboard_from_file(const gchar *filename)
 {
 	KInputKeyboard *p_kbd = g_new(KInputKeyboard, 1);
 	g_message("DAR: keyman_load_keyboard_from_file %s\n",filename);
-#if 0
 	FILE *fp;
 	char version_string[6]={0};
 	unsigned int filelen, kbver=0;
@@ -567,7 +572,6 @@ KInputKeyboard * keyman_load_keyboard_from_file(const gchar *filename)
     }
 
     DBGMSG(1,"DAR: kmfl_load_keyboard_from_file - %s loaded\n",filename);
-#endif
 
     return p_kbd;
 }
@@ -645,6 +649,7 @@ int keyman_check_keyboard(gchar *absfn)
 {
     return 0;
 }
+#endif
 
 
 #ifdef DEBUG
