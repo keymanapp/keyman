@@ -17,22 +17,6 @@ describe('LMLayerWorker', function() {
       }));
       assert(fakePostMessage.calledOnce);
     });
-
-    // TODO: remove from here; convert into integration test
-    it.skip('should work with zero arguments within a Web Worker', function() {
-      var fakePostMessage;
-      var WorkerInSandbox = defineLMLayerWorkerWithinSandbox({
-        postMessage: fakePostMessage = sinon.fake(),
-      });
-      let worker = new WorkerInSandbox();
-
-      // Now try it out.
-      worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
-        model: dummyModelCode()
-      }));
-      assert(fakePostMessage.calledOnce);
-    });
   });
 
   describe('#onMessage()', function() {
@@ -179,27 +163,6 @@ describe('LMLayerWorker', function() {
 
   function dummyModelCode() {
     return 'return {model: {}, configuration: {}}';
-  }
-
-  /**
-   * Evaluate the source code of the LMLayerWorker within a
-   * sandbox, with our own mocked self. Create a new
-   * "sandboxed" LMLayer. It's only "sandboxed", in that it
-   * believes it's in a WebWorker.
-   * 
-   * @param self `self` used in the fake Worker. You should add
-   * at least `postMessage()` to this object.
-   */
-  function defineLMLayerWorkerWithinSandbox(self) {
-    var fs = require('fs');
-    var sourceCode = fs.readFileSync(require.resolve('../../worker'));
-    var sandbox = `(function (self) {
-      var exports = {}; // TypeScript CommonJS code generation will attempt to write to this.
-      var postMessage = self.postMessage;
-      ${sourceCode}
-      return LMLayerWorker;
-    })`;
-    return eval(sandbox)(self);
   }
 
   /**
