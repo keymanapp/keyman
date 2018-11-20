@@ -40,20 +40,24 @@ kmns = [
 kmn_tests = []
 kmn_sources = []
 
-prog_kmcomp = find_program('kmcomp')
+prog_kmcomp = find_program('kmcomp', required: false)
 
-foreach kmn : kmns 
-  kmn_tests += configure_file(
-    output: kmn + '.kmx',
-    input: 'kmn/' + kmn + '.kmn',
-    command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
-  )
+if prog_kmcomp.found()
+
+  foreach kmn : kmns
+    kmn_tests += configure_file(
+      output: kmn + '.kmx',
+      input: 'kmn/' + kmn + '.kmn',
+      command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
+    )
   
-  kmn_sources += configure_file(
-    input: 'kmn/' + kmn + '.kmn',
-    output: kmn + '.kmn',
-    configuration: configuration_data()
-  )
-endforeach
+    kmn_sources += configure_file(
+      input: 'kmn/' + kmn + '.kmn',
+      output: kmn + '.kmn',
+      configuration: configuration_data()
+    )
+  endforeach
 
-test('kmx', kmx, args: [kmns])
+  test('kmx', kmx, args: [kmns])
+
+endif
