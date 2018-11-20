@@ -197,8 +197,20 @@ class LMLayerWorker {
   }
 
   /**
-   * Creates a new instance of the LMLayerWorker, and installs
-   * all its functions within the provided Worker scope.
+   * Creates a new instance of the LMLayerWorker, and installs all its
+   * functions within the provided Worker global scope.
+   *
+   * In production, this is called within the Worker's scope as:
+   *
+   *    LMLayerWorker.install(self);
+   *
+   * ...and this will setup onmessage and postMessage() appropriately.
+   *
+   * During testing, this method is useful to mock an entire global scope,
+   *
+   *    var fakeScope = { postMessage: ... };
+   *    LMLayerWorker.install(fakeScope);
+   *    // now we can spy on methods in fakeScope!
    *
    * @param scope A global scope to install upon.
    */
