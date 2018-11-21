@@ -24,6 +24,13 @@ public final class FileUtils {
   public static final int DOWNLOAD_ERROR = -1;
   public static final int DOWNLOAD_SUCCESS = 1;
 
+  // File extensions and file types
+  public static final String JAVASCRIPT = ".js";
+  public static final String TRUETYPEFONT = ".ttf";
+  public static final String OPENTYPEFONT = ".otf";
+  public static final String KEYBOARDPACKAGE = ".kmp";
+  public static final String WELCOME_HTM = "welcome.htm";
+
   /**
    * Utility to download a file from urlStr and store it at destinationDir/destinationFilename.
    * If the destination directory does not exist, it will be created.
@@ -63,7 +70,7 @@ public final class FileUtils {
 
         if (destinationFilename == null || destinationFilename.isEmpty()) {
           filename = getFilename(Connection.getFile());
-          if (filename.lastIndexOf(".js") > 0 && !filename.contains("-")) {
+          if (hasJavaScriptExtension(filename) && !filename.contains("-")) {
             filename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
           }
         } else {
@@ -202,4 +209,25 @@ public final class FileUtils {
     }
     return filename;
   }
+
+  public static boolean hasFontExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(TRUETYPEFONT) || f.endsWith(OPENTYPEFONT);
+  }
+
+  public static boolean hasJavaScriptExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(JAVASCRIPT);
+  }
+
+  public static boolean hasKeyboardPackageExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(KEYBOARDPACKAGE);
+  }
+
+  public static boolean isWelcomeFile(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(WELCOME_HTM);
+  }
+
 }

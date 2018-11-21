@@ -324,7 +324,7 @@ public class PackageProcessor {
       FileFilter touchKeyboardFilter = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && pathname.getName().endsWith(".js")) {
+          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && FileUtils.hasJavaScriptExtension(pathname.getName())) {
             return true;
           }
           return false;
@@ -347,7 +347,7 @@ public class PackageProcessor {
       FileFilter welcomeFilter = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-          if (pathname.isFile() && pathname.getName().equals("welcome.htm")) {
+          if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
             return true;
           }
           return false;
