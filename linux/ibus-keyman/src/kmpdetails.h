@@ -3,23 +3,57 @@
 // structs like this
 
 #include <glib.h>
-struct kmp_system
+typedef struct
 {
     gchar *fileVersion;
     gchar *keymanDeveloperVersion;
-};
+} kmp_system;
 
-struct kmp_options
+typedef struct
+{
+    gchar *version;
+    gchar *name;
+    gchar *copyright;
+    gchar *author_desc;
+    gchar *author_url;
+    gchar *website_desc;
+    gchar *website_url;
+
+} kmp_info;
+
+
+typedef struct
 {
     gchar *readmeFile;
     gchar *graphicFile;
-};
+} kmp_options;
 
-struct kmp_details
+typedef struct
 {
-    struct kmp_system system;
-    struct kmp_options options;
-};
+    gchar *name;
+    gchar *id;
+    gchar *version;
+} kmp_keyboard;
+
+typedef struct
+{
+    gchar *name;
+    gchar *description;
+} kmp_fileinfo;
+
+
+typedef struct
+{
+    kmp_system system;
+    kmp_info info;
+    kmp_options options;
+    GList *keyboards;
+    GList *files;
+} kmp_details;
+
+void get_kmp_details(const char *kmp_json, kmp_details *details);
+void free_kmp_details(kmp_details * details);
+void print_kmp_details(kmp_details * details);
 
 // or a GObject
 // https://developer.gnome.org/gobject/stable/chapter-gobject.html

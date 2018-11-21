@@ -33,19 +33,25 @@ AM_LDFLAGS = \
 	$(NULL)
 
 check_PROGRAMS = \
-	test-keyman \
+	print_kmpdetails \
+	print_kmp \
 	$(NULL)
 
 TESTS = \
-	$(check_PROGRAMS) \
+	test/print_kmpdetails.test \
+	test/print_kmp.test \
 	$(NULL)
 
+print_kmp_SOURCES = \
+	print_kmp.c
 
-test_keyman_SOURCES = \
-	keymanutil.c \
+print_kmpdetails_SOURCES = \
+	kmpdetails.c \
+	print_kmpdetails.c \
 	$(NULL)
-test_keyman_CFLAGS = \
+print_kmpdetails_CFLAGS = \
 	$(AM_CFLAGS) \
+	@JSON_GLIB_CFLAGS@ \
 	-DDEBUG \
 	$(NULL)
 
@@ -84,6 +90,8 @@ componentdir = @datadir@/ibus/component
 
 EXTRA_DIST = \
 	keyman.xml.in \
+	test/print_kmpdetails.test \
+	test/print_kmp.test \
 	$(NULL)
 
 CLEANFILES = \
