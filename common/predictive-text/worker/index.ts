@@ -20,9 +20,92 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
- type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
- type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
- type OutgoingMessage = 'ready' | 'suggestions';
+type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+type OutgoingMessageKind = 'ready' | 'suggestions';
+
+interface InitializeMessage {
+  /**
+   * Source code of the model.
+   * TODO: write a description of what this source code should look like.
+   */
+  model: string;
+  /**
+   * The configuration that the keyboard can offer to the model.
+   */
+  configuration: RequestedConfiguration;
+}
+
+interface InitializeMessage {
+  /**
+   * Source code of the model.
+   * TODO: write a description of what this source code should look like.
+   */
+  model: string;
+  /**
+   * The configuration that the keyboard can offer to the model.
+   */
+  configuration: RequestedConfiguration;
+}
+
+interface ReadyMessage {
+  configuration: ModelConfiguration;
+}
+
+interface PredictMessage {
+  // TODO:
+  // token: Token;
+  // context: Context;
+  // transform: Transform;
+}
+
+interface RequestedConfiguration {
+  /**
+   * Whether the platform supports deleting to the right.
+   * The absence of this rule implies false.
+   */
+  supportsDeleteRight?: boolean;
+
+  /**
+   * The maximum amount of UTF-16 code units that the keyboard will
+   * provide to the left of the cursor.
+   */
+  maxLeftContextCodeUnits: number;
+
+  /**
+   * The maximum amount of code units that the keyboard will provide to
+   * the right of the cursor. The absence of this setting
+   * implies that right contexts are unsupported and will
+   * never be supplied.
+   */
+  maxRightContextCodeUnits?: number;
+}
+
+interface ModelConfiguration {
+  /**
+   * How many UTF-16 code units maximum to send as the context to the
+   * left of the cursor ("left" in the Unicode character stream).
+   *
+   * Affects the `context` property sent in `predict` messages.
+   *
+   * While the left context MUST NOT bisect surrogate pairs, they MAY
+   * bisect graphical clusters.
+   */
+  leftContextCodeUnits: number;
+
+  /**
+   * How many UTF-16 code units maximum to send as the context to the
+   * right of the cursor ("right" in the Unicode character stream).
+   *
+   * Affects the `context` property sent in `predict` messages.
+   *
+   * While the left context MUST NOT bisect surrogate pairs, they MAY
+   * bisect graphical clusters.
+   */
+  rightContextCodeUnits: number;
+};
+
+// TODO:
+interface Model {};
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -33,47 +116,50 @@ class LMLayerWorker {
    * so that this can be tested **outside of a Worker**.
    */
   private _postMessage: PostMessage;
-  private _importScripts: ImportScripts;
 
   constructor(options = {
     postMessage: null,
-    importScripts: null
   }) {
     this._postMessage = options.postMessage || postMessage;
-    this._importScripts = options.importScripts || importScripts;
   }
 
   /**
    * A function that can be set as self.onmessage (the Worker
    * message handler).
    * NOTE! You must bind it to a specific instance, e.g.:
-   * 
+   *
    *   // Do this!
    *   self.onmessage = worker.onMessage.bind(worker);
-   * 
+   *
    * Incorrect:
-   * 
+   *
    *   // Don't do this!
    *   self.onmessage = worker.onMessage;
-   * 
+   *
    * See: .install();
    */
   onMessage(event: MessageEvent) {
     const {message} = event.data;
+    // We must have gotten a message!
     if (!message) {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
     }
 
-    // Load the model.
-    let model = this._importScripts(event.data.model);
+    // ...that message must have been 'initialize'!
+    if (message !== 'initialize') {
+      throw new Error(`invalid message; expected 'initialize' but got ${message}`);
+    }
 
-    this.cast('ready', {
-      configuration: {
-        // Send a reasonable, but non-configurable amount for now.
-        leftContextCodeUnits: 64,
-        rightContextCodeUnits: 0,
-      }
-    });
+    let payload: InitializeMessage = event.data;
+
+    let {model, configuration} = this.loadModel(
+      // TODO: validate configuration, and provide valid configuration in tests.
+      // @ts-ignore
+      payload.model, payload.configuration || {}
+    );
+
+    // TODO: validate configuration?
+    this.cast('ready', { configuration });
   }
 
   /**
@@ -81,8 +167,33 @@ class LMLayerWorker {
    * @param message A message type.
    * @param payload The message's payload. Can have any properties, except 'message'.
    */
-  private cast(message: OutgoingMessage, payload: object) {
-    this._postMessage({ message, ...payload });
+  private cast(message: OutgoingMessageKind, payload: Object) {
+    // Chrome raises "TypeError: invalid invocation" if postMessage is called
+    // with any non-default value for `this`, i.e., this won't work:
+    //
+    //  this._postMessage({ foo: 'bar' });
+    //
+    // Yank it postMessage() off of `this` so that it's called on the
+    // "global" context, and everything works again.
+    let postMessage = this._postMessage;
+    postMessage({ message, ...payload });
+  }
+
+  /**
+   * Loads a model by executing the given source code, and
+   * passing in the appropriate configuration.
+   *
+   * @param modelCode Source code for a function that takes
+   *                  configuration, and returns { model, configuration }
+   * @param requestedConfiguration Configuration requested from
+   *                               the keyboard.
+   */
+  private loadModel(modelCode: string, requestedConfiguration: RequestedConfiguration) {
+    let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
+    configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
+    configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
+
+    return {model, configuration};
   }
 
   /**
@@ -104,10 +215,7 @@ class LMLayerWorker {
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
-    let worker = new LMLayerWorker({ 
-      postMessage: scope.postMessage,
-      importScripts: scope.importScripts
-    });
+    let worker = new LMLayerWorker({ postMessage: scope.postMessage });
     scope.onmessage = worker.onMessage.bind(worker);
 
     return worker;
@@ -117,6 +225,9 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+} else if (typeof self !== 'undefined' && 'postMessage' in self) {
+  // Automatically install if we're in a Web Worker.
+  LMLayerWorker.install(self as DedicatedWorkerGlobalScope);
 } else {
   //@ts-ignore
   window.LMLayerWorker = LMLayerWorker;

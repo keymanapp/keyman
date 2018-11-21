@@ -64,7 +64,9 @@ typings/
 .next
 
 # TypeScript generated files.
-index.js
-test.js
-lmlayer.js
 *.js.map
+**/*.js
+
+# Intentional JavaScript files.
+!testing/**/*.js
+!unit_tests/**/*.js
