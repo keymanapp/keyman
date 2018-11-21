@@ -846,7 +846,7 @@ public final class KMManager {
         int index = filename.indexOf(base);
         if (index == 0) {
           int firstIndex = base.length();
-          int lastIndex = filename.lastIndexOf(".js");
+          int lastIndex = filename.toLowerCase().lastIndexOf(".js");
           String v = filename.substring(firstIndex, lastIndex);
           if (kbFileVersion != null) {
             if (compareVersions(v, kbFileVersion) > 0) {

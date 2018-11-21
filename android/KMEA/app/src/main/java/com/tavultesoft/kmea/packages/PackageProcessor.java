@@ -49,12 +49,12 @@ public class PackageProcessor {
 
     if(filename.lastIndexOf('.') != -1) {
       // Android's temp downloads attach a suffix to the extension; .kmp isn't the end of the filename.
-      if(filename.lastIndexOf(".kmp") == -1) {
+      if(!filename.toLowerCase().contains(".kmp")) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
       // Extract our best-guess name for the package and construct the temporary package name.
-      return filename.substring(0, filename.lastIndexOf(".kmp"));
+      return filename.substring(0, filename.toLowerCase().lastIndexOf(".kmp"));
     } else {
       throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
     }

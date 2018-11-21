@@ -13,7 +13,8 @@
 * Add feature to vibrate device when Keyman Web calls `beep` (#1227)
 * Add support for extra key found on European hardware keyboards (#1291)
 * Add feature for keyboard picker to switch to next keyboard (#1283)
-* Fixes issue where file extensions are upper-case, e.g. ".TTF"
+* Update to Cloud API 4.0 for downloading keyboards (#1320)
+* Fixes issue where file extensions are upper-case, e.g. ".TTF" (#1333)
 
 ## 2018-11-14 10.0.508 stable
 * Fix crash that can occur when text selection ends before the starting position (#1313)
