@@ -32,22 +32,54 @@ class KeymanWebViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  func initConstraints() {
+    if let pv = self.parent?.view! {
+      // Attempting to utilize constraints now...
+      if #available(iOSApplicationExtension 11.0, *) {
+        // "safeAreaLayoutGuide" considers the iPhone X notch.
+        let constraintWidth = webView.widthAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.widthAnchor)
+        constraintWidth.priority = .init(999) // One beneath the 'required' level.
+        constraintWidth.isActive = true
+        
+        webView.centerXAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.centerXAnchor).isActive = true
+        webView.bottomAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.bottomAnchor).isActive = true
+
+        let constraintHeight = webView.heightAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.heightAnchor)
+        constraintHeight.priority = .init(999)
+        constraintHeight.isActive = true
+      } else if #available(iOSApplicationExtension 9.0, *) {
+        webView.leadingAnchor.constraint(equalTo: webView.layoutMarginsGuide.leadingAnchor).isActive = true
+        webView.trailingAnchor.constraint(equalTo: webView.layoutMarginsGuide.trailingAnchor).isActive = true
+        webView.topAnchor.constraint(equalTo: webView.layoutMarginsGuide.topAnchor).isActive = true
+        webView.bottomAnchor.constraint(equalTo: webView.layoutMarginsGuide.bottomAnchor).isActive = true
+      } else {
+        // Fallback on earlier versions
+      }
+    }
+  }
+  
+  func manageRotation() {
+    view.setNeedsLayout()
+    view.layoutIfNeeded()
+    
+    let kbWidth = view.bounds.size.width
+    let kbHeight = view.bounds.size.height
+    
+    setOskWidth(Int(kbWidth))
+    setOskHeight(Int(kbHeight))
+  }
+  
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
     Manager.shared.viewWillTransition(to: size, with: coordinator)
     
     coordinator.animateAlongsideTransition(in: nil, animation: {
       _ in
-      // What happens if we check this stuff at the rotation's end?
-      if let v = self.parent?.view! {
-        Manager.shared.resizeKeyboard(with: v.frame.size)
-      }
+        self.manageRotation()
     }, completion: {
       _ in
-      if let v = self.parent?.view! {
-        Manager.shared.resizeKeyboard(with: v.frame.size)
+        self.manageRotation()
         self.updateViewConstraints()
-      }
     })
   }
 
@@ -64,21 +96,27 @@ class KeymanWebViewController: UIViewController {
 
     webView = WKWebView(frame: frame ?? .zero, configuration: config)
     webView.isOpaque = false
-    //webView.autoresizingMask = UIViewAutoresizing.flexibleWidth
-    webView.autoresizingMask = UIViewAutoresizing.flexibleHeight.union(.flexibleWidth)
     webView.translatesAutoresizingMaskIntoConstraints = false
     webView.backgroundColor = UIColor.clear
     webView.navigationDelegate = self
     webView.scrollView.isScrollEnabled = false
-
+    
     view = webView
   }
 
   override func viewWillAppear(_ animated: Bool) {
-    if let frame = frame {
-      view.frame = frame
-    }
+//    if let frame = frame {
+//      view.frame = frame
+//    }
     super.viewWillAppear(animated)
+  }
+  
+  // Very useful for immediately adjusting the WebView's properties upon loading.
+  override func viewDidAppear(_ animated: Bool) {
+    //view.frame = self.parent?.view?.frame ?? view.frame
+    initConstraints()
+    self.updateViewConstraints()
+    Manager.shared.refreshKeyboard()
   }
 }
 

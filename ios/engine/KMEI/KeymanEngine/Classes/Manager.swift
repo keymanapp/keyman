@@ -195,10 +195,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
-    
-    // The system isn't actually able to get the proper keyboard size data yet,
-    // so we need to clear the initialization done by this method.
-    kbSize = CGSize.zero
   }
 
   // MARK: - Keyboard management
@@ -914,7 +910,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   var keyboardWidth: CGFloat {
-    return UIScreen.main.bounds.width
+    return kbSize.width
   }
   
   func initKeyboardSize() {
@@ -1041,6 +1037,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     } else {
       _ = setKeyboard(Defaults.keyboard)
     }
+//
+//    refreshKeyboard()
   }
 
   @objc func showHelpBubble() {
@@ -1102,13 +1100,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // should hopefully work on all devices.
     let kbWidth = keyboardWidth
     let kbHeight = keyboardHeight
-    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
+    //keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)//
   }
 
   func resizeKeyboardIfNeeded() {
     // TODO: Eliminate this function; performance cost of resizing is
     //       probably minimal if no resizing actually happens
     resizeKeyboard()
+  }
+
+  func refreshKeyboard() {
+    kbSize = CGSize.zero
+    resizeKeyboard(with: keyboardSize)
   }
 
   // Keyman interaction
@@ -1123,7 +1126,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     let kbWidth = size.width
     let kbHeight = size.height
     
-    keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+    //keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+    //keymanWeb.frame?.size = size
     keymanWeb.setOskWidth(Int(kbWidth))
     keymanWeb.setOskHeight(Int(kbHeight))
   }
@@ -1172,7 +1176,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
-    resizeKeyboard()
+    
     keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Defaults.keyboard
@@ -1186,7 +1190,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         newKb = userKbs[0]
       }
       _ = setKeyboard(newKb)
+      //refreshKeyboard()
     }
+    
+    refreshKeyboard()
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
     if shouldReloadKeyboard {
@@ -1277,6 +1284,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   
   public func showKeyboard() {
     keymanWebDelegate?.resumeKeyboard()
+    refreshKeyboard()
   }
   
   public func hideKeyboard() {

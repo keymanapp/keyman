@@ -137,8 +137,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     containerView!.addSubview(kmInputView)
     view.addSubview(containerView!)
     
-    Manager.shared.initKeyboardSize()
-    Manager.shared.resizeKeyboard()
+    //Manager.shared.initKeyboardSize()
+    //Manager.shared.resizeKeyboard()
   }
 
   open override func viewDidAppear(_ animated: Bool) {
