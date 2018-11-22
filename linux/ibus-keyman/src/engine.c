@@ -45,6 +45,8 @@ struct _IBusKeymanEngine {
     /* members */
     km_kbp_keyboard *keyboard;
     km_kbp_state    *state;
+    gchar           *ldmlfile;
+    gchar           *kb_name;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -191,7 +193,6 @@ ibus_keyman_engine_constructor (GType                   type,
     IBusKeymanEngine *keyman;
     IBusEngine *engine;
     IBusText *text;
-    //KInputMethod *im;
     const gchar *engine_name;
     gchar *surrounding_text;
     guint cursor_pos, anchor_pos;
@@ -308,7 +309,7 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
         keyman->display = NULL;
     }
 
-    g_hash_table_remove(im_table, engine_name);
+    //g_hash_table_remove(im_table, engine_name);
      
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
@@ -695,17 +696,16 @@ static void
 ibus_keyman_engine_enable (IBusEngine *engine)
 {
     const gchar *engine_name;
-    KInputMethod *im;
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
     g_message("WDG: ibus_keyman_engine_enable %s", engine_name);
-    im = (KInputMethod *) g_hash_table_lookup (im_table, engine_name);
     // own dbus name com.Keyman
     // expose properties LDMLFile and Name
     KeymanService *service = km_service_get_default();
-    km_service_set_ldmlfile (service, im->keyboard_ldmlfile);
-    km_service_set_name (service, im->keyboard_name);
+    km_service_set_ldmlfile (service, keyman->ldmlfile);
+    km_service_set_name (service, keyman->kb_name);
     parent_class->enable (engine);
 }
 

@@ -58,6 +58,7 @@
 
 
 #include "keymanutil.h"
+#include "kmpdetails.h"
 
 #if 0
 //Globally loaded keyboards
@@ -80,7 +81,9 @@ static gchar * get_dirname(const gchar * path)
     }
 }
 
-GList * keyman_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
+// change to keyman_get_kmpdirs_fromdir
+// returns list of directories with kmp.json
+GList * keyman_get_kmpdirs_fromdir( GList *keyboard_list, const gchar * path)
 {
 //    g_message("KMFL: getting from dir: %s", path);
     DIR *dir = opendir(path);
@@ -94,21 +97,16 @@ GList * keyman_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
 
             if (S_ISDIR(filestat.st_mode))
             {
-                if(strcmp(file->d_name, ".") != 0 && strcmp(file->d_name, "..") != 0)
-                    keyboard_list = keyman_get_keyboard_fromdir(keyboard_list, absfn);
-                g_free(absfn);
+                if(g_strcmp0(file->d_name, ".") != 0 && g_strcmp0(file->d_name, "..") != 0)
+                    keyboard_list = keyman_get_kmpdirs_fromdir(keyboard_list, absfn);
             }
-
-            // Only .kmx extensions are valid keyboard files
-            else if (S_ISREG(filestat.st_mode)
-                && (g_str_has_suffix(absfn, ".kmx")/* && keyman_check_keyboard(absfn) == 0*/))
+            // Looking for kmp.json
+            else if (S_ISREG(filestat.st_mode) && g_strcmp0(file->d_name, "kmp.json") == 0)
             {
-                keyboard_list=g_list_append(keyboard_list, absfn);
+                g_message("adding kmp path %s", path);
+                keyboard_list=g_list_append(keyboard_list, g_strdup(path));
             }
-            else
-            {
-                g_free(absfn);
-            }
+            g_free(absfn);
 
             file = readdir(dir);
         }
@@ -116,22 +114,22 @@ GList * keyman_get_keyboard_fromdir( GList *keyboard_list, const gchar * path)
     }
     return keyboard_list;
 }
-
+#if 0
 GList * keyman_get_keyboard_list( const gchar * path)
 {
     GList * keyboard_list=NULL;
     keyboard_list = keyman_get_keyboard_fromdir(keyboard_list, path);
     return keyboard_list;
 }
-
-gchar * keyman_get_icon_file(KInputMethod * im)
+#endif
+gchar * keyman_get_icon_file(const gchar *kmx_file)
 {
     // Now there will only be the .png which will have been extracted from the .kmx during installation
     struct stat filestat;
     gchar *filename, *full_path_to_icon_file, *p;
 
-    p=rindex(im->keyboard_filename,'.');
-    filename = g_strndup(im->keyboard_filename, p-(im->keyboard_filename));
+    p=rindex(kmx_file,'.');
+    filename = g_strndup(kmx_file, p-kmx_file);
     full_path_to_icon_file=g_strdup_printf("%s.ico.png", filename);
     g_free(filename);
     stat(full_path_to_icon_file, &filestat);
@@ -144,6 +142,7 @@ gchar * keyman_get_icon_file(KInputMethod * im)
     return full_path_to_icon_file;
 }
 
+#if 0
 gchar * keyman_get_kvk_file(KInputMethod * im)
 {
     gchar *p, *filename, *full_path_to_kvk_file;
@@ -220,22 +219,28 @@ gchar * keyman_get_ldml_file(KInputMethod * im)
     }
     return full_path_to_ldml_file;
 }
+#endif
 
+#if 0
 void keyman_get_keyboard_info(KInputMethod * im) 
 {
+    kmp_details details;
+    g_assert(im != NULL);
+    get_kmp_details(im->keyboard_kmp_json, &details);
 	// either get these from json?
 	// or the keyboardprocessor API from the kmx?
-    im->keyboard_name = g_strdup_printf("dummy");
-    im->keyboard_author = g_strdup("Keyman");
-    im->keyboard_copyright = g_strdup("2018 SIL International");
-    im->keyboard_language=g_strdup("en");
-    im->keyboard_description=g_strdup("Dummy keyboard to test API");
-    im->keyboard_license = g_strdup("MIT");
+    im->keyboard_name = g_strdup(details.info.name); // should be details.keyboards name
+    im->keyboard_author = g_strdup(details.info.author_desc);
+    im->keyboard_copyright = g_strdup(details.info.copyright);
+    im->keyboard_language=g_strdup("en"); // ???
+    im->keyboard_description=g_strdup("Dummy keyboard to test API"); // ???
+    im->keyboard_license = g_strdup("MIT"); // ???
     im->keyboard_visualkeyboard=keyman_get_kvk_file(im);
-    im->keyboard_keyboardversion=g_strdup("1.0");
-    im->keyboard_layout=g_strdup("us");
+    im->keyboard_keyboardversion=g_strdup(details.info.version); // should be details.keyboards version
+    im->keyboard_layout=g_strdup("us"); // ???
     im->keyboard_icon_filename = keyman_get_icon_file(im);
     im->keyboard_ldmlfile=keyman_get_ldml_file(im);
+    free_kmp_details(&details);
 
     #if 0
     char buf[1024];
@@ -304,28 +309,36 @@ void keyman_free_keyboard_info(KInputMethod * im)
     g_free(im->keyboard_keyboardversion);
     g_free(im->keyboard_ldmlfile);
 }
-
+#endif
 
 static IBusEngineDesc *
 ibus_keyman_engine_new (gchar * file_name,
-                      gchar *lang,
                       gchar *name,
+                      gchar *description,
+                      gchar *copyright,
+                      gchar *lang,
+                      gchar *license,
                       gchar *author,
                       gchar *icon,
-                      gchar *copyright,
-                      gchar *description,
-                      gchar *layout,
-                      gchar *license)
+                      gchar *layout)
 {
 	// anything else to add to the engine description that we can get from
 	// either json or keyboardprocessor API?
 	// esp languages
     IBusEngineDesc *engine_desc;
-    gchar * desc = g_strdup_printf("%s\n%s", description, copyright);
-    
+    gchar * desc;
+
+    if (description == NULL) {
+        desc = g_strdup_printf("%s", copyright);
+    }
+    else {
+        desc = g_strdup_printf("%s\n%s", description, copyright);
+    }
+
+    // use varargs instead to put version in
     engine_desc = ibus_engine_desc_new (file_name, // any other proposal for the "engine name" 
                                    name, // longname
-                                   desc ? desc : "",
+                                   desc,
                                    lang,
                                    license ? license : "",
                                    author ? author : "",
@@ -336,17 +349,66 @@ ibus_keyman_engine_new (gchar * file_name,
 }
 
 GList * 
-ibus_keyman_add_engines(GList * engines, GList * keyboard_list)
+ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
 {
-    GList *p;
-    for (p=keyboard_list; p != NULL; p = p->next) {
-        gchar * keyboard_filename = (gchar *) p->data;
-        // TODO: get the other info from the filename from kmpdetails
-        KInputMethod im;        
-        im.keyboard_filename = g_strdup(keyboard_filename);
-        keyman_get_keyboard_info(&im);
-        engines = g_list_append (engines, ibus_keyman_engine_new (keyboard_filename, im.keyboard_language, im.keyboard_name, im.keyboard_author, im.keyboard_icon_filename, im.keyboard_copyright, im.keyboard_description, im.keyboard_layout, im.keyboard_license));
+    GList *p, *l;
 
+    for (p=kmpdir_list; p != NULL; p = p->next) {
+        gchar * kmp_dir = (gchar *) p->data;
+        // TODO: get the other info from the filename from kmpdetails
+        //KInputMethod im;
+        //im.keyboard_filename = g_strdup(keyboard_filename);
+        //keyman_get_keyboard_info(&im);
+
+        g_message("getting kmp details for %s", kmp_dir);
+        kmp_details *details = g_new0(kmp_details, 1);
+        get_kmp_details(kmp_dir, details);
+        g_message("got kmp details for %s", kmp_dir);
+
+        for (l=details->keyboards; l != NULL; l = l->next) {
+            gchar *lang=NULL;
+            kmp_keyboard *keyboard = (kmp_keyboard *) l->data;
+            g_message("got keyboard %s", keyboard->name);
+            g_message("got keyboard kmx %s", keyboard->kmx_file);
+            gchar *abs_kmx = g_strjoin("/", kmp_dir, keyboard->kmx_file, NULL);
+            g_message("getting language for %s", abs_kmx);
+
+            if (keyboard->languages != NULL)
+            {
+                // Only gets the first language because ibus can only handle one
+                kmp_language *language = (kmp_language *) keyboard->languages->data;
+                if (language->id != NULL) {
+                    gchar **tagparts = g_strsplit(language->id, "-", 2);
+                    lang = g_strdup(tagparts[0]);
+                    g_strfreev(tagparts);
+                }
+            }
+            gchar *json_file = g_strjoin(".", keyboard->id, "json", NULL);
+            keyboard_details *kbd_details = g_new0(keyboard_details, 1);
+            get_keyboard_details(kmp_dir, json_file, kbd_details);
+            g_free(json_file);
+
+            g_message("adding engine %s", abs_kmx);
+            engines = g_list_append (engines,
+                ibus_keyman_engine_new (abs_kmx, // kmx full path
+                        keyboard->name, // longname
+                        kbd_details->description, // description
+                        details->info.copyright, // copyright if available
+                        lang, // language, most are ignored by ibus except major languages
+                        kbd_details->license, // license
+                        details->info.author_desc, // author name only, not email
+                        keyman_get_icon_file(abs_kmx), // icon full path
+                        "en")); // layout defaulting to en (en-US)
+            g_message("added engine %s", abs_kmx);
+            free_keyboard_details(kbd_details);
+            g_free(kbd_details);
+            g_free(abs_kmx);
+            g_free(lang);
+        }
+        g_message("freeing details");
+        free_kmp_details(details);
+        g_free(details);
+        g_message("finished adding engines");
     }
     return engines;
 }
@@ -356,27 +418,32 @@ ibus_keyman_list_engines (void)
 {
     GList *engines = NULL;
     GList *keyboard_list;
-    gchar *local_keyboard_path;
+    gchar *local_keyboard_path, *xdgenv;
 
+/*
     if (im_table == NULL) {
         im_table = g_hash_table_new_full (g_str_hash,
                                           g_str_equal,
                                           g_free,
                                           (GDestroyNotify) keyman_free_keyboard_info);
     }
-
-    keyboard_list = keyman_get_keyboard_list("/usr/share/keyman");
-    engines = ibus_keyman_add_engines(engines, keyboard_list);
-    g_list_free(keyboard_list);
-
-    keyboard_list = keyman_get_keyboard_list("/usr/local/share/keyman");
-    engines = ibus_keyman_add_engines(engines, keyboard_list);
-    g_list_free(keyboard_list);
-
-    local_keyboard_path= g_strdup_printf("%s/keyman", getenv("XDG_DATA_HOME"));
-    keyboard_list = keyman_get_keyboard_list(local_keyboard_path);
-    engines = ibus_keyman_add_engines(engines, keyboard_list);
+*/
+    g_message("adding from /usr/share/keyman");
+    keyboard_list = keyman_get_kmpdirs_fromdir(NULL, "/usr/share/keyman");
+    g_message("adding from /usr/share/keyman");
+    keyboard_list = keyman_get_kmpdirs_fromdir(keyboard_list, "/usr/local/share/keyman");
+    xdgenv = getenv("XDG_DATA_HOME");
+    if (xdgenv != NULL){
+        local_keyboard_path= g_strdup_printf("%s/keyman", xdgenv);
+    }
+    else {
+        xdgenv = getenv("HOME");
+        local_keyboard_path= g_strdup_printf("%s/.local/share/keyman", xdgenv);
+    }
+    g_message("adding from %s", local_keyboard_path);
+    keyboard_list = keyman_get_kmpdirs_fromdir(keyboard_list, local_keyboard_path);
     g_free(local_keyboard_path);
+    engines = ibus_keyman_add_engines(engines, keyboard_list);
     g_list_free(keyboard_list);
 
     return engines;

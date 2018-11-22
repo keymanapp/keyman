@@ -18,7 +18,6 @@ typedef struct
     gchar *author_url;
     gchar *website_desc;
     gchar *website_url;
-
 } kmp_info;
 
 
@@ -33,7 +32,16 @@ typedef struct
     gchar *name;
     gchar *id;
     gchar *version;
+    gchar *kmx_file;
+    gchar *kvk_file;
+    GList *languages;
 } kmp_keyboard;
+
+typedef struct
+{
+    gchar *name;
+    gchar *id;
+} kmp_language;
 
 typedef struct
 {
@@ -41,6 +49,12 @@ typedef struct
     gchar *description;
 } kmp_fileinfo;
 
+typedef struct
+{
+    gchar *id;
+    gchar *description;
+    gchar *license;
+} keyboard_details;
 
 typedef struct
 {
@@ -51,9 +65,19 @@ typedef struct
     GList *files;
 } kmp_details;
 
-void get_kmp_details(const char *kmp_json, kmp_details *details);
-void free_kmp_details(kmp_details * details);
-void print_kmp_details(kmp_details * details);
+enum kmp_json_status_codes {
+    JSON_OK,
+    JSON_PARSE_ERROR,
+    JSON_FILE_NOT_EXISTS
+};
+
+typedef int kmp_json_status;
+
+kmp_json_status get_kmp_details(const gchar *kmp_dir, kmp_details *details);
+kmp_json_status free_kmp_details(kmp_details * details);
+kmp_json_status get_keyboard_details(const gchar *kmp_dir, const gchar *id, keyboard_details *details);
+kmp_json_status free_keyboard_details(keyboard_details * details);
+kmp_json_status print_kmp_details(kmp_details * details);
 
 // or a GObject
 // https://developer.gnome.org/gobject/stable/chapter-gobject.html
