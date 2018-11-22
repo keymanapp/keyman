@@ -8,7 +8,8 @@
     "karma": "karma",
     "mocha": "mocha",
     "test": "bash ./unit_tests/test.sh",
-    "tsc": "echo 'Run ./build.sh instead' && false"
+    "tsc": "echo 'Run ./build.sh instead' && false",
+    "unit-test": "mocha --recursive ./unit_tests/headless/*.js"
   },
   "repository": {
     "type": "git",

@@ -15,6 +15,7 @@ assert ( ) {
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
   rm -rf "./build"
+  # TODO: build?
   if [ $? -ne 0 ]; then
     fail "Failed to erase the prior build."
   fi
@@ -24,6 +25,7 @@ display_usage ( ) {
   echo "build.sh [-clean]"
   echo
   echo "  -clean              to erase pre-existing build products before a re-build"
+  # TODO documentation
 }
 
 # Prints a nice, common error message.
@@ -53,11 +55,13 @@ wrap_worker_code ( ) {
 
 run_tests=0
 fetch_deps=1
+unit_tests_only=0
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
+    # todo: help
     -clean)
       clean
       ;;
@@ -67,6 +71,7 @@ while [[ $# -gt 0 ]] ; do
     -tdd)
       run_tests=1
       fetch_deps=0
+      unit_tests_only=1
       ;;
   esac
   shift # past the processed argument
@@ -93,6 +98,9 @@ fi
 echo "Typescript compilation successful."
 
 if (( run_tests )); then
-  npm test ||
-    fail "Tests failed"
+  if (( unit_tests_only )); then
+    npm run unit-test || fail "Unit tests failed"
+  else
+    npm test || fail "Tests failed"
+  fi
 fi
