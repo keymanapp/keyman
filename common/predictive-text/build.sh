@@ -4,6 +4,8 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
+EMBEDDED_WORKER=embedded_worker.js
+
 # Fails the build if a specified file does not exist.
 assert ( ) {
   if ! [ -f "$1" ]; then
@@ -14,8 +16,7 @@ assert ( ) {
 
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
-  rm -rf "./build"
-  # TODO: build?
+  rm -f "${EMBEDDED_WORKER}"
   if [ $? -ne 0 ]; then
     fail "Failed to erase the prior build."
   fi
@@ -104,7 +105,7 @@ fi
 # Then wrap the worker; Then build the main file.
 # TODO: extract to "build" function.
 npm run build-worker &&\
-  (wrap_worker_code LMLayerWorkerCode ./worker/index.js > embedded_worker.js) &&\
+  (wrap_worker_code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}") &&\
   npm run build-main
 
 if [ $? -ne 0 ]; then
