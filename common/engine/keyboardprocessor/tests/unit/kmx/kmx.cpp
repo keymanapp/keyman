@@ -29,6 +29,8 @@ namespace
 
 const std::string base = "tests/unit/kmx/";
 
+bool g_beep_found = false;
+
 struct key_event {
   km_kbp_virtual_key vk;
   uint16_t modifier_state;
@@ -169,22 +171,39 @@ key_event next_key(std::string &keys) {
   }
 }
 
-void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
+void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, std::u16string & text_store) {
   switch (act.type)
   {
   case KM_KBP_IT_END:
     assert(false);
     break;
   case KM_KBP_IT_ALERT:
+    g_beep_found = true;
     //std::cout << "beep" << std::endl;
     break;
   case KM_KBP_IT_CHAR:
+    if (Uni_IsSMP(act.character)) {
+      text_store.push_back(Uni_IsSurrogate1(act.character));
+      text_store.push_back(Uni_IsSurrogate2(act.character));
+    }
+    else {
+      text_store.push_back(act.character);
+    }
     //std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
   case KM_KBP_IT_MARKER:
     //std::cout << "deadkey(" << act.marker << ")" << std::endl;
     break;
   case KM_KBP_IT_BACK:
+    // It is valid for a backspace to be received with an empty text store
+    // as the user can press backspace with no text in the store and Keyman
+    // will pass that back to the client, as the client may do additional
+    // processing at start of a text store, e.g. delete from a previous cell
+    // in a table. Or, if Keyman has a cached context, then there may be
+    // additional text in the text store that Keyman can't see.
+    if (text_store.length() > 0) {
+      text_store.pop_back();
+    }
     break;
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_RESET_OPT:
@@ -269,18 +288,21 @@ int run_test(const std::string & file) {
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
   km_kbp_context_items_dispose(citems);
 
-  bool beep_found = false;
+  // Setup baseline text store
+  std::u16string text_store = context;
 
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
     for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-      if (act->type == KM_KBP_IT_ALERT) beep_found = true;
-      apply_action(test_state, *act);
+      apply_action(test_state, *act, text_store);
     }
   }
 
-  // Compare final output { TODO: need to also check the actions, starting with initial context }
+  // Test if the beep action was as expected
+  if (g_beep_found != expected_beep) return __LINE__;
+
+  // Compare final output - retrieve internal context
   size_t n = 0;
   try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
   try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
@@ -288,7 +310,15 @@ int run_test(const std::string & file) {
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
 
-  if (beep_found != expected_beep) return __LINE__;
+  std::cout << "expected: " << utf16_to_utf8(expected) << std::endl;
+  std::cout << "text store: " << utf16_to_utf8(text_store) << std::endl;
+  std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
+
+  // Compare internal context with expected result
+  if (buf != expected) return __LINE__;
+
+  // Compare text store with expected result
+  if (text_store != expected) return __LINE__;
 
   // Test resultant options
   // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
@@ -307,10 +337,7 @@ int run_test(const std::string & file) {
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
 
-  std::cout << "expected: " << utf16_to_utf8(expected) << std::endl;
-  std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
-
-  return (buf == expected) ? 0 : __LINE__;
+  return 0;
 }
 
 std::u16string parse_source_string(std::string const & s) {

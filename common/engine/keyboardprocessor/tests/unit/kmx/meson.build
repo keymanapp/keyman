@@ -40,13 +40,18 @@ kmns = [
   '027 - system stores 2',
   
   '028 - smp',
-  '029 - beep'
+  '029 - beep',
+  
+  '030 - multiple groups'
 ]
 
 kmn_tests = []
 kmn_sources = []
 
 prog_kmcomp = find_program('kmcomp')
+
+# todo: if kmcomp is not found, use the .kmx in the source folder
+# therefore make kmcomp compile to the source folder and add to repo?
 
 foreach kmn : kmns 
   kmn_test = custom_target(
