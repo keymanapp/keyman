@@ -22,10 +22,13 @@ clean ( ) {
 }
 
 display_usage ( ) {
-  echo "build.sh [-clean]"
+  echo "build.sh [-clean] [-test | -tdd]"
+  echo "build.sh -help"
   echo
   echo "  -clean              to erase pre-existing build products before a re-build"
-  # TODO documentation
+  echo "  -help               displays this screen and exits"
+  echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
+  echo "  -test               runs unit and integration tests after building"
 }
 
 # Prints a nice, common error message.
@@ -61,9 +64,12 @@ unit_tests_only=0
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    # todo: help
     -clean)
       clean
+      ;;
+    -help)
+      display_usage
+      exit
       ;;
     -test)
       run_tests=1
@@ -88,6 +94,7 @@ fi
 
 # Build worker first; the main file depends on it.
 # Then wrap the worker; Then build the main file.
+# TODO: extract to "build" function.
 npm run build-worker &&\
   (wrap_worker_code LMLayerWorkerCode ./worker/index.js > embedded_worker.js) &&\
   npm run build-main
