@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 #
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.
@@ -33,11 +33,15 @@ display_usage ( ) {
 
 # Prints a nice, common error message.
 fail ( ) {
+  local ERROR_RED
+  local NORMAL
+  ERROR_RED="$(tput setaf 1)"
+  NORMAL="$(tput sgr0)"
   FAILURE_MSG="$1"
   if [[ "$FAILURE_MSG" == "" ]]; then
     FAILURE_MSG="Unknown failure."
   fi
-  echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
+  echo "$0: ${ERROR_RED}$FAILURE_MSG${NORMAL}"
   exit 1
 }
 
