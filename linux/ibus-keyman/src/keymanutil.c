@@ -99,21 +99,19 @@ GList * keyman_get_kmpdirs_fromdir( GList *keyboard_list, const gchar * path)
 
 gchar * keyman_get_icon_file(const gchar *kmx_file)
 {
-    // Now there will only be the .png which will have been extracted from the .kmx during installation
-    struct stat filestat;
+    // Now there will only be the .png
+    // which at some point will get extracted from the .kmx during installation
     gchar *filename, *full_path_to_icon_file, *p;
 
     p=rindex(kmx_file,'.');
     filename = g_strndup(kmx_file, p-kmx_file);
     full_path_to_icon_file=g_strdup_printf("%s.ico.png", filename);
     g_free(filename);
-    stat(full_path_to_icon_file, &filestat);
 
-    if (!S_ISREG(filestat.st_mode)) {
+    if (!g_file_test(full_path_to_icon_file, G_FILE_TEST_EXISTS)) {
         g_free(full_path_to_icon_file);
         full_path_to_icon_file=g_strdup("/usr/share/keyman/icons/default.png");
     }
-
     return full_path_to_icon_file;
 }
 
@@ -126,7 +124,8 @@ ibus_keyman_engine_new (gchar * file_name,
                       gchar *license,
                       gchar *author,
                       gchar *icon,
-                      gchar *layout)
+                      gchar *layout,
+                      gchar *version)
 {
    IBusEngineDesc *engine_desc;
     gchar * desc;
@@ -138,15 +137,16 @@ ibus_keyman_engine_new (gchar * file_name,
         desc = g_strdup_printf("%s\n%s", description, copyright);
     }
 
-    // TODO: use varargs instead to put version in
-    engine_desc = ibus_engine_desc_new (file_name, // any other proposal for the "engine name" 
-                                   name, // longname
-                                   desc,
-                                   lang,
-                                   license ? license : "",
-                                   author ? author : "",
-                                   icon ? icon : "",
-                                   layout);
+    engine_desc = ibus_engine_desc_new_varargs ("name", file_name,
+                                    "longname", name,
+                                    "description", desc,
+                                    "language", lang,
+                                    "license", license ? license : "",
+                                    "author", author ? author : "",
+                                    "icon", icon,
+                                    "layout", layout,
+                                    "version", version,
+                                    NULL);
 
     return engine_desc;
 }
@@ -159,18 +159,13 @@ ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
     for (p=kmpdir_list; p != NULL; p = p->next) {
         gchar * kmp_dir = (gchar *) p->data;
 
-        g_message("getting kmp details for %s", kmp_dir);
         kmp_details *details = g_new0(kmp_details, 1);
         get_kmp_details(kmp_dir, details);
-        g_message("got kmp details for %s", kmp_dir);
 
         for (l=details->keyboards; l != NULL; l = l->next) {
             gchar *lang=NULL;
             kmp_keyboard *keyboard = (kmp_keyboard *) l->data;
-            g_message("got keyboard %s", keyboard->name);
-            g_message("got keyboard kmx %s", keyboard->kmx_file);
             gchar *abs_kmx = g_strjoin("/", kmp_dir, keyboard->kmx_file, NULL);
-            g_message("getting language for %s", abs_kmx);
 
             if (keyboard->languages != NULL)
             {
@@ -197,17 +192,15 @@ ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
                         kbd_details->license, // license
                         details->info.author_desc, // author name only, not email
                         keyman_get_icon_file(abs_kmx), // icon full path
-                        "en")); // layout defaulting to en (en-US)
-            g_message("added engine %s", abs_kmx);
+                        "en", // layout defaulting to en (en-US)
+                        keyboard->version));
             free_keyboard_details(kbd_details);
             g_free(kbd_details);
             g_free(abs_kmx);
             g_free(lang);
         }
-        g_message("freeing details");
         free_kmp_details(details);
         g_free(details);
-        g_message("finished adding engines");
     }
     return engines;
 }
