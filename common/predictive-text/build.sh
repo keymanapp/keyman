@@ -22,8 +22,8 @@ clean ( ) {
 }
 
 display_usage ( ) {
-  echo "build.sh [-clean] [-test | -tdd]"
-  echo "build.sh -help"
+  echo "Usage: $0 [-clean] [-test | -tdd]"
+  echo "       $0 -help"
   echo
   echo "  -clean              to erase pre-existing build products before a re-build"
   echo "  -help               displays this screen and exits"
@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]] ; do
     -clean)
       clean
       ;;
-    -help)
+    -help|-h)
       display_usage
       exit
       ;;
@@ -79,6 +79,10 @@ while [[ $# -gt 0 ]] ; do
       fetch_deps=0
       unit_tests_only=1
       ;;
+    *)
+      echo "$0: invalid option: $key"
+      display_usage
+      exit -1
   esac
   shift # past the processed argument
 done
