@@ -3,10 +3,12 @@
   "version": "0.20181001.0",
   "description": "Keyman/Predictive Text integration layer",
   "scripts": {
-    "test": "bash ./unit_tests/test.sh",
+    "build-main": "tsc -p ./tsconfig.json",
+    "build-worker": "tsc -p ./worker/tsconfig.json",
     "karma": "karma",
     "mocha": "mocha",
-    "tsc": "tsc"
+    "test": "bash ./unit_tests/test.sh",
+    "tsc": "echo 'Run ./build.sh instead' && false"
   },
   "repository": {
     "type": "git",

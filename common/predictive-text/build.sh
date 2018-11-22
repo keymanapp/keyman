@@ -51,13 +51,6 @@ wrap_worker_code ( ) {
 
 ################################ Main script ################################
 
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-if [ $? -ne 0 ]; then
-  fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
-
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
   key="$1"
@@ -69,12 +62,16 @@ while [[ $# -gt 0 ]] ; do
   shift # past the processed argument
 done
 
-# Build worker first; main file depends on it.
-# Then wrap the worker;
-# Then build the main file.
-npm run tsc -- -p ./worker/tsconfig.json &&\
+echo "Node.js + dependencies check"
+npm install --no-optional ||\
+  fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+
+
+# Build worker first; the main file depends on it.
+# Then wrap the worker; Then build the main file.
+npm run build-worker &&\
   (wrap_worker_code LMLayerWorkerCode ./worker/index.js > embedded_worker.js) &&\
-  npm run tsc 
+  npm run build-main
 
 if [ $? -ne 0 ]; then
   fail "Compilation failed."
