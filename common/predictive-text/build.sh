@@ -4,18 +4,26 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
-display_usage ( ) {
-  echo "build.sh [-clean]"
-  echo
-  echo "  -clean              to erase pre-existing build products before a re-build"
-}
-
 # Fails the build if a specified file does not exist.
 assert ( ) {
   if ! [ -f $1 ]; then
     fail "Build failed."
     exit 1
   fi
+}
+
+# A nice, extensible method for -clean operations.  Add to this as necessary.
+clean ( ) {
+  rm -rf "./build"
+  if [ $? -ne 0 ]; then
+    fail "Failed to erase the prior build."
+  fi
+}
+
+display_usage ( ) {
+  echo "build.sh [-clean]"
+  echo
+  echo "  -clean              to erase pre-existing build products before a re-build"
 }
 
 # Prints a nice, common error message.
@@ -26,21 +34,6 @@ fail ( ) {
   fi
   echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
   exit 1
-}
-
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-if [ $? -ne 0 ]; then
-  fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
-
-# A nice, extensible method for -clean operations.  Add to this as necessary.
-clean ( ) {
-  rm -rf "./build"
-  if [ $? -ne 0 ]; then
-    fail "Failed to erase the prior build."
-  fi
 }
 
 # Wraps JavaScript code in a way that can be embedded in a worker.
@@ -55,6 +48,15 @@ wrap_worker_code() {
   cat "${js}"
   printf "\n}\n"
 }
+
+################################ Main script ################################
+
+echo "Node.js + dependencies check"
+npm install --no-optional
+
+if [ $? -ne 0 ]; then
+  fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
