@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2018 SIL International
  *
- * kmflutil is dual licensed under the MIT or GPL licenses as described below.
+ * keymanutil is dual licensed under the MIT or GPL licenses as described below.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
