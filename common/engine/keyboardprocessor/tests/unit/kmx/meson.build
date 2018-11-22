@@ -39,7 +39,8 @@ kmns = [
   '026 - system stores',
   '027 - system stores 2',
   
-  '028 - smp'
+  '028 - smp',
+  '029 - beep'
 ]
 
 kmn_tests = []
@@ -48,18 +49,18 @@ kmn_sources = []
 prog_kmcomp = find_program('kmcomp')
 
 foreach kmn : kmns 
-  kmn_tests += custom_target(
+  kmn_test = custom_target(
     kmn + '.kmn',
     output: kmn + '.kmx',
     input: 'kmn/' + kmn + '.kmn',
     command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
   )
   
-  kmn_sources += configure_file(
+  kmn_source = configure_file(
     input: 'kmn/' + kmn + '.kmn',
     output: kmn + '.kmn',
     copy: true
   )
-endforeach
 
-test('kmx', kmx, depends: kmn_tests, args: [kmns])
+  test(kmn, kmx, depends: [kmn_test], args: [kmn])
+endforeach

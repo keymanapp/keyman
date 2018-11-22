@@ -1,10 +1,7 @@
-c Description: Tests platform and baselayout system store rules
+c Description: Tests SMP characters
 c keys: [K_1][K_2]
 c expected: \u1F642hi\u1F600
 c context: 
-c (default) option: &platform=windows desktop hardware native <-- ignored by test
-c (default) option: &baseLayout=kbdus.dll <-- ignored by test
-c (default) option: &baseLayoutAlt=en-US <-- ignored by test
 
 store(&version) '10.0'
 

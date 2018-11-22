@@ -47,7 +47,7 @@ struct kmx_option {
 using kmx_options = std::vector<kmx_option>;
 
 int run_test(const std::string & file);
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options);
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep);
 
 km_kbp_option_item test_env_opts[] =
 {
@@ -206,8 +206,9 @@ int run_test(const std::string & file) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   kmx_options options;
+  bool expected_beep = false;
   
-  int result = load_source(file, keys, expected, context, options);
+  int result = load_source(file, keys, expected, context, options, expected_beep);
   if (result != 0) return result;
 
   std::cout << "file = " << file << std::endl;
@@ -268,21 +269,26 @@ int run_test(const std::string & file) {
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
   km_kbp_context_items_dispose(citems);
 
+  bool beep_found = false;
+
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
     for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
+      if (act->type == KM_KBP_IT_ALERT) beep_found = true;
       apply_action(test_state, *act);
     }
   }
 
-  // Compare final output { TODO: don't use the inbuilt context, instead use the actions, starting with context }
+  // Compare final output { TODO: need to also check the actions, starting with initial context }
   size_t n = 0;
   try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
   try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
   km_kbp_cp *buf = new km_kbp_cp[n];
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
+
+  if (beep_found != expected_beep) return __LINE__;
 
   // Test resultant options
   // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
@@ -366,7 +372,7 @@ bool is_token(const std::string token, std::string &line) {
   return false;
 }
 
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options) {
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
   const std::string s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ",
@@ -391,7 +397,12 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
       trim(keys);
     }
     else if(is_token(s_expected, line)) {
-      expected = parse_source_string(line);
+      if (line == "\\b") {
+        expected_beep = true;
+      }
+      else {
+        expected = parse_source_string(line);
+      }
     }
     else if (is_token(s_context, line)) {
       context = parse_source_string(line);
