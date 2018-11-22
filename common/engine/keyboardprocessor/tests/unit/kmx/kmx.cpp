@@ -301,6 +301,7 @@ int run_test(const std::string & file) {
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
 
+  std::cout << "expected: " << utf16_to_utf8(expected) << std::endl;
   std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
 
   return (buf == expected) ? 0 : __LINE__;
@@ -325,7 +326,8 @@ std::u16string parse_source_string(std::string const & s) {
           t += km_kbp_cp(v);
         }
         else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v)) + km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
+          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
         }
       }
       else if (*p == 'd') {

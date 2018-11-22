@@ -37,7 +37,9 @@ kmns = [
   '025 - options with reset',
 
   '026 - system stores',
-  '027 - system stores 2'
+  '027 - system stores 2',
+  
+  '028 - smp'
 ]
 
 kmn_tests = []
