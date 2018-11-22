@@ -14,6 +14,16 @@ assert ( ) {
   fi
 }
 
+# Build the worker and the main script.
+build ( ) {
+  # Build worker first; the main file depends on it.
+  # Then wrap the worker; Then build the main file.
+  npm run build-worker &&\
+    (wrap_worker_code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}") &&\
+    npm run build-main
+  return $?
+}
+
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
   rm -f "${EMBEDDED_WORKER}"
@@ -101,16 +111,7 @@ if (( fetch_deps )); then
   npm install --no-optional
 fi
 
-# Build worker first; the main file depends on it.
-# Then wrap the worker; Then build the main file.
-# TODO: extract to "build" function.
-npm run build-worker &&\
-  (wrap_worker_code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}") &&\
-  npm run build-main
-
-if [ $? -ne 0 ]; then
-  fail "Compilation failed."
-fi
+build || fail "Compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then
