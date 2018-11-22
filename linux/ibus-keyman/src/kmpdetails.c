@@ -51,7 +51,7 @@ void get_detail_description_from_object(JsonObject *object, const gchar *member_
         }
     }
     else {
-        //g_warning("could not find %s in json\n", member_name);
+        g_message("could not find %s in json\n", member_name);
         *description = NULL;
         if (url != NULL) {
             *url = NULL;

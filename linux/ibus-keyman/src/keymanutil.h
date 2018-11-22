@@ -55,64 +55,7 @@
 #include <ibus.h>
 #include <keyman/keyboardprocessor.h>
 
-#if 0
-typedef enum {OUTPUT_STRING, ERASE_CHAR, FORWARD_KEYEVENT, OUTPUT_BEEP} kmfl_opcodes;
-
-typedef struct
-{  
-  kmfl_opcodes opcode;
-  gchar * cmdarg;
-} Cmd;
-
-typedef struct 
-{
-    //KMSI * p_kmsi;
-    GList * cmds;
-} KInputContext;
-
-typedef struct
-{
-    km_kbp_state *p_state;
-    gchar * keyboard_filename;
-    gchar * name;
-} KInputKeyboard;
-#endif
-
-#if 0
-typedef struct 
-{
-    // Some info is used one-off to create the engine
-    // some is used later - ldmlfile
-    //int keyboard_number;
-    gchar * keyboard_filename;
-    gchar * keyboard_kmp_json;
-    gchar * keyboard_icon_filename;
-    gchar * keyboard_id;
-    gchar * keyboard_name;
-    gchar * keyboard_language;
-    gchar * keyboard_author;
-    gchar * keyboard_copyright;
-    gchar * keyboard_description;
-    gchar * keyboard_layout;
-    gchar * keyboard_license;
-    gchar * keyboard_visualkeyboard;
-    gchar * keyboard_keyboardversion;
-    gchar * keyboard_ldmlfile;
-	
-} KInputMethod;
-static GHashTable      *im_table;
-#endif
-
-
 void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
-//KInputMethod    *kinput_open_im             (const gchar * keyboard_filename);
-//KInputContext   *keyman_create_ic           (KInputMethod *im);
-//void             keyman_destroy_ic          (KInputContext *ic);
-//void             kinput_close_im            (KInputMethod * im);
-//void             keyman_get_keyboard_info   (KInputMethod * im);
-//int              keyman_load_keyboard       (const gchar *keyboard_filename);
-//int              keyman_unload_keyboard     (int keyboard_number);
-//int              keyman_check_keyboard      (gchar *absfn);
 #endif

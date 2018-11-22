@@ -63,16 +63,6 @@
 static GHashTable      *im_table = NULL;
 
 #define N_(text) text
-static gchar * get_dirname(const gchar * path)
-{
-    gchar * dirend = g_strrstr(path, "/");
-
-    if (dirend) {
-        return g_strndup(path, dirend-path);
-    } else {
-        return g_strdup("");
-    }
-}
 
 // change to keyman_get_kmpdirs_fromdir
 // returns list of directories with kmp.json
@@ -229,14 +219,6 @@ ibus_keyman_list_engines (void)
     GList *keyboard_list;
     gchar *local_keyboard_path, *xdgenv;
 
-/*
-    if (im_table == NULL) {
-        im_table = g_hash_table_new_full (g_str_hash,
-                                          g_str_equal,
-                                          g_free,
-                                          (GDestroyNotify) keyman_free_keyboard_info);
-    }
-*/
     g_message("adding from /usr/share/keyman");
     keyboard_list = keyman_get_kmpdirs_fromdir(NULL, "/usr/share/keyman");
     g_message("adding from /usr/share/keyman");

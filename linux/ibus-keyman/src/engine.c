@@ -24,7 +24,6 @@
 #include <ibus.h>
 #include <string.h>
 #include <stdio.h>
-#include <sys/stat.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -194,7 +193,7 @@ ibus_keyman_engine_constructor (GType                   type,
     IBusEngine *engine;
     IBusText *text;
     const gchar *engine_name;
-    gchar *surrounding_text;
+    gchar *surrounding_text, *p;
     guint cursor_pos, anchor_pos;
     km_kbp_context_item *context_items;
     
@@ -209,30 +208,26 @@ ibus_keyman_engine_constructor (GType                   type,
     g_assert (engine_name);
     g_message("DAR: ibus_keyman_engine_constructor %s", engine_name);
 
-    #if 0
-    if (im_table == NULL) {
-        im_table = g_hash_table_new_full (g_str_hash,
-                                          g_str_equal,
-                                          g_free,
-                                          (GDestroyNotify) kinput_close_im);
+    keyman->kb_name = NULL;
+    keyman->ldmlfile = NULL;
+    gchar *kmx_file = g_path_get_basename(engine_name);
+    p = rindex(kmx_file, '.'); // get id to use as dbus service name
+    if (p) {
+        keyman->kb_name = g_strndup(kmx_file, p-kmx_file);
+        p = rindex(engine_name, '.');
+        if (p)
+        {
+            gchar *dir = g_path_get_dirname(engine_name);
+            gchar *ldmlfile = g_strdup_printf("%s/%s.ldml", dir, keyman->kb_name);
+            if (g_file_test(ldmlfile, G_FILE_TEST_EXISTS))
+            {
+                keyman->ldmlfile = g_strdup(ldmlfile);
+            }
+            g_free(dir);
+            g_free(ldmlfile);
+        }
     }
-
-    im = (KInputMethod *) g_hash_table_lookup (im_table, engine_name);
-
-    if (im == NULL) {
-        im = kinput_open_im(engine_name);
-        
-        if (im != NULL)
-            g_hash_table_insert (im_table, g_strdup (engine_name), im);
-
-    }
-
-    if (im == NULL) {
-        g_warning ("Can not find Keyman keymap %s", engine_name);
-        g_object_unref (keyman);
-        return NULL;
-    }
-    #endif
+    g_free(kmx_file);
 
     km_kbp_option_item options[1] = {KM_KBP_OPTIONS_END};
 
@@ -308,8 +303,8 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
         XCloseDisplay(keyman->display);
         keyman->display = NULL;
     }
-
-    //g_hash_table_remove(im_table, engine_name);
+    g_free(keyman->kb_name);
+    g_free(keyman->ldmlfile);
      
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
@@ -660,11 +655,14 @@ ibus_keyman_engine_enable (IBusEngine *engine)
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
     g_message("WDG: ibus_keyman_engine_enable %s", engine_name);
-    // own dbus name com.Keyman
-    // expose properties LDMLFile and Name
-    KeymanService *service = km_service_get_default();
-    km_service_set_ldmlfile (service, keyman->ldmlfile);
-    km_service_set_name (service, keyman->kb_name);
+    if (keyman->ldmlfile)
+    {
+        // own dbus name com.Keyman
+        // expose properties LDMLFile and Name
+        KeymanService *service = km_service_get_default();
+        km_service_set_ldmlfile (service, keyman->ldmlfile);
+        km_service_set_name (service, keyman->kb_name);
+    }
     parent_class->enable (engine);
 }
 
