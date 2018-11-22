@@ -45,11 +45,13 @@ constexpr char const *doc1_expected = u8"\
     \"options\" : {\n\
         \"keyboard\" : {},\n\
         \"environment\" : {\n\
-            \"hello\" : \"world\"\n\
+            \"hello\" : \"-\"\n\
         },\n\
         \"saved\" : {\n\
             \"keyboard\" : {},\n\
-            \"environment\" : {}\n\
+            \"environment\" : {\n\
+                \"hello\" : \"world\"\n\
+            }\n\
         }\n\
     },\n\
     \"context\" : [\n\
@@ -81,7 +83,7 @@ constexpr char const *doc2_expected = u8"\
     \"options\" : {\n\
         \"keyboard\" : {},\n\
         \"environment\" : {\n\
-            \"hello\" : \"world\"\n\
+            \"hello\" : \"-\"\n\
         },\n\
         \"saved\" : {\n\
             \"keyboard\" : {},\n\

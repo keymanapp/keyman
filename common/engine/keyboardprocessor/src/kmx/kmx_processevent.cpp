@@ -21,8 +21,13 @@ namespace km {
       p.replace_extension(".kmx");
       m_valid = (bool) kmx.Load(p.native().c_str());
 
-      //std::vector<km_kbp_option_item> * opts = ;
-      kmx.GetOptions()->Init(kb->default_opts());
+      if (m_valid) {
+        kmx.GetOptions()->Init(kb->default_opts());
+      }
+    }
+
+    void kmx_processor::init_state(std::vector<km_kbp_option_item> *default_env) {
+      kmx.GetEnvironment()->Init(default_env);
     }
 
     char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
@@ -48,9 +53,15 @@ namespace km {
       return 0;
     }
 
-    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key) {
-      if(scope == KM_KBP_OPT_KEYBOARD)
-        kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {
+      switch(scope) {
+        case KM_KBP_OPT_KEYBOARD:
+          kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+          break;
+        case KM_KBP_OPT_ENVIRONMENT:
+          kmx.GetEnvironment()->Load(key, value);
+          break;
+      }
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {

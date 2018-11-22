@@ -95,32 +95,23 @@ enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
 #include <kmx/kmx_actions.h>
 #include <kmx/kmx_xstring.h>
 #include <kmx/kmx_options.h>
+#include <kmx/kmx_environment.h>
 
 /* Utility */
 
 #define GLOBAL_ContextStackSize 80
-
-/* Temporary globals */
-
-struct KMX_Environment {
-  KMX_BOOL simulateAltGr, baseLayoutGivesCtrlRAltForRAlt;
-  std::u16string baseLayout, baseLayoutAlt;
-  KMX_BOOL capsLock;
-  std::u16string platform;
-};
-
-extern KMX_Environment g_environment;
 
 class KMX_Processor {
 private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
   KMSTATE m_state;
-  km_kbp_state *m_state1;
+  km_kbp_state *m_kbp_state;
 
   KMX_Actions m_actions;
   KMX_Context m_context;
   KMX_Options m_options;
+  KMX_Environment m_environment;
 
   INTKEYBOARDINFO m_keyboard = { 0 };
   KMX_DWORD m_modifiers = 0;
@@ -171,6 +162,7 @@ public:
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
   KMX_Options *GetOptions();
+  KMX_Environment *GetEnvironment();
   LPINTKEYBOARDINFO GetKeyboard();
 };
 

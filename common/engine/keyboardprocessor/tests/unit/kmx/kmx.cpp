@@ -49,7 +49,6 @@ using kmx_options = std::vector<kmx_option>;
 int run_test(const std::string & file);
 int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options);
 
-
 km_kbp_option_item test_env_opts[] =
 {
   KM_KBP_OPTIONS_END
@@ -236,15 +235,23 @@ int run_test(const std::string & file) {
 
       std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
 
-      keyboard_opts[i].key = new km_kbp_cp[it->key.length() + 1];
-      it->key.copy((char16_t * const)keyboard_opts[i].key, it->key.length());
-      keyboard_opts[i].key[it->key.length()] = 0;
+      std::u16string key = it->key;
+      if (key[0] == u'&') {
+        // environment value (aka system store)
+        key.erase(0, 1);
+        keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
+      }
+      else {
+        keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+      }
+      keyboard_opts[i].key = new km_kbp_cp[key.length() + 1];
+      key.copy((char16_t * const)keyboard_opts[i].key, key.length());
+      keyboard_opts[i].key[key.length()] = 0;
 
       keyboard_opts[i].value = new km_kbp_cp[it->value.length() + 1];
       it->value.copy(keyboard_opts[i].value, it->value.length());
       keyboard_opts[i].value[it->value.length()] = 0;
 
-      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
       i++;
     }
 
@@ -293,6 +300,8 @@ int run_test(const std::string & file) {
   // Destroy them
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
+
+  std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
 
   return (buf == expected) ? 0 : __LINE__;
 }
