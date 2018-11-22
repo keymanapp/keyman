@@ -51,6 +51,9 @@ wrap_worker_code ( ) {
 
 ################################ Main script ################################
 
+run_tests=0
+fetch_deps=1
+
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
   key="$1"
@@ -58,14 +61,25 @@ while [[ $# -gt 0 ]] ; do
     -clean)
       clean
       ;;
+    -test)
+      run_tests=1
+      ;;
+    -tdd)
+      run_tests=1
+      fetch_deps=0
+      ;;
   esac
   shift # past the processed argument
 done
 
-echo "Node.js + dependencies check"
-npm install --no-optional ||\
-  fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+# Check if Node.JS/npm is installed.
+type npm >/dev/null ||\
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
+if (( fetch_deps )); then
+  echo "Dependencies check"
+  npm install --no-optional
+fi
 
 # Build worker first; the main file depends on it.
 # Then wrap the worker; Then build the main file.
@@ -76,5 +90,9 @@ npm run build-worker &&\
 if [ $? -ne 0 ]; then
   fail "Compilation failed."
 fi
-
 echo "Typescript compilation successful."
+
+if (( run_tests )); then
+  npm test ||
+    fail "Tests failed"
+fi
