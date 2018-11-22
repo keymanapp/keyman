@@ -101,16 +101,16 @@ def download_source(kbid, kbdir, sourcePath):
 			logging.info("Installing %s.kmn as keyman file", kbid)
 		logging.info("Compiling kmn file")
 		subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
-		kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
-		if not os.path.isfile(kmfl_file):
-			message = "Could not compile %s to %s so not installing keyboard." % (kmn_file, kmfl_file)
-			os.remove(kmn_file)
-			rmtree(kbdir)
-			raise InstallError(InstallStatus.Abort, message)
-	else:
-		message = "install_kmp.py: warning: no kmn source file for %s so not installing keyboard." % (kbid)
-		rmtree(kbdir)
-		raise InstallError(InstallStatus.Abort, message)
+		# kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
+		# if not os.path.isfile(kmfl_file):
+		# 	message = "Could not compile %s to %s so not installing keyboard." % (kmn_file, kmfl_file)
+		# 	os.remove(kmn_file)
+		# 	rmtree(kbdir)
+		# 	raise InstallError(InstallStatus.Abort, message)
+	# else:
+	# 	message = "install_kmp.py: warning: no kmn source file for %s so not installing keyboard." % (kbid)
+	# 	rmtree(kbdir)
+	# 	raise InstallError(InstallStatus.Abort, message)
 	icodownloadfile = os.path.join(kbdir, kbid + ".ico")
 	if not os.path.isfile(icodownloadfile):
 		ico_url = base_url + "/source/" + kbid + ".ico"
@@ -134,10 +134,10 @@ def process_keyboard_data(kbid, kbdir):
 		with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
 			json.dump(kbdata, outfile)
 			logging.info("Installing api data file %s.json as keyman file", kbid)
-	else:
-		message = "install_kmp.py: error: cannot download keyboard data so not installing."
-		rmtree(kbdir)
-		raise InstallError(InstallStatus.Abort, message)
+	# else:
+	# 	message = "install_kmp.py: error: cannot download keyboard data so not installing."
+	# 	rmtree(kbdir)
+	# 	raise InstallError(InstallStatus.Abort, message)
 
 def check_keyman_dir(basedir, error_message):
 	# check if keyman subdir exists
@@ -182,7 +182,7 @@ def install_kmp_shared(inputfile, online=False):
 				for kb in keyboards:
 					if kb['id'] != kmpid:
 						process_keyboard_data(kb['id'], kmpdir)
-			do_install_to_ibus = True
+			# do_install_to_ibus = True # temporarily disable
 
 		for f in files:
 			fpath = os.path.join(kmpdir, f['name'])
@@ -242,7 +242,7 @@ def install_kmp_user(inputfile, online=False):
 				for kb in keyboards:
 					if kb['id'] != kmpid:
 						process_keyboard_data(kb['id'], kmpdir)
-			do_install_to_ibus = True
+			# do_install_to_ibus = True # temporarily disable
 
 		for f in files:
 			fpath = os.path.join(kmpdir, f['name'])
