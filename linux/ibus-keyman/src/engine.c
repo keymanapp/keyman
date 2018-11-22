@@ -506,7 +506,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         if ((state & IBUS_CONTROL_MASK) && is_key_pressed(m_display, key_vec, IBUS_Control_R)) {
             km_mod_state |= KM_KBP_MODIFIER_RCTRL;
         }
-
+        // ignoring right shift
         // if ((state & IBUS_SHIFT_MASK) && is_key_pressed(m_display, key_vec, IBUS_Shift_R)) {
         //     right_modifier_state |= (IBUS_SHIFT_MASK << 8);
         // }
@@ -595,45 +595,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 g_warning("Unknown action");
         }
     }
-
-
-#if 0
-    else if (kmfl_interpret(kmfl->context->p_kmsi, keyval, state | right_modifier_state) == 1) {
-        GList * p;
-        for (p=kmfl->context->cmds; p != NULL; p = p->next) {
-            Cmd * cmd = (Cmd *) p->data;
-            if (cmd) {
-                switch (cmd->opcode) {
-                    case OUTPUT_STRING:
-                        ibus_keyman_engine_commit_string(kmfl, cmd->cmdarg);
-                        break;
-                    case ERASE_CHAR:
-		        g_debug("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT, engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT);
-
-                        if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
-                            ibus_engine_delete_surrounding_text(engine, -1, 1);
-                            if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) == 0) {
-                                forward_key(kmfl, IBUS_BackSpace, 0);
-                            }
-                        } else 
-                            forward_key(kmfl, IBUS_BackSpace, 0);
-                        break;
-                    case FORWARD_KEYEVENT:
-                        break;
-                    case OUTPUT_BEEP:
-                        break;
-                }
-                if (cmd->cmdarg)
-                    g_free(cmd->cmdarg);
-                g_free(cmd);
-            }
-        }
-        g_list_free(kmfl->context->cmds);
-        kmfl->context->cmds=NULL;
-        return TRUE;
-    }
-    #endif
-    
     return TRUE;
  }
 
@@ -683,8 +644,6 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
 static void
 ibus_keyman_engine_reset (IBusEngine *engine)
 {
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
     g_message("ibus_keyman_engine_reset");
     parent_class->reset (engine);
     ibus_keyman_engine_focus_in (engine);
@@ -713,7 +672,6 @@ static void
 ibus_keyman_engine_disable (IBusEngine *engine)
 {
     const gchar *engine_name;
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
 
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
@@ -731,8 +689,6 @@ ibus_keyman_engine_disable (IBusEngine *engine)
 static void
 ibus_keyman_engine_page_up (IBusEngine *engine)
 {
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
     g_message("ibus_keyman_engine_page_up");
     reset_context(engine);
     parent_class->page_up (engine);
@@ -741,8 +697,6 @@ ibus_keyman_engine_page_up (IBusEngine *engine)
 static void
 ibus_keyman_engine_page_down (IBusEngine *engine)
 {
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
     g_message("ibus_keyman_engine_page_down");
     reset_context(engine);
     parent_class->page_down (engine);
@@ -751,8 +705,6 @@ ibus_keyman_engine_page_down (IBusEngine *engine)
 static void
 ibus_keyman_engine_cursor_up (IBusEngine *engine)
 {
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
     g_message("ibus_keyman_engine_cursor_up");
     reset_context(engine);
     parent_class->cursor_up (engine);
@@ -761,8 +713,6 @@ ibus_keyman_engine_cursor_up (IBusEngine *engine)
 static void
 ibus_keyman_engine_cursor_down (IBusEngine *engine)
 {
-    //IBusKeymanEngine *kmfl = (IBusKeymanEngine *) engine;
-
     g_message("ibus_keyman_engine_cursor_down");
     reset_context(engine);
     parent_class->cursor_down (engine);
