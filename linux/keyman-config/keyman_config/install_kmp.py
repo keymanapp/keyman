@@ -16,7 +16,7 @@ from enum import Enum
 import requests
 
 from keyman_config.get_kmp import get_keyboard_data, get_kmp, user_keyboard_dir, user_keyman_dir, user_keyman_font_dir
-from keyman_config.kmpmetadata import parseinfdata, parsemetadata, KMFileTypes
+from keyman_config.kmpmetadata import parseinfdata, parsemetadata, infmetadata_to_json, KMFileTypes
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.convertico import checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
@@ -54,7 +54,7 @@ def extract_kmp(kmpfile, directory):
 def get_metadata(tmpdirname):
 	"""
 	Get metadata from kmp.json if it exists.
-	If it does not exist then will return get_infdata
+	If it does not exist then will return get_and_convert_infdata
 
 	Args:
 		inputfile (str): path to kmp file
@@ -68,11 +68,12 @@ def get_metadata(tmpdirname):
 	if os.path.isfile(kmpjson):
 		return parsemetadata(kmpjson, False)
 	else:
-		return get_infdata(tmpdirname)
+		return get_and_convert_infdata(tmpdirname)
 
-def get_infdata(tmpdirname):
+def get_and_convert_infdata(tmpdirname):
 	"""
 	Get metadata from kmp.inf if it exists.
+	Convert it to kmp.json if possible
 
 	Args:
 		inputfile (str): path to kmp file
@@ -85,6 +86,10 @@ def get_infdata(tmpdirname):
 	kmpinf = os.path.join(tmpdirname, "kmp.inf")
 	if os.path.isfile(kmpinf):
 		info, system, options, keyboards, files =  parseinfdata(kmpinf, False)
+		j = infmetadata_to_json(info, system, options, keyboards, files)
+		kmpjson = os.path.join(tmpdirname, "kmp.json")
+		with open(kmpjson, "w") as write_file:
+			print(j, file=write_file)
 		return info, system, options, keyboards, files
 	else:
 		return None, None, None, None, None
