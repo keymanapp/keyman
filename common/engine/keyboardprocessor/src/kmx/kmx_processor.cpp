@@ -23,6 +23,34 @@ KMX_Processor::~KMX_Processor() {
   delete[] m_miniContext;
 }
 
+char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
+  // We only map SHIFT and UNSHIFTED, and CAPS LOCK
+
+  if (modifiers & ~(K_SHIFTFLAG | CAPITALFLAG) != 0) {
+    return 0;
+  }
+
+  bool
+    shifted = (modifiers & K_SHIFTFLAG) == K_SHIFTFLAG,
+    caps = (modifiers & CAPITALFLAG) == CAPITALFLAG;
+
+  if (vk == KM_KBP_VKEY_SPACE) {
+    // Override for space because it is the same for
+    // shifted and unshifted.
+    return 32;
+  }
+
+  for (int i = 0; s_char_to_vkey[i].vk; i++) {
+    if (s_char_to_vkey[i].caps && caps) {
+      if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == !shifted) return i + 32;
+    }
+    else {
+      if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == shifted) return i + 32;
+    }
+  }
+  return 0;
+}
+
 /*
 * KMX_BOOL ProcessEvent();
 *
@@ -36,14 +64,17 @@ KMX_Processor::~KMX_Processor() {
 * process, and checks the state of Windows for the keyboard handling.
 */
 
-KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode)
+KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
 {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
   m_kbp_state = state;
 
+  if (m_environment.capsLock())
+    modifiers |= CAPITALFLAG;
+
   m_state.vkey = vkey;
-  m_state.charCode = charCode;
+  m_state.charCode = VKeyToChar(modifiers, vkey);
   m_modifiers = modifiers;
   m_state.LoopTimes = 0;
 

@@ -157,7 +157,7 @@ public:
   ~KMX_Processor();
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
-  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode);  // returns FALSE on error or key not matched
+  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
@@ -170,7 +170,7 @@ public:
 
 struct char_to_vkey {
   km_kbp_virtual_key vk;
-  bool shifted;
+  bool shifted, caps;
 };
 
 struct modifier_names {
