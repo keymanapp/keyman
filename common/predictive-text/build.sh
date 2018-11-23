@@ -6,14 +6,6 @@
 
 EMBEDDED_WORKER=embedded_worker.js
 
-# Fails the build if a specified file does not exist.
-assert ( ) {
-  if ! [ -f "$1" ]; then
-    fail "Build failed."
-    exit 1
-  fi
-}
-
 # Build the worker and the main script.
 build ( ) {
   # Build worker first; the main file depends on it.
