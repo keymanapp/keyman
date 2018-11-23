@@ -57,9 +57,7 @@ for proj in ${autotool_projects}; do
     rm -rf ../build-$proj
     mkdir -p ../build-$proj
     cd ../build-$proj
-    if [ ! -f config.h ]; then # only configure if not already configured
-        ../$proj/configure
-    fi
+    ../$proj/configure
     make dist
     mv *.tar.gz ../dist
     cd $BASEDIR
