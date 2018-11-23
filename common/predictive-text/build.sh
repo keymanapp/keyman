@@ -10,12 +10,12 @@ EMBEDDED_WORKER=embedded_worker.js
 build ( ) {
   # Build worker first; the main file depends on it.
   # Then wrap the worker; Then build the main file.
-  npm run build-worker && build_wrapped_worker && npm run build-main
+  npm run build-worker && wrap_worker && npm run build-main
 }
 
 # Creates embedded_worker.js. Must be run after the worker is built for the
 # first time
-build_wrapped_worker ( ) {
+wrap_worker ( ) {
   echo "> wrap_worker_code LMLayerWorkerCode ./worker/index.js > ${EMBEDDED_WORKER}"
   wrap_worker_code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}"
 }
