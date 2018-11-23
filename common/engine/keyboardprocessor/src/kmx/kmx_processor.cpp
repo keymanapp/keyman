@@ -5,19 +5,9 @@
 #include <kmx/kmx_processor.h>
 
 /* Globals */
+
 KMX_BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
 KMX_BOOL g_silent = FALSE;
-
-/* Environment - to refactor */
-KMX_Environment g_environment = {
-  FALSE, // simulateAltGr
-  FALSE, // baseLayoutGivesCtrlRAltForRAlt
-  u"kbdus.dll", // baseLayout
-  u"en-US", // baseLayoutAlt
-  FALSE, // capsLock
-  u"windows desktop hardware native" // platform
-};
-
 
 /*
 * KMX_Processor
@@ -33,6 +23,34 @@ KMX_Processor::~KMX_Processor() {
   delete[] m_miniContext;
 }
 
+char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
+  // We only map SHIFT and UNSHIFTED, and CAPS LOCK
+
+  if (modifiers & ~(K_SHIFTFLAG | CAPITALFLAG) != 0) {
+    return 0;
+  }
+
+  bool
+    shifted = (modifiers & K_SHIFTFLAG) == K_SHIFTFLAG,
+    caps = (modifiers & CAPITALFLAG) == CAPITALFLAG;
+
+  if (vk == KM_KBP_VKEY_SPACE) {
+    // Override for space because it is the same for
+    // shifted and unshifted.
+    return 32;
+  }
+
+  for (int i = 0; s_char_to_vkey[i].vk; i++) {
+    if (s_char_to_vkey[i].caps && caps) {
+      if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == !shifted) return i + 32;
+    }
+    else {
+      if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == shifted) return i + 32;
+    }
+  }
+  return 0;
+}
+
 /*
 * KMX_BOOL ProcessEvent();
 *
@@ -46,14 +64,17 @@ KMX_Processor::~KMX_Processor() {
 * process, and checks the state of Windows for the keyboard handling.
 */
 
-KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode)
+KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers)
 {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
-  m_state1 = state;
+  m_kbp_state = state;
+
+  if (m_environment.capsLock())
+    modifiers |= CAPITALFLAG;
 
   m_state.vkey = vkey;
-  m_state.charCode = charCode;
+  m_state.charCode = VKeyToChar(modifiers, vkey);
   m_modifiers = modifiers;
   m_state.LoopTimes = 0;
 
@@ -68,7 +89,7 @@ KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWO
    
   ProcessGroup(gp, &fOutputKeystroke);
 
-  m_state1 = nullptr;
+  m_kbp_state = nullptr;
 
   return !fOutputKeystroke;
 }
@@ -378,12 +399,12 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Reset(km_kbp_state_options(m_state1), n1);
+        GetOptions()->Reset(km_kbp_state_options(m_kbp_state), n1);
         break;
       case CODE_SAVEOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Save(m_state1, n1);
+        GetOptions()->Save(m_kbp_state, n1);
         break;
       case CODE_IFSYSTEMSTORE:
         p+=3;
@@ -402,8 +423,8 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
 
 KMX_BOOL KMX_Processor::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(g_environment.baseLayout.c_str())) == 0 ||   // I4583
-                u16icmp(layoutName, static_cast<const km_kbp_cp*>(g_environment.baseLayoutAlt.c_str())) == 0;   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_kbp_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
 
   return bEqual;
 }
@@ -411,11 +432,20 @@ KMX_BOOL KMX_Processor::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 KMX_BOOL KMX_Processor::IsMatchingPlatformString(PKMX_WCHAR platform)  // I3432
 {
   // TODO retrieve platform string from client environment
-  return
-    u16icmp(platform, u"windows") == 0 ||
-    u16icmp(platform, u"desktop") == 0 ||
-    u16icmp(platform, u"hardware") == 0 ||
-    u16icmp(platform, u"native") == 0;
+  // TODO cleanup to use a vector<string>.
+  PKMX_WCHAR t = new KMX_WCHAR[u16len(m_environment.platform().c_str()) + 1], context = NULL;
+  u16cpy(t, /*wcslen(s->dpString)+1,*/ m_environment.platform().c_str());
+  PKMX_WCHAR p = u16tok(t, u' ', &context);
+  while (p != NULL) {
+    if (u16icmp(platform, p) == 0) {
+      delete t;
+      return TRUE;
+    }
+    p = u16tok(NULL, u' ', &context);
+  }
+
+  delete t;
+  return FALSE;
 }
 
 KMX_BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
@@ -603,6 +633,10 @@ KMX_Context *KMX_Processor::GetContext() {
 
 KMX_Options *KMX_Processor::GetOptions() {
   return &m_options;
+}
+
+KMX_Environment *KMX_Processor::GetEnvironment() {
+  return &m_environment;
 }
 
 LPINTKEYBOARDINFO KMX_Processor::GetKeyboard() {

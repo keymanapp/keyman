@@ -34,30 +34,41 @@ kmns = [
   '022 - options with preset',
   '023 - options with save',
   '024 - options with save and preset',
-  '025 - options with reset'
+  '025 - options with reset',
+
+  '026 - system stores',
+  '027 - system stores 2',
+  
+  '028 - smp',
+  '029 - beep',
+  
+  '030 - multiple groups',
+  '031 - caps lock'
+#  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
+#  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-kmn_tests = []
-kmn_sources = []
+kmn_test = []
+kmn_source = []
 
 prog_kmcomp = find_program('kmcomp', required: false)
 
 if prog_kmcomp.found()
-
   foreach kmn : kmns
-    kmn_tests += configure_file(
+    kmn_test += configure_file(
       output: kmn + '.kmx',
       input: 'kmn/' + kmn + '.kmn',
       command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
     )
   
-    kmn_sources += configure_file(
+    kmn_source += configure_file(
       input: 'kmn/' + kmn + '.kmn',
       output: kmn + '.kmn',
       configuration: configuration_data()
     )
+    test('kmx', kmx, args: [kmn])
   endforeach
-
-  test('kmx', kmx, args: [kmns])
-
+# todo: if kmcomp is not found, use the .kmx in the source folder
+# therefore make kmcomp compile to the source folder and add to repo?
 endif
+

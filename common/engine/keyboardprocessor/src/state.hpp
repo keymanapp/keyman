@@ -27,6 +27,7 @@ protected:
     kbp::context          _ctxt;
     kbp::options          _options;
     kbp::keyboard const & _kb;
+    std::vector<km_kbp_option_item> _env;
 
 public:
     state(kbp::keyboard const & kb, km_kbp_option_item const * env);
@@ -41,11 +42,6 @@ public:
 
     kbp::keyboard const &  keyboard() const noexcept      { return _kb; }
 };
-
-inline
-state::state(kbp::keyboard const & kb, km_kbp_option_item const * env)
-: _options(kb.default_options, env), _kb(kb)
-{}
 
 } // namespace kbp
 } // namespace km

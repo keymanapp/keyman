@@ -50,12 +50,14 @@ namespace
 
   km_kbp_option_item const empty_options_list[] = {KM_KBP_OPTIONS_END};
 
+#if 0
   km::kbp::options mock_options(test_kb, test_env);
   km::kbp::options empty_options(empty_options_list, empty_options_list);
   km_kbp_options * api_mock_options = static_cast<km_kbp_options *>(
                                               &mock_options),
                  * api_empty_options = static_cast<km_kbp_options *>(
                                               &empty_options);
+#endif
 
   std::string get_json_doc(km_kbp_options * const opts)
   {

@@ -68,7 +68,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
       save = option(scope, key, value);
 
       //((km::kbp::state *)state)->keyboard().
-      const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key);
+      const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
 
       return &save;
     }
@@ -76,7 +76,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
 
   _saved.emplace_back(scope, key, value);
 
-  const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key);
+  const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
 
   return &_saved.back();
 }

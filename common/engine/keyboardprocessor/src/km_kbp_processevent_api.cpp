@@ -12,7 +12,8 @@
 #include "processor.hpp"
 #include "state.hpp"
 
-km_kbp_status km_kbp_process_event(km_kbp_state *state,
+km_kbp_status 
+km_kbp_process_event(km_kbp_state *state,
                           km_kbp_virtual_key vk, uint16_t modifier_state)
 {
   km::kbp::keyboard const & k = state->keyboard();
@@ -20,7 +21,8 @@ km_kbp_status km_kbp_process_event(km_kbp_state *state,
 }
 
 
-km_kbp_attr const * km_kbp_get_engine_attrs(km_kbp_state *state)
+km_kbp_attr const * 
+km_kbp_get_engine_attrs(km_kbp_state *state)
 {
   return state->keyboard().processor().get_attrs();
 }

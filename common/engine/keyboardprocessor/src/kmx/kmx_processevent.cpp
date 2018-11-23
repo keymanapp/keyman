@@ -21,42 +21,27 @@ namespace km {
       p.replace_extension(".kmx");
       m_valid = (bool) kmx.Load(p.native().c_str());
 
-      //std::vector<km_kbp_option_item> * opts = ;
-      kmx.GetOptions()->Init(kb->default_opts());
+      if (m_valid) {
+        kmx.GetOptions()->Init(kb->default_opts());
+      }
     }
 
-    char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
-      // We only map SHIFT and UNSHIFTED
-      // TODO: Map CAPS LOCK correctly
-      if (modifiers != 0 && modifiers != K_SHIFTFLAG) {
-        return 0;
-      }
-
-      bool shifted = modifiers == K_SHIFTFLAG;
-
-      if (vk == KM_KBP_VKEY_SPACE) {
-        // Override for space because it is the same for
-        // shifted and unshifted.
-        return 32;
-      }
-
-      for (int i = 0; s_char_to_vkey[i].vk; i++) {
-        if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == shifted) {
-          return i + 32;
-        }
-      }
-      return 0;
+    void kmx_processor::init_state(std::vector<km_kbp_option_item> *default_env) {
+      kmx.GetEnvironment()->Init(default_env);
     }
 
-    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key) {
-      if(scope == KM_KBP_OPT_KEYBOARD)
-        kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {
+      switch(scope) {
+        case KM_KBP_OPT_KEYBOARD:
+          kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+          break;
+        case KM_KBP_OPT_ENVIRONMENT:
+          kmx.GetEnvironment()->Load(key, value);
+          break;
+      }
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
-      // Convert VK to US char
-      uint16_t ch = VKeyToChar(modifier_state, vk);
-
       // Construct a context buffer from the items
 
       std::u16string ctxt;
@@ -83,7 +68,7 @@ namespace km {
 
       kmx.GetContext()->Set(ctxt.c_str());
       kmx.GetActions()->ResetQueue();
-      kmx.ProcessEvent(state, vk, modifier_state, ch);
+      kmx.ProcessEvent(state, vk, modifier_state);
 
       state->actions.clear();
 
