@@ -94,16 +94,16 @@ def get_and_convert_infdata(tmpdirname):
 	else:
 		return None, None, None, None, None
 
-def download_source(kbid, kbdir, sourcePath):
+def download_source(keyboardID, packageDir, sourcePath):
 	# just get latest version of kmn unless there turns out to be a way to get the version of a file at a date
 	base_url = "https://raw.github.com/keymanapp/keyboards/master/" + sourcePath
-	kmn_url = base_url + "/source/" + kbid + ".kmn"
+	kmn_url = base_url + "/source/" + keyboardID + ".kmn"
 	response = requests.get(kmn_url)
 	if response.status_code == 200:
-		kmn_file = os.path.join(kbdir, kbid + ".kmn")
+		kmn_file = os.path.join(packageDir, keyboardID + ".kmn")
 		with open(kmn_file, 'wb') as f:
 			f.write(response.content)
-			logging.info("Installing %s.kmn as keyman file", kbid)
+			logging.info("Installing %s.kmn as keyman file", keyboardID)
 		logging.info("Compiling kmn file")
 		subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
 		# kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
@@ -116,29 +116,29 @@ def download_source(kbid, kbdir, sourcePath):
 	# 	message = "install_kmp.py: warning: no kmn source file for %s so not installing keyboard." % (kbid)
 	# 	rmtree(kbdir)
 	# 	raise InstallError(InstallStatus.Abort, message)
-	icodownloadfile = os.path.join(kbdir, kbid + ".ico")
+	icodownloadfile = os.path.join(packageDir, keyboardID + ".ico")
 	if not os.path.isfile(icodownloadfile):
-		ico_url = base_url + "/source/" + kbid + ".ico"
+		ico_url = base_url + "/source/" + keyboardID + ".ico"
 		response = requests.get(ico_url)
 		if response.status_code == 200:
 			with open(icodownloadfile, 'wb') as f:
 				f.write(response.content)
-			logging.info("Installing %s.ico as keyman file", kbid)
+			logging.info("Installing %s.ico as keyman file", keyboardID)
 			checkandsaveico(icodownloadfile)
 		else:
-			logging.warning("install_kmp.py: warning: no ico source file for %s", kbid)
+			logging.warning("install_kmp.py: warning: no ico source file for %s", keyboardID)
 
-def process_keyboard_data(kbid, kbdir):
-	kbdata = get_keyboard_data(kbid)
+def process_keyboard_data(keyboardID, packageDir):
+	kbdata = get_keyboard_data(keyboardID)
 	if kbdata:
-		if not os.path.isdir(kbdir):
-			os.makedirs(kbdir)
+		if not os.path.isdir(packageDir):
+			os.makedirs(packageDir)
 		if 'sourcePath' in kbdata:
-			download_source(kbid, kbdir, kbdata['sourcePath'])
+			download_source(keyboardID, packageDir, kbdata['sourcePath'])
 
-		with open(os.path.join(kbdir, kbid + '.json'), 'w') as outfile:
+		with open(os.path.join(packageDir, keyboardID + '.json'), 'w') as outfile:
 			json.dump(kbdata, outfile)
-			logging.info("Installing api data file %s.json as keyman file", kbid)
+			logging.info("Installing api data file %s.json as keyman file", keyboardID)
 	# else:
 	# 	message = "install_kmp.py: error: cannot download keyboard data so not installing."
 	# 	rmtree(kbdir)
@@ -170,27 +170,27 @@ def install_kmp_shared(inputfile, online=False):
 	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
 	check_keyman_dir('/usr/local/share/fonts', "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
 
-	kmpid, ext = os.path.splitext(os.path.basename(inputfile))
-	kmpdir = os.path.join('/usr/local/share/keyman', kmpid)
-	kmpdocdir = os.path.join('/usr/local/share/doc/keyman', kmpid)
-	kmpfontdir = os.path.join('/usr/local/share/fonts/keyman', kmpid)
-	if not os.path.isdir(kmpdir):
-		os.makedirs(kmpdir)
-	extract_kmp(inputfile, kmpdir)
-	info, system, options, keyboards, files = get_metadata(kmpdir)
+	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	packageDir = os.path.join('/usr/local/share/keyman', packageID)
+	kmpdocdir = os.path.join('/usr/local/share/doc/keyman', packageID)
+	kmpfontdir = os.path.join('/usr/local/share/fonts/keyman', packageID)
+	if not os.path.isdir(packageDir):
+		os.makedirs(packageDir)
+	extract_kmp(inputfile, packageDir)
+	info, system, options, keyboards, files = get_metadata(packageDir)
 
 	if keyboards:
 		logging.info("Installing %s", info['name']['description'])
 		if online:
-			process_keyboard_data(kmpid, kmpdir)
+			process_keyboard_data(packageID, packageDir)
 			if len(keyboards) > 1:
 				for kb in keyboards:
-					if kb['id'] != kmpid:
-						process_keyboard_data(kb['id'], kmpdir)
+					if kb['id'] != packageID:
+						process_keyboard_data(kb['id'], packageDir)
 			# do_install_to_ibus = True # temporarily disable
 
 		for f in files:
-			fpath = os.path.join(kmpdir, f['name'])
+			fpath = os.path.join(packageDir, f['name'])
 			ftype = f['type']
 			if ftype == KMFileTypes.KM_DOC or ftype == KMFileTypes.KM_IMAGE:
 				#Special handling of doc and images to hard link them into doc dir
@@ -212,49 +212,50 @@ def install_kmp_shared(inputfile, online=False):
 				logging.info("Converting %s to LDML and installing both as as keyman file", f['name'])
 				ldml = convert_kvk_to_ldml(fpath)
 				name, ext = os.path.splitext(f['name'])
-				ldmlfile = os.path.join(kmpdir, name+".ldml")
+				ldmlfile = os.path.join(packageDir, name+".ldml")
 				output_ldml(ldmlfile, ldml)
 				# Special handling of icon to convert to PNG
 			elif ftype == KMFileTypes.KM_ICON:
 				logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 				checkandsaveico(fpath)
 		if do_install_to_ibus:
+			# install all keyboards not just packageID
 			install_to_ibus(kmn_file)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
 		logging.info("Contents of %s:", inputfile)
-		for o in os.listdir(kmpdir):
+		for o in os.listdir(packageDir):
 			logging.info(o)
-		rmtree(kmpdir)
+		rmtree(packageDir)
 		message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
 		raise InstallError(InstallStatus.Abort, message)
 
 def install_kmp_user(inputfile, online=False):
 	do_install_to_ibus = False
-	kmpid, ext = os.path.splitext(os.path.basename(inputfile))
-	kmpdir=user_keyboard_dir(kmpid)
-	if not os.path.isdir(kmpdir):
-		os.makedirs(kmpdir)
+	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	packageDir=user_keyboard_dir(packageID)
+	if not os.path.isdir(packageDir):
+		os.makedirs(packageDir)
 
-	extract_kmp(inputfile, kmpdir)
-	info, system, options, keyboards, files = get_metadata(kmpdir)
+	extract_kmp(inputfile, packageDir)
+	info, system, options, keyboards, files = get_metadata(packageDir)
 
 	if keyboards:
 		logging.info("Installing %s", info['name']['description'])
 		if online:
-			process_keyboard_data(kmpid, kmpdir)
+			process_keyboard_data(packageID, packageDir)
 			if len(keyboards) > 1:
 				for kb in keyboards:
-					if kb['id'] != kmpid:
-						process_keyboard_data(kb['id'], kmpdir)
+					if kb['id'] != packageID:
+						process_keyboard_data(kb['id'], packageDir)
 			# do_install_to_ibus = True # temporarily disable
 
 		for f in files:
-			fpath = os.path.join(kmpdir, f['name'])
+			fpath = os.path.join(packageDir, f['name'])
 			ftype = f['type']
 			if ftype == KMFileTypes.KM_FONT:
 				#Special handling of font to hard link it into font dir
-				fontsdir = os.path.join(user_keyman_font_dir(), kmpid)
+				fontsdir = os.path.join(user_keyman_font_dir(), packageID)
 				if not os.path.isdir(fontsdir):
 					os.makedirs(fontsdir)
 				os.link(fpath, os.path.join(fontsdir, f['name']))
@@ -264,7 +265,7 @@ def install_kmp_user(inputfile, online=False):
 				logging.info("Converting %s to LDML and installing both as as keyman file", f['name'])
 				ldml = convert_kvk_to_ldml(fpath)
 				name, ext = os.path.splitext(f['name'])
-				ldmlfile = os.path.join(kmpdir, name+".ldml")
+				ldmlfile = os.path.join(packageDir, name+".ldml")
 				output_ldml(ldmlfile, ldml)
 			elif ftype == KMFileTypes.KM_ICON:
 				# Special handling of icon to convert to PNG
@@ -274,14 +275,15 @@ def install_kmp_user(inputfile, online=False):
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
 		if do_install_to_ibus:
-			kmn_file = os.path.join(kmpdir, kmpid + ".kmn")
+			# install all keyboards not just packageID
+			kmn_file = os.path.join(packageDir, packageID + ".kmn")
 			install_to_ibus(kmn_file)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
 		logging.info("Contents of %s:", inputfile)
-		for o in os.listdir(kmpdir):
+		for o in os.listdir(packageDir):
 			logging.info(o)
-		rmtree(kmpdir)
+		rmtree(packageDir)
 		message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
 		raise InstallError(InstallStatus.Abort, message)
 

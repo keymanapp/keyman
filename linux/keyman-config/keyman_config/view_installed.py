@@ -172,14 +172,20 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             kmpdata = installed_kmp[kmp]
 
             if install_area == InstallArea.IA_USER:
-                welcome_file = os.path.join(user_keyboard_dir(kmpdata['id']), "welcome.htm")
-                icofile = os.path.join(user_keyboard_dir(kmpdata['id']), kmpdata['id'] + ".ico.png")
+                welcome_file = os.path.join(user_keyboard_dir(kmpdata['packageID']), "welcome.htm")
+                icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['packageID'] + ".ico.png")
+                if not os.path.isfile(icofile):
+                    icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['keyboardID'] + ".ico.png")
             elif install_area == InstallArea.IA_SHARED:
-                welcome_file = os.path.join("/usr/local/share/keyman", kmpdata['id'], "welcome.htm")
-                icofile = os.path.join("/usr/local/share/keyman", kmpdata['id'], kmpdata['id'] + ".ico.png")
+                welcome_file = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], "welcome.htm")
+                icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + ".ico.png")
+                if not os.path.isfile(icofile):
+                    icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + ".ico.png")
             else:
-                welcome_file = os.path.join("/usr/share/keyman", kmpdata['id'], "welcome.htm")
-                icofile = os.path.join("/usr/share/keyman", kmpdata['id'], kmpdata['id'] + ".ico.png")
+                welcome_file = os.path.join("/usr/share/keyman", kmpdata['packageID'], "welcome.htm")
+                icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + ".ico.png")
+                if not os.path.isfile(icofile):
+                    icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + ".ico.png")
             if not os.path.isfile(icofile):
                 icofile = find_keyman_image("icon_kmp.png")
 
@@ -189,7 +195,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             treeiter = store.append([GdkPixbuf.Pixbuf.new_from_file_at_size(icofile, 16, 16), \
                 kmpdata['name'], \
                 kmpdata['version'], \
-                kmpdata['id'], \
+                kmpdata['packageID'], \
                 install_area, \
                 welcome_file])
 
