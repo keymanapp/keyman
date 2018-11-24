@@ -22,7 +22,7 @@ km_kbp_process_event(km_kbp_state *state,
 
 
 km_kbp_attr const * 
-km_kbp_get_engine_attrs(km_kbp_state *state)
+km_kbp_get_engine_attrs(km_kbp_state const *state)
 {
   return state->keyboard().processor().get_attrs();
 }

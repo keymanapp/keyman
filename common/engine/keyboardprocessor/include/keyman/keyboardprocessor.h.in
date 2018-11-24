@@ -519,7 +519,7 @@ Lookup an option based on its key, in an options list.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_lookup(km_kbp_state *state,
+km_kbp_options_lookup(km_kbp_state const *state,
                       uint8_t scope,
                       km_kbp_cp const *key,
                       km_kbp_cp const **value);
@@ -871,7 +871,7 @@ structure.
 */
 KMN_API
 km_kbp_attr const *
-km_kbp_get_engine_attrs(km_kbp_state *state);
+km_kbp_get_engine_attrs(km_kbp_state const *state);
 
 /*
 ```
