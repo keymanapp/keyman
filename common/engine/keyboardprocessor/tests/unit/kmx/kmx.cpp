@@ -261,13 +261,18 @@ int run_test(const std::string & file) {
       else {
         keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
       }
-      keyboard_opts[i].key = new km_kbp_cp[key.length() + 1];
-      key.copy((char16_t * const)keyboard_opts[i].key, key.length());
-      keyboard_opts[i].key[key.length()] = 0;
 
-      keyboard_opts[i].value = new km_kbp_cp[it->value.length() + 1];
-      it->value.copy(keyboard_opts[i].value, it->value.length());
-      keyboard_opts[i].value[it->value.length()] = 0;
+      km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
+      key.copy(cp, key.length());
+      cp[key.length()] = 0;
+
+      keyboard_opts[i].key = cp;
+
+      cp = new km_kbp_cp[it->value.length() + 1];
+      it->value.copy(cp, it->value.length());
+      cp[it->value.length()] = 0;
+
+      keyboard_opts[i].value = cp;
 
       i++;
     }
