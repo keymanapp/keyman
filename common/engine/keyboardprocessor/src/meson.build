@@ -14,6 +14,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
      '-Wendif-labels',
      '-Wextra',
      '-Wno-unknown-pragmas',
+     '-Wno-missing-field-initializers',
      '-Wnon-virtual-dtor',
      '-Wshadow'
   ]

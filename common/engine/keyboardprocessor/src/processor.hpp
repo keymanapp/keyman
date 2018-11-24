@@ -57,7 +57,7 @@ namespace kbp
     km_kbp_status process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state);
     km_kbp_attr const * get_attrs() const;
     km_kbp_status validate() const;
-    void update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {};
+    void update_option(km_kbp_state *_kmn_unused(state), km_kbp_option_scope _kmn_unused(scope), std::u16string const & _kmn_unused(key), std::u16string const & _kmn_unused(value)) {};
     void init_state(std::vector<km_kbp_option_item> *default_env) {
       km_kbp_option_item opt = { u"hello", u"-", 0 };
       default_env->emplace_back(opt);
