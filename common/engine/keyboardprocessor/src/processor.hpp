@@ -38,8 +38,8 @@ namespace kbp
   class kmx_processor : public abstract_processor
   {
   private:
-    bool m_valid;
-    kmx::KMX_Processor kmx;
+    bool _valid;
+    kmx::KMX_Processor _kmx;
   public:
     kmx_processor(km_kbp_keyboard_attrs const * kb_);
     km_kbp_status process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state);

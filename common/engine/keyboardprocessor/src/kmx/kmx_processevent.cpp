@@ -8,7 +8,7 @@ namespace km {
   {
 
     km_kbp_status kmx_processor::validate() const {
-      return m_valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
+      return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
     }
 
     kmx_processor::kmx_processor(km_kbp_keyboard_attrs const * kb_) : abstract_processor(kb_) {
@@ -17,24 +17,24 @@ namespace km {
       std::filesystem::path p = kb->folder_path;
       p /= kb->id;
       p.replace_extension(".kmx");
-      m_valid = (bool) kmx.Load(p.native().c_str());
+      _valid = (bool) _kmx.Load(p.native().c_str());
 
-      if (m_valid) {
-        kmx.GetOptions()->Init(kb->default_opts());
+      if (_valid) {
+        _kmx.GetOptions()->Init(kb->default_opts());
       }
     }
 
     void kmx_processor::init_state(std::vector<km_kbp_option_item> *default_env) {
-      kmx.GetEnvironment()->Init(default_env);
+      _kmx.GetEnvironment()->Init(default_env);
     }
 
     void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {
       switch(scope) {
         case KM_KBP_OPT_KEYBOARD:
-          kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+          _kmx.GetOptions()->Load(km_kbp_state_options(state), key);
           break;
         case KM_KBP_OPT_ENVIRONMENT:
-          kmx.GetEnvironment()->Load(key, value);
+          _kmx.GetEnvironment()->Load(key, value);
           break;
       }
     }
@@ -64,14 +64,14 @@ namespace km {
         }
       }
 
-      kmx.GetContext()->Set(ctxt.c_str());
-      kmx.GetActions()->ResetQueue();
-      kmx.ProcessEvent(state, vk, modifier_state);
+      _kmx.GetContext()->Set(ctxt.c_str());
+      _kmx.GetActions()->ResetQueue();
+      _kmx.ProcessEvent(state, vk, modifier_state);
 
       state->actions.clear();
 
-      for (auto i = 0; i < kmx.GetActions()->Length(); i++) {
-        auto a = kmx.GetActions()->Get(i);
+      for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
+        auto a = _kmx.GetActions()->Get(i);
         switch (a.ItemType) {
         case QIT_CAPSLOCK:
           //TODO: add Caps Event

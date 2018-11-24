@@ -48,9 +48,6 @@ kmns = [
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-kmn_tests = []
-kmn_sources = []
-
 prog_kmcomp = find_program('kmcomp')
 
 # todo: if kmcomp is not found, use the .kmx in the source folder
