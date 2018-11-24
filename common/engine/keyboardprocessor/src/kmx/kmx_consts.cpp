@@ -1,5 +1,9 @@
 
-#include <kmx/kmx_processor.h>
+#include "kmx_processor.h"
+
+namespace km {
+namespace kbp {
+namespace kmx {
 
 const struct char_to_vkey s_char_to_vkey[] = {
   {KM_KBP_VKEY_SPACE, 0, 0},     // 
@@ -388,3 +392,7 @@ const struct modifier_names s_modifier_names[] = {
   {"NSCROLL", 0x2000},    // Scroll lock NOT on
   {NULL, 0}
 };
+
+} // namespace kmx
+} // namespace kbp
+} // namespace km

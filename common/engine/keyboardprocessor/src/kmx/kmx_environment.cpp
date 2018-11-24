@@ -7,6 +7,8 @@
 #include <state.hpp>
 #include <option.hpp>
 
+using namespace km::kbp::kmx;
+
 namespace {
   km_kbp_cp const
     *DEFAULT_PLATFORM                       = u"windows hardware desktop native",

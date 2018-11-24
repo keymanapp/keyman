@@ -2,7 +2,9 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include "kmx_processor.h"
+
+using namespace km::kbp::kmx;
 
 #define MAX_RSHIFT 24
 #define MAX_KSHIFT 18

@@ -2,16 +2,17 @@
 #pragma once
 
 #include <string>
-#include <map>
 #include <vector>
 #include <keyman/keyboardprocessor.h>
+#include "kmx_base.h"
+
+namespace km {
+namespace kbp {
+namespace kmx {
 
 class KMX_Options
 {
 private:
-  //km_kbp_options *m_options;
-  //std::map<std::u16string, KMX_Option> m_options;
-  //km::kbp::options *_options;
   LPINTKEYBOARDINFO _kp;
 
   void AddOptionsStoresFromXString(PKMX_WCHAR s);
@@ -27,3 +28,6 @@ public:
   void Save(km_kbp_state *state, int nStoreToSave);
 };
 
+} // namespace kmx
+} // namespace kbp
+} // namespace km

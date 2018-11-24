@@ -39,7 +39,7 @@ namespace kbp
   {
   private:
     bool m_valid;
-    KMX_Processor kmx;
+    kmx::KMX_Processor kmx;
   public:
     kmx_processor(km_kbp_keyboard_attrs const * kb_);
     km_kbp_status process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state);

@@ -2,9 +2,11 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include "kmx_processor.h"
 #include <stdarg.h>
 #include <iostream>
+
+using namespace km::kbp::kmx;
 
 #define TAB "\t"
 #define NL  "\n"
@@ -41,7 +43,7 @@ GetTickCount()
   return (unsigned long) duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...)
+int km::kbp::kmx::DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...)
 {
   char fmtbuf[256];
 
@@ -75,7 +77,7 @@ int DebugLog_1(const char *file, int line, const char *function, const char *fmt
   return 0;
 }
 
-const char *Debug_ModifierName(KMX_UINT modifiers) {
+const char *km::kbp::kmx::Debug_ModifierName(KMX_UINT modifiers) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
@@ -91,7 +93,7 @@ const char *Debug_ModifierName(KMX_UINT modifiers) {
   return "Unmodified";
 }
 
-const char *Debug_VirtualKey(KMX_WORD vk) {
+const char *km::kbp::kmx::Debug_VirtualKey(KMX_WORD vk) {
 #ifdef _MSC_VER
   __declspec(thread)
 #endif 
@@ -109,7 +111,7 @@ const char *Debug_VirtualKey(KMX_WORD vk) {
   return buf;
 }
 
-const char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
+const char *km::kbp::kmx::Debug_UnicodeString(PKMX_WCHAR s, int x) {
   if (!ShouldDebug()) {
     return "";
   }
@@ -128,7 +130,7 @@ const char *Debug_UnicodeString(PKMX_WCHAR s, int x) {
   return bufout[x];
 }
 
-const char *Debug_UnicodeString(std::u16string s, int x) {
+const char *km::kbp::kmx::Debug_UnicodeString(std::u16string s, int x) {
   if (!ShouldDebug()) {
     return "";
   }
@@ -146,7 +148,7 @@ const char *Debug_UnicodeString(std::u16string s, int x) {
   return bufout[x];
 }
 
-void write_console(KMX_BOOL error, const wchar_t *fmt, ...) {
+void km::kbp::kmx::write_console(KMX_BOOL error, const wchar_t *fmt, ...) {
   if (!g_silent || error) {
     va_list vars;
     va_start(vars, fmt);

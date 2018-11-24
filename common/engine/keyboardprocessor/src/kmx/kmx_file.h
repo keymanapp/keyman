@@ -7,6 +7,10 @@
 
 #include "kmx_base.h"
 
+namespace km {
+namespace kbp {
+namespace kmx {
+
 /* */
 
 #define KEYMAN_LAYOUT_DEFAULT 0x000005FE
@@ -266,3 +270,6 @@ typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
 
+} // namespace kmx
+} // namespace kbp
+} // namespace km

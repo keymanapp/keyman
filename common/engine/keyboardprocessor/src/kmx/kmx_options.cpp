@@ -2,9 +2,11 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include "kmx_processor.h"
 #include <option.hpp>
 #include <state.hpp>
+
+using namespace km::kbp::kmx;
 
 void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   int idx;

@@ -1,6 +1,11 @@
 #pragma once
 
 #include <string>
+#include "kmx_base.h"
+
+namespace km {
+namespace kbp {
+namespace kmx {
 
 class KMX_Environment {
 private:
@@ -24,3 +29,7 @@ public:
   const std::u16string & baseLayoutAlt() const noexcept { return _baseLayoutAlt; }
   const std::u16string & platform() const noexcept { return _platform; }
 };
+
+} // namespace kmx
+} // namespace kbp
+} // namespace km

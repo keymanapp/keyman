@@ -98,15 +98,15 @@ static inline std::string trim_copy(std::string s) {
 key_event char_to_event(char ch) {
   assert(ch >= 32 && ch < 128);
   return {
-    s_char_to_vkey[(int)ch - 32].vk,
-    (uint16_t)(s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
+    km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
+    (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
   };
 }
 
 uint16_t const get_modifier(std::string const m) {
-  for (int i = 0; s_modifier_names[i].name; i++) {
-    if (m == s_modifier_names[i].name) {
-      return s_modifier_names[i].modifier;
+  for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
+    if (m == km::kbp::kmx::s_modifier_names[i].name) {
+      return km::kbp::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
@@ -114,7 +114,7 @@ uint16_t const get_modifier(std::string const m) {
 
 km_kbp_virtual_key const get_vk(std::string const & vk) {
   for (int i = 1; i < 256; i++) {
-    if (vk == s_key_names[i]) {
+    if (vk == km::kbp::kmx::s_key_names[i]) {
       return i;
     }
   }

@@ -2,12 +2,14 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include "kmx_processor.h"
+
+using namespace km::kbp::kmx;
 
 /* Globals */
 
-KMX_BOOL g_debug_ToConsole = TRUE, g_debug_KeymanLog = TRUE;
-KMX_BOOL g_silent = FALSE;
+KMX_BOOL km::kbp::kmx::g_debug_ToConsole = TRUE, km::kbp::kmx::g_debug_KeymanLog = TRUE;
+KMX_BOOL km::kbp::kmx::g_silent = FALSE;
 
 /*
 * KMX_Processor

@@ -4,6 +4,8 @@
 */
 #include <kmx/kmx_processor.h>
 
+using namespace km::kbp::kmx;
+
 void KMX_Processor::ResetCapsLock(void)
 {
   DebugLog("ResetCapsLock: enter");
