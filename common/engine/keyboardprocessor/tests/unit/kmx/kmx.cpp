@@ -22,7 +22,7 @@
 #endif
 #define assert(expr) {if (!(expr)) std::exit(100*__LINE__); }
 
-std::string utf16_to_utf8(std::u16string utf16_string);
+std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
 
 namespace
 {
@@ -231,10 +231,7 @@ int run_test(const std::string & file) {
   if (result != 0) return result;
 
   std::cout << "file = " << file << std::endl;
-  //std::cout << "keys = " << keys << std::endl;
-  //std::cout << "expected = " << utf16_to_utf8(expected) << std::endl;
-  //std::cout << "context = " << utf16_to_utf8(context) << std::endl;
-
+  
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
     

@@ -3,8 +3,6 @@
 #include "state.hpp"
 #include "keyboard.hpp"
 
-std::string utf16_to_utf8(std::u16string utf16_string);
-
 namespace km {
   namespace kbp
   {
@@ -99,7 +97,6 @@ namespace km {
           break;
         case QIT_BACK:
           switch (a.dwData) {
-          case BK_SUPP2: break; //TODO eliminate
           case BK_DEFAULT:
             // This only happens if we know we have context to delete. Last item must be a character
             assert(!state->context().empty() && state->context().back().type != KM_KBP_IT_MARKER);

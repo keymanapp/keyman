@@ -49,7 +49,6 @@
 #define BK_DEFAULT    0
 #define BK_DEADKEY    1
 #define BK_BACKSPACE  2
-#define BK_SUPP2      3 // TODO: eliminate I1389 - Second backspace for supplementary pairs - so we can ignore it on Vista, etc
 
 // Different begin types
 #define BEGIN_ANSI    0

@@ -8,6 +8,8 @@
 #include <codecvt>
 #include <locale>
 
+std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
+
 const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {
     if (*p == ch) return p;
@@ -220,31 +222,6 @@ int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (int)(nch1-ch1));
 }
-
-
-#if 0
-/*
-  This function exists because of a bug in Visual Studio 2015 and 2017:
-  https://social.msdn.microsoft.com/Forums/en-US/8f40dcd8-c67f-4eba-9134-a19b9178e481/vs-2015-rc-linker-stdcodecvt-error?forum=vcgeneral
-  https://stackoverflow.com/a/35103224/1836776
-*/
-#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
-std::string utf16_to_utf8(std::u16string utf16_string)
-{
-  std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
-  auto p = reinterpret_cast<const int16_t *>(utf16_string.data());
-  return convert.to_bytes(p, p + utf16_string.size());
-}
-#else
-std::string utf16_to_utf8(std::u16string utf16_string)
-{
-  std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-  return convert.to_bytes(utf16_string);
-}
-#endif
-#endif 
-
-std::string utf16_to_utf8(std::u16string utf16_string);
 
 PKMX_WCHAR strtowstr(PKMX_CHAR in)
 {
