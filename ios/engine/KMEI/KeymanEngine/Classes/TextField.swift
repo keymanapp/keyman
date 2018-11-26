@@ -106,6 +106,10 @@ public class TextField: UITextField {
     resignFirstResponder()
     Manager.shared.keymanWeb.view.endEditing(true)
   }
+  
+  public func resumeKeyboard() {
+    becomeFirstResponder()
+  }
 
   public override var text: String! {
     get {

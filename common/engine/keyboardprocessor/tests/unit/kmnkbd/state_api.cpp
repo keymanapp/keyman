@@ -138,6 +138,7 @@ int main(int, char * [])
   km_kbp_context_item *citems = nullptr;
   try_status(km_kbp_context_items_from_utf16(u"Hello 😁", &citems));
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
+  km_kbp_context_items_dispose(citems);
   if(km_kbp_context_length(km_kbp_state_context(test_state)) != 7)
     return __LINE__;
   if(km_kbp_context_length(km_kbp_state_context(test_clone)) != 0)
@@ -185,6 +186,8 @@ int main(int, char * [])
   // Destroy them
   km_kbp_state_dispose(test_state);
   km_kbp_state_dispose(test_clone);
+  km_kbp_keyboard_dispose(test_kb);
+
 
   return 0;
 }
