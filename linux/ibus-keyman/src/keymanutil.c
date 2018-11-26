@@ -140,13 +140,14 @@ ibus_keyman_engine_new (gchar * file_name,
     engine_desc = ibus_engine_desc_new_varargs ("name", file_name,
                                     "longname", name,
                                     "description", desc,
-                                    "language", lang,
+                                    "language", lang ? lang : "oth",
                                     "license", license ? license : "",
                                     "author", author ? author : "",
                                     "icon", icon,
                                     "layout", layout,
-                                    "version", version,
+                                    "version", version ? version : "",
                                     NULL);
+    g_free(desc);
 
     return engine_desc;
 }
