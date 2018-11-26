@@ -177,6 +177,11 @@ begin
       Inc(i);
       FParamSourcePath := ParamStr(i);
     end
+    else if s = '-addhelppath' then
+    begin
+      Inc(i);
+      FParamHelpPath := ParamStr(i);
+    end
     else if s = '-schema-path' then
     begin
       Inc(i);
@@ -189,11 +194,6 @@ begin
       FJsonExtract := True;
       Inc(i);
       FParamJsonFields := ParamStr(i);
-    end
-    else if s = '-addHelpPath' then
-    begin
-      Inc(i);
-      FParamHelpPath := ParamStr(i);
     end
     else if FParamInfile = '' then FParamInfile := ParamStr(i)
     else if FParamOutfile = '' then FParamOutfile := ParamStr(i)
