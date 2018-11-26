@@ -16,7 +16,7 @@ from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
-from keyman_config.get_kmp import user_keyboard_dir
+from keyman_config.get_kmp import user_keyboard_dir, user_keyman_dir
 
 class ViewInstalledWindowBase(Gtk.Window):
     def __init__(self):
@@ -231,13 +231,13 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             self.uninstall_button.set_tooltip_text("Uninstall keyboard package " + model[treeiter][1])
             self.help_button.set_tooltip_text("Help for keyboard package " + model[treeiter][1])
             self.about_button.set_tooltip_text("About keyboard package " + model[treeiter][1])
-            logging.debug("You selected", model[treeiter][1], "version", model[treeiter][2])
+            logging.debug("You selected %s version %s", model[treeiter][1], model[treeiter][2])
             if model[treeiter][4] == InstallArea.IA_USER:
-                logging.debug("Enabling uninstall button for", model[treeiter][3], "in", model[treeiter][4])
+                logging.debug("Enabling uninstall button for %s in %s", model[treeiter][3], model[treeiter][4])
                 self.uninstall_button.set_sensitive(True)
             else:
                 self.uninstall_button.set_sensitive(False)
-                logging.debug("Disabling uninstall button for", model[treeiter][3], "in", model[treeiter][4])
+                logging.debug("Disabling uninstall button for %s in %s  ", model[treeiter][3], model[treeiter][4])
             if model[treeiter][5]:
                 self.help_button.set_sensitive(True)
             else:
@@ -246,7 +246,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def on_help_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None:
-            logging.info("Open welcome.htm for" + model[treeiter][1] + "if available")
+            logging.info("Open welcome.htm for %s if available", model[treeiter][1])
             welcome_file = model[treeiter][5]
             if welcome_file and os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
@@ -280,7 +280,13 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None:
             logging.info("Show keyboard details of " + model[treeiter][1])
-            kmp = { "name" : model[treeiter][1], "version" : model[treeiter][2]}
+            if model[treeiter][4] == InstallArea.IA_USER:
+                areapath = user_keyman_dir()
+            elif model[treeiter][4] == InstallArea.IA_SHARED:
+                areapath = "/usr/local/share/keyman"
+            else:
+                areapath = "/usr/share/keyman"
+            kmp = { "name" : model[treeiter][1], "version" : model[treeiter][2], "packageID" : model[treeiter][3],  "areapath" : areapath}
             w = KeyboardDetailsView(kmp)
             w.resize(800, 450)
             w.show_all()
