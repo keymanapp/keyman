@@ -6,8 +6,8 @@ Files: *
 Copyright: 2004-2018 SIL International
 License: GPL-2+
 
-Files: src/kmflutil.c
-       src/kmflutil.h
+Files: src/keymanutil.c
+       src/keymanutil.h
 Copyright: 2009-2018 SIL International
 License: GPL-2+ or MIT
 
