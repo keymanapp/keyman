@@ -410,6 +410,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         fontSourceString = jsonFont.getString(KMManager.KMKey_FontSource);
         if (FileUtils.hasFontExtension(fontSourceString)) {
           urls.add(baseUri + fontSourceString);
+        } else if (FileUtils.hasSVGViewBox(fontSourceString)) {
+          String fontFilename = FileUtils.getSVGFilename(fontSourceString);
+          urls.add(baseUri + fontFilename);
         }
       } catch (JSONException e) {
         return null;

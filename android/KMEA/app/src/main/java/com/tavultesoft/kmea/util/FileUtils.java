@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.util;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
@@ -28,6 +29,11 @@ public final class FileUtils {
   public static final String JAVASCRIPT = ".js";
   public static final String TRUETYPEFONT = ".ttf";
   public static final String OPENTYPEFONT = ".otf";
+
+  public static final String SVGFONT = ".svg";
+  public static final String SVGVIEWBOX = ".svg#";
+  public static final String WOFFFONT = ".woff";
+
   public static final String KEYBOARDPACKAGE = ".kmp";
   public static final String WELCOME_HTM = "welcome.htm";
 
@@ -210,9 +216,22 @@ public final class FileUtils {
     return filename;
   }
 
+  /**
+   * Utility if a given file is a font. We prefer TTF or OTF, but old Android devices use SVG or WOFF.
+   * Limitations: Include SVG only for Build.VERSION.SDK_INT == JELLY_BEAN_MR1 or JELLY_BEAN_MR2 for OSK
+   * @param filename
+   * @return boolean
+   *
+   */
   public static boolean hasFontExtension(String filename) {
     String f = filename.toLowerCase();
-    return f.endsWith(TRUETYPEFONT) || f.endsWith(OPENTYPEFONT);
+    return f.endsWith(TRUETYPEFONT) || f.endsWith(OPENTYPEFONT) || f.endsWith(WOFFFONT) ||
+      (f.endsWith(SVGFONT) && (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2));
+  }
+
+  public static boolean hasSVGViewBox(String filename) {
+    String f = filename.toLowerCase();
+    return f.contains(SVGVIEWBOX);
   }
 
   public static boolean hasJavaScriptExtension(String filename) {
@@ -226,8 +245,22 @@ public final class FileUtils {
   }
 
   public static boolean isWelcomeFile(String filename) {
-    String f = filename.toLowerCase();
-    return f.endsWith(WELCOME_HTM);
+    String f = getFilename(filename);
+    return f.equalsIgnoreCase(WELCOME_HTM);
   }
 
+  /**
+   * Utility to extract the .svg# filename.
+   * @param filename String
+   * @return String. Empty string if filename is not .svg#
+   */
+  public static String getSVGFilename(String filename) {
+    if (!hasSVGViewBox(filename)) {
+      return "";
+    }
+
+    String f = filename.toLowerCase();
+    int i = f.indexOf(SVGVIEWBOX) + SVGVIEWBOX.length();
+    return filename.substring(0, i);
+  }
 }

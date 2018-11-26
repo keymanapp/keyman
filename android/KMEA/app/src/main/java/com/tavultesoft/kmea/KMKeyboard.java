@@ -803,7 +803,8 @@ final class KMKeyboard extends WebView {
   /**
    * Take a font JSON object and adjust to pass to JS
    * 1. Replace "source" keys for "files" keys
-   * 2. Create full font paths for .ttf
+   * 2. Create full font paths for .ttf or
+   * .svg for Android 4.2 or 4.3 OSK
    * @param font String font JSON object as a string
    * @return String of modified font information with full paths. If font is invalid, return "''"
    */
