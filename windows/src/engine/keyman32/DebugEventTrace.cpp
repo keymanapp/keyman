@@ -57,6 +57,13 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
     msg[255] = 0;
   }
 
+  DWORD pid = GetCurrentProcessId();
+  DWORD tid = GetCurrentThreadId();
+  DWORD shiftState = Globals::get_ShiftState();
+  DWORD actualShiftState = GetActualShiftState();
+  DWORD tickCount = GetTickCount();
+  HKL activeHKL = GetKeyboardLayout(0);
+
   if (Globals::get_debug_ToConsole()) {   // I3951
     WCHAR windowinfo[1024];
     wsprintfW(windowinfo,
@@ -72,13 +79,13 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
       L"%hs:%d" TAB  //"SourceFile" TAB
       L"%s\n",     //"Message"
       sProcessName,                    //"Process" TAB
-      GetCurrentProcessId(),           //"PID" TAB
-      GetCurrentThreadId(),            //"TID" TAB
-      Globals::get_ShiftState(),       //"ShiftState" TAB
-      GetActualShiftState(),           // ActualShiftState TAB
-      GetTickCount(),                  //"TickCount" TAB
+      pid,                             //"PID" TAB
+      tid,                             //"TID" TAB
+      shiftState,                      //"ShiftState" TAB
+      actualShiftState,                // ActualShiftState TAB
+      tickCount,                       //"TickCount" TAB
       gti.hwndFocus,                   //"FocusHWND" TAB
-      GetKeyboardLayout(0),            //"ActiveHKL" TAB
+      activeHKL,                       //"ActiveHKL" TAB
       file, line,                      //"SourceFile" TAB
       msg);                            //"Message"
 
@@ -88,12 +95,6 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
   if (_td->etwRegHandle != NULL) {
 #define MAX_DESCRIPTORS 12
     EVENT_DATA_DESCRIPTOR Descriptors[MAX_DESCRIPTORS];
-    DWORD pid = GetCurrentProcessId();
-    DWORD tid = GetCurrentThreadId();
-    DWORD shiftState = Globals::get_ShiftState();
-    DWORD actualShiftState = GetActualShiftState();
-    DWORD tickCount = GetTickCount();
-    HKL activeHKL = GetKeyboardLayout(0);
 
 #ifdef _WIN64
     DWORD platform = 2;
