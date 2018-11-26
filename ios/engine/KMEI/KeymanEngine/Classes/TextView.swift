@@ -81,9 +81,7 @@ public class TextView: UITextView {
       }
 
       if delegate !== delegateProxy {
-        Manager.shared.kmLog(
-          "Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.",
-          checkDebugPrinting: true)
+        log.error("Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.")
       }
       super.delegate = delegateProxy
     }
@@ -95,19 +93,19 @@ public class TextView: UITextView {
   //   - All of the normal UITextViewDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) Dismissing keyboard. Was first responder:\(isFirstResponder)")
     resignFirstResponder()
     Manager.shared.keymanWeb.view.endEditing(true)
+  }
+  
+  public func resumeKeyboard() {
+    becomeFirstResponder()
   }
 
   public override var text: String! {
@@ -139,8 +137,7 @@ public class TextView: UITextView {
       return
     }
 
-    // TODO: Get font name directly from keyboard
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -153,8 +150,7 @@ public class TextView: UITextView {
       becomeFirstResponder()
     }
 
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
   }
 
   // MARK: iOS 7 TextView Scroll bug fix
@@ -227,7 +223,7 @@ extension TextView: KeymanWebDelegate {
     if let viewController = viewController {
       Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
     } else {
-      Manager.shared.switchToNextKeyboard()
+      _ = Manager.shared.switchToNextKeyboard()
     }
   }
 }
@@ -246,10 +242,8 @@ extension TextView: UITextViewDelegate {
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
 
     let isRTL: Bool
-    if let keyboardID = Manager.shared.keyboardID,
-       let languageID = Manager.shared.languageID {
-      let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
-      isRTL = keyboard?.isRTL ?? false
+    if let keyboard = Manager.shared.currentKeyboard {
+      isRTL = keyboard.isRTL
     } else {
       isRTL = false
     }
@@ -286,9 +280,8 @@ extension TextView: UITextViewDelegate {
     Manager.shared.keymanWebDelegate = self
 
     let fontName: String?
-    if let keyboardID = Manager.shared.keyboardID,
-       let languageID = Manager.shared.languageID {
-      fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    if let id = Manager.shared.currentKeyboardID {
+      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
     } else {
       fontName = nil
     }
@@ -299,15 +292,12 @@ extension TextView: UITextViewDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    Manager.shared.kmLog("TextView setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
     // copy this textView's text to the webview
     Manager.shared.setText(text)
     Manager.shared.setSelectionRange(selectedRange, manually: false)
-    Manager.shared.kmLog(
-      "TextView: \(self.debugDescription) Became first responder. Value: \(text.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
   public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,

@@ -123,12 +123,15 @@
   <itemizedlist>
     <listitem>
       <para>Debugging</para>
-      <para>If you are having support issues with Keyman Desktop, you can create a debug log for Keyman Desktop. A debug log contains information to help Keyman support resolve support issues and improve Keyman Desktop. Tick this option to begin a debug log. The debug log automatically creates a folder called <guilabel>keymanlog</guilabel> on your Windows desktop. Untick this option to stop collecting a debug log. You should not need to use this option unless you are requested to do so by Keyman in relation to an issue you are experiencing.</para>
+      <para>If you are having issues with Keyman Desktop, you can create a debug log for Keyman Desktop. A debug log contains information to help Keyman Technical Support resolve compatibility issues and improve Keyman Desktop. Tick this option to begin a debug log. You should not need to use this option unless you are requested to do so by Keyman Technical Support in relation to an issue you are experiencing.</para>
+      <para>The debug log files are created in <guilabel>%LOCALAPPDATA%\Keyman\Diag</guilabel>, and called <guilabel>system#.etl</guilabel>, where # is a number from 0 to 15. Each time you start Keyman Desktop, a new log file will be created, up to <guilabel>system15.etl</guilabel>, after which it will wrap around and start again at <guilabel>system0.etl</guilabel>.  Untick this option to stop collecting a debug log.</para>
+      <para>Debug log files will be sent to Keyman Technical Support when you send a diagnostic report to us with the Keyman System Information tool.</para>
+      <para>Debug log files are in binary format and can be imported into Windows Event Viewer for viewing, or Microsoft Message Analyzer (recommended).</para>
       <note>
-        <para>It is highly recommended that you switch off this option after obtaining the debug log. The keymanlog folder can grow very big very quickly!</para>
+        <para>It is highly recommended that you switch off this option after obtaining the debug log. The log files can grow very large very quickly!</para>
       </note>
       <warning>
-        <para>Privacy Warning - The debug log records anything you type while debugging is ticked. This would include logins and passwords! For this reason, Keyman only recommends switching the debug log on for short and isolated tests specifically requested by Keyman.</para>
+        <para>Privacy Warning - The debug log records every keystroke you type, even if a Keyman keyboard is not active. This includes logins and passwords! For this reason, we recommend only switching the debug log on for short and isolated tests as specifically requested by Keyman Technical Support.</para>
       </warning>
     </listitem>
   </itemizedlist>

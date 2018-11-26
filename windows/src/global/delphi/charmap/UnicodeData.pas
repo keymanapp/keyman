@@ -174,7 +174,7 @@ type
     procedure SetFontName(const Value: WideString);
     procedure SetDBPathToAppData;
     procedure ImportEthnologue;   // I4257
-    function FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage;   // I4257
+//    function FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage;   // I4257
   public
     constructor Create(const SourcePath: WideString; AUnicodeDataUIManager: IUnicodeDataUIManager; const ADBPath: string = ''; AForceDBPathToAppDataOnBuild: Boolean = True); // I2845
     destructor Destroy; override;
@@ -189,8 +189,8 @@ type
     property Blocks: TUnicodeBlockList read FBlocks;
     property FontName: WideString read FFontName write SetFontName;
 
-    function FindLanguageByCode(code: string): TEthnologueLanguage;   // I4257
-    function FindLanguagesByName(name: string): TEthnologueLanguages;   // I4257
+//    function FindLanguageByCode(code: string): TEthnologueLanguage;   // I4257
+//    function FindLanguagesByName(name: string): TEthnologueLanguages;   // I4257
 
     property UnicodeDataUIManager: IUnicodeDataUIManager read FUnicodeDataUIManager;
   end;
@@ -590,7 +590,12 @@ var
   line, str: TStringList;
   i: Integer;
 begin
+  // Handles typical distribution layout
   FUnicodeSourceFile := FUnicodeSourcePath + 'ethnologue.txt';
+  if not FileExists(FUnicodeSourceFile) then
+    // Handles source layout
+    FUnicodeSourceFile := FUnicodeSourcePath + '..\ethnologue\ethnologue.txt';
+
   str := TStringList.Create;
   line := TStringList.Create;
   try
@@ -1179,15 +1184,15 @@ begin
   end;
 end;
 
-function TUnicodeData.FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage; //rec: DaoRecordset): TUnicodeCharacter;   // I4257
+{function TUnicodeData.FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage; //rec: DaoRecordset): TUnicodeCharacter;   // I4257
 begin
   Result.Code := rec.Collect['LanguageCode'];
   Result.Name := rec.Collect['Name'];
   Result.Country := rec.Collect['Country'];
   Result.Status := Copy(rec.Collect['Status'], 1, 1)[1];
-end;
+end;}
 
-function TUnicodeData.FindLanguageByCode(code: string): TEthnologueLanguage;
+{function TUnicodeData.FindLanguageByCode(code: string): TEthnologueLanguage;
 var
   rec: ADODB_TLB.Recordset;
   vRecords: OleVariant;
@@ -1208,9 +1213,9 @@ begin
   finally
     rec := nil;
   end;
-end;
+end;}
 
-function TUnicodeData.FindLanguagesByName(name: string): TEthnologueLanguages;
+{function TUnicodeData.FindLanguagesByName(name: string): TEthnologueLanguages;
 var
   rec: ADODB_TLB.Recordset;
   vRecords: OleVariant;
@@ -1232,7 +1237,7 @@ begin
   finally
     rec := nil;
   end;
-end;
+end;}
 
 procedure TUnicodeData.CleanupFilter(var filter: WideString; FBlock: Boolean);
 var

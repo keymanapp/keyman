@@ -6,6 +6,8 @@ package com.tavultesoft.kmea;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 
@@ -17,7 +19,8 @@ public final class KeyboardEventHandler {
     KEYBOARD_SHOWN,
     KEYBOARD_DISMISSED,
     KEYBOARD_DOWNLOAD_STARTED,
-    KEYBOARD_DOWNLOAD_FINISHED;
+    KEYBOARD_DOWNLOAD_FINISHED,
+    PACKAGE_INSTALLED;
   }
 
   public static void notifyListeners(ArrayList<OnKeyboardEventListener> listeners, KeyboardType keyboardType, EventType event, String newValue) {
@@ -56,7 +59,20 @@ public final class KeyboardEventHandler {
     }
   }
 
-  public static interface OnKeyboardEventListener {
+  public static void notifyListeners(ArrayList<OnKeyboardDownloadEventListener> listeners, EventType event, List<Map<String, String>> keyboardsInfo, int result) {
+    if (listeners != null) {
+      @SuppressWarnings("unchecked")
+      // make a copy of the list to avoid concurrent modification while iterating
+        ArrayList<OnKeyboardDownloadEventListener> _listeners = (ArrayList<OnKeyboardDownloadEventListener>) listeners.clone();
+      if (event == EventType.PACKAGE_INSTALLED) {
+        for (OnKeyboardDownloadEventListener listener : _listeners)
+          listener.onPackageInstalled(keyboardsInfo);
+      }
+    }
+  }
+
+
+  public interface OnKeyboardEventListener {
     void onKeyboardLoaded(KeyboardType keyboardType);
 
     void onKeyboardChanged(String newKeyboard); // newKeyboard string format: languageID_keyboardID e.g. eng_us
@@ -66,9 +82,11 @@ public final class KeyboardEventHandler {
     void onKeyboardDismissed();
   }
 
-  public static interface OnKeyboardDownloadEventListener {
+  public interface OnKeyboardDownloadEventListener {
     void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo);
 
     void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result); // result > 0 if successful, < 0 if failed
+
+    void onPackageInstalled(List<Map<String, String>> keyboardsInstalled);
   }
 }

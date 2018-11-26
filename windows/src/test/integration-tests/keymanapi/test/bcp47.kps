@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.1021.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL="">1.0</Version>
+    <Name URL="">BCP47 Test</Name>
+  </Info>
+  <Files>
+    <File>
+      <Name>bcp47.kmx</Name>
+      <Description>Keyboard BCP47 Test</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>BCP47 Test</Name>
+      <ID>bcp47</ID>
+      <Version>1.0</Version>
+      <RTL>True</RTL>
+      <Languages>
+        <Language ID="tpi">Tok Pisin</Language>
+        <Language ID="abg-Latn">Abaga</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

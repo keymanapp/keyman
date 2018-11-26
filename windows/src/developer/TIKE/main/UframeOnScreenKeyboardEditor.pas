@@ -140,6 +140,7 @@ type
     procedure tmrUpdateCharacterMapTimer(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
     procedure pagesChanging(Sender: TObject; var AllowChange: Boolean);
+    procedure pagesChange(Sender: TObject);
   private
     FVKSetup: Boolean;
 
@@ -182,10 +183,14 @@ type
     function DoesKeyboardSupportXMLVisualKeyboard: Boolean;
     function TransferDesignToSource: Boolean;
     function TransferSourceToDesign(ASilent: Boolean): Boolean;   // I4057
+  protected
+    function GetHelpTopic: string; override;
   public
+
     procedure Load;
     procedure Save;
     procedure UpdateControls;
+    procedure SetFocus; override;
     property UnderlyingLayout: HKL read GetUnderlyingLayout write SetUnderlyingLayout;
     property KeyFont: TFont read GetKeyFont write SetKeyFont;   // I4057
     property VKModified: Boolean read FVKModified write SetVKModified;
@@ -201,6 +206,8 @@ implementation
 
 uses
   Xml.Xmldom,
+
+  Keyman.Developer.System.HelpTopics,
 
   CharacterInfo,
   CharMapInsertMode,
@@ -222,6 +229,9 @@ uses
 procedure TframeOnScreenKeyboardEditor.FormCreate(Sender: TObject);
 begin
   inherited;
+
+  pages.ActivePage := pageDesign;
+
   FVKUnicode := True;
 
   kbdOnScreen.SelectedKey := kbdOnScreen.Keys[0];
@@ -245,6 +255,13 @@ procedure TframeOnScreenKeyboardEditor.TntFormDestroy(Sender: TObject);
 begin
   inherited;
   FreeAndNil(FVK);  // I2794
+end;
+
+procedure TframeOnScreenKeyboardEditor.SetFocus;
+begin
+  inherited;
+  if pages.ActivePage = pageCode then
+    frameSource.SetFocus;
 end;
 
 procedure TframeOnScreenKeyboardEditor.SetKeyFont(const Value: TFont);   // I4057
@@ -307,6 +324,12 @@ end;
 { - Tab interactions                                                         - }
 { ---------------------------------------------------------------------------- }
 
+procedure TframeOnScreenKeyboardEditor.pagesChange(Sender: TObject);
+begin
+  if pages.ActivePage = pageCode then
+    frameSource.SetFocus;
+end;
+
 procedure TframeOnScreenKeyboardEditor.pagesChanging(Sender: TObject;
   var AllowChange: Boolean);
 begin
@@ -342,6 +365,8 @@ begin
       FVK.LoadFromStream(stream);
       VK_UpdateData;
       VK_UpdateKeyFont;
+      FVKCurrentKey := nil;
+      VK_SelectVKey;
     finally
       FVKLoading := False;
     end;
@@ -1240,6 +1265,11 @@ begin
   end;
 end;
 
+function TframeOnScreenKeyboardEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_OnScreenKeyboardEditor;
+end;
+
 function TframeOnScreenKeyboardEditor.GetHTMLExportParams(FFileName: string;
   var FFolders, FGraphical: Boolean): Boolean;
 begin
@@ -1382,9 +1412,10 @@ end;
 
 procedure TframeOnScreenKeyboardEditor.VK_FocusKey;
 begin
-  if rbKeyText.Checked
-    then editVKKeyText.SetFocus
-    else cmdBrowseKeyBitmap.SetFocus;
+  if editVKKeyText.CanFocus then
+    if rbKeyText.Checked
+      then editVKKeyText.SetFocus
+      else cmdBrowseKeyBitmap.SetFocus;
 end;
 
 { ---------------------------------------------------------------------------- }

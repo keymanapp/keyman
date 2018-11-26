@@ -67,7 +67,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_RootPath)
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootPath)
       then Result := IncludeTrailingPathDelimiter(ReadString(SRegValue_RootPath)) + 'xml\osk\'
       else Result := ExtractFilePath(ParamStr(0)) + 'xml\osk\';
   finally

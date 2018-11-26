@@ -199,7 +199,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions) then  // I2890
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then  // I2890
     try
       if not ValueExists(SRegValue_IDEOptShowStartupDialog) then Result := True
       else Result := ReadString(SRegValue_IDEOptShowStartupDialog) = '1';
@@ -221,7 +221,7 @@ var
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_IDEOptions) and ValueExists(SRegValue_IDEOptMultipleInstances)
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) and ValueExists(SRegValue_IDEOptMultipleInstances)
       then FMultiInstance := ReadString(SRegValue_IDEOptMultipleInstances) = '1'
       else FMultiInstance := False;
   finally
@@ -243,7 +243,7 @@ begin
       with TRegistryErrorControlled.Create do  // I2890
       try
         RootKey := HKEY_CURRENT_USER;
-        if not OpenKey(SRegKey_IDEFiles, True) then  // I2890
+        if not OpenKey(SRegKey_IDEFiles_CU, True) then  // I2890
           RaiseLastRegistryError;
         for i := 1 to ParamCount do
         begin
@@ -281,10 +281,10 @@ var
 begin
   if s = '' then
   begin
-    // We set to Courier New, 12pt
-    f.Name := 'Courier New';
-    f.Charset := ANSI_CHARSET;    // 02/02/2003 MCD: Added, charset not set when resetting to default font 
-    f.Size := 12;
+    // We set to Consolas, 12px as default
+    f.Name := 'Consolas';
+    f.Charset := ANSI_CHARSET;    // 02/02/2003 MCD: Added, charset not set when resetting to default font
+    f.Height := 12;
     f.Style := [];
     f.Color := clWindowText;
     Exit;
@@ -340,7 +340,12 @@ end;
 
 function IsKeymanDesktopInstalled: Boolean;
 begin
-  Result := FileExists(TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell));
+  try
+    Result := FileExists(TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell));
+  except
+    on E:EKeymanPath do
+      Result := False;
+  end;
 end;
 
 procedure InstallPackage(const nm: string; FCanInstallUnreg: Boolean);
@@ -356,7 +361,16 @@ begin
     Exit;
   end;
 
-  kmshell := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  try
+    kmshell := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  except
+    on E:EKeymanPath do
+    begin
+      ShowMessage('Keyman Desktop is not installed.  You must install Keyman Desktop to install this keyboard.');
+      Exit;
+    end;
+  end;
+
   if TUtilExecute.WaitForProcess('"'+kmshell+'" -i "'+nm+'"', ExtractFilePath(nm)) = False then  // I3475
     ShowMessage('Failed to install package: '+errmsg);
 
@@ -423,7 +437,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) then
       if ValueExists(SRegValue_RootPath) then
         RootPath := ReadString(SRegValue_RootPath);
   finally
@@ -565,12 +579,12 @@ end;
 
 procedure RemoveOldestTikeEditFonts(FMaxLessOne: Boolean);
 begin
-  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDEEditFonts);
+  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDEEditFonts_CU);
 end;
 
 procedure RemoveOldestTikeTestFonts(FMaxLessOne: Boolean);
 begin
-  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDETestFonts);
+  RemoveOldestTikeFonts(FMaxLessOne, SRegKey_IDETestFonts_CU);
 end;
 
 const  // I3283   // I3503
@@ -615,7 +629,12 @@ end;
 
 function GetKMShellPath(var ps: string): Boolean;   // I3655
 begin
-  ps := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  try
+    ps := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  except
+    on E:EKeymanPath do
+      Exit(False);
+  end;
   Result := FileExists(ps);
 end;
 

@@ -44,7 +44,7 @@
                     09 Aug 2015 - mcdurdin - I4843 - Log reported modifier state as well as Keyman current modifier state
 */
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 #include <stdio.h>
 #include <stdarg.h>
@@ -145,7 +145,7 @@ BOOL ShouldDebug_1() {
 	return g_debug_KeymanLog;
 }
 
-int SendDebugMessageFormat_1(char *fmt, ...) {
+int SendDebugMessageFormat_1(char * file, int line, char *fmt, ...) {
 	char fmtbuf[256];
 
 	va_list vars;
@@ -154,14 +154,14 @@ int SendDebugMessageFormat_1(char *fmt, ...) {
     strcpy_s(fmtbuf, "fail");  // I2248   // I3547
   }
 	fmtbuf[255] = 0;
-	SendDebugMessage(fmtbuf);
+	SendDebugMessage_1(file, line, fmtbuf);
 
   return 0;
 }
 
 #define TAB "\t"
 
-int SendDebugMessage_1(char *msg) {
+int SendDebugMessage_1(char * file, int line, char *msg) {
 	if(!g_debug_KeymanLog) {
     return 0;
   }
@@ -192,6 +192,7 @@ int SendDebugMessage_1(char *msg) {
     "%d" TAB  //"TickCount" TAB
     "%x" TAB  //"FocusHWND" TAB
     "%8x" TAB //"ActiveHKL" TAB
+    "%s:%d" TAB  //"SourceFile" TAB
     "%s",     //"Message"
   			
     sProcessName,                    //"Process" TAB
@@ -201,6 +202,7 @@ int SendDebugMessage_1(char *msg) {
     GetTickCount(),                  //"TickCount" TAB
     gti.hwndFocus,                   //"FocusHWND" TAB
     GetKeyboardLayout(0),            //"ActiveHKL" TAB
+    file, line,                      //"SourceFile" TAB
     msg);                            //"Message"
 
   if(g_debug_ToConsole) {   // I3951

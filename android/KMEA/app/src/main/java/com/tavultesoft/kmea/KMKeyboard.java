@@ -1,9 +1,10 @@
 /**
- * Copyright (C) 2017 SIL International. All rights reserved.
+ * Copyright (C) 2017-2018 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmea;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -24,6 +27,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -49,13 +53,21 @@ import android.widget.Toast;
 final class KMKeyboard extends WebView {
   private final Context context;
   private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
+  private String packageID;
+  private String keyboardID;
+  private String keyboardName;
+  private String keyboardVersion;
+
   private static String currentKeyboard = null;
   private static String txtFont = "";
   private static String oskFont = null;
+  private static String keyboardRoot = "";
+  private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
+  private static FirebaseAnalytics mFirebaseAnalytics;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -85,6 +97,8 @@ final class KMKeyboard extends WebView {
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   public void initKMKeyboard(final Context context) {
+    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+
     setFocusable(false);
     clearCache(true);
     getSettings().setJavaScriptEnabled(true);
@@ -109,8 +123,23 @@ final class KMKeyboard extends WebView {
 
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
-        if (KMManager.isDebugMode())
-          Log.d("Keyman JS Log: Line " + cm.lineNumber(), cm.message());
+        if (KMManager.isDebugMode()) {
+          Log.d("KMEA", "Keyman JS Log: Line " + cm.lineNumber() + ", " + cm.sourceId() + ":" + cm.message());
+        }
+
+        // Send console errors to Firebase Analytics.
+        // (Ignoring spurious message "No keyboard stubs exist = ...")
+        // TODO: Analyze if this error warrants reverting to default keyboard
+        // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
+        if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
+          sendKMWError(cm.lineNumber(), cm.sourceId(), cm.message());
+          Toast.makeText(context, "Fatal Error with " + currentKeyboard +
+            ". Loading default keyboard", Toast.LENGTH_LONG).show();
+
+          setKeyboard(KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID,
+            KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
+            KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
+        }
         return true;
       }
     });
@@ -138,6 +167,11 @@ final class KMKeyboard extends WebView {
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
     setBackgroundColor(0);
+  }
+
+  public void hideKeyboard() {
+    String jsString = "javascript:hideKeyboard()";
+    loadUrl(jsString);
   }
 
   public void executeHardwareKeystroke(int code, int shift, int lstates) {
@@ -222,12 +256,30 @@ final class KMKeyboard extends WebView {
     return currentKeyboard;
   }
 
+  /**
+   * Return the full path to the display text font. Usually used for creating a Typeface font
+   * @return String
+   */
   public static String textFontFilename() {
-    return txtFont;
+    return txtFont.isEmpty() ? "" : keyboardRoot + txtFont;
   }
 
+  /**
+   * Return the full path to the OSK font. Usually used for creating a Typeface font
+   * @return String
+   */
   public static String oskFontFilename() {
-    return oskFont;
+    return keyboardRoot + oskFont;
+  }
+
+  /**
+   * Return the full path to the special OSK font,
+   * which is with all the keyboard assets at the root app_data folder
+   * @param String filename
+   * @return String
+   */
+  public String specialOSKFontFilename(String filename) {
+    return context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator + filename;
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID) {
@@ -237,7 +289,8 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       retVal = false;
@@ -251,6 +304,9 @@ final class KMKeyboard extends WebView {
     String languageName = "";
     keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
 
+    setKeyboardRoot(packageID);
+    String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
+
     String tFont = "''";
     String oFont = null;
     HashMap<String, HashMap<String, String>> kbsInfo = LanguageListActivity.getKeyboardsInfo(context);
@@ -263,11 +319,11 @@ final class KMKeyboard extends WebView {
         oskFont = getFontFilename(kbInfo.get(KMManager.KMKey_OskFont));
 
         if (!txtFont.isEmpty()) {
-          tFont = kbInfo.get(KMManager.KMKey_Font).replace("\"" + KMManager.KMKey_FontSource + "\"", "\"" + KMManager.KMKey_FontFiles + "\"");
+          tFont = makeFontPaths(kbInfo.get(KMManager.KMKey_Font));
         }
 
         if (!oskFont.isEmpty()) {
-          oFont = kbInfo.get(KMManager.KMKey_OskFont).replace("\"" + KMManager.KMKey_FontSource + "\"", "\"" + KMManager.KMKey_FontFiles + "\"");
+          oFont = makeFontPaths(kbInfo.get(KMManager.KMKey_Font));
         } else {
           oskFont = null;
         }
@@ -282,24 +338,25 @@ final class KMKeyboard extends WebView {
       return false;
     }
 
-    // if 4.2 or 4.3, set svg font (if exists) as the only font for the OSK
-    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      oFont = makeSvgOnlyFont(oskFont);
-    }
-
     if (tFont.equals("''")) {
-      tFont = "undefined";
+      tFont = fontUndefined;
     }
     if (oFont.equals("''")) {
-      oFont = "undefined";
-    }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardVersion, tFont, oFont, packageID);
-    loadUrl(jsString);
-    if (KMManager.isDebugMode()) {
-      Log.d("KMKeyboard", jsString);
+      oFont = fontUndefined;
     }
 
+    // Escape single-quoted names for javascript call
+    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+    languageName = languageName.replaceAll("\'", "\\\\'");
+
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
+    loadUrl(jsString);
+
+    this.packageID = packageID;
+    this.keyboardID = keyboardID;
+    this.keyboardName = keyboardName;
+    this.keyboardVersion = keyboardVersion;
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -325,8 +382,9 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Invalid keyboard! Loading default", Toast.LENGTH_LONG).show();
-      packageID = KMManager.KMDefault_PackageID;
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      packageID = KMManager.KMDefault_UndefinedPackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       keyboardName = KMManager.KMDefault_KeyboardName;
@@ -341,6 +399,10 @@ final class KMKeyboard extends WebView {
     //  return false;
 
     keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
+
+    setKeyboardRoot(packageID);
+    String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
+
     String tFont = "''";
     String oFont = null;
     if (kFont == null) {
@@ -348,11 +410,12 @@ final class KMKeyboard extends WebView {
     } else {
       if (kFont.endsWith(".ttf") || kFont.endsWith(".otf")) {
         txtFont = kFont;
-        tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s\"]}", kFont.substring(0, kFont.length() - 4), kFont);
+        tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
       } else {
         txtFont = getFontFilename(kFont);
-        if (!txtFont.isEmpty())
-          tFont = kFont.replace("\"" + KMManager.KMKey_FontSource + "\"", "\"" + KMManager.KMKey_FontFiles + "\"");
+        if (!txtFont.isEmpty()) {
+          tFont = makeFontPaths(kFont);
+        }
       }
     }
 
@@ -360,11 +423,12 @@ final class KMKeyboard extends WebView {
       oskFont = null;
     } else {
       if (kOskFont.endsWith(".ttf") || kOskFont.endsWith(".otf")) {
-        oskFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), kOskFont);
+        oskFont = kOskFont;
+        oFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), keyboardRoot, kOskFont);
       } else {
         oskFont = getFontFilename(kOskFont);
         if (!oskFont.isEmpty()) {
-          oFont = kOskFont.replace("\"" + KMManager.KMKey_FontSource + "\"", "\"" + KMManager.KMKey_FontFiles + "\"");
+          oFont = makeFontPaths(kOskFont);
         } else {
           oskFont = null;
         }
@@ -375,24 +439,25 @@ final class KMKeyboard extends WebView {
       oFont = tFont;
     }
 
-    // if 4.2 or 4.3, set svg font (if exists) as the only font for the OSK
-    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) {
-      oFont = makeSvgOnlyFont(oFont);
-    }
-
     if (tFont.equals("''")) {
-      tFont = "undefined";
+      tFont = fontUndefined;
     }
     if (oFont.equals("''")) {
-      oFont = "undefined";
-    }
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = String.format(jsFormat, keyboardName.replace("'", "\\'"), keyboardID, languageName.replace("'", "\\'"), languageID, keyboardVersion, tFont, oFont, packageID);
-    loadUrl(jsString);
-    if (KMManager.isDebugMode()) {
-      Log.d("KMKeyboard", jsString);
+      oFont = fontUndefined;
     }
 
+    // Escape single-quoted names for javascript call
+    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+    languageName = languageName.replaceAll("\'", "\\\\'");
+
+    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
+    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
+    loadUrl(jsString);
+
+    this.packageID = packageID;
+    this.keyboardID = keyboardID;
+    this.keyboardName = keyboardName;
+    this.keyboardVersion = keyboardVersion;
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -421,6 +486,54 @@ final class KMKeyboard extends WebView {
 
   }
 
+  // Set the base path of the keyboard depending on the package ID
+  private void setKeyboardRoot(String packageID) {
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      this.keyboardRoot = (context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+    } else {
+      this.keyboardRoot = (context.getDir("data", Context.MODE_PRIVATE).toString() +
+        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    }
+  }
+
+  public String getKeyboardRoot() {
+    return this.keyboardRoot;
+  }
+
+  private String makeKeyboardPath(String packageID, String keyboardID, String keyboardVersion) {
+    String keyboardPath;
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      keyboardPath = getKeyboardRoot() + keyboardID + "-" + keyboardVersion + ".js";
+    } else {
+      keyboardPath = getKeyboardRoot() + keyboardID + ".js";
+    }
+    return keyboardPath;
+  }
+
+  private void sendKMWError(int lineNumber, String sourceId, String message) {
+    Bundle params = new Bundle();
+    // Error info
+    params.putInt("cm_lineNumber", lineNumber);
+    params.putString("cm_sourceID", sourceId);
+    params.putString("cm_message", message);
+
+    // Keyboard info
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      params.putString("keyboardType", "INAPP");
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      params.putString("keyboardType", "SYSTEM");
+    }  else {
+      params.putString("keyboardType", "UNDEFINED");
+    }
+    params.putString("packageID", this.packageID);
+    params.putString("keyboardID", this.keyboardID);
+    params.putString("keyboardName", this.keyboardName);
+    params.putString("keyboardVersion", this.keyboardVersion);
+
+    mFirebaseAnalytics.logEvent("kmw_console_error", params);
+  }
+
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
   // Ignores empty strings and layer names
   // Returns: String
@@ -445,6 +558,12 @@ final class KMKeyboard extends WebView {
     editor.commit();
   }
 
+  /**
+   * getFontFilename
+   * Parse a Font JSON object and return the font filename (ending in .ttf or .otf)
+   * @param jsonString String - Font JSON object as a string
+   * @return String - Filename for the font. If font is invalid, return ""
+   */
   private String getFontFilename(String jsonString) {
     String font = "";
     try {
@@ -581,9 +700,9 @@ final class KMKeyboard extends WebView {
       button.setText(title);
 
       if (!specialOskFont.isEmpty()) {
-        button.setTypeface(KMManager.getFontTypeface(context, specialOskFont));
+        button.setTypeface(KMManager.getFontTypeface(context, specialOSKFontFilename(specialOskFont)));
       } else {
-        Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFont : txtFont);
+        Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFontFilename() : textFontFilename());
         if (font != null) {
           button.setTypeface(font);
         } else {
@@ -680,18 +799,42 @@ final class KMKeyboard extends WebView {
     return text;
   }
 
-  private String makeSvgOnlyFont(String font) {
+  /**
+   * Take a font JSON object and adjust to pass to JS
+   * 1. Replace "source" keys for "files" keys
+   * 2. Create full font paths for .ttf or
+   * .svg for Android 4.2 or 4.3 OSK
+   * @param font String font JSON object as a string
+   * @return String of modified font information with full paths. If font is invalid, return "''"
+   */
+  private String makeFontPaths(String font) {
     try {
       JSONObject fontObj = new JSONObject(font);
-      JSONArray sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
-      if (sourceArray != null) {
-        String fontFile;
-        int length = sourceArray.length();
-        for (int i = 0; i < length; i++) {
-          fontFile = sourceArray.getString(i);
-          if (fontFile.contains(".svg")) {
-            fontObj.put(KMManager.KMKey_FontFiles, fontFile);
-            return fontObj.toString();
+      JSONArray sourceArray;
+      String fontFile;
+
+      // Replace "sources" key with "files"
+      if (fontObj.has(KMManager.KMKey_FontSource)) {
+        fontObj.put(KMManager.KMKey_FontFiles, fontObj.get(KMManager.KMKey_FontSource));
+        fontObj.remove(KMManager.KMKey_FontSource);
+      }
+
+      Object obj = fontObj.get(KMManager.KMKey_FontFiles);
+      if (obj instanceof String) {
+        fontFile = fontObj.getString(KMManager.KMKey_FontFiles);
+        fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + obj);
+        return fontObj.toString();
+      } else if (obj instanceof JSONArray) {
+        sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
+        if (sourceArray != null) {
+          for (int i = 0; i < sourceArray.length(); i++) {
+            fontFile = sourceArray.getString(i);
+            if (fontFile.contains(".ttf") ||
+              (fontFile.contains(".svg") && (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2))) {
+              fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + fontFile);
+              fontObj.remove(KMManager.KMKey_FontSource);
+              return fontObj.toString();
+            }
           }
         }
       }
@@ -714,7 +857,7 @@ final class KMKeyboard extends WebView {
       KMKeyPreviewView keyPreview = (KMKeyPreviewView) contentView.findViewById(R.id.kmKeyPreviewView);
       TextView textView = (TextView) contentView.findViewById(R.id.textView1);
       textView.setText(text);
-      Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFont : txtFont);
+      Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFontFilename() : textFontFilename());
       if (font != null) {
         textView.setTypeface(font);
       } else {
@@ -749,7 +892,7 @@ final class KMKeyboard extends WebView {
     KMKeyPreviewView keyPreview = (KMKeyPreviewView) contentView.findViewById(R.id.kmKeyPreviewView);
     TextView textView = (TextView) contentView.findViewById(R.id.textView1);
     textView.setText(text);
-    Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFont : txtFont);
+    Typeface font = KMManager.getFontTypeface(context, (oskFont != null) ? oskFontFilename() : textFontFilename());
     if (font != null) {
       textView.setTypeface(font);
     } else {
@@ -785,7 +928,9 @@ final class KMKeyboard extends WebView {
 
     dismissHelpBubble();
     //keyPreviewWindow.setAnimationStyle(R.style.KeyPreviewAnim);
-    keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
+    if (keyPreviewWindow != null) {
+      keyPreviewWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
+    }
   }
 
   protected void dismissKeyPreview(long delay) {

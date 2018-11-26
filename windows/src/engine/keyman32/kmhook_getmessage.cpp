@@ -62,7 +62,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
    // I3583   // I4287
-#include "keyman64.h"
+#include "pch.h"
 
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam);
@@ -141,34 +141,38 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		if(!InitialiseProcess(mp->hwnd)) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-	if(mp->message == WM_CHAR || mp->message == WM_SYSCHAR || mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP) 
-    if(ShouldDebug(sdmMessage)) DebugMessage(mp, wParam);
+  if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) || mp->message == wm_keymankeydown || mp->message == wm_keymankeyup ||
+    mp->message == wm_keyman_keyevent) 
+    && ShouldDebug(sdmMessage)) {
+    DebugMessage(mp, wParam);
+  }
 
-	if((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
-    _td->LastScanCode = (BYTE) ((mp->lParam & 0xFF0000) >> 16);
+  if ((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
+    BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
+
+    _td->LastScanCode = scan;
     _td->LastKey = mp->wParam;
 
-    switch(mp->wParam) {
+    switch (mp->wParam) {
     case VK_MENU:
     case VK_CONTROL:
     case VK_SHIFT:
-      if(_td->LastScanCode != 0xFF) {   // I4793
-        ProcessModifierChange((UINT) mp->wParam, mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP, mp->lParam & (1<<24));
+      if (scan != SCAN_FLAG_KEYMAN_KEY_EVENT) {   // I4793
+        ProcessModifierChange((UINT)mp->wParam, mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP, KEYMSG_FLAG_EXTENDED(mp->lParam));
       }
       break;
     }
+
+    // 4 Aug 2003 - mcdurdin - Stuff any Keyman wm_key* message with the correct scancode
+    if (mp->wParam != VK_BACK) {
+      if(scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {
+        mp->lParam = (mp->lParam & 0xFF00FFFFL) | (MapVirtualKey((UINT)mp->wParam, 0) << 16);
+      }
+    }
   }
 
-	// 4 Aug 2003 - mcdurdin - Stuff any Keyman wm_key* message with the correct scancode
-	if((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN ||
-		mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP) &&
-		(mp->lParam & 0xFF0000L) == 0xFF0000L &&
-    mp->wParam != VK_BACK)   // I4933
-	{
-		mp->lParam = (mp->lParam & 0xFF00FFFFL) | (MapVirtualKey((UINT) mp->wParam, 0) << 16);
-	}
-
   // I1337 - move mousewheel message checking before the PM_REMOVE handling - otherwise we can't pre-modify the message
+  // TODO: Move to WH_MOUSE_LL proc in main process
 	if(mp->message == WM_MOUSEWHEEL)
 	{
 		HWND hwndMouseWheel = FindWindow("TfrmVisualKeyboard", NULL);
@@ -187,12 +191,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 				return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 			}
 		}
-		//if(
-					/*case WM_MOUSEWHEEL:
-			if(PtInRect(&OnScreenKeyboardRect, pt))
-			{
-				PostMessage(WindowFromPoint(pt), WM_MOUSEWHEEL, wParam, lParam);
-				*/
 	}
 
   if((wParam & PM_REMOVE) == 0)  // I2908
@@ -336,27 +334,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 }
 
-BOOL CALLBACK KeymanExitEnumProc(HWND hwnd, LPARAM lParam)
-{
-  UNREFERENCED_PARAMETER(lParam);
-
-  if(GetWindowThreadProcessId(hwnd, NULL) != GetCurrentThreadId())
-  {
-    // This will be ignored by Keyman if the thread has already shutdown, because no controller windows will be registered
-    DWORD_PTR dwResult;
-    SendMessageTimeout(hwnd, wm_keyman, KM_EXIT, 0, SMTO_BLOCK, 1000, &dwResult);
-  }
-  return TRUE;
-}
-
-void KeymanExit(HWND hwnd)
-{
-	UninitialiseProcess(TRUE);
-  Globals_UninitThread();
-  EnumChildWindows(hwnd, KeymanExitEnumProc, 0);
-}
-
-
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -396,9 +373,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
     }
 
 		break;
-  case KM_EXIT:
-    KeymanExit(hwnd);
-    break;
 	}
 }
 
@@ -504,7 +478,7 @@ BOOL IsFocusedThread()
   gti.cbSize = sizeof(GUITHREADINFO);
   if(!GetGUIThreadInfo(0, &gti))
   {
-    DebugLastError();
+    DebugLastError("GetGUIThreadInfo");
     return FALSE;
   }
   return gti.hwndFocus == GetFocus();

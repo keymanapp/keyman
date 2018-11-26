@@ -84,9 +84,7 @@ public class TextField: UITextField {
       }
 
       if delegate !== delegateProxy {
-        Manager.shared.kmLog(
-          "Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.",
-          checkDebugPrinting: true)
+        log.error("Trying to set TextField's delegate directly. Use setKeymanDelegate() instead.")
       }
       super.delegate = delegateProxy
     }
@@ -98,19 +96,19 @@ public class TextField: UITextField {
   // All of the normal UITextFieldDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) keymanDelegate set to: \(keymanDelegate.debugDescription)",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) Dismissing keyboard. Was first responder:\(isFirstResponder)",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
     resignFirstResponder()
     Manager.shared.keymanWeb.view.endEditing(true)
+  }
+  
+  public func resumeKeyboard() {
+    becomeFirstResponder()
   }
 
   public override var text: String! {
@@ -150,8 +148,7 @@ public class TextField: UITextField {
       return
     }
 
-    // TODO: Get font name directly from keyboard object
-    let fontName = Manager.shared.fontNameForKeyboard(withID: kb.id, languageID: kb.languageID)
+    let fontName = Manager.shared.fontNameForKeyboard(withFullID: kb.fullID)
     let fontSize = font?.pointSize ?? UIFont.systemFontSize
     if let fontName = fontName {
       font = UIFont(name: fontName, size: fontSize)
@@ -163,8 +160,7 @@ public class TextField: UITextField {
       resignFirstResponder()
       becomeFirstResponder()
     }
-    Manager.shared.kmLog(
-      "TextField \(self.debugDescription) setFont: \(font!.familyName)", checkDebugPrinting: true)
+    log.debug("TextField \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
   }
 
   @objc func enableInputClickSound() {
@@ -221,7 +217,7 @@ extension TextField: KeymanWebDelegate {
     if let viewController = viewController {
       Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
     } else {
-      Manager.shared.switchToNextKeyboard()
+      _ = Manager.shared.switchToNextKeyboard()
     }
   }
 }
@@ -247,10 +243,8 @@ extension TextField: UITextFieldDelegate {
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
 
     let isRTL: Bool
-    if let keyboardID = Manager.shared.keyboardID,
-      let languageID = Manager.shared.languageID {
-      let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
-      isRTL = keyboard?.isRTL ?? false
+    if let keyboard = Manager.shared.currentKeyboard {
+      isRTL = keyboard.isRTL
     } else {
       isRTL = false
     }
@@ -285,9 +279,8 @@ extension TextField: UITextFieldDelegate {
     Manager.shared.keymanWebDelegate = self
 
     let fontName: String?
-    if let keyboardID = Manager.shared.keyboardID,
-      let languageID = Manager.shared.languageID {
-      fontName = Manager.shared.fontNameForKeyboard(withID: keyboardID, languageID: languageID)
+    if let id = Manager.shared.currentKeyboardID {
+      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
     } else {
       fontName = nil
     }
@@ -298,8 +291,7 @@ extension TextField: UITextFieldDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    Manager.shared.kmLog("TextField setFont: \(String(describing: font?.familyName))",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
     // copy this textField's text to the webview
     Manager.shared.setText(text)
@@ -307,9 +299,7 @@ extension TextField: UITextFieldDelegate {
     let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                            length: offset(from: textRange.start, to: textRange.end))
     Manager.shared.setSelectionRange(newRange, manually: false)
-    Manager.shared.kmLog(
-      "TextField: \(self.debugDescription) Became first responder. Value: \(String(describing: text))",
-      checkDebugPrinting: true)
+    log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
   public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {

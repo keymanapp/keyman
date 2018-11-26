@@ -64,7 +64,7 @@ type
     actFileSaveCopyAs: TAction;
     actFileRevert: TAction;
     actFilePageSetup: TFilePageSetup;
-    actFilePrint: TPrintDlg;
+    actFilePrint: TAction;
     actFilePrintPreview: TAction;
     actFileExit: TFileExit;
     actEditCut: TKMDEditCut;
@@ -125,7 +125,7 @@ type
     procedure actFileSaveCopyAsExecute(Sender: TObject);
     procedure actFileRevertExecute(Sender: TObject);
     procedure actFilePrintPreviewExecute(Sender: TObject);
-    procedure actFilePrintAccept(Sender: TObject);
+    procedure actFilePrintExecute(Sender: TObject);
     procedure actFilePrintPreviewUpdate(Sender: TObject);
     procedure actFilePrintUpdate(Sender: TObject);
     procedure actFileSaveAsAccept(Sender: TObject);
@@ -224,15 +224,18 @@ uses
   OnlineConstants,
   OnlineUpdateCheck,
   Printers,
-  Project,
-  ProjectFile,
-  ProjectFileType,
-  ProjectFileUI,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.Project.UfrmNewProject,
   GlobalProxySettings,
   RegistryKeys,
   TextFileFormat,
   UFixFontDialogBold,
   UfrmAboutTike,
+  UframeTextEditor,
   UfrmBitmapEditor,
   UfrmCharacterIdentifier,
   UfrmCharacterMapDock,
@@ -248,8 +251,8 @@ uses
   UfrmOptions,
   UfrmOSKEditor,
   UfrmPackageEditor,
-  UfrmProject,
-  UfrmProjectSettings,
+  Keyman.Developer.UI.Project.UfrmProject,
+  Keyman.Developer.UI.Project.UfrmProjectSettings,
   UfrmStartup,
   Upload_Settings,
   utilfiletypes, UfrmMDIChild;
@@ -276,7 +279,7 @@ begin
       if FileName <> '' then
       begin
         if AddToProject then
-          FEditor.ProjectFile := CreateProjectFile(FileName, nil);
+          FEditor.ProjectFile := CreateProjectFile(FGlobalProject, FileName, nil);
         FEditor.OpenFile(FileName);
       end;
     end;
@@ -299,7 +302,7 @@ begin
     actFilePageSetup.Enabled := Assigned(ActiveChild) and Supports(ActiveChild, IKMDPrintActions) and (Printer.Printers.Count > 0);
 end;
 
-procedure TmodActionsMain.actFilePrintAccept(Sender: TObject);
+procedure TmodActionsMain.actFilePrintExecute(Sender: TObject);
 begin
   (frmKeymanDeveloper.ActiveChild as IKMDPrintActions).PrintFile;
 end;
@@ -423,7 +426,13 @@ end;
 
 procedure TmodActionsMain.actHelpCheckForUpdatesExecute(Sender: TObject);
 begin
-  with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper, OnlineProductID_KeymanDeveloper_100, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
+  if TOnlineUpdateCheck.Running then
+  begin
+    ShowMessage('An online update check is already running.');
+    Exit;
+  end;
+
+  with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, True, False, False, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
   try
     if Run = oucShutDown then
       frmKeymanDeveloper.Close;
@@ -444,7 +453,7 @@ begin
   begin
     if not Assigned(ActiveEditor) or ActiveEditor.Untitled then Exit;
     if FGlobalProject.Files.IndexOfFileName(ActiveEditor.FileName) >= 0 then Exit;
-    ActiveEditor.ProjectFile := CreateProjectFile(ActiveEditor.FileName, nil);
+    ActiveEditor.ProjectFile := CreateProjectFile(FGlobalProject, ActiveEditor.FileName, nil);
     ShowProject;
   end;
 end;
@@ -464,32 +473,35 @@ var
 begin
   for i := 0 to actProjectAddFiles.Dialog.Files.Count - 1 do
     if FGlobalProject.Files.IndexOfFileName(actProjectAddFiles.Dialog.Files[i]) < 0 then
-      CreateProjectFile(actProjectAddFiles.Dialog.Files[i], nil);
+      CreateProjectFile(FGlobalProject, actProjectAddFiles.Dialog.Files[i], nil);
   frmKeymanDeveloper.ShowProject;
 end;
 
 procedure TmodActionsMain.actProjectNewExecute(Sender: TObject);
 begin
-  with frmKeymanDeveloper do
-  begin
-    FGlobalProject.Save;
-    ProjectForm.Free;
-    FreeAndNil(FGlobalProject);
-    FGlobalProject := TProjectUI.Create('');   // I4687
-    ShowProject;
-  end;
+  if not frmKeymanDeveloper.BeforeOpenProject then
+    Exit;
+  ShowNewProjectForm(frmKeymanDeveloper);
 end;
 
 procedure TmodActionsMain.actProjectOpenAccept(Sender: TObject);
 begin
+  if not frmKeymanDeveloper.BeforeOpenProject then
+    Exit;
   OpenProject(actProjectOpen.Dialog.FileName);
 end;
 
 procedure TmodActionsMain.OpenProject(FileName: WideString);
 begin
+  if (FileName <> '') and not FileExists(FileName) then
+  begin
+    ShowMessage('The project '+FileName+' does not exist.');
+    Exit;
+  end;
+
   FGlobalProject.Save;
-  FreeAndNil(FGlobalProject);
-  FGlobalProject := TProjectUI.Create(FileName);   // I4687
+  FreeGlobalProjectUI;
+  LoadGlobalProjectUI(FileName);   // I4687
   frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
   frmKeymanDeveloper.ShowProject;
 end;
@@ -757,16 +769,8 @@ begin
 end;
 
 procedure TmodActionsMain.actViewProjectExecute(Sender: TObject);
-var
-  frmProject: TfrmProject;
 begin
-  with frmKeymanDeveloper do
-  begin
-    frmProject := ProjectForm;
-    if Assigned(frmProject) and (ActiveChild = frmProject)
-      then PostMessage(frmProject.Handle, WM_CLOSE, 0, 0)
-      else ShowProject;
-  end;
+  frmKeymanDeveloper.ToggleProject;
 end;
 
 procedure TmodActionsMain.actViewProjectUpdate(Sender: TObject);

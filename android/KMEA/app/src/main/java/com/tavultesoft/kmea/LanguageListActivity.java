@@ -15,22 +15,24 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.BuildConfig;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +43,10 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public final class LanguageListActivity extends Activity implements OnKeyboardDownloadEventListener {
+public final class LanguageListActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
   private Context context;
+  private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
@@ -70,26 +73,18 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
-    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-    try {
-      int titleContainerId = (Integer) Class.forName("com.android.internal.R$id").getField("title_container").get(null);
-      ((ViewGroup) getWindow().findViewById(titleContainerId)).removeAllViews();
-    } catch (Exception e) {
-      Log.e("LanguageListActivity", "Error: " + e);
-    }
+    setContentView(R.layout.activity_list_layout);
 
-    getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.list_title_layout1);
-    setContentView(R.layout.list_layout);
+    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
-
-    final ImageButton backButton = (ImageButton) findViewById(R.id.left_button);
-    backButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        finish();
-      }
-    });
 
     languagesArrayList = new ArrayList<HashMap<String, String>>();
   }
@@ -97,7 +92,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
   @Override
   protected void onResume() {
     super.onResume();
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     if (!didExecuteParser) {
       didExecuteParser = true;
       new JSONParse().execute();
@@ -107,7 +102,20 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
   @Override
   protected void onPause() {
     super.onPause();
-    KMManager.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
+  }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    onBackPressed();
+    return true;
+  }
+
+  @Override
+  public void onBackPressed() {
+    finish();
   }
 
   @Override
@@ -137,6 +145,11 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
     }
   }
 
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing.
+  }
+
   protected static HashMap<String, String> getKeyboardInfo(int languageIndex, int keyboardIndex) {
     if (languages == null)
       return null;
@@ -146,14 +159,9 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       JSONObject language = languages.getJSONObject(languageIndex);
       String langID = language.getString(KMManager.KMKey_ID);
       String langName = language.getString(KMManager.KMKey_Name);
-      String pkgID;
 
-      JSONArray keyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
-      if (keyboards.getJSONObject(keyboardIndex).has(KMManager.KMKey_PackageID)) {
-        pkgID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_PackageID);
-      } else {
-        pkgID = KMManager.KMDefault_LegacyPackageID;
-      }
+      JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
+      String pkgID = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       String kbID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_ID);
       String kbName = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_Name);
       String kbVersion = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -187,8 +195,8 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           return null;
         }
 
-        languages = jsonObj.getJSONObject(KMManager.KMKey_Languages).getJSONArray(KMManager.KMKey_Languages);
-        options = jsonObj.getJSONObject(KMManager.KMKey_Options);
+        languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+        options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
 
@@ -204,7 +212,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           String kbVersion = "1.0";
           String isCustom = "N";
           String kbFont = "";
-          JSONArray langKeyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+          JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
           JSONObject keyboard = null;
 
           int kbLength = langKeyboards.length();
@@ -272,7 +280,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       jsonObj = new JSONObject(objInput.readObject().toString());
       objInput.close();
     } catch (Exception e) {
-      Log.e("Failed to read from cache file", "Error: " + e);
+      Log.e("LanguageListActivity", "Failed to read from cache file. Error: " + e);
       jsonObj = null;
     }
 
@@ -287,7 +295,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       objOutput.writeObject(jsonObj.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e("Failed to save to cache file", "Error: " + e);
+      Log.e("LanguageListActivity", "Failed to save to cache file. Error: " + e);
     }
   }
 
@@ -331,9 +339,9 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
 
       if (hasConnection && !loadFromCache) {
         progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("Loading...");
+        progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
-        if (!((Activity) context).isFinishing()) {
+        if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
         } else {
           cancel(true);
@@ -354,14 +362,15 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
         jsonObj = getCachedJSONObject(context);
       } else if (hasConnection) {
         try {
-          String deviceType = context.getResources().getString(R.string.device_type);
+          String deviceType = getString(R.string.device_type);
           if (deviceType.equals("AndroidTablet")) {
             deviceType = "androidtablet";
           } else {
             deviceType = "androidphone";
           }
-
-          jsonObj = jsonParser.getJSONObjectFromUrl(KMManager.kKeymanApiBaseURL + "languages?device=" + deviceType);
+          String remoteUrl = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
+            KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
+          jsonObj = jsonParser.getJSONObjectFromUrl(remoteUrl);
         } catch (Exception e) {
           jsonObj = null;
         }
@@ -392,8 +401,8 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
       }
 
       try {
-        languages = jsonObj.getJSONObject(KMManager.KMKey_Languages).getJSONArray(KMManager.KMKey_Languages);
-        options = jsonObj.getJSONObject(KMManager.KMKey_Options);
+        languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+        options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
 
@@ -411,7 +420,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
           String kbFont = "";
           String icon = "0";
           String isEnabled = "true";
-          JSONArray langKeyboards = language.getJSONArray(KMManager.KMKey_LanguageKeyboards);
+          JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
           JSONObject keyboard = null;
 
           int kbLength = langKeyboards.length();
@@ -425,7 +434,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
             kbKey = String.format("%s_%s", langID, kbID);
             if (KeyboardPickerActivity.containsKeyboard(context, kbKey)) {
               isEnabled = "false";
-              icon = String.valueOf(R.drawable.ic_action_check);
+              icon = String.valueOf(R.drawable.ic_check);
             }
 
             HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -439,7 +448,7 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
             if (keyboardModifiedDates.get(kbID) == null)
               keyboardModifiedDates.put(kbID, keyboard.getString(KMManager.KMKey_KeyboardModified));
           } else {
-            icon = String.valueOf(R.drawable.ic_action_next);
+            icon = String.valueOf(R.drawable.ic_arrow_forward);
             for (int j = 0; j < kbLength; j++) {
               keyboard = langKeyboards.getJSONObject(j);
               kbID = keyboard.getString(KMManager.KMKey_ID);
@@ -494,44 +503,20 @@ public final class LanguageListActivity extends Activity implements OnKeyboardDo
               startActivity(i);
             } else {
               HashMap<String, String> kbInfo = getKeyboardInfo(selectedIndex, 0);
-              String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
-              String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
-              String langID = kbInfo.get(KMManager.KMKey_LanguageID);
-              String kFont = kbInfo.get(KMManager.KMKey_Font);
-              String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-              KMManager.KeyboardState kbState = KMManager.getKeyboardState(context, pkgID, kbID, langID);
-              //if (kbState == KMManager.KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD) {
-              AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-              dialogBuilder.setTitle(langName + ": " + kbName);
-              dialogBuilder.setMessage("Would you like to download this keyboard?");
-              dialogBuilder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                  // Download keyboard
-                  if (KMManager.hasConnection(context)) {
-                    KMManager.KMKeyboardDownloader.download(context, position, 0, true);
-                  } else {
-                    Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-                  }
-                }
-              });
+              final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
+              final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
+              final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
 
-              dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                  // Cancel
-                }
-              });
-
-              AlertDialog dialog = dialogBuilder.create();
-              dialog.show();
-              /*}
-              else {
-                KeyboardPickerActivity.addKeyboard(context, kbInfo);
-                if (KMManager.InAppKeyboard != null)
-                  KMManager.InAppKeyboard.setKeyboard(kbID, langID, kbName, langName, kFont, kOskFont);
-                if (KMManager.SystemKeyboard != null)
-                  KMManager.SystemKeyboard.setKeyboard(kbID, langID, kbName, langName, kFont, kOskFont);
-                finish();
-              }*/
+              Bundle bundle = new Bundle();
+              bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+              bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
+              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+              bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+              bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+              Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+              i.putExtras(bundle);
+              startActivity(i);
             }
           }
         });

@@ -1,0 +1,12 @@
+﻿store(&NAME) 'issue266'
+store(&TARGETS) 'any'
+store(&COPYRIGHT) '2018 SIL'
+store(&KEYBOARDVERSION) '1.0'
+store(&VISUALKEYBOARD) 'issue266.kvks'
+store(&LAYOUTFILE) 'issue266.keyman-touch-layout'
+begin Unicode > use(main)
+
+group(main) using keys
+
+c 'b' for beep
++ 'b' > context beep

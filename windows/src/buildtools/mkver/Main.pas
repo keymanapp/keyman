@@ -1,18 +1,18 @@
 (*
   Name:             Main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      28 Sep 2006
 
   Modified Date:    26 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          28 Sep 2006 - mcdurdin - Added $GUID and fixed $DATE
                     11 Dec 2009 - mcdurdin - I1807 - Manifest files need version info automatically updated in build
                     04 May 2012 - mcdurdin - I3308 - V9.0 - Start to move towards Delphi namespaces
@@ -32,9 +32,7 @@ uses
   WinApi.ActiveX,
   System.Win.ComObj,
   Xml.XMLIntf,
-  Xml.XMLDoc,
-
-  KeymanVersion;
+  Xml.XMLDoc;
 
 var
   IncrementVersion, DebugVersion: Boolean;
@@ -275,6 +273,7 @@ var
   v: Integer;
   FGUID: array[0..9] of string;
   g: TGUID;
+  ProductReleaseMajor, ProductReleaseMinor, ProductRelease: string;
 begin
   for i := 0 to 9 do
   begin
@@ -303,6 +302,14 @@ begin
     if ProductVersionCvs[i] = ',' then ProductVersionCvs[i] := '-';
   end;
 
+  ProductRelease := ProductVersion;
+  i := Pos('.', ProductRelease, Pos('.', ProductRelease)+1);
+  if i > 0 then
+    Delete(ProductRelease, i, MaxInt);
+
+  ProductReleaseMajor := Copy(ProductRelease, 1, Pos('.', ProductRelease)-1);
+  ProductReleaseMinor := Copy(ProductRelease, Pos('.', ProductRelease)+1, MAXINT);
+
   AssignFile(tfi, fin);
   AssignFile(tfo, fout);
   Reset(tfi);
@@ -311,26 +318,14 @@ begin
   while not EOF(tfi) do
   begin
     readln(tfi, s);
-    n := Pos('$VERSION', s);
-    while n > 0 do
-    begin
-      if Copy(s, n, 11) = '$VERSIONNUM' then
-      begin
-        Delete(s, n, 11);
-        Insert(ProductVersionNum, s, n);
-      end
-      else if Copy(s, n, 11) = '$VERSIONCVS' then
-      begin
-        Delete(s, n, 11);
-        Insert(ProductVersionCvs, s, n);
-      end
-      else
-      begin
-        Delete(s, n, 8);
-        Insert(ProductVersion, s, n);
-      end;
-      n := Pos('$VERSION', s);
-    end;
+
+    s := StringReplace(s, '$VERSIONNUM', ProductVersionNum, [rfReplaceAll]);
+    s := StringReplace(s, '$VERSIONCVS', ProductVersionCvs, [rfReplaceAll]);
+    s := StringReplace(s, '$VERSION', ProductVersion, [rfReplaceAll]);
+
+    s := StringReplace(s, '$RELEASE_MAJOR', ProductReleaseMajor, [rfReplaceAll]);
+    s := StringReplace(s, '$RELEASE_MINOR', ProductReleaseMinor, [rfReplaceAll]);
+    s := StringReplace(s, '$RELEASE', ProductRelease, [rfReplaceAll]);
 
     n := Pos('$GUID', s);
     while n > 0 do
@@ -345,13 +340,7 @@ begin
       n := Pos('$GUID', s);
     end;
 
-    n := Pos('$DATE', s);
-    while n > 0 do
-    begin
-      Delete(s, n, 5);
-      Insert(FormatDateTime('d mmmm yyyy', Now), s, n);
-      n := Pos('$DATE', s);
-    end;
+    s := StringReplace(s, '$DATE', FormatDateTime('d mmmm yyyy', Now), [rfReplaceAll]);
 
     writeln(tfo, s);
   end;
@@ -379,11 +368,14 @@ begin
     writeln('   -v:         Update the version.rc with the template information');
     writeln('   -m:         Update manifest.xml with the template information');
     writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
-    writeln('                          $VERSION     5.0.50.0');
-    writeln('                          $VERSIONNUM  5,0,50,0');
-    writeln('                          $VERSIONCVS  5-0-50-0');
-    writeln('   template:   The source template, usually \keyman\'+SKeymanVersion+'\src\<dir>\version.txt');
-    writeln('   root:       The source template, usually \keyman\'+SKeymanVersion+'\src\version.txt');
+    writeln('                          $VERSION     1.2.3.4');
+    writeln('                          $VERSIONNUM  9,0,700,0');
+    writeln('                          $VERSIONCVS  9-0-700-0');
+    writeln('                          $RELEASE     1.2');
+    writeln('                          $GUID#       GUID 0-9');
+    writeln('                          $DATE        1 March 2018');
+    writeln('   template:   The source template, usually \keyman\windows\src\<dir>\version.txt');
+    writeln('   root:       The source template, usually \keyman\windows\src\version.txt');
     writeln('   version.rc: version.rc file to update');
     ExitCode := 2;
     Exit;

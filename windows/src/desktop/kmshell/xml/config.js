@@ -160,11 +160,15 @@ document.addEventListener("DOMContentLoaded", windowResize);
   }
 
   document.onfocusin = function() {
-    var itemtype, blah;
+    var itemtype, blah, elemid;
     
     globalfocus = event.srcElement;
     if(!event.srcElement) { return true; }
     elemid = event.srcElement.id;
+    if(typeof elemid != 'string') { 
+      // e.g. if document has received focus, id may be undefined
+      return true;
+    }
     itemtype = elemid.substr(0, 5);
     
     if(event.srcElement.className.substr(0,8) != 'menuitem' && event.srcElement != menudiv
@@ -189,9 +193,9 @@ document.addEventListener("DOMContentLoaded", windowResize);
   }        
   
   function list_detail(event,n) {
-    var k = $('#list_'+n);
-    k.toggleClass('expanded');
-    document.getElementById('list_'+n).focus();
+    var k = document.getElementById('list_'+n);
+    $(k).toggleClass('expanded');
+    k.focus();
     save_state();
     return false;
   }

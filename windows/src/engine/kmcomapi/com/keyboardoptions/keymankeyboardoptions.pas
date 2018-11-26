@@ -84,13 +84,23 @@ var
 begin
   Result := nil;
 
-  if VarType(Index) = varOleStr
-    then i := IndexOf(Index)
-    else i := Index;
+  if VarType(Index) = varOleStr then
+  begin
+    i := IndexOf(Index);
+    if i < 0 then
+      i := FKeyboardOptions.Add(TKeymanKeyboardOption.Create(Context, FKeyboardID, Index, ''));
+  end
+  else
+  begin
+    i := Index;
+    if (i < 0) or (i >= Get_Count) then
+    begin
+      ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+      Exit;
+    end;
+  end;
 
-  if (i < Get_Count) and (i >= 0)
-    then Result := FKeyboardOptions[i] as IKeymanKeyboardOption
-    else ErrorFmt(KMN_E_Collection_InvalidIndex, VarArrayOf([Index]));
+  Result := FKeyboardOptions[i] as IKeymanKeyboardOption;
 end;
 
 function TKeymanKeyboardOptions.IndexOf(const Name: WideString): Integer;
@@ -113,7 +123,7 @@ begin
   s := TStringList.Create;
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(BuildKeyboardOptionKey(FKeyboardID)) then
+    if OpenKeyReadOnly(BuildKeyboardOptionKey_CU(FKeyboardID)) then
     begin
       GetValueNames(s);
       for i := 0 to s.Count - 1 do

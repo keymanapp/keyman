@@ -87,11 +87,16 @@ begin
 
   reg := TRegistry.Create;
   try
-    if FInstByAdmin
-      then reg.RootKey := HKEY_LOCAL_MACHINE
-      else reg.RootKey := HKEY_CURRENT_USER;
-
-    RootPath := GetRegistryKeyboardInstallKey(KeyboardName) + SRegKey_LanguageProfiles;
+    if FInstByAdmin then
+    begin
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardName) + SRegSubKey_LanguageProfiles;
+    end
+    else
+    begin
+      reg.RootKey := HKEY_CURRENT_USER;
+      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardName) + SRegSubKey_LanguageProfiles;
+    end;
 
     UnregisterLocale(KeyboardName, LocaleName);
   finally
@@ -157,6 +162,7 @@ var
   sLocale: string;
   FInstByAdmin: Boolean;
   i: Integer;
+  Path: string;
 begin
   if not KeyboardInstalled(KeyboardName, FInstByAdmin) then
     ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardName]));   // I3888
@@ -174,11 +180,17 @@ begin
   reg := TRegistry.Create;
   with reg do
   try
-    if FInstByAdmin
-      then RootKey := HKEY_LOCAL_MACHINE
-      else RootKey := HKEY_CURRENT_USER;
-
-    RootPath := GetRegistryKeyboardInstallKey(KeyboardName) + SRegKey_LanguageProfiles;
+    if FInstByAdmin then
+    begin
+      RootKey := HKEY_LOCAL_MACHINE;
+      Path := GetRegistryKeyboardInstallKey_LM(KeyboardName);
+    end
+    else
+    begin
+      RootKey := HKEY_CURRENT_USER;
+      Path := GetRegistryKeyboardInstallKey_CU(KeyboardName);
+    end;
+    RootPath := Path + SRegSubKey_LanguageProfiles;
     if OpenKey(RootPath, True) then
     begin
       GetKeyNames(sLocales);

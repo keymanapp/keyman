@@ -13,6 +13,7 @@ object modActionsKeyboardEditor: TmodActionsKeyboardEditor
       ImageIndex = 37
       ShortCut = 118
       OnExecute = actKeyboardCompileExecute
+      OnUpdate = actKeyboardCompileUpdate
     end
     object actKeyboardIncludeDebugInformation: TAction
       Category = 'Keyboard'
@@ -150,12 +151,14 @@ object modActionsKeyboardEditor: TmodActionsKeyboardEditor
     object actDebugTestMode: TAction
       Category = 'Debug Control'
       Caption = '&Test Mode'
+      GroupIndex = 1
       OnExecute = actDebugTestModeExecute
       OnUpdate = actDebugTestModeUpdate
     end
     object actDebugDebuggerMode: TAction
       Category = 'Debug Control'
       Caption = '&Debugger Mode'
+      GroupIndex = 2
       OnExecute = actDebugDebuggerModeExecute
       OnUpdate = actDebugDebuggerModeUpdate
     end

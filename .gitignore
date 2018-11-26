@@ -226,6 +226,10 @@
 
 # /test/wm_unichar/
 
+# VS Code
+.vscode
+
+
 .DS_Store
 
 *.kpj.user

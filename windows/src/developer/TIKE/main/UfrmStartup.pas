@@ -46,10 +46,14 @@ type
 
   TfrmStartup = class(TTIKEForm)
     Timer: TTimer;
-    PaintPanel1: TPaintPanel;
     lblVersion: TLabel;
     Image1: TImage;
     Shape1: TShape;
+    Image2: TImage;
+    Label1: TLabel;
+    Shape2: TShape;
+    Shape3: TShape;
+    Shape4: TShape;
     procedure FormCreate(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure imgSplashClick(Sender: TObject);
@@ -65,6 +69,7 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
     procedure AppMinimize(Sender: TObject);
   protected
+    function GetHelpTopic: string; override;
     procedure WndProc(var Message: TMessage); override;
   end;
 
@@ -80,6 +85,9 @@ implementation
 
 uses
   Dialogs,
+
+  Keyman.Developer.System.HelpTopics,
+
   OnlineConstants,
   UfrmMain,
   utilexecute,
@@ -188,6 +196,11 @@ end;
 procedure TfrmStartup.FormShow(Sender: TObject);
 begin
   PostMessage(Handle, WM_USER_FormShown, 0, 0);
+end;
+
+function TfrmStartup.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Startup;
 end;
 
 procedure ForceShowStartup(Parent: TForm);

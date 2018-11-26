@@ -4,6 +4,8 @@
 * Xcode 9.1
 * iOS 8+
 * SwiftLint (`brew install swiftlint`)
+* Carthage (`brew install carthage`)
+* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
 ## Keyman App
 
@@ -11,6 +13,8 @@ The source for our published iOS Keyman app is found within the **keyman/** subd
 the views specific to the Keyman app, while the core functionality is found in KeymanEngine.framework.
 
 ### Building
+Building Keyman Web is a precursor for compiling KMEI, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
+
 To build Keyman for iOS, please run the build.sh build script within this folder.
 You will need to run with the command-line argument `-no-codesign` or establish alternate code-signing permissions to
 complete the build for the final app.

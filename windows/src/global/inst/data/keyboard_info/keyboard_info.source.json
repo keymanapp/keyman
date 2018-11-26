@@ -13,20 +13,25 @@
         "description": { "type": "string" },
         "license": { "type": "string", "enum": ["freeware", "shareware", "commercial", "mit", "other"] },
         "languages": { "anyOf": [
-          { "type": "array", "items": { "type": "string" } },
+          { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
           { "$ref": "#/definitions/KeyboardLanguageInfo" }
         ]},
         "lastModifiedDate": { "type": "string", "format": "date-time" },
         "links": { "type": "array", "items": { "$ref": "#/definitions/KeyboardLinkInfo" } },
         "packageFilename": { "type": "string", "pattern": "\\.km[xp]$" },
+        "packageFileSize": { "type": "number" },
         "jsFilename": { "type": "string", "pattern": "\\.js$" },
+        "jsFileSize": { "type": "number" },
         "documentationFilename": { "type": "string", "pattern": "\\.(rtf|html?|pdf|txt)$" },
+        "documentationFileSize": { "type": "number" },
+        "isRTL": { "type": "boolean" },
         "encodings": { "type": "array", "items": { "type": "string", "enum": ["ansi", "unicode"] }, "additionalItems": false },
         "packageIncludes": { "type": "array", "items": { "type": "string", "enum": ["welcome", "documentation", "fonts", "visualKeyboard"] }, "additionalItems": false },
         "version": { "type": "string" },
-        "minKeymanDesktopVersion": { "type": "string", "pattern": "^\\d+\\.0$" },
+        "minKeymanVersion": { "type": "string", "pattern": "^\\d+\\.0$" },
         "platformSupport": { "$ref": "#/definitions/KeyboardPlatformInfo" },
         "legacyId": { "type": "number" },
+        "sourcePath": { "type": "string", "pattern": "^(release|legacy|experimental)/.+/.+$" },
         "related": { "type": "object", "patternProperties": { 
           ".": { "$ref": "#/definitions/KeyboardRelatedInfo" }
           },
@@ -143,7 +148,7 @@
     "KeyboardPlatformInfo": {
       "type": "object",
       "patternProperties": {
-        "^(windows|macos|desktopWeb|ios|android|mobileWeb|linux)$": { "type": "string", "enum": ["full", "basic", "none"] }
+        "^(windows|macos|desktopWeb|ios|android|mobileWeb|linux)$": { "type": "string", "enum": ["dictionary", "full", "basic", "none"] }
       },
       "required": [],
       "additionalProperties": false
@@ -153,6 +158,7 @@
       "type": "object",
       "properties": {
         "deprecates": { "type": "boolean" },
+        "deprecatedBy": { "type": "boolean" },
         "note": { "type": "string" }
       },
       "required": [],

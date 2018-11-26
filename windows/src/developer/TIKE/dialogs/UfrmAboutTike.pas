@@ -38,18 +38,21 @@ type
 //  end;
 
   TfrmAboutTike = class(TTIKEForm)
-    PaintPanel1: TPaintPanel;
-    lblCopyright: TLabel;
     lblVersion: TLabel;
+    lblCopyright: TLabel;
     lblWebsite: TLabel;
     Image2: TImage;
     Shape1: TShape;
     cmdOK: TButton;
+    Image1: TImage;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure lblWebsiteClick(Sender: TObject);
     procedure imgKeymanClick(Sender: TObject);
   private
     FOnIconClick: TNotifyEvent;
+  protected
+    function GetHelpTopic: string; override;
   public
     property OnIconClick: TNotifyEvent read FOnIconClick write FOnIconClick;
   end;
@@ -59,6 +62,8 @@ implementation
 uses
   VCL.Themes,
 
+  Keyman.Developer.System.HelpTopics,
+
   KeymanVersion,
   onlineconstants,
   Upload_Settings,
@@ -66,7 +71,7 @@ uses
   utilexecute;
 
 const
-  SCaption = 'About Keyman Developer'; // I4819
+  SCaption = 'About Keyman Developer '+SKeymanVersion; // I4819
 
 {$R *.DFM}
 
@@ -82,6 +87,11 @@ end;
 procedure TfrmAboutTike.lblWebsiteClick(Sender: TObject);
 begin
   TUtilExecute.URL(lblWebsite.Caption);  // I3349
+end;
+
+function TfrmAboutTike.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_About;
 end;
 
 procedure TfrmAboutTike.imgKeymanClick(Sender: TObject);

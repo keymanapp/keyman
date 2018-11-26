@@ -28,7 +28,11 @@ div {
 #displaylanguage a { color: white; }
 
 #titleBox { 
-  position: absolute; left: 20px; top: 24px; background: url("keyman-desktop-565x50-black.png"); width: 565px; height: 50px; 
+  position: absolute; left: 20px; top: 24px; background: url("keyman-desktop-486x50-black.png"); width: 486px; height: 50px; 
+}
+
+#silLogo {
+  position: absolute; right: 20px; top: 24px; background: url("sil-logo-blue.png"); width: 48px; height: 50px; 
 }
 
 #family {

@@ -3,7 +3,8 @@ inherited frmPackageEditor: TfrmPackageEditor
   Top = 253
   HelpContext = 1002
   Caption = 'Package Editor'
-  ClientWidth = 681
+  ClientHeight = 622
+  ClientWidth = 965
   Font.Charset = ANSI_CHARSET
   Font.Name = 'Segoe UI'
   Icon.Data = {
@@ -173,15 +174,16 @@ inherited frmPackageEditor: TfrmPackageEditor
     1FFFFFFF9FFF}
   KeyPreview = True
   OnKeyDown = FormKeyDown
-  ExplicitWidth = 681
+  ExplicitWidth = 965
+  ExplicitHeight = 622
   PixelsPerInch = 96
   TextHeight = 13
   object pages: TLeftTabbedPageControl
     Left = 0
     Top = 0
-    Width = 681
-    Height = 447
-    ActivePage = pageDetails
+    Width = 965
+    Height = 622
+    ActivePage = pageCompile
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -195,21 +197,23 @@ inherited frmPackageEditor: TfrmPackageEditor
       Caption = 'Files'
       ImageIndex = 3
       ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 588
+      ExplicitHeight = 447
       object Panel1: TPanel
         Left = 0
         Top = 0
-        Width = 588
-        Height = 447
+        Width = 872
+        Height = 622
         Align = alClient
         BevelOuter = bvNone
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
+        ExplicitWidth = 588
+        ExplicitHeight = 447
         DesignSize = (
-          588
-          447)
+          872
+          622)
         object imgFileIcon: TImage
           Left = 328
           Top = 107
@@ -238,8 +242,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           AutoSize = False
           Caption = 
             'A typical package will need keyboards, fonts, and documentation.' +
-            ' You can also add other .kmp packages.  Don'#39't add any standard K' +
-            'eyman files (such as keyman.exe) here.'
+            ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
+            'tandard Keyman files (such as keyman.exe) here.'
           WordWrap = True
         end
         object lblFileDetails: TLabel
@@ -270,7 +274,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Left = 15
           Top = 72
           Width = 229
-          Height = 329
+          Height = 504
           Anchors = [akLeft, akTop, akBottom]
           ItemHeight = 13
           TabOrder = 0
@@ -278,17 +282,18 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object cmdAddFile: TButton
           Left = 14
-          Top = 407
+          Top = 582
           Width = 86
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Add...'
           TabOrder = 1
           OnClick = cmdAddFileClick
+          ExplicitTop = 407
         end
         object cmdRemoveFile: TButton
           Left = 103
-          Top = 407
+          Top = 582
           Width = 85
           Height = 25
           Anchors = [akLeft, akBottom]
@@ -296,39 +301,43 @@ inherited frmPackageEditor: TfrmPackageEditor
           Enabled = False
           TabOrder = 2
           OnClick = cmdRemoveFileClick
+          ExplicitTop = 407
         end
         object editFileType: TEdit
           Left = 352
           Top = 104
-          Width = 227
+          Width = 511
           Height = 21
           TabStop = False
           Anchors = [akLeft, akTop, akRight]
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 4
+          ExplicitWidth = 227
         end
         object editFilePath: TEdit
           Left = 328
           Top = 72
-          Width = 251
+          Width = 535
           Height = 21
           TabStop = False
           Anchors = [akLeft, akTop, akRight]
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 6
+          ExplicitWidth = 251
         end
         object memoFileDetails: TMemo
           Left = 328
           Top = 136
-          Width = 251
+          Width = 535
           Height = 89
           TabStop = False
           Anchors = [akLeft, akTop, akRight]
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 3
+          ExplicitWidth = 251
         end
         object cmdOpenFile: TButton
           Left = 328
@@ -350,28 +359,259 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
       end
     end
-    object pageDetails: TTabSheet
-      Caption = 'Details'
-      ImageIndex = 2
+    object pageKeyboards: TTabSheet
+      Caption = 'Keyboards'
+      ImageIndex = 5
       ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object Panel2: TPanel
+      ExplicitWidth = 588
+      ExplicitHeight = 447
+      object Panel5: TPanel
         Left = 0
         Top = 0
-        Width = 588
-        Height = 447
+        Width = 872
+        Height = 622
         Align = alClient
         BevelOuter = bvNone
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
+        ExplicitWidth = 588
+        ExplicitHeight = 447
         DesignSize = (
-          588
-          447)
+          872
+          622)
+        object Label2: TLabel
+          Left = 15
+          Top = 10
+          Width = 171
+          Height = 23
+          Caption = 'Keyboard Layouts'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -19
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label3: TLabel
+          Left = 15
+          Top = 37
+          Width = 546
+          Height = 32
+          AutoSize = False
+          Caption = 'Configure language assignments and fonts for each keyboard'
+          WordWrap = True
+        end
+        object lblKeyboardFiles: TLabel
+          Left = 15
+          Top = 516
+          Width = 26
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Files:'
+          ExplicitTop = 341
+        end
+        object lblKeyboardDescription: TLabel
+          Left = 15
+          Top = 489
+          Width = 62
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Description:'
+          ExplicitTop = 314
+        end
+        object lblKeyboardVersion: TLabel
+          Left = 15
+          Top = 568
+          Width = 41
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Version:'
+          ExplicitTop = 393
+        end
+        object lblKeyboardOSKFont: TLabel
+          Left = 260
+          Top = 75
+          Width = 73
+          Height = 13
+          Caption = 'Keyboard font'
+        end
+        object lblKeyboardDisplayFont: TLabel
+          Left = 260
+          Top = 102
+          Width = 62
+          Height = 13
+          Caption = 'Display font'
+        end
+        object lblKeyboardLanguages: TLabel
+          Left = 260
+          Top = 125
+          Width = 56
+          Height = 13
+          Caption = 'Languages'
+        end
+        object lblKeyboardRTL: TLabel
+          Left = 15
+          Top = 595
+          Width = 75
+          Height = 13
+          Anchors = [akLeft, akBottom]
+          Caption = 'Is right-to-left:'
+          ExplicitTop = 420
+        end
+        object lbKeyboards: TListBox
+          Left = 15
+          Top = 72
+          Width = 229
+          Height = 408
+          Anchors = [akLeft, akTop, akBottom]
+          ItemHeight = 13
+          TabOrder = 0
+          OnClick = lbKeyboardsClick
+        end
+        object editKeyboardDescription: TEdit
+          Left = 96
+          Top = 486
+          Width = 148
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 1
+          ExplicitTop = 311
+        end
+        object memoKeyboardFiles: TMemo
+          Left = 96
+          Top = 513
+          Width = 148
+          Height = 46
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 2
+          ExplicitTop = 338
+        end
+        object editKeyboardVersion: TEdit
+          Left = 96
+          Top = 565
+          Width = 148
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 3
+          ExplicitTop = 390
+        end
+        object cbKeyboardOSKFont: TComboBox
+          Left = 339
+          Top = 72
+          Width = 230
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 5
+          OnClick = cbKeyboardOSKFontClick
+        end
+        object cbKeyboardDisplayFont: TComboBox
+          Left = 339
+          Top = 99
+          Width = 230
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 6
+          OnClick = cbKeyboardDisplayFontClick
+        end
+        object gridKeyboardLanguages: TStringGrid
+          Left = 260
+          Top = 144
+          Width = 593
+          Height = 432
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ColCount = 2
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+          TabOrder = 7
+          OnClick = gridKeyboardLanguagesClick
+          OnDblClick = gridKeyboardLanguagesDblClick
+          ColWidths = (
+            78
+            64)
+        end
+        object cmdKeyboardAddLanguage: TButton
+          Left = 260
+          Top = 587
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Add...'
+          TabOrder = 8
+          OnClick = cmdKeyboardAddLanguageClick
+          ExplicitTop = 412
+        end
+        object cmdKeyboardRemoveLanguage: TButton
+          Left = 418
+          Top = 587
+          Width = 72
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Remove'
+          TabOrder = 9
+          OnClick = cmdKeyboardRemoveLanguageClick
+          ExplicitTop = 412
+        end
+        object editKeyboardRTL: TEdit
+          Left = 96
+          Top = 592
+          Width = 148
+          Height = 21
+          TabStop = False
+          Anchors = [akLeft, akBottom]
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 4
+          ExplicitTop = 417
+        end
+        object cmdKeyboardEditLanguage: TButton
+          Left = 339
+          Top = 587
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = 'Ed&it...'
+          TabOrder = 10
+          OnClick = cmdKeyboardEditLanguageClick
+          ExplicitTop = 412
+        end
+      end
+    end
+    object pageDetails: TTabSheet
+      Caption = 'Details'
+      ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitWidth = 588
+      ExplicitHeight = 447
+      object Panel2: TPanel
+        Left = 0
+        Top = 0
+        Width = 872
+        Height = 622
+        Align = alClient
+        BevelOuter = bvNone
+        Color = 14211288
+        ParentBackground = False
+        TabOrder = 0
+        ExplicitWidth = 588
+        ExplicitHeight = 447
+        DesignSize = (
+          872
+          622)
         object lblKMPImageFile: TLabel
           Left = 15
-          Top = 303
+          Top = 327
           Width = 53
           Height = 13
           Caption = 'Image file:'
@@ -379,7 +619,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblKMPImageSize: TLabel
           Left = 108
-          Top = 324
+          Top = 348
           Width = 92
           Height = 13
           Caption = 'Image size: (w x h)'
@@ -408,28 +648,28 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object lblStep2d: TLabel
           Left = 15
-          Top = 179
+          Top = 203
           Width = 54
           Height = 13
           Caption = 'Copyright:'
         end
         object lblStep2e: TLabel
           Left = 15
-          Top = 211
+          Top = 235
           Width = 39
           Height = 13
           Caption = 'Author:'
         end
         object lblStep2f: TLabel
           Left = 15
-          Top = 235
+          Top = 259
           Width = 77
           Height = 13
           Caption = 'E-mail address:'
         end
         object lblStep2g: TLabel
           Left = 15
-          Top = 259
+          Top = 283
           Width = 49
           Height = 13
           Caption = 'Web Site:'
@@ -474,7 +714,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentFont = False
         end
         object lblVersionHint: TLabel
-          Left = 332
+          Left = 616
           Top = 157
           Width = 46
           Height = 13
@@ -485,7 +725,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object cbReadMe: TComboBox
           Left = 108
           Top = 116
-          Width = 215
+          Width = 499
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
@@ -495,86 +735,94 @@ inherited frmPackageEditor: TfrmPackageEditor
         object editInfoName: TEdit
           Left = 108
           Top = 64
-          Width = 215
+          Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           OnChange = editInfoNameChange
+          ExplicitWidth = 215
         end
         object editInfoVersion: TEdit
           Left = 108
           Top = 152
-          Width = 215
+          Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
           OnChange = editInfoVersionChange
+          ExplicitWidth = 215
         end
         object editInfoCopyright: TEdit
           Left = 108
-          Top = 176
-          Width = 215
-          Height = 21
-          Anchors = [akLeft, akTop, akRight]
-          TabOrder = 3
-          Text = #169
-          OnChange = editInfoCopyrightChange
-        end
-        object editInfoAuthor: TEdit
-          Left = 108
-          Top = 208
-          Width = 215
+          Top = 200
+          Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 4
-          OnChange = editInfoAuthorChange
+          Text = #169
+          OnChange = editInfoCopyrightChange
+          ExplicitWidth = 215
         end
-        object editInfoEmail: TEdit
+        object editInfoAuthor: TEdit
           Left = 108
           Top = 232
-          Width = 215
+          Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 5
-          OnChange = editInfoEmailChange
+          OnChange = editInfoAuthorChange
+          ExplicitWidth = 215
         end
-        object editInfoWebSite: TEdit
+        object editInfoEmail: TEdit
           Left = 108
           Top = 256
-          Width = 215
+          Width = 499
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 6
+          OnChange = editInfoEmailChange
+          ExplicitWidth = 215
+        end
+        object editInfoWebSite: TEdit
+          Left = 108
+          Top = 280
+          Width = 499
+          Height = 21
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 7
           OnChange = editInfoWebSiteChange
+          ExplicitWidth = 215
         end
         object cmdInsertCopyright: TButton
-          Left = 330
-          Top = 176
+          Left = 614
+          Top = 200
           Width = 49
           Height = 21
           Anchors = [akTop, akRight]
           Caption = '&Insert '#169
-          TabOrder = 7
+          TabOrder = 8
           OnClick = cmdInsertCopyrightClick
+          ExplicitLeft = 330
         end
         object cbKMPImageFile: TComboBox
           Left = 108
-          Top = 300
-          Width = 215
+          Top = 324
+          Width = 499
           Height = 21
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          TabOrder = 8
+          TabOrder = 9
           OnClick = cbKMPImageFileClick
         end
         object panKMPImageSample: TPanel
-          Left = 410
+          Left = 694
           Top = 72
           Width = 142
           Height = 251
           Anchors = [akTop, akRight]
           BevelOuter = bvLowered
-          TabOrder = 9
+          TabOrder = 10
+          ExplicitLeft = 410
           object imgKMPSample: TImage
             Left = 1
             Top = 0
@@ -582,27 +830,38 @@ inherited frmPackageEditor: TfrmPackageEditor
             Height = 250
           end
         end
+        object chkFollowKeyboardVersion: TCheckBox
+          Left = 108
+          Top = 178
+          Width = 237
+          Height = 17
+          Caption = 'Package version follows keyboard version'
+          TabOrder = 3
+          OnClick = chkFollowKeyboardVersionClick
+        end
       end
     end
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
       ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 588
+      ExplicitHeight = 447
       object Panel3: TPanel
         Left = 0
         Top = 0
-        Width = 588
-        Height = 447
+        Width = 872
+        Height = 622
         Align = alClient
         BevelOuter = bvNone
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
+        ExplicitWidth = 588
+        ExplicitHeight = 447
         DesignSize = (
-          588
-          447)
+          872
+          622)
         object lblStartMenuOptions: TLabel
           Left = 15
           Top = 48
@@ -697,7 +956,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Left = 15
           Top = 136
           Width = 178
-          Height = 254
+          Height = 429
           Anchors = [akLeft, akTop, akBottom]
           ItemHeight = 13
           TabOrder = 3
@@ -705,7 +964,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         end
         object cmdNewStartMenuEntry: TButton
           Left = 14
-          Top = 397
+          Top = 572
           Width = 83
           Height = 25
           Anchors = [akLeft, akBottom]
@@ -713,16 +972,18 @@ inherited frmPackageEditor: TfrmPackageEditor
           Default = True
           TabOrder = 4
           OnClick = cmdNewStartMenuEntryClick
+          ExplicitTop = 397
         end
         object cmdDeleteStartMenuEntry: TButton
           Left = 106
-          Top = 397
+          Top = 572
           Width = 83
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Delete'
           TabOrder = 5
           OnClick = cmdDeleteStartMenuEntryClick
+          ExplicitTop = 397
         end
         object editStartMenuDescription: TEdit
           Left = 271
@@ -754,25 +1015,27 @@ inherited frmPackageEditor: TfrmPackageEditor
       Caption = 'Source'
       ImageIndex = 9
       ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 588
+      ExplicitHeight = 447
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
       ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 588
+      ExplicitHeight = 447
       object Panel4: TPanel
         Left = 0
         Top = 0
-        Width = 588
-        Height = 447
+        Width = 872
+        Height = 622
         Align = alClient
         BevelOuter = bvNone
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
+        ExplicitWidth = 588
+        ExplicitHeight = 447
         object Label13: TLabel
           Left = 15
           Top = 48
@@ -795,26 +1058,12 @@ inherited frmPackageEditor: TfrmPackageEditor
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object lblInstallHint: TLabel
-          Left = 15
-          Top = 183
-          Width = 325
+        object Label5: TLabel
+          Left = 24
+          Top = 121
+          Width = 81
           Height = 13
-          Caption = 'You can install the package, as is, into Keyman Desktop Edition:'
-        end
-        object lblBootstrap: TLabel
-          Left = 168
-          Top = 122
-          Width = 60
-          Height = 13
-          Caption = 'Install with:'
-        end
-        object lblBootstrapMSI: TLabel
-          Left = 232
-          Top = 122
-          Width = 3
-          Height = 13
-          Caption = ' '
+          Caption = 'Target filename:'
         end
         object cmdBuildPackage: TButton
           Left = 15
@@ -825,78 +1074,215 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 0
           OnClick = cmdBuildPackageClick
         end
-        object cmdInstall: TButton
-          Left = 15
-          Top = 204
-          Width = 133
-          Height = 25
-          Caption = '&Install Package...'
-          TabOrder = 1
-          OnClick = cmdInstallClick
-        end
         object editOutPath: TEdit
-          Left = 168
-          Top = 82
-          Width = 349
+          Left = 111
+          Top = 118
+          Width = 383
           Height = 21
           TabStop = False
           ParentColor = True
           ReadOnly = True
-          TabOrder = 2
+          TabOrder = 4
         end
         object cmdOpenContainingFolder2: TButton
-          Left = 15
-          Top = 344
+          Left = 293
+          Top = 80
           Width = 133
           Height = 25
           Caption = '&Open Containing Folder'
-          TabOrder = 3
+          TabOrder = 2
           OnClick = cmdOpenContainingFolder2Click
         end
         object cmdAddToProject: TButton
-          Left = 15
-          Top = 376
+          Left = 432
+          Top = 80
           Width = 133
           Height = 25
           Action = modActionsMain.actProjectAddCurrentEditorFile
-          TabOrder = 4
-        end
-        object cmdUninstall: TButton
-          Left = 15
-          Top = 236
-          Width = 133
-          Height = 25
-          Caption = '&Uninstall Package'
-          TabOrder = 5
-          OnClick = cmdUninstallClick
+          TabOrder = 3
         end
         object cmdCompileInstaller: TButton
-          Left = 15
-          Top = 116
+          Left = 154
+          Top = 80
           Width = 133
           Height = 25
           Caption = 'Compile I&nstaller'
-          TabOrder = 6
+          TabOrder = 1
           OnClick = cmdCompileInstallerClick
         end
-        object cmdInstallWith: TButton
-          Left = 167
-          Top = 140
-          Width = 138
-          Height = 25
-          Caption = '&Select Product Installer ...'
-          TabOrder = 7
-          OnClick = cmdInstallWithClick
+        object panBuildMobile: TPanel
+          Left = 328
+          Top = 162
+          Width = 310
+          Height = 265
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 5
+          object lblDebugHostCaption: TLabel
+            Left = 12
+            Top = 70
+            Width = 252
+            Height = 13
+            Caption = 'Debug host is active at following web addresses:'
+          end
+          object lblCrossPlatform: TLabel
+            Left = 12
+            Top = 6
+            Width = 169
+            Height = 17
+            Caption = 'Android and iOS Targets'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdStartTestOnline: TButton
+            Left = 12
+            Top = 34
+            Width = 150
+            Height = 25
+            Caption = 'Test &Package Online'
+            TabOrder = 0
+            OnClick = cmdStartTestOnlineClick
+          end
+          object cmdOpenDebugHost: TButton
+            Left = 12
+            Top = 198
+            Width = 221
+            Height = 25
+            Caption = 'Open packages page in local &browser'
+            TabOrder = 2
+            OnClick = cmdOpenDebugHostClick
+          end
+          object lbDebugHosts: TListBox
+            Left = 12
+            Top = 95
+            Width = 289
+            Height = 97
+            ItemHeight = 13
+            TabOrder = 1
+          end
         end
-        object editInstallerOutputFilename: TEdit
-          Left = 312
-          Top = 142
-          Width = 205
-          Height = 21
-          TabStop = False
-          ParentColor = True
-          ReadOnly = True
-          TabOrder = 8
+        object panBuildDesktop: TPanel
+          Left = 15
+          Top = 162
+          Width = 295
+          Height = 124
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 6
+          object Label4: TLabel
+            Left = 9
+            Top = 35
+            Width = 254
+            Height = 13
+            Caption = 'You can install the package into Keyman Desktop:'
+          end
+          object lblCompileTargetHeader: TLabel
+            Left = 9
+            Top = 6
+            Width = 202
+            Height = 17
+            Caption = 'Windows and macOS Targets'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object cmdInstall: TButton
+            Left = 9
+            Top = 60
+            Width = 152
+            Height = 25
+            Caption = '&Install...'
+            ImageIndex = 41
+            TabOrder = 0
+            OnClick = cmdInstallClick
+          end
+          object cmdUninstall: TButton
+            Left = 9
+            Top = 91
+            Width = 152
+            Height = 25
+            Caption = '&Uninstall...'
+            ImageIndex = 42
+            TabOrder = 1
+            OnClick = cmdUninstallClick
+          end
+        end
+        object panBuildWindowsInstaller: TPanel
+          Left = 15
+          Top = 295
+          Width = 295
+          Height = 132
+          BevelOuter = bvNone
+          Color = 15921906
+          ParentBackground = False
+          TabOrder = 7
+          object Label9: TLabel
+            Left = 9
+            Top = 6
+            Width = 124
+            Height = 17
+            Caption = 'Windows Installer'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object lblBootstrapMSI: TLabel
+            Left = 9
+            Top = 69
+            Width = 110
+            Height = 13
+            Caption = 'Keyman Desktop MSI:'
+            FocusControl = editBootstrapMSI
+          end
+          object lblInstallerOutputFilename: TLabel
+            Left = 9
+            Top = 37
+            Width = 81
+            Height = 13
+            Caption = 'Target filename:'
+            FocusControl = editInstallerOutputFilename
+          end
+          object editBootstrapMSI: TEdit
+            Left = 125
+            Top = 66
+            Width = 156
+            Height = 21
+            TabStop = False
+            ParentColor = True
+            ReadOnly = True
+            TabOrder = 1
+          end
+          object editInstallerOutputFilename: TEdit
+            Left = 125
+            Top = 34
+            Width = 156
+            Height = 21
+            TabStop = False
+            ParentColor = True
+            ReadOnly = True
+            TabOrder = 0
+          end
+          object cmdInstallWith: TButton
+            Left = 125
+            Top = 96
+            Width = 156
+            Height = 25
+            Caption = 'Find Keyman Desktop MSI...'
+            TabOrder = 2
+            OnClick = cmdInstallWithClick
+          end
         end
       end
     end
@@ -905,19 +1291,22 @@ inherited frmPackageEditor: TfrmPackageEditor
     Filter = 'All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Add Files'
-    Top = 284
+    Left = 32
+    Top = 492
   end
   object dlgNewCustomisation: TSaveDialog
     DefaultExt = 'kct'
     Filter = 'Customisation file (*.kct)|*.kct|All files (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Top = 316
+    Left = 32
+    Top = 532
   end
   object dlgOpenProductInstaller: TOpenDialog
     DefaultExt = 'msi'
     Filter = 'Product Installer Files (*.msi)|*.msi|All Files (*.*)|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     Title = 'Select Product Installer'
-    Top = 248
+    Left = 32
+    Top = 456
   end
 end

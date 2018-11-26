@@ -28,13 +28,18 @@ const
 
   // Compile to .kmx
   KMXKeymanTargets: TKeymanTargets = [
-    ktWindows, ktMacosx, ktDesktop
+    ktWindows, ktMacosx, ktLinux, ktDesktop
   ];
 
   // Compile to .js
   KMWKeymanTargets: TKeymanTargets = [
     ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet,
     ktMobile, ktTablet
+  ];
+
+  // Supports .kvks
+  KeymanTargetsUsingKVK: TKeymanTargets = [
+    ktWindows, ktMacosx, ktLinux, ktDesktop, ktWeb
   ];
 
   // Other targets?
@@ -46,7 +51,16 @@ const
     'web', 'iphone', 'ipad', 'androidphone', 'androidtablet',
     'mobile', 'desktop', 'tablet');
 
+  // Friendly names for targets, e.g. for documentation
+
+  SKeymanTargetNames: array[TKeymanTarget] of string = (
+    'All',
+    'Windows', 'macOS', 'Linux',
+    'Web', 'iPhone', 'iPad', 'Android phone', 'Android tablet',
+    'Mobile devices', 'Desktop devices', 'Tablet devices');
+
 function KeymanTargetsToString(ATargets: TKeymanTargets): string;
+function KeymanTargetsToNames(ATargets: TKeymanTargets): string;
 function StringToKeymanTargets(ATargets: string): TKeymanTargets;
 
 implementation
@@ -83,6 +97,22 @@ begin
     if i in ATargets then
       Result := Result + SKeymanTargets[i] + ' ';
   Result := Trim(Result);
+end;
+
+function KeymanTargetsToNames(ATargets: TKeymanTargets): string;
+var
+  i: TKeymanTarget;
+begin
+  Result := '';
+  for i := Low(TKeymanTarget) to High(TKeymanTarget) do
+  begin
+    if i in ATargets then
+    begin
+      if Result <> '' then
+        Result := Result + ', ';
+      Result := Result + SKeymanTargetNames[i];
+    end;
+  end;
 end;
 
 end.

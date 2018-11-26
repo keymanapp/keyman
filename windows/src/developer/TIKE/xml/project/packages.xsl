@@ -3,18 +3,16 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_packaging">
-    <div class="page" id="Packaging">
-      <div id="uppertext2" style="clear: all; display: block;">
+    <div class="page" id="page-2">
+      <div class="help-container" id="uppertext2">
         <div class="headerimage">
-          <p><img>
-            <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_package.png</xsl:attribute>
-          </img></p>
+          <p><img src='res/header_package.png' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
           
             <ul>
-              <li><a href="help:tutorial_package">Package Tutorial</a></li>
-              <li><a href="help:context_frmPackageEditor">Package Editor Help</a></li>
+              <li><a href="help:guides/distribute/tutorial">Package Tutorial</a></li>
+              <li><a href="help:context/package-editor">Package Editor Help</a></li>
             </ul>
           </div>
         </div>
@@ -22,10 +20,10 @@
         <div class="pagetext">
           <h2>Package keyboards with fonts and documentation</h2>
 
-          <p>After creating a keyboard, you should create a package to make it easier to install on Windows or Mac OS X.  A package can include multiple
+          <p>After creating a keyboard, you should create a package in order to distribute the keyboard to all Windows, macOS, iOS and Android. A package can include multiple
           keyboards, fonts, a welcome page, documentation and shortcuts.</p>
           
-          <p>A package can be installed into Keyman Desktop or Keyman for Mac OS X, and uploaded to the Keyman website to share with others.</p>
+          <p>A package can be installed into any of the end user Keyman apps, and uploaded to the Keyman website to share with others.</p>
           
           <p>Learn more about distributing your packages and keyboards on the Distribution tab.</p>
                     
@@ -93,17 +91,6 @@
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
         
-        <xsl:if test="/KeymanDeveloperProject/Modules/Module[ID='BrandingPack']">
-          |
-          <xsl:call-template name="button">
-            <xsl:with-param name="caption">Build package installers</xsl:with-param>
-            <xsl:with-param name="command">keyman:package_compileallinstallers</xsl:with-param>
-            <xsl:with-param name="enabled">
-              <xsl:if test="not(KeymanDeveloperProject/Files/File[FileType='.kps' and not (ParentFileID)])">false</xsl:if>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-
         <br />
         <br />
 

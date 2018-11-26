@@ -127,22 +127,22 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   UfrmMDIChild, Buttons, StdCtrls, KeyBtn, ComCtrls, ExtCtrls,
   UnicodePanel, Menus, ExtDlgs,
-  ProjectFile, UfrmMDIEditor, CharMapInsertMode,
+  Keyman.Developer.System.Project.ProjectFile, UfrmMDIEditor, CharMapInsertMode,
   Contnrs, Unicode, UframeBitmapEditor, OnScreenKeyboardData,
   UframeTextEditor, UfrmDebug, ExtShiftState,
   ImgList, MenuImgList,
   KeyboardParser, TextFileFormat, dmActionsKeyboardEditor,
   VisualKeyboard, UframeOnScreenKeyboardEditor,
-  KeymanDeveloperUtils, KeymanDeveloperMemo,
+  KeymanDeveloperUtils,
   OnScreenKeyboard, KMDActionInterfaces,
 
 
   AppEvnts,
-  kmnProjectFile,
-  kmnProjectFileUI,
+  kmxfileconsts,
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.UI.Project.kmnProjectFileUI,
   UserMessages,
   UframeTouchLayoutBuilder,
-  UframeJSONEditor,
   CheckboxGridHelper,
   Vcl.Grids, KeyboardFonts,
   TempFileManager,
@@ -158,7 +158,7 @@ type
     Filename: string;
   end;
 
-  TfrmKeymanWizard = class(TfrmTikeEditor, IKMDPrintActions, IKMDPrintPreviewActions)
+  TfrmKeymanWizard = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
     dlgBrowseBitmap: TOpenPictureDialog;
     dlgSaveExport: TSaveDialog;
     dlgSaveBitmap: TSavePictureDialog;
@@ -234,12 +234,6 @@ type
     lblISOLang: TLabel;
     editEthnologueCode: TEdit;
     cmdISOLang_Lookup: TButton;
-    pageMetadata: TTabSheet;
-    panJSONHost: TPanel;
-    panJSONTop: TPanel;
-    cbJSON: TComboBox;
-    cmdAddJSON: TButton;
-    cmdDeleteJSON: TButton;
     Panel1: TPanel;
     lblCongrats: TLabel;
     cmdCompile: TButton;
@@ -269,6 +263,9 @@ type
     panDebugStatusHost: TPanel;
     Splitter1: TSplitter;
     Splitter2: TSplitter;   // I4810
+    panLanguageKeyman10: TPanel;
+    lblLanguageKeyman10Note: TLabel;
+    lblLanguageKeyman10Title: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -328,8 +325,6 @@ type
     procedure editKeyboardVersionChange(Sender: TObject);
     procedure clbTargetsClickCheck(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
-    procedure cmdAddJSONClick(Sender: TObject);
-    procedure cbJSONClick(Sender: TObject);
     procedure pagesLayoutChange(Sender: TObject);
     procedure pagesLayoutChanging(Sender: TObject; var AllowChange: Boolean);
     procedure pagesTouchLayoutChange(Sender: TObject);
@@ -425,7 +420,6 @@ type
     procedure LoadOSK;   // I4034
     procedure SaveOSK;
 
-    function GetEditorMemo: TKeymanDeveloperMemo;
     procedure BitmapEnableControls;
     procedure OSKModified(Sender: TObject);
     procedure OSKImportKMX(Sender: TObject; var KMXFileName: TTempFile);   // I4181
@@ -442,6 +436,8 @@ type
     procedure SaveTouchLayout;
     procedure TouchLayoutModified(Sender: TObject);
     procedure FocusTabTouchLayout;
+
+    procedure EditorBreakpointClicked(Sender: TObject; ALine: Integer);
 
     procedure FillFeatureGrid;
     procedure CheckParserSourceMove(Changed: Boolean);
@@ -464,14 +460,14 @@ type
     function GetTargetsFromListBox: TKeymanTargets;   // I4504
     function GetCompileTargets: TKeymanTargets;   // I4504
 
-    procedure FocusTabJSON;   // I4505
-    procedure InitTabJSON;   // I4505
-    procedure SaveJSON;   // I4505
     function IsInParserMode: Boolean;
     procedure ShowKeyboardComplexDesignMessage;
     function GetIsDebugVisible: Boolean;   // I4557
+    function ShouldShowLanguageControls(field: TSystemStore): Boolean;
+    procedure OrderDetailsPanels;
 
   protected
+    function GetHelpTopic: string; override;
 
     procedure FocusTab;
 
@@ -494,7 +490,9 @@ type
     procedure StopDebugging;
     function PrepareForBuild(var DebugReset: Boolean): Boolean;   // I4504
 
-    procedure UpdateParColour(Sender: TObject; ALine: Integer; ALineType: TParColourLineType);
+    procedure DebugSetBreakpoint(Sender: TObject; ALine: Integer);
+    procedure DebugClearBreakpoint(Sender: TObject; ALine: Integer);
+    procedure DebugUpdateExecutionPoint(Sender: TObject; ALine: Integer);
 
     function HasSubfilename(const Filename: string): Boolean; override;   // I4081
 
@@ -509,12 +507,10 @@ type
     function CanChangeView(FView: TCodeDesignView): Boolean; override;   // I4678
     procedure ChangeView(FView: TCodeDesignView); override;   // I4678
 
-    procedure LoadJSON;   // I4505
-
     { IKMDPrintActions }
     function PrintFile: Boolean;
     { IKMDPrintPreviewActions }
-    function PrintPreview: Boolean;
+    //TODO: function PrintPreview: Boolean;
 
     function CanReloadAsTextFileFormatClick: Boolean; override;   // I3637
     procedure ReloadAsTextFileFormatClick(TextFileFormat: TTextFileFormat);   // I3637
@@ -529,7 +525,6 @@ type
     property DebugStatusForm: TfrmDebugStatus read FDebugStatusForm;
     property IsDebugVisible: Boolean read GetIsDebugVisible;
 
-    property EditorMemo: TKeymanDeveloperMemo read GetEditorMemo;
     property Parser: TKeyboardParser read FKeyboardParser;   // I4505
     property CompileTargets: TKeymanTargets read GetCompileTargets;   // I4504
     property FontInfo[Index: TKeyboardFont]: TKeyboardFontInfo read GetFontInfo write SetFontInfo; // I4057
@@ -556,6 +551,9 @@ uses
   System.Math,
   System.Win.ComObj,
 
+  Keyman.Developer.System.HelpTopics,
+  Keyman.UI.FontUtils,
+
   CharacterDragObject,
   CharacterInfo,
   CharMapDropTool,
@@ -563,13 +561,13 @@ uses
   compile,
   CompileKeymanWeb,
   dmActionsMain,
-  JSONKeyboardInfo,
   KeymanDeveloperOptions,
   KeymanVersion,
   KMDevResourceStrings,
   kmxfile,
   OnlineConstants,
-  Project,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.UI.Project.ProjectFileUI,
   RegExpr,
   ErrorControlledRegistry,
   RedistFiles,
@@ -587,7 +585,6 @@ uses
   UfrmSelectSystemKeyboard,
   UfrmSelectTouchLayoutTemplate,
   UfrmSelectWindowsLanguages,
-  UfrmSelectISOLanguages,
   UfrmSendURLsToEmail,
   Upload_Settings,
   utildir,
@@ -634,11 +631,11 @@ begin
   frameSource.EditorFormat := efKMN;
   frameSource.Visible := True;
   frameSource.OnChanged := SourceChanged;
+  frameSource.OnBreakpointClicked := EditorBreakpointClicked;
   frameSource.TextFileFormat := FTextFileFormat;
 
   pages.ActivePage := pageDetails;
   InitTabIntro;
-  InitTabJSON;   // I4505
   InitTabLanguages;
   InitTabDetails;
   InitSystemKeyboard;
@@ -653,8 +650,8 @@ begin
   SetupDebugForm;
 
   GetCharMapDropTool.Handle(Self, cmimText);
-  GetCharMapDropTool.Handle(frameSource.memo, cmimDefault);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
+  frameSource.SetupCharMapDrop;
 
   FillFeatureGrid;
 
@@ -711,6 +708,13 @@ end;
 { General Functions                                                           }
 {-----------------------------------------------------------------------------}
 
+procedure TfrmKeymanWizard.EditorBreakpointClicked(Sender: TObject;
+  ALine: Integer);
+begin
+  if Assigned(FDebugForm) then
+    FDebugForm.ToggleBreakpoint(ALine);
+end;
+
 procedure TfrmKeymanWizard.EnableControls;
 begin
   BitmapEnableControls;
@@ -732,8 +736,6 @@ begin
 
   if pages.ActivePage = pageDetails then
     FocusTabIntro
-  else if pages.ActivePage = pageMetadata then
-    FocusTabJSON   // I4505
   else if pages.ActivePage = pageLayout then
     FocusTabLayout
   else if pages.ActivePage = pageIcon then
@@ -800,8 +802,6 @@ end;
 procedure TfrmKeymanWizard.CodeFontChanged;
 begin
   inherited;
-  if CodeFont.Size <> CharFont.Size then
-    CharFont.Size := CodeFont.Size;
   frameSource.CodeFont := CodeFont;
 end;
 
@@ -833,11 +833,61 @@ begin
     FTargets := AllKeymanTargets;
 
   // Control visibility based on targets
-  panWindowsLanguages.Visible := ktWindows in FTargets;
+  panWindowsLanguages.Visible := (ktWindows in FTargets) and ShouldShowLanguageControls(ssLanguage);
+  panISOLanguages.Visible := ShouldShowLanguageControls(ssEthnologueCode);
+  panLanguageKeyman10.Visible := ShouldShowLanguageControls(ssVersion);
   panWebHelp.Visible := FTargets * KMWKeymanTargets <> [];
   panBuildWindows.Visible := ktWindows in FTargets;
   panBuildKMW.Visible := FTargets * KMWKeymanTargets <> [];
-  pageMetadata.TabVisible := FTargets * KMWKeymanTargets <> [];   // I4811
+  OrderDetailsPanels;
+end;
+
+procedure TfrmKeymanWizard.OrderDetailsPanels;
+var
+  v: Integer;
+
+  procedure Order(p: TPanel);
+  begin
+    if p.Visible then
+    begin
+      p.Top := v;
+      Inc(v, p.Height);
+    end;
+  end;
+begin
+  v := 0;
+  Order(panName);
+  Order(panTargets);
+  Order(panLanguageKeyman10);
+  Order(panWindowsLanguages);
+  Order(panISOLanguages);
+  Order(panDetailsLeft);
+  Order(panComments);
+  Order(panFeatures);
+end;
+
+function TfrmKeymanWizard.ShouldShowLanguageControls(field: TSystemStore): Boolean;
+var
+  v: string;
+begin
+  // For older versions, we always show the language controls
+  // We use 'ssVersion' for the Version 10 note field. Abuse but hey that
+  // makes life more interesting for maintenance devs.
+  v := FKeyboardParser.GetSystemStoreValue(ssVersion);
+  if (v <> '') and (CompareVersions(v, SKeymanVersion100) > 0) then
+    Exit(field <> ssVersion);
+
+  // For newer versions, we show them only if there are values set for
+  // the fields
+  if field = ssVersion then
+    Exit(True);
+
+  if field = ssLanguage then
+    Result :=
+      (FKeyboardParser.GetSystemStoreValue(ssLanguage) <> '') or
+      (FKeyboardParser.GetSystemStoreValue(ssWindowsLanguages) <> '')
+  else
+    Exit(FKeyboardParser.GetSystemStoreValue(field) <> '');
 end;
 
 function TfrmKeymanWizard.GetTargetsFromListBox: TKeymanTargets;   // I4504
@@ -949,6 +999,9 @@ procedure TfrmKeymanWizard.StartDebugging(FStartTest: Boolean);
     ki: TKeyboardInfo;
     buf: WideString;
   begin
+    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+      Exit(False);
+
     try
       GetKeyboardInfo((ProjectFile as TkmnProjectFile).TargetFilename, True, ki);   // I4695
       try
@@ -998,7 +1051,20 @@ begin
       FDebugForm.CanDebug := True;
       FDebugForm.UIStatus := duiReadyForInput;
       (ProjectFileUI as TkmnProjectFileUI).Debug := True;   // I4687
-      modActionsKeyboardEditor.actKeyboardCompile.Execute;
+
+      frmMessages.Clear;   // I4686
+
+      if not (ProjectFileUI as TkmnProjectFileUI).DoAction(pfaCompile, False) then
+      begin
+        ShowMessage(SKErrorsInCompile);
+        Exit;
+      end;
+
+      if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+      begin
+        ShowMessage(SKKeyboardKMXDoesNotExist);
+        Exit;
+      end;
 
       if not KeyboardContainsDebugInformation then
       begin
@@ -1423,11 +1489,6 @@ begin
   tmrUpdateCharacterMap.Enabled := True;
 end;
 
-procedure TfrmKeymanWizard.UpdateParColour(Sender: TObject; ALine: Integer; ALineType: TParColourLineType);
-begin
-  frameSource.UpdateParColour(ALine, ALineType);
-end;
-
 procedure TfrmKeymanWizard.SelectVKey(VKey: Integer);
 begin
   kbdLayout.SelectedKey := kbdLayout.Keys.ItemsByUSVK[VKey];
@@ -1458,10 +1519,10 @@ begin
   Result := frameSource.PrintFile(FileName);
 end;
 
-function TfrmKeymanWizard.PrintPreview: Boolean;
+{TODO: function TfrmKeymanWizard.PrintPreview: Boolean;
 begin
   Result := frameSource.PrintPreview(FileName);
-end;
+end;}
 
 function TfrmKeymanWizard.GetCurrentRule: TKeyboardParser_LayoutRule;
 var
@@ -1503,11 +1564,6 @@ end;
 function TfrmKeymanWizard.GetDefaultExt: string;
 begin
   Result := 'kmn';
-end;
-
-function TfrmKeymanWizard.GetEditorMemo: TKeymanDeveloperMemo;
-begin
-  Result := frameSource.memo;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1650,6 +1706,7 @@ begin
   if Assigned(c) and not Assigned(FFeature[ID].Frame) then
   begin
     FFeature[ID].Frame := TframeTextEditor.Create(Self);
+    FFeature[ID].Frame.EditorFormat := KeyboardFeatureEditorFormat[ID];
     FFeature[ID].Frame.TextFileFormat := tffUTF8;
     FFeature[ID].Frame.Parent := c;
     FFeature[ID].Frame.Align := alClient;
@@ -1707,117 +1764,6 @@ begin
   FFeature[kfIcon].Modified := frameBitmap.Modified;
 end;
 
-{-----------------------------------------------------------------------------}
-{ JSON Page                                                                   }
-{-----------------------------------------------------------------------------}
-
-procedure TfrmKeymanWizard.InitTabJSON;   // I4505
-begin
-end;
-
-procedure TfrmKeymanWizard.FocusTabJSON;   // I4505
-begin
-  LoadJSON;
-  DoFocus(panJSONHost);
-end;
-
-procedure TfrmKeymanWizard.LoadJSON;   // I4505
-var
-  f: TSearchRec;
-  i: Integer;
-begin
-  for i := cbJSON.Items.Count - 1 downto 0 do
-  begin
-    if not FileExists(ExtractFilePath(FileName)+cbJSON.Items[i]) then
-    begin
-      if MessageDlg('The file '+cbJSON.Items[i]+' no longer exists.  Remove from editor?', mtConfirmation, mbYesNoCancel, 0) = mrYes then
-      begin
-        cbJSON.Items.Objects[i].Free;
-        cbJSON.Items.Delete(i);
-      end;
-    end;
-  end;
-
-  if FindFirst(ExtractFilePath(FileName)+GetKeymanWebCompiledNameFromFileName(FileName) + '-*.json', 0, f) = 0 then   // I4508
-  begin
-    repeat
-      if cbJSON.Items.IndexOf(f.Name) < 0 then
-        cbJSON.Items.Add(f.Name);
-    until FindNext(f) <> 0;
-    FindClose(f);
-  end;
-
-  if (cbJSON.Items.Count > 0) and (cbJSON.ItemIndex < 0) then
-  begin
-    cbJSON.ItemIndex := 0;
-    cbJSONClick(cbJSON);
-  end;
-end;
-
-procedure TfrmKeymanWizard.SaveJSON;   // I4505
-var
-  i: Integer;
-begin
-  for i := 0 to cbJSON.Items.Count - 1 do
-  begin
-    if cbJSON.Items.Objects[i] <> nil then
-    begin
-      (cbJSON.Items.Objects[i] as TframeJSONEditor).Save;
-    end;
-  end;
-end;
-
-procedure TfrmKeymanWizard.cmdAddJSONClick(Sender: TObject);   // I4505
-var
-  FName: string;
-begin
-  // create a new JSON file.
-  FName := ChangeFileExt(FileName,'') + '-';
-  if not InputQuery('Name of new JSON', 'Name of new JSON', FName) then
-    Exit;
-
-  FName := ChangeFileExt(FName, '.json');
-
-  if not FileExists(FName) then
-  begin
-    with TStringList.Create do
-    try
-      Add('{}');
-      SaveToFile(FName);
-    finally
-      Free;
-    end;
-  end;
-
-  LoadJSON;
-  cbJSON.ItemIndex := cbJSON.Items.IndexOf(ExtractFileName(FName));
-  cbJSONClick(cbJSON);
-end;
-
-procedure TfrmKeymanWizard.cbJSONClick(Sender: TObject);   // I4505
-var
-  FJSONEditorFrame: TframeJSONEditor;
-  i: Integer;
-begin
-  for i := 0 to panJSONHost.ControlCount - 1 do
-    panJSONHost.Controls[i].Visible := False;
-
-  if cbJSON.ItemIndex < 0 then
-    Exit;
-
-  if cbJSON.Items.Objects[cbJSON.ItemIndex] = nil then
-  begin
-    FJSONEditorFrame := TframeJSONEditor.Create(Self);
-    FJSONEditorFrame.FileName := ExtractFilePath(FileName) + cbJSON.Items[cbJSON.ItemIndex];
-    cbJSON.Items.Objects[cbJSON.ItemIndex] := FJSONEditorFrame;
-  end;
-
-  FJSONEditorFrame := cbJSON.Items.Objects[cbJSON.ItemIndex] as TframeJSONEditor;
-  FJSONEditorFrame.Parent := panJSONHost;
-  FJSONEditorFrame.Align := alClient;
-  FJSONEditorFrame.Visible := True;
-end;
-
 { ----------------------------------------------------------------------------- }
 { Finish Page }
 { ----------------------------------------------------------------------------- }
@@ -1840,27 +1786,6 @@ begin
   Result := 'Keyboard definitions (*.kmn)|*.kmn';
 end;
 
-function FontSizeToStr(const name: string; sz: Integer): string;   // I4872
-var
-  tm: TTextMetric;
-begin
-  if sz < 0 then
-  begin
-    with TBitmap.Create do
-    try
-      Canvas.Font.Name := name;
-      Canvas.Font.Size := sz;
-      Canvas.TextExtent('A');
-      GetTextMetrics(Canvas.Handle, tm);
-      Result := IntToStr((Canvas.Font.Height - tm.tmInternalLeading) * 72 div GetDeviceCaps(Canvas.Handle, LOGPIXELSY));
-    finally
-      Free;
-    end;
-  end
-  else
-    Result := IntToStr(sz);
-end;
-
 function TfrmKeymanWizard.GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
 begin
   case Index of
@@ -1868,13 +1793,13 @@ begin
       begin
         Result.Enabled := True;
         Result.Name := CodeFont.Name;
-        Result.Size := FontSizeToStr(CodeFont.Name, CodeFont.Size);   // I4872
+        Result.Size := IntToStr(TFontUtils.FontSizeInPoints(CodeFont.Name, CodeFont.Size));   // I4872
       end;
     kfontChar:
       begin
         Result.Enabled := True;
         Result.Name := CharFont.Name;
-        Result.Size := FontSizeToStr(CharFont.Name, CharFont.Size);   // I4872
+        Result.Size := IntToStr(TFontUtils.FontSizeInPoints(CharFont.Name, CharFont.Size));   // I4872
       end;
     kfontOSK:
       begin
@@ -1882,7 +1807,7 @@ begin
         if Result.Enabled then
         begin
           Result.Name := frameOSK.KeyFont.Name;
-          Result.Size := FontSizeToStr(frameOSK.KeyFont.Name, frameOSK.KeyFont.Size);   // I4872
+          Result.Size := IntToStr(TFontUtils.FontSizeInPoints(frameOSK.KeyFont.Name, frameOSK.KeyFont.Size));   // I4872
         end;
       end;
     kfontTouchLayoutPhone, kfontTouchLayoutTablet, kfontTouchLayoutDesktop:
@@ -1896,6 +1821,11 @@ begin
         end;
       end;
   end;
+end;
+
+function TfrmKeymanWizard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_KeyboardEditor;
 end;
 
 function TfrmKeymanWizard.GetIsDebugVisible: Boolean;
@@ -1997,6 +1927,22 @@ begin
   frmKeymanDeveloper.cbTextFileFormat.ItemIndex := Ord(TextFileFormat);
 end;
 
+procedure TfrmKeymanWizard.DebugClearBreakpoint(Sender: TObject;
+  ALine: Integer);
+begin
+  frameSource.DebugClearBreakpoint(ALine);
+end;
+
+procedure TfrmKeymanWizard.DebugSetBreakpoint(Sender: TObject; ALine: Integer);
+begin
+  frameSource.DebugSetBreakpoint(ALine);
+end;
+
+procedure TfrmKeymanWizard.DebugUpdateExecutionPoint(Sender: TObject; ALine: Integer);
+begin
+  frameSource.DebugUpdateExecutionPoint(ALine);
+end;
+
 procedure TfrmKeymanWizard.DoFocus(control: TWinControl);
 begin
   if control.Enabled and control.Visible and control.Showing and control.CanFocus then
@@ -2012,7 +1958,7 @@ end;
 
 function TfrmKeymanWizard.DoOpenFile: Boolean;
 begin
-  Result := DoOpenFileFormat(tffANSI, False);   // I3637
+  Result := DoOpenFileFormat(tffUTF8, False);   // I3637
 end;
 
 function TfrmKeymanWizard.DoOpenFileFormat(FFormat: TTextFileFormat; FUseFormat: Boolean): Boolean;   // I3637
@@ -2029,10 +1975,15 @@ begin
   try
     if FileExists(FileName) then
     begin
-      if FUseFormat then
-        LoadFromFile(FileName, TextFileFormatToEncoding(FFormat))   // I3637
-      else
-        LoadFromFile(FileName); // Let prolog determine encoding  // I3337
+      try
+        if FUseFormat then
+          LoadFromFile(FileName, TextFileFormatToEncoding(FFormat))   // I3637
+        else
+          LoadFromFile(FileName, TEncoding.UTF8); // Let prolog determine encoding  // I3337
+      except
+        on E:EEncodingError do
+          LoadFromFile(FileName, TEncoding.Default);
+      end;
       FLastFileCharSet := Encoding;// LastFileCharSet;
     end
     else
@@ -2064,8 +2015,6 @@ begin
     pages.ActivePage := pageLayout;
     pagesLayout.ActivePage := pageLayoutCode;
   end;
-
-  LoadJSON;   // I4505
 
   // if pages.ActivePage <> pageSource then
   // UpdateControls;
@@ -2100,8 +2049,6 @@ begin
     begin
       SaveFeature(FKey);
     end;
-
-    SaveJSON;   // I4505
 
     try
       case FTextFileFormat of
@@ -2478,7 +2425,6 @@ function TfrmKeymanWizard.CanChangeView(FView: TCodeDesignView): Boolean;   // I
 begin
   Result :=
     (pages.ActivePage = pageLayout) or
-    ((pages.ActivePage = pageMetadata) and (cbJSON.Items.Count > 0)) or
     (pages.ActivePage = pageTouchLayout);
 end;
 
@@ -2488,8 +2434,6 @@ begin
 end;
 
 procedure TfrmKeymanWizard.ChangeView(FView: TCodeDesignView);   // I4678
-var
-  FJSONEditorFrame: TframeJSONEditor;
 begin
   if pages.ActivePage = pageLayout then
   begin
@@ -2499,13 +2443,7 @@ begin
       cdvCode: if pagesLayout.ActivePage <> pageLayoutCode then pagesLayout.SelectNextPage(True);
     end
   end
-  else if pages.ActivePage = pageMetadata then
-  begin
-    FJSONEditorFrame := cbJSON.Items.Objects[cbJSON.ItemIndex] as TframeJSONEditor;
-    FJSONEditorFrame.ChangeView(FView);
-  end
   else if pages.ActivePage = pageTouchLayout then
-
     case FView of
       cdvDesign: if pagesTouchLayout.ActivePage <> pageTouchLayoutDesign then pagesTouchLayout.SelectNextPage(False);
       cdvCode:   if pagesTouchLayout.ActivePage <> pageTouchLayoutCode then pagesTouchLayout.SelectNextPage(True);
@@ -2515,9 +2453,6 @@ end;
 procedure TfrmKeymanWizard.CharFontChanged;
 begin
   inherited;
-  if CodeFont.Size <> CharFont.Size then
-    CodeFont.Size := CharFont.Size;
-
   UpdateKeyFont;
   //VK_UpdateKeyFont;
   frameSource.CharFont := CharFont;
@@ -2591,16 +2526,10 @@ begin
 end;
 
 procedure TfrmKeymanWizard.MoveParserToSource;   // I4557
-var
-  FLine: Integer;
 begin
   FCurrentRule := nil;
   FKeyboardParser.AddRequiredLines;
-  FLine := frameSource.memo.SelLine;
   frameSource.EditorText := FKeyboardParser.KeyboardText;
-  frameSource.memo.SelLine := Min(FLine, frameSource.memo.LineCount - 1);
-
-//  FreeAndNil(FKeyboardParser);
 end;
 
 procedure TfrmKeymanWizard.MoveSourceToParser(UpdateLRShift, FixupShiftStates: Boolean);   // I4137
@@ -2909,10 +2838,13 @@ begin
   FDebugForm.BorderStyle := bsNone;
   FDebugForm.Parent := panDebugWindowHost;
   FDebugForm.Align := alClient;
-  FDebugForm.OnUpdateParColour := UpdateParColour;
+  FDebugForm.OnSetBreakpoint := DebugSetBreakpoint;
+  FDebugForm.OnClearBreakpoint := DebugClearBreakpoint;
+  FDebugForm.OnUpdateExecutionPoint := DebugUpdateExecutionPoint;
   FDebugForm.Visible := True;
 
-  FDebugForm.EditorMemo := frameSource.memo;
+
+// TODO:  FDebugForm.EditorMemo := frameSource.memo;
 
   FDebugStatusForm := TfrmDebugStatus.Create(Self);
   FDebugStatusForm.BorderStyle := bsNone;
@@ -3002,7 +2934,7 @@ begin
   frmMessages.Clear;
   if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, CompilerMessage) <= 0 then   // I4181   // I4865   // I4866
   begin
-    frmMessages.Show;
+    frmMessages.DoShowForm;
     ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
     FreeAndNil(KMXFileName);   // I4181
   end;
@@ -3148,6 +3080,7 @@ begin
   frameTouchLayout.Visible := True;
 
   frameTouchLayoutSource := TframeTextEditor.Create(Self);   // I4034
+  frameTouchLayoutSource.EditorFormat := efJSON;
   frameTouchLayoutSource.TextFileFormat := tffUTF8;
   frameTouchLayoutSource.Parent := pageTouchLayoutCode;
   frameTouchLayoutSource.Align := alClient;
@@ -3182,7 +3115,9 @@ begin
   begin
     if (FFeature[kfTouchLayout].FileName = '') then   // I3909
     begin
-      FFeature[kfTouchLayout].FileName := ChangeFileExt(FileName, '') + '-layout.js';
+      FFeature[kfTouchLayout].FileName :=
+        // See also TKeyboardParser_Features.GetDefaultFeatureFilename
+        Format(KeyboardFeatureFilename[kfTouchLayout], [ChangeFileExt(ExtractFileName(FileName), '')]);
     end;
 
     if pagesTouchLayout.ActivePage = pageTouchLayoutDesign   // I4034
@@ -3208,6 +3143,7 @@ begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutCode then
   begin
     frameTouchLayoutSource.EditorText := frameTouchLayout.SaveToString;
+    DoFocus(frameTouchLayout);
   end;
   FLoading := False;
 end;

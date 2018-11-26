@@ -41,8 +41,7 @@ public extension NotificationCenter {
       if let value = notification.userInfo?[userInfoKey] as? T {
         block(value)
       } else {
-        Manager.shared.kmLog("Unexpected userInfo in notification: \(String(describing: notification))",
-          checkDebugPrinting: false)
+        log.error("Unexpected userInfo in notification: \(String(describing: notification))")
       }
     }
     return NotificationObserver(observer: observer, center: self)

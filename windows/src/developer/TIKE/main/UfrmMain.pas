@@ -91,7 +91,9 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   ComCtrls, ImgList, Menus, StdCtrls, ExtCtrls, ToolWin, Buttons,
   KeymanDeveloperUtils, UfrmMDIChild, UfrmMDIEditor,
-  MenuImgList, Project, UfrmProject, CharacterMapSettings,
+  MenuImgList,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.UI.Project.UfrmProject, CharacterMapSettings,
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
@@ -299,6 +301,8 @@ type
     FInOnHelp: Boolean;
     mHHelp: TWebHookHelpSystem;   // I4677
     FFirstShow: Boolean;
+    FIsClosing: Boolean;
+    FCanClose: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -332,6 +336,7 @@ type
     procedure InitDock;
     procedure LoadDockLayout;
     procedure SaveDockLayout;
+    procedure CEFShutdownComplete(Sender: TObject);
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -357,8 +362,11 @@ type
 
     property ActiveChildIndex: Integer read GetActiveChildIndex write SetActiveChildIndex;
 
+    function BeforeOpenProject: Boolean;
+    procedure OpenProject(const ProjectFilename: string);
     procedure ShowProject;
     function ProjectForm: TfrmProject;
+    procedure ToggleProject;
 
     procedure ShowDebug(AShow: Boolean);
 
@@ -377,7 +385,8 @@ type
     function OpenTestWindow(FFileName: string): TfrmTikeChild;
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
 
-    procedure HelpTopic(s: string);
+    procedure HelpTopic(s: string); overload;
+    procedure HelpTopic(Sender: TTIKEForm); overload;
 
     property ChildWindows: TChildWindowList read FChildWindows;
     property CharMapSettings: TCharMapSettings read FCharMapSettings;
@@ -402,15 +411,18 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
+  Keyman.Developer.System.CEFManager,
+
   CharMapDropTool,
-  DebugManager,
   HTMLHelpViewer,
   KLog,
   keymanapi_TLB,
+  KeymanVersion,
   OnlineConstants,
   OnlineUpdateCheck,
   GlobalProxySettings,
-  ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUI,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -424,7 +436,7 @@ uses
   UfrmSelectSystemKeyboard,
   UfrmStartup, UfrmOptions,
   UfrmTestKeyboard, UfrmKeyTest, UfrmKeymanWizard,
-  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, ProjectFile, ProjectFileType,
+  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.System.Project.ProjectFileType,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
   UfrmHelp, dmActionsTextEditor, UfrmDebugStatus,
   UfrmCharacterIdentifier, UfrmCharacterMapNew;
@@ -477,7 +489,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions) then
+    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
     begin
       if ValueExists(SRegValue_IDEOptToolbarVisible) and (ReadString(SRegValue_IDEOptToolbarVisible) = '0') then
         barTools.Visible := False;
@@ -501,8 +513,10 @@ begin
   RemoveOldestTikeEditFonts(False);
   RemoveOldestTikeTestFonts(False);
 
-  TProjectUI.Create(FActiveProject, True);   // I4687
+  if (FActiveProject <> '') and not FileExists(FActiveProject) then
+    FActiveProject := '';
 
+  LoadGlobalProjectUI(FActiveProject, True);
 
   InitDock;
 
@@ -514,15 +528,6 @@ begin
   frmCharacterIdentifier.OnCancelFocus := CharMapCancelFocus;
 
   frmHelp := TfrmHelp.Create(Application);
-
-  KL.Log('GetDebugManager start');
-  try
-    GetDebugManager(Handle);
-  except
-    on E:Exception do
-      KL.LogError('GetDebugManager failed: '+E.Message);
-  end;
-  KL.Log('GetDebugManager finish');
 
   Application.OnActivate := AppOnActivate;
 
@@ -561,8 +566,6 @@ procedure TfrmKeymanDeveloper.FormClose(Sender: TObject; var Action: TCloseActio
 var
   i: Integer;
 begin
-  SaveDockLayout;
-
   for i := FChildWindows.Count - 1 downto 0 do
   begin
     FChildWindows[i].Visible := False;
@@ -578,7 +581,7 @@ begin
         else FGlobalProject.Save;   // I4691
         
       RootKey := HKEY_CURRENT_USER;
-      if OpenKey(SRegKey_IDEOptions, True) then
+      if OpenKey(SRegKey_IDEOptions_CU, True) then
       begin
         WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
       end;
@@ -600,31 +603,46 @@ procedure TfrmKeymanDeveloper.FormCloseQuery(Sender: TObject;
 var
   i: Integer;
 begin
-  // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
-  if not Assigned(FChildWindows) then
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormCloseQuery: FIsClosing='+BoolToStr(FIsClosing)+' FCanClose='+BoolToStr(FCanClose)));
+  if not FIsClosing then
   begin
-    CanClose := True;
-    Exit;
-  end;
-
-  for i := 0 to FChildWindows.Count - 1 do
-    if not FChildWindows[i].CloseQuery then
+    // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
+    if Assigned(FChildWindows) then
     begin
-      CanClose := False;
-      Exit;
+      for i := 0 to FChildWindows.Count - 1 do
+        if not FChildWindows[i].CloseQuery then
+        begin
+          CanClose := False;
+          Exit;
+        end;
     end;
 
-  CanClose := True;
+    FIsClosing := True;
+    SaveDockLayout;
+
+    CanClose := FInitializeCEF.StartShutdown(CEFShutdownComplete);
+    // TODO: complete exit after StartClose is successful
+  end
+  else
+    CanClose := FCanClose;
+end;
+
+procedure TfrmKeymanDeveloper.CEFShutdownComplete(Sender: TObject);
+begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.CEFShutdownComplete'));
+  FCanClose := True;
+  Close;
 end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);
 begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
   UnhookWindowsHookEx(hInputLangChangeHook);
 
   FreeAndNil(FCharMapSettings);
   Application.OnActivate := nil;
 
-  FreeAndNil(FGlobalProject);
+  FreeGlobalProjectUI;
   FreeAndNil(FChildWindows);
   FreeAndNil(FProjectMRU);
 
@@ -682,7 +700,7 @@ begin
 
   if True then //FKeymanDeveloperOptions.AutoCheckForUpdates then
   begin
-    with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper, OnlineProductID_KeymanDeveloper_100, False, True, True, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
+    with TOnlineUpdateCheck.Create(SRegKey_KeymanDeveloper_CU, OnlineProductID_KeymanDeveloper_100, False, True, True, GetProxySettings.Server, GetProxySettings.Port, GetProxySettings.Username, GetProxySettings.Password) do  // I3377
       Run;
   end;
 end;
@@ -705,7 +723,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDEFiles, True) then  // I2890
+    if not OpenKey(SRegKey_IDEFiles_CU, True) then  // I2890
       RaiseLastRegistryError;
 
     GetValueNames(s);
@@ -760,9 +778,12 @@ begin
       FInOnHelp := True;
       try
         s := PChar(Data);
-        frm := GetParentForm(Screen.ActiveControl, False);
-        if frm is TTikeForm then
-          (frm as TTikeForm).GetHelpTopic(s);
+        if s = '' then
+        begin
+          frm := GetParentForm(Screen.ActiveControl, False);
+          if frm is TTikeForm then
+            s := (frm as TTikeForm).HelpTopic;
+        end;
         if s <> '' then
           mHHelp.HelpTopic(s);
       finally
@@ -859,10 +880,20 @@ begin
   ProjectForm.SetGlobalProject;
 end;
 
+procedure TfrmKeymanDeveloper.ToggleProject;
+var
+  frmProject: TfrmProject;
+begin
+  frmProject := ProjectForm;
+  if Assigned(frmProject) and (ActiveChild = frmProject)
+    then PostMessage(frmProject.Handle, WM_CLOSE, 0, 0)
+    else ShowProject;
+end;
+
 procedure TfrmKeymanDeveloper.InitDock;
 begin
   AppStorage := TJvAppRegistryStorage.Create(self);
-  AppStorage.Path := SRegKey_IDEDock;
+  AppStorage.Path := SRegKey_IDEDock_CU;
   AppStorage.AutoFlush := True;
   AppStorage.AutoReload := True;
 end;
@@ -927,7 +958,7 @@ begin
 
   with TRegistryErrorControlled.Create do
   try
-    if OpenKeyReadOnly(SRegKey_IDEDock) then
+    if OpenKeyReadOnly(SRegKey_IDEDock_CU) then
     begin
       BeginDockLoading;
       try
@@ -1032,6 +1063,11 @@ begin
     DoForm(frmCharacterIdentifier);   // I4807
 end;
 
+procedure TfrmKeymanDeveloper.HelpTopic(Sender: TTIKEForm);
+begin
+  HelpTopic(Sender.HelpTopic);
+end;
+
 function TfrmKeymanDeveloper.OpenTestWindow(FFileName: string): TfrmTikeChild;
 var
   i: Integer;
@@ -1130,6 +1166,32 @@ end;
 function TfrmKeymanDeveloper.OpenKVKEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmOSKEditor);
+end;
+
+function TfrmKeymanDeveloper.BeforeOpenProject: Boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to FChildWindows.Count - 1 do
+    if not FChildWindows[i].CloseQuery then
+      Exit(False);
+
+  Result := True;
+end;
+
+procedure TfrmKeymanDeveloper.OpenProject(const ProjectFilename: string);
+var
+  i: Integer;
+begin
+  // Close child windows
+  for i := 0 to FChildWindows.Count - 1 do
+    FChildWindows[i].Close;
+
+  FGlobalProject.Save;
+  ProjectForm.Free;
+  FreeGlobalProjectUI;
+  LoadGlobalProjectUI('');
+  ShowProject;
 end;
 
 function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
@@ -1274,6 +1336,12 @@ begin
             Window.Parent := nil;
             pages.Pages[i].Free;
             FocusActiveChild;
+
+            if FIsClosing then
+              if pages.PageCount = 0 then
+              begin
+                Close;
+              end;
             Exit;
           end;
       end;
@@ -1432,11 +1500,11 @@ end;
 
 procedure InitClasses;  // I3350
 const
-  CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/9.0)';   // I4045
+  CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/'+SKeymanVersion+')';   // I4045
 begin
   with TRegistryErrorControlled.Create do   // I3887
   try
-    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation, True) then   // I4436
+    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation_CU, True) then   // I4436
       WriteInteger('tike.exe', 9000);   // I4874
   finally
     Free;

@@ -6,11 +6,11 @@
 
 # ----------------------------------------------------------------------
 
-DESKTOP_FILES=keymandesktop.wixobj
+DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj
 
 manual-setup: check setup
 
-setup: desktop copydoc
+setup: desktop
 
 prereq: prereq-resources
     #
@@ -28,15 +28,12 @@ prereq-resources:
     $(LINKPATH) /DLL /OUT:desktop_resources.dll /RELEASE /NOENTRY /MACHINE:X86 desktop_resources.RES
     $(SIGNCODE) /d "Keyman Desktop Resources" desktop_resources.dll
 
-copydoc: prereq
-    $(MAKE) -fdownload.mak copydoc
-
 desktop: prereq
     $(MAKE) -fdownload.mak candle-desktop
-    $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop100.msi -ext WixUIExtension $(DESKTOP_FILES) 
-    $(SIGNCODE) /d "Keyman Desktop" keymandesktop100.msi
-    $(ROOT)\bin\buildtools\buildpkg -m keymandesktop100.msi -s $(ROOT)\bin\desktop -l license.html
-    $(SIGNCODE) /d "Keyman Desktop" keymandesktop100.exe
+    $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES) 
+    $(SIGNCODE) /d "Keyman Desktop" keymandesktop.msi
+    $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
+    $(SIGNCODE) /d "Keyman Desktop" keymandesktop.exe
     $(MAKE) -fdownload.mak copyredist-desktop
 
 clean:
@@ -51,6 +48,7 @@ clean:
     -del /Q download.mak
     -del /Q desktop_resources.dll
     -del /Q desktop_resources.res
+    -del /Q desktopui.wxs
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine

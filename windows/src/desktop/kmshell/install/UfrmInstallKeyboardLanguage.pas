@@ -54,10 +54,12 @@ type
     FCode: string;
   private
     FScript: string;
+    FIsSuggested: Boolean;
   public
-    constructor Create(const ACode, AScript: string);
+    constructor Create(AIsSuggested: Boolean; const ACode, AScript, AName: string);
     destructor Destroy; override;
     function Matches(const ASearchText: string): Boolean;
+    property IsSuggested: Boolean read FIsSuggested;
     property Name: string read FName;
     property LocalName: string read FLocalName;
     property Script: string read FScript;
@@ -74,7 +76,7 @@ type
     FLocalCountryName: string;
     FScript: string;
   public
-    constructor Create(const ACode, ABCP47Tag, AScript: string);
+    constructor Create(const ACode, ABCP47Tag, AScript, AName: string);
     function Matches(const ASearchText: string): Boolean;
     property Name: string read FName;
     property Code: string read FBCP47Tag;
@@ -96,13 +98,23 @@ type
     procedure TntFormDestroy(Sender: TObject);
     procedure gridLanguagesClick(Sender: TObject);
     procedure editSearchChange(Sender: TObject);
+    procedure gridLanguagesDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+  private type
+    TLanguageGridRowType = (lgrtNormal, lgrtSuggested, lgrtHeading);
+    TCustomLanguage = record
+      FullName, LanguageName, ScriptName, RegionName: string;
+      Tag: string;
+    end;
   private
     FKeyboard: IKeymanKeyboardInstalled;
     FLanguages: TInstLanguageList;
+    FCustomLanguage: TCustomLanguage;
     procedure SetKeyboard(const Value: IKeymanKeyboardInstalled);
     procedure AddLocale(lpLocaleString: PWideChar);
     procedure EnableControls;
     procedure FillLanguageGrid;
+    function GetGridRowType(ARow: Integer): TLanguageGridRowType;
   public
     property Keyboard: IKeymanKeyboardInstalled read FKeyboard write SetKeyboard;
   end;
@@ -112,6 +124,13 @@ function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string
 implementation
 
 uses
+  System.Types,
+  Vcl.Themes,
+
+  Keyman.Configuration.UI.MitigationForWin10_1803,
+  Keyman.System.CanonicalLanguageCodeUtils,
+  Keyman.System.LanguageCodeUtils,
+
   BCP47Tag,
   GetOSVersion,
   kmint,
@@ -131,6 +150,7 @@ begin
     Exit(False);
 
   kmcom.Keyboards[n].Languages.Install(ISOCode);
+  CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
   Result := True;
 end;
@@ -172,10 +192,11 @@ var
       with TBCP47Tag.Create(lpLocaleString) do
       try
         Script := Lang.Script;
+        Canonicalize;
         for i := 0 to Lang.Variants.Count - 1 do
           if SameText(Lang.Variants[i].Code, Tag) then
             Exit;
-        FLanguageVariant := TInstLanguageVariant.Create(lpLocaleString, Tag, Lang.Script);
+        FLanguageVariant := TInstLanguageVariant.Create(lpLocaleString, Tag, Lang.Script, '');
       finally
         Free;
       end;
@@ -191,7 +212,7 @@ var
       Scripts := ScriptsBuf;
       while Scripts <> '' do
       begin
-        FLanguage := TInstLanguage.Create(sLang, Copy(Scripts, 1, 4));
+        FLanguage := TInstLanguage.Create(False, sLang, Copy(Scripts, 1, 4), '');
         FLanguages.Add(FLanguage);
 
         if sLang <> lpLocaleString then
@@ -238,7 +259,7 @@ var
 begin
   FLanguageVariant := gridLanguageVariants.Objects[0, gridLanguageVariants.Row] as TInstLanguageVariant;
   if not Assigned(FLanguageVariant)
-    then FCode := gridLanguageVariants.Cells[0, gridLanguageVariants.Row] // Using a custom code
+    then FCode := FCustomLanguage.Tag // Using a custom code
     else FCode := FLanguageVariant.Code;
 
   if not kmcom.SystemInfo.IsAdministrator then
@@ -246,7 +267,9 @@ begin
     WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
   end
   else
+  begin
     InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
+  end;
 
   FKeyboardID := FKeyboard.ID;
   FKeyboard := nil;
@@ -278,8 +301,38 @@ var
   FLanguage: TInstLanguage;
   FVariantComparer: TInstLanguageVariantComparer;
   FComparer: TInstLanguageComparer;
+  i: Integer;
 begin
   FKeyboard := Value;
+
+  { Add the keyboard-defined additional languages first }
+  for i := 0 to FKeyboard.Languages.Count - 1 do
+    if not FKeyboard.Languages[i].IsInstalled then
+    begin
+      //TODO:BCP47: split BCP-47 into language + script + region here.
+      with TBCP47Tag.Create(FKeyboard.Languages[i].BCP47Code) do
+      try
+        Canonicalize;
+        if Tag <> '' then
+        begin
+          FLanguage := TInstLanguage.Create(True, Language, Script, FKeyboard.Languages[i].Name);
+          try
+            FLanguage.Variants.Add(TInstLanguageVariant.Create(Language, Tag, Script, FKeyboard.Languages[i].Name));
+          except
+            on E:EOSError do
+            begin
+              // The language tag is not supported on this OS - probably Win7
+              // Don't offer it as an option
+              FLanguage.Free;
+              Continue;
+            end;
+          end;
+          FLanguages.Add(FLanguage);
+        end;
+      finally
+        Free;
+      end;
+    end;
 
   { Add keyboard default language options (that are not already installed) to the list }
   if not EnumSystemLocalesEx(SystemLocalesEnumProc, LOCALE_WINDOWS or LOCALE_SUPPLEMENTAL, LPARAM(Self), nil) then
@@ -296,8 +349,8 @@ begin
   try
     for FLanguage in FLanguages do
     begin
-      if FLanguage.Variants.Count = 0 then
-        FLanguage.Variants.Add(TInstLanguageVariant.Create(FLanguage.Code, FLanguage.Code, ''));
+      if (FLanguage.Variants.Count = 0) and not FLanguage.IsSuggested then
+        FLanguage.Variants.Add(TInstLanguageVariant.Create(FLanguage.Code, FLanguage.Code, '', ''));
       FLanguage.Variants.Sort(FVariantComparer);
     end;
   finally
@@ -311,44 +364,80 @@ procedure TfrmInstallKeyboardLanguage.FillLanguageGrid;
 var
   n: Integer;
   FLanguage: TInstLanguage;
+  FVariant: TInstLanguageVariant;
   FText: string;
-begin
-  gridLanguages.RowCount := FLanguages.Count + 2;
+  FFoundCustomTag: Boolean;
 
-  FText := editSearch.Text;
+  procedure AddRow(IsSuggested: Boolean; const Name, LocalName, Script, Code: string; Item: TInstLanguage);
+  begin
+    if (gridLanguages.Objects[1,n-1] = Pointer(lgrtSuggested)) and not IsSuggested then
+    begin
+      gridLanguages.Cells[0,n] := 'System languages';
+      gridLanguages.Objects[1,n] := Pointer(lgrtHeading); // break row, only 1 guaranteed
+      Inc(n);
+    end;
+
+    if IsSuggested
+      then gridLanguages.Objects[1,n] := Pointer(lgrtSuggested)
+      else gridLanguages.Objects[1,n] := Pointer(lgrtNormal);
+
+    gridLanguages.Cells[0,n] := Name;
+    gridLanguages.Cells[1,n] := LocalName;
+    gridLanguages.Cells[2,n] := Script;
+    gridLanguages.Cells[3,n] := Code;
+    gridLanguages.Objects[0,n] := Item;
+    Inc(n);
+  end;
+begin
+  // We need to add suggested languages for the keyboard...
+
+  gridLanguages.RowCount := FLanguages.Count + 3;
+
+  FText := Trim(editSearch.Text);
 
   n := 1;
+
+  FFoundCustomTag := False;
 
   for FLanguage in FLanguages do
   begin
     if FLanguage.Matches(FText) then
     begin
-      gridLanguages.Cells[0,n] := FLanguage.Name;
-      gridLanguages.Cells[1,n] := FLanguage.LocalName;
-      gridLanguages.Cells[2,n] := FLanguage.Script;
-      gridLanguages.Cells[3,n] := FLanguage.Code;
-      gridLanguages.Objects[0,n] := FLanguage;
-      Inc(n);
+      AddRow(FLanguage.IsSuggested, FLanguage.Name, FLanguage.LocalName, FLanguage.Script, FLanguage.Code, FLanguage);
+      if SameText(FText, FLanguage.Code) then
+        FFoundCustomTag := True;
+      for FVariant in FLanguage.Variants do
+        if SameText(FText, FVariant.Code) then
+          FFoundCustomTag := True;
     end;
   end;
 
-  if IsValidLocaleName(PChar(FText)) and not (GetOs = osWin7) then
+  if IsValidLocaleName(PChar(FText)) and not (GetOs = osWin7) and not FFoundCustomTag then
   begin
     // Adding custom locales supported with Win8 and later
-    with TBCP47Tag.Create(FText) do
-    try
-      if Tag <> '' then
-      begin
-        gridLanguages.Cells[0, n] := Tag;
-        gridLanguages.Cells[1, n] := Tag;
-        gridLanguages.Cells[2, n] := Script;
-        gridLanguages.Cells[3, n] := Tag;
-        gridLanguages.Objects[0, n] := nil;
-        Inc(n);
+    FText := TCanonicalLanguageCodeUtils.FindBestTag(FText);
+    if FText <> '' then
+      with TBCP47Tag.Create(FText) do
+      try
+        // Let's lookup the lang - script - region and get a good name
+        FCustomLanguage.Tag := Tag;
+        if not TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, FCustomLanguage.LanguageName) then
+          FCustomLanguage.LanguageName := '';
+        if not TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, FCustomLanguage.ScriptName) then
+          FCustomLanguage.ScriptName := '';
+        if not TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, FCustomLanguage.RegionName) then
+          FCustomLanguage.RegionName := '';
+        FCustomLanguage.FullName := TLanguageCodeUtils.LanguageName(FCustomLanguage.LanguageName,
+          FCustomLanguage.ScriptName, '');
+        AddRow(
+          False,
+          FCustomLanguage.FullName,
+          FCustomLanguage.FullName,
+          FCustomLanguage.ScriptName,
+          FCustomLanguage.Tag, nil);
+      finally
+        Free;
       end;
-    finally
-      Free;
-    end;
   end;
 
   gridLanguages.RowCount := n;
@@ -362,8 +451,8 @@ end;
 procedure TfrmInstallKeyboardLanguage.EnableControls;
 begin
   gridLanguages.Enabled := gridLanguages.RowCount > 1;
-  gridLanguageVariants.Enabled := gridLanguageVariants.RowCount > 1;
-  cmdOK.Enabled := gridLanguageVariants.Row > 0;
+  gridLanguageVariants.Enabled := (gridLanguageVariants.RowCount > 1) and (GetGridRowType(gridLanguages.Row) <> lgrtHeading);
+  cmdOK.Enabled := (gridLanguageVariants.Row > 0) and (GetGridRowType(gridLanguages.Row) <> lgrtHeading);
 end;
 
 procedure TfrmInstallKeyboardLanguage.gridLanguagesClick(Sender: TObject);
@@ -383,17 +472,12 @@ begin
     begin
       // We have a custom language tag
       gridLanguageVariants.RowCount := 2;
-      with TBCP47Tag.Create(gridLanguages.Cells[0, gridLanguages.Row]) do
-      try
-        gridLanguageVariants.Objects[0, 1] := nil;
-        gridLanguageVariants.Cells[0, 1] := Tag;
-        gridLanguageVariants.Cells[1, 1] := Region;
-        gridLanguageVariants.Cells[2, 1] := Tag;
-        gridLanguageVariants.Cells[3, 1] := Region;
-        gridLanguageVariants.Cells[4, 1] := Tag;
-      finally
-        Free;
-      end;
+      gridLanguageVariants.Objects[0, 1] := nil;
+      gridLanguageVariants.Cells[0, 1] := FCustomLanguage.FullName;
+      gridLanguageVariants.Cells[1, 1] := FCustomLanguage.RegionName;
+      gridLanguageVariants.Cells[2, 1] := '';
+      gridLanguageVariants.Cells[3, 1] := '';
+      gridLanguageVariants.Cells[4, 1] := FCustomLanguage.Tag;
     end
     else
     begin
@@ -419,6 +503,51 @@ begin
       gridLanguageVariants.FixedRows := 1;
   end;
   EnableControls;
+end;
+
+function TfrmInstallKeyboardLanguage.GetGridRowType(ARow: Integer): TLanguageGridRowType;
+begin
+   Result := TLanguageGridRowType(Integer(gridLanguages.Objects[1, ARow]));
+end;
+
+procedure TfrmInstallKeyboardLanguage.gridLanguagesDrawCell(Sender: TObject;
+  ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+const
+  CCellNormal: array[TGridDrawingStyle] of TThemedGrid =
+    (tgClassicCellNormal, tgCellNormal, tgGradientCellNormal);
+  CCellSelected: array[TGridDrawingStyle] of TThemedGrid =
+    (tgClassicCellSelected, tgCellSelected, tgGradientCellSelected);
+var
+  LText: string;
+  LDetails: TThemedElementDetails;
+  LRect: TRect;
+begin
+  if GetGridRowType(ARow) = lgrtHeading then
+  begin
+    with gridLanguages.Canvas do
+    begin
+      LRect := Rect;
+      Inc(LRect.Bottom);
+      Inc(LRect.Right);
+      Font := gridLanguages.Font;
+      Font.Style := [fsBold];
+      Brush.Color := clWindow;
+      FillRect(Rect);
+      if (gdSelected in State) or (gdRowSelected in State) then
+        LDetails := StyleServices.GetElementDetails(CCellSelected[gridLanguages.DrawingStyle])
+      else
+        LDetails := StyleServices.GetElementDetails(CCellNormal[gridLanguages.DrawingStyle]);
+      StyleServices.DrawElement(Handle, LDetails, LRect, Rect);
+      LText := gridLanguages.Cells[ACol, ARow];
+      Brush.Style := bsClear;
+      TextRect(Rect, Rect.Left+2,
+        Rect.Top+((Rect.Height - Canvas.TextHeight(LText)) div 2), LText);
+    end;
+  end
+  else
+  begin
+    gridLanguages.Canvas.Font.Style := [];
+  end;
 end;
 
 procedure TfrmInstallKeyboardLanguage.TntFormCreate(Sender: TObject);
@@ -463,25 +592,35 @@ const
   LOCALE_SLOCALIZEDCOUNTRYNAME = $00000006;
   LOCALE_SNATIVECOUNTRYNAME = $0000008;
 
-constructor TInstLanguage.Create(const ACode, AScript: string);
+constructor TInstLanguage.Create(AIsSuggested: Boolean; const ACode, AScript, AName: string);
 var
   LanguageBuf: array[0..MAX_PATH-1] of WideChar;
 begin
   inherited Create;
+
+  FIsSuggested := AIsSuggested;
 
   FVariants := TInstLanguageVariantList.Create;
 
   FCode := ACode;
   FScript := AScript;
 
-  if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SLOCALIZEDLANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
-    RaiseLastOSError;
-  FName := LanguageBuf;
+  if FIsSuggested then
+  begin
+    FName := AName;
+    FLocalName := AName;
+  end
+  else
+  begin
+    if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SLOCALIZEDLANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
+      RaiseLastOSError;
+    FName := LanguageBuf;
 
-  if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SNATIVELANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
-    RaiseLastOSError;
+    if GetLocaleInfoEx(PWidechar(ACode), LOCALE_SNATIVELANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
+      RaiseLastOSError;
 
-  FLocalName := LanguageBuf;
+    FLocalName := LanguageBuf;
+  end;
 end;
 
 destructor TInstLanguage.Destroy;
@@ -513,7 +652,7 @@ end;
 
 { TInstLanguageVariant }
 
-constructor TInstLanguageVariant.Create(const ACode, ABCP47Tag, AScript: string);
+constructor TInstLanguageVariant.Create(const ACode, ABCP47Tag, AScript, AName: string);
 var
   LanguageBuf: array[0..MAX_PATH-1] of WideChar;
 begin
@@ -522,12 +661,20 @@ begin
   FBCP47Tag := ABCP47Tag;
   FScript := AScript;
 
-  if GetLocaleInfoEx(PChar(ACode), LOCALE_SLOCALIZEDLANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
-    RaiseLastOSError;
-  FName := LanguageBuf;
-  if GetLocaleInfoEx(PChar(ACode), LOCALE_SNATIVELANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
-    RaiseLastOSError;
-  FLocalName := LanguageBuf;
+  if AName = '' then
+  begin
+    if GetLocaleInfoEx(PChar(ACode), LOCALE_SLOCALIZEDLANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
+      RaiseLastOSError;
+    FName := LanguageBuf;
+    if GetLocaleInfoEx(PChar(ACode), LOCALE_SNATIVELANGUAGENAME, LanguageBuf, MAX_PATH) = 0 then
+      RaiseLastOSError;
+    FLocalName := LanguageBuf;
+  end
+  else
+  begin
+    FName := AName;
+    FLocalName := AName;
+  end;
 
   if GetLocaleInfoEx(PChar(ACode), LOCALE_SLOCALIZEDCOUNTRYNAME, LanguageBuf, MAX_PATH) = 0 then
     RaiseLastOSError;
@@ -557,7 +704,12 @@ end;
 
 function TInstLanguageComparer.Compare(const Left, Right: TInstLanguage): Integer;
 begin
-  Result := CompareText(Left.Name, Right.Name);
+  if Left.IsSuggested and not Right.IsSuggested then
+    Result := -1
+  else if Right.IsSuggested and not Left.IsSuggested then
+    Result := 1
+  else
+    Result := CompareText(Left.Name, Right.Name);
 end;
 
 end.

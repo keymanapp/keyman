@@ -87,7 +87,7 @@ type
     FKeyboardLanguageID: Cardinal;
     FIconFileName: string;   // I3581
     FKeyboardVersion: string;
-    FBCP47Languages: WideString;   // I4136
+    FISO6393Languages: WideString;   // I4136
 
 //    procedure InstallLanguage;
 
@@ -127,7 +127,7 @@ type
     property ProductID: Integer read FProductID;
     property MnemonicLayout: Boolean read FMnemonicLayout;
     property WindowsLanguages: WideString read FWindowsLanguages;
-    property BC47Languages: WideString read FBCP47Languages;
+    property ISO6393Languages: WideString read FISO6393Languages;
     property KeyboardLanguageID: Cardinal read FKeyboardLanguageID;
     property KeyboardVersion: string read FKeyboardVersion;   // I4136
 
@@ -173,7 +173,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     { Remove all Active Keyboards details of the keyboard }
-    DeleteKey(SRegKey_ActiveKeyboards + '\' + FName);
+    DeleteKey(SRegKey_ActiveKeyboards_CU + '\' + FName);
   finally
     Free;
   end;
@@ -195,7 +195,7 @@ begin
     { Load all installed keyboards }
 
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_InstalledKeyboards) then
+    if OpenKeyReadOnly(SRegKey_InstalledKeyboards_LM) then
     begin
       GetKeyNames(str);
       for i := 0 to str.Count - 1 do
@@ -207,8 +207,10 @@ begin
       CloseKey;
     end;
 
+    RootKey := HKEY_CURRENT_USER;
+
     { Find all "Active Keyboards" that have been uninstalled }
-    if OpenKeyReadOnly('\'+SRegKey_ActiveKeyboards) then
+    if OpenKeyReadOnly('\'+SRegKey_ActiveKeyboards_CU) then
     begin
       GetKeyNames(str);
       for i := 0 to str.Count - 1 do
@@ -251,7 +253,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_ActiveKeyboards, True) then
+    if OpenKey(SRegKey_ActiveKeyboards_CU, True) then
     begin
       GetValueNames(str);
       for i := 0 to str.Count - 1 do DeleteValue(str[i]);
@@ -327,9 +329,8 @@ begin
   try
     RootKey := HKEY_LOCAL_MACHINE;
 
-    if OpenKeyReadOnly(GetRegistryKeyboardInstallKey(FName)) then
+    if OpenKeyReadOnly(GetRegistryKeyboardInstallKey_LM(FName)) then
     begin
-      FDefaultHotkey := StrToIntDef(ReadString(SRegValue_KeymanDefaultHotkey), 0);
       FKeymanFile := ReadString(SRegValue_KeymanFile);
       Legacy_FKeyboardID := StrToIntDef('$'+ReadString(SRegValue_Legacy_KeymanKeyboardID), 0);   // I3613
       FPackageName := ReadString(SRegValue_PackageName);
@@ -342,7 +343,7 @@ begin
         with TRegistryErrorControlled.Create do  // I2890
         try
           RootKey := HKEY_LOCAL_MACHINE;
-          if OpenKeyReadOnly(GetRegistryPackageInstallKey(FPackageName)) and ValueExists(SRegValue_PackageDescription)
+          if OpenKeyReadOnly(GetRegistryPackageInstallKey_LM(FPackageName)) and ValueExists(SRegValue_PackageDescription)
             then FPackageDescription := ReadString(SRegValue_PackageDescription)
             else FPackageDescription := FPackageName;
         finally
@@ -353,7 +354,7 @@ begin
     end;
 
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(GetRegistryKeyboardActiveKey(FName)) then
+    if OpenKeyReadOnly(GetRegistryKeyboardActiveKey_CU(FName)) then
     begin
       { Currently installed keyboard }
       if ValueExists(SRegValue_KeymanID) then
@@ -407,8 +408,9 @@ begin
     FMessage := ki.MessageString;
     FCopyright := ki.CopyrightString;
     FWindowsLanguages := ki.WindowsLanguages;
-    FBCP47Languages := ki.BCP47Languages;
+    FISO6393Languages := ki.ISO6393Languages;
     FKeyboardLanguageID := ki.KeyboardID;
+    FDefaultHotkey := ki.DefaultHotkey;
     FKeyboardVersion := ki.KeyboardVersion;   // I4136
 
     if ki.Icon <> nil then
@@ -444,7 +446,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(GetRegistryKeyboardActiveKey(FName), True) then
+    if OpenKey(GetRegistryKeyboardActiveKey_CU(FName), True) then
     begin
       if FKeymanID >= 0 then
         WriteString(SRegValue_KeymanID, IntToStr(FKeymanID))

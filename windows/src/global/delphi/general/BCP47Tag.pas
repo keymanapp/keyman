@@ -1,5 +1,8 @@
 // Adapted from https://github.com/gagle/node-bcp47 [MIT]
-// TODO: Does not do full canonicalization
+// TODO: BCP47: <NoAction> Does not do full canonicalization; however
+// the ISO639-3 -> ISO639-1 mapping is done, which is probably
+// sufficient for our needs at this time.
+// See https://tools.ietf.org/html/bcp47#section-4.5
 unit BCP47Tag;
 
 interface
@@ -21,6 +24,9 @@ type
     FRegion: string;
     FExtLang: string;
     FLangTag_PrivateUse: string;
+    FOriginalTag: string;
+    FIsValid: Boolean;
+    FIsValidated: Boolean;
     procedure SetExtension(const Value: string);
     procedure SetExtLang(const Value: string);
     procedure SetGrandfathered(const Value: string);
@@ -37,6 +43,14 @@ type
 
     procedure Clear;
 
+    function IsValid(Constrained: Boolean): Boolean; overload;
+    function IsValid(Constrained: Boolean; var msg: string): Boolean; overload;
+
+    function IsCanonical: Boolean; overload;
+    function IsCanonical(var msg: string): Boolean; overload;
+
+    procedure Canonicalize;
+
     property Language: string read FLanguage write SetLanguage;
     property ExtLang: string read FExtLang write SetExtLang;
     property Script: string read FScript write SetScript;
@@ -48,15 +62,28 @@ type
     property PrivateUse: string read FPrivateUse write SetPrivateUse;
     property Grandfathered: string read FGrandfathered write SetGrandfathered;
 
+    property OriginalTag: string read FOriginalTag;
     property Tag: string read GetTag write SetTag;
   end;
 
 implementation
 
 uses
-  System.RegularExpressions;
+  System.RegularExpressions,
+
+  Keyman.System.CanonicalLanguageCodeUtils,
+  Keyman.System.LanguageCodeUtils;
 
 { TBCP47Tag }
+
+procedure TBCP47Tag.Canonicalize;
+var
+  newTag: string;
+begin
+  newTag := TCanonicalLanguageCodeUtils.FindBestTag(Tag);
+  if newTag <> '' then
+    SetTag(newTag);
+end;
 
 procedure TBCP47Tag.Clear;
 begin
@@ -69,6 +96,8 @@ begin
   FPrivateUse := '';
   FGrandfathered := '';
   FLangTag_PrivateUse := '';
+  FIsValidated := True;
+  FIsValid := False;
 end;
 
 constructor TBCP47Tag.Create(tag: string);
@@ -100,15 +129,113 @@ begin
   end;
 end;
 
+function TBCP47Tag.IsValid(Constrained: Boolean; var msg: string): Boolean;
+var
+  NewTag: TBCP47Tag;
+begin
+  if not FIsValid and FIsValidated then
+  begin
+    msg := '''' + OriginalTag + ''' is not a valid BCP 47 tag';
+    Exit(False);
+  end;
+
+  NewTag := TBCP47Tag.Create(Tag);
+  try
+    // Test each component, because we want to clarify that a tag constructed with
+    // wrong components shouldn't be treated as valid, even though it might form
+    // a 'valid' string. e.g. if we set .Language to "LO" and .Script to "LA", that
+    // will construct to LO-LA, which is valid, but the component "LA" is actually
+    // only valid as a region, and not a script, resulting in incorrect assumptions.
+    Result :=
+      SameText(NewTag.Language, Language) and
+      SameText(NewTag.ExtLang, ExtLang) and
+      SameText(NewTag.Script, Script) and
+      SameText(NewTag.Region, Region) and
+      SameText(NewTag.Variant, Variant) and
+      SameText(NewTag.Extension, Extension) and
+      SameText(NewTag.PrivateUse, PrivateUse) and
+      SameText(NewTag.Grandfathered, Grandfathered) and
+      SameText(NewTag.LangTag_PrivateUse, LangTag_PrivateUse);
+  finally
+    NewTag.Free;
+  end;
+
+  if not Result then
+  begin
+    msg := '''' + Tag + ''' is not a valid BCP 47 tag';
+  end;
+
+  if Result and Constrained then
+  begin
+    NewTag := TBCP47Tag.Create(Tag);
+    try
+      // For our constrained use of tags, we allow only Language-Script-Region.
+      // We only allow 2 or 3 character IDs.
+      Result :=
+        SameText(NewTag.Language, Language) and
+        (NewTag.ExtLang = '') and
+        SameText(NewTag.Script, Script) and
+        SameText(NewTag.Region, Region) and
+        (NewTag.Variant = '') and
+        (NewTag.Extension = '') and
+        (NewTag.PrivateUse = '') and
+        (NewTag.Grandfathered = '') and
+        (NewTag.LangTag_PrivateUse = '');
+
+      if not Result then
+        msg := '''' + Tag + ''' must contain only Language-Script-Region'
+      else
+      begin
+        Result := Length(NewTag.Language) <= 3;
+        if not Result then
+          msg := '''' + Tag + ''' language component must be no longer than 3 letters';
+      end;
+    finally
+      NewTag.Free;
+    end;
+  end;
+end;
+
+function TBCP47Tag.IsValid(Constrained: Boolean): Boolean;
+var
+  msg: string;
+begin
+  Result := IsValid(Constrained, msg);
+end;
+
+function TBCP47Tag.IsCanonical(var msg: string): Boolean;
+var
+  c: string;
+begin
+  // Assumes that the tag is valid.
+
+  // Test language subtag for canonical value
+  c := TLanguageCodeUtils.TranslateISO6393ToBCP47(Language);
+  Result := SameText(c, Language);
+  if not Result then
+  begin
+    msg := '''' + OriginalTag + ''' is a valid tag but is not canonical: '''+Language+''' should be '''+c+'''';
+  end;
+end;
+
+function TBCP47Tag.IsCanonical: Boolean;
+var
+  msg: string;
+begin
+  Result := IsCanonical(msg);
+end;
+
 procedure TBCP47Tag.SetExtension(const Value: string);
 begin
   FExtension := LowerCase(Value, TLocaleOptions.loInvariantLocale);
+  FIsValidated := False;
   FGrandfathered := '';
   FPrivateUse := '';
 end;
 
 procedure TBCP47Tag.SetExtLang(const Value: string);
 begin
+  FIsValidated := False;
   FExtLang := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -117,11 +244,13 @@ end;
 procedure TBCP47Tag.SetGrandfathered(const Value: string);
 begin
   Clear;
+  FIsValidated := False;
   FGrandfathered := LowerCase(Value, TLocaleOptions.loInvariantLocale);
 end;
 
 procedure TBCP47Tag.SetLangTag_PrivateUse(const Value: string);
 begin
+  FIsValidated := False;
   FLangTag_PrivateUse := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -129,6 +258,7 @@ end;
 
 procedure TBCP47Tag.SetLanguage(const Value: string);
 begin
+  FIsValidated := False;
   FLanguage := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -137,11 +267,13 @@ end;
 procedure TBCP47Tag.SetPrivateUse(const Value: string);
 begin
   Clear;
+  FIsValidated := False;
   FPrivateUse := LowerCase(Value, TLocaleOptions.loInvariantLocale);
 end;
 
 procedure TBCP47Tag.SetRegion(const Value: string);
 begin
+  FIsValidated := False;
   FRegion := UpperCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';
@@ -149,6 +281,7 @@ end;
 
 procedure TBCP47Tag.SetScript(const Value: string);
 begin
+  FIsValidated := False;
   FScript :=
     UpperCase(Copy(Value, 1, 1), TLocaleOptions.loInvariantLocale)+
     LowerCase(Copy(Value, 2, 3), TLocaleOptions.loInvariantLocale);
@@ -172,6 +305,8 @@ var
   m: TMatch;
   s: TArray<string>;
 begin
+  FOriginalTag := Value;
+
   Clear;
 
   with TRegEx.Create(
@@ -181,6 +316,8 @@ begin
       '|\d[\da-z]{3}))*)?((?:-[\da-wy-z](?:-[\da-z]{2,8})+)*)?(-x(?:-[\da-z]{1,8})+)?$|^(x(?:-[\da-z]{1,8})+)$', [roIgnoreCase]) do
   begin
     m := Match(LowerCase(Value, TLocaleOptions.loInvariantLocale));
+
+    FIsValid := m.Success;
 
     if (m.Groups.Count > 3) and (m.Groups[3].Value <> '') then
     begin
@@ -218,10 +355,12 @@ begin
 
 //      raise EBCP47Tag.Create('Invalid tag');
   end;
+  FIsValidated := True;
 end;
 
 procedure TBCP47Tag.SetVariant(const Value: string);
 begin
+  FIsValidated := False;
   FVariant := LowerCase(Value, TLocaleOptions.loInvariantLocale);
   FGrandfathered := '';
   FPrivateUse := '';

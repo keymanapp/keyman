@@ -1,0 +1,5 @@
+src/scim_kmfl_imengine.cpp
+src/scim_kmfl_imengine.h
+src/xkbmap.h
+src/xkbmap.cpp
+src/stringtok.h

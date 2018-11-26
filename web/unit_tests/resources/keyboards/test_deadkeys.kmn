@@ -1,0 +1,148 @@
+﻿store(&VERSION) "10.0"
+store(&TARGETS) 'any windows'
+c Handwritten line numbers correspond to the now-omitted language lines.
+store(&VISUALKEYBOARD) 'test_deadkeys.kvks'
+store(&NAME) 'Keyman Deadkey Stress-Tester'
+store(&COPYRIGHT) '© 2018 SIL International'  
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(deadnums) dk(0) dk(1) dk(2) dk(3) dk(4) dk(5) dk(6) dk(7) dk(8) dk(9)
+store(livenums) '0123456789'  
+                                                     
+store(liveQwerty) 'qwerty'
+store(deadQwerty) dk(q) dk(w) dk(e) dk(r) dk(t) dk(y)
+
+c Simple, standard deadkey behavior.
++ 'a' > deadkey(a)                
+deadkey(a) + 'b' > '(a)(b)'
++ 'b' > '(b)'
+                                    
+c Matching a pattern with a deadkey vs same pattern, no deadkey.
+'(b)' + 'b' > '(b)+(b)'
+'(b)' deadkey(a) + 'b' > '(b)+(a)+(b)'
+
+c Another simple one.
+deadkey(a) + 'c' > 'x'
+           
+c Ensuring needed keys have base output rules.
++ 'd' > 'd' 
++ 'f' > 'f'
+
+c More context edge case checks.
+deadkey(a) 'd' + 'e' > '(a)(d)(e)'
+'f' deadkey(a) 'd' + 'e' > '(f)-(a)-(d)-(e)'
+
+c Simple deadkey ordering.
++ 's' > deadkey(s)
+
+dk(a) dk(s) + '.' > '(a)-(s)'
+dk(s) dk(a) + '.' > '(s)+(a)'    
+
+c Deadkey ordering in output
++ 'm' > dk(m) '(m)'
+dk(m) '(m)' + '.' > 'dk(m)'
+
++ 'n' > '(n)' dk(m)
+'(n)' dk(m) + '.' > 'dk(n)'
+
++ 'o' > '(o)' dk(m) '(o)'
+'(o)' dk(m) '(o)' + '.' > 'dk(o)'    
+
+c Proper deadkey state maintenance checks.
++ 'p' > dk(p) dk(q) '(p)'
+dk(q) '(p)' + 'q' > '(p)(q)'
+dk(p) '(p)(q)' + 'r' > '(p)(q)(r)'       
+
++ 'P' > dk(pp) dk(pp) '(P)'
+dk(pp) '(P)' + 'Q' > '(P)(Q)'
+dk(pp) '(P)(Q)' + 'R' > '(P)(Q)(R)'
+dk(pp) dk(pp) '(P)(Q)' + 'R' > 'ERROR'
+          
+c Basic digits > 'deadnums' - deadkey per number.
++ '0' > dk(0)
++ '1' > dk(1)
++ '2' > dk(2)
++ '3' > dk(3)
++ '4' > dk(4)
++ '5' > dk(5)
++ '6' > dk(6)
++ '7' > dk(7)
++ '8' > dk(8)
++ '9' > dk(9)  
+
+c any/index with deadkeys in stores.
+any(deadnums) + '.' > '#' index(livenums, 1)
+any(liveQwerty) + '!' > '?' index(deadQwerty, 1) index(deadQwerty, 1)
+'?' any(deadQwerty) context(2) + '.' > '(' index(liveQwerty, 2) index(liveQwerty, 2) ')'
+                
+c Two different versions are here to help ensure we don't get a 'lucky fix' due
+c to Developer's rule orderings.  These two sets should end up with opposite orders.
+dk(2) + 'b' > 'dead2'
+dk(1) + 'b' > 'dead1'            
+dk(2) 'dead1' + 'b' > 'ERROR'
+dk(1) 'dead2' + 'b' > 'success'
+
+dk(4) + 'b' > 'dead4'
+dk(3) + 'b' > 'dead3'
+dk(4) 'dead3' + 'b' > 'success'
+dk(3) 'dead4' + 'b' > 'ERROR'  
+       
+c Deadkeys + rules.
++ 'A' > dk(A)
+dk(A) + 'B' > 'ab' dk(blank)
+dk(B) + 'C' > 'abc'
+'abc' + 'D' > '$abc$d'
+'ab' dk(C) 'd' + 'E' > 'success'
+
+match > use(dead_reorder) 
+nomatch > use(qwerty_out)
++ '?' > \
+  'ab    > (a)(b)          tests basic deadkey' d13 \
+  'b     > (b)             only matches if "a" not pressed first' d13 \
+  'bb    > (b)+(b)         Missing deadkey does not trigger match.' d13 \
+  'bab   > (b)+(a)+(b)     deadkey at end of context' d13 \
+  'ac    > x               tests basic deadkey' d13 \
+  'ade   > (a)(d)(e)       deadkey at start of context' d13 \
+  'fade  > (f)-(a)-(d)-(e) deadkey in middle of context' d13 \
+  'as.   > (a)-(s)         defined deadkey order (1/2)' d13 \
+  'sa.   > (s)+(a)         defined deadkey order (2/2)' d13 \
+  'm.    > dk(m)           deadkey output then letters' d13 \
+  'n.    > dk(n)           letters output then deadkey' d13 \
+  'o.    > dk(o)           letters, deadkey, letters' d13 \
+  'pqr   > (p)(q)(r)       deadkey, unmatched, letters' d13 \
+  'PQR   > (P)(Q)(R)       deadkey, deadkey, match, match' d13 \
+  '12bb  > success         deadkey reordering (with the following)' d13 \
+  '21bb  > success         ' d13 \
+  '21b   > dead2           ' d13 \
+  '34bb  > success         ' d13 \
+  '43bb  > success         ' d13 \
+  'ABCDE > success         deadkey output before match(group) rule' d13 \
+  '1.    > #1              deadkey matched by any' d13 \  
+  'q!    > ?               same as above, with extra deadkey output.' d13 \
+  'q!.   > (qq)            deadkey matched by context() in context' d13 \
+  '11    > (1)(1)          deadkey matched by index() within context.' d13 \
+  d13
+group(dead_reorder)
+      
+c What happens when reordering deadkeys?
+dk(2) dk(1) > dk(1) dk(2)  
+dk(3) dk(4) > dk(4) dk(3)
+
+'ab' dk(blank) > dk(B)
+'$abc$d' > 'ab' dk(C) 'd'    
+         
+c Since 'index' cannot function in the 'key' part of a rule, we place the
+c 'index in context' test within this group.
+any(deadnums) index(deadnums, 1) > '(' index(livenums, 1) ')(' index(livenums, 1) ')'
+
+c Needed for KMW testing, as the characters will not be output on plain keystrokes otherwise.
+group(qwerty_out) using keys 
+
++ 'q' > 'q'
++ 'w' > 'w'
++ 'e' > 'e'
++ 'r' > 'r'
++ 't' > 't'
++ 'y' > 'y'

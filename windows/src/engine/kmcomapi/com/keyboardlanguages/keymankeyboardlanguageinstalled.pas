@@ -28,34 +28,33 @@ uses
 
   keymanautoobject,
   keymanapi_TLB,
+  keymankeyboardlanguage,
   internalinterfaces,
   keymancontext,
   msctf;
 
 type
-  TKeymanKeyboardLanguageInstalled = class(TKeymanAutoObject, IKeymanKeyboardLanguageInstalled, IIntKeymanKeyboardLanguage)   // I4376
+  TKeymanKeyboardLanguageInstalled = class(TKeymanKeyboardLanguage, IKeymanKeyboardLanguageInstalled, IIntKeymanKeyboardLanguage)   // I4376
   private
-    FContext: TKeymanContext;
     FOwner: IKeymanKeyboardInstalled;
-    FBCP47Code: string;
-    FLangID: Integer;
     FProfileGUID: TGUID;
   protected
     function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
       override;
 
     { IKeymanKeyboardLanguageInstalled }
-    function Get_BCP47Code: WideString; safecall;
-    function Get_LangID: Integer; safecall;
     function Get_OwnerKeyboard: IKeymanKeyboardInstalled; safecall;
     function Get_ProfileGUID: TGUID; safecall;
+    function Get_IsInstalled: WordBool; safecall;
 
+    procedure Install; safecall;
     procedure Uninstall; safecall;
 
     { IIntKeymanKeyboardLanguageInstalled }
     procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
   public
-    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; ABCP47Code: string; ALangID: Integer; AProfileGUID: TGUID);
+    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
+      ALangID: Integer; AProfileGUID: TGUID; const AName: string);
   end;
 
 implementation
@@ -67,6 +66,7 @@ uses
 
   glossary,
   keymanerrorcodes,
+  kpinstallkeyboardlanguageprofiles,
   kpuninstallkeyboardlanguageprofiles,
   utiltsf,
   utilxml;
@@ -78,45 +78,41 @@ procedure TKeymanKeyboardLanguageInstalled.ApplyEnabled(
 var
   AEnabledInt: Integer;
 begin
+  if not Get_IsInstalled then
+    Exit;
+
   if AEnabled then AEnabledInt := 1 else AEnabledInt := 0;
   try   // I4494
     OleCheck(pInputProcessorProfiles.EnableLanguageProfile(c_clsidKMTipTextService,
-      FLangID, FProfileGUID, AEnabledInt));
+      Get_LangID, FProfileGUID, AEnabledInt));
   except
     on E:EOleException do
     begin
-      FContext.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleException: '+E.Message+' ('+E.Source+', '+IntToHex(E.ErrorCode,8)+')']), kesWarning);
+      Context.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleException: '+E.Message+' ('+E.Source+', '+IntToHex(E.ErrorCode,8)+')']), kesWarning);
     end;
     on E:EOleSysError do
     begin
-      FContext.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleSysError: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']), kesWarning);
+      Context.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleSysError: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']), kesWarning);
     end;
     on E:Exception do
     begin
-      FContext.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]), kesWarning);
+      Context.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]), kesWarning);
     end;
   end;
 end;
 
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
-  AOwner: IKeymanKeyboardInstalled; ABCP47Code: string; ALangID: Integer; AProfileGUID: TGUID);
+  AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string; ALangID: Integer;
+  AProfileGUID: TGUID; const AName: string);
 begin
-  FContext := AContext;
   FOwner := AOwner;
-  FBCP47Code := ABCP47Code;
-  FLangID := ALangID;
   FProfileGUID := AProfileGUID;
-  inherited Create(AContext, IKeymanKeyboardLanguageInstalled);
+  inherited Create(AContext, AOwner, ABCP47Code, ALangID, AName);
 end;
 
-function TKeymanKeyboardLanguageInstalled.Get_BCP47Code: WideString;
+function TKeymanKeyboardLanguageInstalled.Get_IsInstalled: WordBool;
 begin
-  Result := FBCP47Code;
-end;
-
-function TKeymanKeyboardLanguageInstalled.Get_LangID: Integer;
-begin
-  Result := FLangID;
+  Result := not IsEqualGuid(FProfileGUID, GUID_NULL);
 end;
 
 function TKeymanKeyboardLanguageInstalled.Get_OwnerKeyboard: IKeymanKeyboardInstalled;
@@ -129,41 +125,39 @@ begin
   Result := FProfileGUID;
 end;
 
+procedure TKeymanKeyboardLanguageInstalled.Install;
+begin
+  if not Get_IsInstalled then
+    with TKPInstallKeyboardLanguageProfiles.Create(Context) do
+    try
+      Execute(FOwner.ID, FOwner.Name, Get_BCP47Code, FOwner.IconFilename, GetLangName);
+    finally
+      Free;
+    end;
+end;
+
 function TKeymanKeyboardLanguageInstalled.Serialize(Flags: TOleEnum;
   const ImagePath: WideString; References: TStrings): WideString;
-var
-  i: Integer;
-  Language: IKeymanLanguage;
-  LangName: string;
 begin
-  for i := 0 to (Context.Languages as IKeymanLanguages).Count - 1 do
-  begin
-    Language := (Context.Languages as IKeymanLanguages)[i];
-    if Language.LangID = Get_LangID then
-    begin
-      LangName := Language.LocaleName;
-      Break;
-    end;
-  end;
-
-  if LangName = '' then
-    {ignore result := } GetLanguageName(Get_LangID, LangName);
-
   Result := XMLFormat([
     'langid', IntToHex(Get_LangID, 4),
     'profileguid', GUIDToString(FProfileGUID),
-    'bcp47code', FBCP47Code,
-    'langname', LangName]);
+    'bcp47code', Get_BCP47Code,
+    'langname', GetLangName,
+    'isinstalled', Get_IsInstalled
+  ]);
 end;
 
 procedure TKeymanKeyboardLanguageInstalled.Uninstall;
 begin
-  with TKPUninstallKeyboardLanguageProfiles.Create(Context) do
-  try
-    Execute(FOwner.ID, FBCP47Code);
-  finally
-    Free;
-  end;
+  if Get_IsInstalled then
+    with TKPUninstallKeyboardLanguageProfiles.Create(Context) do
+    try
+      Execute(FOwner.ID, Get_BCP47Code);
+      FProfileGUID := GUID_NULL;
+    finally
+      Free;
+    end;
 end;
 
 end.

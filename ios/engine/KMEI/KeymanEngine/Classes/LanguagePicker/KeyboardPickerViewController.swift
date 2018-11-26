@@ -8,7 +8,6 @@
 
 import UIKit
 
-private let errorAlertTag = -1
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
@@ -164,7 +163,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     cell.detailTextLabel?.text = kb.name
     cell.tag = indexPath.row
 
-    if isCurrentKeyboard(languageID: kb.languageID, keyboardID: kb.id) {
+    if Manager.shared.currentKeyboardID == kb.fullID {
       cell.selectionStyle = .blue
       cell.isSelected = true
       cell.accessoryType = .detailDisclosureButton
@@ -232,7 +231,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       // Add keyboard.
       for keyboard in keyboards {
         Manager.shared.addKeyboard(keyboard)
-        Manager.shared.setKeyboard(keyboard)
+        _ = Manager.shared.setKeyboard(keyboard)
       }
 
       navigationController?.popToRootViewController(animated: true)
@@ -254,11 +253,14 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       title = "Keyboard Download Error"
     }
     navigationController?.setToolbarHidden(true, animated: true)
-
-    let alert = UIAlertView(title: title, message: notification.error.localizedDescription,
-                            delegate: self, cancelButtonTitle: "OK", otherButtonTitles: "")
-    alert.tag = errorAlertTag
-    alert.show()
+    
+    let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 
   private func switchKeyboard(_ index: Int) {
@@ -273,16 +275,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func loadUserKeyboards() {
-    let userData = Storage.active.userDefaults
-
-    if let userKeyboards = userData.userKeyboards {
-      self.userKeyboards = userKeyboards
-    } else {
-      userKeyboards = [Defaults.keyboard]
-      userData.userKeyboards = userKeyboards
-      userData.synchronize()
-    }
-
+    userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
     tableView.reloadData()
   }
 
@@ -365,7 +358,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
   private func scroll(toSelectedKeyboard animated: Bool) {
     let index = userKeyboards.index { kb in
-      return isCurrentKeyboard(languageID: kb.languageID, keyboardID: kb.id)
+      return Manager.shared.currentKeyboardID == kb.fullID
     }
 
     if let index = index {
@@ -386,11 +379,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
                                          action: #selector(self.cancelClicked))
       navigationItem.leftBarButtonItem = cancelButton
     }
-  }
-
-  private func isCurrentKeyboard(languageID: String?, keyboardID: String?) -> Bool {
-    return Manager.shared.keyboardID == keyboardID &&
-      Manager.shared.languageID == languageID
   }
 
   @objc func hideToolbarDelayed(_ timer: Timer) {

@@ -293,7 +293,7 @@ uses
   ErrorControlledRegistry,
   KeymanDesktopShell,
   RegistryKeys,
-  LangSwitchUtils,
+  Keyman.System.Util.RenderLanguageIcon,
   UfrmHelp,
   UfrmKeyman7Main,
   UnicodeData,
@@ -1134,16 +1134,20 @@ procedure TfrmVisualKeyboard.UpdateKeyboardIcon;   // I3962
   end;
 var
   kbd: TLangSwitchKeyboard;
+  kbdId: string;
   i: Integer;
   btn: TKeymanToolButton;
 begin
   kbd := frmKeyman7Main.LangSwitchManager.ActiveKeyboard;
+  if Assigned(kbd)
+    then kbdId := kbd.ID
+    else kbdId := '';
 
   for i := 0 to tbKeyboards.ControlCount - 1 do
     if (tbKeyboards.Controls[i] is TToolButton) then
     begin
       btn := tbKeyboards.Controls[i] as TKeymanToolButton;
-      btn.Down := btn.KeyboardName = kbd.ID;
+      btn.Down := btn.KeyboardName = kbdId;
       btn.Marked := btn.Down;
     end;
 
@@ -1253,7 +1257,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKey(SRegKey_KeymanOSK, True) then
+    if OpenKey(SRegKey_KeymanOSK_CU, True) then
     begin
       WriteBool(SRegValue_OSK_FadeVisualKeyboard, FFadeVisualKeyboard);
       WriteInteger(SRegValue_OSK_ActivePage, Ord(ActivePage));
@@ -1353,7 +1357,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_KeymanOSK) then
+    if OpenKeyReadOnly(SRegKey_KeymanOSK_CU) then
     begin
       if ValueExists(SRegValue_OSK_FadeVisualKeyboard) then FFadeVisualKeyboard := ReadBool(SRegValue_OSK_FadeVisualKeyboard);
 

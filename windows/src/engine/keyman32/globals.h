@@ -52,9 +52,14 @@
 #ifndef _globals_h
 #define _globals_h
 
+#include <evntprov.h>
+
 #define GLOBAL_ContextStackSize 80
 #define GLOBAL_MsgStackSize 80
 #define GLOBAL_MaxKeyboards 32
+
+#include "serialkeyeventclient.h"
+#include "SharedBuffers.h"
 
 class Globals
 {
@@ -118,6 +123,9 @@ public:
 
   static BOOL get_MnemonicDeadkeyConversionMode();   // I4583   // I4552
 
+  static UINT get_vk_prefix();
+  static void set_vk_prefix(UINT value);
+
   static void SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboardNameAlt);   // I4583
 
 	static BOOL IsControllerWindow(HWND hwnd);
@@ -132,9 +140,16 @@ public:
   static BOOL IsControllerProcess();
 
   static BOOL InitHandles();
+  static BOOL InitSettings();
   static BOOL Lock();
   static BOOL Unlock();
   static BOOL CheckControllers();
+
+  /* Debugging */
+
+  static BOOL get_debug_KeymanLog();
+  static BOOL get_debug_ToConsole();
+  static void LoadDebugSettings();
 };
 
 /* External interface functions */
@@ -216,13 +231,12 @@ typedef struct tagKEYMAN64THREADDATA
   int CurrentAddin;
   HWND CurrenthWnd;
 
-  void *debug_fp;
-  HANDLE debug_hLogMailSlot, debug_hLogEvent;
-  BOOL debug_DebugInit, debug_KeymanLog, debug_ToConsole;   // I3951
+  BOOL debug_DebugInit;   // I3951
   char debug_buf[64];
 
    // I3617   // I3618
 
+  REGHANDLE etwRegHandle;
 
   /* TSF Manager Globals */
 
@@ -232,6 +246,12 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL TSFFailed;
   WPARAM LastKey;   // I4642
   BYTE LastScanCode;   // I4642
+
+  /* Serialized key events */
+
+  ISerialKeyEventClient *pSerialKeyEventClient;
+  ISharedBufferManager *pSharedBufferManager;
+
 } KEYMAN64THREADDATA, *PKEYMAN64THREADDATA;
 
 extern UINT 
@@ -249,7 +269,13 @@ extern UINT
   wm_keymanshift,
   wm_keymanim_close,
   wm_keymanim_contextchanged,
-  wm_test_keyman_functioning;
+  wm_test_keyman_functioning,
+  wm_keyman_keyevent;   // for serialized input 
+
+extern BOOL
+  flag_ShouldSerializeInput;
+
+extern HINSTANCE g_hInstance;
 
 void UpdateActiveWindows();
 
@@ -264,5 +290,8 @@ void Globals_UninitProcess();
 PKEYMAN64THREADDATA ThreadGlobals();
 BOOL Globals_ProcessInitialised();
 
+/* Debug flags */
+
+BOOL Reg_GetDebugFlag(LPSTR pszFlagRegistrySetting, BOOL bDefault);
 
 #endif

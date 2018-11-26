@@ -1,18 +1,18 @@
 (*
   Name:             VisualKeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Add ExtShiftStateToVkShiftState function
                     19 Mar 2007 - mcdurdin - I699 - Fix crash when exporting on screen keyboard with some shift states
                     19 Nov 2007 - mcdurdin - I1157 - const string parameters
@@ -44,6 +44,7 @@ const
   KVKS_RALT   = 64;
 
 function ExtShiftStateToVkShiftState(ShiftState: TExtShiftState): WORD;
+function VkShiftStateToKmxShiftState(ShiftState: WORD): WORD;
 
 type
   TVisualKeyboardKeyFlags = set of (kvkkBitmap, kvkkUnicode);  // if not set, is kvkkText, kvkkANSI resp.
@@ -205,6 +206,7 @@ function GetVKLegalShiftStateIndex(Shift: Integer): Integer;
 implementation
 
 uses
+  kmxfileconsts,
   VisualKeyboardLoaderBinary,
   VisualKeyboardLoaderXML,
   VisualKeyboardSaverBinary,
@@ -533,6 +535,30 @@ begin
   finally
     Stream.Free;
   end;
+end;
+
+function VkShiftStateToKmxShiftState(ShiftState: WORD): WORD;
+type
+  TVKToKMX = record
+    VK, KMX: Word;
+  end;
+const
+  Map: array[0..6] of TVKToKMX = (
+    (VK: KVKS_SHIFT; KMX: KMX_SHIFTFLAG),
+    (VK: KVKS_CTRL;  KMX: KMX_CTRLFLAG),
+    (VK: KVKS_ALT;   KMX: KMX_ALTFLAG),
+    (VK: KVKS_LCTRL; KMX: KMX_LCTRLFLAG),
+    (VK: KVKS_RCTRL; KMX: KMX_RCTRLFLAG),
+    (VK: KVKS_LALT;  KMX: KMX_LALTFLAG),
+    (VK: KVKS_RALT;  KMX: KMX_RALTFLAG)
+  );
+var
+  i: Integer;
+begin
+  Result := 0;
+  for i := Low(Map) to High(Map) do
+    if (ShiftState and Map[i].VK) = Map[i].VK then
+      Result := Result or Map[i].KMX;
 end;
 
 end.

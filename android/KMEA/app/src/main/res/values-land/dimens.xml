@@ -13,4 +13,7 @@
     <dimen name="help_bubble_height">60dp</dimen>
     <dimen name="help_bubble_offset_x">0.5dp</dimen>
     <dimen name="help_bubble_offset_y">6dp</dimen>
+    <dimen name="close_button_margin">12dp</dimen>
+    <dimen name="fab_margin">10dp</dimen>
+    <dimen name="fab_padding">70dp</dimen>
 </resources>

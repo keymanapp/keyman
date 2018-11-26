@@ -7,7 +7,7 @@
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.4</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -149,11 +149,10 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\comp\FixedTrackbar.pas"/>
         <DCCReference Include="Menu_KeyboardItems.pas"/>
-        <DCCReference Include="..\..\global\delphi\debug\DebugManager.pas"/>
+        <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogManager.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\PaintPanel.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\exImageList.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilhttp.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="VistaMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
@@ -205,9 +204,6 @@
         <DCCReference Include="..\..\global\delphi\general\WebSoundControl.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
-        <DCCReference Include="UfrmDebugNotify.pas">
-            <Form>frmDebugNotify</Form>
-        </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="UfrmKeymanMenu.pas">
             <Form>frmKeymanMenu</Form>
@@ -236,7 +232,7 @@
             <Form>frmScriptError</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
-        <DCCReference Include="langswitch\LangSwitchUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\SHDocVw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
@@ -256,6 +252,19 @@
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Windows8LanguageList.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogClient.pas"/>
+        <DCCReference Include="..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas"/>
+        <DCCReference Include="Keyman.System.SharedBuffers.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.Security.pas"/>
+        <DCCReference Include="..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

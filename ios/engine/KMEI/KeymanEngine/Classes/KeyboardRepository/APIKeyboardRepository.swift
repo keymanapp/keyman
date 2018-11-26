@@ -15,7 +15,7 @@ public enum APIKeyboardFetchError: Error {
 }
 
 public class APIKeyboardRepository: KeyboardRepository {
-  private let languagesAPIURL = URLComponents(string: "https://r.keymanweb.com/api/4.0/languages")!
+  private let languagesAPIURL = URLComponents(string: "https://api.keyman.com/cloud/4.0/languages")!
 
   public weak var delegate: KeyboardRepositoryDelegate?
   public private(set) var languages: [String: Language]?
@@ -24,11 +24,15 @@ public class APIKeyboardRepository: KeyboardRepository {
 
   public func fetch(completionHandler: CompletionHandler?) {
     let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
+    let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     var urlComponents = languagesAPIURL
     urlComponents.queryItems = [
       URLQueryItem(name: "dateformat", value: "seconds"),
-      URLQueryItem(name: "device", value: deviceType)
+      URLQueryItem(name: "device", value: deviceType),
+      URLQueryItem(name: "version", value: keymanVersion),
+      URLQueryItem(name: "languageidtype", value: "bcp47")
     ]
+    log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
     let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
       self.apiCompletionHandler(data: data, response: response, error: error,
                                 fetchCompletionHandler: completionHandler)
@@ -48,12 +52,12 @@ public class APIKeyboardRepository: KeyboardRepository {
     }
 
     if let error = error {
-      Manager.shared.kmLog("Network error fetching languages: \(error)", checkDebugPrinting: false)
+      log.error("Network error fetching languages: \(error)")
       errorHandler(APIKeyboardFetchError.networkError(error))
       return
     }
     guard let data = data else {
-      Manager.shared.kmLog("Language API did not return data", checkDebugPrinting: false)
+      log.error("Language API did not return data")
       errorHandler(APIKeyboardFetchError.noData)
       return
     }
@@ -64,7 +68,7 @@ public class APIKeyboardRepository: KeyboardRepository {
     do {
       result = try decoder.decode(LanguagesAPICall.self, from: data)
     } catch {
-      Manager.shared.kmLog("Failed parsing API languages: \(error)", checkDebugPrinting: false)
+      log.error("Failed parsing API languages: \(error)")
       errorHandler(APIKeyboardFetchError.parsingError(error))
       return
     }
@@ -88,7 +92,7 @@ public class APIKeyboardRepository: KeyboardRepository {
       return kb
     }
 
-    Manager.shared.kmLog("Request completed -- \(result.languages.count) languages.", checkDebugPrinting: true)
+    log.info("Request completed -- \(result.languages.count) languages.")
     DispatchQueue.main.async {
       self.delegate?.keyboardRepositoryDidFetch(self)
       fetchCompletionHandler?(nil)

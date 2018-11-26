@@ -59,10 +59,11 @@ uses
   System.UITypes,
   Windows, SysUtils, Messages, Classes, Graphics, Forms, Controls, StdCtrls,
   Buttons, ComCtrls, ExtCtrls, Dialogs, CommDlg, kmxfile, kpsfile,
-  ImgList, UfrmMDIChild, ProjectFile, PackageInfo,
+  ImgList, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile, PackageInfo,
   UfrmMDIEditor, Grids, dmActionsMain,
-  UserMessages,
-  UframeTextEditor, LeftTabbedPageControl, ProjectFileUI;
+  UserMessages, Keyman.Developer.System.Project.ProjectLog,
+  UframeTextEditor, LeftTabbedPageControl, Keyman.Developer.UI.Project.ProjectFileUI,
+  utilfiletypes;
 
 type
   TfrmPackageEditor = class(TfrmTikeEditor)   // I4689
@@ -134,18 +135,53 @@ type
     Panel4: TPanel;
     Label13: TLabel;
     lblCompilePackage: TLabel;
-    lblInstallHint: TLabel;
-    lblBootstrap: TLabel;
-    lblBootstrapMSI: TLabel;
     cmdBuildPackage: TButton;
-    cmdInstall: TButton;
     editOutPath: TEdit;
     cmdOpenContainingFolder2: TButton;
     cmdAddToProject: TButton;
-    cmdUninstall: TButton;
     cmdCompileInstaller: TButton;
-    cmdInstallWith: TButton;
+    pageKeyboards: TTabSheet;
+    Panel5: TPanel;
+    Label2: TLabel;
+    Label3: TLabel;
+    lblKeyboardFiles: TLabel;
+    lblKeyboardDescription: TLabel;
+    lbKeyboards: TListBox;
+    editKeyboardDescription: TEdit;
+    memoKeyboardFiles: TMemo;
+    lblKeyboardVersion: TLabel;
+    editKeyboardVersion: TEdit;
+    lblKeyboardOSKFont: TLabel;
+    cbKeyboardOSKFont: TComboBox;
+    cbKeyboardDisplayFont: TComboBox;
+    lblKeyboardDisplayFont: TLabel;
+    gridKeyboardLanguages: TStringGrid;
+    lblKeyboardLanguages: TLabel;
+    cmdKeyboardAddLanguage: TButton;
+    cmdKeyboardRemoveLanguage: TButton;
+    chkFollowKeyboardVersion: TCheckBox;
+    lblKeyboardRTL: TLabel;
+    editKeyboardRTL: TEdit;
+    cmdKeyboardEditLanguage: TButton;
+    panBuildMobile: TPanel;
+    lblDebugHostCaption: TLabel;
+    lblCrossPlatform: TLabel;
+    cmdStartTestOnline: TButton;
+    cmdOpenDebugHost: TButton;
+    lbDebugHosts: TListBox;
+    panBuildDesktop: TPanel;
+    Label4: TLabel;
+    lblCompileTargetHeader: TLabel;
+    cmdInstall: TButton;
+    cmdUninstall: TButton;
+    Label5: TLabel;
+    panBuildWindowsInstaller: TPanel;
+    Label9: TLabel;
+    lblBootstrapMSI: TLabel;
+    lblInstallerOutputFilename: TLabel;
+    editBootstrapMSI: TEdit;
     editInstallerOutputFilename: TEdit;
+    cmdInstallWith: TButton;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -184,6 +220,17 @@ type
       var AllowChange: Boolean);
     procedure pagesChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure lbKeyboardsClick(Sender: TObject);
+    procedure cbKeyboardOSKFontClick(Sender: TObject);
+    procedure cbKeyboardDisplayFontClick(Sender: TObject);
+    procedure gridKeyboardLanguagesClick(Sender: TObject);
+    procedure cmdKeyboardRemoveLanguageClick(Sender: TObject);
+    procedure cmdKeyboardAddLanguageClick(Sender: TObject);
+    procedure chkFollowKeyboardVersionClick(Sender: TObject);
+    procedure gridKeyboardLanguagesDblClick(Sender: TObject);
+    procedure cmdKeyboardEditLanguageClick(Sender: TObject);
+    procedure cmdStartTestOnlineClick(Sender: TObject);
+    procedure cmdOpenDebugHostClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -196,20 +243,31 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_User_FormShown;
     procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
     procedure EnableStartMenuControls;
+    procedure EnableDetailsTabControls;
+    procedure EnableCompileTabControls;
     function DoAction(action: TProjectFileAction): Boolean;
     procedure UpdateReadme;
     procedure UpdateImageFiles;
     procedure GetStartMenuEntries(var AName, AProg, AParams: WideString);
     procedure SetStartMenuEntries(AName, AProg, AParams: WideString);
     procedure UpdateStartMenuPrograms;
-    procedure FillFileList(combo: TComboBox; obj: TObject);
+    procedure FillFileList(combo: TComboBox; obj: TObject; FileType: TKMFileType = ftOther);
     procedure UpdateImagePreviews;
     procedure AddFile(FileName: WideString);
     procedure SourceChanged(Sender: TObject);
     procedure MovePackageToSource;
     function MoveSourceToPackage: Boolean;
+    procedure RefreshKeyboardList;
+    function SelectedKeyboard: TPackageKeyboard;
+    procedure EnableKeyboardTabControls;
+    function SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+    procedure RefreshKeyboardLanguageList(k: TPackageKeyboard);
+    procedure HandlePackageRefreshError(Sender: TObject; msg: string;
+      State: TProjectLogState);
+    procedure RefreshTargetPanels;
 
   protected
+    function GetHelpTopic: string; override;
     function DoOpenFile: Boolean; override;
     function DoSaveFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -221,7 +279,9 @@ type
   public
     function GetPack: TKPSFile;
 
-    procedure CreateFromKMX(FFileName: WideString);
+    procedure CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
+
+    procedure NotifyStartedWebDebug;
 
     procedure FindError(const Filename: string; s: string); override;   // I4081
 
@@ -232,20 +292,28 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   CharMapDropTool,
   CharMapInsertMode,
   CompilePackageInstaller,
-  kpsProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFile,
   OnlineConstants,
-  Project,
-  ProjectFileType,
+  KeymanVersion,
+  Keyman.System.PackageInfoRefreshKeyboards,
+  Keyman.System.KeyboardUtils,
+  kmxfileconsts,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFileType,
   ShellApi,
   TextFileFormat,
   TTInfo,
-  utilfiletypes,
   utilsystem,
   UfrmMain,
   UfrmMessages,
+  UmodWebHttpServer,
+  utilexecute,
+  Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
 
 {$R *.DFM}
@@ -260,6 +328,8 @@ begin
     Exit;
   if pages.ActivePage = pageFiles then
     lbFiles.SetFocus
+  else if pages.ActivePage = pageKeyboards then
+    lbKeyboards.SetFocus
   else if pages.ActivePage = pageDetails then
     editInfoName.SetFocus
   else if pages.ActivePage = pageShortcuts then
@@ -277,10 +347,13 @@ begin
     pages.ActivePage := pageFiles;
     pack := TKPSFile.Create;
     EnableStartMenuControls;
+    EnableDetailsTabControls;
+    EnableCompileTabControls;
     UpdateStartMenuPrograms;
     UpdateReadme;
     UpdateImageFiles;
     UpdateImagePreviews;
+    RefreshKeyboardList;
 
     frameSource := TframeTextEditor.Create(Self);
     frameSource.Parent := pageSource;
@@ -302,7 +375,8 @@ end;
 
 procedure TfrmPackageEditor.SourceChanged(Sender: TObject);
 begin
-  if FSetup = 0 then Modified := True;
+  if FSetup = 0 then
+    Modified := True;
 end;
 
 procedure TfrmPackageEditor.cmdCompileInstallerClick(Sender: TObject);
@@ -355,7 +429,7 @@ begin
   if pack.WasIni then
   begin
     if MessageDlg('The file '+FileName+' was originally created in Keyman Developer 6.2 or an earlier version.  '+
-        'Saving it in Keyman Developer 7 changes the file format and it will no longer be editable in '+
+        'Saving it in Keyman Developer '+SKeymanVersion+' changes the file format and it will no longer be editable in '+
         'Keyman Developer 6.2.'#13#10#13#10+'Continue save?', mtWarning, mbOkCancel, 0) = mrCancel then
       Exit;
   end;
@@ -410,6 +484,11 @@ end;
 function TfrmPackageEditor.GetFileNameFilter: string;
 begin
   Result := 'Package source files (*.kps)|*.kps|All files (*.*)|*.*';
+end;
+
+function TfrmPackageEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_PackageEditor;
 end;
 
 function TfrmPackageEditor.DoOpenFile: Boolean;
@@ -548,6 +627,7 @@ begin
           finally
             ki.MemoryDump.Free;
           end;
+
         except
           f.Description := 'Damaged keyboard '+ChangeFileExt(ExtractFileName(FileName), '');
         end;
@@ -562,6 +642,7 @@ begin
   UpdateReadme;
   UpdateImageFiles;
   UpdateStartMenuPrograms;
+  RefreshKeyboardList;
 ////  UpdateCustomisationFile;
   Modified := True;
 end;
@@ -603,8 +684,14 @@ begin
     UpdateReadme;
     UpdateImageFiles;
     UpdateStartMenuPrograms;
+    RefreshKeyboardList;
     Modified := True;
   end;
+end;
+
+procedure TfrmPackageEditor.cmdStartTestOnlineClick(Sender: TObject);
+begin
+  DoAction(pfaTestKeymanWeb);
 end;
 
 {$EXTERNALSYM SHGetFileInfoW}
@@ -756,6 +843,14 @@ begin
   Modified := True;
 end;
 
+procedure TfrmPackageEditor.chkFollowKeyboardVersionClick(Sender: TObject);
+begin
+  if FSetup > 0 then Exit;
+  pack.KPSOptions.FollowKeyboardVersion := chkFollowKeyboardVersion.Checked;
+  EnableDetailsTabControls;
+  Modified := True;
+end;
+
 procedure TfrmPackageEditor.chkStartMenuUninstallClick(Sender: TObject);
 begin
   pack.StartMenu.AddUninstallEntry := chkStartMenuUninstall.Checked;
@@ -797,12 +892,15 @@ var
   desc, prog, params: WideString;
 begin
   Inc(FSetup);  // I1756
-  GetStartMenuEntries(desc, prog, params);
-  editStartMenuDescription.Text := desc;
-  cbStartMenuProgram.Text := prog;
-  editStartMenuParameters.Text := params;
-  EnableStartMenuControls;
-  Dec(FSetup);  // I1756
+  try
+    GetStartMenuEntries(desc, prog, params);
+    editStartMenuDescription.Text := desc;
+    cbStartMenuProgram.Text := prog;
+    editStartMenuParameters.Text := params;
+    EnableStartMenuControls;
+  finally
+    Dec(FSetup);  // I1756
+  end;
 end;
 
 procedure TfrmPackageEditor.pagesChange(Sender: TObject);
@@ -886,6 +984,11 @@ begin
   OpenContainingFolder((lbFiles.Items.Objects[lbFiles.ItemIndex] as TPackageContentFile).FileName);
 end;
 
+procedure TfrmPackageEditor.cmdOpenDebugHostClick(Sender: TObject);
+begin
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html');
+end;
+
 procedure TfrmPackageEditor.cmdOpenFileClick(Sender: TObject);   // I4687
 var
   s: WideString;
@@ -901,7 +1004,7 @@ begin
   end
   else
   begin
-    f := CreateProjectFile(s, ProjectFile);
+    f := CreateProjectFile(FGlobalProject, s, ProjectFile);
     try
       fui := f.UI as TProjectFileUI;
       fui.DefaultEvent(Self);
@@ -986,13 +1089,20 @@ begin
   FillFileList(cbReadme, pack.Options.ReadmeFile);
 end;
 
-procedure TfrmPackageEditor.FillFileList(combo: TComboBox; obj: TObject);
+procedure TfrmPackageEditor.FillFileList(combo: TComboBox; obj: TObject; FileType: TKMFileType);
+var
+  i: Integer;
 begin
   combo.Clear;
-  combo.Items.Assign(lbFiles.Items);
-  combo.Items.InsertObject(0, '(none)', nil);
+
+  combo.Items.AddObject('(none)', nil);
+
+  for i := 0 to pack.Files.Count - 1 do
+    if (FileType = ftOther) or (pack.Files[i].FileType = FileType) then
+      combo.Items.AddObject(ExtractFileName(pack.Files[i].FileName), pack.Files[i]);
+
   if Assigned(obj)
-    then combo.ItemIndex := cbReadme.Items.IndexOfObject(obj)
+    then combo.ItemIndex := combo.Items.IndexOfObject(obj)
     else combo.ItemIndex := 0;
 end;
 
@@ -1014,6 +1124,8 @@ begin
 
     for i := 0 to pack.Info.Count - 1 do
       UpdateInfo(pack.Info[i].Name, pack.Info[i].Description, pack.Info[i].URL);
+    chkFollowKeyboardVersion.Checked := pack.KPSOptions.FollowKeyboardVersion;
+    EnableDetailsTabControls;
 
     lbStartMenuEntries.Clear;
     
@@ -1026,7 +1138,7 @@ begin
     EnableStartMenuControls;
 
     editOutPath.Text := (ProjectFile as TkpsProjectFile).TargetFilename;   // I4688
-    lblBootstrapMSI.Caption := pack.KPSOptions.MSIFileName;
+    editBootstrapMSI.Text := pack.KPSOptions.MSIFileName;
     if pack.KPSOptions.MSIFileName = ''
       then editInstallerOutputFilename.Text := ''
       else editInstallerOutputFilename.Text := (ProjectFile as TkpsProjectFile).TargetInstallerFileName;   // I4688
@@ -1035,6 +1147,8 @@ begin
     lbFilesClick(lbFiles);
 
     UpdateImagePreviews;   // I4814
+
+    RefreshKeyboardList;
   finally
     Dec(FSetup);
   end;
@@ -1155,11 +1269,350 @@ begin
   end;
 end;
 
-procedure TfrmPackageEditor.CreateFromKMX(FFileName: WideString);
+procedure TfrmPackageEditor.NotifyStartedWebDebug;
 begin
-  AddFile(FFileName);
+  lbDebugHosts.Clear;
+  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  if lbDebugHosts.Items.Count > 0 then
+    lbDebugHosts.ItemIndex := 0;
+  EnableCompileTabControls;
 end;
 
+procedure TfrmPackageEditor.CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
+begin
+  if (FKMXFilename <> '') and FileExists(FKMXFilename) then AddFile(FKMXFilename);
+  if (FJSFilename <> '') and FileExists(FJSFilename) then AddFile(FJSFilename);
+end;
+
+{-------------------------------------------------------------------------------
+ - Keyboards tab
+ -------------------------------------------------------------------------------}
+
+(**
+  Adds new keyboards to the Keyboards object in the kmp.inf and
+  removes any that are no longer in the list.
+
+  Note: if both a .js and a .kmx exist for a given keyboard id,
+  then both will be checked for version consistency, etc.??
+
+  Finally, updates the Keyboards tab
+*)
+
+procedure TfrmPackageEditor.HandlePackageRefreshError(Sender: TObject; msg: string; State: TProjectLogState);
+begin
+  if Assigned(Self.ProjectFile.Project) then
+    Self.ProjectFile.Project.Log(State, Filename, Msg);
+end;
+
+procedure TfrmPackageEditor.RefreshKeyboardList;
+var
+  n, i: Integer;
+begin
+  frmMessages.Clear;
+
+  n := lbKeyboards.ItemIndex;
+
+  with TPackageInfoRefreshKeyboards.Create(pack) do
+  try
+    OnError := Self.HandlePackageRefreshError;
+    if not Execute then
+      frmMessages.DoShowForm;
+  finally
+    Free;
+  end;
+
+  lbKeyboards.Clear;
+  for i := 0 to pack.Keyboards.Count - 1 do
+    lbKeyboards.Items.AddObject(pack.Keyboards[i].ID, pack.Keyboards[i]);
+
+  if lbKeyboards.Count = 0 then
+    n := -1
+  else if n >= lbKeyboards.Count then
+    n := lbKeyboards.Count - 1
+  else if (n < 0) and (lbKeyboards.Count > 0) then
+    n := 0;
+  lbKeyboards.ItemIndex := n;
+  lbKeyboardsClick(lbKeyboards);
+
+  RefreshTargetPanels;
+end;
+
+function TfrmPackageEditor.SelectedKeyboard: TPackageKeyboard;
+begin
+  if lbKeyboards.ItemIndex < 0
+    then Result := nil
+    else Result := lbKeyboards.Items.Objects[lbKeyboards.ItemIndex] as TPackageKeyboard;
+end;
+
+function TfrmPackageEditor.SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+var
+  k: TPackageKeyboard;
+begin
+  k := SelectedKeyboard;
+  if not Assigned(k) then
+    Exit(nil);
+
+  if gridKeyboardLanguages.Row = 0 then
+    Exit(nil);
+
+  Result := gridKeyboardLanguages.Objects[0, gridKeyboardLanguages.Row] as TPackageKeyboardLanguage;
+end;
+
+procedure TfrmPackageEditor.lbKeyboardsClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
+    gridKeyboardLanguages.Cells[0, 0] := 'BCP 47 tag';
+    gridKeyboardLanguages.Cells[1, 0] := 'Language name';
+    gridKeyboardLanguages.ColWidths[0] := 120;
+    gridKeyboardLanguages.ColWidths[1] := 10;
+
+    k := SelectedKeyboard;
+    if not Assigned(k) then
+    begin
+      editKeyboardDescription.Text := '';
+      editKeyboardVersion.Text := '';
+      memoKeyboardFiles.Text := '';
+      editKeyboardRTL.Text := '';
+      cbKeyboardOSKFont.ItemIndex := -1;
+      cbKeyboardDisplayFont.ItemIndex := -1;
+      gridKeyboardLanguages.RowCount := 1;
+      EnableKeyboardTabControls;
+      Exit;
+    end;
+
+    // Details
+
+    memoKeyboardFiles.Text := '';
+    editKeyboardDescription.Text := k.Name;
+    editKeyboardVersion.Text := k.Version;
+
+    if k.RTL
+      then editKeyboardRTL.Text := 'True'
+      else editKeyboardRTL.Text := 'False (or not .js format)';
+
+    for i := 0 to pack.Files.Count - 1 do
+      if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
+      begin
+        memoKeyboardFiles.Lines.Add(ExtractFileName(pack.Files[i].FileName));
+      end;
+
+    // Fonts
+
+    FillFileList(cbKeyboardOSKFont, k.OSKFont, ftFont);
+    FillFileList(cbKeyboardDisplayFont, k.DisplayFont, ftFont);
+
+    // Languages
+
+    RefreshKeyboardLanguageList(k);
+    EnableKeyboardTabControls;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+procedure TfrmPackageEditor.RefreshKeyboardLanguageList(k: TPackageKeyboard);
+var
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
+    gridKeyboardLanguages.RowCount := k.Languages.Count + 1;
+    gridKeyboardLanguages.ColWidths[1] := gridKeyboardLanguages.ClientWidth - 120 - 1;
+
+    if k.Languages.Count > 0 then
+    begin
+      gridKeyboardLanguages.FixedRows := 1;
+    end
+    else
+      gridKeyboardLanguages.Enabled := False;
+    for i := 0 to k.Languages.Count - 1 do
+    begin
+      gridKeyboardLanguages.Objects[0, i+1] := k.Languages[i];
+      gridKeyboardLanguages.Cells[0, i+1] := k.Languages[i].ID;
+      gridKeyboardLanguages.Cells[1, i+1] := k.Languages[i].Name;
+    end;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+procedure TfrmPackageEditor.cbKeyboardDisplayFontClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+begin
+  if FSetup > 0 then Exit;
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+
+  if cbKeyboardDisplayFont.ItemIndex <= 0
+    then k.DisplayFont := nil
+    else k.DisplayFont := cbKeyboardDisplayFont.Items.Objects[cbKeyboardDisplayFont.ItemIndex] as TPackageContentFile;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.cbKeyboardOSKFontClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+begin
+  if FSetup > 0 then Exit;
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+  if cbKeyboardOSKFont.ItemIndex <= 0
+    then k.OSKFont := nil
+    else k.OSKFont := cbKeyboardOSKFont.Items.Objects[cbKeyboardOSKFont.ItemIndex] as TPackageContentFile;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.EnableCompileTabControls;
+begin
+  cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
+end;
+
+procedure TfrmPackageEditor.EnableDetailsTabControls;
+var
+  e: Boolean;
+begin
+  e := not chkFollowKeyboardVersion.Checked;
+  editInfoVersion.Enabled := e;
+  lblStep2C.Enabled := e;
+  lblVersionHint.Enabled := e;
+end;
+
+procedure TfrmPackageEditor.EnableKeyboardTabControls;
+var
+  e: Boolean;
+begin
+  e := lbKeyboards.ItemIndex >= 0;
+  lblKeyboardDescription.Enabled := e;
+  editKeyboardDescription.Enabled := e;
+  lblKeyboardFiles.Enabled := e;
+  memoKeyboardFiles.Enabled := e;
+  lblKeyboardVersion.Enabled := e;
+  editKeyboardVersion.Enabled := e;
+  lblKeyboardOSKFont.Enabled := e;
+  cbKeyboardOSKFont.Enabled := e;
+  lblKeyboardDisplayFont.Enabled := e;
+  cbKeyboardDisplayFont.Enabled := e;
+  lblKeyboardLanguages.Enabled := e;
+  cmdKeyboardAddLanguage.Enabled := e;
+
+  e := e and (gridKeyboardLanguages.Row > 0);
+  gridKeyboardLanguages.Enabled := e;
+  cmdKeyboardRemoveLanguage.Enabled := e;
+  cmdKeyboardEditLanguage.Enabled := e;
+end;
+
+procedure TfrmPackageEditor.gridKeyboardLanguagesClick(Sender: TObject);
+begin
+  EnableKeyboardTabControls;
+end;
+
+procedure TfrmPackageEditor.gridKeyboardLanguagesDblClick(Sender: TObject);
+begin
+  if SelectedKeyboardLanguage <> nil then
+    cmdKeyboardEditLanguage.Click;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardAddLanguageClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+  frm: TfrmSelectBCP47Language;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+
+  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
+  try
+    if frm.ShowModal = mrOk then
+    begin
+      lang := TPackageKeyboardLanguage.Create(pack);
+      lang.ID := frm.LanguageID;
+      lang.Name := frm.LanguageName;
+      k.Languages.Add(lang);
+      RefreshKeyboardLanguageList(k);
+      gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
+      gridKeyboardLanguagesClick(gridKeyboardLanguages);
+      Modified := True;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardEditLanguageClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+  frm: TfrmSelectBCP47Language;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+
+  lang := SelectedKeyboardLanguage;
+  Assert(Assigned(lang));
+
+  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
+  try
+    frm.LanguageID := lang.ID;
+    frm.LanguageName := lang.Name;
+    if frm.ShowModal = mrOk then
+    begin
+      lang.ID := frm.LanguageID;
+      lang.Name := frm.LanguageName;
+      RefreshKeyboardLanguageList(k);
+      Modified := True;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.cmdKeyboardRemoveLanguageClick(Sender: TObject);
+var
+  k: TPackageKeyboard;
+  lang: TPackageKeyboardLanguage;
+begin
+  k := SelectedKeyboard;
+  Assert(Assigned(k));
+  lang := SelectedKeyboardLanguage;
+  Assert(Assigned(lang));
+
+  k.Languages.Remove(lang);
+  RefreshKeyboardLanguageList(k);
+  EnableKeyboardTabControls;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.RefreshTargetPanels;
+var
+  i: Integer;
+  k: TPackageKeyboard;
+  FHasDesktopTarget, FHasMobileTarget: Boolean;
+begin
+  FHasDesktopTarget := False;
+  FHasMobileTarget := False;
+  for k in pack.Keyboards do
+  begin
+    for i := 0 to pack.Files.Count - 1 do
+    begin
+      if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
+      begin
+        if pack.Files[i].FileType = ftKeymanFile
+          then FHasDesktopTarget := True
+          else FHasMobileTarget := True;
+      end;
+    end;
+  end;
+
+  panBuildDesktop.Visible := FHasDesktopTarget;
+  panBuildWindowsInstaller.Visible := FHasDesktopTarget;
+  panBuildMobile.Visible := FHasMobileTarget;
+end;
 
 end.
 

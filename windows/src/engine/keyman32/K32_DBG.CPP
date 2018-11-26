@@ -43,94 +43,52 @@
                     24 Apr 2014 - mcdurdin - I4196 - V9.0 - wm_kmmoreposting must be refactored for TIP work as it is not sequential
                     09 Aug 2015 - mcdurdin - I4843 - Log reported modifier state as well as Keyman current modifier state
 */
-#include "keyman64.h"
+#include "pch.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <evntprov.h>
+
+#include "keyman-debug-etw.h"
 //#define _FILELOG
 
 #ifdef _WIN64
 #define DEBUG_PLATFORM_STRING "x64"
+#define DEBUG_PLATFORM_STRINGW L"x64"
 #else
 #define DEBUG_PLATFORM_STRING "x86"
+#define DEBUG_PLATFORM_STRINGW L"x86"
 #endif
 
 #ifdef _FILELOG
 //FILE *fp = NULL;
 #endif
 
+// {DA621615-E08B-4283-918E-D2502D3757AE}
+static const GUID guid_EtwProviderId =
+{ 0xda621615, 0xe08b, 0x4283, { 0x91, 0x8e, 0xd2, 0x50, 0x2d, 0x37, 0x57, 0xae } };
+
+
 enum {NO_DEBUG_WINDOWS=100, UNABLE_TO_CREATE_FILE_MAPPING, UNABLE_TO_MAP_VIEW_OF_FILE};
 
 extern void GetWindowsVersion(char *buf);
 
-void InitDebuggingEx(PKEYMAN64THREADDATA _td)
-{
-	RegistryReadOnly reg(HKEY_CURRENT_USER);
-	if(reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
-		_td->debug_KeymanLog = reg.ValueExists(REGSZ_Debug) && reg.ReadInteger(REGSZ_Debug);
-    _td->debug_ToConsole = reg.ValueExists(REGSZ_DebugToConsole) && reg.ReadInteger(REGSZ_DebugToConsole);   // I3951
-  }
-	else {
-		_td->debug_KeymanLog = FALSE;
-    _td->debug_ToConsole = FALSE;   // I3951
-  }
-  
-
-	if(_td->debug_KeymanLog)
-	{
-		if(_td->debug_hLogMailSlot != 0 && _td->debug_hLogMailSlot != INVALID_HANDLE_VALUE)
-        CloseHandle(_td->debug_hLogMailSlot);
-
-		_td->debug_hLogMailSlot = CreateFile("\\\\.\\mailslot\\Tavultesoft_KeymanEngine_Debug", 
-				GENERIC_WRITE, 
-				FILE_SHARE_READ | FILE_SHARE_WRITE,  // required to write to a mailslot 
-				(LPSECURITY_ATTRIBUTES) NULL, 
-				OPEN_EXISTING, 
-				FILE_FLAG_OVERLAPPED | FILE_ATTRIBUTE_NORMAL, 
-				(HANDLE) NULL);
-
-    if(_td->debug_hLogEvent) CloseHandle(_td->debug_hLogEvent);
-		_td->debug_hLogEvent = CreateEvent(NULL, FALSE, FALSE, "Tavultesoft_KeymanEngine_DebugWrite");
-
-		/*
-		FILE *fp = fopen("c:\\keyman.log", "at");
-		fprintf(fp, "opening log %d (error=%d)\n", hLogMailSlot, GetLastError());
-		fclose(fp);*/
-		
-#ifdef _FILELOG
-		char filenamebuf[256];
-    wsprintf(filenamebuf, "c:\\keymanlog\\system-%d-%d.log", GetCurrentProcessId(), GetCurrentThreadId());
-		_td->debug_fp = (void*) fopen(filenamebuf, "at");
-#endif
-
-		if (_td->debug_hLogMailSlot == INVALID_HANDLE_VALUE)
-		{
-			_td->debug_hLogMailSlot = 0;
-		}
-	}
-	else
-	{
-		if(_td->debug_hLogMailSlot != 0) CloseHandle(_td->debug_hLogMailSlot);
-		_td->debug_hLogMailSlot = 0;
-    if(_td->debug_hLogEvent) CloseHandle(_td->debug_hLogEvent);
-    _td->debug_hLogEvent = 0;
+void InitDebuggingEx(PKEYMAN64THREADDATA _td) {
+	if(Globals::get_debug_KeymanLog()) {
+    DWORD dwErr = EventRegister(&guid_EtwProviderId, NULL, NULL, &_td->etwRegHandle);
+    if (dwErr != ERROR_SUCCESS) {
+      OutputDebugString("Keyman k32_dbg: Failed to EventRegister");//TODO: Build a helper function with GLE?
+    }
 	}
 }
 
-inline void TestInitDebug(PKEYMAN64THREADDATA _td)
-{
-	if(!_td->debug_DebugInit) InitDebuggingEx(_td);
-	_td->debug_DebugInit = TRUE;
-}
-
-void InitDebugging()
-{
+void InitDebugging() {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return;
 
 	InitDebuggingEx(_td);
 	_td->debug_DebugInit = TRUE;
 
-	if(_td->debug_KeymanLog)
+	if(Globals::get_debug_KeymanLog())
 	{
 		VS_FIXEDFILEINFO *ffi;
 		DWORD sz;
@@ -164,31 +122,27 @@ void UninitDebuggingEx()
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return;
 
-  if(_td->debug_hLogMailSlot) CloseHandle(_td->debug_hLogMailSlot);
-	_td->debug_hLogMailSlot = 0;
-	if(_td->debug_hLogEvent) CloseHandle(_td->debug_hLogEvent);
-	_td->debug_hLogEvent = 0;
-#ifdef _FILELOG
-  if(_td->debug_fp) fclose((FILE*)_td->debug_fp);
-	_td->debug_fp = NULL;
-#endif
+  if (_td->etwRegHandle != NULL) {
+    EventUnregister(_td->etwRegHandle);
+    _td->etwRegHandle = NULL;
+  }
+
   _td->debug_DebugInit = FALSE;
 }
 
-void UninitDebugging()
-{
+void UninitDebugging() {
   SendDebugMessage(0, sdmGlobal, 0, "--- UninitDebugging() - shutting down ---");
 }
 
 const TSDMState DebugState[] = {sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sdmGlobal, sdmMenu, sdmDebug, sdmLoad, sdmOther};
 
-inline BOOL ShouldDebug_1() //TSDMState state)
-{
+BOOL ShouldDebug_1() {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
-  TestInitDebug(_td);
-	return _td->debug_KeymanLog;
+  if (!_td->debug_DebugInit) InitDebuggingEx(_td);
+  _td->debug_DebugInit = TRUE;
+  return Globals::get_debug_KeymanLog();
 }
 
 int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...)
@@ -245,47 +199,38 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
 {
   UNREFERENCED_PARAMETER(hwnd);
   UNREFERENCED_PARAMETER(state);   // I3569
+  UNREFERENCED_PARAMETER(kmn_lineno);
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return 0;
 
-	if(_td->debug_KeymanLog)
-	{
-		OVERLAPPED ov;
-		DWORD cbWritten; 
-		char windowinfo[1024];
+  if (msg == NULL) {
+    return 0;
+  }
 
-    if(msg == NULL)
-    {
-      switch(kmn_lineno)
-      {
-      case -1: // Signal an event to the controller
-        strcpy(windowinfo, "*");
-        break;
-      }
-    }
-    else
-    {
-      GUITHREADINFO gti;
-		  char 
-         //sClassName[32], sWindowText[32], 
-         //sFocusClassName[32], sFocusWindowText[32], 
-         //sActiveClassName[32], sActiveWindowText[32], 
-         sProcessPath[256], sProcessName[32];
+	if(Globals::get_debug_KeymanLog()) {
+    GUITHREADINFO gti;
+    char
+      //sClassName[32], sWindowText[32], 
+      //sFocusClassName[32], sFocusWindowText[32], 
+      //sActiveClassName[32], sActiveWindowText[32], 
+      sProcessPath[256], sProcessName[32];
 
-      gti.cbSize = sizeof(gti);
-      GetGUIThreadInfo(GetCurrentThreadId(), &gti);
+    gti.cbSize = sizeof(gti);
+    GetGUIThreadInfo(GetCurrentThreadId(), &gti);
 
-      //FillWindowInfo(hwnd, sClassName, sWindowText);   // I3656
-      //FillWindowInfo(gti.hwndActive, sActiveClassName, sActiveWindowText);   // I3656
-      //FillWindowInfo(gti.hwndFocus, sFocusClassName, sFocusWindowText);   // I3656
+    //FillWindowInfo(hwnd, sClassName, sWindowText);   // I3656
+    //FillWindowInfo(gti.hwndActive, sActiveClassName, sActiveWindowText);   // I3656
+    //FillWindowInfo(gti.hwndFocus, sFocusClassName, sFocusWindowText);   // I3656
 
-		  GetModuleFileName(NULL, sProcessPath, 256);
-		  _splitpath_s(sProcessPath, NULL, 0, NULL, 0, sProcessName, 32, NULL, 0);
-		  sProcessName[31] = 0;
+		GetModuleFileName(NULL, sProcessPath, 256);
+		_splitpath_s(sProcessPath, NULL, 0, NULL, 0, sProcessName, 32, NULL, 0);
+		sProcessName[31] = 0;
 
-		  if(strlen(msg) > 256) msg[255] = 0;
+		if(strlen(msg) > 256) msg[255] = 0;
 
-		  wsprintf(windowinfo, 
+    if(Globals::get_debug_ToConsole()) {   // I3951
+      char windowinfo[1024];
+      wsprintf(windowinfo,
         DEBUG_PLATFORM_STRING TAB //"Platform" TAB
         "%s" TAB  //"Process" TAB
         "%x" TAB  //"PID" TAB
@@ -309,7 +254,7 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
         "%8x" TAB //"ActiveHKL" TAB
         "%s:%d" TAB  //"SourceFile" TAB
         "%s",     //"Message"
-  			
+
         sProcessName,                    //"Process" TAB
         GetCurrentProcessId(),           //"PID" TAB
         GetCurrentThreadId(),            //"TID" TAB
@@ -337,46 +282,52 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
         GetKeyboardLayout(0),            //"ActiveHKL" TAB
         file, line,                      //"SourceFile" TAB
         msg);                            //"Message"
-    }                                       
-#ifdef _FILELOG                        
-		if(_td->debug_fp)
-		{
-			fputs(windowinfo, (FILE*)_td->debug_fp);
-			fputs("\n", (FILE*)_td->debug_fp);
-		}
-#endif
-    if(_td->debug_ToConsole) {   // I3951
       OutputDebugString(windowinfo);   // I3570   // I3951
       OutputDebugString("\n");   // I3570   // I3951
     }
 
-		if(_td->debug_hLogMailSlot != 0)
-    {
-		  ov.Offset = 0;
-		  ov.OffsetHigh = 0;
-		  ov.hEvent = _td->debug_hLogEvent;
-			if(!WriteFile(_td->debug_hLogMailSlot,
-				windowinfo, 
-				(DWORD) strlen(windowinfo) + 1,  // include terminating null 
-				&cbWritten, 
-				&ov))
-      {
-        switch(GetLastError())  // I2445 - Try and reconnect debug pipe on error
-        {
-        case ERROR_HANDLE_EOF:
-        case ERROR_BROKEN_PIPE:
-          UninitDebuggingEx();
-          InitDebuggingEx(_td);
-			    if(WriteFile(_td->debug_hLogMailSlot,
-				    windowinfo, 
-				    (DWORD) strlen(windowinfo) + 1,  // include terminating null 
-				    &cbWritten, 
-				    &ov)) break;
-        default:
-          UninitDebuggingEx();
-          _td->debug_KeymanLog = FALSE;  /// Failed again - we could log to system log I guess
-        }
+    if (_td->etwRegHandle != NULL) {
+#define MAX_DESCRIPTORS 12
+
+      // TODO: convert debugging to Unicode
+      PWSTR sProcessNameW = strtowstr(sProcessName);
+      PWSTR fileW = strtowstr(file);
+      PWSTR msgW = strtowstr(msg);
+      EVENT_DATA_DESCRIPTOR Descriptors[MAX_DESCRIPTORS];
+      DWORD pid = GetCurrentProcessId();
+      DWORD tid = GetCurrentThreadId();
+      DWORD shiftState = Globals::get_ShiftState();
+      DWORD actualShiftState = GetActualShiftState();
+      DWORD tickCount = GetTickCount();
+      HKL activeHKL = GetKeyboardLayout(0);
+
+#ifdef _WIN64
+      DWORD platform = 2;
+#else
+      DWORD platform = 1;
+#endif
+
+      // These must match the manifest template in keyman-debug-etw.man
+      EventDataDescCreate(&Descriptors[0], &platform, sizeof(DWORD)); // <data name = "Platform" inType = "Platform" / >
+      EventDataDescCreate(&Descriptors[1], sProcessNameW, (ULONG) (wcslen(sProcessNameW) + 1) * sizeof(WCHAR)); //  <data name = "Process" inType = "win:UnicodeString" / >
+      EventDataDescCreate(&Descriptors[2], &pid, sizeof(DWORD)); //  <data name = "PID" inType = "win:UInt32" / >
+      EventDataDescCreate(&Descriptors[3], &tid, sizeof(DWORD)); //  <data name = "TID" inType = "win:UInt32" / >
+      EventDataDescCreate(&Descriptors[4], &shiftState, sizeof(DWORD)); //  <data name = "ShiftState" inType = "ShiftState" / >
+      EventDataDescCreate(&Descriptors[5], &actualShiftState, sizeof(DWORD)); //  <data name = "ActualShiftState" inType = "ShiftState" / >
+      EventDataDescCreate(&Descriptors[6], &tickCount, sizeof(DWORD)); //  <data name = "TickCount" inType = "win:UInt32" / >
+      EventDataDescCreate(&Descriptors[7], (PDWORD)&gti.hwndFocus, sizeof(DWORD)); //  <data name = "FocusHWND" inType = "win:UInt32" / >
+      EventDataDescCreate(&Descriptors[8], (PDWORD)&activeHKL, sizeof(DWORD)); //  <data name = "ActiveHKL" inType = "win:UInt32" / >
+      EventDataDescCreate(&Descriptors[9], fileW, (ULONG) (wcslen(fileW)+1) * sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
+      EventDataDescCreate(&Descriptors[10], (PDWORD)&line, sizeof(DWORD)); //  <data name = "SourceLine" inType = "win:UInt32" / >
+      EventDataDescCreate(&Descriptors[11], msgW, (ULONG) (wcslen(msgW)+1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
+
+      DWORD dwErr = EventWrite(_td->etwRegHandle, &DebugEvent, (ULONG)MAX_DESCRIPTORS, &Descriptors[0]);
+      if (dwErr != ERROR_SUCCESS) {
+        OutputDebugString("Keyman k32_dbg: Failed to call EventWrite");
       }
+      delete sProcessNameW;
+      delete fileW;
+      delete msgW;
     }
 	}
 
@@ -407,7 +358,10 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 	else if(msg->message == wm_keymankeyup)
     wsprintf(ds, "DebugMessage(%x, wm_keymankeyup: %s lParam: %X) [message flags: %x time: %d]", msg->hwnd, 
       Debug_VirtualKey((WORD) msg->wParam), msg->lParam, wParam, msg->time);
-	else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
+  else if (msg->message == wm_keyman_keyevent)
+    wsprintf(ds, "DebugMessage(%x, wm_keyman_keyevent: %s lParam: %X) [message flags: %x time: %d]", msg->hwnd,
+      Debug_VirtualKey((WORD)msg->wParam), msg->lParam, wParam, msg->time);
+  else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)
     wsprintf(ds, "DebugMessage(%x, %s, wParam: %s, lParam: %X) [message flags: %x time: %d extra: %x]", 
       msg->hwnd, 
       msgnames[msg->message-WM_KEYDOWN],
@@ -461,14 +415,16 @@ BOOL DebugSignalPause(BOOL fIsUp)
   return FALSE;
 }
 
-void DebugLastError_1(char *file, int line, char *func, char *date)
+void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func)
 {
-  DWORD err = GetLastError();
   if(ShouldDebug(sdmDebug))
   {
     char msg[256];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL);
-    SendDebugMessageFormat_1(NULL, sdmDebug, 0, "ERROR %d in %s [%s:%d]: %s", err, func, file, line, date, msg);
+    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL) == 0) msg[0] = 0;
+    for (char *p = msg; *p; p++) {
+      if (*p == '\r' || *p == '\n') *p = ' ';
+    }
+    SendDebugMessageFormat_1(NULL, sdmDebug, 0, file, line, "ERROR %d in %s calling %s: %s", err, func, context, msg);
   }
 }
 

@@ -24,7 +24,7 @@
                     04 Nov 2012 - mcdurdin - I3529 - V9.0 - Merge of I3284 - Fix blocking of Ctrl+Shift passthrough to other hooks
                     31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
 */
-#include "keyman64.h"
+#include "pch.h"
 
 static BYTE kbstate[256];
 extern BOOL FShouldIgnoreNextKey[256];
@@ -65,16 +65,16 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 	{
 		if(FIsUp && !(GetKeyState(VK_CAPITAL) & 1))		// I267 - 24/11/2006 invert GetKeyState test
 		{
-			keybd_event(VK_CAPITAL, 0xFF, 0, 0);
-			keybd_event(VK_CAPITAL, 0xFF, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
 		}
 	}
 	else if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSALWAYSOFF)
 	{
 		if(!FIsUp && (GetKeyState(VK_CAPITAL) & 1))  
 		{												// I267 - 24/11/2006 invert GetKeyState test
-			keybd_event(VK_CAPITAL, 0xFF, KEYEVENTF_KEYUP, 0);
-			keybd_event(VK_CAPITAL, 0xFF, 0, 0);
+			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
 		}
 	}
 }
@@ -92,8 +92,8 @@ void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
 	{
 		if(!FIsUp)
 		{
-			keybd_event(VK_CAPITAL, 0xFF, 0, 0);
-			keybd_event(VK_CAPITAL, 0xFF, KEYEVENTF_KEYUP, 0);
+			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
 		}
 	}
 }

@@ -23,15 +23,7 @@
     </style> 
  
     <!-- Insert uncompiled KeymanWeb source scripts -->              
-    <script src="../../source/kmwstring.js" type="application/javascript"></script>
-    <script src="../../source/kmwbase.js" type="application/javascript"></script>
-    <script src="../../source/keymanweb.js" type="application/javascript"></script>
-    <script src="../../source/kmwosk.js" type="application/javascript"></script>
-    <script src="../../source/kmwnative.js" type="application/javascript"></script>
-    <script src="../../source/kmwcallback.js" type="application/javascript"></script>
-    <script src="../../source/kmwkeymaps.js" type="application/javascript"></script>
-    <script src="../../source/kmwlayout.js" type="application/javascript"></script>
-    <script src="../../source/kmwinit.js" type="application/javascript"></script>             
+    <script src="../../release/unminified/web/keymanweb.js" type="application/javascript"></script>
 
     <!-- 
       For desktop browsers, a script for the user interface must be inserted here.
@@ -40,36 +32,36 @@
       The toolbar UI is best for any page designed to support keyboards for 
       a large number of languages.
     -->
-    <script src="../../source/kmwuitoolbar.js"></script>                                                                                            
+    <script src="../../release/unminified/web/kmwuitoggle.js"></script>
  
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window['keyman'] ? keyman : tavultesoft.keymanweb;
       kmw.init({
-          resources:'resources',
           attachType:'auto'
         });
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->
-    <script src="./header.js"></script> 
+    <script src="../commonHeader.js"></script>
+    <script src="./header.js"></script>
   
   </head>
 
 <!-- Sample page HTML -->  
-  <body onload='loadKeyboards();'> 
-    <h2>KeymanWeb Sample Page - Uncompiled Source</h2>
+  <body onload='loadKeyboards(1);'>
+    <h2>KeymanWeb:  Test page for interactions between setActiveKeyboard and the toolbar UI</h2>
                                                                              
 	<h3>This version is used to test the interactions of <code>SetActiveKeyboard</code> with the Toolbar UI.</h3>
   <p>Automatically-loaded keyboard IDs:
   <ul>
-  <li>us, eng</li>
-  <li>french, fra</li>
-  <li>european2, nor</li>
-  <li>european2, swe</li>
-  <li>hebrew, heb</li>
+  <li>us, en</li>
+  <li>french, fr</li>
+  <li>european2, no</li>
+  <li>european2, sv</li>
+  <li>hebrew, he</li>
   <li>dzongkha, dzo</li>
-  <li>lao_2008_basic, lao</li>
+  <li>lao_2008_basic, lo</li>
   </ul>
   </p>
       <div id='DynamicTextboxes'>
@@ -92,7 +84,7 @@
     <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
     <input type='button' id='btn1' onclick='addKeyboard(1);' value='Add' />
  
-    <h3>Add a keyboard by ISO 639 language code:</h3>
+    <h3>Add a keyboard by BCP-47 language code:</h3>
     <input type='input' id='kbd_id2' class='kmw-disabled' onkeypress="clickOnEnter(event,2);"/>
     <input type='button' id='btn2' onclick='addKeyboard(2);' value='Add' />
 

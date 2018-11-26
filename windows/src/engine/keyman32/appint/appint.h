@@ -95,6 +95,7 @@ public:
 	WCHAR *BufMax(int n);
 	WCHAR *Buf(int n);
 	BOOL CharIsDeadkey();
+  BOOL CharIsSurrogatePair();
 };
 
 class AppContextWithStores : public AppContext   // I4978

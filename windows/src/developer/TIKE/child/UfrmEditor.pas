@@ -43,12 +43,8 @@ uses
   StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry, 
   RegistryKeys, UfrmMDIChild, MenuImgList, Printers,
   UfrmKeyTest,
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight,
-  HtmlHighlight,
-  pmprint,
-{$ENDIF}
-  ProjectFile, UfrmMDIEditor,
+
+  Keyman.Developer.System.Project.ProjectFile, UfrmMDIEditor,
   CaptionPanel, Grids,
   CharMapInsertMode,
   TextFileFormat, KMDActionInterfaces,
@@ -58,7 +54,7 @@ type
   TUPCOptions = set of (upcSetError, upcClearError, upcSetBreakPoint, upcClearBreakPoint,
     upcSetExecutionPoint, upcClearExecutionPoint);
 
-  TfrmEditor = class(TfrmTikeEditor, IKMDPrintActions, IKMDPrintPreviewActions)
+  TfrmEditor = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrint: TPrintDialog;
@@ -80,12 +76,13 @@ type
     { IKMDPrintActions }
     function PrintFile: Boolean;
     { IKMDPrintPreviewActions }
-    function PrintPreview: Boolean;
+    //TODO: function PrintPreview: Boolean;
     procedure EditorChanged(Sender: TObject);
     function GetEditorFormat: TEditorFormat;
     function GetTextFileFormat: TTextFileFormat;
 
   protected
+    function GetHelpTopic: string; override;
     function DoSaveFile: Boolean; override;
     function DoOpenFile: Boolean; override;
     function GetFileNameFilter: string; override;
@@ -116,6 +113,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   CharacterDragObject,
   CharMapDropTool,
   ClipBrd,
@@ -124,11 +123,11 @@ uses
   dmActionsMain,
   dmActionsTextEditor,
   keymanstrings,
-  kmnProjectFile,
+  Keyman.Developer.System.Project.kmnProjectFile,
   kmxfile,
   kwhelp,
   OnlineConstants,
-  Project,
+  Keyman.Developer.System.Project.Project,
   ResourceStrings,
   KeymanDeveloperOptions,
   KMDevResourceStrings,
@@ -165,7 +164,7 @@ begin
   FEditorFrame.OnChanged := EditorChanged;
   FEditorFrame.TextFileFormat := tffUTF8;
 
-  GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
+//  TODO: GetCharMapDropTool.Handle(FEditorFrame.memo, cmimDefault);    // I1422 - insert character map chars
 
   ActiveControl := FEditorFrame;
 
@@ -183,7 +182,7 @@ end;
 
 procedure TfrmEditor.SetEditorText(s: WideString);
 begin
-  FEditorFrame.memo.SetTextBuf(PWideChar(s));
+  FEditorFrame.SetTextBuf(PWideChar(s));
 end;
 
 procedure TfrmEditor.SetFocus;
@@ -201,6 +200,9 @@ begin
   else if Pos('htm', s) > 0 then EditorFormat := efHTML
   else if Copy(s,1,4) = '.php' then EditorFormat := efHTML
   else if Pos('xml', s) > 0 then EditorFormat := efXML
+  else if s = '.json' then EditorFormat := efJSON
+  else if s = '.js' then EditorFormat := efJS
+  else if s = '.css' then EditorFormat := efCSS
   else EditorFormat := efText;
 end;
 
@@ -263,10 +265,10 @@ end;
 
 {-------------------------------------------------------------------------------}
 
-function TfrmEditor.PrintPreview: Boolean;
+{TODO: function TfrmEditor.PrintPreview: Boolean;
 begin
   Result := FEditorFrame.PrintPreview(FileName);
-end;
+end;}
 
 procedure TfrmEditor.RefreshOptions;
 begin
@@ -326,6 +328,11 @@ end;
 function TfrmEditor.GetFileNameFilter: string;
 begin
   Result := 'Keyboard definitions (*.kmn)|*.kmn|HTML files (*.htm, *.html)|*.htm?|XML files (*.xml)|*.xml|Text files (*.txt)|*.txt|All files (*.*)|*.*';
+end;
+
+function TfrmEditor.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_Editor;
 end;
 
 function TfrmEditor.GetTextFileFormat: TTextFileFormat;

@@ -28,47 +28,33 @@ public class FontManager {
   /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
   /// with `preloadFontFile(atPath:shouldOverwrite:)`
   public func registerCustomFonts() {
-    guard let customFonts = customFonts() else {
+    guard let keyboardDirs = Storage.active.keyboardDirs else {
       return
     }
-
-    for fontURL in customFonts {
-      _ = registerFont(at: fontURL)
+    for dir in keyboardDirs {
+      registerFonts(in: dir)
     }
   }
 
   /// Unregisters all registered fonts in the font path.
   public func unregisterCustomFonts() {
-    guard let customFonts = customFonts() else {
+    guard let keyboardDirs = Storage.active.keyboardDirs else {
       return
     }
-
-    for fontURL in customFonts {
-      _ = unregisterFont(at: fontURL)
+    for dir in keyboardDirs {
+      unregisterFonts(in: dir)
     }
-  }
-
-  private func customFonts() -> [URL]? {
-    let urls: [URL]
-    do {
-      urls = try FileManager.default.contentsOfDirectory(at: Storage.active.fontDir,
-                                                         includingPropertiesForKeys: nil)
-    } catch {
-      Manager.shared.kmLog("Failed to list font dir contents: \(error)", checkDebugPrinting: false)
-      return nil
-    }
-    return urls.filter { $0.lastPathComponent.hasFontExtension }
   }
 
   private func readFontName(at url: URL) -> String? {
     guard let provider = CGDataProvider(url: url as CFURL) else {
-      Manager.shared.kmLog("Failed to open \(url)", checkDebugPrinting: false)
+      log.error("Failed to open \(url)")
       return nil
     }
     guard let font = CGFont(provider),
       let name = font.postScriptName
     else {
-      Manager.shared.kmLog("Failed to read font at \(url)", checkDebugPrinting: false)
+      log.error("Failed to read font at \(url)")
       return nil
     }
     return name as String
@@ -97,15 +83,13 @@ public class FontManager {
       didRegister = CTFontManagerRegisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if !didRegister {
-        Manager.shared.kmLog("Failed to register font at \(url) reason: \(String(describing: error))",
-                             checkDebugPrinting: false)
+        log.error("Failed to register font \(fontName) at \(url) reason: \(String(describing: error))")
       } else {
-        Manager.shared.kmLog("Registered font: \(url)", checkDebugPrinting: true)
+        log.info("Registered font \(fontName) at \(url)")
       }
     } else {
       didRegister = false
-      Manager.shared.kmLog("Did not register font at \(url) because font name \(fontName) is already registered",
-                           checkDebugPrinting: true)
+      log.info("Did not register font at \(url) because font name \(fontName) is already registered")
     }
     let font = RegisteredFont(name: fontName, isRegistered: didRegister)
     fonts[url] = font
@@ -126,12 +110,11 @@ public class FontManager {
       let didUnregister = CTFontManagerUnregisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if didUnregister {
-        Manager.shared.kmLog("Unregistered font at \(url)", checkDebugPrinting: true)
+        log.info("Unregistered font \(font.name) at \(url)")
         font.isRegistered = false
         fonts[url] = font
       } else {
-        Manager.shared.kmLog("Failed to unregister font at \(url) reason: \(String(describing: error))",
-          checkDebugPrinting: false)
+        log.error("Failed to unregister font \(font.name) at \(url) reason: \(String(describing: error))")
       }
     }
 
@@ -140,6 +123,26 @@ public class FontManager {
     }
 
     return font.isRegistered
+  }
+
+  public func registerFonts(in directory: URL) {
+    guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
+      log.error("Could not list contents of directory \(directory)")
+      return
+    }
+    for url in urls where url.lastPathComponent.hasFontExtension {
+      _ = registerFont(at: url)
+    }
+  }
+
+  public func unregisterFonts(in directory: URL, fromSystemOnly: Bool = true) {
+    guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
+      log.error("Could not list contents of directory \(directory)")
+      return
+    }
+    for url in urls where url.lastPathComponent.hasFontExtension {
+      _ = unregisterFont(at: url, fromSystemOnly: fromSystemOnly)
+    }
   }
 
   private func fontExists(_ fontName: String) -> Bool {

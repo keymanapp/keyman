@@ -91,6 +91,7 @@
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
                     
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
+                    28 Feb 2018 - jahorton - GH 281 - Changed the compilation targets for KMW 10 to better support deadkeys.
                     
 *)
 unit CompileKeymanWeb;  // I3306  // I3310
@@ -106,7 +107,7 @@ uses
   compile,
   kmxfile,
   kmxfileconsts,
-  ProjectFile;
+  Keyman.Developer.System.Project.ProjectFile;
 
 type
   TSentinelRecordAny = record
@@ -209,6 +210,7 @@ type
     FDebug: Boolean;   // I3681
     FTabStop: string;   // I3681
     fMnemonic: Boolean;
+    FCompilerWarningsAsErrors: Boolean;
     FTouchLayoutFont: string;   // I4872
 
     function JavaScript_String(ch: DWord): string;  // I2242
@@ -219,7 +221,7 @@ type
     function ExpandSentinel(pwsz: PWideChar): TSentinelRecord;
     function CallFunctionName(s: WideString): WideString;
     function JavaScript_Name(i: Integer; pwszName: PWideChar; UseNameForRelease: Boolean = False): string;   // I3659
-    function JavaScript_Store(pwsz: PWideChar): string;
+    function JavaScript_Store(line: Integer; pwsz: PWideChar): string;
     function JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
     function JavaScript_ShiftAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;   // I4872
     function JavaScript_Key(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
@@ -227,20 +229,17 @@ type
     function JavaScript_ContextLength(Context: PWideChar): Integer;
     function JavaScript_OutputString(fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
     function JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
-    function JavaScript_ContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+    function JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+    function JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
     function RequotedString(s: WideString): string;
     function VisualKeyboardFromFile(
       const FVisualKeyboardFileName: string): WideString;
     function WriteCompiledKeyboard: string;
-    function WriteCompiledKeyboardStub: string;
-    function WriteCompiledKeyboardJson: string;   // I4259
     procedure CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1971
     function GetCodeName(code: Integer): string;  // I3438
     function HasSupplementaryPlaneChars: Boolean;   // I3317
     function ValidateLayoutFile(var sLayoutFile: string; const sVKDictionary: string): Boolean;   // I4139
-    function GetSystemStoreValue(Index: DWORD; const Default: string = ''): string;   // I4259
-    function ValidateJsonFile(const AJSONFilename: string): Boolean;
     function GetKeyboardModifierBitmask: string;
     function FormatModifierAsBitflags(FBitMask: Cardinal): string;
     function FormatKeyAsString(key: Integer): string;
@@ -253,11 +252,6 @@ type
     destructor Destroy; override;
   end;
 
-function GetKeymanWebCompiledName(const Name: WideString): WideString;
-function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString;
-function GetKeymanWebCompiledFileName(const FileName: WideString): WideString; overload;   // I4140
-function GetKeymanWebCompiledFileName(const FileName, Version: WideString): WideString; overload;   // I4140
-
 implementation
 
 uses
@@ -269,12 +263,11 @@ uses
   System.TypInfo,
 
   CompileErrorCodes,
-  JsonKeyboardInfo,
   JsonUtil,
   KeyboardParser,
+  Keyman.System.KeyboardUtils,
   KeymanWebKeyCodes,
   kmxfileutils,
-  TikeUnicodeData,
   TouchLayout,
   TouchLayoutUtils,
   Unicode,
@@ -310,13 +303,17 @@ end;
 
 function TCompileKeymanWeb.Compile(AOwnerProject: TProject; const InFile: string; const OutFile: string; Debug: Boolean; Callback: TCompilerCallback): Boolean;   // I3681   // I4140   // I4688   // I4866   // I4865
 var
-  f: TSearchRec;
-  CompilerWarningsAsErrors, WarnDeprecatedCode: Boolean;
+  WarnDeprecatedCode: Boolean;
+  Data: string;
 begin
   FCallback := Callback;
   FInFile := InFile;
+  FOutFile := OutFile;   // I4140   // I4155   // I4154
   FDebug := Debug;   // I3681
   FError := False;  // I1971
+
+  if FileExists(OutFile) then
+    DeleteFile(OutFile);
 
   if FDebug then   // I3681
   begin
@@ -331,65 +328,41 @@ begin
 
   if Assigned(AOwnerProject) then   // I4865   // I4866
   begin
-    CompilerWarningsAsErrors := AOwnerProject.Options.CompilerWarningsAsErrors;
+    FCompilerWarningsAsErrors := AOwnerProject.Options.CompilerWarningsAsErrors;
     WarnDeprecatedCode := AOwnerProject.Options.WarnDeprecatedCode;
   end
   else
   begin
-    CompilerWarningsAsErrors := False;
+    FCompilerWarningsAsErrors := False;
     WarnDeprecatedCode := True;
   end;
 
   FCallFunctions := TStringList.Create;
   try
     if CompileKeyboardFileToBuffer(PChar(InFile), @fk,
-      CompilerWarningsAsErrors, WarnDeprecatedCode,
+      FCompilerWarningsAsErrors, WarnDeprecatedCode,
       Callback, CKF_KEYMANWEB) > 0 then  // I3482   // I4866   // I4865
       // TODO: Free fk
     begin
-      with TStringStream.Create(WriteCompiledKeyboard, TEncoding.UTF8) do
-      try
-        FOutFile := OutFile;   // I4140   // I4155   // I4154
-        SaveToFile(OutFile);
-      finally
-        Free;
-      end;
+      if Assigned(AOwnerProject) and
+          Assigned(AOwnerProject.CompilerMessageFile) and
+          AOwnerProject.CompilerMessageFile.HasCompileWarning and
+          FCompilerWarningsAsErrors then
+        FError := True;
 
-      with TStringStream.Create(WriteCompiledKeyboardStub, TEncoding.UTF8) do
-      try
-        SaveToFile(ExtractFilePath(OutFile)+ChangeFileExt(ExtractFileName(OutFile), '')+'_load.js');
-      finally
-        Free;
-      end;
-
-      if not FileExists(ExtractFilePath(InFile)+ChangeFileExt(ExtractFileName(OutFile), '')+'.json') then   // I4505   // I4688
+      if not FError then
       begin
-        with TStringStream.Create(WriteCompiledKeyboardJson, TEncoding.UTF8) do   // I4259
-        try
-          SaveToFile(ExtractFilePath(InFile)+ChangeFileExt(ExtractFileName(OutFile), '')+'.json');   // I4688
-        finally
-          Free;
-        end;
-      end;
+        Data := WriteCompiledKeyboard;
 
-      // Copy all .json files to output   // I4688
-
-      if FindFirst(ChangeFileExt(InFile, '') + '-*.json', 0, f) = 0 then
-      begin
-        repeat
-          if not ValidateJsonFile(ExtractFilePath(InFile)+f.Name) then   // I4872
-            Continue;
-
-          if not SameFileName(ExtractFileDir(InFile), ExtractFileDir(OutFile)) then   // I4724
-          begin
-            if not CopyFile(PChar(ExtractFilePath(InFile)+f.Name), PChar(ExtractFilePath(OutFile)+f.Name), False) then
-              ReportError(0, CWARN_CouldNotCopyJsonFile, 'Could not copy file '+ExtractFilePath(InFile)+f.Name+' to '+
-                ExtractFilePath(OutFile)+f.Name+': '+SysErrorMessage(GetLastError));
+        if not FError then
+          with TStringStream.Create(Data, TEncoding.UTF8) do
+          try
+            SaveToFile(OutFile);
+          finally
+            Free;
           end;
-        until FindNext(f) <> 0;
-        FindClose(f);
       end;
-    
+
       Result := not FError;  // I1971
     end
     else
@@ -417,8 +390,9 @@ begin
   Result := xstrlen_printing(Context);
 end;
 
-function TCompileKeymanWeb.JavaScript_ContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
-
+// Used when targeting versions prior to 10.0, before the introduction of FullContextMatch/KFCM.
+function TCompileKeymanWeb.JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+  // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
   function IsRegExpSpecialChar(ch: WideChar): Boolean;
   begin
     Result := Pos('"\^$*+?{}.()|[]/', ch) > 0;
@@ -552,9 +526,115 @@ begin
     Result := Result + Format('",%d)', [Cur - StartQuotes]);
 end;
 
+// Used when targeting versions >= 10.0, after the introduction of FullContextMatch/KFCM.
+function TCompileKeymanWeb.JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
+  // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+  function IsRegExpSpecialChar(ch: WideChar): Boolean;
+  begin
+    Result := Pos('"\^$*+?{}.()|[]/', ch) > 0;
+  end;
+
+var
+  Len: Integer;
+  rec: TSentinelRecord;
+  FullContext, Suffix: string;
+begin
+  Result := '';
+  FullContext := '';
+  Suffix := '';
+  Len := xstrlen(pwsz);
+
+  while pwsz^ <> #0 do
+  begin
+    if FullContext <> '' then
+      FullContext := FullContext + ',';
+
+    rec := ExpandSentinel(pwsz);
+    if rec.IsSentinel then
+    begin
+      case rec.Code of
+        CODE_ANY:
+          begin
+            CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
+            FullContext := FullContext + Format('{t:''a'',a:this.s%s}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
+          end;
+        CODE_DEADKEY:
+          begin
+            FullContext := FullContext + Format('{t:''d'',d:%d}', [rec.Deadkey.Deadkey]);
+          end;
+        CODE_NUL:    // I2243
+          begin
+            FullContext := FullContext + '{t:''n''}';
+          end;
+        CODE_IFOPT:    // I3429
+          begin
+            Dec(Len);
+            if Suffix <> '' then Suffix := Suffix + '&&';
+            if FullContext = ',' then FullContext := '';
+            Suffix := Suffix + Format('this.s%s%sthis.s%s',
+              [JavaScript_Name(rec.IfOpt.StoreIndex1, rec.IfOpt.Store1.szName),
+              IfThen(rec.IfOpt.IsNot = 0, '!==', '==='),
+              JavaScript_Name(rec.IfOpt.StoreIndex2,rec.IfOpt.Store2.szName)]);  // I3429   // I3659   // I3681
+          end;
+        CODE_IFSYSTEMSTORE:     // I3430
+          begin
+            Dec(Len);
+            if Suffix <> '' then Suffix := Suffix + '&&';
+            if FullContext = ',' then FullContext := '';
+            Suffix := Suffix + Format('%sk.KIFS(%d,this.s%s,t)',
+              [IfThen(rec.IfSystemStore.IsNot = 0, '!', ''),
+              rec.IfSystemStore.dwSystemID,
+              JavaScript_Name(rec.IfSystemStore.StoreIndex,rec.IfSystemStore.Store.szName)]);  // I3430   // I3659   // I3681
+          end;
+        CODE_NOTANY:   // I3981
+          begin
+            CheckStoreForInvalidFunctions(fkp, rec.Any.Store);  // I1520
+            FullContext := FullContext + Format('{t:''a'',a:this.s%s,n:1}', [JavaScript_Name(rec.Any.StoreIndex, rec.Any.Store.szName)]);
+          end;
+        CODE_CONTEXTEX:
+          begin
+            FullContext := FullContext + Format('{t:''c'',c:%d}', [rec.ContextEx.Index]);   // I4611
+          end;
+        CODE_INDEX:
+          begin
+            FullContext := FullContext + Format('{t:''i'',i:this.s%s,o:%d}',
+              [JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.szName), rec.Index.Index]);   // I4611
+          end;
+        else
+
+        begin
+          ReportError(fkp.Line, CERR_NotSupportedInKeymanWebContext, Format('Statement %s is not currently supported in context', [GetCodeName(rec.Code)]));  // I1971   // I4061
+          //CODE_NUL: ;     // todo: check if context is longer than that...
+          Result := Result + '/*.*/ 0 ';
+        end;
+      end;
+    end
+		else
+    begin // Simple context character.
+      FullContext := FullContext + '''';
+      if rec.ChrVal in [Ord('"'), Ord('\'), Ord('''')] then
+        FullContext := FullContext + '\';
+      FullContext := FullContext + Javascript_String(rec.ChrVal) + '''';  // I2242
+    end;
+
+		pwsz := incxstr(pwsz);
+	end;
+
+  if FullContext <> '' then
+    Result := Format('k.KFCM(%d,t,[%s])', [Len, FullContext]);
+
+  if (Result <> '') and (Suffix <> '')
+    then Result := Result + '&&' + Suffix
+  else if Suffix <> '' then
+    Result := Suffix;
+
+end;
+
 function TCompileKeymanWeb.JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
 begin
-  Result := JavaScript_ContextValue(fkp, context);
+  if IsKeyboardVersion10OrLater
+    then Result := JavaScript_FullContextValue(fkp, context)
+    else Result := JavaScript_CompositeContextValue(fkp, context);
 end;
 
 const // I1585 - add space to conversion
@@ -676,8 +756,17 @@ var
     for I := 1 to Index-1 do
     begin
       recContext := ExpandSentinel(pwszContext);
-      if recContext.IsSentinel and (recContext.Code in [CODE_DEADKEY, CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
-        Dec(Result);
+
+      if IsKeyboardVersion10OrLater then
+      begin
+        if recContext.IsSentinel and (recContext.Code in [CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(Result);
+      end
+      else
+      begin
+        if recContext.IsSentinel and (recContext.Code in [CODE_DEADKEY, CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(Result);
+      end;
       pwszContext := incxstr(pwszContext);
     end;
   end;
@@ -733,9 +822,38 @@ begin
 
   pwsz := pwszOutput;
 
-  if Assigned(fkp)
-    then len := xstrlen_printing(fkp.dpContext)
-    else len := -1;
+  if Assigned(fkp) then
+  begin
+    if IsKeyboardVersion10OrLater
+    // KMW >=10.0 use the full, sentinel-based length for context deletions.
+    then
+    begin
+      len := xstrlen(fkp.dpContext);
+      n := len;
+      pwszContext := fkp.dpContext;
+
+      //CODE_IFOPT:    // I3429
+      //CODE_IFSYSTEMSTORE:     // I3430
+      for i := 1 to n do
+      begin
+        rec := ExpandSentinel(pwszContext);
+        if rec.IsSentinel and (rec.Code in [CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+          Dec(len);
+        pwszContext := incxstr(pwszContext);
+      end;
+    end
+    // KMW < 10.0 exclude all sentinel-based characters, including deadkeys, from direct context deletion.
+    // Deadkeys have alternative special handling.
+    else len := xstrlen_printing(fkp.dpContext);
+  end
+  else
+    len := -1;
+
+  if IsKeyboardVersion10OrLater() and (pwsz^ <> #0) then
+    begin
+      Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
+      len := -1;
+    end;
 
 	while pwsz^ <> #0 do
   begin
@@ -842,7 +960,7 @@ begin
             Result := Result + nlt+Format('this.s%s=k.KLOAD(this.KI,"%s",%s);',
               [JavaScript_Name(rec.ResetOpt.StoreIndex,rec.ResetOpt.Store.szName),
               JavaScript_Name(rec.ResetOpt.StoreIndex,rec.ResetOpt.Store.szName,True),
-              JavaScript_Store(rec.ResetOpt.Store.dpString)]);  // I3429   // I3681   // I3659
+              JavaScript_Store(fkp.Line, rec.ResetOpt.Store.dpString)]);  // I3429   // I3681   // I3659
             len := -1;
           end;
         CODE_SAVEOPT:  // I3429
@@ -890,47 +1008,54 @@ end;
 
 function TCompileKeymanWeb.JavaScript_Shift(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
 begin
-  if not FMnemonic then
+  if FMnemonic then
   begin
-    if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
+    if (fkp.ShiftFlags and KMX_VIRTUALCHARKEY) = KMX_VIRTUALCHARKEY then
     begin
-      if IsKeyboardVersion10OrLater then
-      begin
-        // Full chiral modifier and state key support starts with KeymanWeb 10.0
-        Result := fkp.ShiftFlags;
-      end
-      else
-      begin
-        // Non-chiral support only and no support for state keys
-        if (fkp.ShiftFlags and (
-          KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG)) <> 0 then   // I4118
-        begin
-          ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
-        end;
+      ReportError(fkp.Line, CERR_VirtualCharacterKeysNotSupportedInKeymanWeb, 'Virtual character keys not currently supported in KeymanWeb');  // I1971   // I4061
+      Exit(0);
+    end;
 
-        if (fkp.ShiftFlags and (
-          KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG)) <> 0 then   // I4118
-        begin
-          ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
-        end;
+    if ((fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY) and (Ord(fkp.Key) <= 255) then
+    begin
+      // We prohibit K_ keys for mnemonic layouts. We don't block T_ and U_ keys.
+      // TODO: this doesn't resolve the issue of, e.g. SHIFT+K_SPACE
+      // https://github.com/keymanapp/keyman/issues/265
+      ReportError(fkp.Line, CERR_VirtualKeysNotValidForMnemonicLayouts, 'Virtual keys are not valid for mnemonic layouts');  // I1971   // I4061
+      Exit(0);
+    end;
+  end;
 
-        Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and (KMX_SHIFTFLAG or KMX_CTRLFLAG or KMX_ALTFLAG));
-      end;
+  if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
+  begin
+    if IsKeyboardVersion10OrLater then
+    begin
+      // Full chiral modifier and state key support starts with KeymanWeb 10.0
+      Result := fkp.ShiftFlags;
     end
     else
     begin
-      Result := KMX_ISVIRTUALKEY;
-      if Pos(fkp.Key, USEnglishShift) > 0 then
-        Result := Result or KMX_SHIFTFLAG;
+      // Non-chiral support only and no support for state keys
+      if (fkp.ShiftFlags and (
+        KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG)) <> 0 then   // I4118
+      begin
+        ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags LALT, RALT, LCTRL, RCTRL are not supported in KeymanWeb');
+      end;
+
+      if (fkp.ShiftFlags and (
+        KMX_CAPITALFLAG or KMX_NOTCAPITALFLAG or KMX_NUMLOCKFLAG or KMX_NOTNUMLOCKFLAG or KMX_SCROLLFLAG or KMX_NOTSCROLLFLAG)) <> 0 then   // I4118
+      begin
+        ReportError(fkp.Line, CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb, 'Extended shift flags CAPS and NCAPS are not supported in KeymanWeb');
+      end;
+
+      Result := KMX_ISVIRTUALKEY or (Integer(fkp.ShiftFlags) and (KMX_SHIFTFLAG or KMX_CTRLFLAG or KMX_ALTFLAG));
     end;
   end
   else
   begin
-    if (fkp.ShiftFlags and KMX_VIRTUALCHARKEY) = KMX_VIRTUALCHARKEY then
-      ReportError(fkp.Line, CERR_VirtualCharacterKeysNotSupportedInKeymanWeb, 'Virtual character keys not currently supported in KeymanWeb');  // I1971   // I4061
-    if (fkp.ShiftFlags and KMX_ISVIRTUALKEY) = KMX_ISVIRTUALKEY then
-      ReportError(fkp.Line, CERR_VirtualKeysNotValidForMnemonicLayouts, 'Virtual keys are not valid for mnemonic layouts');  // I1971   // I4061
-    Result := 0;
+    Result := KMX_ISVIRTUALKEY;
+    if Pos(fkp.Key, USEnglishShift) > 0 then
+      Result := Result or KMX_SHIFTFLAG;
   end;
 end;
 
@@ -952,27 +1077,81 @@ begin
     else Result := ' '+FormatModifierAsBitflags(JavaScript_Shift(fkp, FMnemonic));
 end;
 
-function TCompileKeymanWeb.JavaScript_Store(pwsz: PWideChar): string;
+function TCompileKeymanWeb.JavaScript_Store(line: Integer; pwsz: PWideChar): string;
 var
   ch: DWord;
+  n: Integer;
+  rec: TSentinelRecord;
+const
+  wcsentinel: WideString = #$FFFF;
 begin
-  Result := '"';
-	while pwsz^ <> #0 do
-  begin
-		if PWord(pwsz)^ = UC_SENTINEL then
-    begin
-      Result := Result + '.'; {TODO: fill in .}
-    end
-    else
-    begin
-      ch := GetSuppChar(pwsz);
-      if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
-      Result := Result + Javascript_String(ch);  // I2242
-    end;
+  n := Pos(wcsentinel, pwsz);
 
-    pwsz := incxstr(pwsz);
+  // Start:  plain text store.  Always use for < 10.0, conditionally for >= 10.0.
+  if (n = 0) or not IsKeyboardVersion10OrLater then
+  begin
+    Result := '"';
+    while pwsz^ <> #0 do
+    begin
+      if PWord(pwsz)^ = UC_SENTINEL then
+      begin
+        Result := Result + '.'; // UC_SENTINEL values are not supported in stores for KMW < 10.0.
+      end
+      else
+      begin
+        ch := GetSuppChar(pwsz);
+        if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
+        Result := Result + Javascript_String(ch);  // I2242
+      end;
+
+      pwsz := incxstr(pwsz);
+    end;
+    Result := Result + '"';
+  end
+  else
+  begin
+    Result := '[';
+    while pwsz^ <> #0 do
+    begin
+      if Result <> '[' then Result := Result + ',';
+
+      rec := ExpandSentinel(pwsz);
+      if rec.IsSentinel then
+      begin
+        if rec.Code = CODE_DEADKEY then
+        begin
+          Result := Result + Format('{t:''d'',d:%d}', [rec.Deadkey.DeadKey]);
+        end
+        else if rec.Code = CODE_BEEP then
+        begin
+          Result := Result + '{t:''b''}'
+        end
+        else //if rec.Code = CODE_EXTENDED then
+        begin
+          // At some point, we may wish to filter which codes are safe to stub out like this
+          // versus which ones should be an error.  The commented-out-code shows the way to
+          // handle such cases.
+          Result := Result + '''''';
+        end
+//        else
+//        begin
+//          //ReportError(line, CERR_SomewhereIGotItWrong, 'Internal Error: unexpected sentinel character in store definition');
+//        end;
+      end
+      else
+      begin
+        ch := GetSuppChar(pwsz);
+        Result := Result + '"';
+        // TODO:  Refactor the section below into JavaScript_String, as it's
+        // quite common in our code base.
+        if ch in [Ord('"'), Ord('\')] then Result := Result + '\';
+        Result :=  Result + Javascript_String(ch) + '"';  // I2242
+      end;
+
+      pwsz := incxstr(pwsz);
+    end;
+    Result := Result + ']';
   end;
-  Result := Result + '"';
 end;
 
 function TCompileKeymanWeb.JavaScript_String(ch: DWord): string;  // I2242
@@ -991,8 +1170,13 @@ begin
 end;
 
 procedure TCompileKeymanWeb.ReportError(line: Integer; msgcode: LongWord; const text: string);  // I1971
+var
+  flag: LongWord;
 begin
-  if (msgcode and $C000) <> 0 then FError := True;
+  flag := CERR_FLAG or CFATAL_FLAG;
+  if FCompilerWarningsAsErrors then
+    flag := flag or CWARN_FLAG;
+  if (msgcode and flag) <> 0 then FError := True;
   FCallback(line, msgcode, PAnsiChar(AnsiString(text)));  // I3310 /// TODO: K9: convert to Unicode
 end;
 
@@ -1068,17 +1252,18 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
   function VKShiftToLayerName(Shift: Integer): string;
   const
     masks: array[0..6] of string = (
-      'shift',
-      'ctrl',
-      'alt',
       'leftctrl',
       'rightctrl',
       'leftalt',
-      'rightalt'
+      'rightalt',
+      'shift',
+      'ctrl',
+      'alt'
     );
   var
     i: Integer;
   begin
+    shift := VkShiftStateToKmxShiftState(shift);
     if shift = 0 then
       Result := 'default'
     else
@@ -1134,7 +1319,7 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
 
     // Build the layer array
 
-    Result := nl+FTabStop+'this.KLS={'+nl;
+    Result := nl+FTabStop+'this.KV.KLS={'+nl;
 
     for i := 0 to High(layers) do
     begin
@@ -1171,7 +1356,7 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
     '    return result;'#13#10+
     '  }';
   begin
-    Result := nl+FTabStop+'this.KV.BK=('+IfThen(FDebug,func_debug,func)+')(this.KLS)';
+    Result := nl+FTabStop+'this.KV.BK=('+IfThen(FDebug,func_debug,func)+')(this.KV.KLS)';
   end;
 
 var
@@ -1209,43 +1394,6 @@ begin
   for k in keys do
     Result := Result + ', ' + GetEnumName(TypeInfo(TRequiredKey), Ord(k));
   Delete(Result, 1, 2);
-end;
-
-function TCompileKeymanWeb.ValidateJsonFile(
-  const AJSONFilename: string): Boolean;   // I4872
-var
-  s: string;
-  i: Integer;
-begin
-  with TStringStream.Create('', TEncoding.UTF8) do
-  try
-    LoadFromFile(AJSONFileName);
-    s := DataString;
-  finally
-    Free;
-  end;
-
-  with TJSONKeyboardInfo.Create do
-  try
-    if not Read(s) then
-    begin
-      ReportError(0, CWARN_InvalidJSONMetadataFile, 'Invalid JSON metadata file '+ExtractFileName(AJSONFileName) + ': ' + ReadError);
-      Exit(False);
-    end;
-
-    if FTouchLayoutFont = '' then
-      Exit(True);
-
-    for i := 0 to OskFonts.Count - 1 do
-    begin
-      if not SameText(OskFonts[i].Family, FTouchLayoutFont) then
-        ReportError(0, CWARN_JSONMetadataOSKFontShouldMatchTouchFont, 'JSON metadata file '+ExtractFileName(AJSONFileName)+' should have an OSK Font name that matches the touch layout or OSK font name ('+FTouchLayoutFont+')');
-    end;
-  finally
-    Free;
-  end;
-
-  Result := True;
 end;
 
 function TCompileKeymanWeb.ValidateLayoutFile(var sLayoutFile: string; const sVKDictionary: string): Boolean;   // I4060   // I4139
@@ -1498,7 +1646,7 @@ begin
     Inc(fsp);
   end;
 
-  sName := 'Keyboard_'+GetKeymanWebCompiledNameFromFileName(FInFile);
+  sName := 'Keyboard_'+TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(FInFile);
 
   if sHelpFile <> '' then
   begin
@@ -1587,7 +1735,11 @@ begin
   if sVisualKeyboard <> '' then
   begin
     try
-      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FInFile) + sVisualKeyboard);
+      // The Keyman .kmx compiler will change the value of this store from a
+      // .kvks to a .kvk during the build. Earlier in the build, the visual keyboard
+      // would have been compiled, so we need to account for that and use that file.
+
+      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FOutFile) + sVisualKeyboard);
     except
       on E:EFOpenError do   // I3947
       begin
@@ -1615,6 +1767,7 @@ begin
     '%s%s%s'+
     '%sthis.KI="%s";%s'+
     '%sthis.KN="%s";%s'+
+    '%sthis.KMINVER="%d.%d";%s'+
     '%sthis.KV=%s;%s'+
     '%sthis.KH=%s;%s'+
     '%sthis.KM=%d;%s'+
@@ -1630,6 +1783,7 @@ begin
     FTabStop, JavaScript_SetupDebug, nl,
     FTabStop, sName, nl,
     FTabStop, RequotedString(sFullName), nl,
+    FTabStop, (fk.version and VERSION_MASK_MAJOR) shr 8, fk.version and VERSION_MASK_MINOR, nl,
     FTabStop, sVisualKeyboard, nl,
     FTabStop, sHelp, nl,
     FTabStop, vMnemonic, nl,
@@ -1661,20 +1815,20 @@ begin
     if not fsp.fIsDebug then // and not (fsp.dwSystemID in [TSS_BITMAP, TSS_NAME, TSS_VERSION, TSS_CUSTOMKEYMANEDITION, TSS_CUSTOMKEYMANEDITIONNAME, TSS_KEYMANCOPYRIGHT]) then
     begin
       if fsp.dwSystemID = TSS_COMPARISON then
-        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.dpString), nl])
+        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if fsp.dwSystemID = TSS_COMPILEDVERSION then
-        Result := Result + Format('%sthis.KVER=%s;%s', [FTabStop, JavaScript_Store(fsp.dpString), nl])
+        Result := Result + Format('%sthis.KVER=%s;%s', [FTabStop, JavaScript_Store(fsp.line, fsp.dpString), nl])
       //else if fsp.dwSystemID = TSS_VKDICTIONARY then // I3438, required for vkdictionary
-      //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.dpString), nl])
+      //  Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl])
       else if fsp.fIsOption and not fsp.fIsReserved then
         Result := Result + Format('%sthis.s%s=KeymanWeb.KLOAD(this.KI,"%s",%s);%s',
           [FTabstop,
           JavaScript_Name(i,fsp.szName),
           JavaScript_Name(i,fsp.szName,True),
-          JavaScript_Store(fsp.dpString),
+          JavaScript_Store(fsp.line, fsp.dpString),
           nl])  // I3429
       else if fsp.dwSystemID = TSS_NONE then
-        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.dpString), nl]);   // I3681
+        Result := Result + Format('%sthis.s%s=%s;%s', [FTabStop, JavaScript_Name(i, fsp.szName), JavaScript_Store(fsp.line, fsp.dpString), nl]);   // I3681
     end;
     Inc(fsp);
   end;
@@ -1802,80 +1956,6 @@ begin
   Result := Result + sEmbedJS + '}' + nl;   // I3681
 end;
 
-function TCompileKeymanWeb.WriteCompiledKeyboardJson: string;   // I4259
-var
-  JSON: TJSONObject;
-  jsonOptions: TJSONObject;
-  jsonKeyboard: TJSONObject;
-  jsonLanguages: TJSONArray;
-  jsonLanguage: TJSONObject;
-  languages, version: string;
-  id, name: string;
-  language: string;
-  FResult: TStringList;
-  ethlang: TEthnologueLanguage;
-begin
-  CreateTikeUnicodeData(nil);
-  try
-    id := GetKeymanWebCompiledNameFromFileName(FInFile);
-    name := GetSystemStoreValue(TSS_NAME, id);
-    version := GetSystemStoreValue(TSS_KEYBOARDVERSION, '1.0');
-
-    // Generate an install JSON
-
-    jsonOptions := TJSONObject.Create;
-    jsonOptions.AddPair('device', 'any');
-    jsonOptions.AddPair('keyboardBaseUri', 'http://your-host-here/keyboard-path/');
-    jsonOptions.AddPair('fontBaseUri', 'http://your-host-here/font-path/');
-
-    jsonLanguages := TJSONArray.Create;
-
-    languages := GetSystemStoreValue(TSS_ETHNOLOGUECODE);
-    language := StrToken(languages, ' ,;');
-    while language <> '' do
-    begin
-      jsonLanguage := TJSONObject.Create;
-      jsonLanguage.AddPair('id',language);
-
-      ethlang := FUnicodeData.FindLanguageByCode(language);
-      if ethlang.Name = '' then ethlang.Name := language;
-
-      jsonLanguage.AddPair('name',ethlang.Name);
-      jsonLanguages.Add(jsonLanguage);
-      language := StrToken(languages, ' ,;');
-    end;
-
-    jsonKeyboard := TJSONObject.Create;
-    jsonKeyboard.AddPair('id', id);
-    jsonKeyboard.AddPair('name', name);
-    jsonKeyboard.AddPair('filename', ExtractFileName(FOutFile));
-    jsonKeyboard.AddPair('version',version);
-    jsonKeyboard.AddPair('lastModified',
-      FormatDateTime('yyyy-mm-dd',Now)+'T'+
-      FormatDateTime('hh:mm:ss+00:00',Now));
-    jsonKeyboard.AddPair('languages', jsonLanguages);
-
-    json := TJSONObject.Create;
-    try
-      json.AddPair('options', jsonOptions);
-      json.AddPair('keyboard', jsonKeyboard);
-
-      FResult := TStringList.Create;
-      try
-        PrettyPrintJSON(json, FResult, 0);
-        Result := FResult.Text;
-      finally
-        FResult.Free;
-      end;
-  //    Result := JSONToString(json, True);
-    finally
-      json.Free; //Frees all member objects as well
-    end;
-  finally
-    FreeUnicodeData;
-  end;
-end;
-
 function TCompileKeymanWeb.GetCodeName(code: Integer): string;  // I1971
 begin
   if (code >= Low(KMXCodeNames)) and (code <= High(KMXCodeNames))
@@ -1950,7 +2030,8 @@ const
   wcsentinel: WideString = #$FFFF;
 begin
   n := Pos(wcsentinel, store.dpString);
-  if n > 0 then
+  // Disable the check with versions >= 10.0, since we now support deadkeys in stores.
+  if (n > 0) and not IsKeyboardVersion10OrLater then
   begin
     pwsz := PWideChar(store.dpString);
     Inc(pwsz, n-1);
@@ -2094,42 +2175,6 @@ begin
     Result.ChrVal := GetSuppChar(pwsz);
 end;
 
-function TCompileKeymanWeb.WriteCompiledKeyboardStub: string;
-const
-  nl: WideString = #13#10;
-var
-  sName: string;
-  sFullName: WideString;
-begin
-  Result := '';  //UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl; //I3474
-
-	{ Locate the name of the keyboard }
-  sName := 'Keyboard_'+GetKeymanWebCompiledNameFromFileName(FInFile);
-  sFullName := GetSystemStoreValue(TSS_NAME);   // I4259
-
-  Result := Result + Format('KeymanWeb.KRS(new Stub_%s()); function Stub_%s() {this.KF="%s";this.KI="%s";this.KN="%s";}', [sName, sName, ExtractFileName(FOutFile), sName, RequotedString(sFullName)]);
-end;
-
-function TCompileKeymanWeb.GetSystemStoreValue(Index: DWORD; const Default: string = ''): string;   // I4259
-var
-  i: DWORD;
-	fsp: PFILE_STORE;
-begin
-  if fk.cxStoreArray = 0 then
-    Exit(Default);
-
-  fsp := fk.dpStoreArray;
-
-	for i := 0 to fk.cxStoreArray - 1 do
-  begin
-    if fsp.dwSystemID = Index then
-      Exit(fsp.dpString);
-    Inc(fsp);
-  end;
-
-  Result := Default;
-end;
-
 function TCompileKeymanWeb.CallFunctionName(s: WideString): WideString;
 var
   n: Integer;
@@ -2137,56 +2182,6 @@ begin
   n := Pos(':', s);
   if n = 0 then Result := s
   else Result := Copy(s,n+1,Length(s));
-end;
-
-function GetKeymanWebCompiledName(const Name: WideString): WideString;
-var
-  i: Integer;
-const
-  ValidChars: WideString = 'abcdefghijklmnopqrstuvwxyz0123456789_';
-begin
-  Result := LowerCase(Name);
-  if Length(Result) = 0 then Exit;
-  if Pos(Result[1], '0123456789') > 0 then Result := '_'+Result; // Can't have a number as initial
-  for i := 1 to Length(Result) do
-    if Pos(Result[i], ValidChars) = 0 then Result[i] := '_';
-end;
-
-function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString;
-begin
-  Result := GetKeymanWebCompiledName(ChangeFileExt(ExtractFileName(FileName), ''));
-end;
-
-function GetKeymanWebCompiledFileName(const FileName, Version: WideString): WideString;   // I4140
-begin
-  Result :=
-    ExtractFilePath(FileName) +
-    GetKeymanWebCompiledNameFromFileName(FileName) + '-' +
-    Version +
-    '.js';
-end;
-
-function GetKeymanWebCompiledFileName(const FileName: WideString): WideString;   // I4140
-
-  function GetKeyboardVersionString(const AFileName: string): string;   // I4263
-  begin
-    if not FileExists(AFileName) then   // I4263
-      Exit('1.0');
-
-    // Load in keyboard parser
-    with TKeyboardParser.Create do
-    try
-      LoadFromFile(AFileName);   // I4263
-      Result := GetSystemStoreValue(ssKeyboardVersion);
-      if not IsValidKeyboardVersionString(Result) then
-        Result := '1.0';
-    finally
-      Free;
-    end;
-    if Result = '' then Result := '1.0';
-  end;
-begin
-  Result := GetKeymanWebCompiledFileName(FileName, GetKeyboardVersionString(FileName));
 end;
 
 ///
@@ -2326,19 +2321,25 @@ var
 begin
   FBitMask := 0;
   gp := fk.dpGroupArray;
-  for i := 0 to fk.cxGroupArray-1 do
+  if fk.cxGroupArray > 0 then
   begin
-    if gp.fUsingKeys then
+    for i := 0 to fk.cxGroupArray-1 do
     begin
-      kp := gp.dpKeyArray;
-      for j := 0 to gp.cxKeyArray-1 do
+      if gp.fUsingKeys then
       begin
-        if not RuleIsExcludedByPlatform(kp) then
-          FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
-        Inc(kp);
+        kp := gp.dpKeyArray;
+        if gp.cxKeyArray > 0 then
+        begin
+          for j := 0 to gp.cxKeyArray-1 do
+          begin
+            if not RuleIsExcludedByPlatform(kp) then
+              FBitMask := FBitMask or JavaScript_Shift(kp, fMnemonic);
+            Inc(kp);
+          end;
+        end;
       end;
+      Inc(gp);
     end;
-    Inc(gp);
   end;
 
   if ((FBitMask and KMX_MASK_MODIFIER_CHIRAL) <> 0) and
@@ -2349,7 +2350,7 @@ begin
 
   if FDebug
     then Result := FormatModifierAsBitflags(FBitMask and KMX_MASK_KEYS) // Exclude KMX_ISVIRTUALKEY, KMX_VIRTUALCHARKEY
-    else Result := '0x'+IntToHex(FBitMask, 4);
+    else Result := '0x'+IntToHex(FBitMask and KMX_MASK_KEYS, 4);
 end;
 
 end.

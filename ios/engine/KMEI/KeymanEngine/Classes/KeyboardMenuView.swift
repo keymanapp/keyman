@@ -49,11 +49,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       _tableList = keyboardList
       _tableList!.append(titleCloseButton)
     } else {
-      var keyboard = Defaults.keyboard
-      if let version = Manager.shared.latestKeyboardFileVersion(withID: Defaults.keyboard.id) {
-        keyboard.version = version
-      }
-      _tableList = [keyboard]
+      _tableList = [Defaults.keyboard]
       _tableList!.append(titleCloseButton)
     }
     return _tableList!
@@ -61,7 +57,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
     let isPortrait: Bool
-    if Util.isSystemKeyboard {
+    if Manager.shared.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait
@@ -284,7 +280,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       let keyboard = tableList[indexPath.row] as! InstallableKeyboard
       cell.textLabel?.text = keyboard.name
       cell.tag = indexPath.row
-      if (Manager.shared.languageID == keyboard.languageID) && (Manager.shared.keyboardID == keyboard.id) {
+      if Manager.shared.currentKeyboardID == keyboard.fullID {
         cell.selectionStyle = .none
         cell.isSelected = true
         cell.accessoryType = .checkmark

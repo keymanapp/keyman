@@ -26,7 +26,7 @@
 		9840F5ED1B43B02500410ABA /* MacVKCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 9840F5EC1B43B02500410ABA /* MacVKCodes.h */; };
 		984C2AD81A79C98D0023F89D /* KeymanEngine4Mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AD71A79C98D0023F89D /* KeymanEngine4Mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2ADE1A79C98D0023F89D /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2AD21A79C98D0023F89D /* KeymanEngine4Mac.framework */; };
-		984C2AE51A79C98D0023F89D /* KeymanEngine4MacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2AE41A79C98D0023F89D /* KeymanEngine4MacTests.m */; };
+		984C2AE51A79C98D0023F89D /* KMXFileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2AE41A79C98D0023F89D /* KMXFileTests.m */; };
 		984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AF01A79CA4F0023F89D /* NSArray+Action.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2B051A79CA4F0023F89D /* NSArray+Action.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2AF11A79CA4F0023F89D /* NSArray+Action.m */; };
 		984C2B061A79CA4F0023F89D /* NSString+XString.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AF21A79CA4F0023F89D /* NSString+XString.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -45,6 +45,12 @@
 		984C2B161A79CA4F0023F89D /* KVKFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2B021A79CA4F0023F89D /* KVKFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2B171A79CA4F0023F89D /* KVKFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2B031A79CA4F0023F89D /* KVKFile.m */; };
 		984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2B181A79CB020023F89D /* WindowsVKCodes.h */; };
+		E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E224323E20D37E97006940A1 /* PlatformTest.kmx */; };
+		E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A1020113DC100233965 /* KMEngineTests.m */; };
+		E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */; };
+		E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */; };
+		E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */; };
+		E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,7 +86,7 @@
 		984C2AD71A79C98D0023F89D /* KeymanEngine4Mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngine4Mac.h; sourceTree = "<group>"; };
 		984C2ADD1A79C98D0023F89D /* KeymanEngine4MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanEngine4MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		984C2AE31A79C98D0023F89D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		984C2AE41A79C98D0023F89D /* KeymanEngine4MacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeymanEngine4MacTests.m; sourceTree = "<group>"; };
+		984C2AE41A79C98D0023F89D /* KMXFileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMXFileTests.m; sourceTree = "<group>"; };
 		984C2AF01A79CA4F0023F89D /* NSArray+Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+Action.h"; sourceTree = "<group>"; };
 		984C2AF11A79CA4F0023F89D /* NSArray+Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Action.m"; sourceTree = "<group>"; };
 		984C2AF21A79CA4F0023F89D /* NSString+XString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+XString.h"; sourceTree = "<group>"; };
@@ -99,6 +105,13 @@
 		984C2B021A79CA4F0023F89D /* KVKFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVKFile.h; sourceTree = "<group>"; };
 		984C2B031A79CA4F0023F89D /* KVKFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVKFile.m; sourceTree = "<group>"; };
 		984C2B181A79CB020023F89D /* WindowsVKCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowsVKCodes.h; sourceTree = "<group>"; };
+		E224323E20D37E97006940A1 /* PlatformTest.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlatformTest.kmx; sourceTree = "<group>"; };
+		E22A5A1020113DC100233965 /* KMEngineTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMEngineTests.m; sourceTree = "<group>"; };
+		E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngineTestsStaticHelperMethods.h; sourceTree = "<group>"; };
+		E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeymanEngineTestsStaticHelperMethods.m; sourceTree = "<group>"; };
+		E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = CipherMusicUnicode.kmx; sourceTree = "<group>"; };
+		E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestMacEngine.kmx; sourceTree = "<group>"; };
+		E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMkeyViewProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +136,7 @@
 		981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */ = {
 			isa = PBXGroup;
 			children = (
+				E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */,
 				981880651BC1EA5800A1FBA5 /* KeyLabel.h */,
 				981880661BC1EA5800A1FBA5 /* KeyLabel.m */,
 				981880671BC1EA5800A1FBA5 /* KeyLabelCell.h */,
@@ -178,7 +192,10 @@
 		984C2AE11A79C98D0023F89D /* KeymanEngine4MacTests */ = {
 			isa = PBXGroup;
 			children = (
-				984C2AE41A79C98D0023F89D /* KeymanEngine4MacTests.m */,
+				E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */,
+				E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */,
+				984C2AE41A79C98D0023F89D /* KMXFileTests.m */,
+				E22A5A1020113DC100233965 /* KMEngineTests.m */,
 				984C2AE21A79C98D0023F89D /* Supporting Files */,
 			);
 			path = KeymanEngine4MacTests;
@@ -187,6 +204,9 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */,
+				E224323E20D37E97006940A1 /* PlatformTest.kmx */,
+				E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */,
 				984C2AE31A79C98D0023F89D /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -248,6 +268,7 @@
 				984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */,
 				980053351B37C9B50088DDDD /* NFont.h in Headers */,
 				9818807B1BC1EE9700A1FBA5 /* TimerTarget.h in Headers */,
+				E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */,
 				984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */,
 				984C2B0C1A79CA4F0023F89D /* KMCompGroup.h in Headers */,
 				984C2B101A79CA4F0023F89D /* KMCompStore.h in Headers */,
@@ -307,7 +328,7 @@
 		984C2AC91A79C98D0023F89D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0710;
+				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					984C2AD11A79C98D0023F89D = {
@@ -349,6 +370,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
+				E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */,
+				E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,7 +423,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				984C2AE51A79C98D0023F89D /* KeymanEngine4MacTests.m in Sources */,
+				984C2AE51A79C98D0023F89D /* KMXFileTests.m in Sources */,
+				E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */,
+				E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -422,19 +448,26 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -470,14 +503,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -521,6 +560,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
 		};
@@ -529,6 +569,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -542,6 +583,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Release;
 		};

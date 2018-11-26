@@ -112,7 +112,7 @@ begin
   begin
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_IDEFiles) then
+      if OpenKeyReadOnly(SRegKey_IDEFiles_CU) then
         if OpenKeyReadOnly(FMRUName) then
         begin
           s := TStringList.Create;
@@ -151,7 +151,7 @@ begin
   if FMRUName <> '' then
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKey(SRegKey_IDEFiles, True) then
+      if OpenKey(SRegKey_IDEFiles_CU, True) then
       begin
         if KeyExists(FMRUName) then DeleteKey(FMRUName);
         if OpenKey(FMRUName, True) then
@@ -196,3 +196,4 @@ begin
 end;
 
 end.
+

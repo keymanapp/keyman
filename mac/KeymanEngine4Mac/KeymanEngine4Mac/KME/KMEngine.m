@@ -27,16 +27,33 @@ NSString *const Q_RETURN = @"Q_RETURN";
 DWORD VKMap[0x80];
 
 @interface KMEngine ()
++ (NSRegularExpression *)regexPlatform;
 @property (strong, nonatomic) NSMutableString *tmpCtxBuf;
 @property (strong, nonatomic) NSMutableArray *indexStack;
 @end
 
 @implementation KMEngine
 
++ (NSRegularExpression *)regexPlatform {
+    static NSRegularExpression *regex = nil;
+    if (regex == nil) {
+        regex = [NSRegularExpression regularExpressionWithPattern:@"(\\b(((mac(os)?)x?)|(native)|(hardware)|(desktop)) *)*" options:NSRegularExpressionCaseInsensitive error:nil];
+    }
+    return regex;
+}
+
+NSMutableString* _easterEggForCrashlytics = nil;
+const NSString* kEasterEggText = @"Cr@shlyt!cs crash#KME";
+const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
+
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf {
     self = [super init];
     if (self) {
+#ifdef DEBUG
         self.debugMode = YES;
+#else
+        self.debugMode = NO;
+#endif
         _kmx = kmx;
         _tmpCtxBuf = [[NSMutableString alloc] initWithString:ctxBuf];
         [_tmpCtxBuf removeAllNullChars];
@@ -46,6 +63,25 @@ DWORD VKMap[0x80];
     }
     
     return self;
+}
+
+- (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
+    self.debugMode = useVerboseLogging;
+    
+    if (useVerboseLogging) {
+        NSLog(@"KME - Turning verbose logging on");
+        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Cr@shlyt!cs crash#KME", it will force a simulated crash to test reporting to fabric.io.
+        NSString * kmxName = [[_kmx filePath] lastPathComponent];
+        NSLog(@"Crashlytics - KME: _kmx name = %@", kmxName);
+        if ([kmxName isEqualToString:kEasterEggKmxName]) {
+            NSLog(@"Crashlytics - KME: Preparing to detect Easter egg.");
+            _easterEggForCrashlytics = [[NSMutableString alloc] init];
+        }
+        else
+            _easterEggForCrashlytics = nil;
+    }
+    else
+        NSLog(@"KME - Turning verbose logging off");
 }
 
 - (void)setContextBuffer:(NSString *)ctxBuf {
@@ -82,22 +118,79 @@ DWORD VKMap[0x80];
     KMCompGroup *gp = [self.kmx.group objectAtIndex:startIndex];
     actions = [self processGroup:gp event:event];
     
+    if (actions.count == 0 && _easterEggForCrashlytics != nil) {
+        [self processPossibleEasterEggCharacterFrom:[event characters]];
+    }
+    
     return [[actions mutableCopy] optimise];
 }
 
+- (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {
+    NSUInteger len = [_easterEggForCrashlytics length];
+    NSLog(@"Crashlytics - KME: Processing character(s): %@", characters);
+    if ([characters length] == 1 && [characters characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+        NSLog(@"Crashlytics - KME: Adding character to Easter Egg code string: %@", characterToAdd);
+        [_easterEggForCrashlytics appendString:characterToAdd];
+        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
+            NSLog(@"Crashlytics - KME: Forcing crash now!");
+            // Both of the following approaches do throw an exception that causes control to exit this method,
+            // but at least in my debug builds locally, neither one seems to get picked up by Crashlytics in a
+            // way that results in a new report on Fabric.io
+            
+#ifndef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
+            //#1
+            @throw ([NSException exceptionWithName:@"CrashlyticsForce" reason:@"Easter egg hit" userInfo:nil]);
+            
+            //#2
+            //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
+            //    NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
+            //    // Divide by 0 to throw an exception
+            //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
+            
+#else
+            //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
+            // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
+            // purpose of enabling the engine to force a crash.
+            [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
+#endif
+            
+            NSLog(@"Crashlytics - KME: You should not be seeing this line!");
+        }
+    }
+    else if (len > 0) {
+        NSLog(@"Crashlytics - KME: Clearing Easter Egg code string.");
+        [_easterEggForCrashlytics setString:@""];
+    }
+}
+
 - (NSArray *)processGroup:(KMCompGroup *)gp event:(NSEvent *)event {
-    NSArray *actions = nil;
-    
     if (!gp)
+        return nil;
+    
+    if (event.type != NSKeyDown || ![event respondsToSelector:@selector(keyCode)])
         return nil;
 
     if (([event modifierFlags] & NSEventModifierFlagCommand) == NSEventModifierFlagCommand)
         return nil; // Engine should NEVER attempt to process characters when the Command key is pressed.
-
+    
+    // REVIEW: Might need to use charactersIgnoringModifiers instead of characters to avoid
+    // getting Mac predefined subsitutions for Option + ??? keystrokes. But at least for the normal
+    // case of shifted characters, what we have is what we want.
+    NSString *characters = [event characters];
+    //NSString *characters = [event charactersIgnoringModifiers];
+    if (self.debugMode) {
+        NSLog(@"####### ENGINE INFO #######");
+        NSLog(@"%lu characters = %@", [[event characters] length], characters);
+        NSLog(@"%lu characters ignoring modifiers = %@", [[event charactersIgnoringModifiers] length], [event charactersIgnoringModifiers]);
+    }
+    
+    NSArray *actions = nil;
+    
     if (gp.fUsingKeys) {
         // Begin group using keys
         unsigned short keyCode = [event keyCode];
-        unichar vChar = [[event characters] characterAtIndex:0];
+        unichar vChar = [characters characterAtIndex:0];
         DWORD vkCode = VKMap[keyCode];
         NSMutableArray *mKeys = [NSMutableArray arrayWithCapacity:0];
         for (KMCompKey *kmKey in gp.keys) {
@@ -110,6 +203,7 @@ DWORD VKMap[0x80];
                 if (chars.length && ((kmKey.key == [chars characterAtIndex:0]) || (kmKey.key == [[chars uppercaseString] characterAtIndex:0])))
                     [mKeys addObject:kmKey];
             }
+            // TODO: Need tests remainder of this logic
             else if ((flags & ISVIRTUALKEY) == ISVIRTUALKEY) {
                 if (kmKey.key == vkCode)
                     [mKeys addObject:kmKey];
@@ -124,26 +218,48 @@ DWORD VKMap[0x80];
             NSLog(@"[event modifierFlags] = %lX", [event modifierFlags]);
         }
         DWORD mask = 0;
-        if (([event modifierFlags] & NSEventModifierFlagShift) == NSEventModifierFlagShift)
+        if (([event modifierFlags] & NSEventModifierFlagShift) == NSEventModifierFlagShift) {
+            if (self.debugMode)
+                NSLog(@"Adding SHIFT flag to mask.");
             mask |= K_SHIFTFLAG;
+        }
         
-        if (([event modifierFlags] & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock)
+        if (([event modifierFlags] & NSEventModifierFlagCapsLock) == NSEventModifierFlagCapsLock) {
+            if (self.debugMode)
+                NSLog(@"Adding CAPITAL flag to mask.");
             mask |= CAPITALFLAG;
-
-        if (([event modifierFlags] & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK)
+        }
+        
+        if (([event modifierFlags] & MK_LEFT_ALT_MASK) == MK_LEFT_ALT_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding LEFT ALT flag to mask.");
             mask |= LALTFLAG;
-        else if (([event modifierFlags] & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK)
+        }
+        else if (([event modifierFlags] & MK_RIGHT_ALT_MASK) == MK_RIGHT_ALT_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding RIGHT ALT flag to mask.");
             mask |= RALTFLAG;
-        else if (([event modifierFlags] & NSEventModifierFlagOption) == NSEventModifierFlagOption)
+        }
+        else if (([event modifierFlags] & NSEventModifierFlagOption) == NSEventModifierFlagOption) {
+            if (self.debugMode)
+                NSLog(@"Adding ALT flag to mask.");
             mask |= K_ALTFLAG;
-        
-        if (([event modifierFlags] & MK_LEFT_CTRL_MASK) == MK_LEFT_CTRL_MASK)
+        }
+        if (([event modifierFlags] & MK_LEFT_CTRL_MASK) == MK_LEFT_CTRL_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding LCTRL flag to mask.");
             mask |= LCTRLFLAG;
-        else if (([event modifierFlags] & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK)
+        }
+        else if (([event modifierFlags] & MK_RIGHT_CTRL_MASK) == MK_RIGHT_CTRL_MASK) {
+            if (self.debugMode)
+                NSLog(@"Adding RCTRL flag to mask.");
             mask |= RCTRLFLAG;
-        else if (([event modifierFlags] & NSEventModifierFlagControl) == NSEventModifierFlagControl)
+        }
+        else if (([event modifierFlags] & NSEventModifierFlagControl) == NSEventModifierFlagControl) {
+            if (self.debugMode)
+                NSLog(@"Adding CTRL flag to mask.");
             mask |= K_CTRLFLAG;
-        
+        }
         if (self.debugMode)
             NSLog(@"Mask = %X", mask);
         
@@ -151,8 +267,8 @@ DWORD VKMap[0x80];
         for (KMCompKey *key in mKeys) {
             if (key.shiftFlags & ISVIRTUALKEY) {
                 DWORD kMask = mask;
-                //if (self.debugMode)
-                    //NSLog(@"Has shift flags: %X", key.shiftFlags);
+                if (self.debugMode)
+                    NSLog(@"Has shift flags: %X", key.shiftFlags);
                 //DWORD flags = key.shiftFlags & 0x0FFF;
                 if ((key.shiftFlags & NOTCAPITALFLAG) && !(kMask & CAPITALFLAG))
                     kMask |= NOTCAPITALFLAG;
@@ -193,9 +309,9 @@ DWORD VKMap[0x80];
                     }
                 }
             }
-            else {
+            else if (!(mask & K_MODIFIERFLAG) || mask == K_SHIFTFLAG) {
                 //if (self.debugMode)
-                    //NSLog(@"No shift flags!");
+                //NSLog(@"No shift flags!");
                 if (!key.context.length) {
                     mKey = key;
                     break;
@@ -208,23 +324,23 @@ DWORD VKMap[0x80];
         }
         
         /*
-        // Fall back if no match
-        if (!mKey && mKeys.count == 1) {
-            mKey = [mKeys objectAtIndex:0];
-        }
-        else if (!mKey && mKeys.count > 1) {
-            for (KMCompKey *key in mKeys) {
-                if (!key.context.length) {
-                    mKey = key;
-                }
-                else {
-                    if ([self contextMatch:key]) {
-                        mKey = key;
-                        break;
-                    }
-                }
-            }
-        }*/
+         // Fall back if no match
+         if (!mKey && mKeys.count == 1) {
+         mKey = [mKeys objectAtIndex:0];
+         }
+         else if (!mKey && mKeys.count > 1) {
+         for (KMCompKey *key in mKeys) {
+         if (!key.context.length) {
+         mKey = key;
+         }
+         else {
+         if ([self contextMatch:key]) {
+         mKey = key;
+         break;
+         }
+         }
+         }
+         }*/
         
         if (self.debugMode)
             NSLog(@"mKey = %@", mKey);
@@ -682,14 +798,19 @@ DWORD VKMap[0x80];
                     DWORD x2 = [keyCtx characterAtIndex:i+3]-1;
                     DWORD x3 = [keyCtx characterAtIndex:i+4]-1;
                     KMCompStore *store = [self.kmx.store objectAtIndex:x3];
-                    if (x1 == TSS_PLATFORM && x2 == EQUAL) {
-                        if ([self checkPlatform:store.string])
+                    if (x1 == TSS_PLATFORM) {
+                        BOOL platformMatches = [self checkPlatform:store.string];
+                        if ((platformMatches && (x2 == EQUAL)) ||
+                            (!platformMatches && (x2 == NOT_EQUAL))) {
                             checkPlatform = YES;
-                        else
+                        }
+                        else {
                             return 0;
+                        }
                     }
-                    else
+                    else {
                         return 0; // CODE_IFSYSTEMSTORE is not supported except TSS_PLATFORM
+                    }
                     
                     i+=5;
                     break;
@@ -761,37 +882,9 @@ DWORD VKMap[0x80];
 }
 
 - (BOOL)checkPlatform:(NSString *)platform {
-    NSArray *values = [platform componentsSeparatedByString:@" "];
-    for (NSString *value in values) {
-        if ([value isEqualToString:@"touch"])
-            return NO;
-        else if ([value isEqualToString:@"windows"])
-            return NO;
-        else if ([value isEqualToString:@"android"])
-            return NO;
-        else if ([value isEqualToString:@"ios"])
-            return NO;
-        else if ([value isEqualToString:@"linux"])
-            return NO;
-        else if ([value isEqualToString:@"tablet"])
-            return NO;
-        else if ([value isEqualToString:@"phone"])
-            return NO;
-        else if ([value isEqualToString:@"web"])
-            return NO;
-        else if ([value isEqualToString:@"ie"])
-            return NO;
-        else if ([value isEqualToString:@"chrome"])
-            return NO;
-        else if ([value isEqualToString:@"firefox"])
-            return NO;
-        else if ([value isEqualToString:@"safari"])
-            return NO;
-        else if ([value isEqualToString:@"opera"])
-            return NO;
-    }
-    
-    return YES;
+    NSRange wholeString = NSMakeRange(0, [platform length]);
+    NSRange firstMatchRange = [[KMEngine regexPlatform] rangeOfFirstMatchInString:platform options:NSMatchingAnchored range:wholeString];
+    return (firstMatchRange.length == wholeString.length);
 }
 
 // Creates a VK map to convert Mac VK codes to Windows VK codes

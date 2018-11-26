@@ -4,7 +4,9 @@
          Customize dimensions originally defined in res/values/dimens.xml (such as
          screen margins) for sw720dp devices (e.g. 10" tablets) here.
     -->
-    <dimen name="version_label_width">140dp</dimen>
-    <dimen name="version_label_textsize">18sp</dimen>
-    
+    <dimen name="label_width">140dp</dimen>
+    <dimen name="titlebar_label_textsize">18sp</dimen>
+    <dimen name="product_logo_bottom">196dp</dimen>
+    <dimen name="checkbox_margin">8dp</dimen>
+    <dimen name="checkbox_padding">10dp</dimen>
 </resources>

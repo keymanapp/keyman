@@ -13,7 +13,7 @@ public struct Language: Codable {
   /// Name of language.
   public let name: String
 
-  /// ISO639-3 language code.
+  /// BCP-47 language code.
   public let id: String
 
   /// Corresponding Keyboard objects.

@@ -95,7 +95,6 @@
             NSRect rect = NSInsetRect(NSMakeRect(px, py, width, keyHeight), 2, 2);
             KeyView *keyView = [[KeyView alloc] initWithFrame:rect];;
             [keyView setKey:key];
-            [keyView setAction:@selector(keyAction:)];
             [keyView setTarget:self];
             if (self.oskShiftState && (keyView.key.keyCode == MVK_LEFT_SHIFT || keyView.key.keyCode == MVK_RIGHT_SHIFT))
                 [keyView setKeyPressed:YES];

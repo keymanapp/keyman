@@ -175,23 +175,33 @@ function TCustomisationMessageManager.GetAvailableLanguages: string;
     end;
   end;
 
-  procedure ReadPackageLanguages(Root: HKEY);
+  procedure ReadPackageLanguages(IsLM: Boolean);
   var
     i: Integer;
     s, t: string;
     f: TSearchRec;
     keys: TStringList;
+    Path: string;
   begin
     keys := TStringList.Create;
     with TRegistryErrorControlled.Create do  // I2890
     try
-      RootKey := Root;
-      if OpenKeyReadOnly('\'+SRegKey_InstalledPackages) then
+      if IsLM then
+      begin
+        RootKey := HKEY_LOCAL_MACHINE;
+        Path := SRegKey_InstalledPackages_LM;
+      end
+      else
+      begin
+        RootKey := HKEY_CURRENT_USER;
+        Path := SRegKey_InstalledPackages_CU;
+      end;
+      if OpenKeyReadOnly('\'+Path) then
       begin
         GetKeyNames(keys);
         for i := 0 to keys.Count - 1 do
         begin
-          if OpenKeyReadOnly('\'+SRegKey_InstalledPackages+'\'+keys[i]) then
+          if OpenKeyReadOnly('\'+Path+'\'+keys[i]) then
           begin
             if ValueExists(SRegValue_PackageFile) then
             begin
@@ -243,8 +253,8 @@ begin
 
   { Find all locale*.xml files in the user's installed keyboards }
 
-  ReadPackageLanguages(HKEY_LOCAL_MACHINE);
-  ReadPackageLanguages(HKEY_CURRENT_USER);
+  ReadPackageLanguages(True);
+  ReadPackageLanguages(False);
 end;
 
 procedure TCustomisationMessageManager.GetDialogParameters(

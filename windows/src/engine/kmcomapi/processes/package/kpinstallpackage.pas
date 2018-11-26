@@ -59,6 +59,8 @@ uses
   Windows,
   Classes,
   System.Zip,
+  System.Win.ComObj,
+
   custinterfaces,
   Unicode,
   SysUtils,
@@ -109,6 +111,28 @@ var
   PackageName, dest, prog, errmsg: string;
   FErrorValue: Cardinal;
   FSrcFileName: string;
+
+  procedure InstallKeyboard(FileName: string);
+  var
+    kbd: TPackageKeyboard;
+    FLanguages: TPackageKeyboardLanguageList;
+  begin
+    kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
+    if Assigned(kbd) and (kbd.Languages.Count > 0) then
+    begin
+      FLanguages := kbd.Languages;
+    end
+    else
+      FLanguages := nil;
+
+    with TKPInstallKeyboard.Create(Context) do
+    try
+      Execute(FileName, PackageName, [ikPartOfPackage], FLanguages, Force);
+    finally
+      Free;
+    end;
+  end;
+
 begin
   KL.MethodEnter(Self, 'Execute', [FileName, Force]);
   try
@@ -182,7 +206,7 @@ begin
         try
           RootKey := HKEY_LOCAL_MACHINE;
 
-          if not OpenKey(SRegKey_InstalledPackages+'\'+PackageName, True) then  // I2890
+          if not OpenKey(SRegKey_InstalledPackages_LM+'\'+PackageName, True) then  // I2890
             RaiseLastRegistryError;
 
           WriteString(SRegValue_PackageFile, dest + 'kmp.inf');
@@ -222,13 +246,8 @@ begin
                 end;
               end;
             ftKeymanFile:
-              // I1109: Don't install non-selected keyboards for Light
-              with TKPInstallKeyboard.Create(Context) do
-              try
-                Execute(dest + inf.Files[i].FileName, PackageName, [ikPartOfPackage], Force);
-              finally
-                Free;
-              end;
+              InstallKeyboard(dest + inf.Files[i].FileName);
+
             ftPackageFile:
               with TKPInstallPackage.Create(Context) do
               try
@@ -244,12 +263,19 @@ begin
         for i := 0 to inf.Files.Count - 1 do
         begin
           if inf.Files[i].FileType = ftVisualKeyboard then
-            with TKPInstallVisualKeyboard.Create(Context) do
+          begin
             try
-              Execute(FTempOutPath + inf.Files[i].FileName, '');
-            finally
-              Free;
+              with TKPInstallVisualKeyboard.Create(Context) do
+              try
+                Execute(FTempOutPath + inf.Files[i].FileName, '');
+              finally
+                Free;
+              end;
+            except
+              on E:EOleException do
+                WarnFmt(KMN_W_InstallPackage_KVK_Error, VarArrayOf([PackageName, inf.Files[i].FileName, E.Message]));
             end;
+          end;
         end;
 
         { Install start menu items }

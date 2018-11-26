@@ -66,7 +66,7 @@ type
     procedure DlgMain(var Message: TMessage); override;
     function ProcessCommand(ID, NotificationCode: Integer; hControl: HWND): Boolean; override;
   private
-    FBitmap: THandle;
+    FBitmap, FLogo: THandle;
     StatusMax: Integer;
     FDownloadFilename: WideString;
     FDownloadURL: WideString;
@@ -120,8 +120,6 @@ procedure CheckMSIResult(res: UINT);
 
 implementation
 
-{R *.dfm}
-
 uses
   Unicode, utilexecute,
   utilsystem, shlobj,
@@ -129,6 +127,7 @@ uses
   TntDialogHelp,
   types, upload_settings,
   httpuploader,
+  Keyman.System.UpdateCheckResponse,
   VersionInfo, GetOSVersion,
   SFX,
   bootstrapmain, jwawintype, jwamsi, ErrorControlledRegistry, RegistryKeys;
@@ -221,7 +220,7 @@ end;
 
 function TfrmRun.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
 begin
-  Result := (FInstalledVersion.Version <> '') and (NewVersion <= FInstalledVersion.Version);
+  Result := (FInstalledVersion.Version <> '') and (CompareVersions(NewVersion, FInstalledVersion.Version) >= 0);
 end;
 
 function TfrmRun.CheckDependencies: Boolean;
@@ -275,36 +274,34 @@ begin
 end;
 
 procedure TfrmRun.CheckNewVersion;
+var
+  ucr: TUpdateCheckResponse;
 begin
   with THTTPUploader.Create(nil) do
   try
-    // TODO: Eliminate Raw parameter and use 'setup' instead
-    Fields.Add('OnlineProductID', AnsiString(IntToStr(OnlineProductID_KeymanDeveloper_100)));  // I2856  // I3377
     if FInstalledVersion.Version = ''
       then Fields.Add('Version', AnsiString(FInstallInfo.Version))
       else Fields.Add('Version', AnsiString(FInstalledVersion.Version));
-    Fields.Add('Raw', '1');
 
     Request.HostName := API_Server;
     Request.Protocol := API_Protocol;
-    Request.UrlPath := API_Path_UpdateCheck;
+    Request.UrlPath := API_Path_UpdateCheck_Developer;
 
     Upload;
     if Response.StatusCode = 200 then
     begin
-      with TStringList.Create do
-      try
-        Text := string(Response.MessageBodyAsString);
-        if CompareVersions(Values['newversion'], FInstallInfo.Version) < 0 then  // I2856
+      if ucr.Parse(Response.MessageBodyAsString, 'developer', FInstallInfo.Version) then
+      begin
+        if ucr.Status = ucrsUpdateReady then
         begin
-          FNewVersion.Version := Values['newversion'];
-          FNewVersion.InstallURL := Values['installurl'];
-          FNewVersion.InstallSize := StrToIntDef(Values['installsize'], 0);  // I1917  // I2680
-          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917  // I2680
+          FNewVersion.Version := ucr.NewVersion;
+          FNewVersion.InstallURL := ucr.InstallURL;
+          FNewVersion.InstallSize := ucr.InstallSize;
+          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
         end;
-      finally
-        Free;
-      end;
+      end
+      else
+        raise Exception.Create(ucr.ErrorMessage);
     end
     else
       raise Exception.Create('Error '+IntToStr(Response.StatusCode));
@@ -371,6 +368,7 @@ destructor TfrmRun.Destroy;
 begin
   inherited;
   DeleteObject(FBitmap);
+  DeleteObject(FLogo);
   FreeAndNil(FErrorLog);
 end;
 
@@ -401,10 +399,22 @@ begin
         ScreenToClient(Handle, r.BottomRight);
 
         FBitmapHDC := CreateCompatibleDC(hdc);
-        FOldBitmap := SelectObject(FBitmapHDC, FBitmap);
-        BitBlt(hdc, r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top, FBitmapHDC, 0, 0, SRCCOPY);
-        SelectObject(FBitmapHDC, FOldBitmap);
-        DeleteDC(FBitmapHDC);
+        try
+          FOldBitmap := SelectObject(FBitmapHDC, FBitmap);
+          BitBlt(hdc, r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top, FBitmapHDC, 0, 0, SRCCOPY);
+          SelectObject(FBitmapHDC, FOldBitmap);
+
+          GetWindowRect(GetDlgItem(Handle, IDC_LOGO), r);
+          ScreenToClient(Handle, r.TopLeft);
+          ScreenToClient(Handle, r.BottomRight);
+
+          FOldBitmap := SelectObject(FBitmapHDC, FLogo);
+          BitBlt(hdc, r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top, FBitmapHDC, 0, 0, SRCCOPY);
+          SelectObject(FBitmapHDC, FOldBitmap);
+        finally
+          DeleteDC(FBitmapHDC);
+        end;
+
         Message.Result := 1;
       end;
   else inherited;
@@ -422,35 +432,36 @@ begin
   SetCursor(LoadCursor(0, IDC_WAIT));
   try
     EnableWindow(GetDlgItem(Handle, IDC_MESSAGE), False);
+    EnableWindow(GetDlgItem(Handle, IDC_LOGOMESSAGE), False);
     EnableWindow(GetDlgItem(Handle, IDOK), False);
     EnableWindow(GetDlgItem(Handle, IDCANCEL), False);
     EnableWindow(GetDlgItem(Handle, IDC_CHECK1), False);
 
-    try
-      StatusMax := 6;
+    StatusMax := 6;
 
-      if not CheckDependencies then Exit;
+    if not CheckDependencies then Exit;
 
-      SetupMSI;
+    SetupMSI;
 
-      CheckInstalledVersion;
+    CheckInstalledVersion;
 
-      if SendDlgItemMessage(Handle, IDC_CHECK1, BM_GETCHECK, 0, 0) = BST_CHECKED then
-      begin
-        Status(FInstallInfo.Text(ssStatusCheckingForUpdates));
+    if SendDlgItemMessage(Handle, IDC_CHECK1, BM_GETCHECK, 0, 0) = BST_CHECKED then
+    begin
+      Status(FInstallInfo.Text(ssStatusCheckingForUpdates));
+      try
         CheckNewVersion;
-      end;
-      Status(FInstallInfo.Text(ssStatusInstalling));
-      Result := InstallMSI;  // I1901
-    except
-      on E:Exception do // I1440 - avoid update check failure stopping install
-      begin
-        MessageBox(0, PChar(E.Message), PChar('Error checking for updates'), MB_OK or MB_ICONHAND);
-        Result := False;  // I1901
+      except
+        on E:Exception do // I1440 - avoid update check failure stopping install
+        begin
+          LogError(FInstallInfo.Text(ssCheckForUpdatesError, [E.Message]));
+        end;
       end;
     end;
+    Status(FInstallInfo.Text(ssStatusInstalling));
+    Result := InstallMSI;  // I1901
   finally
     EnableWindow(GetDlgItem(Handle, IDC_MESSAGE), True);
+    EnableWindow(GetDlgItem(Handle, IDC_LOGOMESSAGE), True);
     EnableWindow(GetDlgItem(Handle, IDOK), True);
     EnableWindow(GetDlgItem(Handle, IDCANCEL), True);
     EnableWindow(GetDlgItem(Handle, IDC_CHECK1), True);
@@ -502,6 +513,7 @@ begin
   CheckInternetConnectedState;
 
   FBitmap := LoadBitmap(HInstance, MAKEINTRESOURCE(20));
+  FLogo := LoadBitmap(HInstance, MAKEINTRESOURCE(21));
 
   SetWindowText(Handle, PWideChar(FInstallInfo.Text(ssApplicationTitle)));
   
@@ -510,11 +522,13 @@ begin
   SetFontProperties(IDOK, FW_BOLD, ssFontSize_InstallButton, ssFontName_InstallButton); //e StrToIntDef(FInstallInfo.Text(ssFontSize_InstallButton), 18), FW_BOLD, FInstallInfo.Text(ssFontName_InstallButton));
 
   SetFontProperties(IDC_MESSAGE, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
+  SetFontProperties(IDC_LOGOMESSAGE, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
   SetFontProperties(IDC_STATUS, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
   SetFontProperties(IDC_CHECK1, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
   SetFontProperties(IDCANCEL, FW_NORMAL, ssFontSize_Dialog, ssFontName_Dialog);
 
   SetWindowText(GetDlgItem(Handle, IDC_TITLE), PWideChar(FInstallInfo.Text(ssTitle, [FInstallInfo.EditionTitle])));
+  SetWindowText(GetDlgItem(Handle, IDC_LOGOMESSAGE), PWideChar(FInstallInfo.Text(ssSIL, [FInstallInfo.EditionTitle])));
   SetWindowText(GetDlgItem(Handle, IDC_MESSAGE), PWideChar(FInstallInfo.Text(ssWelcome_Plain, [FInstallInfo.EditionTitle])));
 
   SetWindowText(GetDlgItem(Handle, IDC_CHECK1), PWideChar(FInstallInfo.Text(ssCheckForUpdates)));
@@ -643,6 +657,11 @@ begin
   end;
 end;
 
+procedure DoOutputDebugString(s: string);
+begin
+  OutputDebugString(PWideChar('KEYMANDEVELOPER.SETUP.EXE: '+s+#13#10));
+end;
+
 function TfrmRun.InstallMSI: Boolean;
 var
   res: Cardinal;
@@ -651,12 +670,19 @@ var
 begin
   Result := True;
 
+  DoOutputDebugString('InstallMSI');
+  DoOutputDebugString('  NewVersion.Version=<'+FNewVersion.Version+'>');
+  DoOutputDebugString('  InstallInfo.Version=<'+FInstallInfo.Version+'>');
   { We need to check if the included installer or the patch available is a newer version than the currently installed version }
   if FNewVersion.Version <> '' then
   begin
+    DoOutputDebugString('NewVersion.Version <> ''''');
     if IsNewerVersionInstalled(FNewVersion.Version) then
-      { The patch is older than the installed version }
+    begin
+      DoOutputDebugString('  IsNewerVersionInstalled=True');
       Exit;
+      { The patch is older than the installed version }
+    end;
 
     if not InstallNewVersion then
     begin
@@ -666,8 +692,10 @@ begin
     end;
   end;
 
+  DoOutputDebugString('Testing IsNewerVersionInstalled('''+FInstallInfo.Version+''')');
   if not IsNewerVersionInstalled(FInstallInfo.Version) then
   begin
+    DoOutputDebugString('not IsNewerVersionInstalled');
     ReinstallMode := 'REBOOTPROMPT=S REBOOT=ReallySuppress'; // I2754 - Auto update is too silent  // I3355   // I3500
     if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode)
       then ReinstallMode := ReinstallMode + ' REINSTALLMODE=vdmus REINSTALL=ALL';  // I3355   // I3500   // I4858
@@ -752,7 +780,7 @@ procedure TfrmRun.PrepareForReboot(res: Cardinal);
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_WindowsRunOnce, True) then
+    if OpenKey(SRegKey_WindowsRunOnce_CU, True) then
       WriteString(SRegValue_WindowsRunOnce_Setup, '"'+ParamStr(0)+'" -c');
   finally
     Free;

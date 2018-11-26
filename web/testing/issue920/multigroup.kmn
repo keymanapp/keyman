@@ -1,0 +1,36 @@
+c To repro, on KMW, press <;a> which works. then press <;e> which doesn't
+store(&VERSION) '10.0'
+store(&NAME) 'Secondary group any mismatch #920'
+store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_E] > U+0065
++ [K_COLON] > dk(semicolon)
++ '.' > U+1D1F
+
++ 'f' > 'f'
++ 'g' > 'g'
+
+store(a-key) 'a'
+store(a-out) U+1D44 
+dk(semicolon) + any(a-key) > index(a-out, 2)
+
+match > use(deadkeys)   
+
+group(deadkeys)
+
+store(e-key)  'e' 
+store(e-out)  U+0259
+
+store(f-key) 'f'
+store(g-key) 'g'
+store(f-out) U+0192
+store(g-out) U+01BE 
+
+dk(semicolon) any(e-key) > index(e-out, 2)
+U+1D1F any(e-key) > index(e-out, 2)
+dk(semicolon) dk(semicolon) any(f-key) any(g-key) > index(f-out, 3) index( g-out, 4)
+any(f-key) dk(semicolon) > index(f-out,1) 'woo'

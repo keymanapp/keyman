@@ -15,8 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
+    KeymanEngine.log.outputLevel = .debug
+    KeymanEngine.log.logAppDetails()
     Manager.applicationGroupIdentifier = "group.KMEI"
-    Manager.shared.isDebugPrintingOn = true
     Manager.shared.canRemoveDefaultKeyboard = true
     Manager.shared.openURL = UIApplication.shared.openURL
 

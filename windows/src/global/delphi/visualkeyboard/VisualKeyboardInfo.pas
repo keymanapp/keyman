@@ -64,15 +64,25 @@ begin
 end;
 
 procedure TVisualKeyboardInfoList.Load;
-  procedure LoadExt(hkey: HKEY);
+  procedure LoadExt(FAdmin: Boolean);
   var
+    Path: string;
     i: Integer;
   begin
     with TRegistryErrorControlled.Create do  // I2890
     try
-      RootKey := hkey;
+      if FAdmin then
+      begin
+        RootKey := HKEY_LOCAL_MACHINE;
+        Path := '\'+SRegKey_InstalledKeyboards_LM+'\';
+      end
+      else
+      begin
+        RootKey := HKEY_CURRENT_USER;
+        Path := '\'+SRegKey_InstalledKeyboards_CU+'\';
+      end;
       for i := 0 to Count - 1 do
-        if OpenKeyReadOnly('\'+SRegKey_InstalledKeyboards+'\'+Items[i].KeymanName) then
+        if OpenKeyReadOnly(Path+Items[i].KeymanName) then
           if ValueExists(SRegValue_VisualKeyboard) then Items[i].FileName := ReadString(SRegValue_VisualKeyboard);
     finally
       Free;
@@ -90,7 +100,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_ActiveKeyboards) then
+    if OpenKeyReadOnly(SRegKey_ActiveKeyboards_CU) then
     begin
       GetValueNames(str);
       for i := 0 to str.Count - 1 do
@@ -103,8 +113,8 @@ begin
         Add(vki);
       end;
     end;
-    LoadExt(HKEY_CURRENT_USER);
-    LoadExt(HKEY_LOCAL_MACHINE);
+    LoadExt(False);
+    LoadExt(True);
     for i := 0 to Count - 1 do
       KL.Log('Visual Keyboard '+Items[i].KeymanName+'='+Items[i].FileName);
    finally

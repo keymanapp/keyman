@@ -59,7 +59,8 @@ type
     procedure SetInsertFont(const Value: TFont);
     procedure DrawPreview;
     procedure SetDisplayQuality(const Value: TClearTypeDisplayQuality);
-    { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     property DisplayQuality: TClearTypeDisplayQuality read FDisplayQuality write SetDisplayQuality;
@@ -72,6 +73,8 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   UFixFontDialogBold,
   UframeBitmapEditor;
 
@@ -124,6 +127,11 @@ begin
   SetBounds(X, Y, Width, Height);
 
   DrawPreview;
+end;
+
+function TfrmBitmapEditorText.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_BitmapEditorText;
 end;
 
 function TfrmBitmapEditorText.GetInsertText: WideString;

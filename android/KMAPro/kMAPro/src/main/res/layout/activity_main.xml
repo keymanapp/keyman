@@ -3,20 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:layout_above="@+id/KMKeyboard"
+    android:orientation="vertical"
     android:background="@color/yellow_background"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity">
+
+    <include layout="@layout/titlebar" />
 
     <com.tavultesoft.kmea.KMTextView
         android:id="@+id/kmTextView"
         android:background="@drawable/textview_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/titlebar"
         android:ems="10"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textNoSuggestions"
         android:hint="@string/textview_hint"
         android:gravity="top"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical">
 
         <requestFocus />
     </com.tavultesoft.kmea.KMTextView>

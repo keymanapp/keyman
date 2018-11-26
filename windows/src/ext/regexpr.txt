@@ -23,8 +23,6 @@ Build notes
 
 TRegExpr does not include its own package, as it does not include any components.  The Delphi search path is set during the build.
 
-PlusMemo includes its own version of TRegExpr.  We will use this version as the master version, for now, as we are not using the RegExpr unit from PlusMemo (it is used only by RegExHilit.pas).
-
 License - Custom Free Source
 ----------------------------
 

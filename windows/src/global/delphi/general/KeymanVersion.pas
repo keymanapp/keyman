@@ -20,6 +20,7 @@ unit KeymanVersion;
 interface
 
 const
+  SKeymanVersion110 = '11.0';
   SKeymanVersion100 = '10.0';
   SKeymanVersion90 = '9.0';
   SKeymanVersion80 = '8.0';
@@ -27,11 +28,12 @@ const
   SKeymanVersion60 = '6.0';
   SKeymanVersion50 = '5.0';
 
-  SKeymanVersion = SKeymanVersion100;
+{$I keymanversion_build.inc}
 
   SKeymanKeyboardVersion = SKeymanVersion100;
 
   SKeymanInstallerComponentCode = '{C289B903-7EE8-49C7-B186-BE98259EC540}';
+
 implementation
 
 end.

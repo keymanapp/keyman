@@ -128,7 +128,7 @@ var
               end;
             end;
 
-            if InstallFile(AOwner, FTempFileName, False, True) then Result := True;   // I4989
+            if InstallFile(AOwner, FTempFileName, False, True, '') then Result := True;   // I4989
           finally
             if FileExists(FTempFileName) then
               DeleteFile(FTempFileName);
@@ -196,7 +196,7 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if not OpenKey(SRegKey_KeymanDesktop, True) then  // I2890
+    if not OpenKey(SRegKey_KeymanDesktop_CU, True) then  // I2890
       RaiseLastRegistryError;
     WriteString(SRegValue_AvailableLanguages, FLanguagesAvailableString);
     WriteString(SRegValue_CurrentLanguage, FCurrentLanguage);

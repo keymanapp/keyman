@@ -6,6 +6,8 @@
 
 # ----------------------------------------------------------------------
 
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj
+
 setup:
 
     #
@@ -19,14 +21,14 @@ setup:
     # Build the installation archive
     #
     
-  $(MAKE) -fcopydev.mak candle
-  $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf  -out keymandeveloper100.msi kmdev.wixobj -ext WixUIExtension
+    $(MAKE) -fcopydev.mak candle
+    $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
 
     #
     # Sign the installation archive
     #
 
-  $(SIGNCODE) /d "Keyman Developer" keymandeveloper100.msi
+    $(SIGNCODE) /d "Keyman Developer" keymandeveloper.msi
 
     #
     # Copy the installation archive
@@ -55,6 +57,10 @@ clean:
     -del /Q setup.inf
     -del /Q setup.zip
     -del /Q *.exe
+    -del /Q *.wixpdb
+    -del /Q xml.wxs
+    -del /Q cef.wxs
+    -del /Q templates.wxs
 
 test-releaseexists:
     cd $(ROOT)\src\developer\inst

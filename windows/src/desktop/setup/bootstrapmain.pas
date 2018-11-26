@@ -98,6 +98,7 @@ uses
   Upload_Settings,
   ActiveX,
   SetupForm,
+  Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
   CommonControls,
@@ -221,7 +222,7 @@ function IsKeymanDesktop7Installed: string;   // I4460
 begin
   with CreateHKLMRegistry do
   try
-    if OpenKeyReadOnly(SRegKey_Keyman70) and ValueExists('root path')  //TODO -- test this
+    if OpenKeyReadOnly(SRegKey_Keyman70_LM) and ValueExists('root path')  //TODO -- test this
       then Result := IncludeTrailingPathDelimiter(ReadString('root path')) + TKeymanPaths.S_KMShell
       else Exit('');
 
@@ -236,7 +237,7 @@ function IsKeymanDesktop8Installed: string;   // I4460
 begin
   with CreateHKLMRegistry do
   try
-    if OpenKeyReadOnly(SRegKey_Keyman80) and ValueExists('root path')  //TODO -- test this
+    if OpenKeyReadOnly(SRegKey_Keyman80_LM) and ValueExists('root path')  //TODO -- test this
       then Result := IncludeTrailingPathDelimiter(ReadString('root path')) + TKeymanPaths.S_KMShell
       else Exit('');
 

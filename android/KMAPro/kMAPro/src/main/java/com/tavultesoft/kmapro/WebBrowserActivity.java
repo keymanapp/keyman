@@ -38,10 +38,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.app.ActionBar;
-import android.app.Activity;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
 
-public class WebBrowserActivity extends Activity {
+public class WebBrowserActivity extends AppCompatActivity {
 
   private WebView webView;
   private EditText addressField;
@@ -49,7 +49,7 @@ public class WebBrowserActivity extends Activity {
   private ImageButton stopButton;
   private ImageButton reloadButton;
   private ProgressBar progressBar;
-  private static final String fontBaseUri = "https://az416209.vo.msecnd.net/font/deploy/";
+  private static final String fontBaseUri = "https://s.keyman.com/font/deploy/";
   private String loadedFont;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
@@ -58,21 +58,21 @@ public class WebBrowserActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     final Context context = this;
-    final ActionBar actionBar = getActionBar();
-    actionBar.setLogo(null);
-    actionBar.setDisplayShowHomeEnabled(false);
-    actionBar.setDisplayShowTitleEnabled(false);
-    actionBar.setDisplayShowCustomEnabled(true);
-    actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
-    final ViewGroup webBarLayout = (ViewGroup) getLayoutInflater().inflate(
-      R.layout.web_browser_bar_layout,
-      null);
-    actionBar.setCustomView(webBarLayout);
+
     setContentView(R.layout.activity_web_browser);
 
-    webView = (WebView) findViewById(R.id.webView);
+
+    final Toolbar toolbar = findViewById(R.id.web_browser_toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setTitle(null);
+    getSupportActionBar().setDisplayUseLogoEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+    getSupportActionBar().setDisplayShowCustomEnabled(true);
+    getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
+
+    webView = (WebView) findViewById(R.id.browserWebView);
     addressField = (EditText) findViewById(R.id.address_field);
     clearButton = (ImageButton) findViewById(R.id.clear_button);
     stopButton = (ImageButton) findViewById(R.id.stop_button);
@@ -224,14 +224,10 @@ public class WebBrowserActivity extends Activity {
     closeButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        // Hide the current keyboard so when Keyman app returns, there aren't 2 keyboards visible #220
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(addressField.getWindowToken(), 0);
         finish();
         overridePendingTransition(0, android.R.anim.fade_out);
       }
     });
-
 
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
@@ -336,8 +332,6 @@ public class WebBrowserActivity extends Activity {
   protected void onResume() {
     super.onResume();
     if (webView != null) {
-      webView.resumeTimers();
-
       if (didFinishLoading) {
         String fontFilename = KMManager.getKeyboardTextFontFilename();
         if (!loadedFont.equals(fontFilename)) {
@@ -350,9 +344,6 @@ public class WebBrowserActivity extends Activity {
   @Override
   protected void onPause() {
     super.onPause();
-    if (webView != null) {
-      webView.pauseTimers();
-    }
   }
 
   @Override
@@ -378,8 +369,12 @@ public class WebBrowserActivity extends Activity {
 
   @Override
   public void onBackPressed() {
-    finish();
-    overridePendingTransition(0, android.R.anim.fade_out);
+    if (webView != null && webView.canGoBack()) {
+      webView.goBack();
+    } else {
+      super.onBackPressed();
+      finish();
+    }
   }
 
   private void loadFont() {

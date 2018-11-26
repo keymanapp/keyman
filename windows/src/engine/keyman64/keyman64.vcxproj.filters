@@ -108,9 +108,27 @@
     <ClCompile Include="..\keyman32\hookutils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\keyman32\security.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\serialkeyeventclient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\serialkeyeventserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keyman32\SharedBuffers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Keyman64.RC">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="..\keyman32\keyman-debug-etw.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -232,6 +250,29 @@
     <ClInclude Include="..\keyman32\vkscancodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\keyman32\keyman-debug-etw.h">
+      <Filter>Source Files</Filter>
+    <ClInclude Include="..\keyman32\keyeventsenderthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\security.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\serialkeyeventclient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\serialkeyeventcommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\serialkeyeventserver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keyman32\SharedBuffers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\global\res\bmp\arrow.bmp">
@@ -239,6 +280,9 @@
     </None>
     <None Include="..\..\global\res\bmp\mask.bmp">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\keyman32\keyman-debug-etw.man">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
 </Project>

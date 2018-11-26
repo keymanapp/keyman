@@ -73,6 +73,7 @@ uses
   GetOsVersion,
   IniFiles,
   kmpinffile,
+  Keyman.System.UpgradeRegistryKeys,
   KPInstallFontKMShell,
   KPInstallPackageStartMenu,
   KPUninstallPackageStartMenu,
@@ -305,7 +306,6 @@ begin
       regWrite.WriteString(SRegValue_KeymanFile, pathname + ExtractFileName(filename));
 
       CopyValue(SRegValue_Legacy_DefaultLanguageID);   // I4220
-      CopyValue(SRegValue_KeymanDefaultHotkey);
 
       CopyValue(SRegValue_PackageName);
 
@@ -346,7 +346,7 @@ begin
       with TRegistryErrorControlled.Create do
       try
         RootKey := HKEY_LOCAL_MACHINE;
-        if OpenKeyReadOnly(BuildKeyboardLanguageProfilesKey(keyboardname)) then
+        if OpenKeyReadOnly(BuildKeyboardLanguageProfilesKey_LM(keyboardname)) then
         begin
           GetKeyNames(FProfiles);
           if FProfiles.Count > 0 then
@@ -365,7 +365,7 @@ begin
       if s <> '' then
         with TRegistryErrorControlled.Create do
         try
-          if OpenKey(SRegKey_LanguageHotkeys, True) then
+          if OpenKey(SRegKey_LanguageHotkeys_CU, True) then
             WriteString(s, regRead.ReadString(SRegValue_Legacy_KeymanActiveHotkey));
         finally
           Free;

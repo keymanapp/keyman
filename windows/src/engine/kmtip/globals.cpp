@@ -25,7 +25,7 @@
 // Global variables.
 //
 
-#include "globals.h"
+#include "pch.h"
 
 HINSTANCE g_hInst;
 

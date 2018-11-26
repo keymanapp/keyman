@@ -1,6 +1,6 @@
 <html>
 <!--
- Copyright (C) 2017 SIL International. All rights reserved.
+ Copyright (C) 2017-2018 SIL International. All rights reserved.
 -->
 
 <head>
@@ -16,8 +16,8 @@
 
     function init() {
       //document.body.style.backgroundColor="transparent";
-      window.console.log('Device type = '+device);
-      window.console.log('Keyboard height = '+oskHeight);
+      //window.console.log('Device type = '+device);
+      //window.console.log('Keyboard height = '+oskHeight);
       var kmw=window['keyman'];
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
@@ -26,7 +26,9 @@
       kmw['hideKeyboard'] = hideKeyboard;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
-      kmw['setActiveElement']('ta');
+      kmw['beepKeyboard'] = beepKeyboard;
+      var ta = document.getElementById('ta');
+      kmw['setActiveElement'](ta);
 
       ta.readOnly = false;
 
@@ -56,29 +58,29 @@
       if(oskWidth <= 0) {
         oskWidth = window.jsInterface.getKeyboardWidth();
       }
-      window.console.log('Keyboard width = '+oskWidth);
+      //window.console.log('Keyboard width = '+oskWidth);
       return oskWidth;
+    }
+
+    function beepKeyboard() {
+      window.jsInterface.beepKeyboard();
     }
 
     // Query KMW if a given keyboard uses chiral modifiers.
     function setIsChiral(keyboardProperties) {
-      var name = typeof(keyboardProperties.internalName) == "undefined" ? keyboardProperties.keyboardName : keyboardProperties.internalName;
+      var name = typeof(keyboardProperties.internalName) == 'undefined' ? keyboardProperties.keyboardName : keyboardProperties.internalName;
       var kmw=window['keyman'];
       var isChiral = kmw.isChiral(name);
-      window.console.log('For keyboard "' + name + '"');
-      window.console.log('setIsChiral = ' + isChiral);
 
       window.jsInterface.setIsChiral(isChiral);
       return true;
     }
 
-    function setKeymanLanguage(keyboardName, internalName, languageName, langId, version, font, oskFont, packageId) {
-      //oskFont.files = ['NotoSansSyriacWestern-Regular.svg#NotoSansSyriacWesternRegular'];
-      //window.console.log('oskFonts = '+JSON.stringify(oskFont));
+    function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont, package) {
       var kmw=window['keyman'];
       var kbdInterface=kmw['interface'];
 
-      // Defaults for mising arguments
+      // Defaults for missing arguments
       switch (arguments.length) {
         case 1:
           internalName = keyboardName;
@@ -97,20 +99,42 @@
           break;
       }
 
-      kbdInterface.registerStub({KN:keyboardName,KI:'Keyboard_'+internalName,KLC:langId,KL:languageName,
-        KF:internalName+'-'+version+'.js',KFont:font,KOskFont:oskFont,KP:packageId});
-      kmw['setActiveKeyboard']('Keyboard_'+internalName,langId);
+      var k = {
+        KN:keyboardName,
+        KI:'Keyboard_'+internalName,
+        KLC:langId,
+        KL:languageName,
+        KF:kbdFile,
+        KP:package
+      };
+      if (font) {
+        k.KFont = font;
+        //window.console.log('keyboard.html assigning k.KFont = ' + font);
+      }
+      if (oskFont) {
+        k.KOskFont = oskFont;
+        //window.console.log('keyboard.html assigning k.KOskFont = ' + oskFont);
+      }
+      kbdInterface.registerStub(k);
+
+      kmw['setActiveKeyboard'](package + '::Keyboard_'+internalName,langId);
       kmw['osk']['show'](true);
     }
 
     function insertText(dn, s) {
-      window.console.log('insertText('+ dn +', ' + s +');');
+      //window.console.log('insertText('+ dn +', ' + s +');');
       window.jsInterface.insertText(dn, s);
     }
 
     function resetContext() {
       var kmw=window['keyman'];
       kmw.resetContext();
+    }
+
+    // Tell KMW to switch to "numeric" layer
+    function setNumericLayer() {
+      var kmw=window['keyman'];
+      kmw.setNumericLayer();
     }
 
     function updateKMText(text) {
@@ -181,7 +205,6 @@
       fragmentToggle = (fragmentToggle + 1) % 100;
       var kmw = window['keyman'];
       var pos = kmw['touchMenuPos']();
-      window.console.log('showHelpBubble ' + pos);
       window.location.hash = 'showHelpBubble-' + fragmentToggle + '+keyPos=' + pos;
     }
 
@@ -189,18 +212,18 @@
       var kmw=window['keyman'];
       
       // KMW only needs keyID to process the popup key. keyText merely logged to console
-      window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
+      //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
       kmw['executePopupKey'](keyID);
     }
 
     function executeHardwareKeystroke(code, shift, lstates) {
       var kmw=window['keyman'];
-      window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
+      //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
         var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
-        window.console.log('executeHardwareKeystroke completed with '+r);
+        //window.console.log('executeHardwareKeystroke completed with '+r);
       } catch(e) {
-        window.console.log('oops: '+e);
+        window.console.log('executeHardwareKeystroke exception: '+e);
       }
     }
 
@@ -224,8 +247,7 @@
 
   </script>
   <style type="text/css">
-      body {background-color:#000000; min-width:2500px;}
-     
+      body {background-color:#000000;}
   </style>
 </head>
 <body class="kmw-embedded keyman-app">

@@ -57,7 +57,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let keyboardInfo = Manager.shared.currentKeyboardInfo
+    let keyboardInfo = Manager.shared.currentKeyboard
     let currentKeyboardId = keyboardInfo?.id ?? Defaults.keyboard.id
     let userData = AppDelegate.activeUserDefaults()
     let keyboards = userData.userKeyboards
@@ -71,9 +71,7 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
     let url = "http://keyman.com/iphone-and-ipad/app/systemkeyboard/index.php" +
         "?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
-    #if DEBUG
-      NSLog("Set up page URL: %@", url)
-    #endif
+    log.debug("Set up page URL: \(url)")
   }
 
   func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest,

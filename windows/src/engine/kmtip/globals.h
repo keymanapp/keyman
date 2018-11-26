@@ -29,11 +29,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <windows.h>
-#include <ole2.h>
-#include <olectl.h>
-#include <msctf.h>
-
 #define assert(x)
 
 //
@@ -61,13 +56,13 @@ void LogPush(char *p);
 void LogPop();
 
 BOOL ShouldDebug_1();   // I4379
-int SendDebugMessage_1(char *msg);   // I4379
-int SendDebugMessageFormat_1(char *fmt, ...);   // I4379
+int SendDebugMessage_1(char *file, int line, char *msg);   // I4379
+int SendDebugMessageFormat_1(char *file, int line, char *fmt, ...);   // I4379
 void DebugLastError_1(char *file, int line, char *func, char *date);   // I4379
 
 
-#define SendDebugMessage(msg) (ShouldDebug() ? SendDebugMessage_1((msg)) : 0)
-#define SendDebugMessageFormat(msg,...) (ShouldDebug() ? SendDebugMessageFormat_1((msg),__VA_ARGS__) : 0)
+#define SendDebugMessage(msg) (ShouldDebug() ? SendDebugMessage_1(__FILE__, __LINE__, (msg)) : 0)
+#define SendDebugMessageFormat(msg,...) (ShouldDebug() ? SendDebugMessageFormat_1(__FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
 #define ShouldDebug() ShouldDebug_1()
 #define DebugLastError() (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,__DATE__))
 

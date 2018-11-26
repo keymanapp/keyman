@@ -1,12 +1,13 @@
 package com.keyman.android.tests.keyboardHarness;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -14,13 +15,16 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
+public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
 
   private KMTextView textView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
     KMManager.setDebugMode(true);
@@ -34,9 +38,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Chirality test keyboard
     HashMap<String, String> chiralityKBInfo = new HashMap<String, String>();
-    chiralityKBInfo.put(KMManager.KMKey_PackageID, "chirality");
+    chiralityKBInfo.put(KMManager.KMKey_PackageID, "cloud");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-    chiralityKBInfo.put(KMManager.KMKey_LanguageID, "eng");
+    chiralityKBInfo.put(KMManager.KMKey_LanguageID, "en");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
     chiralityKBInfo.put(KMManager.KMKey_LanguageName, "English");
     chiralityKBInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -45,14 +49,25 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     // Longpress test keyboard
     HashMap<String, String> longpressKBbInfo = new HashMap<String, String>();
-    longpressKBbInfo.put(KMManager.KMKey_PackageID, "longpress");
+    longpressKBbInfo.put(KMManager.KMKey_PackageID, "cloud");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
-    longpressKBbInfo.put(KMManager.KMKey_LanguageID, "eng");
+    longpressKBbInfo.put(KMManager.KMKey_LanguageID, "en");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
     longpressKBbInfo.put(KMManager.KMKey_LanguageName, "English");
     longpressKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
     longpressKBbInfo.put(KMManager.KMKey_Font, "code2001.ttf");
     KMManager.addKeyboard(this, longpressKBbInfo);
+
+    // Platform test keyboard
+    HashMap<String, String> platformtestKBbInfo = new HashMap<String, String>();
+    platformtestKBbInfo.put(KMManager.KMKey_PackageID, "cloud");
+    platformtestKBbInfo.put(KMManager.KMKey_KeyboardID, "platformtest");
+    platformtestKBbInfo.put(KMManager.KMKey_LanguageID, "en");
+    platformtestKBbInfo.put(KMManager.KMKey_KeyboardName, "platformtest Keyboard");
+    platformtestKBbInfo.put(KMManager.KMKey_LanguageName, "English");
+    platformtestKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
+    platformtestKBbInfo.put(KMManager.KMKey_Font, KeyboardFont);
+    KMManager.addKeyboard(this, platformtestKBbInfo);
   }
 
   @Override
@@ -82,7 +97,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onResume();
     KMManager.onResume();
     KMManager.addKeyboardEventListener(this);
-    KMManager.addKeyboardDownloadEventListener(this);
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
   }
 
   @Override
@@ -90,7 +105,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     super.onPause();
     KMManager.onPause();
     KMManager.removeKeyboardEventListener(this);
-    KMManager.removeKeyboardDownloadEventListener(this);
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
   }
 
   @Override
@@ -127,5 +144,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
     // Handle Keyman keyboard download finished event here if needed
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardInfo) {
   }
 }

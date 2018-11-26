@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.1024.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL="">1.0</Version>
+    <Name URL="">Test invalid kmx</Name>
+  </Info>
+  <Files>
+    <File>
+      <Name>test_invalid_kmx.kmx</Name>
+      <Description>Keyboard Test invalid kmx</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>test.doc</Name>
+      <Description>File test.doc</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.doc</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Test invalid kmx</Name>
+      <ID>test_invalid_kmx</ID>
+      <Version>1.0</Version>
+      <RTL>True</RTL>
+      <Languages/>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

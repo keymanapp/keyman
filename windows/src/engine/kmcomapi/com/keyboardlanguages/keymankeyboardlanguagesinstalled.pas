@@ -22,8 +22,16 @@ unit keymankeyboardlanguagesinstalled;
 interface
 
 uses
-  Windows, ActiveX, ComObj, keymanapi_TLB, StdVcl, keymanautoobject, KeymanContext,
-  keymanerrorcodes, internalinterfaces;
+  System.Win.ComObj,
+  System.Win.StdVcl,
+  Winapi.ActiveX,
+  Winapi.Windows,
+
+  keymanapi_TLB,
+  keymanautoobject,
+  KeymanContext,
+  keymanerrorcodes,
+  internalinterfaces;
 
 type
   TKeymanKeyboardLanguageList = TAutoObjectList;
@@ -78,24 +86,22 @@ begin
 end;
 
 procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
-var
-  FProfiles: TStringList;
-  i: Integer;
-  FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
-  RootPath: string;
-  FLangID: Integer;
-  FLocale: string;
-  FGUID: TGUID;
-begin
-  KL.MethodEnter(Self, 'DoRefresh', []);
-  try
-    { Iterate through something somewhere and get the languages associated with this profile? }
 
+  procedure RefreshProfiles;
+  var
+    FProfiles: TStringList;
+    i: Integer;
+    FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
+    RootPath: string;
+    FLangID: Integer;
+    FName, FLocale: string;
+    FGUID: TGUID;
+  begin
     FProfiles := TStringList.Create;
     with TRegistryErrorControlled.Create do
     try
       RootKey := HKEY_LOCAL_MACHINE;
-      RootPath := GetRegistryKeyboardInstallKey(FOwner.ID) + SRegKey_LanguageProfiles;
+      RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + SRegSubKey_LanguageProfiles;
       if OpenKeyReadOnly(RootPath) then
       begin
         GetKeyNames(FProfiles);
@@ -109,7 +115,10 @@ begin
             FLangID := ReadInteger(SRegValue_LanguageProfileLangID);
             FLocale := ReadString(SRegValue_LanguageProfileLocale);
             FGUID := StringToGUID(ReadString(SRegValue_KeymanProfileGUID));
-            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FLocale, FLangID, FGUID);
+            if ValueExists(SRegValue_LanguageProfileName)
+              then FName := ReadString(SRegValue_LanguageProfileName)
+              else FName := '';
+            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FLocale, FLangID, FGUID, FName);
             FLanguages.Add(FKeyboardLanguage);
           end;
         end;
@@ -118,6 +127,55 @@ begin
       Free;
       FProfiles.Free;
     end;
+  end;
+
+  function HasLanguage(BCP47: string): Boolean;
+  var
+    i: Integer;
+  begin
+    for i := 0 to FLanguages.Count - 1 do
+      if SameText((FLanguages[i] as IKeymanKeyboardLanguage).BCP47Code, BCP47) then
+        Exit(True);
+    Result := False;
+  end;
+
+  procedure RefreshSuggestedLanguages;
+  var
+    RootPath: string;
+    FIDs: TStringList;
+    i: Integer;
+    FName: string;
+    FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
+  begin
+    FIDs := TStringList.Create;
+    with TRegistryErrorControlled.Create do
+    try
+      RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + '\' + SRegSubKey_SuggestedLanguages;
+      if OpenKeyReadOnly(RootPath) then
+      begin
+        GetValueNames(FIDs);
+        for i := 0 to FIDs.Count - 1 do
+        begin
+          if not HasLanguage(FIDs[i]) then
+          begin
+            FName := ReadString(FIDs[i]);
+            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FIDs[i], 0, GUID_NULL, FName);
+            FLanguages.Add(FKeyboardLanguage);
+          end;
+        end;
+      end;
+    finally
+      Free;
+      FIDs.Free;
+    end;
+  end;
+
+begin
+  KL.MethodEnter(Self, 'DoRefresh', []);
+  try
+    RefreshProfiles;
+    RefreshSuggestedLanguages;
   finally
     KL.MethodExit(Self, 'DoRefresh');
   end;
@@ -140,7 +198,7 @@ begin
     FIconFileName := GetKeyboardIconFileName(FOwner.Filename);
     if not FileExists(FIconFileName) then
       FIconFileName := '';
-    Execute(FOwner.ID, FOwner.Name, BCP47Code, FIconFileName);   // I3768   // I4607
+    Execute(FOwner.ID, FOwner.Name, BCP47Code, FIconFileName, '');   // I3768   // I4607
   finally
     Free;
   end;

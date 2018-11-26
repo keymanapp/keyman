@@ -27,10 +27,8 @@ unit CompilePackage;
 interface
 
 uses
-  kpsfile, kmpinffile, PackageInfo, ProjectLog;
-
-type
-  TCompilePackageMessageEvent = procedure(Sender: TObject; msg: string; State: TProjectLogState) of object;
+  kpsfile, kmpinffile, PackageInfo,
+  Keyman.Developer.System.Project.ProjectLog;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
 
@@ -43,6 +41,7 @@ uses
   System.IniFiles,
   System.Zip,
 
+  BCP47Tag,
   OnlineConstants,
   VisualKeyboard,
   utilfiletypes,
@@ -50,6 +49,10 @@ uses
   RegistryKeys,
   kmxfile,
   KeymanDeveloperOptions,
+
+  Keyman.System.CanonicalLanguageCodeUtils,
+  Keyman.System.PackageInfoRefreshKeyboards,
+
   RedistFiles,
   TempFileManager;
 
@@ -75,6 +78,7 @@ type
     function Compile: Boolean;
     procedure CheckForDangerousFiles;
     procedure CheckKeyboardVersions;
+    procedure CheckKeyboardLanguages;
   end;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
@@ -120,14 +124,15 @@ begin
 
   WriteMessage(plsInfo, 'Compiling package ' + ExtractFileName(pack.FileName) + '...');
 
-  if pack.Info.Desc['Name'] = '' then
+  if Trim(pack.Info.Desc[PackageInfo_Name]) = '' then
   begin
     FatalMessage('You need to fill in the package name before building.');
     Exit;
   end;
 
   CheckForDangerousFiles;
-  CheckKeyboardVersions;   // I4690
+  CheckKeyboardVersions;
+  CheckKeyboardLanguages;
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -159,6 +164,7 @@ function TCompilePackage.BuildKMP: Boolean;
 var
   kmpinf: TKMPInfFile;
   psf: TPackageContentFile;
+  FPackageVersion: string;
   i: Integer;
   f: TTempFile;
 begin
@@ -166,18 +172,75 @@ begin
 
   kmpinf := TKMPInfFile.Create;
   try
-    { Create KMP.INF }
+    { Create KMP.INF and KMP.JSON }
 
     kmpinf.Assign(pack);
+
+    // Add keyboard information to the package 'for free'
+    // Note: this does not get us very far for mobile keyboards as
+    // they still require the .js to be added by the developer at this stage.
+    // But it ensures that all keyboards in the package are listed in the
+    // {Keyboards} section
+
+    with TPackageInfoRefreshKeyboards.Create(kmpinf) do
+    try
+      OnError := Self.FOnMessage;
+      if not Execute then
+      begin
+        WriteMessage(plsError, 'The package build was not successful.');
+        Exit;
+      end;
+    finally
+      Free;
+    end;
+
+    //
+    // Update the package version to the current compiled
+    // keyboard version.
+    //
+
+    if pack.KPSOptions.FollowKeyboardVersion then
+    begin
+      if kmpinf.Keyboards.Count = 0 then
+      begin
+        FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
+        Exit;
+      end;
+
+      FPackageVersion := kmpinf.Keyboards[0].Version;
+
+      for i := 1 to kmpinf.Keyboards.Count - 1 do
+        if kmpinf.Keyboards[i].Version <> FPackageVersion then
+        begin
+          FatalMessage(
+            'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
+            'and the keyboards have mismatching versions.');
+          Exit;
+        end;
+      kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;;
+    end;
+
     kmpinf.RemoveFilePaths;
-    kmpinf.FileName := FTempPath + '\kmp.inf';
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.inf';
     psf.Description := 'Package information';
     psf.CopyLocation := pfclPackage;
+
     kmpinf.Files.Add(psf);
+
+    psf := TPackageContentFile.Create(kmpinf);
+    psf.FileName := 'kmp.json';
+    psf.Description := 'Package information (JSON)';
+    psf.CopyLocation := pfclPackage;
+
+    kmpinf.Files.Add(psf);
+
+    kmpinf.FileName := FTempPath + '\kmp.inf';
     kmpinf.SaveIni;
+
+    kmpinf.FileName := FTempPath + '\kmp.json';
+    kmpinf.SaveJSON;
   finally
     kmpinf.Free;
   end;
@@ -190,14 +253,18 @@ begin
     { Create output file }
 
     try
+
+      if FileExists(FOutputFilename) then DeleteFile(FOutputFilename);
+
       with TZipFile.Create do
       try
         Open(FOutputFilename, TZipMode.zmWrite);
         Add(FTempPath + '\kmp.inf');
+        Add(FTempPath + '\kmp.json');
         for i := 0 to pack.Files.Count - 1 do
         begin
           if not FileExists(pack.Files[i].FileName) then
-            WriteMessage(plsWarning, 'Warning: File '+pack.Files[i].FileName+' does not exist.')
+            WriteMessage(plsWarning, 'File '+pack.Files[i].FileName+' does not exist.')
           else
           begin
             // When compiling the package, save the kvk keyboard into binary for delivery
@@ -226,12 +293,11 @@ begin
               Add(pack.Files[i].FileName);
           end;
         end;
-        if FileCount < pack.Files.Count + 1 then
+        if FileCount < pack.Files.Count + 2 then
           WriteMessage(plsError, 'The build was not successful. Some files were skipped.')
         else
         begin
           Result := True;
-          WriteMessage(plsInfo, 'Build successfully completed.');
         end;
         Close;
       finally
@@ -290,6 +356,12 @@ var
   ki: TKeyboardInfo;
 begin
   n := 0;
+
+  // The version information is checked separately if we use
+  // 'follow keyboard version'
+  if pack.KPSOptions.FollowKeyboardVersion then
+    Exit;
+
   for i := 0 to pack.Files.Count - 1 do
     if pack.Files[i].FileType = ftKeymanFile then Inc(n);
 
@@ -308,6 +380,45 @@ begin
       WriteMessage(plsWarning, Format(SKKeyboardPackageVersionMismatch,
         [ExtractFileName(pack.Files[i].FileName), ki.KeyboardVersion, pack.Info.Desc[PackageInfo_Version]]));
     ki.MemoryDump.Free;
+  end;
+end;
+
+const
+  SKKeyboardPackageLanguageNonCanonical = 'The keyboard %0:s has a non-canonical language ID "%1:s" (%2:s), should be "%3:s".';
+
+procedure TCompilePackage.CheckKeyboardLanguages;
+var
+  k: TPackageKeyboard;
+  l: TPackageKeyboardLanguage;
+  NewID: string;
+  Tag, NewTag: TBCP47Tag;
+begin
+  for k in pack.Keyboards do
+  begin
+    for l in k.Languages do
+    begin
+      Tag := TBCP47Tag.Create(l.ID);
+      NewID := TCanonicalLanguageCodeUtils.FindBestTag(l.ID);
+      if NewID = '' then
+      begin
+        // We don't have enough data to validate this tag
+        Continue;
+      end;
+
+      NewTag := TBCP47Tag.Create(NewID);
+      try
+        if (Tag.Script = '') and (NewTag.Script <> '') then
+        begin
+          // Only give non-canonical warning if the script tag is missing but should
+          // be present.
+          NewTag.Region := Tag.Region; // We don't care about region, don't give unhelpful info to developer
+          WriteMessage(plsWarning, Format(SKKeyboardPackageLanguageNonCanonical, [k.ID, l.ID, l.Name, NewTag.Tag]));
+        end;
+      finally
+        NewTag.Free;
+        Tag.Free;
+      end;
+    end;
   end;
 end;
 

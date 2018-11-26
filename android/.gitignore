@@ -15,6 +15,7 @@
 
 # Gradle generated files
 **/.gradle/
+build_file_checksums.ser
 
 # OS-specific files
 **/.DS_Store
@@ -25,4 +26,5 @@
 # keymanweb dependencies
 KMEA/app/src/main/assets/
 KMAPro/assets/keyman.js
+
 

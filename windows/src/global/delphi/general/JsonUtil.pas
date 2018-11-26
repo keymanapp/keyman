@@ -1,18 +1,18 @@
 (*
   Name:             JsonUtil
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      10 Oct 2014
 
   Modified Date:    30 May 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          10 Oct 2014 - mcdurdin - I4440 - V9.0 - If more than one language listed for a keyboard, the JSON file becomes invalid
                     30 May 2015 - mcdurdin - I4727 - Changing font while touch layout editor in Code mode results in broken \ rules
 *)
@@ -31,6 +31,7 @@ procedure PrettyPrintJSON(JSONValue: TJSONValue; OutputStrings: TStrings; indent
 function ParseJSONValue(const Data: string; var Offset: Integer): TJSONObject;   // I4035   // I4260
 function JSONDateToDateTime(const Value: string; var DateTime: TDateTime): Boolean;
 function DateTimeToJSONDate(ADateTime: TDateTime): string;
+function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObject;
 
 implementation
 
@@ -55,7 +56,7 @@ end;
 const INDENT_SIZE = 2;
 
 procedure PrettyPrintPair(JSONValue: TJSONPair; OutputStrings: TStrings; last: boolean; indent: integer);
-const TEMPLATE = '%s : %s';
+const TEMPLATE = '%s: %s';
 var
   line: string;
   newList: TStringList;
@@ -84,7 +85,7 @@ begin
       if i < JSONValue.Count - 1 then
         OutputStrings[OutputStrings.Count-1] := OutputStrings[OutputStrings.Count-1] + ',';   // I4440
    end;
-   OutputStrings.add(StringOfChar(' ', indent * INDENT_SIZE) + ']');
+   OutputStrings.add(StringOfChar(' ', (indent-1) * INDENT_SIZE) + ']');
 end;
 
 procedure PrettyPrintJSON(JSONValue: TJSONValue; OutputStrings: TStrings; indent: integer = 0);
@@ -156,6 +157,20 @@ begin
     end;
   except
     Result := '';
+  end;
+end;
+
+function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObject;
+var
+  ss: TStringStream;
+begin
+  ss := TStringStream.Create('', TEncoding.UTF8);
+  try
+    ss.LoadFromFile(Filename);
+    offset := 0;
+    Result := ParseJSONValue(ss.DataString, offset);
+  finally
+    ss.Free;
   end;
 end;
 

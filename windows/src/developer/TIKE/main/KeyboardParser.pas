@@ -1,8 +1,8 @@
 (*
   Name:             KeyboardParser
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    23 Feb 2016
@@ -43,7 +43,10 @@ uses
 
   ExtShiftState,
   kmxfile,
-  UKeymanTargets;
+  kmxfileconsts,
+  TextFileFormat,
+  UKeymanTargets,
+  utilfiletypes;
 
 {$ASSERTIONS ON}
 
@@ -316,12 +319,16 @@ const
     ssBitmap, ssVisualKeyboard, ssLayoutFile,
     ssKMW_EmbedJS, ssKMW_EmbedCSS, ssKMW_HelpFile, ssIncludeCodes);   // I4369
   KeyboardFeatureFilename: array[TKeyboardParser_FeatureID] of string = (
-    '%s.ico', '%s.kvks', '%s-layout.js',
+    '%s.ico', '%s'+Ext_VisualKeyboardSource, '%s'+Ext_KeymanTouchLayout,
     '%s-code.js', '%s.css', '%s-help.htm', '%s-codes.txt');   // I4369
+  KeyboardFeatureEditorFormat: array[TKeyboardParser_FeatureID] of TEditorFormat = (
+    efText, efXML, efJSON,
+    efJS, efCSS, efHTML, efText
+  );
   KeyboardFeatureTargets: array[TKeyboardParser_FeatureID] of TKeymanTargets = (   // I4504
     // Due to Delphi compiler limitation, need to copy the target values, can't
     // use the defined constants.
-    [ktWindows, ktMacosx, ktDesktop], //KMXKeymanTargets
+    [ktWindows, ktMacosx, ktLinux, ktDesktop], //KMXKeymanTargets
     [ktAny, ktWindows, ktMacosx, ktLinux, ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktDesktop, ktTablet], //AllKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //TouchKeymanTargets
     [ktWeb, ktIphone, ktIpad, ktAndroidphone, ktAndroidtablet, ktMobile, ktTablet], //KMWKeymanTargets
@@ -748,7 +755,7 @@ procedure TKeyboardParser_Comment.InitLine(ALine: WideString);
 begin
   inherited InitLine(ALine);
   Assert(WideSameText(GetTag(ALine), 'c'));
-  Value := Trim(ALine);
+  FValue := Trim(ALine);
 end;
 
 constructor TKeyboardParser_Comment.CreateNew(AValue: WideString; ANew: Boolean);

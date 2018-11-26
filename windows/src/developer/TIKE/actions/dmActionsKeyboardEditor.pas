@@ -121,6 +121,7 @@ type
     procedure actDebugViewStateUpdate(Sender: TObject);
     procedure actKeyboardFontHelperExecute(Sender: TObject);
     procedure actKeyboardFontsExecute(Sender: TObject);
+    procedure actKeyboardCompileUpdate(Sender: TObject);
   private
     function IsDebuggerVisible: Boolean;
     function IsDebuggerInTestMode: Boolean;
@@ -138,16 +139,20 @@ implementation
 uses
   ComObj,
   Forms,
-  kmnProjectFile,
-  kmnProjectFileUI,
-  KeymanDeveloperMemo,
-  ProjectFile,
-  ProjectFileUI,
+  KMDActions,
+  KMDActionInterfaces,
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.UI.Project.kmnProjectFileUI,
+  Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  UframeTextEditor,
   UfrmKeymanWizard,
   UfrmDebug,
   UfrmDebugStatus,
   UfrmMessages,
   UfrmMain,
+  UfrmPackageEditor,
   UKeymanTargets;
 
 {$R *.dfm}
@@ -159,24 +164,37 @@ begin
     else Result := nil;
 end;
 
+function ActivePackageEditor: TfrmPackageEditor;
+begin
+  if Assigned(frmKeymanDeveloper.ActiveChild) and (frmKeymanDeveloper.ActiveChild is TfrmPackageEditor)
+    then Result := frmKeymanDeveloper.ActiveChild as TfrmPackageEditor
+    else Result := nil;
+end;
+
 function ActiveProjectFile: TkmnProjectFile;
 begin
   Result := ActiveEditor.ProjectFile as TkmnProjectFile;
 end;
 
-function ActiveMemo: TKeymanDeveloperMemo;
+function ActivePackageProjectFile: TkpsProjectFile;
 begin
-  if Screen.ActiveControl is TKeymanDeveloperMemo
-    then Result := Screen.ActiveControl as TKeymanDeveloperMemo
-    else Result := nil;
+  Result := ActivePackageEditor.ProjectFile as TkpsProjectFile;
+end;
+
+function ActiveMemo: IKMDTextEditorActions;
+begin
+  Result := GetTextEditorController(Screen.ActiveControl);
 end;
 
 procedure TmodActionsKeyboardEditor.actionsKeyboardEditorUpdate(Action: TBasicAction; var Handled: Boolean);
 begin
   with Action as TAction do
   begin
-    Enabled := ActiveEditor <> nil;
-    if not Enabled then Handled := True;
+    if not Assigned(Action.OnUpdate) then
+    begin
+      Enabled := ActiveEditor <> nil;
+      if not Enabled then Handled := True;
+    end;
   end;
 end;
 
@@ -242,9 +260,9 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugSetClearBreakpointExecute(Sender: TObject);
 begin
-  if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelPar)
-    then ActiveEditor.DebugForm.ClearBreakpoint(ActiveMemo.SelPar)
-    else ActiveEditor.DebugForm.SetBreakpoint(ActiveMemo.SelPar);
+  if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
+    then ActiveEditor.DebugForm.ClearBreakpoint(ActiveMemo.SelectedRow)
+    else ActiveEditor.DebugForm.SetBreakpoint(ActiveMemo.SelectedRow);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSetClearBreakpointUpdate(Sender: TObject);
@@ -253,7 +271,7 @@ begin
   begin
     actDebugSetClearBreakpoint.Enabled := True;
     actDebugSetClearBreakpoint.Visible := True;
-    if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelPar)
+    if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
       then actDebugSetClearBreakpoint.Caption := 'Clear &Breakpoint'
       else actDebugSetClearBreakpoint.Caption := 'Set &Breakpoint';
   end
@@ -412,11 +430,23 @@ begin
 
   frmMessages.Clear;   // I4686
 
-  if not ActiveEditor.PrepareForBuild(DebugReset) then
-    Exit;
+  if ActiveEditor <> nil then
+  begin
+    if not ActiveEditor.PrepareForBuild(DebugReset) then
+      Exit;
 
-  if (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False) and DebugReset then   // I4686
-    ActiveEditor.StartDebugging;
+    if (ActiveProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False) and DebugReset then   // I4686
+      ActiveEditor.StartDebugging;
+  end
+  else if ActivePackageEditor <> nil then
+  begin
+    (ActivePackageProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False);
+  end;
+end;
+
+procedure TmodActionsKeyboardEditor.actKeyboardCompileUpdate(Sender: TObject);
+begin
+  actKeyboardCompile.Enabled := (ActiveEditor <> nil) or (ActivePackageEditor <> nil);
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardCreatePackageExecute(Sender: TObject);
@@ -443,7 +473,8 @@ end;
 procedure TmodActionsKeyboardEditor.actKeyboardIncludeDebugInformationUpdate(
   Sender: TObject);
 begin
-  if ActiveProjectFile <> nil
+  actKeyboardIncludeDebugInformation.Enabled := ActiveEditor <> nil;
+  if (ActiveEditor <> nil) and (ActiveProjectFile <> nil)
     then actKeyboardIncludeDebugInformation.Checked := (ActiveProjectFile.UI as TkmnProjectFileUI).Debug   // I4687
     else actKeyboardIncludeDebugInformation.Checked := False;
 end;

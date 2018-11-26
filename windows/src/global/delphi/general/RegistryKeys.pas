@@ -74,19 +74,27 @@ const
 
   { Keyman keys }
 
-  SRegKey_Software            = 'Software';                                         // LM CU
-  SRegKey__Tavultesoft        = SRegKey_Software            + '\Tavultesoft';       // LM CU
-  SRegKey_KeymanRoot          = SRegKey_Software            + '\Keyman';
-  SRegKey_KeymanEngineRoot    = SRegKey_KeymanRoot          + '\Keyman Engine';     // LM CU
+{$IFDEF WIN64}
+  SRegKey_Software_LM            = 'Software\WOW6432Node';                             // LM
+{$ELSE}
+  SRegKey_Software_LM            = 'Software';                                         // LM
+{$ENDIF}
+  SRegKey_Software_CU            = 'Software';                                         // CU
+  SRegKey_KeymanRoot_LM          = SRegKey_Software_LM         + '\Keyman';            // LM
+  SRegKey_KeymanRoot_CU          = SRegKey_Software_CU         + '\Keyman';            // CU
+  SRegKey_KeymanEngineRoot_LM    = SRegKey_KeymanRoot_LM       + '\Keyman Engine';     // LM
+  SRegKey_KeymanEngineRoot_CU    = SRegKey_KeymanRoot_CU       + '\Keyman Engine';     // CU
 
-  SRegKey_SoftwareKeyman = SRegKey_Software + '\Keyman';
+  SRegKey_SoftwareKeyman_LM      = SRegKey_KeymanRoot_LM;
+  SRegKey_SoftwareKeyman_CU      = SRegKey_KeymanRoot_CU;
 
   { Keyman base key and values }
 
-  SRegKey_KeymanEngine        = SRegKey_KeymanEngineRoot    + '\'+SKeymanVersion;               // LM CU
-  SRegKey_KeymanEngineDiag    = SRegKey_KeymanEngine + '\Diag';                     // CU
+  SRegKey_KeymanEngine_LM     = SRegKey_KeymanEngineRoot_LM;     // LM
+  SRegKey_KeymanEngine_CU     = SRegKey_KeymanEngineRoot_CU;     // CU
+  SRegKey_KeymanEngineDiag_CU = SRegKey_KeymanEngine_CU + '\Diag';                     // CU
 
-  SregKey_KeymanHotkeys       = SRegKey_KeymanEngine + '\hotkeys';
+  SregKey_KeymanHotkeys_CU    = SRegKey_KeymanEngine_CU + '\hotkeys';
 
   SRegValue_RootKeyboardAdminPath   = 'root keyboard admin path';                   // LM
   SRegValue_RootKeyboardUserPath    = 'root keyboard user path';                    // CU
@@ -128,8 +136,8 @@ const
 
   { On Screen Keyboard Settings }
 
-  SRegKey_KeymanOSK = SRegKey_KeymanEngine + '\On Screen Keyboard';
-  SRegKey_KeymanOSK_CharMap = SRegKey_KeymanOSK + '\Character Map';
+  SRegKey_KeymanOSK_CU         = SRegKey_KeymanEngine_CU + '\On Screen Keyboard';
+  SRegKey_KeymanOSK_CharMap_CU = SRegKey_KeymanOSK_CU + '\Character Map';
 
   SRegValue_OSK_ShowVisualKeyboard          = 'show visual keyboard';                // CU
   SRegValue_OSK_FadeVisualKeyboard          = 'fade visual keyboard';                // CU
@@ -141,25 +149,27 @@ const
 
   SRegValue_ConfigurationState              = 'configuration state';                 // CU
 
-  SRegKey_KeymanRegisteredWindows           = SRegKey_KeymanRoot+'\Window References';       // CU  // I2720
+  SRegKey_KeymanRegisteredWindows_CU        = SRegKey_KeymanRoot_CU+'\Window References';       // CU  // I2720
 
   { Hint Settings - CU }
 
   SRegValue_EnableHints = 'enable hints';
-  SRegKey_Hints = 'hints';
+  SRegSubKey_Hints = 'hints';
 
   { Keyman Desktop }
 
-  SRegKey_KeymanDesktopRoot = SRegKey_KeymanRoot + '\Keyman Desktop';
-  SRegKey_KeymanDesktop = SRegKey_KeymanDesktopRoot + '\' + SKeymanVersion;
+  SRegKey_KeymanDesktopRoot_CU = SRegKey_KeymanRoot_CU + '\Keyman Desktop';
+  SRegKey_KeymanDesktopRoot_LM = SRegKey_KeymanRoot_LM + '\Keyman Desktop';
+  SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU;
+  SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM;
 
   { Other Keyman Settings }
 
   SRegValue_DeadkeyConversionMode       = 'deadkey conversion mode';                // CU   // I4552
   SRegValue_UnderlyingLayout            = 'underlying layout';                      // CU
 
-  SRegKey_AppInitDLLs                   = 'Software\Microsoft\Windows NT\CurrentVersion\Windows';  // LM
-  SRegValue_AppInitDLLs                 = 'AppInit_DLLs';                                          // LM
+//  SRegKey_AppInitDLLs                   = 'Software\Microsoft\Windows NT\CurrentVersion\Windows';  // LM
+//  SRegValue_AppInitDLLs                 = 'AppInit_DLLs';                                          // LM
 
   SRegKey_KeyboardLayoutToggle          = 'keyboard layout\toggle';                 // CU  // I2522
   SRegValue_Toggle_Hotkey               = 'Hotkey';
@@ -173,27 +183,27 @@ const
 
   { ActiveKeyboards }
 
-  SRegKey_ActiveKeyboards = SRegKey_KeymanEngine + '\Active Keyboards';                   // CU
+  SRegKey_ActiveKeyboards_CU = SRegKey_KeymanEngine_CU + '\Active Keyboards';                   // CU
 
-  SRegKeyNode_KeyboardOptions = 'Options';  // CU\ActiveKeyboards\<id>\Options
+  SRegSubKey_KeyboardOptions = 'Options';  // CU\ActiveKeyboards\<id>\Options
 
   SRegValue_KeymanID            = 'keyman id';                                      // CU
   SRegValue_Legacy_KeymanInstalledLanguage = 'keyman installed language';                  // CU   // I4220
 
-  SRegKey_SharedOptionsSubKey = 'shared';                                             // CU
+  SRegSubKey_SharedOptions = 'shared';                                             // CU
 
   { ActiveLanguages }
 
-  SRegKey_ActiveLanguages = SRegKey_KeymanEngine + '\Active Languages';                   // CU
-  SRegKey_LanguageHotkeys = SRegKey_KeymanEngine + '\Language Hotkeys';                   // CU
+  SRegKey_ActiveLanguages_CU = SRegKey_KeymanEngine_CU + '\Active Languages';                   // CU
+  SRegKey_LanguageHotkeys_CU = SRegKey_KeymanEngine_CU + '\Language Hotkeys';                   // CU
 
   { InstalledKeyboards }
 
-  SRegKey_InstalledKeyboards = SRegKey_KeymanEngine + '\Installed Keyboards';             // LM CU
+  SRegKey_InstalledKeyboards_LM = SRegKey_KeymanEngine_LM + '\Installed Keyboards';             // LM
+  SRegKey_InstalledKeyboards_CU = SRegKey_KeymanEngine_CU + '\Installed Keyboards';             // CU
 
   SRegValue_KeymanFile_MnemonicOverride = 'keyman file mnemonic override';          // LM   // I4169
   SRegValue_KeymanFile_MnemonicOverride_Deadkey = 'keyman file mnemonic override deadkey';          // LM   // I4552
-  SRegValue_KeymanDefaultHotkey = 'keyman default hotkey';                          // LM CU
   SRegValue_KeymanFile          = 'keyman file';                                    // LM CU
   SRegValue_Legacy_KeymanKeyboardID    = 'keyman keyboard id';                             // LM CU   // I3613
   SRegValue_PackageName         = 'package name';                                   // LM CU
@@ -202,31 +212,35 @@ const
 
   SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM CU   // I3581
 
+  SRegSubKey_SuggestedLanguages = 'Suggested Languages';                            // LM
+
   { Language Profiles }
 
   {$MESSAGE HINT 'Refactor this to use SRegKeyNode naming (no prefix \); fixup references'}
-  SRegKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM CU
+  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM CU
   SRegValue_LanguageProfileLangID = 'LangID';
   SRegValue_LanguageProfileLocale = 'Locale';
+  SRegValue_LanguageProfileName = 'Name';
 
   { InstalledPackages }
 
-  SRegKey_InstalledPackages = SRegKey_KeymanEngine + '\Installed Packages';               // LM CU
+  SRegKey_InstalledPackages_LM = SRegKey_KeymanEngine_LM + '\Installed Packages';               // LM
+  SRegKey_InstalledPackages_CU = SRegKey_KeymanEngine_CU + '\Installed Packages';               // CU
 
   SRegValue_PackageDescription  = 'package description';                            // LM CU
   SRegValue_PackageFile  = 'package inf file';                                      // LM CU
 
   { Latin keyboard cache }
 
-  SRegKey_LatinKeyboardCache = SRegKey_KeymanEngine + '\Latin Keyboard Cache';      // LM   // I4169
+  SRegKey_LatinKeyboardCache_LM = SRegKey_KeymanEngine_LM + '\Latin Keyboard Cache';      // LM   // I4169
 
   { Internet Explorer feature control }
 
-  SRegKey_InternetExplorerFeatureBrowserEmulation = 'Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION';   // I4436
+  SRegKey_InternetExplorerFeatureBrowserEmulation_CU = 'Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION';   // I4436
 
   { System KeyboardLayouts }
 
-  SRegKey_KeyboardLayouts = 'System\CurrentControlSet\Control\keyboard layouts';    // LM
+  SRegKey_KeyboardLayouts_LM = 'System\CurrentControlSet\Control\keyboard layouts';    // LM
 
   SRegValue_LayoutDisplayName                = 'layout display name';               // LM
   SRegValue_KeyboardLayoutText               = 'layout text';                       // LM
@@ -240,9 +254,9 @@ const
 
   { User-installed keyboards/languages }
 
-  SRegKey_KeyboardLayout = 'keyboard layout';                                       // CU
-  SRegKey_KeyboardLayoutPreload = 'keyboard layout\preload';                        // CU
-  SRegKey_KeyboardLayoutSubstitutes = 'keyboard layout\substitutes';                // CU
+  SRegKey_KeyboardLayout_CU = 'keyboard layout';                                       // CU
+  SRegKey_KeyboardLayoutPreload_CU = 'keyboard layout\preload';                        // CU
+  SRegKey_KeyboardLayoutSubstitutes_CU = 'keyboard layout\substitutes';                // CU
 
   { User profile keys }
 
@@ -250,22 +264,23 @@ const
 
   { Font keys }
 
-  SRegKey_FontList   = 'Software\Microsoft\Windows\CurrentVersion\Fonts';           // LM
-  SRegKey_NTFontList = 'Software\Microsoft\Windows NT\CurrentVersion\Fonts';        // LM
+  SRegKey_FontList_LM   = 'Software\Microsoft\Windows\CurrentVersion\Fonts';           // LM
+  SRegKey_NTFontList_LM = 'Software\Microsoft\Windows NT\CurrentVersion\Fonts';        // LM
 
   { Run with Windows keys }
 
-  SRegKey_WindowsRun                   = 'Software\Microsoft\Windows\CurrentVersion\Run';  // CU, LM
-  SRegKey_WindowsRunOnce               = 'Software\Microsoft\Windows\CurrentVersion\RunOnce';  // CU, LM
+  SRegKey_WindowsRun_CU                   = 'Software\Microsoft\Windows\CurrentVersion\Run';  // CU, LM
+  SRegKey_WindowsRun_LM                   = 'Software\Microsoft\Windows\CurrentVersion\Run';  // CU, LM
+  SRegKey_WindowsRun_Wow64_LM             = 'Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Run';  // CU, LM
+  SRegKey_WindowsRunOnce_CU               = 'Software\Microsoft\Windows\CurrentVersion\RunOnce';  // CU, LM
+  SRegKey_WindowsRunOnce_LM               = 'Software\Microsoft\Windows\CurrentVersion\RunOnce';  // CU, LM
+  SRegKey_WindowsRunOnce_Wow64_LM         = 'Software\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce';  // CU, LM
+
   SRegValue_WindowsRunOnce_Setup       = 'keyman-setup.exe';                                // CU
 
   SRegValue_WindowsRun_Keyman          = 'Keyman';
 
   SRegValue_LanguageCheckDisabledItems = 'language check disabled items'; // CU
-
-  { Upgrade temporary keys }
-
-  SRegKey_UpgradeBackupPath = '\'+SRegKey_KeymanEngine+'\Upgrade Backup\';  // I2642
 
 {-------------------------------------------------------------------------------
  - Keyman Developer keys and values                                            -
@@ -273,25 +288,29 @@ const
 
   { Keyman Developer Keys }
 
-  SRegKey_KeymanDeveloperRoot = SRegKey_KeymanRoot          + '\Keyman Developer';  // LM CU
-  SRegKey_KeymanDeveloper     = SRegKey_KeymanDeveloperRoot + '\'+SKeymanVersion;               // LM CU
-  SRegKey_IDE                 = SRegKey_KeymanDeveloper     + '\IDE';                // CU
-  SRegKey_IDEDock             = SRegKey_IDE                 + '\Dock';              // CU
-  SRegKey_IDEFiles            = SRegKey_IDE                 + '\Files';               // CU
-  SRegKey_IDEOptions          = SRegKey_IDE                 + '\Options';             // CU
-  SRegKey_IDECharacterMap     = SRegKey_IDE                 + '\Character Map';             // CU
-  SRegKey_IDEColours          = SRegKey_IDE                 + '\Colours';             // CU
-  SRegKey_IDEEditFonts        = SRegKey_IDE                 + '\EditFonts';           // CU
-  SRegKey_IDETestFonts        = SRegKey_IDE                 + '\TestFonts';           // CU
-  SRegKey_IDEVisualKeyboard   = SRegKey_IDE                 + '\VisualKeyboard';      // CU
-  SRegKey_IDEToolbars         = SRegKey_IDE                 + '\Toolbars';            // CU
-  SRegKey_KCT                 = SRegKey_KeymanDeveloper     + '\KCT';               // LM CU
-  SRegKey_KCTFiles            = SRegKey_KCT                 + '\Files';             // CU
+  SRegKey_KeymanDeveloperRoot_CU = SRegKey_KeymanRoot_CU          + '\Keyman Developer';  // LM CU
+  SRegKey_KeymanDeveloper_CU     = SRegKey_KeymanDeveloperRoot_CU;               // LM CU
 
-  SRegKey_IDEOnline          = SRegKey_IDE                + '\Online';              // CU
-  SRegKey_IDE_BrandingPackTest = SRegKey_IDE              + '\Branding Pack\Test';  // CU   // I4873
+  SRegKey_KeymanDeveloperRoot_LM = SRegKey_KeymanRoot_LM          + '\Keyman Developer';  // LM CU
+  SRegKey_KeymanDeveloper_LM     = SRegKey_KeymanDeveloperRoot_LM;               // LM CU
 
-  SRegKey_CRM                = SRegKey_KeymanDeveloper    + '\CRM';                 // CU
+  SRegKey_IDE_CU                 = SRegKey_KeymanDeveloper_CU     + '\IDE';                // CU
+  SRegKey_IDEDock_CU             = SRegKey_IDE_CU                 + '\Dock';              // CU
+  SRegKey_IDEFiles_CU            = SRegKey_IDE_CU                 + '\Files';               // CU
+  SRegKey_IDEOptions_CU          = SRegKey_IDE_CU                 + '\Options';             // CU
+  SRegKey_IDECharacterMap_CU     = SRegKey_IDE_CU                 + '\Character Map';             // CU
+  SRegKey_IDEColours_CU          = SRegKey_IDE_CU                 + '\Colours';             // CU
+  SRegKey_IDEEditFonts_CU        = SRegKey_IDE_CU                 + '\EditFonts';           // CU
+  SRegKey_IDETestFonts_CU        = SRegKey_IDE_CU                 + '\TestFonts';           // CU
+  SRegKey_IDEVisualKeyboard_CU   = SRegKey_IDE_CU                 + '\VisualKeyboard';      // CU
+  SRegKey_IDEToolbars_CU         = SRegKey_IDE_CU                 + '\Toolbars';            // CU
+//  SRegKey_KCT                 = SRegKey_KeymanDeveloper_CU     + '\KCT';               // LM CU
+//  SRegKey_KCTFiles            = SRegKey_KCT_CU                 + '\Files';             // CU
+
+//  SRegKey_IDEOnline          = SRegKey_IDE_CU                + '\Online';              // CU
+//  SRegKey_IDE_BrandingPackTest = SRegKey_IDE_CU              + '\Branding Pack\Test';  // CU   // I4873
+
+//  SRegKey_CRM                = SRegKey_KeymanDeveloper    + '\CRM';                 // CU
 
   SRegValue_CheckForUpdates   = 'check for updates'; // CU
   SRegValue_LastUpdateCheckTime = 'last update check time'; // CU
@@ -349,6 +368,7 @@ const
   SRegValue_IDEOptUseSyntaxHighlighting = 'use syntax highlighting';               // CU
   SRegValue_IDEOptToolbarVisible   = 'toolbar visible';                            // CU
   SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
+  SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
 
   SRegValue_IDEOptShowStartupDialog       = 'show startup dialog';                 // CU
   //SRegValue_IDEOptShowStartupHelperDialog = 'show startup helper dialog';          // CU
@@ -376,7 +396,7 @@ const
 
   { SRegKey_KCT values }
 
-  SRegValue_KCTTemplatePath = 'template path';                                      // LM
+//  SRegValue_KCTTemplatePath = 'template path';                                      // LM
 
 {-------------------------------------------------------------------------------
  - Shared keys and values                                                      -
@@ -389,62 +409,19 @@ const
 
   { Uninstall feedback keyboard list }
 
-  SRegKey_UninstallBackupKeyboards = 'Software\KeymanDesktop_UninstallKeyboards';        // CU  // I1729
-
-{-------------------------------------------------------------------------------
- -
- -------------------------------------------------------------------------------}
+  SRegKey_UninstallBackupKeyboards_CU = 'Software\KeymanDesktop_UninstallKeyboards';        // CU  // I1729
 
   { Debugging keys and values }
 
-  SRegKey_KeymanDebug = SRegKey_KeymanRoot + '\Debug';
+  SRegKey_KeymanDebug_CU = SRegKey_KeymanRoot_CU + '\Debug';
   SRegValue_Debug_TikeDebugMode = 'TikeDebugMode';
 
-  SRegKey_DelphiProjectManager = SRegKey_SoftwareKeyman + '\DelphiProjectManager';
+  SRegKey_DelphiProjectManager_CU = SRegKey_SoftwareKeyman_CU + '\DelphiProjectManager';
   SRegValue_CallbackWindow = 'CallbackWindow';
 
-  SRegKey_Keyman_Exception = SRegKey_KeymanRoot + '\Exception';
+  SRegKey_Keyman_Exception_CU = SRegKey_KeymanRoot_CU + '\Exception';
   SRegValue_SymbolPath = 'SymbolPath';
 
-{-------------------------------------------------------------------------------
- - Upgrade-related keys
- -------------------------------------------------------------------------------}
-
-const
-  SRegKey_TavultesoftKeyman = SRegKey__Tavultesoft + '\Keyman';
-  SRegKey_Keyman60 = SRegKey_TavultesoftKeyman + '\'+SKeymanVersion60;
-  SRegKey_Keyman70 = SRegKey_TavultesoftKeyman + '\'+SKeymanVersion70;
-  SRegKey_Keyman80 = SRegKey_TavultesoftKeyman + '\'+SKeymanVersion80;
-
-  SRegKey_TavultesoftKeymanEngine = SRegKey__Tavultesoft + '\Keyman Engine';
-  SRegKey_KeymanEngine70 = SRegKey_TavultesoftKeymanEngine + '\'+SKeymanVersion70;
-  SRegKey_KeymanEngine80 = SRegKey_TavultesoftKeymanEngine + '\'+SKeymanVersion80;
-  SRegKey_KeymanEngine90 = SRegKey_TavultesoftKeymanEngine + '\'+SKeymanVersion90;
-
-  SRegKey_Keyman60_InstalledPackages = SRegKey_Keyman60 + '\Installed Packages';
-  SRegKey_Keyman60_InstalledKeyboards = SRegKey_Keyman60 + '\Installed Keyboards';
-  SRegKey_Keyman60_ActiveKeyboards = SRegKey_Keyman60 + '\Active Keyboards';
-
-  SRegKey_KeymanEngine70_InstalledPackages = SRegKey_KeymanEngine70+'\Installed Packages';
-  SRegKey_KeymanEngine70_InstalledKeyboards = SRegKey_KeymanEngine70+'\Installed Keyboards';
-  SRegKey_KeymanEngine70_ActiveKeyboards = SRegKey_KeymanEngine70+'\Active Keyboards';
-
-  SRegKey_KeymanEngine80_ActiveLanguages = SRegKey_KeymanEngine80+'\Active Languages';
-  SRegKey_KeymanEngine80_InstalledPackages = SRegKey_KeymanEngine80+'\Installed Packages';
-  SRegKey_KeymanEngine80_InstalledKeyboards = SRegKey_KeymanEngine80+'\Installed Keyboards';
-  SRegKey_KeymanEngine80_ActiveKeyboards = SRegKey_KeymanEngine80+'\Active Keyboards';
-
-  SRegKey_KeymanEngine90_ActiveLanguages = SRegKey_KeymanEngine90+'\Active Languages';
-  SRegKey_KeymanEngine90_InstalledPackages = SRegKey_KeymanEngine90+'\Installed Packages';
-  SRegKey_KeymanEngine90_InstalledKeyboards = SRegKey_KeymanEngine90+'\Installed Keyboards';
-  SRegKey_KeymanEngine90_ActiveKeyboards = SRegKey_KeymanEngine90+'\Active Keyboards';
-
-  SRegKey_KeymanEngine90_ProductOptions_Desktop_Pro = SRegKey_KeymanEngine90 + '\Product Options\desktop_pro';
-  SRegKey_KeymanEngine80_ProductOptions_Desktop_Pro = SRegKey_KeymanEngine80 + '\Product Options\desktop_pro';
-  SRegKey_KeymanEngine70_ProductOptions_Desktop_Pro = SRegKey_KeymanEngine70 + '\Product Options\desktop_pro';
-  SRegKey_KeymanEngine70_ProductOptions_Desktop_Light = SRegKey_KeymanEngine70 + '\Product Options\desktop_light';
-
-  SRegValue_Legacy_KeymanActiveHotkey = 'keyman active hotkey';
 
 // Fixed path names
 const
@@ -453,13 +430,12 @@ const
   // AD = CSIDL_APPDATA
   // CAD = CSIDL_COMMON_APPDATA
 
-  SFolderTavultesoft_                = 'Tavultesoft';                              // PF, PFC, AD, CAD
   SFolderKeymanRoot                 = 'Keyman';
-  SFolderKeymanEngine               = SFolderKeymanRoot + '\Keyman Engine '+SKeymanVersion;
+  SFolderKeymanEngine               = SFolderKeymanRoot + '\Keyman Engine';
   SFolderKeymanKeyboard             = SFolderKeymanEngine + '\Keyboard';
-  SFolderShared                     = SFolderKeymanRoot + '\Shared Data '+SKeymanVersion;
+  SFolderShared                     = SFolderKeymanRoot + '\Shared Data';
   SFolderSharedDatabases            = SFolderShared + '\Databases';
-  SFolderKeymanDeveloper            = SFolderKeymanRoot + '\Keyman Developer '+SKeymanVersion;
+  SFolderKeymanDeveloper            = SFolderKeymanRoot + '\Keyman Developer';
   SFolderKeymanDeveloperTemplates   = SFolderKeymanDeveloper + '\Templates';
   SFolderRegressionTests            = SFolderKeymanDeveloper + '\Regression Tests';
 
@@ -467,19 +443,19 @@ const
 
   SFolderKeymanEngineDiag           = SFolderKeymanRoot + '\Diag';
 
-function BuildKeyboardOptionKey(const KeyboardID: string): string;
-function BuildKeyboardLanguageProfilesKey(const KeyboardID: string): string;
+function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
+function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
 
 implementation
 
-function BuildKeyboardOptionKey(const KeyboardID: string): string;
+function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
 begin
-  Result := SRegKey_ActiveKeyboards + '\' + KeyboardID + '\' + SRegKeyNode_KeyboardOptions;
+  Result := SRegKey_ActiveKeyboards_CU + '\' + KeyboardID + '\' + SRegSubKey_KeyboardOptions;
 end;
 
-function BuildKeyboardLanguageProfilesKey(const KeyboardID: string): string;
+function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
 begin
-  Result := SRegKey_InstalledKeyboards + '\' + KeyboardID + SRegKey_LanguageProfiles;
+  Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + SRegSubKey_LanguageProfiles;
 end;
 
 end.

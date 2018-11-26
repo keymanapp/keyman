@@ -13,10 +13,13 @@
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
 @property (nonatomic, weak) IBOutlet WebView *webView;
 @property (nonatomic, weak) IBOutlet NSButton *alwaysShowOSKCheckBox;
+@property (nonatomic, weak) IBOutlet NSButton *useVerboseLoggingCheckBox;
+@property (nonatomic, weak) IBOutlet NSTextField *verboseLoggingInfo;
 @property (nonatomic, strong) NSMutableArray *tableContents;
 @property (nonatomic, strong) NSTimer *reloadTimer;
 @property (nonatomic, strong) NSDate *lastReloadDate;
 @property (nonatomic, strong) NSAlert *deleteAlertView;
+@property (nonatomic, strong) NSAlert *confirmKmpInstallAlertView;
 @end
 
 @implementation KMConfigurationWindowController
@@ -56,11 +59,10 @@
     [self startTimer];
     
     [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
-    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://help.keyman.com/products/macosx/"]]];
-    if (self.AppDelegate.alwaysShowOSK)
-        [self.alwaysShowOSKCheckBox setState:NSOnState];
-    else
-        [self.alwaysShowOSKCheckBox setState:NSOffState];
+    [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://help.keyman.com/products/macosx/"]]];
+
+    [self.alwaysShowOSKCheckBox setState:(self.AppDelegate.alwaysShowOSK ? NSOnState : NSOffState)];
+    [self.useVerboseLoggingCheckBox setState:(self.AppDelegate.useVerboseLogging ? NSOnState : NSOffState)];
 }
 
 - (void)setTableView:(NSTableView *)tableView {
@@ -300,12 +302,15 @@
 
 - (void)checkBoxAction:(id)sender {
     NSButton *checkBox = (NSButton *)sender;
+    NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
     if (checkBox.state == NSOnState) {
-        [self.activeKeyboards addObject:[self kmxFilePathAtIndex:checkBox.tag]];
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Adding active keyboard: %@", kmxFilePath);
+        [self.activeKeyboards addObject:kmxFilePath];
         [self saveActiveKeyboards];
     }
     else if (checkBox.state == NSOffState) {
-        [self.activeKeyboards removeObject:[self kmxFilePathAtIndex:checkBox.tag]];
+        [self.activeKeyboards removeObject:kmxFilePath];
         [self saveActiveKeyboards];
     }
 }
@@ -368,10 +373,54 @@
 
 - (IBAction)alwaysShowOSKCheckBoxAction:(id)sender {
     NSButton *checkBox = (NSButton *)sender;
-    if (checkBox.state == NSOnState)
-        [self.AppDelegate setAlwaysShowOSK:YES];
-    else if (checkBox.state == NSOffState)
-        [self.AppDelegate setAlwaysShowOSK:NO];
+    [self.AppDelegate setAlwaysShowOSK:(checkBox.state == NSOnState)];
+}
+
+- (IBAction)useVerboseLoggingCheckBoxAction:(id)sender {
+    NSButton *checkBox = (NSButton *)sender;
+    BOOL verboseLoggingOn = checkBox.state == NSOnState;
+    [self.AppDelegate setUseVerboseLogging:verboseLoggingOn];
+    [self.verboseLoggingInfo setHidden:!verboseLoggingOn];
+}
+
+- (void)handleRequestToInstallPackage:(KMPackage *) package {
+    NSString *infoFmt = NSLocalizedString(@"Do you want the Keyman Input Method to install this Package?\rFile: %@", @"Alert informative text when user double-clicks a KMP file. Parameter is the name of the KMP file.");
+    [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:infoFmt, package.getOrigKmpFilename]];
+    
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"Asking user to confirm installation of %@...", package.getOrigKmpFilename);
+        NSLog(@"KMP - temp file name: %@", package.getTempKmpFilename);
+    }
+    
+    [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window
+                                                modalDelegate:self
+                                               didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                                                  contextInfo:(__bridge void *)(package)];
+}
+
+- (void)installPackageFile:(NSString *)kmpFile {
+    // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
+    
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"KMP - Ready to unzip/install Package File: %@", kmpFile);
+    }
+    
+    BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
+    
+    if (!didUnzip) {
+        NSAlert *failure = [[NSAlert alloc] init];
+        [failure addButtonWithTitle:NSLocalizedString(@"OK", @"Alert button")];
+        [failure setMessageText:NSLocalizedString(@"Failed to unzip Keyman Package!", @"Alert message when user double-clicks a KMP file that cannot be unzipped.")];
+        [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
+        [failure setAlertStyle:NSWarningAlertStyle];
+        [failure beginSheetModalForWindow:self.window
+                            modalDelegate:self
+                           didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                              contextInfo:nil];
+    }
+    else if ([self.AppDelegate debugMode]) {
+        NSLog(@"Completed installation of KMP file.");
+    }
 }
 
 - (void)startTimer {
@@ -428,37 +477,67 @@
         [_deleteAlertView addButtonWithTitle:@"OK"];
         [_deleteAlertView addButtonWithTitle:@"Cancel"];
         [_deleteAlertView setAlertStyle:NSWarningAlertStyle];
+        [_deleteAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
     
     return _deleteAlertView;
 }
 
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-    if (returnCode == NSAlertFirstButtonReturn) {
-        // OK
-        NSNumber *n = (__bridge NSNumber *)contextInfo;
-        NSInteger index = [n integerValue];
-        NSString *path2Remove = nil;
-        NSString *kmxFilePath = [self kmxFilePathAtIndex:index];
-        if (kmxFilePath == nil) {
-            kmxFilePath = [self kmxFilePathAtIndex:index+1];
-            path2Remove = [[self keyboardsPath] stringByAppendingPathComponent:[self packageFolderFromPath:kmxFilePath]];
-        }
-        else {
-            path2Remove = kmxFilePath;
-        }
-        
-        NSError *error;
-        [[NSFileManager defaultManager] removeItemAtPath:path2Remove error:&error];
-        if (error == nil) {
-            [self performSelector:@selector(timerAction:) withObject:nil afterDelay:1.0];
-        }
-    }
-    else if (returnCode == NSAlertSecondButtonReturn) {
-        // Cancel
+- (NSAlert *)confirmKmpInstallAlertView {
+    if (_confirmKmpInstallAlertView == nil) {
+        _confirmKmpInstallAlertView = [[NSAlert alloc] init];
+        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"Yes", @"Alert button")];
+        [_confirmKmpInstallAlertView addButtonWithTitle:NSLocalizedString(@"No", @"Alert button")];
+        [_confirmKmpInstallAlertView setMessageText:NSLocalizedString(@"Install Keyman Package?", @"Alert message text when user double-clicks a KMP file.")];
+        [_confirmKmpInstallAlertView setAlertStyle:NSInformationalAlertStyle];
+        [_confirmKmpInstallAlertView setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     }
     
-    _deleteAlertView = nil;
+    return _confirmKmpInstallAlertView;
 }
 
+- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
+    if ([self.AppDelegate debugMode]) {
+        NSLog(@"User responded to NSAlert");
+    }
+    if (alert == _deleteAlertView) {
+        if (returnCode == NSAlertFirstButtonReturn) { // OK
+            [self deleteFileAtIndex:(__bridge NSNumber *)contextInfo];
+        }
+        
+        _deleteAlertView = nil;
+    }
+    else if (alert == _confirmKmpInstallAlertView) {
+        KMPackage *package = (__bridge KMPackage *)contextInfo;
+        if ([self.AppDelegate debugMode]) {
+            NSLog(@"KMP - Temp file: %@", package.getTempKmpFilename);
+        }
+        if (returnCode == NSAlertFirstButtonReturn) { // Yes
+            [self installPackageFile: package.getTempKmpFilename];
+        }
+        
+        [package releaseTempKMPFile];
+        _confirmKmpInstallAlertView = nil;
+    }
+    // else, just a message - nothing to do.
+}
+
+- (void)deleteFileAtIndex:(NSNumber *) n {
+    NSInteger index = [n integerValue];
+    NSString *path2Remove = nil;
+    NSString *kmxFilePath = [self kmxFilePathAtIndex:index];
+    if (kmxFilePath == nil) {
+        kmxFilePath = [self kmxFilePathAtIndex:index+1];
+        path2Remove = [[self keyboardsPath] stringByAppendingPathComponent:[self packageFolderFromPath:kmxFilePath]];
+    }
+    else {
+        path2Remove = kmxFilePath;
+    }
+    
+    NSError *error;
+    [[NSFileManager defaultManager] removeItemAtPath:path2Remove error:&error];
+    if (error == nil) {
+        [self performSelector:@selector(timerAction:) withObject:nil afterDelay:1.0];
+    }
+}
 @end

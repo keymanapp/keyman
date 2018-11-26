@@ -36,7 +36,7 @@ type
 
 const
   CRuntimeFiles: array[0..0] of TRedistFile = (
-    (FileName: 'keymandesktop100.msi'; Description: 'Keyman Desktop Installer')
+    (FileName: 'keymandesktop.msi'; Description: 'Keyman Desktop Installer')
   );
 
   CRedistFiles: array[0..11] of TRedistFile = (
@@ -60,6 +60,7 @@ function GetHelpURL: string;   // I4841
 function GetRedistUIPath: string;
 function GetRedistAddinsPath: string;
 function GetRedistSetupPath: string;
+function GetRedistProjectTemplatePath: string;
 function GetWixPath: string;
 function GetStockKCTPath: string;
 function GetDebugKMCmpDllPath: string;
@@ -68,6 +69,7 @@ function GetUnicodeDataSourcePath(DefaultPath: string = ''): string;  // I3463
 function GetXMLTemplatePath: string;
 function GetDeveloperRootPath: string;
 function GetLayoutBuilderPath: string;   // I3885
+function GetCEFPath: string;  // Chromium Embedded Framework
 
 implementation
 
@@ -122,6 +124,11 @@ begin
   Result := GetDebugPath('Debug_WixPath', ExtractFilePath(ParamStr(0))+'wix\');
 end;
 
+function GetRedistProjectTemplatePath: string;
+begin
+  Result := GetDebugPath('Debug_RedistTemplatePath', ExtractFilePath(ParamStr(0))+'projects\templates\');
+end;
+
 function GetDebugKMCmpDllPath: string;
 begin
   Result := GetDebugPath('Debug_KMCMPDLLPath', ExtractFilePath(ParamStr(0)));
@@ -137,6 +144,18 @@ begin
   Result := GetDebugPath('Debug_XMLTemplatePath', ExtractFilePath(ParamStr(0))+'xml\');
 end;
 
+function GetCEFPath: string;
+begin
+  Result := GetDebugPath('Debug_CEFPath', '');
+  if Result = '' then
+  begin
+    Result := GetEnvironmentVariable('KEYMAN_CEF4DELPHI_ROOT');
+    if Result = ''
+      then Result := ExtractFilePath(ParamStr(0))+'cef\'
+      else Result := IncludeTrailingPathDelimiter(Result);
+  end;
+end;
+
 function GetLayoutBuilderPath: string;   // I3885
 begin
   Result := GetXMLTemplatePath + 'layoutbuilder\';
@@ -147,7 +166,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly(SRegKey_KeymanDeveloper) then  // I2890
+    if not OpenKeyReadOnly(SRegKey_KeymanDeveloper_LM) then  // I2890
       RaiseLastRegistryError;
     Result := ReadString(SRegValue_RootPath);
     if Result = '' then

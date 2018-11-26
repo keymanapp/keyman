@@ -11,7 +11,7 @@ import UIKit
 import QuartzCore
 
 // Internal strings
-private let baseUri = "http://r.keymanweb.com/20/fonts/get_mobileconfig.php?id="
+private let baseUri = "https://r.keymanweb.com/20/fonts/get_mobileconfig.php?id="
 private let profileKey = "profile"
 private let checkedProfilesKey = "CheckedProfiles"
 
@@ -22,7 +22,7 @@ let dontShowGetStartedKey = "DontShowGetStarted"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
-class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
+class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate {
   private let minTextSize: CGFloat = 9.0
   private let maxTextSize: CGFloat = 72.0
   private let getStartedViewTag = 7183
@@ -31,6 +31,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   var textView: TextView!
   var textSize: CGFloat = 0.0
+  var navbarBackground: KMNavigationBarBackgroundView!
 
   private var getStartedVC: GetStartedViewController!
   private var infoView: InfoViewController!
@@ -119,8 +120,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardRemoved,
       observer: self,
       function: MainViewController.keyboardRemoved)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
-        name: launchedFromUrlNotification, object: nil)
 
   }
 
@@ -135,10 +134,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     automaticallyAdjustsScrollViewInsets = false
 
     let systemFonts = Set<String>(UIFont.familyNames)
-    let screenRect = UIScreen.main.bounds
-    let orientation = UIApplication.shared.statusBarOrientation
-    screenWidth = screenRect.size.width
-    screenHeight = screenRect.size.height
 
     // Setup Keyman Manager & fetch keyboards list
     Manager.shared.canRemoveDefaultKeyboard = true
@@ -169,47 +164,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     // Setup NavigationBar
-    // TODO: refactor
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      let size = CGFloat.maximum(screenRect.width, screenRect.height)
-      if size > 568.0 {
-        // Navbar for iPhone 6 & 6 Plus
-        let image: UIImage
-        if UIInterfaceOrientationIsPortrait(orientation) {
-          image = #imageLiteral(resourceName: "navbar-Portrait.png")
-        } else {
-          image = #imageLiteral(resourceName: "navbar-Landscape-568h.png")
-        }
-        let bgImg = image.resizableImage(withCapInsets:
-              UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), resizingMode: .stretch)
-        navigationController?.navigationBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
-      } else if size == 568 {
-        // Navbar for iPhone and iPod Touch with 4" Display
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Portrait.png"),
-            for: UIBarMetrics.default)
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Landscape-568h.png"),
-            for: UIBarMetrics.compact)
-      } else if size < 568.0 {
-        // Navbar for iPhone and iPod Touch with 3.5" Display
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Portrait.png"),
-            for: UIBarMetrics.default)
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Landscape.png"),
-            for: UIBarMetrics.compact)
-      }
-    } else {
-      // Navbar for iPad
-      if UIInterfaceOrientationIsPortrait(orientation) {
-        navigationController?.navigationBar.setBackgroundImage(
-          #imageLiteral(resourceName: "navbar-Portrait.png"), for: UIBarMetrics.default)
-      } else {
-        navigationController?.navigationBar.setBackgroundImage(
-            #imageLiteral(resourceName: "navbar-Landscape.png"), for: UIBarMetrics.default)
-      }
+    if let navbar = navigationController?.navigationBar {
+      navbarBackground = KMNavigationBarBackgroundView()
+      navbarBackground.addToNavbar(navbar)
+      navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
     }
 
     // Setup Keyman TextView
     textSize = 16.0
-    textView = TextView(frame: screenRect)
+    textView = TextView(frame: view.frame)
     textView.setKeymanDelegate(self)
     textView.viewController = self
     textView.backgroundColor = bgColor
@@ -375,29 +338,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       }, completion: nil)
     }
 
-    // TODO: Refactor
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      let screenRect = UIScreen.main.bounds
-      let size = CGFloat.maximum(screenRect.width, screenRect.height)
-      if size > 568.0 {
-        // Navbar for iPhone 6 & 6 Plus
-        let image: UIImage
-        if UIInterfaceOrientationIsPortrait(orientation) {
-          image = #imageLiteral(resourceName: "navbar-Portrait.png")
-        } else {
-          image = #imageLiteral(resourceName: "navbar-Landscape-568h.png")
-        }
-        let bgImg = image.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
-                                         resizingMode: .stretch)
-        navigationController?.navigationBar.setBackgroundImage(bgImg, for: UIBarMetrics.default)
-      }
-    } else {
-      if UIInterfaceOrientationIsPortrait(orientation) {
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Portrait.png"), for: UIBarMetrics.default)
-      } else {
-        navigationController?.navigationBar.setBackgroundImage(#imageLiteral(resourceName: "navbar-Landscape.png"), for: UIBarMetrics.default)
-      }
+    if let navbarBackground = navbarBackground {
+      navbarBackground.setOrientation(toInterfaceOrientation)
     }
+
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
   }
@@ -470,7 +414,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       didDownload = false
     }
 
-    checkProfile(forKeyboardID: kb.id, languageID: kb.languageID, doListCheck: listCheck)
+    checkProfile(forFullID: kb.fullID, doListCheck: listCheck)
   }
 
   private func keyboardDownloadStarted() {
@@ -495,7 +439,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     for keyboard in keyboards {
       Manager.shared.addKeyboard(keyboard)
-      Manager.shared.setKeyboard(keyboard)
+      _ = Manager.shared.setKeyboard(keyboard)
     }
 
     launchUrl = nil
@@ -505,8 +449,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
       let error = notification.error
-      showAlert(withTitle: "Keyboard Download Error", message: error.localizedDescription,
-                cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
+      appDelegate.showSimpleAlert(title: "Keyboard Download Error", message: error.localizedDescription)
       launchUrl = nil
     }
   }
@@ -532,17 +475,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   // MARK: - View Actions
-
-  @objc func launched(fromUrl notification: Notification) {
-    if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
-      launchUrl = url
-      if didKeyboardLoad {
-        performAction(from: url)
-      }
-    } else {
-      launchUrl = nil
-    }
-  }
 
   @objc func infoButtonClick(_ sender: Any?) {
     UIView.setAnimationDelegate(self)
@@ -833,8 +765,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if let urlString = params["url"] {
       // Download and set custom keyboard
       guard let url = URL(string: urlString) else {
-        showAlert(withTitle: "Custom Keyboard", message: "The keyboard could not be installed: Invalid Url",
-                  cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
+        appDelegate.showSimpleAlert(title: "Custom Keyboard",
+                                    message: "The keyboard could not be installed: Invalid Url")
         launchUrl = nil
         return
       }
@@ -846,8 +778,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
       customKeyboardToDownload = url
       let title = "Custom Keyboard: \(url.lastPathComponent)"
-      showAlert(withTitle: title, message: "Would you like to install this keyboard?",
-                cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
+      confirmInstall(withTitle: title, message: "Would you like to install this keyboard?",
+                cancelButtonHandler: showGetStartedIfNeeded,
+                installButtonHandler: proceedWithCustomKeyboardDownload)
     } else if let kbID = params["keyboard"], let langID = params["language"] {
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
       guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
@@ -857,20 +790,20 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
       if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
         keyboardToDownload = keyboard
-        showAlert(withTitle: "\(keyboard.languageName): \(keyboard.name)",
+        confirmInstall(withTitle: "\(keyboard.languageName): \(keyboard.name)",
           message: "Would you like to install this keyboard?",
-                  cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
+          installButtonHandler: proceedWithKeyboardDownload)
       } else {
         Manager.shared.addKeyboard(keyboard)
-        Manager.shared.setKeyboard(keyboard)
+        _ = Manager.shared.setKeyboard(keyboard)
       }
     } else {
       launchUrl = nil
     }
   }
 
-  private func profileName(withKeyboardID kbID: String, languageID langID: String) -> String? {
-    guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID),
+  private func profileName(withFullID fullID: FullKeyboardID) -> String? {
+    guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID),
           let font = keyboard.font else {
       return nil
     }
@@ -882,15 +815,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return font.source.first { $0.lowercased().hasSuffix(FileExtensions.configurationProfile) }
   }
 
-  private func checkProfile(forKeyboardID kbID: String, languageID langID: String, doListCheck: Bool) {
-    if kbID == Defaults.keyboard.id && langID == Defaults.keyboard.languageID {
+  private func checkProfile(forFullID fullID: FullKeyboardID, doListCheck: Bool) {
+    if fullID == Defaults.keyboard.fullID {
       return
     }
     if profileName != nil {
       return  // already installing a profile
     }
 
-    guard let profile = profileName(withKeyboardID: kbID, languageID: langID) else {
+    guard let profile = profileName(withFullID: fullID) else {
       return
     }
 
@@ -906,11 +839,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     if doInstall {
       profileName = profile
-      let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withID: kbID, languageID: langID)!
+      let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID)!
       let languageName = keyboard.languageName
       let title = "\(languageName) Font"
       let msg = "Touch Install to make \(languageName) display correctly in all your apps"
-      showAlert(withTitle: title, message: msg, cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 1)
+      confirmInstall(withTitle: title, message: msg,
+                cancelButtonHandler: handleUserDecisionAboutInstallingProfile,
+                installButtonHandler: handleUserDecisionAboutInstallingProfile)
     } else {
       profileName = nil
     }
@@ -920,55 +855,53 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.becomeFirstResponder()
   }
 
-  private func showAlert(withTitle title: String, message msg: String, cancelButtonTitle cbTitle: String?,
-                         otherButtonTitles obTitles: String?, tag: Int) {
+  private func confirmInstall(withTitle title: String, message msg: String,
+                         cancelButtonHandler cbHandler: ((UIAlertAction) -> Swift.Void)? = nil,
+                         installButtonHandler installHandler: ((UIAlertAction) -> Swift.Void)?) {
     dismissGetStartedView(nil)
-    let alertView = UIAlertView(title: title, message: msg, delegate: self, cancelButtonTitle: cbTitle,
-                                otherButtonTitles: obTitles ?? "")
-    alertView.tag = tag
-    alertView.show()
+    
+    let alertController = UIAlertController(title: title, message: msg,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "Cancel",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: cbHandler))
+    alertController.addAction(UIAlertAction(title: "Install",
+                                              style: UIAlertActionStyle.default,
+                                              handler: installHandler))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
-
-  private func performAlertButtonClick(withTag tag: Int) {
-    switch tag {
-    case 0:
-      if let keyboard = keyboardToDownload {
-        Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
-      }
-    case 1:
-      if let profileName = profileName {
-        checkedProfiles.append(profileName)
-        let userData = AppDelegate.activeUserDefaults()
-        userData.set(checkedProfiles, forKey: checkedProfilesKey)
-        userData.synchronize()
-
-        UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
-        self.profileName = nil
-      }
-    case 2:
-      if let url = customKeyboardToDownload {
-        Manager.shared.downloadKeyboard(from: url)
-      }
-    default:
-      break
+  
+  private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
+    if let keyboard = keyboardToDownload {
+      Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
     }
   }
 
-  func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
-    if buttonIndex != alertView.cancelButtonIndex {
-      performAlertButtonClick(withTag: alertView.tag)
-    }
-
-    if let profileName = profileName, alertView.tag == 1 {
+  private func handleUserDecisionAboutInstallingProfile(withAction action: UIAlertAction) {
+    if let profileName = profileName {
       checkedProfiles.append(profileName)
       let userData = AppDelegate.activeUserDefaults()
       userData.set(checkedProfiles, forKey: checkedProfilesKey)
       userData.synchronize()
-      self.profileName = nil
-    } else if alertView.tag == 2 {
-      if shouldShowGetStarted {
-        showGetStartedView(nil)
+
+      if action.style == .default {
+        UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
       }
+      self.profileName = nil
+    }
+  }
+
+  private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
+    if let url = customKeyboardToDownload {
+      Manager.shared.downloadKeyboard(from: url)
+    }
+    showGetStartedIfNeeded(withAction: action)
+  }
+
+  private func showGetStartedIfNeeded(withAction action: UIAlertAction) {
+    if shouldShowGetStarted {
+      showGetStartedView(nil)
     }
   }
 
@@ -1016,6 +949,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let doneButton = navBar?.topItem?.rightBarButtonItem
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissGetStartedView)
+    
+    Manager.shared.hideKeyboard()
 
     containerView.frame = containerView.frame.insetBy(dx: 15, dy: 140)
     containerView.backgroundColor = UIColor.white
@@ -1032,6 +967,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func dismissGetStartedView(_ sender: Any?) {
     overlayWindow.viewWithTag(getStartedViewTag)?.removeFromSuperview()
     overlayWindow.isHidden = true
+    
+    Manager.shared.showKeyboard()
   }
 
   private var shouldShowGetStarted: Bool {

@@ -1,5 +1,10 @@
 # Keyman for Android & Keyman Engine for Android
 
+## Prerequisites
+* Android Studio 3.0.1+
+* Java
+* [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+
 ## Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 15 for [Android 4.0.3 Ice Cream Sandwich](https://developer.android.com/about/versions/android-4.0.3.html)
 
@@ -23,13 +28,27 @@ yes | ./sdkmanager.bat --licenses
 ## Keyman for Android Development
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
+Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
+
+### Crashlytics
+Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with a "Package name" `com.tavultesoft.kmapro.debug`.
+
+If you need to view near real-time analytics in the Firebase DebugView console, enable Debug mode on the emulator with the command:
+```
+ adb shell setprop debug.firebase.analytics.app com.tavultesoft.kmapro.debug
+```
+To disable Debug mode, use the command:
+```
+adb shell setprop debug.firebase.analytics.app .none.
+```
+ 
 ### Compiling From Command Line
 1. Launch a command prompt
 2. Change to one of these directories depending on what you want to compile:
     * For compiling KMEA and KMAPro, cd to the directory **keyman/android**
     * For compiling only KMAPro, cd to the directory **keyman/android/KMAPro**
-3. `./build.sh`
-4. The APK will be found in **KMAPro/kMAPro/build/outputs/apk/kMAPro-*.apk**
+3. `./build.sh -debug`
+4. The APK will be found in **KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
 
 ### Compiling From Android Studio
 1. Ensure that [Keyman Engine for Android](#how-to-build-keyman-engine-for-android) is built.
@@ -75,7 +94,7 @@ Building these projects follow the same steps as KMAPro:
 
 **android/Tests/KeyboardHarness** app is a test harness for developers to troubleshoot keyboards.
 
-1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/packages/packageID* (replace "packageID" with the name of your actual keyboard package.
+1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/cloud/*.
 
    For users of Keyman Engine pre 10.0, use the folders
 *android/Tests/KeyboardHarness/app/src/main/assets/languages/* and
@@ -101,14 +120,25 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
     b. If you choose to use your own build of the Keyman Engine, get the library from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
-4. include `api (name:'keyman-engine', ext:'aar')` in dependencies.
-5. after dependencies, insert
+4. After the `android {}` object, include the following:
 ````gradle
-    repositories {
-        google()
-        flatDir {
-            dirs 'libs'
-        }
+repositories {
+    flatDir {
+        dirs 'libs'
     }
+    google()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.firebase:firebase-crash:11.8.0'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true
+    }
+    api (name:'keyman-engine', ext:'aar')
+}
+
 ````
-6. include `import com.tavultesoft.kmea.*;` to use Keyman Engine in a class.
+5. include `import com.tavultesoft.kmea.*;` to use Keyman Engine in a class.

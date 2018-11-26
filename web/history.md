@@ -1,5 +1,66 @@
 # KeymanWeb Version History
 
+## 11.0 alpha
+* Add `setNumericLayer()` for embedded platforms to change OSK to numeric layer.
+
+## 2018-07-06 10.0.103 stable
+* Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
+
+## 2018-06-28 10.0.100 stable
+* 10.0 stable release
+
+## 2018-06-27 10.0.99 beta
+* Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
+
+## 2018-06-26 10.0.98 beta
+* Fixes miskey when pressing between two keys on iOS (#1020)
+
+## 2018-06-21 10.0.97 beta
+* Fixes an issue where cancelling a touch event could cause the keyboard to throw an error on Android (#1014)
+
+## 2018-06-20 10.0.96 beta
+* Fixes edge case issue with deadkeys in complex keyboards with multiple groups (#1008)
+
+## 2018-06-15 10.0.95 beta
+* No substantial changes.
+
+## 2018-06-13 10.0.94 beta
+* No substantial changes.
+
+## 2018-06-11 10.0.93 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-05-22 10.0.92 beta
+* (Embedded) Fixes out-of-order key events in Keyman for iOS (does not affect web hosted keyboard) (#865)
+
+## 2018-05-09 10.0.91 beta
+* Fixes basic support for mnemonic keyboards.  (#517)
+  * At this time, all mnemonic keyboards will assume a US keyboard layout within KeymanWeb.
+
+## 2018-05-08 10.0.90 beta
+* Fixes support for Keyman-language 'beep' statements as part of keyboard stores. (#733)
+
+## 2018-05-07 10.0.89 beta
+* Fixes an issue with case sensitive virtual keys used by some Keyman keyboards. (#162)
+
+## 2018-04-30 10.0.88 beta
+* Fixes some left/right modifier issues (#797)
+
+## 2018-04-25 10.0.87 beta
+* Fixes some issues with default key output (#772)
+
+## 2018-04-25 10.0.86 beta
+* Fixes display of popup keys representing modifiers and other special characters. (#698)
+
+## 2018-03-26 10.0.85 beta
+* No substantial changes.
+
+## 2018-03-23 10.0.84 beta
+* Fixed a single test case (#703).
+
+## 2018-03-22 10.0.83 beta
+* Initial beta for KeymanWeb v 10.0.
+
 ## 10.0 alpha
 * Updated versioning scheme for uniformity across all Keyman products.
 * Reworked the KeymanWeb attachment model significantly to allow greater user control. (#98)
@@ -21,6 +82,12 @@
 * New feature:  physical keyboard input now supported on touch-enabled inputs. (#237) (#311)
   * Note that hardware-based keyboard input will always follow 'hardware' and 'desktop' platform rules to ensure consistency.
 * Fixed behavior of longpress subkeys specifying (layer-default) modifier settings. (#161)
+* Converted KeymanWeb (largely) to TypeScript and streamlined the code to reflect new minimum requirements.
+* Fixed styling of "Special" keys on touch layouts
+* Added automated testing for KeymanWeb builds. (#350)
+* Fixed bugs in the handling of deadkeys. (#281)
+* Change from ISO 639-3 language codes to BCP-47 language codes
+* Now generates 'change' and 'input' events from keyboard and OSK input (#42) (#571)
 
 ## 2017-07-10 2.0.473 stable
 * 2.0 stable release build.

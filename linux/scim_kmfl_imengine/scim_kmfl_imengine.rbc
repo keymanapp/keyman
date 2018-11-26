@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<anjuta_rpm_builder>
+  <head>
+    <property name="rbc-version">1.0</property>
+    <property name="projectname">scim_kmfl_imengine</property>
+    <property name="projectversion">0.1</property>
+  </head>
+  <global>
+    <property name="Name">scim_kmfl_imengine</property>
+    <property name="Version">0.1</property>
+    <property name="Release">1</property>
+    <property name="Vendor">SILl &lt;doug_rintoul@sil.orgl&gt;</property>
+    <property name="Packager">User &lt;Email&gt;</property>
+    <property name="License">GPL</property>
+    <property name="BuildArch">i586</property>
+    <property name="BuildRoot">/var/tmp/scim_kmfl_imengine</property>
+    <property name="Prefix">/usr</property>
+    <Source>%{name}-%{version}.tar.gz</Source>
+    <Docs>AUTHORS
+COPYING
+ChangeLog
+README
+INSTALL
+NEWS
+TODO
+</Docs>
+    <script name="build">
+      <property name="by_user">False</property>
+    </script>
+    <script name="install">
+      <property name="by_user">False</property>
+    </script>
+    <script name="configure">
+      <property name="by_user">False</property>
+    </script>
+    <script name="setup">
+      <property name="by_user">False</property>
+    </script>
+    <changelog/>
+  </global>
+  <subpackage>
+    <property name="disabled">False</property>
+    <property name="conditional_building">False</property>
+    <property name="Name">%base%</property>
+    <property name="Group">Applications/System</property>
+    <property name="Summary">%{name}</property>
+    <property name="Requires">libkmfl</property>
+    <property name="Provides">scim_kmfl_imengine</property>
+    <Description>%anjuta%</Description>
+    <Files>%{_libdir}/scim-1.0/0.8.0/IMEngine/kmfl.so
+</Files>
+  </subpackage>
+  <subpackage>
+    <property name="disabled">False</property>
+    <property name="conditional_building">False</property>
+    <property name="Name">libs</property>
+    <property name="Group">System Environment/Libraries</property>
+    <property name="Summary">Dynamic libraries for %{name}</property>
+    <Description>%anjuta%</Description>
+    <Files>%{_libdir}/scim-1.0/0.8.0/IMEngine/kmfl.la
+%{_libdir}/scim-1.0/0.8.0/IMEngine/kmfl.a
+</Files>
+  </subpackage>
+</anjuta_rpm_builder>

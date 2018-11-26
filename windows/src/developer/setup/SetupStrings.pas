@@ -32,6 +32,7 @@ type
     ssApplicationTitle,
     ssTitle,
     ssWelcome_Plain,
+    ssSIL,
     ssCheckForUpdates,
     ssInstallButton,
     ssExitButton,
@@ -58,7 +59,8 @@ type
 
     ssRedistIEUpdateRequired,
     ssMustRestart,
-    ssRedistRequired
+    ssRedistRequired,
+    ssCheckForUpdatesError
     );
 
 const
@@ -69,6 +71,7 @@ const
     'Keyman Developer Setup',
     '%0:s Setup',
     'Setup will install %0:s',
+    'Created by SIL International',
     'Check for &updates online before installing',
     '&Install Keyman Developer',
     'E&xit',
@@ -98,8 +101,9 @@ const
 
     'You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.',
 
-    'A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website.'
+    'A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website.',
 
+    'The online update check failed with an error: %0:s'
     );
 
 implementation

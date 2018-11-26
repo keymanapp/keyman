@@ -41,7 +41,8 @@ uses
   Classes,
   httpuploader,
   SysUtils,
-  UfrmDownloadProgress;
+  UfrmDownloadProgress,
+  Keyman.System.UpdateCheckResponse;
 
 type
   EOnlineUpdateCheck = class(Exception);
@@ -49,7 +50,8 @@ type
   TOnlineUpdateCheckResult = (oucUnknown, oucShutDown, oucSuccess, oucNoUpdates, oucFailure, oucSuccessReboot, oucOffline);
 
   TOnlineUpdateCheckParamsPackage = record
-    Name: string;
+    ID: string;
+    NewID: string;
     Description: string;
     OldVersion, NewVersion: string;
     DownloadURL: string;
@@ -63,7 +65,6 @@ type
     DownloadURL: string;
     SavePath: string;
     DownloadSize: Integer;
-    IsPatch: Boolean;
     Install: Boolean;
   end;
 
@@ -103,6 +104,7 @@ type
       const Message: string; Position, Total: Int64); // I2855
     procedure DoInstallKeyman;
     function DoInstallPackage(Package: TOnlineUpdateCheckParamsPackage): Boolean;
+    procedure SavePackageUpgradesToDownloadTempPath;
   public
 
   public
@@ -118,10 +120,8 @@ procedure OnlineUpdateAdmin(Path: string);
 implementation
 
 uses
-  ActiveX,
-  Controls,
-  Dialogs,
-  Forms,
+  Vcl.Dialogs,
+  Vcl.Forms,
   GlobalProxySettings,
   KLog,
   keymanapi_TLB,
@@ -142,9 +142,10 @@ uses
   versioninfo,
   WideStrUtils,
   Windows,
-  WinINet,
-  xmldoc,
-  xmlintf;
+  WinINet;
+
+const
+  SPackageUpgradeFilename = 'upgrade_packages.inf';
 
 { TOnlineUpdateCheck }
 
@@ -216,7 +217,7 @@ var
     function DownloadFile(const url, savepath: string): TModalResult;
     begin
       Result := mrCancel;
-      with THTTPUploader.Create(AOwner) do
+      with THttpUploader.Create(AOwner) do
       try
         OnCheckCancel := AOwner.HTTPCheckCancel;
         OnStatus := DownloadUpdatesHTTPStatus;
@@ -346,7 +347,7 @@ begin
   for i := 0 to kmcom.Packages.Count - 1 do
   begin
     pkg := kmcom.Packages[i];
-    if WideSameText(pkg.ID, Package.Name) then
+    if WideSameText(pkg.ID, Package.ID) then
     begin
       pkg.Uninstall(True);
       Break;
@@ -381,6 +382,22 @@ begin
     Exit;
   if not FResult then
     ShowMessage(SysErrorMessage(GetLastError));
+end;
+
+procedure TOnlineUpdateCheck.SavePackageUpgradesToDownloadTempPath;
+var
+  i: Integer;
+begin
+  with TStringList.Create do
+  try
+    for i := 0 to High(FParams.Packages) do
+      if FParams.Packages[i].NewID <> '' then
+        Add(FParams.Packages[i].NewID+'='+FParams.Packages[i].ID);
+    if Count > 0 then
+      SaveToFile(DownloadTempPath + SPackageUpgradeFileName);
+  finally
+    Free;
+  end;
 end;
 
 procedure TOnlineUpdateCheck.ShowUpdateForm;
@@ -428,6 +445,7 @@ begin
     begin
       if CanElevate then
       begin
+        SavePackageUpgradesToDownloadTempPath;
         if WaitForElevatedConfiguration(Application.Handle, '-ou "'+DownloadTempPath+'"', not FParams.Keyman.Install) <> 0 then  // I2513
           FParams.Result := oucFailure
         else if FParams.Keyman.Install then
@@ -468,17 +486,11 @@ end;
 
 function TOnlineUpdateCheck.DoRun: TOnlineUpdateCheckResult;
 var
-  node, root: IXMLNode;
-  doc: IXMLDocument;
-  {FProxyHost: string;
-  FProxyPort: Integer;}
   flags: DWord;
   i, n: Integer;
-  kbd0: IKeymanKeyboard;
-  pkg0: IKeymanPackageInstalled;
-  kbd: IKeymanKeyboardInstalled;
   pkg: IKeymanPackage;
   j: Integer;
+  ucr: TUpdateCheckResponse;
 begin
   {FProxyHost := '';
   FProxyPort := 0;}
@@ -495,7 +507,7 @@ begin
   try
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop) then
+      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
         if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
         begin
@@ -527,6 +539,8 @@ begin
     end;
   end;
 
+  Result := oucNoUpdates;
+
   try
     with THTTPUploader.Create(nil) do
     try
@@ -534,21 +548,9 @@ begin
       Fields.Add('Version', ansistring(FCurrentVersion));
       for i := 0 to kmcom.Packages.Count - 1 do
       begin
-        pkg0 := kmcom.Packages[i];
-        pkg := pkg0;
-        if pkg.Keyboards.Count > 0 then
-        begin
-          kbd0 := pkg.Keyboards[0];
-          kbd := kbd0 as IKeymanKeyboardInstalled;
-          if kbd.Loaded then
-          begin
-            Fields.Add(ansistring('Package_'+pkg.ID), ansistring(pkg.Version));
-          end;
-          kbd := nil;
-          kbd0 := nil;
-        end;
+        pkg := kmcom.Packages[i];
+        Fields.Add(ansistring('Package_'+pkg.ID), ansistring(pkg.Version));
         pkg := nil;
-        pkg0 := nil;
       end;
         
       Proxy.Server := GetProxySettings.Server;
@@ -558,97 +560,64 @@ begin
 
       Request.HostName := API_Server;
       Request.Protocol := API_Protocol;
-      Request.UrlPath := API_Path_UpdateCheck;
+      Request.UrlPath := API_Path_UpdateCheck_Desktop;
       //OnStatus :=
       Upload;
       if Response.StatusCode = 200 then
       begin
-        doc := LoadXMLData(Response.MessageBodyAsString);
-        doc.Options := doc.Options - [doAttrNull];
-
-        root := doc.DocumentElement;
-        if root.NodeName <> 'updatecheck' then
-          raise EOnlineUpdateCheck.Create('Invalid response:'#13#10+string(Response.MessageBodyAsString));
-
-        SetLength(FParams.Packages,0);
-        n := root.ChildNodes.IndexOf('package');
-        if n >= 0
-          then node := root.ChildNodes[n]
-          else node := nil;
-        while Assigned(node) and (node.NodeName = 'package') do
+        if ucr.Parse(Response.MessageBodyAsString, 'windows', FCurrentVersion) then
         begin
-
-          n := kmcom.Packages.IndexOf(node.Attributes['name']);
-          if n >= 0 then
+          SetLength(FParams.Packages,0);
+          for i := Low(ucr.Packages) to High(ucr.Packages) do
           begin
-            pkg0 := kmcom.Packages[n];
-            pkg := pkg0 as IKeymanPackage;
-            j := Length(FParams.Packages);
-            SetLength(FParams.Packages, j+1);
-            FParams.Packages[j].Name := node.Attributes['name'];
-            FParams.Packages[j].Description := pkg.Name;
-            FParams.Packages[j].OldVersion := node.Attributes['oldversion'];
-            FParams.Packages[j].NewVersion := node.Attributes['newversion'];
-            FParams.Packages[j].DownloadSize := StrToIntDef(node.Attributes['filesize'], 0);
-            FParams.Packages[j].DownloadURL := node.Attributes['installurl'];
-            pkg := nil;
-            pkg0 := nil;
-          end
-          else
-            FErrorMessage := 'Unable to find package '+node.Attributes['name'];
-
-          node := node.NextSibling;
-        end;
-        n := root.ChildNodes.IndexOf('update');
-        if n >= 0 then
-        begin
-          root := root.ChildNodes[n];
-
-          if (root.Attributes['newversion'] > FCurrentVersion) then
-          begin
-            FParams.Keyman.IsPatch := root.Attributes['patchurl'] <> '';
-            FParams.Keyman.OldVersion := FCurrentVersion;
-            FParams.Keyman.NewVersion := root.Attributes['newversion'];
-            //FParams.Keyman.DownloadURL := root.Attributes['installurl'];
-            if FParams.Keyman.IsPatch then
+            n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
+            if n >= 0 then
             begin
-              FParams.Keyman.DownloadURL := root.Attributes['patchurl'];
-              FParams.Keyman.DownloadSize := StrToIntDef(root.Attributes['patchsize'], 0);
+              pkg := kmcom.Packages[n];
+              j := Length(FParams.Packages);
+              SetLength(FParams.Packages, j+1);
+              FParams.Packages[j].NewID := ucr.Packages[i].NewID;
+              FParams.Packages[j].ID := ucr.Packages[i].ID;
+              FParams.Packages[j].Description := ucr.Packages[i].Name;
+              FParams.Packages[j].OldVersion := pkg.Version;
+              FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
+              FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
+              FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
+              pkg := nil;
             end
             else
-            begin
-              FParams.Keyman.DownloadURL := root.Attributes['installurl'];
-              FParams.Keyman.DownloadSize := StrToIntDef(root.Attributes['installsize'], 0);
-            end;
+              FErrorMessage := 'Unable to find package '+ucr.Packages[i].ID;
           end;
-        end;
 
-        if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
-        begin
-          if not FSilent then
-            ShowUpdateForm
-          else
-          begin
-            ShowUpdateIcon;
+          case ucr.Status of
+            ucrsNoUpdate:
+              begin
+                FErrorMessage := ucr.ErrorMessage;
+              end;
+            ucrsUpdateReady:
+              begin
+                FParams.Keyman.OldVersion := ucr.CurrentVersion;
+                FParams.Keyman.NewVersion := ucr.NewVersion;
+                FParams.Keyman.DownloadURL := ucr.InstallURL;
+                FParams.Keyman.DownloadSize := ucr.InstallSize;
+              end;
           end;
-          Result := FParams.Result;
+
+          if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
+          begin
+            if not FSilent then
+              ShowUpdateForm
+            else
+            begin
+              ShowUpdateIcon;
+            end;
+            Result := FParams.Result;
+          end;
         end
         else
         begin
-          n := root.ChildNodes.IndexOf('message');
-          if n >= 0 then
-          begin
-            Result := oucFailure;
-            if root.ChildNodes[n].Attributes['Severity'] = 'fatal' then
-              FErrorMessage := 'FATAL ERROR: '+root.ChildNodes[n].NodeValue
-            else
-              FErrorMessage := root.ChildNodes[n].NodeValue;
-          end
-          else
-          begin
-            FErrorMessage := 'No updates are currently available.';
-            Result := oucNoUpdates;
-          end;
+          FErrorMessage := ucr.ErrorMessage;
+          Result := oucFailure;
         end;
       end
       else
@@ -673,7 +642,7 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop, True) then
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
       WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
   finally
     Free;
@@ -685,35 +654,40 @@ var
   Package: TOnlineUpdateCheckParamsPackage;
   f: TSearchRec;
   ext: string;
+  FPackageUpgradeList: TStringList;
 begin
   Path := IncludeTrailingPathDelimiter(Path);
+  FPackageUpgradeList := TStringList.Create;
   with TOnlineUpdateCheck.Create(False,True) do
   try
+    if FileExists(Path + SPackageUpgradeFileName) then
+      FPackageUpgradeList.LoadFromFile(Path + SPackageUpgradeFilename);
+
     if FindFirst(Path + '*.k??', 0, f) = 0 then
     begin
-      ext := LowerCase(ExtractFileExt(f.Name));
-      if (ext = '.kmx') or (ext = '.kmp') or (ext = '.kxx') then
-      begin
-        Package.SavePath := Path + f.Name;
-        Package.Name := ChangeFileExt(f.Name, '');
-        DoInstallPackage(Package);
-      end;
+      repeat
+        ext := LowerCase(ExtractFileExt(f.Name));
+        if (ext = '.kmx') or (ext = '.kmp') then
+        begin
+          Package.SavePath := Path + f.Name;
+          Package.NewID := ChangeFileExt(f.Name, '');
+          Package.ID := FPackageUpgradeList.Values[Package.NewID];
+          DoInstallPackage(Package);
+        end;
+      until FindNext(f) <> 0;
 
       SysUtils.FindClose(f);
     end;
 
-    if FindFirst(Path + '*', 0, f) = 0 then
+    if FindFirst(Path + '*.exe', 0, f) = 0 then
     begin
-      ext := LowerCase(ExtractFileExt(f.Name));
-      if (ext = '.msi') or (ext = '.msp') or (ext = '.exe') then
-      begin
-        FParams.Keyman.SavePath := Path + f.Name;
-        DoInstallKeyman;
-      end;
+      FParams.Keyman.SavePath := Path + f.Name;
+      DoInstallKeyman;
       SysUtils.FindClose(f);
     end;
   finally
     Free;
+    FPackageUpgradeList.Free;
   end;
 end;
 

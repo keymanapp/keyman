@@ -204,7 +204,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
-        Width = 860
+        Width = 950
         Height = 645
         Align = alClient
         BevelInner = bvNone
@@ -217,7 +217,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object panTargets: TPanel
           Left = 0
           Top = 48
-          Width = 843
+          Width = 933
           Height = 106
           Margins.Top = 8
           Margins.Bottom = 4
@@ -246,13 +246,14 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panWindowsLanguages: TPanel
           Left = 0
-          Top = 154
-          Width = 843
+          Top = 192
+          Width = 933
           Height = 189
           Align = alTop
           BevelOuter = bvNone
           ParentColor = True
           TabOrder = 2
+          ExplicitTop = 189
           object lblWinLangTitle: TLabel
             Left = 12
             Top = 5
@@ -310,13 +311,14 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panComments: TPanel
           Left = 0
-          Top = 534
-          Width = 843
+          Top = 572
+          Width = 933
           Height = 87
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 5
+          ExplicitTop = 569
           object lblComments: TLabel
             Left = 12
             Top = 3
@@ -342,12 +344,13 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panFeatures: TPanel
           Left = 0
-          Top = 621
-          Width = 843
+          Top = 659
+          Width = 933
           Height = 232
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 6
+          ExplicitTop = 656
           object Label9: TLabel
             AlignWithMargins = True
             Left = 12
@@ -414,17 +417,18 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panDetailsLeft: TPanel
           Left = 0
-          Top = 407
-          Width = 843
+          Top = 445
+          Width = 933
           Height = 127
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 4
+          ExplicitTop = 442
           object panMessage: TPanel
             Left = 0
             Top = 42
-            Width = 843
+            Width = 933
             Height = 21
             Margins.Bottom = 4
             Align = alTop
@@ -456,7 +460,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object panCharSetAndCopyright: TPanel
             Left = 0
             Top = 0
-            Width = 843
+            Width = 933
             Height = 42
             Margins.Bottom = 4
             Align = alTop
@@ -510,7 +514,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object panKeyboardVersion: TPanel
             Left = 0
             Top = 106
-            Width = 843
+            Width = 933
             Height = 21
             Margins.Top = 8
             Margins.Bottom = 4
@@ -545,7 +549,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           object panWebHelp: TPanel
             Left = 0
             Top = 63
-            Width = 843
+            Width = 933
             Height = 43
             Margins.Top = 8
             Margins.Bottom = 4
@@ -588,12 +592,13 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         object panISOLanguages: TPanel
           Left = 0
-          Top = 343
-          Width = 843
+          Top = 381
+          Width = 933
           Height = 64
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 3
+          ExplicitTop = 378
           object lblISOLangTitle: TLabel
             Left = 12
             Top = 3
@@ -636,7 +641,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object panName: TPanel
           Left = 0
           Top = 0
-          Width = 843
+          Width = 933
           Height = 48
           Margins.Top = 8
           Margins.Bottom = 4
@@ -683,74 +688,54 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             OnChange = editNameChange
           end
         end
-      end
-    end
-    object pageMetadata: TTabSheet
-      Caption = 'JSON Metadata'
-      ImageIndex = 10
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 831
-      object panJSONHost: TPanel
-        Left = 0
-        Top = 57
-        Width = 860
-        Height = 588
-        Align = alClient
-        BevelOuter = bvNone
-        TabOrder = 0
-        ExplicitWidth = 950
-        ExplicitHeight = 733
-      end
-      object panJSONTop: TPanel
-        Left = 0
-        Top = 0
-        Width = 860
-        Height = 57
-        Align = alTop
-        BevelOuter = bvNone
-        Color = 14211288
-        ParentBackground = False
-        TabOrder = 1
-        ExplicitWidth = 950
-        object cbJSON: TComboBox
-          Left = 16
-          Top = 16
-          Width = 145
-          Height = 21
-          Style = csDropDownList
-          TabOrder = 0
-          OnClick = cbJSONClick
-        end
-        object cmdAddJSON: TButton
-          Left = 167
-          Top = 14
-          Width = 75
-          Height = 25
-          Caption = '&New...'
-          TabOrder = 1
-          OnClick = cmdAddJSONClick
-        end
-        object cmdDeleteJSON: TButton
-          Left = 248
-          Top = 14
-          Width = 75
-          Height = 25
-          Caption = '&Remove'
-          TabOrder = 2
+        object panLanguageKeyman10: TPanel
+          Left = 0
+          Top = 154
+          Width = 933
+          Height = 38
+          Margins.Top = 8
+          Margins.Bottom = 4
+          Align = alTop
+          AutoSize = True
+          BevelOuter = bvNone
+          ParentColor = True
+          TabOrder = 7
+          object lblLanguageKeyman10Note: TLabel
+            AlignWithMargins = True
+            Left = 12
+            Top = 22
+            Width = 482
+            Height = 13
+            Caption = 
+              'In Keyman 10, language metadata should now be managed in the pac' +
+              'kage, not the keyboard.'
+          end
+          object lblLanguageKeyman10Title: TLabel
+            Left = 12
+            Top = 0
+            Width = 115
+            Height = 17
+            Caption = 'Language Codes'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -14
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
         end
       end
     end
     object pageLayout: TTabSheet
       Caption = 'Layout'
       ImageIndex = 5
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 831
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesLayout: TPageControl
         Left = 0
         Top = 0
-        Width = 860
+        Width = 950
         Height = 645
         ActivePage = pageLayoutDesign
         Align = alClient
@@ -758,33 +743,29 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         TabPosition = tpBottom
         OnChange = pagesLayoutChange
         OnChanging = pagesLayoutChanging
-        ExplicitWidth = 950
-        ExplicitHeight = 831
         object pageLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
           ExplicitLeft = 0
           ExplicitTop = 0
-          ExplicitWidth = 942
-          ExplicitHeight = 805
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object panLayoutSimple: TPanel
             Left = 0
             Top = 0
-            Width = 852
+            Width = 942
             Height = 492
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
             TabOrder = 0
-            ExplicitWidth = 942
-            ExplicitHeight = 678
             DesignSize = (
-              852
+              942
               492)
             object kbdLayout: TOnScreenKeyboard
               Left = 19
               Top = 8
-              Width = 823
+              Width = 913
               Height = 486
               OnSelectionChange = kbdLayoutSelectionChange
               OnShiftChange = kbdLayoutShiftChange
@@ -800,15 +781,13 @@ inherited frmKeymanWizard: TfrmKeymanWizard
               OnDragDrop = kbdLayoutDragDrop
               ParentColor = False
               TabOrder = 0
-              ExplicitWidth = 913
-              ExplicitHeight = 631
             end
           end
           object panLayoutSimple_Edit: TPanel
             AlignWithMargins = True
             Left = 3
             Top = 496
-            Width = 846
+            Width = 936
             Height = 119
             Margins.Top = 4
             Margins.Bottom = 4
@@ -816,8 +795,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             AutoSize = True
             BevelOuter = bvNone
             TabOrder = 1
-            ExplicitTop = 641
-            ExplicitWidth = 936
             object lblLayoutOutputCodeCaption: TLabel
               Left = 13
               Top = 77
@@ -998,8 +975,8 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           ImageIndex = -1
           ExplicitLeft = 0
           ExplicitTop = 0
-          ExplicitWidth = 942
-          ExplicitHeight = 764
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
@@ -1009,12 +986,12 @@ inherited frmKeymanWizard: TfrmKeymanWizard
       inline frameBitmap: TframeBitmapEditor
         Left = 0
         Top = 0
-        Width = 860
+        Width = 950
         Height = 645
         Align = alClient
         TabOrder = 0
         TabStop = True
-        ExplicitWidth = 860
+        ExplicitWidth = 950
         ExplicitHeight = 645
         inherited panPreviewFrame: TPanel
           inherited lblPreview: TLabel
@@ -1022,9 +999,28 @@ inherited frmKeymanWizard: TfrmKeymanWizard
             ExplicitWidth = 39
           end
         end
+        inherited panReadOnlyIcons: TPanel
+          Width = 950
+          Height = 645
+          ExplicitTop = 0
+          ExplicitWidth = 950
+          ExplicitHeight = 645
+          inherited ppReadOnlyIcons: TPaintPanel
+            Width = 950
+            Height = 491
+            ExplicitLeft = 0
+            ExplicitTop = 154
+            ExplicitWidth = 950
+            ExplicitHeight = 491
+          end
+          inherited panReadOnlyIconsTop: TPanel
+            Width = 950
+            ExplicitWidth = 950
+          end
+        end
         inherited ilCmds: TImageList
           Bitmap = {
-            494C01010C000E00D00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+            494C01010C000E00F00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
             0000000000003600000028000000400000004000000001002000000000000040
             0000000000000000000000000000000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000000000000000
@@ -1564,20 +1560,20 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageOnScreenKeyboard: TTabSheet
       Caption = 'On-Screen'
       ImageIndex = 7
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 790
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 831
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
-        Width = 860
+        Width = 950
         Height = 645
         ActivePage = pageTouchLayoutDesign
         Align = alClient
@@ -1585,72 +1581,68 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         TabPosition = tpBottom
         OnChange = pagesTouchLayoutChange
         OnChanging = pagesTouchLayoutChanging
-        ExplicitWidth = 950
-        ExplicitHeight = 831
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
           ExplicitLeft = 0
           ExplicitTop = 0
-          ExplicitWidth = 942
-          ExplicitHeight = 764
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
           ExplicitLeft = 0
           ExplicitTop = 0
-          ExplicitWidth = 942
-          ExplicitHeight = 764
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 790
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 790
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 790
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 790
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      ExplicitLeft = 93
-      ExplicitWidth = 950
-      ExplicitHeight = 831
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
-        Width = 860
+        Width = 950
         Height = 645
         Align = alClient
         BevelOuter = bvNone
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 950
-        ExplicitHeight = 831
         object lblCongrats: TLabel
           Left = 10
           Top = 13

@@ -7,14 +7,6 @@
 //
 
 public enum Key {
-  public static let keyboardId = "kbId"
-  public static let languageId = "langId"
-
-  public static let fontFamily = "family"
-  public static let fontSource = "source"
-  public static let fontFiles = "files"
-  // Font filename is deprecated
-  public static let fontFilename = "filename"
   public static let keyboardInfo = "keyboardInfo"
 
   /// Array of user keyboards info list in UserDefaults
@@ -27,6 +19,7 @@ public enum Key {
   static let engineVersion = "KeymanEngineVersion"
   static let keyboardPickerDisplayed = "KeyboardPickerDisplayed"
   static let synchronizeSWKeyboard = "KeymanSynchronizeSWKeyboard"
+  static let migrationLevel = "KeymanEngineMigrationLevel"
 
   // JSON keys for language REST calls
   static let options = "options"
@@ -42,11 +35,11 @@ public enum Key {
 
 public enum Defaults {
   private static let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
-  public static let keyboard = InstallableKeyboard(id: "european2",
-                                                   name: "EuroLatin2 Keyboard",
-                                                   languageID: "eng",
+  public static let keyboard = InstallableKeyboard(id: "sil_euro_latin",
+                                                   name: "EuroLatin (SIL)",
+                                                   languageID: "en",
                                                    languageName: "English",
-                                                   version: "1.6",
+                                                   version: "1.8",
                                                    isRTL: false,
                                                    font: font,
                                                    oskFont: nil,
@@ -61,11 +54,16 @@ public enum Resources {
   }()
 
   public static let oskFontFilename = "keymanweb-osk.ttf"
-  static let kmwFileName = "keyboard.html"
+  static let kmwFilename = "keyboard.html"
 }
 
 public enum Util {
-  /// Is the process of a custom keyboard extension.
+  /// Is the process of a custom keyboard extension. Avoid using this
+  /// in most situations as Manager.shared.isSystemKeyboard is more
+  /// reliable in situations where in-app and system keyboard can
+  /// be used in the same app, for example using the Web Browser in
+  /// the Keyman app. However, in initialization scenarios this test
+  /// makes sense.
   public static let isSystemKeyboard: Bool = {
     let infoDict = Bundle.main.infoDictionary
     let extensionInfo = infoDict?["NSExtension"] as? [AnyHashable: Any]

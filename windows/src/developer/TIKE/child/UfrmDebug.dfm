@@ -37,34 +37,7 @@ inherited frmDebug: TfrmDebug
     OnClick = memoClick
     OnEnter = memoGotFocus
     OnExit = memoLostFocus
-    AltFont.Charset = DEFAULT_CHARSET
-    AltFont.Color = clWindowText
-    AltFont.Height = -11
-    AltFont.Name = 'MS Sans Serif'
-    AltFont.Style = []
-    ApplyStartStopKeys = False
-    CaretWidth = 1
-    ColumnWrap = 0
-    DisplayOnly = False
-    EnableHotKeys = False
-    EndOfTextMark.Color = clRed
-    EndOfTextMark.Style = psClear
-    Justified = False
-    LineHeight = 0
-    Options = [pmoWrapCaret, pmoInsertKeyActive, pmoWideOverwriteCaret, pmoAutoScrollBars, pmoBlockSelection]
-    Overwrite = False
-    RightLinePen.Color = clGray
-    RightLinePen.Style = psDot
-    SelBackColor = clHighlight
-    SelTextColor = clHighlightText
-    Separators = #9#10#13' $%&,./:;<=>'
-    ShowEndParSelected = False
-    SpecUnderline.Color = clRed
-    TabStops = 4
-    UndoMaxSpace = 65536
-    UpdateMode = umImmediate
-    Version = 'v7.1  Professional ed.'
-    OnSelMove = memoSelMove
+    OnKeyUp = memoKeyUp
     OnMessage = memoMessage
   end
   object sgChars: TStringGrid

@@ -34,20 +34,18 @@
 
 #include <windows.h>
 
-#include "keymanversion.h"
-
 #ifdef _WIN64
 
-#define REGSZ_KeymanCU    			"software\\keyman\\keyman engine\\" KEYMANVERSION
-#define REGSZ_KeymanDeveloperCU	"software\\keyman\\keyman developer\\" KEYMANVERSION
+#define REGSZ_KeymanCU    			"software\\keyman\\keyman engine"
+#define REGSZ_KeymanDeveloperCU	"software\\keyman\\keyman developer"
 
-#define REGSZ_KeymanLM			"software\\wow6432node\\keyman\\keyman engine\\" KEYMANVERSION
-#define REGSZ_KeymanDeveloperLM	"software\\wow6432node\\keyman\\keyman developer\\" KEYMANVERSION
+#define REGSZ_KeymanLM			"software\\wow6432node\\keyman\\keyman engine"
+#define REGSZ_KeymanDeveloperLM	"software\\wow6432node\\keyman\\keyman developer"
 
 #else
 // this below is same in NT 4 and Win95; others will be different
-#define REGSZ_Keyman			"software\\keyman\\keyman engine\\" KEYMANVERSION
-#define REGSZ_KeymanDeveloper	"software\\keyman\\keyman developer\\" KEYMANVERSION
+#define REGSZ_Keyman			"software\\keyman\\keyman engine" 
+#define REGSZ_KeymanDeveloper	"software\\keyman\\keyman developer"
 #define REGSZ_KeymanCU  REGSZ_Keyman
 #define REGSZ_KeymanLM  REGSZ_Keyman
 #define REGSZ_KeymanDeveloperCU  REGSZ_Keyman
@@ -108,9 +106,19 @@
 #define REGSZ_SimulateAltGr     "simulate altgr"
 #define REGSZ_KeyboardHotkeysAreToggle "hotkeys are toggles"
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
+#define REGSZ_ZapVirtualKeyCode        "zap virtual key code"   // LM, defaults to 0x0E (_VK_PREFIX_DEFAULT)
+/* 
+  Debug flags
+  These are all stored in HKCU\Software\Keyman\Debug
+*/
 
+#define REGSZ_Keyman_Debug  REGSZ_KeymanCU "\\Debug"
 
-/* Enable/disable deep TSF integration */
+/* DWORD: Enable/disable serialized input, default 1 */
+
+#define REGSZ_Flag_ShouldSerializeInput "Flag_ShouldSerializeInput"
+
+/* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
 

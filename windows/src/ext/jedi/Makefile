@@ -21,16 +21,11 @@ build-jcldbg:
     # It also needs to be called after make install
     cd $(EXT)\jedi\jcl\jcl\examples\windows\debug\tools
 
-!IFDEF DELPHI_STARTER
-    $(DCC32) makejcldbg.dpr    
-    $(COPY) ..\..\..\..\bin\makejcldbg.exe $(PROGRAM)\buildtools
-!ELSE
     # We use a direct build to ignore platform warnings
     # as we don't control the source of this code
 
     $(MAKEDIR)\dcc32.exe $(DELPHIDPRPARAMS) makejcldbg.dpr
     $(COPY) makejcldbg.exe $(PROGRAM)\buildtools
-!ENDIF
 
 build-jvcl-docking:
     cd $(EXT)\jedi\packages

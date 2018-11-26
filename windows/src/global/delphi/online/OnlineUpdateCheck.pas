@@ -70,6 +70,8 @@ type
     function DoRun: TOnlineUpdateCheckResult;
     procedure SyncShowUpdateForm;
     procedure SyncShutDown;
+  private
+    class var FRunning: Boolean;
   public
 
   protected
@@ -79,6 +81,7 @@ type
     constructor Create(ARootKey: string; AOnlineProductID: Integer; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
+    class function Running: Boolean;
     property CurrentVersion: string read FCurrentVersion write FCurrentVersion;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
@@ -86,13 +89,13 @@ type
 implementation
 
 uses
-  ActiveX,
-  Controls,
-  Dialogs,
-  Forms,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.Forms,
   httpuploader,
   KLog,
   ErrorControlledRegistry,
+  Keyman.System.UpdateCheckResponse,
   RegistryKeys,
   ShellApi,
   Upload_Settings,
@@ -102,14 +105,15 @@ uses
   utilsystem,
   versioninfo,
   Windows,
-  WinINet,
-  xmldoc,
-  xmlintf;
+  WinINet;
 
 { TOnlineUpdateCheck }
 
 constructor TOnlineUpdateCheck.Create(ARootKey: string; AOnlineProductID: Integer; AForce, ASilent, AThread: Boolean; AProxyServer: string; AProxyPort: Integer; AProxyUsername, AProxyPassword: string);
 begin
+  Assert(not FRunning);
+  FRunning := True;
+
   FShowErrors := True;
   FCurrentVersion := GetVersionString;
   FParams.Result := oucUnknown;
@@ -140,6 +144,8 @@ begin
   KL.Log('TOnlineUpdateCheck.Destroy: FErrorMessage = '+FErrorMessage);
   KL.Log('TOnlineUpdateCheck.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
 
+  FRunning := False;
+
   inherited Destroy;
 end;
 
@@ -157,6 +163,11 @@ begin
   end;
 end;
 
+class function TOnlineUpdateCheck.Running: Boolean;
+begin
+  Result := FRunning;
+end;
+
 procedure TOnlineUpdateCheck.DoDownloadUpdate(AOwner: TfrmDownloadProgress; var Result: Boolean);
 begin
   Result := False;
@@ -170,9 +181,7 @@ begin
       Proxy.Username := FProxyUsername;
       Proxy.Password := FProxyPassword;
       Request.Agent := API_UserAgent;
-      //Request.Protocol := Upload_Protocol;
-      //Request.HostName := Upload_Server;
-      Request.SetURL(DownloadUpdate_URL);// UrlPath := URL;
+      Request.SetURL(DownloadUpdate_URL);
       Upload;
       if Response.StatusCode = 200 then
       begin
@@ -283,16 +292,9 @@ end;
 
 function TOnlineUpdateCheck.DoRun: TOnlineUpdateCheckResult;
 var
-  root: IXMLNode;
-  doc: IXMLDocument;
-  {FProxyHost: string;
-  FProxyPort: Integer;}
+  ucr: TUpdateCheckResponse;
   flags: DWord;
-  n: Integer;
 begin
-  {FProxyHost := '';
-  FProxyPort := 0;}
-
   { Check if user is currently online and don't force dialup dialog to appear if not }
   if FSilent then
     if not InternetGetConnectedState(@flags, 0) then
@@ -317,12 +319,6 @@ begin
           Result := oucNoUpdates;
           Exit;
         end;
-
-        {if ValueExists(SRegValue_UpdateCheck_UseProxy) and ReadBool(SRegValue_UpdateCheck_UseProxy) then
-        begin
-          FProxyHost := ReadString(SRegValue_UpdateCheck_ProxyHost);
-          FProxyPort := StrToIntDef(ReadString(SRegValue_UpdateCheck_ProxyPort), 80);
-        end;}
       end;
     finally
       Free;
@@ -337,10 +333,11 @@ begin
     end;
   end;
 
+  Result := oucNoUpdates;
+
   try
     with THTTPUploader.Create(nil) do
     try
-      Fields.Add('OnlineProductID', ansistring(IntToStr(FOnlineProductID)));
       Fields.Add('Version', ansistring(FCurrentVersion));
       Proxy.Server := FProxyServer;
       Proxy.Port := FProxyPort;
@@ -349,52 +346,35 @@ begin
 
       Request.HostName := API_Server;
       Request.Protocol := API_Protocol;
-      Request.UrlPath := API_Path_UpdateCheck;
+      Request.UrlPath := API_Path_UpdateCheck_Developer;
       //OnStatus :=
       Upload;
       if Response.StatusCode = 200 then
       begin
-        doc := LoadXMLData(Response.MessageBodyAsString);
-        doc.Options := doc.Options - [doAttrNull];
+        // TODO: Refactor with setup and desktop updatechecks
 
-        root := doc.DocumentElement;
-        if root.NodeName <> 'updatecheck' then
-          raise EOnlineUpdateCheck.Create('Invalid response:'#13#10+string(Response.MessageBodyAsString));
-        n := root.ChildNodes.IndexOf('update');
-        if n >= 0 then
+        if ucr.Parse(Response.MessageBodyAsString, 'developer', FCurrentVersion) then
         begin
-          root := root.ChildNodes[n];
-
-          if (CompareVersions(root.Attributes['newversion'], GetVersionString) >= 0) or (root.Attributes['installurl'] = '') then   // I2849, I2856
-          begin
-            FErrorMessage := 'No updates are currently available.';
-            Result := oucNoUpdates;
-          end
-          else
-          begin
-            FParams.NewVersion := root.Attributes['newversion'];
-            FParams.InstallURL := root.Attributes['installurl'];  // I2849
-            FParams.InstallSize := StrToIntDef(root.Attributes['installsize'], 0);  // I2849
-            Synchronize(SyncShowUpdateForm);
-            Result := FParams.Result;
+          case ucr.Status of
+            ucrsNoUpdate:
+              begin
+                FErrorMessage := ucr.ErrorMessage;
+              end;
+            ucrsUpdateReady:
+              begin
+                FParams.NewVersion := ucr.NewVersion;
+                FParams.InstallURL := ucr.InstallURL;
+                FParams.InstallSize := ucr.InstallSize;
+                Synchronize(SyncShowUpdateForm);
+                Result := FParams.Result;
+              end;
           end;
         end
-        else if not FSilent then
-        begin
-          Result := oucFailure;
-          n := root.ChildNodes.IndexOf('message');
-          if n >= 0 then
-          begin
-            if root.ChildNodes[n].Attributes['Severity'] = 'fatal' then
-              FErrorMessage := 'FATAL ERROR: '+root.ChildNodes[n].NodeValue
-            else
-              FErrorMessage := root.ChildNodes[n].NodeValue;
-          end
-          else
-            FErrorMessage := 'Invalid response:'#13#10+string(Response.MessageBodyAsString);
-        end
         else
+        begin
+          FErrorMessage := ucr.ErrorMessage;
           Result := oucFailure;
+        end;
       end
       else
         raise EOnlineUpdateCheck.Create('Error '+IntToStr(Response.StatusCode));
@@ -428,12 +408,7 @@ end;
 procedure TOnlineUpdateCheck.Execute;
 begin
   FreeOnTerminate := True;
-  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
-  try
-    FParams.Result := DoRun;
-  finally
-    CoUninitialize;
-  end;
+  FParams.Result := DoRun;
 end;
 
 end.

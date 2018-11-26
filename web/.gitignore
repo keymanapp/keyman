@@ -1,5 +1,15 @@
+# Legacy build folders.
 output/
+build/
 embedded/
+
+# Current build folders.
+intermediate/
+release/
+
+# Other local files.
+node_modules/
+unit_tests/modernizr.js
 **/.idea/**/*.xml
 **/*.iml
 **/*.kpj.user

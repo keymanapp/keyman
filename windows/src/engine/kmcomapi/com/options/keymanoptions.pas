@@ -115,7 +115,7 @@ var
 begin
   with TRegistryErrorControlled.Create do   // I3717
   try
-    if OpenKey(SRegKey_KeymanEngine, True) then
+    if OpenKey(SRegKey_KeymanEngine_CU, True) then
     begin
       if ValueExists(SRegValue_UnderlyingLayout)
         then FOldBaseLayout := StrToIntDef('$'+ReadString(SRegValue_UnderlyingLayout),0)   // I3759

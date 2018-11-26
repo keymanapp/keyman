@@ -18,6 +18,11 @@ display_usage ( ) {
 
 echo Build KMEA
 
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
+
 # Path definitions
 KM_ROOT="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 KMA_ROOT="$KM_ROOT/android"
@@ -79,27 +84,27 @@ fi
 
 PLATFORM=`uname -s`
 
+# Report JUnit test results to CI
+echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\TEST-com.tavultesoft.kmea.packages.PackageProcessorTest.xml']"
+
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
     cd $KMW_SOURCE
-    # $OS should only be defined on Windows
-    if [ "$OS" = "Windows_NT" ]; then
-        ./build.bat -embed
-    else
-        ./build.sh -embed
-    fi
+
+    ./build.sh -embed
+	
     if [ $? -ne 0 ]; then
         die "ERROR: keymanweb build failed. Exiting"
     fi
 fi
 if [ "$DO_COPY" = true ]; then
     echo "Copying KMW artifacts"
-    cp $KMW_ROOT/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/embedded/keyman.js $KMEA_ASSETS/keyman.js
-    cp $KMW_ROOT/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
-    cp $KMW_ROOT/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
-    cp $KMW_ROOT/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
+    cp $KMW_ROOT/release/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
+    cp $KMW_ROOT/release/embedded/keyman.js $KMEA_ASSETS/keyman.js
+    cp $KMW_ROOT/release/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
+    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
     if [ $? -ne 0 ]; then
         die "ERROR: copying artifacts failed"
     fi
@@ -111,6 +116,10 @@ cd $KMA_ROOT/KMEA
 ./gradlew $DAEMON_FLAG aR
 if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
+fi
+./gradlew $DAEMON_FLAG test
+if [ $? -ne 0 ]; then
+    die "ERROR: KMEA test cases failed"
 fi
 
 echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"

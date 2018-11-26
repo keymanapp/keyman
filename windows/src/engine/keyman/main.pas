@@ -32,17 +32,23 @@ procedure Run;
 implementation
 
 uses
-  Dialogs,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Winapi.Windows,
+  System.Win.Registry,
+  System.SysUtils,
+
   GetOsVersion,
+  Keyman.System.Security,
+  Keyman.Winapi.VersionHelpers,
   KeymanVersion,
-  Windows,
-  Forms,
-  SysUtils,
+  RegistryKeys,
   UfrmKeyman7Main,
   UserMessages;
 
 function ValidateParameters(var FCommand: Integer): Boolean; forward;
 function PassParametersToRunningInstance(FCommand: Integer): Boolean; forward;
+procedure InitialiseRegistrySecurity; forward;
 
 function CaptureMutex: Boolean;
 begin
@@ -91,6 +97,8 @@ begin
             ShowMessage('Keyman Engine '+SKeymanVersion+' can not be started while Keyman 5.x or 6.x is running.  Please shut down Keyman 5.x/6.x first.');
             Exit;
           end;
+
+          InitialiseRegistrySecurity;
 
           { we now own the mutex }
           Application.Initialize;
@@ -154,6 +162,26 @@ begin
   else Exit;
 
   Result := True;
+end;
+
+{
+  Enables metro-style apps to read the Keyman registry key in order
+  to load the list of keyboards, and other settings, on Windows 8 and
+  later versions
+}
+procedure InitialiseRegistrySecurity;
+var
+  r: TRegistry;
+begin
+  r := TRegistry.Create;
+  try
+    if r.OpenKey(SRegKey_KeymanRoot_CU, True) then
+    begin
+      GrantPermissionToAllApplicationPackages(r.CurrentKey, KEY_READ);
+    end;
+  finally
+    r.Free;
+  end;
 end;
 
 end.

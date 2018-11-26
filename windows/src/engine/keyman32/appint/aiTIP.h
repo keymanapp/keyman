@@ -32,7 +32,8 @@
 #define AIType_TIP	3
 
 // _VK_PREFIX is used to mask out ALT key seemingly pressed by itself when Keyman swallows the next key, which would activate a menu.   // I4844
-#define _VK_PREFIX    0x07
+// This can be customised with HKLM\Software\Keyman\Keyman Engine\zap virtual key code
+#define _VK_PREFIX_DEFAULT    0x0E
 
 struct AIDEBUGKEYINFO
 {

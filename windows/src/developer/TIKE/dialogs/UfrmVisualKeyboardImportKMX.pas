@@ -66,6 +66,7 @@ type
     procedure Validate102Key;
     procedure SetStatus(const msg: string);
   protected
+    function GetHelpTopic: string; override;
     procedure WndProc(var Message: TMessage); override;
   public
     property FileName: WideString read FFileName write FFileName;
@@ -77,8 +78,10 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
   keyman32_int,
   KeymanDeveloperUtils,
+  kmxfileconsts,
   debugging,
   VKeys;
 
@@ -491,6 +494,11 @@ begin
     Inc(kp);
   end;
 
+end;
+
+function TfrmVisualKeyboardImportKMX.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_VisualKeyboardImportKMX;
 end;
 
 function TfrmVisualKeyboardImportKMX.GetKeyboardKeys: Boolean;

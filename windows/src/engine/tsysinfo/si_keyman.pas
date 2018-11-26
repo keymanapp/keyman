@@ -110,9 +110,9 @@ begin
 
   subnode := xmlAddChild(node,'Registry');
   regnode := xmlAddChild(subnode,'LocalMachine');
-  AddRegistry(regnode, HKEY_LOCAL_MACHINE, SRegKey_KeymanRoot);
+  AddRegistry(regnode, HKEY_LOCAL_MACHINE, SRegKey_KeymanRoot_LM);
   regnode := xmlAddChild(subnode,'CurrentUser');
-  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeymanRoot);
+  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeymanRoot_CU);
 
   { Get file versions }
 
@@ -123,6 +123,8 @@ begin
   AddFiles(regnode, CSIDL_PROGRAM_FILES_COMMON, SFolderKeymanRoot);
   regnode := xmlAddChild(subnode,'AppData-Files-Keyman');
   AddFiles(regnode, CSIDL_APPDATA, SFolderKeymanRoot);
+  regnode := xmlAddChild(subnode,'Local-AppData-Files-Keyman');
+  AddFiles(regnode, CSIDL_LOCAL_APPDATA, SFolderKeymanRoot);
   regnode := xmlAddChild(subnode,'Common-AppData-Files-Keyman');
   AddFiles(regnode, CSIDL_COMMON_APPDATA, SFolderKeymanRoot);
 

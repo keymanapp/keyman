@@ -8,6 +8,8 @@
 
 import UIKit
 import WebKit
+import XCGLogger
+import Zip
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
@@ -22,8 +24,8 @@ public enum KeyboardState {
   case none
 }
 
-// URLs
-private let keymanHostName = "r.keymanweb.com"
+// URLs - used for reachability test
+private let keymanHostName = "api.keyman.com"
 
 public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
@@ -31,10 +33,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   public static let shared = Manager()
 
-  public var isDebugPrintingOn = false
-
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
+
+  public var isSystemKeyboard = false
 
   // TODO: Change API to not disable removing as well
   /// Allow users to add new keyboards in the keyboard picker.
@@ -74,8 +76,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// Set this to `UIApplication.shared.openURL` in your application.
   public var openURL: ((URL) -> Bool)?
 
-  var keyboardID: String?
-  var languageID: String?
+  var currentKeyboardID: FullKeyboardID?
   weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
@@ -101,46 +102,37 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
-    if !Util.isSystemKeyboard {
-      if let shared = Storage.shared,
-        let nonShared = Storage.nonShared {
-        let keysToCopy = [Key.userKeyboardsList, Key.userCurrentKeyboard,
-                          Key.engineVersion, Key.keyboardPickerDisplayed]
-        nonShared.copyUserDefaults(to: shared, withKeys: keysToCopy, shouldOverwrite: false)
-        do {
-          try nonShared.copyFiles(to: shared)
-        } catch {
-          kmLog("Failed to copy files to shared container: \(error)", checkDebugPrinting: false)
-        }
-      }
-      let userData = Storage.active.userDefaults
-      let isKPDisplayed = userData.bool(forKey: Key.keyboardPickerDisplayed)
-      if isKPDisplayed {
-        isKeymanHelpOn = false
-      }
-    } else {
+    Migrations.migrate(storage: Storage.active)
+    if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
+      Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+    }
+
+    if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
     }
 
     do {
       try Storage.active.copyKMWFiles(from: Resources.bundle)
     } catch {
-      kmLog("Failed to copy KMW files from bundle: \(error)", checkDebugPrinting: false)
+      log.error("Failed to copy KMW files from bundle: \(error)")
     }
 
     updateUserKeyboards(with: Defaults.keyboard)
 
     reachability = Reachability(hostName: keymanHostName)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
+
+    if(!Util.isSystemKeyboard) {
+      NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
                                            name: .reachabilityChanged, object: reachability)
-    reachability.startNotifier()
+      reachability.startNotifier()
+    }
 
     /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
 
-    keymanWeb = KeymanWebViewController()
+    keymanWeb = KeymanWebViewController(storage: Storage.active)
     keymanWeb.delegate = self
     _ = keymanWeb.view
   }
@@ -155,60 +147,40 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   ///   - addKeyboard()
   /// - Returns: Whether the keyboard was set successfully
-  public func setKeyboard(withID keyboardID: String, languageID: String) -> Bool {
-    if let keyboard = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID) {
-      return setKeyboard(keyboard)
+  //TODO: this method appears unused, should we remove it?
+  public func setKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
+    if let keyboard = Storage.active.userDefaults.userKeyboard(withFullID: fullID) {
+        return setKeyboard(keyboard)
     }
     return false
   }
+  
 
   /// Set the current keyboard.
   ///
-  /// - Returns: Whether the keyboard was set successfully
+  /// - Throws: error if the keyboard was unchanged
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
-    if kb.languageID == self.languageID && kb.id == self.keyboardID {
-      kmLog("Keyboard unchanged: \(kb.languageID)_\(kb.id)", checkDebugPrinting: true)
+    if kb.fullID == currentKeyboardID {
+      log.info("Keyboard unchanged: \(kb.fullID)")
       return false
+     // throw KeyboardError.unchanged
     }
 
-    kmLog("Setting language: \(kb.languageID)_\(kb.id)", checkDebugPrinting: true)
+    log.info("Setting language: \(kb.fullID)")
 
-    // FIXME: kb.version is not respected. Ideally we should be able to trust that the version number in UserDefaults
-    // is-to-date but it is sometimes not updated.
-    guard let kbVersion = latestKeyboardFileVersion(withID: kb.id) else {
-      kmLog("Could not set keyboardID to \(kb.id) because the keyboard file does not exist",
-        checkDebugPrinting: false)
-      // Fallback to default keyboard if no keyboard is currently set.
-      if (self.keyboardID == nil || self.languageID == nil) && kb.id != Defaults.keyboard.id {
-        _ = setKeyboard(Defaults.keyboard)
-      }
-      return false
-    }
-
-    self.languageID = kb.languageID
-    self.keyboardID = kb.id
-
-    let jsFont = self.jsFont(fromFont: kb.font) ?? "undefined"
-    let jsOskFont: String
-    if let oskFont = kb.oskFont {
-      jsOskFont = self.jsFont(fromFont: oskFont) ?? "undefined"
-    } else {
-      jsOskFont = jsFont
-    }
+    currentKeyboardID = kb.fullID
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forFilename: fontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: fontFilename))
     }
     if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forFilename: oskFontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
     }
 
-    keymanWeb.setKeyboard(id: kb.id, name: kb.name, languageID: kb.languageID, languageName: kb.languageName,
-                          version: kbVersion, font: jsFont, oskFont: jsOskFont)
+    keymanWeb.setKeyboard(kb)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-
-    userData.currentKeyboard = kb
+    userData.currentKeyboardID = kb.fullID
     userData.synchronize()
 
     if isKeymanHelpOn {
@@ -218,6 +190,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
+    
     return true
   }
 
@@ -226,8 +199,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
     let keyboardPath = Storage.active.keyboardURL(for: keyboard).path
     if !FileManager.default.fileExists(atPath: keyboardPath) {
-      kmLog("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist",
-        checkDebugPrinting: false)
+      log.error("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist")
       return
     }
 
@@ -236,7 +208,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
-    if let index = userKeyboards.index(where: { $0.id == keyboard.id && $0.languageID == keyboard.languageID }) {
+    if let index = userKeyboards.index(where: { $0.fullID == keyboard.fullID }) {
       userKeyboards[index] = keyboard
     } else {
       userKeyboards.append(keyboard)
@@ -249,9 +221,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
-  public func removeKeyboard(withID keyboardID: String, languageID: String) -> Bool {
+  public func removeKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     // Remove keyboard from the list if it exists
-    let index = Storage.active.userDefaults.userKeyboards?.index { $0.id == keyboardID && $0.languageID == languageID }
+    let index = Storage.active.userDefaults.userKeyboards?.index { $0.fullID == fullID }
     if let index = index {
       return removeKeyboard(at: index)
     }
@@ -278,9 +250,22 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
 
+    log.info("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
+
     // Set a new keyboard if deleting the current one
-    if kb.id == keyboardID && kb.languageID == languageID {
-      setKeyboard(userKeyboards[0])
+    if kb.fullID == currentKeyboardID {
+      _ = setKeyboard(userKeyboards[0])
+    }
+
+    if !userKeyboards.contains(where: { $0.id == kb.id }) {
+      let keyboardDir = Storage.active.keyboardDir(forID: kb.id)
+      FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
+      log.info("Deleting directory \(keyboardDir)")
+      if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
+        log.error("Failed to delete \(keyboardDir)")
+      }
+    } else {
+      log.info("User has another language installed. Skipping delete of keyboard files.")
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
@@ -288,40 +273,33 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   /// - Returns: Info for the current keyboard, if a keyboard is set
-  public var currentKeyboardInfo: InstallableKeyboard? {
-    guard let keyboardID = keyboardID, let languageID = languageID else {
+  public var currentKeyboard: InstallableKeyboard? {
+    guard let fullID = currentKeyboardID else {
       return nil
     }
-    return Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+    return Storage.active.userDefaults.userKeyboard(withFullID: fullID)
   }
 
   /// Switch to the next keyboard.
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
-          let index = userKeyboards.index(where: { isCurrentKeyboard($0) }) else {
+      let index = userKeyboards.index(where: { self.currentKeyboardID == $0.fullID })
+    else {
       return nil
     }
     let newIndex = (index + 1) % userKeyboards.count
-    setKeyboard(userKeyboards[newIndex])
+    _ = setKeyboard(userKeyboards[newIndex])
     return newIndex
-  }
-
-  func isCurrentKeyboard(withID keyboardID: String?, languageID: String?) -> Bool {
-    return self.keyboardID == keyboardID && self.languageID == languageID
-  }
-
-  func isCurrentKeyboard(_ keyboard: InstallableKeyboard) -> Bool {
-    return keyboard.id == self.keyboardID && keyboard.languageID == self.languageID
   }
 
   /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
-  public func fontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+  public func fontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
+    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
     if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forFilename: filename)
+      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -330,42 +308,124 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
-  func oskFontNameForKeyboard(withID keyboardID: String, languageID: String) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withID: keyboardID, languageID: languageID)
+  func oskFontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
+    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
     if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forFilename: filename)
+      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
   }
-
-  func jsFont(fromFont font: Font?) -> String? {
-    guard let font = font else {
-      return jsFont(fromFontDictionary: nil)
-    }
-    return jsFont(fromFontDictionary: [
-      Key.fontFamily: font.family,
-      Key.fontSource: font.source,
-      "size": font.size
-    ])
-  }
-
-  func jsFont(fromFontDictionary fontDict: [AnyHashable: Any]?) -> String? {
-    guard let fontDict = fontDict, !fontDict.isEmpty else {
-      return nil
-    }
-
-    let data: Data
+    
+  // MARK: - Adhoc keyboards
+  public func parseKMP(_ folder: URL) throws -> Void {
     do {
-      data = try JSONSerialization.data(withJSONObject: fontDict, options: [])
+      var path = folder
+      path.appendPathComponent("kmp.json")
+      let data = try Data(contentsOf: path, options: .mappedIfSafe)
+      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+      if let jsonResult = jsonResult as? [String:AnyObject] {
+        if let keyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
+          for k in keyboards {
+            let name = k["name"] as! String
+            let keyboardID = k["id"] as! String
+            let version = k["version"] as! String
+            
+            var oskFont: Font?
+            let osk = k["oskFont"] as? String
+            if let _ = osk {
+              oskFont = Font(filename: osk!)
+            }
+            var displayFont: Font?
+            let font = k["displayFont"] as? String
+            if let _ = font {
+              displayFont = Font(filename: font!)
+            }
+            
+            //TODO: handle errors if languages do not exist
+            var languageName = ""
+            var languageId = ""
+            
+            var installableKeyboards : [InstallableKeyboard] = []
+            if let langs = k["languages"] as? [[String:String]] {
+              for l in langs {
+                languageName = l["name"]!
+                languageId = l["id"]!
+                
+                installableKeyboards.append( InstallableKeyboard(
+                  id: keyboardID,
+                  name: name,
+                  languageID: languageId,
+                  languageName: languageName,
+                  version: version,
+                  isRTL: false,
+                  font: displayFont,
+                  oskFont: oskFont,
+                  isCustom: false))
+              }
+            }
+            
+            do {
+              try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+                                                      withIntermediateDirectories: true)
+            } catch {
+              log.error("Could not create dir for download: \(error)")
+              throw KMPError.fileSystem
+            }
+            
+            for keyboard in installableKeyboards {
+              let storedPath = Storage.active.keyboardURL(for: keyboard)
+              
+              var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
+              if let osk = osk {
+                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
+                installableFiles.append([osk, oskPath])
+              }
+              
+              if let font = font {
+                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
+                installableFiles.append([font, displayPath])
+              }
+              do {
+                for item in installableFiles {
+                  var filePath = folder
+                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+                    try FileManager.default.removeItem(at: item[1] as! URL)
+                  }
+                  filePath.appendPathComponent(item[0] as! String)
+                  try FileManager.default.copyItem(at: filePath,
+                                                   to: item[1] as! URL)
+                  
+                }
+              } catch {
+                log.error("Error saving the download: \(error)")
+                throw KMPError.copyFiles
+              }
+              Manager.shared.addKeyboard(keyboard)
+            }
+          }
+        }
+      }
     } catch {
-      kmLog("Failed to encode font dictionary as JSON: \(String(describing: fontDict))", checkDebugPrinting: false)
-      return nil
+      log.error("error parsing kmp: \(error)")
+      throw KMPError.invalidPackage
     }
-
-    return String(data: data, encoding: .ascii)!
-      .replacingOccurrences(of: Key.fontFilename, with: Key.fontFiles)
-      .replacingOccurrences(of: Key.fontSource, with: Key.fontFiles)
+  }
+  
+  public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void)
+  {
+    do {
+      try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
+                        password: nil,
+                        progress: { (progress) -> () in
+                          //TODO: add timeout
+                          if(progress == 1.0) {
+                            complete()
+                          }
+                        })
+    } catch {
+      log.error("error unzipping archive: \(error)")
+    }
   }
 
   // MARK: - Downloading keyboards
@@ -383,12 +443,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       let options = apiKeyboardRepository.options
     else {
       if fetchRepositoryIfNeeded {
-        kmLog("Fetching repository from API for keyboard download", checkDebugPrinting: true)
+        log.info("Fetching repository from API for keyboard download")
         apiKeyboardRepository.fetch { error in
           if let error = error {
             self.downloadFailed(forKeyboards: [], error: error)
           } else {
-            self.kmLog("Fetched repository. Continuing with keyboard download.", checkDebugPrinting: true)
+            log.info("Fetched repository. Continuing with keyboard download.")
             self.downloadKeyboard(withID: keyboardID,
                                   languageID: languageID,
                                   isUpdate: isUpdate,
@@ -427,8 +487,15 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return
+    }
 
+    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
 
@@ -447,7 +514,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = Storage.active.fontURL(forFilename: url.lastPathComponent).path
+      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboardID, filename: url.lastPathComponent).path
       request.tag = i + 1
       downloadQueue!.addRequest(request)
     }
@@ -479,15 +546,29 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       downloadFailed(forKeyboards: [], error: error)
       return
     }
+    
+    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
+  }
 
+  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
     let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .ios8601WithFallback
-    do {
-      let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
-      return downloadKeyboard(keyboard)
-    } catch {
-      downloadFailed(forKeyboards: [], error: error)
-      return
+    decoder.dateDecodingStrategy = decodingStrategy
+  
+    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+      downloadKeyboard(keyboard)
+    } else {
+      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
+      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+        downloadKeyboard(keyboard)
+      } else {
+        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
+        do {
+          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+          downloadKeyboard(keyboard)
+        } catch {
+          downloadFailed(forKeyboards: [], error: error)
+        }
+      }
     }
   }
 
@@ -495,7 +576,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private func downloadKeyboard(_ keyboardAPI: KeyboardAPICall) {
     let keyboard = keyboardAPI.keyboard
     let installableKeyboards = keyboard.languages!.map { language in
-      InstallableKeyboard(keyboard: keyboard, language: language)
+      InstallableKeyboard(keyboard: keyboard, language: language, isCustom: true)
     }
 
     let filename = keyboard.filename
@@ -518,9 +599,17 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    let isUpdate = latestKeyboardFileVersion(withID: keyboard.id) != nil
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return
+    }
 
-    downloadQueue = HTTPDownloader.init(self)
+    let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
+
+    downloadQueue = HTTPDownloader(self)
     let commonUserData: [String: Any] = [
       Key.keyboardInfo: installableKeyboards,
       Key.update: isUpdate
@@ -534,7 +623,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     downloadQueue!.addRequest(request)
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = Storage.active.fontURL(forFilename: url.lastPathComponent).path
+      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
       request.tag = i + 1
       downloadQueue!.addRequest(request)
     }
@@ -546,14 +635,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if keyboardIdForCurrentRequest() == keyboardID {
       return .downloading
     }
-    guard let latestDownloadedVersion = latestKeyboardFileVersion(withID: keyboardID) else {
+    let userKeyboards = Storage.active.userDefaults.userKeyboards
+    guard let userKeyboard = userKeyboards?.first(where: { $0.id == keyboardID }) else {
       return .needsDownload
     }
 
     // Check version
-    if let latestRepositoryVersion = apiKeyboardRepository.keyboards?[keyboardID]?.version,
-      compareVersions(latestDownloadedVersion, latestRepositoryVersion) == .orderedAscending {
-      return .needsUpdate
+    if let repositoryVersionString = apiKeyboardRepository.keyboards?[keyboardID]?.version {
+      let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
+      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
+      if downloadedVersion < repositoryVersion {
+        return .needsUpdate
+      }
     }
     return .upToDate
   }
@@ -574,29 +667,23 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   @objc func reachabilityChanged(_ notification: Notification) {
-    if isDebugPrintingOn {
-      var reachStr = "Not Reachable"
-      let status: NetworkStatus = reachability.currentReachabilityStatus()
-      if status == ReachableViaWiFi {
+    log.debug {
+      let reachStr: String
+      switch reachability.currentReachabilityStatus() {
+      case ReachableViaWiFi:
         reachStr = "Reachable Via WiFi"
-      }
-      if status == ReachableViaWWAN {
+      case ReachableViaWWAN:
         reachStr = "Reachable Via WWan"
+      default:
+        reachStr = "Not Reachable"
       }
-      kmLog("Reachability changed to '\(reachStr)'", checkDebugPrinting: true)
+      return "Reachability changed to '\(reachStr)'"
     }
   }
 
   // MARK: - HTTPDownloadDelegate methods
 
-  func downloadQueueFinished(_ queue: HTTPDownloader) {
-    if isDebugPrintingOn {
-      let fontContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.fontDir.path)
-      kmLog("Font Directory contents: \(String(describing: fontContents))", checkDebugPrinting: true)
-      let langContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path)
-      kmLog("Language Directory contents: \(String(describing: langContents))", checkDebugPrinting: true)
-    }
-  }
+  func downloadQueueFinished(_ queue: HTTPDownloader) { }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
     // If we're downloading a new keyboard.
@@ -621,7 +708,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
           // Download queue finished.
           downloadQueue = nil
           FontManager.shared.registerCustomFonts()
-          kmLog("Downloaded keyboard: \(keyboard.id).", checkDebugPrinting: true)
+          log.info("Downloaded keyboard: \(keyboard.id).")
 
           NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
                                           object: self,
@@ -641,7 +728,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
         let error = NSError(domain: "Keyman", code: 0,
                             userInfo: [NSLocalizedDescriptionKey: errorMessage])
-        kmLog("Keyboard download failed: \(error).", checkDebugPrinting: true)
+        log.error("Keyboard download failed: \(error).")
 
         if !isUpdate {
           // Clean up keyboard file if anything fails
@@ -658,7 +745,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     case .downloadFile:
       downloadQueue = nil
       let error = request.error!
-      kmLog("Keyboard download failed: \(error).", checkDebugPrinting: true)
+      log.error("Keyboard download failed: \(error).")
 
       let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
       let keyboard = keyboards[0]
@@ -681,88 +768,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - Loading custom keyboards
-
-  /// Preloads a .js file for a language so that the keyboard is available without downloading.
-  /// - Precondition:
-  ///   - The .js filename must remain the same as when obtained from Keyman.
-  ///   - The .js file must be bundled in your application.
-  public func preloadKeyboardFile(at url: URL, shouldOverwrite: Bool) throws {
-    try Storage.copyAndExcludeFromBackup(at: url,
-                                         to: Storage.active.languageDir.appendingPathComponent(url.lastPathComponent),
-                                         shouldOverwrite: shouldOverwrite)
-  }
-
-  /// Preloads a .ttf or .otf file to be available without downloading.
-  /// - Precondition:
-  ///   - The font file must be bundled in your application.
-  /// - SeeAlso: `registerCustomFonts()`
-  public func preloadFontFile(at url: URL, shouldOverwrite: Bool) throws {
-    try Storage.copyAndExcludeFromBackup(at: url,
-                                         to: Storage.active.fontDir.appendingPathComponent(url.lastPathComponent),
-                                         shouldOverwrite: shouldOverwrite)
-  }
-
-  // TODO: Use a logging library or have more than 2 log levels
-  // Facilitates KeymanEngine internal logging.
-  public func kmLog(_ logStr: String, checkDebugPrinting: Bool) {
-    if checkDebugPrinting && !isDebugPrintingOn {
-      return
+  /// Preloads the JS and font files required for a keyboard.
+  public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
+    let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
+    try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
+    for url in urls {
+      try Storage.copyAndExcludeFromBackup(at: url,
+                                           to: keyboardDir.appendingPathComponent(url.lastPathComponent),
+                                           shouldOverwrite: shouldOverwrite)
     }
-    NSLog("%@", logStr)
   }
 
   // MARK: - File system and UserData management
-  func latestKeyboardFileVersion(withID keyboardID: String) -> String? {
-    guard let dirContents = try? FileManager.default.contentsOfDirectory(atPath: Storage.active.languageDir.path) else {
-      return nil
-    }
-
-    var latestVersion: String?
-    for filename in dirContents where filename.hasPrefix("\(keyboardID)-") && filename.hasJavaScriptExtension {
-      let dashRange = filename.range(of: "-", options: .backwards)!
-      let extensionRange = filename.range(of: ".js", options: .backwards)!
-      let version = String(filename[dashRange.upperBound..<extensionRange.lowerBound])
-
-      if let previousMax = latestVersion {
-        if compareVersions(previousMax, version) == .orderedAscending {
-          latestVersion = version
-        }
-      } else if compareVersions(version, version) != nil {  // Ensure that the version number is valid
-        latestVersion = version
-      }
-    }
-    return latestVersion
-  }
-
-  /// Compares version numbers in dotted numberic format.
-  /// - Returns: ComparisonResult if both version numbers are valid.
-  func compareVersions(_ v1: String, _ v2: String) -> ComparisonResult? {
-    if v1.isEmpty || v2.isEmpty {
-      return nil
-    }
-    let components1 = v1.components(separatedBy: ".")
-    let components2 = v2.components(separatedBy: ".")
-
-    let len = max(components1.count, components2.count)
-    for i in 0..<len {
-      // Shorter version number padded with trailing zero components
-      let component1 = components1[safe: i] ?? "0"
-      let component2 = components2[safe: i] ?? "0"
-      guard let val1 = Int(component1), val1 >= 0 else {
-        return nil
-      }
-      guard let val2 = Int(component2), val2 >= 0 else {
-        return nil
-      }
-      if val1 < val2 {
-        return .orderedAscending
-      }
-      if val1 > val2 {
-        return .orderedDescending
-      }
-    }
-    return .orderedSame
-  }
 
   /// Updates the user's installed keyboards and current keyboard with information in newKeyboard.
   /// - Parameter newKeyboard: Info for updated keyboard.
@@ -779,27 +796,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         if kb.languageID == newKeyboard.languageID {
           kb = newKeyboard
         } else {
-          kb.version = newKeyboard.id
+          kb.version = newKeyboard.version
         }
         userKeyboards[i] = kb
       }
     }
     userData.userKeyboards = userKeyboards
     userData.synchronize()
-
-    // Set version for current keyboard
-    let currentUserData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-    if var kb = currentUserData.currentKeyboard {
-      if kb.id == newKeyboard.id {
-        if kb.languageID == newKeyboard.languageID {
-          kb = newKeyboard
-        } else {
-          kb.version = newKeyboard.id
-        }
-        currentUserData.currentKeyboard = kb
-        currentUserData.synchronize()
-      }
-    }
   }
 
   func synchronizeSWKeyboard() {
@@ -811,7 +814,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         try shared.copyFiles(to: nonShared)
         FontManager.shared.registerCustomFonts()
       } catch {
-        kmLog("Failed to copy from shared container: \(error)", checkDebugPrinting: false)
+        log.error("Failed to copy from shared container: \(error)")
       }
     }
   }
@@ -844,7 +847,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
-    viewController.dismiss(animated: true)
+    // #1045 - Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
+    // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
+    // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
+    // true source of the problems.
+    viewController.dismiss(animated: false)
     if shouldReloadKeyboard {
       keymanWeb.reloadKeyboard()
     }
@@ -852,16 +859,15 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   @objc func resetKeyboard() {
-    let keyboard = currentKeyboardInfo
-    keyboardID = nil
-    languageID = nil
+    let keyboard = currentKeyboard
+    currentKeyboardID = nil
 
     if let keyboard = keyboard {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      setKeyboard(keyboard)
+      _ = setKeyboard(keyboard)
     } else {
-      setKeyboard(Defaults.keyboard)
+      _ = setKeyboard(Defaults.keyboard)
     }
   }
 
@@ -877,7 +883,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func clearText() {
     setText(nil)
     setSelectionRange(NSRange(location: 0, length: 0), manually: true)
-    kmLog("Cleared text.", checkDebugPrinting: true)
+    log.info("Cleared text.")
   }
 
   func setText(_ text: String?) {
@@ -888,23 +894,21 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
-    kmLog("Loaded keyboard.", checkDebugPrinting: true)
+    log.info("Loaded keyboard.")
     keymanWeb.resizeKeyboard()
     keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Defaults.keyboard
-    if (keyboardID == nil || languageID == nil) && !shouldReloadKeyboard {
-      let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-      if let currentKb = userData.currentKeyboard {
-        let kbID = currentKb.id
-        let langID = currentKb.languageID
-        if Storage.active.userDefaults.userKeyboard(withID: kbID, languageID: langID) != nil {
-          newKb = currentKb
+    if currentKeyboardID == nil && !shouldReloadKeyboard {
+      let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+      if let id = userData.currentKeyboardID {
+        if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
+          newKb = kb
         }
       } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
         newKb = userKbs[0]
       }
-      setKeyboard(newKb)
+      _ = setKeyboard(newKb)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
@@ -946,6 +950,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.menuKeyUp(keymanWeb)
   }
+  
+  public func showKeyboard() {
+    keymanWebDelegate?.resumeKeyboard()
+  }
+  
+  public func hideKeyboard() {
+    keymanWebDelegate?.dismissKeyboard()
+    
+    keymanWeb.dismissHelpBubble()
+    keymanWeb.dismissSubKeys()
+    keymanWeb.dismissKeyboardMenu()
+  }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.hideKeyboard(keymanWeb)
@@ -983,7 +999,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     if (!didSynchronize || shouldSynchronize) && Storage.shared != nil {
       synchronizeSWKeyboard()
-      if keyboardID != nil && languageID != nil {
+      if currentKeyboardID != nil {
         shouldReloadKeyboard = true
         keymanWeb.reloadKeyboard()
       }

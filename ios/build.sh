@@ -12,6 +12,7 @@ display_usage ( ) {
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
     echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
     echo "  -only-framework         Builds only the KeymanEngine framework; does not attempt to build the app."
+    echo "  -no-carthage            Disables downloading and building for dependencies."
     echo "  -no-codesign            Disables code-signing for the Keyman application, allowing it to be performed separately later."
     echo "                          Will not construct the archive and .ipa.  (includes -no-archive)"
     echo "  -no-archive             Bypasses the archive and .ipa preparation stage."
@@ -34,6 +35,7 @@ set_version ( ) {
 
 do_clean ( ) {
   rm -rf $BUILD_PATH
+  rm -rf Carthage
 }
 
 ### START OF THE BUILD ###
@@ -46,6 +48,7 @@ BUILD_PATH=$DERIVED_DATA/Build/Products
 DO_KMW_BUILD=true
 DO_KEYMANAPP=true
 DO_ARCHIVE=true
+DO_CARTHAGE=true
 CLEAN_ONLY=false
 CONFIG=Release
 
@@ -75,6 +78,9 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-build)
             CLEAN_ONLY=true
+            ;;
+        -no-carthage)
+            DO_CARTHAGE=false
             ;;
         -debug)
             CONFIG=Debug
@@ -114,17 +120,24 @@ update_bundle ( ) {
     fi
 
     if [ $DO_KMW_BUILD = true ]; then
-        echo Building KeymanWeb 10.0 from $KMW_SOURCE
+        echo Building KeymanWeb from $KMW_SOURCE
         base_dir="$(pwd)"
 
         cd $KMW_SOURCE
-        ./build.sh -embed
+
+        if [ "$CONFIG" == "Debug" ]; then
+          KMWFLAGS="-debug_embedded"
+        else
+          KMWFLAGS="-embed"
+        fi
+
+        ./build.sh $KMWFLAGS
         if [ $? -ne 0 ]; then
             fail "ERROR:  KeymanWeb's build.sh failed."
         fi
 
         #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
-        cd ../embedded
+        cd ../release/embedded
         cp resources/osk/kmwosk.css        "$base_dir/$BUNDLE_PATH/kmwosk.css"
         cp resources/osk/keymanweb-osk.ttf "$base_dir/$BUNDLE_PATH/keymanweb-osk.ttf"
         cp keyman.js                       "$base_dir/$BUNDLE_PATH/keymanios.js"
@@ -135,6 +148,12 @@ update_bundle ( ) {
 
 # First things first - update our dependencies.
 update_bundle
+
+if [ $DO_CARTHAGE = true ]; then
+    echo
+    echo "Load dependencies with Carthage"
+    carthage bootstrap --platform iOS || fail "carthage boostrap failed"
+fi
 
 echo
 echo "Building KMEI..."

@@ -54,7 +54,6 @@ uses
   RegKeyboards in '..\..\global\delphi\general\RegKeyboards.pas',
   HotkeyUtils in '..\..\global\delphi\general\HotkeyUtils.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
-  olepro32 in 'util\olepro32.pas',
   kpbase in 'processes\kpbase.pas',
   kpinstallkeyboard in 'processes\keyboard\kpinstallkeyboard.pas',
   utilunicode in 'util\utilunicode.pas',
@@ -102,7 +101,6 @@ uses
   utildir in '..\..\global\delphi\general\utildir.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   MessageDefaults in '..\..\global\delphi\cust\MessageDefaults.pas',
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
@@ -130,7 +128,6 @@ uses
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
-  utilicon in '..\..\global\delphi\general\utilicon.pas',
   KPInstallPackageStartMenu in '..\..\global\delphi\general\KPInstallPackageStartMenu.pas',
   KPUninstallPackageStartMenu in '..\..\global\delphi\general\KPUninstallPackageStartMenu.pas',
   utilwow64 in '..\..\global\delphi\general\utilwow64.pas',
@@ -144,8 +141,20 @@ uses
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   Windows8LanguageList in '..\..\global\delphi\general\Windows8LanguageList.pas',
-  BCP47SuppressScriptRegistry in '..\..\global\delphi\general\BCP47SuppressScriptRegistry.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas';
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  keymankeyboardlanguage in 'com\keyboardlanguages\keymankeyboardlanguage.pas',
+  keymankeyboardlanguagesfile in 'com\keyboardlanguages\keymankeyboardlanguagesfile.pas',
+  keymankeyboardlanguagefile in 'com\keyboardlanguages\keymankeyboardlanguagefile.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  utilicon in '..\..\global\delphi\general\utilicon.pas',
+  Keyman.System.MitigateWin10_1803LanguageInstall in 'processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas';
 
 {$R *.TLB}
 

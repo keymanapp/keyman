@@ -88,6 +88,14 @@ img{
 	border: solid 2px gray;
 }
 
+.branding{
+	text-align: center;
+}
+
+.logo{
+	border: 0;
+}
+
 table{
 	width: 100%;
 	margin-bottom: 50px;

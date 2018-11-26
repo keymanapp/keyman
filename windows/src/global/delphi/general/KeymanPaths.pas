@@ -2,7 +2,12 @@ unit KeymanPaths;
 
 interface
 
+uses
+  System.SysUtils;
+
 type
+  EKeymanPath = class(Exception);
+
   TKeymanPaths = class
   public
     const S_KMShell = 'kmshell.exe';
@@ -28,7 +33,6 @@ uses
   Winapi.Windows,
   Winapi.ActiveX,
   Winapi.ShlObj,
-  System.SysUtils,
   System.Win.Registry,
 
   DebugPaths,
@@ -81,7 +85,7 @@ begin
   with TRegistry.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop) and ValueExists(SRegValue_RootPath) then
+    if OpenKeyReadOnly(SRegKey_KeymanDesktop_LM) and ValueExists(SRegValue_RootPath) then
       Result := ReadString(SRegValue_RootPath);
   finally
     Free;
@@ -90,7 +94,7 @@ begin
   Result := GetDebugPath('KeymanDesktop', Result);
 
   if Result = '' then
-    raise Exception.Create('Unable to find the Keyman Desktop directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyman Desktop directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
 end;
@@ -105,7 +109,7 @@ begin
   with TRegistry.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_RootPath) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootPath) then
       Result := ReadString(SRegValue_RootPath);
   finally
     Free;
@@ -114,7 +118,7 @@ begin
   Result := GetDebugPath('KeymanEngine', Result);
 
   if Result = '' then
-    raise Exception.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
 end;
@@ -128,8 +132,10 @@ class function TKeymanPaths.KeyboardsInstallPath(const filename: string): string
 begin
   with TRegistry.Create do  // I2890
   try
+    // TODO: We only want to use %CommonAppData%\Keyman now for all keyboards
+    // So we should eliminate use of RootKeyboardAdminPath and S_FallbackKeyboardPath
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) and ValueExists(SRegValue_RootKeyboardAdminPath) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_RootKeyboardAdminPath) then
     begin
       Result := ReadString(SRegValue_RootKeyboardAdminPath)
     end
@@ -147,7 +153,7 @@ begin
 
   Result := GetDebugPath('Keyboards', Result, True);
   if Result = '' then
-    raise Exception.Create('Unable to find the Keyboards directory.  You should reinstall the product.');
+    raise EKeymanPath.Create('Unable to find the Keyboards directory.  You should reinstall the product.');
 
   Result := Result + Filename;
 end;

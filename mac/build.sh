@@ -22,10 +22,7 @@ display_usage() {
     echo "                  the deploy option is used to specify preprelease, in which configuration will be"
     echo "                  Release (i.e., -config option is ignored)."
     echo "  -clean          Removes all previously-existing build products for anything to be built before building."
-    # Note: it's fairly unlikely that we will ever need/want unit tests for the IM or the test app, but
-    # FWIW, the -test option is currently only implemented for KeymanEngine4Mac. Not sure exactly what the
-    # problem is, but I can't get it to work with the other two (two different build errors).
-    echo "  -test           Runs KeymanEngine4Mac unit tests (when we get some)"
+    echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
     echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
     echo "                  (ignored if a deploy option other than 'none' is specified)."
     echo "  -quiet          Do not display any output except for warnings and errors."
@@ -65,8 +62,9 @@ assertOptionsPrecedeTargets() {
 }
 
 do_clean ( ) {
-  rm -rf $KME4M_BUILD_PATH
-  rm -rf $APP_BUILD_PATH
+#  rm -rf $KME4M_BUILD_PATH
+#  rm -rf $APP_BUILD_PATH
+  rm -rf $KEYMAN_MAC_BASE_PATH/Carthage
 }
 
 ### SET PATHS ###
@@ -81,7 +79,7 @@ KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
 
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
-KMIM_PROJECT_PATH="$KM4MIM_BASE_PATH/$IM_NAME$XCODE_PROJ_EXT"
+KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 
 # KME4M_BUILD_PATH=engine/KME4M/build
 # APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
@@ -99,7 +97,7 @@ CONFIG="Debug"
 LOCALDEPLOY=false
 PREPRELEASE=false
 KM_TIER="alpha"
-KM_VERSION="10.0.0"
+KM_VERSION=`cat ../resources/VERSION.md`.0
 UPDATE_VERSION_IN_PLIST=false
 DO_KEYMANENGINE=true
 DO_KEYMANIM=true
@@ -107,7 +105,7 @@ DO_KEYMANTESTAPP=false
 CODESIGNING_SUPPRESSION=""
 BUILD_OPTIONS=""
 BUILD_ACTIONS="build"
-TEST_ACTIONS=""
+TEST_ACTION=""
 CLEAN=false
 QUIET=false
 SKIP_BUILD=false
@@ -166,7 +164,13 @@ while [[ $# -gt 0 ]] ; do
                 if $PREPRELEASE && [[ "$2" != "Release" ]]; then
                     echo "Deployment option 'preprelease' supersedes $2 configuration."
                 else
-                    CONFIG="$2"
+                	if [[ "$2" == "r" || "$2" == "R" ]]; then
+                    	CONFIG="Release"
+                    elif [[ "$2" == "d" || "$2" == "D" ]]; then
+                    	CONFIG="Debug"
+                    else
+                    	CONFIG="$2"
+                    fi
                 fi
                 shift # past argument
             fi
@@ -176,13 +180,13 @@ while [[ $# -gt 0 ]] ; do
             BUILD_ACTIONS="clean $BUILD_ACTIONS"
             ;;
         -test)
-            TEST_ACTIONS="test -scheme $ENGINE_NAME"
+            TEST_ACTION="test"
             ;;
         -no-codesign)
             if $LOCALDEPLOY || $PREPRELEASE ; then
                 warn "Code-signing is required for selected deployment option."
             else
-                CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO"
+                CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
             fi
             ;;
         -quiet)
@@ -220,7 +224,7 @@ if $SKIP_BUILD ; then
     DO_KEYMANIM=false
     DO_KEYMANTESTAPP=false
     BUILD_ACTIONS=""
-    TEST_ACTIONS=""
+    TEST_ACTION=""
     BUILD_OPTIONS=""
     CODESIGNING_SUPPRESSION=""
 fi
@@ -232,23 +236,26 @@ displayInfo "" \
     "KM_TIER: $KM_TIER" \
     "LOCALDEPLOY: $LOCALDEPLOY" \
     "PREPRELEASE: $PREPRELEASE" \
+    "CLEAN: $CLEAN" \
     "DO_KEYMANENGINE: $DO_KEYMANENGINE" \
     "DO_KEYMANIM: $DO_KEYMANIM" \
     "DO_KEYMANTESTAPP: $DO_KEYMANTESTAPP" \
     "CODESIGNING_SUPPRESSION: $CODESIGNING_SUPPRESSION" \
     "BUILD_OPTIONS: $BUILD_OPTIONS" \
     "BUILD_ACTIONS: $BUILD_ACTIONS" \
-    "TEST_ACTIONS: $TEST_ACTIONS" \
+    "TEST_ACTION: $TEST_ACTION" \
     ""
 
 ### START OF THE BUILD ###
 
-#if $CLEAN ; then
-# if ! [ -d "${KME4M_OUTPUT_FOLDER}" ]; then
-#     mkdir -p "${KME4M_OUTPUT_FOLDER}"
-# fi
-#fi
+if $CLEAN ; then
+    do_clean
+fi
 
+if [ "$TEST_ACTION" == "test" ]; then
+	carthage bootstrap		
+fi
+ 
 execBuildCommand() {
     typeset component="$1"
     shift
@@ -269,9 +276,16 @@ updatePlist() {
 	    KM_COMPONENT_NAME="$2"
 		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
 		if [ -f "$KM_PLIST" ]; then 
-			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION"
+			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION in $KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $KM_VERSION" "$KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
+			if [[ "$CONFIG" == "Release" && "$KM_COMPONENT_NAME" == "$IM_NAME" ]]; then
+				echo "Setting Fabric APIKey for release build in $KM_PLIST"
+				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]; then
+				    fail "FABRIC_API_KEY_KEYMAN4MACIM environment variable not set!"
+				fi
+				/usr/libexec/Plistbuddy -c "Set Fabric:APIKey $FABRIC_API_KEY_KEYMAN4MACIM" "$KM_PLIST"
+			fi
 		else
 			fail "File not found: $KM_PLIST"
 		fi
@@ -280,12 +294,21 @@ updatePlist() {
 
 if $DO_KEYMANENGINE ; then
     updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
-    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTIONS"
+    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
+    execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
 fi
 
 if $DO_KEYMANIM ; then
+	cd "$KM4MIM_BASE_PATH"
+	pod install
+	cd "$KEYMAN_MAC_BASE_PATH"
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
-    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS"
+    execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+    if [ "$TEST_ACTION" == "test" ]; then
+    	if [ "$CONFIG" == "Debug" ]; then
+    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+    	fi
+    fi
 fi
 
 if $DO_KEYMANTESTAPP ; then
@@ -295,8 +318,9 @@ fi
 
 # Deploy as requested
 if $LOCALDEPLOY ; then
-    displayInfo "" "Attempting local deployment..."
+    displayInfo "" "Attempting local deployment with command:"
     KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
+    displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\"" 
     eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
     if [ $? == 0 ]; then
         displayInfo "Local deployment succeeded!" ""

@@ -54,13 +54,14 @@ type
     function GetSystemKeyboardName: string;
     procedure SetSystemKeyboardName(Value: string);
     procedure InvalidateCell(ACol, ARow: Integer);
-    { Private declarations }
+  protected
+    function GetHelpTopic: string; override;
   public
     { Public declarations }
     property SystemKeyboardName: string read GetSystemKeyboardName write SetSystemKeyboardName;
   end;
 
-function SelectSystemKeyboard(FOwner: TCustomForm; var FKeyboardName: string): Boolean;
+function SelectSystemKeyboard(FOwner: TComponent; var FKeyboardName: string): Boolean;
 
 function LoadSystemKeyboard(var FLoadedSystemKeyboard: Boolean; FKeyboardName: string): HKL;
 
@@ -71,13 +72,15 @@ function GetSystemKeyboardIndex(keyboardlist: TStrings; id: string): Integer;
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   ErrorControlledRegistry, 
   RegistryKeys,
   utilstr;
   
 {$R *.DFM}
 
-function SelectSystemKeyboard(FOwner: TCustomForm; var FKeyboardName: string): Boolean;
+function SelectSystemKeyboard(FOwner: TComponent; var FKeyboardName: string): Boolean;
 begin
   Result := False;
 
@@ -113,12 +116,12 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then
     begin
       GetKeyNames(str);
 
       for i := str.Count - 1 downto 0 do
-        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts + '\' + str[i]) then
+        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM + '\' + str[i]) then
           if not ValueExists('Layout Text') then   // I3613
             str.Delete(i)
           else
@@ -153,6 +156,11 @@ begin
     str.Free;
     Free;
   end;
+end;
+
+function TfrmSelectSystemKeyboard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_SelectSystemKeyboard;
 end;
 
 function TfrmSelectSystemKeyboard.GetSystemKeyboardName: string;
@@ -300,12 +308,12 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeyboardLayouts) then
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM) then
     begin
       GetKeyNames(str);
 
       for i := str.Count - 1 downto 0 do
-        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts + '\' + str[i]) then
+        if OpenKeyReadOnly('\'+SRegKey_KeyboardLayouts_LM + '\' + str[i]) then
           if not ValueExists('Layout Text') then   // I3613
             str.Delete(i)
           else

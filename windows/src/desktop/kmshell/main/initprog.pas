@@ -127,6 +127,7 @@ uses
   UImportOlderVersionSettings,
   UImportOlderVersionKeyboards8,
   UImportOlderVersionKeyboards9,
+  UImportOlderVersionKeyboards10,
   UILanguages,
   uninstall,
   UpgradeMnemonicLayout,
@@ -185,7 +186,7 @@ begin
   end;
 end;
 
-function Init(var FMode: TKMShellMode; KeyboardFileNames: TWideStrings; var FSilent, FForce, FNoWelcome: Boolean; var FQuery: string): Boolean;
+function Init(var FMode: TKMShellMode; KeyboardFileNames: TWideStrings; var FSilent, FForce, FNoWelcome: Boolean; var FLogFile, FQuery: string): Boolean;
 var
   s: string;
   i: Integer;
@@ -230,6 +231,7 @@ begin
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
       else if s = '-kp' then FMode := fmKeyboardPrint  // I2329
+      else if s = '-log' then begin Inc(i); FLogFile := ParamStr(i); end
       else if Copy(s,1,Length('-firstrun')) = '-firstrun' then begin FMode := fmFirstRun; FQuery := Copy(s,Length('-firstrun')+2,MAXINT); end  // I2562
       else if Copy(s,1,Length('-upgradekeyboards')) = '-upgradekeyboards' then begin FMode := fmUpgradeKeyboards; FQuery := Copy(s,Length('-upgradekeyboards')+2,MAXINT); end // I2548
       else if s = '-upgrademnemoniclayout' then FMode := fmUpgradeMnemonicLayout   // I4553
@@ -262,7 +264,7 @@ begin
   RegisterClasses([TImage, TCheckBox, TLabel, TButton, TPanel, TGroupBox, TPageControl, TTabSheet]);
 end;
 
-procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean; FQuery: string); forward;
+procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean; FLogFile, FQuery: string); forward;
 
 procedure Run;
 var
@@ -271,13 +273,14 @@ var
   FSilent: Boolean;
   FNoWelcome: Boolean;
   FForce: Boolean;
+  FLogFile: string;
 
 begin
   RegisterControlClasses;
 
   with TRegistryErrorControlled.Create do   // I4400
   try
-    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation, True) then   // I4436
+    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation_CU, True) then   // I4436
     begin
       WriteInteger(TKeymanPaths.S_KMShell, 9000);
       WriteInteger(TKeymanPaths.S_KeymanExe, 9000);
@@ -292,7 +295,7 @@ begin
 
   KeyboardFileNames := TWideStringList.Create;
   try
-    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FQuery) then
+    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery) then
     begin
   //TODO:   TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
       Exit;
@@ -300,7 +303,7 @@ begin
 
     if not LoadKMCOM then Exit;
     try
-      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FQuery);
+      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery);
     finally
       kmcom := nil;
     end;
@@ -309,7 +312,7 @@ begin
   end;
 end;
 
-procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean; FQuery: string);
+procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean; FLogFile, FQuery: string);
 var
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
@@ -396,6 +399,7 @@ begin
       begin
         ImportOlderVersionKeyboards8(Pos('admin', FQuery) > 0);   // I4185
         ImportOlderVersionKeyboards9(Pos('admin', FQuery) > 0);   // I4185
+        ImportOlderVersionKeyboards10(Pos('admin', FQuery) > 0);   // I4185
         DeleteLegacyKeymanInstalledSystemKeyboards;   // I3613
       end;
 
@@ -438,7 +442,7 @@ begin
           then ExitCode := 0
           else ExitCode := 1;
       end
-      else if InstallFile(nil, FirstKeyboardFileName, FSilent, FNoWelcome)
+      else if InstallFile(nil, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
         then ExitCode := 0
         else ExitCode := 1;
 

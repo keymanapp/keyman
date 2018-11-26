@@ -47,7 +47,6 @@ uses
   utilxml in '..\..\global\delphi\general\utilxml.pas',
   UfrmInstallKeyboardFromWeb in 'install\UfrmInstallKeyboardFromWeb.pas' {frmInstallKeyboardFromWeb},
   UfrmWebContainer in '..\..\global\delphi\ui\UfrmWebContainer.pas' {frmWebContainer},
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
   UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
   kmcomapi_errors in '..\..\global\delphi\general\kmcomapi_errors.pas',
@@ -58,7 +57,6 @@ uses
   WelcomeXMLRenderer in 'render\WelcomeXMLRenderer.pas',
   ValidateKeymanInstalledSystemKeyboards in 'main\ValidateKeymanInstalledSystemKeyboards.pas',
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
-  keymanerrorcodes in '..\..\engine\kmcomapi\util\keymanerrorcodes.pas',
   uninstall in 'install\uninstall.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
@@ -86,7 +84,7 @@ uses
   UfrmKeyboardOptions in 'main\UfrmKeyboardOptions.pas' {frmKeyboardOptions},
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
-  UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
+  UImportOlderVersionKeyboards10 in 'main\UImportOlderVersionKeyboards10.pas',
   MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   FixupLocaleDoctype in '..\..\global\delphi\general\FixupLocaleDoctype.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
@@ -146,7 +144,21 @@ uses
   VisualKeyboardSaverBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverBinary.pas',
   VisualKeyboardSaverXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardSaverXML.pas',
   UtilWaitForTSF in 'util\UtilWaitForTSF.pas',
-  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas';
+  BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  Keyman.System.LanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas',
+  Keyman.System.Standards.ISO6393ToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas',
+  Keyman.System.Standards.LCIDToBCP47Registry in '..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas',
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
+  Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
+  UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
+  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

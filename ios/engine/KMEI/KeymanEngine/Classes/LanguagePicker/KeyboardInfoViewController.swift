@@ -70,9 +70,9 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
       if indexPath.row == 1 {
         let url = URL(string: "http://help.keyman.com/keyboard/\(keyboardID)/\(keyboardVersion)/")!
         if let openURL = Manager.shared.openURL {
-          openURL(url)
+          _ = openURL(url)
         } else {
-          Manager.shared.kmLog("openURL not set in Manager. Failed to open \(url)", checkDebugPrinting: false)
+          log.error("openURL not set in Manager. Failed to open \(url)")
         }
       } else if indexPath.row == 2 {
         showDeleteKeyboard()
@@ -134,24 +134,21 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func showDeleteKeyboard() {
-    let alert = UIAlertView(title: title ?? "",
-                            message: "Would you like to delete this keyboard?",
-                            delegate: self,
-                            cancelButtonTitle: "Cancel",
-                            otherButtonTitles: "Delete")
-    alert.tag = 1
-    alert.show()
+    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this keyboard?",
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "Cancel",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    alertController.addAction(UIAlertAction(title: "Delete",
+                                            style: UIAlertActionStyle.default,
+                                            handler: deleteHandler))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
 
-  func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
-    if buttonIndex == alertView.cancelButtonIndex {
-      return
-    }
-
-    if alertView.tag == 1 {
-      if Manager.shared.removeKeyboard(at: keyboardIndex) {
+  func deleteHandler(withAction action: UIAlertAction) {
+    if Manager.shared.removeKeyboard(at: keyboardIndex) {
         navigationController?.popToRootViewController(animated: true)
-      }
     }
   }
 }

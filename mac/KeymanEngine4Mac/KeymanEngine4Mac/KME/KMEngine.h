@@ -6,8 +6,13 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+#ifndef KMEngine_h
+#define KMEngine_h
+
 #import <Foundation/Foundation.h>
 #import "KMXFile.h"
+
+//#define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 
 extern NSString *const Q_STR;
 extern NSString *const Q_BACK;
@@ -27,5 +32,8 @@ extern DWORD VKMap[0x80];
 - (void)setContextBuffer:(NSString *)ctxBuf;
 - (NSString *)contextBuffer;
 - (NSArray *)processEvent:(NSEvent *)event;
+- (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 
 @end
+
+#endif /* KMEngine_h */

@@ -36,7 +36,7 @@ uses
 
 function GetErrLogPath: string;
 begin
-  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanEngineDiag + '\';
+  Result := GetFolderPath(CSIDL_LOCAL_APPDATA) + SFolderKeymanEngineDiag + '\';
   ForceDirectories(Result);  // I2768
 end;
 

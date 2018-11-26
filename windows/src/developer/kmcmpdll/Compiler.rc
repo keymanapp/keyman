@@ -202,6 +202,7 @@ BEGIN
     CERR_ContextExHasInvalidOffset       "context() statement has offset out of range"
     CERR_90FeatureOnlyEmbedCSS           "Embedding CSS requires store(&version) '9.0'"
     CERR_90FeatureOnlyTargets            "&TARGETS system store requires store(&version) '9.0'"
+    CERR_ContextAndIndexInvalidInMatchNomatch "context and index statements cannot be used in a match or nomatch statement"
     CWARN_PlatformNotInTargets           "The specified platform is not a target platform"
 END
 
@@ -216,4 +217,10 @@ STRINGTABLE
 BEGIN
     CWARN_DontMixChiralAndNonChiralModifiers "Don't mix the use of left/right modifiers with non-left/right modifiers in the same platform"
     CWARN_MixingLeftAndRightModifiers        "Left and right modifiers should not both be used in the same rule"
+END
+
+STRINGTABLE
+BEGIN
+    CWARN_LanguageHeadersDeprecatedInKeyman10 "This language header has been deprecated in Keyman 10. Instead, add language metadata in the package file"
+    CINFO_NonUnicodeFile                      "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"
 END

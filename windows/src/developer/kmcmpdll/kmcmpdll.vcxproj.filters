@@ -61,6 +61,15 @@
     <ClInclude Include="versioning.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="kmcmpdll.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeprecationChecks.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
@@ -78,6 +87,8 @@
     <ClCompile Include="..\..\ext\json-schema-validator\json-validator.cpp" />
     <ClCompile Include="json-validation.cpp" />
     <ClCompile Include="versioning.cpp" />
+    <ClCompile Include="DeprecationChecks.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Compiler.rc" />

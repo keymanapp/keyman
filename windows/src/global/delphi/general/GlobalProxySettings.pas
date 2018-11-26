@@ -84,7 +84,7 @@ begin
   inherited Create;
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanEngine) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
     begin
       if ValueExists(SRegValue_ProxyServer) then FServer := ReadString(SRegValue_ProxyServer);
       if ValueExists(SRegValue_ProxyPort) then FPort := ReadInteger(SRegValue_ProxyPort);
@@ -120,7 +120,7 @@ begin
   FPassword := Password;
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanEngine, True) then
+    if OpenKey(SRegKey_KeymanEngine_CU, True) then
     begin
       WriteString(SRegValue_ProxyServer, FServer);
       WriteInteger(SRegValue_ProxyPort, FPort);

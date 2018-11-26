@@ -64,21 +64,16 @@
                     23 Feb 2016 - mcdurdin - I4982 - Defined character constants cannot be referenced correctly in other stores
                     25 Oct 2016 - mcdurdin - I5135 - Remove product and licensing references from Developer projects
 */
-#include <ctype.h>
-#include <stdio.h>
-
-#include <string.h>
-#include <windows.h>
-
-// Keyman includes
-
-#include <keyman64.h>
+#include "pch.h"
 
 #include <compfile.h>
 #include <compiler.h>
 #include <comperr.h>
 #include <vkeys.h>
 #include <versioning.h>
+#include <kmcmpdll.h>
+#include <DeprecationChecks.h>
+
 #include "virtualcharkeys.h"
 
 #include "crc32.h"
@@ -143,8 +138,7 @@ DWORD process_set_synonym(DWORD dwSystemID, PFILE_KEYBOARD fk, LPWSTR q, LPWSTR 
 
 BOOL IsValidKeyboardVersion(WCHAR *dpString);   // I4140
 
-HANDLE UTF16TempFromANSI(HANDLE hInfile);
-HANDLE UTF16TempFromUTF8(HANDLE hInfile);
+HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble);
 
 const PWCHAR LineTokens[] = {
 	L"SVNBHBGMNSCCLLCMLB", L"store", L"VERSION ", L"NAME ",
@@ -288,10 +282,6 @@ BOOL AddCompileMessage(DWORD msg)
 
 	return FALSE;
 }
-
-#define SetError(err)       { if(AddCompileMessage(err)) return FALSE; }
-#define AddWarning(warn)    { if(AddCompileMessage(warn)) return FALSE; }
-
 	
 extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL ASaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc)   // I4865   // I4866
 {
@@ -336,11 +326,11 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR p
 	}
 	SetFilePointer(hInfile, 0, NULL, FILE_BEGIN);
 	if(str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-		hInfile = UTF16TempFromUTF8(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, TRUE);
 	else if(str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
 		SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
 	else
-		hInfile = UTF16TempFromANSI(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, FALSE);  // Will fall back to ansi for invalid UTF-8
   if(hInfile == INVALID_HANDLE_VALUE)   // I3228   // I3510
   {
     return CERR_CannotCreateTempfile;
@@ -420,11 +410,11 @@ extern "C" BOOL __declspec(dllexport) CompileKeyboardFileToBuffer(PSTR pszInfile
 	}
 	SetFilePointer(hInfile, 0, NULL, FILE_BEGIN);
 	if(str[0] == UTF8Sig[0] && str[1] == UTF8Sig[1] && str[2] == UTF8Sig[2])
-		hInfile = UTF16TempFromUTF8(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, TRUE);
 	else if(str[0] == UTF16Sig[0] && str[1] == UTF16Sig[1])
 		SetFilePointer(hInfile, 2, NULL, FILE_BEGIN);
 	else
-		hInfile = UTF16TempFromANSI(hInfile);
+		hInfile = UTF16TempFromUTF8(hInfile, FALSE);
 
 	CodeConstants = new NamedCodeConstants;
 	err = CompileKeyboardHandle(hInfile, pfkBuffer);
@@ -560,7 +550,14 @@ BOOL CompileKeyboardHandle(HANDLE hInfile, PFILE_KEYBOARD fk)
 
 	delete str;
 
-  return CheckKeyboardFinalVersion(fk);
+  if (!CheckKeyboardFinalVersion(fk)) {
+    return FALSE;
+  }
+
+  /* Flag presence of deprecated features */
+  CheckForDeprecatedFeatures(fk);
+
+  return TRUE;
 }
 
 DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
@@ -598,9 +595,17 @@ DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PWSTR p)
 	return CERR_None;
 }
 
-DWORD WarnDeprecatedCode() {   // I4866
-  if(FWarnDeprecatedCode) {
-    AddWarning(CWARN_HeaderStatementIsDeprecated);
+DWORD ValidateMatchNomatchOutput(PWSTR p) {
+  while (p && *p) {
+    if (*p == UC_SENTINEL) {
+      switch (*(p + 1)) {
+      case CODE_CONTEXT:
+      case CODE_CONTEXTEX:
+      case CODE_INDEX:
+        return CERR_ContextAndIndexInvalidInMatchNomatch;
+      }
+    }
+    p = incxstr(p);
   }
   return CERR_None;
 }
@@ -640,7 +645,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 
 	case T_NAME:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if( !q ) return CERR_InvalidName;
 		
@@ -648,7 +653,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 
 	case T_COPYRIGHT:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if(!q) return CERR_InvalidCopyright;
 
@@ -656,7 +661,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 	
   case T_MESSAGE:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if(!q) return CERR_InvalidMessage;
 
@@ -664,7 +669,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		break;
 
 	case T_LANGUAGENAME:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		q = GetDelimitedString(&p, L"\"\"", 0);
 		if(!q) return CERR_InvalidLanguageName;
 
@@ -673,7 +678,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 
 	case T_LANGUAGE:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
 		  q = wcstok_s(p, L"\n", &tokcontext);  // I3481
 		  if((msg = AddStore(fk, TSS_LANGUAGE, q)) != CERR_None) return msg;
@@ -681,30 +686,30 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_LAYOUT:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
   		q = wcstok_s(p, L"\n", &tokcontext);  // I3481
 	  	if((msg = AddStore(fk, TSS_LAYOUT, q)) != CERR_None) return msg;
 		  break;
     }
 	case T_CAPSOFF:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_CAPSALWAYSOFF, L"1")) != CERR_None) return msg;
 		break;
 	
 	case T_CAPSON:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_CAPSONONLY, L"1")) != CERR_None) return msg;
 		break;
 	
 	case T_SHIFT:
-    WarnDeprecatedCode();   // I4866
+    WarnDeprecatedHeader();   // I4866
 		if((msg = AddStore(fk, TSS_SHIFTFREESCAPS, L"1")) != CERR_None) return msg;
 		break;
 
 	case T_HOTKEY:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
       if((q = wcstok_s(p, L"\n", &tokcontext)) == NULL) return CERR_CodeInvalidInThisSection;  // I3481
 	  	if((msg = AddStore(fk, TSS_HOTKEY, q)) != CERR_None) return msg;
@@ -712,7 +717,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_BITMAP:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
   		if((q = wcstok_s(p, L"\n", &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
 
@@ -724,7 +729,7 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_BITMAPS:
     {
-      WarnDeprecatedCode();   // I4866
+      WarnDeprecatedHeader();   // I4866
       wchar_t *tokcontext = NULL;
   		AddWarning(CWARN_BitmapNotUsed);
 
@@ -736,7 +741,6 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
     }
 	case T_KEYTOKEY:			// A rule
 		if(fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
-		if(fk->version == 0) return CERR_NoVersionLine;
 		if((msg = ProcessKeyLine(fk, p, IsUnicode)) != CERR_None) return msg;
 		break;
 
@@ -750,7 +754,12 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 		    return msg;
 		  }
 
-		  gp = &fk->dpGroupArray[fk->currentGroup];
+      if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
+        delete buf;
+        return msg;
+      }
+      
+      gp = &fk->dpGroupArray[fk->currentGroup];
 		
 		  gp->dpMatch = new WCHAR[wcslen(buf) + 1];
 		  wcscpy_s(gp->dpMatch, wcslen(buf)+1, buf);  // I3481
@@ -783,6 +792,11 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
         return msg;
       }
 
+      if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
+        delete buf;
+        return msg;
+      }
+
 		  gp = &fk->dpGroupArray[fk->currentGroup];
 		
 		  gp->dpNoMatch = new WCHAR[wcslen(buf) + 1];
@@ -808,7 +822,6 @@ DWORD ParseLine(PFILE_KEYBOARD fk, PWSTR str)
 }
 
 //**********************************************************************************************************************
-
 
 DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PWSTR p)
 {
@@ -1004,6 +1017,7 @@ DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PWSTR p)
 	fk->dpStoreArray = sp;
 	sp = &fk->dpStoreArray[fk->cxStoreArray];
 
+  sp->line = currentLine;
   sp->fIsOption = FALSE;
   sp->fIsReserved = FALSE;
   sp->fIsStore = FALSE;
@@ -1067,6 +1081,7 @@ DWORD AddStore(PFILE_KEYBOARD fk, DWORD SystemID, PWSTR str, DWORD *dwStoreID)
 	fk->dpStoreArray = sp;
 	sp = &fk->dpStoreArray[fk->cxStoreArray];
 
+  sp->line = currentLine;
   sp->fIsOption = FALSE;   // I3686
   sp->fIsReserved = (SystemID != TSS_NONE);
   sp->fIsStore = FALSE;
@@ -1110,7 +1125,7 @@ DWORD AddDebugStore(PFILE_KEYBOARD fk, PWSTR str)
 
 	sp->dpString = new WCHAR[wcslen(tstr)+1];
 	wcscpy_s(sp->dpString, wcslen(tstr)+1, tstr);  // I3481
-
+  sp->line = 0;
   sp->fIsOption = FALSE;
   sp->fIsReserved = TRUE;
   sp->fIsStore = FALSE;
@@ -3396,7 +3411,7 @@ HANDLE CreateTempFile()
 }
 
 ///////////////////
-HANDLE UTF16TempFromUTF8(HANDLE hInfile)
+HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 {
 	HANDLE hOutfile = CreateTempFile();
   if(hOutfile == INVALID_HANDLE_VALUE)     // I3228   // I3510
@@ -3405,59 +3420,52 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile)
     return INVALID_HANDLE_VALUE;
   }
 
-	PBYTE buf, p, q;
+	PBYTE buf, p;
 	PWSTR outbuf, poutbuf;
 	DWORD len, len2;
+  WCHAR prolog = 0xFEFF;
+  WriteFile(hOutfile, &prolog, 2, &len2, NULL);
 
-	SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
-	len = GetFileSize(hInfile, NULL) - 3;
-	buf = new BYTE[8193];
-	outbuf = new WCHAR[8193];
-	// read in buffer as UTF8 and write out buffer as WCHAR...
-	q = buf;
-	outbuf[0] = 0xFEFF;
-	WriteFile(hOutfile, outbuf, 2, &len2, NULL);
-	while(ReadFile(hInfile, q, 8192-(int)(q-buf), &len, NULL) && len > 0)
-	{
-	  len += (q-buf);   // I1011 - fix buf length so that buffer does not get clobbered (idiot)
-		buf[len] = 0; p = buf; poutbuf = outbuf;  
-
-		ConversionResult n = ConvertUTF8toUTF16(&p, &buf[len], (UTF16 **) &poutbuf, (const UTF16 *) &outbuf[8192], lenientConversion);
-		WriteFile(hOutfile, outbuf, (int)(poutbuf-outbuf)*2, &len2, NULL);
-		memmove(buf, p, len-(int)(p-buf));
-		q = &buf[len-(int)(p-buf)];
-	}
-	CloseHandle(hInfile);
-	delete buf;
-	SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN);
-	return hOutfile;
-}
-
-HANDLE UTF16TempFromANSI(HANDLE hInfile)
-{
-	HANDLE hOutfile = CreateTempFile();
-  if(hOutfile == INVALID_HANDLE_VALUE)     // I3228   // I3510
-  {
-    CloseHandle(hInfile);
-    return INVALID_HANDLE_VALUE;
+  len = GetFileSize(hInfile, NULL);
+  if (hasPreamble) {
+    SetFilePointer(hInfile, 3, NULL, FILE_BEGIN); // Cut off UTF-8 marker
+    len -= 3;
   }
 
-	PCHAR buf = new char[8193];
-	PWSTR outbuf;
-	DWORD len;
-	// read in buffer as ANSI and write out buffer as WCHAR...
-	buf[0] = '\xFF';
-	buf[1] = '\xFE';
-	WriteFile(hOutfile, buf, 2, &len, NULL);
-	while(ReadFile(hInfile, buf, 8192, &len, NULL) && len > 0)
-	{
-		buf[len] = 0;
-		outbuf = strtowstr(buf);
-		WriteFile(hOutfile, outbuf, wcslen(outbuf)*2, &len, NULL);
-		delete outbuf;
-	}
-	CloseHandle(hInfile);
+  buf = new BYTE[len + 1]; // null terminated
+  outbuf = new WCHAR[len + 1];
+  if (ReadFile(hInfile, buf, len, &len2, NULL)) {
+    buf[len2] = 0;
+    p = buf;
+    poutbuf = outbuf;
+    if (hasPreamble) {
+      // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a 
+      // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
+      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
+      WriteFile(hOutfile, outbuf, (int)(poutbuf - outbuf) * 2, &len2, NULL);
+    }
+    else {
+      // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
+      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
+      if (cr == sourceIllegal) {
+        // Not a valid UTF-8 file, so fall back to ANSI
+        //AddCompileMessage(CINFO_NonUnicodeFile); 
+        // note, while this message is defined, for now we will not emit it 
+        // because we don't support HINT/INFO messages yet and we don't want
+        // this to cause a blocking compile at this stage
+        poutbuf = strtowstr((PSTR)buf);
+        WriteFile(hOutfile, poutbuf, wcslen(poutbuf) * 2, &len2, NULL);
+        delete poutbuf;
+      }
+      else {
+        WriteFile(hOutfile, outbuf, (int)(poutbuf - outbuf) * 2, &len2, NULL);
+      }
+    }
+  }
+
+  CloseHandle(hInfile);
 	delete buf;
+  delete outbuf;
 	SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN);
 	return hOutfile;
 }

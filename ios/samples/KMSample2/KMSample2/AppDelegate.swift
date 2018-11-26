@@ -15,6 +15,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
+    // Set desired level before release
+    KeymanEngine.log.outputLevel = .debug
+    KeymanEngine.log.logAppDetails()
+
     // Replace with your application group id
     Manager.applicationGroupIdentifier = "group.KMSample"
     return true

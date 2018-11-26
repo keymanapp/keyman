@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 24/03/2017 5:09:28 PM (- $Rev: 12980 $, 162398703).
+// File generated on 21/02/2018 8:54:28 PM (- $Rev: 12980 $, 726708000).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -28,7 +28,7 @@ library keymanapi
   interface IKeymanCollection;
   interface IKeymanErrors;
   interface IKeymanHotkeys;
-  interface IKeymanKeyboardLanguagesInstalled;
+  interface IKeymanKeyboardLanguages;
   interface IKeymanKeyboardOptions;
   interface IKeymanKeyboards;
   interface IKeymanKeyboardsInstalled;
@@ -56,6 +56,9 @@ library keymanapi
   interface IKeymanSystemInfo;
   interface IKeymanUserInterface;
   interface IKeymanVisualKeyboard;
+  interface IKeymanKeyboardLanguage;
+  interface IKeymanKeyboardLanguagesInstalled;
+  interface IKeymanKeyboardLanguagesFile;
 
 
   [
@@ -281,18 +284,12 @@ library keymanapi
   [
     uuid(F5CFFF42-4294-44C7-8F97-67EB2E83BB1F),
     version(10.0),
-    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguagesInstalled"),
+    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguages"),
     dual,
     oleautomation
   ]
-  interface IKeymanKeyboardLanguagesInstalled: IKeymanCollection
+  interface IKeymanKeyboardLanguages: IKeymanCollection
   {
-    [propget, id(0x00000000), defaultcollelem]
-    HRESULT _stdcall Items([in] long Index, [out, retval] IKeymanKeyboardLanguageInstalled** Value);
-    [id(0x00000010)]
-    HRESULT _stdcall Install([in] BSTR BCP47Code);
-    [id(0x00000011)]
-    HRESULT _stdcall InstallByLangID([in] long LangID);
   };
 
   [
@@ -583,6 +580,8 @@ library keymanapi
   {
     [id(0x00000100)]
     HRESULT _stdcall Install([in] VARIANT_BOOL Force);
+    [propget, id(0x00000192)]
+    HRESULT _stdcall Languages([out, retval] IKeymanKeyboardLanguagesFile** Value);
   };
 
   [
@@ -623,18 +622,18 @@ library keymanapi
     dual,
     oleautomation
   ]
-  interface IKeymanKeyboardLanguageInstalled: IKeymanObject
+  interface IKeymanKeyboardLanguageInstalled: IKeymanKeyboardLanguage
   {
-    [propget, id(0x00000001)]
-    HRESULT _stdcall BCP47Code([out, retval] BSTR* Value);
-    [propget, id(0x00000003)]
-    HRESULT _stdcall LangID([out, retval] long* Value);
     [propget, id(0x00000004)]
     HRESULT _stdcall OwnerKeyboard([out, retval] IKeymanKeyboardInstalled** Value);
     [propget, id(0x00000005)]
     HRESULT _stdcall ProfileGUID([out, retval] struct GUID* Value);
     [id(0x00000006)]
     HRESULT _stdcall Uninstall(void);
+    [propget, id(0x00000192)]
+    HRESULT _stdcall IsInstalled([out, retval] VARIANT_BOOL* Value);
+    [id(0x00000193)]
+    HRESULT _stdcall Install(void);
   };
 
   [
@@ -858,6 +857,52 @@ library keymanapi
     HRESULT _stdcall Filename([out, retval] BSTR* Value);
     [id(0x00000002)]
     HRESULT _stdcall Uninstall(void);
+  };
+
+  [
+    uuid(8D0B3363-E537-437D-AD89-A0B5103F5F64),
+    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguage"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardLanguage: IKeymanObject
+  {
+    [propget, id(0x000000C9)]
+    HRESULT _stdcall BCP47Code([out, retval] BSTR* Value);
+    [propget, id(0x000000CA)]
+    HRESULT _stdcall OwnerKeyboard([out, retval] IKeymanKeyboard** Value);
+    [propget, id(0x000000CB)]
+    HRESULT _stdcall LangID([out, retval] long* Value);
+    [propget, id(0x0000012D)]
+    HRESULT _stdcall Name([out, retval] BSTR* Value);
+  };
+
+  [
+    uuid(7DC22BC0-85BB-45C0-8EDB-A2F4BD1D500B),
+    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguagesInstalled"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardLanguagesInstalled: IKeymanKeyboardLanguages
+  {
+    [id(0x00000010)]
+    HRESULT _stdcall Install([in] BSTR BCP47Code);
+    [id(0x00000011)]
+    HRESULT _stdcall InstallByLangID([in] long LangID);
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] int Index, [out, retval] IKeymanKeyboardLanguageInstalled** Value);
+  };
+
+  [
+    uuid(5F90BCDA-F1C1-433A-8FD0-B498299D3C30),
+    helpstring("http://help.keyman.com/developer/engine/desktop/10.0/api/IKeymanKeyboardLanguagesFile"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardLanguagesFile: IKeymanKeyboardLanguages
+  {
+    [propget, id(0x00000000), defaultcollelem]
+    HRESULT _stdcall Items([in] int Index, [out, retval] IKeymanKeyboardLanguage** Value);
   };
 
   [

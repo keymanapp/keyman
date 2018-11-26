@@ -24,15 +24,21 @@
       }
 
       .test {
-          font-size: 1.5em; 
-          background-color: #ffffee; 
-          height:100px;
-          width:92%; 
-          min-height:30px; 
-          border: 1px solid gray;
+        font-size: 1.5em; 
+        background-color: #ffffee; 
+        height:100px;
+        width:92%; 
+        min-height:30px; 
       }
       
-      #install_link { 
+      .desktop-device .test {
+        box-sizing: border-box;
+        padding: 4px;
+        margin: 0;
+        width:100%; 
+      }
+      
+      .install-link { 
         background: none repeat scroll 0 0 #CCCCCC;
         border: 1px solid #444444;
         border-radius: 4px;
@@ -41,52 +47,97 @@
         display: none;
         font-family: Sans-serif;
         font-size: 10pt;
-        font-weight: bold;
-        margin: 18px 0;
+        margin: 0;
         padding: 6px;
+        margin: 2px;
         text-decoration: none;
-    }
+      }
       
-      /** Mobile **/
-      @media only screen and (max-width: 767px), only screen and (max-device-width: 767px) {
-          #install_link { display: inline-block; }
-      }
-
-      /** Tablet **/
-      @media only screen and (min-width : 768px) and (max-width : 1024px) {
-          #install_link { display: inline-block; }
-      }
-
-      /** Tablet (landscape) **/
-      @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
-          #install_link { display: inline-block; }
-      }
-
+      /** Mobile, Tablet **/
       
+      #install-link {
+        font-weight: bold;
+      }
+      
+      .install-link .ios,
+      .install-link .android {
+        display: none;
+      }
+
+      .touch-device #install-link,
+      .touch-device #install-link-packages,
+      .touch-device-ios #install-link-ios,
+      .touch-device-android #install-link-android {
+        display: inline-block;
+      }
+
+      .touch-device-android .install-link .android,
+      .touch-device-ios .install-link .ios {
+        display: inline;
+      }
+      
+      #top-toolbar {
+        background: #eeeeee;
+        min-height: 23px;
+        padding: 4px;
+      }
+      
+      .control {
+        float: left; 
+      }
+
+      .touch-device #character-grid {
+        white-space: nowrap;
+        overflow-x: scroll;
+      }
+      
+      #character-grid {
+        min-height: 49px;
+        margin: 8px 0;
+        border: solid 1px #cccccc;
+      }
+      
+      #character-grid > div {
+        display: inline-block;
+      }
+      
+      .char-char,
+      .char-code {
+        border-right: solid 1px #eeeeee;
+        margin-right: 2px;
+      }
+
+      .char-char {
+        border-bottom: solid 1px #eeeeee;
+      }
+      
+      .cursor > .char-char,
+      .cursor > .char-code {
+        border-right: solid 3px blue;
+        margin-right: 0;
+      }
+      
+      .cursor#character-grid {
+        border-left: solid 3px blue;
+      }
+      
+      .cursor-selected {
+        background: #e0e0ff;
+      }
+      
+      .char-char {
+        font-size: 14pt;
+        text-align: center;
+      }
+      
+      .char-code {
+        font: 8pt Consolas,Courier;
+        padding: 4px;
+      }
     </style> 
-<!--
-    <script src="kmw-release.js" type="text/javascript"></script>
--->
 
-    <script src="resource/kmwreleasestub.js"></script>   
-    <script src="resource/kmwbase.js"></script>
-    <script src="resource/kmwstring.js"></script>
-    <script src="resource/keymanweb.js"></script>
-    <script src="resource/kmwkeymaps.js"></script>
-    <script src="resource/kmwcallback.js"></script>
-    <script src="resource/kmwlayout.js"></script> 
-    <script src="resource/kmwosk.js"></script>
-    <script src="resource/kmwnative.js"></script>
-    <!--<script src="resource/kmwdebug.js"></script>-->
-
-    <script src="resource/kmwuibutton.js"></script>
-
-  <!-- The following scripts should be inserted at the end of the page after visible elements but before the closing 'body' tag. -->
-  
-  <!-- If a custom user interface is used, its script should be inserted here, and will override any ui specified during initialization.  --> 
-  
-  <!-- <script src="kmwuibutton-release.js"></script>  
-  <script src="resource/kmwuibutton.js"></script> --> 
+  <script src="resource/keymanweb.js"></script>   
+  <script src="resource/kmwuibutton.js"></script>
     
   <!-- The following dynamic script will register each of the additional keyboards -->
     
@@ -114,9 +165,25 @@
 
     <div>
       <!-- The following DIV is only needed as a UI placeholder for the Button and Toolbar User Interfaces -->
-      <div id='KeymanWebControl'></div>
-      <textarea id='ta1' class='test'></textarea><br/>
-      <a href='' id='install_link'>Install Keyboard into native Keyman</a>
+      <div id='top-toolbar'>
+        <div class='control' id='keymanweb-control-host'>
+          <div id='KeymanWebControl'></div>
+        </div>
+        <div class='control' id='controls'>
+          <a href='https://keyman.com/go/developer/10.0/ios-app' target='_blank' class='install-link' id='install-link-ios'>Install Keyman for iOS</a>
+          <a href='https://keyman.com/go/developer/10.0/android-app' target='_blank' class='install-link' id='install-link-android'>Install Keyman for Android</a>
+          <a href='' class='install-link' id='install-link'>Add keyboard to Keyman for <span class='android'>Android</span><span class='ios'>iOS</span></a>
+          <a href='packages.html' class='install-link' id='install-link-packages'>Install packages</a>
+        </div>
+        <div style='clear:left'></div>
+      </div>
+      <div id='character-grid'>
+        <!-- contains the breakdown of characters from the input-area -->
+      </div>
+      <div id='input-area'>
+        <textarea id='ta1' class='test'></textarea><br/>
+      </div>
+      
     </div>
     <script> 
       keyman.init({
@@ -131,10 +198,139 @@
         function (p) {
           //alert(p.internalName);
           var nm = p.internalName.substr('Keyboard_'.length);
-          document.getElementById('install_link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
+          document.getElementById('install-link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
         });
         
-      //keyman.addEventListener
+      var ta1 = document.getElementById('ta1');
+      var charGrid = document.getElementById('character-grid');
+      var lastContent = null;
+      
+      if(keyman.util.isTouchDevice()) {
+        document.body.className += ' touch-device';
+        if(keyman.util.device.OS == 'iOS') {
+          document.body.className += ' touch-device-ios';
+        } else if(keyman.util.device.OS == 'Android') {
+          document.body.className += ' touch-device-android';
+        }
+      } else {
+        document.body.className += ' desktop-device';
+      }
+      
+      function removeChildNodes(node) {
+        while (node.lastChild) {
+          node.removeChild(node.lastChild);
+        }
+      }
+      
+      function addCharElements(text, code) {
+        var ebox = document.createElement('div'), echar = document.createElement('div'), ecode = document.createElement('div');
+        echar.textContent = text;
+        echar.className = 'char-char keymanweb-font';
+        ecode.textContent = code;
+        ecode.className = 'char-code';
+        ebox.appendChild(echar);
+        ebox.appendChild(ecode);
+        charGrid.appendChild(ebox);
+      }
+      
+      function logContent() {
+        if(lastContent === ta1.value) {
+          updateLogCursor();
+          return;
+        }
+        removeChildNodes(charGrid);
+        if(ta1.value.length == 0) {
+          addCharElements('-','empty');
+        } else {
+          for(var i = 0; i < ta1.value.length; i++) {
+            //
+            var code = ta1.value.charCodeAt(i);
+            var text = ta1.value.charAt(i);
+            var slice = 4;
+            // Test for SMP
+            if(code >= 0xD800 && code < 0xDC00) {
+              if(i < ta1.value.length) {
+                var code2 = ta1.value.charCodeAt(i+1);
+                if(code2 >= 0xDC00 && code < 0xE000) {
+                  code = (code - 0xD800) * 0x400 + (code2 - 0xDC00) + 0x10000;
+                  text += ta1.value.charAt(i+1);
+                  slice = 6;
+                  i++;
+                }
+              }
+            }
+            addCharElements(text, ('000000'+(code).toString(16)).slice(-slice));
+          }
+        }
+        updateLogCursor();
+        lastContent = ta1.value;
+      }
+      
+      var lastSelStart = -1;
+      
+      function calculateLengthByCodepoint(text, base, x)  {
+        var stop = base + x;
+        while(base < stop - 1) {
+          if(text.charCodeAt(base) >= 0xD800 && text.charCodeAt(base) < 0xDC00 && 
+             text.charCodeAt(base+1) >= 0xDC00 && text.charCodeAt(base+1) < 0xE000) {
+            // Decrement position by one for each surrogate pair
+            x--;
+          }
+          base++;
+        }
+        return x;
+      }
+      
+      function updateLogCursor() {
+        var i, selStart, selLength, selDirection;
+        
+        if(keyman.isPositionSynthesized()) { // this is an internal function
+          // For touch devices, we need to ask KMW
+          selStart = keyman.touchAliasing.getTextBeforeCaret(ta1.kmw_ip).length;
+          selLength = 0;
+          selDirection = 'forward';
+        } else {
+          // For desktop devices, we use the position reported by the textarea control
+          selStart = ta1.selectionStart;
+          selLength = ta1.selectionEnd - ta1.selectionStart;
+          selDirection = ta1.selectionDirection;
+        }
+        
+        selLength = calculateLengthByCodepoint(ta1.value, selStart, selLength);
+        selStart = calculateLengthByCodepoint(ta1.value, 0, selStart);
+        
+        //console.log('selStart='+selStart+', selLength='+selLength);
+        if(lastSelStart != selStart || lastSelLength != selLength) {
+          for(i = 0; i < charGrid.childNodes.length; i++) {
+            charGrid.childNodes[i].className = '';
+          }
+          
+          var x = selDirection == 'backward' ? selStart-1 : selStart+selLength - 1;
+
+          if(x < 0) {
+            charGrid.className = 'cursor';
+          } else {
+            charGrid.className = '';
+            if(x >= 0 && x < charGrid.childNodes.length) {
+              charGrid.childNodes[x].className = 'cursor';
+            }
+            charGrid.childNodes[x].scrollIntoView();
+          }
+
+          for(i = selStart; i < selStart+selLength; i++) {
+            charGrid.childNodes[i].className += ' cursor-selected';
+          }
+          lastSelStart = selStart;
+          lastSelLength = selLength;
+        }
+      }
+
+      logContent();
+      window.setInterval(logContent, 100);
+        
+      /* TODO: once KeymanWeb supports oninput signalling
+      document.getElementById('ta1').addEventListener('input', logContent, false);
+      */
       
       window.onload = function() {
         window.setTimeout(

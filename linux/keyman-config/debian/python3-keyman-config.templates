@@ -1,0 +1,15 @@
+Template: python3-keyman-config/keymandir
+Type: boolean
+Default: true
+_Description: Do you want to make keyman directories available to everyone?
+ The keyman package installer programs will install files to:
+ .
+ /usr/local/share/keyman
+ /usr/local/share/doc/keyman
+ /usr/local/share/fonts/keyman
+ .
+ This will make these directories mode 7770 so that all users may
+ install and uninstall shared keyman keyboards.
+ .
+ You may choose your own alternative policy of who can do what in
+ these directories.

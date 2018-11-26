@@ -100,7 +100,7 @@ const
 
     'The package %0:s is already installed.  Do you wish to update it now?',
 
-    'You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.  Restart now?',
+    'You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.'#13#10#13#10'Restart now?',
     'Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman.',
 
     'Internet Explorer 9.0 or later is required to install Keyman Desktop.',   // I4470

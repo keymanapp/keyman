@@ -91,7 +91,7 @@ implementation
 uses
   CleartypeDrawCharacter,
   ImgList,
-  LangSwitchUtils,
+  Keyman.System.Util.RenderLanguageIcon,
   Math,
   utilhotkey,
   WideStrings;

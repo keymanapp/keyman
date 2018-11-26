@@ -1,153 +1,160 @@
-(*
-  Name:             UframeTextEditor
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      23 Aug 2006
-
-  Modified Date:    23 Feb 2016
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          23 Aug 2006 - mcdurdin - Initial version
-                    14 Sep 2006 - mcdurdin - Add find and replace dialogs
-                    14 Sep 2006 - mcdurdin - Add LoadFromStream and SaveToStream
-                    14 Sep 2006 - mcdurdin - Add ConvertCharacter and GetWideCodes functions
-                    28 Sep 2006 - mcdurdin - Add context help and character map lookup
-                    06 Oct 2006 - mcdurdin - Only update help if form is visible
-                    04 Dec 2006 - mcdurdin - Update help only when help form visible
-                    12 Dec 2006 - mcdurdin - Add Print, Print Preview
-                    04 Jan 2007 - mcdurdin - Add help support
-                    25 Jan 2007 - mcdurdin - Delete dlgSave unused component
-                    19 Mar 2007 - mcdurdin - I712 - Fix character map should follow selected character
-                    30 May 2007 - mcdurdin - I781 - Search and Replace dialogs now support Unicode
-                    19 Nov 2007 - mcdurdin - I1157 - const string parameters
-                    14 Jun 2008 - mcdurdin - I1426 - Fixup script tag font
-                    18 Mar 2011 - mcdurdin - I2794 - Fix memory leak
-                    08 Jul 2011 - mcdurdin - I2971 - Branding Pack locale.xml not editing as UTF-8
-                    18 May 2012 - mcdurdin - I3323 - V9.0 - Change from Plus-MemoU to Plus-Memo
-                    08 Jun 2012 - mcdurdin - I3337 - V9.0 - Review of input/output for Unicode
-                    06 Feb 2012 - mcdurdin - I3082 - Reload text file with specific encoding support, not marking as unmodified after reload
-                    03 Nov 2012 - mcdurdin - I3502 - V9.0 - Merge of I3082 - Reload text file with specific encoding support
-                    13 Dec 2012 - mcdurdin - I3637 - V9.0 - I3502 Fail - Reload as Format button is disabled in some contexts
-                    01 Jan 2013 - mcdurdin - I3636 - V9.0 - File format dropdown shows wrong value
-                    10 Jan 2014 - mcdurdin - I4021 - V9.0 - Redesign Keyboard Wizard to integrate V9 features
-                    07 Feb 2014 - mcdurdin - I4034 - V9.0 - Restructure keyboard wizard for source views and features
-                    27 Feb 2014 - mcdurdin - I4083 - V9.0 - When errors encountered in JSON layout file, locate the error in the source view
-                    27 May 2015 - mcdurdin - I4616 - Developer crashes when saving or switching views due to locked files [CrashID:tike.exe_9.0.481.0_004587D3_EFOpenError]
-                    27 May 2015 - mcdurdin - I4721 - V9.0 - Developer crashes if a file is in use and a reload is attempted
-                    27 May 2015 - mcdurdin - I4499 - Developer crashes switching to source tab when line number is too high [CrashID:tike.exe_9.0.466.0_00698269_ERangeError]
-                    27 May 2015 - mcdurdin - I4655 - Developer crashes when changing font settings and in code view for touch layout if not on first line [CrashID:tike.exe_9.0.487.0_0069BE51_ERangeError]
-                    22 Jun 2015 - mcdurdin - I4765 - Double-click on message does not find source line since build 500
-                    24 Jul 2015 - mcdurdin - I4797 - Convert to characters tool is inconsistent
-                    03 Aug 2015 - mcdurdin - I4807 - Add Character Identifier to Keyman Developer
-                    24 Aug 2015 - mcdurdin - I4870 - Editor does not always refresh immediately with new theming
-                    06 Nov 2015 - mcdurdin - I4918 - Text editor is not refreshing correctly with new theme
-                    23 Feb 2016 - mcdurdin - I4962 - Redraw not reliably working in text editor
-*)
 unit UframeTextEditor;  // I3323   // I4797
 
 interface
 
 uses
+  System.Classes,
+  System.ImageList,
+  System.JSON,
+  System.SysUtils,
   System.Types,
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ImgList,
-  MenuImgList, ExtCtrls,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.ImgList,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
 
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlight,
-  PlusMemo,
-  PlusGutter,
-  ExtHilit,
-  HtmlHighlight,
-  pmprint,
-  PMSupport,
-{$ENDIF}
+  uCEFConstants,
+  uCEFInterfaces,
+  uCEFTypes,
 
-  TextFileFormat, UfrmTike,
-  System.ImageList, KeymanDeveloperMemo,
-  Vcl.StdCtrls;
+  Keyman.Developer.UI.UframeCEFHost,
+  KMDActionInterfaces,
+  MenuImgList,
+  TextFileFormat,
+  UfrmTike,
+  UserMessages;
 
 type
-  TParColourLineType = (pcltNone, pcltBreakpoint, pcltExecutionPoint, pcltError);
+  TEditorBreakpointClickedEvent = procedure(Sender: TObject; ALine: Integer) of object;
 
-  TframeTextEditor = class(TTIKEForm)
-    memo: TKeymanDeveloperMemo;
+  TframeTextEditor = class(TTIKEForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrintSetup: TPrinterSetupDialog;
-    dlgFind: TFindDialog;
-    dlgReplace: TReplaceDialog;
     lstImagesDisabled: TImageList;
-    tmrUpdateSelectedToken: TTimer;
     procedure FormCreate(Sender: TObject);
-    procedure memoBeforeChange(Sender: TObject; var Txt: PWideChar);
-    procedure memoEnter(Sender: TObject);
-    procedure memoExit(Sender: TObject);
-    procedure memoKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure memoChange(Sender: TObject);
-    procedure memoSelMove(Sender: TObject);
-    procedure memoMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure memoMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure mnuPopupShowCharacterClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure dlgFindFind(Sender: TObject);
-    procedure dlgReplaceReplace(Sender: TObject);
-    procedure dlgReplaceFind(Sender: TObject);
-    procedure tmrUpdateSelectedTokenTimer(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
   private
-{$IFDEF USE_PLUSMEMO}
-    gutter: TPlusGutter;
-    SyntaxHighlighter: TSyntaxHighlighter;
-    pmPrinter: TPlusMemoPrinter;
-    highlighter: TExtHighlighter;
-    highlighterHTML: THtmlHighlighter;
-{$ENDIF}
-
+    class var FInitialFilenameIndex: Integer;
+  private
+    FCharFont, FCodeFont: TFont;
+    FSelectedRange: TRect;
+    FSelectedRangeIsBackwards: Boolean;
+    FHasBeenLoaded: Boolean;
+    FCanUndo: Boolean;
+    FCanRedo: Boolean;
+    FHasSelection: Boolean;
     FLoading: Boolean;
     FEditorFormat: TEditorFormat;
     FOnChanged: TNotifyEvent;
-    FErrorPar: Integer;
     FTextFileFormat: TTextFileFormat;
-    FindFound: Boolean;
+
+    cef: TframeCEFHost;
+    FFilename: string;
+    FOnBreakpointClicked: TEditorBreakpointClickedEvent;
+
     procedure RefreshOptions;
     function GetText: WideString;
     procedure SetText(Value: WideString);
     procedure SetEditorFormat(const Value: TEditorFormat);
-    procedure UpdateFontTags;
     procedure Changed;
-    procedure UpdateState;
+    procedure UpdateState(ALocation: string);
     procedure ClearError;
-    procedure UpdateSelectedToken;
     procedure SetCharFont(const Value: TFont);
     procedure SetCodeFont(const Value: TFont);
     function GetCharFont: TFont;
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
-    function UpdateHelp(token: WideString): Boolean;
+
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+    procedure cefBeforeContextMenu(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const params: ICefContextMenuParams; const model: ICefMenuModel);
+    procedure cefContextMenuCommand(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const params: ICefContextMenuParams; commandId: Integer;
+      eventFlags: Cardinal; out Result: Boolean);
+    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
+      const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
+      Result: Boolean);
+
+    procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
+    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
+    procedure WMUser_SyntaxColourChange(var Message: TMessage); message WM_USER_SYNTAXCOLOURCHANGE;
+    procedure FireCommand(const commands: TStringList);
+    procedure LoadFileInBrowser(const AData: string);
+    procedure UpdateInsertState(const AMode: string);
+    procedure ExecuteCommand(const command: string; const parameters: TJSONValue = nil);
+    procedure ExecuteLineCommand(ALine: Integer; const command: string);
+    procedure UpdateToken(command: string);
+    procedure SetCursorPosition(AColumn, ARow: Integer);
+    procedure cefLoadEnd(Sender: TObject);
+    procedure DoBreakpointClicked(const line: string);
+    procedure UpdateEditorFonts;
+    procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+
+  protected
+    function GetHelpTopic: string; override;
+
+    procedure SaveToStream(AStream: TStream);
+
+    { IKMDSearchActions }
+    procedure EditFind;
+    procedure EditFindNext;
+    procedure EditReplace;
+    function CanEditFind: Boolean;
+    function CanEditFindNext: Boolean;
+
+    { IKMDEditActions }
+    function IKMDTextEditorActions_GetText: string;
+    procedure IKMDTextEditorActions_SetText(const Value: string);
+    function IKMDTextEditorActions.GetText = IKMDTextEditorActions_GetText;
+    procedure IKMDTextEditorActions.SetText = IKMDTextEditorActions_SetText;
+    procedure CutToClipboard;
+    procedure CopyToClipboard;
+    procedure PasteFromClipboard;
+    procedure Undo;
+    procedure Redo;   // I4032
+    procedure SelectAll;
+    procedure ClearSelection;
+    function CanCut: Boolean;
+    function CanCopy: Boolean;
+    function CanPaste: Boolean;
+    function CanUndo: Boolean;
+    function CanRedo: Boolean;   // I4032
+    function CanSelectAll: Boolean;
+    function CanClearSelection: Boolean;
+
+    { IKMDTextEditorActions }
+    function GetEditorFormat: TEditorFormat;
+    function GetSelectedRow: Integer;
+    function GetSelectedCol: Integer;
+    function GetSelectedRange: TRect;
+    procedure ReplaceSelection(ARange: TRect; const ANewText: string);
+
   public
     { Public declarations }
-    procedure GetHelpTopic(var s: string); override;
-    procedure UpdateParColour(par: Integer; LineType: TParColourLineType);
+    procedure DebugSetBreakpoint(ALine: Integer);
+    procedure DebugClearBreakpoint(ALine: Integer);
+    procedure DebugUpdateExecutionPoint(ALine: Integer);
+    property OnBreakpointClicked: TEditorBreakpointClickedEvent read FOnBreakpointClicked write FOnBreakpointClicked;
+
     procedure SetFocus; override;
+    procedure SetupCharMapDrop;
 
     procedure FindError(ln: Integer);
     procedure FindErrorByOffset(offset: Integer);   // I4083
     function OffsetToLine(Offset: Integer): Integer;   // I4083
-
-    function GetHelpToken: WideString;
-
-    procedure EditFind;
-    procedure EditFindNext;
-    procedure EditReplace;
 
     procedure SyntaxColourChange;
 
@@ -155,14 +162,15 @@ type
     function PrintPreview(Header: WideString = ''): Boolean;
 
     procedure LoadFromFile(AFileName: WideString); overload;   // I4034
-    procedure LoadFromFile(AFileName: WideString; ATextFileFormat: TTextFileFormat); overload;   // I4034
-    procedure SaveToFile(AFileName: WideString);
-    procedure LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat); overload;  // I2964
     procedure LoadFromStream(AStream: TStream); overload;  // I2964
-    procedure SaveToStream(AStream: TStream);
+    procedure SaveToFile(AFileName: WideString);
+    procedure LoadFromFile(AFileName: WideString; ATextFileFormat: TTextFileFormat); overload;   // I4034
+    procedure LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat); overload;  // I2964
+
+    procedure SetSelectedRow(ARow: Integer);
 
     property EditorText: WideString read GetText write SetText;
-    property EditorFormat: TEditorFormat read FEditorFormat write SetEditorFormat;
+    property EditorFormat: TEditorFormat read GetEditorFormat write SetEditorFormat;
     property OnChanged: TNotifyEvent read FOnChanged write FonChanged;
 
     property CodeFont: TFont read GetCodeFont write SetCodeFont;
@@ -173,152 +181,153 @@ type
 implementation
 
 uses
+  System.TypInfo,
+  Vcl.Clipbrd,
+
+  Keyman.Developer.System.HelpTopics,
+  Keyman.UI.FontUtils,
+
+  dmActionsMain,
   dmActionsTextEditor,
+  CharacterDragObject,
   CharacterInfo,
   CharMapDropTool,
+  CharMapInsertMode,
   keyboardparser,
   KeymanDeveloperOptions,
   kwhelp,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys,
   UfrmHelp,
   UfrmMain,
+  UmodWebHTTPServer,
   Unicode,
+  utilhttp,
   utilstr;
-  
+
 {$R *.dfm}
 
 { TframeTextEditor }
 
 procedure TframeTextEditor.RefreshOptions;
 begin
-  memo.TabStops   := FKeymanDeveloperOptions.IndentSize;
+  //TODO: memo.TabStops   := FKeymanDeveloperOptions.IndentSize;
+end;
+
+procedure TframeTextEditor.ReplaceSelection(ARange: TRect;
+  const ANewText: string);
+var
+  j: TJSONObject;
+begin
+  j := TJSONObject.Create;
+  try
+    j.AddPair('top', TJSONNumber.Create(ARange.Top));
+    j.AddPair('left', TJSONNumber.Create(ARange.Left));
+    j.AddPair('bottom', TJSONNumber.Create(ARange.Bottom));
+    j.AddPair('right', TJSONNumber.Create(ARange.Right));
+    j.AddPair('newText', ANewText);
+    ExecuteCommand('replaceSelection', j);
+  finally
+    j.Free;
+  end;
+end;
+
+procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+var
+  params: TStringList;
+begin
+  Result := False;
+
+  if csDestroying in ComponentState then   // I3983
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  if GetParamsFromURL(URL, params) then
+  begin
+    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
+    Result := True;
+  end;
+end;
+
+const
+  TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER       = MENU_ID_USER_FIRST + 1;  //actTextEditor_ShowCharacter
+  TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS = MENU_ID_USER_FIRST + 2;  //actTextEditor_ConvertToCharacters
+
+procedure TframeTextEditor.cefBeforeContextMenu(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const params: ICefContextMenuParams; const model: ICefMenuModel);
+begin
+  if not cef.cef.IsSameBrowser(browser) then exit;
+
+  model.AddSeparator;
+  model.AddItem(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,        'S&how Character');
+  model.SetEnabled(TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER, modActionsTextEditor.actTextEditor_ShowCharacter.Enabled);
+  model.AddItem(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS,  'C&onvert to Characters');
+  model.SetAccelerator(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, Ord('U'), True, True, False);
+  model.SetEnabled(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, modActionsTextEditor.actTextEditor_ConvertToCharacters.Enabled);
+end;
+
+procedure TframeTextEditor.cefContextMenuCommand(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const params: ICefContextMenuParams; commandId: Integer; eventFlags: Cardinal;
+  out Result: Boolean);
+begin
+  Result := False;
+
+  if not cef.cef.IsSameBrowser(browser) then exit;
+
+  case commandId of
+    TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER,
+    TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS:
+      PostMessage(Handle, WM_USER_TextEditor_Command, commandId, 0);
+  end;
+end;
+
+procedure TframeTextEditor.cefPreKeyEvent(Sender: TObject;
+  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
+  out isKeyboardShortcut, Result: Boolean);
+begin
+  if event.windows_key_code = VK_ESCAPE then
+  begin
+    ClearError;
+    Result := True;
+  end;
 end;
 
 procedure TframeTextEditor.Changed;
 begin
-  memo.Update; // required due to bug in Delphi's TStyleHook which causes invalidated areas to be lost because   // I4962
-    // WM_SETREDRAW is set on the window when the caption is changed, due to the {*} character being added
-    // to the caption.   I4870   // I4918 undoes memo.Update for more performant painting
   if Assigned(FOnChanged) then FOnChanged(Self);
-  UpdateState;
 end;
 
 procedure TframeTextEditor.FormCreate(Sender: TObject);
 begin
   inherited;
-{$IFDEF USE_PLUSMEMO}
-  highlighter := TExtHighlighter.Create(Self);
-  highlighterHTML := THtmlHighlighter.Create(Self);
-  with highlighterHTML do
-  begin
-    Bracket.AltFont := False;
-    Bracket.Style := [fsBold];
-    Bracket.Background := -1;
-    Bracket.Foreground := clBlue;
-    Bracket.Cursor := crDefault;
-    DefaultText.AltFont := False;
-    DefaultText.Style := [];
-    DefaultText.Background := -1;
-    DefaultText.Foreground := clWindowText;
-    DefaultText.Cursor := crDefault;
-    HtmlKeyword.AltFont := False;
-    HtmlKeyword.Style := [fsBold];
-    HtmlKeyword.Background := -1;
-    HtmlKeyword.Foreground := clNavy;
-    HtmlKeyword.Cursor := crDefault;
-    HtmlTag.AltFont := False;
-    HtmlTag.Style := [fsItalic];
-    HtmlTag.Background := -1;
-    HtmlTag.Foreground := clGreen;
-    HtmlTag.Cursor := crDefault;
-    HtmlComment.AltFont := False;
-    HtmlComment.Style := [fsItalic];
-    HtmlComment.Background := -1;
-    HtmlComment.Foreground := clOlive;
-    HtmlComment.Cursor := crDefault;
-    HtmlAttribute.AltFont := False;
-    HtmlAttribute.Style := [];
-    HtmlAttribute.Background := -1;
-    HtmlAttribute.Foreground := clGreen;
-    HtmlAttribute.Cursor := crDefault;
-    HtmlAttributeValue.AltFont := False;
-    HtmlAttributeValue.Style := [];
-    HtmlAttributeValue.Background := -1;
-    HtmlAttributeValue.Foreground := clGray;
-    HtmlAttributeValue.Cursor := crDefault;
-    PerlScript.AltFont := False;
-    PerlScript.Style := [];
-    PerlScript.Background := -1;
-    PerlScript.Foreground := clTeal;
-    PerlScript.Cursor := crDefault;
-    ScriptTag.AltFont := False;
-    ScriptTag.Style := [fsBold];
-    ScriptTag.Background := clWindow;
-    ScriptTag.Foreground := clPurple;
-    ScriptTag.Cursor := crDefault;
-    ScriptContent.AltFont := True;
-    ScriptContent.Style := [];
-    ScriptContent.Background := -1;
-    ScriptContent.Foreground := clWindowText;
-    ScriptContent.Cursor := crDefault;
-    SpecialChars.AltFont := False;
-    SpecialChars.Style := [];
-    SpecialChars.Background := -1;
-    SpecialChars.Foreground := clFuchsia;
-    SpecialChars.Cursor := crDefault;
-    UnknownTag.AltFont := False;
-    UnknownTag.Style := [];
-    UnknownTag.Background := -1;
-    UnknownTag.Foreground := clRed;
-    UnknownTag.Cursor := crDefault;
-    XMLSyntax := False;
-  end;
 
-  memo.Highlighter := highlighter;
+  FCharFont := TFont.Create;
+  FCodeFont := TFont.Create;
 
-  gutter := TPlusGutter.Create(Self);
-  gutter.Align := alLeft;
-  gutter.IgnoreLastLineIfEmpty := False;
-  gutter.PlusMemo := memo;
-  gutter.Parent := Self;
+  cef := TframeCEFHost.Create(Self);
+  cef.ShouldShowContextMenu := True;
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
+  cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
+  cef.cef.OnContextMenuCommand := cefContextMenuCommand;
+  cef.OnPreKeyEvent := cefPreKeyEvent;
+  SetupCharMapDrop;
+end;
 
-  pmPrinter := TPlusMemoPrinter.Create(Self);
-  with pmPrinter do
-  begin
-    MemoToPrint := memo;
-    GutterWidth := 0.500000000000000000;
-    MarginLeft := 0.750000000000000000;
-    MarginRight := 0.500000000000000000;
-    MarginTop := 0.750000000000000000;
-    MarginBottom := 0.750000000000000000;
-    LineSpacing := -1.200000047683716000;
-    Footer := 'Page {p} of {P}';
-    HeaderYPos := 0.400000005960464400;
-    FooterYPos := 0.400000005960464400;
-    HeaderFont.Charset := ANSI_CHARSET;
-    HeaderFont.Color := clWindowText;
-    HeaderFont.Height := -13;
-    HeaderFont.Name := 'Arial';
-    HeaderFont.Style := [];
-    FooterFont.Charset := ANSI_CHARSET;
-    FooterFont.Color := clWindowText;
-    FooterFont.Height := -13;
-    FooterFont.Name := 'Arial';
-    FooterFont.Style := [];
-    NumbersFont.Charset := DEFAULT_CHARSET;
-    NumbersFont.Color := clWindowText;
-    NumbersFont.Height := -11;
-    NumbersFont.Name := 'Tahoma';
-    NumbersFont.Style := [];
-    PreviewTitle := 'Print preview';
-    PrintTitle := '{application}';
-  end;
+procedure TframeTextEditor.SetupCharMapDrop;
+begin
+  GetCharMapDropTool.Handle(cef.cefwp, cmimDefault, CharMapDragOver, CharMapDragDrop);
+end;
 
-  SyntaxHighlighter := TSyntaxHighlighter.Create(Self);
-  SyntaxHighlighter.Apply(memo, highlighter);
-{$ENDIF}
-  UpdateFontTags;
+procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
+begin
+  FHasBeenLoaded := True;
 end;
 
 type
@@ -349,21 +358,32 @@ end;
 
 function TframeTextEditor.GetCharFont: TFont;
 begin
-  if FEditorFormat = efHTML
-    then Result := memo.Font   // I1426 - script tags should be 'code' font
-    else Result := Memo.AltFont;
+  Result := FCharFont;
 end;
 
 function TframeTextEditor.GetCodeFont: TFont;
 begin
-  if FEditorFormat = efHTML
-    then Result := Memo.AltFont  // I1426 - script tags should be 'code' font
-    else Result := Memo.Font;
+  Result := FCodeFont;
+end;
+
+function TframeTextEditor.GetEditorFormat: TEditorFormat;
+begin
+  Result := FEditorFormat;
 end;
 
 function TframeTextEditor.GetText: WideString;
 begin
-  Result := memo.Text;
+  Result := modWebHttpServer.AppSource.GetSource(FFileName);
+end;
+
+function TframeTextEditor.IKMDTextEditorActions_GetText: string;
+begin
+  Result := GetText;
+end;
+
+procedure TframeTextEditor.IKMDTextEditorActions_SetText(const Value: string);
+begin
+  SetText(Value);
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString);
@@ -372,6 +392,7 @@ var
 begin
   FLoading := True;
   try
+    FFileName := AFileName;
     if FileExists(AFileName) then
     begin
       fs := TFileStream.Create(AFileName, fmOpenRead);
@@ -384,25 +405,58 @@ begin
     else
     begin
       TextFileFormat := tffUTF8;
-      memo.SetTextBuf('');
+      LoadFileInBrowser('');
     end;
-    memo.Modified := False;
   finally
     FLoading := False;
   end;
 end;
 
 procedure TframeTextEditor.LoadFromStream(AStream: TStream; ATextFileFormat: TTextFileFormat);  // I2964
+var
+  s: TStringList;
 begin
   FLoading := True;
   try
     TextFileFormat := ATextFileFormat;
 
-    memo.Lines.LoadFromStream(AStream, TextFileFormatToEncoding(TextFileFormat));   // I3637
-    memo.Modified := False;  // I3082   // I3502
+    s := TStringList.Create;
+    try
+      s.LoadFromStream(AStream, TextFileFormatToEncoding(TextFileFormat));   // I3637
+      LoadFileInBrowser(s.Text);
+    finally
+      s.Free;
+    end;
+
   finally
     FLoading := False;
   end;
+end;
+
+procedure TframeTextEditor.LoadFileInBrowser(const AData: string);
+  function GenerateNewFilename: string;
+  begin
+    Inc(FInitialFilenameIndex);
+    Result := '*texteditor*'+IntToStr(FInitialFilenameIndex);
+  end;
+  function EncodeFont(const prefix: string; f: TFont): string;
+  begin
+    Result := Format('&%sName=%s&%sSize=%d', [prefix, URLEncode(f.Name), prefix, TFontUtils.FontSizeInPixels(f)]);
+  end;
+const
+  mode: array[TEditorFormat] of string = (
+    'keyman', 'xml', 'text', 'html', 'json', 'javascript', 'css'
+  );
+begin
+  if FFilename = '' then
+    FFilename := GenerateNewFilename;
+  modWebHTTPServer.AppSource.RegisterSource(FFilename, AData, True);
+  cef.Navigate(
+    modWebHttpServer.GetLocalhostURL + '/app/editor/'+
+    '?mode='+mode[FEditorFormat]+
+    '&filename='+URLEncode(FFilename)+
+    EncodeFont('charFont', FCharFont)+
+    EncodeFont('codeFont', FCodeFont));
 end;
 
 procedure TframeTextEditor.LoadFromFile(AFileName: WideString;
@@ -412,6 +466,7 @@ var
 begin
   FLoading := True;
   try
+    FFileName := AFileName;
     if FileExists(AFileName) then
     begin
       try
@@ -432,26 +487,57 @@ begin
     else
     begin
       TextFileFormat := ATextFileFormat;
-      memo.SetTextBuf('');
+      LoadFileInBrowser('');
     end;
-    memo.Modified := False;
   finally
     FLoading := False;
   end;
 end;
 
 procedure TframeTextEditor.LoadFromStream(AStream: TStream);
+var
+  s: TStringList;
+  buffer: TBytes;
+  encoding: TEncoding;
+  p: Int64;
+  BufferLength, PreambleLength: Integer;
 begin
   FLoading := True;
   try
-    memo.Lines.LoadFromStream(AStream); // prolog determines encoding  // I3337
-    if memo.Encoding = TEncoding.UTF8 then  // I3337   // I3636
-      TextFileFormat := tffUTF8
-    else if memo.Encoding = TEncoding.Unicode then  // I3337   // I3636
-      TextFileFormat := tffUTF16
-    else
-      TextFileFormat := tffANSI;
-    memo.Modified := False;
+    { Sniff the buffer preamble }
+    p := AStream.Position;
+    SetLength(buffer, 16);
+    BufferLength := AStream.Read(buffer, 16);
+    SetLength(buffer, BufferLength);
+    encoding := nil;
+    PreambleLength := TEncoding.GetBufferEncoding(buffer, encoding, TEncoding.UTF8);
+    AStream.Position := p + PreambleLength;
+
+    s := TStringList.Create;
+    try
+      p := AStream.Position;
+      try
+        s.LoadFromStream(AStream, encoding); // prolog determines encoding  // I3337
+      except
+        on E:EEncodingError do
+        begin
+          // Reload as ANSI, because not valid UTF-8
+          AStream.Position := p;
+          s.LoadFromStream(AStream, TEncoding.Default);
+        end;
+      end;
+
+      if s.Encoding = TEncoding.UTF8 then  // I3337   // I3636
+        TextFileFormat := tffUTF8
+      else if s.Encoding = TEncoding.Unicode then  // I3337   // I3636
+        TextFileFormat := tffUTF16
+      else
+        TextFileFormat := tffANSI;
+      LoadFileInBrowser(s.Text);
+    finally
+      s.Free;
+    end;
+
   finally
     FLoading := False;
   end;
@@ -468,29 +554,28 @@ begin
   finally
     Free;
   end;
-  memo.Modified := False;
 end;
 
 
 procedure TframeTextEditor.SaveToStream(AStream: TStream);
+var
+  FSource: string;
+  ss: TStringStream;
 begin
+  FSource := modWebHttpServer.AppSource.GetSource(FFileName);
   case FTextFileFormat of
-    tffANSI:  memo.Lines.SaveToStream(AStream, TEncoding.Default);  // I3337
-    tffUTF8:  memo.Lines.SaveToStream(AStream, TEncoding.UTF8);
-    tffUTF16: memo.Lines.SaveToStream(AStream, TEncoding.Unicode);
+    tffANSI:  ss := TStringStream.Create(FSource, TEncoding.Default);
+    tffUTF8:  ss := TStringStream.Create(FSource, TEncoding.UTF8);
+    tffUTF16: ss := TStringStream.Create(FSource, TEncoding.Unicode);
+    else raise EAssertionFailed.Create('Unsupported file format');
   end;
-  memo.Modified := False;
+  try
+    AStream.CopyFrom(ss, 0);
+  finally
+    ss.Free;
+  end;
 end;
 
-procedure TframeTextEditor.memoBeforeChange(Sender: TObject; var Txt: PWideChar);
-begin
-  ClearError;
-end;
-
-procedure TframeTextEditor.memoChange(Sender: TObject);
-begin
-  if not FLoading then Changed;
-end;
 (*
   with Source as TCharacterDragObject do
     s := Text[cmimText];
@@ -508,156 +593,128 @@ end;
     memo.SetCaretFromMouse(X - 16, Y - 16);
   end;
  *)
-procedure TframeTextEditor.memoEnter(Sender: TObject);
-begin
-  //frmKeymanDeveloper.RegisterToolbarClient(Self);
-end;
 
-procedure TframeTextEditor.memoExit(Sender: TObject);
+procedure TframeTextEditor.UpdateInsertState(const AMode: string);
 begin
-  //frmKeymanDeveloper.UnregisterToolbarClient(Self);
-end;
-
-procedure TframeTextEditor.memoKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-var
-  k: Integer;
-  pt: TPoint;
-begin
-  if (Key=VK_Insert) and (Shift = []) then
-  begin
-    memo.Overwrite := not memo.Overwrite;
-    if memo.Overwrite
-      then frmKeymanDeveloper.barStatus.Panels[1].Text := 'Overwrite'
-      else frmKeymanDeveloper.barStatus.Panels[1].Text := 'Insert';
-    Key := 0;
-  end
-  else if (Key=VK_ESCAPE) and (Shift = []) then
-  begin
-    ClearError;
-  end
-  else if (Key=VK_APPS) and (Shift = []) then
-  begin
-    pt := memo.ClientToScreen(Point(memo.CaretX, memo.CaretY + memo.LineHeight));
-    modActionsTextEditor.mnuTextEditor.Popup(pt.X, pt.Y);
-    Key := 0;
-  end
-  else if (Key=VK_Tab) and (Shift = []) then
-  begin
-    if FKeymanDeveloperOptions.UseTabChar then Exit;
-    k := memo.TabStops-(memo.SelCol mod memo.TabStops);
-    if k = 0 then k := memo.TabStops;
-    memo.SelText := StringOfChar(' ', k);
-    Key := 0;
-  end;
-end;
-
-procedure TframeTextEditor.memoMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var
-  pt: TPoint;
-begin
-  if Button = mbRight then
-  begin
-//    memo.Perform(WM_LBUTTONDOWN, 0, MAKELONG(X, Y));
-//    memo.Perform(WM_LBUTTONUP, 0, MAKELONG(X, Y));
-    pt := memo.ClientToScreen(Point(X,Y));
-    modActionsTextEditor.mnuTextEditor.Popup(pt.X, pt.Y);
-  end;
-end;
-
-procedure TframeTextEditor.memoMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  UpdateState;
-end;
-
-procedure TframeTextEditor.memoSelMove(Sender: TObject);
-begin
-  UpdateState;
-end;
-
-procedure TframeTextEditor.mnuPopupShowCharacterClick(Sender: TObject);
-begin
-  //
+  frmKeymanDeveloper.barStatus.Panels[1].Text := AMode;
 end;
 
 function TframeTextEditor.PrintFile(Header: WideString): Boolean;
 begin
-  Result := False;
-{$IFDEF USE_PLUSMEMO}
-  pmPrinter.Header := Header;
-  pmPrinter.Print;
-{$ENDIF}
+  ExecuteCommand('print');
+  Result := True;
 end;
 
 function TframeTextEditor.PrintPreview(Header: WideString): Boolean;
 begin
-{$IFDEF USE_PLUSMEMO}
-  pmPrinter.Header := Header;
-  pmPrinter.Preview;
-{$ENDIF}
+  // TODO: print preview
   Result := True;
 end;
 
 procedure TframeTextEditor.SetCharFont(const Value: TFont);
 begin
-  if FEditorFormat = efHTML
-    then memo.Font := Value  // I1426 - script tags should be 'code' font
-    else memo.AltFont := Value;
+  FCharFont.Assign(Value);
+  UpdateEditorFonts;
 end;
 
 procedure TframeTextEditor.SetCodeFont(const Value: TFont);
 begin
-  if FEditorFormat = efHTML
-    then memo.AltFont := Value  // I1426 - script tags should be 'code' font
-    else memo.Font := Value;
+  FCodeFont.Assign(Value);
+  UpdateEditorFonts;
+end;
+
+procedure TframeTextEditor.UpdateEditorFonts;
+  function FontToJSON(f: TFont): TJSONObject;
+  begin
+    Result := TJSONObject.Create;
+    Result.AddPair('name', f.Name);
+    Result.AddPair('size', TJSONNumber.Create(TFontUtils.FontSizeInPixels(f)));
+  end;
+var
+  j: TJSONObject;
+begin
+  if not FHasBeenLoaded then
+    Exit;
+
+  j := TJSONObject.Create;
+  try
+    j.AddPair('codeFont', FontToJSON(FCodeFont));
+    j.AddPair('charFont', FontToJSON(FCharFont));
+    ExecuteCommand('setFonts', j);
+  finally
+    j.Free;
+  end;
 end;
 
 procedure TframeTextEditor.SetEditorFormat(const Value: TEditorFormat);
 begin
   FEditorFormat := Value;
-  UpdateFontTags;
 end;
 
 procedure TframeTextEditor.SetFocus;
 begin
-  memo.SetFocus;
+  inherited;
+  cef.SetFocus;
 end;
 
-procedure TframeTextEditor.UpdateFontTags;
+procedure TframeTextEditor.SetSelectedRow(ARow: Integer);
 begin
-{$IFDEF USE_PLUSMEMO}
-  case FEditorFormat of
-    efKMN:  memo.Highlighter := highlighter;
-    efHTML: begin highlighterHTML.XMLSyntax := False; memo.Highlighter := highlighterHTML; end;
-    efXML:  begin highlighterHTML.XMLSyntax := True;  memo.Highlighter := highlighterHTML; end;
-    efText: memo.Highlighter := nil;
+  SetCursorPosition(0, ARow);
+end;
+
+procedure TframeTextEditor.SetCursorPosition(AColumn, ARow: Integer);
+var
+  j: TJSONObject;
+begin
+  j := TJSONObject.Create;
+  try
+    j.AddPair('row', TJSONNumber.Create(ARow));
+    j.AddPair('column', TJSONNumber.Create(AColumn));
+    ExecuteCommand('moveCursor', j);
+  finally
+    j.Free;
   end;
-  memo.ApplyStartStopKeys := Assigned(memo.Highlighter);
-  memo.ApplyKeywords := Assigned(memo.Highlighter);
-  memo.ReApplyKeywords;
-{$ENDIF}
+end;
+
+function TframeTextEditor.GetSelectedCol: Integer;
+begin
+  if FSelectedRangeIsBackwards
+    then Result := FSelectedRange.Left
+    else Result := FSelectedRange.Right;
+end;
+
+function TframeTextEditor.GetSelectedRange: TRect;
+begin
+  Result := FSelectedRange;
+end;
+
+function TframeTextEditor.GetSelectedRow: Integer;
+begin
+  if FSelectedRangeIsBackwards
+    then Result := FSelectedRange.Top
+    else Result := FSelectedRange.Bottom;
 end;
 
 procedure TframeTextEditor.SetText(Value: WideString);
 var
-  SelLine: Integer;
-  SelCol: Integer;
+  v: TJSONString;
 begin
-  if memo.Text <> Value then   // I4021
+  RefreshOptions;
+
+  if FHasBeenLoaded then
+  begin
+    v := TJSONString.Create(Value);
+    try
+      ExecuteCommand('setText', v);
+    finally
+      v.Free;
+    end;
+  end
+  else
   begin
     FLoading := True;
     try
-      SelLine := memo.SelLine;
-      SelCol := memo.SelCol;
-      memo.SetTextBuf(PWideChar(Value));
-      memo.Modified := False;
-      RefreshOptions;
-      if SelLine >= memo.Lines.Count then SelLine := memo.Lines.Count - 1;   // I4499   // I4655
-      memo.SelLine := SelLine;
-      memo.SelCol := SelCol;
-      memo.ScrollInView;
+      LoadFileInBrowser(Value);
     finally
       FLoading := False;
     end;
@@ -665,290 +722,413 @@ begin
 end;
 
 procedure TframeTextEditor.SetTextFileFormat(const Value: TTextFileFormat);
+var
+  FSource: string;
 begin
   if FTextFileFormat <> Value then
   begin
     FTextFileFormat := Value;
-    if FTextFileFormat = tffANSI then
-      memo.Lines.Text := memo.Lines.Text;
+    if (FTextFileFormat = tffANSI) and modWebHttpServer.AppSource.IsSourceRegistered(FFileName) then
+    begin
+      // Recode to ANSI
+      FSource := string(AnsiString(modWebHttpServer.AppSource.GetSource(FFileName)));
+      SetText(FSource);
+    end;
   end;
 end;
 
 procedure TframeTextEditor.SyntaxColourChange;
 begin
-{$IFDEF USE_PLUSMEMO}
-  SyntaxHighlighter.Load;
-  SyntaxHighlighter.Apply(memo, highlighter);
-  memo.ReApplyKeywords;
-{$ENDIF}
+  // TODO: syntax colouring
 end;
 
-procedure TframeTextEditor.UpdateState;
+procedure TframeTextEditor.UpdateState(ALocation: string);
 begin
-  frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [memo.SelLine+1, memo.SelCol+1]);
+  if cef.HasFocus then
+  begin
+    if ALocation <> '' then
+    begin
+      FSelectedRange.Top   := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Left    := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Bottom  := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRange.Right := StrToIntDef(StrToken(ALocation, ','),0);
+      FSelectedRangeIsBackwards := StrToIntDef(StrToken(ALocation, ','),0) > 0;
+      frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRange.Top+1,FSelectedRange.Left+1]);
+    end;
+  end;
+end;
 
-  if memo.Focused then
-    UpdateSelectedToken;
-  //UpdateToolbarState;
+procedure TframeTextEditor.WMUser_FireCommand(var Message: TMessage);
+var
+  params: TStringList;
+begin
+  params := TStringList(Message.LParam);
+  if (params.Count > 0) and (params[0] = 'command') then
+  begin
+    params.Delete(0);
+    FireCommand(params);
+  end;
+  params.Free;
+end;
+
+procedure TframeTextEditor.WMUser_SyntaxColourChange(var Message: TMessage);
+begin
+  ExecuteCommand('reloadSettings');
+end;
+
+procedure TframeTextEditor.WMUser_TextEditor_Command(var Message: TMessage);
+begin
+  case Message.wParam of
+    TEXTEDITOR_CONTEXTMENU_SHOWCHARACTER:
+      modActionsTextEditor.actTextEditor_ShowCharacter.Execute;
+    TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS:
+      modActionsTextEditor.actTextEditor_ConvertToCharacters.Execute;
+  end;
 end;
 
 {-------------------------------------------------------------------------------
  - Paragraph colour management and errors                                      -
  -------------------------------------------------------------------------------}
 
- procedure TframeTextEditor.ClearError;
-var
-  par: Integer;
+procedure TframeTextEditor.ClearError;
 begin
-  if FErrorPar > -1 then
-  begin
-    par := FErrorPar;
-    FErrorPar := -1;
-    UpdateParColour(par, pcltNone);
-  end;
+  ExecuteCommand('highlightError');
 end;
 
-procedure TframeTextEditor.dlgFindFind(Sender: TObject);
+{ IKMDEditActions }
+
+function TframeTextEditor.CanClearSelection: Boolean;
 begin
-  if not memo.FindTxt(dlgFind.FindText, frDown in dlgFind.Options,
-      frMatchCase in dlgFind.Options, frWholeWord in dlgFind.Options, True)
-    then ShowMessage(Format('Cannot find "%s"', [dlgFind.FindText]))
-    else memo.ScrollInView;
+  Result := FHasSelection;
 end;
 
-procedure TframeTextEditor.dlgReplaceFind(Sender: TObject);
+function TframeTextEditor.CanCopy: Boolean;
 begin
-  if not memo.FindTxt(dlgReplace.FindText, frDown in dlgReplace.Options,
-      frMatchCase in dlgReplace.Options, frWholeWord in dlgReplace.Options, True) then
-  begin
-    ShowMessage(Format('Cannot find "%s"', [dlgReplace.FindText]));
-    FindFound := False;
-  end
-  else
-  begin
-    memo.SelLength := -Length(dlgReplace.FindText);
-    memo.ScrollInView;
-    FindFound := True;
-  end;
+  Result := FHasSelection;
 end;
 
-procedure TframeTextEditor.dlgReplaceReplace(Sender: TObject);
-var
-  i: Integer;
+function TframeTextEditor.CanCut: Boolean;
 begin
-  if frReplaceAll in dlgReplace.Options then
-  begin
-    memo.SelStart := 0; i := 0;
-    while memo.FindTxt(dlgReplace.FindText, frDown in dlgReplace.Options,
-        frMatchCase in dlgReplace.Options, frWholeWord in dlgReplace.Options, True) do
-    begin
-      memo.SelText := dlgReplace.ReplaceText;
-      Inc(i);
-    end;
-    ShowMessage(Format('Replaced %d occurrences of "%s" with "%s"',
-      [i, dlgReplace.FindText, dlgReplace.ReplaceText]));
-    FindFound := False;
-  end
-  else if frReplace in dlgReplace.Options then
-  begin
-    if not FindFound then
-    begin
-      dlgReplaceFind(dlgReplace);
-      Exit;
-    end;
-    if (memo.SelText = dlgReplace.FindText) then
-    begin
-      memo.SelText := dlgReplace.ReplaceText;
-      dlgReplaceFind(dlgReplace);
-      Exit;
-    end;
-  end;
+  Result := FHasSelection;
+end;
+
+function TframeTextEditor.CanPaste: Boolean;
+begin
+  Result := Clipboard.HasFormat(CF_TEXT);
+end;
+
+function TframeTextEditor.CanRedo: Boolean;
+begin
+  Result := FCanRedo;
+end;
+
+function TframeTextEditor.CanSelectAll: Boolean;
+begin
+  Result := True; // TODO: Only if we have text?
+end;
+
+function TframeTextEditor.CanUndo: Boolean;
+begin
+  Result := FCanUndo;
+end;
+
+procedure TframeTextEditor.Undo;
+begin
+  ExecuteCommand('editUndo');
+end;
+
+procedure TframeTextEditor.Redo;
+begin
+  ExecuteCommand('editRedo');
+end;
+
+procedure TframeTextEditor.SelectAll;
+begin
+  ExecuteCommand('editSelectAll');
+end;
+
+procedure TframeTextEditor.ClearSelection;
+begin
+  cef.cef.ClipboardDel;
+end;
+
+procedure TframeTextEditor.CopyToClipboard;
+begin
+  cef.cef.ClipboardCopy;
+end;
+
+procedure TframeTextEditor.CutToClipboard;
+begin
+  cef.cef.ClipboardCut;
+end;
+
+procedure TframeTextEditor.DebugClearBreakpoint(ALine: Integer);
+begin
+  ExecuteLineCommand(ALine, 'clearBreakpoint');
+end;
+
+procedure TframeTextEditor.DebugSetBreakpoint(ALine: Integer);
+begin
+  ExecuteLineCommand(ALine, 'setBreakpoint');
+end;
+
+procedure TframeTextEditor.DebugUpdateExecutionPoint(ALine: Integer);
+begin
+  ExecuteLineCommand(ALine, 'updateExecutionPoint');
+end;
+
+procedure TframeTextEditor.PasteFromClipboard;
+begin
+  cef.cef.ClipboardPaste;
+end;
+
+{ IKMDSearchActions }
+
+function TframeTextEditor.CanEditFind: Boolean;
+begin
+  Result := True;
+end;
+
+function TframeTextEditor.CanEditFindNext: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TframeTextEditor.EditFind;
 begin
-  if not memo.Focused then Exit;
-  dlgFind.Execute;
+  if not cef.HasFocus then Exit;
+  ExecuteCommand('searchFind');
 end;
 
 procedure TframeTextEditor.EditFindNext;
 begin
-  if not memo.Focused then Exit;
-  dlgFindFind(dlgFind);
+  if not cef.HasFocus then Exit;
+  ExecuteCommand('searchFindNext');
 end;
 
 procedure TframeTextEditor.EditReplace;
 begin
-  if not memo.Focused then Exit;
-  FindFound := False;
-  dlgReplace.Execute;
+  if not cef.HasFocus then Exit;
+  ExecuteCommand('searchReplace');
+end;
+
+procedure TframeTextEditor.ExecuteCommand(const command: string; const parameters: TJSONValue);
+begin
+  if Assigned(parameters) then
+  begin
+    cef.cef.ExecuteJavaScript('window.editorGlobalContext.'+command+'('+parameters.ToJSON+')', '');
+  end
+  else
+  begin
+    cef.cef.ExecuteJavaScript('window.editorGlobalContext.'+command+'()', '');
+  end;
+end;
+
+procedure TframeTextEditor.ExecuteLineCommand(ALine: Integer;
+  const command: string);
+var
+  v: TJSONNumber;
+begin
+  v := TJSONNumber.Create(ALine);
+  try
+    ExecuteCommand(command, v);
+  finally
+    v.Free;
+  end;
 end;
 
 procedure TframeTextEditor.FindError(ln: Integer);
 begin
   ClearError;
+  if (ln <= 0) then Exit;
 
-  if (ln <= 0) or (ln >= memo.LineCount) then Exit;   // I4765
-
-  memo.SelLine := ln;
-  memo.SelCol := 0;
-  memo.ScrollInView;
-  FErrorPar := ln;
-
-  UpdateParColour(FErrorPar, pcltError);
+  ExecuteLineCommand(ln, 'highlightError');
+  SetSelectedRow(ln);
 end;
 
 function TframeTextEditor.OffsetToLine(Offset: Integer): Integer;   // I4083
+var
+  line: Integer;
 begin
-  Result := 0;
-  while (Result < memo.ParagraphCount) and (Offset > memo.PargrphOffset[Result]) do
-    Inc(Result);
+  with TStringList.Create do
+  try
+    Text := Self.GetText;
+    line := 0;
+    while offset > 0 do
+    begin
+      Dec(offset, Strings[line].Length + 2);
+      Inc(line);
+    end;
+  finally
+    Free;
+  end;
+
+  Result := line;
 end;
 
 procedure TframeTextEditor.FindErrorByOffset(offset: Integer);   // I4083
 begin
   ClearError;
-
-  if offset <= 0 then Exit;
-
-  memo.SelStart := offset;
-  memo.SelCol := 0;
-  memo.ScrollInView;
-  FErrorPar := memo.SelLine;
-
-  UpdateParColour(FErrorPar, pcltError);
+  FindError(OffsetToLine(offset));
 end;
 
-procedure TframeTextEditor.UpdateParColour(par: Integer; LineType: TParColourLineType);
-{$IFDEF USE_PLUSMEMO}
+procedure TframeTextEditor.FireCommand(const commands: TStringList);
 var
-  FGColor, BGColor: TColor;
+  i: Integer;
+  command0, command: string;
+  commandParams: TArray<string>;
 begin
-  if par < 0 then Exit;
-  case LineType of
-    pcltNone: begin FGColor := -1; BGColor := -1; end;
-    pcltBreakpoint: begin FGColor := clWhite; BGColor := clRed; end;
-    pcltExecutionPoint: begin FGColor := clWhite; BGColor := clBlue; end;
-    pcltError: begin FGColor := clWhite; BGColor := clMaroon; end;
-    else Exit;
-  end;
-
-  if (memo.ParagraphsBackground[par] <> BGColor) or (memo.ParagraphsForeground[par] <> FGColor) then
+  i := 0;
+  while i < commands.Count do
   begin
-    memo.ParagraphsBackground[par] := BGColor;
-    memo.ParagraphsForeground[par] := FGColor;
-  end;
-{$ELSE}
-begin
-{$ENDIF}
-end;
-
-function TframeTextEditor.GetHelpToken: WideString;
-var
-  x, tx: Integer;
-  prevtoken: WideString;
-begin
-  x := memo.SelCol+1;
-
-  if EditorFormat = efKMN
-    then Result := GetTokenAtCursor(memo.LinesArray[memo.SelLine], x, tx, prevtoken)
-    else Result := '';
-
-  if not IsValidHelpToken(Result) then
-  begin
-    Result := prevtoken;
-    if not IsValidHelpToken(Result) then Result := '';
-  end;
-end;
-
-procedure TframeTextEditor.GetHelpTopic(var s: string);
-begin
-  if FEditorFormat <> efKMN then Exit;
-
-  s := memo.SelText;
-  if s = '' then
-  begin
-{$IFDEF USE_PLUSMEMO}
-    memo.Delimiters := [#9, ' ', '.', ',', ';', ':', '=', '<', '>', '(', ')'];
-{$ENDIF}
-    s := memo.CurrentWord;
-  end;
-
-  s := kwhelp.HelpKeyword(s);
-end;
-
-function TframeTextEditor.UpdateHelp(token: WideString): Boolean;
-begin
-  Result := False;
-  if not IsValidHelpToken(token) then Exit;
-  if Assigned(frmHelp) and frmHelp.Showing then frmHelp.LoadHelp(token, 'KMN');
-  Result := True;
-end;
-
-procedure TframeTextEditor.tmrUpdateSelectedTokenTimer(Sender: TObject);
-var
-  prevtoken, token: WideString;
-  tx, x: Integer;
-  ch: WideString;
-begin
-  tmrUpdateSelectedToken.Enabled := False;
-
-  x := memo.SelCol+1;
-
-  if EditorFormat = efKMN then   // I4807
-  begin
-    if memo.SelLength < 0 then
-      Inc(x, memo.SelLength);
-    token := GetTokenAtCursor(memo.LinesArray[memo.SelLine], x, tx, prevtoken);
-    if (memo.SelText <> '') and (token <> '') then
+    command0 := commands[i];
+    commandParams := command0.Split([',']);
+    command := commandParams[0];
+    if command = 'modified' then Changed   // I3948
+    else if command = 'undo-disable' then FCanUndo := False
+    else if command = 'undo-enable' then FCanUndo := True
+    else if command = 'redo-disable' then FCanRedo := False
+    else if command = 'redo-enable' then FCanRedo := True
+    else if command = 'has-selection' then FHasSelection := True
+    else if command = 'no-selection' then FHasSelection := False
+    else if command = 'breakpoint-clicked' then DoBreakpointClicked(commandParams[1])
+    else if command0.StartsWith('insert-mode,') then
     begin
-      prevtoken := memo.SelText;
-      if (x > tx) and CharInSet(token[1], ['"', '''']) then
-        prevtoken := token[1] + prevtoken + token[1];
-
-      if not TKeyboardParser_Line.GetXStr(prevtoken, token) then
-        token := memo.SelText;
-
-      x := 1;
-      tx := 1;
+      UpdateInsertState(command0.Substring('insert-mode,'.Length));
     end
-    else
-      token := GetTokenAtCursor(memo.LinesArray[memo.SelLine], x, tx, prevtoken);
-  end
-  else if memo.SelText <> '' then
+    else if command0.StartsWith('location,') then
+    begin
+      UpdateState(command0.Substring('location,'.Length));
+    end
+    else if command0.StartsWith('token,') then
+    begin
+      UpdateToken(command0.Substring('token,'.Length));
+    end
+    else ShowMessage('keyman:'+commands.Text);
+    Inc(i);
+  end;
+end;
+
+procedure TframeTextEditor.DoBreakpointClicked(const line: string);
+begin
+  if Assigned(FOnBreakpointClicked) then
+    FOnBreakpointClicked(Self, StrToInt(line));
+end;
+
+procedure TframeTextEditor.UpdateToken(command: string);
+var
+  col: Integer;
+  line: string;
+  x, tx: Integer;
+  token, prevtoken: WideString;
+  FHelpTopic, FPrevHelpTopic: WideString;
+begin
+  token := StrToken(command, ',');
+  if token = 'null' then
+    col := 0
+  else if not TryStrToInt(token, col) then
+    Exit;
+
+  line := command;
+
+  x := col+1;
+
+  token := GetTokenAtCursor(line, x, tx, prevtoken);
+  if (FHasSelection) and (token <> '') then
   begin
-    token := memo.SelText;
+    prevtoken := line;
+    if (x > tx) and CharInSet(token[1], ['"', '''']) then
+      prevtoken := token[1] + prevtoken + token[1];
+
+    if not TKeyboardParser_Line.GetXStr(prevtoken, token) then
+      token := line;
+
+    x := 1;
+    tx := 1;
   end
   else
-  begin
-    ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart);
-    if ch = '' then Exit;
+    token := GetTokenAtCursor(line, x, tx, prevtoken);
 
-    if Uni_IsSurrogate2(ch[1]) then
-      ch := memo.GetTextPart(memo.SelStart-2, memo.SelStart)
-    else if Uni_IsSurrogate1(ch[1]) then
-      ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart+1);
+  UpdateCharacterMap(False, token, x, tx, FHasSelection);
 
-    token := FormatUnicode(ch);
-  end;
+  FHelpTopic := token;
+  FPrevHelpTopic := prevtoken;
 
-  UpdateCharacterMap(False, token, x, tx, memo.SelText <> '');   // I4807
   if EditorFormat = efKMN then
-    if not UpdateHelp(token) then UpdateHelp(prevtoken);
+  begin
+    if not IsValidHelpToken(FHelpTopic, False) then
+    begin
+      if not IsValidHelpToken(FPrevHelpTopic, False)
+        then FHelpTopic := ''
+        else FHelpTopic := FPrevHelpTopic;
+    end;
+
+    if FHelpTopic <> '' then
+    begin
+      HelpKeyword := FHelpTopic;
+
+      if Assigned(frmHelp) and frmHelp.Showing then
+        frmHelp.QueueRefresh;
+    end;
+  end;
+end;
+
+function TframeTextEditor.GetHelpTopic: string;
+begin
+  if FEditorFormat <> efKMN then
+    Exit(SHelpTopic_Context_TextEditor);
+
+  Result := HelpKeyword;
 end;
 
 procedure TframeTextEditor.TntFormDestroy(Sender: TObject);
 begin
   inherited;
-{$IFDEF USE_PLUSMEMO}
-  FreeAndNil(SyntaxHighlighter);  // I2794
-{$ENDIF}
+  if FFileName <> '' then
+    modWebHttpServer.AppSource.UnregisterSource(FFileName);
+
+  FreeAndNil(FCharFont);
+  FreeAndNil(FCodeFont);
 end;
 
-procedure TframeTextEditor.UpdateSelectedToken;
+procedure TframeTextEditor.CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+var
+  j: TJSONObject;
 begin
-  tmrUpdateSelectedToken.Enabled := False;
-  tmrUpdateSelectedToken.Enabled := True;
+  cef.cefwp.SetFocus;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('x', TJSONNumber.Create(X));
+    j.AddPair('y', TJSONNumber.Create(Y));
+    j.AddPair('state', GetEnumName(TypeInfo(TDragState), Ord(State)));
+    ExecuteCommand('charmapDragOver', j);
+  finally
+    j.Free;
+  end;
+
+  // We cannot test acceptance via event because it is asynchronous
+  // So we will just assume we can accept and throw it away if it is outside bounds
+  // during drop.
+  Accept := True;
+end;
+
+procedure TframeTextEditor.CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  j: TJSONObject;
+  cdo: TCharacterDragObject;
+begin
+  cef.cefwp.SetFocus;
+  cdo := Source as TCharacterDragObject;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('x', TJSONNumber.Create(X));
+    j.AddPair('y', TJSONNumber.Create(Y));
+    j.AddPair('text', cdo.Text[cdo.InsertType]);
+    ExecuteCommand('charmapDragDrop', j);
+  finally
+    j.Free;
+  end;
 end;
 
 end.

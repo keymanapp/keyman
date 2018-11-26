@@ -37,7 +37,7 @@ function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsErro
 implementation
 
 uses
-  ProjectLog;
+  Keyman.Developer.System.Project.ProjectLog;
 
 type
   TKCCompilePackage = class
@@ -85,9 +85,12 @@ begin
       Result := DoCompilePackage(pack, tcp.SelfMessage, ASilent, ChangeFileExt(pack.FileName, '.kmp'));   // I4694
       if AWarnAsError and tcp.FHasWarning then Result := False;
 
-      if AInstaller then
-        Result := Result or DoCompilePackageInstaller(pack, tcp.SelfMessage, ASilent, AInstallerMSI,   // I4694
+      if AInstaller and Result then
+      begin
+        Result := DoCompilePackageInstaller(pack, tcp.SelfMessage, ASilent, AInstallerMSI,   // I4694
           ChangeFileExt(pack.FileName, '.exe'), AUpdateInstaller);
+        if AWarnAsError and tcp.FHasWarning then Result := False;
+      end;
     finally
       tcp.Free;
     end;

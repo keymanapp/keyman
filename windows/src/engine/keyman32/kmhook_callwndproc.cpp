@@ -44,7 +44,7 @@
                     22 Apr 2015 - mcdurdin - I4674 - V9.0 - Hotkeys do not always work consistently
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 /*
 *	kmnCallWndProc
@@ -108,7 +108,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 		cp = (CWPSTRUCT *)lParam;
     if(!Globals::get_Keyman_Initialised())
     {
-      SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc: Keyman not init, %x", GetLastError());  // I3226   // I3531
+      //DebugLastError("get_Keyman_Initialised");
     }
 	  else 
 	  {
@@ -126,20 +126,20 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
       {
         if(!Globals::CheckControllers()) 
         {
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc: Keyman not init, failed to check controllers (_td not set), %x", GetLastError());  // I3226   // I3531
+          DebugLastError("CheckControllers");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
 
         if(!Globals_InitThread())
         {
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc: Keyman not init, could not init controllers, %x", GetLastError());  // I3226   // I3531
+          DebugLastError("Globals_InitThread");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
 
         _td = ThreadGlobals();
 	      if(!_td)
         {
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc: Keyman not init, no thread globals, %x", GetLastError());  // I3226   // I3531
+          DebugLastError("ThreadGlobals");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
       }
@@ -148,12 +148,12 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
       {
         if(!Globals::CheckControllers())
         {
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc: Keyman not init, failed to CheckControllers, %x", GetLastError());  // I3226   // I3531
+          DebugLastError("CheckControllers");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
         if(!InitialiseProcess(cp->hwnd))
         {
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc: Keyman not init, failed to InitialiseProcess, %x", GetLastError());  // I3226   // I3531
+          DebugLastError("InitialiseProcess");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
       }

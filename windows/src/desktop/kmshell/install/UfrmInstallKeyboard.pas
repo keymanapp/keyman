@@ -79,7 +79,8 @@ type
 
     procedure SetInstallFile(const Value: string);
     procedure DeleteFileReferences;
-    procedure InstallKeyboard;
+    procedure InstallKeyboard(const ALogFile: string);
+    procedure CheckLogFileForWarnings(const Filename: string; Silent: Boolean);
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
@@ -88,7 +89,7 @@ type
   end;
 
 function InstallKeyboardFromFile(Owner: TComponent): Boolean;
-function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean): Boolean;
+function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile: string): Boolean;
 function InstallFiles(Owner: TComponent; const FileNames: TWideStrings; ASilent: Boolean): Boolean;
 
 implementation
@@ -102,10 +103,13 @@ uses
   GetOSVersion,
   MessageIdentifierConsts,
   MessageIdentifiers,
+  Keyman.Configuration.UI.MitigationForWin10_1803,
+  kmcomapi_errors,
   kmint,
   OnlineConstants,
   ShellApi,
   StrUtils,
+  TempFileManager,
   UfrmHTML,
   //UfrmSelectLanguage,
   utildir,
@@ -140,12 +144,14 @@ begin
       if AnsiSameText(ExtractFileExt(FileNames[i]), '.kmp')
         then kmcom.Packages.Install(FileNames[i], True)
         else kmcom.Keyboards.Install(FileNames[i], True);
+      CheckForMitigationWarningFor_Win10_1803(ASilent, '');
     except
       on E:EOleException do
       begin
         if kmcom.Errors.Count = 0 then Raise;
-        for j := 0 to kmcom.Errors.Count - 1 do
-          ShowMessage(kmcom.Errors[j].Description);
+        if not ASilent then
+          for j := 0 to kmcom.Errors.Count - 1 do
+            ShowMessage(kmcom.Errors[j].Description);
         Exit;
       end;
     end;
@@ -184,7 +190,7 @@ begin
     AddDefaultLanguageHotkey(InstalledKeyboards[i]);
 end;
 
-function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean): Boolean;
+function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile: string): Boolean;
 var
   n: Integer;
   InstalledKeyboards: array of IKeymanKeyboardInstalled;
@@ -202,7 +208,7 @@ begin
     begin
       if ASilent then
       begin
-        InstallKeyboard;
+        InstallKeyboard(LogFile);
         Result := True;
       end
       else
@@ -331,29 +337,54 @@ begin
 end;
 
 procedure TfrmInstallKeyboard.FireCommand(const command: WideString; params: TStringList);
+var
+  t: TTempFile;
 begin
   if (command = 'keyboard_install') and kmcom.SystemInfo.IsAdministrator then   // I4172
   begin
-    InstallKeyboard;
+    InstallKeyboard('');
   end
   else if command = 'keyboard_cancel' then
     ModalResult := mrCancel
   else if (command = 'keyboard_installallusers') or (command = 'keyboard_install') then   // I4172
   begin
-    if WaitForElevatedConfiguration(Handle, '-s -i "'+FInstallFile+'" -nowelcome') = 0 then
-      ModalResult := mrOk
-    else
-      ModalResult := mrCancel;
+    t := TTempFileManager.Get('.log');
+    try
+      if WaitForElevatedConfiguration(Handle, '-log "'+t.Name+'" -s -i "'+FInstallFile+'" -nowelcome') = 0 then
+        ModalResult := mrOk
+      else
+        ModalResult := mrCancel;
+
+      CheckLogFileForWarnings(t.Name, False);
+    finally
+      t.Free;
+    end;
   end
   else
     inherited;
+end;
+
+procedure TfrmInstallKeyboard.CheckLogFileForWarnings(const Filename: string; Silent: Boolean);
+var
+  str: TStringList;
+begin
+  if FileExists(Filename) then
+  begin
+    str := TStringList.Create;
+    try
+      str.LoadFromFile(Filename);
+      ShowMitigationWarningFormFor_Win10_1803(str.Text);
+    finally
+      str.Free;
+    end;
+  end;
 end;
 
 {-------------------------------------------------------------------------------
  - Control events                                                              -
  ------------------------------------------------------------------------------}
 
-procedure TfrmInstallKeyboard.InstallKeyboard;
+procedure TfrmInstallKeyboard.InstallKeyboard(const ALogFile: string);
 var
   i: Integer;
   kbd: IKeymanKeyboardInstalled;
@@ -394,6 +425,7 @@ begin
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;
         FKeyboard.Install(True);
+        CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end
       else
       begin
@@ -449,6 +481,7 @@ begin
         kmcom.Keyboards.Refresh;  // I2169
 
         FPackage.Install(True);
+        CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end;
     except
       on E:EOleException do
@@ -484,7 +517,7 @@ begin
     dlgOpen.Title := 'Install Keyman Keyboard';
 
     if dlgOpen.Execute then
-      Result := InstallFile(Owner, dlgOpen.FileName, False, False)
+      Result := InstallFile(Owner, dlgOpen.FileName, False, False, '')
     else
       Result := False;
   finally

@@ -5,11 +5,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:hardwareAccelerated="true"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher_round"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <receiver android:name="com.tavultesoft.kmapro.NetworkStateReceiver" >
@@ -31,21 +34,133 @@
                 android:resource="@xml/method" />
         </service>
 
-        <activity
-            android:name="com.tavultesoft.kmapro.MainActivity"
+        <service
+            android:name="com.tavultesoft.kmea.util.DownloadIntentService"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+            android:exported="true"
+            />
+
+        <activity
+            android:name="com.tavultesoft.kmapro.SplashScreenActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            android:theme="@style/AppTheme.BrandedLaunch" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.tavultesoft.kmapro.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+            android:label="@string/app_name"
+            android:launchMode="singleTask">
+
+            <!-- See http://stackoverflow.com/questions/1733195/android-intent-filter-for-a-particular-file-extension/2062112#2062112 -->
+
+            <!--
+                 Capture content by MIME type, which is how Gmail broadcasts
+                 attachment open requests.  pathPattern and file extensions
+                 are ignored, so the MIME type *MUST* be explicit, otherwise
+                 we will match absolutely every file opened.
+            -->
+            <intent-filter
+                android:priority="50">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!-- needed for properly formatted email messages -->
+                <data
+                    android:mimeType="application/vnd.keyman"
+                    android:scheme="content" />
+                <!-- needed for mangled email messages -->
+                <data
+                    android:mimeType="application/keyman"
+                    android:scheme="content" />
+                <!-- needed for mangled email messages -->
+                <data
+                    android:mimeType="application/octet-stream"
+                    android:scheme="content" />
+            </intent-filter>
+
+            <!--
+                 Capture file open requests (pathPattern is honoured) where no
+                 MIME type is provided in the Intent.  An Intent with a null
+                 MIME type will never be matched by a filter with a set MIME
+                 type, so we need a second intent-filter if we wish to also
+                 match files with this extension and a non-null MIME type
+                 (even if it is non-null but zero length).
+            -->
+            <intent-filter
+                android:priority="50">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:host="*" />
+
+                <!--
+                     Work around Android's ugly primitive PatternMatcher
+                     implementation that can't cope with finding a . early in
+                     the path unless it's explicitly matched.
+                -->
+                <data android:pathPattern=".*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+            </intent-filter>
+
+            <!--
+                 Capture file open requests (pathPattern is honoured) where a
+                 (possibly blank) MIME type is provided in the Intent.  This
+                 filter may only be necessary for supporting ES File Explorer,
+                 which has the probably buggy behaviour of using an Intent
+                 with a MIME type that is set but zero-length.  It's
+                 impossible to match such a type except by using a global
+                 wildcard.
+            -->
+            <intent-filter
+                android:priority="50">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+
+                <!--
+                     Work around Android's ugly primitive PatternMatcher
+                     implementation that can't cope with finding a . early in
+                     the path unless it's explicitly matched.
+                -->
+                <data android:pathPattern=".*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+            </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="keyman" android:host="localhost" android:path="/open"/>
+
+                <!-- http:// and  https:// protocols -->
+                <data android:scheme="http" android:host="*" android:pathPattern=".*\\.kmp" />
+                <data android:scheme="https" android:host="*" android:pathPattern=".*\\.kmp" />
             </intent-filter>
+
         </activity>
         <activity
             android:name="com.tavultesoft.kmapro.InfoActivity"
@@ -63,12 +178,27 @@
             android:label="@string/app_name" >
         </activity>
         <activity
+            android:name="com.tavultesoft.kmapro.PackageActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
             android:name="com.tavultesoft.kmapro.GetStartedActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" >
+            android:theme="@style/Theme.AppCompat.Light.Dialog" >
         </activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.tavultesoft.kmapro.fileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

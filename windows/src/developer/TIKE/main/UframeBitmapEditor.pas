@@ -89,6 +89,11 @@ type
     dlgExport: TSavePictureDialog;
     imgTransparent: TImage;
     lblPixel: TLabel;
+    panReadOnlyIcons: TPanel;
+    lblReadOnlyIcons: TLabel;
+    memoReadOnlyIcons: TMemo;
+    ppReadOnlyIcons: TPaintPanel;
+    panReadOnlyIconsTop: TPanel;
     procedure panEditMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure panEditMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -113,12 +118,11 @@ type
     procedure actOpenPaletteExecute(Sender: TObject);
     procedure cmdExportClick(Sender: TObject);
     procedure cmdImportClick(Sender: TObject);
+    procedure ppReadOnlyIconsPaint(Sender: TObject);
   private
-    //FTemp: Boolean;
-
+    FReadOnlyIcons: array of TIcon;
+    FRSP21318IsPngIcon: Boolean;
     FEdit: TBitmapEditorCurrentEdit;
-    //PrevButton: TMouseButton;
-    //PrevColour: TColor;
 
     X1, Y1: Integer;
     FBitmaps: array[TBitmapEditorBMType] of TBitmap;
@@ -130,6 +134,7 @@ type
     FLastInsertFont: TFont;
     FLastDisplayQuality: TCleartypeDisplayQuality;
     FTransparency: Boolean;
+    FIconCanBeEdited: Boolean;
     procedure CopyFromTemp;
     procedure CopyToTemp;
     procedure DrawColours;
@@ -140,6 +145,8 @@ type
     procedure SetModified(const Value: Boolean);
     procedure DrawMasked(Canvas: TCanvas; x, y: Integer; Bitmap: TBitmap);
     procedure SetTransparency(const Value: Boolean);
+    function CheckIfIconCanBeEdited(s: TStream): Boolean;
+    procedure LoadReadOnlyIcon(Stream: TStream);
   protected
 
     procedure CopyToClipboard;
@@ -193,6 +200,9 @@ var
 begin
   inherited Create(AOwner);
 
+  FIconCanBeEdited := True;
+  panReadOnlyIcons.Visible := not FIconCanBeEdited;
+
   TPicture.RegisterClipboardFormat(cf_Bitmap, TBitmap);
 
   for beb := Low(beb) to High(beb) do
@@ -237,9 +247,14 @@ end;
 destructor TframeBitmapEditor.Destroy;
 var
   beb: TBitmapEditorBMType;
+  i: Integer;
 begin
   for beb := Low(beb) to High(beb) do
     FBitmaps[beb].Free;
+
+  for i := 0 to High(FReadOnlyIcons) do
+    FReadOnlyIcons[i].Free;
+  SetLength(FReadOnlyIcons, 0);
 
   FLastInsertFont.Free;
   inherited Destroy;
@@ -675,6 +690,22 @@ begin
   panEdit.SetFocus;
 end;
 
+procedure TframeBitmapEditor.ppReadOnlyIconsPaint(Sender: TObject);
+var
+  i, x: Integer;
+begin
+  if FRSP21318IsPngIcon then
+    Exit;
+
+  x := 8;
+
+  for i := 0 to High(FReadOnlyIcons) do
+  begin
+    ppReadOnlyIcons.Canvas.Draw(x, 8, FReadOnlyIcons[i]);
+    Inc(x, FReadOnlyIcons[i].Width + 4);
+  end;
+end;
+
 procedure TframeBitmapEditor.SaveUndoBitmap;
 begin
   FBitmaps[bebUndo].Assign(FBitmaps[bebEdit]);
@@ -781,30 +812,83 @@ begin
   end;
 end;
 
+function IsPNGSignature(const buf: array of byte): Boolean;
+begin
+  Result :=
+    (buf[0] = $89) and
+    (buf[1] = $50) and
+    (buf[2] = $4E) and
+    (buf[3] = $47);
+end;
+
+function TframeBitmapEditor.CheckIfIconCanBeEdited(s: TStream): Boolean;
+var
+  p: Int64;
+  ci: TCursorOrIcon;
+  header: TIconRec;
+  buf: array[0..3] of byte;
+begin
+  p := s.Position;
+  try
+    if s.Read(ci, SizeOf(TCursorOrIcon)) <> SizeOf(TCursorOrIcon) then
+      Exit(False);
+
+    if (ci.wType <> rc3_Icon) or (ci.Count <> 1) then
+      Exit(False);
+
+    // We need to read the header of that icon
+    if not s.Read(header, SizeOf(header)) = sizeof(header) then
+      Exit(False);
+
+    if (header.Width <> 16) or (header.Height <> 16) then
+      Exit(False);
+
+    // Check that it's not a PNG format image
+    s.Position := header.DIBOffset;
+    if s.Read(buf, 4) <> 4 then
+      Exit(False);
+
+    FRSP21318IsPngIcon := IsPNGSignature(buf);
+    Result := not FRSP21318IsPngIcon;
+  finally
+    s.Position := p;
+  end;
+end;
+
 procedure TframeBitmapEditor.LoadFromStream(Stream: TStream; IsIcon: Boolean);
 var
   FIcon: TIcon;
 begin
   if IsIcon then
   begin
-    Transparency := True;
-    FBitmaps[bebEdit].Canvas.Brush.Color := TransparentReplacementColour;  // I2634
-    FBitmaps[bebEdit].Canvas.FillRect(Rect(0,0,16,16));
-    FIcon := TIcon.Create;
-    try
+    FIconCanBeEdited := CheckIfIconCanBeEdited(Stream);
+    if not FIconCanBeEdited then
+      LoadReadOnlyIcon(Stream);
+
+    if not FRSP21318IsPngIcon then
+    begin
+      Transparency := True;
+      FBitmaps[bebEdit].Canvas.Brush.Color := TransparentReplacementColour;  // I2634
+      FBitmaps[bebEdit].Canvas.FillRect(Rect(0,0,16,16));
+      FIcon := TIcon.Create;
       try
-        FIcon.LoadFromStream(Stream);
-      except
-        on E:EInvalidGraphic do
-          ShowMessage(E.Message);
+        try
+          FIcon.LoadFromStream(Stream);
+          DrawIconEx(FBitmaps[bebEdit].Canvas.Handle, 0, 0, FIcon.Handle, 16, 16, 0, 0, DI_NORMAL);
+        except
+          on E:EOutOfResources do
+            ShowMessage(E.Message);
+          on E:EInvalidGraphic do
+            ShowMessage(E.Message);
+        end;
+      finally
+        FIcon.Free;
       end;
-      DrawIconEx(FBitmaps[bebEdit].Canvas.Handle, 0, 0, FIcon.Handle, 16, 16, 0, 0, DI_NORMAL);
-    finally
-      FIcon.Free;
     end;
   end
   else
   begin
+    FIconCanBeEdited := True;
     Transparency := False;
     try
       FBitmaps[bebEdit].LoadFromStream(Stream);
@@ -817,29 +901,85 @@ begin
   end;
   Modified := False;
   FEdit.IsTemp := False;
+
+  panReadOnlyIcons.Visible := not FIconCanBeEdited;
   panEdit.RePaint;
   panPreview.RePaint;
   SaveUndoBitmap;
+end;
+
+(**
+  Loads a view of the icons available in a .ico file
+
+  Some of this code mirrors Vcl.Graphics ReadIcon
+  because WinAPI doesn't have an API to read .ico
+  files that supports multiple images in a single file;
+  while there are possible COM APIs available, we don't
+  want to add a dependency just to read the icon data.
+*)
+procedure TframeBitmapEditor.LoadReadOnlyIcon(Stream: TStream);
+type
+  PIconRecArray = ^TIconRecArray;
+  TIconRecArray = array[0..300] of TIconRec;
+var
+  ci: TCursorOrIcon;
+  List: PIconRecArray;
+  HeaderLen: Integer;
+  i, w, h: Integer;
+  cd: string;
+  p: Int64;
+begin
+  memoReadOnlyIcons.Clear;
+  p := Stream.Position;
+  Stream.ReadBuffer(ci, SizeOf(TCursorOrIcon));
+  HeaderLen := SizeOf(TIconRec) * ci.Count;
+  List := AllocMem(HeaderLen);
+  try
+    Stream.Read(List^, HeaderLen);
+    SetLength(FReadOnlyIcons, ci.Count);
+    for i := 0 to ci.Count - 1 do
+    begin
+      Stream.Position := p;
+      FReadOnlyIcons[i] := TIcon.Create;
+      if List[i].Colors = 0
+        then cd := '24 bit'
+        else cd := IntToStr(List[i].Colors);
+      if List[i].Width = 0 then w := 256 else w := List[i].Width;
+      if List[i].Height = 0 then h := 256 else h := List[i].Height;
+
+      FReadOnlyIcons[i].SetSize(w, h);
+      FReadOnlyIcons[i].LoadFromStream(Stream);
+
+      memoReadOnlyIcons.Lines.Add(Format('Icon #%d: %d x %d, %s colour',
+        [i+1, w, h, cd]));
+    end;
+  finally
+    FreeMem(List);
+    Stream.Position := p;
+  end;
 end;
 
 procedure TframeBitmapEditor.SaveToFile(FileName: WideString);
 var
   Stream: TStream;
 begin
-  try
-    Stream := TFileStream.Create(FileName, fmCreate);
-  except
-    on E:EFileStreamError do
-    begin
-      ShowMessage(E.Message);
-      Exit;
+  if FIconCanBeEdited then
+  begin
+    try
+      Stream := TFileStream.Create(FileName, fmCreate);
+    except
+      on E:EFileStreamError do
+      begin
+        ShowMessage(E.Message);
+        Exit;
+      end;
     end;
-  end;
 
-  try
-    SaveToStream(Stream, SameStr(ExtractFileExt(FileName), '.ico'));
-  finally
-    Stream.Free;
+    try
+      SaveToStream(Stream, SameStr(ExtractFileExt(FileName), '.ico'));
+    finally
+      Stream.Free;
+    end;
   end;
 end;
 

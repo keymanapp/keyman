@@ -92,6 +92,8 @@ type
     procedure SaveFont;
     procedure FocusTestWindow;
     procedure ShowEditControl;
+  protected
+    function GetHelpTopic: string; override;
   public
     procedure Reload;
     property KeyboardName: string read FKeyboardName write SetKeyboardName;
@@ -101,12 +103,14 @@ type
 implementation
 
 uses
+  Keyman.Developer.System.HelpTopics,
+
   KeymanDeveloperUtils,
   kmxfile,
   UfrmMessages,
   keyman32_int,
   UfrmMain,
-  utilstr;
+  utilstr, Unicode;
 
 {$R *.DFM}
 
@@ -243,7 +247,7 @@ begin
 
     FAnsiFont := '';
 
-    if OpenKeyReadOnly('\'+SRegKey_IDEEditFonts) then
+    if OpenKeyReadOnly('\'+SRegKey_IDEEditFonts_CU) then
     try
       FAnsiFont := ReadString('');
     except
@@ -251,7 +255,7 @@ begin
 
     FUnicodeFont := FAnsiFont;
 
-    if OpenKeyReadOnly('\'+SRegKey_IDETestFonts) then
+    if OpenKeyReadOnly('\'+SRegKey_IDETestFonts_CU) then
     try
       if ValueExists(FKeyboardName+',A') then
       begin
@@ -284,7 +288,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDETestFonts, True) then  // I2890
+    if not OpenKey(SRegKey_IDETestFonts_CU, True) then  // I2890
       RaiseLastRegistryError;
     s := ReadString('');
 
@@ -343,7 +347,7 @@ begin
   with TRegistryErrorControlled.Create do  // I2890
   try
     RootKey := HKEY_CURRENT_USER;
-    if not OpenKey(SRegKey_IDETestFonts, True) then  // I2890
+    if not OpenKey(SRegKey_IDETestFonts_CU, True) then  // I2890
       RaiseLastRegistryError;
     try
       if ValueExists(FKeyboardName+',A') then DeleteValue(FKeyboardName+',A');
@@ -404,7 +408,7 @@ var
   ch: WideString;
 begin
   if memo.SelText = '' then
-    ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart)
+    ch := Unicode.CopyChar(memo.Text, memo.SelStart-1, 1)
   else
     ch := Copy(memo.SelText, 1, 16);
 
@@ -428,6 +432,11 @@ begin
   end;
 end;
 
+
+function TfrmTestKeyboard.GetHelpTopic: string;
+begin
+  Result := SHelpTopic_Context_TestKeyboard;
+end;
 
 { Debug menu }
 

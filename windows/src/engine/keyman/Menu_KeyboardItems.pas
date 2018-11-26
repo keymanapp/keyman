@@ -70,7 +70,7 @@ uses
   KeymanDesktopShell,
   kmint,
   LangSwitchManager,
-  LangSwitchUtils,
+  Keyman.System.Util.RenderLanguageIcon,
   MessageIdentifierConsts,
   MessageIdentifiers,
   InterfaceHotkeys,
