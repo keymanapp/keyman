@@ -3,10 +3,12 @@
 import logging
 import os.path
 import pathlib
+
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
+
 from keyman_config.list_installed_kmp import get_installed_kmp, InstallArea
 from keyman_config.welcome import WelcomeView
 from keyman_config.keyboard_details import KeyboardDetailsView
@@ -202,11 +204,24 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
     def refresh_installed_kmp(self):
         logging.debug("Refreshing listview")
         self.store.clear()
+        self.incomplete_kmp = []
         user_kmp = get_installed_kmp(InstallArea.IA_USER)
+        for kmp in sorted(user_kmp):
+            kmpdata = user_kmp[kmp]
+            if kmpdata["has_kbjson"] == False:
+                self.incomplete_kmp.append(kmpdata)
         self.addlistitems(user_kmp, self.store, InstallArea.IA_USER)
         shared_kmp = get_installed_kmp(InstallArea.IA_SHARED)
+        for kmp in sorted(shared_kmp):
+            kmpdata = shared_kmp[kmp]
+            if kmpdata["has_kbjson"] == False:
+                self.incomplete_kmp.append(kmpdata)
         self.addlistitems(shared_kmp, self.store, InstallArea.IA_SHARED)
         os_kmp = get_installed_kmp(InstallArea.IA_OS)
+        for kmp in sorted(os_kmp):
+            kmpdata = os_kmp[kmp]
+            if kmpdata["has_kbjson"] == False:
+                self.incomplete_kmp.append(kmpdata)
         self.addlistitems(os_kmp, self.store, InstallArea.IA_OS)
 
 

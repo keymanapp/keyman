@@ -63,7 +63,7 @@ def get_installed_kmp_paths(check_paths):
                 kmpname (str): Keyboard name in local
                 version (str): Keyboard version
                 kmpversion (str):
-                path (str): base path where kmp is installed ???
+                path (str): base path of area where kmp is installed
                 description (str): Keyboard description
     """
     installed_keyboards = {}
@@ -75,6 +75,7 @@ def get_installed_kmp_paths(check_paths):
                     info, system, options, keyboards, files = parsemetadata(os.path.join(keymanpath, o, "kmp.json"))
                     if not info:
                         info, system, options, keyboards, files = parseinfdata(os.path.join(keymanpath, o, "kmp.inf"))
+                    has_kbjson = False
                     kbjson = os.path.join(keymanpath, o, o + ".json")
                     if os.path.isfile(kbjson):
                         with open(kbjson, "r") as read_file:
@@ -84,6 +85,7 @@ def get_installed_kmp_paths(check_paths):
                             description = kbdata['description']
                         version = kbdata['version']
                         name = kbdata['name']
+                        has_kbjson = True
                     if info:
                         md_version = info['version']['description']
                         md_name = info['name']['description']
@@ -96,7 +98,7 @@ def get_installed_kmp_paths(check_paths):
                         version = md_version
                         name = md_name
 
-                    installed_keyboards[o] = { "packageID" : o, "keyboardID" : keyboardID, "name" : name, "kmpname" : md_name, "version" : version, "kmpversion" : md_version, "path" : keymanpath, "description" : description}
+                    installed_keyboards[o] = { "packageID" : o, "keyboardID" : keyboardID, "name" : name, "kmpname" : md_name, "version" : version, "kmpversion" : md_version, "areapath" : keymanpath, "description" : description, "has_kbjson" : has_kbjson}
     return installed_keyboards
 
 
