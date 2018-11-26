@@ -1,8 +1,8 @@
 # vim:set noet ts=4:
 #
-# ibus-kmfl - The kmfl engine for IBus
+# ibus-keyman - The Keyman engine for IBus
 #
-# Copyright (c) 2007-2008 Huang Peng <shawn.p.huang@gmail.com>
+# Copyright (c) 2018 SIL International
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
