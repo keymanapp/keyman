@@ -150,6 +150,7 @@ enum km_kbp_status_codes {
   KM_KBP_STATUS_KEY_ERROR = 4,
   KM_KBP_STATUS_INSUFFICENT_BUFFER = 5,
   KM_KBP_STATUS_INVALID_UTF = 6,
+  KM_KBP_STATUS_INVALID_KEYBOARD = 7,
   KM_KBP_STATUS_OS_ERROR = 0x80000000
 };
 
@@ -469,9 +470,9 @@ enum km_kbp_option_scope {
 };
 
 struct km_kbp_option_item {
-  km_kbp_cp const *  key;
-  km_kbp_cp const *  value;
-  uint8_t       scope;  // Scope which an option belongs to.
+  km_kbp_cp const *   key;
+  km_kbp_cp const *   value;
+  uint8_t             scope;  // Scope which an option belongs to.
 };
 
 #define KM_KBP_OPTIONS_END { 0, 0, 0 }
@@ -506,7 +507,7 @@ Lookup an option based on its key, in an options list.
   if the scope is invalid.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __opts__: An opaque pointer to an options object.
+- __state__: An opaque pointer to a state object.
 - __scope__: Which key-value store to interrogate.
 - __key__: A UTF-16 string that matches the key in the target `km_kbp_option_item`.
 - __value__: A pointer to the result variable:
@@ -518,7 +519,7 @@ Lookup an option based on its key, in an options list.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_lookup(km_kbp_options const *opts,
+km_kbp_options_lookup(km_kbp_state const *state,
                       uint8_t scope,
                       km_kbp_cp const *key,
                       km_kbp_cp const **value);
@@ -534,7 +535,7 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __opts__: An opaque pointer to an `km_kbp_options`.
+- __state__: An opaque pointer to a `km_kbp_state`.
 - __new_opts__: An array of `km_kbp_option_item` objects to update or add. Must be
     terminated with `KM_KBP_OPTIONS_END`.
 
@@ -542,7 +543,7 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_update(km_kbp_options *opts,
+km_kbp_options_update(km_kbp_state *state,
                       km_kbp_option_item const *new_opts);
 
 /*
@@ -850,8 +851,9 @@ typedef struct {
 
 enum km_kbp_tech_value {
   KM_KBP_TECH_UNSPECIFIED = 0,
-  KM_KBP_TECH_KMN         = 1 << 0,
-  KM_KBP_TECH_LDML        = 1 << 1
+  KM_KBP_TECH_MOCK        = 1 << 0,
+  KM_KBP_TECH_KMX         = 1 << 1,
+  KM_KBP_TECH_LDML        = 1 << 2
 };
 
 
@@ -863,11 +865,13 @@ Get access processors attributes describing version and technology implemented.
 ##### Return:
 A pointer to a `km_kbp_attr` structure. Do not modify the contents of this
 structure.
+##### Parameters:
+- __state__: An opaque pointer to an `km_kbp_state`.
 ```c
 */
 KMN_API
 km_kbp_attr const *
-km_kbp_get_engine_attrs();
+km_kbp_get_engine_attrs(km_kbp_state const *state);
 
 /*
 ```
