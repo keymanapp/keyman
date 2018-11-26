@@ -41,7 +41,7 @@ uses
   Dialogs, JclDebug;
 
 procedure LogExceptionToExternalHandler(CrashID, Message, Detail, Log: string);
-procedure SendExceptionToExternalHandler(ExceptionObject: TObject; Title, ExceptionMessage: String; CallStack: TStrings);
+procedure SendExceptionToExternalHandler(CrashID: string; ExceptionObject: TObject; Title, ExceptionMessage: String; CallStack: TStrings);
 
 implementation
 
@@ -65,7 +65,7 @@ var
 
 function InternalGetWindowText(h:HWND; lpStr: PWideChar; n: Integer): Integer; stdcall; external 'user32.dll';
 
-procedure SendExceptionToExternalHandler(ExceptionObject: TObject; Title, ExceptionMessage: String; CallStack: TStrings);
+procedure SendExceptionToExternalHandler(CrashID: string; ExceptionObject: TObject; Title, ExceptionMessage: String; CallStack: TStrings);
 var
   i: Integer;
   ExceptionDetail, ctrls: TStringList;
@@ -213,7 +213,7 @@ begin
     ApplicationTerminated := True;
 
     LogExceptionToExternalHandler(
-      ExtractFileName(ParamStr(0))+'_'+GetVersionString+'_'+IntToHex(Integer(ExceptAddr), 8)+'_'+ExceptionObject.ClassName,
+      CrashID,
       ExceptionMessage,
       ExceptionDetail.Text,
       CallStack.Text + #13#10 + ctrls.Text);

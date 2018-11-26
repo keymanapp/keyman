@@ -1281,7 +1281,7 @@ namespace com.keyman {
       var scroller=e.firstChild, cs=this.caret.style, sp2=<HTMLElement>scroller.childNodes[1];
       
       // Attach the caret to this scroller and position it over the caret span
-      if(this.caret.parentNode != scroller) {
+      if(this.caret.parentNode != <Node>scroller) {
         scroller.appendChild(this.caret);
       }
 

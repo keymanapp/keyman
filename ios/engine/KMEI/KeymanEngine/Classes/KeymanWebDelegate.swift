@@ -42,6 +42,9 @@ protocol KeymanWebDelegate: class {
   func menuKeyUp(_ keymanWeb: KeymanWebViewController)
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController)
   func hideKeyboard(_ keymanWeb: KeymanWebViewController)
+  
+  func dismissKeyboard()
+  func resumeKeyboard()
 }
 
 extension KeymanWebDelegate {
@@ -59,4 +62,7 @@ extension KeymanWebDelegate {
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {}
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {}
+  
+  func dismissKeyboard() {}
+  func resumeKeyboard() {}
 }

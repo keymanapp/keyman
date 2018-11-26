@@ -4,14 +4,16 @@
                 the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_options_api.cpp
+  History:       2 Oct 2018 - TSE - Refactored out of km_kbp_options_api.cpp.
+                 7 Nov 2018 - TSE - Refactored into option.hpp & option.cpp.
 */
 
 #pragma once
 
-#include <unordered_map>
+#include <vector>
+#include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 
 // Forward declarations
 class json;
@@ -19,43 +21,80 @@ class json;
 namespace km {
 namespace kbp
 {
-  class options_set : public std::unordered_map<std::string, std::string>
+  struct option : public km_kbp_option_item
   {
-    km_kbp_option_scope _scope;
+    option(): km_kbp_option_item KM_KBP_OPTIONS_END {}
+    option(option const &);
+    option(option &&);
+    option(km_kbp_option_scope, std::u16string const &,
+           std::u16string const &);
 
-  public:
-    options_set(km_kbp_option_scope s) : _scope(s) {}
+    ~option() noexcept;
 
-    auto scope() const noexcept { return _scope; }
+    option & operator=(option && rhs);
   };
 
-}
-}
+  inline
+  option::option(option const & rhs)
+  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value)
+  {}
 
-json & operator << (json &, km::kbp::options_set const &);
-
-
-// Adaptor between internal km::kbp::options_set object and API definitiion.
-struct km_kbp_options_set
-{
-  km::kbp::options_set   & target;
-
-  km_kbp_options_set(km::kbp::options_set & tgt) : target(tgt) {}
-
-  km_kbp_option const * export_option(char const * k, char const * v) const {
-    _last_lookup.key = k;
-    _last_lookup.value = v;
-    return &_last_lookup;
+  inline
+  option::option(option && rhs)
+  : km_kbp_option_item { rhs.key, rhs.value, rhs.scope }
+  {
+    rhs.key = nullptr;
+    rhs.value = nullptr;
   }
 
-  void update(km_kbp_option const * opt);
+  inline
+  option::~option() noexcept
+  {
+    delete [] key;
+    delete [] value;
+  }
 
-private:
-  km_kbp_option mutable  _last_lookup;
-};
+  inline
+  option & option::operator=(option && rhs)
+  {
+    delete [] key;
+    delete [] value;
+    key = rhs.key;
+    value = rhs.value; rhs.key = nullptr;
+    scope = rhs.scope; rhs.value = nullptr;
+    return *this;
+  }
 
-inline
-void km_kbp_options_set::update(km_kbp_option const * opt)
-{
-  for (;opt->key; ++opt)  target.emplace(opt->key, opt->value);
-}
+
+
+  class options
+  {
+    km_kbp_option_item const * _scopes[KM_KBP_OPT_MAX_SCOPES-1];
+    std::vector<option>   _saved;
+
+  public:
+    options(km_kbp_option_item const *env, km_kbp_option_item const *kb_defs);
+
+    char16_t const *      lookup(km_kbp_option_scope scope,
+                                 std::u16string const & key) const noexcept;
+    km_kbp_option_item const * assign(km_kbp_option_scope scope, std::u16string const & key,
+                                           std::u16string const & value);
+    void                  reset(km_kbp_option_scope scope,
+                                std::u16string const & key);
+
+    friend json & operator << (json &j, km::kbp::options const &opts);
+  };
+
+  json & operator << (json &j, km::kbp::options const &opts);
+
+  inline
+  options::options(km_kbp_option_item const *kb_defs, km_kbp_option_item const *env)
+  : _scopes {kb_defs, env}
+  {}
+
+} // namespace kbp
+} // namespace km
+
+
+// Adaptor between internal km::kbp::options object and API definitiion.
+struct km_kbp_options: public km::kbp::options {};

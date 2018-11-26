@@ -47,13 +47,9 @@ if compiler.get_id() == 'msvc'
   links = []
 endif
 
-pkg = import('pkgconfig')
-pkg.generate(
-    name: 'keyman_kmn_processor',
-    version: meson.project_version(),
-    description: 'Keyman processor for KMN keyboards.')
-
 lib = library('kmnkbp0',
+    'option.cpp',
+    'keyboard.cpp',
     'keyboardprocessor.cpp',
     'km_kbp_context_api.cpp',
     'km_kbp_keyboard_api.cpp',
@@ -67,3 +63,10 @@ lib = library('kmnkbp0',
     install: true)
 
 kmnkbp = declare_dependency(link_with: lib, include_directories: inc)
+
+pkg = import('pkgconfig')
+pkg.generate(
+    name: 'keyman_kmn_processor',
+    version: meson.project_version(),
+    description: 'Keyman processor for KMN keyboards.',
+    libraries: lib)

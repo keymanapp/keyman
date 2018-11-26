@@ -300,7 +300,11 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   
   public func beep(_ keymanWeb: KeymanWebViewController) {
     // Does nothing on the iPod touch, but otherwise emits a brief vibration.
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+    // The publicly-suggested kSystemSoundID_Vibrate lasts for 0.4 seconds - too long for a proper beep.
+    // Code 1519 is near-undocumented, but should result in a 'weaker'/shorter vibration.
+    //
+    // Ref: https://stackoverflow.com/questions/10570553/how-to-set-iphone-vibrate-length/44495798#44495798
+    AudioServicesPlaySystemSound(1519)
   }
 }
 
