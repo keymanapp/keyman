@@ -68,32 +68,7 @@ STDAPI CKMTipTextService::OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr)
 
 STDAPI CKMTipTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pDocMgrPrevFocus)
 {
-  LogEnter();
 
-  HWND hwndActive = NULL;
-  HWND hwndPrevious = NULL;
-
-  ITfContext *pContext;
-  if (pDocMgrFocus != NULL && SUCCEEDED(pDocMgrFocus->GetTop(&pContext))) {
-    ITfContextView *pView;
-    if (SUCCEEDED(pContext->GetActiveView(&pView))) {
-      pView->GetWnd(&hwndActive);
-      pView->Release();
-    }
-    pContext->Release();
-  }
-
-  if (pDocMgrPrevFocus != NULL && SUCCEEDED(pDocMgrPrevFocus->GetTop(&pContext))) {
-    ITfContextView *pView;
-    if (SUCCEEDED(pContext->GetActiveView(&pView))) {
-      pView->GetWnd(&hwndPrevious);
-      pView->Release();
-    }
-    pContext->Release();
-  }
-
-  SendDebugMessageFormat(L"OnSetFocus ... calling Keyman32Interface::SetFocus(%x, %x)", hwndActive, hwndPrevious);
-  Keyman32Interface::SetFocus(hwndActive, hwndPrevious);
 /* http://blogs.msdn.com/b/tsfaware/archive/2007/05/21/transitory-extensions.aspx
 bool isTransitory = false;
   ITfContext *pITfContext = NULL;

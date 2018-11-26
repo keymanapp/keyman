@@ -684,25 +684,3 @@ void RefreshPreservedKeys(BOOL Activating) {
     }
   }
 }
-
-
-
-extern "C" void __declspec(dllexport) WINAPI TIPSetFocusReceived(HWND hwnd, WPARAM wParam) {
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (!_td) {
-    return;
-  }
-
-  if (IsSysTrayWindow(hwnd))      // I2443 - always do the focus change now? really unsure about this one
-    SendDebugMessageFormat(hwnd, sdmGlobal, 0, "WM_SETFOCUS -- not hooking because IsSysTrayWindow");
-  else if (Globals::IsControllerWindow(hwnd))
-    SendDebugMessageFormat(hwnd, sdmGlobal, 0, "WM_SETFOCUS -- not hooking because IsControllerWindow");
-  else if (Globals::IsControllerProcess())
-    SendDebugMessageFormat(hwnd, sdmGlobal, 0, "WM_SETFOCUS -- not hooking because IsControllerProcess");
-  else
-  {
-    PostMessage(hwnd, wm_keyman, KM_FOCUSCHANGED, KMF_WINDOWCHANGED);
-    SendDebugMessageFormat(hwnd, sdmGlobal, 0, "WM_SETFOCUS %x <- %x", hwnd, wParam);  // I3226   // I3531
-    if (_td->app) _td->app->ResetContext();
-  }
-}

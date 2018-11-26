@@ -39,4 +39,3 @@ EXPORTS
       Keyman_ResetInitialisation
       
 	  Keyman_WriteDebugEvent
-      TIPSetFocusReceived

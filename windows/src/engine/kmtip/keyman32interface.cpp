@@ -2,7 +2,6 @@
 #include "kmtip.h"
 
 typedef BOOL (WINAPI *PKEYMAN_WRITEDEBUGEVENT)(char *file, int line, PWCHAR msg);
-typedef void (WINAPI *PKEYMAN_SETFOCUSRECEIVED)(HWND hwndActive, HWND hwndPrevious);
 
 //TODO: LoadLibrary on startup, FreeLibrary on shutdown
 HMODULE Keyman32Interface::GetHandle() {
@@ -11,20 +10,6 @@ HMODULE Keyman32Interface::GetHandle() {
 #else
   return GetModuleHandle("keyman32.dll");
 #endif
-}
-
-void Keyman32Interface::SetFocus(HWND hwndActive, HWND hwndPrevious) {
-  HMODULE hKeyman = GetHandle();
-  if (hKeyman) {
-    PKEYMAN_SETFOCUSRECEIVED pSetFocusReceived = (PKEYMAN_SETFOCUSRECEIVED)GetProcAddress(hKeyman, "TIPSetFocusReceived");
-    if (pSetFocusReceived) {
-      (*pSetFocusReceived)(hwndActive, hwndPrevious);
-    }
-    else {
-      DebugLastError(L"SetFocusReceived");
-    }
-  }
-  // No point trying to debug last error because it depends on GetHandle() working
 }
 
 void Keyman32Interface::WriteDebugEvent(char *file, int line, PWCHAR msg) {
