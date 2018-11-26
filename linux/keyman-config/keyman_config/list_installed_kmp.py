@@ -38,7 +38,8 @@ def get_installed_kmp(area):
     check_paths = []
     if area == InstallArea.IA_USER:
         home = os.path.expanduser("~")
-        check_paths = [ user_keyman_dir(), os.path.join(home, ".kmfl") ]
+        datahome = os.environ.get("XDG_DATA_HOME", os.path.join(home, ".local", "share"))
+        check_paths = [ user_keyman_dir(), os.path.join(datahome, "keyman") ]
     elif area == InstallArea.IA_SHARED:
         check_paths = [ "/usr/local/share/keyman" ]
     elif area == InstallArea.IA_OS:
