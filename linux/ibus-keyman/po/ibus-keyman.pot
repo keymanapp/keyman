@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Huang Peng <shawn.p.huang@gmail.com>
-# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) 2018 SIL International
+# This file is distributed under the same license as the ibus-keyman package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: ibus-keyman 10.99.33\n"
 "Report-Msgid-Bugs-To: https://github.com/ibus/ibus/issues/new\n"
-"POT-Creation-Date: 2018-09-03 16:25+0700\n"
+"POT-Creation-Date: 2018-11-26 11:25+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/kmflutil.c:294
-msgid "KMFL"
+#: src/keymanutil.c:244
+msgid "Keyman"
 msgstr ""
