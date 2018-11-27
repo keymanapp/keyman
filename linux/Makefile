@@ -3,6 +3,9 @@
 default: # builds only
 	BUILDONLY="yes" ./scripts/build.sh
 
+clean:
+	rm -rf build-*
+
 reconf:
 	./scripts/reconf.sh
 
