@@ -1,5 +1,11 @@
 # Keyman Developer Version History
 
+## 2018-11-28 10.0.1206 stable
+* Add parameter `-add-help-link` to kmcomp (#1346)
+
+## 2018-11-07 10.0.1205 stable
+* Mitigation for issues with installation under certain languages in Windows 10 1803 or later (#1299)
+
 ## 2018-09-28 10.0.1204 stable
 * Fix crash in Keyman Developer package editor when a compiled .js keyboard is missing (#1224)
 
