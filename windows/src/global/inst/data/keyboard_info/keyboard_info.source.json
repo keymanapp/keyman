@@ -29,6 +29,7 @@
         "packageIncludes": { "type": "array", "items": { "type": "string", "enum": ["welcome", "documentation", "fonts", "visualKeyboard"] }, "additionalItems": false },
         "version": { "type": "string" },
         "minKeymanVersion": { "type": "string", "pattern": "^\\d+\\.0$" },
+        "helpLink": { "type": "string", "pattern": "^https://help\\.keyman\\.com/keyboard/" },
         "platformSupport": { "$ref": "#/definitions/KeyboardPlatformInfo" },
         "legacyId": { "type": "number" },
         "sourcePath": { "type": "string", "pattern": "^(release|legacy|experimental)/.+/.+$" },
