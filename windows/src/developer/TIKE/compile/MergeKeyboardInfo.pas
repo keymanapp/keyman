@@ -1,7 +1,7 @@
 {  Merges a source .keyboard_info file with data programatically extracted from a .kmp file and a keyboard .js file
 
   - Command line parameters:
-     kmcomp -m <keyboard.kmp> <keyboard.js> [-addHelpPath <help path>] <keyboard.keyboard_info>
+     kmcomp -m <keyboard.kmp> <keyboard.js> [-add-help-link <help path>] <keyboard.keyboard_info>
 
   Note: if keyboard.kmp or keyboard.js do not exist, merge_compiled_keyboard_info will continue to work, just will
         not attempt to pull data from them
@@ -66,13 +66,13 @@ type
     FJSFileInfo: TJSKeyboardInfoMap;
     FVersion: string;
     FSourcePath: string;
-    FHelpPath: string;
+    FHelpLink: string;
     function Failed(message: string): Boolean;
     function Execute: Boolean; overload;
     function LoadJsonFile: Boolean;
     function LoadKMPFile: Boolean;
     function LoadJSFile: Boolean;
-    constructor Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpPath: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
+    constructor Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
     procedure AddAuthor;
     procedure AddAuthorEmail;
     procedure CheckOrAddEncodings;
@@ -84,7 +84,7 @@ type
     procedure AddName;
     procedure CheckOrAddPackageFilename;
     procedure AddPackageIncludes;
-    procedure AddHelpPath;
+    procedure AddHelpLink;
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
     function SaveJsonFile: Boolean;
@@ -93,7 +93,7 @@ type
     procedure AddSourcePath;
   public
     destructor Destroy; override;
-    class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpPath: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
+    class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
   end;
 
 implementation
@@ -118,10 +118,10 @@ type
 
 { TMergeKeyboardInfo }
 
-class function TMergeKeyboardInfo.Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpPath: string;
+class function TMergeKeyboardInfo.Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string;
   AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean;
 begin
-  with TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpPath, AMergingValidateIds, ASilent, ACallback) do
+  with TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink, AMergingValidateIds, ASilent, ACallback) do
   try
     Result := Execute;
   finally
@@ -129,14 +129,14 @@ begin
   end;
 end;
 
-constructor TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpPath: string;
+constructor TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string;
   AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
 begin
   inherited Create;
 
   FSourcePath := ASourcePath;
   FMergingValidateIds := AMergingValidateIds;
-  FHelpPath := AHelpPath;
+  FHelpLink := AHelpLink;
   FSilent := ASilent;
   FCallback := ACallback;
 
@@ -193,7 +193,7 @@ begin
     CheckOrAddFileSizes;
     AddPackageIncludes;
     CheckOrAddMinKeymanVersion;
-    AddHelpPath;
+    AddHelpLink;
     AddPlatformSupport;
 
     if not SaveJsonFile then
@@ -780,15 +780,27 @@ begin
 end;
 
 //
-// Add helpPath, from commandline parameter
+// Add helpLink, from commandline parameter
 //
-procedure TMergeKeyboardInfo.AddHelpPath;
+procedure TMergeKeyboardInfo.AddHelpLink;
+var
+  v: TJSONValue;
 
 begin
-    if FHelpPath = '' then
-    Exit;
+  // Validate pre-existing helpLink
+  v := json.GetValue('helpLink');
+  if v <> nil then
+  begin
+    if v.Value.IndexOf('https://help.keyman.com/keyboard/') < 0 then
+      raise EInvalidKeyboardInfo.Create('helpLink should be on https://help.keyman.com/keyboard/');
+  end
+  else
+  begin
+    if FHelpLink = '' then
+      Exit;
 
-   json.AddPair('helpPath', FHelpPath);
+    json.AddPair('helpLink', FHelpLink);
+  end;
 end;
 
 //

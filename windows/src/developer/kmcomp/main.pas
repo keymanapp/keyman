@@ -112,7 +112,7 @@ var
   FMergingValidateIds: Boolean;
   FJsonSchemaPath: string;
   FParamSourcePath: string;
-  FParamHelpPath: string;
+  FParamHelpLink: string;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -177,10 +177,10 @@ begin
       Inc(i);
       FParamSourcePath := ParamStr(i);
     end
-    else if s = '-addhelppath' then
+    else if s = '-add-help-link' then
     begin
       Inc(i);
-      FParamHelpPath := ParamStr(i);
+      FParamHelpLink := ParamStr(i);
     end
     else if s = '-schema-path' then
     begin
@@ -219,7 +219,7 @@ begin
     writeln('');
     writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('              [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
-    writeln('              [-addHelpPath path]');
+    writeln('              [-add-help-link path]');
     writeln('              [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -234,7 +234,7 @@ begin
     writeln('          -d       include debug information');
     writeln('          -w       treat warnings as errors');
     writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
-    writeln('          -addHelpPath path to help file on https://help.keyman.com/keyboards');
+    writeln('          -add-help-link path to help file on https://help.keyman.com/keyboards');
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
     writeln('          -v[s]    validate infile against source schema');
@@ -262,7 +262,7 @@ begin
       hOutfile := 0;
 
     if FMerging then
-      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpPath, FMergingValidateIds, FSilent, @CompilerMessage)
+      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpLink, FMergingValidateIds, FSilent, @CompilerMessage)
     else if FValidating then
       FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, @CompilerMessage)
     else if FJsonExtract then
