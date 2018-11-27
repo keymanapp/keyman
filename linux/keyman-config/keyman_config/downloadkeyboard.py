@@ -8,11 +8,10 @@ import subprocess
 import webbrowser
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit', '3.0')
-from gi.repository import Gtk, WebKit
+gi.require_version('WebKit2', '4.0')
+from gi.repository import Gtk, WebKit2
 from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from keyman_config.install_window import InstallKmpWindow
-from keyman_config.check_mime_type import check_mime_type
 from keyman_config.accelerators import bind_accelerator, init_accel
 
 class DownloadKmpWindow(Gtk.Window):
@@ -29,12 +28,12 @@ class DownloadKmpWindow(Gtk.Window):
         s = Gtk.ScrolledWindow()
         # TODO update (or remove) user_agent once website supports Linux kmp packages
         user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"
-        webview = WebKit.WebView()
-        settings = WebKit.WebSettings()
-        settings.set_property('user-agent', user_agent)
+        #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
+        webview = WebKit2.WebView()
+        settings = WebKit2.Settings()
+        settings.set_user_agent(user_agent)
         webview.set_settings(settings)
-        webview.connect("navigation-policy-decision-requested", self.check)
-        webview.connect("mime-type-policy-decision-requested", check_mime_type)
+        webview.connect("decide-policy", self.keyman_policy)
         # TODO update website URI once website supports Linux kmp packages
         webview.load_uri("https://keyman.com/keyboards?embed=macos&version=10")
         s.add(webview)
@@ -61,20 +60,28 @@ class DownloadKmpWindow(Gtk.Window):
             return True
         return False
 
-    def check(self, view, frame, req, nav, policy):
-        uri = req.get_uri()
-        parsed = urllib.parse.urlparse(uri)
-        if parsed.scheme == "keyman":
-            if parsed.path == "download":
-                qs = urllib.parse.parse_qs(parsed.query)
-                downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
-                if self.process_kmp(qs['url'][0], downloadfile):
-                    policy.ignore()
+    def keyman_policy(self, web_view, decision, decision_type):
+        logging.info("Checking policy")
+        logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
+        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION:
+            nav_action = decision.get_navigation_action()
+            request = nav_action.get_request()
+            uri = request.get_uri()
+            logging.debug("nav request is for uri %s", uri)
+            parsed = urllib.parse.urlparse(uri)
+            if parsed.scheme == "keyman":
+                logging.debug("using keyman scheme")
+                if parsed.path == "download":
+                    qs = urllib.parse.parse_qs(parsed.query)
+                    downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
+                    if self.process_kmp(qs['url'][0], downloadfile):
+                        decision.ignore()
+                        return True
+                elif parsed.path == "link":
+                    qs = urllib.parse.parse_qs(parsed.query)
+                    webbrowser.open(qs['url'][0])
+                    decision.ignore()
                     return True
-            elif parsed.path == "link":
-                qs = urllib.parse.parse_qs(parsed.query)
-                webbrowser.open(qs['url'][0])
-                return True
         return False
 
     def on_close_clicked(self, button):

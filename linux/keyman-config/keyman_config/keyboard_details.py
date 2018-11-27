@@ -5,8 +5,7 @@
 import gi
 import os.path
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit', '3.0')
-from gi.repository import Gtk, WebKit
+from gi.repository import Gtk
 
 # basics: keyboard name, package version, description
 # other things: filename (of kmx), ,
