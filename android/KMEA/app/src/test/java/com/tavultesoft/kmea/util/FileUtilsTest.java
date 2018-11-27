@@ -131,4 +131,22 @@ public class FileUtilsTest {
     Assert.assertFalse(FileUtils.isWelcomeFile(filename));
   }
 
+  @Test
+  public void test_getSVGFilename() {
+    String filename = "test/abc.svg#xyz";
+    Assert.assertEquals("test/abc.svg#", FileUtils.getSVGFilename(filename));
+
+    filename = "test/abc.SVG#XYZ";
+    Assert.assertEquals("test/abc.SVG#", FileUtils.getSVGFilename(filename));
+
+    filename = "";
+    Assert.assertEquals("", FileUtils.getSVGFilename(filename));
+
+    filename = "test/abc.notsvg#";
+    Assert.assertEquals("", FileUtils.getSVGFilename(filename));
+
+    filename = "test/abc.svg";
+    Assert.assertEquals("", FileUtils.getSVGFilename(filename));
+
+  }
 }

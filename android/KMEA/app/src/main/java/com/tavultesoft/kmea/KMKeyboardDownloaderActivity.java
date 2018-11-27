@@ -399,6 +399,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           fontSourceString = fontSource.getString(i);
           if (FileUtils.hasFontExtension(fontSourceString)) {
             urls.add(baseUri + fontSourceString);
+          } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
+            String fontFilename = FileUtils.getSVGFilename(fontSourceString);
+            urls.add(baseUri + fontFilename);
           }
         } catch (JSONException e) {
           return null;
@@ -410,7 +413,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         fontSourceString = jsonFont.getString(KMManager.KMKey_FontSource);
         if (FileUtils.hasFontExtension(fontSourceString)) {
           urls.add(baseUri + fontSourceString);
-        } else if (FileUtils.hasSVGViewBox(fontSourceString)) {
+        } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
           String fontFilename = FileUtils.getSVGFilename(fontSourceString);
           urls.add(baseUri + fontFilename);
         }
