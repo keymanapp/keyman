@@ -14,6 +14,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
      '-Wendif-labels',
      '-Wextra',
      '-Wno-unknown-pragmas',
+     '-Wno-missing-field-initializers',
      '-Wnon-virtual-dtor',
      '-Wshadow'
   ]
@@ -50,6 +51,7 @@ endif
 lib = library('kmnkbp0',
     'option.cpp',
     'keyboard.cpp',
+	'state.cpp',
     'km_kbp_context_api.cpp',
     'km_kbp_keyboard_api.cpp',
     'km_kbp_options_api.cpp',
@@ -63,6 +65,7 @@ lib = library('kmnkbp0',
 	'kmx/kmx_capslock.cpp',
 	'kmx/kmx_context.cpp',
 	'kmx/kmx_debug.cpp',
+    'kmx/kmx_environment.cpp',
 	'kmx/kmx_file.cpp',
 	'kmx/kmx_modifiers.cpp',
 	'kmx/kmx_options.cpp',

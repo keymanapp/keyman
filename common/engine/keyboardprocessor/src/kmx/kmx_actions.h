@@ -7,6 +7,10 @@
 
 #include "kmx_base.h"
 
+namespace km {
+namespace kbp {
+namespace kmx {
+
 #define MAXACTIONQUEUE  1024
 
 typedef struct
@@ -51,4 +55,8 @@ public:
   int Length() { return QueueSize; }
   KMX_Action Get(int index) { return Queue[index]; }
 };
+
+} // namespace kmx
+} // namespace kbp
+} // namespace km
 

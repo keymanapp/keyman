@@ -3,14 +3,12 @@
 #include "state.hpp"
 #include "keyboard.hpp"
 
-std::string utf16_to_utf8(std::u16string utf16_string);
-
 namespace km {
   namespace kbp
   {
 
     km_kbp_status kmx_processor::validate() const {
-      return m_valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
+      return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
     }
 
     kmx_processor::kmx_processor(km_kbp_keyboard_attrs const * kb_) : abstract_processor(kb_) {
@@ -19,44 +17,29 @@ namespace km {
       std::filesystem::path p = kb->folder_path;
       p /= kb->id;
       p.replace_extension(".kmx");
-      m_valid = (bool) kmx.Load(p.native().c_str());
+      _valid = (bool) _kmx.Load(p.native().c_str());
 
-      //std::vector<km_kbp_option_item> * opts = ;
-      kmx.GetOptions()->Init(kb->default_opts());
+      if (_valid) {
+        _kmx.GetOptions()->Init(kb->default_opts());
+      }
     }
 
-    char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
-      // We only map SHIFT and UNSHIFTED
-      // TODO: Map CAPS LOCK correctly
-      if (modifiers != 0 && modifiers != K_SHIFTFLAG) {
-        return 0;
-      }
-
-      bool shifted = modifiers == K_SHIFTFLAG;
-
-      if (vk == KM_KBP_VKEY_SPACE) {
-        // Override for space because it is the same for
-        // shifted and unshifted.
-        return 32;
-      }
-
-      for (int i = 0; s_char_to_vkey[i].vk; i++) {
-        if (s_char_to_vkey[i].vk == vk && s_char_to_vkey[i].shifted == shifted) {
-          return i + 32;
-        }
-      }
-      return 0;
+    void kmx_processor::init_state(std::vector<km_kbp_option_item> *default_env) {
+      _kmx.GetEnvironment()->Init(default_env);
     }
 
-    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key) {
-      if(scope == KM_KBP_OPT_KEYBOARD)
-        kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {
+      switch(scope) {
+        case KM_KBP_OPT_KEYBOARD:
+          _kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+          break;
+        case KM_KBP_OPT_ENVIRONMENT:
+          _kmx.GetEnvironment()->Load(key, value);
+          break;
+      }
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
-      // Convert VK to US char
-      uint16_t ch = VKeyToChar(modifier_state, vk);
-
       // Construct a context buffer from the items
 
       std::u16string ctxt;
@@ -81,14 +64,14 @@ namespace km {
         }
       }
 
-      kmx.GetContext()->Set(ctxt.c_str());
-      kmx.GetActions()->ResetQueue();
-      kmx.ProcessEvent(state, vk, modifier_state, ch);
+      _kmx.GetContext()->Set(ctxt.c_str());
+      _kmx.GetActions()->ResetQueue();
+      _kmx.ProcessEvent(state, vk, modifier_state);
 
       state->actions.clear();
 
-      for (auto i = 0; i < kmx.GetActions()->Length(); i++) {
-        auto a = kmx.GetActions()->Get(i);
+      for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
+        auto a = _kmx.GetActions()->Get(i);
         switch (a.ItemType) {
         case QIT_CAPSLOCK:
           //TODO: add Caps Event
@@ -114,7 +97,6 @@ namespace km {
           break;
         case QIT_BACK:
           switch (a.dwData) {
-          case BK_SUPP2: break; //TODO eliminate
           case BK_DEFAULT:
             // This only happens if we know we have context to delete. Last item must be a character
             assert(!state->context().empty() && state->context().back().type != KM_KBP_IT_MARKER);

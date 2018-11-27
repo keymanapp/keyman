@@ -9,6 +9,10 @@
 
 #define MAXCONTEXT 64
 
+namespace km {
+namespace kbp {
+namespace kmx {
+
 class KMX_Context
 {
 private:
@@ -27,3 +31,7 @@ public:
   KMX_BOOL CharIsDeadkey();
   KMX_BOOL CharIsSurrogatePair();
 };
+
+} // namespace kmx
+} // namespace kbp
+} // namespace km

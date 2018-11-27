@@ -2,13 +2,17 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
 #include <vector>
 #include <iterator>
 #include <codecvt>
 #include <locale>
+#include "kmx_processor.h"
 
-const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
+std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
+
+using namespace km::kbp::kmx;
+
+const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {
     if (*p == ch) return p;
     p++;
@@ -16,7 +20,7 @@ const km_kbp_cp *u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   return ch == 0 ? p : NULL;
 }
 
-const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
+const km_kbp_cp *km::kbp::kmx::u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
   km_kbp_cp *o = dst;
   while (*src) {
     *dst++ = *src++;
@@ -25,7 +29,7 @@ const km_kbp_cp *u16cpy(km_kbp_cp *dst, const km_kbp_cp *src) {
   return o;
 }
 
-size_t u16len(const km_kbp_cp *p) {
+size_t km::kbp::kmx::u16len(const km_kbp_cp *p) {
   int i = 0;
   while (*p) {
     p++;
@@ -34,7 +38,7 @@ size_t u16len(const km_kbp_cp *p) {
   return i;
 }
 
-int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q) {
+int km::kbp::kmx::u16cmp(const km_kbp_cp *p, const km_kbp_cp *q) {
   while (*p && *q) {
     if (*p != *q) return *p - *q;
     p++;
@@ -43,7 +47,7 @@ int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q) {
   return *p - *q;
 }
 
-int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q) {
+int km::kbp::kmx::u16icmp(const km_kbp_cp *p, const km_kbp_cp *q) {
   while (*p && *q) {
     if (toupper(*p) != toupper(*q)) return *p - *q;
     p++;
@@ -52,7 +56,7 @@ int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q) {
   return *p - *q;
 }
 
-int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) {
+int km::kbp::kmx::u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) {
   while (*p && *q && count) {
     if (*p != *q) return *p - *q;
     p++;
@@ -64,7 +68,7 @@ int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count) {
   return 0;
 }
 
-km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
+km_kbp_cp *km::kbp::kmx::u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
@@ -98,7 +102,7 @@ km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx) {
 * xstrlen calculates the length of a string, ignoring some special chars.
 */
 
-PKMX_WCHAR incxstr(PKMX_WCHAR p)
+PKMX_WCHAR km::kbp::kmx::incxstr(PKMX_WCHAR p)
 {
   if(*p == 0) return p;
   if(*p != UC_SENTINEL)
@@ -129,7 +133,7 @@ PKMX_WCHAR incxstr(PKMX_WCHAR p)
   }
 }
 
-PKMX_WCHAR decxstr(PKMX_WCHAR p)
+PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
 {
   p--;
   if(*p == UC_SENTINEL_EXTENDEDEND)
@@ -182,7 +186,7 @@ PKMX_WCHAR decxstr(PKMX_WCHAR p)
   return p;
 }
 
-int xstrlen_ignoreifopt(PKMX_WCHAR p)
+int km::kbp::kmx::xstrlen_ignoreifopt(PKMX_WCHAR p)
 {
   int i;
   for(i = 0; *p; i++, p=incxstr(p))
@@ -192,21 +196,21 @@ int xstrlen_ignoreifopt(PKMX_WCHAR p)
   return i;
 }
 
-int xstrlen(PKMX_WCHAR p)
+int km::kbp::kmx::xstrlen(PKMX_WCHAR p)
 {
   int i;
   for(i = 0; *p; i++, p=incxstr(p));
   return i;
 }
 
-int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
+int km::kbp::kmx::xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
 {
   int i;
   for(i = 0; p < p1; p = incxstr(p), i++);
   return i;
 }
 
-PKMX_WCHAR xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
+PKMX_WCHAR km::kbp::kmx::xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
 {
   for(PKMX_WCHAR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
     if(!u16ncmp(buf, chr, (int)(q-buf)))
@@ -214,39 +218,14 @@ PKMX_WCHAR xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
   return NULL;
 }
 
-int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
+int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
 {
   PKMX_WCHAR nch1 = incxstr(ch1);
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
   return u16ncmp(ch1, ch2, (int)(nch1-ch1));
 }
 
-
-#if 0
-/*
-  This function exists because of a bug in Visual Studio 2015 and 2017:
-  https://social.msdn.microsoft.com/Forums/en-US/8f40dcd8-c67f-4eba-9134-a19b9178e481/vs-2015-rc-linker-stdcodecvt-error?forum=vcgeneral
-  https://stackoverflow.com/a/35103224/1836776
-*/
-#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
-std::string utf16_to_utf8(std::u16string utf16_string)
-{
-  std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
-  auto p = reinterpret_cast<const int16_t *>(utf16_string.data());
-  return convert.to_bytes(p, p + utf16_string.size());
-}
-#else
-std::string utf16_to_utf8(std::u16string utf16_string)
-{
-  std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-  return convert.to_bytes(utf16_string);
-}
-#endif
-#endif 
-
-std::string utf16_to_utf8(std::u16string utf16_string);
-
-PKMX_WCHAR strtowstr(PKMX_CHAR in)
+PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
 {
   km_kbp_cp *result;
 
@@ -267,67 +246,13 @@ PKMX_WCHAR strtowstr(PKMX_CHAR in)
 }
 
 
-PKMX_CHAR wstrtostr(PKMX_WCHAR in)
+PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
 {
   PKMX_CHAR result;
 
-  auto s = utf16_to_utf8(in);
+  auto s = ::utf16_to_utf8(in);
   result = new char[s.length() + 1];
   s.copy(result, s.length());
   result[s.length()] = 0;
   return result;
 }
-
-#if 0
-
-This is a proposed replacement for the xstr functions above. However, probably a bridge too far for 
-this PR.
-
-namespace kmx {
-  struct kmx_char {
-    uint8_t type;
-    union {
-      /* codepoint */           struct { uint32_t ch; } ch;
-      /* CODE_ANY */            struct { uint16_t store; } any;
-      /* CODE_INDEX */          struct { uint16_t store, context_offset; } index;
-      // CODE_CONTEXT, CODE_NUL have no params
-      /* CODE_USE */            struct { uint16_t group; } use;                     
-      // CODE_RETURN, CODE_BEEP have no params
-      /* CODE_DEADKEY */        struct { uint16_t deadkey; } deadkey;
-      /* CODE_EXTENDED */       struct { uint16_t modifier, vkey; } extended;
-      // CODE_EXTENDEDEND not used
-      // CODE_SWITCH, CODE_KEY deprecated
-      // CODE_CLEARCONTEXT deprecated
-      /* CODE_CALL */           struct { uint16_t store; } call;  // Not supported cross-platform
-      /* CODE_CONTEXTEX */      struct { uint16_t context_offset; } contextex;
-      /* CODE_NOTANY */         struct { uint16_t store; } notany;
-      /* CODE_SETOPT */         struct { uint16_t store1, store2; } setopt;
-      /* CODE_IFOPT */          struct { uint16_t store1, store2, op; } ifopt;
-      /* CODE_SAVEOPT */        struct { uint16_t store; } saveopt;
-      /* CODE_RESETOPT */       struct { uint16_t store; } resetopt;
-      /* CODE_IFSYSTEMSTORE */  struct { uint16_t store1, store2, op; } ifsystemstore;
-      /* CODE_SETSYSTEMSTORE */ struct { uint16_t store1, store2; } setsystemstore;
-    };
-  };
-
-  class kmx_string : public std::vector<kmx_char> {
-    kmx_string(km_kbp_cp *source);
-  };
-
-
-  kmx_string::kmx_string(km_kbp_cp *source) {
-    auto ss = std::u16string(source);
-    for (auto i = ss.begin(); i != ss.end(); i++) {
-      if (*i == UC_SENTINEL) {
-
-      }
-      else {
-
-      }
-      switch (*i) {
-
-      }
-    }
-  }
-};
-#endif

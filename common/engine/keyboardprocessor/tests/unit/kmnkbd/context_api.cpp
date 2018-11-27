@@ -116,16 +116,21 @@ int main(int, char * [])
   try_status(km_kbp_context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Hello World!") != ctxt_buffer) return __LINE__;
+  km_kbp_context_items_dispose(tmp_ctxt);
 
   // Test shrink and prepend, delete more than we provide to prepend.
   try_status(km_kbp_context_items_from_utf16(u"Bye, ", &ctxt1));
   // We delete 7 characters plus 1 marker hence 8 and not 7 as expected if you
-  //  go bye the test string above.
+  //  go by the test string above.
   try_status(km_kbp_context_shrink(&mock_ctxt1, 8, ctxt1));
   ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);
   try_status(km_kbp_context_get(&mock_ctxt1, &tmp_ctxt));
   try_status(km_kbp_context_items_to_utf16(tmp_ctxt, ctxt_buffer, &ctxt_size));
   if (std::u16string(u"Bye, Hello") != ctxt_buffer) return __LINE__;
+
+  // dispose the items lists
+  km_kbp_context_items_dispose(tmp_ctxt);
+  km_kbp_context_items_dispose(ctxt1);
 
   return 0;
 }

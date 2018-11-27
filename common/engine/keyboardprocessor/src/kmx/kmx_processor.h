@@ -5,122 +5,36 @@
 #include <string>
 #include <string.h>
 #include <keyman/keyboardprocessor_bits.h>
-#include <kmx/kmx_base.h>
+#include "kmx_base.h"
+#include "kmx_file.h"
+#include "kmx_context.h"
+#include "kmx_actions.h"
+#include "kmx_xstring.h"
+#include "kmx_options.h"
+#include "kmx_environment.h"
 
 /***************************************************************************/ 
 
-typedef struct tagSTORE
-{
-  KMX_DWORD dwSystemID;
-  PKMX_WCHAR dpName;
-  PKMX_WCHAR dpString;    
-} STORE, *LPSTORE;
+namespace km {
+namespace kbp {
+namespace kmx {
 
-
-typedef struct tagKEY
-{
-  KMX_WCHAR Key;
-  KMX_DWORD Line;
-  KMX_DWORD ShiftFlags;
-  PKMX_WCHAR dpOutput;    
-  PKMX_WCHAR dpContext; 
-} KEY, *LPKEY;
-
-
-typedef struct tagGROUP
-{
-  PKMX_WCHAR dpName;
-  LPKEY dpKeyArray;   // [LPKEY] address of first item in key array
-  PKMX_WCHAR dpMatch;   
-  PKMX_WCHAR dpNoMatch;   
-  KMX_DWORD cxKeyArray;   // in array entries
-  KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
-} GROUP, *LPGROUP;
-
-
-typedef struct tagKEYBOARD
-{
-  KMX_DWORD dwIdentifier;   // Keyman compiled keyboard id
-
-  KMX_DWORD dwFileVersion;  // Version of the file - Keyman 4.0 is 0x0400
-  
-  KMX_DWORD dwCheckSum;   // As stored in keyboard
-  KMX_DWORD xxkbdlayout;      // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-  KMX_DWORD IsRegistered;   // layout id, from same key
-  KMX_DWORD version;      // keyboard version
-
-  KMX_DWORD cxStoreArray;   // in array entries
-  KMX_DWORD cxGroupArray;   // in array entries
-
-  LPSTORE dpStoreArray; // [LPSTORE] address of first item in store array, from start of file
-  LPGROUP dpGroupArray; // [LPGROUP] address of first item in group array, from start of file
-  
-  KMX_DWORD StartGroup[2];  // index of starting groups [2 of them]
-              // Ansi=0, Unicode=1
-
-  KMX_DWORD dwFlags;      // Flags for the keyboard file
-
-  KMX_DWORD dwHotKey;     // standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
-} KEYBOARD, *LPKEYBOARD;
-
-typedef struct tagINTKEYBOARDOPTIONS
-{
-  PKMX_WCHAR Value;
-  PKMX_WCHAR OriginalStore;
-} INTKEYBOARDOPTIONS, *LPINTKEYBOARDOPTIONS;
-
-// The members of this structure, from first through to IMDLLs, must match KEYBOARDINFO from keymanapi.h
-typedef struct tagINTKEYBOARDINFO
-{
-  KMX_DWORD      KeymanID;
-  char       Name[256];
-  LPKEYBOARD Keyboard;
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
-} INTKEYBOARDINFO, *LPINTKEYBOARDINFO;
-
-typedef struct tagKMSTATE
-{
-  KMX_BOOL StopOutput;
-  int LoopTimes;
-  KMX_BOOL isExtended;
-  KMX_WORD vkey; // I934
-  KMX_WCHAR charCode;   // I4582
-} KMSTATE;
-   // I3616
-enum ProcessStringReturn {psrPostMessages, psrCheckMatches};
-
-
-#include <kmx/kmx_file.h>
-#include <kmx/kmx_context.h>
-#include <kmx/kmx_actions.h>
-#include <kmx/kmx_xstring.h>
-#include <kmx/kmx_options.h>
 
 /* Utility */
 
 #define GLOBAL_ContextStackSize 80
-
-/* Temporary globals */
-
-struct KMX_Environment {
-  KMX_BOOL simulateAltGr, baseLayoutGivesCtrlRAltForRAlt;
-  std::u16string baseLayout, baseLayoutAlt;
-  KMX_BOOL capsLock;
-  std::u16string platform;
-};
-
-extern KMX_Environment g_environment;
 
 class KMX_Processor {
 private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
   KMSTATE m_state;
-  km_kbp_state *m_state1;
+  km_kbp_state *m_kbp_state;
 
-  KMX_Actions m_actions;
-  KMX_Context m_context;
-  KMX_Options m_options;
+  kmx::KMX_Actions m_actions;
+  kmx::KMX_Context m_context;
+  kmx::KMX_Options m_options;
+  kmx::KMX_Environment m_environment;
 
   INTKEYBOARDINFO m_keyboard = { 0 };
   KMX_DWORD m_modifiers = 0;
@@ -166,11 +80,12 @@ public:
   ~KMX_Processor();
 
   KMX_BOOL Load(km_kbp_path_name keyboardName);
-  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_WCHAR charCode);  // returns FALSE on error or key not matched
+  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
   KMX_Options *GetOptions();
+  KMX_Environment *GetEnvironment();
   LPINTKEYBOARDINFO GetKeyboard();
 };
 
@@ -178,7 +93,7 @@ public:
 
 struct char_to_vkey {
   km_kbp_virtual_key vk;
-  bool shifted;
+  bool shifted, caps;
 };
 
 struct modifier_names {
@@ -219,3 +134,6 @@ inline KMX_BOOL ShouldDebug() {
 
 void write_console(KMX_BOOL error, const wchar_t *fmt, ...);
 
+} // namespace kmx
+} // namespace kbp
+} // namespace km

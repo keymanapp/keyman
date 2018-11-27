@@ -2,9 +2,11 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <kmx/kmx_processor.h>
+#include "kmx_processor.h"
 #include <option.hpp>
 #include <state.hpp>
+
+using namespace km::kbp::kmx;
 
 void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   int idx;
@@ -28,13 +30,21 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
 void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
   LPSTORE sp;
   int i;
+
+  assert(options != nullptr);
+  assert(!key.empty());
+
+  if (options == nullptr || key.empty()) return;
+  
   for (i = 0, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++) {
     if (_kp->KeyboardOptions[i].OriginalStore != NULL && sp->dpName != NULL && u16icmp(sp->dpName, key.c_str()) == 0) {
       Reset(options, i);
       return;
     }
   }
-  // TODO: Do we need to flag missing item?
+
+  // No entry was found.
+  assert(false);
 }
 
 void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
@@ -92,9 +102,7 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
 KMX_Options::~KMX_Options()
 {
   //TODO: move ownership of _kp->KeyboardOptions into this class (so we control lifetime of it here)
-  assert(_kp != NULL);
-  assert(_kp->Keyboard != NULL);
-  assert(_kp->KeyboardOptions != NULL);
+  if (!_kp || !_kp->Keyboard || !_kp->KeyboardOptions) return;
 
   for(KMX_DWORD i = 0; i < _kp->Keyboard->cxStoreArray; i++)
     if(_kp->KeyboardOptions[i].Value)
@@ -144,7 +152,7 @@ void KMX_Options::Reset(km_kbp_options *options, int nStoreToReset)
 
   if(_kp->Keyboard->dpStoreArray[nStoreToReset].dpName == NULL) return;
 
-  // Now we need to go back and get any saved value from KPAPI
+  // Now we need to go back and get any saved value from KPAPI. internal_value is owned by options api
   km_kbp_cp const *internal_value = options->lookup(km_kbp_option_scope(KM_KBP_OPT_KEYBOARD), _kp->Keyboard->dpStoreArray[nStoreToReset].dpName);
   if(internal_value) {
     // Copy the value from KPAPI

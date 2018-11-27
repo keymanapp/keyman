@@ -22,12 +22,14 @@
 #endif
 #define assert(expr) {if (!(expr)) std::exit(100*__LINE__); }
 
-std::string utf16_to_utf8(std::u16string utf16_string);
+std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
 
 namespace
 {
 
 const std::string base = "tests/unit/kmx/";
+
+bool g_beep_found = false;
 
 struct key_event {
   km_kbp_virtual_key vk;
@@ -47,8 +49,7 @@ struct kmx_option {
 using kmx_options = std::vector<kmx_option>;
 
 int run_test(const std::string & file);
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options);
-
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep);
 
 km_kbp_option_item test_env_opts[] =
 {
@@ -97,15 +98,15 @@ static inline std::string trim_copy(std::string s) {
 key_event char_to_event(char ch) {
   assert(ch >= 32 && ch < 128);
   return {
-    s_char_to_vkey[(int)ch - 32].vk,
-    (uint16_t)(s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
+    km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
+    (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
   };
 }
 
 uint16_t const get_modifier(std::string const m) {
-  for (int i = 0; s_modifier_names[i].name; i++) {
-    if (m == s_modifier_names[i].name) {
-      return s_modifier_names[i].modifier;
+  for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
+    if (m == km::kbp::kmx::s_modifier_names[i].name) {
+      return km::kbp::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
@@ -113,7 +114,7 @@ uint16_t const get_modifier(std::string const m) {
 
 km_kbp_virtual_key const get_vk(std::string const & vk) {
   for (int i = 1; i < 256; i++) {
-    if (vk == s_key_names[i]) {
+    if (vk == km::kbp::kmx::s_key_names[i]) {
       return i;
     }
   }
@@ -170,22 +171,39 @@ key_event next_key(std::string &keys) {
   }
 }
 
-void apply_action(km_kbp_state const * state, km_kbp_action_item const & act) {
+void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, std::u16string & text_store) {
   switch (act.type)
   {
   case KM_KBP_IT_END:
     assert(false);
     break;
   case KM_KBP_IT_ALERT:
+    g_beep_found = true;
     //std::cout << "beep" << std::endl;
     break;
   case KM_KBP_IT_CHAR:
+    if (Uni_IsSMP(act.character)) {
+      text_store.push_back(Uni_IsSurrogate1(act.character));
+      text_store.push_back(Uni_IsSurrogate2(act.character));
+    }
+    else {
+      text_store.push_back(act.character);
+    }
     //std::cout << "char(" << act.character << ") size=" << cp->size() << std::endl;
     break;
   case KM_KBP_IT_MARKER:
     //std::cout << "deadkey(" << act.marker << ")" << std::endl;
     break;
   case KM_KBP_IT_BACK:
+    // It is valid for a backspace to be received with an empty text store
+    // as the user can press backspace with no text in the store and Keyman
+    // will pass that back to the client, as the client may do additional
+    // processing at start of a text store, e.g. delete from a previous cell
+    // in a table. Or, if Keyman has a cached context, then there may be
+    // additional text in the text store that Keyman can't see.
+    if (text_store.length() > 0) {
+      text_store.pop_back();
+    }
     break;
   case KM_KBP_IT_PERSIST_OPT:
   case KM_KBP_IT_RESET_OPT:
@@ -207,15 +225,13 @@ int run_test(const std::string & file) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   kmx_options options;
+  bool expected_beep = false;
   
-  int result = load_source(file, keys, expected, context, options);
+  int result = load_source(file, keys, expected, context, options, expected_beep);
   if (result != 0) return result;
 
   std::cout << "file = " << file << std::endl;
-  //std::cout << "keys = " << keys << std::endl;
-  //std::cout << "expected = " << utf16_to_utf8(expected) << std::endl;
-  //std::cout << "context = " << utf16_to_utf8(context) << std::endl;
-
+  
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
     
@@ -236,15 +252,28 @@ int run_test(const std::string & file) {
 
       std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
 
-      keyboard_opts[i].key = new km_kbp_cp[it->key.length() + 1];
-      it->key.copy((char16_t * const)keyboard_opts[i].key, it->key.length());
-      keyboard_opts[i].key[it->key.length()] = 0;
+      std::u16string key = it->key;
+      if (key[0] == u'&') {
+        // environment value (aka system store)
+        key.erase(0, 1);
+        keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
+      }
+      else {
+        keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+      }
 
-      keyboard_opts[i].value = new km_kbp_cp[it->value.length() + 1];
-      it->value.copy(keyboard_opts[i].value, it->value.length());
-      keyboard_opts[i].value[it->value.length()] = 0;
+      km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
+      key.copy(cp, key.length());
+      cp[key.length()] = 0;
 
-      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+      keyboard_opts[i].key = cp;
+
+      cp = new km_kbp_cp[it->value.length() + 1];
+      it->value.copy(cp, it->value.length());
+      cp[it->value.length()] = 0;
+
+      keyboard_opts[i].value = cp;
+
       i++;
     }
 
@@ -261,21 +290,37 @@ int run_test(const std::string & file) {
   try_status(km_kbp_context_set(km_kbp_state_context(test_state), citems));
   km_kbp_context_items_dispose(citems);
 
+  // Setup baseline text store
+  std::u16string text_store = context;
+
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
     for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-      apply_action(test_state, *act);
+      apply_action(test_state, *act, text_store);
     }
   }
 
-  // Compare final output { TODO: don't use the inbuilt context, instead use the actions, starting with context }
+  // Test if the beep action was as expected
+  if (g_beep_found != expected_beep) return __LINE__;
+
+  // Compare final output - retrieve internal context
   size_t n = 0;
   try_status(km_kbp_context_get(km_kbp_state_context(test_state), &citems));
   try_status(km_kbp_context_items_to_utf16(citems, nullptr, &n));
   km_kbp_cp *buf = new km_kbp_cp[n];
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
+
+  std::cout << "expected: " << utf16_to_utf8(expected) << std::endl;
+  std::cout << "text store: " << utf16_to_utf8(text_store) << std::endl;
+  std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
+
+  // Compare internal context with expected result
+  if (buf != expected) return __LINE__;
+
+  // Compare text store with expected result
+  if (text_store != expected) return __LINE__;
 
   // Test resultant options
   // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
@@ -294,7 +339,7 @@ int run_test(const std::string & file) {
   km_kbp_state_dispose(test_state);
   km_kbp_keyboard_dispose(test_kb);
 
-  return (buf == expected) ? 0 : __LINE__;
+  return 0;
 }
 
 std::u16string parse_source_string(std::string const & s) {
@@ -316,7 +361,8 @@ std::u16string parse_source_string(std::string const & s) {
           t += km_kbp_cp(v);
         }
         else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v)) + km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
+          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
         }
       }
       else if (*p == 'd') {
@@ -355,7 +401,7 @@ bool is_token(const std::string token, std::string &line) {
   return false;
 }
 
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options) {
+int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
   const std::string s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ",
@@ -380,7 +426,12 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
       trim(keys);
     }
     else if(is_token(s_expected, line)) {
-      expected = parse_source_string(line);
+      if (line == "\\b") {
+        expected_beep = true;
+      }
+      else {
+        expected = parse_source_string(line);
+      }
     }
     else if (is_token(s_context, line)) {
       context = parse_source_string(line);

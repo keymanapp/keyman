@@ -22,7 +22,7 @@ LCID_DATA=$(STANDARDS_DATA_PATH)\windows-lcid-to-bcp-47\map_clean_win.txt
 LCID_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.LCIDToBCP47Registry.pas
 
 ALLTAGS_DATA=$(STANDARDS_DATA_PATH)\alltags\alltags.txt
-ALLTAGS_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.LibPalasoAllTagsRegistry.pas
+ALLTAGS_PAS=$(STANDARDS_OUT_PATH)\Keyman.System.Standards.NRSIAllTagsRegistry.pas
 
 build: 
     $(DELPHI_MSBUILD) build_standards_data.dproj

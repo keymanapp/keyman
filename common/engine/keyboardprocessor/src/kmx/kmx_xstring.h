@@ -2,6 +2,10 @@
 
 #include "kmx_base.h"
 
+namespace km {
+namespace kbp {
+namespace kmx {
+
 #define Uni_IsSurrogate1(ch) ((ch) >= 0xD800 && (ch) <= 0xDBFF)
 #define Uni_IsSurrogate2(ch) ((ch) >= 0xDC00 && (ch) <= 0xDFFF)
 #define Uni_IsSMP(ch) ((ch) >= 0x10000)
@@ -29,3 +33,7 @@ int u16cmp(const km_kbp_cp *p, const km_kbp_cp *q);
 int u16icmp(const km_kbp_cp *p, const km_kbp_cp *q);
 int u16ncmp(const km_kbp_cp *p, const km_kbp_cp *q, size_t count);
 km_kbp_cp *u16tok(km_kbp_cp *p, km_kbp_cp ch, km_kbp_cp **ctx);
+
+} // namespace kmx
+} // namespace kbp
+} // namespace km

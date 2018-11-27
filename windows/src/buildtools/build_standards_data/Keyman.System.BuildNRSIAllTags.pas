@@ -1,9 +1,9 @@
-unit Keyman.System.BuildLibPalasoAllTags;
+unit Keyman.System.BuildNRSIAllTags;
 
 interface
 
 type
-  TBuildLibPalasoAllTags = class
+  TBuildNRSIAllTags = class
     class procedure Build(AllTagsFile, DestinationFile: string);
   end;
 
@@ -15,9 +15,9 @@ uses
   System.StrUtils,
   System.SysUtils;
 
-{ TBuildLibPalasoAllTags }
+{ TBuildNRSIAllTags }
 
-class procedure TBuildLibPalasoAllTags.Build(AllTagsFile,
+class procedure TBuildNRSIAllTags.Build(AllTagsFile,
   DestinationFile: string);
 var
   FAllTags: TStringList;
@@ -37,7 +37,7 @@ begin
     FResult := TStringList.Create;
     try
 
-      FResult.Add('unit Keyman.System.Standards.LibPalasoAllTagsRegistry;');
+      FResult.Add('unit Keyman.System.Standards.NRSIAllTagsRegistry;');
       FResult.Add('');
       FResult.Add('interface');
       FResult.Add('');
@@ -49,16 +49,16 @@ begin
       FResult.Add('  System.Generics.Collections;');
       FResult.Add('');
       FResult.Add('type');
-      FResult.Add('  TLibPalasoAllTagsMap = class');
+      FResult.Add('  TNRSIAllTagsMap = class');
       FResult.Add('  public');
       FResult.Add('    class procedure Fill(dict: TDictionary<string,TArray<string>>);');
       FResult.Add('  end;');
       FResult.Add('');
       FResult.Add('implementation');
       FResult.Add('');
-      FResult.Add('{ TLibPalasoAllTagsMap }');
+      FResult.Add('{ TNRSIAllTagsMap }');
       FResult.Add('');
-      FResult.Add('class procedure TLibPalasoAllTagsMap.Fill(dict: TDictionary<string,TArray<string>>);');
+      FResult.Add('class procedure TNRSIAllTagsMap.Fill(dict: TDictionary<string,TArray<string>>);');
       FResult.Add('begin');
 
       dict := TStringList.Create; //' TArray<string,TArray<string>>.Create;
