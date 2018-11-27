@@ -36,7 +36,6 @@ const
 
 const
   // UfrmKeymanBase
-  WM_USER_FireCommand = WM_USER + 111;
   WM_USER_FormShown = WM_USER + 112;
   WM_USER_ContentRender = WM_USER + 113;
   WM_USER_Step = WM_USER + 114;
@@ -46,8 +45,6 @@ const
   // KeymanDeveloperUtils
   WM_USER_LOADREGFILES = WM_USER+120;
   //WM_USER_FORMSHOWN = WM_USER+100;
-
-  WM_USER_WEBCOMMAND = WM_USER+122;
 
   WC_COMMAND = 0;
   WC_HELP = 1;
