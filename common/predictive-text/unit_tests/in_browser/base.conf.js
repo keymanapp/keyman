@@ -34,8 +34,7 @@ module.exports = {
     'cases/**/*.js', // Where the tests actually reside.
 
     // Include the generated worker code.
-    '../../embedded_worker.js',
-    '../../build/index.js',
+    '../../index.js',
     
     // We don't have anything in these locations... yet.  But they'll be useful for test resources.
     'json/**/*.json', // Where pre-loaded JSON resides.
