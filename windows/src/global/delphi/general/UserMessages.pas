@@ -36,6 +36,7 @@ const
 
 const
   // UfrmKeymanBase
+  WM_USER_FireCommand = WM_USER + 111;
   WM_USER_FormShown = WM_USER + 112;
   WM_USER_ContentRender = WM_USER + 113;
   WM_USER_Step = WM_USER + 114;
