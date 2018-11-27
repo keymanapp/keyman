@@ -31,3 +31,15 @@
  * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString	
  */	
 type USVString = string;
+
+class LMLayer {
+
+}
+
+// Let LMLayerWorker be available both in browser and in Node.
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = LMLayer;
+} else {
+  //@ts-ignore
+  window.LMLayer = LMLayer;
+}

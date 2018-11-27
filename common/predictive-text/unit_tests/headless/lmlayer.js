@@ -9,7 +9,7 @@ describe('LMLayer', function() {
       let FakeWorker = sinon.fake();
       new LMLayer(FakeWorker);
       
-      assert.is(FakeWorker.callCount, 1);
+      assert.strictEqual(FakeWorker.callCount, 1);
     });
   });
 });
