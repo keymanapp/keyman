@@ -10,7 +10,18 @@ EMBEDDED_WORKER=embedded_worker.js
 build ( ) {
   # Build worker first; the main file depends on it.
   # Then wrap the worker; Then build the main file.
-  npm run build-worker && wrap_worker && npm run build-main
+  build-worker && wrap_worker && build-main
+}
+
+# Builds the top-level JavaScript file (the second stage of compilation)
+build-main () {
+  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level JavaScript file."
+}
+
+# Builds the inner JavaScript worker (the first stage of compilation).
+# This script must be wrapped.
+build-worker () {
+  npm run tsc -- -p ./worker/tsconfig.json || fail "Could not build worker."
 }
 
 # Creates embedded_worker.js. Must be run after the worker is built for the
