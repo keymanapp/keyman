@@ -20,11 +20,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// Include the code intended to run WITHIN the Web Worker.
-// This MUST be compiled before this file is compiled.
-/// <reference path="embedded_worker.js" />
-declare var LMLayerWorkerCode: Function;
-
 /**	
  * A JavaScript string with the restriction that it must only	
  * contain Unicode scalar values.	
