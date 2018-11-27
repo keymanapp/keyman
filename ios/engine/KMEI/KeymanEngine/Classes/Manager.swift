@@ -830,6 +830,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   /// TextView/TextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
+    hideKeyboard()
     let vc = KeyboardPickerViewController()
     let nc = UINavigationController(rootViewController: vc)
     nc.modalTransitionStyle = .coverVertical
@@ -852,6 +853,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
     // true source of the problems.
     viewController.dismiss(animated: false)
+    showKeyboard()
     if shouldReloadKeyboard {
       keymanWeb.reloadKeyboard()
     }
