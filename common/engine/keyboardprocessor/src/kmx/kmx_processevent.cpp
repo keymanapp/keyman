@@ -36,6 +36,8 @@ namespace km {
         case KM_KBP_OPT_ENVIRONMENT:
           _kmx.GetEnvironment()->Load(key, value);
           break;
+        default:
+          break;
       }
     }
 

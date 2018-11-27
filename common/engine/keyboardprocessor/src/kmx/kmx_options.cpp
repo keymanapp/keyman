@@ -18,7 +18,7 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
       case CODE_SAVEOPT:
       case CODE_RESETOPT:
         idx = *(s + 2) - 1;
-        if (idx >= 0 && idx < _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
+        if (idx >= 0 && idx < (int) _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
           _kp->KeyboardOptions[idx].OriginalStore = _kp->Keyboard->dpStoreArray[idx].dpString;
         }
         break;
@@ -36,7 +36,7 @@ void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
 
   if (options == nullptr || key.empty()) return;
   
-  for (i = 0, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++) {
+  for (i = 0, sp = _kp->Keyboard->dpStoreArray; i < (int) _kp->Keyboard->cxStoreArray; i++, sp++) {
     if (_kp->KeyboardOptions[i].OriginalStore != NULL && sp->dpName != NULL && u16icmp(sp->dpName, key.c_str()) == 0) {
       Reset(options, i);
       return;
@@ -59,8 +59,8 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
   int i, j;
   LPGROUP gp;
   LPKEY kkp;
-  for (i = 0, gp = _kp->Keyboard->dpGroupArray; i < _kp->Keyboard->cxGroupArray; i++, gp++) {
-    for (j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
+  for (i = 0, gp = _kp->Keyboard->dpGroupArray; i < (int) _kp->Keyboard->cxGroupArray; i++, gp++) {
+    for (j = 0, kkp = gp->dpKeyArray; j < (int) gp->cxKeyArray; j++, kkp++) {
       AddOptionsStoresFromXString(kkp->dpContext);
       AddOptionsStoresFromXString(kkp->dpOutput);
     }
@@ -70,7 +70,7 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
 
   LPINTKEYBOARDOPTIONS ko;
   int n = 0;
-  for (i = 0, ko = _kp->KeyboardOptions; i < _kp->Keyboard->cxStoreArray; i++, ko++) {
+  for (i = 0, ko = _kp->KeyboardOptions; i < (int) _kp->Keyboard->cxStoreArray; i++, ko++) {
     if (ko->OriginalStore != NULL) {
       n++;
     }
@@ -85,7 +85,7 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
   // Setup the default options for KPAPI to maintain
 
   LPSTORE sp;
-  for (n = 0, i = 0, ko = _kp->KeyboardOptions, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++, ko++) {
+  for (n = 0, i = 0, ko = _kp->KeyboardOptions, sp = _kp->Keyboard->dpStoreArray; i < (int) _kp->Keyboard->cxStoreArray; i++, sp++, ko++) {
     if (ko->OriginalStore == NULL) continue;
     km_kbp_option_item opt;
     opt.key = sp->dpName;
