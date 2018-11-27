@@ -5,11 +5,16 @@ let LMLayer = require('../../');
 
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
-    it('should be given a Worker class to instantiate', function () {
-      let FakeWorker = sinon.fake();
-      new LMLayer(FakeWorker);
-      
-      assert.strictEqual(FakeWorker.callCount, 1);
+    it('should be given a WorkerFactory to instantiate', function () {
+      let createWorker = sinon.fake();
+      new LMLayer(createWorker);
+      assert.strictEqual(createWorker.callCount, 1);
+    });
+
+    it('should give the worker factory a blob URI', function () {
+      let createWorker = sinon.fake();
+      new LMLayer(createWorker);
+      assert.match(createWorker.lastArg, /^blob:/);
     });
   });
 });
