@@ -785,7 +785,6 @@ end;
 procedure TMergeKeyboardInfo.AddHelpLink;
 var
   v: TJSONValue;
-
 begin
   // Validate pre-existing helpLink
   v := json.GetValue('helpLink');
