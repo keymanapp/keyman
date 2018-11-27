@@ -218,15 +218,13 @@ public final class FileUtils {
 
   /**
    * Utility if a given file is a font. We prefer TTF or OTF, but old Android devices use SVG or WOFF.
-   * Limitations: Include SVG only for Build.VERSION.SDK_INT == JELLY_BEAN_MR1 or JELLY_BEAN_MR2 for OSK
    * @param filename
    * @return boolean
-   *
    */
   public static boolean hasFontExtension(String filename) {
     String f = filename.toLowerCase();
-    return f.endsWith(TRUETYPEFONT) || f.endsWith(OPENTYPEFONT) || f.endsWith(WOFFFONT) ||
-      (f.endsWith(SVGFONT) && (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2));
+    return f.endsWith(TRUETYPEFONT) || f.endsWith(OPENTYPEFONT) ||
+      f.endsWith(WOFFFONT) || f.endsWith(SVGFONT);
   }
 
   public static boolean hasSVGViewBox(String filename) {

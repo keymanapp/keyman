@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.util.ReflectionHelpers;
 
 @RunWith(RobolectricTestRunner.class)
 public class FileUtilsTest {
@@ -29,34 +28,14 @@ public class FileUtilsTest {
     filename = "test/abc.woff";
     Assert.assertTrue(FileUtils.hasFontExtension(filename));
 
-    // Test SVG limited to SDK 17 and 18
-    ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", 15);
-    filename = "test/abc.svg";
-    Assert.assertFalse(FileUtils.hasFontExtension(filename));
+    filename = "test/abc.WOFF";
+    Assert.assertTrue(FileUtils.hasFontExtension(filename));
 
-    filename = "test/abc.SVG";
-    Assert.assertFalse(FileUtils.hasFontExtension(filename));
-
-    ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN_MR1);
     filename = "test/abc.svg";
     Assert.assertTrue(FileUtils.hasFontExtension(filename));
 
     filename = "test/abc.SVG";
     Assert.assertTrue(FileUtils.hasFontExtension(filename));
-
-    ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN_MR2);
-    filename = "test/abc.svg";
-    Assert.assertTrue(FileUtils.hasFontExtension(filename));
-
-    filename = "test/abc.SVG";
-    Assert.assertTrue(FileUtils.hasFontExtension(filename));
-
-    ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", 27);
-    filename = "test/abc.svg";
-    Assert.assertFalse(FileUtils.hasFontExtension(filename));
-
-    filename = "test/abc.SVG";
-    Assert.assertFalse(FileUtils.hasFontExtension(filename));
 
     filename = "test/abcttf";
     Assert.assertFalse(FileUtils.hasFontExtension(filename));
