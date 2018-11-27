@@ -32,7 +32,14 @@
  */	
 type USVString = string;
 
+type WorkerFactory = (uri: string) => Worker;
+
 class LMLayer {
+  private _worker: Worker;
+
+  constructor(workerFactory: WorkerFactory = (uri) => new Worker(uri)) {
+    this._worker = workerFactory("about:blank");
+  }
 
 }
 
