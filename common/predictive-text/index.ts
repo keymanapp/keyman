@@ -46,6 +46,16 @@ class LMLayer {
     let uri = URL.createObjectURL(blob);
     this._worker = workerFactory(uri);
   }
+
+  /**
+   * Given a function, this utility returns the source code within it.
+   * @param fn 
+   */
+  static unwrap(fn: Function): string {
+      let wrapper = fn.toString();
+      let match = wrapper.match(/function[^{]+{((?:.|\n)+)}[^}]*$/);
+      return match[1];
+  }
 }
 
 // Let LMLayerWorker be available both in browser and in Node.
