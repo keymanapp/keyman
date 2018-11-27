@@ -20,6 +20,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// Include the code intended to run WITHIN the Web Worker.
+// This MUST be compiled before this file is compiled.
+/// <reference path="embedded_worker.js" />
+declare var LMLayerWorkerCode: Function;
+
 /**	
  * A JavaScript string with the restriction that it must only	
  * contain Unicode scalar values.	
@@ -33,18 +38,14 @@
 type USVString = string;
 
 // TODO: document
-type WorkerFactory = (uri: string) => Worker;
-
-// TODO: document
 class LMLayer {
-  // TODO: document
+  /**
+   * The underlying worker instance. By default, this is the LMLayerWorker. 
+   */
   private _worker: Worker;
 
-  // TODO: document
-  constructor(workerFactory: WorkerFactory = (uri) => new Worker(uri)) {
-    let blob = new Blob([], { type: 'text/javascript' });
-    let uri = URL.createObjectURL(blob);
-    this._worker = workerFactory(uri);
+  constructor(uri?: string) {
+    this._worker = new Worker(uri || LMLayer.asBlobURI(LMLayerWorkerCode));
   }
 
   /**
@@ -78,7 +79,7 @@ class LMLayer {
   }
 }
 
-// Let LMLayerWorker be available both in browser and in Node.
+// Let LMLayer be available both in browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayer;
 } else {

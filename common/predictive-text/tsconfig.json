@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
     "module": "none",
     "outDir": "build/",
     "inlineSources": true,
