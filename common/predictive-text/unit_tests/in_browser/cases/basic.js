@@ -11,12 +11,7 @@ describe('LMLayerWorker', function () {
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let code = LMLayer.unwrap(LMLayerWorkerCode);
-      assert.isString(code);
-
-      let blob = new Blob([code], { type: 'text/javascript' });
-      let uri = URL.createObjectURL(blob);
-
+      let uri = LMLayer.asBlobURI(LMLayerWorkerCode);
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
