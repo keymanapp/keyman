@@ -24,13 +24,6 @@ build-worker () {
   npm run tsc -- -p ./worker/tsconfig.json || fail "Could not build worker."
 }
 
-# Creates embedded_worker.js. Must be run after the worker is built for the
-# first time
-wrap-worker ( ) {
-  echo "> wrap-worker-code LMLayerWorkerCode ./worker/index.js > ${EMBEDDED_WORKER}"
-  wrap-worker-code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}"
-}
-
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
   rm -f "${EMBEDDED_WORKER}"
@@ -66,6 +59,13 @@ fail ( ) {
 
 unit-test ( ) {
   npm run mocha -- --recursive ./unit_tests/headless/*.js
+}
+
+# Creates embedded_worker.js. Must be run after the worker is built for the
+# first time
+wrap-worker ( ) {
+  echo "> wrap-worker-code LMLayerWorkerCode ./worker/index.js > ${EMBEDDED_WORKER}"
+  wrap-worker-code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}"
 }
 
 # Wraps JavaScript code in a way that can be embedded in a worker.
