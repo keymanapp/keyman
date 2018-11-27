@@ -61,7 +61,7 @@ public class TextField: UITextField {
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      Manager.shared.keymanWebDelegate = self
+      Manager.shared.keymanWeb.delegate = self
       return Manager.shared.keymanWeb.view
     }
 
@@ -276,7 +276,7 @@ extension TextField: UITextFieldDelegate {
   }
 
   public func textFieldDidBeginEditing(_ textField: UITextField) {
-    Manager.shared.keymanWebDelegate = self
+    Manager.shared.keymanWeb.delegate = self
 
     let fontName: String?
     if let id = Manager.shared.currentKeyboardID {

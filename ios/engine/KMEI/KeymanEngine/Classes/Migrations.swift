@@ -45,7 +45,7 @@ enum Migrations {
       return
     }
 
-    let userKeyboards = oldUserKeyboards.flatMap { installableKeyboard(from: $0) }
+    let userKeyboards = oldUserKeyboards.compactMap { installableKeyboard(from: $0) }
     let currentKeyboardID = fullKeyboardID(from: oldCurrentKeyboard)
 
     storage.userDefaults.userKeyboards = userKeyboards

@@ -97,8 +97,14 @@ class KeymanWebViewController: UIViewController {
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
-    Manager.shared.viewWillTransition(to: size, with: coordinator)
-    
+
+    setKeyboardSize(size: size)
+    resetKeyboardState()
+
+    if Manager.shared.isKeymanHelpOn {
+      showHelpBubble(afterDelay: 1.5)
+    }
+
     coordinator.animateAlongsideTransition(in: nil, animation: {
       _ in
         self.manageRotation()
@@ -407,6 +413,38 @@ extension KeymanWebViewController: WKNavigationDelegate {
 
 // MARK: - KeymanWebDelegate
 extension KeymanWebViewController: KeymanWebDelegate {
+  func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
+    delegate?.keyboardLoaded(keymanWeb)
+
+    log.info("Loaded keyboard.")
+    resizeKeyboard()
+    setDeviceType(UIDevice.current.userInterfaceIdiom)
+
+    let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
+    var newKb = Defaults.keyboard
+    if Manager.shared.currentKeyboardID == nil && !shouldReloadKeyboard {
+      let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+      if let id = userData.currentKeyboardID {
+        if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
+          newKb = kb
+        }
+      } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
+        newKb = userKbs[0]
+      }
+      _ = Manager.shared.setKeyboard(newKb)
+      //refreshKeyboard()
+    }
+    
+    refreshKeyboard()
+
+    NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
+    if shouldReloadKeyboard {
+      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
+      perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
+      Manager.shared.shouldReloadKeyboard = false
+    }
+  }
+  
   func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     dismissHelpBubble()
     Manager.shared.isKeymanHelpOn = false
@@ -671,15 +709,38 @@ extension KeymanWebViewController {
 
   func resizeKeyboard(to size: CGSize) {
     setKeyboardSize(size: size)
-    
+
     // TODO: Refactor to use resizeKeyboard()
     let kbWidth = size.width
     let kbHeight = size.height
-    
+
     //keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
     //keymanWeb.frame?.size = size
     setOskWidth(Int(kbWidth))
     setOskHeight(Int(kbHeight))
+  }
+  
+  func resetKeyboardState() {
+    dismissSubKeys()
+    dismissKeyPreview()
+    dismissKeyboardMenu()
+    resizeKeyboard()
+  }
+  
+  // Used for a selector; keep @objc!
+  @objc func resetKeyboard() {
+    let keyboard = Manager.shared.currentKeyboard
+    Manager.shared.currentKeyboardID = nil
+
+    if let keyboard = keyboard {
+      _ = setKeyboard(keyboard)
+    } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
+      _ = setKeyboard(keyboard)
+    } else {
+      _ = setKeyboard(Defaults.keyboard)
+    }
+//
+//    refreshKeyboard()
   }
 
   // MARK: - Show/hide views

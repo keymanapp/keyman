@@ -27,7 +27,7 @@ public enum KeyboardState {
 // URLs - used for reachability test
 private let keymanHostName = "api.keyman.com"
 
-public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
+public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
 
@@ -77,7 +77,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public var openURL: ((URL) -> Bool)?
 
   var currentKeyboardID: FullKeyboardID?
-  weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
   var keymanWeb: KeymanWebViewController!
@@ -133,7 +132,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     sharedQueue = HTTPDownloader.init(self)
 
     keymanWeb = KeymanWebViewController(storage: Storage.active)
-    keymanWeb.delegate = self
     _ = keymanWeb.view
   }
 
@@ -860,21 +858,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
 
-  @objc func resetKeyboard() {
-    let keyboard = currentKeyboard
-    currentKeyboardID = nil
-
-    if let keyboard = keyboard {
-      _ = setKeyboard(keyboard)
-    } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      _ = setKeyboard(keyboard)
-    } else {
-      _ = setKeyboard(Defaults.keyboard)
-    }
-//
-//    refreshKeyboard()
-  }
-
   // MARK: - Text
 
   // TODO: Switch from NSRange
@@ -895,100 +878,28 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - KeymanWebViewDelegate methods
-  func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.keyboardLoaded(keymanWeb)
-
-    log.info("Loaded keyboard.")
-    keymanWeb.resizeKeyboard()
-    keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
-
-    var newKb = Defaults.keyboard
-    if currentKeyboardID == nil && !shouldReloadKeyboard {
-      let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-      if let id = userData.currentKeyboardID {
-        if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
-          newKb = kb
-        }
-      } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
-        newKb = userKbs[0]
-      }
-      _ = setKeyboard(newKb)
-      //refreshKeyboard()
-    }
-    
-    keymanWeb.refreshKeyboard()
-
-    NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
-    if shouldReloadKeyboard {
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
-      perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
-      shouldReloadKeyboard = false
-    }
-  }
-
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    keymanWebDelegate?.insertText(keymanWeb, numCharsToDelete: numCharsToDelete, newText: newText)
-  }
-
-  func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    keymanWebDelegate?.showKeyPreview(keymanWeb, keyFrame: keyFrame, preview: preview)
-  }
-
-  func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.dismissKeyPreview(keymanWeb)
-  }
-
-  func showSubkeys(_ keymanWeb: KeymanWebViewController,
-                   keyFrame: CGRect,
-                   subkeyIDs: [String],
-                   subkeyTexts: [String],
-                   useSpecialFont: Bool) {
-    keymanWebDelegate?.showSubkeys(keymanWeb,
-                                   keyFrame: keyFrame,
-                                   subkeyIDs: subkeyIDs,
-                                   subkeyTexts: subkeyTexts,
-                                   useSpecialFont: useSpecialFont)
-  }
-
-  func menuKeyDown(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.menuKeyDown(keymanWeb)
-  }
-
-  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.menuKeyUp(keymanWeb)
-  }
-  
   public func showKeyboard() {
-    keymanWebDelegate?.resumeKeyboard()
+    keymanWeb.delegate?.resumeKeyboard()
     keymanWeb.refreshKeyboard()
   }
   
   public func hideKeyboard() {
-    keymanWebDelegate?.dismissKeyboard()
-    
-    keymanWeb.dismissHelpBubble()
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyboardMenu()
+    keymanWeb.delegate?.dismissKeyboard()
+    keymanWeb.resetKeyboardState()
   }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.hideKeyboard(keymanWeb)
+    keymanWeb.delegate?.hideKeyboard(keymanWeb)
   }
 
   // MARK: - InputViewController methods
   // TODO: Manager should not have InputViewController methods. Move this into InputViewController.
   func updateViewConstraints() {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.dismissKeyboardMenu()
-    keymanWeb.resizeKeyboard()
+    keymanWeb.resetKeyboardState()
   }
 
   func inputViewDidLoad() {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.dismissKeyboardMenu()
-    keymanWeb.resizeKeyboard()
+    keymanWeb.resetKeyboardState()
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
@@ -1015,16 +926,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),
                           forKey: Key.synchronizeSWKeyboard)
       standardUserDef.synchronize()
-    }
-  }
-
-  func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.dismissKeyboardMenu()
-    keymanWeb.resizeKeyboard(to: size)
-    if isKeymanHelpOn {
-      keymanWeb.showHelpBubble(afterDelay: 1.5)
     }
   }
 

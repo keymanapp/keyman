@@ -58,7 +58,7 @@ public class TextView: UITextView {
   // MARK: - Class Overrides
   public override var inputView: UIView? {
     get {
-      Manager.shared.keymanWebDelegate = self
+      Manager.shared.keymanWeb.delegate = self
       return Manager.shared.keymanWeb.view
     }
 
@@ -277,7 +277,7 @@ extension TextView: UITextViewDelegate {
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
-    Manager.shared.keymanWebDelegate = self
+    Manager.shared.keymanWeb.delegate = self
 
     let fontName: String?
     if let id = Manager.shared.currentKeyboardID {

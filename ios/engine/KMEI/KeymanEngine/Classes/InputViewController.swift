@@ -121,7 +121,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     //view.translatesAutoresizingMaskIntoConstraints = false
 
     Manager.shared.inputViewDidLoad()
-    Manager.shared.keymanWebDelegate = self
+    Manager.shared.keymanWeb.delegate = self
 
     topBarImageView?.removeFromSuperview()
     topBarImageView = UIImageView()
@@ -150,7 +150,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     //TODO: find out why this is actually happening
     if let containerView = self.containerView {
       if containerView.subviews.isEmpty {
-        Manager.shared.keymanWebDelegate = self
+        Manager.shared.keymanWeb.delegate = self
         containerView.addSubview(kmInputView)
       }
     }
