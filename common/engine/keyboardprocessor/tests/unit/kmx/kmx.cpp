@@ -27,7 +27,7 @@ std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.c
 namespace
 {
 
-const std::string base = "tests/unit/kmx/";
+const std::string base = "../tests/unit/kmx/";
 
 bool g_beep_found = false;
 
