@@ -1,4 +1,5 @@
 var assert = chai.assert;
+
 describe('LMLayerWorker', function () {
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {
