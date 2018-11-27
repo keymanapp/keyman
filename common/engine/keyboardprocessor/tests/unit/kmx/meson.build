@@ -48,24 +48,25 @@ kmns = [
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-prog_kmcomp = find_program('kmcomp')
+prog_kmcomp = find_program('kmcomp', required: false)
 
 # todo: if kmcomp is not found, use the .kmx in the source folder
 # therefore make kmcomp compile to the source folder and add to repo?
 
-foreach kmn : kmns 
-  kmn_test = custom_target(
-    kmn + '.kmn',
-    output: kmn + '.kmx',
-    input: 'kmn/' + kmn + '.kmn',
-    command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
-  )
+if prog_kmcomp.found()
+  foreach kmn : kmns 
+    kmn_test = configure_file(
+      input: 'kmn/' + kmn + '.kmn',
+      output: kmn + '.kmx',
+      command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
+    )
   
-  kmn_source = configure_file(
-    input: 'kmn/' + kmn + '.kmn',
-    output: kmn + '.kmn',
-    copy: true
-  )
+    kmn_source = configure_file(
+      input: 'kmn/' + kmn + '.kmn',
+      output: kmn + '.kmn',
+      configuration: configuration_data()
+    )
 
-  test(kmn, kmx, depends: [kmn_test], args: [kmn])
-endforeach
+    test(kmn, kmx, args: [kmn])
+  endforeach
+endif
