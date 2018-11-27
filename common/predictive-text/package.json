@@ -6,8 +6,7 @@
     "karma": "karma",
     "mocha": "mocha",
     "test": "bash ./unit_tests/test.sh",
-    "tsc": "tsc",
-    "unit-test": "mocha --recursive ./unit_tests/headless/*.js"
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
