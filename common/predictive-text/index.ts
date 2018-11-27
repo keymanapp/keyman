@@ -32,15 +32,20 @@
  */	
 type USVString = string;
 
+// TODO: document
 type WorkerFactory = (uri: string) => Worker;
 
+// TODO: document
 class LMLayer {
+  // TODO: document
   private _worker: Worker;
 
+  // TODO: document
   constructor(workerFactory: WorkerFactory = (uri) => new Worker(uri)) {
-    this._worker = workerFactory("about:blank");
+    let blob = new Blob([], { type: 'text/javascript' });
+    let uri = URL.createObjectURL(blob);
+    this._worker = workerFactory(uri);
   }
-
 }
 
 // Let LMLayerWorker be available both in browser and in Node.
