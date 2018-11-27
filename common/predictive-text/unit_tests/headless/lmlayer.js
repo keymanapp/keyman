@@ -14,8 +14,8 @@ describe('LMLayer', function() {
    * .unwrap() is a static function that unwraps some function code.
    */
   describe('.unwrap', function () {
-    // Since the Blob API is DOM-specific, look for that code in the 
-    // in_browser tests.
+    // Since the Blob API is DOM-specific, look for those tests
+    // in the in_browser tests.
     it('should return the inner code of a function', function () {
       let text = LMLayer.unwrap(function hello() {
         var hello;

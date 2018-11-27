@@ -56,6 +56,17 @@ class LMLayer {
       let match = wrapper.match(/function[^{]+{((?:.|\n)+)}[^}]*$/);
       return match[1];
   }
+
+  /**
+   * Converts the INSIDE of a function into a blob URI that can
+   * be passed as a valid URI for a Worker.
+   * @param fn Function whose body will be referenced by a URI.
+   */
+  static asBlobURI(fn: Function): string {
+    let code = LMLayer.unwrap(fn);
+    let blob = new Blob([code], { type: 'text/javascript' });
+    return URL.createObjectURL(blob);
+  }
 }
 
 // Let LMLayerWorker be available both in browser and in Node.
