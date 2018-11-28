@@ -4,11 +4,10 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
-EMBEDDED_WORKER=embedded_worker.js
-
 # Include some helper functions from resources
-# shellcheck source=../../resources/shellHelperFunctions.sh
-. "$(dirname "$0")/../../resources/shellHelperFunctions.sh"
+. ../../resources/shellHelperFunctions.sh
+
+EMBEDDED_WORKER=embedded_worker.js
 
 
 # Build the worker and the main script.
