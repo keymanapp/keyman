@@ -269,7 +269,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
 
     topBar.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeight)).isActive = true
-//    topBar.bottomAnchor.constraint(equalTo: container.topAnchor, constant: CGFloat(8)).isActive = true;
 
     // Establishes a set of constraints for the keyboard's container, supporting autoresizing of
     // the keyboard's WebView via its constraints.

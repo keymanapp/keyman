@@ -60,15 +60,12 @@ class KeymanWebViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func manageRotation() {
+  func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
     
-    let kbWidth = view.bounds.size.width
-    let kbHeight = view.bounds.size.height
-    
-    setOskWidth(Int(kbWidth))
-    setOskHeight(Int(kbHeight))
+    setOskWidth(Int(view.bounds.size.width))
+    setOskHeight(Int(view.bounds.size.height))
   }
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -83,10 +80,10 @@ class KeymanWebViewController: UIViewController {
 
     coordinator.animateAlongsideTransition(in: nil, animation: {
       _ in
-        self.manageRotation()
+        self.fixLayout()
     }, completion: {
       _ in
-        self.manageRotation()
+        self.fixLayout()
         self.updateViewConstraints()
     })
   }
@@ -132,7 +129,7 @@ class KeymanWebViewController: UIViewController {
   
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
-    refreshKeyboard()
+    fixLayout()
   }
 }
 
@@ -405,10 +402,9 @@ extension KeymanWebViewController: KeymanWebDelegate {
         newKb = userKbs[0]
       }
       _ = Manager.shared.setKeyboard(newKb)
-      //refreshKeyboard()
     }
     
-    refreshKeyboard()
+    fixLayout()
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
     if shouldReloadKeyboard {
@@ -676,36 +672,9 @@ extension KeymanWebViewController {
     view.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
   }
 
-  func refreshKeyboard() {
-//    kbSize = CGSize.zero
-    resizeKeyboard(to: keyboardSize)
-  }
-
   // Keyman interaction
   func resizeKeyboard() {
-    resizeKeyboard(to: keyboardSize)
-  }
-
-  func resizeKeyboard(to size: CGSize) {
-    keyboardSize = size
-    
-    view.setNeedsLayout()
-    view.layoutIfNeeded()
-    
-    let kbWidth = view.bounds.size.width
-    let kbHeight = view.bounds.size.height
-    
-    setOskWidth(Int(kbWidth))
-    setOskHeight(Int(kbHeight))
-
-//    // TODO: Refactor to use resizeKeyboard()
-//    let kbWidth = size.width
-//    let kbHeight = size.height
-//
-//    //keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
-//    //keymanWeb.frame?.size = size
-//    setOskWidth(Int(kbWidth))
-//    setOskHeight(Int(kbHeight))
+    fixLayout()
   }
   
   func resetKeyboardState() {

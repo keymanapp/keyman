@@ -230,7 +230,7 @@ extension TextView: KeymanWebDelegate {
   }
 }
 
-// MARK: - UITextViewDelegate
+//// MARK: - UITextViewDelegate
 extension TextView: UITextViewDelegate {
   public func textViewDidChangeSelection(_ textView: UITextView) {
     // Workaround for iOS 7 UITextView scroll bug
@@ -278,50 +278,50 @@ extension TextView: UITextViewDelegate {
     return true
   }
 
-//  public func textViewDidBeginEditing(_ textView: UITextView) {
-//    //Manager.shared.keymanWeb.delegate = self
-//
-//    let fontName: String?
-//    if let id = Manager.shared.currentKeyboardID {
-//      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
-//    } else {
-//      fontName = nil
-//    }
-//    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-//    if let fontName = fontName {
-//      font = UIFont(name: fontName, size: fontSize)
-//    } else {
-//      font = UIFont.systemFont(ofSize: fontSize)
-//    }
-//
-//    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
-//
-//    // copy this textView's text to the webview
-//    Manager.shared.setText(text)
-//    Manager.shared.setSelectionRange(selectedRange, manually: false)
-//    log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
-//  }
-//
-//  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
-//                       replacementText text: String) -> Bool {
-//    // Enable text update to catch copy/paste operations
-//    shouldUpdateKMText = true
-//    return true
-//  }
-//
-//  public func textViewDidChange(_ textView: UITextView) {
-//    if shouldUpdateKMText {
-//      // Catches copy/paste operations
-//      Manager.shared.setText(textView.text)
-//      Manager.shared.setSelectionRange(textView.selectedRange, manually: false)
-//      shouldUpdateKMText = false
-//    }
-//  }
-//
-//  public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
-//    if textView == self {
-//      resignFirstResponder()
-//    }
-//    return true
-//  }
+  public func textViewDidBeginEditing(_ textView: UITextView) {
+    //Manager.shared.keymanWeb.delegate = self
+
+    let fontName: String?
+    if let id = Manager.shared.currentKeyboardID {
+      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
+    } else {
+      fontName = nil
+    }
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+
+    // copy this textView's text to the webview
+    Manager.shared.setText(text)
+    Manager.shared.setSelectionRange(selectedRange, manually: false)
+    log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
+  }
+
+  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
+                       replacementText text: String) -> Bool {
+    // Enable text update to catch copy/paste operations
+    shouldUpdateKMText = true
+    return true
+  }
+
+  public func textViewDidChange(_ textView: UITextView) {
+    if shouldUpdateKMText {
+      // Catches copy/paste operations
+      Manager.shared.setText(textView.text)
+      Manager.shared.setSelectionRange(textView.selectedRange, manually: false)
+      shouldUpdateKMText = false
+    }
+  }
+
+  public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+    if textView == self {
+      resignFirstResponder()
+    }
+    return true
+  }
 }

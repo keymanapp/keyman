@@ -275,38 +275,36 @@ extension TextField: UITextFieldDelegate {
     return true
   }
 
-//  public func textFieldDidBeginEditing(_ textField: UITextField) {
-//    Manager.shared.keymanWeb.delegate = self
-//
-//    let fontName: String?
-//    if let id = Manager.shared.currentKeyboardID {
-//      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
-//    } else {
-//      fontName = nil
-//    }
-//    let fontSize = font?.pointSize ?? UIFont.systemFontSize
-//    if let fontName = fontName {
-//      font = UIFont(name: fontName, size: fontSize)
-//    } else {
-//      font = UIFont.systemFont(ofSize: fontSize)
-//    }
-//
-//    log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
-//
-//    // copy this textField's text to the webview
-//    Manager.shared.setText(text)
-//    let textRange = selectedTextRange!
-//    let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-//                           length: offset(from: textRange.start, to: textRange.end))
-//    Manager.shared.setSelectionRange(newRange, manually: false)
-//    log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
-//  }
-//
-//  public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-//    if textField == self {
-//      resignFirstResponder()
-//    }
-//
-//    return true
-//  }
+  public func textFieldDidBeginEditing(_ textField: UITextField) {
+    let fontName: String?
+    if let id = Manager.shared.currentKeyboardID {
+      fontName = Manager.shared.fontNameForKeyboard(withFullID: id)
+    } else {
+      fontName = nil
+    }
+    let fontSize = font?.pointSize ?? UIFont.systemFontSize
+    if let fontName = fontName {
+      font = UIFont(name: fontName, size: fontSize)
+    } else {
+      font = UIFont.systemFont(ofSize: fontSize)
+    }
+
+    log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+
+    // copy this textField's text to the webview
+    Manager.shared.setText(text)
+    let textRange = selectedTextRange!
+    let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
+                           length: offset(from: textRange.start, to: textRange.end))
+    Manager.shared.setSelectionRange(newRange, manually: false)
+    log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
+  }
+
+  public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+    if textField == self {
+      resignFirstResponder()
+    }
+
+    return true
+  }
 }
