@@ -74,7 +74,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     var mainFrame = inputViewController.view.frame
     if mainFrame == CGRect.zero {
-      mainFrame = Manager.shared.keymanWeb.view.frame
+      // TODO:  Fix!
+      mainFrame = Manager.shared.inputViewController.keymanWeb.view.frame
     }
     super.init(frame: mainFrame)
 
@@ -83,8 +84,9 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
-    let vHeight = Manager.shared.keymanWeb.keyboardHeight + topBarHeight
-    let bY = Manager.shared.keymanWeb.keyboardHeight - (keyFrame.origin.y + baseHeight)
+    // TODO:  Fix!
+    let vHeight = Manager.shared.inputViewController.keymanWeb.keyboardHeight + topBarHeight
+    let bY = Manager.shared.inputViewController.keymanWeb.keyboardHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
       let maxRows = (vHeight - baseHeight - bY) / rowHeight
@@ -235,7 +237,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   @objc func tapAction(_ sender: UITapGestureRecognizer) {
-    Manager.shared.keymanWeb.dismissKeyboardMenu()
+    // TODO:  Fix!
+    Manager.shared.inputViewController.keymanWeb.dismissKeyboardMenu()
   }
 
   func numberOfSections(in tableView: UITableView) -> Int {
@@ -293,7 +296,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
-    Manager.shared.keymanWeb.dismissKeyboardMenu()
+    // TODO:  Fix!
+    Manager.shared.inputViewController.keymanWeb.dismissKeyboardMenu()
   }
 
   func getMaxWidth() -> CGFloat {

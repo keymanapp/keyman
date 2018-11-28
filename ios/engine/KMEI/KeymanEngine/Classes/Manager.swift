@@ -79,12 +79,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   var currentKeyboardID: FullKeyboardID?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
-  var keymanWeb: KeymanWebViewController!
+
+  var inputViewController: InputViewController!
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
   private var reachability: Reachability!
-  private var didSynchronize = false
+  var didSynchronize = false
 
   // MARK: - Object Admin
   deinit {
@@ -131,8 +132,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      */
     sharedQueue = HTTPDownloader.init(self)
 
-    keymanWeb = KeymanWebViewController(storage: Storage.active)
-    _ = keymanWeb.view
+    inputViewController = InputViewController()
+    // We used to preload the old KeymanWebViewController, but now that it's embedded within the
+    // InputViewController, that's not exactly viable.
   }
 
   // MARK: - Keyboard management
@@ -175,14 +177,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
     }
 
-    keymanWeb.setKeyboard(kb)
+    inputViewController.setKeyboard(kb)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     userData.currentKeyboardID = kb.fullID
     userData.synchronize()
 
     if isKeymanHelpOn {
-      keymanWeb.showHelpBubble(afterDelay: 1.5)
+      inputViewController.showHelpBubble(afterDelay: 1.5)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
@@ -713,7 +715,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                           value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
-            keymanWeb.reloadKeyboard()
+            inputViewController.reload()
           }
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -853,7 +855,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     viewController.dismiss(animated: false)
     showKeyboard()
     if shouldReloadKeyboard {
-      keymanWeb.reloadKeyboard()
+      inputViewController.reload()
     }
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
@@ -863,7 +865,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // TODO: Switch from NSRange
   func setSelectionRange(_ range: NSRange, manually: Bool) {
     if range.location != NSNotFound {
-      keymanWeb.setCursorRange(range)
+      inputViewController.setCursorRange(range)
     }
   }
 
@@ -874,18 +876,19 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   func setText(_ text: String?) {
-    keymanWeb.setText(text)
+    inputViewController.setText(text)
   }
 
-  // MARK: - KeymanWebViewDelegate methods
   public func showKeyboard() {
-    keymanWeb.delegate?.resumeKeyboard()
-    keymanWeb.refreshKeyboard()
+    // TODO:  Fix!
+    //keymanWeb.delegate?.resumeKeyboard()
+    //keymanWeb.refreshKeyboard()
   }
   
   public func hideKeyboard() {
-    keymanWeb.delegate?.dismissKeyboard()
-    keymanWeb.resetKeyboardState()
+    // TODO:  Fix!
+    //keymanWeb.delegate?.dismissKeyboard()
+    //keymanWeb.resetKeyboardState()
   }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
@@ -894,41 +897,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - InputViewController methods
   // TODO: Manager should not have InputViewController methods. Move this into InputViewController.
-  func updateViewConstraints() {
-    keymanWeb.resetKeyboardState()
-  }
-
-  func inputViewDidLoad() {
-    keymanWeb.resetKeyboardState()
-
-    let activeUserDef = Storage.active.userDefaults
-    let standardUserDef = UserDefaults.standard
-    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-
-    let shouldSynchronize: Bool
-    if let standardDate = standardDate,
-       let activeDate = activeDate {
-      shouldSynchronize = standardDate != activeDate
-    } else if activeDate == nil {
-      shouldSynchronize = false
-    } else {
-      shouldSynchronize = true
-    }
-
-    if (!didSynchronize || shouldSynchronize) && Storage.shared != nil {
-      synchronizeSWKeyboard()
-      if currentKeyboardID != nil {
-        shouldReloadKeyboard = true
-        keymanWeb.reloadKeyboard()
-      }
-      didSynchronize = true
-      standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),
-                          forKey: Key.synchronizeSWKeyboard)
-      standardUserDef.synchronize()
-    }
-  }
-
   var isSystemKeyboardTopBarEnabled: Bool {
     return true
   }

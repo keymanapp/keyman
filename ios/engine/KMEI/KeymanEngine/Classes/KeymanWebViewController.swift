@@ -52,36 +52,12 @@ class KeymanWebViewController: UIViewController {
   init(storage: Storage) {
     self.storage = storage
     super.init(nibName: nil, bundle: nil)
+    
+    _ = view
   }
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-  
-  func initConstraints() {
-    if let pv = self.parent?.view! {
-      // Attempting to utilize constraints now...
-      if #available(iOSApplicationExtension 11.0, *) {
-        // "safeAreaLayoutGuide" considers the iPhone X notch.
-        let constraintWidth = webView.widthAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.widthAnchor)
-        constraintWidth.priority = .init(999) // One beneath the 'required' level.
-        constraintWidth.isActive = true
-        
-        webView.centerXAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.centerXAnchor).isActive = true
-        webView.bottomAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.bottomAnchor).isActive = true
-
-        let constraintHeight = webView.heightAnchor.constraint(equalTo: pv.safeAreaLayoutGuide.heightAnchor)
-        constraintHeight.priority = .init(999)
-        constraintHeight.isActive = true
-      } else if #available(iOSApplicationExtension 9.0, *) {
-        webView.leadingAnchor.constraint(equalTo: webView.layoutMarginsGuide.leadingAnchor).isActive = true
-        webView.trailingAnchor.constraint(equalTo: webView.layoutMarginsGuide.trailingAnchor).isActive = true
-        webView.topAnchor.constraint(equalTo: webView.layoutMarginsGuide.topAnchor).isActive = true
-        webView.bottomAnchor.constraint(equalTo: webView.layoutMarginsGuide.bottomAnchor).isActive = true
-      } else {
-        // Fallback on earlier versions
-      }
-    }
   }
   
   func manageRotation() {
@@ -98,8 +74,8 @@ class KeymanWebViewController: UIViewController {
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
 
-    setKeyboardSize(size: size)
-    resetKeyboardState()
+//    keyboardSize = size
+//    resetKeyboardState()
 
     if Manager.shared.isKeymanHelpOn {
       showHelpBubble(afterDelay: 1.5)
@@ -156,9 +132,6 @@ class KeymanWebViewController: UIViewController {
   
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
-    //view.frame = self.parent?.view?.frame ?? view.frame
-    initConstraints()
-    self.updateViewConstraints()
     refreshKeyboard()
   }
 }
@@ -676,16 +649,22 @@ extension KeymanWebViewController {
     }
   }
   
-  func setKeyboardSize(size: CGSize) {
-    kbSize = size
-  }
-
   var keyboardSize: CGSize {
-    if kbSize.equalTo(CGSize.zero) {
-      initKeyboardSize()
+    get {
+      if kbSize.equalTo(CGSize.zero) {
+        initKeyboardSize()
+      }
+      
+      return kbSize
     }
-    
-    return kbSize
+    set(size) {
+      // DO NOT keep like this for the final version.
+      if size.height == 0 {
+        kbSize = CGSize(width: size.width, height: 100)
+      } else {
+        kbSize = size
+      }
+    }
   }
 
   @objc func resizeDelay() {
@@ -698,7 +677,7 @@ extension KeymanWebViewController {
   }
 
   func refreshKeyboard() {
-    kbSize = CGSize.zero
+//    kbSize = CGSize.zero
     resizeKeyboard(to: keyboardSize)
   }
 
@@ -708,16 +687,25 @@ extension KeymanWebViewController {
   }
 
   func resizeKeyboard(to size: CGSize) {
-    setKeyboardSize(size: size)
-
-    // TODO: Refactor to use resizeKeyboard()
-    let kbWidth = size.width
-    let kbHeight = size.height
-
-    //keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
-    //keymanWeb.frame?.size = size
+    keyboardSize = size
+    
+    view.setNeedsLayout()
+    view.layoutIfNeeded()
+    
+    let kbWidth = view.bounds.size.width
+    let kbHeight = view.bounds.size.height
+    
     setOskWidth(Int(kbWidth))
     setOskHeight(Int(kbHeight))
+
+//    // TODO: Refactor to use resizeKeyboard()
+//    let kbWidth = size.width
+//    let kbHeight = size.height
+//
+//    //keymanWeb.frame = keymanWeb.parent?.view.frame //CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
+//    //keymanWeb.frame?.size = size
+//    setOskWidth(Int(kbWidth))
+//    setOskHeight(Int(kbHeight))
   }
   
   func resetKeyboardState() {
