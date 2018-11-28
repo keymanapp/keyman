@@ -90,7 +90,7 @@ namespace km {
         {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {1} });
+          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} });
           break;
 
         default:
