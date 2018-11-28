@@ -6,6 +6,7 @@ import urllib.parse
 import pathlib
 import subprocess
 import webbrowser
+
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
@@ -13,6 +14,7 @@ from gi.repository import Gtk, WebKit2
 from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from keyman_config.install_window import InstallKmpWindow
 from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.get_info import GetInfo
 
 class DownloadKmpWindow(Gtk.Window):
 
@@ -49,6 +51,7 @@ class DownloadKmpWindow(Gtk.Window):
         vbox.pack_start(bbox, False, False, 12)
 
         self.add(vbox)
+        self.getinfo = GetInfo(self.viewwindow.incomplete_kmp)
 
     def process_kmp(self, url, downloadfile):
         logging.info("Downloading kmp file to %s", downloadfile)
