@@ -6,6 +6,11 @@
 
 EMBEDDED_WORKER=embedded_worker.js
 
+# Include some helper functions from resources
+# shellcheck source=../../resources/shellHelperFunctions.sh
+. "$(dirname "$0")/../../resources/shellHelperFunctions.sh"
+
+
 # Build the worker and the main script.
 build ( ) {
   # Build worker first; the main file depends on it.
@@ -40,21 +45,6 @@ display_usage ( ) {
   echo "  -help               displays this screen and exits"
   echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
   echo "  -test               runs unit and integration tests after building"
-}
-
-# Prints a nice, common error message.
-fail ( ) {
-  # TODO: source shellHelperFunctions.sh
-  local ERROR_RED
-  local NORMAL
-  ERROR_RED="$(tput setaf 1)"
-  NORMAL="$(tput sgr0)"
-  FAILURE_MSG="$1"
-  if [[ "$FAILURE_MSG" == "" ]]; then
-    FAILURE_MSG="Unknown failure."
-  fi
-  echo "$0: ${ERROR_RED}$FAILURE_MSG${NORMAL}"
-  exit 1
 }
 
 unit-test ( ) {
