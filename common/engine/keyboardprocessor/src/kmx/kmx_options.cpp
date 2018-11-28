@@ -27,7 +27,7 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   }
 }
 
-void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
+void KMX_Options::Load(km::kbp::options *options, std::u16string const &key) {
   LPSTORE sp;
   int i;
 
@@ -135,7 +135,7 @@ void KMX_Options::Set(int nStoreToSet, int nStoreToRead)
   _kp->Keyboard->dpStoreArray[nStoreToSet].dpString = _kp->KeyboardOptions[nStoreToSet].Value;
 }
 
-void KMX_Options::Reset(km_kbp_options *options, int nStoreToReset)
+void KMX_Options::Reset(km::kbp::options *options, int nStoreToReset)
 {
   assert(_kp != NULL);
   assert(_kp->Keyboard != NULL);

@@ -24,14 +24,14 @@ namespace km {
       }
     }
 
-    void kmx_processor::init_state(std::vector<km_kbp_option_item> *default_env) {
-      _kmx.GetEnvironment()->Init(default_env);
+    void kmx_processor::init_state(environment_store & default_env) {
+      _kmx.GetEnvironment()->Init(&default_env);
     }
 
     void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {
       switch(scope) {
         case KM_KBP_OPT_KEYBOARD:
-          _kmx.GetOptions()->Load(km_kbp_state_options(state), key);
+          _kmx.GetOptions()->Load(&state->options(), key);
           break;
         case KM_KBP_OPT_ENVIRONMENT:
           _kmx.GetEnvironment()->Load(key, value);

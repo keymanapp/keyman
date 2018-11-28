@@ -2,6 +2,8 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
+#include "state.hpp"
+
 #include "kmx_processor.h"
 
 using namespace km::kbp::kmx;
@@ -401,7 +403,7 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Reset(km_kbp_state_options(m_kbp_state), n1);
+        GetOptions()->Reset(&m_kbp_state->options(), n1);
         break;
       case CODE_SAVEOPT:
         p++;

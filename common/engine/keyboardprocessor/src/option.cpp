@@ -68,7 +68,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
       save = option(scope, key, value);
 
       //((km::kbp::state *)state)->keyboard().
-      const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+      const_cast<km::kbp::abstract_processor &>(state->keyboard().processor()).update_option(state, scope, key, value);
 
       return &save;
     }
@@ -80,6 +80,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
 
   return &_saved.back();
 }
+
 
 void options::reset(km_kbp_option_scope scope, std::u16string const & key)
 {

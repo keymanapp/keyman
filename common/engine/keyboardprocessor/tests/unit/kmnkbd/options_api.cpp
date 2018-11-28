@@ -59,12 +59,12 @@ namespace
                                               &empty_options);
 #endif
 
-  std::string get_json_doc(km_kbp_options * const opts)
+  std::string get_json_doc(km_kbp_state * const state)
   {
     size_t sz = 0;
-    try_status(km_kbp_options_to_json(opts, nullptr, &sz));
+    try_status(km_kbp_state_options_to_json(state, nullptr, &sz));
     std::string buf(sz-1, 0);
-    try_status(km_kbp_options_to_json(opts, &buf[0], &sz));
+    try_status(km_kbp_state_options_to_json(state, &buf[0], &sz));
 
     return buf;
   }
@@ -74,7 +74,7 @@ namespace
   {
 #if 0
     km_kbp_cp const * ret = nullptr;
-    auto s = km_kbp_options_lookup(api_mock_options, scope,
+    auto s = km_kbp_state_option_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
     bool v = s == KM_KBP_STATUS_OK && ret == value;
@@ -84,7 +84,7 @@ namespace
     return v;
 #else
     return true;
-#endif;
+#endif
   }
 
 constexpr char const *empty_json = "\

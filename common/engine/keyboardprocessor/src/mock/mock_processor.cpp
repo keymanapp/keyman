@@ -9,10 +9,12 @@
   Authors:      Tim Eves (TSE)
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
+#include <cassert>
 
 #include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 #include "state.hpp"
+
 
 namespace
 {
@@ -74,7 +76,12 @@ namespace km {
   namespace kbp
   {
 
-    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
+    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state)
+    {
+      assert(state);
+      if (!state)
+        return KM_KBP_STATUS_INVALID_ARGUMENT;
+
       try
       {
         state->actions.clear();
@@ -84,7 +91,6 @@ namespace km {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
           state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {1} });
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
           break;
 
         default:
@@ -98,7 +104,7 @@ namespace km {
             for (auto c = char_seq; *c; ++c)
             {
               km_kbp_usv usv = *c;
-              state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR,{0,},{usv} });
+              state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR,{0,}, {usv} });
               state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
             }
             state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
@@ -108,10 +114,11 @@ namespace km {
 
           // Both shift states output nothing, generate an alert.
           state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_ALERT, {0,}, {0} });
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
           break;
         }
         }
+
+        state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
       }
       catch (std::bad_alloc)
       {
@@ -123,7 +130,8 @@ namespace km {
 
     }
 
-    km_kbp_attr const * mock_processor::get_attrs() const {
+    km_kbp_attr const * mock_processor::get_attrs() const
+    {
       return &engine_attrs;
     }
 

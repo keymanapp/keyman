@@ -226,15 +226,15 @@ int run_test(const std::string & file) {
   std::u16string expected = u"", context = u"";
   kmx_options options;
   bool expected_beep = false;
-  
+
   int result = load_source(file, keys, expected, context, options, expected_beep);
   if (result != 0) return result;
 
   std::cout << "file = " << file << std::endl;
-  
+
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
-    
+
   try_status(km_kbp_keyboard_load(std::filesystem::path(base + file + ".kmx").c_str(), &test_kb));
 
   // Setup state, environment
@@ -279,7 +279,7 @@ int run_test(const std::string & file) {
 
     keyboard_opts[i] = KM_KBP_OPTIONS_END;
 
-    try_status(km_kbp_options_update(test_state, keyboard_opts));
+    try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
     delete keyboard_opts;
   }
@@ -324,12 +324,12 @@ int run_test(const std::string & file) {
 
   // Test resultant options
   // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
-  
+
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type != KOT_OUTPUT) continue;
     std::cout << "output option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value);
     km_kbp_cp const *value;
-    try_status(km_kbp_options_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+    try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
     std::cout << " actual: " << utf16_to_utf8(value) << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
     km_kbp_cp_dispose(value);
@@ -381,9 +381,9 @@ std::u16string parse_source_string(std::string const & s) {
 bool parse_option_string(std::string line, kmx_options &options, kmx_option_type type) {
   auto x = line.find('=');
   if (x == std::string::npos) return false;
-  
+
   kmx_option o;
-  
+
   o.type = type;
   o.key = parse_source_string(line.substr(0, x));
   o.value = parse_source_string(line.substr(x + 1));
@@ -463,5 +463,3 @@ int main(int argc, char *argv[])
   }
   return 0;
 }
-
-

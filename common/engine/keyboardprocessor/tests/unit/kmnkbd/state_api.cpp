@@ -127,8 +127,6 @@ int main(int, char * [])
   // Check sub objects have been copied and not shared.
   if (km_kbp_state_context(test_state) == km_kbp_state_context(test_clone))
     return __LINE__;
-  if (km_kbp_state_options(test_state) == km_kbp_state_options(test_clone))
-    return __LINE__;
   size_t n_actions = 0;
   if (km_kbp_state_action_items(test_state, &n_actions) == nullptr
       && n_actions != 0)
@@ -148,8 +146,7 @@ int main(int, char * [])
   km_kbp_option_item new_opt[] = {
     {u"hello", u"globe", KM_KBP_OPT_ENVIRONMENT},
     KM_KBP_OPTIONS_END};
-  try_status(
-    km_kbp_options_update(test_clone, new_opt));
+  try_status(km_kbp_state_options_update(test_clone, new_opt));
 
   // Test the engine
   auto attrs = km_kbp_get_engine_attrs(test_state);

@@ -3,7 +3,10 @@
 
 #include <string>
 #include <vector>
+
 #include <keyman/keyboardprocessor.h>
+#include "option.hpp"
+
 #include "kmx_base.h"
 
 namespace km {
@@ -22,9 +25,9 @@ public:
   ~KMX_Options();
 
   void Init(std::vector<km_kbp_option_item> *opts);
-  void Load(km_kbp_options *options, std::u16string const &key);
+  void Load(km::kbp::options *options, std::u16string const &key);
   void Set(int nStoreToSet, int nStoreToRead);
-  void Reset(km_kbp_options *options, int nStoreToReset);
+  void Reset(km::kbp::options *options, int nStoreToReset);
   void Save(km_kbp_state *state, int nStoreToSave);
 };
 

@@ -128,7 +128,6 @@ typedef uint32_t    km_kbp_status;      // Status return code.
 typedef struct km_kbp_context     km_kbp_context;
 typedef struct km_kbp_keyboard    km_kbp_keyboard;
 typedef struct km_kbp_state       km_kbp_state;
-typedef struct km_kbp_options     km_kbp_options;
 
 // Forward declarations
 //
@@ -498,7 +497,7 @@ km_kbp_options_list_size(km_kbp_option_item const *opts);
 
 /*
 ```
-### `km_kbp_options_lookup`
+### `km_kbp_state_option_lookup`
 ##### Description:
 Lookup an option based on its key, in an options list.
 ##### Return status:
@@ -519,14 +518,14 @@ Lookup an option based on its key, in an options list.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_lookup(km_kbp_state const *state,
+km_kbp_state_option_lookup(km_kbp_state const *state,
                       uint8_t scope,
                       km_kbp_cp const *key,
                       km_kbp_cp const **value);
 
 /*
 ```
-### `km_kbp_options_update`
+### `km_kbp_state_options_update`
 ##### Description:
 Adds or updates one or more options from a list of `km_kbp_option_item`s.
 ##### Return status:
@@ -535,7 +534,7 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __state__: An opaque pointer to a `km_kbp_state`.
+- __state__: An opaque pointer to a state object.
 - __new_opts__: An array of `km_kbp_option_item` objects to update or add. Must be
     terminated with `KM_KBP_OPTIONS_END`.
 
@@ -543,12 +542,12 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_update(km_kbp_state *state,
+km_kbp_state_options_update(km_kbp_state *state,
                       km_kbp_option_item const *new_opts);
 
 /*
 ```
-### `km_kbp_options_to_json`
+### `km_kbp_state_options_to_json`
 ##### Description:
 Export the contents of a `km_kbp_options` array to a JSON formatted document and
 place it in the supplied buffer, reporting how much space was used. If null is
@@ -560,7 +559,7 @@ undefined. The returned buffer uses UTF-8 encoding.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
-- __opts__: An opaque pointer to an options object.
+- __opts__: An opaque pointer to a state object.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
 document into, can be null.
 - __space__: A pointer to a size_t variable. This variable must contain the
@@ -571,7 +570,7 @@ null. On return it will hold how many bytes were used.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_to_json(km_kbp_options const *opts,
+km_kbp_state_options_to_json(km_kbp_state const *state,
                        char *buf,
                        size_t *space);
 
@@ -758,23 +757,6 @@ of the state object. If null is passed in, then null is returned.
 KMN_API
 km_kbp_context *
 km_kbp_state_context(km_kbp_state *state);
-
-/*
-```
-### `km_kpb_state_options`
-##### Description:
-Get access to the state object's options.
-##### Return:
-A pointer to an opaque state object. This pointer is valid for the lifetime
-of the state object. If null is passed in, then null is returned.
-##### Parameters:
-- __state__: A pointer to the opaque state object to be queried.
-
-```c
-*/
-KMN_API
-km_kbp_options *
-km_kbp_state_options(km_kbp_state *state);
 
 /*
 ```

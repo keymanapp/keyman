@@ -69,7 +69,6 @@ namespace kbp
 
   class options
   {
-    //km_kbp_keyboard_attrs const &_kb;
     km_kbp_option_item const * _scopes[KM_KBP_OPT_MAX_SCOPES-1];
     std::vector<option>   _saved;
 
@@ -101,7 +100,3 @@ namespace kbp
 
 } // namespace kbp
 } // namespace km
-
-
-// Adaptor between internal km::kbp::options object and API definitiion.
-struct km_kbp_options: public km::kbp::options {};

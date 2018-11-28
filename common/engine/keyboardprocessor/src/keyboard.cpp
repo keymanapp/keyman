@@ -39,6 +39,7 @@ keyboard::keyboard(std::filesystem::path const & path)
   default_options = _default_opts.data();
 }
 
+
 json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
 {
   j << json::object
