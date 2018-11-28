@@ -26,7 +26,7 @@ build-worker () {
 
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
-  rm -f "${EMBEDDED_WORKER}"
+  rm -f "${EMBEDDED_WORKER}" index.js index.js.map
   if [ $? -ne 0 ]; then
     fail "Failed to erase the prior build."
   fi
