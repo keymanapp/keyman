@@ -24,32 +24,8 @@ public enum KeyboardState {
   case none
 }
 
-// Strings
-private let keyboardChangeHelpText = "Tap here to change keyboard"
-
 // URLs - used for reachability test
 private let keymanHostName = "api.keyman.com"
-
-// UI In-App Keyboard Constants
-/*
-These values are currently determined by the default keyboard size
- provided by iOS. TODO: In the future, we may want to allow a custom size
-to cater for larger keyboard layouts. This can be achieved by
-implementing allowsSelfSizing:
-https://stackoverflow.com/questions/33261686/how-can-i-set-height-of-custom-inputview
-
-private let phonePortraitInAppKeyboardHeight: CGFloat = 253.0
-private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
-private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
-private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
-*/
-
-// UI System Keyboard Constants
-private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
-private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
-private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
-private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
-
 
 public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
@@ -104,32 +80,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
-  var keymanWeb: KeymanWebViewController! = nil
+  var keymanWeb: KeymanWebViewController!
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
   private var reachability: Reachability!
   private var didSynchronize = false
-  private var didResizeToOrientation = false
-  private var useSpecialFontForSubkeys = false
-
-  private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
-  private let subKeyColorHighlighted = #colorLiteral(red: 136.0 / 255.0, green: 136.0 / 255.0, blue: 1.0, alpha: 1.0)
-
-  // Views
-  private var helpBubbleView: PopoverView?
-  private var keyPreviewView: KeyPreviewView?
-  private var subKeysView: SubKeysView?
-  private var keyboardMenuView: KeyboardMenuView?
-
-  // Arrays
-  private var subKeyIDs: [String] = []
-  private var subKeyTexts: [String] = []
-  private var subKeys: [UIButton] = []
-
-  // Key frames
-  private var keyFrame = CGRect.zero
-  private var menuKeyFrame = CGRect.zero
 
   // MARK: - Object Admin
   deinit {
@@ -161,24 +117,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       log.error("Failed to copy KMW files from bundle: \(error)")
     }
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-                                           name: .UIKeyboardWillShow, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-                                           name: .UIKeyboardWillHide, object: nil)
-
     updateUserKeyboards(with: Defaults.keyboard)
-
-    keymanWeb = KeymanWebViewController(storage: Storage.active)
-    keymanWeb.frame = CGRect(origin: .zero, size: keyboardSize)
-    keymanWeb.delegate = self
-    reloadKeyboard(in: keymanWeb)
-
-    // Set UILongPressGestureRecognizer to show sub keys
-    // TODO: Move to KeymanWebViewController
-    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
-    hold.minimumPressDuration = 0.5
-    hold.delegate = self
-    keymanWeb.view.addGestureRecognizer(hold)
 
     reachability = Reachability(hostName: keymanHostName)
 
@@ -192,6 +131,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      * set the queue running, this should be perfectly fine.
      */
     sharedQueue = HTTPDownloader.init(self)
+
+    keymanWeb = KeymanWebViewController(storage: Storage.active)
+    keymanWeb.delegate = self
+    _ = keymanWeb.view
   }
 
   // MARK: - Keyboard management
@@ -241,10 +184,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     userData.synchronize()
 
     if isKeymanHelpOn {
-      helpBubbleView?.removeFromSuperview()
-      let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: showHelpBubble, object: nil)
-      perform(showHelpBubble, with: nil, afterDelay: 1.5)
+      keymanWeb.showHelpBubble(afterDelay: 1.5)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
@@ -775,7 +715,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                           value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
-            reloadKeyboard(in: keymanWeb)
+            keymanWeb.reloadKeyboard()
           }
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -881,85 +821,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - View management
 
-  public var keyboardHeight: CGFloat {
-    if isSystemKeyboard {
-      return keyboardHeight(isPortrait: InputViewController.isPortrait)
-    } else {
-      return keyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
-    }
-  }
-
-  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
-    return keyboardHeight(isPortrait: orientation.isPortrait)
-  }
-
-  func keyboardHeight(isPortrait: Bool) -> CGFloat {
-    let parentHeight: CGFloat = keymanWeb.parent != nil ? keymanWeb.parent!.view.frame.height : CGFloat(100.0)
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return isSystemKeyboard ? padPortraitSystemKeyboardHeight : parentHeight
-      } else {
-        return isSystemKeyboard ? padLandscapeSystemKeyboardHeight : parentHeight
-      }
-    } else {
-      if isPortrait {
-        return isSystemKeyboard ? phonePortraitSystemKeyboardHeight : parentHeight
-      } else {
-        return isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : parentHeight
-      }
-    }
-  }
-
-  var keyboardWidth: CGFloat {
-    return UIScreen.main.bounds.width
-  }
-
-  var keyboardSize: CGSize {
-    return CGSize(width: keyboardWidth, height: keyboardHeight)
-  }
-
-  private var keymanScrollView: UIScrollView {
-    return keymanWeb.webView.scrollView
-  }
-
-  @objc func clearSubKeyArrays() {
-    if subKeysView == nil {
-      subKeys.removeAll()
-      subKeyIDs.removeAll()
-      subKeyTexts.removeAll()
-    }
-  }
-
-  @objc func dismissHelpBubble() {
-    if let view = helpBubbleView {
-      view.removeFromSuperview()
-      helpBubbleView = nil
-    }
-  }
-
-  @objc func dismissKeyPreview() {
-    if let view = keyPreviewView {
-      view.removeFromSuperview()
-      keyPreviewView = nil
-    }
-  }
-
-  var isSubKeysMenuVisible: Bool {
-    return subKeysView != nil
-  }
-
-  private func dismissSubKeys() {
-    if let subKeysView = subKeysView {
-      subKeysView.removeFromSuperview()
-      subKeysView.subviews.forEach { $0.removeFromSuperview() }
-      self.subKeysView = nil
-      keymanWeb.setPopupVisible(false)
-    }
-    subKeys.removeAll()
-    subKeyIDs.removeAll()
-    subKeyTexts.removeAll()
-  }
-
   /// Displays a list of available keyboards and allows a user to add/download new keyboards
   /// or remove existing ones.
   ///
@@ -969,6 +830,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - SeeAlso:
   /// TextView/TextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
+    hideKeyboard()
     let vc = KeyboardPickerViewController()
     let nc = UINavigationController(rootViewController: vc)
     nc.modalTransitionStyle = .coverVertical
@@ -991,22 +853,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
     // true source of the problems.
     viewController.dismiss(animated: false)
+    showKeyboard()
     if shouldReloadKeyboard {
-      reloadKeyboard(in: keymanWeb)
+      keymanWeb.reloadKeyboard()
     }
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
-  }
-
-  private func reloadKeyboard(in keymanWeb: KeymanWebViewController) {
-    if #available(iOS 9.0, *) {
-      keymanWeb.webView.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
-    } else {
-      // WKWebView in iOS < 9 is missing loadFileURL().
-      let request = URLRequest(url: Storage.active.kmwURL,
-                               cachePolicy: .reloadIgnoringCacheData,
-                               timeoutInterval: 60.0)
-      keymanWeb.webView.load(request)
-    }
   }
 
   @objc func resetKeyboard() {
@@ -1020,94 +871,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     } else {
       _ = setKeyboard(Defaults.keyboard)
     }
-  }
-
-  @objc func showHelpBubble() {
-    // Help bubble is always disabled for system-wide keyboard
-    if Manager.shared.isSystemKeyboard || keyboardMenuView != nil {
-      return
-    }
-
-    keymanWeb.languageMenuPosition { keyFrame in
-      self.showHelpBubble(for: keyFrame)
-    }
-  }
-
-  // TODO: The bulk of this should be moved to PopoverView
-  func showHelpBubble(for keyFrame: CGRect) {
-    self.helpBubbleView?.removeFromSuperview()
-    let helpBubbleView = PopoverView(frame: CGRect.zero)
-    self.helpBubbleView = helpBubbleView
-    helpBubbleView.backgroundColor = UIColor(red: 253.0 / 255.0, green: 244.0 / 255.0,
-                                             blue: 196.0 / 255.0, alpha: 1.0)
-    helpBubbleView.backgroundColor2 = UIColor(red: 233.0 / 255.0, green: 224.0 / 255.0,
-                                              blue: 176.0 / 255.0, alpha: 1.0)
-    helpBubbleView.borderColor = UIColor(red: 0.5, green: 0.25, blue: 0.25, alpha: 1.0)
-
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    let sizeMultiplier = CGFloat(isPad ? 1.5 : 1.0)
-    let popupWidth = 90.0 * sizeMultiplier
-    let popupHeight = 40.0 * sizeMultiplier + helpBubbleView.arrowHeight
-    let fontSize = 10.0 * sizeMultiplier
-
-    let inputViewFrame = keymanWeb.view.frame
-    let screenWidth = inputViewFrame.size.width
-
-    let x = CGFloat.maximum(0, CGFloat.minimum(screenWidth - popupWidth, keyFrame.midX - popupWidth / 2))
-    let adjY = CGFloat(3.0)  // Tweak the positioning of the popup
-    let y = keyFrame.minY - popupHeight + adjY
-
-    helpBubbleView.frame = CGRect(x: x, y: y, width: popupWidth, height: popupHeight)
-    helpBubbleView.arrowPosX = keyFrame.midX - x
-
-    let helpText = UILabel(frame: CGRect(x: 5,
-                                         y: 0,
-                                         width: popupWidth - 10,
-                                         height: popupHeight - helpBubbleView.arrowHeight))
-    helpText.backgroundColor = UIColor.clear
-    helpText.font = helpText.font.withSize(fontSize)
-    helpText.textAlignment = .center
-    helpText.textColor = UIColor.darkText
-    helpText.lineBreakMode = .byWordWrapping
-    helpText.numberOfLines = 0
-    helpText.text = keyboardChangeHelpText
-    helpBubbleView.addSubview(helpText)
-    keymanWeb.view.addSubview(helpBubbleView)
-  }
-
-  @objc func resizeDelay() {
-    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
-    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
-    // should hopefully work on all devices.
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight
-    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
-  }
-
-  func resizeKeyboardIfNeeded() {
-    // TODO: Eliminate this function; performance cost of resizing is
-    //       probably minimal if no resizing actually happens
-    resizeKeyboard()
-  }
-
-  // Keyman interaction
-  private func resizeKeyboard() {
-    let newSize = keyboardSize
-
-    keymanWeb.frame = CGRect(origin: .zero, size: newSize)
-    keymanWeb.setOskWidth(Int(newSize.width))
-    keymanWeb.setOskHeight(Int(newSize.height))
-  }
-
-  func resizeKeyboard(with orientation: UIInterfaceOrientation) {
-    // TODO: Update to use new size instead of orientation since viewWillRotate() is deprecated
-    // TODO: Refactor to use resizeKeyboard()
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight(with: orientation)
-    keymanWeb.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight)
-
-    keymanWeb.setOskWidth(Int(kbWidth))
-    keymanWeb.setOskHeight(Int(kbHeight))
   }
 
   // MARK: - Text
@@ -1129,32 +892,12 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     keymanWeb.setText(text)
   }
 
-  // MARK: - Keyboard Notifications
-  @objc func keyboardWillShow(_ notification: Notification) {
-    dismissSubKeys()
-    dismissKeyPreview()
-    resizeKeyboard()
-
-    if isKeymanHelpOn {
-      helpBubbleView?.removeFromSuperview()
-      let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: showHelpBubble, object: nil)
-      perform(showHelpBubble, with: nil, afterDelay: 1.5)
-    }
-  }
-
-  @objc func keyboardWillHide(_ notification: Notification) {
-    dismissHelpBubble()
-    dismissSubKeys()
-    dismissKeyPreview()
-  }
-
   // MARK: - KeymanWebViewDelegate methods
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
-    resizeKeyboard()
+    keymanWeb.resizeKeyboard()
     keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
 
     var newKb = Defaults.keyboard
@@ -1180,43 +923,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     keymanWebDelegate?.insertText(keymanWeb, numCharsToDelete: numCharsToDelete, newText: newText)
-
-    dismissHelpBubble()
-    isKeymanHelpOn = false
   }
 
   func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {
     keymanWebDelegate?.showKeyPreview(keymanWeb, keyFrame: keyFrame, preview: preview)
-
-    if UIDevice.current.userInterfaceIdiom == .pad
-      || (Manager.shared.isSystemKeyboard && !isSystemKeyboardTopBarEnabled)
-      || subKeysView != nil {
-      return
-    }
-
-    dismissKeyPreview()
-    clearSubKeyArrays()
-
-    keyPreviewView = KeyPreviewView(frame: keyFrame)
-
-    keyPreviewView!.setLabelText(preview)
-    var oskFontName = oskFontNameForKeyboard(withFullID: currentKeyboardID!)
-    oskFontName = oskFontName ?? fontNameForKeyboard(withFullID: currentKeyboardID!)
-    keyPreviewView!.setLabelFont(oskFontName)
-    keymanWeb.view.addSubview(keyPreviewView!)
   }
 
   func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.dismissKeyPreview(keymanWeb)
-
-    if UIDevice.current.userInterfaceIdiom == .pad || keyPreviewView == nil {
-      return
-    }
-
-    let dismissKeyPreview = #selector(self.dismissKeyPreview as () -> Void)
-    NSObject.cancelPreviousPerformRequests(withTarget: self, selector: dismissKeyPreview, object: nil)
-    perform(dismissKeyPreview, with: nil, afterDelay: 0.1)
-    clearSubKeyArrays()
   }
 
   func showSubkeys(_ keymanWeb: KeymanWebViewController,
@@ -1229,16 +943,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                    subkeyIDs: subkeyIDs,
                                    subkeyTexts: subkeyTexts,
                                    useSpecialFont: useSpecialFont)
-
-    dismissHelpBubble()
-    isKeymanHelpOn = false
-    dismissSubKeys()
-    dismissKeyboardMenu()
-
-    self.keyFrame = keyFrame
-    subKeyIDs = subkeyIDs
-    subKeyTexts = subkeyTexts
-    useSpecialFontForSubkeys = useSpecialFont
   }
 
   func menuKeyDown(_ keymanWeb: KeymanWebViewController) {
@@ -1247,14 +951,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.menuKeyUp(keymanWeb)
-
-    dismissHelpBubble()
-    isKeymanHelpOn = false
-    if Manager.shared.isSystemKeyboard {
-      let userData = UserDefaults.standard
-      userData.set(true, forKey: Key.keyboardPickerDisplayed)
-      userData.synchronize()
-    }
   }
   
   public func showKeyboard() {
@@ -1264,155 +960,29 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public func hideKeyboard() {
     keymanWebDelegate?.dismissKeyboard()
     
-    dismissHelpBubble()
-    dismissSubKeys()
-    dismissKeyboardMenu()
+    keymanWeb.dismissHelpBubble()
+    keymanWeb.dismissSubKeys()
+    keymanWeb.dismissKeyboardMenu()
   }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
     keymanWebDelegate?.hideKeyboard(keymanWeb)
-
-    dismissHelpBubble()
-    dismissSubKeys()
-    dismissKeyboardMenu()
-  }
-
-  // MARK: - UIGestureRecognizer
-  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                                shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-    return true
-  }
-
-  // UILongPressGestureRecognizer implementation to show sub keys in a subview
-  @objc func holdAction(_ sender: UILongPressGestureRecognizer) {
-    switch sender.state {
-    case .ended:
-      // Touch Ended
-      if let subKeysView = subKeysView {
-        subKeysView.removeFromSuperview()
-        subKeysView.subviews.forEach { $0.removeFromSuperview() }
-        self.subKeysView = nil
-        keymanWeb.setPopupVisible(false)
-      }
-      var buttonClicked = false
-      for button in subKeys where button.isHighlighted {
-        button.isHighlighted = false
-        button.backgroundColor = subKeyColor
-        button.isEnabled = false
-        button.sendActions(for: .touchUpInside)
-        buttonClicked = true
-        break
-      }
-      if !buttonClicked {
-        clearSubKeyArrays()
-      }
-    case .began:
-      // Touch & Hold Began
-      let touchPoint = sender.location(in: sender.view)
-      // Check if touch was for language menu button
-      keymanWeb.languageMenuPosition { keyFrame in
-        self.menuKeyFrame = keyFrame
-        if keyFrame.contains(touchPoint) {
-          self.keymanWebDelegate?.menuKeyHeld(self.keymanWeb)
-          return
-        }
-        self.touchHoldBegan()
-      }
-    default:
-      // Hold & Move
-      guard let subKeysView = subKeysView else {
-        return
-      }
-      let touchPoint = sender.location(in: subKeysView.containerView)
-      for button in subKeys {
-        if button.frame.contains(touchPoint) {
-          button.isEnabled = true
-          button.isHighlighted = true
-          button.backgroundColor = subKeyColorHighlighted
-        } else {
-          button.isHighlighted = false
-          button.isEnabled = false
-          button.backgroundColor = subKeyColor
-        }
-      }
-    }
-  }
-
-  private func touchHoldBegan() {
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    let fontSize = isPad ? UIFont.buttonFontSize * 2 : UIFont.buttonFontSize
-
-    var oskFontName = oskFontNameForKeyboard(withFullID: currentKeyboardID!)
-    if oskFontName == nil {
-      oskFontName = fontNameForKeyboard(withFullID: currentKeyboardID!)
-    }
-
-    if subKeyIDs.isEmpty {
-      subKeys = []
-      return
-    }
-
-    subKeys = subKeyTexts.enumerated().map { i, subKeyText in
-      let button = UIButton(type: .custom)
-      button.tag = i
-      button.backgroundColor = subKeyColor
-      button.setRoundedBorder(withRadius: 4.0, borderWidth: 1.0, color: .gray)
-      button.setTitleColor(.black, for: .disabled)
-      button.setTitleColor(.black, for: .highlighted)
-
-      if let oskFontName = oskFontName {
-        button.titleLabel?.font = UIFont(name: oskFontName, size: fontSize)
-      } else {
-        button.titleLabel?.font = UIFont.systemFont(ofSize: fontSize)
-      }
-
-      if useSpecialFontForSubkeys {
-        if FontManager.shared.registerFont(at: Storage.active.specialOSKFontURL),
-          let fontName = FontManager.shared.fontName(at: Storage.active.specialOSKFontURL) {
-          button.titleLabel?.font = UIFont(name: fontName, size: fontSize)
-        }
-        button.setTitleColor(.gray, for: .disabled)
-      }
-
-      button.addTarget(self, action: #selector(subKeyButtonClick), for: .touchUpInside)
-      button.setTitle(subKeyText, for: .normal)
-      button.tintColor = UIColor(red: 181.0 / 255.0, green: 181.0 / 255.0, blue: 181.0 / 255.0, alpha: 1.0)
-      button.isEnabled = false
-      return button
-    }
-
-    dismissKeyPreview()
-    subKeysView = SubKeysView(keyFrame: keyFrame, subKeys: subKeys)
-    keymanWeb.view.addSubview(subKeysView!)
-    keymanWeb.setPopupVisible(true)
-  }
-
-  @objc func subKeyButtonClick(_ sender: UIButton) {
-    let keyIndex = sender.tag
-    if keyIndex < subKeyIDs.count && keyIndex < subKeyTexts.count {
-      let subKeyID = subKeyIDs[keyIndex]
-      let subKeyText = subKeyTexts[keyIndex]
-      keymanWeb.executePopupKey(id: subKeyID, text: subKeyText)
-    }
-    subKeys.removeAll()
-    subKeyIDs.removeAll()
-    subKeyTexts.removeAll()
   }
 
   // MARK: - InputViewController methods
   // TODO: Manager should not have InputViewController methods. Move this into InputViewController.
   func updateViewConstraints() {
-    dismissSubKeys()
-    dismissKeyPreview()
-    dismissKeyboardMenu()
-    resizeKeyboardIfNeeded()
+    keymanWeb.dismissSubKeys()
+    keymanWeb.dismissKeyPreview()
+    keymanWeb.dismissKeyboardMenu()
+    keymanWeb.resizeKeyboard()
   }
 
   func inputViewDidLoad() {
-    dismissSubKeys()
-    dismissKeyPreview()
-    dismissKeyboardMenu()
-    resizeKeyboard()
+    keymanWeb.dismissSubKeys()
+    keymanWeb.dismissKeyPreview()
+    keymanWeb.dismissKeyboardMenu()
+    keymanWeb.resizeKeyboard()
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
@@ -1433,7 +1003,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       synchronizeSWKeyboard()
       if currentKeyboardID != nil {
         shouldReloadKeyboard = true
-        reloadKeyboard(in: keymanWeb)
+        keymanWeb.reloadKeyboard()
       }
       didSynchronize = true
       standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),
@@ -1444,41 +1014,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // FIXME: This is deprecated. Use inputViewWillTransition()
   func inputViewWillRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-    dismissSubKeys()
-    dismissKeyPreview()
-    dismissKeyboardMenu()
-    resizeKeyboard(with: toInterfaceOrientation)
+    keymanWeb.dismissSubKeys()
+    keymanWeb.dismissKeyPreview()
+    keymanWeb.dismissKeyboardMenu()
+    keymanWeb.resizeKeyboard(with: toInterfaceOrientation)
     if isKeymanHelpOn {
-      helpBubbleView?.removeFromSuperview()
-      let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: showHelpBubble, object: nil)
-      perform(showHelpBubble, with: nil, afterDelay: 1.5)
+      keymanWeb.showHelpBubble(afterDelay: 1.5)
     }
-    didResizeToOrientation = true
-  }
-
-  func showKeyboardMenu(_ ic: InputViewController, closeButtonTitle: String?) {
-    let parentView = ic.view ?? keymanWeb.view
-    keymanWeb.languageMenuPosition { keyFrame in
-      self.menuKeyFrame = keyFrame
-      if keyFrame != .zero {
-        self.keyboardMenuView?.removeFromSuperview()
-        self.keyboardMenuView = KeyboardMenuView(keyFrame: self.menuKeyFrame, inputViewController: ic,
-                                                 closeButtonTitle: closeButtonTitle)
-        parentView?.addSubview(self.keyboardMenuView!)
-      }
-    }
-  }
-
-  func dismissKeyboardMenu() {
-    if let keyboardMenuView = keyboardMenuView {
-      keyboardMenuView.removeFromSuperview()
-      self.keyboardMenuView = nil
-    }
-  }
-
-  var isKeyboardMenuVisible: Bool {
-    return keyboardMenuView != nil
   }
 
   var isSystemKeyboardTopBarEnabled: Bool {
