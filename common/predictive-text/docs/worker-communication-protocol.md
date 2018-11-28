@@ -19,7 +19,7 @@ Note: I'm using the term **keyboard** as a synonym for **KeymanWeb**.
 Communication protocol between keyboard and asynchronous worker
 ---------------------------------------------------------------
 
-![Sequence diagram of obtaining a prediction](./docs/predictive-text-sequence.png)
+![Sequence diagram of obtaining a prediction](./predictive-text-sequence.png)
 
 We have decided that everything to the right of the `KeymanWeb` will be
 in a Web Worker. However, communication can happen only through
