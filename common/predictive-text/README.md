@@ -389,20 +389,3 @@ keyboard to acknowledge late suggestions, or for the LMLayer to avoid
 sending late `suggestions` messages. In either case, a `suggestions`
 message can be identified as appropriate or "late" via its `token`
 property.
-
-
-TODO
-====
-
- - [x] Document `suggestions`
- - [x] TypeScript!
- - [ ] make simple `index.html` that demos a dummy model
- - [x] Update class definitions in README from TypeScript sources.
- - [ ] Do word segmentation
- - [ ] Determine the exact arguments given to the model's `predict()`
-       method.
- - [ ] Make an `error` initialization message.
- - [ ] Make a `cancel` message.
- - [ ] LOGLIKEIHOOD IN THE TRANSFORM!
- - [ ] `possibleTransforms` where `transform` is an alias for `possibleTransforms[0]`
- - [ ] Use [puppeteer](https://github.com/GoogleChrome/puppeteer)?
