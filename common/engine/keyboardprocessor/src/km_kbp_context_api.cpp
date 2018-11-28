@@ -54,47 +54,6 @@ km_kbp_context_items_from_utf16(km_kbp_cp const *text,
   return KM_KBP_STATUS_OK;
 }
 
-constexpr const int8_t _utf_codec<8>::sz_lut[16] = {
-  1,1,1,1,1,1,1,1,    // 1 byte
-  0,0,0,0,            // trailing byte
-  2,2,                // 2 bytes
-  3,                  // 3 bytes
-  4                   // 4 bytes
-};
-constexpr const uint8_t _utf_codec<8>::mask_lut[5] = {0x7f, 0xff, 0x3f, 0x1f, 0x0f};
-
-km_kbp_status
-km_kbp_context_items_from_utf8(char const *text,
-                                km_kbp_context_item **out_ptr)
-{
-  assert(text); assert(out_ptr);
-  if (!text || !out_ptr)  return KM_KBP_STATUS_INVALID_ARGUMENT;
-
-  *out_ptr = nullptr;
-  try
-  {
-    std::vector<km_kbp_context_item> res;
-
-    for (auto i = utf8::const_sentinal_iterator(text); i; ++i)
-    {
-      if(i.error())   return KM_KBP_STATUS_INVALID_UTF;
-      res.emplace_back(km_kbp_context_item {KM_KBP_CT_CHAR, {0,}, {*i}});
-    }
-    // Terminate the context_items array.
-    res.emplace_back(km_kbp_context_item KM_KBP_CONTEXT_ITEM_END);
-
-    *out_ptr = new km_kbp_context_item[res.size()];
-    std::move(res.begin(), res.end(), *out_ptr);
-  }
-  catch(std::bad_alloc)
-  {
-    return KM_KBP_STATUS_NO_MEM;
-  }
-
-  return KM_KBP_STATUS_OK;
-}
-
-
 km_kbp_status km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
                                             km_kbp_cp *buf, size_t * sz_ptr)
 {

@@ -108,8 +108,14 @@ template <>
 struct _utf_codec<8>
 {
 private:
-    static const int8_t sz_lut[16];
-    static const uint8_t mask_lut[5];
+    static constexpr const int8_t sz_lut[16] = {
+      1,1,1,1,1,1,1,1,    // 1 byte
+      0,0,0,0,            // trailing byte
+      2,2,                // 2 bytes
+      3,                  // 3 bytes
+      4                   // 4 bytes
+    };
+    static constexpr const uint8_t mask_lut[5] = {0x7f, 0xff, 0x3f, 0x1f, 0x0f};
     static const uchar_t    limit = 0x110000;
 
 public:
