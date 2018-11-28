@@ -10,7 +10,7 @@ kmx = executable('kmx', 'kmx.cpp',
     include_directories: [inc, libsrc],
     link_args: links,
     objects: lib.extract_all_objects())
-    
+
 kmns = [
   '000 - null keyboard',
   '001 - basic input UnicodeI',
@@ -29,7 +29,7 @@ kmns = [
   '018 - nul testing',
   '019 - multiple deadkeys',
   '020 - deadkeys and backspace',
-  
+
   '021 - options',
   '022 - options with preset',
   '023 - options with save',
@@ -38,34 +38,35 @@ kmns = [
 
   '026 - system stores',
   '027 - system stores 2',
-  
+
   '028 - smp',
   '029 - beep',
-  
+
   '030 - multiple groups',
   '031 - caps lock'
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-prog_kmcomp = find_program('kmcomp')
-
 # todo: if kmcomp is not found, use the .kmx in the source folder
 # therefore make kmcomp compile to the source folder and add to repo?
 
-foreach kmn : kmns 
-  kmn_test = custom_target(
-    kmn + '.kmn',
-    output: kmn + '.kmx',
-    input: 'kmn/' + kmn + '.kmn',
-    command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
-  )
-  
-  kmn_source = configure_file(
-    input: 'kmn/' + kmn + '.kmn',
-    output: kmn + '.kmn',
-    copy: true
-  )
+kmcomp = find_program('kmcomp', required: false)
+if kmcomp.found()
+  foreach kmn : kmns
+    kmn_test = custom_target(
+      kmn + '.kmn',
+      output: kmn + '.kmx',
+      input: 'kmn/' + kmn + '.kmn',
+      command : [kmcomp, '-s', '@INPUT@', '@OUTPUT@']
+    )
 
-  test(kmn, kmx, depends: [kmn_test], args: [kmn])
-endforeach
+    kmn_source = configure_file(
+      input: 'kmn/' + kmn + '.kmn',
+      output: kmn + '.kmn',
+      copy: true
+    )
+
+    test(kmn, kmx, depends: [kmn_test], args: [kmn])
+  endforeach
+endif
