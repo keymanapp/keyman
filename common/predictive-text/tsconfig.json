@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
     "module": "none",
-    "outDir": "build/",
+    "outFile": "./index.js",
     "inlineSources": true,
     "sourceMap": true,
     "target": "es5",
-    "lib": ["webworker", "es6"]
+    "lib": ["es6", "dom"]
   },
   "include" : [
     "./*.ts"

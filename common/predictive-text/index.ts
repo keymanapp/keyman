@@ -32,28 +32,52 @@
  */	
 type USVString = string;
 
-/**
- * Describes a potential change to a text buffer.
- */
-interface Transform {
+// TODO: document
+class LMLayer {
   /**
-   * The Unicode scalar values (i.e., characters) to be inserted at the
-   * cursor position.
-   *
-   * Corresponds to `s` in com.keyman.KeyboardInterface.output.
+   * The underlying worker instance. By default, this is the LMLayerWorker. 
    */
-  insert: USVString;
+  private _worker: Worker;
+
+  constructor(uri?: string) {
+    this._worker = new Worker(uri || LMLayer.asBlobURI(LMLayerWorkerCode));
+  }
 
   /**
-   * The number of code units to delete to the left of the cursor.
-   *
-   * Corresponds to `dn` in com.keyman.KeyboardInterface.output.
+   * Given a function, this utility returns the source code within it.
+   * @param fn 
    */
-  delete: number;
+  static unwrap(fn: Function): string {
+      let wrapper = fn.toString();
+      let match = wrapper.match(/function[^{]+{((?:.|\n)+)}[^}]*$/);
+      return match[1];
+  }
 
   /**
-   * The number of code units to delete to the right of the cursor.
-   * Not available on all platforms.
+   * Converts the INSIDE of a function into a blob URI that can
+   * be passed as a valid URI for a Worker.
+   * @param fn Function whose body will be referenced by a URI.
+   * 
+   * This function makes the following possible:
+   * 
+   *    let worker = new Worker(LMLayer.asBlobURI(function myWorkerCode () {
+   *      postMessage('inside Web Worker')
+   *      function onmessage(event) {
+   *        // handle message inside Web Worker.
+   *      }
+   *    }));
    */
-  deleteRight?: number;
+  static asBlobURI(fn: Function): string {
+    let code = LMLayer.unwrap(fn);
+    let blob = new Blob([code], { type: 'text/javascript' });
+    return URL.createObjectURL(blob);
+  }
+}
+
+// Let LMLayer be available both in browser and in Node.
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = LMLayer;
+} else {
+  //@ts-ignore
+  window.LMLayer = LMLayer;
 }

@@ -1,4 +1,5 @@
 var assert = chai.assert;
+
 describe('LMLayerWorker', function () {
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {
@@ -10,15 +11,7 @@ describe('LMLayerWorker', function () {
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let wrapper = LMLayerWorkerCode.toString();
-      let match = wrapper.match(/function[^{]+{((?:.|\n)+)}[^}]*$/);
-      assert.isNotNull(match);
-      let code = match[1];
-      assert.isString(code);
-
-      let blob = new Blob([code], { type: 'text/javascript' });
-      let uri = URL.createObjectURL(blob);
-
+      let uri = LMLayer.asBlobURI(LMLayerWorkerCode);
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
