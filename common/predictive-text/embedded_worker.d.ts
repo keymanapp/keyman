@@ -21,7 +21,9 @@
  */
 
 // Include the code intended to run WITHIN the Web Worker.
-// The worker code must be compiled before this file is compiled.
+// The worker code MUST be compiled before this file is compiled.
+// If you see a 'File: embedded_worker.js not found.' error message, please
+// compile the worker first (stage one).
 /// <reference path="embedded_worker.js" />
 
 /**
