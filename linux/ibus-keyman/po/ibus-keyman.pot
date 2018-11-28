@@ -1,4 +1,4 @@
-# SOME DESCRIPTIVE TITLE.
+# Translations for ibus-keyman.
 # Copyright (C) 2018 SIL International
 # This file is distributed under the same license as the ibus-keyman package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ibus-keyman 10.99.33\n"
-"Report-Msgid-Bugs-To: https://github.com/ibus/ibus/issues/new\n"
+"Report-Msgid-Bugs-To: https://github.com/keymanapp/keyman/issues/new\n"
 "POT-Creation-Date: 2018-11-26 11:25+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

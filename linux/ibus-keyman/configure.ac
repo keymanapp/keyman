@@ -29,7 +29,7 @@ m4_define(ibus_maybe_datestamp,
 m4_define([ibus_version],
     ibus_major_version.ibus_minor_version.ibus_micro_version[]ibus_maybe_datestamp)
 
-AC_INIT([ibus-keyman], m4_esyscmd_s([cat VERSION]), [https://github.com/ibus/ibus/issues/new])
+AC_INIT([ibus-keyman], m4_esyscmd_s([cat VERSION]), [https://github.com/keymanapp/keyman/issues/new])
 
 AM_INIT_AUTOMAKE
 AC_GNU_SOURCE
