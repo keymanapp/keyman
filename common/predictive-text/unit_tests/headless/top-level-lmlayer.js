@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-let LMLayer = require('../../');
+let LMLayer = require('../..');
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
