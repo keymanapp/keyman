@@ -22,17 +22,17 @@ Run `build.sh`. This will also automatically install dependencies with `npm`.
 
 ### Two-stage compilation process
 
-Since the primary LMLayer code runs within a [Web Worker][], the LMLayer must be
-compiled in two stages:
+Since the primary LMLayer code runs within a [Web Worker][], `build.sh` compiles the
+LMLayer in two stages:
 
  1. Compile the inner worker code
-    a. Compile the TypeScript sources for _only_ the Worker code.
-    b. Wrap the Worker code as `embedded_worker.js`
+    1. Compile the TypeScript sources for _only_ the Worker code.
+    2. Wrap the Worker code as `embedded_worker.js`
 
  2. Compile the top-level code
-    a. Include `embedded_worker.js` verbatim using a TypeScript directive.
-    b. Compile the top-level TypeScript code.
-    c. Unwrap the Worker code at runtime.
+    1. Include `embedded_worker.js` verbatim using a TypeScript directive.
+    2. Compile the top-level TypeScript code.
+    3. Unwrap the Worker code at runtime.
 
 [Web Worker]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
 
@@ -55,7 +55,7 @@ change a source code file. Here's the command I run in separate window:
 git ls-files | entr -c ./build.sh -tdd
 ```
 
-Importantly, this `./build.sh -tdd` skips running the in-browser tests, and skips
+Importantly, `./build.sh -tdd` skips running the in-browser tests, and skips
 downloading/updating `npm` dependencies.
 
 [entr]: http://eradman.com/entrproject/
