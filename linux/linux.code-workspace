@@ -7,7 +7,7 @@
 			"path": "../onboard-keyman"
 		},
 		{
-			"path": "/opt/Repos/github-lsdev/keyman/common"
+			"path": "../common/engine/keyboardprocessor"
 		}
 	],
 	"settings": {
