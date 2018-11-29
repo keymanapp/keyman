@@ -15,11 +15,12 @@ extra_projects="keyboardprocessor keyman-config"
 
 if [ "$1" == "origdist" ]; then
     if [ "$2" != "" ]; then
+        echo "$2"
         if [ ! -d "$2" ]; then
             echo "project $2 does not exist"
             exit 1
         fi
-        if [ "$2" == "keyman-config" || "$2" == "keyboardprocessor" ]; then
+        if [ "$2" == "keyman-config" ] || [ "$2" == "keyboardprocessor" ]; then
             autotool_projects=""
             extra_projects="$2"
         else
@@ -29,11 +30,12 @@ if [ "$1" == "origdist" ]; then
     fi
 else
     if [ "$1" != "" ]; then
+        echo "$1"
         if [ ! -d "$1" ]; then
             echo "project $1 does not exist"
             exit 1
         fi
-        if [ "$1" == "keyman-config" || "$1" == "keyboardprocessor" ]; then
+        if [ "$1" == "keyman-config" ] || [ "$1" == "keyboardprocessor" ]; then
             autotool_projects=""
             extra_projects="$1"
         else
@@ -76,10 +78,12 @@ for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         cd ../common/engine
         vers=`grep -Po "\d.\d.\d" keyboardprocessor/meson.build`
-        cp -a keyboardprocessor keyman-keyboardprocessor-$vers
-        tar czf keyman-keyboardprocessor-$vers.tar.gz --exclude='debian/' --exclude='build/' keyman-keyboardprocessor-$vers
-        rm -rf keyman-keyboardprocessor-$vers
-        cp keyman-keyboardprocessor-$vers.tar.gz ../../linux/dist
+        datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
+        kbpvers="keyman-keyboardprocessor-$vers~$datevers"
+        cp -a keyboardprocessor $kbpvers
+        tar czf $kbpvers.tar.gz --exclude='debian/' --exclude='build/' $kbpvers
+        rm -rf $kbpvers
+        cp $kbpvers.tar.gz ../../linux/dist
     fi
     cd $BASEDIR
 done
