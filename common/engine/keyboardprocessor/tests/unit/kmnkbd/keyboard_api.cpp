@@ -6,7 +6,7 @@
 */
 #include <string>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 #include <experimental/filesystem>
 
 namespace std {
@@ -27,10 +27,11 @@ namespace
 int main(int, char *[])
 {
   km_kbp_keyboard * test_kb = nullptr;
+  km_kbp_keyboard_attrs const * kb_attrs = nullptr;
 
-  try_status(km_kbp_keyboard_load(test_kb_path.string().c_str(), &test_kb));
-  auto kb_attrs = km_kbp_keyboard_get_attrs(test_kb);
-  if (kb_attrs->folder_path != test_kb_path.parent_path().string())
+  try_status(km_kbp_keyboard_load(test_kb_path.c_str(), &test_kb));
+  try_status(km_kbp_keyboard_get_attrs(test_kb, &kb_attrs));
+  if (kb_attrs->folder_path != test_kb_path.parent_path())
     return __LINE__;
 
   km_kbp_keyboard_dispose(test_kb);

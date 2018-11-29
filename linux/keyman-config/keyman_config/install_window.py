@@ -11,8 +11,8 @@ import webbrowser
 import tempfile
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit', '3.0')
-from gi.repository import Gtk, WebKit
+gi.require_version('WebKit2', '4.0')
+from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
 from keyman_config.list_installed_kmp import get_kmp_version
@@ -209,19 +209,22 @@ class InstallKmpWindow(Gtk.Window):
                 grid.attach_next_to(label, label6, Gtk.PositionType.RIGHT, 1, 1)
 
             self.page2 = Gtk.Box()
-            s = Gtk.ScrolledWindow()
-            webview = WebKit.WebView()
-            webview.connect("navigation-policy-decision-requested", self.check)
-            webview.connect("mime-type-policy-decision-requested", check_mime_type)
+            webview = WebKit2.WebView()
+            webview.connect("decide-policy", self.doc_policy)
 
             if options and "readmeFile" in options:
                 self.readme = options['readmeFile']
             else:
                 self.readme = "noreadme"
             readme_file = os.path.join(tmpdirname, self.readme)
+
             if os.path.isfile(readme_file):
-                readme_uri = pathlib.Path(readme_file).as_uri()
-                webview.load_uri(readme_uri)
+                with open(readme_file, "r") as read_file:
+                    readme_data = read_file.read()
+                    readme_uri = pathlib.Path(readme_file).as_uri()
+                    logging.debug(readme_data)
+                    webview.load_html(readme_data, readme_uri)
+                s = Gtk.ScrolledWindow()
                 s.add(webview)
                 self.page2.pack_start(s, True, True, 0)
 
@@ -253,12 +256,19 @@ class InstallKmpWindow(Gtk.Window):
         self.add(vbox)
         self.resize(635, 270)
 
-    def check(self, view, frame, req, nav, policy):
-        uri = req.get_uri()
-        if not self.readme in uri:
-            webbrowser.open(uri)
-            policy.ignore()
-            return True
+    def doc_policy(self, web_view, decision, decision_type):
+        logging.info("Checking policy")
+        logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
+        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION:
+            nav_action = decision.get_navigation_action()
+            request = nav_action.get_request()
+            uri = request.get_uri()
+            logging.debug("nav request is for uri %s", uri)
+            if not self.readme in uri:
+                logging.debug("opening uri %s in webbrowser")
+                webbrowser.open(uri)
+                decision.ignore()
+                return True
         return False
 
     def on_install_clicked(self, button):

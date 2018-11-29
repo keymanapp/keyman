@@ -73,6 +73,7 @@ uses
 
   input_installlayoutortip,
   isadmin,
+  Keyman.System.MitigateWin10_1803LanguageInstall,
   keymanerrorcodes,
   KeymanPaths,
   RegistryKeys,
@@ -251,9 +252,36 @@ var
   IconIndex: Integer;
   UserLanguageInstalled: Boolean;
   Win8Lang: TWindows8Language;
+  ml: TMitigateWin10_1803.TMitigatedLanguage;
+  FMitigationApplied: Boolean;
+  TempLangID: Integer;
 begin
   Result := False;
   UserLanguageInstalled := False;
+
+  //
+  // Begin #1285 mitigation
+  //
+  if BCP47Tag = '' then
+  begin
+    FMitigationApplied := TMitigateWin10_1803.IsMitigationRequired(LangID, ml);
+  end
+  else if ConvertBCP47TagToLangID(BCP47Tag, TempLangID) then
+  begin
+    FMitigationApplied := TMitigateWin10_1803.IsMitigationRequired(TempLangID, ml);
+  end
+  else
+    FMitigationApplied := False;
+
+  if FMitigationApplied then
+  begin
+    BCP47Tag := ml.NewLanguage.BCP47;
+    LangID := ml.NewLanguage.Code;
+    WarnFmt(KMN_W_ProfileInstall_Win10_1803_MitigationApplied, VarArrayOf([ml.OriginalLanguage.Name, ml.NewLanguage.Name]));
+  end;
+  //
+  // End #1285 mitigation
+  //
 
   if BCP47Tag = '' then
   begin

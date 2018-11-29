@@ -14,6 +14,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
      '-Wendif-labels',
      '-Wextra',
      '-Wno-unknown-pragmas',
+     '-Wno-missing-field-initializers',
      '-Wnon-virtual-dtor',
      '-Wshadow'
   ]
@@ -47,19 +48,29 @@ if compiler.get_id() == 'msvc'
   links = []
 endif
 
-pkg = import('pkgconfig')
-pkg.generate(
-    name: 'keyman_kmn_processor',
-    version: meson.project_version(),
-    description: 'Keyman processor for KMN keyboards.')
-
 lib = library('kmnkbp0',
-    'keyboardprocessor.cpp',
+    'option.cpp',
+    'keyboard.cpp',
+	'state.cpp',
     'km_kbp_context_api.cpp',
     'km_kbp_keyboard_api.cpp',
     'km_kbp_options_api.cpp',
     'km_kbp_state_api.cpp',
+	'km_kbp_processevent_api.cpp',
     'json.cpp',
+	'mock/mock_processor.cpp',
+	'kmx/kmx_consts.cpp',
+	'kmx/kmx_processevent.cpp',
+	'kmx/kmx_actions.cpp',
+	'kmx/kmx_capslock.cpp',
+	'kmx/kmx_context.cpp',
+	'kmx/kmx_debug.cpp',
+    'kmx/kmx_environment.cpp',
+	'kmx/kmx_file.cpp',
+	'kmx/kmx_modifiers.cpp',
+	'kmx/kmx_options.cpp',
+	'kmx/kmx_processor.cpp',
+	'kmx/kmx_xstring.cpp',
     cpp_args: defns + warns + flags,
     link_args: links,
     version: meson.project_version(),
@@ -67,3 +78,10 @@ lib = library('kmnkbp0',
     install: true)
 
 kmnkbp = declare_dependency(link_with: lib, include_directories: inc)
+
+pkg = import('pkgconfig')
+pkg.generate(
+    name: 'keyman_kmn_processor',
+    version: meson.project_version(),
+    description: 'Keyman processor for KMN keyboards.',
+    libraries: lib)

@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <keyboardprocessor.h>
+#include <keyman/keyboardprocessor.h>
 #include <utfcodec.hpp>
 #include <json.hpp>
 
@@ -25,26 +25,34 @@
 #include "keyboard.hpp"
 #include "state.hpp"
 
+using namespace km::kbp;
+
 km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
-                                  km_kbp_option const *env,
+                                  km_kbp_option_item const *env,
                                   km_kbp_state ** out)
 {
-  assert(keyboard && out);
-  if (!keyboard || !out)
+  assert(keyboard); assert(env); assert(out);
+  if (!keyboard || !env || !out)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  constexpr km_kbp_option const end = KM_KBP_OPTIONS_END;
-  auto opts = km::kbp::options_set(KM_KBP_OPT_ENVIRONMENT);
-  km_kbp_options_set {opts}.update(env ? env : &end);
-  *out = new km_kbp_state(static_cast<km::kbp::keyboard const &>(*keyboard),
-                            opts);
+  try
+  {
+    *out = new km_kbp_state(static_cast<km::kbp::keyboard const &>(*keyboard),
+      env);
+
+  }
+  catch (std::bad_alloc)
+  {
+    return KM_KBP_STATUS_NO_MEM;
+  }
   return KM_KBP_STATUS_OK;
 }
+
 
 km_kbp_status km_kbp_state_clone(km_kbp_state const *state,
                                  km_kbp_state ** out)
 {
-  assert(state && out);
+  assert(state); assert(out);
   if (!state || !out)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
@@ -52,10 +60,12 @@ km_kbp_status km_kbp_state_clone(km_kbp_state const *state,
   return KM_KBP_STATUS_OK;
 }
 
+
 void km_kbp_state_dispose(km_kbp_state *state)
 {
   delete state;
 }
+
 
 km_kbp_context *km_kbp_state_context(km_kbp_state *state)
 {
@@ -65,13 +75,15 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *state)
   return static_cast<km_kbp_context *>(&state->context());
 }
 
-km_kbp_options_set *km_kbp_state_options(km_kbp_state *state)
+
+km_kbp_options *km_kbp_state_options(km_kbp_state *state)
 {
   assert(state);
   if (!state) return nullptr;
 
-  return &state->run_opts_adaptor;
+  return static_cast<km_kbp_options *>(&state->options());
 }
+
 
 km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
                                                      size_t *num_items)
@@ -86,6 +98,89 @@ km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
   // teminated
   return state->actions.data();
 }
+
+namespace {
+  char const * action_item_name_lut[] = {
+    "",
+    "character",
+    "marker",
+    "alert",
+    "back",
+    "persist",
+    "reset",
+    "vkeydown",
+    "vkeyup",
+    "vshiftdown",
+    "vshiftup"
+  };
+
+  constexpr char const * const scope_names_lut[] = {
+    u8"unspecified",
+    u8"keyboard",
+    u8"environment"
+  };
+}
+
+
+json & operator << (json & j, km_kbp_action_item const &act)
+{
+  j << json::flat << json::object;
+  if (act.type >= KM_KBP_IT_MAX_TYPE_ID)
+  {
+    j << "invalid" << json::null << json::close;
+    return j;
+  }
+
+  j << action_item_name_lut[act.type];
+  switch (act.type)
+  {
+    case KM_KBP_IT_END:
+    case KM_KBP_IT_ALERT:
+      j << json::null;
+      break;
+    case KM_KBP_IT_CHAR:
+    case KM_KBP_IT_MARKER:
+      j << km_kbp_context_item {act.type, {0,}, {act.character}}; // TODO: is act.type correct here? it may map okay but this is bad practice to mix constants across types. Similarly using act.character instead of act.type
+      break;
+    case KM_KBP_IT_BACK:
+      j << act.erased;
+      break;
+    case KM_KBP_IT_PERSIST_OPT:
+    case KM_KBP_IT_RESET_OPT:
+      j << json::object
+          << scope_names_lut[act.option->scope]
+          << json::flat << json::object
+            << act.option->key << act.option->value
+          << json::close
+        << json::close;
+      break;
+    case KM_KBP_IT_VKEYDOWN:
+    case KM_KBP_IT_VKEYUP:
+    case KM_KBP_IT_VSHIFTDOWN:
+    case KM_KBP_IT_VSHIFTUP:
+      j << act.vkey;
+      break;
+  }
+  j << json::close;
+
+  return j;
+}
+
+
+json & operator << (json & j, std::vector<km_kbp_action_item> const & acts)
+{
+    j << json::array;
+    for (auto & act: acts)
+    {
+      if (act.type != KM_KBP_IT_END)
+      {
+        j << act;
+      }
+    }
+    j << json::close;
+    return j;
+}
+
 
 km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
                                         char *buf,
@@ -104,12 +199,9 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
     jo << json::object
         << "$schema" << "keyman/keyboardprocessor/doc/introspection.schema"
         << "keyboard" << state->keyboard()
-        << "options" << json::object
-          << "environment" << state->environment()
-          << "dynamic" <<  state->options()
-          << json::close
+        << "options" << state->options()
         << "context" << state->context()
-// TODO:        << "actions" << state->actions()
+        << "actions" << state->actions
         << json::close;
   }
   catch (std::bad_alloc)
@@ -127,7 +219,7 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
   }
 
   // Return space needed/used.
-  *space = doc.size();
+  *space = doc.size()+1;
   return KM_KBP_STATUS_OK;
 
 }

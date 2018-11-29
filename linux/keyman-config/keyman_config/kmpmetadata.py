@@ -459,6 +459,14 @@ def parsemetadata(jsonfile, verbose=False):
 				print_files(files, extracted_dir)
 	return info, system, options, keyboards, files
 
+def infmetadata_to_json(info, system, options, keyboards, files):
+	jsonfiles = []
+	for entry in files:
+		jsonfiles.append({"name" : entry["name"], "description" : entry["description"]})
+	d = { "system" : system, "options" : options,
+		"info" : info , "keyboards" : keyboards, "files" : jsonfiles }
+	return json.dumps(d, indent=2)
+
 def main(argv):
 	if len(sys.argv) != 2:
 		logging.error("kmpmetadata.py <kmp.json> or <kmp.inf>")
@@ -474,7 +482,9 @@ def main(argv):
 	if ext == ".json":
 		parsemetadata(inputfile, True)
 	elif ext == ".inf":
-		parseinfdata(inputfile, True)
+		info, system, options, keyboards, files = parseinfdata(inputfile, True)
+		jsontest = metadata_to_json(info, system, options, keyboards, files)
+		print(jsontest)
 	else:
 		logging.error("kmpmetadata.py Input file must be json or inf.")
 		logging.error("kmpmetadata.py <kmp.json> or <kmp.inf>")
