@@ -38,16 +38,25 @@ const
   CEF_SETFOCUS = WM_USER + 305;
   CEF_KEYEVENT = WM_USER + 306;
   CEF_BEFOREBROWSE = WM_USER + 307;
+  CEF_CONSOLEMESSAGE = WM_USER + 308;
 
 type
   TCEFHostKeyEventData = record
     browserid: Integer;
-    frameid: Int64;
     event: TCefKeyEvent;
     osEvent: TMsg;
   end;
 
   PCEFHostKeyEventData = ^TCEFHostKeyEventData;
+
+  TCEFConsoleMessageEventData = record
+    browserid: Integer;
+    level: Cardinal;
+    message, source: ustring;
+    line: Integer;
+  end;
+
+  PCEFConsoleMessageEventData = ^TCEFConsoleMessageEventData;
 
   TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; out Handled: Boolean) of object;
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean) of object;
@@ -126,6 +135,7 @@ type
     procedure Handle_CEF_SETFOCUS(var message: TMessage);
     procedure Handle_CEF_KEYEVENT(var message: TMessage);
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
+    procedure Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -313,6 +323,7 @@ begin
     CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
     CEF_KEYEVENT: Handle_CEF_KEYEVENT(Message);
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
+    CEF_CONSOLEMESSAGE: Handle_CEF_CONSOLEMESSAGE(Message);
   end;
 
   if Self <> nil then
@@ -370,6 +381,28 @@ begin
   params.Free;
 end;
 
+procedure TframeCEFHost.Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
+var
+  I: Integer;
+  id: string;
+  p: PCEFConsoleMessageEventData;
+begin
+  AssertVclThread;
+  p := PCEFConsoleMessageEventData(message.LParam);
+
+  id := LowerCase(ExtractFileName(ParamStr(0)))+'_'+GetVersionString+'_script_';
+  if Assigned(Owner)
+    then id := id + Owner.ClassName
+    else id := id + 'unknown';
+
+  I := string(p.source).LastDelimiter('/');
+  id := id + '_' + string(p.source).SubString(I + 1) + '_' + IntToStr(p.line);
+
+  LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(p.line)+' of '+p.source, p.message, '');
+
+  FreeMem(p);
+end;
+
 procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
   const request: ICefRequest; user_gesture, isRedirect: Boolean;
@@ -422,21 +455,20 @@ procedure TframeCEFHost.cefConsoleMessage(Sender: TObject;
   const browser: ICefBrowser; level: Cardinal; const message, source: ustring;
   line: Integer; out Result: Boolean);
 var
-  id: string;
-  I: Integer;
+  p: PCEFConsoleMessageEventData;
 begin
   AssertVclThread;
-  id := LowerCase(ExtractFileName(ParamStr(0)))+'_'+GetVersionString+'_script_';
-  if Assigned(Owner)
-    then id := id + Owner.ClassName
-    else id := id + 'unknown';
 
-  I := string(source).LastDelimiter('/');
-  id := id + '_' + string(source).SubString(I + 1) + '_' + IntToStr(line);
-
-  LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(line)+' of '+source, message, '');
+  p := AllocMem(SizeOf(TCEFConsoleMessageEventData));
+  p.browserid := browser.Identifier;
+  p.level := level;
+  p.message := message;
+  p.source := source;
+  p.line := line;
 
   Result := True;
+
+  PostMessage(FCallbackWnd, CEF_CONSOLEMESSAGE, WORD(Result), LPARAM(p));
 end;
 
 procedure TframeCEFHost.Handle_CEF_DESTROY(var Message: TMessage);
@@ -510,6 +542,7 @@ begin
   Result := False;
 
   p := AllocMem(Sizeof(TCEFHostKeyEventData));
+  p.browserid := browser.Identifier;
   p.event := event^;
   if Assigned(osEvent) then
     p.osEvent := osEvent^;
