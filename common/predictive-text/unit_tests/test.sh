@@ -11,7 +11,7 @@ cd $(dirname "$BASH_SOURCE")
 
 display_usage ( ) {
   echo "test.sh [ -? | -h | -help]"
-  echo "  -ci               to perform continuous-integration friendly tests and reporting"
+  echo "  -CI               to perform continuous-integration friendly tests and reporting"
   echo "  -headless         to disable the in-browser tests"
   echo "  -integrated       to disable the 'headless' test suite"
   echo "  -? | -h | -help   to display this help information"
@@ -25,11 +25,21 @@ init_dependencies ( ) {
 }
 
 test-headless ( ) {
+  _FLAGS=FLAGS
   if (( CI_REPORTING )); then
-    FLAGS="${FLAGS} --reporter mocha-teamcity-reporter"
+    _FLAGS="${_FLAGS} --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive ${FLAGS} ./unit_tests/headless/*.js
+  npm run mocha -- --recursive ${_FLAGS} ./unit_tests/headless/*.js
+}
+
+test-browsers ( ) {
+  _FLAGS=FLAGS
+  if (( CI_REPORTING )); then
+    _FLAGS="${_FLAGS} -CI -reporter teamcity"
+  fi
+
+  in_browser/browser-test.sh ${_FLAGS} $os_id
 }
 
 # Defaults
@@ -47,7 +57,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit
       ;;
-    -ci)
+    -CI)
       CI_REPORTING=1
       ;;
     -headless)
@@ -62,8 +72,6 @@ done
 
 init_dependencies
 
-BASE_PATH=`dirname $BASH_SOURCE`
-
 # Run headless (browserless) tests.
 if (( RUN_HEADLESS )); then
   test-headless || fail "DOMless tests failed!"
@@ -71,7 +79,5 @@ fi
 
 # Run browser-based tests.
 if (( RUN_BROWSERS )); then
-  $BASE_PATH/in_browser/browser-test.sh $os_id
-  CODE=$?
-  exit $CODE
+  test-browsers || fail "Browser-based tests failed!"
 fi
