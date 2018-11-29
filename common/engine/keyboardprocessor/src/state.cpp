@@ -10,6 +10,15 @@
 
 using namespace km::kbp;
 
+void actions::push_persist(option const &opt) {
+  assert(!empty() && back().type != KM_KBP_IT_END);
+  _option_items_stack.emplace_back(opt);
+  km_kbp_action_item ai = {KM_KBP_IT_PERSIST_OPT, {0,}, {0}};
+  ai.option = &_option_items_stack.back();
+  emplace_back(std::move(ai));
+}
+
+
 state::state(km::kbp::keyboard const & kb, km_kbp_option_item const * env)
   : _options(kb.default_options), _kb(kb)
 {

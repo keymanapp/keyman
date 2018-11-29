@@ -77,12 +77,13 @@ namespace kbp
 
     void set_default_env(km_kbp_option_item const *env);
 
-    char16_t const *      lookup(km_kbp_option_scope scope,
-                                 std::u16string const & key) const noexcept;
-    km_kbp_option_item const * assign(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key,
-                                           std::u16string const & value);
-    void                  reset(km_kbp_option_scope scope,
-                                std::u16string const & key);
+    char16_t const *  lookup(km_kbp_option_scope scope,
+                             std::u16string const & key) const noexcept;
+
+    option const *    assign(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key,
+                             std::u16string const & value);
+    void              reset(km_kbp_option_scope scope,
+                            std::u16string const & key);
 
     friend json & operator << (json &j, km::kbp::options const &opts);
   };

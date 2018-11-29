@@ -53,8 +53,7 @@ namespace kbp
   class mock_processor : public abstract_processor
   {
   public:
-    mock_processor(km_kbp_keyboard_attrs const * kb) : abstract_processor(kb) {
-    }
+    mock_processor(km_kbp_keyboard_attrs const * kb);
     km_kbp_status process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state);
     km_kbp_attr const * get_attrs() const;
     km_kbp_status validate() const;

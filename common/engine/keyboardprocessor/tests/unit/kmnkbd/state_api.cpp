@@ -33,6 +33,13 @@ namespace
     KM_KBP_OPTIONS_END
   };
 
+  // km_kbp_option_item const expected_persist_opt =
+  // {
+  //   u"__test_point",
+  //   u"F2 pressed test save.",
+  //   KM_KBP_OPT_KEYBOARD
+  // };
+
 constexpr char const *doc1_expected = u8"\
 {\n\
     \"$schema\" : \"keyman/keyboardprocessor/doc/introspection.schema\",\n\
@@ -96,6 +103,37 @@ constexpr char const *doc2_expected = u8"\
     \"actions\" : []\n\
 }\n";
 
+
+
+inline
+bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs)
+{
+  return lhs.scope == rhs.scope
+      && std::u16string(lhs.key) == rhs.key
+      && std::u16string(lhs.value) == rhs.value;
+}
+
+
+bool operator==(km_kbp_action_item const & lhs,
+                km_kbp_action_item const & rhs)
+{
+  if (lhs.type != rhs.type) return false;
+  switch(lhs.type)
+  {
+    case KM_KBP_IT_CHAR:        return lhs.character == rhs.character;
+    case KM_KBP_IT_MARKER:      return lhs.marker == rhs.marker;
+    case KM_KBP_IT_PERSIST_OPT: return *lhs.option == *rhs.option;
+    case KM_KBP_IT_VKEYDOWN:
+    case KM_KBP_IT_VKEYUP:
+    case KM_KBP_IT_VSHIFTDOWN:
+    case KM_KBP_IT_VSHIFTUP:
+      return lhs.vkey == rhs.vkey;
+    default: break;
+  }
+
+  return true;
+}
+
 #ifdef assert
 #undef assert
 #endif
@@ -107,7 +145,7 @@ bool action_items(km_kbp_state const * state,
   auto act = km_kbp_state_action_items(state, &n);
 
   for (auto &rhs: expected)
-    if (std::memcmp(act++, &rhs, sizeof rhs) != 0) return false;
+    if (!(*act++ == rhs)) return false;
 
   return true;
 }
@@ -169,6 +207,9 @@ int main(int, char * [])
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
                                   KM_KBP_MODIFIER_SHIFT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}}));
+  //try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2,0));
+  // assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
+  //                     {uintptr_t(&expected_persist_opt)}}}));
 
   // Test debug dump
   auto doc1 = get_json_doc(*test_state),

@@ -54,7 +54,7 @@ char16_t const * options::lookup(km_kbp_option_scope scope,
 }
 
 
-km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key,
+option const * options::assign(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key,
                                        std::u16string const & value)
 {
   km_kbp_option_item const * opt = _scopes[scope-1];

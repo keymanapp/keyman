@@ -75,6 +75,11 @@ namespace
 namespace km {
   namespace kbp
   {
+    mock_processor::mock_processor(km_kbp_keyboard_attrs const * kb)
+    : abstract_processor(kb)
+    {
+    }
+
 
     km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state)
     {
@@ -84,13 +89,28 @@ namespace km {
 
       try
       {
-        state->actions.clear();
+        // At the start of every process_event allways clear the action_items
+        state->actions().clear();
 
         switch (vk)
         {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} });
+          state->actions().push_backspace();
+          break;
+
+        case KM_KBP_VKEY_F2:
+        {
+          auto opt = state->options().assign(state, KM_KBP_OPT_KEYBOARD,
+                      u"__test_point", u"F2 pressed test save.");
+          if (opt)  state->actions().push_persist(*opt);
+
+          break;
+        }
+
+        case KM_KBP_VKEY_F4:
+          state->context().push_marker(KM_KBP_VKEY_QUOTE);
+          state->actions().push_marker(KM_KBP_VKEY_QUOTE);
           break;
 
         default:
@@ -104,25 +124,25 @@ namespace km {
             for (auto c = char_seq; *c; ++c)
             {
               km_kbp_usv usv = *c;
-              state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR,{0,}, {usv} });
-              state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
+              state->context().push_character(usv);
+              state->actions().push_character(usv);
             }
-            state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
+            state->actions().commit();
 
             return KM_KBP_STATUS_OK;
           }
 
           // Both shift states output nothing, generate an alert.
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_ALERT, {0,}, {0} });
+          state->actions().push_alert();
           break;
         }
         }
 
-        state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
+        state->actions().commit();
       }
       catch (std::bad_alloc)
       {
-        state->actions.clear();
+        state->actions().clear();
         return KM_KBP_STATUS_NO_MEM;
       }
 

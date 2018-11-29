@@ -20,7 +20,23 @@ namespace kbp
 
 // This will likely be replaced with a class implementing a more space
 // efficient data structure such as a ring buffer or bounded queue.
-using context = std::list<km_kbp_context_item>;
+class context: public std::list<km_kbp_context_item>
+{
+public:
+  void push_character(km_kbp_usv);
+  void push_marker(uint32_t);
+};
+
+
+inline
+void context::push_character(km_kbp_usv usv) {
+  emplace_back(km_kbp_context_item { KM_KBP_CT_CHAR, {0,}, {usv} });
+}
+
+inline
+void context::push_marker(uint32_t marker) {
+  emplace_back(km_kbp_context_item { KM_KBP_CT_MARKER, {0,}, {marker} });
+}
 
 } // namespace kbp
 } // namespace km
