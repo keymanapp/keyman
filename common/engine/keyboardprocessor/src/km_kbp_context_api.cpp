@@ -54,6 +54,7 @@ km_kbp_context_items_from_utf16(km_kbp_cp const *text,
   return KM_KBP_STATUS_OK;
 }
 
+
 km_kbp_status km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
                                             km_kbp_cp *buf, size_t * sz_ptr)
 {
