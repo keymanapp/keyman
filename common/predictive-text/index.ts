@@ -49,7 +49,7 @@ class LMLayer {
    */
   static unwrap(fn: Function): string {
       let wrapper = fn.toString();
-      let match = wrapper.match(/function[^{]+{((?:.|\n)+)}[^}]*$/);
+      let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
       return match[1];
   }
 

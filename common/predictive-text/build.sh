@@ -68,10 +68,6 @@ fail ( ) {
   exit 1
 }
 
-unit-test ( ) {
-  npm run mocha -- --recursive ./unit_tests/headless/*.js
-}
-
 # Creates embedded_worker.js. Must be run after the worker is built for the
 # first time
 wrap-worker ( ) {
@@ -139,7 +135,7 @@ echo "Typescript compilation successful."
 
 if (( run_tests )); then
   if (( unit_tests_only )); then
-    unit-test || fail "Unit tests failed"
+    npm run test -- -headless || fail "Unit tests failed"
   else
     npm test || fail "Tests failed"
   fi

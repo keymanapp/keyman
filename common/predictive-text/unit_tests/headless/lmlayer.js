@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-let LMLayer = require('../../');
+let LMLayer = require('../../build/');
 
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
