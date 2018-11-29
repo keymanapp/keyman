@@ -81,7 +81,6 @@ AM_GNU_GETTEXT_VERSION(0.19.7)
 # OUTPUT files
 AC_CONFIG_FILES([ po/Makefile.in
 Makefile
-ibus-keyman.spec
 src/Makefile
 src/keyman.xml.in
 icons/Makefile
