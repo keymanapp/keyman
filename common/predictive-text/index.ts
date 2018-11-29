@@ -32,20 +32,55 @@
  */	
 type USVString = string;
 
-// TODO: document
+/**
+ * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
+ * 
+ * The Language Modelling layer provides a way for keyboards to offer prediction and
+ * correction functionalities. The LMLayer proper runs within a Web Worker, however,
+ * this class is intended to run in the main thread, and automatically spawn a Web
+ * Worker, capable of offering predictions.
+ * 
+ * Since the Worker runs in a different thread, the public methods of this class are
+ * asynchronous. Methods of note include:
+ * 
+ *  - #initialize() -- initialize the LMLayer with a configuration and language model
+ *  - #predict() -- ask the LMLayer to offer suggestions (predictions or corrections) for
+ *                  the input event
+ * 
+ * The top-level LMLayer will automatically starts up its own Web Worker.
+ */
 class LMLayer {
   /**
    * The underlying worker instance. By default, this is the LMLayerWorker. 
    */
   private _worker: Worker;
 
+  /**
+   * Construct the top-level LMLayer interface. This also starts the underlying Worker.
+   * Make sure to call .initialize() when using the default Worker.
+   * 
+   * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
+   *            or file: URI. If uri is not provided, this will start the default Worker.
+   */
   constructor(uri?: string) {
     this._worker = new Worker(uri || LMLayer.asBlobURI(LMLayerWorkerCode));
   }
 
+  // TODO: asynchronous initialize() method, based on 
+  //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L42-L62
+
+  // TODO: asynchronous predict() method, based on 
+  //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L64-L80
+
+  // TODO: asynchronous close() method.
+  //       Worker code must recognize message and call self.close().
+
   /**
-   * Given a function, this utility returns the source code within it.
-   * @param fn 
+   * Given a function, this utility returns the source code within it, as a string.
+   * This is intended to unwrap the "wrapped" source code created in the LMLayerWorker
+   * build process.
+   *
+   * @param fn The function whose body will be returned.
    */
   static unwrap(fn: Function): string {
       let wrapper = fn.toString();
@@ -74,7 +109,7 @@ class LMLayer {
   }
 }
 
-// Let LMLayer be available both in browser and in Node.
+// Let LMLayer be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayer;
 } else {

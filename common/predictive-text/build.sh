@@ -4,10 +4,14 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
+# Include some helper functions from resources
+. ../../resources/shellHelperFunctions.sh
+
 LMLAYER_OUTPUT=build
 WORKER_OUTPUT=build/intermediate
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
+
 
 # Build the worker and the main script.
 build ( ) {
@@ -51,21 +55,6 @@ display_usage ( ) {
   echo "  -help               displays this screen and exits"
   echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
   echo "  -test               runs unit and integration tests after building"
-}
-
-# Prints a nice, common error message.
-fail ( ) {
-  # TODO: source shellHelperFunctions.sh
-  local ERROR_RED
-  local NORMAL
-  ERROR_RED="$(tput setaf 1)"
-  NORMAL="$(tput sgr0)"
-  FAILURE_MSG="$1"
-  if [[ "$FAILURE_MSG" == "" ]]; then
-    FAILURE_MSG="Unknown failure."
-  fi
-  echo "$0: ${ERROR_RED}$FAILURE_MSG${NORMAL}"
-  exit 1
 }
 
 # Creates embedded_worker.js. Must be run after the worker is built for the

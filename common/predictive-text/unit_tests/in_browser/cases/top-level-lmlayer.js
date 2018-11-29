@@ -8,12 +8,15 @@ describe('LMLayer', function () {
       });
   });
 
-  describe('#asBlobURI', function () {
+  describe('#asBlobURI()', function () {
+    // #asBlobURI() requires browser APIs, hence why it cannot be tested headless in Node.
     it('should take a function and convert it into a blob function', function (done) {
       let uri = LMLayer.asBlobURI(function dummyHandler() {
-        // Post something weird, so we can be reasonably certain it's not a fluke.
-        // WARNING: Do NOT factor out this string as a variable.
-        // It MUST remain a string in this function body, because it gets stringified!
+        // Post something weird, so we can be reasonably certain the Web Worker is...
+        // well, working.
+        // WARNING: Do NOT refactor this string as a variable. It **MUST** remain a string
+        // in this function body, because the code in this function's body gets
+        // stringified!
         postMessage('fhqwhgads');
       });
       assert.match(uri, /^blob:/);
