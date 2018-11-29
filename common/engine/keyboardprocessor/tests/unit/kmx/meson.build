@@ -52,25 +52,26 @@ prog_kmcomp = find_program('kmcomp', required: false)
 
 if prog_kmcomp.found()
   foreach kmn : kmns 
-    kmn_test = custom_target(
-      kmn + '.kmn',
-      output: kmn + '.kmx',
+    custom_target(
+      kmn + '.kmx',
+      build_by_default: true,
       input: kmn + '.kmn',
-      command : [prog_kmcomp, '-s', '@INPUT@']
+      output: kmn + '.kmx',
+      command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
     )
-    
-    #kmn_source = configure_file(
-      #input: 'kmn/' + kmn + '.kmn',
-      #output: kmn + '.kmn',
-      #copy: true
-    #)
 
-    test(kmn, kmx, depends: [kmn_test], args: [kmn])
+    configure_file(
+      copy: true,
+      input:  kmn + '.kmn',
+      output: kmn + '.kmn'
+    )
+
+    test(kmn, kmx, args: [kmn, meson.build_root()])
   endforeach
 else
   warning('kmcomp was not found. Using existing compiled keyboards and changes to kmn files will be ignored.')
+  foreach kmn : kmns
+    test(kmn, kmx, args: [kmn, meson.source_root()])
+  endforeach
 endif
 
-foreach kmn : kmns 
-  test(kmn, kmx, args: kmn)
-endforeach
