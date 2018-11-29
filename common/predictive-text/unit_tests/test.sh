@@ -25,21 +25,21 @@ init_dependencies ( ) {
 }
 
 test-headless ( ) {
-  _FLAGS=FLAGS
+  _FLAGS=$FLAGS
   if (( CI_REPORTING )); then
-    _FLAGS="${_FLAGS} --reporter mocha-teamcity-reporter"
+    _FLAGS="$_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive ${_FLAGS} ./unit_tests/headless/*.js
+  npm run mocha -- --recursive $_FLAGS ./unit_tests/headless/*.js
 }
 
 test-browsers ( ) {
-  _FLAGS=FLAGS
+  _FLAGS=$FLAGS
   if (( CI_REPORTING )); then
-    _FLAGS="${_FLAGS} -CI -reporter teamcity"
+    _FLAGS="$_FLAGS -CI -reporter teamcity"
   fi
 
-  in_browser/browser-test.sh ${_FLAGS} $os_id
+  in_browser/browser-test.sh $_FLAGS $os_id
 }
 
 # Defaults
