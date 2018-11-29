@@ -12,9 +12,9 @@
 
 ## Linux Requirements/Setup
 
-- It is helpful to be using the [packages.sil.org](http://packages.sil.org)  repo
+- It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
 
-- Install packages required for building and developing KMFL
+- Install packages required for building and developing KMFL and Keyman for Linux
 `sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson`
 
 
@@ -76,8 +76,9 @@ This is only for testing the build, not for running ibus-kmfl or ibus-keyman in 
 
 ### Continuous integration
 
-Teamcity will run `make tmpinstall`
-
+Teamcity PR builds will run `make tmpinstall`
+Master builds run `make tmpinstall` and create source packages
+Nightly builds upload the most recent new master build to https://downloads.keyman.com
 
 ### Building packages
 
