@@ -67,5 +67,6 @@ if prog_kmcomp.found()
       output: kmn + '.kmn',
       copy: true
     )
-  test(kmn, kmx, depends: [kmn_test], args: [kmn])
+    test(kmn, kmx, depends: [kmn_test], args: [kmn])
+  endforeach
 endif
