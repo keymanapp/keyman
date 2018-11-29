@@ -3,8 +3,12 @@ var sinon = require('sinon');
 
 let LMLayerWorker = require('../../worker');
 
+// Unit tests for instantiating and initializing the LMLayer Worker in isolation.
+//
+// Although the LMLayerWorker expected to be used inside a DedicatedWorkerGlobalScope,
+// these unit tests DO NOT run inside a Worker, and instead use Sinon fakes to assert
+// behavior.
 describe('LMLayerWorker', function() {
-
   describe('#constructor()', function() {
     it('should allow for the mocking of postMessage()', function () {
       var fakePostMessage = sinon.fake();
@@ -147,6 +151,7 @@ describe('LMLayerWorker', function() {
     });
   });
 
+  // TODO: move these tests to a different file.
   describe('Message: predict', function () {
     it.skip('should predict from a local model', function () {
       // will need import scripts figured out
@@ -161,6 +166,11 @@ describe('LMLayerWorker', function() {
     return { data };
   }
 
+  /**
+   * Deprecation warning: Soon, models will not be requierd to be passed as source code;
+   * when this happens, tests should refrain from sending source code for the model
+   * parameter.
+   */
   function dummyModelCode() {
     return 'return {model: {}, configuration: {}}';
   }

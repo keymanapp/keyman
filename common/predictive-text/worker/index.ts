@@ -20,33 +20,37 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/**
+ * The signature of self.postMessage(), so that unit tests can mock it.
+ */
 type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+
+/**
+ * The valid outgoing message types.
+ */
 type OutgoingMessageKind = 'ready' | 'suggestions';
 
+/**
+ * The structure of an initialization message. It should include the model (either in
+ * source code or parameter form), as well as the keyboard's capabilities.
+ */
 interface InitializeMessage {
   /**
-   * Source code of the model.
-   * TODO: write a description of what this source code should look like.
+   * The model, and its configuration.
+   * TODO: write a description of what this actually is!
    */
-  model: string;
+  model: any;
+
   /**
    * The configuration that the keyboard can offer to the model.
    */
+  // TODO: rename to capabilities? They **are** the capabilities of the keyboard's platform.
   configuration: RequestedConfiguration;
 }
 
-interface InitializeMessage {
-  /**
-   * Source code of the model.
-   * TODO: write a description of what this source code should look like.
-   */
-  model: string;
-  /**
-   * The configuration that the keyboard can offer to the model.
-   */
-  configuration: RequestedConfiguration;
-}
-
+/**
+ * The structure of the message back to the keyboard.
+ */
 interface ReadyMessage {
   configuration: ModelConfiguration;
 }
@@ -104,7 +108,7 @@ interface ModelConfiguration {
   rightContextCodeUnits: number;
 };
 
-// TODO:
+// TODO: define what valid values of the model are.
 interface Model {};
 
  /**
@@ -222,7 +226,7 @@ class LMLayerWorker {
   }
 }
 
-// Let LMLayerWorker be available both in browser and in Node.
+// Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
