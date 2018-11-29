@@ -28,21 +28,13 @@ class DownloadKmpWindow(Gtk.Window):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         s = Gtk.ScrolledWindow()
-        # TODO update (or remove) user_agent once website supports Linux kmp packages
-        user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"
-        #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
         webview = WebKit2.WebView()
-        settings = WebKit2.Settings()
-        settings.set_user_agent(user_agent)
-        webview.set_settings(settings)
         webview.connect("decide-policy", self.keyman_policy)
-        # TODO update website URI once website supports Linux kmp packages
-        webview.load_uri("https://keyman.com/keyboards?embed=macos&version=10")
+        webview.load_uri("https://keyman.com/keyboards?embed=linux&version=10")
         s.add(webview)
         vbox.pack_start(s, True, True, 0)
 
         bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
-        #bbox.set_layout(Gtk.ButtonBoxStyle.END)
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.connect("clicked", self.on_close_clicked)
