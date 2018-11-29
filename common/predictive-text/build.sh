@@ -4,12 +4,16 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
-EMBEDDED_WORKER=embedded_worker.js
+LMLAYER_OUTPUT=build
+WORKER_OUTPUT=build/intermediate
+NAKED_WORKER=$WORKER_OUTPUT/index.js
+EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
 
 # Build the worker and the main script.
 build ( ) {
   # Build worker first; the main file depends on it.
   # Then wrap the worker; Then build the main file.
+
   build-worker && wrap-worker && build-main
 }
 
@@ -21,14 +25,21 @@ build-main () {
 # Builds the inner JavaScript worker (the first stage of compilation).
 # This script must be wrapped.
 build-worker () {
+  if ! [ -d $WORKER_OUTPUT ]; then
+    mkdir -p "$WORKER_OUTPUT" # Includes any base folders recursively.
+  fi
+
   npm run tsc -- -p ./worker/tsconfig.json || fail "Could not build worker."
 }
 
 # A nice, extensible method for -clean operations.  Add to this as necessary.
 clean ( ) {
-  rm -f "${EMBEDDED_WORKER}"
-  if [ $? -ne 0 ]; then
-    fail "Failed to erase the prior build."
+  if [ -d $WORKER_OUTPUT ]; then
+    rm -rf "$WORKER_OUTPUT" || fail "Failed to erase the prior build."
+  fi
+  
+  if [ -d $LMLAYER_OUTPUT ]; then
+    rm -rf "$LMLAYER_OUTPUT" || fail "Failed to erase the prior build."
   fi
 }
 
@@ -64,8 +75,8 @@ unit-test ( ) {
 # Creates embedded_worker.js. Must be run after the worker is built for the
 # first time
 wrap-worker ( ) {
-  echo "> wrap-worker-code LMLayerWorkerCode ./worker/index.js > ${EMBEDDED_WORKER}"
-  wrap-worker-code LMLayerWorkerCode ./worker/index.js > "${EMBEDDED_WORKER}"
+  echo "> wrap-worker-code LMLayerWorkerCode ${NAKED_WORKER} > ${EMBEDDED_WORKER}"
+  wrap-worker-code LMLayerWorkerCode "${NAKED_WORKER}" > "${EMBEDDED_WORKER}"
 }
 
 # Wraps JavaScript code in a way that can be embedded in a worker.

@@ -22,7 +22,7 @@
 
 // Include the code intended to run WITHIN the Web Worker.
 // The worker code must be compiled before this file is compiled.
-/// <reference path="embedded_worker.js" />
+/// <reference path="build/intermediate/embedded_worker.js" />
 
 /**
  * The body of this function contains code that should run
