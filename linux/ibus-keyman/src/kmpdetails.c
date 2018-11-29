@@ -259,7 +259,7 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
             &(keyboard->id));
         get_detail_from_object(object, "description",
             &(keyboard->description));
-        get_detail_from_object(object, "description",
+        get_detail_from_object(object, "license",
             &(keyboard->license));
     }
     g_object_unref(parser);
