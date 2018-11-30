@@ -88,6 +88,7 @@ class LMLayer {
    * The underlying worker instance. By default, this is the LMLayerWorker. 
    */
   private _worker: Worker;
+  private _resolveInitialized: (Configuration) => void;
 
   /**
    * Construct the top-level LMLayer interface. This also starts the underlying Worker.
@@ -100,6 +101,7 @@ class LMLayer {
     // Either use the given worker, or instantiate the default worker.
     this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
     this._worker.onmessage = this.onMessage.bind(this)
+    this._resolveInitialized = null;
   }
 
   /**
@@ -107,12 +109,14 @@ class LMLayer {
    * as well as a description of the model required.
    */
   initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration> {
-    this._worker.postMessage({
-      message: 'initialize',
-      // TODO: other arguments
-    })
-
-    return Promise.reject('Not implemented');
+    return new Promise((resolve, _reject) => {
+      this._worker.postMessage({
+        message: 'initialize',
+        capabilities,
+        model
+      });
+      this._resolveInitialized = resolve;
+    });
   }
 
   // TODO: asynchronous predict() method, based on 
@@ -122,7 +126,12 @@ class LMLayer {
   //       Worker code must recognize message and call self.close().
 
   private onMessage(event: MessageEvent): void {
-    throw new Error('Not implemented');
+    let {message} = event.data;
+    if (message === 'ready') {
+      this._resolveInitialized(event.data.configuration);
+    } else {
+      throw new Error(`Message not implemented: ${message}`);
+    }
   }
 
   /**
