@@ -48,24 +48,31 @@ kmns = [
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-prog_kmcomp = find_program('kmcomp')
+prog_kmcomp = find_program('kmcomp', required: false)
 
-# todo: if kmcomp is not found, use the .kmx in the source folder
-# therefore make kmcomp compile to the source folder and add to repo?
+if prog_kmcomp.found()
+  warning('Compiled keyboards are not automatically added to the repo. Copy them from the build dir if you are committing any changes to tests.')
+  foreach kmn : kmns 
+    custom_target(
+      kmn + '.kmx',
+      build_by_default: true,
+      input: kmn + '.kmn',
+      output: kmn + '.kmx',
+      command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
+    )
 
-foreach kmn : kmns 
-  kmn_test = custom_target(
-    kmn + '.kmn',
-    output: kmn + '.kmx',
-    input: 'kmn/' + kmn + '.kmn',
-    command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
-  )
-  
-  kmn_source = configure_file(
-    input: 'kmn/' + kmn + '.kmn',
-    output: kmn + '.kmn',
-    copy: true
-  )
+    configure_file(
+      copy: true,
+      input:  kmn + '.kmn',
+      output: kmn + '.kmn'
+    )
 
-  test(kmn, kmx, depends: [kmn_test], args: [kmn])
-endforeach
+    test(kmn, kmx, args: [kmn, meson.build_root()])
+  endforeach
+else
+  warning('kmcomp was not found. Using existing compiled keyboards and changes to kmn files will be ignored.')
+  foreach kmn : kmns
+    test(kmn, kmx, args: [kmn, meson.source_root()])
+  endforeach
+endif
+
