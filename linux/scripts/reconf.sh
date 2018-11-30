@@ -55,8 +55,7 @@ done
 if [ "${extra_project}" == "keyman-config" ]; then
     majorvers=`cat ../resources/VERSION.md | cut -d . -f 1`
     cd keyman-config/keyman_config
-    sed "s/_VERSION_/${newvers}/g" version.py.in > version.py
-    sed "s/_MAJORVERSION_/${majorvers}/g" downloadkeyboard.py.in > downloadkeyboard.py
+    sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${majorvers}/g" version.py.in > version.py
 fi
 cd $BASEDIR
 
