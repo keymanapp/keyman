@@ -42,7 +42,8 @@ class LMLayer {
    * The underlying worker instance. By default, this is the LMLayerWorker. 
    */
   private _worker: Worker;
-  private _resolveInitialized: (Configuration) => void;
+  /** Call this when the LMLayer has sent us the 'ready' message! */
+  private _declareLMLayerReady: (Configuration) => void;
 
   /**
    * Construct the top-level LMLayer interface. This also starts the underlying Worker.
@@ -55,7 +56,7 @@ class LMLayer {
     // Either use the given worker, or instantiate the default worker.
     this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
     this._worker.onmessage = this.onMessage.bind(this)
-    this._resolveInitialized = null;
+    this._declareLMLayerReady = null;
   }
 
   /**
@@ -69,7 +70,10 @@ class LMLayer {
         capabilities,
         model
       });
-      this._resolveInitialized = resolve;
+
+      // Sets up so the promise is resolved in the onMessage() callback, when it receives
+      // the 'ready' message.
+      this._declareLMLayerReady = resolve;
     });
   }
 
@@ -82,7 +86,7 @@ class LMLayer {
   private onMessage(event: MessageEvent): void {
     let {message} = event.data;
     if (message === 'ready') {
-      this._resolveInitialized(event.data.configuration);
+      this._declareLMLayerReady(event.data.configuration);
     } else {
       throw new Error(`Message not implemented: ${message}`);
     }
