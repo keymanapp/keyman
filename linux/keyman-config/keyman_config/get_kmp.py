@@ -11,18 +11,18 @@ import os
 from pathlib import Path
 
 
-def get_keyboard_data(keyboardid, weekCache=False):
+def get_keyboard_data(keyboardID, weekCache=False):
 	"""
-	Get Keyboard data from web api.
+	Get Keyboard or package data from web api.
 
 	Args:
-		keyboardid (str): Keyboard ID
+		keyboardID (str): Keyboard or package ID
 		weekCache (bool) : cache data for 1 week, default is 1 day
 	Returns:
 		dict: Keyboard data
 	"""
-	logging.info("Getting data for keyboard %s", keyboardid)
-	api_url = "https://api.keyman.com/keyboard/" + keyboardid
+	logging.info("Getting data for keyboard %s", keyboardID)
+	api_url = "https://api.keyman.com/keyboard/" + keyboardID
 	logging.debug("At URL %s", api_url)
 	home = str(Path.home())
 	cache_dir = keyman_cache_dir()
@@ -139,16 +139,16 @@ def download_kmp_file(url, kmpfile, cache=False):
 			downloadfile = kmpfile
 	return downloadfile
 
-def get_kmp(keyboardid):
+def get_kmp(packageID):
 	"""
-	Download a kmp file given a keyboard id.
+	Download a kmp file given a package id.
 
 	Args:
-		keyboardid (str): Keyboard ID
+		packageID (str): package ID
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
-	kbdata = get_keyboard_data(keyboardid)
+	kbdata = get_keyboard_data(packageID)
 	if (kbdata):
 		return get_kmp_file(kbdata)
 	else:

@@ -55,195 +55,63 @@
 #define DEBUG_PLATFORM_STRING "x86"
 #endif
 
-enum {NO_DEBUG_WINDOWS=100, UNABLE_TO_CREATE_FILE_MAPPING, UNABLE_TO_MAP_VIEW_OF_FILE};
 
-BOOL g_debug_KeymanLog = FALSE, g_debug_ToConsole = FALSE;
-HANDLE g_debug_hLogMailSlot = 0, g_debug_hLogEvent = 0;
-BOOL g_debug_DebugInit = FALSE;
-
-void InitDebuggingEx() {
-	if(g_debug_hLogMailSlot != 0 && g_debug_hLogMailSlot != INVALID_HANDLE_VALUE) {
-    CloseHandle(g_debug_hLogMailSlot);
-  }
-
-  if(g_debug_hLogEvent) {
-    CloseHandle(g_debug_hLogEvent);
-  }
-
-  g_debug_hLogMailSlot = 0;
-  g_debug_hLogEvent = 0;
-  g_debug_KeymanLog = FALSE;
-
-	g_debug_hLogMailSlot = CreateFile("\\\\.\\mailslot\\Tavultesoft_KeymanEngine_Debug", 
-			GENERIC_WRITE, 
-			FILE_SHARE_READ | FILE_SHARE_WRITE,  // required to write to a mailslot 
-			(LPSECURITY_ATTRIBUTES) NULL, 
-			OPEN_EXISTING, 
-			FILE_FLAG_OVERLAPPED | FILE_ATTRIBUTE_NORMAL, 
-			(HANDLE) NULL);
-
-  if(!g_debug_hLogMailSlot || g_debug_hLogMailSlot == INVALID_HANDLE_VALUE) {
-    return;
-  }
-
-	g_debug_hLogEvent = CreateEvent(NULL, FALSE, FALSE, "Tavultesoft_KeymanEngine_DebugWrite");
-  if(g_debug_hLogEvent == 0) {
-    CloseHandle(g_debug_hLogMailSlot);
-    g_debug_hLogMailSlot = 0;
-    return;
-  }
-
-  g_debug_KeymanLog = TRUE;
-}
-
-inline void TestInitDebug() {
-	if(!g_debug_DebugInit) InitDebuggingEx();
-	g_debug_DebugInit = TRUE;
+BOOL ShouldDebug() {
+  return TRUE;
 }
 
 void InitDebugging() {
-	InitDebuggingEx();
-	g_debug_DebugInit = TRUE;
+  if (ShouldDebug()) {
+    VS_FIXEDFILEINFO *ffi;
+    DWORD sz;
+    UINT ffilen;
+    char *buf = new char[1024], fname[260];
 
-	if(g_debug_KeymanLog)	{
-		VS_FIXEDFILEINFO *ffi;
-		DWORD sz;
-		UINT ffilen;
-		char *buf = new char[1024], fname[260];
+    GetModuleFileName(GetModuleHandle("kmtip.dll"), fname, 260);
+    sz = GetFileVersionInfoSize(fname, 0);
+    if (sz > 0) {
+      buf = new char[sz];
+      GetFileVersionInfo(fname, 0, sz, buf);
+      VerQueryValue(buf, "\\", (void **)&ffi, &ffilen);
 
-		GetModuleFileName(GetModuleHandle("kmtip.dll"), fname, 260);
-		sz = GetFileVersionInfoSize(fname, 0);
-		if(sz > 0) {
-			buf = new char[sz];
-			GetFileVersionInfo(fname, 0, sz, buf);
-			VerQueryValue(buf, "\\", (void **) &ffi, &ffilen);
-
-			SendDebugMessageFormat("kmtip version: %d.%d.%d.%d", 
-				HIWORD(ffi->dwProductVersionMS), LOWORD(ffi->dwProductVersionMS), 
-				HIWORD(ffi->dwProductVersionLS), LOWORD(ffi->dwProductVersionLS));
-  		delete buf; // I2157
-		} else {
-			SendDebugMessage("kmtip version: damaged");
+      SendDebugMessageFormat(L"kmtip version: %d.%d.%d.%d",
+        HIWORD(ffi->dwProductVersionMS), LOWORD(ffi->dwProductVersionMS),
+        HIWORD(ffi->dwProductVersionLS), LOWORD(ffi->dwProductVersionLS));
+      delete buf; // I2157
     }
-	}
+    else {
+      SendDebugMessage(L"kmtip version: damaged");
+    }
+  }
 }
 
-void UninitDebuggingEx() {
-  if(g_debug_hLogMailSlot) {
-    CloseHandle(g_debug_hLogMailSlot);
+int SendDebugMessageFormat_1(char *file, int line, PWCHAR fmt, ...) {
+  if (ShouldDebug()) {
+    WCHAR fmtbuf[256];
+
+    va_list vars;
+    va_start(vars, fmt);
+    if (_vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars) <= 0) {
+      wcscpy_s(fmtbuf, L"fail");  // I2248   // I3547
+    }
+    fmtbuf[255] = 0;
+    SendDebugMessage_1(file, line, fmtbuf);
   }
-	g_debug_hLogMailSlot = 0;
-	if(g_debug_hLogEvent) {
-    CloseHandle(g_debug_hLogEvent);
-  }
-	g_debug_hLogEvent = 0;
-  g_debug_DebugInit = FALSE;
-}
-
-BOOL ShouldDebug_1() {
-  TestInitDebug();
-	return g_debug_KeymanLog;
-}
-
-int SendDebugMessageFormat_1(char * file, int line, char *fmt, ...) {
-	char fmtbuf[256];
-
-	va_list vars;
-	va_start(vars, fmt);
-	if(vsnprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars) <= 0) {
-    strcpy_s(fmtbuf, "fail");  // I2248   // I3547
-  }
-	fmtbuf[255] = 0;
-	SendDebugMessage_1(file, line, fmtbuf);
-
   return 0;
 }
 
-#define TAB "\t"
-
-int SendDebugMessage_1(char * file, int line, char *msg) {
-	if(!g_debug_KeymanLog) {
-    return 0;
+int SendDebugMessage_1(char *file, int line, PWCHAR msg) {
+  if (ShouldDebug()) {
+    Keyman32Interface::WriteDebugEvent(file, line, msg);
   }
-
-	OVERLAPPED ov;
-	DWORD cbWritten; 
-	char windowinfo[1024];
-
-  GUITHREADINFO gti;
-	char sProcessPath[256], sProcessName[32];
-
-  gti.cbSize = sizeof(gti);
-  GetGUIThreadInfo(GetCurrentThreadId(), &gti);
-
-	GetModuleFileName(NULL, sProcessPath, 256);
-	_splitpath_s(sProcessPath, NULL, 0, NULL, 0, sProcessName, 32, NULL, 0);
-	sProcessName[31] = 0;
-
-	if(strlen(msg) > 256) msg[255] = 0;
-
-	wsprintf(windowinfo, 
-    DEBUG_PLATFORM_STRING TAB //"Platform" TAB
-    "%s" TAB  //"Process" TAB
-    "%x" TAB  //"PID" TAB
-    "%x" TAB  //"TID" TAB
-    " " TAB  //"ShiftState" TAB
-    " " TAB  //"ActualShiftState" TAB   // I4843
-    "%d" TAB  //"TickCount" TAB
-    "%x" TAB  //"FocusHWND" TAB
-    "%8x" TAB //"ActiveHKL" TAB
-    "%s:%d" TAB  //"SourceFile" TAB
-    "%s",     //"Message"
-  			
-    sProcessName,                    //"Process" TAB
-    GetCurrentProcessId(),           //"PID" TAB
-    GetCurrentThreadId(),            //"TID" TAB
-    //0,                               //"ShiftState" TAB
-    GetTickCount(),                  //"TickCount" TAB
-    gti.hwndFocus,                   //"FocusHWND" TAB
-    GetKeyboardLayout(0),            //"ActiveHKL" TAB
-    file, line,                      //"SourceFile" TAB
-    msg);                            //"Message"
-
-  if(g_debug_ToConsole) {   // I3951
-    OutputDebugString(windowinfo);   // I3570   // I3951
-    OutputDebugString("\n");   // I3570   // I3951
-  }
-
-	if(g_debug_hLogMailSlot != 0) {
-		ov.Offset = 0;
-		ov.OffsetHigh = 0;
-		ov.hEvent = g_debug_hLogEvent;
-		if(!WriteFile(g_debug_hLogMailSlot,
-			windowinfo, 
-			(DWORD) strlen(windowinfo) + 1,  // include terminating null 
-			&cbWritten, 
-			&ov)) {
-      switch(GetLastError()) { // I2445 - Try and reconnect debug pipe on error
-      case ERROR_HANDLE_EOF:
-      case ERROR_BROKEN_PIPE:
-        UninitDebuggingEx();
-        InitDebuggingEx();
-			  if(WriteFile(g_debug_hLogMailSlot,
-				  windowinfo, 
-				  (DWORD) strlen(windowinfo) + 1,  // include terminating null 
-				  &cbWritten, 
-				  &ov)) break;
-      default:
-        UninitDebuggingEx();
-        g_debug_KeymanLog = FALSE;  /// Failed again - we could log to system log I guess
-      }
-    }
-  }
-
   return 0;
 }
 
-void DebugLastError_1(char *file, int line, char *func, char *date) {
-  DWORD err = GetLastError();
+void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err) {
   if(ShouldDebug()) {
-    char msg[256];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL);
-    SendDebugMessageFormat_1("ERROR %d in %s [%s:%d]: %s", err, func, file, line, date, msg);
+    WCHAR buf[256];
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, buf, _countof(buf), NULL);
+    SendDebugMessageFormat(L"ERROR %d in %hs [%hs:%d] calling %s: %s", err, func, file, line, msg, buf);
   }
 }
+
