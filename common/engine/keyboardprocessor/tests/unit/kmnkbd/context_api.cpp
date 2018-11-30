@@ -26,6 +26,8 @@ namespace
 
   std::u16string const  initial_bmp_context = u"Hello, အရှောက်, मानव अधिकारों की सार्वभौम घोषणा",
                         initial_smp_context = u"😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏";
+  std::string const     initial_u8_bmp_context = u8"Hello, အရှောက်, मानव अधिकारों की सार्वभौम घोषणा",
+                        initial_u8_smp_context = u8"😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏";
   auto const bmp_ctxt_size = count_codepoints(initial_bmp_context),
              smp_ctxt_size = count_codepoints(initial_smp_context);
   km_kbp_context_item test_marker_ctxt[2] = {
@@ -41,19 +43,27 @@ namespace
 
 int main(int, char * [])
 {
-  km_kbp_context_item *ctxt1, *ctxt2;
+  km_kbp_context_item *ctxt1, *ctxt2, *ctxt3, *ctxt4;
   // Test UTF16 to context_item conversion.
   try_status(km_kbp_context_items_from_utf16(initial_bmp_context.data(), &ctxt1));
   try_status(km_kbp_context_items_from_utf16(initial_smp_context.data(), &ctxt2));
+  try_status(km_kbp_context_items_from_utf8(initial_u8_bmp_context.data(), &ctxt3));
+  try_status(km_kbp_context_items_from_utf8(initial_u8_smp_context.data(), &ctxt4));
 
   // Check context_item to UTF16 conversion, roundtrip test.
-  km_kbp_cp ctxt_buffer[512] ={0,};
+  char16_t ctxt_buffer[512] ={0,};
+  char     ctxt_u8_buffer[512] ={0,};
   // First call measure space 2nd call do conversion.
   size_t ctxt_size = sizeof ctxt_buffer/sizeof(km_kbp_cp);
   try_status(km_kbp_context_items_to_utf16(ctxt1, nullptr, &ctxt_size));
   if (ctxt_size > sizeof ctxt_buffer/sizeof(km_kbp_cp))  return __LINE__;
   try_status(km_kbp_context_items_to_utf16(ctxt1, ctxt_buffer, &ctxt_size));
   if (initial_bmp_context != ctxt_buffer) return __LINE__;
+  // repeat for utf-8 versions.
+  try_status(km_kbp_context_items_to_utf8(ctxt3, nullptr, &ctxt_size));
+  if (ctxt_size > sizeof ctxt_u8_buffer/sizeof(char))  return __LINE__;
+  try_status(km_kbp_context_items_to_utf8(ctxt3, ctxt_u8_buffer, &ctxt_size));
+  if (initial_u8_bmp_context != ctxt_u8_buffer) return __LINE__;
 
   // Test roundtripping SMP characters in surrogate pairs.
   ctxt_size=sizeof ctxt_buffer/sizeof(km_kbp_cp);

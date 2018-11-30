@@ -11,8 +11,9 @@
 */
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 
 typedef uint32_t  uchar_t;
 

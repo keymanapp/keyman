@@ -311,8 +311,8 @@ context during the conversion.
 */
 KMN_API
 km_kbp_status
-km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
-                              km_kbp_cp *buf,
+km_kbp_context_items_to_utf8(km_kbp_context_item const *item,
+                              char *buf,
                               size_t *buf_size);
 
 /*
