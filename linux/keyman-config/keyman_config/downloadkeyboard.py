@@ -31,7 +31,7 @@ class DownloadKmpWindow(Gtk.Window):
         s = Gtk.ScrolledWindow()
         webview = WebKit2.WebView()
         webview.connect("decide-policy", self.keyman_policy)
-        webview.load_uri("https://keyman.com/keyboards?embed=linux&version="+__majorversion__)
+        webview.load_uri("https://keyman.com/go/linux/"+__majorversion__+"/download-keyboards")
         s.add(webview)
         vbox.pack_start(s, True, True, 0)
 

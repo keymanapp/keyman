@@ -53,7 +53,7 @@ for proj in ${autotool_projects}; do
 done
 
 if [ "${extra_project}" == "keyman-config" ]; then
-    majorvers=`cat ../resources/VERSION.md | cut -d . -f 1`
+    majorvers=`cat ../resources/VERSION.md`
     cd keyman-config/keyman_config
     sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${majorvers}/g" version.py.in > version.py
 fi
