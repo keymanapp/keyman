@@ -62,9 +62,6 @@ interface PredictMessage {
   // transform: Transform;
 }
 
-// TODO: define what valid values of the model are.
-interface Model {};
-
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
   */
@@ -145,7 +142,7 @@ class LMLayerWorker {
    * @param capabilities Capabilities on offer from the keyboard.
    */
   private loadModel(modelCode: any, capabilities: Capabilities) {
-    let model: Model = null;
+    let model: ModelDescription = null;
     let configuration: Configuration = {
       leftContextCodeUnits: 0,
       rightContextCodeUnits: 0
