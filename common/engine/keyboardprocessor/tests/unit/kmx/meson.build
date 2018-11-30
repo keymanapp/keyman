@@ -51,6 +51,7 @@ kmns = [
 prog_kmcomp = find_program('kmcomp', required: false)
 
 if prog_kmcomp.found()
+  warning('Compiled keyboards are not automatically added to the repo. Copy them from the build dir if you are committing any changes to tests.')
   foreach kmn : kmns 
     custom_target(
       kmn + '.kmx',
