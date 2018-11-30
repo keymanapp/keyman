@@ -27,7 +27,7 @@ std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.c
 namespace
 {
 
-const std::string base = "tests/unit/kmx/";
+const std::string base = "/tests/unit/kmx/";
 
 bool g_beep_found = false;
 
@@ -48,8 +48,8 @@ struct kmx_option {
 
 using kmx_options = std::vector<kmx_option>;
 
-int run_test(const std::string & file);
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep);
+int run_test(const std::string & file, const std::string & inputpath);
+int load_source(const std::string & file, const std::string & inputpath, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep);
 
 km_kbp_option_item test_env_opts[] =
 {
@@ -221,13 +221,13 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   }
 }
 
-int run_test(const std::string & file) {
+int run_test(const std::string & file, const std::string & inputpath) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   kmx_options options;
   bool expected_beep = false;
   
-  int result = load_source(file, keys, expected, context, options, expected_beep);
+  int result = load_source(file, inputpath, keys, expected, context, options, expected_beep);
   if (result != 0) return result;
 
   std::cout << "file = " << file << std::endl;
@@ -235,7 +235,7 @@ int run_test(const std::string & file) {
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
     
-  try_status(km_kbp_keyboard_load(std::filesystem::path(base + file + ".kmx").c_str(), &test_kb));
+  try_status(km_kbp_keyboard_load(std::filesystem::path(inputpath + base + file + ".kmx").c_str(), &test_kb));
 
   // Setup state, environment
 
@@ -401,7 +401,7 @@ bool is_token(const std::string token, std::string &line) {
   return false;
 }
 
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
+int load_source(const std::string & file, const std::string & inputpath, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
   const std::string s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ",
@@ -409,7 +409,7 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
     s_option_expected = "c expected option: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
-  std::ifstream kmn(base + file + ".kmn");
+  std::ifstream kmn(inputpath + base + file + ".kmn");
   if (!kmn.good()) {
     kmn.open(file + ".kmn");
   }
@@ -456,11 +456,9 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
 
 int main(int argc, char *argv[])
 {
-  for (int i = 1; i < argc; i++) {
-    int result;
-    std::cout << argv[i] << std::endl;
-    if ((result = run_test(argv[i])) != 0) return result;
-  }
+  int result;
+  std::cout << argv[1] << " in path " << argv[2] << base << std::endl;
+  if ((result = run_test(argv[1], argv[2])) != 0) return result;
   return 0;
 }
 

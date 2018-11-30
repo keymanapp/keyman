@@ -203,6 +203,13 @@ BOOL PreservedKeyMap::MapKeyRule(KEY *pKey, TF_PRESERVEDKEY *pPreservedKey)
     return FALSE;
   }
 
+  if (Key > 255) {
+    //
+    // Touch-defined keys have a value > 255, but these should never be preserved
+    //
+    return FALSE;
+  }
+
   if(ShiftFlags == 0)
   {
     if(!MapUSCharToVK(&Key, &ShiftFlags)) return FALSE;
