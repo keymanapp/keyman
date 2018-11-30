@@ -7,8 +7,12 @@ let LMLayer = require('../../build');
 // Note: these tests can only be run after BOTH stages of compilation are completed.
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
-    it.skip('should be take a URI to instantiate', function () {
-      new LMLayer(uri);
+    it('should be take a Worker to instantiate', function () {
+      let fakeWorker = {
+        postMessage: sinon.fake(),
+        onmessage: null
+      };
+      new LMLayer(fakeWorker);
     });
   });
 
