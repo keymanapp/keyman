@@ -116,7 +116,7 @@ private:
       4                   // 4 bytes
     };
     static constexpr const uint8_t mask_lut[5] = {0x7f, 0xff, 0x3f, 0x1f, 0x0f};
-    static const uchar_t    limit = 0x110000;
+    static constexpr const uchar_t limit = 0x110000;
 
 public:
     typedef uint8_t   codeunit_t;
