@@ -31,7 +31,7 @@ describe('LMLayer', function() {
     });
 
     it('should send the `initialize` message to the LMLayer', async function () {
-      let fakeWorker = createFakeWorker();
+      let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(fakeWorker);
       let configuration = await lmLayer.initialize(
         {
@@ -44,11 +44,20 @@ describe('LMLayer', function() {
       );
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
-      assert(fakeWorker.postMessage.calledOnceWith(sinon.match({
-        message: 'initialize',
-        capabilities: sinon.match.any(),
-        model: sinon.match.any()
-      })));
+      // In the "Worker", assert the message structure and reply.
+      function fakePostMessage(data) {
+        assert.propertyVal(data, 'message', 'initialize')
+        assert.isObject(data.capabilities);
+        assert.isObject(data.model);
+      
+        // send the message on setTimeout() to emulate "asynchronous" call.
+        setTimeout(() => fakeWorker.onmessage({
+          data: {
+            message: 'ready',
+            configuration: {}
+          }
+        }), 0);
+      }
       assert.isObject(configuration);
     });
   });
@@ -74,10 +83,9 @@ describe('LMLayer', function() {
    * 
    * @returns {Worker} an object with sinon.fake() instances.
    */
-  function createFakeWorker() {
+  function createFakeWorker(postMessage) {
     return {
-        // TODO: this should reply
-        postMessage: sinon.fake(),
+        postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
         onmessage: null
       };
   }
