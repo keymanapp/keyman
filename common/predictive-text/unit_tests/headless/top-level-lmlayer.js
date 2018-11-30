@@ -51,12 +51,12 @@ describe('LMLayer', function() {
         assert.isObject(data.model);
       
         // send the message on setTimeout() to emulate "asynchronous" call.
-        setTimeout(() => fakeWorker.onmessage({
+        callAsynchronously(() => fakeWorker.onmessage({
           data: {
             message: 'ready',
             configuration: {}
           }
-        }), 0);
+        }));
       }
       assert.isObject(configuration);
     });
@@ -88,5 +88,22 @@ describe('LMLayer', function() {
         postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
         onmessage: null
       };
+  }
+
+  /**
+   * Call a function in the future, i.e., later in the event loop.  
+   * The call does NOT block the current execution.
+   * Use this to fake asynchronous callbacks. 
+   * 
+   * @param {Function} fn function to call
+   */
+  function callAsynchronously(fn) {
+    if (typeof process !== 'undefined' && process.nextTick) {
+      // Preferred way to do it in Node.JS
+      process.nextTick(fn);
+    } else {
+      // In all other JavaScript environments (e.g., the browser)
+      setTimeout(fn, 0)
+    }
   }
 });
