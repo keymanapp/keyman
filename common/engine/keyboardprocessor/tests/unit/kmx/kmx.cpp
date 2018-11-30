@@ -332,7 +332,6 @@ int run_test(const std::string & file) {
     try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
     std::cout << " actual: " << utf16_to_utf8(value) << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
-    km_kbp_cp_dispose(value);
   }
 
   // Destroy them

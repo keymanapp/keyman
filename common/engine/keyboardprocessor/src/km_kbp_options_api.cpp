@@ -48,27 +48,8 @@ km_kbp_state_option_lookup(km_kbp_state const *state,
 
   auto & opts = state->options();
 
-  // Copy the internal value to our new buffer
-  km_kbp_cp const *internal_value = opts.lookup(km_kbp_option_scope(scope), key);
-  if (!internal_value)
-  {
-    return KM_KBP_STATUS_KEY_ERROR;
-  }
-  std::u16string const &value = internal_value;
-
-  km_kbp_cp *valuep;
-  try
-  {
-    valuep = new km_kbp_cp[value.size() + 1];
-  }
-  catch (std::bad_alloc)
-  {
-    return KM_KBP_STATUS_NO_MEM;
-  }
-  std::copy(value.begin(), value.end(), valuep);
-  valuep[value.size()] = u'\0';
-
-  *value_out = valuep;
+  *value_out = opts.lookup(km_kbp_option_scope(scope), key);
+  if (!*value_out)  return KM_KBP_STATUS_KEY_ERROR;
 
   return KM_KBP_STATUS_OK;
 }
@@ -134,10 +115,4 @@ km_kbp_state_options_to_json(km_kbp_state const *state, char *buf, size_t *space
   // Return space needed/used.
   *space = doc.size()+1;
   return KM_KBP_STATUS_OK;
-}
-
-void
-km_kbp_cp_dispose(km_kbp_cp const *cp)
-{
-  delete [] cp;
 }
