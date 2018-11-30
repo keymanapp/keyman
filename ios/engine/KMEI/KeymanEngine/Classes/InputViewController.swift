@@ -28,6 +28,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var menuBehaviour = MenuBehaviour.showAlways
 
   open var topBarImageView: UIImageView?
+  open var leftMarginBufferView: UIView?
+  open var rightMarginBufferView: UIView?
+  open var bottomMarginBufferView: UIView?
 
   var isTopBarEnabled: Bool
   var keymanWeb: KeymanWebViewController
@@ -75,10 +78,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
   
   open override func loadView() {
-    let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
+    //let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
 
     let baseView = UIView()
-    baseView.backgroundColor = bgColor
+    baseView.backgroundColor = UIColor.orange //bgColor
 
     // TODO: If the following line is enabled, the WKWebView does not respond to touch events
     // Can figure out why one day maybe
@@ -93,6 +96,21 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     topBarImageView!.translatesAutoresizingMaskIntoConstraints = false
     topBarImageView!.backgroundColor = UIColor.gray
     baseView.addSubview(topBarImageView!)
+
+    leftMarginBufferView = UIView()
+    leftMarginBufferView!.translatesAutoresizingMaskIntoConstraints = false
+    leftMarginBufferView!.backgroundColor = UIColor.green
+    baseView.addSubview(leftMarginBufferView!)
+
+    rightMarginBufferView = UIView()
+    rightMarginBufferView!.translatesAutoresizingMaskIntoConstraints = false
+    rightMarginBufferView!.backgroundColor = UIColor.green
+    baseView.addSubview(rightMarginBufferView!)
+
+    bottomMarginBufferView = UIView()
+    bottomMarginBufferView!.translatesAutoresizingMaskIntoConstraints = false
+    bottomMarginBufferView!.backgroundColor = UIColor.blue
+    baseView.addSubview(bottomMarginBufferView!)
 
     baseView.addSubview(keymanWeb.view)
 
@@ -141,6 +159,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func viewDidAppear(_ animated: Bool) {
     //Manager.shared.isSystemKeyboard = true
     super.viewDidAppear(animated)
+    // When using the system keyboard, makes sure Manager has the correct instance.
+    Manager.shared.inputViewController = self
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
   }
@@ -283,12 +303,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
       // Allow these to be broken if/as necessary to resolve layout issues.
       let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
-      kbdWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
 
       let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor)
       // Cannot be met, but helps to 'force' height for the system keyboard.
-      kbdHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdHeightConstraint.priority = .defaultHigh
       kbdHeightConstraint.isActive = true;
     } else {
       // Fallback on earlier versions
@@ -298,14 +318,55 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
       // Allow these to be broken if/as necessary to resolve layout issues.
       let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
-      kbdWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
 
       let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
       // Cannot be met, but helps to 'force' height for the system keyboard.
-      kbdHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdHeightConstraint.priority = .defaultHigh
       kbdHeightConstraint.isActive = true;
     }
+
+    // Establish constraints for margin views - this is needed for correct layout of the system keyboard.
+    
+    let leftMargin = leftMarginBufferView!
+    leftMargin.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+    leftMargin.rightAnchor.constraint(equalTo: topBar.leftAnchor).isActive = true
+    leftMargin.topAnchor.constraint(equalTo: topBar.topAnchor).isActive = true
+    leftMargin.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
+
+    let leftMarginWidthConstraint = leftMargin.widthAnchor.constraint(equalToConstant: 10)
+    leftMarginWidthConstraint.priority = UILayoutPriority.defaultLow
+    leftMarginWidthConstraint.isActive = true
+    let leftMarginHeightConstraint = leftMargin.heightAnchor.constraint(equalToConstant: 10)
+    leftMarginHeightConstraint.priority = UILayoutPriority.defaultLow
+    leftMarginHeightConstraint.isActive = true
+
+    let rightMargin = rightMarginBufferView!
+    rightMargin.leftAnchor.constraint(equalTo: topBar.rightAnchor).isActive = true
+    rightMargin.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+    rightMargin.topAnchor.constraint(equalTo: topBar.topAnchor).isActive = true
+    rightMargin.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
+
+    let rightMarginWidthConstraint = rightMargin.widthAnchor.constraint(equalToConstant: 10)
+    rightMarginWidthConstraint.priority = UILayoutPriority.defaultLow
+    rightMarginWidthConstraint.isActive = true
+    let rightMarginHeightConstraint = rightMargin.heightAnchor.constraint(equalToConstant: 10)
+    rightMarginHeightConstraint.priority = UILayoutPriority.defaultLow
+    rightMarginHeightConstraint.isActive = true
+
+    let bottomMargin = bottomMarginBufferView!
+    bottomMargin.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+    bottomMargin.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+    bottomMargin.topAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
+    bottomMargin.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+
+    let bottomMarginWidthConstraint = bottomMargin.widthAnchor.constraint(equalToConstant: 10)
+    bottomMarginWidthConstraint.priority = UILayoutPriority.defaultLow
+    bottomMarginWidthConstraint.isActive = true
+    let bottomMarginHeightConstraint = bottomMargin.heightAnchor.constraint(equalToConstant: 10)
+    bottomMarginHeightConstraint.priority = UILayoutPriority.defaultLow
+    bottomMarginHeightConstraint.isActive = true
 
     fixLayout()
   }
@@ -317,6 +378,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
+    log.info("Starting keyboard rotation.")
 
     coordinator.animateAlongsideTransition(in: nil, animation: {
       _ in
