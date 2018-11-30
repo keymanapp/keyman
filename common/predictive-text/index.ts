@@ -20,52 +20,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**	
- * A JavaScript string with the restriction that it must only	
- * contain Unicode scalar values.	
- *	
- * This means that any lone high surrogate must be paired with	
- * a low surrogate, if it exists. Lone surrogate code units are	
- * forbidden.	
- *	
- * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString	
- */	
-type USVString = string;
-
-
-/**
- * Describes the capabilities of the keyboard's platform.
- * This includes upper bounds for how much text will be sent on each
- * prediction, as well as what operations the keyboard is allowed to do on the
- * underlying buffer.
- */
-interface Capabilities {
-  /**
-   * The maximum amount of UTF-16 code units that the keyboard will provide to
-   * the left of the cursor, as an integer.
-   */
-  maxLeftContextCodeUnits: number,
-
-  /**
-   * The maximum amount of code units that the keyboard will provide to the
-   * right of the cursor, as an integer. The value 0 or the absence of this
-   * rule implies that the right contexts are not supported.
-   */
-  maxRightContextCodeUnits?: number,
-
-  /**
-   * Whether the platform supports deleting to the right. The absence of this
-   * rule implies false.
-   */
-  supportsDeleteRight?: false,
-}
-
-// TODO: Define this!
-interface ModelDescription {}
-
-// TODO: Define this!
-interface Configuration {}
-
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
  * 

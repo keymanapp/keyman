@@ -19,6 +19,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/// <reference path="../message.d.ts" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
@@ -60,57 +61,6 @@ interface PredictMessage {
   // context: Context;
   // transform: Transform;
 }
-
-/**
- * Describes the capabilities of the keyboard's platform.
- * This includes upper bounds for how much text will be sent on each
- * prediction, as well as what operations the keyboard is allowed to do on the
- * underlying buffer.
- */
-interface Capabilities {
-  /**
-   * The maximum amount of UTF-16 code units that the keyboard will provide to
-   * the left of the cursor, as an integer.
-   */
-  maxLeftContextCodeUnits: number,
-
-  /**
-   * The maximum amount of code units that the keyboard will provide to the
-   * right of the cursor, as an integer. The value 0 or the absence of this
-   * rule implies that the right contexts are not supported.
-   */
-  maxRightContextCodeUnits?: number,
-
-  /**
-   * Whether the platform supports deleting to the right. The absence of this
-   * rule implies false.
-   */
-  supportsDeleteRight?: false,
-}
-
-interface Configuration {
-  /**
-   * How many UTF-16 code units maximum to send as the context to the
-   * left of the cursor ("left" in the Unicode character stream).
-   *
-   * Affects the `context` property sent in `predict` messages.
-   *
-   * While the left context MUST NOT bisect surrogate pairs, they MAY
-   * bisect graphical clusters.
-   */
-  leftContextCodeUnits: number;
-
-  /**
-   * How many UTF-16 code units maximum to send as the context to the
-   * right of the cursor ("right" in the Unicode character stream).
-   *
-   * Affects the `context` property sent in `predict` messages.
-   *
-   * While the left context MUST NOT bisect surrogate pairs, they MAY
-   * bisect graphical clusters.
-   */
-  rightContextCodeUnits: number;
-};
 
 // TODO: define what valid values of the model are.
 interface Model {};
