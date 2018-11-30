@@ -17,7 +17,8 @@ describe('LMLayerWorker', function() {
       // Sending it the initialize it should notify us that it's initialized!
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
-        model: dummyModelCode()
+        model: dummyModelCode(),
+        capabilities: defaultCapabilities()
       }));
       assert(fakePostMessage.calledOnce);
     });
@@ -54,7 +55,8 @@ describe('LMLayerWorker', function() {
       // Send a message; we should get something back.
       worker.onMessage(createMessageEventWithData({
        message: 'initialize',
-       model: dummyModelCode()
+       model: dummyModelCode(),
+        capabilities: defaultCapabilities()
       }));
 
       // It called the postMessage() in its global scope. 
@@ -81,7 +83,8 @@ describe('LMLayerWorker', function() {
       var worker = new LMLayerWorker({ postMessage: fakePostMessage });
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
-        model: dummyModelCode()
+        model: dummyModelCode(),
+        capabilities: defaultCapabilities()
       }));
 
       assert(fakePostMessage.calledOnceWith(sinon.match({
@@ -96,7 +99,7 @@ describe('LMLayerWorker', function() {
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
         model: dummyModelCode(),
-        configuration: {
+        capabilities: {
           maxLeftContextCodeUnits: maxCodeUnits,
         }
       }));
@@ -123,8 +126,8 @@ describe('LMLayerWorker', function() {
 
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
-        configuration: {
-          supportsRightContexts: true,
+        capabilities: {
+          maxLeftContextCodeUnits: maxCodeUnit,
           maxRightContextCodeUnits: maxCodeUnit
         },
         // We can only send source code through the Structure Clones algorithm,
@@ -167,12 +170,22 @@ describe('LMLayerWorker', function() {
   }
 
   /**
-   * Deprecation warning: Soon, models will not be requierd to be passed as source code;
+   * Deprecation warning: Soon, models will not be required to be passed as source code;
    * when this happens, tests should refrain from sending source code for the model
    * parameter.
    */
   function dummyModelCode() {
     return 'return {model: {}, configuration: {}}';
+  }
+
+  /**
+   * Returns reasonable defaults for the default capabilities
+   * to initialize the LMLayer.
+   */
+  function defaultCapabilities() {
+    return {
+      maxLeftContextCodeUnits: 64
+    };
   }
 
   /**

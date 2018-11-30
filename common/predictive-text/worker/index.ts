@@ -44,15 +44,14 @@ interface InitializeMessage {
   /**
    * The configuration that the keyboard can offer to the model.
    */
-  // TODO: rename to capabilities? They **are** the capabilities of the keyboard's platform.
-  configuration: RequestedConfiguration;
+  capabilities: Capabilities;
 }
 
 /**
  * The structure of the message back to the keyboard.
  */
 interface ReadyMessage {
-  configuration: ModelConfiguration;
+  configuration: Configuration;
 }
 
 interface PredictMessage {
@@ -62,29 +61,34 @@ interface PredictMessage {
   // transform: Transform;
 }
 
-interface RequestedConfiguration {
+/**
+ * Describes the capabilities of the keyboard's platform.
+ * This includes upper bounds for how much text will be sent on each
+ * prediction, as well as what operations the keyboard is allowed to do on the
+ * underlying buffer.
+ */
+interface Capabilities {
   /**
-   * Whether the platform supports deleting to the right.
-   * The absence of this rule implies false.
+   * The maximum amount of UTF-16 code units that the keyboard will provide to
+   * the left of the cursor, as an integer.
    */
-  supportsDeleteRight?: boolean;
+  maxLeftContextCodeUnits: number,
 
   /**
-   * The maximum amount of UTF-16 code units that the keyboard will
-   * provide to the left of the cursor.
+   * The maximum amount of code units that the keyboard will provide to the
+   * right of the cursor, as an integer. The value 0 or the absence of this
+   * rule implies that the right contexts are not supported.
    */
-  maxLeftContextCodeUnits: number;
+  maxRightContextCodeUnits?: number,
 
   /**
-   * The maximum amount of code units that the keyboard will provide to
-   * the right of the cursor. The absence of this setting
-   * implies that right contexts are unsupported and will
-   * never be supplied.
+   * Whether the platform supports deleting to the right. The absence of this
+   * rule implies false.
    */
-  maxRightContextCodeUnits?: number;
+  supportsDeleteRight?: false,
 }
 
-interface ModelConfiguration {
+interface Configuration {
   /**
    * How many UTF-16 code units maximum to send as the context to the
    * left of the cursor ("left" in the Unicode character stream).
@@ -158,8 +162,7 @@ class LMLayerWorker {
 
     let {model, configuration} = this.loadModel(
       // TODO: validate configuration, and provide valid configuration in tests.
-      // @ts-ignore
-      payload.model, payload.configuration || {}
+      payload.model, payload.capabilities
     );
 
     // TODO: validate configuration?
@@ -189,13 +192,30 @@ class LMLayerWorker {
    *
    * @param modelCode Source code for a function that takes
    *                  configuration, and returns { model, configuration }
-   * @param requestedConfiguration Configuration requested from
-   *                               the keyboard.
+   * @param capabilities Capabilities on offer from the keyboard.
    */
-  private loadModel(modelCode: string, requestedConfiguration: RequestedConfiguration) {
-    let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
-    configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
-    configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
+  private loadModel(modelCode: any, capabilities: Capabilities) {
+    let model: Model = null;
+    let configuration: Configuration = {
+      leftContextCodeUnits: 0,
+      rightContextCodeUnits: 0
+    };
+
+    if (typeof modelCode === 'string') {
+      // Deprecated! The model should not be source code.
+      let result = new Function('configuration', modelCode)(capabilities);
+      model = result.model;
+      configuration = result.configuration;
+    }
+    // TODO: when model is object with kind 'wordlist' or 'fst'
+
+    // Set reasonable defaults for the configuration.
+    if (!configuration.leftContextCodeUnits) {
+      configuration.leftContextCodeUnits = capabilities.maxLeftContextCodeUnits;
+    }
+    if (!configuration.rightContextCodeUnits) {
+      configuration.rightContextCodeUnits = capabilities.maxRightContextCodeUnits || 0;
+    }
 
     return {model, configuration};
   }
