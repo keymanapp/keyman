@@ -44,13 +44,13 @@ describe('LMLayer', function() {
       );
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
-      // In the "Worker", assert the message structure and reply.
+      // In the "Worker", assert the message looks right and
+      // ASYNCHRONOUSLY reply with ready message.
       function fakePostMessage(data) {
         assert.propertyVal(data, 'message', 'initialize')
         assert.isObject(data.capabilities);
         assert.isObject(data.model);
       
-        // send the message on setTimeout() to emulate "asynchronous" call.
         callAsynchronously(() => fakeWorker.onmessage({
           data: {
             message: 'ready',
@@ -58,8 +58,37 @@ describe('LMLayer', function() {
           }
         }));
       }
-      assert.isObject(configuration);
     });
+
+    it('should resolve with the model configuration', async function () {
+      let expectedConfiguration = {
+        leftContextCodeUnits: 32,
+        rightContextCodeUnits: 0,
+      }
+
+      let fakeWorker = createFakeWorker(function fakePostMessage(_data) {
+        callAsynchronously(() => fakeWorker.onmessage({
+          data: {
+            message: 'ready',
+            configuration: expectedConfiguration
+          }
+        }));
+      });
+
+      let lmLayer = new LMLayer(fakeWorker);
+      let actualConfiguration = await lmLayer.initialize(
+        {
+          maxLeftContextCodeUnits: 32,
+        },
+        {
+          kind: 'wordlist',
+          words: ['foo', 'bar', 'baz', 'quux']
+        }
+      );
+
+      // This SHOULD be called by initialize().
+      assert.deepEqual(actualConfiguration, expectedConfiguration);
+    })
   });
 
   // Since the Blob API is limited to browsers, look for those
