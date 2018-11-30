@@ -77,33 +77,15 @@ static inline void trim(std::string &s) {
   rtrim(s);
 }
 
-// trim from start (copying)
-static inline std::string ltrim_copy(std::string s) {
-  ltrim(s);
-  return s;
-}
-
-// trim from end (copying)
-static inline std::string rtrim_copy(std::string s) {
-  rtrim(s);
-  return s;
-}
-
-// trim from both ends (copying)
-static inline std::string trim_copy(std::string s) {
-  trim(s);
-  return s;
-}
-
 key_event char_to_event(char ch) {
-  assert(ch >= 32 && ch < 128);
+  assert(ch >= 32 && ch <= 127);
   return {
     km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-    (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
+    uint16_t(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
   };
 }
 
-uint16_t const get_modifier(std::string const m) {
+uint16_t get_modifier(std::string const m) {
   for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
     if (m == km::kbp::kmx::s_modifier_names[i].name) {
       return km::kbp::kmx::s_modifier_names[i].modifier;
@@ -247,12 +229,12 @@ int run_test(const std::string & file) {
     km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
 
     int i = 0;
-    for (auto it = options.begin(); it != options.end(); it++) {
-      if (it->type != KOT_INPUT) continue;
+    for (auto & opt: options) {
+      if (opt.type != KOT_INPUT) continue;
 
-      std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
+      std::cout << "input option-key: " << utf16_to_utf8(opt.key) << std::endl;
 
-      std::u16string key = it->key;
+      std::u16string key = opt.key;
       if (key[0] == u'&') {
         // environment value (aka system store)
         key.erase(0, 1);
@@ -268,9 +250,9 @@ int run_test(const std::string & file) {
 
       keyboard_opts[i].key = cp;
 
-      cp = new km_kbp_cp[it->value.length() + 1];
-      it->value.copy(cp, it->value.length());
-      cp[it->value.length()] = 0;
+      cp = new km_kbp_cp[opt.value.length() + 1];
+      opt.value.copy(cp, opt.value.length());
+      cp[opt.value.length()] = 0;
 
       keyboard_opts[i].value = cp;
 
@@ -281,7 +263,7 @@ int run_test(const std::string & file) {
 
     try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
-    delete keyboard_opts;
+    delete [] keyboard_opts;
   }
 
   // Setup context
@@ -325,13 +307,13 @@ int run_test(const std::string & file) {
   // Test resultant options
   // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
 
-  for (auto it = options.begin(); it != options.end(); it++) {
-    if (it->type != KOT_OUTPUT) continue;
-    std::cout << "output option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value);
+  for (auto & opt : options) {
+    if (opt.type != KOT_OUTPUT) continue;
+    std::cout << "output option-key: " << utf16_to_utf8(opt.key) << " expected: " << utf16_to_utf8(opt.value);
     km_kbp_cp const *value;
-    try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+    try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, opt.key.c_str(), &value));
     std::cout << " actual: " << utf16_to_utf8(value) << std::endl;
-    if (it->value.compare(value) != 0) return __LINE__;
+    if (opt.value.compare(value) != 0) return __LINE__;
   }
 
   // Destroy them

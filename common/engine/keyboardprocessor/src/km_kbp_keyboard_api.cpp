@@ -24,6 +24,7 @@
 #include "option.hpp"
 
 
+using namespace km::kbp;
 
 km_kbp_status
 km_kbp_keyboard_load(km_kbp_path_name kb_path,
@@ -48,7 +49,7 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path,
     }
     *keyboard = static_cast<km_kbp_keyboard *>(kp);
   }
-  catch (std::bad_alloc) 
+  catch (std::bad_alloc)
   {
     return KM_KBP_STATUS_NO_MEM;
   }

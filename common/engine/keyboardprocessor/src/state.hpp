@@ -61,41 +61,41 @@ actions::actions(Args&&... args)
 template<km_kbp_action_type V>
 inline
 void actions::_push_vkey(km_kbp_virtual_key vk) {
-    assert(empty() || !empty() && back().type != KM_KBP_IT_END);
-    emplace_back(km_kbp_action_item {V, {0,}, {vk}});
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
+  emplace_back(km_kbp_action_item {V, {0,}, {vk}});
 }
 
 inline
 void actions::push_character(km_kbp_usv usv) {
-    assert(empty() || !empty() && back().type != KM_KBP_IT_END);
-    emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
+  emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
 }
 
 
 inline
 void actions::push_marker(uintptr_t marker) {
-  assert(empty() || !empty() && back().type != KM_KBP_IT_END);
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   emplace_back(km_kbp_action_item {KM_KBP_IT_MARKER, {0,}, {marker}});
 }
 
 
 inline
 void actions::push_alert() {
-  assert(empty() || !empty() && back().type != KM_KBP_IT_END);
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   emplace_back(km_kbp_action_item {KM_KBP_IT_ALERT, {0,}, {0}});
 }
 
 
 inline
 void actions::push_backspace() {
-  assert(empty() || !empty() && back().type != KM_KBP_IT_END);
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   emplace_back(km_kbp_action_item {KM_KBP_IT_BACK, {0,}, {0}});
 }
 
 
 inline
 void actions::commit() {
-  assert(empty() || !empty() && back().type != KM_KBP_IT_END);
+  assert(empty() || (!empty() && back().type != KM_KBP_IT_END));
   emplace_back(km_kbp_action_item {KM_KBP_IT_END, {0,}, {0}});
 }
 
