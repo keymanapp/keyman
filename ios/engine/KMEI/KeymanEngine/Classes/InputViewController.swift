@@ -253,6 +253,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     if #available(iOSApplicationExtension 11.0, *) {
       topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
       topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
 
       // Allow this one to be broken if/as necessary to resolve layout issues.
       let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
@@ -261,10 +262,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     } else {
       topBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
       topBar.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor).isActive = true
+      topBar.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
       
       // Allow this one to be broken if/as necessary to resolve layout issues.
       let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
-      //topBarWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      topBarWidthConstraint.priority = UILayoutPriority(rawValue: 999)
       topBarWidthConstraint.isActive = true
     }
 
@@ -276,17 +278,54 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if #available(iOSApplicationExtension 11.0, *) {
       container.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-      container.widthAnchor.constraint(equalTo:view.safeAreaLayoutGuide.widthAnchor).isActive = true
       container.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+      container.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
+
+      // Allow these to be broken if/as necessary to resolve layout issues.
+      let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
+      kbdWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdWidthConstraint.isActive = true
+
+      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor)
+      // Cannot be met, but helps to 'force' height for the system keyboard.
+      kbdHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdHeightConstraint.isActive = true;
     } else {
       // Fallback on earlier versions
       container.bottomAnchor.constraint(equalTo:view.layoutMarginsGuide.bottomAnchor).isActive = true
-      container.widthAnchor.constraint(equalTo:view.layoutMarginsGuide.widthAnchor).isActive = true
       container.leftAnchor.constraint(equalTo:view.layoutMarginsGuide.leftAnchor).isActive = true
+      container.rightAnchor.constraint(equalTo:view.layoutMarginsGuide.rightAnchor).isActive = true
+
+      // Allow these to be broken if/as necessary to resolve layout issues.
+      let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
+      kbdWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdWidthConstraint.isActive = true
+
+      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
+      // Cannot be met, but helps to 'force' height for the system keyboard.
+      kbdHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+      kbdHeightConstraint.isActive = true;
     }
 
+    fixLayout()
+  }
+  
+  func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
+  }
+  
+  open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+
+    coordinator.animateAlongsideTransition(in: nil, animation: {
+      _ in
+        self.fixLayout()
+    }, completion: {
+      _ in
+        self.fixLayout()
+        self.updateViewConstraints()
+    })
   }
 
   @objc func enableInputClickSound() {

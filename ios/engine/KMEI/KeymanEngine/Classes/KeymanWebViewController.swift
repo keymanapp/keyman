@@ -63,9 +63,12 @@ class KeymanWebViewController: UIViewController {
   func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
-    
+
     setOskWidth(Int(view.bounds.size.width))
     setOskHeight(Int(view.bounds.size.height))
+
+    log.info("Setting keyboard width: \(view.bounds.size.width)")
+    log.info("Setting keyboard height: \(view.bounds.size.height)")
   }
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
