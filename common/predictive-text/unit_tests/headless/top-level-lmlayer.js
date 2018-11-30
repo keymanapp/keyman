@@ -8,20 +8,13 @@ let LMLayer = require('../../build');
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
     it('should accept a Worker to instantiate', function () {
-      let fakeWorker = {
-        postMessage: sinon.fake(),
-        onmessage: null
-      };
-      new LMLayer(fakeWorker);
+      new LMLayer(createFakeWorker());
     });
   });
 
   describe('#initialize()', function () {
     it('should accept capabilities and model description', function () {
-      let fakeWorker = {
-        postMessage: sinon.fake(),
-        onmessage: null
-      };
+      let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(fakeWorker);
       lmLayer.initialize(
@@ -52,4 +45,19 @@ describe('LMLayer', function() {
       assert.match(text, /^\s*var\s+hello;\s*var\s+world;\s*$/);
     });
   });
+
+  /**
+   * Returns an object implementing *enough* of the Worker
+   * interface to fool the LMLayer into thinking it's
+   * communicating with a bona fide Web Worker.
+   * 
+   * @returns {Worker} an object with sinon.fake() instances.
+   */
+  function createFakeWorker() {
+    return {
+        // TODO: this should reply
+        postMessage: sinon.fake(),
+        onmessage: null
+      };
+  }
 });
