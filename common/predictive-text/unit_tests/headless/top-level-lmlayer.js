@@ -28,7 +28,28 @@ describe('LMLayer', function() {
       );
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
+    });
+
+    it('should send the `initialize` message to the LMLayer', async function () {
+      let fakeWorker = createFakeWorker();
+      let lmLayer = new LMLayer(fakeWorker);
+      let configuration = await lmLayer.initialize(
+        {
+          maxLeftContextCodeUnits: 32,
+        },
+        {
+          kind: 'wordlist',
+          words: ['foo', 'bar', 'baz', 'quux']
+        }
+      );
+
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
+      assert(fakeWorker.postMessage.calledOnceWith(sinon.match({
+        message: 'initialize',
+        capabilities: sinon.match.any(),
+        model: sinon.match.any()
+      })));
+      assert.isObject(configuration);
     });
   });
 
