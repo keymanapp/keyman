@@ -4,5 +4,7 @@
 # Authors:      Tim Eves (TSE)
 #
 
-e = executable('utftest', 'utftest.cpp', include_directories: [libsrc])
+e = executable('utftest', 'utftest.cpp',
+               objects: lib.extract_objects('utfcodec.cpp'),
+               include_directories: [libsrc])
 test('utftest', e)
