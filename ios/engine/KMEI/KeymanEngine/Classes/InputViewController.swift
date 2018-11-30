@@ -159,8 +159,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func viewDidAppear(_ animated: Bool) {
     //Manager.shared.isSystemKeyboard = true
     super.viewDidAppear(animated)
-    // When using the system keyboard, makes sure Manager has the correct instance.
+
+    // When using the system keyboard, sets the system-initialized version of the keyboard
+    // as Manager.shared's inputViewController.
     Manager.shared.inputViewController = self
+
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
   }
@@ -182,8 +185,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       newRange = context.startIndex..<context.startIndex
     }
 
-    Manager.shared.setText(context)
-    Manager.shared.setSelectionRange(NSRange(newRange, in: context), manually: false)
+    setText(context)
+    setSelectionRange(NSRange(newRange, in: context), manually: false)
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -415,12 +418,24 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.showHelpBubble(afterDelay: delay)
   }
   
-  func setCursorRange(_ range: NSRange) {
-    keymanWeb.setCursorRange(range)
-  }
+//  func setCursorRange(_ range: NSRange) {
+//    keymanWeb.setCursorRange(range)
+//  }
   
   func setText(_ text: String?) {
     keymanWeb.setText(text)
+  }
+  
+  func clearText() {
+    setText(nil)
+    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
+    log.info("Cleared text.")
+  }
+  
+  func setSelectionRange(_ range: NSRange, manually: Bool) {
+    if range.location != NSNotFound {
+      keymanWeb.setCursorRange(range)
+    }
   }
   
   func resetKeyboardState() {

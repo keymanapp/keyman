@@ -80,7 +80,22 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
 
-  var inputViewController: InputViewController!
+  var _inputViewController: InputViewController?
+  
+  // This allows for 'lazy' initialization of the keyboard.
+  var inputViewController: InputViewController! {
+    get {
+      // Occurs for the in-app keyboard ONLY.
+      if _inputViewController == nil {
+        _inputViewController = InputViewController()
+      }
+      return _inputViewController
+    }
+
+    set(value) {
+      _inputViewController = value
+    }
+  }
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
@@ -132,7 +147,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      */
     sharedQueue = HTTPDownloader.init(self)
 
-    inputViewController = InputViewController()
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
   }
@@ -863,22 +877,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // MARK: - Text
 
   // TODO: Switch from NSRange
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
-    if range.location != NSNotFound {
-      inputViewController.setCursorRange(range)
-    }
-  }
-
-  func clearText() {
-    setText(nil)
-    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
-    log.info("Cleared text.")
-  }
-
-  func setText(_ text: String?) {
-    inputViewController.setText(text)
-  }
-
   public func showKeyboard() {
     // TODO:  Fix!
     //keymanWeb.delegate?.resumeKeyboard()
@@ -893,6 +891,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
     keymanWeb.delegate?.hideKeyboard(keymanWeb)
+  }
+
+  func setText(_ text: String?) {
+    inputViewController.setText(text)
+  }
+
+  func clearText() {
+    inputViewController.clearText()
+  }
+
+  func setSelectionRange(_ range: NSRange, manually: Bool) {
+    inputViewController.setSelectionRange(range, manually: manually)
   }
 
   // MARK: - InputViewController methods

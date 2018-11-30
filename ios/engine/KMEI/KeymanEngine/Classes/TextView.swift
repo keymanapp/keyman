@@ -122,8 +122,8 @@ public class TextView: UITextView {
         super.text = ""
       }
 
-      Manager.shared.setText(self.text)
-      Manager.shared.setSelectionRange(selectedRange, manually: false)
+      Manager.shared.inputViewController.setText(self.text)
+      Manager.shared.inputViewController.setSelectionRange(selectedRange, manually: false)
     }
   }
 
