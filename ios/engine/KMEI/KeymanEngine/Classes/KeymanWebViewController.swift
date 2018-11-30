@@ -299,12 +299,35 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   }
   
   public func beep(_ keymanWeb: KeymanWebViewController) {
-    // Does nothing on the iPod touch, but otherwise emits a brief vibration.
-    // The publicly-suggested kSystemSoundID_Vibrate lasts for 0.4 seconds - too long for a proper beep.
-    // Code 1519 is near-undocumented, but should result in a 'weaker'/shorter vibration.
-    //
-    // Ref: https://stackoverflow.com/questions/10570553/how-to-set-iphone-vibrate-length/44495798#44495798
-    AudioServicesPlaySystemSound(1519)
+    let vibrationSupport = Manager.shared.vibrationSupportLevel
+    let kSystemSoundID_LightVibrate: SystemSoundID = 1519
+
+    if vibrationSupport == .none {
+      // TODO:  Find something we can do visually and/or audibly to provide feedback.
+    } else if vibrationSupport == .basic {
+      // The publicly-suggested kSystemSoundID_Vibrate lasts for 0.4 seconds.
+      // Better than nothing, though it's easily too long for a proper beep.
+      AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+    } else if vibrationSupport == .basic_plus {
+      // Code 1519 is near-undocumented, but should result in a 'weaker'/shorter vibration.
+      // Corresponds directly to UIImpactFeedbackGenerator below, but on select phones that
+      // don't support that part of the API.
+      //
+      // Ref: https://stackoverflow.com/questions/10570553/how-to-set-iphone-vibrate-length/44495798#44495798
+      // Not usable by older iPhone models.
+      AudioServicesPlaySystemSound(kSystemSoundID_LightVibrate)
+    } else { // if vibrationSupport == .taptic
+      if #available(iOSApplicationExtension 10.0, *) {
+        // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
+        // We use this style b/c it's short, and in essence it is a minor UI element collision -
+        // a single key with blocked (erroneous) output.
+        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackStyle.light)
+        vibrator.impactOccurred()
+      } else {
+        // Fallback on earlier feedback style
+        AudioServicesPlaySystemSound(kSystemSoundID_LightVibrate)
+      }
+    }
   }
 }
 
