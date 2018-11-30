@@ -32,6 +32,40 @@
  */	
 type USVString = string;
 
+
+/**
+ * Describes the capabilities of the keyboard's platform.
+ * This includes upper bounds for how much text will be sent on each
+ * prediction, as well as what operations the keyboard is allowed to do on the
+ * underlying buffer.
+ */
+interface Capabilities {
+  /**
+   * The maximum amount of UTF-16 code units that the keyboard will provide to
+   * the left of the cursor, as an integer.
+   */
+  maxLeftContextCodeUnits: number,
+
+  /**
+   * The maximum amount of code units that the keyboard will provide to the
+   * right of the cursor, as an integer. The value 0 or the absence of this
+   * rule implies that the right contexts are not supported.
+   */
+  maxRightContextCodeUnits?: number,
+
+  /**
+   * Whether the platform supports deleting to the right. The absence of this
+   * rule implies false.
+   */
+  supportsDeleteRight?: false,
+}
+
+// TODO: Define this!
+interface ModelDescription {}
+
+// TODO: Define this!
+interface Configuration {}
+
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
  * 
@@ -65,16 +99,31 @@ class LMLayer {
   constructor(worker?: Worker) {
     // Either use the given worker, or instantiate the default worker.
     this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
+    this._worker.onmessage = this.onMessage.bind(this)
   }
 
-  // TODO: asynchronous initialize() method, based on 
-  //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L42-L62
+  /**
+   * Initializes the LMLayer worker with the keyboard/platform's capabilities,
+   * as well as a description of the model required.
+   */
+  initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration> {
+    this._worker.postMessage({
+      message: 'initialize',
+      // TODO: other arguments
+    })
+
+    return Promise.reject('Not implemented');
+  }
 
   // TODO: asynchronous predict() method, based on 
   //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L64-L80
 
   // TODO: asynchronous close() method.
   //       Worker code must recognize message and call self.close().
+
+  private onMessage(event: MessageEvent): void {
+    throw new Error('Not implemented');
+  }
 
   /**
    * Given a function, this utility returns the source code within it, as a string.
