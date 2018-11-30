@@ -1,0 +1,5 @@
+ibus-keyman (10.99.0-1) unstable; urgency=low
+
+    * initial alpha release
+
+ -- Daniel Glassey <wdg@debian.org>  Mon, 26 Nov 2018 11:09:40 +0700

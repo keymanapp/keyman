@@ -1,0 +1,28 @@
+.TH IBUS-ENGINE-KEYMAN "1" "September 2018" "ibus-engine-keyman" "User Commands"
+.SH NAME
+ibus-engine-keyman \- multiple language input engine based on ibus
+.SH DESCRIPTION
+\&ibus\-engine\-keyman [options] [engines]
+.TP
+this command should run from ibus, don't run it directly.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show this message.
+.TP
+\fB\-d\fR, \fB\-\-daemonize\fR
+daemonize ibus engine
+.TP
+\fB\-l\fR, \fB\-\-list\fR
+list all Keyman input methods
+.TP
+\fB\-a\fR, \fB\-\-all\fR
+enable all Keyman input methods
+.SS "example:"
+.IP
+\&./ibus\-engine\-keyman zh:py ja:trycode
+
+\&./ibus\-engine\-keyman zh:py,pinyin hi:inscript
+
+\&./ibus\-engine\-keyman \fB\-a\fR
+.SH "SEE ALSO"
+.BR ibus(1)

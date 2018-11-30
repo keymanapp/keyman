@@ -3,6 +3,9 @@
 default: # builds only
 	BUILDONLY="yes" ./scripts/build.sh
 
+clean:
+	rm -rf build-*
+
 reconf:
 	./scripts/reconf.sh
 
@@ -29,7 +32,7 @@ sources:
 	./scripts/dist.sh
 
 tmpsources:
-        PKG_CONFIG_PATH="/tmp/kmfl/share/pkgconfig" ./scripts/dist.sh
+	PKG_CONFIG_PATH="../keyboardprocessor/meson-private" ./scripts/dist.sh
 
 origdist:
 	./scripts/dist.sh origdist
@@ -48,3 +51,4 @@ releasedeb: reconf origdist cow debnocow # it will prompt for sudo if required f
 
 nightlydist: reconf sources
 	echo "Built nightly source release in dist/"
+
