@@ -60,7 +60,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private var expandedHeight: CGFloat {
-    return Manager.shared.keyboardHeight +
+    return Manager.shared.keymanWeb.keyboardHeight +
       (isTopBarEnabled ? CGFloat(InputViewController.topBarHeight) : 0)
   }
 
@@ -88,13 +88,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     barHeightConstraints[0].constant = topBarHeight
     addConstraints(barHeightConstraints)
 
-    barWidthConstraints[0].constant = Manager.shared.keyboardWidth
+    barWidthConstraints[0].constant = Manager.shared.keymanWeb.keyboardWidth
     addConstraints(barWidthConstraints)
 
-    containerHeightConstraints[0].constant = Manager.shared.keyboardHeight
+    containerHeightConstraints[0].constant = Manager.shared.keymanWeb.keyboardHeight
     addConstraints(containerHeightConstraints)
 
-    containerWidthConstraints[0].constant = Manager.shared.keyboardWidth
+    containerWidthConstraints[0].constant = Manager.shared.keymanWeb.keyboardWidth
     addConstraints(containerWidthConstraints)
 
     heightConstraint.constant = expandedHeight
@@ -188,7 +188,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if Manager.shared.isSubKeysMenuVisible {
+    if keymanWeb.isSubKeysMenuVisible {
       return
     }
 
@@ -226,7 +226,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    if Manager.shared.isKeyboardMenuVisible {
+    if keymanWeb.isKeyboardMenuVisible {
       return
     }
 
@@ -246,7 +246,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     switch menuBehaviour {
     case .showAlways,
          .showIfMultipleKeyboards where keyboardListCount > 1:
-      Manager.shared.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
+      keymanWeb.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
     case .showIfMultipleKeyboards, // keyboardListCount() <= 1
     .showNever:
       break
@@ -254,6 +254,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
+    // Is not implemented for this class, nor is resumeKeyboard().
+    // This class is used for System-level keyboards and would not have a
+    // practical way to be resumed after dismissal.
     dismissKeyboard()
   }
 
@@ -278,7 +281,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     view.addConstraints(barHorizontalPositionConstraints)
 
     containerHeightConstraints = NSLayoutConstraint.constraints(
-      withVisualFormat: "V:[container(\(Manager.shared.keyboardHeight))]",
+      withVisualFormat: "V:[container(\(Manager.shared.keymanWeb.keyboardHeight))]",
       metrics: nil, views: viewsDict)
 
     containerWidthConstraints = NSLayoutConstraint.constraints(

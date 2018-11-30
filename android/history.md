@@ -7,16 +7,21 @@
 * Change default keyboard from `european` to `sil_euro_latin` (#1112)
 * Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
 * Add splash screen (#1151)
-* Update app to use Material Design theme
+* Update app to use Material Design theme (#681)
 * Fix globe button when pausing WebBrowser (#1213)
 * Change system keyboard to "numeric" layer for digit/phone number text fields (#1218)
 * Add feature to vibrate device when Keyman Web calls `beep` (#1227)
+* Add support for extra key found on European hardware keyboards (#1291)
+* Add feature for keyboard picker to switch to next keyboard (#1283)
 
-## 2018-10-03 10.0.506 stable
+## 2018-11-14 10.0.508 stable
+* Fix crash that can occur when text selection ends before the starting position (#1313)
+
+## 2018-10-04 10.0.507 stable
 * Fix crash that can occur when displaying preview key (#1230, #1234)
 
 ## 2018-08-23 10.0.505 stable
-* Validate keyboard ID when downloading keyboard from keman cloud (#1121)
+* Validate keyboard ID when downloading keyboard from Keyman cloud (#1121)
 
 ## 2018-08-22 10.0.504 stable
 * Fixes crash when installed keyboards list is invalid (#1119)

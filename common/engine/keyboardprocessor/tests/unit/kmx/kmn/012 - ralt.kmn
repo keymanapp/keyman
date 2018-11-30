@@ -1,0 +1,16 @@
+c Description: Tests Right Alt processing: requires Ctrl+Alt simulation off.
+c env.simulate_altgr: 0
+c keys: [RALT K_A][RALT K_O][LCTRL LALT K_A][LCTRL LALT K_O]
+c expected: \u05d6\u05e8\u0062\u0063
+c context: 
+
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [RAlt K_A] > U+05D6 
++ [RAlt K_O] > U+05E8
++ [Ctrl Alt K_A] > "b" 
++ [Ctrl Alt K_O] > "c" 

@@ -949,6 +949,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let doneButton = navBar?.topItem?.rightBarButtonItem
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissGetStartedView)
+    
+    Manager.shared.hideKeyboard()
 
     containerView.frame = containerView.frame.insetBy(dx: 15, dy: 140)
     containerView.backgroundColor = UIColor.white
@@ -965,6 +967,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func dismissGetStartedView(_ sender: Any?) {
     overlayWindow.viewWithTag(getStartedViewTag)?.removeFromSuperview()
     overlayWindow.isHidden = true
+    
+    Manager.shared.showKeyboard()
   }
 
   private var shouldShowGetStarted: Bool {

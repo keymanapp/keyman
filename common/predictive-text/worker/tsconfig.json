@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": false,
     "module": "none",
-    "outFile": "./index.js",
+    "outFile": "../build/intermediate/index.js",
     "inlineSources": true,
     "sourceMap": true,
     "lib": ["webworker", "es6"],

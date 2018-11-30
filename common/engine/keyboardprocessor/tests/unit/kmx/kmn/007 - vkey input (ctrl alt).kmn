@@ -1,0 +1,16 @@
+c Description: Tests basic vkey input with control and alt (Unicode)
+c keys: [LCTRL LALT K_A][K_B][RCTRL RALT K_C][K_SPACE][K_D][K_E][LCTRL LALT K_F]
+c expected: \u0E01\u0E02\u0E03\u0020\u0E04\u0E05\u0E06
+c context: 
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+         
++ [CTRL ALT K_A] > U+0E01
++ [K_B] > U+0E02
++ [CTRL ALT K_C] > U+0E03
+
+'de' + [CTRL ALT K_F] > U+0E04 U+0E05 U+0E06

@@ -12,7 +12,7 @@ implementation
 
 uses
   windows, sysutils, shellapi, shlobj, ttinfo, utilsystem,
-  ErrorControlledRegistry, registrykeys, getosversion, keymanerrorcodes, Variants;
+  ErrorControlledRegistry, registrykeys, getosversion, kmcomapi_errors, Variants;
 
 function TKPInstallFont.Execute(const src_filename: string): Boolean;
 var

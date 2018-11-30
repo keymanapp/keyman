@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
-let LMLayerWorker = require('../../worker');
+let LMLayerWorker = require('../../build/intermediate');
 
 // Unit tests for instantiating and initializing the LMLayer Worker in isolation.
 //

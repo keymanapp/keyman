@@ -12,19 +12,45 @@
     <include layout="@layout/list_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/keyboard_picker_appbar"/>
+        android:id="@+id/keyboard_list_layout"
+        android:layout_below="@id/keyboard_picker_appbar"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/right_button"
-        style="?android:attr/actionButtonStyle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        app:useCompatPadding="true"
-        android:contentDescription="@string/image_button"
-        android:src="@drawable/ic_add_white"
-        app:fabSize="normal" />
+        android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/close_keyman_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="@dimen/close_button_margin"
+            android:layout_marginLeft="@dimen/close_button_margin"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="@string/label_close_keyman" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:layout_gravity="center"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_button"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:contentDescription="@string/image_button"
+            android:src="@drawable/ic_add_white"
+            app:fabSize="normal" />
+
+    </LinearLayout>
 </RelativeLayout>

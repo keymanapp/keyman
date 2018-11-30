@@ -11,6 +11,21 @@
 * Projects can now include other related files such as history.md (#1243)
 * Keyman Developer now treats files as UTF-8 by default (#1244)
 
+## 2018-11-28 10.0.1206 stable
+* Add parameter `-add-help-link` to kmcomp (#1346)
+
+## 2018-11-07 10.0.1205 stable
+* Mitigation for issues with installation under certain languages in Windows 10 1803 or later (#1299)
+
+## 2018-09-28 10.0.1204 stable
+* Fix crash in Keyman Developer package editor when a compiled .js keyboard is missing (#1224)
+
+## 2018-09-12 10.0.1202 stable
+* Refactor how keyboard_info metadata is generated (#1174)
+
+## 2018-07-06 10.0.1201 stable
+* No changes to Keyman Developer (update to KeymanWeb script)
+
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release
 
