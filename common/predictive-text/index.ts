@@ -62,8 +62,9 @@ class LMLayer {
    * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
    *            or file: URI. If uri is not provided, this will start the default Worker.
    */
-  constructor(uri?: string) {
-    this._worker = new Worker(uri || LMLayer.asBlobURI(LMLayerWorkerCode));
+  constructor(worker?: Worker) {
+    // Either use the given worker, or instantiate the default worker.
+    this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
   }
 
   // TODO: asynchronous initialize() method, based on 
