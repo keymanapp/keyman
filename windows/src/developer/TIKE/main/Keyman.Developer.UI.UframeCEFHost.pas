@@ -457,7 +457,7 @@ procedure TframeCEFHost.cefConsoleMessage(Sender: TObject;
 var
   p: PCEFConsoleMessageEventData;
 begin
-  AssertVclThread;
+  AssertCefThread;
 
   p := AllocMem(SizeOf(TCEFConsoleMessageEventData));
   p.browserid := browser.Identifier;
