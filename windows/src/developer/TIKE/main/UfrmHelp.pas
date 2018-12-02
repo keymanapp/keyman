@@ -35,7 +35,8 @@ type
 //    procedure AddUnmatchedContext(FormName, ControlName: string);
 //    procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
   protected
     function GetHelpTopic: string; override;
   public
@@ -214,6 +215,7 @@ begin
   cef.cef.DefaultUrl := modWebHttpServer.GetAppURL('help/');
   cef.Parent := Self;
   cef.Visible := True;
+  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnLoadEnd := cefLoadEnd;
 //  cef.Navigate(modWebHttpServer.GetAppURL('help/'));
@@ -224,14 +226,13 @@ begin
   Result := SHelpTopic_Context_Help;
 end;
 
-procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 var
   frm: TTIKEForm;
 begin
-  Result := False;
+  AssertVclThread;
   if Copy(Url, 1, 5) = 'help:' then
   begin
-    Result := True;
     if FHelpControl is TTIKEForm then
       frm := FHelpControl as TTIKEForm
     else if FHelpControl.Owner is TTIKEForm then
@@ -246,11 +247,18 @@ begin
   end;
 end;
 
+procedure TfrmHelp.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+begin
+  AssertCefThread;
+  Handled := Copy(Url, 1, 5) = 'help:';
+end;
+
 procedure TfrmHelp.cefLoadEnd(Sender: TObject);
 begin
+  AssertVclThread;
+
   if csDestroying in ComponentState then
     Exit;
-//  if cef.cef.ChromiumBrowser. then
 
   FDocumentLoaded := True;
   QueueRefresh;

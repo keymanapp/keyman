@@ -74,7 +74,7 @@ type
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
 
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
     procedure cefBeforeContextMenu(Sender: TObject;
       const browser: ICefBrowser; const frame: ICefFrame;
       const params: ICefContextMenuParams; const model: ICefMenuModel);
@@ -82,12 +82,10 @@ type
       const browser: ICefBrowser; const frame: ICefFrame;
       const params: ICefContextMenuParams; commandId: Integer;
       eventFlags: Cardinal; out Result: Boolean);
-    procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
-      const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
-      Result: Boolean);
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
 
     procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
-    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_SyntaxColourChange(var Message: TMessage); message WM_USER_SYNTAXCOLOURCHANGE;
     procedure FireCommand(const commands: TStringList);
     procedure LoadFileInBrowser(const AData: string);
@@ -232,22 +230,13 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
-var
-  params: TStringList;
+procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 begin
-  Result := False;
-
-  if csDestroying in ComponentState then   // I3983
+  AssertVclThread;
+  if (params.Count > 0) and (params[0] = 'command') then
   begin
-    Result := True;
-    Exit;
-  end;
-
-  if GetParamsFromURL(URL, params) then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Result := True;
+    params.Delete(0);
+    FireCommand(params);
   end;
 end;
 
@@ -285,15 +274,22 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.cefPreKeyEvent(Sender: TObject;
-  const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
-  out isKeyboardShortcut, Result: Boolean);
+procedure TframeTextEditor.cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData;
+  wasShortcut, wasHandled: Boolean);
 begin
-  if event.windows_key_code = VK_ESCAPE then
+  AssertVclThread;
+  if e.event.windows_key_code = VK_ESCAPE then
   begin
     ClearError;
-    Result := True;
   end;
+end;
+
+procedure TframeTextEditor.cefPreKeySyncEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+begin
+  AssertCefThread;
+  if e.event.windows_key_code = VK_ESCAPE then
+    Handled := True;
 end;
 
 procedure TframeTextEditor.Changed;
@@ -314,9 +310,12 @@ begin
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnLoadEnd := cefLoadEnd;
+
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
   cef.cef.OnContextMenuCommand := cefContextMenuCommand;
-  cef.OnPreKeyEvent := cefPreKeyEvent;
+
+  cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
+  cef.OnKeyEvent := cefKeyEvent;
   SetupCharMapDrop;
 end;
 
@@ -756,19 +755,6 @@ begin
       frmKeymanDeveloper.barStatus.Panels[0].Text := Format('Line %d, Col %d', [FSelectedRange.Top+1,FSelectedRange.Left+1]);
     end;
   end;
-end;
-
-procedure TframeTextEditor.WMUser_FireCommand(var Message: TMessage);
-var
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  if (params.Count > 0) and (params[0] = 'command') then
-  begin
-    params.Delete(0);
-    FireCommand(params);
-  end;
-  params.Free;
 end;
 
 procedure TframeTextEditor.WMUser_SyntaxColourChange(var Message: TMessage);
