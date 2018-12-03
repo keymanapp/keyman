@@ -208,11 +208,9 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   case KM_KBP_IT_PERSIST_OPT:
     assert(false); // TODO
     break;
-/*
   case KM_KBP_IT_INVALIDATE_CONTEXT:
-    assert(false); // TODO
+    std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
-*/
   case KM_KBP_IT_EMIT_KEYSTROKE:
     std::cout << "action: emit keystroke" << std::endl;
     break;

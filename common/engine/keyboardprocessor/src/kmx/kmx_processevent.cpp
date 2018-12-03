@@ -129,9 +129,7 @@ namespace km {
           }
           break;
         case QIT_INVALIDATECONTEXT:
-          // TODO: support invalidating the context
-          // TODO: IMPORTANT! invalidate the context; state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0} });
-
+          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0} });
           break;
         default:
           //std::cout << "Unexpected item type " << a.ItemType << ", " << a.dwData << std::endl;

@@ -490,14 +490,12 @@ enum km_kbp_action_type {
   KM_KBP_IT_ALERT       = 3,  // The keyboard has triggered a alert/beep/bell.
   KM_KBP_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
   KM_KBP_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
-  KM_KBP_IT_RESET_OPT   = 6,  // Set the indicated option from the last
-                              //  persisted value or defaults. This includes
-                              //  the pristine value from environment or
-                              //  keyboard options.
-  KM_KBP_IT_VKEYDOWN    = 7,  // A virtual key has been pressed.
-  KM_KBP_IT_VKEYUP      = 8,  // A virtual key has been released.
-  KM_KBP_IT_VSHIFTDOWN  = 9,  // A shifted virtual key has been pressed.
-  KM_KBP_IT_VSHIFTUP    = 10, // A shifted virtual key has been released.
+  KM_KBP_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
+  KM_KBP_IT_INVALIDATE_CONTEXT = 7, 
+                              // The processor requests that the context buffer be cleared;
+							  // for applications where context is cached, this clears the context;
+							  // for applications where context is read from the focused text store,
+							  // the context is just re-read and markers flushed.
   KM_KBP_IT_MAX_TYPE_ID
 };
 
