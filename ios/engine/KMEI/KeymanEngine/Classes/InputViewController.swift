@@ -163,7 +163,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // When using the system keyboard, sets the system-initialized version of the keyboard
     // as Manager.shared's inputViewController.
     Manager.shared.inputViewController = self
-    reload()
 
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
@@ -278,9 +277,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     
     // Establish a consistent set of constraints for the top bar.
     if #available(iOSApplicationExtension 11.0, *) {
-      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
+//      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+//      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+//      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
 
       topBar.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
       topBar.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
