@@ -31,17 +31,17 @@ fi
 : ${DIST:="$(lsb_release --short --codename)"}
 
 # Optionally change Debian codenames in $DIST to their aliases.
-#case "$DIST" in
-#    $UNSTABLE_CODENAME)
-#        DIST="unstable"
-#        ;;
+case "$DIST" in
+    $UNSTABLE_CODENAME)
+        DIST="unstable"
+        ;;
 #    $TESTING_CODENAME)
 #        DIST="testing"
 #        ;;
 #    $STABLE_CODENAME)
 #        DIST="stable"
 #        ;;
-#esac
+esac
 
 # Optionally set the architecture to the host architecture if none set. Note
 # that you can set your own default (i.e. ${ARCH:="i386"}).
@@ -78,3 +78,5 @@ else
     echo "Unknown distribution: $DIST"
     exit 1
 fi
+
+echo "DIST is $DIST"

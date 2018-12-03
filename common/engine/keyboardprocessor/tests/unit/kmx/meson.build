@@ -51,8 +51,8 @@ tests = [
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-# todo: if kmcomp is not found, use the .kmx in the source folder
-# therefore make kmcomp compile to the source folder and add to repo?
+# If kmcomp is not found, use the .kmx in the source folder.
+# If it is make kmcomp compile to the source folder to keep repo in sync.
 if build_machine.system() == 'windows'
   kmcomp_cmd = [kmcomp]
 else
@@ -65,7 +65,7 @@ endif
 
 if kmcomp.found()
   foreach kbd : tests
-    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_src = files(kbd + '.kmn')
     kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
     kbd_log = custom_target(kbd + '.kmx'.underscorify(),
       output: kbd + '.log',
@@ -77,7 +77,7 @@ if kmcomp.found()
   endforeach
 else
   foreach kbd : tests
-    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_src = files(kbd + '.kmn')
     kbd_obj = files(kbd + '.kmx')
 
     test(kbd, kmx, args: [kbd_src, kbd_obj])

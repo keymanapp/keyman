@@ -504,6 +504,7 @@ begin
   LoadGlobalProjectUI(FileName);   // I4687
   frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
   frmKeymanDeveloper.ShowProject;
+  frmKeymanDeveloper.UpdateCaption;
 end;
 
 procedure TmodActionsMain.actProjectSaveAsAccept(Sender: TObject);

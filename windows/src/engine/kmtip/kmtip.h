@@ -136,4 +136,12 @@ private:
     LONG _cRef;     // COM ref count
 };
 
+class Keyman32Interface {
+private:
+  static HMODULE GetHandle();
+public:
+  static void SetFocus(HWND hwndActive, HWND hwndPrevious);
+  static void WriteDebugEvent(char *file, int line, PWCHAR msg);
+};
+
 #endif // KMTIP_H

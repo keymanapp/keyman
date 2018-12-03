@@ -353,6 +353,8 @@ type
     procedure CharMapInsertCode(Sender: TObject; Control: TWinControl;
       DragObject: TCharacterDragObject);
 
+    procedure UpdateCaption;
+
     procedure DefaultDockLayout;
 
     procedure UDUI_Error(Sender: TUnicodeData; Error: TUnicodeDataError; const Details: WideString);
@@ -533,6 +535,8 @@ begin
 
   LoadDockLayout;
   Invalidate;
+
+  UpdateCaption;
 end;
 
 procedure TfrmKeymanDeveloper.CreateWnd;
@@ -1192,6 +1196,7 @@ begin
   FreeGlobalProjectUI;
   LoadGlobalProjectUI('');
   ShowProject;
+  UpdateCaption;
 end;
 
 function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
@@ -1451,6 +1456,15 @@ procedure TfrmKeymanDeveloper.UDUI_UpdateStatus(const Msg: WideString; Pos,
 begin
   if Assigned(FUnicodeDataStatusForm) then
     FUnicodeDataStatusForm.UpdateStatus(Msg, Pos, Max);
+end;
+
+procedure TfrmKeymanDeveloper.UpdateCaption;
+begin
+  if FGlobalProject.Untitled
+    then Caption := '(Untitled project) - Keyman Developer'
+    else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
+
+  Application.Title := Caption;
 end;
 
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);

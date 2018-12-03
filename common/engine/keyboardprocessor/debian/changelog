@@ -1,0 +1,5 @@
+keyman-keyboardprocessor (0.0.0~2018-1) unstable; urgency=medium
+
+  * Initial release.
+
+ -- Daniel Glassey <wdg@debian.org>  Tue, 20 Nov 2018 10:01:32 +0700

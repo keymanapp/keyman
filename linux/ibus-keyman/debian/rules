@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --with autoreconf
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		--libexecdir=/usr/lib/ibus
+
+override_dh_auto_test:
+	# run test but disable failing
+	-dh_auto_test

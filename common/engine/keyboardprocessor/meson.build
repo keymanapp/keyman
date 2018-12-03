@@ -20,7 +20,7 @@ endif
 py = import('python3')
 python = py.find_python()
 
-subdir('doc')
+#subdir('doc')
 subdir('include')
 subdir('src')
 subdir('tests')
