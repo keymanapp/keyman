@@ -337,6 +337,7 @@ type
     procedure LoadDockLayout;
     procedure SaveDockLayout;
     procedure CEFShutdownComplete(Sender: TObject);
+    procedure ActivateActiveChild;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -1091,16 +1092,17 @@ begin
   end;
 end;
 
+procedure TfrmKeymanDeveloper.ActivateActiveChild;
+begin
+  if Assigned(ActiveChild) then
+    SendMessage(ActiveChild.Handle, CM_ACTIVATE, 0, 0);
+end;
+
 procedure TfrmKeymanDeveloper.pagesChange(Sender: TObject);
 begin
   inherited;
   //CharacterMapFormChanged(ActiveChild);
-  if Assigned(ActiveChild) then
-  begin
-    //if ActiveChild.SetFocus;
-    SendMessage(ActiveChild.Handle, CM_ACTIVATE, 0, 0);
-    if ActiveChild.Visible and Visible and CanFocus then ActiveChild.SetFocus;
-  end;
+  ActivateActiveChild;
 
   cbTextFileFormat.Enabled := Assigned(ActiveChild) and (ActiveChild is TfrmTikeEditor);   // I3733
   FocusActiveChild;
@@ -1335,6 +1337,7 @@ begin
             //CharacterMapFormChanged(nil);
             Window.Parent := nil;
             pages.Pages[i].Free;
+            ActivateActiveChild;
             FocusActiveChild;
 
             if FIsClosing then
