@@ -40,7 +40,13 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path,
 
   try
   {
-    *keyboard = static_cast<km_kbp_keyboard *>(new km::kbp::keyboard(kb_path));
+    km::kbp::keyboard *kp = new km::kbp::keyboard(kb_path);
+    km_kbp_status status = kp->processor().validate();
+    if (status != KM_KBP_STATUS_OK) {
+      delete kp;
+      return status;
+    }
+    *keyboard = static_cast<km_kbp_keyboard *>(kp);
   }
   catch (std::bad_alloc) 
   {

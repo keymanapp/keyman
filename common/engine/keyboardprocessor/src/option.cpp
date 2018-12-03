@@ -9,9 +9,11 @@
 #include <algorithm>
 #include <memory>
 
+#include "keyboard.hpp"
 #include "option.hpp"
 #include "json.hpp"
 #include "utfcodec.hpp"
+#include "state.hpp"
 
 using namespace km::kbp;
 
@@ -52,7 +54,7 @@ char16_t const * options::lookup(km_kbp_option_scope scope,
 }
 
 
-km_kbp_option_item const * options::assign(km_kbp_option_scope scope, std::u16string const & key,
+km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key,
                                        std::u16string const & value)
 {
   km_kbp_option_item const * opt = _scopes[scope-1];
@@ -64,14 +66,20 @@ km_kbp_option_item const * options::assign(km_kbp_option_scope scope, std::u16st
     if (save.key == key && save.scope == scope)
     {
       save = option(scope, key, value);
+
+      //((km::kbp::state *)state)->keyboard().
+      const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+
       return &save;
     }
   }
 
   _saved.emplace_back(scope, key, value);
+
+  const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+
   return &_saved.back();
 }
-
 
 void options::reset(km_kbp_option_scope scope, std::u16string const & key)
 {

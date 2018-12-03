@@ -1982,7 +1982,7 @@ begin
           LoadFromFile(FileName, TEncoding.UTF8); // Let prolog determine encoding  // I3337
       except
         on E:EEncodingError do
-          LoadFromFile(FileName, TEncoding.Default);
+          LoadFromFile(FileName);
       end;
       FLastFileCharSet := Encoding;// LastFileCharSet;
     end

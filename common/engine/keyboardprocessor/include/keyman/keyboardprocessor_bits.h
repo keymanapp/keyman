@@ -20,6 +20,10 @@
   #define _kmn_export_flag      visibility("default")
   #define _kmn_import_flag      visibility("default")
   #define _kmn_static_flag      visibility("hidden")
+  #define _kmn_unused(x)        UNUSED_ ## x __attribute__((__unused__))
+#else
+  #define _kmn_unused(x)        UNUSED_ ## x
+
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__

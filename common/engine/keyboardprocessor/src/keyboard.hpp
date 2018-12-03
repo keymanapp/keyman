@@ -14,6 +14,7 @@
 #include <keyman/keyboardprocessor.h>
 
 #include "option.hpp"
+#include "processor.hpp"
 
 namespace std {
   namespace filesystem = std::experimental::filesystem;
@@ -32,11 +33,18 @@ namespace kbp
     std::u16string const                      _version_string;
     std::filesystem::path              const  _folder_path;
     std::vector<km_kbp_option_item>           _default_opts;
-
+    abstract_processor                       *_processor;
   public:
     keyboard(std::filesystem::path const &);
+    ~keyboard() {
+      delete _processor;
+    }
 
     friend json & operator << (json &, km::kbp::keyboard const &);
+
+    std::vector<km_kbp_option_item> *default_opts() { return & _default_opts; }
+
+    kbp::abstract_processor const &  processor() const noexcept { return *_processor; }
   };
 
   json & operator << (json &, km::kbp::keyboard const &);

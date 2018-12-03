@@ -29,7 +29,7 @@ m4_define(ibus_maybe_datestamp,
 m4_define([ibus_version],
     ibus_major_version.ibus_minor_version.ibus_micro_version[]ibus_maybe_datestamp)
 
-AC_INIT([ibus-kmfl], m4_esyscmd_s([cat VERSION]), [https://github.com/ibus/ibus/issues/new])
+AC_INIT([ibus-kmfl], m4_esyscmd_s([cat VERSION]), [https://github.com/keymanapp/keyman/issues/new])
 
 AM_INIT_AUTOMAKE
 AC_GNU_SOURCE
@@ -65,7 +65,7 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Define to the read-only architecture-independent data directory.])
 
 AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION(0.16.1)
+AM_GNU_GETTEXT_VERSION(0.19.7)
 
 
 # OUTPUT files
