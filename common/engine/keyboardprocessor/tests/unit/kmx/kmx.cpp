@@ -201,9 +201,16 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   }
 }
 
-int run_test(const std::string & source, const std::string & compiled) {
+std::wstring utf8_to_wchar(std::string utf8_string)
+{
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+  return convert.from_bytes(utf8_string);
+}
+
+int run_test(const std::string & source, const std::string & _compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
+  std::wstring compiled = utf8_to_wchar(_compiled);
   kmx_options options;
   bool expected_beep = false;
 
@@ -211,7 +218,7 @@ int run_test(const std::string & source, const std::string & compiled) {
   if (result != 0) return result;
 
   std::cout << "source file   = " << source << std::endl
-            << "compiled file = " << compiled << std::endl;
+            << "compiled file = " << _compiled << std::endl;
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;

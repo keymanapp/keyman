@@ -54,9 +54,10 @@ tests = [
 # todo: if kmcomp is not found, use the .kmx in the source folder
 # therefore make kmcomp compile to the source folder and add to repo?
 if build_machine.system() == 'windows'
-  wine = ''
+  kmcomp_cmd = [kmcomp]
 else
   wine = find_program('wine', required: false)
+  kmcomp_cmd = [wine, kmcomp]
   if not wine.found()
     kmcomp = disable()
   endif
@@ -69,7 +70,7 @@ if kmcomp.found()
     kbd_log = custom_target(kbd + '.kmx'.underscorify(),
       output: kbd + '.log',
       input: kbd_src,
-      command: [wine, kmcomp, '-s', '@INPUT@', kbd_obj, '@OUTPUT@']
+      command: kmcomp_cmd + ['-s', '@INPUT@', kbd_obj, '@OUTPUT@']
     )
 
     test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
