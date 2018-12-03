@@ -172,6 +172,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func viewWillDisappear(_ animated: Bool) {
     //Manager.shared.isSystemKeyboard = false
     super.viewWillDisappear(animated)
+    // Necessary for existing infrastructure to resend info for the keyboard after reloading
+    // as system keyboard.
     Manager.shared.shouldReloadKeyboard = true
   }
 
