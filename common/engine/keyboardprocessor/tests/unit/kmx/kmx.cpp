@@ -27,8 +27,6 @@ std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.c
 namespace
 {
 
-const std::string base = "tests/unit/kmx/";
-
 bool g_beep_found = false;
 
 struct key_event {
@@ -48,8 +46,8 @@ struct kmx_option {
 
 using kmx_options = std::vector<kmx_option>;
 
-int run_test(const std::string & file);
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep);
+int load_source(const std::string &, std::string &, std::u16string &,
+                std::u16string &, kmx_options &, bool &);
 
 km_kbp_option_item test_env_opts[] =
 {
@@ -77,26 +75,8 @@ static inline void trim(std::string &s) {
   rtrim(s);
 }
 
-// trim from start (copying)
-static inline std::string ltrim_copy(std::string s) {
-  ltrim(s);
-  return s;
-}
-
-// trim from end (copying)
-static inline std::string rtrim_copy(std::string s) {
-  rtrim(s);
-  return s;
-}
-
-// trim from both ends (copying)
-static inline std::string trim_copy(std::string s) {
-  trim(s);
-  return s;
-}
-
 key_event char_to_event(char ch) {
-  assert(ch >= 32 && ch < 128);
+  assert(ch >= 32 && ch <= 127);
   return {
     km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
     (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ?  KM_KBP_MODIFIER_SHIFT : 0)
@@ -221,21 +201,22 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   }
 }
 
-int run_test(const std::string & file) {
+int run_test(const std::string & source, const std::string & compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
   kmx_options options;
   bool expected_beep = false;
 
-  int result = load_source(file, keys, expected, context, options, expected_beep);
+  int result = load_source(source, keys, expected, context, options, expected_beep);
   if (result != 0) return result;
 
-  std::cout << "file = " << file << std::endl;
+  std::cout << "source file   = " << source << std::endl
+            << "compiled file = " << compiled << std::endl;
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
 
-  try_status(km_kbp_keyboard_load(std::filesystem::path(base + file + ".kmx").c_str(), &test_kb));
+  try_status(km_kbp_keyboard_load(compiled.c_str(), &test_kb));
 
   // Setup state, environment
 
@@ -281,7 +262,7 @@ int run_test(const std::string & file) {
 
     try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
-    delete keyboard_opts;
+    delete [] keyboard_opts;
   }
 
   // Setup context
@@ -401,7 +382,7 @@ bool is_token(const std::string token, std::string &line) {
   return false;
 }
 
-int load_source(const std::string & file, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
+int load_source(const std::string & path, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
   const std::string s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ",
@@ -409,10 +390,7 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
     s_option_expected = "c expected option: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
-  std::ifstream kmn(base + file + ".kmn");
-  if (!kmn.good()) {
-    kmn.open(file + ".kmn");
-  }
+  std::ifstream kmn(path);
   if (!kmn.good()) {
     return __LINE__;
   }
@@ -452,14 +430,21 @@ int load_source(const std::string & file, std::string & keys, std::u16string & e
   return 0;
 }
 
+constexpr const auto help_str = "\
+kmx <KMN_FILE> <KMX_FILE>\n\
+help:\n\
+\tKMN_FILE:\tThe source file for the keyboard under test.\n\
+\tKMX_FILE:\tThe corresponding compiled kmx file produced from KMN_FILE.\n";
 } // namespace
 
 int main(int argc, char *argv[])
 {
-  for (int i = 1; i < argc; i++) {
-    int result;
-    std::cout << argv[i] << std::endl;
-    if ((result = run_test(argv[i])) != 0) return result;
+  if (argc < 3)
+  {
+    std::cerr << "kmx: Not enough arguments." << std::endl;
+    std::cout << help_str;
+    return 1;
   }
-  return 0;
+
+  return run_test(argv[1], argv[2]);
 }

@@ -11,7 +11,10 @@ kmx = executable('kmx', 'kmx.cpp',
     link_args: links,
     objects: lib.extract_all_objects())
 
-kmns = [
+copyfile = ['-c', 'import sys, shutil', 'shutil.copyfile(*sys.argv[1:])']
+kmcomp = find_program('kmcomp.exe', required: false)
+
+tests = [
   '000 - null keyboard',
   '001 - basic input UnicodeI',
   '002 - basic input Unicode',
@@ -50,23 +53,32 @@ kmns = [
 
 # todo: if kmcomp is not found, use the .kmx in the source folder
 # therefore make kmcomp compile to the source folder and add to repo?
+if build_machine.system() == 'windows'
+  wine = ''
+else
+  wine = find_program('wine', required: false)
+  if not wine.found()
+    kmcomp = disable()
+  endif
+endif
 
-kmcomp = find_program('kmcomp', required: false)
 if kmcomp.found()
-  foreach kmn : kmns
-    kmn_test = custom_target(
-      kmn + '.kmn',
-      output: kmn + '.kmx',
-      input: 'kmn/' + kmn + '.kmn',
-      command : [kmcomp, '-s', '@INPUT@', '@OUTPUT@']
+  foreach kbd : tests
+    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
+    kbd_log = custom_target(kbd + '.kmx'.underscorify(),
+      output: kbd + '.log',
+      input: kbd_src,
+      command: [wine, kmcomp, '-s', '@INPUT@', kbd_obj, '@OUTPUT@']
     )
 
-    kmn_source = configure_file(
-      input: 'kmn/' + kmn + '.kmn',
-      output: kmn + '.kmn',
-      copy: true
-    )
+    test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
+  endforeach
+else
+  foreach kbd : tests
+    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_obj = files(kbd + '.kmx')
 
-    test(kmn, kmx, depends: [kmn_test], args: [kmn])
+    test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach
 endif
