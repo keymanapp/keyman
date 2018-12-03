@@ -163,14 +163,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // When using the system keyboard, sets the system-initialized version of the keyboard
     // as Manager.shared's inputViewController.
     Manager.shared.inputViewController = self
+    reload()
 
     setConstraints()
     inputView?.setNeedsUpdateConstraints()
   }
 
   open override func viewWillDisappear(_ animated: Bool) {
-    Manager.shared.isSystemKeyboard = false
+    //Manager.shared.isSystemKeyboard = false
     super.viewWillDisappear(animated)
+    Manager.shared.shouldReloadKeyboard = true
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
@@ -278,6 +280,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
       topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
 
+      topBar.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+      topBar.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+      topBar.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+
       // Allow this one to be broken if/as necessary to resolve layout issues.
       let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
       topBarWidthConstraint.priority = UILayoutPriority(rawValue: 999)
@@ -324,10 +330,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
 
-      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
-      // Cannot be met, but helps to 'force' height for the system keyboard.
-      kbdHeightConstraint.priority = .defaultHigh
-      kbdHeightConstraint.isActive = true;
+//      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
+//      // Cannot be met, but helps to 'force' height for the system keyboard.
+//      kbdHeightConstraint.priority = .defaultHigh
+//      kbdHeightConstraint.isActive = true;
     }
 
     // Establish constraints for margin views - this is needed for correct layout of the system keyboard.
