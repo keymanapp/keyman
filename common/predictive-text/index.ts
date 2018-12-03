@@ -20,6 +20,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/// <reference path="node_modules/promise-polyfill/lib/polyfill.js" />
+
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
  * 
