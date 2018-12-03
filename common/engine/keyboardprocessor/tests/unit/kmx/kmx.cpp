@@ -4,14 +4,17 @@
   Create Date:  30 Oct 2018
   Authors:      Marc Durdin (MD), Tim Eves (TSE)
 */
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <cctype>
 #include <algorithm>
+#include <cctype>
+#include <fstream>
 #include <iostream>
 #include <list>
+#include <sstream>
+#include <string>
+#include <type_traits>
+
 #include <keyman/keyboardprocessor.h>
+
 #include "state.hpp"
 
 #define   try_status(expr) \
@@ -201,16 +204,32 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   }
 }
 
-std::wstring utf8_to_wchar(std::string utf8_string)
+template<typename P>
+std::basic_string<
+  typename std::remove_const<
+    typename std::remove_pointer<P>::type>::type
+>
+utf8_to(const std::string &);
+
+template<>
+inline
+std::basic_string<wchar_t> utf8_to<const wchar_t *>(const std::string & s)
 {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-  return convert.from_bytes(utf8_string);
+  return convert.from_bytes(s);
+}
+
+template<>
+inline
+std::basic_string<char> utf8_to<const char *>(const std::string & s)
+{
+  return s;
 }
 
 int run_test(const std::string & source, const std::string & _compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
-  std::wstring compiled = utf8_to_wchar(_compiled);
+  auto compiled = utf8_to<km_kbp_path_name>(_compiled);
   kmx_options options;
   bool expected_beep = false;
 
