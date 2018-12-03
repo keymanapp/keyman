@@ -1,0 +1,2 @@
+#!/bin/sh
+./print_kmp $srcdir/test/kmp.json

@@ -20,82 +20,120 @@
 #include "utfcodec.hpp"
 
 namespace {
-  constexpr km_kbp_usv UNICODE_SMP_START = 0x10000;
+  template<class U>
+  km_kbp_status
+  _context_items_from(typename U::codeunit_t const *text,
+                      km_kbp_context_item **out_ptr)
+  {
+    assert(text); assert(out_ptr);
+    if (!text || !out_ptr)  return KM_KBP_STATUS_INVALID_ARGUMENT;
+
+    *out_ptr = nullptr;
+    try
+    {
+      std::vector<km_kbp_context_item> res;
+
+      for (auto i = typename U::const_sentinal_iterator(text); i; ++i)
+      {
+        if(i.error())   return KM_KBP_STATUS_INVALID_UTF;
+        res.emplace_back(km_kbp_context_item {KM_KBP_CT_CHAR, {0,}, {*i}});
+      }
+      // Terminate the context_items array.
+      res.emplace_back(km_kbp_context_item KM_KBP_CONTEXT_ITEM_END);
+
+      *out_ptr = new km_kbp_context_item[res.size()];
+      std::move(res.begin(), res.end(), *out_ptr);
+    }
+    catch(std::bad_alloc)
+    {
+      return KM_KBP_STATUS_NO_MEM;
+    }
+
+    return KM_KBP_STATUS_OK;
+  }
+
+  template<class U>
+  km_kbp_status _context_items_to(km_kbp_context_item const *ci,
+                                  typename U::codeunit_t *buf,
+                                  size_t * sz_ptr)
+  {
+    assert(ci); assert(sz_ptr);
+    if (!ci || !sz_ptr)   return KM_KBP_STATUS_INVALID_ARGUMENT;
+    auto const buf_size = *sz_ptr;
+
+    if (buf && buf_size > 0)
+    {
+      auto i = typename U::iterator(buf);
+      auto const e = decltype(i)(buf + buf_size - 1);
+
+      for (;i != e && ci->type != KM_KBP_CT_END; ++ci)
+      {
+        if (ci->type == KM_KBP_CT_CHAR)
+        {
+          *i = ci->character; ++i;
+        }
+      }
+      *i = 0; // null terminate the UTF16 string.
+
+      *sz_ptr = buf_size - (e - i);
+
+      return ci->type == KM_KBP_CT_END
+              ? KM_KBP_STATUS_OK
+              : KM_KBP_STATUS_INSUFFICENT_BUFFER;
+    }
+    else
+    {
+      auto n = 0;
+      typename U::codeunit_t cps[4/sizeof(typename U::codeunit_t)];
+
+      do
+      {
+        if (ci->type == KM_KBP_CT_CHAR)
+        {
+          int8_t l;
+          U::codec::put(cps, ci->character, l);
+          n += l;
+        }
+      }
+      while(ci++->type != KM_KBP_CT_END);
+
+      *sz_ptr = n+1;
+      return KM_KBP_STATUS_OK;
+    }
+  }
 }
 
 km_kbp_status
 km_kbp_context_items_from_utf16(km_kbp_cp const *text,
                                 km_kbp_context_item **out_ptr)
 {
-  assert(text); assert(out_ptr);
-  if (!text || !out_ptr)  return KM_KBP_STATUS_INVALID_ARGUMENT;
+  return _context_items_from<utf16>(reinterpret_cast<utf16::codeunit_t const *>(text), out_ptr);
+}
 
-  *out_ptr = nullptr;
-  try
-  {
-    std::vector<km_kbp_context_item> res;
 
-    for (auto i = utf16::const_sentinal_iterator(text); i; ++i)
-    {
-      if(i.error())   return KM_KBP_STATUS_INVALID_UTF;
-      res.emplace_back(km_kbp_context_item {KM_KBP_CT_CHAR, {0,}, {*i}});
-    }
-    // Terminate the context_items array.
-    res.emplace_back(km_kbp_context_item KM_KBP_CONTEXT_ITEM_END);
+km_kbp_status
+km_kbp_context_items_from_utf8(char const *text,
+                                km_kbp_context_item **out_ptr)
+{
+  return _context_items_from<utf8>(reinterpret_cast<utf8::codeunit_t const *>(text), out_ptr);
+}
 
-    *out_ptr = new km_kbp_context_item[res.size()];
-    std::move(res.begin(), res.end(), *out_ptr);
-  }
-  catch(std::bad_alloc)
-  {
-    return KM_KBP_STATUS_NO_MEM;
-  }
 
-  return KM_KBP_STATUS_OK;
+km_kbp_status km_kbp_context_items_to_utf8(km_kbp_context_item const *ci,
+                                            char *buf, size_t * sz_ptr)
+{
+  return _context_items_to<utf8>(ci,
+            reinterpret_cast<utf8::codeunit_t *>(buf),
+            sz_ptr);
 }
 
 
 km_kbp_status km_kbp_context_items_to_utf16(km_kbp_context_item const *ci,
                                             km_kbp_cp *buf, size_t * sz_ptr)
 {
-  assert(ci); assert(sz_ptr);
-  if (!ci || !sz_ptr)   return KM_KBP_STATUS_INVALID_ARGUMENT;
-  auto const buf_size = *sz_ptr;
-
-  if (buf && buf_size > 0)
-  {
-    auto i = utf16::iterator(buf);
-    auto const e = utf16::iterator(buf + buf_size - 1);
-
-    for (;i != e && ci->type != KM_KBP_CT_END; ++ci)
-    {
-      if (ci->type == KM_KBP_CT_CHAR)
-      {
-        *i = ci->character; ++i;
-      }
-    }
-    *i = 0; // null terminate the UTF16 string.
-
-    *sz_ptr = buf_size - (e - i);
-
-    return ci->type == KM_KBP_CT_END
-            ? KM_KBP_STATUS_OK
-            : KM_KBP_STATUS_INSUFFICENT_BUFFER;
-  }
-  else
-  {
-    auto n = 0;
-
-    do
-    {
-      if (ci->type == KM_KBP_CT_CHAR)
-        n += ci->character >= UNICODE_SMP_START ? 2 : 1;
-    }
-    while(ci++->type != KM_KBP_CT_END);
-
-    *sz_ptr = n+1;
-    return KM_KBP_STATUS_OK;
-  }
+  return _context_items_to<utf16>(ci,
+            reinterpret_cast<utf16::codeunit_t *>(buf),
+            sz_ptr);
 }
 
 

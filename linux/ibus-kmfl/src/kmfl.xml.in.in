@@ -12,8 +12,7 @@
 	<observed-paths>
 		<path>/usr/share/kmfl/</path>
 		<path>~/.kmfl/</path>
-		<path>/usr/local/share/keyman/</path>
-		<path>~/.local/share/keyman/</path>
+		<path>/usr/local/share/kmfl/</path>
 	</observed-paths>
 	<engines exec=\"${libexecdir}/ibus-engine-kmfl --xml\" />
 </component>

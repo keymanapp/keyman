@@ -60,7 +60,6 @@ if prog_kmcomp.found()
       output: kmn + '.kmx',
       command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
     )
-
     configure_file(
       copy: true,
       input:  kmn + '.kmn',
@@ -75,4 +74,3 @@ else
     test(kmn, kmx, args: [kmn, meson.source_root()])
   endforeach
 endif
-

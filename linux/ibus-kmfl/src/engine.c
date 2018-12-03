@@ -29,7 +29,6 @@
 #include <X11/keysym.h>
 
 #include "kmflutil.h"
-#include "keyman-service.h"
 #include "engine.h"
 
 typedef struct _IBusKMFLEngine IBusKMFLEngine;
@@ -412,13 +411,6 @@ ibus_kmfl_engine_enable (IBusEngine *engine)
     engine_name = ibus_engine_get_name (engine);
     g_assert (engine_name);
     g_message("WDG: ibus_kmfl_engine_enable %s", engine_name);
-    im = (KInputMethod *) g_hash_table_lookup (im_table, engine_name);
-    // own dbus name com.Keyman
-    // expose properties LDMLFile and Name
-    KeymanService *service = km_service_get_default();
-    //const gchar *ldmlfile = "";
-    km_service_set_ldmlfile (service, im->keyboard_ldmlfile);
-    km_service_set_name (service, im->keyboard_name);
     parent_class->enable (engine);
 }
 
@@ -432,11 +424,6 @@ ibus_kmfl_engine_disable (IBusEngine *engine)
     g_assert (engine_name);
     g_message("WDG: ibus_kmfl_engine_disable %s", engine_name);
     ibus_kmfl_engine_focus_out (engine);
-    // stop owning dbus name com.Keyman
-    KeymanService *service = km_service_get_default();
-    km_service_set_ldmlfile (service, "");
-    km_service_set_name (service, "None");
-    // g_clear_object(&service);
 
     parent_class->disable (engine);
 }
