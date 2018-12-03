@@ -63,12 +63,11 @@ class KeymanWebViewController: UIViewController {
   func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
+    
+    let newSize = view.bounds.size
 
-    setOskWidth(Int(view.bounds.size.width))
-    setOskHeight(Int(view.bounds.size.height))
-
-    //log.info("Setting keyboard width: \(view.bounds.size.width)")
-    //log.info("Setting keyboard height: \(view.bounds.size.height)")
+    setOskWidth(Int(newSize.width))
+    setOskHeight(Int(newSize.height))
   }
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -105,7 +104,7 @@ class KeymanWebViewController: UIViewController {
     webView = WKWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView.isOpaque = false
     webView.translatesAutoresizingMaskIntoConstraints = false
-    webView.backgroundColor = UIColor.magenta //UIColor.clear
+    webView.backgroundColor = UIColor.clear
     webView.navigationDelegate = self
     webView.scrollView.isScrollEnabled = false
     
@@ -695,16 +694,14 @@ extension KeymanWebViewController {
 
     if let keyboard = keyboard {
       log.info("Current keyboard is set.")
-      _ = setKeyboard(keyboard)
+      _ = Manager.shared.setKeyboard(keyboard)
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
       log.info("Using user's default keyboard.")
-      _ = setKeyboard(keyboard)
+      _ = Manager.shared.setKeyboard(keyboard)
     } else {
       log.info("Using app-default keyboard.")
-      _ = setKeyboard(Defaults.keyboard)
+      _ = Manager.shared.setKeyboard(Defaults.keyboard)
     }
-//
-//    refreshKeyboard()
   }
 
   // MARK: - Show/hide views

@@ -78,10 +78,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
   
   open override func loadView() {
-    //let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
+    let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
+    let baseView = UIInputView(frame: CGRect.zero, inputViewStyle: .keyboard)
 
-    let baseView = UIView()
-    baseView.backgroundColor = UIColor.orange //bgColor
+    baseView.backgroundColor = bgColor
 
     // TODO: If the following line is enabled, the WKWebView does not respond to touch events
     // Can figure out why one day maybe
@@ -114,14 +114,15 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     baseView.addSubview(keymanWeb.view)
 
-    view = baseView
+    //view = baseView
+    inputView = baseView
   }
 
   open override func viewDidLoad() {
     super.viewDidLoad()
 
     keymanWeb.resetKeyboardState()
-    setConstraints()
+    setInnerConstraints()
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
@@ -164,7 +165,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // as Manager.shared's inputViewController.
     Manager.shared.inputViewController = self
 
-    setConstraints()
+    setInnerConstraints()
+    setOuterConstraints()
     inputView?.setNeedsUpdateConstraints()
   }
 
@@ -265,7 +267,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     dismissKeyboard()
   }
 
-  private func setConstraints() {
+  // These require the view to appear - parent and our relationship with it must exist!
+  private func setOuterConstraints() {
+    var baseWidthConstraint: NSLayoutConstraint
+    if #available(iOSApplicationExtension 11.0, *) {
+      baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
+    } else {
+      baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.layoutMarginsGuide.widthAnchor)
+    }
+
+    baseWidthConstraint.priority = .defaultHigh
+    baseWidthConstraint.isActive = true
+  }
+
+  private func setInnerConstraints() {
     // Top Bar temporarily perma-set here for debugging during development on the big keyboard refactor.
     isTopBarEnabled = true
     //isTopBarEnabled = false
@@ -277,13 +292,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     
     // Establish a consistent set of constraints for the top bar.
     if #available(iOSApplicationExtension 11.0, *) {
-//      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-//      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-//      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-
-      topBar.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
 
       // Allow this one to be broken if/as necessary to resolve layout issues.
       let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
@@ -295,7 +306,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       topBar.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
       
       // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
+      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalToConstant: 500)//(equalTo: view.layoutMarginsGuide.widthAnchor)
       topBarWidthConstraint.priority = UILayoutPriority(rawValue: 999)
       topBarWidthConstraint.isActive = true
     }
@@ -388,7 +399,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
-    log.info("Starting keyboard rotation.")
 
     coordinator.animateAlongsideTransition(in: nil, animation: {
       _ in
