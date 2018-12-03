@@ -60,7 +60,7 @@ class KeymanWebViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func fixLayout() {
+  @objc func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
     
@@ -73,9 +73,6 @@ class KeymanWebViewController: UIViewController {
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
 
-//    keyboardSize = size
-//    resetKeyboardState()
-
     if Manager.shared.isKeymanHelpOn {
       showHelpBubble(afterDelay: 1.5)
     }
@@ -85,8 +82,9 @@ class KeymanWebViewController: UIViewController {
         self.fixLayout()
     }, completion: {
       _ in
-        self.fixLayout()
-        self.updateViewConstraints()
+      // When going from landscape to portrait, the value is often not properly set until the end of the call chain.
+      // A simple, ultra-short timer allows us to quickly rectify the value in these cases to correct the keyboard.
+      Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(self.fixLayout), userInfo: nil, repeats: false)
     })
   }
 

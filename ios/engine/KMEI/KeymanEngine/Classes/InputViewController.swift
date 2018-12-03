@@ -28,9 +28,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var menuBehaviour = MenuBehaviour.showAlways
 
   open var topBarImageView: UIImageView?
-  open var leftMarginBufferView: UIView?
-  open var rightMarginBufferView: UIView?
-  open var bottomMarginBufferView: UIView?
 
   var isTopBarEnabled: Bool
   var keymanWeb: KeymanWebViewController
@@ -96,21 +93,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     topBarImageView!.translatesAutoresizingMaskIntoConstraints = false
     topBarImageView!.backgroundColor = UIColor.gray
     baseView.addSubview(topBarImageView!)
-
-    leftMarginBufferView = UIView()
-    leftMarginBufferView!.translatesAutoresizingMaskIntoConstraints = false
-    leftMarginBufferView!.backgroundColor = UIColor.green
-    baseView.addSubview(leftMarginBufferView!)
-
-    rightMarginBufferView = UIView()
-    rightMarginBufferView!.translatesAutoresizingMaskIntoConstraints = false
-    rightMarginBufferView!.backgroundColor = UIColor.green
-    baseView.addSubview(rightMarginBufferView!)
-
-    bottomMarginBufferView = UIView()
-    bottomMarginBufferView!.translatesAutoresizingMaskIntoConstraints = false
-    bottomMarginBufferView!.backgroundColor = UIColor.blue
-    baseView.addSubview(bottomMarginBufferView!)
 
     baseView.addSubview(keymanWeb.view)
 
@@ -327,8 +309,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
 
-      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor)
-      // Cannot be met, but helps to 'force' height for the system keyboard.
+      // Determines the actual height when in "keyboard extension" (system) mode.
+      // Without any value set here, the system keyboard will be given no room to display.
+      // In-app will instead auto-set the height based on the layout rules above and the default height for keyboards.
+      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))
       kbdHeightConstraint.priority = .defaultHigh
       kbdHeightConstraint.isActive = true;
     } else {
@@ -342,52 +326,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
 
-//      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
-//      // Cannot be met, but helps to 'force' height for the system keyboard.
-//      kbdHeightConstraint.priority = .defaultHigh
-//      kbdHeightConstraint.isActive = true;
+      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
+      // Cannot be met, but helps to 'force' height for the system keyboard.
+      kbdHeightConstraint.priority = .defaultHigh
+      kbdHeightConstraint.isActive = true;
     }
-
-    // Establish constraints for margin views - this is needed for correct layout of the system keyboard.
-    
-    let leftMargin = leftMarginBufferView!
-    leftMargin.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-    leftMargin.rightAnchor.constraint(equalTo: topBar.leftAnchor).isActive = true
-    leftMargin.topAnchor.constraint(equalTo: topBar.topAnchor).isActive = true
-    leftMargin.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
-
-    let leftMarginWidthConstraint = leftMargin.widthAnchor.constraint(equalToConstant: 10)
-    leftMarginWidthConstraint.priority = UILayoutPriority.defaultLow
-    leftMarginWidthConstraint.isActive = true
-    let leftMarginHeightConstraint = leftMargin.heightAnchor.constraint(equalToConstant: 10)
-    leftMarginHeightConstraint.priority = UILayoutPriority.defaultLow
-    leftMarginHeightConstraint.isActive = true
-
-    let rightMargin = rightMarginBufferView!
-    rightMargin.leftAnchor.constraint(equalTo: topBar.rightAnchor).isActive = true
-    rightMargin.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-    rightMargin.topAnchor.constraint(equalTo: topBar.topAnchor).isActive = true
-    rightMargin.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
-
-    let rightMarginWidthConstraint = rightMargin.widthAnchor.constraint(equalToConstant: 10)
-    rightMarginWidthConstraint.priority = UILayoutPriority.defaultLow
-    rightMarginWidthConstraint.isActive = true
-    let rightMarginHeightConstraint = rightMargin.heightAnchor.constraint(equalToConstant: 10)
-    rightMarginHeightConstraint.priority = UILayoutPriority.defaultLow
-    rightMarginHeightConstraint.isActive = true
-
-    let bottomMargin = bottomMarginBufferView!
-    bottomMargin.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-    bottomMargin.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-    bottomMargin.topAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
-    bottomMargin.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-
-    let bottomMarginWidthConstraint = bottomMargin.widthAnchor.constraint(equalToConstant: 10)
-    bottomMarginWidthConstraint.priority = UILayoutPriority.defaultLow
-    bottomMarginWidthConstraint.isActive = true
-    let bottomMarginHeightConstraint = bottomMargin.heightAnchor.constraint(equalToConstant: 10)
-    bottomMarginHeightConstraint.priority = UILayoutPriority.defaultLow
-    bottomMarginHeightConstraint.isActive = true
 
     fixLayout()
   }
