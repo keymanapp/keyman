@@ -68,9 +68,12 @@ namespace km {
 
       _kmx.GetContext()->Set(ctxt.c_str());
       _kmx.GetActions()->ResetQueue();
-      _kmx.ProcessEvent(state, vk, modifier_state);
-
       state->actions.clear();
+
+      if (!_kmx.ProcessEvent(state, vk, modifier_state)) {
+        // We need to output the default keystroke
+        state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {0} });
+      }
 
       for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
         auto a = _kmx.GetActions()->Get(i);
@@ -127,6 +130,8 @@ namespace km {
           break;
         case QIT_INVALIDATECONTEXT:
           // TODO: support invalidating the context
+          // TODO: IMPORTANT! invalidate the context; state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0} });
+
           break;
         default:
           //std::cout << "Unexpected item type " << a.ItemType << ", " << a.dwData << std::endl;
@@ -136,7 +141,7 @@ namespace km {
 
       state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
 
-      return 0;
+      return KM_KBP_STATUS_OK;
     }
 
     constexpr km_kbp_attr const engine_attrs = {

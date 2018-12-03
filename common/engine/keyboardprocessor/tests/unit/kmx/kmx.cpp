@@ -206,14 +206,15 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
     }
     break;
   case KM_KBP_IT_PERSIST_OPT:
-  case KM_KBP_IT_RESET_OPT:
     assert(false); // TODO
     break;
-  case KM_KBP_IT_VKEYDOWN:
-  case KM_KBP_IT_VKEYUP:
-  case KM_KBP_IT_VSHIFTDOWN:
-  case KM_KBP_IT_VSHIFTUP:
-    assert(false); // NOT SUPPORTED
+/*
+  case KM_KBP_IT_INVALIDATE_CONTEXT:
+    assert(false); // TODO
+    break;
+*/
+  case KM_KBP_IT_EMIT_KEYSTROKE:
+    std::cout << "action: emit keystroke" << std::endl;
     break;
   default:
     assert(false); // NOT SUPPORTED
@@ -296,6 +297,7 @@ int run_test(const std::string & file, const std::string & inputpath) {
   // Run through key events, applying output for each event
   for (auto p = next_key(keys); p.vk != 0; p = next_key(keys)) {
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
+
     for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
       apply_action(test_state, *act, text_store);
     }
