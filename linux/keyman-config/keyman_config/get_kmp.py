@@ -20,8 +20,8 @@ def get_package_download_data(packageID, weekCache=False):
 	Returns:
 		dict: Keyboard data
 	"""
-	logging.info("Getting download data for package %s", keyboardID)
-	api_url = "https://downloads.keyman.com/api/keyboard/1.0/" + keyboardID
+	logging.info("Getting download data for package %s", packageID)
+	api_url = "https://downloads.keyman.com/api/keyboard/1.0/" + packageID
 	logging.debug("At URL %s", api_url)
 	home = str(Path.home())
 	cache_dir = keyman_cache_dir()
@@ -124,7 +124,7 @@ def get_kmp_file(downloaddata, cache=False):
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
-	if 'kmp' not in kbdata:
+	if 'kmp' not in downloaddata:
 		logging.info("get_kmp.py: Package does not have a kmp file available")
 		return None
 
