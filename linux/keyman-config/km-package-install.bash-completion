@@ -6,7 +6,7 @@ _km-package-install_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h --help -v --verbose -vv --veryverbose --version -k --keyboardid -f --file -s --shared"
+    opts="-h --help -v --verbose -vv --veryverbose --version -p --package -f --file -s --shared"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
