@@ -10,6 +10,38 @@ import requests_cache
 import os
 from pathlib import Path
 
+def get_package_download_data(packageID, weekCache=False):
+	"""
+	Get package download data from keyboards download api.
+
+	Args:
+		packageID (str): package ID
+		weekCache (bool) : cache data for 1 week, default is 1 day
+	Returns:
+		dict: Keyboard data
+	"""
+	logging.info("Getting download data for package %s", keyboardID)
+	api_url = "https://downloads.keyman.com/api/keyboard/1.0/" + keyboardID
+	logging.debug("At URL %s", api_url)
+	home = str(Path.home())
+	cache_dir = keyman_cache_dir()
+	current_dir = os.getcwd()
+	if weekCache:
+		expire_after = datetime.timedelta(days=7)
+	else:
+		expire_after = datetime.timedelta(days=1)
+	os.chdir(cache_dir)
+	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
+	now = time.ctime(int(time.time()))
+	response = requests.get(api_url)
+	logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
+	os.chdir(current_dir)
+	requests_cache.core.uninstall_cache()
+	if response.status_code == 200:
+		return response.json()
+	else:
+		return None
+
 
 def get_keyboard_data(keyboardID, weekCache=False):
 	"""
@@ -82,23 +114,22 @@ def user_keyboard_dir(keyboardid):
 	return os.path.join(user_keyman_dir(), keyboardid)
 
 
-def get_kmp_file(kbdata, cache=False):
+def get_kmp_file(downloaddata, cache=False):
 	"""
 	Get info from keyboard data to download kmp then download it.
 
 	Args:
-		kbdata (dict): Keyboard data
+		downloaddata (dict): Package download data
 		cache (bool): Whether to cache the kmp file web request
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
-	if 'packageFilename' not in kbdata:
-		logging.info("get_kmp.py: Keyboard does not have a kmp file available")
+	if 'kmp' not in kbdata:
+		logging.info("get_kmp.py: Package does not have a kmp file available")
 		return None
 
-	kmp_url = "https://downloads.keyman.com/keyboards/" + kbdata['id'] + "/" + kbdata['version'] + "/" + kbdata['packageFilename']
-	downloadfile = os.path.join(get_download_folder(), kbdata['packageFilename'])
-	return download_kmp_file(kmp_url, downloadfile, cache)
+	downloadfile = os.path.join(get_download_folder(), os.path.basename(downloaddata['kmp']))
+	return download_kmp_file(downloaddata['kmp'], downloadfile, cache)
 
 def download_kmp_file(url, kmpfile, cache=False):
 	"""
@@ -148,10 +179,10 @@ def get_kmp(packageID):
 	Returns:
 		str: path where kmp file has been downloaded
 	"""
-	kbdata = get_keyboard_data(packageID)
-	if (kbdata):
-		return get_kmp_file(kbdata)
+	downloaddata = get_package_download_data(packageID)
+	if (downloaddata):
+		return get_kmp_file(downloaddata)
 	else:
-		logging.warning("get_kmp.py: Could not download information about keyboard.")
+		logging.warning("get_kmp.py: Could not get download information about keyboard package.")
 		return None
 	return
