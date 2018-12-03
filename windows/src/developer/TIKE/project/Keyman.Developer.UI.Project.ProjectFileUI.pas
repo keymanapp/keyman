@@ -213,12 +213,12 @@ begin
       // Inject the user settings to the loaded file
       //
 
-      if FileExists(SavedFileName + '.user') then   // I4698
+      if FileExists(SavedUserFileName) then   // I4698
       begin
         userdoc := MSXMLDOMDocumentFactory.CreateDOMDocument;
         try
           userdoc.async := False;
-          userdoc.load(SavedFileName + '.user');
+          userdoc.load(SavedUserFileName);
           for i := 0 to userdoc.documentElement.childNodes.length - 1 do
             doc.documentElement.appendChild(userdoc.documentElement.childNodes.item[i].cloneNode(true));
         finally

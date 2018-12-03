@@ -1121,7 +1121,7 @@ begin
     try
       ext := LowerCase(ExtractFileExt(FFileName));
 
-      if ext = '.kpj' then
+      if ext = Ext_ProjectSource then
         modActionsMain.OpenProject(FFileName)
       else
       begin

@@ -7,7 +7,9 @@ uses
   IdCustomHTTPServer,
   IdHTTPServer,
 
-  Keyman.Developer.System.HttpServer.Base;
+  Keyman.Developer.System.HttpServer.Base,
+
+  utilfiletypes;
 
 // /app
 
@@ -35,13 +37,13 @@ uses
   System.JSON,
   System.SysUtils,
   System.Variants,
+  Winapi.Windows,
   Xml.XMLDoc,
   Xml.XMLIntf,
 
   JsonUtil,
   KeymanDeveloperOptions,
   Keyman.Developer.System.Project.ProjectFile,
-  Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles;
 
 { TAppHttpServer }
@@ -108,7 +110,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     path := ARequestInfo.Params.Values['path'];
 
-    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj')) then
+    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
       AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
@@ -116,7 +118,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
     end;
 
     // Transform the .kpj
-    with TProject.Create(path, (path='')) do
+    with TProject.Create(path) do
     try
       AResponseInfo.ContentType := 'text/html; charset=UTF-8';
       AResponseInfo.ContentText := Render;
@@ -164,7 +166,8 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
   var
     displayState, path: string;
     xmldoc: IXMLDocument;
-    FProject: TProject;
+    FNewDisplayState: PChar;
+    FNewPath: PChar;
   begin
     with TStringStream.Create('', TEncoding.UTF8) do
     try
@@ -194,19 +197,21 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     // Saving state
 
-    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), '.kpj')) then
+    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
       AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
       Exit;
     end;
 
-    FProject := TProject.Create(path, (path = ''));
-    try
-      FProject.DisplayState := displayState;
-      FProject.SaveUser;
-    finally
-      FProject.Free;
+    if GlobalProjectStateWndHandle <> 0 then
+    begin
+      // Potential for a race condition here as the window
+      // may be destroyed before we post to it. Can only happen at
+      // process destruction time and really not worth worrying about.
+      FNewDisplayState := StrNew(PChar(displayState));
+      FNewPath := StrNew(PChar(Path));
+      PostMessage(GlobalProjectStateWndHandle, WM_USER_ProjectUpdateDisplayState, NativeInt(FNewPath), NativeInt(FNewDisplayState));
     end;
   end;
 begin
