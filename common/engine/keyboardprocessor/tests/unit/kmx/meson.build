@@ -10,8 +10,11 @@ kmx = executable('kmx', 'kmx.cpp',
     include_directories: [inc, libsrc],
     link_args: links,
     objects: lib.extract_all_objects())
-    
-kmns = [
+
+copyfile = ['-c', 'import sys, shutil', 'shutil.copyfile(*sys.argv[1:])']
+kmcomp = find_program('kmcomp.exe', required: false)
+
+tests = [
   '000 - null keyboard',
   '001 - basic input UnicodeI',
   '002 - basic input Unicode',
@@ -29,7 +32,7 @@ kmns = [
   '018 - nul testing',
   '019 - multiple deadkeys',
   '020 - deadkeys and backspace',
-  
+
   '021 - options',
   '022 - options with preset',
   '023 - options with save',
@@ -38,39 +41,44 @@ kmns = [
 
   '026 - system stores',
   '027 - system stores 2',
-  
+
   '028 - smp',
   '029 - beep',
-  
+
   '030 - multiple groups',
   '031 - caps lock'
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-prog_kmcomp = find_program('kmcomp', required: false)
+# todo: if kmcomp is not found, use the .kmx in the source folder
+# therefore make kmcomp compile to the source folder and add to repo?
+if build_machine.system() == 'windows'
+  wine = ''
+else
+  wine = find_program('wine', required: false)
+  if not wine.found()
+    kmcomp = disable()
+  endif
+endif
 
-if prog_kmcomp.found()
-  warning('Compiled keyboards are not automatically added to the repo. Copy them from the build dir if you are committing any changes to tests.')
-  foreach kmn : kmns 
-    custom_target(
-      kmn + '.kmx',
-      build_by_default: true,
-      input: kmn + '.kmn',
-      output: kmn + '.kmx',
-      command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
-    )
-    configure_file(
-      copy: true,
-      input:  kmn + '.kmn',
-      output: kmn + '.kmn'
+if kmcomp.found()
+  foreach kbd : tests
+    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
+    kbd_log = custom_target(kbd + '.kmx'.underscorify(),
+      output: kbd + '.log',
+      input: kbd_src,
+      command: [wine, kmcomp, '-s', '@INPUT@', kbd_obj, '@OUTPUT@']
     )
 
-    test(kmn, kmx, args: [kmn, meson.build_root()])
+    test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
   endforeach
 else
-  warning('kmcomp was not found. Using existing compiled keyboards and changes to kmn files will be ignored.')
-  foreach kmn : kmns
-    test(kmn, kmx, args: [kmn, meson.source_root()])
+  foreach kbd : tests
+    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_obj = files(kbd + '.kmx')
+
+    test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach
 endif
