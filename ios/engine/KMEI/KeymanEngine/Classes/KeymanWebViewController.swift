@@ -422,7 +422,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
   func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
     if UIDevice.current.userInterfaceIdiom == .pad
-      || (Util.isSystemKeyboard && !Manager.shared.isSystemKeyboardTopBarEnabled)
+      || (Util.isSystemKeyboard && Manager.shared.inputViewController.activeTopBarHeight == 0)
       || isSubKeysMenuVisible {
       return
     }

@@ -65,8 +65,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     _inputViewController = inputViewController
     self.closeButtonTitle = closeButtonTitle
-    topBarHeight = Manager.shared.isSystemKeyboardTopBarEnabled ?
-      CGFloat(InputViewController.topBarHeight) : 0
+    topBarHeight = inputViewController.activeTopBarHeight
     keyFrame = frame
     rowHeight = UIDevice.current.userInterfaceIdiom == .phone ? 30 : 60
     fontSize = UIDevice.current.userInterfaceIdiom == .phone ? 14 : 21

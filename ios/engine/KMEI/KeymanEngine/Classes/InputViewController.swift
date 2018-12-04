@@ -29,7 +29,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   open var topBarImageView: UIImageView?
 
-  var isSystemKeyboard: Bool
+  var _isSystemKeyboard: Bool
+  var isSystemKeyboard: Bool {
+    return _isSystemKeyboard;
+  }
+
   var keymanWeb: KeymanWebViewController
 
   open class var isPortrait: Bool {
@@ -67,11 +71,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   public convenience init(forSystem: Bool) {
     // In-app uses of the keyboard should call this constructor for simplicity, setting `forSystem`=`false`.
     self.init(nibName: nil, bundle: nil)
-    isSystemKeyboard = forSystem
+    _isSystemKeyboard = forSystem
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    isSystemKeyboard = true
+    // Must set within this constructor, even if we override it immediately after in the convenience inits.
+    _isSystemKeyboard = true
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     
@@ -153,7 +158,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func viewDidAppear(_ animated: Bool) {
-    //Manager.shared.isSystemKeyboard = true
     super.viewDidAppear(animated)
 
     // When using the system keyboard, sets the system-initialized version of the keyboard
@@ -166,7 +170,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func viewWillDisappear(_ animated: Bool) {
-    //Manager.shared.isSystemKeyboard = false
     super.viewWillDisappear(animated)
     // Necessary for existing infrastructure to resend info for the keyboard after reloading
     // as system keyboard.
@@ -275,11 +278,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint.isActive = true
   }
 
+  public var activeTopBarHeight: CGFloat {
+    // If 'isSystemKeyboard' is true, always show the top bar.
+    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
+  }
+
   private func setInnerConstraints() {
-    // Top Bar temporarily perma-set here for debugging during development on the big keyboard refactor.
-
-    let topBarHeight = isSystemKeyboard ? InputViewController.topBarHeight : 0
-
     let topBar = topBarImageView!
     let container = keymanWeb.view!
     
@@ -304,7 +308,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       topBarWidthConstraint.isActive = true
     }
 
-    topBar.heightAnchor.constraint(equalToConstant: CGFloat(topBarHeight)).isActive = true
+    topBar.heightAnchor.constraint(equalToConstant: activeTopBarHeight).isActive = true
 
     // Establishes a set of constraints for the keyboard's container, supporting autoresizing of
     // the keyboard's WebView via its constraints.

@@ -36,7 +36,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
   
-  public var isSystemKeyboard = false
+  public var isSystemKeyboard: Bool {
+    guard let kbd = self._inputViewController else {
+      return false
+    }
+
+    return kbd.isSystemKeyboard
+  }
 
   // TODO: Change API to not disable removing as well
   /// Allow users to add new keyboards in the keyboard picker.
@@ -903,11 +909,5 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   func setSelectionRange(_ range: NSRange, manually: Bool) {
     inputViewController.setSelectionRange(range, manually: manually)
-  }
-
-  // MARK: - InputViewController methods
-  // TODO: Manager should not have InputViewController methods. Move this into InputViewController.
-  var isSystemKeyboardTopBarEnabled: Bool {
-    return true
   }
 }
