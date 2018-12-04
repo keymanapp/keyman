@@ -59,13 +59,13 @@ else
   wine = find_program('wine', required: false)
   kmcomp_cmd = [wine, kmcomp]
   if not wine.found()
-    kmcomp = disable()
+    kmcomp = wine
   endif
 endif
 
 if kmcomp.found()
   foreach kbd : tests
-    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_src = files(kbd + '.kmn')
     kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
     kbd_log = custom_target(kbd + '.kmx'.underscorify(),
       output: kbd + '.log',
@@ -77,7 +77,7 @@ if kmcomp.found()
   endforeach
 else
   foreach kbd : tests
-    kbd_src = files(join_paths('kmn', kbd) + '.kmn')
+    kbd_src = files(kbd + '.kmn')
     kbd_obj = files(kbd + '.kmx')
 
     test(kbd, kmx, args: [kbd_src, kbd_obj])
