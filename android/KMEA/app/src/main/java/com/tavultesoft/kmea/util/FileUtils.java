@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.util;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
@@ -23,6 +24,18 @@ public final class FileUtils {
 
   public static final int DOWNLOAD_ERROR = -1;
   public static final int DOWNLOAD_SUCCESS = 1;
+
+  // File extensions and file types
+  public static final String JAVASCRIPT = ".js";
+  public static final String TRUETYPEFONT = ".ttf";
+  public static final String OPENTYPEFONT = ".otf";
+
+  public static final String SVGFONT = ".svg";
+  public static final String SVGVIEWBOX = ".svg#";
+  public static final String WOFFFONT = ".woff";
+
+  public static final String KEYBOARDPACKAGE = ".kmp";
+  public static final String WELCOME_HTM = "welcome.htm";
 
   /**
    * Utility to download a file from urlStr and store it at destinationDir/destinationFilename.
@@ -63,7 +76,7 @@ public final class FileUtils {
 
         if (destinationFilename == null || destinationFilename.isEmpty()) {
           filename = getFilename(Connection.getFile());
-          if (filename.lastIndexOf(".js") > 0 && !filename.contains("-")) {
+          if (hasJavaScriptExtension(filename) && !filename.contains("-")) {
             filename = filename.substring(0, filename.lastIndexOf(".js")) + "-1.0.js";
           }
         } else {
@@ -201,5 +214,51 @@ public final class FileUtils {
       filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
+  }
+
+  /**
+   * Utility if a given file is a font. We prefer TTF or OTF, but old Android devices use SVG or WOFF.
+   * @param filename
+   * @return boolean
+   */
+  public static boolean hasFontExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(TRUETYPEFONT) || f.endsWith(OPENTYPEFONT) ||
+      f.endsWith(WOFFFONT) || f.endsWith(SVGFONT);
+  }
+
+  public static boolean hasSVGViewBox(String filename) {
+    String f = filename.toLowerCase();
+    return f.contains(SVGVIEWBOX);
+  }
+
+  public static boolean hasJavaScriptExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(JAVASCRIPT);
+  }
+
+  public static boolean hasKeyboardPackageExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(KEYBOARDPACKAGE);
+  }
+
+  public static boolean isWelcomeFile(String filename) {
+    String f = getFilename(filename);
+    return f.equalsIgnoreCase(WELCOME_HTM);
+  }
+
+  /**
+   * Utility to extract the .svg# filename.
+   * @param filename String
+   * @return String. Empty string if filename is not .svg#
+   */
+  public static String getSVGFilename(String filename) {
+    if (!hasSVGViewBox(filename)) {
+      return "";
+    }
+
+    String f = filename.toLowerCase();
+    int i = f.indexOf(SVGVIEWBOX) + SVGVIEWBOX.length();
+    return filename.substring(0, i);
   }
 }

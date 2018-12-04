@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             File newFile = new File(getDir("userdata", Context.MODE_PRIVATE), filename);
             copyFile(inputStream, newFile);
             inputStream.close();
-          } else if ((filename.endsWith(".js") || filename.endsWith(".ttf") || filename.endsWith(".otf"))) {
+          } else if (FileUtils.hasJavaScriptExtension(filename) || FileUtils.hasFontExtension(filename)) {
             File packagesDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
               KMManager.KMDefault_AssetPackages);
             if (!packagesDir.exists()) {
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             }
 
             // Only handle ad-hoc kmp packages
-            if (url.endsWith(".kmp")) {
+            if (FileUtils.hasKeyboardPackageExtension(url)) {
               try {
                 // Download the KMP to app cache
                 downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -667,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     InputStream inputFile = null;
     Bundle bundle = new Bundle();
     try {
-      boolean fileEndsWithKMP = false;
+      boolean isKMP = false;
       switch (data.getScheme().toLowerCase()) {
         case "content":
           // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
@@ -675,7 +675,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
-          fileEndsWithKMP = filename.endsWith(".kmp");
+          isKMP = FileUtils.hasKeyboardPackageExtension(filename);
           cacheKMPFilename = filename;
           inputFile = getContentResolver().openInputStream(data);
           break;
@@ -683,13 +683,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         case "file":
           File kmpFile = new File(data.getPath());
           filename = kmpFile.getName();
-          fileEndsWithKMP = data.toString().endsWith(".kmp");
+          isKMP = FileUtils.hasKeyboardPackageExtension(data.toString());
           cacheKMPFilename = kmpFile.getName();
           inputFile = new FileInputStream(kmpFile);
           break;
       }
 
-      if (fileEndsWithKMP) {
+      if (isKMP) {
         // Copy KMP to app cache
         cacheKMPFile = new File(MainActivity.this.getCacheDir().toString(), cacheKMPFilename);
         if (cacheKMPFile.exists()) {
