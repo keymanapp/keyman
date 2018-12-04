@@ -57,8 +57,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   // TODO:  Consider deleting this.
   private var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight +
-      (isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0)
+    return keymanWeb.keyboardHeight + activeTopBarHeight
   }
   
   public convenience init() {
@@ -258,20 +257,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
   }
 
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    // Is not implemented for this class, nor is resumeKeyboard().
-    // This class is used for System-level keyboards and would not have a
-    // practical way to be resumed after dismissal.
-    dismissKeyboard()
-  }
-
   // These require the view to appear - parent and our relationship with it must exist!
   private func setOuterConstraints() {
     var baseWidthConstraint: NSLayoutConstraint
     if #available(iOSApplicationExtension 11.0, *) {
       baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
     } else {
-      baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.layoutMarginsGuide.widthAnchor)
+      //baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.layoutMarginsGuide.widthAnchor)
+      baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.widthAnchor)
     }
 
     baseWidthConstraint.priority = .defaultHigh

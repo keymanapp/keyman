@@ -352,7 +352,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       delegate?.menuKeyUp(self)
     } else if fragment.hasPrefix("#hideKeyboard-") {
       hideKeyboard(self)
-      delegate?.hideKeyboard(self)
+      Manager.shared.hideKeyboard()
     } else if fragment.hasPrefix("ios-log:#iOS#") {
       let message = fragment.dropFirst(13)
       log.info("KMW Log: \(message)")
@@ -610,10 +610,6 @@ extension KeymanWebViewController {
   public var keyboardHeight: CGFloat {
     return kbSize.height
   }
-
-//  func keyboardHeight(with orientation: UIInterfaceOrientation) -> CGFloat {
-//    return initKeyboardHeight(isPortrait: orientation.isPortrait)
-//  }
 
   func initKeyboardHeight(isPortrait: Bool) -> CGFloat {
     let parentHeight: CGFloat = self.parent != nil ? self.parent!.view.frame.height : CGFloat(100.0)

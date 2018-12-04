@@ -98,19 +98,6 @@ public class TextField: UITextField {
     log.debug("TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
-  // Dismisses the keyboard if this textview is the first responder.
-  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
-  public func dismissKeyboard() {
-    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
-    resignFirstResponder()
-    // TODO:  Fix!
-    //Manager.shared.keymanWeb.view.endEditing(true)
-  }
-  
-  public func resumeKeyboard() {
-    becomeFirstResponder()
-  }
-
   public override var text: String! {
     get {
       return super.text ?? ""
@@ -180,6 +167,16 @@ public class TextField: UITextField {
   }
 }
 
+extension KeymanResponder where Self: TextField {
+  // Dismisses the keyboard if this textview is the first responder.
+  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
+  public func dismissKeyboard() {
+    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
+    resignFirstResponder()
+    Manager.shared.inputViewController.keymanWeb.view.endEditing(true)
+  }
+}
+
 // MARK: - KeymanWebDelegate
 extension TextField: KeymanWebDelegate {
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -207,10 +204,6 @@ extension TextField: KeymanWebDelegate {
       }
       insertText(newText)
     }
-  }
-
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    dismissKeyboard()
   }
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
@@ -276,6 +269,7 @@ extension TextField: UITextFieldDelegate {
   }
 
   public func textFieldDidBeginEditing(_ textField: UITextField) {
+    Manager.shared.currentResponder = self
     let fontName: String?
     if let id = Manager.shared.currentKeyboardID {
       fontName = Manager.shared.fontNameForKeyboard(withFullID: id)

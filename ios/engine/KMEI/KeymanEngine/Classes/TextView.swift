@@ -97,19 +97,6 @@ public class TextView: UITextView {
     log.debug("TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
-  // Dismisses the keyboard if this textview is the first responder.
-  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
-  public func dismissKeyboard() {
-    log.debug("TextView: \(self.hashValue) Dismissing keyboard. Was first responder:\(isFirstResponder)")
-    resignFirstResponder()
-    // TODO:  Fix!
-    // Manager.shared.keymanWeb.view.endEditing(true)
-  }
-  
-  public func resumeKeyboard() {
-    becomeFirstResponder()
-  }
-
   public override var text: String! {
     get {
       return super.text ?? ""
@@ -183,6 +170,16 @@ public class TextView: UITextView {
   }
 }
 
+extension KeymanResponder where Self: TextView {
+  // Dismisses the keyboard if this textview is the first responder.
+  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
+  public func dismissKeyboard() {
+    log.debug("TextView: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
+    resignFirstResponder()
+    Manager.shared.inputViewController.keymanWeb.view.endEditing(true)
+  }
+}
+
 // MARK: - KeymanWebDelegate
 extension TextView: KeymanWebDelegate {
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -215,10 +212,6 @@ extension TextView: KeymanWebDelegate {
     // TODO check if fixed
     perform(#selector(self.scroll(toShowSelection:)), with: self, afterDelay: 0.1)
     // Smaller delays are unreliable.
-  }
-
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    dismissKeyboard()
   }
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
@@ -279,7 +272,7 @@ extension TextView: UITextViewDelegate {
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
-    //Manager.shared.keymanWeb.delegate = self
+    Manager.shared.currentResponder = self
 
     let fontName: String?
     if let id = Manager.shared.currentKeyboardID {

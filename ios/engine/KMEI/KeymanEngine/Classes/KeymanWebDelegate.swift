@@ -8,6 +8,17 @@
 
 import WebKit
 
+// Replaces the old use of KeymanWebDelegate for tracking an app's active responder element.
+public protocol KeymanResponder {
+  func dismissKeyboard()
+}
+
+extension UIResponder: KeymanResponder {
+  public func dismissKeyboard() {
+    resignFirstResponder()
+  }
+}
+
 /// Delegate receiving events from Keyman Web.
 protocol KeymanWebDelegate: class {
   /// Keyman Web has loaded (or reloaded).
@@ -38,10 +49,6 @@ protocol KeymanWebDelegate: class {
   func menuKeyDown(_ keymanWeb: KeymanWebViewController)
   func menuKeyUp(_ keymanWeb: KeymanWebViewController)
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController)
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController)
-  
-  func dismissKeyboard()
-  func resumeKeyboard()
 }
 
 extension KeymanWebDelegate {
@@ -57,8 +64,4 @@ extension KeymanWebDelegate {
   func menuKeyDown(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {}
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {}
-  
-  func dismissKeyboard() {}
-  func resumeKeyboard() {}
 }

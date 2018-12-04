@@ -87,6 +87,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   var shouldReloadKeyboard = false
 
   var _inputViewController: InputViewController?
+  var currentResponder: UIResponder?
   
   // This allows for 'lazy' initialization of the keyboard.
   var inputViewController: InputViewController! {
@@ -882,21 +883,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - Text
 
-  // TODO: Switch from NSRange
   public func showKeyboard() {
-    // TODO:  Fix!
-    //keymanWeb.delegate?.resumeKeyboard()
-    //keymanWeb.refreshKeyboard()
+    currentResponder?.becomeFirstResponder()
   }
   
   public func hideKeyboard() {
-    // TODO:  Fix!
-    //keymanWeb.delegate?.dismissKeyboard()
-    //keymanWeb.resetKeyboardState()
-  }
-
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    keymanWeb.delegate?.hideKeyboard(keymanWeb)
+    currentResponder?.dismissKeyboard()
+    Manager.shared.inputViewController.resetKeyboardState()
   }
 
   func setText(_ text: String?) {
