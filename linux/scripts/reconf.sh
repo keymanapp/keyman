@@ -14,6 +14,31 @@ set -e
 # see ../test.sh for script to bring in
 # maybe make it a function to get the minor number?
 
+
+BASEDIR=`pwd`
+echo "basedir is $BASEDIR"
+autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
+extra_projects="keyboardprocessor keyman-config"
+
+if [ "$1" != "" ]; then
+    if [ "$1" == "keyboardprocessor" ]; then
+	echo "reconfiguring only keyboardprocessor"
+        extra_projects="keyboardprocessor"
+        autotool_projects=""
+    elif [ ! -d "$1" ]; then
+        echo "project $1 does not exist"
+        exit 1
+    elif [ "$1" == "keyman-config" ]; then
+	echo "reconfiguring only keyman-config"
+        extra_projects="keyman-config"
+        autotool_projects=""
+    else
+	echo "reconfiguring only $1"
+        autotool_projects="$1"
+        extra_projects=""
+    fi
+fi
+
 JENKINS=${JENKINS:="no"}
 oldvers=`cat VERSION`
 
@@ -22,28 +47,6 @@ oldvers=`cat VERSION`
 version
 
 echo "version: ${newvers}"
-
-BASEDIR=`pwd`
-autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
-extra_projects="keyboardprocessor keyman-config"
-
-if [ "$1" != "" ]; then
-    if [ "$1" == "keyboardprocessor" ]; then
-        extra_projects="keyboardprocessor"
-        autotool_projects=""
-    elif [ ! -d "$1" ]; then
-        echo "project $1 does not exist"
-        exit 1
-    fi
-    if [ "$1" == "keyman-config" ]; then
-        extra_projects="keyman-config"
-        autotool_projects=""
-    else
-        autotool_projects="$1"
-        extra_projects=""
-    fi
-fi
-
 echo "${newvers}" > VERSION
 
 # autoreconf the projects
