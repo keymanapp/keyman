@@ -53,12 +53,8 @@ begin
     try
       try
         GrantPermissionToAllApplicationPackages(hFile,
-          FILE_LIST_DIRECTORY or
-          FILE_READ_ATTRIBUTES or
-          FILE_READ_DATA or
-          FILE_READ_EA or
-          FILE_TRAVERSE or
-          READ_CONTROL, SE_FILE_OBJECT);
+          GENERIC_READ or GENERIC_EXECUTE,
+          SE_FILE_OBJECT);
       except
         on E:EOSError do
           Exit(ReportFailure(hInstall, 'GrantPermission', E.ErrorCode));
