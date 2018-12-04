@@ -244,8 +244,7 @@ ibus_keyman_engine_constructor (GType                   type,
     {
         g_warning("problem creating km_kbp_state");
     }
-    //km_kbp_state_context(keyman->state);
-    #if HAVE_FROM_UTF8
+
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
         g_message("getting initial context");
@@ -258,7 +257,6 @@ ibus_keyman_engine_constructor (GType                   type,
         km_kbp_context_items_dispose(context_items);
         g_free(surrounding_text);
     }
-    #endif
 
     keyman->display  = XOpenDisplay(NULL);
 
@@ -458,7 +456,7 @@ static void reset_context(IBusEngine *engine)
 
     g_message("reset_context");
     km_kbp_context_clear(km_kbp_state_context(keyman->state));
-    #if HAVE_FROM_UTF8
+
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
@@ -470,7 +468,6 @@ static void reset_context(IBusEngine *engine)
         km_kbp_context_items_dispose(context_items);
         g_free(surrounding_text);
     }
-    #endif
 }
 
 static gboolean
