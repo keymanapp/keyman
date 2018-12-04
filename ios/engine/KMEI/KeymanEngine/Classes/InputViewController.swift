@@ -29,7 +29,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   open var topBarImageView: UIImageView?
 
-  var isTopBarEnabled: Bool
+  var isSystemKeyboard: Bool
   var keymanWeb: KeymanWebViewController
 
   open class var isPortrait: Bool {
@@ -51,14 +51,27 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
+  // TODO:  Consider deleting this.
   private var expandedHeight: CGFloat {
     return keymanWeb.keyboardHeight +
-      (isTopBarEnabled ? CGFloat(InputViewController.topBarHeight) : 0)
+      (isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0)
+  }
+  
+  public convenience init() {
+    // iOS will call this constructor to initialize the system keyboard app extension.
+    // It's safe and there will only ever be one active instance of this class within process scope.
+    // See https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/ExtensionOverview.html
+    self.init(forSystem: true)
+  }
+  
+  public convenience init(forSystem: Bool) {
+    // In-app uses of the keyboard should call this constructor for simplicity, setting `forSystem`=`false`.
+    self.init(nibName: nil, bundle: nil)
+    isSystemKeyboard = forSystem
   }
 
   public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    // Fix:  `isTopBarEnabled` was initialized here from Manager.shared, but that reference no longer exists here.
-    isTopBarEnabled = true
+    isSystemKeyboard = true
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     
@@ -264,10 +277,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   private func setInnerConstraints() {
     // Top Bar temporarily perma-set here for debugging during development on the big keyboard refactor.
-    isTopBarEnabled = true
-    //isTopBarEnabled = false
 
-    let topBarHeight = isTopBarEnabled ? InputViewController.topBarHeight : 0
+    let topBarHeight = isSystemKeyboard ? InputViewController.topBarHeight : 0
 
     let topBar = topBarImageView!
     let container = keymanWeb.view!

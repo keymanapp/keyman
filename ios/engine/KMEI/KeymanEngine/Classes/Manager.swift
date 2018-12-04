@@ -87,7 +87,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     get {
       // Occurs for the in-app keyboard ONLY.
       if _inputViewController == nil {
-        _inputViewController = InputViewController()
+        _inputViewController = InputViewController(forSystem: false)
       }
       return _inputViewController
     }
