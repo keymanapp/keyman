@@ -480,7 +480,7 @@ begin
   if not Assigned(AProject) then   // I4720
     CheckGetFileParameters;
 
-  if Assigned(FDoCreateProjectFileUI) then   // I4702
+  if (GetCurrentThreadId = MainThreadID) and Assigned(FDoCreateProjectFileUI) then   // I4702
     FDoCreateProjectFileUI(Self);   // I4687
 
   UpdateID;
