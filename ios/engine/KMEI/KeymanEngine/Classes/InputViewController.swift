@@ -34,10 +34,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return _isSystemKeyboard;
   }
   
-  // Sets of constraints dependent upon the device's current rotation state.
+  // Constraints dependent upon the device's current rotation state.
   // For now, should be mostly upon keymanWeb.view.heightAnchor.
-  var portraitConstraints: [NSLayoutConstraint] = []
-  var landscapeConstraints: [NSLayoutConstraint] = []
+  var portraitConstraint: NSLayoutConstraint?
+  var landscapeConstraint: NSLayoutConstraint?
 
   var keymanWeb: KeymanWebViewController
 
@@ -96,11 +96,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     // Activate / deactivate layout-specific constraints.
     if InputViewController.isPortrait {
-      NSLayoutConstraint.deactivate(landscapeConstraints)
-      NSLayoutConstraint.activate(portraitConstraints)
+      landscapeConstraint?.isActive = false
+      portraitConstraint?.isActive = true
     } else {
-      NSLayoutConstraint.deactivate(portraitConstraints)
-      NSLayoutConstraint.activate(landscapeConstraints)
+      portraitConstraint?.isActive = false
+      landscapeConstraint?.isActive = true
     }
 
     super.updateViewConstraints()
@@ -281,7 +281,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.widthAnchor)
     }
 
-    baseWidthConstraint.priority = .defaultHigh
+    baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
     baseWidthConstraint.isActive = true
   }
 
@@ -302,7 +302,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
       // Allow this one to be broken if/as necessary to resolve layout issues.
       let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
-      topBarWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      topBarWidthConstraint.priority = .defaultHigh
       topBarWidthConstraint.isActive = true
     } else {
       topBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
@@ -310,8 +310,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       topBar.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
       
       // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalToConstant: 500)//(equalTo: view.layoutMarginsGuide.widthAnchor)
-      topBarWidthConstraint.priority = UILayoutPriority(rawValue: 999)
+      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
+      topBarWidthConstraint.priority = .defaultHigh
       topBarWidthConstraint.isActive = true
     }
 
@@ -345,10 +345,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
     let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.priority = .defaultHigh
-    portraitConstraints.append(portraitHeight)
     let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
     landscapeHeight.priority = .defaultHigh
-    landscapeConstraints.append(landscapeHeight)
+
+    portraitConstraint = portraitHeight
+    landscapeConstraint = landscapeHeight
     // .isActive will be set according to the current portrait/landscape perspective.
 
     self.updateViewConstraints()
@@ -365,6 +366,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     coordinator.animateAlongsideTransition(in: nil, animation: {
       _ in
+        self.updateViewConstraints()
         self.fixLayout()
     }, completion: {
       _ in
