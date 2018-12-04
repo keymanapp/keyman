@@ -33,6 +33,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var isSystemKeyboard: Bool {
     return _isSystemKeyboard;
   }
+  
+  // Sets of constraints dependent upon the device's current rotation state.
+  // For now, should be mostly upon keymanWeb.view.heightAnchor.
+  var portraitConstraints: [NSLayoutConstraint]
+  var landscapeConstraints: [NSLayoutConstraint]
 
   var keymanWeb: KeymanWebViewController
 
@@ -77,6 +82,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // Must set within this constructor, even if we override it immediately after in the convenience inits.
     _isSystemKeyboard = true
     keymanWeb = KeymanWebViewController(storage: Storage.active)
+    self.portraitConstraints = []
+    self.landscapeConstraints = []
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     
     addChildViewController(keymanWeb)
@@ -88,6 +95,24 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   open override func updateViewConstraints() {
     resetKeyboardState()
+
+    // Activate / deactivate layout-specific constraints.
+    if InputViewController.isPortrait {
+      for c in landscapeConstraints {
+        c.isActive = false
+      }
+      for c in portraitConstraints {
+        c.isActive = true
+      }
+    } else {
+      for c in portraitConstraints {
+        c.isActive = false
+      }
+      for c in landscapeConstraints {
+        c.isActive = true
+      }
+    }
+
     super.updateViewConstraints()
   }
   
@@ -316,13 +341,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
       kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
-
-      // Determines the actual height when in "keyboard extension" (system) mode.
-      // Without any value set here, the system keyboard will be given no room to display.
-      // In-app will instead auto-set the height based on the layout rules above and the default height for keyboards.
-      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))
-      kbdHeightConstraint.priority = .defaultHigh
-      kbdHeightConstraint.isActive = true;
     } else {
       // Fallback on earlier versions
       container.bottomAnchor.constraint(equalTo:view.layoutMarginsGuide.bottomAnchor).isActive = true
@@ -333,13 +351,18 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
       kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
-
-      let kbdHeightConstraint = container.heightAnchor.constraint(equalToConstant: CGFloat(200))//container.heightAnchor.constraint(equalTo: view.layoutMarginsGuide.heightAnchor)
-      // Cannot be met, but helps to 'force' height for the system keyboard.
-      kbdHeightConstraint.priority = .defaultHigh
-      kbdHeightConstraint.isActive = true;
     }
+    
+    // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
+    let portraitHeightConstraint = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    portraitHeightConstraint.priority = .defaultHigh
+    portraitConstraints.append(portraitHeightConstraint)
+    let landscapeHeightConstraint = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    landscapeHeightConstraint.priority = .defaultHigh
+    landscapeConstraints.append(landscapeHeightConstraint)
+    // .isActive will be set according to the current portrait/landscape perspective.
 
+    self.updateViewConstraints()
     fixLayout()
   }
   
@@ -356,8 +379,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
         self.fixLayout()
     }, completion: {
       _ in
-        self.fixLayout()
         self.updateViewConstraints()
+        self.fixLayout()
     })
   }
 

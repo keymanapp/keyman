@@ -33,7 +33,7 @@ class KeymanWebViewController: UIViewController {
   private var useSpecialFont = false
 
   // Views
-  var webView: WKWebView!
+  var webView: WKWebView?
   private var helpBubbleView: PopoverView?
   private var keyPreviewView: KeyPreviewView?
   private var subKeysView: SubKeysView?
@@ -64,10 +64,7 @@ class KeymanWebViewController: UIViewController {
     view.setNeedsLayout()
     view.layoutIfNeeded()
     
-    let newSize = view.bounds.size
-
-    setOskWidth(Int(newSize.width))
-    setOskHeight(Int(newSize.height))
+    keyboardSize = view.bounds.size
   }
   
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -100,11 +97,11 @@ class KeymanWebViewController: UIViewController {
     config.userContentController = userContentController
 
     webView = WKWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
-    webView.isOpaque = false
-    webView.translatesAutoresizingMaskIntoConstraints = false
-    webView.backgroundColor = UIColor.clear
-    webView.navigationDelegate = self
-    webView.scrollView.isScrollEnabled = false
+    webView!.isOpaque = false
+    webView!.translatesAutoresizingMaskIntoConstraints = false
+    webView!.backgroundColor = UIColor.clear
+    webView!.navigationDelegate = self
+    webView!.scrollView.isScrollEnabled = false
     
     view = webView
 
@@ -123,7 +120,6 @@ class KeymanWebViewController: UIViewController {
   }
 
   override func viewWillAppear(_ animated: Bool) {
-    //view.frame = CGRect(origin: .zero, size: keyboardSize)
     super.viewWillAppear(animated)
   }
   
@@ -136,7 +132,7 @@ class KeymanWebViewController: UIViewController {
 // MARK: - JavaScript functions
 extension KeymanWebViewController {
   func languageMenuPosition(_ completion: @escaping (CGRect) -> Void) {
-    webView.evaluateJavaScript("langMenuPos();") { result, _ in
+    webView!.evaluateJavaScript("langMenuPos();") { result, _ in
       guard let result = result as? String, !result.isEmpty else {
         return
       }
@@ -160,7 +156,7 @@ extension KeymanWebViewController {
       let escapedText = jsonString[start..<end]
       
       let cmd = "executePopupKey(\"\(id)\",\"\(escapedText)\");"
-      webView.evaluateJavaScript(cmd, completionHandler: nil)
+      webView!.evaluateJavaScript(cmd, completionHandler: nil)
     } catch {
       log.error(error)
       return
@@ -168,20 +164,20 @@ extension KeymanWebViewController {
   }
 
   func setOskWidth(_ width: Int) {
-    webView.evaluateJavaScript("setOskWidth(\(width));", completionHandler: nil)
+    webView?.evaluateJavaScript("setOskWidth(\(width));", completionHandler: nil)
   }
 
   func setOskHeight(_ height: Int) {
-    webView.evaluateJavaScript("setOskHeight(\(height));", completionHandler: nil)
+    webView?.evaluateJavaScript("setOskHeight(\(height));", completionHandler: nil)
   }
 
   func setPopupVisible(_ visible: Bool) {
-    webView.evaluateJavaScript("popupVisible(\(visible));", completionHandler: nil)
+    webView!.evaluateJavaScript("popupVisible(\(visible));", completionHandler: nil)
   }
 
   func setCursorRange(_ range: NSRange) {
     if range.location != NSNotFound {
-      webView.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
+      webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
     }
   }
 
@@ -190,7 +186,7 @@ extension KeymanWebViewController {
     text = text.replacingOccurrences(of: "\\", with: "\\\\")
     text = text.replacingOccurrences(of: "'", with: "\\'")
     text = text.replacingOccurrences(of: "\n", with: "\\n")
-    webView.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
+    webView!.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
   }
 
   func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
@@ -204,7 +200,7 @@ extension KeymanWebViewController {
       log.error("Unexpected interface idiom: \(idiom)")
       return
     }
-    webView.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
+    webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
   }
 
   private func fontObject(from font: Font?, keyboardID: String, isOsk: Bool) -> [String: Any]? {
@@ -248,7 +244,7 @@ extension KeymanWebViewController {
     }
 
     log.debug("Keyboard stub: \(stubString)")
-    webView.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
+    webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
 }
 
@@ -608,38 +604,41 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
 extension KeymanWebViewController {
   // MARK: - Sizing
   public var keyboardHeight: CGFloat {
-    return kbSize.height
+    return keyboardSize.height
   }
 
-  func initKeyboardHeight(isPortrait: Bool) -> CGFloat {
-    let parentHeight: CGFloat = self.parent != nil ? self.parent!.view.frame.height : CGFloat(100.0)
+  func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
     if UIDevice.current.userInterfaceIdiom == .pad {
       if isPortrait {
-        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : parentHeight
+        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
       } else {
-        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : parentHeight
+        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
       }
     } else {
       if isPortrait {
-        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : parentHeight
+        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
       } else {
-        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : parentHeight
+        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
       }
     }
   }
 
   var keyboardWidth: CGFloat {
-    return kbSize.width
+    return keyboardSize.width
   }
   
   func initKeyboardSize() {
-    kbSize.width = UIScreen.main.bounds.width
-    
+    var width: CGFloat
+    var height: CGFloat
+    width = UIScreen.main.bounds.width
+
     if Util.isSystemKeyboard {
-      kbSize.height = initKeyboardHeight(isPortrait: InputViewController.isPortrait)
+      height = constraintTargetHeight(isPortrait: InputViewController.isPortrait)
     } else {
-      kbSize.height = initKeyboardHeight(isPortrait: UIDevice.current.orientation.isPortrait)
+      height = constraintTargetHeight(isPortrait: UIDevice.current.orientation.isPortrait)
     }
+
+    keyboardSize = CGSize(width: width, height: height)
   }
   
   var keyboardSize: CGSize {
@@ -651,12 +650,9 @@ extension KeymanWebViewController {
       return kbSize
     }
     set(size) {
-      // DO NOT keep like this for the final version.
-      if size.height == 0 {
-        kbSize = CGSize(width: size.width, height: 100)
-      } else {
-        kbSize = size
-      }
+      kbSize = size
+      setOskWidth(Int(size.width))
+      setOskHeight(Int(size.height))
     }
   }
 
@@ -700,15 +696,7 @@ extension KeymanWebViewController {
 
   // MARK: - Show/hide views
   func reloadKeyboard() {
-    if #available(iOS 9.0, *) {
-      webView.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
-    } else {
-      // WKWebView in iOS < 9 is missing loadFileURL().
-      let request = URLRequest(url: Storage.active.kmwURL,
-                               cachePolicy: .reloadIgnoringCacheData,
-                               timeoutInterval: 60.0)
-      webView.load(request)
-    }
+    webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
   }
 
   @objc func showHelpBubble() {
