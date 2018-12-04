@@ -334,7 +334,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   
   public func beep(_ keymanWeb: KeymanWebViewController) {
     let vibrationSupport = Manager.shared.vibrationSupportLevel
-    let kSystemSoundID_LightVibrate: SystemSoundID = 1519
+    let kSystemSoundID_MediumVibrate: SystemSoundID = 1520
 
     if vibrationSupport == .none {
       // TODO:  Find something we can do visually and/or audibly to provide feedback.
@@ -349,17 +349,17 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       //
       // Ref: https://stackoverflow.com/questions/10570553/how-to-set-iphone-vibrate-length/44495798#44495798
       // Not usable by older iPhone models.
-      AudioServicesPlaySystemSound(kSystemSoundID_LightVibrate)
+      AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
     } else { // if vibrationSupport == .taptic
       if #available(iOSApplicationExtension 10.0, *) {
         // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
         // We use this style b/c it's short, and in essence it is a minor UI element collision -
         // a single key with blocked (erroneous) output.
-        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackStyle.light)
+        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackStyle.medium)
         vibrator.impactOccurred()
       } else {
         // Fallback on earlier feedback style
-        AudioServicesPlaySystemSound(kSystemSoundID_LightVibrate)
+        AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
       }
     }
   }
