@@ -1050,7 +1050,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return .none
     } else if device.isPhone {
       let basicVibrationModels: [Device] = [.iPhone4, .iPhone4s, .iPhone5, Device.iPhone5s,
-                                            .iPhone5c, .iPhone6, .iPhone6Plus]
+                                            .iPhone5c, .iPhone6, .iPhone6Plus, .iPhoneSE]
       if device.isOneOf(Device.allSimulators) {
         // The Simulator for testing on macOS doesn't emulate or indicate vibration, unfortunately.
         return .none

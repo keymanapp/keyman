@@ -173,6 +173,8 @@
 		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
+		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
+		CE2B1E4D21B6112B007D092E /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
 		E213601C2141C5FB00A043B7 /* sil-small.png in Resources */ = {isa = PBXBuildFile; fileRef = E213601B2141C5FB00A043B7 /* sil-small.png */; };
@@ -199,6 +201,7 @@
 				1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */,
 				1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */,
 				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
+				CE2B1E4D21B6112B007D092E /* DeviceKit.framework in Embed Frameworks */,
 				1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -376,6 +379,7 @@
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
+		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E213601B2141C5FB00A043B7 /* sil-small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sil-small.png"; sourceTree = "<group>"; };
@@ -386,6 +390,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */,
 				1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */,
 				1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */,
 			);
@@ -616,6 +621,7 @@
 		98ABADA7176935E400B62590 = {
 			isa = PBXGroup;
 			children = (
+				CE2B1E4B21B6112B007D092E /* DeviceKit.framework */,
 				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				98ABADB2176935E400B62590 /* Frameworks */,
