@@ -36,8 +36,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   // Sets of constraints dependent upon the device's current rotation state.
   // For now, should be mostly upon keymanWeb.view.heightAnchor.
-  var portraitConstraints: [NSLayoutConstraint]
-  var landscapeConstraints: [NSLayoutConstraint]
+  var portraitConstraints: [NSLayoutConstraint] = []
+  var landscapeConstraints: [NSLayoutConstraint] = []
 
   var keymanWeb: KeymanWebViewController
 
@@ -82,8 +82,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // Must set within this constructor, even if we override it immediately after in the convenience inits.
     _isSystemKeyboard = true
     keymanWeb = KeymanWebViewController(storage: Storage.active)
-    self.portraitConstraints = []
-    self.landscapeConstraints = []
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     
     addChildViewController(keymanWeb)
@@ -98,19 +96,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     // Activate / deactivate layout-specific constraints.
     if InputViewController.isPortrait {
-      for c in landscapeConstraints {
-        c.isActive = false
-      }
-      for c in portraitConstraints {
-        c.isActive = true
-      }
+      NSLayoutConstraint.deactivate(landscapeConstraints)
+      NSLayoutConstraint.activate(portraitConstraints)
     } else {
-      for c in portraitConstraints {
-        c.isActive = false
-      }
-      for c in landscapeConstraints {
-        c.isActive = true
-      }
+      NSLayoutConstraint.deactivate(portraitConstraints)
+      NSLayoutConstraint.activate(portraitConstraints)
     }
 
     super.updateViewConstraints()
@@ -354,12 +344,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
     
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeightConstraint = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
-    portraitHeightConstraint.priority = .defaultHigh
-    portraitConstraints.append(portraitHeightConstraint)
-    let landscapeHeightConstraint = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
-    landscapeHeightConstraint.priority = .defaultHigh
-    landscapeConstraints.append(landscapeHeightConstraint)
+    let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    portraitHeight.priority = .defaultHigh
+    portraitConstraints.append(portraitHeight)
+    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    landscapeHeight.priority = .defaultHigh
+    landscapeConstraints.append(landscapeHeight)
     // .isActive will be set according to the current portrait/landscape perspective.
 
     self.updateViewConstraints()
