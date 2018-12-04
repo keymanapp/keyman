@@ -448,7 +448,30 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     // Many more KEYS currently not used by KMW...
   };
 
+static void reset_context(IBusEngine *engine)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
+    IBusText *text;
+    gchar *surrounding_text;
+    guint cursor_pos, anchor_pos;
+    km_kbp_context_item *context_items;
 
+    g_message("reset_context");
+    km_kbp_context_clear(km_kbp_state_context(keyman->state));
+    #if HAVE_FROM_UTF8
+    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
+    {
+        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
+        g_message("new context is:%s", surrounding_text);
+        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+            km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
+        }
+        km_kbp_context_items_dispose(context_items);
+        g_free(surrounding_text);
+    }
+    #endif
+}
 
 static gboolean
 ibus_keyman_engine_process_key_event (IBusEngine     *engine,
@@ -521,19 +544,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         //     right_modifier_state |= (IBUS_SHIFT_MASK << 8);
         // }
         XCloseDisplay(m_display);
-
-        // if ((km_mod_state & KM_KBP_MODIFIER_ALT) && !(km_mod_state & KM_KBP_MODIFIER_RALT))
-        // {
-        //     // Left alt so do not pass to keyman
-        //     g_message("Left alt so do not pass to keyman until it allows us to use it");
-        //     return FALSE;
-        // }
-        // if ((km_mod_state & KM_KBP_MODIFIER_CTRL) && !(km_mod_state & KM_KBP_MODIFIER_RCTRL))
-        // {
-        //     // Left ctrl so do not pass to keyman
-        //     g_message("Left ctrl so do not pass to keyman until it allows us to use it");
-        //     return FALSE;
-        // }
     }
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
     km_kbp_status event_status = km_kbp_process_event(keyman->state,
@@ -584,17 +594,13 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
             case KM_KBP_IT_PERSIST_OPT:
                 g_message("PERSIST_OPT action");
                 break;
-            case KM_KBP_IT_VKEYDOWN:
-                g_message("VKEYDOWN action");
+            case KM_KBP_IT_EMIT_KEYSTROKE:
+                g_message("EMIT_KEYSTROKE action");
+                return False;
                 break;
-            case KM_KBP_IT_VKEYUP:
-                g_message("VKEYUP action");
-                break;
-            case KM_KBP_IT_VSHIFTDOWN:
-                g_message("VSHIFTDOWN action");
-                break;
-            case KM_KBP_IT_VSHIFTUP:
-                g_message("VSHIFTUP action");
+            case KM_KBP_IT_INVALIDATE_CONTEXT:
+                g_message("INVALIDATE_CONTEXT action");
+                reset_context(engine);
                 break;
             case KM_KBP_IT_END:
                 g_message("END action");
@@ -605,31 +611,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     }
     return TRUE;
  }
-
-static void reset_context(IBusEngine *engine)
-{
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
-    IBusText *text;
-    gchar *surrounding_text;
-    guint cursor_pos, anchor_pos;
-    km_kbp_context_item *context_items;
-
-    g_message("reset_context");
-    km_kbp_context_clear(km_kbp_state_context(keyman->state));
-    #if HAVE_FROM_UTF8
-    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
-    {
-        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
-        g_message("new context is:%s", surrounding_text);
-        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-            km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
-        }
-        km_kbp_context_items_dispose(context_items);
-        g_free(surrounding_text);
-    }
-    #endif
-}
 
 static void
 ibus_keyman_engine_focus_in (IBusEngine *engine)
