@@ -18,7 +18,8 @@ describe('LMLayerWorker', function () {
       };
       worker.postMessage({
         message: 'initialize',
-        model: "return {model: {}, configuration: {}}"
+        model: "return {model: {}, configuration: {}}",
+        capabilities: { maxLeftContextCodeUnits: 64 }
       });
     });
   });

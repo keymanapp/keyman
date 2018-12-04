@@ -19,6 +19,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/// <reference path="../message.d.ts" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
@@ -44,15 +45,14 @@ interface InitializeMessage {
   /**
    * The configuration that the keyboard can offer to the model.
    */
-  // TODO: rename to capabilities? They **are** the capabilities of the keyboard's platform.
-  configuration: RequestedConfiguration;
+  capabilities: Capabilities;
 }
 
 /**
  * The structure of the message back to the keyboard.
  */
 interface ReadyMessage {
-  configuration: ModelConfiguration;
+  configuration: Configuration;
 }
 
 interface PredictMessage {
@@ -61,55 +61,6 @@ interface PredictMessage {
   // context: Context;
   // transform: Transform;
 }
-
-interface RequestedConfiguration {
-  /**
-   * Whether the platform supports deleting to the right.
-   * The absence of this rule implies false.
-   */
-  supportsDeleteRight?: boolean;
-
-  /**
-   * The maximum amount of UTF-16 code units that the keyboard will
-   * provide to the left of the cursor.
-   */
-  maxLeftContextCodeUnits: number;
-
-  /**
-   * The maximum amount of code units that the keyboard will provide to
-   * the right of the cursor. The absence of this setting
-   * implies that right contexts are unsupported and will
-   * never be supplied.
-   */
-  maxRightContextCodeUnits?: number;
-}
-
-interface ModelConfiguration {
-  /**
-   * How many UTF-16 code units maximum to send as the context to the
-   * left of the cursor ("left" in the Unicode character stream).
-   *
-   * Affects the `context` property sent in `predict` messages.
-   *
-   * While the left context MUST NOT bisect surrogate pairs, they MAY
-   * bisect graphical clusters.
-   */
-  leftContextCodeUnits: number;
-
-  /**
-   * How many UTF-16 code units maximum to send as the context to the
-   * right of the cursor ("right" in the Unicode character stream).
-   *
-   * Affects the `context` property sent in `predict` messages.
-   *
-   * While the left context MUST NOT bisect surrogate pairs, they MAY
-   * bisect graphical clusters.
-   */
-  rightContextCodeUnits: number;
-};
-
-// TODO: define what valid values of the model are.
-interface Model {};
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
@@ -158,8 +109,7 @@ class LMLayerWorker {
 
     let {model, configuration} = this.loadModel(
       // TODO: validate configuration, and provide valid configuration in tests.
-      // @ts-ignore
-      payload.model, payload.configuration || {}
+      payload.model, payload.capabilities
     );
 
     // TODO: validate configuration?
@@ -189,13 +139,30 @@ class LMLayerWorker {
    *
    * @param modelCode Source code for a function that takes
    *                  configuration, and returns { model, configuration }
-   * @param requestedConfiguration Configuration requested from
-   *                               the keyboard.
+   * @param capabilities Capabilities on offer from the keyboard.
    */
-  private loadModel(modelCode: string, requestedConfiguration: RequestedConfiguration) {
-    let {model, configuration} = new Function('configuration', modelCode)(requestedConfiguration);
-    configuration.leftContextCodeUnits = configuration.leftContextCodeUnits || requestedConfiguration.maxLeftContextCodeUnits;
-    configuration.rightContextCodeUnits = requestedConfiguration.maxRightContextCodeUnits ? configuration.rightContextCodeUnits : 0;
+  private loadModel(modelCode: any, capabilities: Capabilities) {
+    let model: ModelDescription = null;
+    let configuration: Configuration = {
+      leftContextCodeUnits: 0,
+      rightContextCodeUnits: 0
+    };
+
+    if (typeof modelCode === 'string') {
+      // Deprecated! The model should not be source code.
+      let result = new Function('configuration', modelCode)(capabilities);
+      model = result.model;
+      configuration = result.configuration;
+    }
+    // TODO: when model is object with kind 'wordlist' or 'fst'
+
+    // Set reasonable defaults for the configuration.
+    if (!configuration.leftContextCodeUnits) {
+      configuration.leftContextCodeUnits = capabilities.maxLeftContextCodeUnits;
+    }
+    if (!configuration.rightContextCodeUnits) {
+      configuration.rightContextCodeUnits = capabilities.maxRightContextCodeUnits || 0;
+    }
 
     return {model, configuration};
   }

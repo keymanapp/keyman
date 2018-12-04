@@ -20,17 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**	
- * A JavaScript string with the restriction that it must only	
- * contain Unicode scalar values.	
- *	
- * This means that any lone high surrogate must be paired with	
- * a low surrogate, if it exists. Lone surrogate code units are	
- * forbidden.	
- *	
- * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString	
- */	
-type USVString = string;
+/// <reference path="node_modules/promise-polyfill/lib/polyfill.js" />
 
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
@@ -54,6 +44,8 @@ class LMLayer {
    * The underlying worker instance. By default, this is the LMLayerWorker. 
    */
   private _worker: Worker;
+  /** Call this when the LMLayer has sent us the 'ready' message! */
+  private _declareLMLayerReady: (Configuration) => void;
 
   /**
    * Construct the top-level LMLayer interface. This also starts the underlying Worker.
@@ -65,16 +57,42 @@ class LMLayer {
   constructor(worker?: Worker) {
     // Either use the given worker, or instantiate the default worker.
     this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
+    this._worker.onmessage = this.onMessage.bind(this)
+    this._declareLMLayerReady = null;
   }
 
-  // TODO: asynchronous initialize() method, based on 
-  //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L42-L62
+  /**
+   * Initializes the LMLayer worker with the keyboard/platform's capabilities,
+   * as well as a description of the model required.
+   */
+  initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration> {
+    return new Promise((resolve, _reject) => {
+      this._worker.postMessage({
+        message: 'initialize',
+        capabilities,
+        model
+      });
+
+      // Sets up so the promise is resolved in the onMessage() callback, when it receives
+      // the 'ready' message.
+      this._declareLMLayerReady = resolve;
+    });
+  }
 
   // TODO: asynchronous predict() method, based on 
   //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L64-L80
 
   // TODO: asynchronous close() method.
   //       Worker code must recognize message and call self.close().
+
+  private onMessage(event: MessageEvent): void {
+    let {message} = event.data;
+    if (message === 'ready') {
+      this._declareLMLayerReady(event.data.configuration);
+    } else {
+      throw new Error(`Message not implemented: ${message}`);
+    }
+  }
 
   /**
    * Given a function, this utility returns the source code within it, as a string.

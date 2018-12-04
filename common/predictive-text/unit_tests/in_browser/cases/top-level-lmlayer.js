@@ -2,10 +2,24 @@ var assert = chai.assert;
 
 describe('LMLayer', function () {
   describe('[[constructor]]', function () {
-      it('should construct with zero arguments', function () {
-        let lmlayer = new LMLayer();
-        assert.instanceOf(lmlayer, LMLayer);
+    it('should construct with zero arguments', function () {
+      let lmLayer = new LMLayer();
+      assert.instanceOf(lmLayer, LMLayer);
+    });
+  });
+
+  describe('#initialize()', function () {
+    it('should yield a reasonable configuration', function () {
+      let maxLeftContext = 64;
+      let lmLayer = new LMLayer();
+      return lmLayer.initialize(
+        { maxLeftContextCodeUnits: maxLeftContext },
+        { model: { kind: 'wordlist', words: ['foo', 'bar']} }
+      ).then(function (configuration) {
+        assert.isAtMost(configuration.leftContextCodeUnits, maxLeftContext);
+        assert.propertyVal(configuration, 'rightContextCodeUnits', 0);
       });
+    });
   });
 
   describe('#asBlobURI()', function () {
