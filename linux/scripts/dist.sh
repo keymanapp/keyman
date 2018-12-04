@@ -81,7 +81,7 @@ for proj in ${extra_projects}; do
         datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
         kbpvers="keyman-keyboardprocessor-$vers~$datevers"
         cp -a keyboardprocessor $kbpvers
-        tar czf $kbpvers.tar.gz --exclude='debian/' --exclude='build/' $kbpvers
+        tar czf $kbpvers.tar.gz --exclude=debian\/ --exclude=build\/ --exclude=.gitignore $kbpvers
         rm -rf $kbpvers
         cp $kbpvers.tar.gz ../../linux/dist
     fi
