@@ -65,8 +65,9 @@ for proj in ${extra_projects}; do
         meson ../common/engine/keyboardprocessor keyboardprocessor
     fi
     if [ "${proj}" == "keyman-config" ]; then
+        majorvers=`cat ../resources/VERSION.md`
         cd keyman-config/keyman_config
-        sed "s/_VERSION_/${newvers}/g" version.py.in > version.py
+        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${majorvers}/g" version.py.in > version.py
     fi
     cd $BASEDIR
 done
