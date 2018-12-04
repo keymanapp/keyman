@@ -100,7 +100,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       NSLayoutConstraint.activate(portraitConstraints)
     } else {
       NSLayoutConstraint.deactivate(portraitConstraints)
-      NSLayoutConstraint.activate(portraitConstraints)
+      NSLayoutConstraint.activate(landscapeConstraints)
     }
 
     super.updateViewConstraints()
@@ -178,7 +178,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // as Manager.shared's inputViewController.
     Manager.shared.inputViewController = self
 
-    setInnerConstraints()
     setOuterConstraints()
     inputView?.setNeedsUpdateConstraints()
   }
