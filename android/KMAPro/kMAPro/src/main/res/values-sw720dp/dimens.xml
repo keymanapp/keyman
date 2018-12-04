@@ -9,5 +9,7 @@
     <dimen name="package_label_width">650dp</dimen>
     <dimen name="product_logo_bottom">196dp</dimen>
     <dimen name="checkbox_margin">8dp</dimen>
+    <dimen name="checkbox_margin_left">15dp</dimen>
     <dimen name="checkbox_padding">10dp</dimen>
+
 </resources>

@@ -8,5 +8,7 @@
     <dimen name="titlebar_label_textsize">6.75sp</dimen>
     <dimen name="product_logo_bottom">196dp</dimen>
     <dimen name="checkbox_margin">18dp</dimen>
+    <dimen name="checkbox_margin_left">12dp</dimen>
     <dimen name="checkbox_padding">10dp</dimen>
+
 </resources>
