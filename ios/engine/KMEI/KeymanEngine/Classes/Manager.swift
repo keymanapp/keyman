@@ -38,7 +38,7 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 // URLs - used for reachability test
 private let keymanHostName = "api.keyman.com"
 
-public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate, KeymanWebDelegate {
+public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
 
@@ -46,8 +46,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
+  
+  public var isSystemKeyboard: Bool {
+    guard let kbd = self._inputViewController else {
+      return false
+    }
 
-  public var isSystemKeyboard = false
+    return kbd.isSystemKeyboard
+  }
 
   // TODO: Change API to not disable removing as well
   /// Allow users to add new keyboards in the keyboard picker.
@@ -88,15 +94,31 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public var openURL: ((URL) -> Bool)?
 
   var currentKeyboardID: FullKeyboardID?
-  weak var keymanWebDelegate: KeymanWebDelegate?
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
-  var keymanWeb: KeymanWebViewController!
+
+  var _inputViewController: InputViewController?
+  var currentResponder: KeymanResponder?
+  
+  // This allows for 'lazy' initialization of the keyboard.
+  var inputViewController: InputViewController! {
+    get {
+      // Occurs for the in-app keyboard ONLY.
+      if _inputViewController == nil {
+        _inputViewController = InputViewController(forSystem: false)
+      }
+      return _inputViewController
+    }
+
+    set(value) {
+      _inputViewController = value
+    }
+  }
 
   private var downloadQueue: HTTPDownloader?
   private var sharedQueue: HTTPDownloader!
   private var reachability: Reachability!
-  private var didSynchronize = false
+  var didSynchronize = false
 
   // MARK: - Object Admin
   deinit {
@@ -143,9 +165,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
      */
     sharedQueue = HTTPDownloader.init(self)
 
-    keymanWeb = KeymanWebViewController(storage: Storage.active)
-    keymanWeb.delegate = self
-    _ = keymanWeb.view
+    // We used to preload the old KeymanWebViewController, but now that it's embedded within the
+    // InputViewController, that's not exactly viable.
   }
 
   // MARK: - Keyboard management
@@ -188,14 +209,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
     }
 
-    keymanWeb.setKeyboard(kb)
+    inputViewController.setKeyboard(kb)
 
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     userData.currentKeyboardID = kb.fullID
     userData.synchronize()
 
     if isKeymanHelpOn {
-      keymanWeb.showHelpBubble(afterDelay: 1.5)
+      inputViewController.showHelpBubble(afterDelay: 1.5)
     }
 
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
@@ -726,7 +747,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                           value: keyboards)
           if isUpdate {
             shouldReloadKeyboard = true
-            keymanWeb.reloadKeyboard()
+            inputViewController.reload()
           }
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -866,176 +887,32 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     viewController.dismiss(animated: false)
     showKeyboard()
     if shouldReloadKeyboard {
-      keymanWeb.reloadKeyboard()
+      inputViewController.reload()
     }
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
 
-  @objc func resetKeyboard() {
-    let keyboard = currentKeyboard
-    currentKeyboardID = nil
-
-    if let keyboard = keyboard {
-      _ = setKeyboard(keyboard)
-    } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      _ = setKeyboard(keyboard)
-    } else {
-      _ = setKeyboard(Defaults.keyboard)
-    }
-  }
-
   // MARK: - Text
 
-  // TODO: Switch from NSRange
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
-    if range.location != NSNotFound {
-      keymanWeb.setCursorRange(range)
-    }
-  }
-
-  func clearText() {
-    setText(nil)
-    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
-    log.info("Cleared text.")
-  }
-
-  func setText(_ text: String?) {
-    keymanWeb.setText(text)
-  }
-
-  // MARK: - KeymanWebViewDelegate methods
-  func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.keyboardLoaded(keymanWeb)
-
-    log.info("Loaded keyboard.")
-    keymanWeb.resizeKeyboard()
-    keymanWeb.setDeviceType(UIDevice.current.userInterfaceIdiom)
-
-    var newKb = Defaults.keyboard
-    if currentKeyboardID == nil && !shouldReloadKeyboard {
-      let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-      if let id = userData.currentKeyboardID {
-        if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
-          newKb = kb
-        }
-      } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
-        newKb = userKbs[0]
-      }
-      _ = setKeyboard(newKb)
-    }
-
-    NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
-    if shouldReloadKeyboard {
-      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
-      perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
-      shouldReloadKeyboard = false
-    }
-  }
-
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    keymanWebDelegate?.insertText(keymanWeb, numCharsToDelete: numCharsToDelete, newText: newText)
-  }
-
-  func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    keymanWebDelegate?.showKeyPreview(keymanWeb, keyFrame: keyFrame, preview: preview)
-  }
-
-  func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.dismissKeyPreview(keymanWeb)
-  }
-
-  func showSubkeys(_ keymanWeb: KeymanWebViewController,
-                   keyFrame: CGRect,
-                   subkeyIDs: [String],
-                   subkeyTexts: [String],
-                   useSpecialFont: Bool) {
-    keymanWebDelegate?.showSubkeys(keymanWeb,
-                                   keyFrame: keyFrame,
-                                   subkeyIDs: subkeyIDs,
-                                   subkeyTexts: subkeyTexts,
-                                   useSpecialFont: useSpecialFont)
-  }
-
-  func menuKeyDown(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.menuKeyDown(keymanWeb)
-  }
-
-  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.menuKeyUp(keymanWeb)
-  }
-  
   public func showKeyboard() {
-    keymanWebDelegate?.resumeKeyboard()
+    currentResponder?.summonKeyboard()
   }
   
   public func hideKeyboard() {
-    keymanWebDelegate?.dismissKeyboard()
-    
-    keymanWeb.dismissHelpBubble()
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyboardMenu()
+    currentResponder?.dismissKeyboard()
+    Manager.shared.inputViewController.resetKeyboardState()
   }
 
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    keymanWebDelegate?.hideKeyboard(keymanWeb)
+  func setText(_ text: String?) {
+    inputViewController.setText(text)
   }
 
-  // MARK: - InputViewController methods
-  // TODO: Manager should not have InputViewController methods. Move this into InputViewController.
-  func updateViewConstraints() {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.dismissKeyboardMenu()
-    keymanWeb.resizeKeyboard()
+  func clearText() {
+    inputViewController.clearText()
   }
 
-  func inputViewDidLoad() {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.dismissKeyboardMenu()
-    keymanWeb.resizeKeyboard()
-
-    let activeUserDef = Storage.active.userDefaults
-    let standardUserDef = UserDefaults.standard
-    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-
-    let shouldSynchronize: Bool
-    if let standardDate = standardDate,
-       let activeDate = activeDate {
-      shouldSynchronize = standardDate != activeDate
-    } else if activeDate == nil {
-      shouldSynchronize = false
-    } else {
-      shouldSynchronize = true
-    }
-
-    if (!didSynchronize || shouldSynchronize) && Storage.shared != nil {
-      synchronizeSWKeyboard()
-      if currentKeyboardID != nil {
-        shouldReloadKeyboard = true
-        keymanWeb.reloadKeyboard()
-      }
-      didSynchronize = true
-      standardUserDef.set(activeUserDef.object(forKey: Key.synchronizeSWKeyboard),
-                          forKey: Key.synchronizeSWKeyboard)
-      standardUserDef.synchronize()
-    }
-  }
-
-  // FIXME: This is deprecated. Use inputViewWillTransition()
-  func inputViewWillRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-    keymanWeb.dismissSubKeys()
-    keymanWeb.dismissKeyPreview()
-    keymanWeb.dismissKeyboardMenu()
-    keymanWeb.resizeKeyboard(with: toInterfaceOrientation)
-    if isKeymanHelpOn {
-      keymanWeb.showHelpBubble(afterDelay: 1.5)
-    }
-  }
-
-  var isSystemKeyboardTopBarEnabled: Bool {
-    return true
+  func setSelectionRange(_ range: NSRange, manually: Bool) {
+    inputViewController.setSelectionRange(range, manually: manually)
   }
   
   var vibrationSupportLevel: VibrationSupport {
