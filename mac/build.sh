@@ -1,10 +1,11 @@
 #!/bin/sh
 
+# Include our resource functions; they're pretty useful!
+. ../resources/shellHelperFunctions.sh
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
-if [[ "${OSTYPE}" != "darwin"* ]]; then
-  echo "This build script will only run in a Mac environment."
-  exit 1
-fi
+verify_on_mac
+
 
 display_usage() {
     echo "usage: build.sh [build options] [targets]"
@@ -44,8 +45,6 @@ pushd . > /dev/null
 cd `dirname ${KEYMAN_MAC_BASE_PATH}` > /dev/null
 KEYMAN_MAC_BASE_PATH=`pwd`;
 popd  > /dev/null
-
-. $KEYMAN_MAC_BASE_PATH/bashHelperFunctions.sh
 
 assertOptionsPrecedeTargets() {
     if [[ "$1" =~ ^\- ]]; then
