@@ -17,7 +17,9 @@ rm -rf ${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $sourcename"
 log "reconfigure"
-JENKINS="yes" ./scripts/reconf.sh $sourcename
+if [ "$1" != "keyman-keyboardprocessor" ]; then
+	JENKINS="yes" ./scripts/reconf.sh $sourcename
+fi
 log "Make origdist"
 ./scripts/dist.sh origdist $sourcename
 log "Make deb source"
