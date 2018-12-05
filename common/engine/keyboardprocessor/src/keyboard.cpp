@@ -56,7 +56,7 @@ json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
   https://stackoverflow.com/a/35103224/1836776
 */
 
-#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1916 /* VS 2017 */
+#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1916 /* VS 2017 19.16 */
 
 std::string utf16_to_utf8(std::u16string utf16_string)
 {
