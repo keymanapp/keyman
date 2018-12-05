@@ -573,18 +573,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
             case KM_KBP_IT_PERSIST_OPT:
                 g_message("PERSIST_OPT action");
                 break;
-            case KM_KBP_IT_VKEYDOWN:
-                g_message("VKEYDOWN action");
-                break;
-            case KM_KBP_IT_VKEYUP:
-                g_message("VKEYUP action");
-                break;
-            case KM_KBP_IT_VSHIFTDOWN:
-                g_message("VSHIFTDOWN action");
-                break;
-            case KM_KBP_IT_VSHIFTUP:
-                g_message("VSHIFTUP action");
-                break;
             case KM_KBP_IT_END:
                 g_message("END action");
                 break;
