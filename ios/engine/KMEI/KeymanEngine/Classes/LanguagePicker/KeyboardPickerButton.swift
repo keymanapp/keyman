@@ -19,7 +19,7 @@ public class KeyboardPickerButton: UIButton {
     layer.cornerRadius = 8.0
     clipsToBounds = true
     setColor(UIColor(red: 0.62, green: 0.68, blue: 0.76, alpha: 1.0))
-    addTarget(self, action: #selector(self.showKeyboardPicker), for: .touchUpInside)
+    addTarget(self, action: #selector(self.displayKeyboardPicker), for: .touchUpInside)
 
     setImage(UIImage(named: "keyboard_icon", in: Resources.bundle, compatibleWith: nil), for: .normal)
     sizeToFit()
@@ -34,7 +34,7 @@ public class KeyboardPickerButton: UIButton {
     presentingVC = nil
   }
 
-  @objc func showKeyboardPicker() {
+  @objc func displayKeyboardPicker() {
     if let presentingVC = presentingVC {
       Manager.shared.showKeyboardPicker(in: presentingVC, shouldAddKeyboard: false)
     }

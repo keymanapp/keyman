@@ -37,7 +37,7 @@ extension UIView {
         return constraint
     }
 
-    func constrainCorners(to parent: UIView, options: [String:CGFloat]) {
+    func constrainCorners(to parent: UIView, options: [String: CGFloat]) {
         self.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint(item: self,
                            attribute: .top,
