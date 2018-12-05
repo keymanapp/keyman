@@ -7,6 +7,8 @@
 * Updated the default keyboard to SIL EuroLatin (#1288)
 * Added support for error feeedback from keyboards (#1314)
 * Fixed bug behind some crashes of system keyboard (#1166)
+* Added support for keypress error feedback (#257)
+* Fixed ongoing issues with keyboard rotation and sizing, including the iPhone X notch. (#444) (#1045)
 
 ## 2018-08-02 10.0.208 stable 
 * Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159) 
