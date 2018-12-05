@@ -11,6 +11,7 @@
     <dimen name="package_label_width">250dp</dimen>
     <dimen name="keyman_bar_height">8dp</dimen>
     <dimen name="checkbox_margin">8dp</dimen>
+    <dimen name="checkbox_margin_left">15dp</dimen>
     <dimen name="checkbox_padding">10dp</dimen>
 
 </resources>
