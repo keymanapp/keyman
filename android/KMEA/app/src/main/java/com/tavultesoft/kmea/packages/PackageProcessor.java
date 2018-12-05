@@ -49,12 +49,12 @@ public class PackageProcessor {
 
     if(filename.lastIndexOf('.') != -1) {
       // Android's temp downloads attach a suffix to the extension; .kmp isn't the end of the filename.
-      if(filename.lastIndexOf(".kmp") == -1) {
+      if(!FileUtils.hasKeyboardPackageExtension(filename)) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
       // Extract our best-guess name for the package and construct the temporary package name.
-      return filename.substring(0, filename.lastIndexOf(".kmp"));
+      return filename.substring(0, filename.toLowerCase().lastIndexOf(".kmp"));
     } else {
       throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
     }
@@ -324,7 +324,7 @@ public class PackageProcessor {
       FileFilter touchKeyboardFilter = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && pathname.getName().endsWith(".js")) {
+          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && FileUtils.hasJavaScriptExtension(pathname.getName())) {
             return true;
           }
           return false;
@@ -347,7 +347,7 @@ public class PackageProcessor {
       FileFilter welcomeFilter = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-          if (pathname.isFile() && pathname.getName().equals("welcome.htm")) {
+          if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
             return true;
           }
           return false;

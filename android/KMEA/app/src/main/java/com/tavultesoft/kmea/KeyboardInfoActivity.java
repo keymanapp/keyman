@@ -30,6 +30,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.tavultesoft.kmea.util.FileUtils;
+
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardInfoActivity extends AppCompatActivity {
 
@@ -97,7 +99,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
           Intent i = new Intent(Intent.ACTION_VIEW);
 
           if (customHelpLink != null) {
-            if (customHelpLink.endsWith("welcome.htm")) {
+            if (FileUtils.isWelcomeFile(customHelpLink)) {
               File customHelp = new File(new File(customHelpLink).getAbsolutePath());
               i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider

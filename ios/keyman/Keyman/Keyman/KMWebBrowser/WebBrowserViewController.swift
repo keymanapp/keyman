@@ -129,7 +129,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       loadUrlString(urlString)
     }
   }
-  
+
   func loadUrlString(_ urlString: String, allowSearchRedirect: Bool  = true) {
     guard var url = URL(string: urlString) else {
       if allowSearchRedirect {
@@ -143,7 +143,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let request = URLRequest(url: url)
     webView.loadRequest(request)
   }
-  
+
   func loadSearchString(_ searchString: String) {
     if let query = searchString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
       loadUrlString("google.com/search?q=\(query)", allowSearchRedirect: false)

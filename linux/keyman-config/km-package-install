@@ -9,13 +9,15 @@ from keyman_config import __version__
 import datetime
 import time
 
-def get_keyboard_dir_page(kb_url):
+def get_languages():
+	import json
 	import requests
 	import requests_cache
 	from keyman_config.get_kmp import keyman_cache_dir
 
-	logging.info("Getting keyboard list")
-	logging.debug("At URL %s", kb_url)
+	logging.info("Getting language list from search")
+	api_url = "https://api.keyman.com/search?q=l:*&platform=linux"
+	logging.debug("At URL %s", api_url)
 	cache_dir = keyman_cache_dir()
 	current_dir = os.getcwd()
 	expire_after = datetime.timedelta(days=7)
@@ -25,32 +27,36 @@ def get_keyboard_dir_page(kb_url):
 	requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
 	now = time.ctime(int(time.time()))
 	try:
-		response = requests.get(kb_url)
+		response = requests.get(api_url)
 		logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
 		os.chdir(current_dir)
 		requests_cache.core.uninstall_cache()
 		if response.status_code == 200:
-			return response.text
+			return response.json()
 		else:
 			return None
 	except:
 		return None
 
-
-def get_dir_list():
-	from bs4 import BeautifulSoup
-
-	url = "https://downloads.keyman.com/keyboards/"
-	page = get_keyboard_dir_page(url)
-	soup = BeautifulSoup(page, 'html.parser')
-	return [url + node.get('href') for node in soup.find_all('a')]
+def get_keyboard_list():
+	languages = get_languages()
+	keyboards = []
+	if "languages" in languages:
+		for lang in languages["languages"]:
+			if "keyboards" in lang:
+				for kb in lang["keyboards"]:
+					kbnospace = kb.replace(" ", "%20")
+					if kbnospace not in keyboards:
+						keyboards.append(kbnospace)
+	if keyboards:
+		keyboards.sort()
+	return keyboards
 
 def write_kmpdirlist(kmpdirfile):
-	with open(os.path.join(kmpdirfile), 'wt') as kmpdirlist:
-		for file in get_dir_list():
-			#logging.debug(file)
-			kb = os.path.basename(os.path.dirname(file))
-			if kb != "keyboards":
+	with open(kmpdirfile, 'wt') as kmpdirlist:
+		keyboards = get_keyboard_list()
+		if keyboards:
+			for kb in get_keyboard_list():
 				print(kb, file=kmpdirlist)
 
 def list_keyboards():
@@ -60,6 +66,7 @@ def list_keyboards():
 		write_kmpdirlist(kmpdirfile)
 	else:
 		logging.debug("kmpdirlist already exists")
+		# file empty
 		if os.path.getsize(kmpdirfile) == 0:
 			write_kmpdirlist(kmpdirfile)
 

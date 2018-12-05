@@ -443,7 +443,7 @@ public final class KMManager {
         FileFilter keyboardFilter = new FileFilter() {
           @Override
           public boolean accept(File pathname) {
-            if (pathname.isFile() && pathname.getName().endsWith(".js")) {
+            if (pathname.isFile() && FileUtils.hasJavaScriptExtension(pathname.getName())) {
               return true;
             }
             return false;
@@ -614,7 +614,7 @@ public final class KMManager {
     Typeface font = null;
 
     if (fontFilename != null) {
-      if (fontFilename.endsWith(".ttf") || fontFilename.endsWith(".otf")) {
+      if (FileUtils.hasFontExtension(fontFilename)) {
         File file = new File(fontFilename);
         if (file.exists()) {
           font = Typeface.createFromFile(file);
@@ -828,7 +828,7 @@ public final class KMManager {
          */
         public boolean accept(File pathname) {
           String name = pathname.getName();
-          if (pathname.isFile() && name.startsWith(keyboardID) && name.endsWith(".js") && pathname.length() > 0) {
+          if (pathname.isFile() && name.startsWith(keyboardID) && FileUtils.hasJavaScriptExtension(name) && pathname.length() > 0) {
             return true;
           }
           return false;
@@ -846,7 +846,7 @@ public final class KMManager {
         int index = filename.indexOf(base);
         if (index == 0) {
           int firstIndex = base.length();
-          int lastIndex = filename.lastIndexOf(".js");
+          int lastIndex = filename.toLowerCase().lastIndexOf(".js");
           String v = filename.substring(firstIndex, lastIndex);
           if (kbFileVersion != null) {
             if (compareVersions(v, kbFileVersion) > 0) {

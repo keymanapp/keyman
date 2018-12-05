@@ -17,6 +17,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -408,7 +409,7 @@ final class KMKeyboard extends WebView {
     if (kFont == null) {
       txtFont = "";
     } else {
-      if (kFont.endsWith(".ttf") || kFont.endsWith(".otf")) {
+      if (FileUtils.hasFontExtension(kFont)) {
         txtFont = kFont;
         tFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kFont.substring(0, kFont.length() - 4), keyboardRoot, kFont);
       } else {
@@ -422,7 +423,7 @@ final class KMKeyboard extends WebView {
     if (kOskFont == null || kOskFont.isEmpty()) {
       oskFont = null;
     } else {
-      if (kOskFont.endsWith(".ttf") || kOskFont.endsWith(".otf")) {
+      if (FileUtils.hasFontExtension(kOskFont)) {
         oskFont = kOskFont;
         oFont = String.format("{\"family\":\"font_family_%s\",\"files\":[\"%s%s\"]}", kOskFont.substring(0, kOskFont.length() - 4), keyboardRoot, kOskFont);
       } else {
@@ -574,7 +575,7 @@ final class KMKeyboard extends WebView {
         int length = sourceArray.length();
         for (int i = 0; i < length; i++) {
           fontFile = sourceArray.getString(i);
-          if (fontFile.endsWith(".ttf") || fontFile.endsWith(".otf")) {
+          if (FileUtils.hasFontExtension(fontFile)) {
             font = fontFile;
             break;
           }
@@ -582,7 +583,7 @@ final class KMKeyboard extends WebView {
       } else {
         String fontFile = fontObj.optString(KMManager.KMKey_FontSource);
         if (fontFile != null) {
-          if (fontFile.endsWith(".ttf") || fontFile.endsWith(".otf")) {
+          if (FileUtils.hasFontExtension(fontFile)) {
             font = fontFile;
           }
         }
@@ -802,8 +803,7 @@ final class KMKeyboard extends WebView {
   /**
    * Take a font JSON object and adjust to pass to JS
    * 1. Replace "source" keys for "files" keys
-   * 2. Create full font paths for .ttf or
-   * .svg for Android 4.2 or 4.3 OSK
+   * 2. Create full font paths for .ttf or .svg
    * @param font String font JSON object as a string
    * @return String of modified font information with full paths. If font is invalid, return "''"
    */
@@ -829,8 +829,7 @@ final class KMKeyboard extends WebView {
         if (sourceArray != null) {
           for (int i = 0; i < sourceArray.length(); i++) {
             fontFile = sourceArray.getString(i);
-            if (fontFile.contains(".ttf") ||
-              (fontFile.contains(".svg") && (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1 || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2))) {
+            if (FileUtils.hasFontExtension(fontFile)) {
               fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + fontFile);
               fontObj.remove(KMManager.KMKey_FontSource);
               return fontObj.toString();
