@@ -17,7 +17,9 @@ rm -rf ${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $sourcename"
 log "reconfigure"
-if [ "$1" != "keyman-keyboardprocessor" ]; then
+if [ "$1" == "keyman-keyboardprocessor" ]; then
+	mkdir -p keyboardprocessor
+else
 	JENKINS="yes" ./scripts/reconf.sh $sourcename
 fi
 log "Make origdist"
