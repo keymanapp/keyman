@@ -38,6 +38,7 @@
                 kmw['hideKeyboard'] = hideKeyboard;
                 kmw['getOskHeight'] = getOskHeight;
                 kmw['getOskWidth'] = getOskWidth;
+                kmw['beepKeyboard'] = beepKeyboard;
                 kmw['setActiveElement']('ta');
             }
             
@@ -88,6 +89,14 @@
                 //window.location.hash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
                 if (typeof(window.webkit) != 'undefined')
                     window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
+            }
+        
+            function beepKeyboard() {
+                fragmentToggle = (fragmentToggle + 1) % 100;
+                var beepHash = 'beep-'+ fragmentToggle;
+                if(typeof(window.webkit) != 'undefined') {
+                    window.webkit.messageHandlers.keyman.postMessage('#' + beepHash);
+                }
             }
         
             function oskCreateKeyPreview(x,y,w,h,t)

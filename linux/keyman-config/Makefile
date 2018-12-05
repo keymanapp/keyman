@@ -7,7 +7,7 @@ install: # run as sudo
 	python3 setup.py install
 	# install icons
 	mkdir -p /usr/local/share/keyman/icons
-	cp keyman_config/icons/* /usr/local/share/keyman
+	cp keyman_config/icons/* /usr/local/share/keyman/icons
 	# install man pages
 	mkdir -p /usr/local/share/man/man1
 	cp debian/man/*.1 /usr/local/share/man/man1

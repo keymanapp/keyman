@@ -567,6 +567,7 @@ uses
   kmxfile,
   OnlineConstants,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.UI.Project.ProjectFileUI,
   RegExpr,
   ErrorControlledRegistry,
@@ -1838,7 +1839,7 @@ begin
   Result := inherited GetProjectFile;
   if not Assigned(Result) then
   begin
-    FStandaloneProjectFile := TkmnProjectFile.Create(nil, FileName, nil);
+    FStandaloneProjectFile := TkmnProjectFileAction.Create(nil, FileName, nil);
     Result := FStandaloneProjectFile;
   end;
 end;
@@ -1982,7 +1983,7 @@ begin
           LoadFromFile(FileName, TEncoding.UTF8); // Let prolog determine encoding  // I3337
       except
         on E:EEncodingError do
-          LoadFromFile(FileName, TEncoding.Default);
+          LoadFromFile(FileName);
       end;
       FLastFileCharSet := Encoding;// LastFileCharSet;
     end

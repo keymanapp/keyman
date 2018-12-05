@@ -39,6 +39,7 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
   {
     *out = new km_kbp_state(static_cast<km::kbp::keyboard const &>(*keyboard),
       env);
+
   }
   catch (std::bad_alloc)
   {
@@ -139,13 +140,12 @@ json & operator << (json & j, km_kbp_action_item const &act)
       break;
     case KM_KBP_IT_CHAR:
     case KM_KBP_IT_MARKER:
-      j << km_kbp_context_item {act.type, {0,}, {act.character}};
+      j << km_kbp_context_item {act.type, {0,}, {act.character}}; // TODO: is act.type correct here? it may map okay but this is bad practice to mix constants across types. Similarly using act.character instead of act.type
       break;
     case KM_KBP_IT_BACK:
-      j << act.erased;
+      j << json::null; // act.erased;
       break;
     case KM_KBP_IT_PERSIST_OPT:
-    case KM_KBP_IT_RESET_OPT:
       j << json::object
           << scope_names_lut[act.option->scope]
           << json::flat << json::object
@@ -153,11 +153,6 @@ json & operator << (json & j, km_kbp_action_item const &act)
           << json::close
         << json::close;
       break;
-    case KM_KBP_IT_VKEYDOWN:
-    case KM_KBP_IT_VKEYUP:
-    case KM_KBP_IT_VSHIFTDOWN:
-    case KM_KBP_IT_VSHIFTUP:
-      j << act.vkey;
       break;
   }
   j << json::close;

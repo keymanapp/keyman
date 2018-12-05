@@ -51,6 +51,7 @@ const
   Ext_KeymanSource = '.kmn';
   Ext_Icon = '.ico';
   Ext_ProjectSource = '.kpj';
+  Ext_ProjectSourceUser = '.kpj.user';
   Ext_Javascript = '.js';
 
 const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (

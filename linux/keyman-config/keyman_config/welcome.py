@@ -8,8 +8,8 @@ import urllib.parse
 
 import webbrowser
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit', '3.0')
-from gi.repository import Gtk, WebKit
+gi.require_version('WebKit2', '4.0')
+from gi.repository import Gtk, WebKit2
 from keyman_config.check_mime_type import check_mime_type
 from keyman_config.accelerators import bind_accelerator, init_accel
 
@@ -25,9 +25,8 @@ class WelcomeView(Gtk.Window):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
         s = Gtk.ScrolledWindow()
-        self.webview = WebKit.WebView()
-        self.webview.connect("navigation-policy-decision-requested", self.check)
-        self.webview.connect("mime-type-policy-decision-requested", check_mime_type)
+        self.webview = WebKit2.WebView()
+        self.webview.connect("decide-policy", self.doc_policy)
         self.webview.load_uri(welcomeurl)
         s.add(self.webview)
         vbox.pack_start(s, True, True, 0)
@@ -47,12 +46,19 @@ class WelcomeView(Gtk.Window):
 
         self.add(vbox)
 
-    def check(self, view, frame, req, nav, policy):
-        uri = req.get_uri()
-        if not "welcome.htm" in uri:
-            webbrowser.open(uri)
-            policy.ignore()
-            return True
+    def doc_policy(self, web_view, decision, decision_type):
+        logging.info("Checking policy")
+        logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
+        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION or decision_type == WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION:
+            nav_action = decision.get_navigation_action()
+            request = nav_action.get_request()
+            uri = request.get_uri()
+            logging.debug("nav request is for uri %s", uri)
+            if not "welcome.htm" in uri:
+                logging.debug("opening uri %s in webbrowser")
+                webbrowser.open(uri)
+                decision.ignore()
+                return True
         return False
 
     def on_openweb_clicked(self, button):

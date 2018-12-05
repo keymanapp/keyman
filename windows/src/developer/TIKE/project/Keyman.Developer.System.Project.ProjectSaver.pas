@@ -64,7 +64,8 @@ uses
   System.Win.ComObj,
 
   OnlineConstants,
-  Keyman.Developer.System.Project.ProjectFiles;
+  Keyman.Developer.System.Project.ProjectFiles,
+  utilfiletypes;
 
 { TProjectSaver }
 
@@ -151,7 +152,7 @@ begin
     end;
   end;
 
-  doc.SaveToFile(FFileName + '.user');
+  doc.SaveToFile(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
 end;
 
 end.

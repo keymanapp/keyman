@@ -70,6 +70,7 @@ uses
   System.SysUtils,
   System.Types,
   System.WideStrings,
+  Winapi.Messages,
   Winapi.msxml,
   Winapi.Windows,
   Xml.Win.msxmldom,
@@ -106,7 +107,6 @@ type
     FFileName: string;
     FFiles: TProjectFileList;
     FDisplayState: WideString;
-    FTempFileName: TTempFile;   // I4181
     FMRU: TMRUList;
     FOptions: TProjectOptions;
 
@@ -122,13 +122,14 @@ type
     procedure MRUChange(Sender: TObject);
     procedure UpdateFileParameters;
     procedure LoadPersistedUntitledProject;
-    procedure PersistUntitledProjectUser;
+    function GetSavedUserFileName: string;
   protected
     procedure DoRefresh; virtual;
     procedure DoRefreshCaption; virtual;
 
     property State: TProjectState read FState;
     property SavedFileName: string read GetSavedFileName;
+    property SavedUserFileName: string read GetSavedUserFileName;
 
   public
     procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual;
@@ -149,6 +150,8 @@ type
     class function StandardTemplatePath: string;
     class function StringsTemplatePath: string;
 
+    class function GetUntitledProjectFilename(CurrentProcess: Boolean): string;
+
     function GetTargetFilename(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
 
     //procedure AddMRU(const FFileName: string);
@@ -167,6 +170,7 @@ type
 
     property Busy: Boolean read FBusy write FBusy;
     property MustSave: Boolean read FMustSave write FMustSave;
+
   public
     class var CompilerMessageFile: TProjectFile;   // I4694
   end;
@@ -297,6 +301,10 @@ type
     property CompilerWarningsAsErrors: Boolean read FCompilerWarningsAsErrors write FCompilerWarningsAsErrors;   // I4865
   end;
 
+const
+  WM_USER_ProjectUpdateDisplayState = WM_USER;
+
+function GlobalProjectStateWndHandle: THandle;
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
 
 implementation
@@ -319,6 +327,7 @@ uses
   UMD5Hash,
   Unicode,
   utildir,
+  utilfiletypes,
   utilsystem;
 
 { TProjectFileList }
@@ -471,7 +480,7 @@ begin
   if not Assigned(AProject) then   // I4720
     CheckGetFileParameters;
 
-  if Assigned(FDoCreateProjectFileUI) then   // I4702
+  if (GetCurrentThreadId = MainThreadID) and Assigned(FDoCreateProjectFileUI) then   // I4702
     FDoCreateProjectFileUI(Self);   // I4687
 
   UpdateID;
@@ -676,23 +685,30 @@ begin
   inherited Create;
   FMRU := TMRUList.Create('');
   FMRU.OnChange := MRUChange;
-  FTempFileName := TTempFileManager.Get('.kpj');   // I4181
   FFileName := AFileName;
   FFiles := TProjectFileList.Create;
   FFiles.OnChange := ListNotify;
 
   FState := psReady;
 
+  FMustSave := False;
+
   if (FFileName = '') and (ALoadPersistedUntitledProject) then
-    LoadPersistedUntitledProject // I1010: Persist untitled project
+  begin
+    FMustSave := True;
+    LoadPersistedUntitledProject; // I1010: Persist untitled project
+  end
   else if not Load then   // I4703
   begin
     FFileName := '';
-    LoadPersistedUntitledProject;   // I4703
+    if not Load then
+    begin
+      FMustSave := True;
+      LoadPersistedUntitledProject;   // I4703
+    end;
   end;
 
   FBusy := True;
-  FMustSave := False;
   i := 0;
   while i < FFiles.Count do
   begin
@@ -710,7 +726,6 @@ begin
   FFiles.Free;
   FMRU.Free;
   FreeAndNil(FOptions);   // I4688
-  FreeAndNil(FTempFileName);   // I4181
   inherited Destroy;
 end;
 
@@ -783,7 +798,7 @@ end;
 
 procedure TProject.LoadPersistedUntitledProject;
 begin
-  FFileName := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled.kps';
+  FFileName := TProject.GetUntitledProjectFilename(False);
   try
     Load;
   finally
@@ -800,7 +815,7 @@ procedure TProject.PersistUntitledProject;
 var
   path: string;
 begin
-  path := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled.kps';
+  path := TProject.GetUntitledProjectFilename(False);
 
   FState := psSaving;
   with TProjectSaver.Create(Self, path) do
@@ -809,22 +824,7 @@ begin
   finally
     Free;
   end;
-  FState := psReady;
-end;
 
-procedure TProject.PersistUntitledProjectUser;
-var
-  path: string;
-begin
-  path := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled.kps';
-
-  FState := psSaving;
-  with TProjectSaver.Create(Self, path) do
-  try
-    SaveUser;
-  finally
-    Free;
-  end;
   FState := psReady;
 end;
 
@@ -854,12 +854,13 @@ begin
       // Inject the user settings to the loaded file
       //
 
-      if FileExists(SavedFileName + '.user') then   // I4698
+      if FileExists(SavedUserFileName) then   // I4698
       begin
         userdoc := MSXMLDOMDocumentFactory.CreateDOMDocument;
         try
           userdoc.async := False;
-          userdoc.load(SavedFileName + '.user');
+          userdoc.load(SavedUserFileName);
+
           for i := 0 to userdoc.documentElement.childNodes.length - 1 do
             doc.documentElement.appendChild(userdoc.documentElement.childNodes.item[i].cloneNode(true));
         finally
@@ -973,15 +974,12 @@ function TProject.SaveUser: Boolean;
 begin
   FState := psSaving;
   try
-    if FFilename = '' then
-      PersistUntitledProjectUser
-    else
-      with TProjectSaver.Create(Self, SavedFileName) do
-      try
-        SaveUser;
-      finally
-        Free;
-      end;
+    with TProjectSaver.Create(Self, SavedFileName) do
+    try
+      SaveUser;
+    finally
+      Free;
+    end;
   finally
     FState := psReady;
   end;
@@ -992,8 +990,13 @@ end;
 function TProject.GetSavedFileName: string;
 begin
   if FFileName = ''
-    then Result := FTempFileName.Name   // I4181
+    then Result := TProject.GetUntitledProjectFilename(True)   // I4181
     else Result := FFileName;
+end;
+
+function TProject.GetSavedUserFileName: string;
+begin
+  Result := ChangeFileExt(SavedFileName, Ext_ProjectSourceUser);
 end;
 
 function TProject.GetTargetFilename(ATargetFile, ASourceFile, AVersion: string): string;   // I4688
@@ -1029,6 +1032,13 @@ begin
       then Result := Result + '\xml\project\'
       else Result := GetXMLTemplatePath + 'project\';
   end;
+end;
+
+class function TProject.GetUntitledProjectFilename(CurrentProcess: Boolean): string;
+begin
+  if CurrentProcess
+    then Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled.' + IntToStr(GetCurrentProcessId) + Ext_ProjectSource
+    else Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\Untitled' + Ext_ProjectSource;
 end;
 
 procedure TProject.UpdateFileParameters;   // I4688   // I4710
@@ -1167,4 +1177,72 @@ begin
   CompilerWarningsAsErrors := False;   // I4865
 end;
 
+type
+  TGlobalProjectStateWnd = class
+  private
+    procedure WndProc(var Message: TMessage);
+    constructor Create;
+    destructor Destroy; override;
+  end;
+
+var
+  FGlobalProjectStateWnd: TGlobalProjectStateWnd = nil;
+
+  // Make this a global to prevent potential race
+  // condition causing an access violation. If it
+  // is an invalid window handle or 0 at destruction time,
+  // it's no big deal...
+  FGlobalProjectStateWndHandle: THandle = 0;
+
+{ TGlobalProjectStateWnd }
+
+constructor TGlobalProjectStateWnd.Create;
+begin
+  inherited Create;
+  FGlobalProjectStateWndHandle := AllocateHWnd(WndProc);
+end;
+
+destructor TGlobalProjectStateWnd.Destroy;
+var
+  h: THandle;
+begin
+  h := FGlobalProjectStateWndHandle;
+  FGlobalProjectStateWndHandle := 0;
+  DeallocateHWnd(h);
+  inherited Destroy;
+end;
+
+procedure TGlobalProjectStateWnd.WndProc(var Message: TMessage);
+var
+  PPath, PDisplayState: PChar;
+begin
+  if Message.Msg = WM_USER_ProjectUpdateDisplayState then
+  begin
+    PPath := PChar(Message.WParam);
+    PDisplayState := PChar(Message.LParam);
+    if Assigned(FGlobalProject) and (FGlobalProject.FileName = PPath) then
+    begin
+      FGlobalProject.DisplayState := PDisplayState;
+      FGlobalProject.SaveUser;
+    end;
+    StrDispose(PDisplayState);
+    StrDispose(PPath);
+  end;
+  DefWindowProc(FGlobalProjectStateWndHandle, Message.Msg, Message.WParam, Message.LParam);
+end;
+
+function GlobalProjectStateWndHandle: THandle;
+begin
+  Result := FGlobalProjectStateWndHandle;
+end;
+
+initialization
+  FGlobalProjectStateWnd := TGlobalProjectStateWnd.Create;
+finalization
+  if FileExists(TProject.GetUntitledProjectFilename(True)) then
+    System.SysUtils.DeleteFile(TProject.GetUntitledProjectFilename(True));
+  if FileExists(ChangeFileExt(TProject.GetUntitledProjectFilename(True),Ext_ProjectSourceUser)) then
+    System.SysUtils.DeleteFile(ChangeFileExt(TProject.GetUntitledProjectFilename(True),Ext_ProjectSourceUser));
+
+  FGlobalProjectStateWnd.Free;
 end.

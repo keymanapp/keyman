@@ -11,9 +11,9 @@
 
 set -e
 
-all_distributions="bionic xenial"
+all_distributions="bionic"
 distributions=""
-all_projects="kmflcomp libkmfl ibus-kmfl keyman-config"
+all_projects="kmflcomp libkmfl keyman-keyboardprocessor ibus-kmfl keyman-config ibus-keyman"
 projects=""
 echo "all_distributions: ${all_distributions}"
 echo "all_projects: ${all_projects}"
@@ -75,6 +75,7 @@ echo "distributions: ${distributions}"
 echo "projects: ${projects}"
 
 BASEDIR=`pwd`
+#echo "basedir is $BASEDIR"
 
 mkdir -p builddebs
 
@@ -82,14 +83,18 @@ mkdir -p builddebs
 cd builddebs
 for proj in ${projects}; do
 	vers=`ls ../dist/${proj}_*.orig.tar.gz`
-	# echo "${vers}"
+	#echo "vers1:${vers}"
 	vers=${vers##*_}
-	# echo "${vers}"
+	#echo "vers2:${vers}"
 	vers=${vers%*.orig.tar.gz}
-	# echo "${vers}"
+	#echo "vers3:${vers}"
 	cp -a ../dist/${proj}_${vers}.orig.tar.gz .
 	tar xfz ${proj}_${vers}.orig.tar.gz
-	cp -a ../${proj}/debian ${proj}-${vers}
+	if [ "keyman-keyboardprocessor" == "$proj" ]; then
+		cp -a ../../common/engine/keyboardprocessor/debian ${proj}-${vers}
+	else
+		cp -a ../${proj}/debian ${proj}-${vers}
+	fi
 	cd ${proj}-${vers}
 	dch -v ${vers}-1 "local build"
 	echo "${proj}-${vers}"

@@ -678,10 +678,10 @@ namespace com.keyman {
       }
       
       for(i=0;i<fList.length;i++) {
-        if(fList[i].indexOf('.ttf') > 0) ttf=fList[i];
-        if(fList[i].indexOf('.woff') > 0) woff=fList[i];
-        if(fList[i].indexOf('.eot') > 0) eot=fList[i];
-        if(fList[i].indexOf('.svg') > 0) svg=fList[i];
+        if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
+        if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
+        if(fList[i].toLowerCase().indexOf('.eot') > 0) eot=fList[i];
+        if(fList[i].toLowerCase().indexOf('.svg') > 0) svg=fList[i];
       }
 
       // Font path qualified to support page-relative fonts (build 347)

@@ -9,6 +9,7 @@
 #include <codecvt>
 #include "keyboard.hpp"
 #include "json.hpp"
+#include "processor.hpp"
 
 using namespace km::kbp;
 
@@ -23,9 +24,20 @@ keyboard::keyboard(std::filesystem::path const & path)
   version_string = _version_string.c_str();
   id = _keyboard_id.c_str();
   folder_path = _folder_path.native().c_str();
+
+  if (path.extension() == ".kmx" ||
+      path.extension() == ".KMX") { // Some legacy packages may include upper-case file extensions
+    _processor = new kmx_processor(this);
+  }
+  else if (path.extension() == ".mock") {
+    _processor = new mock_processor(this);
+  }
+  else {
+    _processor = new null_processor(this);
+  }
+
   default_options = _default_opts.data();
 }
-
 
 json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
 {
@@ -44,7 +56,7 @@ json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
   https://stackoverflow.com/a/35103224/1836776
 */
 
-#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1915 /* VS 2017 */
+#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1916 /* VS 2017 19.16 */
 
 std::string utf16_to_utf8(std::u16string utf16_string)
 {

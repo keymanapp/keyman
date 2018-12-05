@@ -271,8 +271,7 @@ function savestate() {
   
   var xmlDoc = document.implementation.createDocument(null, "state");
 
-  appendElement(xmlDoc, 'path', projectPath);
-  appendElement(xmlDoc, 'tab', tabselected);
+  appendElement(xmlDoc, 'tab', tabselected.toString());
   appendElement(xmlDoc, 'showhelp', document.getElementById('upperexpand').className == 'checkbox' ? "0":"1");
   
   var files = document.getElementsByTagName('span');

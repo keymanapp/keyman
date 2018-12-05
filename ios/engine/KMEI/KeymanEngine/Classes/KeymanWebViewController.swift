@@ -8,6 +8,7 @@
 
 import UIKit
 import WebKit
+import AudioToolbox
 
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
@@ -352,6 +353,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     } else if fragment.hasPrefix("ios-log:#iOS#") {
       let message = fragment.dropFirst(13)
       log.info("KMW Log: \(message)")
+    } else if fragment.hasPrefix("#beep-") {
+      beep(self)
+      delegate?.beep(self)
     } else {
       log.error("Unexpected KMW event: \(fragment)")
     }
@@ -360,6 +364,39 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
     // kmw adds w/2 to x.
     return CGRect(x: x - w / 2.0, y: y, width: w, height: h)
+  }
+  
+  public func beep(_ keymanWeb: KeymanWebViewController) {
+    let vibrationSupport = Manager.shared.vibrationSupportLevel
+    let kSystemSoundID_MediumVibrate: SystemSoundID = 1520
+
+    if vibrationSupport == .none {
+      // TODO:  Find something we can do visually and/or audibly to provide feedback.
+    } else if vibrationSupport == .basic {
+      // The publicly-suggested kSystemSoundID_Vibrate lasts for 0.4 seconds.
+      // Better than nothing, though it's easily too long for a proper beep.
+      AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+    } else if vibrationSupport == .basic_plus {
+      // Code 1519 is near-undocumented, but should result in a 'weaker'/shorter vibration.
+      // Corresponds directly to UIImpactFeedbackGenerator below, but on select phones that
+      // don't support that part of the API.
+      //
+      // Ref: https://stackoverflow.com/questions/10570553/how-to-set-iphone-vibrate-length/44495798#44495798
+      // Not usable by older iPhone models.
+      AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
+    } else { // if vibrationSupport == .taptic
+      if #available(iOSApplicationExtension 10.0, *) {
+        // Available with iPhone 7 and beyond, we can now produce nicely customized haptic feedback.
+        // We use this style b/c it's short, and in essence it is a minor UI element collision -
+        // a single key with blocked (erroneous) output.
+        // Oddly, is a closer match to SystemSoundID 1520 than 1521.
+        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackStyle.heavy)
+        vibrator.impactOccurred()
+      } else {
+        // Fallback on earlier feedback style
+        AudioServicesPlaySystemSound(kSystemSoundID_MediumVibrate)
+      }
+    }
   }
 }
 

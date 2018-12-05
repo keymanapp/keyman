@@ -1,0 +1,23 @@
+c Description: Tests Caps Lock
+c keys: [K_1][SHIFT K_2][K_A][SHIFT K_B]
+c expected: pass.pass.pass.pass.
+c option: &capsLock=1
+c context: 
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [NCAPS K_1] > 'fail.'
++ [CAPS K_1] > 'pass.'
+
++ '@' > 'pass.'
++ '2' > 'fail.'
+
++ 'a' > 'fail.'
++ 'A' > 'pass.'
+
++ 'b' > 'pass.'
++ 'B' > 'fail.'

@@ -63,7 +63,6 @@ type
     FLastErrorOffset: Integer;   // I4083
     FFilename: string;
     function GetLayoutJS: string;
-    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure DoModified;
     procedure DoLoad;
     procedure FireCommand(const commands: TStringList); virtual;
@@ -74,8 +73,7 @@ type
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
     
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
-      out Result: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
   protected
     function GetHelpTopic: string; override;
@@ -459,40 +457,21 @@ begin
   if Assigned(FOnImportFromOSKCommand) then FOnImportFromOSKCommand(Self);
 end;
 
-procedure TframeTouchLayoutBuilder.cefBeforeBrowse(Sender: TObject;
-  const Url: string; out Result: Boolean);
-var
-  params: TStringList;
+procedure TframeTouchLayoutBuilder.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 begin
   if csDestroying in ComponentState then   // I3983
-  begin
-    Result := True;
     Exit;
-  end;
 
-  if GetParamsFromURL(URL, params) then
+  if (params.Count > 0) and (params[0] = 'command') then
   begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Result := True;
+    params.Delete(0);
+    FireCommand(params);
   end;
 end;
 
 procedure TframeTouchLayoutBuilder.cefLoadEnd(Sender: TObject);
 begin
   FLoading := False;
-end;
-
-procedure TframeTouchLayoutBuilder.WMUser_FireCommand(var Message: TMessage);
-var
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  if (params.Count > 0) and (params[0] = 'command') then
-  begin
-    params.Delete(0);
-    FireCommand(params);
-  end;
-  params.Free;
 end;
 
 function TframeTouchLayoutBuilder.BuilderCommand(const cmd: string): Boolean;

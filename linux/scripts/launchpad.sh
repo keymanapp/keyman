@@ -26,13 +26,13 @@ fi
 if [ "${PROJECT}" != "" ]; then
     projects="${PROJECT}"
 else
-    projects="kmflcomp libkmfl ibus-kmfl keyman-config"
+    projects="kmflcomp libkmfl keyman-keyboardprocessor ibus-kmfl keyman-config ibus-keyman"
 fi
 
 if [ "${DIST}" != "" ]; then
     distributions="${DIST}"
 else
-    distributions="xenial bionic cosmic"
+    distributions="xenial bionic cosmic disco"
 fi
 
 BASEDIR=`pwd`
