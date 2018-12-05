@@ -259,8 +259,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .doNothing:
         break
       }
-    } else {
-      //
+    } else { // Use in-app keyboard behavior instead.
+      if !(Manager.shared.currentResponder?.showKeyboardPicker() ?? false) {
+        _ = Manager.shared.switchToNextKeyboard
+      }
     }
   }
 

@@ -175,6 +175,15 @@ extension KeymanResponder where Self: TextField {
     resignFirstResponder()
     Manager.shared.inputViewController.endEditing(true)
   }
+
+  public func showKeyboardPicker() -> Bool {
+    if let viewController = viewController {
+      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+      return true
+    } else {
+      return false
+    }
+  }
 }
 
 // MARK: - UITextFieldDelegate
