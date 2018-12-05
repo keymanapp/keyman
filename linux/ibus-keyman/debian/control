@@ -3,7 +3,8 @@ Section: utils
 Priority: optional
 Maintainer: Daniel Glassey <wdg@debian.org>
 Build-Depends: debhelper (>= 9), autotools-dev, dh-autoreconf, pkg-config,
- libkmnkbp-dev (>=0.0.0~), libibus-1.0-dev (>= 1.2), x11proto-core-dev, libx11-dev
+ libkmnkbp-dev (>=0.0.0~), libibus-1.0-dev (>= 1.2), libjson-glib-dev (>= 1.4.0),
+ x11proto-core-dev, libx11-dev
 Standards-Version: 3.9.8
 Homepage: http://www.keyman.com
 
