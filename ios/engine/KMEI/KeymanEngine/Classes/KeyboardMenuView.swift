@@ -71,21 +71,16 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     fontSize = UIDevice.current.userInterfaceIdiom == .phone ? 14 : 21
     xLength = keyFrame.size.width * (isPortrait ? 1.1 : 0.6)
 
-    var mainFrame = inputViewController.view.frame
-    if mainFrame == CGRect.zero {
-      // TODO:  Fix!
-      mainFrame = Manager.shared.inputViewController.keymanWeb.view.frame
-    }
-    super.init(frame: mainFrame)
+    super.init(frame: inputViewController.view.frame)
 
     let screenWidth = UIScreen.main.bounds.width
     let maxWidth = CGFloat.minimum(getMaxWidth(), screenWidth)
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
-    // TODO:  Fix!
-    let vHeight = Manager.shared.inputViewController.keymanWeb.keyboardHeight + topBarHeight
-    let bY = Manager.shared.inputViewController.keymanWeb.keyboardHeight - (keyFrame.origin.y + baseHeight)
+
+    let vHeight = Manager.shared.inputViewController.kmwHeight + topBarHeight
+    let bY = Manager.shared.inputViewController.kmwHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
       let maxRows = (vHeight - baseHeight - bY) / rowHeight
@@ -236,8 +231,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   @objc func tapAction(_ sender: UITapGestureRecognizer) {
-    // TODO:  Fix!
-    Manager.shared.inputViewController.keymanWeb.dismissKeyboardMenu()
+    Manager.shared.inputViewController.dismissKeyboardMenu()
   }
 
   func numberOfSections(in tableView: UITableView) -> Int {
@@ -295,8 +289,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
-    // TODO:  Fix!
-    Manager.shared.inputViewController.keymanWeb.dismissKeyboardMenu()
+
+    Manager.shared.inputViewController.dismissKeyboardMenu()
   }
 
   func getMaxWidth() -> CGFloat {

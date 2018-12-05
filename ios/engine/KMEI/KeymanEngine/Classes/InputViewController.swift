@@ -39,7 +39,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var portraitConstraint: NSLayoutConstraint?
   var landscapeConstraint: NSLayoutConstraint?
 
-  var keymanWeb: KeymanWebViewController
+  private var keymanWeb: KeymanWebViewController
 
   open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
@@ -244,19 +244,23 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    if keymanWeb.isKeyboardMenuVisible {
-      return
-    }
-
-    switch globeKeyTapBehaviour {
-    case .switchToNextKeyboard:
-      if let nextIndex = Manager.shared.switchToNextKeyboard(), nextIndex <= 0 {
-        advanceToNextInputMode()
+    if isSystemKeyboard {
+      if keymanWeb.isKeyboardMenuVisible {
+        return
       }
-    case .switchToNextInputMethod:
-      advanceToNextInputMode()
-    case .doNothing:
-      break
+
+      switch globeKeyTapBehaviour {
+      case .switchToNextKeyboard:
+        if let nextIndex = Manager.shared.switchToNextKeyboard(), nextIndex <= 0 {
+          advanceToNextInputMode()
+        }
+      case .switchToNextInputMethod:
+        advanceToNextInputMode()
+      case .doNothing:
+        break
+      }
+    } else {
+      //
     }
   }
 
@@ -288,6 +292,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   public var activeTopBarHeight: CGFloat {
     // If 'isSystemKeyboard' is true, always show the top bar.
     return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
+  }
+  
+  public var kmwHeight: CGFloat {
+    return keymanWeb.keyboardHeight
   }
 
   private func setInnerConstraints() {
@@ -422,5 +430,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func resetKeyboardState() {
     keymanWeb.resetKeyboardState()
+  }
+
+  func endEditing(_ force: Bool) {
+    keymanWeb.view.endEditing(force)
+  }
+  
+  func dismissKeyboardMenu() {
+    keymanWeb.dismissKeyboardMenu()
   }
 }

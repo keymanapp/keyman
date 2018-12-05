@@ -59,13 +59,13 @@ public class TextField: UITextField {
   }
 
   // MARK: - Class Overrides
-  public override var inputView: UIView? {
+  public override var inputViewController: UIInputViewController? {
     get {
-      return Manager.shared.inputViewController.view
+      return Manager.shared.inputViewController
     }
 
-    set(inputView) {
-      super.inputView = inputView
+    set(inputViewController) {
+      _ = inputViewController
     }
   }
 
@@ -173,7 +173,7 @@ extension KeymanResponder where Self: TextField {
   public func dismissKeyboard() {
     log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
     resignFirstResponder()
-    Manager.shared.inputViewController.keymanWeb.view.endEditing(true)
+    Manager.shared.inputViewController.endEditing(true)
   }
 }
 

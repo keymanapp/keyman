@@ -49,8 +49,6 @@ public class TextView: UITextView {
       inputAssistantItem.leadingBarButtonGroups = []
       inputAssistantItem.trailingBarButtonGroups = []
     }
-    
-    self.inputView = Manager.shared.inputViewController.view
 
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
@@ -176,7 +174,7 @@ extension KeymanResponder where Self: TextView {
   public func dismissKeyboard() {
     log.debug("TextView: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
     resignFirstResponder()
-    Manager.shared.inputViewController.keymanWeb.view.endEditing(true)
+    Manager.shared.inputViewController.endEditing(true)
   }
 }
 

@@ -57,8 +57,7 @@ class SubKeysView: UIView {
       }
     }
 
-    //TODO: adjust to the inner view of the new keymanWeb; its definition has changed!
-    let kbHeight = Manager.shared.inputViewController.keymanWeb.keyboardHeight
+    let kbHeight = Manager.shared.inputViewController.kmwHeight
     let tbHeight = Manager.shared.inputViewController.activeTopBarHeight
     var maxContainerHeight = (screenHeight - kbHeight) + keyFrame.origin.y - strokeWidth
     if isSystemKeyboard {
