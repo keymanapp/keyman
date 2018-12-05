@@ -8,17 +8,6 @@
 
 import WebKit
 
-// Replaces the old use of KeymanWebDelegate for tracking an app's active responder element.
-public protocol KeymanResponder {
-  func dismissKeyboard()
-}
-
-extension UIResponder: KeymanResponder {
-  public func dismissKeyboard() {
-    resignFirstResponder()
-  }
-}
-
 /// Delegate receiving events from Keyman Web.
 protocol KeymanWebDelegate: class {
   /// Keyman Web has loaded (or reloaded).

@@ -177,44 +177,6 @@ extension KeymanResponder where Self: TextField {
   }
 }
 
-// MARK: - KeymanWebDelegate
-extension TextField: KeymanWebDelegate {
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if keymanWeb.isSubKeysMenuVisible {
-      return
-    }
-
-    if isInputClickSoundEnabled {
-      AudioServicesPlaySystemSound(0x450)
-
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
-      isInputClickSoundEnabled = false
-      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
-    }
-
-    let textRange = selectedTextRange!
-    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-
-    if selRange.length != 0 {
-      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
-    } else {
-      for _ in 0..<numCharsToDelete {
-        deleteBackward()
-      }
-      insertText(newText)
-    }
-  }
-
-  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    if let viewController = viewController {
-      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
-    } else {
-      _ = Manager.shared.switchToNextKeyboard()
-    }
-  }
-}
-
 // MARK: - UITextFieldDelegate
 extension TextField: UITextFieldDelegate {
   public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,

@@ -180,49 +180,6 @@ extension KeymanResponder where Self: TextView {
   }
 }
 
-// MARK: - KeymanWebDelegate
-extension TextView: KeymanWebDelegate {
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if keymanWeb.isSubKeysMenuVisible {
-      return
-    }
-
-    if isInputClickSoundEnabled {
-      AudioServicesPlaySystemSound(0x450)
-
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
-      isInputClickSoundEnabled = false
-      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
-    }
-
-    let textRange = selectedTextRange ?? UITextRange()
-    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-
-    if selRange.length != 0 {
-      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
-    } else {
-      for _ in 0..<numCharsToDelete {
-        deleteBackward()
-      }
-      insertText(newText)
-    }
-
-    // Workaround for iOS 7 UITextView scroll bug
-    // TODO check if fixed
-    perform(#selector(self.scroll(toShowSelection:)), with: self, afterDelay: 0.1)
-    // Smaller delays are unreliable.
-  }
-
-  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
-    if let viewController = viewController {
-      Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
-    } else {
-      _ = Manager.shared.switchToNextKeyboard()
-    }
-  }
-}
-
 //// MARK: - UITextViewDelegate
 extension TextView: UITextViewDelegate {
   public func textViewDidChangeSelection(_ textView: UITextView) {
