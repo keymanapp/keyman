@@ -213,7 +213,8 @@ ibus_keyman_engine_constructor (GType                   type,
     gchar **split_name = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
-        abs_kmx_path = NULL;
+        IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
+        return NULL;
     }
     else if (split_name[1] == NULL)
     {
@@ -248,6 +249,8 @@ ibus_keyman_engine_constructor (GType                   type,
     km_kbp_option_item options[1] = {KM_KBP_OPTIONS_END};
 
     km_kbp_status status_keyboard = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    g_free(abs_kmx_path);
+
     if (status_keyboard != KM_KBP_STATUS_OK)
     {
         g_warning("problem creating km_kbp_keyboard");
@@ -277,7 +280,6 @@ ibus_keyman_engine_constructor (GType                   type,
     #endif
 
     keyman->display  = XOpenDisplay(NULL);
-    g_free(abs_kmx_path);
     return (GObject *) keyman;
 }
 
