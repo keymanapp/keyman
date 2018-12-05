@@ -17,6 +17,9 @@ protocol KeymanWebDelegate: class {
   ///   - numCharsToDelete: The number of UTF-16 code units to delete before inserting the new text.
   ///   - newText: The string to insert.
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String)
+  
+  /// - Parameters:
+  func beep(_ keymanWeb: KeymanWebViewController)
 
   /// - Parameters:
   ///   - keyFrame: The frame of the anchor key.
@@ -38,15 +41,12 @@ protocol KeymanWebDelegate: class {
   func menuKeyDown(_ keymanWeb: KeymanWebViewController)
   func menuKeyUp(_ keymanWeb: KeymanWebViewController)
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController)
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController)
-  
-  func dismissKeyboard()
-  func resumeKeyboard()
 }
 
 extension KeymanWebDelegate {
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {}
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {}
+  func beep(_ keymanWeb: KeymanWebViewController) {}
   func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {}
   func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {}
   func showSubkeys(_ keymanWeb: KeymanWebViewController,
@@ -57,8 +57,4 @@ extension KeymanWebDelegate {
   func menuKeyDown(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {}
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {}
-  
-  func dismissKeyboard() {}
-  func resumeKeyboard() {}
 }

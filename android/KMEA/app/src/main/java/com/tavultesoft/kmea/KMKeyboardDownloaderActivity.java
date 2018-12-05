@@ -318,7 +318,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       int result = 0;
       for (String url : urls) {
         String filename = "";
-        if (url.endsWith(".js")) {
+        if (FileUtils.hasJavaScriptExtension(url)) {
 
           int start = kbFilename.lastIndexOf("/");
           if (start < 0) {
@@ -397,12 +397,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         String fontSourceString;
         try {
           fontSourceString = fontSource.getString(i);
-          if (fontSourceString.endsWith(".ttf") || fontSourceString.endsWith(".otf")) {
+          if (FileUtils.hasFontExtension(fontSourceString)) {
             urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && (fontSourceString.endsWith(".svg") || fontSourceString.endsWith(".woff"))) {
-            urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && fontSourceString.contains(".svg#")) {
-            String fontFilename = fontSourceString.substring(0, fontSourceString.indexOf(".svg#") + 5);
+          } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
+            String fontFilename = FileUtils.getSVGFilename(fontSourceString);
             urls.add(baseUri + fontFilename);
           }
         } catch (JSONException e) {
@@ -413,12 +411,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       String fontSourceString;
       try {
         fontSourceString = jsonFont.getString(KMManager.KMKey_FontSource);
-        if (fontSourceString.endsWith(".ttf") || fontSourceString.endsWith(".otf")) {
+        if (FileUtils.hasFontExtension(fontSourceString)) {
           urls.add(baseUri + fontSourceString);
-        } else if (isOskFont && (fontSourceString.endsWith(".svg") || fontSourceString.endsWith(".woff"))) {
-          urls.add(baseUri + fontSourceString);
-        } else if (isOskFont && fontSourceString.contains(".svg#")) {
-          String fontFilename = fontSourceString.substring(0, fontSourceString.indexOf(".svg#") + 5);
+        } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
+          String fontFilename = FileUtils.getSVGFilename(fontSourceString);
           urls.add(baseUri + fontFilename);
         }
       } catch (JSONException e) {
