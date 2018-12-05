@@ -10,6 +10,7 @@ import UIKit
 import WebKit
 import XCGLogger
 import Zip
+import DeviceKit
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
@@ -23,6 +24,16 @@ public enum KeyboardState {
   case downloading
   case none
 }
+
+public enum VibrationSupport {
+  case none // Has no vibrator
+  case basic // Has only the basic 0.4 sec long vibration
+  case basic_plus // Has undocumented access to three other vibration lengths
+  case taptic // Has the Taptic engine, allowing use of UIImpactFeedbackGenerator for customizable vibrations
+}
+
+// Strings
+private let keyboardChangeHelpText = "Tap here to change keyboard"
 
 // URLs - used for reachability test
 private let keymanHostName = "api.keyman.com"
@@ -1025,5 +1036,33 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   var isSystemKeyboardTopBarEnabled: Bool {
     return true
+  }
+  
+  var vibrationSupportLevel: VibrationSupport {
+    let device = Device()
+
+    if device.isPod {
+      return .none
+    } else if device.isPad {
+      // May not be entirely true, but I can't find any documentation on which
+      // ones DO have it.  Closest thing is https://discussions.apple.com/thread/7415858
+      // that suggests none before Jan 2016 had it, at least.
+      return .none
+    } else if device.isPhone {
+      let basicVibrationModels: [Device] = [.iPhone4, .iPhone4s, .iPhone5, Device.iPhone5s,
+                                            .iPhone5c, .iPhone6, .iPhone6Plus, .iPhoneSE]
+      if device.isOneOf(Device.allSimulators) {
+        // The Simulator for testing on macOS doesn't emulate or indicate vibration, unfortunately.
+        return .none
+      } else if device == Device.iPhone6s || device == Device.iPhone6sPlus {
+        return .basic_plus
+      } else if device.isOneOf(basicVibrationModels) {
+        return .basic
+      } else {
+        return .taptic
+      }
+    } else {
+      return .none
+    }
   }
 }
