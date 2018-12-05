@@ -60,7 +60,9 @@ uses
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.ProjectFiles,
-  Keyman.Developer.System.Project.ProjectFileType;
+  Keyman.Developer.System.Project.ProjectFileType,
+
+  utilfiletypes;
 
 { TProjectLoader }
 
@@ -163,9 +165,9 @@ var
   state: IXMLDocument;
   viewState: IXMLNode;
 begin
-  if not FileExists(FFileName + '.user') then Exit;
+  if not FileExists(ChangeFileExt(FFileName, Ext_ProjectSourceUser)) then Exit;
 
-  doc := LoadXMLDocument(FFileName + '.user'); //TXMLDocument.Create(nil);
+  doc := LoadXMLDocument(ChangeFileExt(FFileName, Ext_ProjectSourceUser)); //TXMLDocument.Create(nil);
 
   root := doc.DocumentElement;
   if root.NodeName <> 'KeymanDeveloperProjectUser' then
@@ -182,13 +184,19 @@ begin
       viewState.ChildNodes.Add(state.DocumentElement.ChildNodes[i].CloneNode(True));
 
     try
-      doc.SaveToFile(FFileName + '.user');
+      doc.SaveToFile(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
     except
       on E:EOleException do   // I4212
       begin
         ;
       end;
     end;
+  end;
+
+  viewState := root.ChildNodes.FindNode('ViewState');
+  if Assigned(viewState) then
+  begin
+    FProject.DisplayState := viewState.XML;
   end;
 
   { Load root nodes first - I708 }
@@ -216,7 +224,6 @@ begin
       FProject.MRU.Append(node.ChildNodes[i].ChildNodes['FullPath'].NodeValue);
     end;
   end;
-
 end;
 
 end.

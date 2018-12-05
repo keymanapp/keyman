@@ -83,7 +83,7 @@ uses
   PackageInfo;
 
 {-------------------------------------------------------------------------------
- - TkmnProjectFile                                                             -
+ - TkpsProjectFile                                                             -
  -------------------------------------------------------------------------------}
 
 procedure TkpsProjectFile.GetFileParameters;

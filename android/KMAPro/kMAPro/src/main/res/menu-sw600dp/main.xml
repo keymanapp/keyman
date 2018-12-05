@@ -17,25 +17,25 @@
     
     <item
         android:id="@+id/action_text_size"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="@string/action_text_size"
         android:icon="@drawable/ic_light_action_textsize" />
     
     <item
         android:id="@+id/action_clear_text"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="@string/action_clear_text"
         android:icon="@drawable/ic_light_action_trash" />
     
     <item
         android:id="@+id/action_info"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="@string/action_info"
         android:icon="@drawable/ic_light_action_info" />
     
     <item
         android:id="@+id/action_get_started"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="@string/get_started"
         android:icon="@drawable/ic_action_get_started" />
         

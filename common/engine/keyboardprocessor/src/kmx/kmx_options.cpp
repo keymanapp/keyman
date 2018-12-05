@@ -18,7 +18,7 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
       case CODE_SAVEOPT:
       case CODE_RESETOPT:
         idx = *(s + 2) - 1;
-        if (idx >= 0 && idx < _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
+        if (idx >= 0 && static_cast<KMX_DWORD>(idx) < _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
           _kp->KeyboardOptions[idx].OriginalStore = _kp->Keyboard->dpStoreArray[idx].dpString;
         }
         break;
@@ -29,7 +29,7 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
 
 void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
   LPSTORE sp;
-  int i;
+  KMX_DWORD i;
 
   assert(options != nullptr);
   assert(!key.empty());
@@ -56,7 +56,7 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
 
   // Scan all rules to find options references.
 
-  int i, j;
+  KMX_DWORD i, j;
   LPGROUP gp;
   LPKEY kkp;
   for (i = 0, gp = _kp->Keyboard->dpGroupArray; i < _kp->Keyboard->cxGroupArray; i++, gp++) {

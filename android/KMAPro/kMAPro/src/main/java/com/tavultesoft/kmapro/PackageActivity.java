@@ -69,9 +69,8 @@ public class PackageActivity extends AppCompatActivity {
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
-    getSupportActionBar().setLogo(R.drawable.keyman_logo);
-    getSupportActionBar().setDisplayUseLogoEnabled(true);
-    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayUseLogoEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(false);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
