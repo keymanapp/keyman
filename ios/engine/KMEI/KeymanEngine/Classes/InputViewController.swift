@@ -267,13 +267,15 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
-    switch menuBehaviour {
-    case .showAlways,
-         .showIfMultipleKeyboards where keyboardListCount > 1:
-      keymanWeb.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
-    case .showIfMultipleKeyboards, // keyboardListCount() <= 1
-    .showNever:
-      break
+    if isSystemKeyboard {
+      switch menuBehaviour {
+      case .showAlways,
+           .showIfMultipleKeyboards where keyboardListCount > 1:
+        keymanWeb.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
+      case .showIfMultipleKeyboards, // keyboardListCount() <= 1
+      .showNever:
+        break
+      }
     }
   }
 

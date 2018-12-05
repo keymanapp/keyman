@@ -87,7 +87,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   var shouldReloadKeyboard = false
 
   var _inputViewController: InputViewController?
-  var currentResponder: UIResponder?
+  var currentResponder: KeymanResponder?
   
   // This allows for 'lazy' initialization of the keyboard.
   var inputViewController: InputViewController! {
@@ -884,7 +884,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // MARK: - Text
 
   public func showKeyboard() {
-    currentResponder?.becomeFirstResponder()
+    currentResponder?.summonKeyboard()
   }
   
   public func hideKeyboard() {

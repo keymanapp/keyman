@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextField: UITextField {
+public class TextField: UITextField, KeymanResponder {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -50,6 +50,8 @@ public class TextField: UITextField {
       inputAssistantItem.leadingBarButtonGroups = []
       inputAssistantItem.trailingBarButtonGroups = []
     }
+
+    self.inputView = Manager.shared.inputViewController.view
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
                                            name: .UITextFieldTextDidChange, object: self)
@@ -174,6 +176,10 @@ extension KeymanResponder where Self: TextField {
     log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
     resignFirstResponder()
     Manager.shared.inputViewController.endEditing(true)
+  }
+  
+  public func summonKeyboard() {
+    becomeFirstResponder()
   }
 
   public func showKeyboardPicker() -> Bool {
