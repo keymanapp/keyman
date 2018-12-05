@@ -59,6 +59,11 @@ else
   wine = find_program('wine', required: false)
   kmcomp_cmd = [wine, kmcomp]
   if not wine.found()
+    # We assign the unfound wine external program object to kmcomp
+    # to cause the kmcomp object to fail too, as without wine we
+    # cannot execute kmcomp.exe on non-Windows systems.
+    # NOTE: a disabler() would be ideal here, but we need to support
+    # pre 0.45 versions of meson.
     kmcomp = wine
   endif
 endif
