@@ -19,6 +19,12 @@ uses
 {
   Add permission for ALL APPLICATION PACKAGES to read %ProgramData%\Keyman folder
 }
+
+// This function is essentially a duplicate of EnginePostInstall in engine/inst/insthelper.
+// Copied here because there's a number of boilerplate changes required and it's not worth
+// refactoring as this is really a manual test app just to make sure that the permission
+// change applies. It may be useful as a fixup app in a situation where a user finds that
+// programdata permissions are broken?
 function EnginePostInstall: Boolean;
 var
   hFile: THandle;
