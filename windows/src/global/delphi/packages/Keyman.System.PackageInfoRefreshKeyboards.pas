@@ -6,7 +6,7 @@ uses
   System.Types,
 
   PackageInfo,
-  ProjectLog,
+  Keyman.Developer.System.Project.ProjectLog,
   utilfiletypes;
 
 type
@@ -51,9 +51,11 @@ uses
 
   BCP47Tag,
 
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.KMXFileLanguages,
   Keyman.System.KeyboardJSInfo,
   Keyman.System.KeyboardUtils,
+  Keyman.System.LanguageCodeUtils,
   kmxfile;
 
 const
@@ -228,7 +230,7 @@ begin
 
   // Need to test if the JS is a valid keyboard file.
   // This is a bit of a pain... but we have to stick with .js for compat
-  if IsKeyboardFileByContent(f) then
+  if not FileExists(f.FileName) or IsKeyboardFileByContent(f) then
     Exit(ftJavascript);
 
   Exit(ftOther);
@@ -239,6 +241,7 @@ var
   codes: TStringDynArray;
   lang: TPackageKeyboardLanguage;
   i: Integer;
+  s, t: string;
 begin
   //
   k.Languages.Clear;
@@ -248,10 +251,32 @@ begin
       codes := TKMXFileLanguages.GetKMXFileBCP47Codes(f.FileName);
       for i := 0 to High(codes) do
       begin
+        t := TCanonicalLanguageCodeUtils.FindBestTag(codes[i]);
+        if t = '' then
+          // We won't add codes that are unrecognised
+          Continue;
+
         lang := TPackageKeyboardLanguage.Create(f.Package);
-        lang.ID := codes[i];
-        // TODO: BCP47: <DeveloperBCP47LanguageLookup> Lookup default names
-        lang.Name := codes[i];
+
+        with TBCP47Tag.Create(t) do
+        try
+          Region := '';
+          lang.ID := Tag;
+
+          if not TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, lang.Name) then
+          begin
+            lang.Name := Language;
+          end;
+
+          if Script <> '' then
+          begin
+            if TLanguageCodeUtils.BCP47Languages.TryGetValue(Script, s) then
+              lang.Name := lang.Name + ' ('+s+')';
+          end;
+        finally
+          Free;
+        end;
+
         k.Languages.Add(lang);
       end;
     except
@@ -269,6 +294,9 @@ class function TPackageInfoRefreshKeyboards.FillKeyboardDetails(f: TPackageConte
 var
   ki: TKeyboardInfo;
 begin
+  if not FileExists(f.FileName) then
+    Exit(False);
+
   Result := True;
   pki.ID := TKeyboardUtils.KeyboardFileNameToID(f.FileName);
   pki.RTL := False;

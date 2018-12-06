@@ -1,5 +1,5 @@
 //
-//  KeymanTests.m
+//  KMInputMethodBrowserClientEventHandlerTests.m
 //  KeymanTests
 //
 //  Created by tom on 1/25/18.
@@ -7,12 +7,13 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "TestAppDelegate.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
 #import <OCMock/OCMock.h>
 
 @interface KeymanTests : XCTestCase
-
+@property (nonatomic, strong) TestAppDelegate * delegate;
 @end
 
 @implementation KeymanTests
@@ -20,10 +21,12 @@ KMInputMethodBrowserClientEventHandler * _im;
 
 - (void)setUp {
     [super setUp];
+    _delegate = [[TestAppDelegate alloc] init];
+    [[NSApplication sharedApplication] setDelegate:_delegate];
     // Put setup code here. This method is called before the invocation of each test method in the class.
     NSString *path = [[NSBundle bundleForClass:[KeymanTests class]] pathForResource:@"SimpleTest.kmx" ofType:nil];
     KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
-    [((KMInputMethodAppDelegate *)[NSApp delegate]) setKmx:kmxFile];
+    [_delegate setKmx:kmxFile];
     _im = [[KMInputMethodBrowserClientEventHandler alloc] init];
 }
 
@@ -47,8 +50,9 @@ KMInputMethodBrowserClientEventHandler * _im;
     {
         [_im checkContextIn:client];
     }
-    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:NSTimeIntervalSince1970 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:0];
+    NSEvent *event = [_delegate keyStrokeEventForCharacter: @"a" keyCode:kVK_ANSI_A];
     [_im handleEvent:event client:client];
+    [client verify];
 }
 
 @end

@@ -10,7 +10,10 @@
 #import "KMInputMethodAppDelegate.h"
 #import "KMConfigColumn1CellView.h"
 #import "KMConfigColumn3CellView.h"
+#import "KMPackage.h"
 
 @interface KMConfigurationWindowController : NSWindowController <NSTableViewDelegate, NSTableViewDataSource>
+
+- (void)handleRequestToInstallPackage:(KMPackage *) package;
 
 @end

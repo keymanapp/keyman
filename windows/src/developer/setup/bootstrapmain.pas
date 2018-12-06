@@ -215,15 +215,16 @@ BEGIN
 
         ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3310
 
-        if not SysUtils.FileExists(ExtPath + 'setup.inf') then  // I3310
+        if ParamStr(1) <> '--test-dialog' then
         begin
-          LogError('The file "setup.inf" is missing.  Setup cannot continue.');
-          Exit;
-        end;
+          if not SysUtils.FileExists(ExtPath + 'setup.inf') then  // I3310
+          begin
+            LogError('The file "setup.inf" is missing.  Setup cannot continue.');
+            Exit;
+          end;
 
-        FInstallInfo.Load;
-        {TESTING CODE: ExtPath := 'c:\keyman\5.1\devel\kmredist';
-        SFXDetails.Flags := [sdfRegistered, sdfGraphicDialog];}
+          FInstallInfo.Load;
+        end;
 
         with TfrmRun.Create(nil) do
         try

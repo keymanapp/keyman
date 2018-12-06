@@ -15,13 +15,19 @@ type
     FBCP47Languages: TDictionary<string,string>;
     FBCP47Scripts: TDictionary<string,string>;
     FBCP47Regions: TDictionary<string,string>;
+    FSuppressScripts: TDictionary<string,string>;
+    FAllTags: TDictionary<string,TArray<string>>;
 
     class procedure BuildISO6393ToBCP47; static;
     class procedure BuildLCIDToBCP47; static;
     class procedure BuildSubtagRegistry; static;
+    class procedure BuildAllTagsRegistry; static;
     class function GetBCP47Languages: TDictionary<string, string>; static;
     class function GetBCP47Regions: TDictionary<string, string>; static;
     class function GetBCP47Scripts: TDictionary<string, string>; static;
+    class function GetAllTags: TDictionary<string, TArray<string>>; static;
+    class function GetSuppressScripts: TDictionary<string, string>; static;
+    class procedure BuildSuppressScripts; static;
   public
     class function TranslateISO6393ToBCP47(codes: TStringDynArray): TStringDynArray; overload; static;
     class function TranslateISO6393ToBCP47(code: string): string; overload; static; // single code
@@ -38,15 +44,20 @@ type
     class property BCP47Languages: TDictionary<string,string> read GetBCP47Languages;
     class property BCP47Scripts: TDictionary<string,string> read GetBCP47Scripts;
     class property BCP47Regions: TDictionary<string,string> read GetBCP47Regions;
+    class property AllTags: TDictionary<string,TArray<string>> read GetAllTags;
+    class property SuppressScripts: TDictionary<string,string> read GetSuppressScripts;
   end;
 
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
   Keyman.System.Standards.BCP47SubtagRegistry,
+  Keyman.System.Standards.BCP47SuppressScriptRegistry,
   Keyman.System.Standards.ISO6393ToBCP47Registry,
   Keyman.System.Standards.LCIDToBCP47Registry,
+  Keyman.System.Standards.NRSIAllTagsRegistry,
 
   utilstr;
 
@@ -63,8 +74,7 @@ end;
 
 class function TLanguageCodeUtils.TranslateISO6393ToBCP47(code: string): string;
 begin
-  if not Assigned(FISO6393ToBCP47) then
-    BuildISO6393ToBCP47;
+  BuildISO6393ToBCP47;
 
   if not FISO6393ToBCP47.TryGetValue(code, Result) then
     Result := code;
@@ -96,23 +106,37 @@ end;
 
 class function TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(code: Integer): string;
 begin
-  if not Assigned(FLCIDToBCP47) then
-    BuildLCIDToBCP47;
+  BuildLCIDToBCP47;
 
   if not FLCIDToBCP47.TryGetValue(code, Result) then
     Result := '';
 end;
 
+class procedure TLanguageCodeUtils.BuildAllTagsRegistry;
+begin
+  if not Assigned(FAllTags) then
+  begin
+    FAllTags := TDictionary<string,TArray<string>>.Create;
+    TNRSIAllTagsMap.Fill(FAllTags);
+  end;
+end;
+
 class procedure TLanguageCodeUtils.BuildISO6393ToBCP47;
 begin
-  FISO6393ToBCP47 := TDictionary<string,string>.Create;
-  TISO6393ToBCP47Map.Fill(FISO6393ToBCP47);
+  if not Assigned(FISO6393ToBCP47) then
+  begin
+    FISO6393ToBCP47 := TDictionary<string,string>.Create;
+    TISO6393ToBCP47Map.Fill(FISO6393ToBCP47);
+  end;
 end;
 
 class procedure TLanguageCodeUtils.BuildLCIDToBCP47;
 begin
-  FLCIDToBCP47 := TDictionary<Integer,string>.Create;
-  TLCIDToBCP47Map.Fill(FLCIDToBCP47);
+  if not Assigned(FLCIDToBCP47) then
+  begin
+    FLCIDToBCP47 := TDictionary<Integer,string>.Create;
+    TLCIDToBCP47Map.Fill(FLCIDToBCP47);
+  end;
 end;
 
 class procedure TLanguageCodeUtils.BuildSubtagRegistry;
@@ -145,6 +169,12 @@ begin
   end;
 end;
 
+class function TLanguageCodeUtils.GetAllTags: TDictionary<string, TArray<string>>;
+begin
+  BuildAllTagsRegistry;
+  Result := FAllTags;
+end;
+
 class function TLanguageCodeUtils.GetBCP47Languages: TDictionary<string, string>;
 begin
   BuildSubtagRegistry;
@@ -155,6 +185,31 @@ class function TLanguageCodeUtils.GetBCP47Scripts: TDictionary<string, string>;
 begin
   BuildSubtagRegistry;
   Result := FBCP47Scripts;
+end;
+
+class function TLanguageCodeUtils.GetSuppressScripts: TDictionary<string, string>;
+begin
+  BuildSuppressScripts;
+  Result := FSuppressScripts;
+end;
+
+class procedure TLanguageCodeUtils.BuildSuppressScripts;
+var
+  FScripts: TStringList;
+  i: Integer;
+begin
+  if not Assigned(FSuppressScripts) then
+  begin
+    FSuppressScripts := TDictionary<string,string>.Create;
+    FScripts := TStringList.Create;
+    try
+      FScripts.Text := SuppressScriptSubtagRegistry;
+      for i := 0 to FScripts.Count - 1 do
+        FSuppressScripts.Add(FScripts.Names[i], FScripts.ValueFromIndex[i]);
+    finally
+      FScripts.Free;
+    end;
+  end;
 end;
 
 class function TLanguageCodeUtils.LanguageName(const LanguageName, ScriptName, RegionName: string): string;
@@ -204,5 +259,6 @@ finalization
   FreeAndNil(TLanguageCodeUtils.FBCP47Languages);
   FreeAndNil(TLanguageCodeUtils.FBCP47Regions);
   FreeAndNil(TLanguageCodeUtils.FBCP47Scripts);
+  FreeAndNil(TLanguageCodeUtils.FAllTags);
 end.
 

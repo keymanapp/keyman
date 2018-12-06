@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  
+  <!-- Set the viewport width to match iOS device widths                         
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />   -->
+  <meta name="viewport" content="width=device-width,user-scalable=no" /> 
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  
+  <!-- Enable IE9 Standards mode -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+    
+  <title>Keyman Developer Keyboard Package Installation Site</title>
+
+  <style type='text/css'>   
+    body {
+        padding-left: 10px;
+        margin-left: 12px;
+    }
+
+    h2 { 
+        font-family: sans-serif 
+    }
+
+    .install-link { 
+      background: none repeat scroll 0 0 #CCCCCC;
+      border: 1px solid #444444;
+      border-radius: 4px;
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+      color: #444444;
+      display: none;
+      font-family: Sans-serif;
+      font-size: 10pt;
+      margin: 0;
+      padding: 6px;
+      margin: 2px;
+      text-decoration: none;
+    }
+    
+    /** Mobile, Tablet **/
+    
+    #install-link {
+      font-weight: bold;
+    }
+    
+    .install-link .ios,
+    .install-link .android {
+      display: none;
+    }
+
+    .touch-device #install-link,
+    .touch-device-ios #install-link-ios,
+    .touch-device-android #install-link-android {
+      display: inline-block;
+    }
+
+    .touch-device-android .install-link .android,
+    .touch-device-ios .install-link .ios {
+      display: inline;
+    }
+  </style> 
+</head>
+  
+<body>
+  <h2>Available Packages for Installation</h2>
+
+  <p>Clicking the package links below will download and install the package into the Keyman app on this device.</p>
+  
+  <ul id='packages'>
+  </ul>
+  
+  <p>You can add more packages to this list by opening the package source in the Package Editor and clicking
+  [Test Online].</p>
+
+  <!-- The following dynamic script will register each of the additional packages -->
+<script>
+  var packages = null, packagesJSON = '';
+  
+  function ajaxRequest(){
+    var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
+    if (window.ActiveXObject) { //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
+      for (var i=0; i<activexmodes.length; i++) {
+        try {
+          return new ActiveXObject(activexmodes[i]);
+        } catch(e) {
+          //suppress error
+        }
+      }
+    } else if (window.XMLHttpRequest) { // if Mozilla, Safari etc
+      return new XMLHttpRequest();
+    }
+   return false;
+  }
+  
+  function updatePackages(data) {
+    var dataJSON = JSON.stringify(data);
+    if(packagesJSON !== dataJSON) {
+      packagesJSON = dataJSON;
+      packages = data;
+      if(!data.packages) {
+        return false;
+      }
+      
+      var ul = document.getElementById('packages');
+      ul.innerHTML = '';
+      if(data.packages.length == 0) {
+        var li = document.createElement('li');
+        li.innerText = 'No packages available.';
+        ul.appendChild(li);
+        return true;
+      }
+      
+      for(var i = 0; i < data.packages.length; i++) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '/package/'+data.packages[i].id;
+        a.innerText = data.packages[i].name;
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+    }
+  }
+
+  function checkPackages() {
+    var req=new ajaxRequest();
+    req.onreadystatechange = function() {
+      if (req.readyState==4) {
+        if (req.status==200) {
+          updatePackages(JSON.parse(req.responseText));
+        }
+      }
+    }
+    req.open("GET", "/inc/packages.json", true);
+    req.send(null);
+  }
+  
+  checkPackages();
+  
+  window.setInterval(checkPackages, 2000);
+</script>
+</body>
+</html>

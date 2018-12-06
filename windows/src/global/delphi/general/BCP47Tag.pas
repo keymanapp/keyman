@@ -49,6 +49,8 @@ type
     function IsCanonical: Boolean; overload;
     function IsCanonical(var msg: string): Boolean; overload;
 
+    procedure Canonicalize;
+
     property Language: string read FLanguage write SetLanguage;
     property ExtLang: string read FExtLang write SetExtLang;
     property Script: string read FScript write SetScript;
@@ -69,9 +71,19 @@ implementation
 uses
   System.RegularExpressions,
 
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils;
 
 { TBCP47Tag }
+
+procedure TBCP47Tag.Canonicalize;
+var
+  newTag: string;
+begin
+  newTag := TCanonicalLanguageCodeUtils.FindBestTag(Tag);
+  if newTag <> '' then
+    SetTag(newTag);
+end;
 
 procedure TBCP47Tag.Clear;
 begin

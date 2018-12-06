@@ -38,3 +38,4 @@ EXPORTS
       Keyman_StartExit
       Keyman_ResetInitialisation
       
+	  Keyman_WriteDebugEvent

@@ -12,7 +12,6 @@ uses
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   TntDialogHelp in 'TntDialogHelp.pas',
   httpuploader_messageprocessor_windows in 'httpuploader_messageprocessor_windows.pas',
   SetupForm in 'SetupForm.pas',

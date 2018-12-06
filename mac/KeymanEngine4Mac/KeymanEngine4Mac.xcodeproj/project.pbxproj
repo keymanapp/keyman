@@ -45,9 +45,12 @@
 		984C2B161A79CA4F0023F89D /* KVKFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2B021A79CA4F0023F89D /* KVKFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2B171A79CA4F0023F89D /* KVKFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2B031A79CA4F0023F89D /* KVKFile.m */; };
 		984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2B181A79CB020023F89D /* WindowsVKCodes.h */; };
+		E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E224323E20D37E97006940A1 /* PlatformTest.kmx */; };
 		E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A1020113DC100233965 /* KMEngineTests.m */; };
 		E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */; };
+		E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */; };
 		E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */; };
+		E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,10 +105,13 @@
 		984C2B021A79CA4F0023F89D /* KVKFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KVKFile.h; sourceTree = "<group>"; };
 		984C2B031A79CA4F0023F89D /* KVKFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KVKFile.m; sourceTree = "<group>"; };
 		984C2B181A79CB020023F89D /* WindowsVKCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowsVKCodes.h; sourceTree = "<group>"; };
+		E224323E20D37E97006940A1 /* PlatformTest.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlatformTest.kmx; sourceTree = "<group>"; };
 		E22A5A1020113DC100233965 /* KMEngineTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMEngineTests.m; sourceTree = "<group>"; };
 		E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeymanEngineTestsStaticHelperMethods.h; sourceTree = "<group>"; };
 		E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeymanEngineTestsStaticHelperMethods.m; sourceTree = "<group>"; };
+		E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = CipherMusicUnicode.kmx; sourceTree = "<group>"; };
 		E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestMacEngine.kmx; sourceTree = "<group>"; };
+		E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMkeyViewProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +136,7 @@
 		981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */ = {
 			isa = PBXGroup;
 			children = (
+				E28C71E420EBBA2C002D959D /* KMkeyViewProtocol.h */,
 				981880651BC1EA5800A1FBA5 /* KeyLabel.h */,
 				981880661BC1EA5800A1FBA5 /* KeyLabel.m */,
 				981880671BC1EA5800A1FBA5 /* KeyLabelCell.h */,
@@ -197,6 +204,8 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */,
+				E224323E20D37E97006940A1 /* PlatformTest.kmx */,
 				E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */,
 				984C2AE31A79C98D0023F89D /* Info.plist */,
 			);
@@ -259,6 +268,7 @@
 				984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */,
 				980053351B37C9B50088DDDD /* NFont.h in Headers */,
 				9818807B1BC1EE9700A1FBA5 /* TimerTarget.h in Headers */,
+				E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */,
 				984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */,
 				984C2B0C1A79CA4F0023F89D /* KMCompGroup.h in Headers */,
 				984C2B101A79CA4F0023F89D /* KMCompStore.h in Headers */,
@@ -361,6 +371,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
+				E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */,
+				E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,6 +467,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -547,6 +560,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
 		};
@@ -555,6 +569,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -568,6 +583,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Release;
 		};

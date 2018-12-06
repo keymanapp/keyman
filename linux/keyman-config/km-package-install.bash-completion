@@ -1,0 +1,38 @@
+#/usr/bin/env bash
+
+_km-package-install_completions()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-h --help -v --verbose -vv --veryverbose --version -p --package -f --file -s --shared"
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+
+    case "${prev}" in
+        "-k"|"--keyboardid")
+            words=""
+            if [[ ! -s ~/.cache/keyman/kmpdirlist ]] ; then
+                if [[ -e ./km-package-install ]]; then
+                    python3 -c "from imp import load_source;load_source('km_package_install', './km-package-install');from km_package_install import list_keyboards;list_keyboards()"
+                else
+                    python3 -c "from imp import load_source;load_source('km_package_install', '/usr/bin/km-package-install');from km_package_install import list_keyboards;list_keyboards()"
+                fi
+            fi
+
+            if [[ -r ~/.cache/keyman/kmpdirlist ]] ; then
+                for file in `cat ~/.cache/keyman/kmpdirlist`; do words="${words} ${file}"; done
+                COMPREPLY=($(compgen -W "${words}" -- ${cur}))
+                return 0
+            fi
+            ;;
+        *)
+        ;;
+    esac
+}
+
+complete -F _km-package-install_completions km-package-install

@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- From Keyman colour palette -->
+    <color name="analagous_1">#D2782E</color>
+    <color name="analagous_2">#C9872F</color>
+    <color name="analagous_3">#C06033</color>
+    <color name="analagous_4">#D44B2C</color>
+    <color name="analagous_5">#F68924</color>
+    <color name="analagous_6">#CC3846</color>
+    <color name="complementary_1">#F69169</color>
+    <color name="complementary_2">#773017</color>
+    <color name="complementary_3">#C06033</color>
+    <color name="complementary_4">#00735E</color>
+    <color name="complementary_5">#0AB8A0</color>
+    <color name="complementary_6">#79C3DA</color>
+    <color name="neutral_1">#000000</color>
+    <color name="neutral_2">#6D6C6F</color>
+    <color name="neutral_3">#929396</color>
+    <color name="neutral_4">#C9CACA</color>
+    <color name="neutral_5">#DADDDC</color>
+
+    <color name="keyman_orange">@color/analagous_5</color>
+    <color name="keyman_red">@color/analagous_6</color>
+    <color name="keyman_blue">@color/complementary_6</color>
+
     <color name="yellow_background">#FFFFFFCF</color>
-    <color name="keyman_orange">#FFFF7132</color>
-    <color name="keyman_red">#FFC82236</color>
-    <color name="keyman_blue">#FF4CB8D1</color>
+    <color name="activated_bg">@color/complementary_1</color>
+
 </resources>

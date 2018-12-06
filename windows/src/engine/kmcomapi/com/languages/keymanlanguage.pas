@@ -192,7 +192,7 @@ begin
       kbd := Items[i] as IKeymanKeyboardInstalled;
       for j := 0 to kbd.Languages.Count - 1 do
       begin
-        if kbd.Languages[j].ProfileGUID = Get_ProfileGUID then
+        if kbd.Languages[j].IsInstalled and (kbd.Languages[j].ProfileGUID = Get_ProfileGUID) then
           Exit(kbd.Languages[j]);
       end;
     end;

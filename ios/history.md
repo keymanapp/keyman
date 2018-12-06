@@ -1,11 +1,74 @@
 # Keyman for iPhone and iPad Version History
 
+## 11.0 alpha
+* Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
+* Bookmark add button is enabled only when title/url fields have text (#1073)
+* Removed deprecated code to to support keyman:// scheme for ad-hoc distribution (#1160)
+* Updated the default keyboard to SIL EuroLatin (#1288)
+* Fixed bug behind some crashes of system keyboard (#1166)
+* Added support for keypress error feedback (#257)
+* Fixed ongoing issues with keyboard rotation and sizing, including the iPhone X notch. (#444) (#1045)
+* Fixed keyboard display/overlap of "Getting Started" info panel, added keyboard hide/display API functions. (#1084)
+
+## 2018-08-02 10.0.208 stable 
+* Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159) 
+
+## 2018-07-06 10.0.203 stable
+* Fixes an issue where a keyboard with varying row counts in different layers could crash (#1056, #1057)
+
+## 2018-06-28 10.0.200 stable
+* 10.0 stable release
+
+## 2018-06-27 10.0.163 beta
+* Fixes issue where next layer was not correctly selected when the first longpress key pressed (#1027)
+
+## 2018-06-26 10.0.162 beta
+* Fixes miskey when pressing between two keys (#1020)
+
+## 2018-06-14 10.0.161 beta
+* Fixes keyboard not responding to touch from #981 (#988)
+
+## 2018-06-13 10.0.160 beta
+* No changes affecting iOS
+
+## 2018-06-13 10.0.159 beta
+* No changes affecting iOS
+
+## 2018-06-13 10.0.158 beta
+* Bug fix installing a keyboard with missing metadata (#982)
+
+## 2018-06-13 10.0.157 beta
+* Improvements to device rotation (#981)
+
+## 2018-06-12 10.0.156 beta
+* No changes affecting iOS
+
+## 2018-06-11 10.0.155 beta
+* Platform tests (in keyboards) are now consistent across all platforms (#969)
+
+## 2018-06-07 10.0.154 beta
+* Fixed API call to fetch BCP-47 language ids and make keyboard updates more robust (#961)
+
+## 2018-06-06 10.0.147-10.0.153 beta
+* No actual code changes affecting iOS (#873)
+
+## 2018-05-18 10.0.146 beta
+* Code cleanup to remove warnings, etc. (#805)
+
+## 2018-05-17 10.0.145 beta
+* Fixes occasional repeated characters when typing rapidly (#865)
+
 ## 2018-05-04 10.0.144 beta
 * Refactor navigation bar branding. (#802)
 
-## 2018-04-25 10.0.141 beta
+## 2018-05-04 10.0.143 beta
 * Search google when an invalid URL is entered in the address bar. (#801)
-* Fix alphabetical list to be case insensitive on new keyboard list. (#722)
+
+## 2018-05-03 10.0.142 beta
+* Supports loading of keyboard .json files which include milliseconds in date formats (#804)
+
+## 2018-05-02 10.0.141 beta
+* Fix alphabetical list to be case insensitive on new keyboard list. (#803)
 
 ## 2018-04-25 10.0.140 beta
 * Fixed lack of output for certain punctuation longpress keys. (#702)

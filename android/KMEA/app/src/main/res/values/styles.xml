@@ -1,10 +1,11 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="AppTheme.Base" />
+
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize the theme here -->
+
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -12,27 +13,30 @@
         -->
     </style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    <!--style name="ToolbarStyle">
+        <item name="theme">@style/ToolbarTheme</item>
     </style>
 
+    <style name="ToolbarTheme">
+        <item name="android:background">@android:color/white</item>
+    </style-->
+
     <style name="PopupAnim">
-    	<item name="android:windowEnterAnimation">@anim/fade_in</item>
-    	<item name="android:windowExitAnimation">@anim/fade_out</item>
-	</style>
-	
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+    
     <style name="KeyPreviewAnim">
-    	<item name="android:windowEnterAnimation">@anim/key_preview_fade_in</item>
-    	<item name="android:windowExitAnimation">@anim/key_preview_fade_out</item>
-	</style>
+        <item name="android:windowEnterAnimation">@anim/key_preview_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/key_preview_fade_out</item>
+    </style>
     
     <style name="subkey_button" >
         <item name="android:background">@drawable/subkey_phone</item>
         <item name="android:gravity">center</item>
-    	<item name="android:textColor">#ffffff</item>
-    	<item name="android:textSize">18sp</item>
-    	<item name="android:textStyle">normal</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
   </style>
     
 </resources>

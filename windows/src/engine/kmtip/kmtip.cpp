@@ -29,7 +29,7 @@
 // IUnknown, ITfTextInputProcessor implementation.
 //
 
-#include "globals.h"
+#include "pch.h"
 #include "kmtip.h"
 
 //+---------------------------------------------------------------------------
@@ -169,7 +169,8 @@ STDAPI_(ULONG) CKMTipTextService::Release()
 
     if (_cRef == 0)
     {
-        delete this;
+      Log(L"CKMTipTextService::Release --> deleting");
+      delete this;
     }
 
     return cr;
@@ -182,7 +183,7 @@ STDAPI_(ULONG) CKMTipTextService::Release()
 //----------------------------------------------------------------------------
 
 STDAPI CKMTipTextService::ActivateEx(ITfThreadMgr *ptim, TfClientId tid, DWORD dwFlags) {   // I4216
-	Log(L"Activating text service ex");
+  LogEnter();
   ITfDocumentMgr *pFocusDoc;
 
   _cPreservedKeyCount = 0;   // I3588   // I3714
@@ -222,7 +223,7 @@ ExitError:
 
 STDAPI CKMTipTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
 {
-	Log(L"Activating text service");
+  LogEnter();
   ITfDocumentMgr *pFocusDoc;
 
   _cPreservedKeyCount = 0;   // I3588   // I3714
@@ -270,14 +271,16 @@ ExitError:
 
 STDAPI CKMTipTextService::Deactivate()
 {
-    _UninitThreadMgrSink();
-    _UninitKeystrokeSink();
-    _UninitKeyman();
+  LogEnter();
 
-    // we MUST release all refs to _pThreadMgr in Deactivate
-    SafeReleaseClear(_pThreadMgr);
+  _UninitThreadMgrSink();
+  _UninitKeystrokeSink();
+  _UninitKeyman();
 
-    _tfClientId = TF_CLIENTID_NULL;
+  // we MUST release all refs to _pThreadMgr in Deactivate
+  SafeReleaseClear(_pThreadMgr);
 
-    return S_OK;
+  _tfClientId = TF_CLIENTID_NULL;
+
+  return S_OK;
 }

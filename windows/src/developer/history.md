@@ -1,17 +1,180 @@
 # Keyman Developer Version History
 
-## 2018-05-03 10.0.1076.0 beta
-* Restrict modifier options to a small set by default in touch layout editor (#810)
-* Touch layout editor no longer leaves broken JSON when deleting or modifying some keys (#811)
-* Special keys imported from a visual keyboard into a touch layout now display correctly (#812)
-* Checking for online update when it is already running in background can crash Developer (#813)
-* Avoid crash if online update already running (#814)
-* Don't create a blank project on 'opening' a project, either on startup or via menu (#815)
-* Scroll text editor cursor into view after undo (#821)
+## 11.0 alpha
+* Refactor how keyboard_info metadata is generated (#1158)
+* New Feature: New Project from template and Import Keyboard (#1210)
+* New Feature: kmconvert command line utility (#1207)
+* New code editor using open source Monaco component (#1153, #1154, #1252)
+* Tidy up of installer to make future upgrades easier (#1175)
+* Support Linux targets (#1239)
+* Opening or creating a project now closes current editor files (#1242)
+* Projects can now include other related files such as history.md (#1243)
+* Keyman Developer now treats files as UTF-8 by default (#1244)
+
+## 2018-11-28 10.0.1206 stable
+* Add parameter `-add-help-link` to kmcomp (#1346)
+
+## 2018-11-07 10.0.1205 stable
+* Mitigation for issues with installation under certain languages in Windows 10 1803 or later (#1299)
+
+## 2018-09-28 10.0.1204 stable
+* Fix crash in Keyman Developer package editor when a compiled .js keyboard is missing (#1224)
+
+## 2018-09-12 10.0.1202 stable
+* Refactor how keyboard_info metadata is generated (#1174)
+
+## 2018-07-06 10.0.1201 stable
+* No changes to Keyman Developer (update to KeymanWeb script)
+
+## 2018-06-28 10.0.1200 stable
+* 10.0 stable release
+
+## 2018-06-27 10.0.1113.0 beta
+* No changes to Keyman Developer (update to KeymanWeb)
+
+## 2018-06-26 10.0.1112.0 beta
+* Keyman Developer no longer crashes if a .kpj.user file is deleted while in use (#1017)
+
+## 2018-06-21 10.0.1111.0 beta
+* No changes to Keyman Developer (update to KeymanWeb)
+
+## 2018-06-20 10.0.1110.0 beta
+* Script subtags are now appended for more scripts in the Keyboard languages dialog (#1006)
+* KeymanWeb 10.0 compiler now computes indexes correctly when deadkey and any used in a secondary group (#1008)
+
+## 2018-06-19 10.0.1109.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-15 10.0.1108.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-13 10.0.1107.0 beta
+* Add Unicode 11.0 characters
+
+## 2018-06-12 10.0.1106.0 beta
+* No changes to Keyman Developer
+ 
+## 2018-06-11 10.0.1105.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-09 10.0.1104.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-07 10.0.1103.0 beta
+* No changes to Keyman Developer
+
+## 2018-06-05 10.0.1102.0 beta
+* Improved crash reporting stability (#940)
+
+## 2018-06-03 10.0.1101.0 beta
+* Open Packages Page now opens the browser in Package Editor (#926)
+* Source editor no longer left-trims comments (#925)
+
+## 2018-06-01 10.0.1100.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-31 10.0.1099.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-30 10.0.1098.0 beta
+* Validate and lookup language names automatically in package editor (#911)
+* Feature: add .kmp download links from debug web server (#910)
+
+## 2018-05-29 10.0.1097.0 beta
+* Prevent a crash when attempting to load an invalid project file (#909)
+* Hide debug status panel in Test Mode (#908)
+
+## 2018-05-28 10.0.1096.0 beta
+* Fix for crash in regression testing restart (#907)
+
+## 2018-05-28 10.0.1095.0 beta
+* Renames touch layout extension from -layout.js to .keyman-touch-layout (#897)
+
+## 2018-05-26 10.0.1094.0 beta
+* Check that build succeeded before attempting to start debugger (#900)
+
+## 2018-05-25 10.0.1093.0 beta
+* Make longpress slash darker in touch layout editor (#898)
+
+## 2018-05-22 10.0.1092.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-17 10.0.1091.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-11 10.0.1090.0 beta
+* Fixed missing icons in project view (#864)
+
+## 2018-05-11 10.0.1087.0 beta
+* Opening an editor by double-clicking a message in message window can crash Developer (#857)
+
+## 2018-05-09 10.0.1086.0 beta
+* No changes to Keyman Developer (KeymanWeb updated)
+
+## 2018-05-08 10.0.1085.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-08 10.0.1084.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-08 10.0.1083.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-08 10.0.1082.0 beta
+* Fixes support for 'beep' statements in keyboard stores when compiling for web or mobile targets (#733)
+
+## 2018-05-07 10.0.1081.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-07 10.0.1080.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-07 10.0.1079.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-04 10.0.1078.0 beta
+* No changes to Keyman Developer
+
+## 2018-05-04 10.0.1077.0 beta
 * Correctly show the messages window after a compile (#822)
 
-## 2018-04-30 10.0.1067.0 beta
+## 2018-05-04 10.0.1076.0 beta
+* Don't create a blank project on 'opening' a project, either on startup or via menu (#815)
+* Scroll text editor cursor into view after undo (#821)
+
+## 2018-05-04 10.0.1075.0 beta
+* Ensure that compiled visual keyboard associates with correct base keyboard (#817)
+
+## 2018-05-03 10.0.1074.0 beta
+* Restrict modifier options to a small set by default in touch layout editor (#810)
+
+## 2018-05-03 10.0.1073.0 beta
+* Checking for online update when it is already running in background can crash Developer (#813)
+* Avoid crash if online update already running (#814)
+
+## 2018-05-03 10.0.1072.0 beta
+* Touch layout editor no longer leaves broken JSON when deleting or modifying some keys (#811)
+
+## 2018-05-03 10.0.1071.0 beta
+* Special keys imported from a visual keyboard into a touch layout now display correctly (#812)
+
+## 2018-04-30 10.0.1070.0 beta
 * BCP 47 picker in package editor now does name lookups and constrains codes as required by target operating systems (#746, #766)
+
+## 2018-04-30 10.0.1066.0 beta
+* Fixed broken test for valid match/nomatch output (#793)
+
+## 2018-04-27 10.0.1061.0 beta
+* Fixed broken context help (#779)
+
+## 2018-04-25 10.0.1060.0 beta
+* No changes in Keyman Developer (updated KeymanWeb)
+
+## 2018-04-25 10.0.1059.0 beta
+* No changes in Keyman Developer (updated KeymanWeb)
+
+## 2018-04-25 10.0.1058.0 beta
+* No changes in Keyman Developer
 
 ## 2018-04-12 10.0.1057.0 beta
 * No changes in Keyman Developer

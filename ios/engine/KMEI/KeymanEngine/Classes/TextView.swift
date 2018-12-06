@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextView: UITextView {
+public class TextView: UITextView, KeymanResponder {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -49,6 +49,8 @@ public class TextView: UITextView {
       inputAssistantItem.leadingBarButtonGroups = []
       inputAssistantItem.trailingBarButtonGroups = []
     }
+    
+    self.inputView = Manager.shared.inputViewController.view
 
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
@@ -56,14 +58,13 @@ public class TextView: UITextView {
   }
 
   // MARK: - Class Overrides
-  public override var inputView: UIView? {
+  public override var inputViewController: UIInputViewController? {
     get {
-      Manager.shared.keymanWebDelegate = self
-      return Manager.shared.keymanWeb.view
+      return Manager.shared.inputViewController
     }
 
-    set(inputView) {
-      super.inputView = inputView
+    set(inputViewController) {
+      _ = inputViewController
     }
   }
 
@@ -96,14 +97,6 @@ public class TextView: UITextView {
     log.debug("TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
   }
 
-  // Dismisses the keyboard if this textview is the first responder.
-  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
-  public func dismissKeyboard() {
-    log.debug("TextView: \(self.hashValue) Dismissing keyboard. Was first responder:\(isFirstResponder)")
-    resignFirstResponder()
-    Manager.shared.keymanWeb.view.endEditing(true)
-  }
-
   public override var text: String! {
     get {
       return super.text ?? ""
@@ -116,8 +109,8 @@ public class TextView: UITextView {
         super.text = ""
       }
 
-      Manager.shared.setText(self.text)
-      Manager.shared.setSelectionRange(selectedRange, manually: false)
+      Manager.shared.inputViewController.setText(self.text)
+      Manager.shared.inputViewController.setSelectionRange(selectedRange, manually: false)
     }
   }
 
@@ -177,54 +170,30 @@ public class TextView: UITextView {
   }
 }
 
-// MARK: - KeymanWebDelegate
-extension TextView: KeymanWebDelegate {
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if Manager.shared.isSubKeysMenuVisible {
-      return
-    }
-
-    if isInputClickSoundEnabled {
-      AudioServicesPlaySystemSound(0x450)
-
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
-      isInputClickSoundEnabled = false
-      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
-    }
-
-    let textRange = selectedTextRange ?? UITextRange()
-    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-
-    if selRange.length != 0 {
-      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
-    } else {
-      for _ in 0..<numCharsToDelete {
-        deleteBackward()
-      }
-      insertText(newText)
-    }
-
-    // Workaround for iOS 7 UITextView scroll bug
-    // TODO check if fixed
-    perform(#selector(self.scroll(toShowSelection:)), with: self, afterDelay: 0.1)
-    // Smaller delays are unreliable.
+extension KeymanResponder where Self: TextView {
+  // Dismisses the keyboard if this textview is the first responder.
+  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
+  public func dismissKeyboard() {
+    log.debug("TextView: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
+    resignFirstResponder()
+    Manager.shared.inputViewController.endEditing(true)
+  }
+  
+  public func summonKeyboard() {
+    becomeFirstResponder()
   }
 
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    dismissKeyboard()
-  }
-
-  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+  public func showKeyboardPicker() -> Bool {
     if let viewController = viewController {
       Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+      return true
     } else {
-      Manager.shared.switchToNextKeyboard()
+      return false
     }
   }
 }
 
-// MARK: - UITextViewDelegate
+//// MARK: - UITextViewDelegate
 extension TextView: UITextViewDelegate {
   public func textViewDidChangeSelection(_ textView: UITextView) {
     // Workaround for iOS 7 UITextView scroll bug
@@ -273,7 +242,7 @@ extension TextView: UITextViewDelegate {
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
-    Manager.shared.keymanWebDelegate = self
+    Manager.shared.currentResponder = self
 
     let fontName: String?
     if let id = Manager.shared.currentKeyboardID {

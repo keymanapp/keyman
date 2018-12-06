@@ -39,9 +39,9 @@ import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.ActionBar;
-import android.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -65,6 +65,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -75,7 +76,7 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
+public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
   ActivityCompat.OnRequestPermissionsResultCallback {
 
   // Fields used for installing kmp packages
@@ -93,7 +94,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
+  private Toolbar toolbar;
   private Menu menu;
+
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
 
@@ -130,12 +133,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     resultReceiver = new DownloadResultReceiver(new Handler());
-    final ActionBar actionBar = getActionBar();
-    actionBar.setLogo(R.drawable.keyman_logo);
-    actionBar.setDisplayShowTitleEnabled(false);
-    actionBar.setBackgroundDrawable(getActionBarDrawable(this));
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -145,15 +145,22 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     setContentView(R.layout.activity_main);
+
+    toolbar = (Toolbar) findViewById(R.id.titlebar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setTitle(null);
+    getSupportActionBar().setDisplayUseLogoEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setLogo(R.drawable.keyman_logo);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+    getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
+
     textView = (KMTextView) findViewById(R.id.kmTextView);
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     textView.setText(prefs.getString(userTextKey, ""));
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
-
-
-
 
     boolean didCheckUserData = prefs.getBoolean(MainActivity.didCheckUserDataKey, false);
     if (!didCheckUserData && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)) {
@@ -192,7 +199,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
             File newFile = new File(getDir("userdata", Context.MODE_PRIVATE), filename);
             copyFile(inputStream, newFile);
             inputStream.close();
-          } else if ((filename.endsWith(".js") || filename.endsWith(".ttf") || filename.endsWith(".otf"))) {
+          } else if (FileUtils.hasJavaScriptExtension(filename) || FileUtils.hasFontExtension(filename)) {
             File packagesDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
               KMManager.KMDefault_AssetPackages);
             if (!packagesDir.exists()) {
@@ -264,8 +271,6 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         case "file":
           checkStoragePermission(data);
           break;
-        // Intending to deprecate keyman:// protocol in https://github.com/keymanapp/keyman/issues/538
-        case "keyman" :
         case "http" :
         case "https" :
           Intent downloadIntent;
@@ -283,7 +288,8 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
               filename = url.substring(index);
             }
 
-            if (url.endsWith(".kmp")) {
+            // Only handle ad-hoc kmp packages
+            if (FileUtils.hasKeyboardPackageExtension(url)) {
               try {
                 // Download the KMP to app cache
                 downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -292,7 +298,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
                 downloadIntent.putExtra("receiver", resultReceiver);
 
                 progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setMessage("Downloading keyboard package\n" + filename + "...");
+                String ellipsisStr = "\u2026";
+                progressDialog.setMessage(String.format("%s\n%s%s",
+                  getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
                 progressDialog.setCancelable(false);
                 progressDialog.show();
 
@@ -305,23 +313,14 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
                 break;
               }
             } else {
-              // Legacy ad-hoc keyboard (JSON) distribution
-              downloadIntent = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-              Bundle bundle = new Bundle();
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_KEYBOARD,
-                data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Keyboard));
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANGUAGE,
-                data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language));
-              bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_URL, url);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_FILENAME, filename);
-              downloadIntent.putExtras(bundle);
-              startActivity(downloadIntent);
+              String message = "Download failed. Not a .kmp keyboard package.";
+              Toast.makeText(getApplicationContext(), message,
+                Toast.LENGTH_SHORT).show();
             }
           }
           break;
         default :
-          Log.d(TAG, "Unrecognized protocol " + data.getScheme());
+          Log.e(TAG, "Unrecognized protocol " + data.getScheme());
       }
     }
     intent.setData(null);
@@ -352,7 +351,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    getActionBar().setBackgroundDrawable(getActionBarDrawable(this));
+    getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
     resizeTextView(textView.isKeyboardVisible());
     invalidateOptionsMenu();
   }
@@ -512,9 +511,9 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
-    dialogBuilder.setTitle(String.format("Text Size: %d", textSize));
+    dialogBuilder.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
     dialogBuilder.setView(textSizeController);
-    dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         // Done
@@ -543,7 +542,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         textSize = progress + minTextSize;
         textView.setTextSize((float) textSize);
-        dialog.setTitle(String.format("Text Size: %d", textSize));
+        dialog.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
       }
     });
 
@@ -571,16 +570,16 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   private void showClearTextDialog() {
     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_trash);
-    dialogBuilder.setTitle("Clear Text");
-    dialogBuilder.setMessage("\nAll text will be cleared\n");
-    dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    dialogBuilder.setTitle(getString(R.string.action_clear_text));
+    dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.all_text_will_be_cleared)));
+    dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         textView.setText("");
       }
     });
 
-    dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    dialogBuilder.setNegativeButton(getString(R.string.label_cancel), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         // Cancel
@@ -614,15 +613,12 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
-      Log.d(TAG, "Received response for Storage permission request");
       if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
-        Log.d(TAG, "Permission: " + permissions[0] + " was " + grantResults[0]);
         useLocalKMP(data);
       } else {
         // Permission request denied
         String message = "Storage permission request was denied. Unable to install keyboard package";
-        Log.d(TAG, message);
         Toast.makeText(getApplicationContext(), message,
           Toast.LENGTH_SHORT).show();
       }
@@ -634,16 +630,13 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
         PackageManager.PERMISSION_GRANTED) {
-        Log.d(TAG, "Read external storage permission granted");
         useLocalKMP(data);
       } else {
-        Log.d(TAG, "Read external storage permission denied");
         // Permission is missing and must be requested
         requestStoragePermission();
       }
     } else {
       // Permission automatically granted on older Android versions
-      Log.d(TAG, "Read external storage permission granted");
       useLocalKMP(data);
     }
   }
@@ -674,7 +667,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
     InputStream inputFile = null;
     Bundle bundle = new Bundle();
     try {
-      boolean fileEndsWithKMP = false;
+      boolean isKMP = false;
       switch (data.getScheme().toLowerCase()) {
         case "content":
           // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
@@ -682,7 +675,7 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
-          fileEndsWithKMP = filename.endsWith(".kmp");
+          isKMP = FileUtils.hasKeyboardPackageExtension(filename);
           cacheKMPFilename = filename;
           inputFile = getContentResolver().openInputStream(data);
           break;
@@ -690,20 +683,19 @@ public class MainActivity extends Activity implements OnKeyboardEventListener, O
         case "file":
           File kmpFile = new File(data.getPath());
           filename = kmpFile.getName();
-          fileEndsWithKMP = data.toString().endsWith(".kmp");
+          isKMP = FileUtils.hasKeyboardPackageExtension(data.toString());
           cacheKMPFilename = kmpFile.getName();
           inputFile = new FileInputStream(kmpFile);
           break;
       }
 
-      if (fileEndsWithKMP) {
+      if (isKMP) {
         // Copy KMP to app cache
         cacheKMPFile = new File(MainActivity.this.getCacheDir().toString(), cacheKMPFilename);
         if (cacheKMPFile.exists()) {
           cacheKMPFile.delete();
         }
 
-        Log.d(TAG, "Copying " + filename + " to app cache");
         FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
       } else {
         String noKeyboardsInstalledMessage = " is not a valid keyboard package file.\nNo keyboards were installed.";

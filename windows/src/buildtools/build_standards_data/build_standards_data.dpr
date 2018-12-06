@@ -9,7 +9,8 @@ uses
   Keyman.System.BuildLanguageSubtagRegistry in 'Keyman.System.BuildLanguageSubtagRegistry.pas',
   Keyman.System.BuildISO6393Registry in 'Keyman.System.BuildISO6393Registry.pas',
   Keyman.Console.BuildStandardsData in 'Keyman.Console.BuildStandardsData.pas',
-  Keyman.System.BuildLCIDToBCP47Registry in 'Keyman.System.BuildLCIDToBCP47Registry.pas';
+  Keyman.System.BuildLCIDToBCP47Registry in 'Keyman.System.BuildLCIDToBCP47Registry.pas',
+  Keyman.System.BuildNRSIAllTags in 'Keyman.System.BuildNRSIAllTags.pas';
 
 begin
   try

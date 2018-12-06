@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.inputmethodservice.InputMethodService;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
    */
   @Override
   public View onCreateInputView() {
-    //Log.i("SystemKeyboard", "onCreateInputView");
     if (inputView == null) {
       inputView = KMManager.createInputView(this);
     }
@@ -105,7 +105,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    //Log.i("SystemKeyboard", "onStartInput");
+    // Select numeric layer if applicable
+    int inputType = attribute.inputType;
+    if (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
+        ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE)) {
+      KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    }
+
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
@@ -123,13 +129,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
-    //Log.i("SystemKeyboard", "onStartInputView");
   }
 
   @Override
   public void onUpdateExtractingVisibility(EditorInfo ei) {
     super.onUpdateExtractingVisibility(ei);
-    //Log.i("SystemKeyboard", "onUpdateExtractingVisibility");
   }
 
   @Override

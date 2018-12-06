@@ -26,7 +26,7 @@
                     13 Oct 2014 - mcdurdin - I4452 - V9.0 - Chinese keyboard is not working correctly
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 typedef BOOL (WINAPI *InitDllFunction)(PSTR name);
 

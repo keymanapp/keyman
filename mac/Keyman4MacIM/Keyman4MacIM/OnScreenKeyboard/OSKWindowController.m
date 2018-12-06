@@ -36,13 +36,18 @@
     [self.window setMinSize:NSMakeSize(size.width*0.8, size.height*0.8)];
     [self.window setBackgroundColor:[NSColor colorWithSRGBRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0]];
     
-    _helpButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 17, 17)];
-    [_helpButton setTitle:@""];
-    [_helpButton setBezelStyle:NSHelpButtonBezelStyle];
-    [_helpButton setControlSize:NSMiniControlSize];
-    [_helpButton setAction:@selector(helpAction:)];
-    [_helpButton setEnabled:[self hasHelpDocumentation]];
-    [self.window addViewToTitleBar:_helpButton positionX:NSWidth(self.window.frame) - NSWidth(_helpButton.frame) -10];
+    // # 1079: Versions of macOS prior to 10.10 do not support setting control size.
+    // Safest to just not add the help button at all on the OSK.
+    NSButton *helpBtn = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 17, 17)];
+    if (helpBtn && [helpBtn respondsToSelector:@selector(setControlSize:)]) {
+        _helpButton = helpBtn;
+        [_helpButton setTitle:@""];
+        [_helpButton setBezelStyle:NSHelpButtonBezelStyle];
+        [_helpButton setControlSize:NSMiniControlSize];
+        [_helpButton setAction:@selector(helpAction:)];
+        [_helpButton setEnabled:[self hasHelpDocumentation]];
+        [self.window addViewToTitleBar:_helpButton positionX:NSWidth(self.window.frame) - NSWidth(_helpButton.frame) -10];
+    }
 }
 
 - (void)windowDidLoad {
@@ -77,7 +82,9 @@
 - (void)resetOSK {
     [self.oskView setKvk:[self.AppDelegate kvk]];
     [self.oskView resetOSK];
-    [_helpButton setEnabled:[self hasHelpDocumentation]];
+    if (_helpButton) {
+        [_helpButton setEnabled:[self hasHelpDocumentation]];
+    }
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {

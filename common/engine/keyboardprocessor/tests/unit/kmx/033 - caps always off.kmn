@@ -1,0 +1,22 @@
+c Description: Tests Caps Lock always off
+c keys: [K_1][K_CAPS][K_2][K_CAPS][K_3]
+c expected: pass.pass.pass.
+c option: &capsLock=0
+c context: 
+
+store(&version) '10.0'
+
+store(&capsalwaysoff) '1'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [CAPS K_1] > 'fail.'
++ [NCAPS K_1] > 'pass.'
+
++ [CAPS K_2] > 'fail.'
++ [NCAPS K_2] > 'pass.'
+
++ [CAPS K_3] > 'fail.'
++ [NCAPS K_3] > 'pass.'

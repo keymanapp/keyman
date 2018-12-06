@@ -21,7 +21,7 @@
                     03 Feb 2015 - mcdurdin - I4551 - V9.0 - If Ctrl+Alt simulates RAlt is on, then Ctrl+Alt rules don’t work at all (both should work).
                     06 Feb 2015 - mcdurdin - I4583 - V9.0 - Remove altgr lookup test from keyman32 and put it into the registry
 */
-#include "keyman64.h"   // I4551
+#include "pch.h"   // I4551
 
 BYTE kbstate[256];
 

@@ -13,6 +13,8 @@
 
 CGFloat lw = 1.0;
 CGFloat r = 7.0;
+const NSTimeInterval delayBeforeRepeating = 0.5f;
+const NSTimeInterval repeatInterval = 0.05f;
 
 @interface KeyView ()
 @property (nonatomic, assign) NSUInteger keyCode;
@@ -43,21 +45,23 @@ CGFloat r = 7.0;
         [_label setBordered:NO];
         [_label setDrawsBackground:NO];
         [_label setAlignment:NSCenterTextAlignment];
-        [_label setLineBreakMode:NSLineBreakByClipping];
+        if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
+            [_label setLineBreakMode:NSLineBreakByClipping];
+        } // There might be some problem not calling this, but it seems to be okay as far as I can tell
         [_label setFont:[NSFont systemFontOfSize:fontSize]];
         [_label setTextColor:[NSColor blackColor]];
         [_label setStringValue:@""];
         [self addSubview:_label];
         
-        bgColor1 = [NSColor colorWithRed:209.0/255.0 green:211.0/255.0 blue:212.0/255.0 alpha:1.0];
-        bgColor2 = [NSColor colorWithRed:166.0/255.0 green:169.0/255.0 blue:172.0/255.0 alpha:1.0];
+        bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
+        bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
     }
     
     return self;
 }
 
 - (void)drawRect:(NSRect)rect {
-    [[NSColor colorWithRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0] setFill];
+    [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
     NSRectFillUsingOperation(rect, NSCompositeSourceOver);
     
     // Drawing code here.
@@ -163,7 +167,10 @@ CGFloat r = 7.0;
 }
 
 - (void)setBitmap:(NSImage *)bitmap {
-    // Bitmap is disabled;
+    // Bitmap is disabled: Per Marc, this is super low priority. Bitmaps are ugly and scale badly. We
+    // supported them a long time ago in Windows but you'd need to add support for Windows' BMP format
+    // to show them. I think we'd be better off not supporting them for now (just document as a platform
+    // difference).
     _bitmap = nil;
     /*
     _bitmap = bitmap;
@@ -191,7 +198,9 @@ CGFloat r = 7.0;
         [_caption setDrawsBackground:NO];
         //[_caption setBackgroundColor:[NSColor yellowColor]];
         [_caption setAlignment:NSLeftTextAlignment];
-        [_caption setLineBreakMode:NSLineBreakByClipping];
+        if ([_caption respondsToSelector:@selector(setLineBreakMode:)]) {
+            [_caption setLineBreakMode:NSLineBreakByClipping];
+        } // There might be some problem not calling this, but it seems to be okay as far as I can tell
         [_caption setFont:[NSFont systemFontOfSize:fontSize]];
         [_caption setTextColor:[NSColor darkGrayColor]];
         [_caption setStringValue:@""];
@@ -204,58 +213,97 @@ CGFloat r = 7.0;
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
-    if (!self.isModifierKey)
-        [self setKeyPressed:YES];
-    [self timerAction:nil];
-    if (!self.isModifierKey)
-        [self startTimerWithTimeInterval:0.5f];
+    @synchronized(self.target) {
+        if (!self.isModifierKey) {
+            // All KeyViews are about to get blown away and recreated, so we don't want the timer to fire
+            // again until some other key gets pressed.
+            [self stopTimer];
+        }
+        else {
+            [self setKeyPressed:YES];
+        }
+        [self processKeyClick];
+        if (!self.isModifierKey)
+            [self startTimerWithTimeInterval:delayBeforeRepeating];
+    }
 }
 
 - (void)mouseUp:(NSEvent *)theEvent {
-    if (!self.isModifierKey)
+    if (!self.isModifierKey) {
         [self setKeyPressed:NO];
-    [self stopTimer];
+        [self stopTimer];
+    }
+}
+
+-(void)processKeyClick {
+    [self.target keyAction:self];
 }
 
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
-    if (_keyEventTimer == nil) {
-        TimerTarget *timerTarget = [[TimerTarget alloc] init];
-        timerTarget.target = self;
-        _keyEventTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                          target:timerTarget
-                                                        selector:@selector(timerAction:)
-                                                        userInfo:nil
-                                                         repeats:YES];
+    @synchronized(self.target) {
+        if (_keyEventTimer == nil) {
+            // The TimerTarget class and the following two lines allow the timer to hold a *weak*
+            // reference to this KeyView object, so it can be disposed even if there is a timer waiting
+            // to fire that refers to it.
+            TimerTarget *timerTarget = [[TimerTarget alloc] init];
+            timerTarget.target = self;
+            _keyEventTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                              target:timerTarget
+                                                            selector:@selector(timerAction:)
+                                                            userInfo:nil
+                                                             repeats:YES];
+        }
     }
 }
 
 - (void)stopTimer {
-    if (_keyEventTimer != nil) {
-        [_keyEventTimer invalidate];
-        _keyEventTimer = nil;
+    @synchronized(self.target) {
+        //NSLog(@"KeyView TIMER - stopping");
+        if (_keyEventTimer != nil) {
+            [_keyEventTimer invalidate];
+            _keyEventTimer = nil;
+        }
     }
 }
 
 - (void)timerAction:(NSTimer *)timer {
-    ((void (*)(id, SEL))[self.target methodForSelector:self.action])(self.target, self.action);
-    if ([_keyEventTimer timeInterval] == 0.5f) {
-        [self stopTimer];
-        [self startTimerWithTimeInterval:0.05f];
+    @synchronized(self.target) {
+        //NSLog(@"KeyView TIMER - Fired for key %lu", [self keyCode]);
+        [self processKeyClick];
+        
+        if ([timer timeInterval] == delayBeforeRepeating) {
+            // Fired following a normal (non-modifier key press). As long as user continues to hold
+            // down that key, it will now begin to repeat every 0.05 seconds. All we really want to
+            // do is change the time interval, but NSTimer doesn't support that.
+            [self stopTimer];
+            [self startTimerWithTimeInterval:repeatInterval];
+        }
     }
 }
 
 - (void)setKeyPressed:(BOOL)keyPressed {
     _keyPressed = keyPressed;
     if (keyPressed) {
-        bgColor1 = [NSColor colorWithRed:109.0/255.0 green:111.0/255.0 blue:112.0/255.0 alpha:1.0];
-        bgColor2 = [NSColor colorWithRed:236.0/255.0 green:239.0/255.0 blue:242.0/255.0 alpha:1.0];
+        bgColor1 = [self getOpaqueColorWithRed:109 green:111 blue:112];
+        bgColor2 = [self getOpaqueColorWithRed:236 green:239 blue:242];
         [self setNeedsDisplay:YES];
     }
     else {
-        bgColor1 = [NSColor colorWithRed:209.0/255.0 green:211.0/255.0 blue:212.0/255.0 alpha:1.0];
-        bgColor2 = [NSColor colorWithRed:166.0/255.0 green:169.0/255.0 blue:172.0/255.0 alpha:1.0];
+        bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
+        bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
         [self setNeedsDisplay:YES];
     }
 }
 
+- (NSColor *)getOpaqueColorWithRed:(NSUInteger) red green: (NSUInteger) green blue: (NSUInteger) blue {
+    // RGB is what was in the code originally I can't tell any difference between that and SRGB for the
+    // colors we're using in the OSK, but at the risk of causing an unintended change, I'm leaving it as
+    // it was for versions of macOS that support colorWithRed:green:blue:
+    if ([NSColor respondsToSelector:@selector(colorWithRed:green:blue:alpha:)]) {
+        return [NSColor colorWithRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:1.0];
+    }
+    else {
+        return [NSColor colorWithSRGBRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:1.0];
+    }
+}
 @end

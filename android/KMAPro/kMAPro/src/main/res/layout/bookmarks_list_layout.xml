@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/bookmarks_toolbar" />
+
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_below="@id/bookmarks_toolbar"
         android:background="@android:color/white" />
-    
-    <TextView 
+
+    <TextView
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/bookmarks_toolbar"
         android:gravity="center"
         android:text="@string/no_bookmarks"
         android:background="@android:color/white" />
-    
-    <!-- *android:layout_above="@+id/toolbar" in ListView
-    <LinearLayout
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:background="@android:color/background_light" >
 
-        <ImageButton
-            android:id="@+id/addButton"
-            style="?android:attr/actionButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/image_button"
-            android:src="@drawable/ic_content_add" />
-        
-    </LinearLayout>
-    -->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addButton"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/image_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginRight="12dp"
+        android:src="@drawable/ic_add_white"
+        app:fabSize="normal"/>
+
 </RelativeLayout>

@@ -56,7 +56,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <headerheight>40</headerheight>
 </Dialog>
 
-<String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_GettingStarted" Version="7.0.239.0" Description="Configuration dialog link to Getting Started">Getting Started</String>
 <String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_Help" Version="7.0.239.0" Description="Configuration dialog link to Help">Help</String>
 
 <!-- Tab names and shortcut keys -->  
@@ -199,6 +198,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_ContactHeading" Version="9.0.465.0" Description="">Contact Keyman Support</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_ContactInstructions_Free" Version="9.0.465.0" Description="">If you have any issues using Keyman, just ask a question on the Keyman Community Forum.</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_CommunitySupport" Version="9.0.465.0" Description="">Open Keyman Community Forum</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_CreatedBySIL" Version="11.0.1500.0" Description="Support - SIL statement">Created by SIL International</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Copyright" Version="7.0.230.0" Description="Support - Product Copyright">Copyright &#xa9; SIL International. All Rights Reserved.</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Version" Version="7.0.230.0" Description="Support - version">Version</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_EngineVersion" Version="7.0.230.0" Description="Support - engine version">Engine Version</String>
@@ -406,7 +406,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 <Dialog Id="Help" Width="450" Height="300"></Dialog>
 <String Group="Help Dialog" Type="PlainText" Id="S_HelpTitle" Version="7.0.230.0" Description="Help - product name help">&Name; Help</String>
-<String Group="Help Dialog" Type="PlainText" Id="S_Help_Tutorial" Version="7.0.230.0" Description="Help - getting started tutorial name">Get Started</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Product" Version="7.0.230.0" Description="Help - help contents link title">Help Contents</String>
 
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Prefix" Version="7.0.230.0" Description="Help - text preceding keyboard name">Help on "</String>
@@ -451,7 +450,6 @@ keyboard layout for your language.</String>
 
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Welcome" Version="7.0.244.0" Description="Usage page - keyboard help button">Keyboard Help</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_OSK" Version="7.0.244.0" Description="Usage page - On Screen Keyboard button">On Screen Keyboard</String>
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_Tutorial" Version="7.0.244.0" Description="Usage page - Getting Started button">Get Started</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Help" Version="7.0.244.0" Description="Usage page - Product Help button">&Name; Help</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Config" Version="7.0.244.0" Description="Usage page - Product Configuration button">&Name; Configuration</String>
 <String Group="Usage Page" Type="HTML" Id="S_Usage_KeyboardNoDocumentation" Version="7.1.261.0" Description="Usage page - Text shown when keyboard has no documentation">This keyboard layout has no Getting Started or Usage documentation. Please check the Start Menu or contact the keyboard developer for more information on how to use this keyboard layout.</String>
@@ -529,11 +527,11 @@ Do you want to try and start &Name; again now?</String>
 
 <!-- Warnings -->
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKDebuggingWarning" Version="7.0.230.0" Description="Warning upon starting debugging in the Options tab">&Name; debug information will be stored in a text file called keymanlog\system.log on your desktop.  You should exit &Name; before reading or deleting this file.
+<String Group="Formatted Messages" Type="FormatString" Id="SKDebuggingWarning" Version="7.0.230.0" Description="Warning upon starting debugging in the Options tab">&Name; debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit &Name; before attempting to delete this file.
 
-WARNING: This file can grow large very quickly.  Enabling debugging will slow down your system and should only be done if advised by technical support.
+WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.
 
-PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session, and delete the [desktop]\keymanlog\system.log file as soon as possible.</String>
+PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</String>
 
 <!-- Microsoft Office -->
 

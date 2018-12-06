@@ -1,0 +1,28 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'mozhi-ff-issue'
+store(&COPYRIGHT) '© beniza'
+store(&MESSAGE) 'To test the FF compatibility issue'
+store(&KEYBOARDVERSION) '0.1'
+begin Unicode > use(main)
+
+group(main) using keys
+
+c ====================================================================
+c BUG
+c   We should find why this breaks only on FF
+c   My observations:
+c     - '്' is the virama (inherent vowel killer) in Malayalam.
+c     - For whatever reason in FF the rule is matches the preceding consonant also as part of the match.
+c     - Does Chrome and FF uses the same version of HarfBuzz?
+c --------------------------------------------------------------------
++ [K_K] > 'ക്'
+'്' + [K_R] > '്ര്' c <<<< This rule causes the Keyman compatibility issue in Firefox
+
+c ==========================================
+c WORKAROUND
+c   Re-write the keyboard to avoid rules that trigger the issue
+c ------------------------------------------
+store(cKeys) 'g'
+store(cValues)  'ഗ'
++ any(cKeys) > index(cValues, 1) '്'
+any(cValues) '്' + 'r' > index(cValues, 1) '്ര്' c <<<< This won't break in FF

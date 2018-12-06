@@ -36,7 +36,7 @@ interface
 uses
   System.Types,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ProjectFile, ProjectFileUI, CharacterMapSettings, Contnrs,
+  StdCtrls, ExtCtrls, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.UI.Project.ProjectFileUI, CharacterMapSettings, Contnrs,
   CharMapInsertMode, UfrmTike, TextFileFormat;
 
 type
@@ -68,6 +68,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    procedure StartClose; virtual;
 
     procedure TextFileFormatClick; virtual;
     function CanTextFileFormatClick: Boolean; virtual;
@@ -237,6 +239,11 @@ begin
   FProjectFile := Value;
   if Assigned(FProjectFile) then
     FProjectFile.AddFreeNotification(Self);
+end;
+
+procedure TfrmTikeChild.StartClose;
+begin
+  // Called to close down chromium windows
 end;
 
 {-------------------------------------------------------------------------------

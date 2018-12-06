@@ -79,6 +79,7 @@ type
     FRunUpgrade7: Boolean;
     FRunUpgrade8: Boolean;   // I4293
     FRunUpgrade9: Boolean;
+    FRunUpgrade10: Boolean;
     constructor Create;
     procedure DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
     function InstallNewVersion(var HasAcceptedUpdate: Boolean): Boolean;
@@ -97,6 +98,7 @@ type
     procedure RunVersion7Upgrade(const KMShellPath: WideString);
     procedure RunVersion8Upgrade(const KMShellPath: WideString);   // I4293
     procedure RunVersion9Upgrade(const KMShellPath: WideString);
+    procedure RunVersion10Upgrade(const KMShellPath: WideString);
     procedure CloseKeymanApplications;  // I2740
     procedure DeleteBackupPath; // I2747
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
@@ -114,6 +116,7 @@ type
     property RunUpgrade7: Boolean read FRunUpgrade7 write FRunUpgrade7;
     property RunUpgrade8: Boolean read FRunUpgrade8 write FRunUpgrade8;   // I4293
     property RunUpgrade9: Boolean read FRunUpgrade9 write FRunUpgrade9;
+    property RunUpgrade10: Boolean read FRunUpgrade10 write FRunUpgrade10;
   end;
 
 function GetRunTools: TRunTools;
@@ -122,32 +125,34 @@ procedure CheckMSIResult(res: UINT);
 implementation
 
 uses
+  System.Variants,
+  System.Win.ComObj,
   Vcl.Forms,
-  Keyman.System.UpdateCheckResponse,
+  Winapi.psapi,
+  Winapi.ShlObj,
+  Winapi.Tlhelp32,
+
+  jwamsi,
+  jwawintype,
 
   bootstrapmain,
-  comobj,
   errlogpath,
   GetOsVersion,
   HTTPUploader,
-  jwamsi,
-  jwawintype,
+  Keyman.System.UpgradeRegistryKeys,
+  Keyman.System.UpdateCheckResponse,
   KeymanPaths,
   OnlineConstants,
-  psapi,
   RegistryHelpers,
   RegistryKeys,
-  ShlObj,
   SetupStrings,
   SFX,
-  Tlhelp32,
   TntDialogHelp,
   ErrorControlledRegistry,
   UCreateProcessAsShellUser,
   Upload_Settings,
   utilsystem,
   utilexecute,
-  Variants,
   VersionInfo;
 
 var
@@ -182,7 +187,7 @@ end;
 function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates: Boolean): Boolean;
 begin
   Result := False;
-  
+
   if PackagesOnly
     then StatusMax := FInstallInfo.Packages.Count
     else StatusMax := 6 + FInstallInfo.Packages.Count;
@@ -198,9 +203,7 @@ begin
         CheckNewVersion;
       except
         on E:Exception do // I1440 - avoid update check failure stopping install
-        begin
-          MessageBox(0, PChar(E.Message), PChar('Error checking for updates'), MB_OK or MB_ICONHAND);
-        end;
+          LogError('Error checking for updates: '+E.Message);
       end;
     end;
     Status(FInstallInfo.Text(ssStatusInstalling));
@@ -677,7 +680,8 @@ begin
     RunVersion6Upgrade(FKMShellPath);
     RunVersion7Upgrade(FKMShellPath);  // I2548
     RunVersion8Upgrade(FKMShellPath);  // I4293
-    RunVersion9Upgrade(FKMShellPatH);
+    RunVersion9Upgrade(FKMShellPath);
+    RunVersion10Upgrade(FKMShellPath);
 
     { Install packages for all users }
     s := '-nowelcome -s -i '; //"'+ExtPath+'" ';
@@ -723,13 +727,14 @@ begin
 
   if res = ERROR_SUCCESS_REBOOT_REQUIRED then
   begin
-    if GetRunTools.PromptForReboot and (MessageDlgW(FInstallInfo.Text(ssQueryRestart), mtConfirmation, mbOkCancel, 0) = mrOk) then  // I3355   // I3500
+    if GetRunTools.PromptForReboot and
+      (MessageDlgW(FInstallInfo.Text(ssQueryRestart), mtConfirmation, [mbYes,mbNo], 0) = mrYes) then
     begin
       if not RestartWindows then
         GetRunTools.LogError(FInstallInfo.Text(ssErrorUnableToAutomaticallyRestart));
     end
     else
-      GetRunTools.LogError(FInstallInfo.Text(ssMustRestart), False);
+      GetRunTools.LogError(FInstallInfo.Text(ssMustRestart));
   end;
 end;
 
@@ -794,7 +799,7 @@ begin
   FAdjustTokenPrivileges(hToken, False, tkp, 0, nil, retlen);
   if GetLastError() <> ERROR_SUCCESS then Exit;
 
-  ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_APPLICATION or SHTDN_REASON_MINOR_INSTALLATION or SHTDN_REASON_FLAG_PLANNED);
+  Result := ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_APPLICATION or SHTDN_REASON_MINOR_INSTALLATION or SHTDN_REASON_FLAG_PLANNED);
 end;
 
 procedure TRunTools.RunVersion6Upgrade(const kmshellpath: WideString);
@@ -841,6 +846,17 @@ begin
   begin
     s := '"'+KMShellPath+'" -upgradekeyboards='; // I2548
     TUtilExecute.WaitForProcess(s+'9,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
+  end;
+end;
+
+procedure TRunTools.RunVersion10Upgrade(const KMShellPath: WideString);
+var
+  s: WideString;
+begin
+  if FRunUpgrade10 then
+  begin
+    s := '"'+KMShellPath+'" -upgradekeyboards='; // I2548
+    TUtilExecute.WaitForProcess(s+'10,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
   end;
 end;
 

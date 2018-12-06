@@ -756,11 +756,13 @@ if(!window['keyman']['initialized']) {
     {
       if(e && typeof(e.id) != 'undefined')
       {
+        //TODO: refactor this, it's pretty messy...
         var i, 
           idx = e.id.split('-'), 
           baseId = idx[idx.length-1], 
           layer = e['key'] && e['key']['layer'] ? e['key']['layer'] : (idx.length > 1 ? idx[0] : ''),
-          sp = e['key'] && e['key']['sp'];
+          sp = e['key'] && e['key']['sp'],
+          nextlayer = e['key'] && e['key']['nextlayer'] ? e['key']['nextlayer'] : null;
         if(typeof e.subKeys != 'undefined' && e.subKeys.length > 0 && (e.subKeys[0].id != baseId || e.subKeys[0].layer != layer))
         {
           var eCopy={'id':baseId,'layer':'','key':undefined};
@@ -769,6 +771,9 @@ if(!window['keyman']['initialized']) {
           }
           if(sp) {
             eCopy['sp'] = sp;
+          }
+          if(nextlayer) {
+            eCopy['nextlayer'] = nextlayer;
           }
           for(i = 0; i < e.childNodes.length; i++) {
             if(osk.hasClass(e.childNodes[i],'kmw-key-text')) break;
@@ -795,24 +800,24 @@ if(!window['keyman']['initialized']) {
      * @param       {string}      keyName   custom virtual key code to lookup in the dictionary
      * @return      {number}                key code > 255 on success, or 0 if not found
      */
-    osk.getVKDictionaryCode = function(keyName)
-    {
+    osk.getVKDictionaryCode = function(keyName) {
       var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-      if(!activeKeyboard['VKDictionary'])
-      {
+      if(!activeKeyboard['VKDictionary']) {
         var a=[];
-        if(typeof activeKeyboard['KVKD'] == 'string')
-        {
+        if(typeof activeKeyboard['KVKD'] == 'string') {
           // Build the VK dictionary
-          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  Makes the VKDictionary member unnecessary
+          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  
+          // Makes the VKDictionary member unnecessary.
           //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
           var s=activeKeyboard['KVKD'].split(' ');
-          for(var i=0; i<s.length; i++) a[s[i]]=i+256;
+          for(var i=0; i<s.length; i++) {
+            a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
+          }
         }
         activeKeyboard['VKDictionary']=a;
       }
 
-      var res=activeKeyboard['VKDictionary'][keyName];
+      var res=activeKeyboard['VKDictionary'][keyName.toUpperCase()];
       return res ? res : 0;
     }
     /**
@@ -1141,22 +1146,27 @@ if(!window['keyman']['initialized']) {
         }
 
         // Include *limited* support for mnemonic keyboards (Sept 2012)
-        if(activeKeyboard && (activeKeyboard['KM']))
-        {
-          var keyText=e.firstChild.firstChild.wholeText;
-          Lkc.LisVirtualKey=false; Lkc.LisVirtualKeyCode=false;
-          Lkc.vkCode=Lkc.Lcode;
-          if(Lkc.Lcode != osk.keyCodes['K_SPACE']) // exception required, March 2013
-          {
-            if(typeof keyText == 'string' && keyText != '')
-              Lkc.Lcode=keyText.charCodeAt(0);
-            else
-              Lkc.Lcode=0;
-            if(Lkc.Lcode == 160) Lkc.Lcode = 0;
+        // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
+        if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && device.formFactor != 'desktop')) {
+          if(Lkc.Lcode != osk.keyCodes['K_SPACE']) { // exception required, March 2013
+            Lkc.vkCode = Lkc.Lcode;
+            // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+            // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+            var mappedChar: string = osk.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
+            if(mappedChar) {
+              Lkc.Lcode = mappedChar.charCodeAt(0);
+            } // No 'else' - avoid remapping control + modifier keys!
+
+            if(osk._stateKeys['K_CAPS']) {
+              if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
+                Lkc.Lmodifiers ^= 0x10; // Flip the 'shift' bit.
+                Lkc.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+              }
+            }
           }
-          Lkc.Lmodifiers=0;
+        } else {
+          Lkc.vkCode=Lkc.Lcode;
         }
-        else Lkc.vkCode=Lkc.Lcode;
 
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
         if(typeof activeKeyboard['KM'] == 'undefined')
@@ -2863,8 +2873,8 @@ if(!window['keyman']['initialized']) {
       for(k = 0; k < t.childNodes.length; k++)
       {
         if(t.childNodes[k].firstChild.className.indexOf('key-hidden') >= 0) continue;
-        x1 = t.childNodes[k].firstChild.offsetLeft;
-        x2 = x1 + t.childNodes[k].firstChild.offsetWidth;
+        x1 = t.childNodes[k].offsetLeft;
+        x2 = x1 + t.childNodes[k].offsetWidth;
         dx =x1 - x;
         if(dx >= 0 && dx < dxMin)
         {
@@ -2878,7 +2888,7 @@ if(!window['keyman']['initialized']) {
       }
       if(dxMin < 100000)
       {
-        t = t.childNodes[k0].firstChild;
+        t = t.childNodes[k0];
         x1 = t.offsetLeft;
         x2 = x1 + t.offsetWidth;
 
@@ -2886,7 +2896,7 @@ if(!window['keyman']['initialized']) {
         if(t.offsetWidth > 40) dxMax = 0.6 * t.offsetWidth;
         if(((x1 - x) >= 0 && (x1 - x) < dxMax) ||
             ((x - x2) >= 0 && (x - x2) < dxMax))
-          return t;
+          return t.firstChild;
       }
       return null;
     }
@@ -3144,7 +3154,11 @@ if(!window['keyman']['initialized']) {
 
       if(unshiftedEmulationLayer == null && shiftedEmulationLayer == null) {
         // We've run out of things to go on; we can't detect if chiral AltGr emulation is intended or not.
-        console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
+        if(!osk.altGrWarning) {
+          console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
+          // Avoid spamming the console with warnings on every call of the method.
+          osk.altGrWarning = true;
+        }
       }
       return true;
     }
@@ -4331,10 +4345,22 @@ if(!window['keyman']['initialized']) {
         // TODO: are these needed, or do they interfere with other OSK event handling ????
         if(device.touchable) // I3363 (Build 301)
         {
-          util.attachDOMEvent(osk._Box,'touchstart',function(e){keymanweb.uiManager.setActivatingUI(true); e.preventDefault();e.stopPropagation();});
-          util.attachDOMEvent(osk._Box,'touchend',function(e){e.preventDefault(); e.stopPropagation();});
-          util.attachDOMEvent(osk._Box,'touchmove',function(e){e.preventDefault();e.stopPropagation();});
-          util.attachDOMEvent(osk._Box,'touchcancel',function(e){e.preventDefault();e.stopPropagation();});
+          var cancelEventFunc = function(e) {
+            if(e.cancelable) {
+              e.preventDefault();
+            }
+            e.stopPropagation();
+            return false;
+          };
+          
+          util.attachDOMEvent(osk._Box, 'touchstart', function(e) {
+            keymanweb.uiManager.setActivatingUI(true); 
+            return cancelEventFunc(e);
+          });
+          
+          util.attachDOMEvent(osk._Box, 'touchend', cancelEventFunc);
+          util.attachDOMEvent(osk._Box, 'touchmove', cancelEventFunc);
+          util.attachDOMEvent(osk._Box, 'touchcancel', cancelEventFunc);
 
           // Can only get (initial) viewport scale factor after page is fully loaded!
           osk.vpScale=util.getViewportScale();

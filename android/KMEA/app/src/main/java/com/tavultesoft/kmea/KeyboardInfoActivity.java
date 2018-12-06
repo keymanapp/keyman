@@ -9,7 +9,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,9 +30,12 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-// Public access is necessary to avoid IllegalAccessException
-public final class KeyboardInfoActivity extends Activity {
+import com.tavultesoft.kmea.util.FileUtils;
 
+// Public access is necessary to avoid IllegalAccessException
+public final class KeyboardInfoActivity extends AppCompatActivity {
+
+  private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> infoList = null;
   protected static Typeface titleFont = null;
@@ -42,28 +46,19 @@ public final class KeyboardInfoActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
-    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-    try {
-      int titleContainerId = (Integer) Class.forName("com.android.internal.R$id").getField("title_container").get(null);
-      ((ViewGroup) getWindow().findViewById(titleContainerId)).removeAllViews();
-    } catch (Exception e) {
-      Log.e("KeyboardInfoActivity", "Error: " + e);
-    }
 
-    getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.list_title_layout1);
-    setContentView(R.layout.list_layout);
+    setContentView(R.layout.activity_list_layout);
+    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+
     listView = (ListView) findViewById(R.id.listView);
 
-    final ImageButton backButton = (ImageButton) findViewById(R.id.left_button);
-    backButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        finish();
-      }
-    });
-
     final String kbID = getIntent().getStringExtra(KMManager.KMKey_KeyboardID);
-    //String langID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
     String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
@@ -77,16 +72,16 @@ public final class KeyboardInfoActivity extends Activity {
     infoList = new ArrayList<HashMap<String, String>>();
     String icon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
-    hashMap.put(titleKey, "Keyboard version");
+    hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     if (!isCustomKeyboard || customHelpLink != null) {
-      icon = String.valueOf(R.drawable.ic_action_next);
+      icon = String.valueOf(R.drawable.ic_arrow_forward);
       hashMap = new HashMap<String, String>();
-      hashMap.put(titleKey, "Help link");
+      hashMap.put(titleKey, getString(R.string.help_link));
       hashMap.put(subtitleKey, "");
       hashMap.put(iconKey, icon);
       infoList.add(hashMap);
@@ -104,7 +99,7 @@ public final class KeyboardInfoActivity extends Activity {
           Intent i = new Intent(Intent.ACTION_VIEW);
 
           if (customHelpLink != null) {
-            if (customHelpLink.endsWith("welcome.htm")) {
+            if (FileUtils.isWelcomeFile(customHelpLink)) {
               File customHelp = new File(new File(customHelpLink).getAbsolutePath());
               i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
@@ -127,6 +122,17 @@ public final class KeyboardInfoActivity extends Activity {
           }
         }
       }
+
+
     });
+
+
   }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    super.onBackPressed();
+    return true;
+  }
+
 }

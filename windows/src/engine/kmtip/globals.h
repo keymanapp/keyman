@@ -29,11 +29,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <windows.h>
-#include <ole2.h>
-#include <olectl.h>
-#include <msctf.h>
-
 #define assert(x)
 
 //
@@ -57,19 +52,22 @@ void GetDeadkeyFlags(TfEditCookie ec, ITfContext *pContext, PWSTR buf, int n);
 //
 
 void Log(WCHAR *fmt, ...);
-void LogPush(char *p);
-void LogPop();
 
-BOOL ShouldDebug_1();   // I4379
-int SendDebugMessage_1(char *file, int line, char *msg);   // I4379
-int SendDebugMessageFormat_1(char *file, int line, char *fmt, ...);   // I4379
-void DebugLastError_1(char *file, int line, char *func, char *date);   // I4379
+BOOL ShouldDebug();
+int SendDebugMessage_1(char *file, int line, PWCHAR msg);   // I4379
+int SendDebugMessageFormat_1(char *file, int line, PWCHAR fmt, ...);   // I4379
+void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err); 
 
+#define SendDebugMessage(msg) (SendDebugMessage_1(__FILE__, __LINE__, (msg)))
+#define SendDebugMessageFormat(msg,...) (SendDebugMessageFormat_1(__FILE__, __LINE__, (msg),__VA_ARGS__))
 
-#define SendDebugMessage(msg) (ShouldDebug() ? SendDebugMessage_1(__FILE__, __LINE__, (msg)) : 0)
-#define SendDebugMessageFormat(msg,...) (ShouldDebug() ? SendDebugMessageFormat_1(__FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
-#define ShouldDebug() ShouldDebug_1()
-#define DebugLastError() (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,__DATE__))
+#define DebugLastError(msg) (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,(msg),GetLastError()))
+#define DebugLastError0(msg,err) (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,(msg),(err)))
+
+//#define LogEnter() (SendDebugMessageFormat_1(__FILE__, __LINE__, L"%hs ENTER", __FUNCTION__))
+//#define LogExit() (SendDebugMessageFormat_1(__FILE__, __LINE__, L"%hs EXIT", __FUNCTION__))
+#define LogEnter()
+#define LogExit()
 
 //
 // Defines

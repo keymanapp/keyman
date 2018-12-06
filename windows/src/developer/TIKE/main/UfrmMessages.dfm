@@ -7,14 +7,13 @@ inherited frmMessages: TfrmMessages
   Caption = 'Messages'
   ClientHeight = 84
   ClientWidth = 312
-  FormStyle = fsStayOnTop
   OldCreateOrder = True
   OnDestroy = FormDestroy
   ExplicitWidth = 328
   ExplicitHeight = 123
   PixelsPerInch = 96
   TextHeight = 13
-  object memoMessage: TMemo
+  object memoMessage: TMemo [0]
     Left = 0
     Top = 0
     Width = 312

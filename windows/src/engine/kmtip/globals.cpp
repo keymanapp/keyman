@@ -25,7 +25,7 @@
 // Global variables.
 //
 
-#include "globals.h"
+#include "pch.h"
 
 HINSTANCE g_hInst;
 
@@ -40,52 +40,11 @@ const CLSID c_clsidKMTipTextService = { 0xFE0420F1, 0x38D1, 0x4B4C, { 0x96, 0xBF
 LOGGING
 */
 
-
-#define nl L"\r\n"
-#define utf16 "\xFF\xFE"
-
-//void Log(WCHAR *fmt, ...) {}
-
 void Log(WCHAR *fmt, ...) {   // I4379
 	WCHAR outbuf[264];
 	va_list vars;
 	va_start(vars, fmt);
   wcscpy_s(outbuf, L"kmtip: ");
 	wvsprintfW(wcschr(outbuf,0), fmt, vars);
-  SendDebugMessageFormat("%ws", outbuf);
+  SendDebugMessageFormat(L"%s", outbuf);
 }
-
-//char *logstack[100];
-//DWORD logstackt[100];
-//int logsp = 0;
-
-void LogPush(char *p) {}
-void LogPop() {}
-/*
-void PLogPush(char *p)
-{
-	if(logsp > 99) return; // blah it'll mess up but who cares
-
-	FILE *fp = NULL;
-	if(fopen_s(&fp, "c:\\kmtip.log", "at") == 0)  // I3481
-	{
-		fprintf(fp, "%*.*s%10.10d: ENTER %s\n", logsp, logsp, "", logstackt[logsp]=GetTickCount(), p);
-		fclose(fp);
-	}
-
-	logstack[logsp++] = p;
-}
-
-void PLogPop()
-{
-	if(logsp == 0) return;
-	--logsp;
-
-	FILE *fp = NULL;
-	if(fopen_s(&fp, "c:\\kmtip.log", "at") == 0)  // I3481
-	{
-		fprintf(fp, "%*.*s%10.10d: EXIT  %s\n", logsp, logsp, "", GetTickCount() - logstackt[logsp], logstack[logsp]);
-		fclose(fp);
-	}
-}
-*/

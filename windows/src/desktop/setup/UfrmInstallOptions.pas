@@ -32,6 +32,7 @@ type
     chkUpgradeKeyman7: TCheckBox;
     cmdOK: TButton;
     cmdCancel: TButton;
+    procedure FormCreate(Sender: TObject);
   private
     function GetCanUpgradeKeyman7: Boolean;
     function GetCheckForUpdates: Boolean;
@@ -60,7 +61,16 @@ implementation
 
 {$R *.dfm}
 
+uses
+  KeymanVersion;
+
 { TfrmInstallOptions }
+
+procedure TfrmInstallOptions.FormCreate(Sender: TObject);
+begin
+  // Keyman 11 and later version keyboards will always automatically update
+  chkUpgradeKeyman7.Caption := 'Upgrade earlier version Keyman Desktop keyboards to Keyman Desktop '+SKeymanVersion;
+end;
 
 function TfrmInstallOptions.GetCanUpgradeKeyman7: Boolean;
 begin

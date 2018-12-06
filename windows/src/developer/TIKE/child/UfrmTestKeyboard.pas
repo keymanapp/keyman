@@ -29,8 +29,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, ComCtrls, Buttons, int_kmdebug, Menus, ErrorControlledRegistry, 
-  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo, 
-  KeymanDeveloperMemo;
+  RegistryKeys, UfrmMDIChild, KeymanDeveloperDebuggerMemo;
 
 type
   TfrmTestKeyboard = class(TfrmTikeChild)
@@ -111,7 +110,7 @@ uses
   UfrmMessages,
   keyman32_int,
   UfrmMain,
-  utilstr;
+  utilstr, Unicode;
 
 {$R *.DFM}
 
@@ -409,7 +408,7 @@ var
   ch: WideString;
 begin
   if memo.SelText = '' then
-    ch := memo.GetTextPart(memo.SelStart-1, memo.SelStart)
+    ch := Unicode.CopyChar(memo.Text, memo.SelStart-1, 1)
   else
     ch := Copy(memo.SelText, 1, 16);
 

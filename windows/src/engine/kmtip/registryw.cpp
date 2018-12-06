@@ -16,6 +16,7 @@
   History:          01 Dec 2012 - mcdurdin - I3622 - V9.0 - Add Registry*W classes for Unicode
                     13 Dec 2012 - mcdurdin - I3675 - V9.0 - Minor updates to I3622 for consistency
 */
+#include "pch.h"
 #include "keyman64.h"   // I3622
 #include "registryw.h"
 

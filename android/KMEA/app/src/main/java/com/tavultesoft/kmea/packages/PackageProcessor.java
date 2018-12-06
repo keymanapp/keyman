@@ -33,6 +33,7 @@ import org.json.JSONObject;
  */
 public class PackageProcessor {
   private static File resourceRoot = null;
+  public static final String PPDefault_Version = "1.0";
 
   public static void initialize(File resourceRoot) {
     PackageProcessor.resourceRoot = resourceRoot;
@@ -48,12 +49,12 @@ public class PackageProcessor {
 
     if(filename.lastIndexOf('.') != -1) {
       // Android's temp downloads attach a suffix to the extension; .kmp isn't the end of the filename.
-      if(filename.lastIndexOf(".kmp") == -1) {
+      if(!FileUtils.hasKeyboardPackageExtension(filename)) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
       // Extract our best-guess name for the package and construct the temporary package name.
-      return filename.substring(0, filename.lastIndexOf(".kmp"));
+      return filename.substring(0, filename.toLowerCase().lastIndexOf(".kmp"));
     } else {
       throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
     }
@@ -100,7 +101,7 @@ public class PackageProcessor {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
-      Log.d("PackageProcessor", infoFile.toString() + " does not exist.");
+      Log.e("PackageProcessor", infoFile.toString() + " does not exist.");
       return null;
     }
   }
@@ -192,21 +193,22 @@ public class PackageProcessor {
         return name;
       }
     } catch (Exception e) {
-      return null;
+      // Developer will never allow package name to be undefined, but just in case, reuse package ID
+      return getPackageID(kmpPath);
     }
   }
 
   /**
    * Simply extracts the package's version number.
+   * If undefined, return default version "1.0"
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
-   * @throws JSONException
    */
-  public static String getPackageVersion(JSONObject json) throws JSONException {
-    if(json == null) {
-      return null;
-    } else {
+  public static String getPackageVersion(JSONObject json) {
+    try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
+    } catch (JSONException e) {
+      return PPDefault_Version;
     }
   }
 
@@ -221,7 +223,7 @@ public class PackageProcessor {
         return version;
       }
     } catch (Exception e) {
-      return null;
+      return PPDefault_Version;
     }
   }
 
@@ -322,7 +324,7 @@ public class PackageProcessor {
       FileFilter touchKeyboardFilter = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && pathname.getName().endsWith(".js")) {
+          if (pathname.isFile() && pathname.getName().startsWith(keyboardId) && FileUtils.hasJavaScriptExtension(pathname.getName())) {
             return true;
           }
           return false;
@@ -345,7 +347,7 @@ public class PackageProcessor {
       FileFilter welcomeFilter = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-          if (pathname.isFile() && pathname.getName().equals("welcome.htm")) {
+          if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
             return true;
           }
           return false;

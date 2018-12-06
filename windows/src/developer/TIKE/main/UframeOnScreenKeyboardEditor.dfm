@@ -19,6 +19,7 @@ inherited frameOnScreenKeyboardEditor: TframeOnScreenKeyboardEditor
     Align = alClient
     TabOrder = 0
     TabPosition = tpBottom
+    OnChange = pagesChange
     OnChanging = pagesChanging
     object pageDesign: TTabSheet
       Caption = 'Design'
@@ -365,10 +366,6 @@ inherited frameOnScreenKeyboardEditor: TframeOnScreenKeyboardEditor
     object pageCode: TTabSheet
       Caption = 'Code'
       ImageIndex = -1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 380
     end
   end
   object dlgVKImportXML: TOpenDialog

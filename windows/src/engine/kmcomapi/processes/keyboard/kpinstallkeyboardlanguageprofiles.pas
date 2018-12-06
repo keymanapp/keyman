@@ -43,8 +43,8 @@ uses
 type
   TKPInstallKeyboardLanguageProfiles = class(TKPBase)
     // Expects LANGIDs and LocaleNames in format 'en-US en 0409';
-    procedure Execute(const KeyboardName, KeyboardDescription: string; LangIDs: array of Integer; IconFileName: string; InstallFirstOnly: Boolean); overload;  // I3707   // I3768   // I4607
-    procedure Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string); overload;  // I3707   // I3768   // I4607
+    procedure Execute(const KeyboardID, KeyboardName: string; LangIDs: array of Integer; IconFileName: string; InstallFirstOnly: Boolean); overload;  // I3707   // I3768   // I4607
+    function Execute(const KeyboardID, KeyboardName, BCP47Tag, IconFileName, LanguageName: string): Boolean; overload;  // I3707   // I3768   // I4607
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
   private
@@ -71,16 +71,16 @@ uses
   System.Win.ComObj,
   Winapi.ActiveX,
 
-  Keyman.System.Standards.BCP47SuppressScriptRegistry,
-
   input_installlayoutortip,
   isadmin,
+  Keyman.System.MitigateWin10_1803LanguageInstall,
   keymanerrorcodes,
   KeymanPaths,
   RegistryKeys,
   BCP47Tag,
   TempFileManager,
   utilexecute,
+  utilfiletypes,
   utilkeyman,
   utilstr,
   utiltsf;
@@ -127,34 +127,39 @@ begin
   inherited Destroy;
 end;
 
-procedure TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardName, KeyboardDescription: string; LangIDs: array of Integer; IconFileName: string; InstallFirstOnly: Boolean);   // I3707   // I3768   // I4607
+procedure TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardID, KeyboardName: string; LangIDs: array of Integer; IconFileName: string; InstallFirstOnly: Boolean);   // I3707   // I3768   // I4607
 var
   FIsAdmin: Boolean;
   i: Integer;
+  FKeyboardName: string;
 begin
-  if not KeyboardInstalled(KeyboardName, FIsAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardName]));   // I3888
+  if not KeyboardInstalled(KeyboardID, FIsAdmin) then
+    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
   if not IsAdministrator and FIsAdmin then   // I3720
-    ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardName]));   // I3764   // I3888
+    ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardID]));   // I3764   // I3888
+
+  if KeyboardName = ''
+    then FKeyboardName := KeyboardID + Ext_KeymanFile
+    else FKeyboardName := KeyboardName;
 
   reg := TRegistry.Create;
   try
     if FIsAdmin then
     begin
       reg.RootKey := HKEY_LOCAL_MACHINE;
-      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardName) + SRegSubKey_LanguageProfiles;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
     end
     else
     begin
       reg.RootKey := HKEY_CURRENT_USER;
-      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardName) + SRegSubKey_LanguageProfiles;
+      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardID) + SRegSubKey_LanguageProfiles;
     end;
 
     if reg.OpenKey(RootPath, True) then
     begin
       for i := 0 to High(LangIDs) do
-        if RegisterLocale(KeyboardDescription, '', LangIDs[i], IconFileName, '') and InstallFirstOnly then   // I3707   // I3768   // I4607
+        if RegisterLocale(FKeyboardName, '', LangIDs[i], IconFileName, '') and InstallFirstOnly then   // I3707   // I3768   // I4607
           Break;
     end;
   finally
@@ -164,31 +169,37 @@ begin
   Context.Control.AutoApplyKeyman;
 end;
 
-procedure TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName: string);
+function  TKPInstallKeyboardLanguageProfiles.Execute(const KeyboardID, KeyboardName, BCP47Tag, IconFileName, LanguageName: string): Boolean;
 var
   FIsAdmin: Boolean;
+  FKeyboardName: string;
 begin
-  if not KeyboardInstalled(KeyboardName, FIsAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardName]));   // I3888
+  if not KeyboardInstalled(KeyboardID, FIsAdmin) then
+    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
   if not IsAdministrator and FIsAdmin then   // I3720
-    ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardName]));   // I3764   // I3888
+    ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardID]));   // I3764   // I3888
+
+  if KeyboardName = ''
+    then FKeyboardName := KeyboardID + Ext_KeymanFile
+    else FKeyboardName := KeyboardName;
 
   reg := TRegistry.Create;
   try
     if FIsAdmin then
     begin
       reg.RootKey := HKEY_LOCAL_MACHINE;
-      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardName) + SRegSubKey_LanguageProfiles;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
     end
     else
     begin
       reg.RootKey := HKEY_CURRENT_USER;
-      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardName) + SRegSubKey_LanguageProfiles;
+      RootPath := GetRegistryKeyboardInstallKey_CU(KeyboardID) + SRegSubKey_LanguageProfiles;
     end;
 
-    if reg.OpenKey(RootPath, True) then
-      RegisterLocale(KeyboardDescription, BCP47Tag, 0, IconFileName, LanguageName);   // I3707   // I3768   // I4607
+    if reg.OpenKey(RootPath, True)
+      then Result := RegisterLocale(FKeyboardName, BCP47Tag, 0, IconFileName, LanguageName)   // I3707   // I3768   // I4607
+      else Result := False;
   finally
     reg.Free;
   end;
@@ -208,6 +219,18 @@ begin
     begin
       LangID := Win8Lang.LangID;
       Exit(True);
+    end;
+  end
+  else
+  begin
+    // Assuming that the tag is a Language-Script-Region triplet at most.
+    // If you use -Variant or -Extension then YMMV.
+    with TBCP47Tag.Create(Locale) do
+    try
+      Script := '';
+      Locale := Tag;
+    finally
+      Free;
     end;
   end;
 
@@ -229,17 +252,51 @@ var
   IconIndex: Integer;
   UserLanguageInstalled: Boolean;
   Win8Lang: TWindows8Language;
+  ml: TMitigateWin10_1803.TMitigatedLanguage;
+  FMitigationApplied: Boolean;
+  TempLangID: Integer;
 begin
   Result := False;
   UserLanguageInstalled := False;
+
+  //
+  // Begin #1285 mitigation
+  //
+  if BCP47Tag = '' then
+  begin
+    FMitigationApplied := TMitigateWin10_1803.IsMitigationRequired(LangID, ml);
+  end
+  else if ConvertBCP47TagToLangID(BCP47Tag, TempLangID) then
+  begin
+    FMitigationApplied := TMitigateWin10_1803.IsMitigationRequired(TempLangID, ml);
+  end
+  else
+    FMitigationApplied := False;
+
+  if FMitigationApplied then
+  begin
+    BCP47Tag := ml.NewLanguage.BCP47;
+    LangID := ml.NewLanguage.Code;
+    WarnFmt(KMN_W_ProfileInstall_Win10_1803_MitigationApplied, VarArrayOf([ml.OriginalLanguage.Name, ml.NewLanguage.Name]));
+  end;
+  //
+  // End #1285 mitigation
+  //
 
   if BCP47Tag = '' then
   begin
     if not ConvertLangIDToBCP47Tag(LangID, BCP47Tag) then
       Exit;
   end
-  else if not ConvertBCP47TagToLangID(BCP47Tag, LangID) and FWin8Languages.IsSupported then
+  else if not ConvertBCP47TagToLangID(BCP47Tag, LangID) then
   begin
+    //
+    // Installing a custom language only supported with Win8 and later
+    //
+
+    if not FWin8Languages.IsSupported then
+      Exit;
+
     //
     // Install user language with Powershell if it isn't present
     //
@@ -249,9 +306,9 @@ begin
 
     BCP47Tag := ExtractBaseBCP47Tag(BCP47Tag);
 
-    if not InstallBCP47Language(BCP47Tag) then
+    if (BCP47Tag = '') or not InstallBCP47Language(BCP47Tag) then
     begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language']));
+      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language '+BCP47Tag]));
       Exit;
     end;
 
@@ -293,20 +350,6 @@ begin
 
   PIconFileName := PWideChar(IconFileName);
 
-  OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
-    c_clsidKMTipTextService,
-    LangID,
-    guid,
-    PWideChar(KeyboardName),
-    Length(KeyboardName),
-    PWideChar(IconFileName),
-    Length(IconFileName),
-    IconIndex,
-    0,
-    0,
-    1,
-    0));
-
   FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
     GuidToString(guid)]);
 
@@ -330,6 +373,22 @@ begin
     end;
   end;
 
+  { Register the keyboard profile }
+
+  OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
+    c_clsidKMTipTextService,
+    LangID,
+    guid,
+    PWideChar(KeyboardName),
+    Length(KeyboardName),
+    PWideChar(IconFileName),
+    Length(IconFileName),
+    IconIndex,
+    0,
+    0,
+    1,
+    0));
+
   if UserLanguageInstalled then
   begin
     RemoveDefaultKeyboardForLanguage(BCP47Tag);
@@ -340,22 +399,15 @@ end;
 
 function TKPInstallKeyboardLanguageProfiles.ExtractBaseBCP47Tag(BCP47Tag: string): string;
 var
-  FScripts: TStringList;
   FTag: TBCP47Tag;
 begin
   Result := BCP47Tag;
 
-  FScripts := TStringList.Create;
   FTag := TBCP47Tag.Create(BCP47Tag);
   try
-    FScripts.Text := SuppressScriptSubtagRegistry;
-    if SameText(FTag.Script, FScripts.Values[FTag.Language]) then
-    begin
-      FTag.Script := '';
-      Result := FTag.Tag;
-    end;
+    FTag.Canonicalize;
+    Result := FTag.Tag;
   finally
-    FScripts.Free;
     FTag.Free;
   end;
 end;

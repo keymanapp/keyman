@@ -122,13 +122,12 @@
         <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\SystemDebugPath.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
-        <DCCReference Include="..\..\developer\TIKE\project\ProjectLog.pas"/>
+        <DCCReference Include="..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UMD5Hash.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
@@ -157,6 +156,9 @@
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

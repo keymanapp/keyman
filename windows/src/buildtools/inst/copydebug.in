@@ -17,8 +17,9 @@ copydebug:
     echo regedit /s tds.reg >> $(ROOT)\src\install.bat
     $(WZZIP) $(ROOT)\src\tds.zip $(ROOT)\src\install.bat $(ROOT)\src\buildtools\inst\tds.reg
 
-    "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
-    "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
+    rem Disabling symsrv upload from the build agents (2018-06-19 mcdurdin)
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
 
     # ping localhost  # delay for a few seconds
     # $(WZSE) $(ROOT)\src\tds.zip -setup -t $(ROOT)\src\buildtools\inst\tds_dialog.txt -c .\install.bat
@@ -35,6 +36,7 @@ copydebug:
 
 
 uploadsymbols:
-    "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
-    "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
+    rem Disabling symsrv upload from the build agents (2018-06-19 mcdurdin)
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\debug\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
+    # "C:\Program Files (x86)\Windows Kits\8.0\Debuggers\x86\symstore" add /r /f $(ROOT)\bin\*.* /s c:\Tavultesoft\Debug\Symbols /t "Keyman" /v "Build $VERSION" /c "Release $VERSION"
 

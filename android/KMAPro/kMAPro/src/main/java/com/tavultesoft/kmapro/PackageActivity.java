@@ -1,9 +1,9 @@
 package com.tavultesoft.kmapro;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,8 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PackageActivity extends Activity {
+public class PackageActivity extends AppCompatActivity {
 
+  private Toolbar toolbar;
   private WebView webView;
   private AlertDialog alertDialog;
   private File kmpFile;
@@ -45,6 +46,8 @@ public class PackageActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_package_installer);
+
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
@@ -53,43 +56,38 @@ public class PackageActivity extends Activity {
 
     final String pkgId = PackageProcessor.getPackageID(kmpFile);
     String pkgVersion = PackageProcessor.getPackageVersion(kmpFile, false);
-    if (pkgVersion == null || pkgVersion.isEmpty()) {
-      String message = "Invalid package version in " + kmpFile.getName();
-      showErrorDialog(context, pkgId, message);
-    }
     String pkgName = PackageProcessor.getPackageName(kmpFile, false);
 
     try {
       tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
     } catch (Exception e) {
-      String message = "Failed to extract\n" + kmpFile.getAbsolutePath();
+      String message = String.format("%s\n%s",
+        getString(R.string.failed_to_extract), kmpFile.getAbsolutePath());
       showErrorDialog(context, pkgId, message);
     }
 
-    final ActionBar actionBar = getActionBar();
-    actionBar.setLogo(R.drawable.keyman_logo);
-    actionBar.setDisplayShowHomeEnabled(false);
-    actionBar.setDisplayShowTitleEnabled(false);
-    actionBar.setDisplayShowCustomEnabled(true);
-    actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
+    toolbar = (Toolbar) findViewById(R.id.titlebar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setTitle(null);
+    getSupportActionBar().setDisplayUseLogoEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(false);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+    getSupportActionBar().setDisplayShowCustomEnabled(true);
+    getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
+
     TextView packageActivityTitle = new TextView(this);
     packageActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
-    packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.package_label_textsize));
+    packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String titleStr = "Install Keyboard Package";
-    if (pkgVersion != null) {
-      titleStr += " " + pkgVersion;
-    }
+    String titleStr = String.format("%s %s", getString(R.string.install_keyboard_package), pkgVersion);
     packageActivityTitle.setText(titleStr);
-    actionBar.setCustomView(packageActivityTitle);
-
-    setContentView(R.layout.activity_package_installer);
+    getSupportActionBar().setCustomView(packageActivityTitle);
 
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
 
-    webView = (WebView) findViewById(R.id.webView);
+    webView = (WebView) findViewById(R.id.packageWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
     webView.getSettings().setUseWideViewPort(true);
@@ -110,7 +108,7 @@ public class PackageActivity extends Activity {
 
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        if (!url.toLowerCase().equals("about:blank"))
+        if (url != null && !url.toLowerCase().equals("about:blank"))
           view.loadUrl(url);
 
         return true;
@@ -141,7 +139,8 @@ public class PackageActivity extends Activity {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No welcome.htm so display minimal package information
-      String keyboardString = (pkgName.toLowerCase().endsWith("keyboard")) ? "" : " Keyboard ";
+      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" :
+        String.format(" %s", getString(R.string.title_keyboard));
       String htmlString = String.format(
         "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
         pkgName, keyboardString);
@@ -163,12 +162,12 @@ public class PackageActivity extends Activity {
             }
             cleanup();
           } else {
-            showErrorDialog(context, pkgId, "No new touch-optimized keyboards to install");
+            showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
           }
 
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
-          showErrorDialog(context, pkgId, "No valid touch-optimized keyboards to install");
+          showErrorDialog(context, pkgId, getString(R.string.no_valid_touch_keyboards_to_install));
         }
       }
     });
@@ -218,11 +217,12 @@ public class PackageActivity extends Activity {
   private void showErrorDialog(Context context, String pkgId, String message) {
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
-    alertDialogBuilder.setTitle("Package " + pkgId + " failed to install");
+    alertDialogBuilder.setTitle(String.format("%s %s %s",
+      getString(R.string.title_package), pkgId, getString(R.string.title_failed_to_install)));
     alertDialogBuilder
       .setMessage(message)
       .setCancelable(false)
-      .setNeutralButton("Close",new DialogInterface.OnClickListener() {
+      .setPositiveButton(getString(R.string.label_close),new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog,int id) {
           if (dialog != null) {
             dialog.dismiss();

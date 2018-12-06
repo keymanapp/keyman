@@ -8,12 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "OSKKey.h"
+#import "KMkeyViewProtocol.h"
 
 @interface KeyView : NSView
 
 @property (nonatomic, strong) OSKKey *key;
-@property (nonatomic, assign) SEL action;
-@property (nonatomic, strong) id target;
+@property (nonatomic, strong) id <KMkeyView> target;
 @property (nonatomic, strong) NSImage *bitmap;
 @property (nonatomic, assign) BOOL keyPressed;
 

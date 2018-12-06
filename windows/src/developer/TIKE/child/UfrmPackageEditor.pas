@@ -59,10 +59,10 @@ uses
   System.UITypes,
   Windows, SysUtils, Messages, Classes, Graphics, Forms, Controls, StdCtrls,
   Buttons, ComCtrls, ExtCtrls, Dialogs, CommDlg, kmxfile, kpsfile,
-  ImgList, UfrmMDIChild, ProjectFile, PackageInfo,
+  ImgList, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile, PackageInfo,
   UfrmMDIEditor, Grids, dmActionsMain,
-  UserMessages, ProjectLog,
-  UframeTextEditor, LeftTabbedPageControl, ProjectFileUI,
+  UserMessages, Keyman.Developer.System.Project.ProjectLog,
+  UframeTextEditor, LeftTabbedPageControl, Keyman.Developer.UI.Project.ProjectFileUI,
   utilfiletypes;
 
 type
@@ -135,18 +135,11 @@ type
     Panel4: TPanel;
     Label13: TLabel;
     lblCompilePackage: TLabel;
-    lblInstallHint: TLabel;
-    lblBootstrap: TLabel;
-    lblBootstrapMSI: TLabel;
     cmdBuildPackage: TButton;
-    cmdInstall: TButton;
     editOutPath: TEdit;
     cmdOpenContainingFolder2: TButton;
     cmdAddToProject: TButton;
-    cmdUninstall: TButton;
     cmdCompileInstaller: TButton;
-    cmdInstallWith: TButton;
-    editInstallerOutputFilename: TEdit;
     pageKeyboards: TTabSheet;
     Panel5: TPanel;
     Label2: TLabel;
@@ -170,6 +163,25 @@ type
     lblKeyboardRTL: TLabel;
     editKeyboardRTL: TEdit;
     cmdKeyboardEditLanguage: TButton;
+    panBuildMobile: TPanel;
+    lblDebugHostCaption: TLabel;
+    lblCrossPlatform: TLabel;
+    cmdStartTestOnline: TButton;
+    cmdOpenDebugHost: TButton;
+    lbDebugHosts: TListBox;
+    panBuildDesktop: TPanel;
+    Label4: TLabel;
+    lblCompileTargetHeader: TLabel;
+    cmdInstall: TButton;
+    cmdUninstall: TButton;
+    Label5: TLabel;
+    panBuildWindowsInstaller: TPanel;
+    Label9: TLabel;
+    lblBootstrapMSI: TLabel;
+    lblInstallerOutputFilename: TLabel;
+    editBootstrapMSI: TEdit;
+    editInstallerOutputFilename: TEdit;
+    cmdInstallWith: TButton;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -217,6 +229,8 @@ type
     procedure chkFollowKeyboardVersionClick(Sender: TObject);
     procedure gridKeyboardLanguagesDblClick(Sender: TObject);
     procedure cmdKeyboardEditLanguageClick(Sender: TObject);
+    procedure cmdStartTestOnlineClick(Sender: TObject);
+    procedure cmdOpenDebugHostClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -230,6 +244,7 @@ type
     procedure WMSysCommand(var Message: TWMSysCommand); message WM_SYSCOMMAND;
     procedure EnableStartMenuControls;
     procedure EnableDetailsTabControls;
+    procedure EnableCompileTabControls;
     function DoAction(action: TProjectFileAction): Boolean;
     procedure UpdateReadme;
     procedure UpdateImageFiles;
@@ -249,6 +264,7 @@ type
     procedure RefreshKeyboardLanguageList(k: TPackageKeyboard);
     procedure HandlePackageRefreshError(Sender: TObject; msg: string;
       State: TProjectLogState);
+    procedure RefreshTargetPanels;
 
   protected
     function GetHelpTopic: string; override;
@@ -265,6 +281,8 @@ type
 
     procedure CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
 
+    procedure NotifyStartedWebDebug;
+
     procedure FindError(const Filename: string; s: string); override;   // I4081
 
     function CanChangeTab(FForward: Boolean): Boolean; override;
@@ -279,20 +297,23 @@ uses
   CharMapDropTool,
   CharMapInsertMode,
   CompilePackageInstaller,
-  kpsProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFileAction,
   OnlineConstants,
   KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
   Keyman.System.KeyboardUtils,
   kmxfileconsts,
-  Project,
-  ProjectFileType,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFileType,
   ShellApi,
   TextFileFormat,
   TTInfo,
   utilsystem,
   UfrmMain,
   UfrmMessages,
+  UmodWebHttpServer,
+  utilexecute,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   xmldoc;
 
@@ -328,6 +349,7 @@ begin
     pack := TKPSFile.Create;
     EnableStartMenuControls;
     EnableDetailsTabControls;
+    EnableCompileTabControls;
     UpdateStartMenuPrograms;
     UpdateReadme;
     UpdateImageFiles;
@@ -446,7 +468,7 @@ begin
   Result := inherited GetProjectFile;
   if not Assigned(Result) then
   begin
-    FStandaloneProjectFile := TkpsProjectFile.Create(nil, FileName, nil);
+    FStandaloneProjectFile := TkpsProjectFileAction.Create(nil, FileName, nil);
     Result := FStandaloneProjectFile;
   end;
 end;
@@ -666,6 +688,11 @@ begin
     RefreshKeyboardList;
     Modified := True;
   end;
+end;
+
+procedure TfrmPackageEditor.cmdStartTestOnlineClick(Sender: TObject);
+begin
+  DoAction(pfaTestKeymanWeb);
 end;
 
 {$EXTERNALSYM SHGetFileInfoW}
@@ -958,6 +985,11 @@ begin
   OpenContainingFolder((lbFiles.Items.Objects[lbFiles.ItemIndex] as TPackageContentFile).FileName);
 end;
 
+procedure TfrmPackageEditor.cmdOpenDebugHostClick(Sender: TObject);
+begin
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html');
+end;
+
 procedure TfrmPackageEditor.cmdOpenFileClick(Sender: TObject);   // I4687
 var
   s: WideString;
@@ -973,7 +1005,7 @@ begin
   end
   else
   begin
-    f := CreateProjectFile(s, ProjectFile);
+    f := CreateProjectFile(FGlobalProject, s, ProjectFile);
     try
       fui := f.UI as TProjectFileUI;
       fui.DefaultEvent(Self);
@@ -1107,7 +1139,7 @@ begin
     EnableStartMenuControls;
 
     editOutPath.Text := (ProjectFile as TkpsProjectFile).TargetFilename;   // I4688
-    lblBootstrapMSI.Caption := pack.KPSOptions.MSIFileName;
+    editBootstrapMSI.Text := pack.KPSOptions.MSIFileName;
     if pack.KPSOptions.MSIFileName = ''
       then editInstallerOutputFilename.Text := ''
       else editInstallerOutputFilename.Text := (ProjectFile as TkpsProjectFile).TargetInstallerFileName;   // I4688
@@ -1238,6 +1270,15 @@ begin
   end;
 end;
 
+procedure TfrmPackageEditor.NotifyStartedWebDebug;
+begin
+  lbDebugHosts.Clear;
+  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  if lbDebugHosts.Items.Count > 0 then
+    lbDebugHosts.ItemIndex := 0;
+  EnableCompileTabControls;
+end;
+
 procedure TfrmPackageEditor.CreateFromCompiledKeyboard(FKMXFilename, FJSFilename: string);
 begin
   if (FKMXFilename <> '') and FileExists(FKMXFilename) then AddFile(FKMXFilename);
@@ -1293,6 +1334,8 @@ begin
     n := 0;
   lbKeyboards.ItemIndex := n;
   lbKeyboardsClick(lbKeyboards);
+
+  RefreshTargetPanels;
 end;
 
 function TfrmPackageEditor.SelectedKeyboard: TPackageKeyboard;
@@ -1425,6 +1468,11 @@ begin
   Modified := True;
 end;
 
+procedure TfrmPackageEditor.EnableCompileTabControls;
+begin
+  cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
+end;
+
 procedure TfrmPackageEditor.EnableDetailsTabControls;
 var
   e: Boolean;
@@ -1539,6 +1587,32 @@ begin
   RefreshKeyboardLanguageList(k);
   EnableKeyboardTabControls;
   Modified := True;
+end;
+
+procedure TfrmPackageEditor.RefreshTargetPanels;
+var
+  i: Integer;
+  k: TPackageKeyboard;
+  FHasDesktopTarget, FHasMobileTarget: Boolean;
+begin
+  FHasDesktopTarget := False;
+  FHasMobileTarget := False;
+  for k in pack.Keyboards do
+  begin
+    for i := 0 to pack.Files.Count - 1 do
+    begin
+      if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
+      begin
+        if pack.Files[i].FileType = ftKeymanFile
+          then FHasDesktopTarget := True
+          else FHasMobileTarget := True;
+      end;
+    end;
+  end;
+
+  panBuildDesktop.Visible := FHasDesktopTarget;
+  panBuildWindowsInstaller.Visible := FHasDesktopTarget;
+  panBuildMobile.Visible := FHasMobileTarget;
 end;
 
 end.

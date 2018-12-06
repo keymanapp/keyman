@@ -59,7 +59,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
    // I4326
-#include "keyman64.h"
+#include "pch.h"
 #include <Psapi.h>
 
 #ifdef _WIN64
@@ -74,6 +74,7 @@ BOOL InLanguageSwitchKeySequence = FALSE;
 HWND hwndLanguageSwitch = 0;
 		
 BOOL ForegroundWindowIsRDP() {   // I4197
+  //TODO: Cache result
   DWORD dwProcessId;
   HWND hwnd = GetForegroundWindow();
   if(hwnd == NULL) {
@@ -140,7 +141,7 @@ BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD Shift
         //ReportActiveKeyboard(_td, 0);
         Globals::PostControllers(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
         PostDummyKeyEvent();   // I4124   // I4844
-        keybd_event(VK_SHIFT, 0xFF, KEYEVENTF_KEYUP, 0);    // I4203
+        keybd_event(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);    // I4203
         return TRUE;
       }
       

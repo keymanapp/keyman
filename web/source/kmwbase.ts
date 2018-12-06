@@ -16,8 +16,8 @@
 /// <reference path="kmwuimanager.ts" />
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2017-2018 SIL International
 ***/
 namespace com.keyman {
   export class KeymanBase {
@@ -405,6 +405,15 @@ namespace com.keyman {
     };
 
     /**
+     * Function     setNumericLayer
+     * Scope        Public
+     * Description  Set OSK to numeric layer if it exists
+     */
+    ['setNumericLayer']() {
+      this.interface.setNumericLayer();
+    };
+
+    /**
      * Function     disableControl
      * Scope        Public
      * @param       {Element}      Pelem       Element to be disabled
@@ -539,6 +548,10 @@ namespace com.keyman {
     ['activatingUI'](state: boolean) {
       this.uiManager.setActivatingUI(state);
     } 
+
+    // Functions that might be added later
+    ['beepKeyboard']: () => void;
+    ['oninserttext']: (dn: number, s: string) => void;
   }
 }
 

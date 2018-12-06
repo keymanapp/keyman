@@ -39,7 +39,7 @@ interface
 uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  UfrmMDIChild, ProjectFile, UserMessages;
+  UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile, UserMessages;
 
 type
   TfrmTikeEditor = class(TfrmTikeChild)
@@ -129,7 +129,7 @@ uses
   dmActionsMain,
   KeymanDeveloperUtils,
   KMDevResourceStrings,
-  Project,
+  Keyman.Developer.System.Project.Project,
   UfrmMain,
   WideStrUtils;
 
@@ -189,7 +189,10 @@ begin
     case MessageDlg('The file '+s+' has changed.'+#13#10+'Do you wish to save changes?',
       mtConfirmation, mbYesNoCancel, 0) of
     mrYes:
-      CanClose := modActionsMain.actFileSave.Execute;
+      begin
+        frmKeymanDeveloper.ActiveChild := Self;
+        CanClose := modActionsMain.actFileSave.Execute;
+      end;
     mrNo:
       CanClose := True;
     mrCancel:

@@ -324,7 +324,11 @@ begin
       Open(AFileName, TZipMode.zmWrite);
       Add(FTempFileName);
       for i := 0 to FFiles.Count - 1 do
+      try
         Add(FFiles[i]);
+      except
+        on E:EFOpenError do ;
+      end;
       Close;
     finally
       Free;

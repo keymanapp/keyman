@@ -1,0 +1,27 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+#editor { 
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.km_error {
+  background: rgb(255, 128, 128);
+}
+
+.km_breakpoint {
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3Cstyle%3E.icon-canvas-transparent,.icon-vs-out{fill:%23f6f6f6}.icon-canvas-transparent{opacity:0}.icon-vs-red{fill:%23e51400}%3C/style%3E%3C/defs%3E%3Ctitle%3Ebreakpoint%3C/title%3E%3Cpath class='icon-canvas-transparent' d='M16 0v16H0V0z' id='canvas'/%3E%3Cpath class='icon-vs-red' d='M11.789 8A3.789 3.789 0 1 1 8 4.211 3.788 3.788 0 0 1 11.789 8z' id='iconBg'/%3E%3C/svg%3E") 50% no-repeat
+}
+
+.km_executionPoint {
+    background-color: deepskyblue;
+}

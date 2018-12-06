@@ -35,13 +35,12 @@ uses
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
   KeyNames in '..\..\global\delphi\general\KeyNames.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
-  ProjectLog in '..\..\developer\TIKE\project\ProjectLog.pas',
+  Keyman.Developer.System.Project.ProjectLog in '..\..\developer\TIKE\project\Keyman.Developer.System.Project.ProjectLog.pas',
   UMD5Hash in '..\..\global\delphi\general\UMD5Hash.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
@@ -69,7 +68,10 @@ uses
   Keyman.System.RegExGroupHelperRSP19902 in '..\..\global\delphi\general\Keyman.System.RegExGroupHelperRSP19902.pas',
   kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
   BCP47Tag in '..\..\global\delphi\general\BCP47Tag.pas',
-  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas';
+  Keyman.System.Standards.BCP47SubtagRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas',
+  Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
+  Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
+  Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas';
 
 begin
   Run;

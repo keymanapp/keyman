@@ -139,12 +139,14 @@ implementation
 uses
   ComObj,
   Forms,
-  kmnProjectFile,
-  kmnProjectFileUI,
-  kpsProjectFile,
-  KeymanDeveloperMemo,
-  ProjectFile,
-  ProjectFileUI,
+  KMDActions,
+  KMDActionInterfaces,
+  Keyman.Developer.System.Project.kmnProjectFile,
+  Keyman.Developer.UI.Project.kmnProjectFileUI,
+  Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  UframeTextEditor,
   UfrmKeymanWizard,
   UfrmDebug,
   UfrmDebugStatus,
@@ -179,11 +181,9 @@ begin
   Result := ActivePackageEditor.ProjectFile as TkpsProjectFile;
 end;
 
-function ActiveMemo: TKeymanDeveloperMemo;
+function ActiveMemo: IKMDTextEditorActions;
 begin
-  if Screen.ActiveControl is TKeymanDeveloperMemo
-    then Result := Screen.ActiveControl as TKeymanDeveloperMemo
-    else Result := nil;
+  Result := GetTextEditorController(Screen.ActiveControl);
 end;
 
 procedure TmodActionsKeyboardEditor.actionsKeyboardEditorUpdate(Action: TBasicAction; var Handled: Boolean);
@@ -260,9 +260,9 @@ end;
 
 procedure TmodActionsKeyboardEditor.actDebugSetClearBreakpointExecute(Sender: TObject);
 begin
-  if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelPar)
-    then ActiveEditor.DebugForm.ClearBreakpoint(ActiveMemo.SelPar)
-    else ActiveEditor.DebugForm.SetBreakpoint(ActiveMemo.SelPar);
+  if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
+    then ActiveEditor.DebugForm.ClearBreakpoint(ActiveMemo.SelectedRow)
+    else ActiveEditor.DebugForm.SetBreakpoint(ActiveMemo.SelectedRow);
 end;
 
 procedure TmodActionsKeyboardEditor.actDebugSetClearBreakpointUpdate(Sender: TObject);
@@ -271,7 +271,7 @@ begin
   begin
     actDebugSetClearBreakpoint.Enabled := True;
     actDebugSetClearBreakpoint.Visible := True;
-    if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelPar)
+    if ActiveEditor.DebugForm.IsBreakPointLine(ActiveMemo.SelectedRow)
       then actDebugSetClearBreakpoint.Caption := 'Clear &Breakpoint'
       else actDebugSetClearBreakpoint.Caption := 'Set &Breakpoint';
   end

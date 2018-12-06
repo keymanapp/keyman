@@ -3,8 +3,7 @@ apply plugin: 'com.github.triplet.play'
 apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 27
     playAccountConfigs {
         defaultAccountConfig {
             if (project.hasProperty("keys_json_file")) {
@@ -15,7 +14,7 @@ android {
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 27
 
         //dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration
 
@@ -33,8 +32,9 @@ android {
             // Because TeamCity does not bubble build.counter into system properties...
             versionName "${project.ext['build.number']}"
         } else {
+            String majorMinorVersion = file('$projectDir/../../../../resources/VERSION.md').text.trim()
             versionCode 100
-            versionName '10.0.0.0'
+            versionName majorMinorVersion + '.0.0'
         }
 
         playAccountConfig = playAccountConfigs.defaultAccountConfig
@@ -99,14 +99,18 @@ repositories {
     }
 }
 
-dependencies {
-    api(name: 'keyman-engine', ext: 'aar')
+ext {
+    currentFirebaseVersion = "15.0.2"
+}
 
+dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:support-v4:25.4.0'
-    implementation 'com.google.firebase:firebase-core:11.8.0'
-    implementation 'com.google.firebase:firebase-crash:11.8.0'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    api(name: 'keyman-engine', ext: 'aar')
+    implementation "com.google.firebase:firebase-core:$currentFirebaseVersion"
+    implementation "com.google.firebase:firebase-crash:$currentFirebaseVersion"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
         transitive = true
     }
 }

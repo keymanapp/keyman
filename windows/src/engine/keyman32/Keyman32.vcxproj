@@ -73,9 +73,8 @@
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>keyman64.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>./Keyman32.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
       <AssemblerListingLocation>./</AssemblerListingLocation>
       <ObjectFileName>./</ObjectFileName>
@@ -136,9 +135,8 @@
       <ExceptionHandling>
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>keyman64.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>./Keyman32.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AssemblerOutput>All</AssemblerOutput>
       <AssemblerListingLocation>./</AssemblerListingLocation>
       <ObjectFileName>./</ObjectFileName>
@@ -217,6 +215,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="DebugEventTrace.cpp" />
     <ClCompile Include="glossary.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -307,8 +306,16 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="preservedkeymap.cpp" />
+    <ClCompile Include="security.cpp" />
     <ClCompile Include="selectkeyboard.cpp" />
+    <ClCompile Include="serialkeyeventclient.cpp" />
+    <ClCompile Include="serialkeyeventserver.cpp" />
+    <ClCompile Include="SharedBuffers.cpp" />
     <ClCompile Include="syskbd.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -342,11 +349,24 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="keyman-debug-etw.man">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling keyman-debug-etw</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).rc;%(Filename.h);MSG00001.bin</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling keyman-debug-etw</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).rc;%(Filename.h);MSG00001.bin</Outputs>
+      <SubType>Designer</SubType>
+    </CustomBuild>
     <None Include="KEYMAN32.DEF" />
     <None Include="..\..\global\res\bmp\arrow.bmp" />
     <None Include="..\..\global\res\bmp\mask.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="keyman-debug-etw.rc" />
     <ResourceCompile Include="KEYMAN32.RC">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -361,6 +381,7 @@
     <ClInclude Include="capsstate.h" />
     <ClInclude Include="..\..\global\inc\Compiler.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="hotkeys.h" />
     <ClInclude Include="k32_tsf.h" />
     <ClInclude Include="KBD.H" />
@@ -368,10 +389,17 @@
     <ClInclude Include="..\..\global\inc\keyman64.h" />
     <ClInclude Include="..\..\global\inc\keymanapi.h" />
     <ClInclude Include="..\..\global\inc\keymancontrol.h" />
+    <ClInclude Include="keyman-debug-etw.h" />
+    <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />
     <ClInclude Include="..\..\global\inc\Km95api.h" />
     <ClInclude Include="..\..\global\inc\rc4.h" />
     <ClInclude Include="..\..\global\inc\registry.h" />
+    <ClInclude Include="security.h" />
+    <ClInclude Include="serialkeyeventclient.h" />
+    <ClInclude Include="serialkeyeventcommon.h" />
+    <ClInclude Include="serialkeyeventserver.h" />
+    <ClInclude Include="SharedBuffers.h" />
     <ClInclude Include="syskbd.h" />
     <ClInclude Include="..\..\global\inc\unicode.h" />
     <ClInclude Include="vkscancodes.h" />

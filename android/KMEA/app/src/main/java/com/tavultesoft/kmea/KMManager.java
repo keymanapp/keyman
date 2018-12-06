@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,19 +25,22 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.text.InputType;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -44,6 +48,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -53,7 +58,6 @@ import org.json.JSONObject;
 
 public final class KMManager {
 
-  private static final String KMEngineVersion = "2.4.3";
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
@@ -105,11 +109,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";
-  public static final String KMKey_KeyboardFileSize = "fileSize";
   public static final String KMKey_Font = "font";
   public static final String KMKey_OskFont = "oskFont";
-  public static final String KMKey_DisplayFont = "displayFont";
-  public static final String KMKey_FontFamily = "family";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_KeyboardModified = "lastModified";
@@ -117,6 +118,7 @@ public final class KMManager {
   public static final String KMKey_CustomKeyboard = "CustomKeyboard";
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
+  public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -131,9 +133,9 @@ public final class KMManager {
   public static final String KMDefault_AssetPackages = "packages";
 
   // Default Keyboard Info
-  public static final String KMDefault_KeyboardID = "european2";
+  public static final String KMDefault_KeyboardID = "sil_euro_latin";
   public static final String KMDefault_LanguageID = "en";
-  public static final String KMDefault_KeyboardName = "EuroLatin2 Keyboard";
+  public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
@@ -146,10 +148,6 @@ public final class KMManager {
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
 
   private static Context appContext;
-
-  public static String getVersion() {
-    return KMEngineVersion;
-  }
 
   protected static String getResourceRoot() {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
@@ -188,7 +186,7 @@ public final class KMManager {
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       initSystemKeyboard(appContext);
     } else {
-      Log.w(TAG, "Cannot initialize: Invalid keyboard type");
+      Log.e(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
     // Initializes the PackageProcessor with the base resource directory, which is the parent directory
@@ -225,8 +223,6 @@ public final class KMManager {
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
-      if (isDebugMode())
-        Log.d(TAG, "Initializing In-App Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -235,15 +231,13 @@ public final class KMManager {
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
       InAppKeyboard.setWebViewClient(new KMInAppKeyboardWebViewClient(appContext));
-      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext), "jsInterface");
+      InAppKeyboard.addJavascriptInterface(new KMInAppKeyboardJSHandler(appContext, InAppKeyboard), "jsInterface");
       InAppKeyboard.loadKeyboard();
     }
   }
 
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
-      if (isDebugMode())
-        Log.d(TAG, "Initializing System Keyboard...");
       int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
       RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -252,7 +246,7 @@ public final class KMManager {
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
       SystemKeyboard.setWebViewClient(new KMSystemKeyboardWebViewClient(appContext));
-      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext), "jsInterface");
+      SystemKeyboard.addJavascriptInterface(new KMSystemKeyboardJSHandler(appContext, SystemKeyboard), "jsInterface");
       SystemKeyboard.loadKeyboard();
     }
   }
@@ -278,25 +272,6 @@ public final class KMManager {
       parent.removeView(SystemKeyboard);
     keyboardLayout.addView(SystemKeyboard);
     
-    /*
-    final RelativeLayout overlayLayout = new RelativeLayout(appContext);
-    overlayLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-    LayoutInflater inflater = (LayoutInflater) appContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    RelativeLayout overlayView = (RelativeLayout) inflater.inflate(R.layout.overlay_layout, null, false);
-    overlayView.setLayoutParams(SystemKeyboard.getLayoutParams());
-    overlayView.setBackgroundColor(Color.argb(192, 0, 0, 0));
-    overlayView.setClickable(true);
-    overlayLayout.addView(overlayView);
-    Button activateButton = (Button) overlayView.findViewById(R.id.button1);
-    activateButton.setOnClickListener(new OnClickListener(){
-      @Override
-      public void onClick(View v) {
-        mainLayout.removeView(overlayLayout);
-        Toast.makeText(context, "Reactivated", Toast.LENGTH_LONG).show();
-      }
-    });
-    */
-
     mainLayout.addView(keyboardLayout);
     //mainLayout.addView(overlayLayout);
     return mainLayout;
@@ -316,9 +291,11 @@ public final class KMManager {
 
   public static void onResume() {
     if (InAppKeyboard != null) {
+      InAppKeyboard.resumeTimers();
       InAppKeyboard.onResume();
     }
     if (SystemKeyboard != null) {
+      SystemKeyboard.resumeTimers();
       SystemKeyboard.onResume();
     }
   }
@@ -466,7 +443,7 @@ public final class KMManager {
         FileFilter keyboardFilter = new FileFilter() {
           @Override
           public boolean accept(File pathname) {
-            if (pathname.isFile() && pathname.getName().endsWith(".js")) {
+            if (pathname.isFile() && FileUtils.hasJavaScriptExtension(pathname.getName())) {
               return true;
             }
             return false;
@@ -531,7 +508,7 @@ public final class KMManager {
       boolean shouldClearCache = false;
       HashMap<String, String> kbInfo = kbList.get(0);
       String kbID = kbInfo.get(KMKey_KeyboardID);
-      if (kbID.equals("us")) {
+      if (kbID.equals("us") || (kbID.equals("european2"))) {
         HashMap<String, String> newKbInfo = new HashMap<String, String>();
         newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
         newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
@@ -637,7 +614,7 @@ public final class KMManager {
     Typeface font = null;
 
     if (fontFilename != null) {
-      if (fontFilename.endsWith(".ttf") || fontFilename.endsWith(".otf")) {
+      if (FileUtils.hasFontExtension(fontFilename)) {
         File file = new File(fontFilename);
         if (file.exists()) {
           font = Typeface.createFromFile(file);
@@ -730,8 +707,34 @@ public final class KMManager {
     if (InAppKeyboard != null) {
       InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
+
     if (SystemKeyboard != null) {
       SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+    }
+  }
+
+  protected static IBinder getToken() {
+    if (IMService == null) {
+      return null;
+    }
+    final Dialog dialog = IMService.getWindow();
+    if (dialog == null) {
+      return null;
+    }
+    final Window window = dialog.getWindow();
+    if (window == null) {
+      return null;
+    }
+    return window.getAttributes().token;
+  }
+
+  public static void advanceToNextInputMode() {
+    InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+    // TODO: this method is added in API level 16 and deprecated in API level 28
+    // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      imm.switchToNextInputMethod(getToken(), false);
     }
   }
 
@@ -743,7 +746,7 @@ public final class KMManager {
       return SystemKeyboard;
     } else {
       // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
-      Log.w("KMManager", "Invalid keyboard");
+      Log.e("KMManager", "Invalid keyboard");
       return null;
     }
   }
@@ -825,7 +828,7 @@ public final class KMManager {
          */
         public boolean accept(File pathname) {
           String name = pathname.getName();
-          if (pathname.isFile() && name.startsWith(keyboardID) && name.endsWith(".js") && pathname.length() > 0) {
+          if (pathname.isFile() && name.startsWith(keyboardID) && FileUtils.hasJavaScriptExtension(name) && pathname.length() > 0) {
             return true;
           }
           return false;
@@ -843,7 +846,7 @@ public final class KMManager {
         int index = filename.indexOf(base);
         if (index == 0) {
           int firstIndex = base.length();
-          int lastIndex = filename.lastIndexOf(".js");
+          int lastIndex = filename.toLowerCase().lastIndexOf(".js");
           String v = filename.substring(firstIndex, lastIndex);
           if (kbFileVersion != null) {
             if (compareVersions(v, kbFileVersion) > 0) {
@@ -1052,6 +1055,7 @@ public final class KMManager {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+      i.putExtra(KMKey_DisplayKeyboardSwitcher, false);
       context.startActivity(i);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
@@ -1059,6 +1063,7 @@ public final class KMManager {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
       i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      i.putExtra(KMKey_DisplayKeyboardSwitcher, true);
       context.startActivity(i);
     }
   }
@@ -1071,14 +1076,27 @@ public final class KMManager {
     KeyboardPickerActivity.showLanguageList(context);
   }
 
-  public static boolean updateText(KeyboardType kbType, String text) {
-    boolean result = false;
+  public static void setNumericLayer(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        String kmText = "";
-        if (text != null) {
-          kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-        }
+        InAppKeyboard.loadUrl("javascript:setNumericLayer()");
+      }
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+        SystemKeyboard.loadUrl("javascript:setNumericLayer()");
+      }
+    }
+  }
+
+  public static boolean updateText(KeyboardType kbType, String text) {
+    boolean result = false;
+    String kmText = "";
+    if (text != null) {
+      kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
+    }
+
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
         InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
         result = true;
       }
@@ -1086,10 +1104,6 @@ public final class KMManager {
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        String kmText = "";
-        if (text != null) {
-          kmText = text.toString().replace("\\", "\\u005C").replace("'", "\\u0027").replace("\n", "\\n");
-        }
         SystemKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
         result = true;
       }
@@ -1257,9 +1271,6 @@ public final class KMManager {
     public void onPageFinished(WebView view, String url) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
-        if (isDebugMode()) {
-          Log.d("KMManager", "In-App Keyboard loaded.");
-        }
 
         if (!InAppKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -1435,10 +1446,6 @@ public final class KMManager {
     public void onPageFinished(WebView view, String url) {
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         SystemKeyboardLoaded = true;
-        if (isDebugMode()) {
-          Log.d("KMManager", "System Keyboard loaded.");
-        }
-
         if (!SystemKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
           int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
@@ -1515,7 +1522,7 @@ public final class KMManager {
           SystemKeyboard.showHelpBubble(context, fx, fy);
         }
       } else if (url.indexOf("showKeyPreview") >= 0) {
-        String deviceType = context.getResources().getString(R.string.device_type);
+        String deviceType = context.getString(R.string.device_type);
         if (deviceType.equals("AndroidTablet")) {
           return false;
         }
@@ -1592,42 +1599,10 @@ public final class KMManager {
     }
   }
 
-  private static final class KMInAppKeyboardJSHandler {
-    private Context context;
+  private static final class KMInAppKeyboardJSHandler extends KMKeyboardJSHandler {
 
-    KMInAppKeyboardJSHandler(Context context) {
-      this.context = context;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public String getDeviceType() {
-      return context.getResources().getString(R.string.device_type);
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardHeight() {
-      int kbHeight = context.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      kbHeight -= kbHeight % 20;
-      return kbHeight;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardWidth() {
-      DisplayMetrics dms = context.getResources().getDisplayMetrics();
-      int kbWidth = (int) (dms.widthPixels / dms.density);
-      return kbWidth;
-    }
-
-    // Store the current keyboard chirality status from KMW in InAppKeyboard
-    @JavascriptInterface
-    public void setIsChiral(boolean isChiral) {
-      if (isDebugMode()) {
-        Log.d("KMManager", "InAppKeyboard chirality: " + String.valueOf(isChiral));
-      }
-      InAppKeyboard.setChirality(isChiral);
+    KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
+      super(context, k);
     }
 
     // This annotation is required in Jelly Bean and later:
@@ -1637,8 +1612,9 @@ public final class KMManager {
       mainLoop.post(new Runnable() {
         public void run() {
           if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
-            if (KMTextView.activeView == null)
+            if ((KMTextView.activeView == null) && isDebugMode()) {
               Log.w("IAK: JS Handler", "insertText failed: activeView is null");
+            }
             return;
           }
 
@@ -1649,6 +1625,15 @@ public final class KMManager {
 
           int start = textView.getSelectionStart();
           int end = textView.getSelectionEnd();
+          // Workaround for Android TextView bug where end < start
+          // Reference: https://issuetracker.google.com/issues/36911048
+          if (end < start) {
+            Log.d(TAG, "Swapping TextView selection end:" + end + " and start:" + start);
+            int temp = end;
+            end = start;
+            start = temp;
+          }
+
           if (dn <= 0) {
             if (start == end) {
               if (!s.isEmpty() && s.charAt(0) == '\n') {
@@ -1706,42 +1691,9 @@ public final class KMManager {
     }
   }
 
-  private static final class KMSystemKeyboardJSHandler {
-    private Context context;
-
-    KMSystemKeyboardJSHandler(Context context) {
-      this.context = context;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public String getDeviceType() {
-      return context.getResources().getString(R.string.device_type);
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardHeight() {
-      int kbHeight = context.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      kbHeight -= kbHeight % 20;
-      return kbHeight;
-    }
-
-    // This annotation is required in Jelly Bean and later:
-    @JavascriptInterface
-    public int getKeyboardWidth() {
-      DisplayMetrics dms = context.getResources().getDisplayMetrics();
-      int kbWidth = (int) (dms.widthPixels / dms.density);
-      return kbWidth;
-    }
-
-    // Store the current keyboard chirality status from KMW in SystemKeyboard
-    @JavascriptInterface
-    public void setIsChiral(boolean isChiral) {
-      if (isDebugMode()) {
-        Log.d("KMManager", "SystemKeyboard chirality: " + String.valueOf(isChiral));
-      }
-      SystemKeyboard.setChirality(isChiral);
+  private static final class KMSystemKeyboardJSHandler extends KMKeyboardJSHandler {
+    KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
+      super(context, k);
     }
 
     // This annotation is required in Jelly Bean and later:
@@ -1756,7 +1708,9 @@ public final class KMManager {
 
           InputConnection ic = IMService.getCurrentInputConnection();
           if (ic == null) {
-            Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+            if (isDebugMode()) {
+              Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+            }
             return;
           }
 

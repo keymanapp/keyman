@@ -7,6 +7,7 @@ type
   public
     class function KeyboardFileNameToID(filename: string): string;
     class function CleanKeyboardID(const Name: WideString): WideString; static;
+    class function IsValidKeyboardID(const Name: string): Boolean; static;
     class function GetKeymanWebCompiledFileName(const FileName: WideString): WideString; static;
     class function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString; static;
   end;
@@ -35,6 +36,11 @@ end;
 class function TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString;
 begin
   Result := CleanKeyboardID(ChangeFileExt(ExtractFileName(FileName), ''));
+end;
+
+class function TKeyboardUtils.IsValidKeyboardID(const Name: string): Boolean;
+begin
+  Result := CleanKeyboardID(Name.Trim) = LowerCase(Name.Trim);
 end;
 
 class function TKeyboardUtils.GetKeymanWebCompiledFileName(const FileName: WideString): WideString;   // I4140

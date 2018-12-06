@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/get_started_toolbar" />
 
     <ListView
         android:id="@+id/listView"
@@ -11,22 +15,25 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/listView" >
-    
+        android:layout_height="wrap_content" >
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_alignParentTop="true"
-            android:background="@android:color/holo_blue_light" />
-        
+            android:background="@color/keyman_orange" />
+
         <CheckBox
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="14dp"
-            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/checkbox_margin_left"
+            android:layout_marginStart="@dimen/checkbox_margin_left"
+            android:layout_marginTop="@dimen/checkbox_padding"
+            android:layout_marginBottom="@dimen/checkbox_padding"
+            android:paddingTop="@dimen/checkbox_padding"
+            android:paddingBottom="@dimen/checkbox_padding"
             android:text="@string/dont_show_again" />
-    
+
     </RelativeLayout>
-</RelativeLayout>
+</LinearLayout>

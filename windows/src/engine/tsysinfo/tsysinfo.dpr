@@ -31,7 +31,6 @@ uses
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
-  SystemDebugPath in '..\..\global\delphi\general\SystemDebugPath.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',

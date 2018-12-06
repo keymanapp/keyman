@@ -91,7 +91,9 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   ComCtrls, ImgList, Menus, StdCtrls, ExtCtrls, ToolWin, Buttons,
   KeymanDeveloperUtils, UfrmMDIChild, UfrmMDIEditor,
-  MenuImgList, Project, UfrmProject, CharacterMapSettings,
+  MenuImgList,
+  Keyman.Developer.System.Project.Project,
+  Keyman.Developer.UI.Project.UfrmProject, CharacterMapSettings,
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
@@ -299,6 +301,8 @@ type
     FInOnHelp: Boolean;
     mHHelp: TWebHookHelpSystem;   // I4677
     FFirstShow: Boolean;
+    FIsClosing: Boolean;
+    FCanClose: Boolean;
 
     //procedure ChildWindowsChange(Sender: TObject);
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FORMSHOWN;
@@ -332,6 +336,8 @@ type
     procedure InitDock;
     procedure LoadDockLayout;
     procedure SaveDockLayout;
+    procedure CEFShutdownComplete(Sender: TObject);
+    procedure ActivateActiveChild;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -348,6 +354,8 @@ type
     procedure CharMapInsertCode(Sender: TObject; Control: TWinControl;
       DragObject: TCharacterDragObject);
 
+    procedure UpdateCaption;
+
     procedure DefaultDockLayout;
 
     procedure UDUI_Error(Sender: TUnicodeData; Error: TUnicodeDataError; const Details: WideString);
@@ -357,8 +365,11 @@ type
 
     property ActiveChildIndex: Integer read GetActiveChildIndex write SetActiveChildIndex;
 
+    function BeforeOpenProject: Boolean;
+    procedure OpenProject(const ProjectFilename: string);
     procedure ShowProject;
     function ProjectForm: TfrmProject;
+    procedure ToggleProject;
 
     procedure ShowDebug(AShow: Boolean);
 
@@ -403,15 +414,18 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
+  Keyman.Developer.System.CEFManager,
+
   CharMapDropTool,
-  DebugManager,
   HTMLHelpViewer,
   KLog,
   keymanapi_TLB,
+  KeymanVersion,
   OnlineConstants,
   OnlineUpdateCheck,
   GlobalProxySettings,
-  ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUI,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -425,7 +439,7 @@ uses
   UfrmSelectSystemKeyboard,
   UfrmStartup, UfrmOptions,
   UfrmTestKeyboard, UfrmKeyTest, UfrmKeymanWizard,
-  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, ProjectFile, ProjectFileType,
+  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.System.Project.ProjectFileType,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
   UfrmHelp, dmActionsTextEditor, UfrmDebugStatus,
   UfrmCharacterIdentifier, UfrmCharacterMapNew;
@@ -504,8 +518,8 @@ begin
 
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
     FActiveProject := '';
-  TProjectUI.Create(FActiveProject, True);   // I4687
 
+  LoadGlobalProjectUI(FActiveProject, True);
 
   InitDock;
 
@@ -518,19 +532,12 @@ begin
 
   frmHelp := TfrmHelp.Create(Application);
 
-  KL.Log('GetDebugManager start');
-  try
-    GetDebugManager(Handle);
-  except
-    on E:Exception do
-      KL.LogError('GetDebugManager failed: '+E.Message);
-  end;
-  KL.Log('GetDebugManager finish');
-
   Application.OnActivate := AppOnActivate;
 
   LoadDockLayout;
   Invalidate;
+
+  UpdateCaption;
 end;
 
 procedure TfrmKeymanDeveloper.CreateWnd;
@@ -564,8 +571,6 @@ procedure TfrmKeymanDeveloper.FormClose(Sender: TObject; var Action: TCloseActio
 var
   i: Integer;
 begin
-  SaveDockLayout;
-
   for i := FChildWindows.Count - 1 downto 0 do
   begin
     FChildWindows[i].Visible := False;
@@ -603,31 +608,46 @@ procedure TfrmKeymanDeveloper.FormCloseQuery(Sender: TObject;
 var
   i: Integer;
 begin
-  // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
-  if not Assigned(FChildWindows) then
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormCloseQuery: FIsClosing='+BoolToStr(FIsClosing)+' FCanClose='+BoolToStr(FCanClose)));
+  if not FIsClosing then
   begin
-    CanClose := True;
-    Exit;
-  end;
-
-  for i := 0 to FChildWindows.Count - 1 do
-    if not FChildWindows[i].CloseQuery then
+    // I944 - Fix crash when FChildWindows is nil on closing Keyman Developer
+    if Assigned(FChildWindows) then
     begin
-      CanClose := False;
-      Exit;
+      for i := 0 to FChildWindows.Count - 1 do
+        if not FChildWindows[i].CloseQuery then
+        begin
+          CanClose := False;
+          Exit;
+        end;
     end;
 
-  CanClose := True;
+    FIsClosing := True;
+    SaveDockLayout;
+
+    CanClose := FInitializeCEF.StartShutdown(CEFShutdownComplete);
+    // TODO: complete exit after StartClose is successful
+  end
+  else
+    CanClose := FCanClose;
+end;
+
+procedure TfrmKeymanDeveloper.CEFShutdownComplete(Sender: TObject);
+begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.CEFShutdownComplete'));
+  FCanClose := True;
+  Close;
 end;
 
 procedure TfrmKeymanDeveloper.FormDestroy(Sender: TObject);
 begin
+//  OutputDebugString(PChar('TfrmKeymanDeveloper.FormDestroy'));
   UnhookWindowsHookEx(hInputLangChangeHook);
 
   FreeAndNil(FCharMapSettings);
   Application.OnActivate := nil;
 
-  FreeAndNil(FGlobalProject);
+  FreeGlobalProjectUI;
   FreeAndNil(FChildWindows);
   FreeAndNil(FProjectMRU);
 
@@ -865,6 +885,16 @@ begin
   ProjectForm.SetGlobalProject;
 end;
 
+procedure TfrmKeymanDeveloper.ToggleProject;
+var
+  frmProject: TfrmProject;
+begin
+  frmProject := ProjectForm;
+  if Assigned(frmProject) and (ActiveChild = frmProject)
+    then PostMessage(frmProject.Handle, WM_CLOSE, 0, 0)
+    else ShowProject;
+end;
+
 procedure TfrmKeymanDeveloper.InitDock;
 begin
   AppStorage := TJvAppRegistryStorage.Create(self);
@@ -1066,16 +1096,17 @@ begin
   end;
 end;
 
+procedure TfrmKeymanDeveloper.ActivateActiveChild;
+begin
+  if Assigned(ActiveChild) then
+    SendMessage(ActiveChild.Handle, CM_ACTIVATE, 0, 0);
+end;
+
 procedure TfrmKeymanDeveloper.pagesChange(Sender: TObject);
 begin
   inherited;
   //CharacterMapFormChanged(ActiveChild);
-  if Assigned(ActiveChild) then
-  begin
-    //if ActiveChild.SetFocus;
-    SendMessage(ActiveChild.Handle, CM_ACTIVATE, 0, 0);
-    if ActiveChild.Visible and Visible and CanFocus then ActiveChild.SetFocus;
-  end;
+  ActivateActiveChild;
 
   cbTextFileFormat.Enabled := Assigned(ActiveChild) and (ActiveChild is TfrmTikeEditor);   // I3733
   FocusActiveChild;
@@ -1096,7 +1127,7 @@ begin
     try
       ext := LowerCase(ExtractFileExt(FFileName));
 
-      if ext = '.kpj' then
+      if ext = Ext_ProjectSource then
         modActionsMain.OpenProject(FFileName)
       else
       begin
@@ -1141,6 +1172,33 @@ end;
 function TfrmKeymanDeveloper.OpenKVKEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmOSKEditor);
+end;
+
+function TfrmKeymanDeveloper.BeforeOpenProject: Boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to FChildWindows.Count - 1 do
+    if not FChildWindows[i].CloseQuery then
+      Exit(False);
+
+  Result := True;
+end;
+
+procedure TfrmKeymanDeveloper.OpenProject(const ProjectFilename: string);
+var
+  i: Integer;
+begin
+  // Close child windows
+  for i := 0 to FChildWindows.Count - 1 do
+    FChildWindows[i].Close;
+
+  FGlobalProject.Save;
+  ProjectForm.Free;
+  FreeGlobalProjectUI;
+  LoadGlobalProjectUI('');
+  ShowProject;
+  UpdateCaption;
 end;
 
 function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
@@ -1284,7 +1342,14 @@ begin
             //CharacterMapFormChanged(nil);
             Window.Parent := nil;
             pages.Pages[i].Free;
+            ActivateActiveChild;
             FocusActiveChild;
+
+            if FIsClosing then
+              if pages.PageCount = 0 then
+              begin
+                Close;
+              end;
             Exit;
           end;
       end;
@@ -1396,6 +1461,15 @@ begin
     FUnicodeDataStatusForm.UpdateStatus(Msg, Pos, Max);
 end;
 
+procedure TfrmKeymanDeveloper.UpdateCaption;
+begin
+  if FGlobalProject.Untitled
+    then Caption := '(Untitled project) - Keyman Developer'
+    else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
+
+  Application.Title := Caption;
+end;
+
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);
 var
   i: Integer;
@@ -1443,7 +1517,7 @@ end;
 
 procedure InitClasses;  // I3350
 const
-  CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/9.0)';   // I4045
+  CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/'+SKeymanVersion+')';   // I4045
 begin
   with TRegistryErrorControlled.Create do   // I3887
   try

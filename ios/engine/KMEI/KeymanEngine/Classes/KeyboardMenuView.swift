@@ -57,7 +57,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   init(keyFrame frame: CGRect, inputViewController: InputViewController, closeButtonTitle: String?) {
     let isPortrait: Bool
-    if Util.isSystemKeyboard {
+    if Manager.shared.isSystemKeyboard {
       isPortrait = InputViewController.isPortrait
     } else {
       isPortrait = UIDevice.current.orientation.isPortrait
@@ -65,26 +65,22 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     _inputViewController = inputViewController
     self.closeButtonTitle = closeButtonTitle
-    topBarHeight = Manager.shared.isSystemKeyboardTopBarEnabled ?
-      CGFloat(InputViewController.topBarHeight) : 0
+    topBarHeight = inputViewController.activeTopBarHeight
     keyFrame = frame
     rowHeight = UIDevice.current.userInterfaceIdiom == .phone ? 30 : 60
     fontSize = UIDevice.current.userInterfaceIdiom == .phone ? 14 : 21
     xLength = keyFrame.size.width * (isPortrait ? 1.1 : 0.6)
 
-    var mainFrame = inputViewController.view.frame
-    if mainFrame == CGRect.zero {
-      mainFrame = Manager.shared.keymanWeb.view.frame
-    }
-    super.init(frame: mainFrame)
+    super.init(frame: inputViewController.view.frame)
 
     let screenWidth = UIScreen.main.bounds.width
     let maxWidth = CGFloat.minimum(getMaxWidth(), screenWidth)
     let baseHeight = keyFrame.size.height
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
-    let vHeight = Manager.shared.keyboardHeight + topBarHeight
-    let bY = Manager.shared.keyboardHeight - (keyFrame.origin.y + baseHeight)
+
+    let vHeight = Manager.shared.inputViewController.kmwHeight + topBarHeight
+    let bY = Manager.shared.inputViewController.kmwHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
       let maxRows = (vHeight - baseHeight - bY) / rowHeight
@@ -235,7 +231,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   }
 
   @objc func tapAction(_ sender: UITapGestureRecognizer) {
-    Manager.shared.dismissKeyboardMenu()
+    Manager.shared.inputViewController.dismissKeyboardMenu()
   }
 
   func numberOfSections(in tableView: UITableView) -> Int {
@@ -293,7 +289,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     switchKeyboard(indexPath.row)
-    Manager.shared.dismissKeyboardMenu()
+
+    Manager.shared.inputViewController.dismissKeyboardMenu()
   }
 
   func getMaxWidth() -> CGFloat {

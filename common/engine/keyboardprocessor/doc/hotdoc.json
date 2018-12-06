@@ -1,0 +1,14 @@
+{
+    "project_name": "@project_name@",
+    "project_version": "@project_version@",
+    "sitemap": "../../doc/sitemap.txt",
+    "index": "../../doc/markdown_files/index.md",
+    "c_sources": [
+      "../include/keyboardprocessor.h"
+    ],
+    "c_smart_index" : true,
+    "output": ".",
+    "extra_assets": [
+        "../../assets"
+    ]
+}

@@ -1,0 +1,5 @@
+  SKeymanVersion = '$RELEASE';
+
+  KeymanVersion_Major = $RELEASE_MAJOR;
+  KeymanVersion_Minor = $RELEASE_MINOR;
+

@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../onboard-keyman"
+		},
+		{
+			"path": "../common/engine/keyboardprocessor"
+		}
+	],
+	"settings": {
+		"C_Cpp.default.includePath": "/usr/include/glib-2.0;/usr/include/json-glib-1.0",
+		"files.associations": {
+			"glib.h": "c",
+			"json-glib.h": "c"
+		}
+	},
+}

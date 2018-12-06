@@ -17,7 +17,7 @@
                     31 May 2010 - mcdurdin - I2397 - Assertion failure - keyboard options loading twice
                     28 Nov 2012 - mcdurdin - I3594 - V9.0 - Remove old SelectKeyboard code and related messages
 */
-#include "keyman64.h"
+#include "pch.h"
 #include "registry.h"
 
 void IntSaveKeyboardOption(LPCSTR key, LPINTKEYBOARDINFO kp, int nStoreToSave);
@@ -134,12 +134,12 @@ BOOL IntLoadKeyboardOptions(LPCSTR key, LPINTKEYBOARDINFO kp)
   RegistryReadOnly r(HKEY_CURRENT_USER);
   if(r.OpenKeyReadOnly(REGSZ_KeymanActiveKeyboards) && r.OpenKeyReadOnly(kp->Name) && r.OpenKeyReadOnly(key))
   {
-    WCHAR buf[255];
+    WCHAR buf[256];
     int n = 0;
     while(r.GetValueNames(buf, sizeof(buf) / sizeof(buf[0]), n))
     {
       buf[255] = 0;
-      WCHAR val[255];
+      WCHAR val[256];
       if(r.ReadString(buf, val, sizeof(val) / sizeof(val[0])) && val[0])
       {
         val[255] = 0;

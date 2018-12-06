@@ -24,7 +24,7 @@
                     23 Jun 2014 - mcdurdin - I4287 - V9.0 - Remove extraneous AppIntegration class type tests
 */
    // I4287
-#include "keyman64.h"
+#include "pch.h"
 
 PWSTR decxstr(PWSTR p);
 

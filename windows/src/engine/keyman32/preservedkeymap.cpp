@@ -24,7 +24,7 @@
                     10 Feb 2015 - mcdurdin - I4592 - V9.0 - If a computer does not have US keyboard installed, then AltGr rules can go wrong
 */
    // I3623   // I4169   // I4575   // I4575
-#include "keyman64.h"
+#include "pch.h"
 
 WORD USVKToScanCodeToLayoutVK(WORD VKey);   // I3762
 
@@ -203,6 +203,13 @@ BOOL PreservedKeyMap::MapKeyRule(KEY *pKey, TF_PRESERVEDKEY *pPreservedKey)
     return FALSE;
   }
 
+  if (Key > 255) {
+    //
+    // Touch-defined keys have a value > 255, but these should never be preserved
+    //
+    return FALSE;
+  }
+
   if(ShiftFlags == 0)
   {
     if(!MapUSCharToVK(&Key, &ShiftFlags)) return FALSE;
@@ -234,6 +241,16 @@ BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreserved
 
   m_BaseKeyboardUsesAltGr = KeyboardGivesCtrlRAltForRAlt();   // I4592
 
+  // This is not the same as m_BaseKeyboardUsesAltGr -- we are turning 
+  // the simulation back on after (possibly) turning it off, for a 
+  // consistent experience. TODO: determine if m_BaseKeyboardUseAltGr
+  // is still needed given we always use kbdus as base for Keyman 10+
+  BOOL bSimulateAltGr = Globals::get_SimulateAltGr();
+
+  // We only want to translate RALT and RALT+SHIFT for Ctrl+Alt rules.
+  // So we exclude all our other favourite modifier keys.
+  const UINT RALT_MATCHING_MASK = TF_MOD_CONTROL | TF_MOD_ALT | TF_MOD_LCONTROL | TF_MOD_RCONTROL | TF_MOD_LALT | TF_MOD_RALT;
+
   for(i = 0; i < pKeyboard->cxGroupArray; i++)
   {
     if(pKeyboard->dpGroupArray[i].fUsingKeys)
@@ -245,6 +262,12 @@ BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreserved
   if(cKeys == 0)
   {
     return FALSE;
+  }
+
+  if (bSimulateAltGr)
+  {
+    // We might need twice as many preserved keys to map both LCtrl+LAlt+x and RAlt+x
+    cKeys *= 2;
   }
 
   if(pPreservedKeys == NULL)
@@ -267,12 +290,24 @@ BOOL PreservedKeyMap::MapKeyboard(KEYBOARD *pKeyboard, PreservedKey **pPreserved
     {
       for(j = 0; j < pGroup->cxKeyArray; j++)
       {
+        // If we have a key rule for the key, we should preserve it
         if(MapKeyRule(&pGroup->dpKeyArray[j], &pKeys[n].key))
         {
+          // Don't attempt to add the same preserved key twice. Bad things happen
           if(!IsMatchingKey(&pKeys[n], pKeys, n))
           {
             CoCreateGuid(&pKeys[n].guid);
             n++;
+
+            if (bSimulateAltGr && (pKeys[n-1].key.uModifiers & RALT_MATCHING_MASK) == TF_MOD_RALT) 
+            {
+              // Do this for RALT and RALT+SHIFT only, so we've tested against that mask
+              // Copy the key and fix modifiers
+              pKeys[n].key = pKeys[n - 1].key;
+              pKeys[n].key.uModifiers = (pKeys[n].key.uModifiers & ~TF_MOD_RALT) | TF_MOD_LCONTROL | TF_MOD_LALT;
+              CoCreateGuid(&pKeys[n].guid);
+              n++;
+            }
           }
         }
       }

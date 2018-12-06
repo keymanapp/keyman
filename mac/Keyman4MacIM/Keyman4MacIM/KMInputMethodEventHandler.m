@@ -8,6 +8,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodEventHandlerProtected.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#import <Crashlytics/Crashlytics.h>
 
 @implementation KMInputMethodEventHandler
 
@@ -19,6 +20,9 @@ NSMutableString* _pendingBuffer;
 NSUInteger _numberOfPostedDeletesToExpect = 0;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
+NSMutableString* _easterEggForCrashlytics = nil;
+NSString* const kEasterEggText = @"Crashlytics force now";
+NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 NSRange _previousSelRange;
 
@@ -40,14 +44,21 @@ NSRange _previousSelRange;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId {
+    // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
+    // with Apple's IM faramework) have a problem in that if the user selects a different font (or other
+    // formatting) and then types a sequence that causes characters to be added to the document and then
+    // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
+    // "fixed" by treating them as legacy apps, but it causes other problems.
     BOOL legacy = ([clientAppId isEqual: @"com.github.atom"] ||
             [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
+            [clientAppId isEqual: @"org.libreoffice.script"] ||
             [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
             [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
             [clientAppId isEqual: @"com.microsoft.Word"] ||
-            [clientAppId isEqual: @"org.openoffice.script"]
+            [clientAppId isEqual: @"org.openoffice.script"] ||
+            [clientAppId isEqual: @"com.adobe.InDesign"]
                /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
     
     // We used to default to NO, so these were the obvious exceptions. But then we realized that
@@ -59,6 +70,14 @@ NSRange _previousSelRange;
     //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
     //        _clientSelectionCanChangeUnexpectedly = YES;
     //    }
+    
+    // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Crashlytics force now", it will force a simulated crash to test reporting to fabric.io.
+    if ([self.AppDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+        NSLog(@"Crashlytics - Preparing to detect Easter egg.");
+        _easterEggForCrashlytics = [[NSMutableString alloc] init];
+    }
+    else
+        _easterEggForCrashlytics = nil;
     
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
@@ -83,6 +102,8 @@ NSRange _previousSelRange;
             NSLog(@"  _keyCodeOfOriginalEvent = %hu", _keyCodeOfOriginalEvent);
         }
         _numberOfPostedDeletesToExpect = 0;
+        // If _sourceFromOriginalEvent != nil, we should probably attempt to release and clear it.
+        // [self dealloc]
         _pendingBuffer = nil;
         _keyCodeOfOriginalEvent = 0;
     }
@@ -266,6 +287,11 @@ NSRange _previousSelRange;
 }
 
 - (void)updateContextBufferIfNeeded:(id)client {
+    // REVIEW: if self.AppDelegate.lowLevelEventTap == nil under what circumstances might we be able to safely
+    // re-get the context? (Probably clientCanProvideSelectionInfo would need to be true, and it would only
+    // actually be useful if client respondsToSelector:@selector(attributedSubstringFromRange:), but even then
+    // we'd only want to do it if we have actually moved from our previous location. Otherwise, we wouldn't be
+    // able to handle dead keys correctly.)
     if (self.AppDelegate.contextChangingEventDetected)
     {
         if (!_contextOutOfDate && [self.AppDelegate debugMode]) {
@@ -283,10 +309,40 @@ NSRange _previousSelRange;
     BOOL deleteBackPosted = NO;
     NSArray *actions = nil;
     if (![self willDeleteNullChar]) {
-        NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-        actions = [self.kme processEvent:eventWithOriginalModifierFlags];
-        if (actions.count == 0)
+        if (self.AppDelegate.lowLevelEventTap != nil) {
+            NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.AppDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:event.context characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+            actions = [self.kme processEvent:eventWithOriginalModifierFlags];
+        }
+        else {
+            // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
+            // Keyboards that depend on chirality support will not work. And command-key actions that change the
+            // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
+            actions = [self.kme processEvent:event];
+        }
+        if (actions.count == 0) {
+            if (_easterEggForCrashlytics != nil) {
+                NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
+                NSLog(@"Crashlytics - KMX name: %@", kmxName);
+                if ([kmxName isEqualToString:kEasterEggKmxName]) {
+                    NSUInteger len = [_easterEggForCrashlytics length];
+                    NSLog(@"Crashlytics - Processing character(s): %@", [event characters]);
+                    if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+                        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+                        NSLog(@"Crashlytics - Adding character to Easter Egg code string: %@", characterToAdd);
+                        [_easterEggForCrashlytics appendString:characterToAdd];
+                        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
+                            NSLog(@"Crashlytics - Forcing crash now with API Key: %@", [[Crashlytics sharedInstance] APIKey]);
+                            [[Crashlytics sharedInstance] crash];
+                        }
+                    }
+                    else if (len > 0) {
+                        NSLog(@"Crashlytics - Clearing Easter Egg code string.");
+                        [_easterEggForCrashlytics setString:@""];
+                    }
+                }
+            }
             return NO;
+        }
     }
     else
         return NO;
@@ -399,19 +455,26 @@ NSRange _previousSelRange;
                 NSLog(@"Processing final posted delete-back...");
             
             self.willDeleteNullChar = NO;
-            if (_legacyMode && _pendingBuffer != nil && _pendingBuffer.length > 0) {
-                if ([self.AppDelegate debugMode])
-                    NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
-                [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
+            if (_legacyMode) {
+                if (_pendingBuffer != nil && _pendingBuffer.length > 0) {
+                    if ([self.AppDelegate debugMode])
+                        NSLog(@"Posting special code to tell IM to insert characters from pending buffer.");
+                    [self performSelector:@selector(initiatePendingBufferProcessing:) withObject:client afterDelay:0.1];
+                }
             }
             else {
-                if ([self.AppDelegate debugMode]) {
-                    NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
+                if (!_sourceFromOriginalEvent) {
+                    NSLog(@"----- If not legacy mode, _sourceFromOriginalEvent should be retained until original code is posted -----");
                 }
-                [self postKeyPressToFrontProcess:_keyCodeOfOriginalEvent from:_sourceFromOriginalEvent];
-                _keyCodeOfOriginalEvent = 0;
-                CFRelease(_sourceFromOriginalEvent);
-                _sourceFromOriginalEvent = nil;
+                else {
+                    if ([self.AppDelegate debugMode]) {
+                        NSLog(@"Re-posting original (unhandled) code: %d", (int)_keyCodeOfOriginalEvent);
+                    }
+                    [self postKeyPressToFrontProcess:_keyCodeOfOriginalEvent from:_sourceFromOriginalEvent];
+                    _keyCodeOfOriginalEvent = 0;
+                    CFRelease(_sourceFromOriginalEvent);
+                    _sourceFromOriginalEvent = nil;
+                }
             }
             *updateEngineContext = NO;
         }
@@ -426,13 +489,7 @@ NSRange _previousSelRange;
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
     
-    if (event.type == NSLeftMouseDown || event.type == NSLeftMouseUp ) {
-        _contextOutOfDate = YES;
-        return NO;
-    }
-    else if (event.type != NSKeyDown)
-        return NO; // We ignore NSLeftMouseDragged events (because we'll eventually get a mouse-up).
-    else if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
+    if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
         [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.
     }
@@ -471,10 +528,9 @@ NSRange _previousSelRange;
             if ([self.AppDelegate debugMode])
                 NSLog(@"Deleted %li null characters from context buffer", nc);
             // This can presumably only happen if a previous event resulted in a chain of
-            // actions that had a Q_BACK not followed by a Q_STR (assuming that can happen).
-            // REVIEW: Need to test this scenario in Atom and Googe Docs in Safari
+            // actions that had a Q_BACK not followed by a Q_STR.
             self.willDeleteNullChar = YES;
-            [self postDeleteBack:nc for:event];
+            [self postDeleteBacks:nc for:event];
             _keyCodeOfOriginalEvent = event.keyCode;
             
             return YES;
@@ -510,18 +566,18 @@ NSRange _previousSelRange;
                 break;
                 
             default:
-            {
-                // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
-                // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
-                // can generate more than one character in event.characters.
-                unichar ch = [event.characters characterAtIndex:0];
-                if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
-                    charactersToAppend = event.characters;
+                {
+                    // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
+                    // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
+                    // can generate more than one character in event.characters.
+                    unichar ch = [event.characters characterAtIndex:0];
+                    if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
+                        charactersToAppend = event.characters;
+                    }
+                    else {
+                        // Other keys
+                    }
                 }
-                else {
-                    // Other keys
-                }
-            }
                 break;
         }
         if (charactersToAppend != nil) {
@@ -662,7 +718,7 @@ NSRange _previousSelRange;
     if (pos >= n) {
         // n is now the number of delete-backs we need to post (plus one more if there is selected text)
         if ([self.AppDelegate debugMode]) {
-            NSLog(@"Legacy mode: calling postDeleteBack");
+            NSLog(@"Legacy mode: calling postDeleteBacks");
             if (_clientCanProvideSelectionInfo == No || _clientCanProvideSelectionInfo == Unreliable)
                 NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
         }
@@ -679,7 +735,7 @@ NSRange _previousSelRange;
         
         if (_clientCanProvideSelectionInfo == Yes && selectedRange.length > 0)
             n++; // First delete-back will delete the existing selection.
-        [self postDeleteBack:n for:event];
+        [self postDeleteBacks:n for:event];
         
         CFRelease(_sourceFromOriginalEvent);
         _sourceFromOriginalEvent = nil;
@@ -704,22 +760,19 @@ NSRange _previousSelRange;
     CFRelease(keyUpEvent);
 }
 
-- (void)postDeleteBack:(NSUInteger)count for:(NSEvent *) event {
+- (void)postDeleteBacks:(NSUInteger)count for:(NSEvent *) event {
     _numberOfPostedDeletesToExpect = count;
-    CGEventRef ev;
+    
     _sourceFromOriginalEvent = CGEventCreateSourceFromEvent([event CGEvent]);
     
     for (int db = 0; db < count; db++)
     {
-        if ([self.AppDelegate debugMode])
+        if ([self.AppDelegate debugMode]) {
             NSLog(@"Posting a delete (down/up) at kCGHIDEventTap.");
-        
-        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, true);//delete-back down
-        CGEventPost(kCGHIDEventTap, ev);
-        CFRelease(ev);
-        ev = CGEventCreateKeyboardEvent (_sourceFromOriginalEvent, kVK_Delete, false); //delete-back up
-        CGEventPost(kCGHIDEventTap, ev);
-        CFRelease(ev);
+        }
+        [self.AppDelegate postKeyboardEventWithSource:_sourceFromOriginalEvent code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
+            CGEventPost(kCGHIDEventTap, eventToPost);
+        }];
     }
 }
 
@@ -731,15 +784,18 @@ NSRange _previousSelRange;
     ProcessSerialNumber psn;
     GetFrontProcess(&psn);
     
-    CGEventRef event = CGEventCreateKeyboardEvent(source, code, true);
-    CGEventPostToPSN(&psn, event);
-    CFRelease(event);
-    
-    if (code != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed
-        event = CGEventCreateKeyboardEvent(source, code, false);
-        CGEventPostToPSN(&psn, event);
-        CFRelease(event);
+    if ([self.AppDelegate debugMode]) {
+        if (code == kProcessPendingBuffer) {
+            NSLog(@"Posting code to tell Keyman to process characters in pending buffer.");
+        }
+        else {
+            NSLog(@"Posting a keypress (down/up) to the 'front process' for the %hu key.", code);
+        }
     }
+    
+    [self.AppDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
+        CGEventPostToPSN((ProcessSerialNumberPtr)&psn, eventToPost);
+    }];
 }
 
 @end

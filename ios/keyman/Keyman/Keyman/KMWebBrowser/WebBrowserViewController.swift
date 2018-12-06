@@ -129,7 +129,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
       loadUrlString(urlString)
     }
   }
-  
+
   func loadUrlString(_ urlString: String, allowSearchRedirect: Bool  = true) {
     guard var url = URL(string: urlString) else {
       if allowSearchRedirect {
@@ -143,7 +143,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let request = URLRequest(url: url)
     webView.loadRequest(request)
   }
-  
+
   func loadSearchString(_ searchString: String) {
     if let query = searchString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
       loadUrlString("google.com/search?q=\(query)", allowSearchRedirect: false)
@@ -209,12 +209,13 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
   func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
     UIApplication.shared.isNetworkActivityIndicatorVisible = false
     updateButtons()
-    let alert = UIAlertView(title: "Cannot Open Page",
-                            message: error.localizedDescription,
-                            delegate: self,
-                            cancelButtonTitle: "OK",
-                            otherButtonTitles: "")
-    alert.show()
+    let alertController = UIAlertController(title: "Cannot Open Page",
+                                            message: error.localizedDescription,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: nil))
+    self.present(alertController, animated: true, completion: nil)
   }
 
   private func updateButtons() {

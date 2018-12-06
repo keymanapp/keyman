@@ -17,7 +17,7 @@
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
 */
 
-#include "keyman64.h"
+#include "pch.h"
 
 BOOL CryptRC4::SelfTest()
 {

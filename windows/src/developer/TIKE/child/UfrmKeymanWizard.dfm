@@ -198,6 +198,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
@@ -726,6 +729,9 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageLayout: TTabSheet
       Caption = 'Layout'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesLayout: TPageControl
         Left = 0
         Top = 0
@@ -740,6 +746,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object panLayoutSimple: TPanel
             Left = 0
             Top = 0
@@ -963,6 +973,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
@@ -1006,7 +1020,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         end
         inherited ilCmds: TImageList
           Bitmap = {
-            494C01010C000E00E00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+            494C01010C000E00F00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
             0000000000003600000028000000400000004000000001002000000000000040
             0000000000000000000000000000000000000000000000000000000000000000
             0000000000000000000000000000000000000000000000000000000000000000
@@ -1546,10 +1560,16 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageOnScreenKeyboard: TTabSheet
       Caption = 'On-Screen'
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1564,32 +1584,55 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0

@@ -4,6 +4,11 @@
          Customize dimensions originally defined in res/values/dimens.xml (such as
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     -->
+    <dimen name="package_label_width">750dp</dimen>
     <dimen name="activity_horizontal_margin">128dp</dimen>
-    
+    <dimen name="product_logo_bottom">196dp</dimen>
+    <dimen name="checkbox_margin">8dp</dimen>
+    <dimen name="checkbox_margin_left">15dp</dimen>
+    <dimen name="checkbox_padding">10dp</dimen>
+
 </resources>

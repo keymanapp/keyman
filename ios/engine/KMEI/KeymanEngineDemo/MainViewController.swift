@@ -276,8 +276,12 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   }
 
   @objc func showAlert(_ message: String) {
-    let alert = UIAlertView(title: "Keyboard Download Error", message: message, delegate: self,
-                            cancelButtonTitle: "OK", otherButtonTitles: "")
-    alert.show()
+    let alertController = UIAlertController(title: "Keyboard Download Error",
+                                            message: message,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: nil))
+    self.present(alertController, animated: true, completion: nil)
   }
 }

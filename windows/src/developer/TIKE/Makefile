@@ -12,11 +12,24 @@ build: version.res manifest.res icons dirs xml
     $(COPY) tike.exe $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer
 
-xml: pull-keymanweb 
+xml: pull-keymanweb pull-npm
     cd $(ROOT)\src\developer\tike\xml
     -del /q $(ROOT)\bin\developer\xml\*
     xcopy /s /y * $(ROOT)\bin\developer\xml
     cd $(ROOT)\src\developer\tike
+
+pull-npm:
+    #
+    # Grab the version of Monaco and any other node modules 
+    # that we want to use in Keyman Developer, and copy into
+    # lib folder for sane paths. If we use more npm modules in the
+    # future, we may consolidate the paths at that time.
+    #
+    cd $(ROOT)\src\developer\tike\xml\app
+    npm install
+    -rd /s/q $(ROOT)\src\developer\tike\xml\app\lib\monaco
+    xcopy /s /y $(ROOT)\src\developer\tike\xml\app\node_modules\monaco-editor\min $(ROOT)\src\developer\tike\xml\app\lib\monaco\min\ #
+    xcopy /s /y $(ROOT)\src\developer\tike\xml\app\node_modules\monaco-editor\min-maps $(ROOT)\src\developer\tike\xml\app\lib\monaco\min-maps\ #
 
 pull-keymanweb:
     #
@@ -29,6 +42,7 @@ pull-keymanweb:
     # GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l    
     #
     cd $(ROOT)\..\web\source
+
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh -no_minify
 !else
@@ -64,5 +78,13 @@ test-manifest:
     # test that linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\tike.exe -validate_manifest
 
+generate-app-wxs:
+    @echo *******************************************************************************************
+    @echo The generated ..\inst\monaco_gen.wxs file will require manual merging with the existing 
+    @echo monaco.xws. Existing component GUIDs must be maintained per Windows Installer component 
+    @echo rules (a file at a single location should have a permanent GUID for reference counting).
+    @echo *******************************************************************************************
+    $(WIXPATH)\heat.exe dir xml\app\lib\monaco\min\vs -gg -o ..\inst\monaco_gen.wxs -cg MonacoFiles -var var.MonacoSourceDir -dr MonacoTargetDir
+    
 !include ..\..\Target.mak
 

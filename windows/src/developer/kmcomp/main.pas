@@ -112,6 +112,7 @@ var
   FMergingValidateIds: Boolean;
   FJsonSchemaPath: string;
   FParamSourcePath: string;
+  FParamHelpLink: string;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -176,6 +177,11 @@ begin
       Inc(i);
       FParamSourcePath := ParamStr(i);
     end
+    else if s = '-add-help-link' then
+    begin
+      Inc(i);
+      FParamHelpLink := ParamStr(i);
+    end
     else if s = '-schema-path' then
     begin
       Inc(i);
@@ -213,6 +219,7 @@ begin
     writeln('');
     writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('              [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
+    writeln('              [-add-help-link path]');
     writeln('              [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -222,18 +229,19 @@ begin
     writeln('');
     writeln('          -s       silent; don''t print information-level messages');
     writeln('          -ss      fully silent; don''t print anything (except fatal errors)');
-    writeln('          -nologo  don''t print the compiler description and registration');
+    writeln('          -nologo  don''t print the compiler description');
     writeln('          -c       clean target (only for .kpj)');
     writeln('          -d       include debug information');
     writeln('          -w       treat warnings as errors');
     writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
+    writeln('          -add-help-link path to help file on https://help.keyman.com/keyboards');
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
     writeln('          -v[s]    validate infile against source schema');
     writeln('          -vd      validate infile against distribution schema');
     writeln('          -m       merge information from infile (can be .kmp and .js) into .keyboard_info output file');
     writeln('          -m-validate-id  validate the id against the .js, .kmx and .kmp filenames when merging');
-    writeln('          -json-extract   print json data .keyboard_info for build script integration');
+    writeln('          -extract-keyboard-info   print json data .keyboard_info for build script integration');
     writeln('          -source-path    specify path to add to the sourcePath field in the .keyboard_info output file');
     writeln('          -schema-path    specify path to the keyboard_info json schema definitions');
     writeln('                          if not specified, then defaults to same folder as kmcomp.exe');
@@ -254,7 +262,7 @@ begin
       hOutfile := 0;
 
     if FMerging then
-      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FMergingValidateIds, FSilent, @CompilerMessage)
+      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpLink, FMergingValidateIds, FSilent, @CompilerMessage)
     else if FValidating then
       FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, @CompilerMessage)
     else if FJsonExtract then

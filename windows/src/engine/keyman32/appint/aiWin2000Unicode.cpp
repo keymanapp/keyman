@@ -40,7 +40,8 @@
                     31 Dec 2014 - mcdurdin - I4548 - V9.0 - When Alt is down, release of Ctrl, Shift is not detectable within TIP in some languages
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
-#include "keyman64.h"   // I4128   // I4287
+#include "pch.h"   // I4128   // I4287
+#include "serialkeyeventclient.h"
 
 #define KEYMAN_MOREPOST	"WM_KMMOREPOST"
 
@@ -177,7 +178,6 @@ BOOL AIWin2000Unicode::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY 
 
 BOOL AIWin2000Unicode::PostKeys()
 {	
-  BYTE saved_kbd_state[256];
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) {
     return FALSE;
@@ -195,13 +195,6 @@ BOOL AIWin2000Unicode::PostKeys()
   LPINPUT pInputs = new INPUT[QueueSize*100]; // TODO: Tidy this up. Horrid doing a junky alloc like this each event
   int i = 0;
 
-  if((QueueSize < 2) ||
-     (Queue[0].ItemType != QIT_VSHIFTDOWN && Queue[0].ItemType != QIT_VSHIFTUP))   /* I1813 - need to test queuesize as well */
-  {
-    /* Fakes a key to block Alt being recognised as a menu key */
-    keybd_shift(pInputs, &i, FALSE, saved_kbd_state);
-  }
-
   for(; n < QueueSize; n++)
   {
 	  switch(Queue[n].ItemType) {
@@ -215,7 +208,7 @@ BOOL AIWin2000Unicode::PostKeys()
         pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = (WORD)Queue[n].dwData & 0xFF;  // I3242 - noted as unclean but was not cause of the issue  // I3438   // I3527
 
-        pInputs[i].ki.wScan = 0xFF;
+        pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
         pInputs[i].ki.dwFlags = ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
 
         pInputs[i].ki.time = 0;
@@ -242,7 +235,7 @@ BOOL AIWin2000Unicode::PostKeys()
       {
         pInputs[i].type = INPUT_KEYBOARD;
         pInputs[i].ki.wVk = (WORD) Queue[n].dwData & 0xFF;  // I3242 - noted as unclean but was not cause of the issue  // I3438   // I3527
-        pInputs[i].ki.wScan = 0xFF;
+        pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
         pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
         pInputs[i].ki.time = 0;
         pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378
@@ -281,14 +274,14 @@ BOOL AIWin2000Unicode::PostKeys()
 
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = VK_BACK;
-      pInputs[i].ki.wScan = 0xFF;
+      pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
       pInputs[i].ki.dwFlags = ((Queue[n].dwData & 0x0100) ? KEYEVENTF_EXTENDEDKEY : 0);
       pInputs[i].ki.time = 0;
       pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378
 
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = VK_BACK;
-      pInputs[i].ki.wScan = 0xFF;
+      pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
       pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & 0x0100) ? KEYEVENTF_EXTENDEDKEY : 0);
       pInputs[i].ki.time = 0;
       pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378
@@ -296,8 +289,6 @@ BOOL AIWin2000Unicode::PostKeys()
       break;
 	  }
   }
-
-  keybd_shift(pInputs, &i, TRUE, saved_kbd_state);
 
 	QueueSize = 0;
 
@@ -310,9 +301,7 @@ BOOL AIWin2000Unicode::PostKeys()
   SetLastError(0);
 
   if(i > 0) {   // I4452
-    if(SendInput(i, pInputs, sizeof(INPUT)) == 0) {
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: failed to SendInput with error %d", GetLastError());
-    }
+    _td->pSerialKeyEventClient->SignalServer(pInputs, i);
   }
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input finished");

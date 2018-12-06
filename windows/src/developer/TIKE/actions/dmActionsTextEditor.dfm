@@ -29,41 +29,4 @@ object modActionsTextEditor: TmodActionsTextEditor
       OnUpdate = actTextEditor_ReformatXMLUpdate
     end
   end
-  object mnuTextEditor: TPopupMenu
-    Left = 336
-    Top = 224
-    object ShowCharacter1: TMenuItem
-      Action = actTextEditor_ShowCharacter
-    end
-    object ConverttoCharacters1: TMenuItem
-      Action = actTextEditor_ConvertToCharacters
-    end
-    object N1: TMenuItem
-      Caption = '-'
-    end
-    object Undo1: TMenuItem
-      Action = modActionsMain.actEditUndo
-    end
-    object Redo1: TMenuItem
-      Action = modActionsMain.actEditRedo
-    end
-    object N2: TMenuItem
-      Caption = '-'
-    end
-    object Cut1: TMenuItem
-      Action = modActionsMain.actEditCut
-    end
-    object Copy1: TMenuItem
-      Action = modActionsMain.actEditCopy
-    end
-    object Paste1: TMenuItem
-      Action = modActionsMain.actEditPaste
-    end
-    object N3: TMenuItem
-      Caption = '-'
-    end
-    object SelectAll1: TMenuItem
-      Action = modActionsMain.actEditSelectAll
-    end
-  end
 end

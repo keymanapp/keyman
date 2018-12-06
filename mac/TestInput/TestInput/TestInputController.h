@@ -59,6 +59,9 @@
     //used to remember where text is being inserted in the _composedBuffer
     NSInteger						_originalIndex;
     NSUInteger _numberOfDeletesExpected;
+
 }
+
+- (void)menuAction:(id)sender;
 
 @end

@@ -1,0 +1,54 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the keyman-config package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: keyman-config\n"
+"Report-Msgid-Bugs-To: keyman-config@packages.debian.org\n"
+"POT-Creation-Date: 2018-09-01 10:55+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../python3-keyman-config.templates:1001
+msgid "Do you want to make keyman directories available to everyone?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../python3-keyman-config.templates:1001
+msgid "The keyman package installer programs will install files to:"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../python3-keyman-config.templates:1001
+msgid ""
+"/usr/local/share/keyman /usr/local/share/doc/keyman /usr/local/share/fonts/"
+"keyman"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../python3-keyman-config.templates:1001
+msgid ""
+"This will make these directories mode 7770 so that all users may install and "
+"uninstall shared keyman keyboards."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../python3-keyman-config.templates:1001
+msgid ""
+"You may choose your own alternative policy of who can do what in these "
+"directories."
+msgstr ""

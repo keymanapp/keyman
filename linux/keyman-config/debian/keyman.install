@@ -1,0 +1,2 @@
+./keyman_config/icons/* /usr/share/keyman/icons/
+debian/km-config.desktop /usr/share/applications

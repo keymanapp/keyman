@@ -3,12 +3,10 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_packaging">
-    <div class="page" id="Packaging">
-      <div id="uppertext2" style="clear: all; display: block;">
+    <div class="page" id="page-2">
+      <div class="help-container" id="uppertext2">
         <div class="headerimage">
-          <p><img>
-            <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>header_package.png</xsl:attribute>
-          </img></p>
+          <p><img src='res/header_package.png' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
           
@@ -93,17 +91,6 @@
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
         
-        <xsl:if test="/KeymanDeveloperProject/Modules/Module[ID='BrandingPack']">
-          |
-          <xsl:call-template name="button">
-            <xsl:with-param name="caption">Build package installers</xsl:with-param>
-            <xsl:with-param name="command">keyman:package_compileallinstallers</xsl:with-param>
-            <xsl:with-param name="enabled">
-              <xsl:if test="not(KeymanDeveloperProject/Files/File[FileType='.kps' and not (ParentFileID)])">false</xsl:if>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
-
         <br />
         <br />
 

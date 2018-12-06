@@ -22,7 +22,7 @@ let dontShowGetStartedKey = "DontShowGetStarted"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
-class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate, UIAlertViewDelegate {
+class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDelegate {
   private let minTextSize: CGFloat = 9.0
   private let maxTextSize: CGFloat = 72.0
   private let getStartedViewTag = 7183
@@ -120,8 +120,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardRemoved,
       observer: self,
       function: MainViewController.keyboardRemoved)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.launched),
-        name: launchedFromUrlNotification, object: nil)
 
   }
 
@@ -441,7 +439,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     for keyboard in keyboards {
       Manager.shared.addKeyboard(keyboard)
-      Manager.shared.setKeyboard(keyboard)
+      _ = Manager.shared.setKeyboard(keyboard)
     }
 
     launchUrl = nil
@@ -451,8 +449,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
       let error = notification.error
-      showAlert(withTitle: "Keyboard Download Error", message: error.localizedDescription,
-                cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
+      appDelegate.showSimpleAlert(title: "Keyboard Download Error", message: error.localizedDescription)
       launchUrl = nil
     }
   }
@@ -478,34 +475,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   // MARK: - View Actions
-
-  //
-  // Called from AppDelegate when a keyman:// legacy ad-hoc keyboard
-  // install URL is encountered. Deprecated, remove in Keyman 11
-  //
-  func launchFromUrl(fromUrl: URL) {
-    launchUrl = fromUrl
-    if didKeyboardLoad {
-      performAction(from: fromUrl)
-    } else {
-      launchUrl = nil
-    }
-  }
-
-  //
-  // TODO: Is this notification-based launched event ever used any more? If not,
-  // refactor it into oblivion. Probably deprecated with legacy ad-hoc keyboard.
-  //
-  @objc func launched(fromUrl notification: Notification) {
-    if let url = notification.userInfo?[urlKey] as? URL, url.query != nil {
-      launchUrl = url
-      if didKeyboardLoad {
-        performAction(from: url)
-      }
-    } else {
-      launchUrl = nil
-    }
-  }
 
   @objc func infoButtonClick(_ sender: Any?) {
     UIView.setAnimationDelegate(self)
@@ -796,8 +765,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if let urlString = params["url"] {
       // Download and set custom keyboard
       guard let url = URL(string: urlString) else {
-        showAlert(withTitle: "Custom Keyboard", message: "The keyboard could not be installed: Invalid Url",
-                  cancelButtonTitle: "OK", otherButtonTitles: nil, tag: -1)
+        appDelegate.showSimpleAlert(title: "Custom Keyboard",
+                                    message: "The keyboard could not be installed: Invalid Url")
         launchUrl = nil
         return
       }
@@ -809,8 +778,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
       customKeyboardToDownload = url
       let title = "Custom Keyboard: \(url.lastPathComponent)"
-      showAlert(withTitle: title, message: "Would you like to install this keyboard?",
-                cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 2)
+      confirmInstall(withTitle: title, message: "Would you like to install this keyboard?",
+                cancelButtonHandler: showGetStartedIfNeeded,
+                installButtonHandler: proceedWithCustomKeyboardDownload)
     } else if let kbID = params["keyboard"], let langID = params["language"] {
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
       guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
@@ -820,12 +790,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
       if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
         keyboardToDownload = keyboard
-        showAlert(withTitle: "\(keyboard.languageName): \(keyboard.name)",
+        confirmInstall(withTitle: "\(keyboard.languageName): \(keyboard.name)",
           message: "Would you like to install this keyboard?",
-                  cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 0)
+          installButtonHandler: proceedWithKeyboardDownload)
       } else {
         Manager.shared.addKeyboard(keyboard)
-        Manager.shared.setKeyboard(keyboard)
+        _ = Manager.shared.setKeyboard(keyboard)
       }
     } else {
       launchUrl = nil
@@ -873,7 +843,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       let languageName = keyboard.languageName
       let title = "\(languageName) Font"
       let msg = "Touch Install to make \(languageName) display correctly in all your apps"
-      showAlert(withTitle: title, message: msg, cancelButtonTitle: "Cancel", otherButtonTitles: "Install", tag: 1)
+      confirmInstall(withTitle: title, message: msg,
+                cancelButtonHandler: handleUserDecisionAboutInstallingProfile,
+                installButtonHandler: handleUserDecisionAboutInstallingProfile)
     } else {
       profileName = nil
     }
@@ -883,55 +855,53 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.becomeFirstResponder()
   }
 
-  private func showAlert(withTitle title: String, message msg: String, cancelButtonTitle cbTitle: String?,
-                         otherButtonTitles obTitles: String?, tag: Int) {
+  private func confirmInstall(withTitle title: String, message msg: String,
+                              cancelButtonHandler cbHandler: ((UIAlertAction) -> Swift.Void)? = nil,
+                              installButtonHandler installHandler: ((UIAlertAction) -> Swift.Void)?) {
     dismissGetStartedView(nil)
-    let alertView = UIAlertView(title: title, message: msg, delegate: self, cancelButtonTitle: cbTitle,
-                                otherButtonTitles: obTitles ?? "")
-    alertView.tag = tag
-    alertView.show()
+
+    let alertController = UIAlertController(title: title, message: msg,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "Cancel",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: cbHandler))
+    alertController.addAction(UIAlertAction(title: "Install",
+                                              style: UIAlertActionStyle.default,
+                                              handler: installHandler))
+
+    self.present(alertController, animated: true, completion: nil)
   }
 
-  private func performAlertButtonClick(withTag tag: Int) {
-    switch tag {
-    case 0:
-      if let keyboard = keyboardToDownload {
-        Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
-      }
-    case 1:
-      if let profileName = profileName {
-        checkedProfiles.append(profileName)
-        let userData = AppDelegate.activeUserDefaults()
-        userData.set(checkedProfiles, forKey: checkedProfilesKey)
-        userData.synchronize()
-
-        UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
-        self.profileName = nil
-      }
-    case 2:
-      if let url = customKeyboardToDownload {
-        Manager.shared.downloadKeyboard(from: url)
-      }
-    default:
-      break
+  private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
+    if let keyboard = keyboardToDownload {
+      Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
     }
   }
 
-  func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
-    if buttonIndex != alertView.cancelButtonIndex {
-      performAlertButtonClick(withTag: alertView.tag)
-    }
-
-    if let profileName = profileName, alertView.tag == 1 {
+  private func handleUserDecisionAboutInstallingProfile(withAction action: UIAlertAction) {
+    if let profileName = profileName {
       checkedProfiles.append(profileName)
       let userData = AppDelegate.activeUserDefaults()
       userData.set(checkedProfiles, forKey: checkedProfilesKey)
       userData.synchronize()
-      self.profileName = nil
-    } else if alertView.tag == 2 {
-      if shouldShowGetStarted {
-        showGetStartedView(nil)
+
+      if action.style == .default {
+        UIApplication.shared.openURL(URL(string: "\(baseUri)\(profileName)")!)
       }
+      self.profileName = nil
+    }
+  }
+
+  private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
+    if let url = customKeyboardToDownload {
+      Manager.shared.downloadKeyboard(from: url)
+    }
+    showGetStartedIfNeeded(withAction: action)
+  }
+
+  private func showGetStartedIfNeeded(withAction action: UIAlertAction) {
+    if shouldShowGetStarted {
+      showGetStartedView(nil)
     }
   }
 
@@ -980,6 +950,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissGetStartedView)
 
+    Manager.shared.hideKeyboard()
+
     containerView.frame = containerView.frame.insetBy(dx: 15, dy: 140)
     containerView.backgroundColor = UIColor.white
     containerView.layer.cornerRadius = 6.0
@@ -995,6 +967,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func dismissGetStartedView(_ sender: Any?) {
     overlayWindow.viewWithTag(getStartedViewTag)?.removeFromSuperview()
     overlayWindow.isHidden = true
+
+    Manager.shared.showKeyboard()
   }
 
   private var shouldShowGetStarted: Bool {

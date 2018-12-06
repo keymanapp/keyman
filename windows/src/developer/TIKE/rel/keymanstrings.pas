@@ -21,6 +21,8 @@ interface
 
 const
   SKMustIncludeDebug = 'You must include debug information to start the debugger.  Check ''Include debug information'' in the Keyboard menu.';
+  SKErrorsInCompile = 'The keyboard did not compile successfully. Unable to start debugger.';
+  SKKeyboardKMXDoesNotExist = 'The keyboard .kmx output file does not exist. The keyboard must target Windows or macOS for interactive debugging.';
 
 implementation
 

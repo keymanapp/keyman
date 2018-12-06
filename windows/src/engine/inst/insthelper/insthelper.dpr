@@ -20,20 +20,27 @@ uses
   CRC32 in '..\..\..\global\delphi\general\CRC32.pas',
   VersionInfo in '..\..\..\global\delphi\general\VersionInfo.pas',
   GetOsVersion in '..\..\..\global\delphi\general\GetOsVersion.pas',
-  SystemDebugPath in '..\..\..\global\delphi\general\SystemDebugPath.pas',
   OnlineConstants in '..\..\..\global\delphi\productactivation\OnlineConstants.pas',
-  ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
-  Unicode in '..\..\..\global\delphi\general\Unicode.pas',
   KeymanVersion in '..\..\..\global\delphi\general\KeymanVersion.pas',
   preuninstallunit in 'preuninstallunit.pas',
   input_installlayoutortip in '..\..\..\global\delphi\winapi\input_installlayoutortip.pas',
   utiltsf in '..\..\..\global\delphi\general\utiltsf.pas',
-  keyman_msctf in '..\..\..\global\delphi\winapi\keyman_msctf.pas';
+  keyman_msctf in '..\..\..\global\delphi\winapi\keyman_msctf.pas',
+  Keyman.System.Install.EnginePostInstall in 'Keyman.System.Install.EnginePostInstall.pas',
+  Keyman.System.Security in '..\..\..\global\delphi\general\Keyman.System.Security.pas',
+  Keyman.Winapi.VersionHelpers in '..\..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
+  DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',
+  ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
+  Unicode in '..\..\..\global\delphi\general\Unicode.pas',
+  utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
+  utilsystem in '..\..\..\global\delphi\general\utilsystem.pas',
+  KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas';
 
 {$R *.RES}
 {$R VERSION.RES}
 
 exports
+  EnginePostInstall,
   PreUninstall;
 begin
 end.

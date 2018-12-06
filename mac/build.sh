@@ -79,7 +79,7 @@ KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
 
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
-KMIM_PROJECT_PATH="$KM4MIM_BASE_PATH/$IM_NAME$XCODE_PROJ_EXT"
+KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
 
 # KME4M_BUILD_PATH=engine/KME4M/build
 # APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
@@ -97,7 +97,7 @@ CONFIG="Debug"
 LOCALDEPLOY=false
 PREPRELEASE=false
 KM_TIER="alpha"
-KM_VERSION="10.0.0"
+KM_VERSION=`cat ../resources/VERSION.md`.0
 UPDATE_VERSION_IN_PLIST=false
 DO_KEYMANENGINE=true
 DO_KEYMANIM=true
@@ -164,7 +164,13 @@ while [[ $# -gt 0 ]] ; do
                 if $PREPRELEASE && [[ "$2" != "Release" ]]; then
                     echo "Deployment option 'preprelease' supersedes $2 configuration."
                 else
-                    CONFIG="$2"
+                	if [[ "$2" == "r" || "$2" == "R" ]]; then
+                    	CONFIG="Release"
+                    elif [[ "$2" == "d" || "$2" == "D" ]]; then
+                    	CONFIG="Debug"
+                    else
+                    	CONFIG="$2"
+                    fi
                 fi
                 shift # past argument
             fi
@@ -247,9 +253,9 @@ if $CLEAN ; then
 fi
 
 if [ "$TEST_ACTION" == "test" ]; then
-	carthage bootstrap
+	carthage bootstrap		
 fi
-
+ 
 execBuildCommand() {
     typeset component="$1"
     shift
@@ -270,9 +276,16 @@ updatePlist() {
 	    KM_COMPONENT_NAME="$2"
 		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
 		if [ -f "$KM_PLIST" ]; then 
-			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION"
+			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION in $KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $KM_VERSION" "$KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
+			if [[ "$CONFIG" == "Release" && "$KM_COMPONENT_NAME" == "$IM_NAME" ]]; then
+				echo "Setting Fabric APIKey for release build in $KM_PLIST"
+				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]; then
+				    fail "FABRIC_API_KEY_KEYMAN4MACIM environment variable not set!"
+				fi
+				/usr/libexec/Plistbuddy -c "Set Fabric:APIKey $FABRIC_API_KEY_KEYMAN4MACIM" "$KM_PLIST"
+			fi
 		else
 			fail "File not found: $KM_PLIST"
 		fi
@@ -282,14 +295,18 @@ updatePlist() {
 if $DO_KEYMANENGINE ; then
     updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
+    execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
 fi
 
 if $DO_KEYMANIM ; then
+	cd "$KM4MIM_BASE_PATH"
+	pod install
+	cd "$KEYMAN_MAC_BASE_PATH"
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
-    execBuildCommand $IM_NAME "xcodebuild -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS"
+    execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     if [ "$TEST_ACTION" == "test" ]; then
     	if [ "$CONFIG" == "Debug" ]; then
-    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -project \"$KMIM_PROJECT_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman"
+    		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     	fi
     fi
 fi

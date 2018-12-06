@@ -4,8 +4,8 @@
 
 <xsl:template name="head">
   <head>
-    <link rel='stylesheet' type='text/css'><xsl:attribute name='href'><xsl:value-of select='/KeymanDeveloperProject/templatepath' />project.css</xsl:attribute></link>
-    <script><xsl:attribute name='src'><xsl:value-of select='/KeymanDeveloperProject/templatepath' />project.js</xsl:attribute><xsl:text> </xsl:text></script>
+    <link rel='stylesheet' type='text/css' href='res/project.css' />
+    <script src='res/project.js'><xsl:text> </xsl:text></script>
   </head>
 
 </xsl:template>
@@ -44,7 +44,7 @@
     <xsl:param name="FileType" />
     <img>
       <xsl:attribute name="alt"><xsl:value-of select="$FileType" /></xsl:attribute>
-      <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath' />icon_<xsl:choose>
+      <xsl:attribute name="src">res/icon_<xsl:choose>
           <xsl:when test='contains(".kmn.kmp.kmx.kps.kvk", $FileType)'><xsl:value-of select="substring($FileType,2)" />.png</xsl:when>
           <xsl:otherwise>file.gif</xsl:otherwise>
         </xsl:choose></xsl:attribute>
@@ -115,21 +115,11 @@
   - Popup menu implementation
   -
   -->
-
-  <!-- xsl:template name="menu_style">
-    /* Popup menu styles */
-        .menu { position: absolute; display: block; background: white; visibility: hidden; border: solid 1px #ACA899; font: 8pt Tahoma; padding: 0px; background-image: url("<xsl:value-of select='/KeymanDeveloperProject/templatepath'/>menugrey.gif"); background-repeat: repeat-y; background-position: 0 0; }
-        k\:menuitem { width: 100%; padding: 4 4 4 28; margin: 1px; }
-        k\:menuitem.hover { color: #000000; background: #FFE3DB; border: solid 1px #DB704F; padding: 3 3 3 27; }
-        k\:menuitem.down { background: #DB704F; }
-  </xsl:template -->
   
   <xsl:template name="menuitem">
     <xsl:param name="caption" />
     <xsl:param name="command" />
     <k:menuitem>
-      <xsl:attribute name="onmouseover">javascript:menuitemover();</xsl:attribute>
-      <xsl:attribute name="onmouseout">javascript:menuitemout();</xsl:attribute>
       <xsl:attribute name="onmousedown">javascript:menuitemdown();</xsl:attribute>
       <xsl:attribute name="command">
         <xsl:value-of select="$command" />
@@ -169,12 +159,18 @@
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template name="filetype_kvks">
+    <xsl:call-template name="filetype"> 
+      <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kvks</xsl:with-param> <xsl:with-param name="title">Keyman On Screen Keyboard Source File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
   <xsl:template name="filetype_kvk">
     <xsl:call-template name="filetype"> 
       <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kvk</xsl:with-param> <xsl:with-param name="title">Keyman On Screen Keyboard File</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-
+  
   <xsl:template name="filetype_kps">
     <xsl:call-template name="filetype"> 
       <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kps</xsl:with-param> <xsl:with-param name="title">Keyman Package Source File</xsl:with-param>
@@ -216,15 +212,11 @@
   <!-- Filetype Generic Templates -->
 
   <xsl:template name="filetype__arrow">
-    <td class="ioarrow"><img>
-      <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>icon32_arrow.gif</xsl:attribute>
-    </img></td>
+    <td class="ioarrow"><img src='res/icon32_arrow.gif' /></td>
   </xsl:template>
   
   <xsl:template name="filetype__plus">
-    <td class="ioarrow"><img>
-      <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>icon32_plus.gif</xsl:attribute>
-    </img></td>
+    <td class="ioarrow"><img src='res/icon32_plus.gif' /></td>
   </xsl:template>    
 
   <xsl:template name="filetype">
@@ -235,7 +227,7 @@
       <xsl:attribute name="href">help:reference/file-types/<xsl:value-of select="$type" /></xsl:attribute>
       <xsl:attribute name="title"><xsl:value-of select="$title"/></xsl:attribute>
       <img>
-        <xsl:attribute name="src"><xsl:value-of select='/KeymanDeveloperProject/templatepath'/>icon32_<xsl:value-of select="$type" />.<xsl:value-of select="$icontype" /></xsl:attribute>
+        <xsl:attribute name="src">res/icon32_<xsl:value-of select="$type" />.<xsl:value-of select="$icontype" /></xsl:attribute>
       </img><br />.<xsl:value-of select="translate($type,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" />
     </a></td>
   </xsl:template>

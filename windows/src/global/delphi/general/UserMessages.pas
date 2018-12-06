@@ -32,7 +32,6 @@ const
   WM_USER_ParameterPass = WM_USER+100;
   WM_USER_SendFontChange = WM_USER+102;
   WM_USER_PlatformComms = WM_USER+103;
-  WM_USER_DebugNotify = WM_USER+104;
   WM_USER_VisualKeyboardClosed = WM_USER+105;   // I4242
 
 const
@@ -47,8 +46,6 @@ const
   // KeymanDeveloperUtils
   WM_USER_LOADREGFILES = WM_USER+120;
   //WM_USER_FORMSHOWN = WM_USER+100;
-
-  WM_USER_WEBCOMMAND = WM_USER+122;
 
   WC_COMMAND = 0;
   WC_HELP = 1;
@@ -73,6 +70,10 @@ const
 
 const
   WM_USER_ResetWebFocus = WM_USER + 160;
+
+const
+  // UframeTextEditor
+  WM_USER_TextEditor_Command = WM_USER + 170;
 
 const
   // UfrmDebug

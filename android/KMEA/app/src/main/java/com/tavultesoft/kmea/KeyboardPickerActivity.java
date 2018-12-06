@@ -24,8 +24,8 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.BuildConfig;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,22 +36,26 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-public final class KeyboardPickerActivity extends Activity implements OnKeyboardDownloadEventListener {
+public final class KeyboardPickerActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
+  private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private static ImageButton addButton = null;
+  private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
@@ -78,23 +82,35 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
-    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-    try {
-      int titleContainerId = (Integer) Class.forName("com.android.internal.R$id").getField("title_container").get(null);
-      ((ViewGroup) getWindow().findViewById(titleContainerId)).removeAllViews();
-    } catch (Exception e) {
-      Log.e("KeyboardPickerActivity", "Error: " + e);
+    setContentView(R.layout.keyboard_picker_list_layout);
+
+    toolbar = (Toolbar) findViewById(R.id.keyboard_picker_toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+    closeButton = (Button) findViewById(R.id.close_keyman_button);
+    Bundle bundle = getIntent().getExtras();
+    if (bundle != null) {
+      if (!bundle.getBoolean(KMManager.KMKey_DisplayKeyboardSwitcher)) {
+        closeButton.setVisibility(View.GONE);
+      }
     }
+    closeButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        KMManager.advanceToNextInputMode();
+        if (dismissOnSelect) {
+          finish();
+        }
+      }
+    });
 
-    getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.list_title_layout2);
-    setContentView(R.layout.list_layout);
     listView = (ListView) findViewById(R.id.listView);
-
-    File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
-    if (file.exists()) {
-      keyboardsList = getKeyboardsList(context);
-    } else {
+    keyboardsList = getKeyboardsList(context);
+    if (keyboardsList == null) {
       keyboardsList = new ArrayList<HashMap<String, String>>();
       HashMap<String, String> kbInfo = new HashMap<String, String>();
       kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -107,7 +123,12 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);
-      saveKeyboardsList(context);
+
+      // We'd prefer not to overwrite a file if it exists
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+      if (!file.exists()) {
+        saveKeyboardsList(context);
+      }
     }
 
     String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardName};
@@ -149,14 +170,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       }
     });
 
-    final ImageButton leftButton = (ImageButton) findViewById(R.id.left_button);
-    leftButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        finish();
-      }
-    });
-
-    final ImageButton addButton = (ImageButton) findViewById(R.id.right_button);
+    addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
@@ -166,17 +180,17 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
           context.startActivity(i);
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(context.getResources().getString(R.string.title_add_keyboard));
-          dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
-          dialogBuilder.setMessage("\nCannot connect to Keyman server!\n");
-          dialogBuilder.setPositiveButton("OK", null);
+          dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
+          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
+          dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
           dialog.show();
         }
       }
     });
-    if (!canAddNewKeyboard)
+    if (!canAddNewKeyboard) {
       addButton.setVisibility(View.GONE);
+    }
 
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
@@ -200,7 +214,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       public void run() {
         boolean shouldCheckUpdate = false;
         if (lastUpdateCheck == null) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+          SharedPreferences prefs = context.getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
           Long lastUpdateCheckTime = prefs.getLong("lastUpdateCheck", 0);
           if (lastUpdateCheckTime > 0) {
             lastUpdateCheck = Calendar.getInstance();
@@ -252,6 +266,17 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       }
       didUpdate = false;
     }
+  }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    onBackPressed();
+    return true;
+  }
+
+  @Override
+  public void onBackPressed() {
+    finish();
   }
 
   private static int getCurrentKeyboardIndex() {
@@ -516,10 +541,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       context.startActivity(i);
     } else {
       AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-      dialogBuilder.setTitle(context.getResources().getString(R.string.title_add_keyboard));
-      dialogBuilder.setIcon(context.getResources().getDrawable(android.R.drawable.ic_input_add));
-      dialogBuilder.setMessage("\nCannot connect to Keyman server!\n");
-      dialogBuilder.setPositiveButton("OK", null);
+      dialogBuilder.setTitle(context.getString(R.string.title_add_keyboard));
+      dialogBuilder.setMessage(String.format("\n%s\n", context.getString(R.string.cannot_connect)));
+      dialogBuilder.setPositiveButton(context.getString(R.string.label_ok), null);
       AlertDialog dialog = dialogBuilder.create();
       dialog.show();
     }
@@ -537,9 +561,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
         checkingUpdates = true;
         if (hasConnection) {
           progressDialog = new ProgressDialog(context);
-          progressDialog.setMessage("Checking keyboard updates...");
+          progressDialog.setMessage(context.getString(R.string.checking_keyboard_updates));
           progressDialog.setCancelable(false);
-          if (!((Activity) context).isFinishing()) {
+          if (!((AppCompatActivity) context).isFinishing()) {
             progressDialog.show();
           } else {
             cancel(true);
@@ -553,7 +577,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
         int ret = 0;
         if (hasConnection && !isCancelled()) {
           try {
-            String deviceType = context.getResources().getString(R.string.device_type);
+            String deviceType = context.getString(R.string.device_type);
             if (deviceType.equals("AndroidTablet")) {
               deviceType = "androidtablet";
             } else {
@@ -567,7 +591,8 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
               String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
               String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
               String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
-              String url = String.format("%slanguages/%s/%s?version=%s&device=%s", KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID,  BuildConfig.VERSION_NAME, deviceType);
+              String url = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
+                KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID,  BuildConfig.VERSION_NAME, deviceType);
               JSONObject kbData = jsonParser.getJSONObjectFromUrl(url);
               JSONObject language = kbData.optJSONObject(KMKeyboardDownloaderActivity.KMKey_Language);
               JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
@@ -611,9 +636,9 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
           failedUpdateCount = 0;
           updateCount = result;
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle("Keyboard Updates Available");
-          dialogBuilder.setMessage("Would you like to update keyboards now?");
-          dialogBuilder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+          dialogBuilder.setTitle(context.getString(R.string.keyboard_updates_available));
+          dialogBuilder.setMessage(context.getString(R.string.confirm_update));
+          dialogBuilder.setPositiveButton(context.getString(R.string.label_update), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
               // Update keyboards
               if (KMManager.hasConnection(context)) {
@@ -632,7 +657,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
                     if (Float.valueOf(newKbVersion) > Float.valueOf(kbVersion)) {
                       if (updateProgress == null || !updateProgress.isShowing()) {
                         updateProgress = new ProgressDialog(context);
-                        updateProgress.setMessage("Updating keyboards...");
+                        updateProgress.setMessage(context.getString(R.string.updating_keyboards));
                         updateProgress.setCancelable(false);
                         updateProgress.show();
                       }
@@ -657,7 +682,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
             }
           });
 
-          dialogBuilder.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+          dialogBuilder.setNegativeButton(context.getString(R.string.label_later), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
               lastUpdateCheck = Calendar.getInstance();
               checkingUpdates = false;
@@ -665,7 +690,7 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
           });
 
           AlertDialog dialog = dialogBuilder.create();
-          if (!((Activity) context).isFinishing()) {
+          if (!((AppCompatActivity) context).isFinishing()) {
             dialog.setOnCancelListener(new OnCancelListener() {
               @Override
               public void onCancel(DialogInterface dialog) {
@@ -694,15 +719,6 @@ public final class KeyboardPickerActivity extends Activity implements OnKeyboard
       }
     }.execute();
   }
-
-  /*
-  @Override
-  public void onBackPressed() {
-    Intent setIntent = new Intent(Intent.ACTION_MAIN);
-    setIntent.addCategory(Intent.CATEGORY_HOME);
-    setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivity(setIntent);
-  }*/
 
   @Override
   public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
