@@ -1053,7 +1053,8 @@ if(!window['keyman']['initialized']) {
 
       if(Lelem != null) {
         // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
-        var layer=t[0], keyName=t[t.length-1], keyShiftState=osk.getModifierState(osk.layerId),
+        // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
+        var layer=t[0], keyName=t[t.length-1].toUpperCase(), keyShiftState=osk.getModifierState(osk.layerId),
           nextLayer = keyShiftState;
 
         // Make sure to get the full current layer, since layers are now kebab-case.
