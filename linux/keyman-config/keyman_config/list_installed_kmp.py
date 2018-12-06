@@ -79,6 +79,7 @@ def get_installed_kmp_paths(check_paths):
                         with open(kbjson, "r") as read_file:
                             kbdata = json.load(read_file)
                     if kbdata:
+                        logging.debug("kbdata from %s", kbjson)
                         if 'description' in kbdata:
                             description = kbdata['description']
                         version = kbdata['version']

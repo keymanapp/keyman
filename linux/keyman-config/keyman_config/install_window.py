@@ -45,12 +45,20 @@ class InstallKmpWindow(Gtk.Window):
         self.viewwindow = viewkmp
         self.download = downloadwindow
         self.accelerators = None
-        keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
-        installed_kmp_ver = get_kmp_version(keyboardid)
+
+        kmpfilebase = os.path.basename(kmpfile)
+        if kmpfilebase == "kmp.json":
+            # use name of directory that kmp.json was found in
+            packageID = os.path.basename(os.path.dirname(kmpfile))
+        else:
+            # use name of kmpfile
+            packageID = os.path.basename(os.path.splitext(kmpfile)[0])
+        logging.debug("Thinking about installing packageID %s", packageID)
+        installed_kmp_ver = get_kmp_version(packageID)
         if installed_kmp_ver:
             logging.info("installed kmp version %s", installed_kmp_ver)
 
-        windowtitle = "Installing keyboard/package " + keyboardid
+        windowtitle = "Installing keyboard/package " + packageID
         Gtk.Window.__init__(self, title=windowtitle)
         init_accel(self)
 
@@ -77,7 +85,7 @@ class InstallKmpWindow(Gtk.Window):
                     dialog.destroy()
                     if response == Gtk.ResponseType.YES:
                         logging.debug("QUESTION dialog closed by clicking YES button")
-                        uninstall_kmp(keyboardid)
+                        uninstall_kmp(packageID)
                     elif response == Gtk.ResponseType.NO:
                         logging.debug("QUESTION dialog closed by clicking NO button")
                         self.checkcontinue = False
@@ -95,7 +103,7 @@ class InstallKmpWindow(Gtk.Window):
                             dialog.destroy()
                             if response == Gtk.ResponseType.YES:
                                 logging.debug("QUESTION dialog closed by clicking YES button")
-                                uninstall_kmp(keyboardid)
+                                uninstall_kmp(packageID)
                             elif response == Gtk.ResponseType.NO:
                                 logging.debug("QUESTION dialog closed by clicking NO button")
                                 self.checkcontinue = False
@@ -279,8 +287,15 @@ class InstallKmpWindow(Gtk.Window):
                 self.viewwindow.refresh_installed_kmp()
             if self.download:
                 self.download.close()
-            keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])
-            welcome_file = os.path.join(user_keyboard_dir(keyboardid), "welcome.htm")
+            kmpfilebase = os.path.basename(self.kmpfile)
+            if kmpfilebase == "kmp.json":
+                # use name of directory that kmp.json was found in
+                packageID = os.path.basename(os.path.dirname(self.kmpfile))
+            else:
+                # use name of kmpfile
+                packageID = os.path.basename(os.path.splitext(self.kmpfile)[0])
+
+            welcome_file = os.path.join(user_keyboard_dir(packageID), "welcome.htm")
             if os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.debug(uri_path)
@@ -322,18 +337,18 @@ class InstallKmpWindow(Gtk.Window):
 
 def main(argv):
     if len(sys.argv) != 2:
-        logging.error("install_window.py <kmpfile>")
+        logging.error("install_window.py <kmpfile or kmp.json>")
         sys.exit(2)
 
     name, ext = os.path.splitext(sys.argv[1])
-    if ext != ".kmp":
-        logging.error("install_window.py Input file", sys.argv[1], "is not a kmp file.")
-        logging.error("install_window.py <kmpfile>")
+    if ext != ".kmp" and (os.path.basename(sys.argv[1]) != "kmp.json"):
+        logging.error("install_window.py Input file", sys.argv[1], "is not a kmp file or kmp.json.")
+        logging.error("install_window.py <kmpfile or kmp.json>>")
         sys.exit(2)
 
     if not os.path.isfile(sys.argv[1]):
-        logging.error("install_window.py Keyman kmp file", sys.argv[1], "not found.")
-        logging.error("install_window.py <kmpfile>")
+        logging.error("install_window.py Keyman kmp file or kmp.json", sys.argv[1], "not found.")
+        logging.error("install_window.py <kmpfile or kmp.json>")
         sys.exit(2)
 
     w = InstallKmpWindow(sys.argv[1])

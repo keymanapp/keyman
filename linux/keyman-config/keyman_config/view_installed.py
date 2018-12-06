@@ -49,7 +49,11 @@ class ViewInstalledWindowBase(Gtk.Window):
         filter_text = Gtk.FileFilter()
         filter_text.set_name("KMP files")
         filter_text.add_pattern("*.kmp")
+        jsonfilter_text = Gtk.FileFilter()
+        jsonfilter_text.set_name("KMP json")
+        jsonfilter_text.add_pattern("kmp.json")
         dlg.add_filter(filter_text)
+        dlg.add_filter(jsonfilter_text)
         response = dlg.run()
         if response == Gtk.ResponseType.OK:
             kmpfile = dlg.get_filename()

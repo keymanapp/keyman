@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import os.path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -48,8 +49,15 @@ def list_files(directory, extension):
 	return (f for f in listdir(directory) if f.endswith('.' + extension))
 
 def extract_kmp(kmpfile, directory):
-	with zipfile.ZipFile(kmpfile,"r") as zip_ref:
-		zip_ref.extractall(directory)
+	if os.path.basename(kmpfile) == "kmp.json":
+		kmpdir = os.path.dirname(kmpfile)
+		for item in os.listdir(kmpdir):
+			s = os.path.join(kmpdir, item)
+			d = os.path.join(directory, item)
+			shutil.copy2(s, d)
+	else:
+		with zipfile.ZipFile(kmpfile,"r") as zip_ref:
+			zip_ref.extractall(directory)
 
 def get_metadata(tmpdirname):
 	"""
@@ -159,10 +167,10 @@ def check_keyman_dir(basedir, error_message):
 
 def install_kmp_shared(inputfile, online=False):
 	"""
-	Install a kmp file to /usr/local/share/keyman
+	Install a kmp file or copy a kmp directory to /usr/local/share/keyman
 
 	Args:
-		inputfile (str): path to kmp file
+		inputfile (str): path to kmp file or kmp.json
 		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
 	"""
 	do_install_to_ibus = False
@@ -170,7 +178,13 @@ def install_kmp_shared(inputfile, online=False):
 	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
 	check_keyman_dir('/usr/local/share/fonts', "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
 
-	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	kmpfilebase = os.path.basename(inputfile)
+	if kmpfilebase == "kmp.json":
+		# use name of directory that kmp.json was found in
+		packageID = os.path.basename(os.path.dirname(inputfile))
+	else:
+		# use name of kmpfile
+		packageID = os.path.basename(os.path.splitext(inputfile)[0])
 	packageDir = os.path.join('/usr/local/share/keyman', packageID)
 	kmpdocdir = os.path.join('/usr/local/share/doc/keyman', packageID)
 	kmpfontdir = os.path.join('/usr/local/share/fonts/keyman', packageID)
@@ -231,8 +245,21 @@ def install_kmp_shared(inputfile, online=False):
 		raise InstallError(InstallStatus.Abort, message)
 
 def install_kmp_user(inputfile, online=False):
+	"""
+	Install a kmp file or copy a kmp directory to ~/.local/share/keyman
+
+	Args:
+		inputfile (str): path to kmp file or kmp.json
+		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
+	"""
 	do_install_to_ibus = False
-	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	kmpfilebase = os.path.basename(inputfile)
+	if kmpfilebase == "kmp.json":
+		# use name of directory that kmp.json was found in
+		packageID = os.path.basename(os.path.dirname(inputfile))
+	else:
+		# use name of kmpfile
+		packageID = os.path.basename(os.path.splitext(inputfile)[0])
 	packageDir=user_keyboard_dir(packageID)
 	if not os.path.isdir(packageDir):
 		os.makedirs(packageDir)
@@ -328,7 +355,7 @@ def install_kmp(inputfile, online=False, sharedarea=False):
 	Install a kmp file
 
 	Args:
-		inputfile (str): path to kmp file
+		inputfile (str): path to kmp file or kmp.json
 		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
 		sharedarea(bool, default=False): whether install kmp to shared area or user directory
 	"""
