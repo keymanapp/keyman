@@ -27,14 +27,14 @@ namespace com.keyman {
     // iOS-oriented members 
     // --------------------
     // We'll assume permutations are complete after this many 'update' iterations.
-    private static readonly IDLE_PERMUTATION_CAP = 10;
+    private static readonly IDLE_PERMUTATION_CAP = 15;
     // Tracks the number of idle 'update' iterations since the last permutation.
     private idlePermutationCounter: number = RotationManager.IDLE_PERMUTATION_CAP;
     // Tracks the most recent rotation state snapshot.
     private rotState: RotationState;
     // Tracks the window.setTimeout id for rotation update checks.
     private updateTimer: number;
-    private static readonly UPDATE_INTERVAL = 10; // 10 ms, that is.
+    private static readonly UPDATE_INTERVAL = 20; // 20 ms, that is.
     // --------------------
     
     constructor(keyman: KeymanBase) {
