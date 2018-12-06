@@ -18,17 +18,6 @@ interface Document {
     _KeymanWebSelectionEnd: number
 }
 
-// See https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation.
-class ScreenOrientation {
-    angle: number;
-    onchange: () => void;
-    type: "portrait-primary"|"portrait-secondary"|"landscape-primary"|"landscape-secondary";
-}
-
-interface Screen {
-    orientation: ScreenOrientation;
-}
-
 interface Element {
     _kmwAttachment: com.keyman.AttachmentInfo,     // Used to track each input element's attachment data.
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
