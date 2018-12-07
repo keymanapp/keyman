@@ -103,13 +103,16 @@ namespace com.keyman {
         ts.fontSize=spec['fontsize'];
       }
 
+      let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
+      var font = keyboardManager.getFont();
+
       // Check the key's display width - does the key visualize well?
-      let width=OSKKey.getTextWidth(keyText, spec['font']);
+      let width=OSKKey.getTextWidth(keyText, font);
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
         keyText = '\u25cc' + keyText;
 
-        if((<KeymanBase>window['keyman']).keyboardManager.isRTL()) {
+        if(keyboardManager.isRTL()) {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }

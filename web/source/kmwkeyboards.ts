@@ -785,7 +785,8 @@ namespace com.keyman {
     }
 
     isRTL(k0?: any|KeyboardStub): boolean {
-      return (this.activeKeyboard != null) && (this.activeKeyboard['KRTL']);
+      var k = k0 || this.activeKeyboard;
+      return (k != null) && (k['KRTL']);
     }
 
     /**
@@ -826,6 +827,16 @@ namespace com.keyman {
       }
 
       return this.keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
+    }
+
+    getFont(k0?) {
+      var k = k0 || this.activeKeyboard;
+
+      if(k['KV']) {
+        return k['KV']['F'];
+      }
+      
+      return null;
     }
 
     /**
