@@ -18,6 +18,7 @@ else
 		exit -1
 	fi
 fi
+exit 0
 
 # clean up prev deb builds
 log "cleaning previous builds of $1"
