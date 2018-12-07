@@ -263,8 +263,7 @@ ibus_keyman_engine_constructor (GType                   type,
     {
         g_warning("problem creating km_kbp_state");
     }
-    //km_kbp_state_context(keyman->state);
-    #if HAVE_FROM_UTF8
+
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
         g_message("getting initial context");
@@ -277,7 +276,6 @@ ibus_keyman_engine_constructor (GType                   type,
         km_kbp_context_items_dispose(context_items);
         g_free(surrounding_text);
     }
-    #endif
 
     keyman->display  = XOpenDisplay(NULL);
     return (GObject *) keyman;
@@ -466,7 +464,29 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     // Many more KEYS currently not used by KMW...
   };
 
+static void reset_context(IBusEngine *engine)
+{
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
+    IBusText *text;
+    gchar *surrounding_text;
+    guint cursor_pos, anchor_pos;
+    km_kbp_context_item *context_items;
 
+    g_message("reset_context");
+    km_kbp_context_clear(km_kbp_state_context(keyman->state));
+
+    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
+    {
+        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
+        g_message("new context is:%s", surrounding_text);
+        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+            km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
+        }
+        km_kbp_context_items_dispose(context_items);
+        g_free(surrounding_text);
+    }
+}
 
 static gboolean
 ibus_keyman_engine_process_key_event (IBusEngine     *engine,
@@ -491,6 +511,20 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     {
         km_mod_state |= KM_KBP_MODIFIER_SHIFT;
     }
+    if (state & IBUS_MOD5_MASK)
+    {
+        km_mod_state |= KM_KBP_MODIFIER_RALT;
+        g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_MOD5_MASK");
+    }
+    if (state & IBUS_MOD1_MASK)
+    {
+        km_mod_state |= KM_KBP_MODIFIER_ALT;
+        g_message("modstate KM_KBP_MODIFIER_ALT");
+    }
+    if (state & IBUS_CONTROL_MASK) {
+        km_mod_state |= KM_KBP_MODIFIER_CTRL;
+        g_message("modstate KM_KBP_MODIFIER_CTRL");
+    }
 
     g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
 
@@ -506,41 +540,25 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
 
     // If a modifier key is pressed, check to see if it is a right modifier key
     // This is rather expensive so only do it if a shift state is active
-    if (state & (IBUS_SHIFT_MASK | IBUS_CONTROL_MASK | IBUS_MOD1_MASK)) {
+    if (state & (/*IBUS_SHIFT_MASK |*/ IBUS_CONTROL_MASK | IBUS_MOD1_MASK)) {
         Display * m_display  = XOpenDisplay(NULL);;
         char key_vec[32];
         XQueryKeymap(m_display, key_vec);
 
-        if (state & IBUS_MOD1_MASK) {
-            km_mod_state |= KM_KBP_MODIFIER_ALT;
-        }
-        if (state & IBUS_CONTROL_MASK) {
-            km_mod_state |= KM_KBP_MODIFIER_CTRL;
-        }
-
         if ((state & IBUS_MOD1_MASK) && is_key_pressed(m_display, key_vec, IBUS_Alt_R)) {
             km_mod_state |= KM_KBP_MODIFIER_RALT;
+            g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_Alt_R");
         }
 
         if ((state & IBUS_CONTROL_MASK) && is_key_pressed(m_display, key_vec, IBUS_Control_R)) {
             km_mod_state |= KM_KBP_MODIFIER_RCTRL;
+            g_message("modstate KM_KBP_MODIFIER_RCTRL");
         }
         // ignoring right shift
         // if ((state & IBUS_SHIFT_MASK) && is_key_pressed(m_display, key_vec, IBUS_Shift_R)) {
         //     right_modifier_state |= (IBUS_SHIFT_MASK << 8);
         // }
         XCloseDisplay(m_display);
-
-        if ((km_mod_state & KM_KBP_MODIFIER_ALT) && !(km_mod_state & KM_KBP_MODIFIER_RALT))
-        {
-            // Left alt so do not pass to keyman
-            return FALSE;
-        }
-        if ((km_mod_state & KM_KBP_MODIFIER_CTRL) && !(km_mod_state & KM_KBP_MODIFIER_RCTRL))
-        {
-            // Left ctrl so do not pass to keyman
-            return FALSE;
-        }
     }
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
     km_kbp_status event_status = km_kbp_process_event(keyman->state,
@@ -591,6 +609,13 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
             case KM_KBP_IT_PERSIST_OPT:
                 g_message("PERSIST_OPT action");
                 break;
+            case KM_KBP_IT_EMIT_KEYSTROKE:
+                g_message("EMIT_KEYSTROKE action");
+                return False;
+            case KM_KBP_IT_INVALIDATE_CONTEXT:
+                g_message("INVALIDATE_CONTEXT action");
+                reset_context(engine);
+                break;
             case KM_KBP_IT_END:
                 g_message("END action");
                 break;
@@ -600,31 +625,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     }
     return TRUE;
  }
-
-static void reset_context(IBusEngine *engine)
-{
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
-    IBusText *text;
-    gchar *surrounding_text;
-    guint cursor_pos, anchor_pos;
-    km_kbp_context_item *context_items;
-
-    g_message("reset_context");
-    km_kbp_context_clear(km_kbp_state_context(keyman->state));
-    #if HAVE_FROM_UTF8
-    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
-    {
-        ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
-        g_message("new context is:%s", surrounding_text);
-        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-            km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
-        }
-        km_kbp_context_items_dispose(context_items);
-        g_free(surrounding_text);
-    }
-    #endif
-}
 
 static void
 ibus_keyman_engine_focus_in (IBusEngine *engine)
