@@ -62,6 +62,7 @@ type
     FLastError: string;   // I4083
     FLastErrorOffset: Integer;   // I4083
     FFilename: string;
+    FSourceWasRegistered: Boolean;
     function GetLayoutJS: string;
     procedure DoModified;
     procedure DoLoad;
@@ -75,6 +76,8 @@ type
     
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
+    procedure RegisterSource;
+    procedure UnregisterSource;
   protected
     function GetHelpTopic: string; override;
 
@@ -201,8 +204,23 @@ end;
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);
 begin
   inherited;
+  UnregisterSource;
+end;
+
+procedure TframeTouchLayoutBuilder.RegisterSource;
+begin
   if FFilename <> '' then
+    modWebHttpServer.AppSource.RegisterSource(FFilename, FSavedLayoutJS);
+
+  FSourceWasRegistered := True;
+end;
+
+procedure TframeTouchLayoutBuilder.UnregisterSource;
+begin
+  if (FFilename <> '') and FSourceWasRegistered then
     modWebHttpServer.AppSource.UnregisterSource(FFilename);
+
+  FSourceWasRegistered := False;
 end;
 
 procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   // I3945
@@ -288,6 +306,8 @@ begin
 //  FreeAndNil(FHTMLTempFilename);   // I4195
 //  FHTMLTempFilename := TTempFileManager.Get('.html');   // I4195
 
+  UnregisterSource;
+
   if ALoadFromString then
   begin
     FNewLayoutJS := AFilename;
@@ -344,7 +364,7 @@ begin
     FTouchLayout.Free;
   end;
 
-  modWebHttpServer.AppSource.RegisterSource(FFilename, FSavedLayoutJS);
+  RegisterSource;
 
   try
     DoLoad;
