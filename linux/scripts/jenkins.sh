@@ -14,8 +14,8 @@ fi
 # clean up prev deb builds
 log "cleaning previous builds of $1"
 rm -rf builddebs
-rm -rf $1/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
-rm -rf ${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
+rm -rf $sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
+rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $sourcename"
 log "reconfigure"
