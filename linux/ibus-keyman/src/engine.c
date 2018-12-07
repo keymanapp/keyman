@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <X11/keysym.h>
 #include <keyman/keyboardprocessor.h>
 
@@ -548,7 +549,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     // If a modifier key is pressed, check to see if it is a right modifier key
     // This is rather expensive so only do it if a shift state is active
     if (state & (/*IBUS_SHIFT_MASK |*/ IBUS_CONTROL_MASK | IBUS_MOD1_MASK)) {
-        Display * m_display  = XOpenDisplay(NULL);;
+        Display * m_display  = XOpenDisplay(NULL);
         char key_vec[32];
         XQueryKeymap(m_display, key_vec);
 
@@ -631,6 +632,9 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_ALERT:
                 g_message("ALERT action");
+                Display * alert_display  = XOpenDisplay(NULL);
+                XkbBell(alert_display, None, 0, None);
+                XCloseDisplay(alert_display);
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action");
