@@ -309,6 +309,21 @@ if $DO_KEYMANIM ; then
     		execBuildCommand "$IM_NAME tests" "xcodebuild $TEST_ACTION -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
     	fi
     fi
+
+    # Upload symbols (thisa was hanging when called from xcodebuild)
+    # Actually, it probably better from here than in the project as we don't need 
+    # to upload symbols when developing within xcode, only when doing a real build
+    # See https://stackoverflow.com/questions/53488083/why-is-fabric-upload-symbols-hanging-on-step-begin-processing-dsym-under-xcode
+
+    cd "$KM4MIM_BASE_PATH"
+    if [ "${CONFIGURATION}" = "Release" ]; then
+        if [ "${FABRIC_API_KEY_KEYMAN4MACIM}" != "" ]; then
+            Pods/Fabric/upload-symbols -d -a ${FABRIC_API_KEY_KEYMAN4MACIM} -p mac build/${CONFIGURATION}
+        fi
+    else
+        Pods/Fabric/upload-symbols -d -a 68056571ada44ad2d93864380272808ada308b24 -p mac build/${CONFIGURATION}
+    fi
+    cd "$KEYMAN_MAC_BASE_PATH"
 fi
 
 if $DO_KEYMANTESTAPP ; then
