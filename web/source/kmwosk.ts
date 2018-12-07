@@ -7,11 +7,11 @@ namespace com.keyman {
     text?: string;
     sp?: string;
     width: string;
-    layer: string;
+    layer?: string; // Added during OSK construction.
     nextlayer?: string;
     pad?: string;
-    widthpc?: number;
-    padpc?: number;
+    widthpc?: number; // Added during OSK construction.
+    padpc?: number; // Added during OSK construction.
 
     constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
       this.id = id;
