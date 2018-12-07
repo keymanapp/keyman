@@ -9,6 +9,8 @@ namespace com.keyman {
     width: string;
     nextlayer?: string;
     pad?: string;
+    widthpc?: number;
+    padpc?: number;
 
     constructor(id: string, text?: string, width?: string, sp?: string, nextlayer?: string, pad?: string) {
       this.id = id;
@@ -17,6 +19,175 @@ namespace com.keyman {
       this.sp = sp;
       this.nextlayer = nextlayer;
       this.pad = pad;
+    }
+  }
+
+  export class OSKKey {
+    spec: OSKKeySpec;
+
+    private static keyman: KeymanBase;
+
+    constructor(spec: OSKKeySpec) {
+      this.spec = spec;
+    }
+
+    construct(keyman: KeymanBase, layout, layer, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+      OSKKey.keyman = keyman;
+      let util = keyman.util;
+      let osk = keyman['osk'];
+      let spec = this.spec;
+      let isDesktop = util.device.formFactor == 'desktop'
+
+      let kDiv=util._CreateElement('div');
+      kDiv['keyId']=spec['id'];
+      kDiv.className='kmw-key-square';
+
+      let ks=kDiv.style;
+      ks.width=this.objectUnits(spec['widthpc']);
+
+      let originalPercent = totalPercent;
+
+      if(!isDesktop) {
+        // Regularize interkey spacing by rounding key width and padding (Build 390)
+        //keys[j]['padpc']=Math.round(keys[j]['padpc']);
+        //keys[j]['widthpc']=Math.round(keys[j]['widthpc']);
+        ks.left=this.objectUnits(totalPercent+spec['padpc']);
+        ks.bottom=rowStyle.bottom;
+        ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
+      } else {
+        ks.marginLeft=this.objectUnits(spec['padpc']);
+      }
+
+      totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
+
+      let btn=util._CreateElement('div');
+
+      // Set button class
+      osk.setButtonClass(spec,btn,layout);
+
+      // Set distinct phone and tablet button position properties
+      if(!isDesktop) {
+        btn.style.left=ks.left;
+        btn.style.width=ks.width;
+      }
+
+      // Add the (US English) keycap label for desktop OSK or if KDU flag is non-zero
+      var q=null;
+      if(layout.keyLabels || isDesktop) { //desktop or KDU flag set
+        // Create the default key cap labels (letter keys, etc.)
+        var x=osk.keyCodes[spec.id];
+        switch(x) {
+          case 186: x=59; break;
+          case 187: x=61; break;
+          case 188: x=44; break;
+          case 189: x=45; break;
+          case 190: x=46; break;
+          case 191: x=47; break;
+          case 192: x=96; break;
+          case 219: x=91; break;
+          case 220: x=92; break;
+          case 221: x=93; break;
+          case 222: x=39; break;
+          default:
+            if(x < 48 || x > 90) {
+              x=0;
+            }
+        }
+
+        if(x > 0) {
+          q=util._CreateElement('div');
+          q.className='kmw-key-label';
+          q.innerHTML=String.fromCharCode(x);
+          //kDiv.appendChild(q);
+          btn.appendChild(q);
+        }
+      }
+
+      // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
+      btn.id=layer['id']+'-'+spec.id;
+      // TODO:  convert to 'this' instead.
+      btn['key']=spec;  //attach reference to key layout spec to element
+
+      // Add reference to subkey array if defined
+      if(typeof spec['sk'] != 'undefined' && spec['sk'] != null) {
+        var bsn,bsk=btn['subKeys']=spec['sk'];
+        for(bsn=0; bsn<bsk.length; bsn++) {
+          if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
+            var oldText=bsk[bsn]['text'];
+            bsk[bsn]['text']=osk.renameSpecialKey(oldText);
+          }
+        }
+      } else {
+        btn['subKeys']=null;
+      }
+
+      // Define callbacks to handle key touches: iOS and Android tablets and phones
+      // TODO: replace inline function calls??
+      if(!util.device.touchable) {
+        // Highlight key while mouse down or if moving back over originally selected key
+        btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
+
+        // Remove highlighting when key released or moving off selected element
+        btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
+      }
+
+      // Add OSK key labels
+      var t=util._CreateElement('span'), ts=t.style;
+      if(spec['text'] == null || spec['text'] == '') {
+        t.innerHTML='\xa0';
+        if(typeof spec['id'] == 'string') {
+          if(/^U_[0-9A-F]{4}$/i.test(spec['id'])) {
+            t.innerHTML=String.fromCharCode(parseInt(spec['id'].substr(2),16));
+          }
+        }
+      } else {
+        t.innerHTML=spec['text'];
+      }
+      t.className='kmw-key-text';
+
+      // Use special case lookup for modifier keys
+      if(spec['sp'] == '1' || spec['sp'] == '2') {
+        var tId=((spec['text'] == '*Tab*' && layer['id'] == 'shift') ? '*TabLeft*' : spec['text']);
+        t.innerHTML=osk.renameSpecialKey(tId);
+      }
+
+      //Override font spec if set for this key in the layout
+      if('font' in spec) ts.fontFamily=spec['font'];
+      if('fontsize' in spec) ts.fontSize=spec['fontsize'];
+
+      // Add text to button and button to placeholder div
+      btn.appendChild(t);
+      kDiv.appendChild(btn);
+
+      // Prevent user selection of key captions
+      //t.style.webkitUserSelect='none';
+
+      // If a subkey array is defined, add an icon
+      if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
+        var skIcon=util._CreateElement('div');
+        skIcon.className='kmw-key-popup-icon';
+        //kDiv.appendChild(skIcon);
+        btn.appendChild(skIcon);
+      }
+      
+      // The 'return value' of this process.
+      return {element: kDiv, percent: totalPercent - originalPercent};
+    }
+
+    objectUnits(v: number) {
+      if(OSKKey.keyman.util.device.formFactor == 'desktop') {
+        return v + '%';
+      } else {
+        return Math.round(v)+'px';
+      }
+    }
+
+    objectWidth() {
+      if(OSKKey.keyman.util.device.formFactor == 'desktop') {
+        return 100;
+      } else {
+        return keyman['osk'].getWidth();
+      }
     }
   }
 }
@@ -643,7 +814,7 @@ if(!window['keyman']['initialized']) {
         sk=e.subKeys[i];
         kDiv=document.createElement('DIV');
 
-        for(var tp in tKey) {
+        for(var tp in tKey) {  // tKey = osk.getDefaultKeyObject();
           if(typeof sk[tp] != 'string') {
             sk[tp]=tKey[tp];
           }
@@ -2309,7 +2480,7 @@ if(!window['keyman']['initialized']) {
             for(j=0; j<keys.length; j++)
             {
               key=keys[j];
-              for(var tp in tKey)
+              for(var tp in tKey) // tKey = osk.getDefaultKeyObject();
               {
                 if(typeof key[tp] != 'string') key[tp]=tKey[tp];
               }
@@ -2365,147 +2536,14 @@ if(!window['keyman']['initialized']) {
 
             //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
             totalPercent=0;
-            for(j=0; j<keys.length; j++)
-            {
+            for(j=0; j<keys.length; j++) {
               key=keys[j];
-              kDiv=util._CreateElement('DIV');
-              kDiv.keyId=key['id'];
-              kDiv.className='kmw-key-square';
-              ks=kDiv.style;
+              
+              var keyGenerator = new com.keyman.OSKKey(key);
+              var keyTuple = keyGenerator.construct(keymanweb, layout, layer, rs, totalPercent);
 
-              kDiv.width=ks.width=objectUnits(key['widthpc']);
-
-              if(formFactor != 'desktop')
-              {
-                // Regularize interkey spacing by rounding key width and padding (Build 390)
-                //keys[j]['padpc']=Math.round(keys[j]['padpc']);
-                //keys[j]['widthpc']=Math.round(keys[j]['widthpc']);
-                ks.left=objectUnits(totalPercent+keys[j]['padpc']);
-                ks.bottom=rs.bottom;
-                ks.height=rs.height;  //must be specified in px for rest of layout to work correctly
-              }
-              else
-              {
-                ks.marginLeft=objectUnits(key['padpc']);
-              }
-
-              totalPercent=totalPercent+keys[j]['padpc']+keys[j]['widthpc'];
-
-              btn=util._CreateElement('DIV');
-
-              // Set button class
-              osk.setButtonClass(key,btn,layout);
-
-              // Set distinct phone and tablet button position properties
-              if(formFactor != 'desktop')
-              {
-                btn.style.left=ks.left;
-                btn.style.width=ks.width;
-              }
-
-              // Add the (US English) keycap label for desktop OSK or if KDU flag is non-zero
-              var q=null;
-              if(layout.keyLabels || (formFactor == 'desktop')) //desktop or KDU flag set
-              {
-                // Create the default key cap labels (letter keys, etc.)
-                var x=osk.keyCodes[key.id];
-                switch(x)
-                {
-                  case 186: x=59; break;
-                  case 187: x=61; break;
-                  case 188: x=44; break;
-                  case 189: x=45; break;
-                  case 190: x=46; break;
-                  case 191: x=47; break;
-                  case 192: x=96; break;
-                  case 219: x=91; break;
-                  case 220: x=92; break;
-                  case 221: x=93; break;
-                  case 222: x=39; break;
-                  default:
-                    if(x < 48 || x > 90) x=0;
-                }
-
-                if(x > 0)
-                {
-                  q=util._CreateElement('DIV');
-                  q.className='kmw-key-label';
-                  q.innerHTML=String.fromCharCode(x);
-                  //kDiv.appendChild(q);
-                  btn.appendChild(q);
-                }
-              }
-
-              // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-              btn.id=layer['id']+'-'+key.id;
-              btn.key=key;  //attach reference to key layout spec to element
-
-              // Add reference to subkey array if defined
-              if(typeof key['sk'] != 'undefined' && key['sk'] != null)
-              {
-                var bsn,bsk=btn.subKeys=key['sk'];
-                for(bsn=0; bsn<bsk.length; bsn++)
-                  if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2')
-                  {
-                    var oldText=bsk[bsn]['text'];
-                    bsk[bsn]['text']=osk.renameSpecialKey(oldText);
-                  }
-              }
-              else btn.subKeys=null;
-
-              // Define callbacks to handle key touches: iOS and Android tablets and phones
-              // TODO: replace inline function calls??
-              if(!device.touchable)
-              {
-                // Highlight key while mouse down or if moving back over originally selected key
-                btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
-
-                // Remove highlighting when key released or moving off selected element
-                btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
-              }
-
-              // Add OSK key labels
-              var t=util._CreateElement('SPAN'),ts=t.style;
-              if(key['text'] == null || key['text'] == '')
-              {
-                t.innerHTML='\xa0';
-                if(typeof key['id'] == 'string')
-                {
-                  if(/^U_[0-9A-F]{4}$/i.test(key['id']))
-                    t.innerHTML=String.fromCharCode(parseInt(key['id'].substr(2),16));
-                }
-              }
-              else t.innerHTML=key['text'];
-              t.className='kmw-key-text';
-
-              // Use special case lookup for modifier keys
-              if(key['sp'] == '1' || key['sp'] == '2')
-              {
-                var tId=((key['text'] == '*Tab*' && n == 1) ? '*TabLeft*' : key['text']);
-                t.innerHTML=osk.renameSpecialKey(tId);
-              }
-
-              //Override font spec if set for this key in the layout
-              if('font' in key) ts.fontFamily=key['font'];
-              if('fontsize' in key) ts.fontSize=key['fontsize'];
-
-              // Add text to button and button to placeholder div
-              btn.appendChild(t);
-              kDiv.appendChild(btn);
-
-              // Prevent user selection of key captions
-              //t.style.webkitUserSelect='none';
-
-              // If a subkey array is defined, add an icon
-              if(typeof(key['sk']) != 'undefined' && key['sk'] != null)
-              {
-                var skIcon=util._CreateElement('DIV');
-                skIcon.className='kmw-key-popup-icon';
-                //kDiv.appendChild(skIcon);
-                btn.appendChild(skIcon);
-              }
-              // Add key to row
-              rDiv.appendChild(kDiv);
+              rDiv.appendChild(keyTuple.element);
+              totalPercent += keyTuple.percent;
             }
             // Add row to layer
             gDiv.appendChild(rDiv);
