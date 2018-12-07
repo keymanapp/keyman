@@ -1,18 +1,18 @@
 (*
   Name:             UframeTouchLayoutBuilder
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      21 Aug 2013
 
   Modified Date:    3 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          21 Aug 2013 - mcdurdin - I3894 - V9.0 - Support modified state for touch layout builder
                     21 Aug 2013 - mcdurdin - I3895 - V9.0 - App hotkeys don't work within layout builder
                     07 Nov 2013 - mcdurdin - I3945 - V9.0 - Touch Layout Editor should allow import from existing On Screen Keyboard
@@ -36,9 +36,24 @@ unit UframeTouchLayoutBuilder;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmTike, UserMessages, KMDActionInterfaces,
-  KeyboardFonts, TempFileManager, Keyman.Developer.UI.UframeCEFHost;
+  System.Classes,
+  System.JSON,
+  System.SysUtils,
+  System.Variants,
+  Winapi.Messages,
+  Winapi.Windows,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.Graphics,
+
+  Keyman.Developer.UI.UframeCEFHost,
+
+  KeyboardFonts,
+  KMDActionInterfaces,
+  TempFileManager,
+  UfrmTike,
+  UserMessages;
 
 type
   TframeTouchLayoutBuilder = class(TTikeForm, IKMDEditActions)
@@ -69,7 +84,7 @@ type
     procedure FireCommand(const commands: TStringList); virtual;
     procedure DoSelectTemplate;
     procedure DoImportFromOSK;
-    function BuilderCommand(const cmd: string): Boolean;
+    function BuilderCommand(const cmd: string; const parameters: TJSONValue = nil): Boolean;
     procedure UpdateCharacterMap(code: string);  // I4046
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
@@ -78,6 +93,9 @@ type
     procedure cefLoadEnd(Sender: TObject);
     procedure RegisterSource;
     procedure UnregisterSource;
+    procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
   protected
     function GetHelpTopic: string; override;
 
@@ -98,6 +116,7 @@ type
 
   public
     { Public declarations }
+    procedure SetupCharMapDrop;
     function Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
     procedure Save(const AFilename: string);
     function SaveToString: string;
@@ -115,7 +134,7 @@ type
 implementation
 
 uses
-  System.JSON,
+  System.TypInfo,
 
   xmlintf,
   xmldoc,
@@ -123,6 +142,9 @@ uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
 
+  CharacterDragObject,
+  CharMapDropTool,
+  CharMapInsertMode,
   KeymanDeveloperOptions,
   VKeys,
   OnScreenKeyboardData,
@@ -199,6 +221,7 @@ begin
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnLoadEnd := cefLoadEnd;
+  SetupCharMapDrop;
 end;
 
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);
@@ -494,14 +517,21 @@ begin
   FLoading := False;
 end;
 
-function TframeTouchLayoutBuilder.BuilderCommand(const cmd: string): Boolean;
+function TframeTouchLayoutBuilder.BuilderCommand(const cmd: string; const parameters: TJSONValue): Boolean;
 begin
   Result := False;
   if FLoading then Exit;   // I4057
   FDisplayScriptErrors := False;   // I4047
   try
     try
-      cef.cef.ExecuteJavaScript('builder.'+cmd+'();', '');
+      if Assigned(parameters) then
+      begin
+        cef.cef.ExecuteJavaScript('builder.'+cmd+'('+parameters.ToJSON+')', '');
+      end
+      else
+      begin
+        cef.cef.ExecuteJavaScript('builder.'+cmd+'();', '');
+      end;
     except
       // Ignore errors
     end;
@@ -606,6 +636,52 @@ end;
 procedure TframeTouchLayoutBuilder.Redo;
 begin
   BuilderCommand('redo');
+end;
+
+
+procedure TframeTouchLayoutBuilder.CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+var
+  j: TJSONObject;
+begin
+  cef.cefwp.SetFocus;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('x', TJSONNumber.Create(X));
+    j.AddPair('y', TJSONNumber.Create(Y));
+    j.AddPair('state', GetEnumName(TypeInfo(TDragState), Ord(State)));
+    BuilderCommand('charmapDragOver', j);
+  finally
+    j.Free;
+  end;
+
+  // We cannot test acceptance via event because it is asynchronous
+  // So we will just assume we can accept and throw it away if it is outside bounds
+  // during drop.
+  Accept := True;
+end;
+
+procedure TframeTouchLayoutBuilder.CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  j: TJSONObject;
+  cdo: TCharacterDragObject;
+begin
+  cef.cefwp.SetFocus;
+  cdo := Source as TCharacterDragObject;
+  j := TJSONObject.Create;
+  try
+    j.AddPair('x', TJSONNumber.Create(X));
+    j.AddPair('y', TJSONNumber.Create(Y));
+    j.AddPair('text', cdo.Text[cdo.InsertType]);
+    BuilderCommand('charmapDragDrop', j);
+  finally
+    j.Free;
+  end;
+end;
+
+procedure TframeTouchLayoutBuilder.SetupCharMapDrop;
+begin
+  GetCharMapDropTool.Handle(cef.cefwp, cmimDefault, CharMapDragOver, CharMapDragDrop);
 end;
 
 end.

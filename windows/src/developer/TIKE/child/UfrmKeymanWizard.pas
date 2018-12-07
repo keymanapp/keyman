@@ -653,6 +653,8 @@ begin
   GetCharMapDropTool.Handle(Self, cmimText);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
   frameSource.SetupCharMapDrop;
+  frameTouchLayout.SetupCharMapDrop;
+  frameTouchLayoutSource.SetupCharMapDrop;
 
   FillFeatureGrid;
 

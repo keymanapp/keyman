@@ -1368,7 +1368,9 @@ $(function () {
     builder.generateSubKeys();
   }));
 
-  builder.updateSubKeyCap = builder.wrapChange(function (val) {
+  builder.updateSubKeyCap = builder.wrapChange(function () {
+    var val = $(this).val();
+
     var k = builder.selectedSubKey();
     if (k.length == 0) return;
     $('.text', k).text(builder.renameSpecialKey(val));
@@ -1794,6 +1796,55 @@ $(function () {
     builder.ctrlDown = false;
   });
 
+  //
+  // Character map drag+drop and double-click insertion
+  //
+  
+  builder.charmapDragOver = function(o) {
+    
+    // Convert X, Y to document coordinates
+    
+    let target = document.elementFromPoint(o.x, o.y);
+    if(target === null || (target.nodeName != 'INPUT' && target.className != 'text')) {
+      return false;
+    }
+    
+    return true;    
+  };
+  
+  builder.charmapDragDrop = function(o) {
+
+    // Convert X, Y to document coordinates
+    
+    if(o.x >= 0 && o.y >= 0) {
+      var target = document.elementFromPoint(o.x, o.y);
+      if(target === null) {
+        return false;
+      }
+      if(target.nodeName == 'INPUT') {
+        target = $(target);
+      } else if(target.className == 'text') {
+        if(target.parentElement.parentElement.id == 'sk') {
+          builder.selectSubKey(target.parentElement);
+          target = document.lastFocus;
+        } else {
+          builder.selectKey(target.parentElement);
+          target = document.lastFocus;
+        }
+      } else {
+        return false;
+      }
+    } else {
+      // Double-click insertion, so use last focused control
+      var target = $(document.lastFocus);
+    }
+    
+    // Focus the control and add the text
+
+    target.focus();
+    target.val(target.val() + o.text);
+  };
+  
   builder.preparePlatforms();
   builder.enableUndoControls();
 });
