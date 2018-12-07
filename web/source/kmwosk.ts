@@ -7,6 +7,7 @@ namespace com.keyman {
     text?: string;
     sp?: string;
     width: string;
+    layer: string;
     nextlayer?: string;
     pad?: string;
     widthpc?: number;
@@ -22,12 +23,14 @@ namespace com.keyman {
     }
   }
 
-  export class OSKKey {
+  export abstract class OSKKey {
     spec: OSKKeySpec;
 
     constructor(spec: OSKKeySpec) {
       this.spec = spec;
     }
+
+    abstract getId(): string;
 
     /**
      * Replace default key names by special font codes for modifier keys
@@ -43,7 +46,7 @@ namespace com.keyman {
     }
 
     // Produces a HTMLSpanElement with the key's actual text.
-    protected generateKeyText(layerId: string): HTMLSpanElement {
+    protected generateKeyText(): HTMLSpanElement {
       let util = (<KeymanBase>window['keyman']).util;
       let spec = this.spec;
 
@@ -65,17 +68,18 @@ namespace com.keyman {
       // Use special case lookup for modifier keys
       if(spec['sp'] == '1' || spec['sp'] == '2') {
         // Unique layer-based transformation.
-        var tId=((spec['text'] == '*Tab*' && layerId == 'shift') ? '*TabLeft*' : spec['text']);
+        var tId=((spec['text'] == '*Tab*' && spec.layer == 'shift') ? '*TabLeft*' : spec['text']);
 
         // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
         t.innerHTML=this.renameSpecialKey(tId);
       }
 
       //Override font spec if set for this key in the layout
-      if('font' in spec) {
+      ts.fontSize=(<KeymanBase>window['keyman']).osk.fontSize;     //Build 344, KMEW-90
+      if(typeof spec['font'] == 'string' && spec['font'] != '') {
         ts.fontFamily=spec['font'];
       }
-      if('fontsize' in spec) {
+      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
         ts.fontSize=spec['fontsize'];
       }
 
@@ -86,6 +90,11 @@ namespace com.keyman {
   export class OSKBaseKey extends OSKKey {
     constructor(spec: OSKKeySpec) {
       super(spec);
+    }
+
+    getId(): string {
+      // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
+      return this.spec.layer+'-'+this.spec.id;
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
@@ -148,6 +157,8 @@ namespace com.keyman {
       let spec = this.spec;
       let isDesktop = util.device.formFactor == 'desktop'
 
+      spec.layer = layerId;
+
       let kDiv=util._CreateElement('div');
       kDiv['keyId']=spec['id'];
       kDiv.className='kmw-key-square';
@@ -187,7 +198,7 @@ namespace com.keyman {
       }
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-      btn.id=layerId+'-'+spec.id;
+      btn.id=this.getId();
       // TODO:  convert btn['key'] to use the 'this' reference instead.
       btn['key']=spec;  //attach reference to key layout spec to element
 
@@ -209,7 +220,7 @@ namespace com.keyman {
       }
       
       // Add text to button and button to placeholder div
-      btn.appendChild(this.generateKeyText(layerId));
+      btn.appendChild(this.generateKeyText());
       kDiv.appendChild(btn);
 
       // Prevent user selection of key captions
@@ -239,6 +250,17 @@ namespace com.keyman {
   export class OSKSubKey extends OSKKey {
     constructor(spec: OSKKeySpec) {
       super(spec);
+    }
+
+    getId(): string {
+      let spec = this.spec;
+      // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
+      if(typeof(spec['layer']) == 'string' && spec['layer'] != '') {
+        return 'popup-'+spec['layer']+'-'+spec['id'];
+      } else {
+        // We only create subkeys when they're needed - the currently-active layer should be fine.
+        return 'popup-' + (<KeymanBase> window['keyman']).osk.layerId + '-'+spec['id'];
+      }
     }
 
     construct(baseKey: HTMLDivElement, topMargin: boolean): HTMLDivElement {
@@ -271,12 +293,7 @@ namespace com.keyman {
       let btn=document.createElement('div');
       osk.setButtonClass(spec,btn);
 
-      // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-      if(typeof(spec['layer']) == 'string' && spec['layer'] != '') {
-        btn.id='popup-'+spec['layer']+'-'+spec['id'];
-      } else {
-        btn.id='popup-' + osk.layerId + '-'+spec['id'];
-      }
+      btn.id = this.getId();
 
       // TODO:  Swap to use the 'this' reference.
       btn['key'] = spec;
@@ -289,31 +306,7 @@ namespace com.keyman {
       // Must set position explicitly, at least for Android
       bs.position='absolute';
 
-      ///
-      let t=(<KeymanBase>window['keyman']).util._CreateElement('span');
-      t.className='kmw-key-text';
-      if(spec['text'] == null || spec['text'] == '') {
-        t.innerHTML='\xa0';
-        if(typeof spec['id'] == 'string') {
-          if(/^U_[0-9A-F]{4}$/i.test(spec['id'])) {
-            t.innerHTML=String.fromCharCode(parseInt(spec['id'].substr(2),16));
-          }
-        }
-      } else {
-        t.innerHTML=spec['text'];
-      }
-
-      // Override the font name and size if set in the layout
-      let ts=t.style;
-      ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
-      if(typeof spec['font'] == 'string' && spec['font'] != '') {
-        ts.fontFamily=spec['font'];
-      }
-      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
-        ts.fontSize=spec['fontsize'];
-      }
-
-      btn.appendChild(t);
+      btn.appendChild(this.generateKeyText());
       kDiv.appendChild(btn);
 
       return kDiv;
