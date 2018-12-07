@@ -98,7 +98,7 @@ namespace com.keyman {
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
-    protected generateKeyCapLabel(): HTMLDivElement {
+    private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)
       var x = (<KeymanBase>window['keyman'])['osk'].keyCodes[this.spec.id];
       switch(x) {
@@ -130,11 +130,9 @@ namespace com.keyman {
       }
     }
 
-    protected processSubkeys(btn: HTMLDivElement) {
-      let spec = this.spec;
-      
+    private processSubkeys(btn: HTMLDivElement) {
       // Add reference to subkey array if defined
-      var bsn: number, bsk=btn['subKeys'] = spec['sk'];
+      var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
       for(bsn=0; bsn<bsk.length; bsn++) {
         if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
@@ -151,9 +149,8 @@ namespace com.keyman {
     }
 
     construct(layout, layerId: string, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
-      let keyman = (<KeymanBase>window['keyman'])
-      let util = keyman.util;
-      let osk = keyman['osk'];
+      let util = (<KeymanBase>window['keyman']).util;
+      let osk = (<KeymanBase>window['keyman']).osk;
       let spec = this.spec;
       let isDesktop = util.device.formFactor == 'desktop'
 
@@ -199,7 +196,7 @@ namespace com.keyman {
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId();
-      // TODO:  convert btn['key'] to use the 'this' reference instead.
+      // Keyman 12 goal:  convert btn['key'] to use the 'this' reference instead.
       btn['key']=spec;  //attach reference to key layout spec to element
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
@@ -235,14 +232,6 @@ namespace com.keyman {
         return v + '%';
       } else {
         return Math.round(v)+'px';
-      }
-    }
-
-    objectWidth() {
-      if((<KeymanBase>window['keyman']).util.device.formFactor == 'desktop') {
-        return 100;
-      } else {
-        return keyman['osk'].getWidth();
       }
     }
   }
@@ -295,7 +284,7 @@ namespace com.keyman {
 
       btn.id = this.getId();
 
-      // TODO:  Swap to use the 'this' reference.
+      // Plan for Keyman 12:  swap to use the 'this' reference.
       btn['key'] = spec;
 
       // Must set button size (in px) dynamically, not from CSS
@@ -881,7 +870,7 @@ if(!window['keyman']['initialized']) {
       // The holder is position:fixed, but the keys do not need to be, as no scrolling
       // is possible while the array is visible.  So it is simplest to let the keys have
       // position:static and display:inline-block
-      var subKeys=document.createElement('DIV'),i,sk,
+      var subKeys=document.createElement('DIV'),i,
         t,ts,t1,ts1,kDiv,ks,btn,bs;
 
       var tKey = osk.getDefaultKeyObject();
@@ -938,9 +927,8 @@ if(!window['keyman']['initialized']) {
         if(nRows > 1 && nRow > 0) {
           needsTopMargin = true;
         }
-        sk=e.subKeys[i];
 
-        let keyGenerator = new com.keyman.OSKSubKey(sk);
+        let keyGenerator = new com.keyman.OSKSubKey(e.subKeys[i]);
         let kDiv = keyGenerator.construct(e, needsTopMargin);
         
         subKeys.appendChild(kDiv);
@@ -2446,12 +2434,10 @@ if(!window['keyman']['initialized']) {
         }
 
         // Get the actual available document width and scale factor according to device type
-        var objectUnits, objectWidth;
+        var objectWidth;
         if(formFactor == 'desktop') {
-          objectUnits = function(v) { return v + '%' };
           objectWidth = 100;
         } else {
-          objectUnits = function(v) { return Math.round(v)+'px' };
           objectWidth = osk.getWidth();
         }
 
@@ -2546,8 +2532,7 @@ if(!window['keyman']['initialized']) {
             for(j=0; j<keys.length; j++)
             {
               key=keys[j];
-              for(var tp in tKey) // tKey = osk.getDefaultKeyObject();
-              {
+              for(var tp in tKey) { // tKey = osk.getDefaultKeyObject();
                 if(typeof key[tp] != 'string') key[tp]=tKey[tp];
               }
 
