@@ -49,6 +49,7 @@ struct _IBusKeymanEngine {
     gchar           *ldmlfile;
     gchar           *kb_name;
     gunichar         firstsurrogate;
+    gboolean         marker;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -246,6 +247,7 @@ ibus_keyman_engine_constructor (GType                   type,
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
     keyman->firstsurrogate = 0;
+    keyman->marker = False;
     gchar **split_name = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
@@ -494,6 +496,8 @@ static void reset_context(IBusEngine *engine)
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
     g_message("reset_context");
+    keyman->firstsurrogate = 0;
+    keyman->marker = False;
     km_kbp_context_clear(km_kbp_state_context(keyman->state));
     read_context(engine);
 }
@@ -597,6 +601,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         switch(action_items[i].type)
         {
             case KM_KBP_IT_CHAR:
+                keyman->marker = False;
                 if (g_unichar_type(action_items[i].character) == G_UNICODE_SURROGATE) {
                     if (keyman->firstsurrogate == 0) {
                         keyman->firstsurrogate = action_items[i].character;
@@ -628,6 +633,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 }
                 break;
             case KM_KBP_IT_MARKER:
+                keyman->marker = True;
                 g_message("MARKER action");
                 break;
             case KM_KBP_IT_ALERT:
@@ -638,14 +644,19 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action");
-                g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
+                if (keyman->marker) {
+                    keyman->marker = False;
+                }
+                else {
+                    g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
 
-                if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
-                    g_message("deleting surrounding text 1 char");
-                    ibus_engine_delete_surrounding_text(engine, -1, 1);
-                } else {
-                    g_message("forwarding backspace");
-                    forward_keycode(keyman, Keyman_Pass_Backspace_To_IBus, 0);
+                    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
+                        g_message("deleting surrounding text 1 char");
+                        ibus_engine_delete_surrounding_text(engine, -1, 1);
+                    } else {
+                        g_message("forwarding backspace");
+                        forward_keycode(keyman, Keyman_Pass_Backspace_To_IBus, 0);
+                    }
                 }
                 break;
             case KM_KBP_IT_PERSIST_OPT:
