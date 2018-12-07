@@ -46,6 +46,7 @@ struct _IBusKeymanEngine {
     km_kbp_state    *state;
     gchar           *ldmlfile;
     gchar           *kb_name;
+    gunichar         firstsurrogate;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -241,6 +242,7 @@ ibus_keyman_engine_constructor (GType                   type,
 
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
+    keyman->firstsurrogate = 0;
     gchar **split_name = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
@@ -593,17 +595,36 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         switch(action_items[i].type)
         {
             case KM_KBP_IT_CHAR:
-                numbytes = g_unichar_to_utf8(action_items[i].character, utf8);
-                if (numbytes > 12)
-                {
-                    g_error("g_unichar_to_utf8 overflowing buffer");
+                if (g_unichar_type(action_items[i].character) == G_UNICODE_SURROGATE) {
+                    if (keyman->firstsurrogate == 0) {
+                        keyman->firstsurrogate = action_items[i].character;
+                        g_message("first surrogate %d", keyman->firstsurrogate);
+                    }
+                    else {
+                        glong items_read, items_written;
+                        gunichar2 utf16_pair[2] = {keyman->firstsurrogate, action_items[i].character};
+                        gchar *utf8_pair = g_utf16_to_utf8 (utf16_pair, 2,
+                            &items_read,
+                            &items_written,
+                            NULL);
+                        ibus_keyman_engine_commit_string(keyman, utf8_pair);
+                        g_free(utf8_pair);
+                        keyman->firstsurrogate = 0;
+                    }
                 }
-                if (numbytes)
-                {
-                    utf8[numbytes] = 0;
+                else {
+                    numbytes = g_unichar_to_utf8(action_items[i].character, utf8);
+                    if (numbytes > 12)
+                    {
+                        g_error("g_unichar_to_utf8 overflowing buffer");
+                    }
+                    if (numbytes)
+                    {
+                        utf8[numbytes] = 0;
+                    }
+                    g_message("CHAR action unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
+                    ibus_keyman_engine_commit_string(keyman, utf8);
                 }
-                g_message("CHAR action unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
-                ibus_keyman_engine_commit_string(keyman, utf8);
                 break;
             case KM_KBP_IT_MARKER:
                 g_message("MARKER action");
@@ -635,6 +656,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_END:
                 g_message("END action");
+                keyman->firstsurrogate = 0;
                 break;
             default:
                 g_warning("Unknown action");
