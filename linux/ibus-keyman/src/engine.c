@@ -193,7 +193,7 @@ ibus_keyman_engine_constructor (GType                   type,
     IBusEngine *engine;
     IBusText *text;
     const gchar *engine_name;
-    gchar *surrounding_text, *p;
+    gchar *surrounding_text, *p, *abs_kmx_path;
     guint cursor_pos, anchor_pos;
     km_kbp_context_item *context_items;
     
@@ -210,14 +210,31 @@ ibus_keyman_engine_constructor (GType                   type,
 
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
-    gchar *kmx_file = g_path_get_basename(engine_name);
+    gchar **split_name = g_strsplit(engine_name, ":", 2);
+    if (split_name[0] == NULL)
+    {
+        IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
+        return NULL;
+    }
+    else if (split_name[1] == NULL)
+    {
+        abs_kmx_path = g_strdup(split_name[0]);
+    }
+    else
+    {
+        abs_kmx_path = g_strdup(split_name[1]);
+    }
+
+    g_strfreev(split_name);
+
+    gchar *kmx_file = g_path_get_basename(abs_kmx_path);
     p = rindex(kmx_file, '.'); // get id to use as dbus service name
     if (p) {
         keyman->kb_name = g_strndup(kmx_file, p-kmx_file);
-        p = rindex(engine_name, '.');
+        p = rindex(abs_kmx_path, '.');
         if (p)
         {
-            gchar *dir = g_path_get_dirname(engine_name);
+            gchar *dir = g_path_get_dirname(abs_kmx_path);
             gchar *ldmlfile = g_strdup_printf("%s/%s.ldml", dir, keyman->kb_name);
             if (g_file_test(ldmlfile, G_FILE_TEST_EXISTS))
             {
@@ -231,7 +248,9 @@ ibus_keyman_engine_constructor (GType                   type,
 
     km_kbp_option_item options[1] = {KM_KBP_OPTIONS_END};
 
-    km_kbp_status status_keyboard = km_kbp_keyboard_load(engine_name, &(keyman->keyboard));
+    km_kbp_status status_keyboard = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    g_free(abs_kmx_path);
+
     if (status_keyboard != KM_KBP_STATUS_OK)
     {
         g_warning("problem creating km_kbp_keyboard");
@@ -259,7 +278,6 @@ ibus_keyman_engine_constructor (GType                   type,
     }
 
     keyman->display  = XOpenDisplay(NULL);
-
     return (GObject *) keyman;
 }
 

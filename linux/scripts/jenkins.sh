@@ -5,8 +5,10 @@ init --no-package
 
 if [ "$1" == "keyman-keyboardprocessor" ]; then
 	sourcename="keyboardprocessor"
+	sourcedir="../common/engine/keyboardprocessor"
 else
 	sourcename="$1"
+	sourcedir="$1"
 fi
 
 # clean up prev deb builds
@@ -33,5 +35,5 @@ for file in `ls builddebs/*.dsc`; do
 	debsign -k$2 $file
 done
 
-mkdir -p $1
-mv builddebs/* $1
+mkdir -p $sourcedir
+mv builddebs/* $sourcedir

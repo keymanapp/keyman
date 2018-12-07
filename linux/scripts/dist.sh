@@ -59,7 +59,7 @@ for proj in ${autotool_projects}; do
     rm -rf ../build-$proj
     mkdir -p ../build-$proj
     cd ../build-$proj
-    ../$proj/configure
+    JSON_GLIB_CFLAGS="-I/usr/include/json-glib-1.0" JSON_GLIB_LIBS="-ljson-glib-1.0" KEYMAN_PROC_CFLAGS="-I/usr/include/keyman" KEYMAN_PROC_LIBS="-lkmnkbp" ../$proj/configure
     make dist
     mv *.tar.gz ../dist
     cd $BASEDIR
