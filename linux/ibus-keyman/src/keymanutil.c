@@ -155,7 +155,7 @@ ibus_keyman_engine_new (gchar * file_name,
 GList * 
 ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
 {
-    GList *p, *l;
+    GList *p, *k, *l;
 
     for (p=kmpdir_list; p != NULL; p = p->next) {
         gchar * kmp_dir = (gchar *) p->data;
@@ -163,42 +163,71 @@ ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
         kmp_details *details = g_new0(kmp_details, 1);
         get_kmp_details(kmp_dir, details);
 
-        for (l=details->keyboards; l != NULL; l = l->next) {
+        for (k=details->keyboards; k != NULL; k = k->next) {
             gchar *lang=NULL;
-            kmp_keyboard *keyboard = (kmp_keyboard *) l->data;
+            gchar *name_with_lang = NULL;
+            kmp_keyboard *keyboard = (kmp_keyboard *) k->data;
             gchar *abs_kmx = g_strjoin("/", kmp_dir, keyboard->kmx_file, NULL);
 
-            if (keyboard->languages != NULL)
-            {
-                // Only gets the first language because ibus can only handle one
-                kmp_language *language = (kmp_language *) keyboard->languages->data;
-                if (language->id != NULL) {
-                    gchar **tagparts = g_strsplit(language->id, "-", 2);
-                    lang = g_strdup(tagparts[0]);
-                    g_strfreev(tagparts);
-                }
-            }
             gchar *json_file = g_strjoin(".", keyboard->id, "json", NULL);
             keyboard_details *kbd_details = g_new0(keyboard_details, 1);
             get_keyboard_details(kmp_dir, json_file, kbd_details);
             g_free(json_file);
 
-            g_message("adding engine %s", abs_kmx);
-            engines = g_list_append (engines,
-                ibus_keyman_engine_new (abs_kmx, // kmx full path
-                        keyboard->name, // longname
-                        kbd_details->description, // description
-                        details->info.copyright, // copyright if available
-                        lang, // language, most are ignored by ibus except major languages
-                        kbd_details->license, // license
-                        details->info.author_desc, // author name only, not email
-                        keyman_get_icon_file(abs_kmx), // icon full path
-                        "en", // layout defaulting to en (en-US)
-                        keyboard->version));
+            if (keyboard->languages != NULL) {
+                for (l=keyboard->languages; l != NULL; l = l->next) {
+                    kmp_language *language = (kmp_language *) l->data;
+                    if (language->id != NULL) {
+                        gchar **tagparts = g_strsplit(language->id, "-", 2);
+                        lang = g_strdup(tagparts[0]);
+                        g_strfreev(tagparts);
+                        // If ibus doesn't know about the language then append the
+                        // language name to the keyboard name
+                        if (language->name != NULL) {
+                            if (g_strcmp0(ibus_get_untranslated_language_name (lang), "Other") == 0) {
+                                name_with_lang = g_strjoin(" - ", keyboard->name, language->name, NULL);
+                            }
+                        }
+
+                        gchar *id_with_lang = g_strjoin(":", language->id, abs_kmx, NULL);
+
+                        g_message("adding engine %s", id_with_lang);
+                        engines = g_list_append (engines,
+                            ibus_keyman_engine_new (id_with_lang, // lang:kmx full path
+                                    name_with_lang ? name_with_lang : keyboard->name, // longname
+                                    kbd_details->description, // description
+                                    details->info.copyright, // copyright if available
+                                    lang, // language, most are ignored by ibus except major languages
+                                    kbd_details->license, // license
+                                    details->info.author_desc, // author name only, not email
+                                    keyman_get_icon_file(abs_kmx), // icon full path
+                                    "en", // layout defaulting to en (en-US)
+                                    keyboard->version));
+                        g_free(lang);
+                        g_free(id_with_lang);
+                        g_free(name_with_lang);
+                        name_with_lang = NULL;
+                    }
+                }
+            }
+            else {
+                g_message("adding engine %s", abs_kmx);
+                engines = g_list_append (engines,
+                    ibus_keyman_engine_new (abs_kmx, // kmx full path
+                            keyboard->name, // longname
+                            kbd_details->description, // description
+                            details->info.copyright, // copyright if available
+                            lang, // language, most are ignored by ibus except major languages
+                            kbd_details->license, // license
+                            details->info.author_desc, // author name only, not email
+                            keyman_get_icon_file(abs_kmx), // icon full path
+                            "en", // layout defaulting to en (en-US)
+                            keyboard->version));
+            }
+
             free_keyboard_details(kbd_details);
             g_free(kbd_details);
             g_free(abs_kmx);
-            g_free(lang);
         }
         free_kmp_details(details);
         g_free(details);
