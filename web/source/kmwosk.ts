@@ -25,50 +25,27 @@ namespace com.keyman {
   export class OSKKey {
     spec: OSKKeySpec;
 
-    private static keyman: KeymanBase;
-
     constructor(spec: OSKKeySpec) {
       this.spec = spec;
     }
 
-    // Produces a small reference label for the corresponding physical key on a US keyboard.
-    private generateKeyCapLabel(): HTMLDivElement {
-      // Create the default key cap labels (letter keys, etc.)
-      var x=OSKKey.keyman['osk'].keyCodes[this.spec.id];
-      switch(x) {
-        case 186: x=59; break;
-        case 187: x=61; break;
-        case 188: x=44; break;
-        case 189: x=45; break;
-        case 190: x=46; break;
-        case 191: x=47; break;
-        case 192: x=96; break;
-        case 219: x=91; break;
-        case 220: x=92; break;
-        case 221: x=93; break;
-        case 222: x=39; break;
-        default:
-          if(x < 48 || x > 90) {
-            x=0;
-          }
-      }
-
-      if(x > 0) {
-        let q=OSKKey.keyman.util._CreateElement('div');
-        q.className='kmw-key-label';
-        q.innerHTML=String.fromCharCode(x);
-        return q;
-      } else {
-        // Keyman-only virtual keys have no corresponding physical key.
-        return null;
-      }
+    /**
+     * Replace default key names by special font codes for modifier keys
+     *
+     *  @param  {string}  oldText
+     *  @return {string}
+     **/
+    protected renameSpecialKey(oldText: string): string {
+      let keyman = (<KeymanBase>window['keyman'])
+      // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
+      let specialCharacters = keyman['osk'].specialCharacters;
+      return specialCharacters[oldText] ? String.fromCharCode(0XE000 + specialCharacters[oldText]) : oldText;
     }
 
     // Produces a HTMLSpanElement with the key's actual text.
-    private generateKeyText(layerId: string): HTMLSpanElement {
-      let util = OSKKey.keyman.util;
+    protected generateKeyText(layerId: string): HTMLSpanElement {
+      let util = (<KeymanBase>window['keyman']).util;
       let spec = this.spec;
-      let osk = OSKKey.keyman['osk'];
 
       // Add OSK key labels
       var t=util._CreateElement('span'), ts=t.style;
@@ -91,7 +68,7 @@ namespace com.keyman {
         var tId=((spec['text'] == '*Tab*' && layerId == 'shift') ? '*TabLeft*' : spec['text']);
 
         // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
-        t.innerHTML=osk.renameSpecialKey(tId);
+        t.innerHTML=this.renameSpecialKey(tId);
       }
 
       //Override font spec if set for this key in the layout
@@ -104,10 +81,48 @@ namespace com.keyman {
 
       return t;
     }
+  }
 
-    private processSubkeys(btn: HTMLDivElement) {
+  export class OSKBaseKey extends OSKKey {
+    constructor(spec: OSKKeySpec) {
+      super(spec);
+    }
+
+    // Produces a small reference label for the corresponding physical key on a US keyboard.
+    protected generateKeyCapLabel(): HTMLDivElement {
+      // Create the default key cap labels (letter keys, etc.)
+      var x = (<KeymanBase>window['keyman'])['osk'].keyCodes[this.spec.id];
+      switch(x) {
+        case 186: x=59; break;
+        case 187: x=61; break;
+        case 188: x=44; break;
+        case 189: x=45; break;
+        case 190: x=46; break;
+        case 191: x=47; break;
+        case 192: x=96; break;
+        case 219: x=91; break;
+        case 220: x=92; break;
+        case 221: x=93; break;
+        case 222: x=39; break;
+        default:
+          if(x < 48 || x > 90) {
+            x=0;
+          }
+      }
+
+      if(x > 0) {
+        let q = (<KeymanBase>window['keyman']).util._CreateElement('div');
+        q.className='kmw-key-label';
+        q.innerHTML=String.fromCharCode(x);
+        return q;
+      } else {
+        // Keyman-only virtual keys have no corresponding physical key.
+        return null;
+      }
+    }
+
+    protected processSubkeys(btn: HTMLDivElement) {
       let spec = this.spec;
-      let osk = OSKKey.keyman['osk'];
       
       // Add reference to subkey array if defined
       var bsn: number, bsk=btn['subKeys'] = spec['sk'];
@@ -115,19 +130,19 @@ namespace com.keyman {
       for(bsn=0; bsn<bsk.length; bsn++) {
         if(bsk[bsn]['sp'] == '1' || bsk[bsn]['sp'] == '2') {
           var oldText=bsk[bsn]['text'];
-          bsk[bsn]['text']=osk.renameSpecialKey(oldText);
+          bsk[bsn]['text']=this.renameSpecialKey(oldText);
         }
       }
 
       // If a subkey array is defined, add an icon
-      var skIcon=OSKKey.keyman.util._CreateElement('div');
+      var skIcon=(<KeymanBase>window['keyman']).util._CreateElement('div');
       skIcon.className='kmw-key-popup-icon';
       //kDiv.appendChild(skIcon);
       btn.appendChild(skIcon);
     }
 
-    construct(keyman: KeymanBase, layout, layerId: string, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
-      OSKKey.keyman = keyman;
+    construct(layout, layerId: string, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+      let keyman = (<KeymanBase>window['keyman'])
       let util = keyman.util;
       let osk = keyman['osk'];
       let spec = this.spec;
@@ -205,7 +220,7 @@ namespace com.keyman {
     }
 
     objectUnits(v: number) {
-      if(OSKKey.keyman.util.device.formFactor == 'desktop') {
+      if((<KeymanBase>window['keyman']).util.device.formFactor == 'desktop') {
         return v + '%';
       } else {
         return Math.round(v)+'px';
@@ -213,11 +228,95 @@ namespace com.keyman {
     }
 
     objectWidth() {
-      if(OSKKey.keyman.util.device.formFactor == 'desktop') {
+      if((<KeymanBase>window['keyman']).util.device.formFactor == 'desktop') {
         return 100;
       } else {
         return keyman['osk'].getWidth();
       }
+    }
+  }
+
+  export class OSKSubKey extends OSKKey {
+    constructor(spec: OSKKeySpec) {
+      super(spec);
+    }
+
+    construct(baseKey: HTMLDivElement, topMargin: boolean): HTMLDivElement {
+      let osk = (<KeymanBase> window['keyman']).osk;
+      let spec = this.spec;
+
+      let kDiv=document.createElement('div');
+      let tKey = osk.getDefaultKeyObject();
+      let ks=kDiv.style;
+
+      for(var tp in tKey) {
+        if(typeof spec[tp] != 'string') {
+          spec[tp]=tKey[tp];
+        }
+      }
+
+      kDiv.className='kmw-key-square-ex';
+      kDiv['keyId']=spec['id'];
+      if(topMargin) {
+        ks.marginTop='5px';
+      }
+
+      if(typeof spec['width'] != 'undefined') {
+        ks.width=(parseInt(spec['width'],10)*baseKey.offsetWidth/100)+'px';
+      } else {
+        ks.width=baseKey.offsetWidth+'px';
+      }
+      ks.height=baseKey.offsetHeight+'px';
+
+      let btn=document.createElement('div');
+      osk.setButtonClass(spec,btn);
+
+      // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
+      if(typeof(spec['layer']) == 'string' && spec['layer'] != '') {
+        btn.id='popup-'+spec['layer']+'-'+spec['id'];
+      } else {
+        btn.id='popup-' + osk.layerId + '-'+spec['id'];
+      }
+
+      // TODO:  Swap to use the 'this' reference.
+      btn['key'] = spec;
+
+      // Must set button size (in px) dynamically, not from CSS
+      let bs=btn.style;
+      bs.height=ks.height;
+      bs.width=ks.width;
+
+      // Must set position explicitly, at least for Android
+      bs.position='absolute';
+
+      ///
+      let t=(<KeymanBase>window['keyman']).util._CreateElement('span');
+      t.className='kmw-key-text';
+      if(spec['text'] == null || spec['text'] == '') {
+        t.innerHTML='\xa0';
+        if(typeof spec['id'] == 'string') {
+          if(/^U_[0-9A-F]{4}$/i.test(spec['id'])) {
+            t.innerHTML=String.fromCharCode(parseInt(spec['id'].substr(2),16));
+          }
+        }
+      } else {
+        t.innerHTML=spec['text'];
+      }
+
+      // Override the font name and size if set in the layout
+      let ts=t.style;
+      ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
+      if(typeof spec['font'] == 'string' && spec['font'] != '') {
+        ts.fontFamily=spec['font'];
+      }
+      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
+        ts.fontSize=spec['fontsize'];
+      }
+
+      btn.appendChild(t);
+      kDiv.appendChild(btn);
+
+      return kDiv;
     }
   }
 }
@@ -841,72 +940,16 @@ if(!window['keyman']['initialized']) {
 
       // Add nested button elements for each sub-key
       for(i=0; i<nKeys; i++) {
-        sk=e.subKeys[i];
-        kDiv=document.createElement('DIV');
-
-        for(var tp in tKey) {  // tKey = osk.getDefaultKeyObject();
-          if(typeof sk[tp] != 'string') {
-            sk[tp]=tKey[tp];
-          }
-        }
-
-        kDiv.className='kmw-key-square-ex';
-        kDiv.keyId=sk['id'];
-        ks=kDiv.style;
-        nRow=Math.floor(i/nCols);
+        var needsTopMargin = false;
+        let nRow=Math.floor(i/nCols);
         if(nRows > 1 && nRow > 0) {
-          ks.marginTop='5px';
+          needsTopMargin = true;
         }
+        sk=e.subKeys[i];
 
-        if(typeof sk['width'] != 'undefined') {
-          kDiv.width=ks.width=(parseInt(sk['width'],10)*e.offsetWidth/100)+'px';
-        } else {
-          kDiv.width=ks.width=e.offsetWidth+'px';
-        }
-        ks.height=e.offsetHeight+'px';
-
-        btn=document.createElement('DIV');
-        osk.setButtonClass(sk,btn);
-
-        // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-        if(typeof(sk['layer']) == 'string' && sk['layer'] != '') {
-          btn.id='popup-'+sk['layer']+'-'+sk['id'];
-        } else {
-          btn.id='popup-' + osk.layerId + '-'+sk['id'];
-        }
-
-        btn.key = sk;
-
-        // Must set button size (in px) dynamically, not from CSS
-        bs=btn.style; bs.height=ks.height; bs.width=ks.width;
-
-        // Must set position explicitly, at least for Android
-        bs.position='absolute';
-        t=util._CreateElement('SPAN');
-        t.className='kmw-key-text';
-        if(sk['text'] == null || sk['text'] == '') {
-          t.innerHTML='\xa0';
-          if(typeof sk['id'] == 'string') {
-            if(/^U_[0-9A-F]{4}$/i.test(sk['id'])) {
-              t.innerHTML=String.fromCharCode(parseInt(sk['id'].substr(2),16));
-            }
-          }
-        } else {
-          t.innerHTML=sk['text'];
-        }
-
-        // Override the font name and size if set in the layout
-        ts=t.style;
-        ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
-        if(typeof sk['font'] == 'string' && sk['font'] != '') {
-          ts.fontFamily=sk['font'];
-        }
-        if(typeof sk['fontsize'] == 'string' && sk['fontsize'] != 0) {
-          ts.fontSize=sk['fontsize'];
-        }
-
-        btn.appendChild(t);
-        kDiv.appendChild(btn);
+        let keyGenerator = new com.keyman.OSKSubKey(sk);
+        let kDiv = keyGenerator.construct(e, needsTopMargin);
+        
         subKeys.appendChild(kDiv);
       }
 
@@ -2569,8 +2612,8 @@ if(!window['keyman']['initialized']) {
             for(j=0; j<keys.length; j++) {
               key=keys[j];
               
-              var keyGenerator = new com.keyman.OSKKey(key);
-              var keyTuple = keyGenerator.construct(keymanweb, layout, layer['id'], rs, totalPercent);
+              var keyGenerator = new com.keyman.OSKBaseKey(key);
+              var keyTuple = keyGenerator.construct(layout, layer['id'], rs, totalPercent);
 
               rDiv.appendChild(keyTuple.element);
               totalPercent += keyTuple.percent;
@@ -2582,17 +2625,6 @@ if(!window['keyman']['initialized']) {
           lDiv.appendChild(gDiv);
         }
         return lDiv;
-    }
-
-    /**
-     * Replace default key names by special font codes for modifier keys
-     *
-     *  @param    {string}  oldText
-     *  @return {string}
-     **/
-    osk.renameSpecialKey = function(oldText) {
-      // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-      return osk.specialCharacters[oldText] ? String.fromCharCode(0XE000 + osk.specialCharacters[oldText]) : oldText;
     }
 
     osk.clearPopup = function()
