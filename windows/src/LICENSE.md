@@ -1,5 +1,7 @@
 The MIT License
 
+a new license
+
 Copyright (c) 2017 SIL International
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
