@@ -797,7 +797,7 @@ namespace com.keyman {
      * @param       {Object}      Ptarg      Target element
      */    
     _SetTargDir(Ptarg: HTMLElement) {  
-      var elDir=((this.keyman.keyboardManager.activeKeyboard != null) && (this.keyman.keyboardManager.activeKeyboard['KRTL'])) ? 'rtl' : 'ltr';
+      var elDir=(this.keyman.keyboardManager.isRTL()) ? 'rtl' : 'ltr';
 
       if(Ptarg) {
         if(this.keyman.util.device.touchable) {

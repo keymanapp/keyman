@@ -784,6 +784,10 @@ namespace com.keyman {
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
     }
 
+    isRTL(k0?: any|KeyboardStub): boolean {
+      return (this.activeKeyboard != null) && (this.activeKeyboard['KRTL']);
+    }
+
     /**
      * Function     isChiral
      * Scope        Public

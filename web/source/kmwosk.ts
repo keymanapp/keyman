@@ -33,6 +33,23 @@ namespace com.keyman {
     abstract getId(): string;
 
     /**
+     * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
+     * 
+     * @param {String} text The text to be rendered.
+     * @param {String} font The css font descriptor that text is to be rendered with (e.g. "bold 14px verdana").
+     * 
+     * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
+     */
+    static getTextWidth(text: string, font: string) {
+      // re-use canvas object for better performance
+      var canvas = OSKKey.getTextWidth['canvas'] || (OSKKey.getTextWidth['canvas'] = document.createElement("canvas"));
+      var context = canvas.getContext("2d");
+      context.font = font;
+      var metrics = context.measureText(text);
+      return metrics.width;
+    }
+
+    /**
      * Replace default key names by special font codes for modifier keys
      *
      *  @param  {string}  oldText
@@ -51,18 +68,20 @@ namespace com.keyman {
       let spec = this.spec;
 
       // Add OSK key labels
+      var keyText;
       var t=util._CreateElement('span'), ts=t.style;
       if(spec['text'] == null || spec['text'] == '') {
-        t.innerHTML='\xa0';  // default:  nbsp.
+        keyText='\xa0';  // default:  nbsp.
         if(typeof spec['id'] == 'string') {
           // If the ID's Unicode-based, just use that code.
           if(/^U_[0-9A-F]{4}$/i.test(spec['id'])) {
-            t.innerHTML=String.fromCharCode(parseInt(spec['id'].substr(2),16));
+            keyText=String.fromCharCode(parseInt(spec['id'].substr(2),16));
           }
         }
       } else {
-        t.innerHTML=spec['text'];
+        keyText=spec['text'];
       }
+
       t.className='kmw-key-text';
 
       // Use special case lookup for modifier keys
@@ -71,7 +90,7 @@ namespace com.keyman {
         var tId=((spec['text'] == '*Tab*' && spec.layer == 'shift') ? '*TabLeft*' : spec['text']);
 
         // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
-        t.innerHTML=this.renameSpecialKey(tId);
+        keyText=this.renameSpecialKey(tId);
       }
 
       //Override font spec if set for this key in the layout
@@ -79,9 +98,25 @@ namespace com.keyman {
       if(typeof spec['font'] == 'string' && spec['font'] != '') {
         ts.fontFamily=spec['font'];
       }
+
       if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
         ts.fontSize=spec['fontsize'];
       }
+
+      // Check the key's display width - does the key visualize well?
+      let width=OSKKey.getTextWidth(keyText, spec['font']);
+      if(width == 0 && keyText != '' && keyText != '\xa0') {
+        // Add the Unicode 'empty circle' as a base support for needy diacritics.
+        keyText = '\u25cc' + keyText;
+
+        if((<KeymanBase>window['keyman']).keyboardManager.isRTL()) {
+          // Add the RTL marker to ensure it displays properly.
+          keyText = '\u200f' + keyText;
+        }
+      }
+
+      // Finalize the key's text.
+      t.innerHTML = keyText;
 
       return t;
     }
