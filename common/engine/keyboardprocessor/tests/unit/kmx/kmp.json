@@ -215,6 +215,61 @@
       ]
     },
     {
+      "name": "021 - options",
+      "id": "021 - options",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "022 - options with preset",
+      "id": "022 - options with preset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "023 - options with save",
+      "id": "023 - options with save",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "024 - options with save and preset",
+      "id": "024 - options with save and preset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "025 - options with reset",
+      "id": "025 - options with reset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
       "name": "026 - system stores",
       "id": "026 - system stores",
       "version": "0.0",
