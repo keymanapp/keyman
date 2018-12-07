@@ -612,7 +612,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
             case KM_KBP_IT_EMIT_KEYSTROKE:
                 g_message("EMIT_KEYSTROKE action");
                 return False;
-                break;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
                 g_message("INVALIDATE_CONTEXT action");
                 reset_context(engine);
