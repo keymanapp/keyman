@@ -2033,7 +2033,9 @@ if(!window['keyman']['initialized']) {
       }
 
       // Correct for viewport scaling (iOS - Android 4.2 does not want this, at least on Galaxy Tab 3))
-      if(device.OS == 'iOS') height=height/util.getViewportScale();
+      if(device.OS == 'iOS') {
+        height=height/util.getViewportScale();
+      }
 
       // Correct for devicePixelratio - needed on Android 4.1.2 phones,
       // for Opera, Chrome and Firefox, but not for native browser!   Exclude native browser for Build 344.
@@ -2051,25 +2053,28 @@ if(!window['keyman']['initialized']) {
      *
      *  @return   {number}    height in pixels
      **/
-    osk.getWidth=function()
-    {
+    osk.getWidth=function() {
       // KeymanTouch - get OSK height from device
-      if(typeof(keymanweb['getOskWidth']) == 'function') return keymanweb['getOskWidth']();
+      if(typeof(keymanweb['getOskWidth']) == 'function') {
+        return keymanweb['getOskWidth']();
+      }
 
-      // screen width always correct for iOS (iOS 8, anyway)
-      var width=screen.width;
-
-      // On Android (Opera, Chrome and Firefox; native browser not supported)
-      // must use document client width, using window width only if document undefined
-      if(device.OS == 'Android')
-      {
+      var width: number;
+      if(util.device.OS == "iOS") {
+        // iOS does not interchange these values when the orientation changes!
+        //width = util.portraitView() ? screen.width : screen.height;
+        width = window.innerWidth;
+      } else if(device.OS == 'Android') {
         try {
           width=document.documentElement.clientWidth;
           }
         catch(ex) {
           width=screen.availWidth;
           }
+      } else {
+        width=screen.width;
       }
+
       return width;
     }
 
