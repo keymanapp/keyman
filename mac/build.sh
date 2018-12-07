@@ -300,6 +300,7 @@ fi
 
 if $DO_KEYMANIM ; then
 	cd "$KM4MIM_BASE_PATH"
+    pod update
 	pod install
 	cd "$KEYMAN_MAC_BASE_PATH"
     updatePlist "$KM4MIM_BASE_PATH" "$IM_NAME"
