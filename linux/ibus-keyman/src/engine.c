@@ -516,15 +516,15 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         km_mod_state |= KM_KBP_MODIFIER_RALT;
         g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_MOD5_MASK");
     }
-    if (state & IBUS_MOD1_MASK)
-    {
-        km_mod_state |= KM_KBP_MODIFIER_ALT;
-        g_message("modstate KM_KBP_MODIFIER_ALT");
-    }
-    if (state & IBUS_CONTROL_MASK) {
-        km_mod_state |= KM_KBP_MODIFIER_CTRL;
-        g_message("modstate KM_KBP_MODIFIER_CTRL");
-    }
+    // if (state & IBUS_MOD1_MASK)
+    // {
+    //     km_mod_state |= KM_KBP_MODIFIER_ALT;
+    //     g_message("modstate KM_KBP_MODIFIER_ALT");
+    // }
+    // if (state & IBUS_CONTROL_MASK) {
+    //     km_mod_state |= KM_KBP_MODIFIER_CTRL;
+    //     g_message("modstate KM_KBP_MODIFIER_CTRL");
+    // }
 
     g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
 
@@ -545,14 +545,26 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         char key_vec[32];
         XQueryKeymap(m_display, key_vec);
 
-        if ((state & IBUS_MOD1_MASK) && is_key_pressed(m_display, key_vec, IBUS_Alt_R)) {
-            km_mod_state |= KM_KBP_MODIFIER_RALT;
-            g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_Alt_R");
+        if (state & IBUS_MOD1_MASK) {
+            if (is_key_pressed(m_display, key_vec, IBUS_Alt_R)) {
+                km_mod_state |= KM_KBP_MODIFIER_RALT;
+                g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_Alt_R");
+            }
+            else {
+                km_mod_state |= KM_KBP_MODIFIER_LALT;
+                g_message("modstate KM_KBP_MODIFIER_LALT");
+            }
         }
 
-        if ((state & IBUS_CONTROL_MASK) && is_key_pressed(m_display, key_vec, IBUS_Control_R)) {
-            km_mod_state |= KM_KBP_MODIFIER_RCTRL;
-            g_message("modstate KM_KBP_MODIFIER_RCTRL");
+        if (state & IBUS_CONTROL_MASK) {
+            if (is_key_pressed(m_display, key_vec, IBUS_Control_R)) {
+                km_mod_state |= KM_KBP_MODIFIER_RCTRL;
+                g_message("modstate KM_KBP_MODIFIER_RCTRL");
+            }
+            else {
+                km_mod_state |= KM_KBP_MODIFIER_LCTRL;
+                g_message("modstate KM_KBP_MODIFIER_LCTRL");
+            }
         }
         // ignoring right shift
         // if ((state & IBUS_SHIFT_MASK) && is_key_pressed(m_display, key_vec, IBUS_Shift_R)) {
