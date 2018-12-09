@@ -56,7 +56,6 @@ type
     FEditorFormat: TEditorFormat;
     FOnChanged: TNotifyEvent;
     FTextFileFormat: TTextFileFormat;
-    FHasError: Boolean;
 
     cef: TframeCEFHost;
     FFilename: string;
