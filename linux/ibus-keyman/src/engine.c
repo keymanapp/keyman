@@ -48,6 +48,7 @@ struct _IBusKeymanEngine {
     km_kbp_state    *state;
     gchar           *ldmlfile;
     gchar           *kb_name;
+    gchar           *char_buffer;
     gunichar         firstsurrogate;
     gboolean         marker;
     IBusLookupTable *table;
@@ -160,7 +161,7 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     engine_class->disable = ibus_keyman_engine_disable;
 
     engine_class->set_surrounding_text = ibus_keyman_engine_set_surrounding_text;
-    //engine_class->set_cursor_location = ibus_keyman_engine_set_cursor_location;
+    // engine_class->set_cursor_location = ibus_keyman_engine_set_cursor_location;
 
 
     engine_class->focus_in = ibus_keyman_engine_focus_in;
@@ -175,26 +176,54 @@ ibus_keyman_engine_class_init (IBusKeymanEngineClass *klass)
     engine_class->property_activate = ibus_keyman_engine_property_activate;
 }
 
-static void read_context(IBusEngine *engine)
+static gchar *get_current_context_text(km_kbp_context *context)
+{
+    size_t buf_size = 512;
+    km_kbp_context_item *context_items;
+    gchar *current_context_utf8 = g_new0(gchar, buf_size);
+    if (km_kbp_context_get(context, &context_items) == KM_KBP_STATUS_OK) {
+        km_kbp_context_items_to_utf8(context_items,
+                            current_context_utf8,
+                            &buf_size);
+    }
+    km_kbp_context_items_dispose(context_items);
+    g_message("current context is:%lu:%lu:%s:", km_kbp_context_length(context), buf_size, current_context_utf8);
+    return current_context_utf8;
+}
+
+static void reset_context(IBusEngine *engine)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
     IBusText *text;
-    gchar *surrounding_text;
+    gchar *surrounding_text, *current_context_utf8;
     guint cursor_pos, anchor_pos, context_start;
     km_kbp_context_item *context_items;
+    km_kbp_context *context;
 
+    g_message("reset_context");
+    keyman->firstsurrogate = 0;
+    keyman->marker = False;
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
-        g_message("reading context");
+        context = km_kbp_state_context(keyman->state);
+        current_context_utf8 = get_current_context_text(context);
+
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
         context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
         surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
-        g_message("new context is:%s", surrounding_text);
-        if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
-            km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
+        g_message("new context is:%u:%s:", cursor_pos - context_start, surrounding_text);
+
+        g_message(":%s:%s:", surrounding_text, current_context_utf8);
+        if (g_strcmp0(surrounding_text, current_context_utf8) != 0)
+        {
+            g_message("setting context because it has changed from expected");
+            if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
+                km_kbp_context_set(context, context_items);
+            }
+            km_kbp_context_items_dispose(context_items);
         }
-        km_kbp_context_items_dispose(context_items);
         g_free(surrounding_text);
+        g_free(current_context_utf8);
     }
 }
 
@@ -302,7 +331,7 @@ ibus_keyman_engine_constructor (GType                   type,
         g_warning("problem creating km_kbp_state");
     }
 
-    read_context(engine);
+    reset_context(engine);
 
     keyman->display  = XOpenDisplay(NULL);
     return (GObject *) keyman;
@@ -491,17 +520,6 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     // Many more KEYS currently not used by KMW...
   };
 
-static void reset_context(IBusEngine *engine)
-{
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
-
-    g_message("reset_context");
-    keyman->firstsurrogate = 0;
-    keyman->marker = False;
-    km_kbp_context_clear(km_kbp_state_context(keyman->state));
-    read_context(engine);
-}
-
 static gboolean
 ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                                     guint           keyval,
@@ -586,13 +604,21 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         // }
         XCloseDisplay(m_display);
     }
+    g_message("before process key event");
+    km_kbp_context *context = km_kbp_state_context(keyman->state);
+    g_free(get_current_context_text(context));
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
     km_kbp_status event_status = km_kbp_process_event(keyman->state,
                                    keycode_to_vk[keycode], km_mod_state);
+    context = km_kbp_state_context(keyman->state);
+    g_message("after process key event");
+    g_free(get_current_context_text(context));
 
     // km_kbp_state_action_items to get action items
     size_t num_action_items;
     gint numbytes;
+    g_free(keyman->char_buffer);
+    keyman->char_buffer = NULL;
     const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state,
                                                      &num_action_items);
 
@@ -614,8 +640,15 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                             &items_read,
                             &items_written,
                             NULL);
-                        ibus_keyman_engine_commit_string(keyman, utf8_pair);
-                        g_free(utf8_pair);
+                        if (keyman->char_buffer == NULL) {
+                            keyman->char_buffer = utf8_pair;
+                        }
+                        else {
+                            gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8_pair, NULL);
+                            g_free(keyman->char_buffer);
+                            g_free(utf8_pair);
+                            keyman->char_buffer = new_buffer;
+                        }
                         keyman->firstsurrogate = 0;
                     }
                 }
@@ -624,12 +657,20 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     numbytes = g_unichar_to_utf8(action_items[i].character, utf8);
                     if (numbytes > 12) {
                         g_error("g_unichar_to_utf8 overflowing buffer");
+                        g_free(utf8);
                     }
                     else {
                         g_message("unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
-                        ibus_keyman_engine_commit_string(keyman, utf8);
+                        if (keyman->char_buffer == NULL) {
+                            keyman->char_buffer = utf8;
+                        }
+                        else {
+                            gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
+                            g_free(keyman->char_buffer);
+                            g_free(utf8);
+                            keyman->char_buffer = new_buffer;
+                        }
                     }
-                    g_free(utf8);
                 }
                 break;
             case KM_KBP_IT_MARKER:
@@ -644,6 +685,12 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action");
+                if (keyman->char_buffer != NULL)
+                {
+                    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                    g_free(keyman->char_buffer);
+                    keyman->char_buffer = NULL;
+                }
                 if (keyman->marker) {
                     keyman->marker = False;
                 }
@@ -663,6 +710,12 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 g_message("PERSIST_OPT action");
                 break;
             case KM_KBP_IT_EMIT_KEYSTROKE:
+                if (keyman->char_buffer != NULL)
+                {
+                    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                    g_free(keyman->char_buffer);
+                    keyman->char_buffer = NULL;
+                }
                 g_message("EMIT_KEYSTROKE action");
                 return False;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
@@ -672,11 +725,20 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
             case KM_KBP_IT_END:
                 g_message("END action");
                 keyman->firstsurrogate = 0;
+                if (keyman->char_buffer != NULL)
+                {
+                    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                    g_free(keyman->char_buffer);
+                    keyman->char_buffer = NULL;
+                }
                 break;
             default:
                 g_warning("Unknown action");
         }
     }
+    context = km_kbp_state_context(keyman->state);
+    g_message("after processing all actions");
+    g_free(get_current_context_text(context));
     return TRUE;
  }
 
@@ -686,9 +748,13 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
                                             guint       cursor_pos,
                                             guint       anchor_pos)
 {
+    gchar *surrounding_text;
+    guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
     g_message("ibus_keyman_engine_set_surrounding_text");
     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
-    // TODO: this could lose deadkeys(markers)
+    surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
+    g_message("surrounding context is:%u:%s:", cursor_pos - context_start, surrounding_text);
+    g_free(surrounding_text);
     reset_context(engine);
 }
 
