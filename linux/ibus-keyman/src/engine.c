@@ -586,7 +586,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
 
     // km_kbp_state_action_items to get action items
     size_t num_action_items;
-    gchar utf8[12];
     gint numbytes;
     const km_kbp_action_item *action_items = km_kbp_state_action_items(keyman->state,
                                                      &num_action_items);
@@ -614,17 +613,16 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     }
                 }
                 else {
+                    gchar *utf8 = (gchar *) g_new0(gchar, 12);
                     numbytes = g_unichar_to_utf8(action_items[i].character, utf8);
-                    if (numbytes > 12)
-                    {
+                    if (numbytes > 12) {
                         g_error("g_unichar_to_utf8 overflowing buffer");
                     }
-                    if (numbytes)
-                    {
-                        utf8[numbytes] = 0;
+                    else {
+                        g_message("unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
+                        ibus_keyman_engine_commit_string(keyman, utf8);
                     }
-                    g_message("CHAR action unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
-                    ibus_keyman_engine_commit_string(keyman, utf8);
+                    g_free(utf8);
                 }
                 break;
             case KM_KBP_IT_MARKER:
@@ -677,6 +675,7 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
 {
     g_message("ibus_keyman_engine_set_surrounding_text");
     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
+    // TODO: this could lose deadkeys(markers)
     reset_context(engine);
 }
 
