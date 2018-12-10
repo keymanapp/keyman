@@ -35,6 +35,7 @@
 #include "engine.h"
 
 #define Keyman_Pass_Backspace_To_IBus 254 // unused keycode to forward backspace back to ibus
+#define MAXCONTEXT_ITEMS 128
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
@@ -178,14 +179,15 @@ static void read_context(IBusEngine *engine)
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
     IBusText *text;
     gchar *surrounding_text;
-    guint cursor_pos, anchor_pos;
+    guint cursor_pos, anchor_pos, context_start;
     km_kbp_context_item *context_items;
 
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
         g_message("reading context");
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), 0, cursor_pos);
+        context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
         g_message("new context is:%s", surrounding_text);
         if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
             km_kbp_context_set(km_kbp_state_context(keyman->state), context_items);
