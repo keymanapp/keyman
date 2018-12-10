@@ -34,7 +34,6 @@
 #include "keyman-service.h"
 #include "engine.h"
 
-#define Keyman_Pass_Backspace_To_IBus 254 // unused keycode to forward backspace back to ibus
 #define MAXCONTEXT_ITEMS 128
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
@@ -196,7 +195,7 @@ static void reset_context(IBusEngine *engine)
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
     IBusText *text;
     gchar *surrounding_text, *current_context_utf8;
-    guint cursor_pos, anchor_pos, context_start;
+    guint cursor_pos, anchor_pos, context_start, context_pos;
     km_kbp_context_item *context_items;
     km_kbp_context *context;
 
@@ -208,9 +207,10 @@ static void reset_context(IBusEngine *engine)
         current_context_utf8 = get_current_context_text(context);
 
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
-        context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
-        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
-        g_message("new context is:%u:%s:", cursor_pos - context_start, surrounding_text);
+        context_pos = anchor_pos < cursor_pos ? anchor_pos : cursor_pos;
+        context_start = context_pos > MAXCONTEXT_ITEMS ? context_pos - MAXCONTEXT_ITEMS : 0;
+        surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, context_pos);
+        g_message("new context is:%u:%s: cursor:%d anchor:%d", context_pos - context_start, surrounding_text, cursor_pos, anchor_pos);
 
         g_message(":%s:%s:", surrounding_text, current_context_utf8);
         if (g_strcmp0(surrounding_text, current_context_utf8) != 0)
@@ -418,11 +418,11 @@ static void forward_keysym(IBusKeymanEngine *engine, unsigned int keysym, unsign
     ibus_engine_forward_key_event((IBusEngine *)engine, keysym, keycode-8, state);
 }
 
-static void forward_keycode(IBusKeymanEngine *engine, unsigned char keycode, unsigned int state)
-{
-    g_debug("DAR: forward_keycode no keysym");
-    ibus_engine_forward_key_event((IBusEngine *)engine, 0, keycode, state);
-}
+// static void forward_keycode(IBusKeymanEngine *engine, unsigned char keycode, unsigned int state)
+// {
+//     g_debug("DAR: forward_keycode no keysym");
+//     ibus_engine_forward_key_event((IBusEngine *)engine, 0, keycode, state);
+// }
 
 
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMHardwareKeyboardInterpreter.java
@@ -524,6 +524,16 @@ static km_kbp_virtual_key const keycode_to_vk[256] = {
     // Many more KEYS currently not used by KMW...
   };
 
+static gboolean ok_for_single_backspace(const km_kbp_action_item *action_items, int i, size_t num_actions)
+{
+    for (int j=i+1; j < num_actions; j++) {
+        if (action_items[i].type == KM_KBP_IT_BACK || action_items[i].type == KM_KBP_IT_CHAR || action_items[i].type == KM_KBP_IT_EMIT_KEYSTROKE) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
 static gboolean
 ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                                     guint           keyval,
@@ -531,7 +541,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                                     guint           state)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
-    
+
     if (state & IBUS_RELEASE_MASK)
         return FALSE;
 
@@ -565,11 +575,11 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
 
     // // Let the application handle user generated backspaces after resetting the kmfl history
-    if (keycode == Keyman_Pass_Backspace_To_IBus) {
-        //clear_history(keyman->state);
-        g_message("IBUS_BackSpace");
-        return FALSE;
-    }
+//    if (keycode == Keyman_Pass_Backspace_To_IBus) {
+//        //clear_history(keyman->state);
+//        g_message("IBUS_BackSpace");
+//        return FALSE;
+//    }
 
     if (keycode_to_vk[keycode] == 0) // key we don't handle
         return FALSE;
@@ -631,6 +641,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         switch(action_items[i].type)
         {
             case KM_KBP_IT_CHAR:
+                g_message("CHAR action %d/%d", i+1, (int)num_action_items);
                 if (g_unichar_type(action_items[i].character) == G_UNICODE_SURROGATE) {
                     if (keyman->firstsurrogate == 0) {
                         keyman->firstsurrogate = action_items[i].character;
@@ -678,39 +689,53 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_MARKER:
                 keyman->hasonlymarker = TRUE;
-                g_message("MARKER action");
+                g_message("MARKER action %d/%d", i+1, (int)num_action_items);
                 break;
             case KM_KBP_IT_ALERT:
-                g_message("ALERT action");
+                g_message("ALERT action %d/%d", i+1, (int)num_action_items);
                 Display * alert_display  = XOpenDisplay(NULL);
                 XkbBell(alert_display, None, 0, None);
                 XCloseDisplay(alert_display);
                 break;
             case KM_KBP_IT_BACK:
-                g_message("BACK action");
-                if (keyman->char_buffer != NULL)
-                {
-                    ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-                    g_free(keyman->char_buffer);
-                    keyman->char_buffer = NULL;
-                }
+                g_message("BACK action %d/%d", i+1, (int)num_action_items);
                 if (keyman->hasonlymarker) {
                     keyman->hasonlymarker = FALSE;
                 }
                 else {
-                    g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
+                    if (keyman->char_buffer != NULL)
+                    {
+                        ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                        g_free(keyman->char_buffer);
+                        keyman->char_buffer = NULL;
+                    }
+                    if (ok_for_single_backspace(action_items, i, num_action_items)) {
+                        // single backspace can be handled by ibus as normal
+                        g_message("no char actions, just single back");
+                        return FALSE;
+                    }
+                    else {
+                        g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
 
-                    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
-                        g_message("deleting surrounding text 1 char");
-                        ibus_engine_delete_surrounding_text(engine, -1, 1);
-                    } else {
-                        g_message("forwarding backspace");
-                        forward_keycode(keyman, Keyman_Pass_Backspace_To_IBus, 0);
+                        if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
+                            g_message("deleting surrounding text 1 char");
+                            ibus_engine_delete_surrounding_text(engine, -1, 1);
+                        } else {
+                            g_message("forwarding backspace with reset context");
+                            km_kbp_context_item *context_items;
+                            km_kbp_context_get(km_kbp_state_context(keyman->state),
+                                &context_items);
+                            reset_context(engine);
+                            forward_keysym(keyman, XK_BackSpace, 0);
+                            km_kbp_context_set(km_kbp_state_context(keyman->state),
+                                context_items);
+                            km_kbp_context_items_dispose(context_items);
+                        }
                     }
                 }
                 break;
             case KM_KBP_IT_PERSIST_OPT:
-                g_message("PERSIST_OPT action");
+                g_message("PERSIST_OPT action %d/%d", i+1, (int)num_action_items);
                 break;
             case KM_KBP_IT_EMIT_KEYSTROKE:
                 if (keyman->char_buffer != NULL)
@@ -719,16 +744,16 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     g_free(keyman->char_buffer);
                     keyman->char_buffer = NULL;
                 }
-                g_message("EMIT_KEYSTROKE action");
+                g_message("EMIT_KEYSTROKE action %d/%d", i+1, (int)num_action_items);
                 return False;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
-                g_message("INVALIDATE_CONTEXT action");
+                g_message("INVALIDATE_CONTEXT action %d/%d", i+1, (int)num_action_items);
                 keyman->hasonlymarker = FALSE;
                 km_kbp_context_clear(km_kbp_state_context(keyman->state));
                 reset_context(engine);
                 break;
             case KM_KBP_IT_END:
-                g_message("END action");
+                g_message("END action %d/%d", i+1, (int)num_action_items);
                 keyman->firstsurrogate = 0;
                 if (keyman->char_buffer != NULL)
                 {
@@ -739,7 +764,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 }
                 break;
             default:
-                g_warning("Unknown action");
+                g_warning("Unknown action %d/%d(%d)", i+1, (int)num_action_items, action_items[i].type);
         }
     }
     context = km_kbp_state_context(keyman->state);
@@ -757,6 +782,9 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
     gchar *surrounding_text;
     guint context_start = cursor_pos > MAXCONTEXT_ITEMS ? cursor_pos - MAXCONTEXT_ITEMS : 0;
     g_message("ibus_keyman_engine_set_surrounding_text");
+    if (cursor_pos != anchor_pos){
+        g_message("ibus_keyman_engine_set_surrounding_text: There is a selection");
+    }
     parent_class->set_surrounding_text (engine, text, cursor_pos, anchor_pos);
     surrounding_text = g_utf8_substring(ibus_text_get_text(text), context_start, cursor_pos);
     g_message("surrounding context is:%u:%s:", cursor_pos - context_start, surrounding_text);
