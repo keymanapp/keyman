@@ -24,12 +24,13 @@ unit UImportOlderVersionSettings;
 
 interface
 
-procedure FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean);  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean): Boolean;  // I2753
 
 implementation
 
 uses
   System.SysUtils,
+  System.Win.ComObj,
 
   Hints,
   InterfaceHotkeys,
@@ -41,7 +42,7 @@ uses
   RegistryKeys,
   UImportOlderKeyboardUtils;
 
-procedure FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean);  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean): Boolean;  // I2753
 var
   I: Integer;
   v: Integer;
@@ -131,9 +132,22 @@ begin
   if DoDefaults then
   begin
     // I2753
+    kmcom.Errors.Clear;
     kmcom.Hotkeys.Apply;  // I2651 - hotkeys not saving, 8.0.309.0
     kmcom.Options.Apply;
+    if kmcom.Errors.Count > 0 then
+    begin
+      // Handle error setting values, most likely Start With Windows, which can
+      // be blocked by zealous security software. Note: there is an error that will
+      // be bubbled through in the Errors array but we are not going to worry about
+      // that one here for now; we can't really add a lot of detail without significant
+      // refactoring, and this is the only error we are really concerned about at
+      // present.
+      Exit(False);
+    end;
   end;
+
+  Result := True;
 end;
 
 end.
