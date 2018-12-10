@@ -60,6 +60,7 @@ type
     cef: TframeCEFHost;
     FFilename: string;
     FOnBreakpointClicked: TEditorBreakpointClickedEvent;
+    FErrorLine: Integer;
 
     procedure RefreshOptions;
     function GetText: WideString;
@@ -288,7 +289,10 @@ procedure TframeTextEditor.cefPreKeySyncEvent(Sender: TObject;
   e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
 begin
   AssertCefThread;
-  if e.event.windows_key_code = VK_ESCAPE then
+  Handled := False;
+  // While FErrorLine is from main thread, this is unlikely to cause trouble so
+  // will not worry about synchronisation
+  if (e.event.windows_key_code = VK_ESCAPE) and (FErrorLine > 0) then
     Handled := True;
 end;
 
@@ -926,6 +930,9 @@ end;
 procedure TframeTextEditor.FindError(ln: Integer);
 begin
   ClearError;
+
+  FErrorLine := ln;
+
   if (ln <= 0) then Exit;
 
   ExecuteLineCommand(ln, 'highlightError');
