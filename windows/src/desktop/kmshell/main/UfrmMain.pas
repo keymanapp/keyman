@@ -735,7 +735,10 @@ begin
   if (kmcom.Options['koDebugging'].Value <> DebuggingChecked) and kmcom.Options['koDebugging'].Value then
     ShowMessage(MsgFromId(SKDebuggingWarning));
 
+  kmcom.Errors.Clear;
   kmcom.Options.Apply;
+  if kmcom.Errors.Count > 0 then
+    ShowMessage(kmcom.Errors[0].Description);
 
   DebuggingChecked := kmcom.Options['koDebugging'].Value;
 

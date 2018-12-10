@@ -22,7 +22,8 @@ unit UCreateProcessAsShellUser;
 
 interface
 
-function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean;  // I2757
+function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean; var AExitCode: Cardinal): Boolean; overload; // I2757
+function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean; overload; // I2757
 
 implementation
 
@@ -40,6 +41,13 @@ var
   CreateProcessWithTokenW: TCreateProcessWithTokenW = nil;
 
 function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean): Boolean;  // I2757
+var
+  ec: Cardinal;
+begin
+  Result := CreateProcessAsShellUser(process, cmdline, Wait, ec);
+end;
+
+function CreateProcessAsShellUser(const process, cmdline: WideString; Wait: Boolean; var AExitCode: Cardinal): Boolean;  // I2757
 var
   dwProcessId: Cardinal;
   hProcess, hShellProcessToken: THandle;
@@ -129,11 +137,13 @@ begin
   Result := True;
 
   if Wait then  // I2757   // I4318
+  begin
     DoWait;
+    GetExitCodeProcess(pi.hProcess, AExitCode);
+  end;
 
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
-
 end;
 
 var
