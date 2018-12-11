@@ -50,7 +50,7 @@ struct _IBusKeymanEngine {
     gchar           *kb_name;
     gchar           *char_buffer;
     gunichar         firstsurrogate;
-    gchar            marker;
+    gboolean         hasonlymarker;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -216,7 +216,7 @@ static void reset_context(IBusEngine *engine)
         if (g_strcmp0(surrounding_text, current_context_utf8) != 0)
         {
             g_message("setting context because it has changed from expected");
-            keyman->marker = 0;
+            keyman->hasonlymarker = FALSE;
             if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
                 km_kbp_context_set(context, context_items);
             }
@@ -226,7 +226,7 @@ static void reset_context(IBusEngine *engine)
         g_free(current_context_utf8);
     }
     else {
-        keyman->marker = 0;
+        keyman->hasonlymarker = FALSE;
         km_kbp_context_clear(context);
     }
 }
@@ -280,7 +280,7 @@ ibus_keyman_engine_constructor (GType                   type,
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
     keyman->firstsurrogate = 0;
-    keyman->marker = 0;
+    keyman->hasonlymarker = FALSE;
     gchar **split_name = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
@@ -677,7 +677,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 }
                 break;
             case KM_KBP_IT_MARKER:
-                keyman->marker++;
+                keyman->hasonlymarker = TRUE;
                 g_message("MARKER action");
                 break;
             case KM_KBP_IT_ALERT:
@@ -694,8 +694,8 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     g_free(keyman->char_buffer);
                     keyman->char_buffer = NULL;
                 }
-                if (keyman->marker > 0) {
-                    keyman->marker--;
+                if (keyman->hasonlymarker) {
+                    keyman->hasonlymarker = FALSE;
                 }
                 else {
                     g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
@@ -723,7 +723,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 return False;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
                 g_message("INVALIDATE_CONTEXT action");
-                keyman->marker = 0;
+                keyman->hasonlymarker = FALSE;
                 km_kbp_context_clear(km_kbp_state_context(keyman->state));
                 reset_context(engine);
                 break;
@@ -735,6 +735,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
                     g_free(keyman->char_buffer);
                     keyman->char_buffer = NULL;
+                    keyman->hasonlymarker = FALSE;
                 }
                 break;
             default:
