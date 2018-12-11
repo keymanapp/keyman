@@ -203,9 +203,9 @@ static void reset_context(IBusEngine *engine)
     g_message("reset_context");
     keyman->firstsurrogate = 0;
     keyman->marker = False;
+    context = km_kbp_state_context(keyman->state);
     if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0)
     {
-        context = km_kbp_state_context(keyman->state);
         current_context_utf8 = get_current_context_text(context);
 
         ibus_engine_get_surrounding_text(engine, &text, &cursor_pos, &anchor_pos);
@@ -224,6 +224,9 @@ static void reset_context(IBusEngine *engine)
         }
         g_free(surrounding_text);
         g_free(current_context_utf8);
+    }
+    else {
+        km_kbp_context_clear(context);
     }
 }
 
