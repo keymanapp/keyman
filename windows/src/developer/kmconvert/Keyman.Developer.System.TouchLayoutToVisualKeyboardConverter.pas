@@ -159,6 +159,7 @@ var
 type
   TLayoutShiftState = record Shift: Word; id: ansistring end;
 const
+  // These layer names match those in KeymanWeb, kmwosk.ts osk.modifierSpecials
   ShiftStates: array[0..21] of TLayoutShiftState = (
     (Shift: KVKS_NORMAL; id: 'default'),
     (Shift: KVKS_SHIFT; id: 'shift'),
@@ -177,12 +178,12 @@ const
     (Shift: KVKS_RALT; id: 'rightalt'),
     (Shift: KVKS_RCTRL or KVKS_RALT; id: 'rightctrl-rightalt'),
     (Shift: KVKS_SHIFT; id: 'shift'),
-    (Shift: KVKS_SHIFT or KVKS_LCTRL; id: 'shift-lctrl'),
-    (Shift: KVKS_SHIFT or KVKS_RCTRL; id: 'shift-rctrl'),
-    (Shift: KVKS_SHIFT or KVKS_LALT; id: 'shift-lalt'),
-    (Shift: KVKS_SHIFT or KVKS_RALT; id: 'shift-ralt'),
-    (Shift: KVKS_SHIFT or KVKS_LCTRL or KVKS_LALT; id: 'shift-lctrl-lalt'),
-    (Shift: KVKS_SHIFT or KVKS_RCTRL or KVKS_RALT; id: 'shift-rctrl-ralt')
+    (Shift: KVKS_SHIFT or KVKS_LCTRL; id: 'leftctrl-shift'),
+    (Shift: KVKS_SHIFT or KVKS_RCTRL; id: 'rightctrl-shift'),
+    (Shift: KVKS_SHIFT or KVKS_LALT; id: 'leftalt-shift'),
+    (Shift: KVKS_SHIFT or KVKS_RALT; id: 'rightalt-shift'),
+    (Shift: KVKS_SHIFT or KVKS_LCTRL or KVKS_LALT; id: 'leftctrl-leftalt-shift'),
+    (Shift: KVKS_SHIFT or KVKS_RCTRL or KVKS_RALT; id: 'rightctrl-rightalt-shift')
   );
 const
   NFirstChiralShiftState = 8;
