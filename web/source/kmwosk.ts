@@ -102,6 +102,8 @@ namespace com.keyman {
       // Create the default key cap labels (letter keys, etc.)
       var x = (<KeymanBase>window['keyman'])['osk'].keyCodes[this.spec.id];
       switch(x) {
+        // Converts the keyman key id code for common symbol keys into its representative ASCII code.
+        // K_COLON -> K_BKQUOTE
         case 186: x=59; break;
         case 187: x=61; break;
         case 188: x=44; break;
@@ -109,11 +111,13 @@ namespace com.keyman {
         case 190: x=46; break;
         case 191: x=47; break;
         case 192: x=96; break;
+        // K_LBRKT -> K_QUOTE
         case 219: x=91; break;
         case 220: x=92; break;
         case 221: x=93; break;
         case 222: x=39; break;
         default:
+          // No other symbol character represents a base key on the standard QWERTY English layout.
           if(x < 48 || x > 90) {
             x=0;
           }
