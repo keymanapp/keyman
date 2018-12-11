@@ -36,6 +36,7 @@ uses
   ImgList, MenuImgList, Menus, StdCtrls, Buttons, ExtCtrls, PaintPanel,
   CleartypeDrawCharacter, mbColorPalette, mbColorPreview,
   ComCtrls, ActnList, PalUtils, KMDActionInterfaces, Vcl.ExtDlgs,
+  Vcl.Imaging.PngImage,
   System.Actions, System.ImageList;
 
 type
@@ -120,7 +121,7 @@ type
     procedure cmdImportClick(Sender: TObject);
     procedure ppReadOnlyIconsPaint(Sender: TObject);
   private
-    FReadOnlyIcons: array of TIcon;
+    FReadOnlyIcons: array of TGraphic;
     FRSP21318IsPngIcon: Boolean;
     FEdit: TBitmapEditorCurrentEdit;
 
@@ -189,7 +190,6 @@ implementation
 uses
   Clipbrd,
   JPEG,
-  PngImage,
   UfrmBitmapEditorText;
 
 const
@@ -253,7 +253,9 @@ begin
     FBitmaps[beb].Free;
 
   for i := 0 to High(FReadOnlyIcons) do
+  begin
     FReadOnlyIcons[i].Free;
+  end;
   SetLength(FReadOnlyIcons, 0);
 
   FLastInsertFont.Free;
@@ -928,6 +930,7 @@ var
   i, w, h: Integer;
   cd: string;
   p: Int64;
+  buf: array[0..3] of byte;
 begin
   memoReadOnlyIcons.Clear;
   p := Stream.Position;
@@ -939,16 +942,31 @@ begin
     SetLength(FReadOnlyIcons, ci.Count);
     for i := 0 to ci.Count - 1 do
     begin
-      Stream.Position := p;
-      FReadOnlyIcons[i] := TIcon.Create;
       if List[i].Colors = 0
         then cd := '24 bit'
         else cd := IntToStr(List[i].Colors);
       if List[i].Width = 0 then w := 256 else w := List[i].Width;
       if List[i].Height = 0 then h := 256 else h := List[i].Height;
 
-      FReadOnlyIcons[i].SetSize(w, h);
-      FReadOnlyIcons[i].LoadFromStream(Stream);
+      Stream.Position := List[i].DIBOffset;
+      Assert(Stream.Read(buf, 4) = 4);
+      if IsPNGSignature(buf) then
+      begin
+        // Loads a PNG-format icon from the offset of
+        // the file for the specific icon
+        Stream.Position := List[i].DIBOffset;
+        FReadOnlyIcons[i] := TPngImage.Create;
+        FReadOnlyIcons[i].LoadFromStream(Stream);
+      end
+      else
+      begin
+        // Uses Delphi's icon loading function to get the correct icon
+        // from the stream
+        Stream.Position := p;
+        FReadOnlyIcons[i] := TIcon.Create;
+        FReadOnlyIcons[i].SetSize(w, h);
+        FReadOnlyIcons[i].LoadFromStream(Stream);
+      end;
 
       memoReadOnlyIcons.Lines.Add(Format('Icon #%d: %d x %d, %s colour',
         [i+1, w, h, cd]));
