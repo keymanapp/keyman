@@ -784,7 +784,7 @@ namespace com.keyman {
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
     }
 
-    isRTL(k0?: any|KeyboardStub): boolean {
+    isRTL(k0?): boolean {
       var k = k0 || this.activeKeyboard;
       return (k != null) && (k['KRTL']);
     }
@@ -832,7 +832,7 @@ namespace com.keyman {
     getFont(k0?) {
       var k = k0 || this.activeKeyboard;
 
-      if(k['KV']) {
+      if(k && k['KV']) {
         return k['KV']['F'];
       }
       
