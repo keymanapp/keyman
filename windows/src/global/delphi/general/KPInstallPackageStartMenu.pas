@@ -29,6 +29,7 @@ uses
   Winapi.Windows,
 
   PackageInfo,
+  StockFileNames,
   utilsystem,
   utilwow64;
 
@@ -81,7 +82,7 @@ begin
 
     programs := IncludeTrailingPathDelimiter(programs);
 
-    with TIniFile.Create(dest+'kmp.inf') do
+    with TIniFile.Create(dest+PackageFile_KMPInf) do
     try
       WriteString('Uninstall','StartMenuPath', programs + inf.StartMenu.Path);
     finally
@@ -94,7 +95,7 @@ begin
 
       ForceDirectories(ExtractFileDir(lnkfile));
 
-      with TIniFile.Create(dest+'kmp.inf') do
+      with TIniFile.Create(dest+PackageFile_KMPInf) do
       try
         WriteString('Files', 'uninst.vbs', 'uninst.vbs');
       finally
