@@ -671,6 +671,7 @@ var
   i: Integer;
   s: WideString;
   FKMShellPath: WideString;
+  FExitCode: Cardinal;
 begin
   //if FInstallInfo.Packages.Count = 0 then Exit;  I879
 
@@ -697,7 +698,14 @@ begin
     if (FInstalledVersion.Version = '') or (FInstalledVersion.ProductCode <> FInstallerVersion.ProductCode) then s := s + 'InstallDefaults,';  // I2651
 
     TUtilExecute.WaitForProcess('"'+FKMShellPath+'" '+s, ExtractFilePath(FKMShellPath), SW_SHOWNORMAL, WaitFor); // I2605 - for admin-installed packages  // I3349
-    CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True);  // I2757
+
+    FExitCode := 0;
+    if not CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'" '+s, True, FExitCode) then // I2757
+      LogError('Failed to setup default options for Keyman Desktop: '+SysErrorMessage(GetLastError))
+    else if FExitCode = 2 then
+    begin
+      LogError('Failed to setup Keyman Desktop to start with Windows; this action may have been blocked by security software.');
+    end;
   end;
 
   DeleteBackupPath;  // I2747
