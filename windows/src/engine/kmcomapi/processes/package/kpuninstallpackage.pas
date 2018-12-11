@@ -45,7 +45,8 @@ uses
   keymancontext, comobj,
   kpuninstallpackagestartmenu, kpuninstallkeyboard, kpuninstallfont, ErrorControlledRegistry, RegistryKeys,
   utilkeyman, utilsystem, KMPInfFile, packageinfo, keymanerrorcodes, utilfiletypes,
-  isadmin, IniFiles, GetOSVersion, shellapi, shlobj, utildir, Variants;
+  isadmin, IniFiles, GetOSVersion, shellapi, shlobj, utildir, StockFileNames,
+  Variants;
 
 { TKPUninstallPackage }
 
@@ -173,7 +174,7 @@ begin
       end
       else
       begin
-        FileName := GetPackageInstallPath(PackageName) + '\kmp.inf';
+        FileName := GetPackageInstallPath(PackageName) + '\'+PackageFile_KMPInf;
       end;
 
       if FIsAdmin then
