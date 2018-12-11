@@ -250,10 +250,8 @@ procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   /
 var
   converter: TTouchLayoutToVisualKeyboardConverter;
   FVK: TVisualKeyboard;
-  FOldLayoutJS: string;
+  FJS: string;
 begin
-  FOldLayoutJS := FSavedLayoutJS;
-
   if not FileExists(KVKFileName) then
   begin
     ShowMessage('This keyboard does not include an On Screen Keyboard file named '+KVKFileName);
@@ -274,9 +272,8 @@ begin
 
     converter := TTouchLayoutToVisualKeyboardConverter.Create(FVK);
     try
-      if not converter.Execute(FSavedLayoutJS) then
+      if not converter.Execute(FJS) then
       begin
-        FSavedLayoutJS := FOldLayoutJS;
         ShowMessage('The converter failed to run.');
         Exit;
       end;
@@ -288,11 +285,10 @@ begin
   end;
 
   try
-    DoLoad;
+    Load(FJS, False, True);
   except
     on E:Exception do
     begin
-      FSavedLayoutJS := FOldLayoutJS;
       ShowMessage(E.Message);
       Exit;
     end;
@@ -325,6 +321,9 @@ var
 begin
   FLastErrorOffset := -1;
   FLastError := '';
+
+  if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFilename) then
+    modWebHttpServer.AppSource.UnregisterSource(FFilename);
 
 //  FreeAndNil(FHTMLTempFilename);   // I4195
 //  FHTMLTempFilename := TTempFileManager.Get('.html');   // I4195
