@@ -49,9 +49,7 @@ namespace com.keyman {
       var fontSize: string;
       // TODO:  properly parse the font size spec.
       if(!fontSpec.absolute) {
-        let emSizeStr = getComputedStyle(document.body).fontSize;
-        let emSize = parseFloat(emSizeStr.substr(0, emSizeStr.indexOf('px')));
-        fontSize = fontSpec.val * (emSize * emScale) + 'px';
+        fontSize = fontSpec.val * emScale + 'px';
       } else {
         fontSize = fontSpec.val + 'px';
       }
@@ -854,18 +852,14 @@ if(!window['keyman']['initialized']) {
     osk.getKeyEmFontSize = function() {
       // TODO:  properly parse the font size spec.
       if(util.device.formFactor == 'desktop') {
-        let kbdFontSize = util.getFontSizeStyle(osk._DivVKbd)['val']; // This will be set to an exact size by osk.loadCookie().
+        let kbdFontSize = osk.getFontSizeFromCookie();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
         return kbdFontSize * keySquareScale;
       } else {
         // All set as hard-coded values in this file.  All are relative.
-        let boxFontScale = util.getFontSizeStyle(osk._Box)['val'];
-        let kbdFontScale = util.getFontSizeStyle(osk._DivVKbd)['val'];
-        let layerFontScale = util.getFontSizeStyle(osk._DivVKbd.firstChild)['val'];
-
         let emSizeStr = getComputedStyle(document.body).fontSize;
-        let emSize = util.getFontSizeStyle(emSizeStr);
-        let emScale = boxFontScale * kbdFontScale * layerFontScale;
+        let emSize = util.getFontSizeStyle(emSizeStr).val;
+        let emScale = util.getFontSizeStyle(osk._Box).val;
         return emSize * emScale;
       }
     }
@@ -3745,8 +3739,6 @@ if(!window['keyman']['initialized']) {
       // Resize the layer group.
       b=b.firstChild.firstChild; bs=b.style;
       bs.height=bs.maxHeight=(oskHeight+3)+'px';
-      // Yet _another_ adjustment to the font size for phone devices!
-      if(device.formFactor == 'phone') fs=0.6;
 
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
       if(device.OS == 'iOS')
@@ -4255,19 +4247,6 @@ if(!window['keyman']['initialized']) {
           Ls.border='none'; Ls.borderTop='1px solid gray';
           osk._Enabled=1; osk._Visible=1; // I3363 (Build 301)
 
-          // Adjust keyboard font sizes
-          if(device.formFactor == 'phone') // I3363 (Build 301)
-            // NOTE:  Yet more adjustments to the standard key font size!
-            osk._DivVKbd.style.fontSize='120%'; //'1.875em';
-          else
-          {
-            // The following is a *temporary* fix for small format tablets, e.g. PendoPad
-            if(device.OS == 'Android' && device.formFactor == 'tablet'  &&
-                parseInt(Ls.height,10) < 300)
-              osk._DivVKbd.style.fontSize='120%';
-            else
-              osk._DivVKbd.style.fontSize='200%'; //'2.5em';
-          }
           // Identify and save references to the language key, hide keyboard key, and space bar
           osk.lgKey=osk.getSpecialKey(nLayer,'K_LOPT');     //TODO: should be saved with layer
           osk.hkKey=osk.getSpecialKey(nLayer,'K_ROPT');
@@ -4609,12 +4588,35 @@ if(!window['keyman']['initialized']) {
       //if(screen.availHeight < 500) s.fontSize='10pt';
       //else if(screen.availHeight < 800) s.fontSize='11pt';
       //else s.fontSize='12pt';
-      // TODO:  Note that this is PART of the font scaling that affects each key's '1em' value.
-      if(device.formFactor == 'phone') {
-        s.fontSize='1.6em';
-        osk.boxFontScale = 1.6;
-      } else {
-        osk.boxFontScale = 1;
+
+      // TODO:  Coalesce all mobile device scaling here.
+      // Set scaling for mobile devices here.
+      if(device.touchable) {
+        var fontScale: number = 1;
+        if(device.formFactor == 'phone') {
+          fontScale = 1.6 * 0.6;  // Combines original scaling factor with one previously applied to the layer group.
+        }
+
+        // This section was formerly used for a scaling parameter on osk._DivVKbd.
+        // Adjust keyboard font sizes
+        if(device.formFactor == 'phone') { // I3363 (Build 301)
+          fontScale *= 1.2;
+        } else {
+          // The following is a *temporary* fix for small format tablets, e.g. PendoPad
+          var pixelRatio = 1;
+          if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+            pixelRatio = window.devicePixelRatio;
+          }
+          if(device.OS == 'Android' && device.formFactor == 'tablet' &&
+              parseInt(osk.getHeight(),10) < 300 * pixelRatio) {
+            fontScale *= 1.2;
+          } else {
+            fontScale *= 2; //'2.5em';
+          }
+        }
+
+        // Finalize the font size parameter.
+        s.fontSize = fontScale + 'em';
       }
 
       osk._DivVKbd = osk._DivVKbdHelp = null;  // I1476 - Handle SELECT overlapping
@@ -4869,7 +4871,7 @@ if(!window['keyman']['initialized']) {
       if(newWidth < 0.2*screen.width) newWidth = 0.2*screen.width;
       if(newHeight < 0.1*screen.height) newHeight = 0.1*screen.height;
       if(newWidth > 0.9*screen.width) newWidth=0.9*screen.width;
-      if(newHeight > 0.5*screen.height) newWidth=0.5*screen.height;
+      if(newHeight > 0.5*screen.height) newHeight=0.5*screen.height;
 
       if(osk._DivVKbd)
       {
@@ -4887,6 +4889,20 @@ if(!window['keyman']['initialized']) {
       if(osk.userPositioned && osk._Box) osk.setPos({'left':osk.x,'top':osk.y});
 
       return true;
+    }
+
+    osk.getFontSizeFromCookie = function(): number {
+      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
+      if(typeof(c) == 'undefined' || c == null) {
+        return 16;
+      }
+
+      var newHeight=util.toNumber(c['height'],0.15*screen.height);
+      if(newHeight > 0.5*screen.height) {
+        newHeight=0.5*screen.height;
+      }
+
+      return (newHeight/8);
     }
 
   })();
