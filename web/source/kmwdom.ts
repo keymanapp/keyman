@@ -6,7 +6,7 @@
 /// <reference path="kmwdomevents.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="kmwstring.ts" />
-
+bug here
 namespace com.keyman {
   /**
    * This class serves as the intermediary between KeymanWeb and any given web page's elements.
