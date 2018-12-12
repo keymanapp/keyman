@@ -377,10 +377,10 @@ if(!window['keyman']['initialized']) {
       switch(edge)
       {
         case -1:
-          w1 -= dx; w2 -= dx; //w3 += dx;
+          w1 -= dx; w2 -= dx;
           break;
         case 1:
-          /*w0 += dx;*/ w1 += dx; w2 += dx;
+          w1 += dx; w2 += dx;
           break;
       }
       

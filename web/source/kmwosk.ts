@@ -43,15 +43,18 @@ namespace com.keyman {
      */
     static getTextWidth(text: string, style: CSSStyleDeclaration) {
       let fontFamily = style.fontFamily;
-      let emScale = (<KeymanBase> window['keyman']).osk.getKeyEmFontSize();
 
+      // Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
+      // The following allows us to calculate the font size in those situations.
+      let emScale = (<KeymanBase> window['keyman']).osk.getKeyEmFontSize();
       let fontSpec = (<KeymanBase> window['keyman']).util.getFontSizeStyle(style.fontSize);
+
       var fontSize: string;
-      // TODO:  properly parse the font size spec.
-      if(!fontSpec.absolute) {
-        fontSize = fontSpec.val * emScale + 'px';
-      } else {
+      if(fontSpec.absolute) {
+        // We've already got an exact size - use it!
         fontSize = fontSpec.val + 'px';
+      } else {
+        fontSize = fontSpec.val * emScale + 'px';
       }
 
       // re-use canvas object for better performance
@@ -150,8 +153,6 @@ namespace com.keyman {
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
 
       // Check the key's display width - does the key visualize well?
-      // We'd want getComputedStyle for the key, but it's not computed until after the element's been added to the DOM.
-      // 'em'-based font sizings won't work properly here without that...
       var width: number = OSKKey.getTextWidth(keyText, ts);
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
@@ -3604,9 +3605,6 @@ if(!window['keyman']['initialized']) {
       osk.keyMap = LdivC; Lkbd.appendChild(LdivC);
 
       // Set base class and box class - OS and keyboard added for Build 360
-      // Note:  this is the main place where we assign to these variables, and it's after constructing
-      // the keyboard from its layout.
-      // Worse:  osk.loadCookie is what sets this element's width, and it's called even later.
       osk._DivVKbdHelp = osk._DivVKbd = Lkbd;
       osk._Box.className=device.formFactor+' '+device.OS.toLowerCase()+' kmw-osk-frame';
       Lkbd.className=device.formFactor+' kmw-osk-inner-frame';
@@ -3736,7 +3734,6 @@ if(!window['keyman']['initialized']) {
 
       var b=osk._Box,bs=b.style;
       bs.height=bs.maxHeight=(oskHeight+3)+'px';
-      // Resize the layer group.
       b=b.firstChild.firstChild; bs=b.style;
       bs.height=bs.maxHeight=(oskHeight+3)+'px';
 
