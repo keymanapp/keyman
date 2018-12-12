@@ -36,17 +36,54 @@ namespace com.keyman {
      * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
      * 
      * @param {String} text The text to be rendered.
-     * @param {String} font The css font descriptor that text is to be rendered with (e.g. "bold 14px verdana").
+     * @param {String} style The CSSStyleDeclaration for an element to measure against, without modification.
      * 
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
      */
-    static getTextWidth(text: string, font: string) {
+    static getTextWidth(text: string, style: CSSStyleDeclaration) {
+      let fontFamily = style.fontFamily;
+      let fontSize = style.fontSize;
+
+      // TODO:  properly parse the font size spec.
+      if(fontSize == '1em' || fontSize == '1 em') {
+        let emSizeStr = getComputedStyle(document.body).fontSize;
+        let emSize = parseFloat(emSizeStr.substr(0, emSizeStr.indexOf('px')));
+        fontSize = (emSize * (<KeymanBase> window['keyman']).osk.keyEmFontScale) + 'px';
+      }
+
       // re-use canvas object for better performance
       var canvas = OSKKey.getTextWidth['canvas'] || (OSKKey.getTextWidth['canvas'] = document.createElement("canvas"));
       var context = canvas.getContext("2d");
-      context.font = font;
+      context.font = fontSize + " " + fontFamily;
       var metrics = context.measureText(text);
       return metrics.width;
+    }
+
+    getKeyWidth(): number {
+      let units = this.objectUnits();
+
+      if(units == 'px') {
+        // For mobile devices, we presently specify width directly in pixels.  Just use that!
+        return this.spec['widthpc'];
+      } else if(units == '%') {
+        // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
+        // approximation for that.  `osk._DivVkbd` is the element controlling the OSK's width, set in px.
+        // ... and it's null whenever this method would be called during key construction.  GREAT.
+        var oskWidthSpec: string = "500"; //(<KeymanBase> window['keyman']).osk._DivVkbd.style.width;
+        let oskWidth = parseInt(oskWidthSpec.substr(0, oskWidthSpec.indexOf('px')));
+
+        // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
+        return Math.floor(oskWidth * this.spec['widthpc'] / 100);
+      }
+    }
+
+    objectUnits(): string {
+      // Returns a unit string corresponding to how the width for each key is specified.
+      if((<KeymanBase>window['keyman']).util.device.formFactor == 'desktop') {
+        return '%';
+      } else {
+        return 'px';
+      }
     }
 
     /**
@@ -93,8 +130,12 @@ namespace com.keyman {
         keyText=this.renameSpecialKey(tId);
       }
 
+      // Grab our default for the key's font and font size.
+      let osk = (<KeymanBase> window['keyman']).osk;
+      ts.fontFamily = osk.fontFamily; // Helps with style sheet calculations.
+      ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
+
       //Override font spec if set for this key in the layout
-      ts.fontSize=(<KeymanBase>window['keyman']).osk.fontSize;     //Build 344, KMEW-90
       if(typeof spec['font'] == 'string' && spec['font'] != '') {
         ts.fontFamily=spec['font'];
       }
@@ -104,10 +145,11 @@ namespace com.keyman {
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
-      var font = keyboardManager.getFont();
 
       // Check the key's display width - does the key visualize well?
-      let width=OSKKey.getTextWidth(keyText, font);
+      // We'd want getComputedStyle for the key, but it's not computed until after the element's been added to the DOM.
+      // 'em'-based font sizings won't work properly here without that...
+      var width: number = OSKKey.getTextWidth(keyText, ts);
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
         keyText = '\u25cc' + keyText;
@@ -116,6 +158,20 @@ namespace com.keyman {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
+        
+        // Recompute the new width for use in autoscaling calculations below, just in case.
+        width = OSKKey.getTextWidth(keyText, ts);
+      }
+
+      // If the keyboard has a specified font size for the key, we should take that spec as gospel.
+      let keyWidth = this.getKeyWidth();
+      let maxProportion = 0.90;
+      let proportion = (keyWidth * maxProportion) / width; // How much of the key does the text want to take?
+
+      // Never upscale keys past the default - only downscale them.
+      if(proportion < 1) {
+        // TODO:  Instead, parse the current ts.fontSize value and scale that directly.
+        ts.fontSize = proportion + 'em';
       }
 
       // Finalize the key's text.
@@ -199,7 +255,7 @@ namespace com.keyman {
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
-      ks.width=this.objectUnits(spec['widthpc']);
+      ks.width=this.objectGeometry(spec['widthpc']);
 
       let originalPercent = totalPercent;
       
@@ -210,7 +266,7 @@ namespace com.keyman {
       // Set key and button positioning properties.
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
-        ks.left=this.objectUnits(totalPercent+spec['padpc']);
+        ks.left=this.objectGeometry(totalPercent+spec['padpc']);
         ks.bottom=rowStyle.bottom;
         ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
 
@@ -218,7 +274,7 @@ namespace com.keyman {
         btn.style.left=ks.left;
         btn.style.width=ks.width;
       } else {
-        ks.marginLeft=this.objectUnits(spec['padpc']);
+        ks.marginLeft=this.objectGeometry(spec['padpc']);
       }
 
       totalPercent=totalPercent+spec['padpc']+spec['widthpc'];
@@ -265,11 +321,12 @@ namespace com.keyman {
       return {element: kDiv, percent: totalPercent - originalPercent};
     }
 
-    objectUnits(v: number) {
-      if((<KeymanBase>window['keyman']).util.device.formFactor == 'desktop') {
-        return v + '%';
-      } else {
-        return Math.round(v)+'px';
+    objectGeometry(v: number): string {
+      let unit = this.objectUnits();
+      if(unit == '%') {
+        return v + unit;
+      } else { // unit == 'px'
+        return Math.round(v)+unit;
       }
     }
   }
@@ -543,6 +600,7 @@ if(!window['keyman']['initialized']) {
     osk.keyPending = null;        // currently depressed key (if any)
     osk.fontFamily = '';          // layout-specified font for keyboard
     osk.fontSize = '1em';         // layout-specified fontsize for keyboard
+    osk.keyEmFontScale = 1.152;       // Detemines the cumulative scaling applied to '1em' for an OSK key.
     osk.layout = null;            // reference to complete layout
     osk.layers = null;            // reference to layout (layers array for this device)
     osk.layerId = 'default';      // currently active OSK layer (if any)
@@ -2429,7 +2487,8 @@ if(!window['keyman']['initialized']) {
         if(layout == null) return lDiv;
 
         // Set default OSK font size (Build 344, KMEW-90)
-        if(typeof(layout['fontsize']) == 'undefined' || layout['fontsize'] == null)
+        let layoutFS = layout['fontsize'];
+        if(typeof layoutFS == 'undefined' || layoutFS == null || layoutFS == '')
           ls.fontSize='1em';
         else
           ls.fontSize=layout['fontsize'];
@@ -3526,6 +3585,9 @@ if(!window['keyman']['initialized']) {
       osk.keyMap = LdivC; Lkbd.appendChild(LdivC);
 
       // Set base class and box class - OS and keyboard added for Build 360
+      // Note:  this is the main place where we assign to these variables, and it's after constructing
+      // the keyboard from its layout.
+      // Worse:  osk.loadCookie is what sets this element's width, and it's called even later.
       osk._DivVKbdHelp = osk._DivVKbd = Lkbd;
       osk._Box.className=device.formFactor+' '+device.OS.toLowerCase()+' kmw-osk-frame';
       Lkbd.className=device.formFactor+' kmw-osk-inner-frame';
@@ -3655,8 +3717,10 @@ if(!window['keyman']['initialized']) {
 
       var b=osk._Box,bs=b.style;
       bs.height=bs.maxHeight=(oskHeight+3)+'px';
+      // Resize the layer group.
       b=b.firstChild.firstChild; bs=b.style;
       bs.height=bs.maxHeight=(oskHeight+3)+'px';
+      // Yet _another_ adjustment to the font size for phone devices!
       if(device.formFactor == 'phone') fs=0.6;
 
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
@@ -4168,6 +4232,7 @@ if(!window['keyman']['initialized']) {
 
           // Adjust keyboard font sizes
           if(device.formFactor == 'phone') // I3363 (Build 301)
+            // NOTE:  Yet more adjustments to the standard key font size!
             osk._DivVKbd.style.fontSize='120%'; //'1.875em';
           else
           {
@@ -4519,6 +4584,7 @@ if(!window['keyman']['initialized']) {
       //if(screen.availHeight < 500) s.fontSize='10pt';
       //else if(screen.availHeight < 800) s.fontSize='11pt';
       //else s.fontSize='12pt';
+      // TODO:  Note that this is PART of the font scaling that affects each key's '1em' value.
       if(device.formFactor == 'phone') s.fontSize='1.6em';
 
       osk._DivVKbd = osk._DivVKbdHelp = null;  // I1476 - Handle SELECT overlapping

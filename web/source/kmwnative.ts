@@ -285,7 +285,7 @@ if(!window['keyman']['initialized']) {
             ktls = ktLabel.style,
             edge = 0,
             canvas = tip.firstChild, 
-            previewFontScale = 1.8;
+            previewFontScale = 1.6;
             
         // Find key text element
         for(var i=0; i<key.childNodes.length; i++)
@@ -306,7 +306,18 @@ if(!window['keyman']['initialized']) {
         kts.height = canvas.height+'px';
 
         var px=util.getStyleInt(kc,'font-size');
-        if(px != 0) kts.fontSize = (previewFontScale * px)+'px';
+        if(px != 0) {
+          let popupFS = previewFontScale * px;
+          kts.fontSize = popupFS + 'px';
+
+          let textWidth = com.keyman.OSKKey.getTextWidth(ktLabel.textContent, kts);
+          let proportion = canvas.width * 0.9 / (textWidth);
+
+          // Prevent the preview from overrunning its display area.
+          if(proportion < 1) {
+            kts.fontSize = (popupFS * proportion) + 'px';
+          }
+        }
         
         ktLabel.textContent = kc.textContent;
         ktls.display = 'block';
@@ -365,10 +376,10 @@ if(!window['keyman']['initialized']) {
       switch(edge)
       {
         case -1:
-          w1 -= dx; w2 -= dx; w3 -= dx;
+          w1 -= dx; w2 -= dx; //w3 += dx;
           break;
         case 1:
-          w0 += dx; w1 += dx; w2 += dx;
+          /*w0 += dx;*/ w1 += dx; w2 += dx;
           break;
       }
       
