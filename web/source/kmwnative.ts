@@ -285,7 +285,7 @@ if(!window['keyman']['initialized']) {
             ktls = ktLabel.style,
             edge = 0,
             canvas = tip.firstChild, 
-            previewFontScale = 1.6;
+            previewFontScale = 1.8;
             
         // Find key text element
         for(var i=0; i<key.childNodes.length; i++)
@@ -311,6 +311,7 @@ if(!window['keyman']['initialized']) {
           kts.fontSize = popupFS + 'px';
 
           let textWidth = com.keyman.OSKKey.getTextWidth(ktLabel.textContent, kts);
+          // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
           let proportion = canvas.width * 0.9 / (textWidth);
 
           // Prevent the preview from overrunning its display area.
