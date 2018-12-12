@@ -26,7 +26,7 @@ fi
 if [ "${PROJECT}" != "" ]; then
     projects="${PROJECT}"
 else
-    projects="kmflcomp libkmfl keyman-keyboardprocessor ibus-kmfl keyman-config ibus-keyman"
+    projects="keyman-keyboardprocessor kmflcomp libkmfl ibus-kmfl keyman-config ibus-keyman"
 fi
 
 if [ "${DIST}" != "" ]; then
@@ -41,7 +41,11 @@ rm -rf launchpad
 mkdir -p launchpad
 
 for proj in ${projects}; do
-    cd ${proj}
+    if [ "${proj}" == "keyman-keyboardprocessor" ]; then
+       cd ${BASEDIR}/../common/engine/keyboardprocessor
+    else
+       cd ${proj}
+    fi
     if [ "${proj}" == "keyman-config" ]; then
         tarname="keyman_config"
         make clean
@@ -49,15 +53,16 @@ for proj in ${projects}; do
         tarname="${proj}"
     fi
     version=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -`
+    dirversion=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6`
     echo "${proj} version is ${version}"
     uscan
     cd ..
-    mv ${proj}-${version} launchpad
-    mv ${proj}_${version}.orig.tar.gz launchpad
-    mv ${tarname}-${version}.tar.gz launchpad
+    mv ${proj}-${version} ${BASEDIR}/launchpad
+    mv ${proj}_${version}.orig.tar.gz ${BASEDIR}/launchpad
+    mv ${tarname}-${version}.tar.gz ${BASEDIR}/launchpad
     rm ${proj}*.debian.tar.xz
-    cd launchpad
-    wget -N https://downloads.keyman.com/linux/alpha/${version}/SHA256SUMS
+    cd ${BASEDIR}/launchpad
+    wget -N https://downloads.keyman.com/linux/alpha/${dirversion}/SHA256SUMS
     sha256sum -c --ignore-missing SHA256SUMS |grep ${tarname}
     cd ${proj}-${version}
     echo `pwd`
