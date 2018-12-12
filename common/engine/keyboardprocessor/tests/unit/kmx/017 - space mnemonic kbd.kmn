@@ -1,5 +1,5 @@
 c Description: Tests Space handling in mnemonic keyboards (failed with Win 98)
-c keys: ab c d de
+c keys: [K_A][K_B][K_SPACE][K_C][K_SPACE][K_D][K_SPACE][K_D][K_E]
 c expected: XYZ
 
 store(&VERSION) '9.0'
