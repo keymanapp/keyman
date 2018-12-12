@@ -386,6 +386,31 @@ namespace com.keyman {
       return Device._GetIEVersion();
     }
 
+    getFontSizeStyle(e: HTMLElement|string): {val: number, absolute: boolean} {
+      var val: number;
+      var fs: string;
+
+      if(typeof e == 'string') {
+        fs = e;
+      } else {
+        fs = e.style.fontSize;
+      }
+
+      if(fs.indexOf('em') != -1) {
+        val = parseFloat(fs.substr(0, fs.indexOf('em')));
+        return {val: val, absolute: false};
+      } else if(fs.indexOf('px') != -1) {
+        val = parseFloat(fs.substr(0, fs.indexOf('px')));
+        return {val: val, absolute: true};
+      } else if(fs.indexOf('%') != -1) {
+        val = parseFloat(fs.substr(0, fs.indexOf('%')));
+        return {val: val/100, absolute: false};
+      } else {
+        // Cannot parse.
+        return null;
+      }
+    }
+
     /**
      * Get browser-independent computed style value for element
      * 

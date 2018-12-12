@@ -39,16 +39,21 @@ namespace com.keyman {
      * @param {String} style The CSSStyleDeclaration for an element to measure against, without modification.
      * 
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
+     * This version has been substantially modified to work for this particular application.
      */
     static getTextWidth(text: string, style: CSSStyleDeclaration) {
       let fontFamily = style.fontFamily;
-      let fontSize = style.fontSize;
+      let emScale = (<KeymanBase> window['keyman']).osk.getKeyEmFontSize();
 
+      let fontSpec = (<KeymanBase> window['keyman']).util.getFontSizeStyle(style.fontSize);
+      var fontSize: string;
       // TODO:  properly parse the font size spec.
-      if(fontSize == '1em' || fontSize == '1 em') {
+      if(!fontSpec.absolute) {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = parseFloat(emSizeStr.substr(0, emSizeStr.indexOf('px')));
-        fontSize = (emSize * (<KeymanBase> window['keyman']).osk.keyEmFontScale) + 'px';
+        fontSize = fontSpec.val * (emSize * emScale) + 'px';
+      } else {
+        fontSize = fontSpec.val + 'px';
       }
 
       // re-use canvas object for better performance
@@ -163,15 +168,18 @@ namespace com.keyman {
         width = OSKKey.getTextWidth(keyText, ts);
       }
 
-      // If the keyboard has a specified font size for the key, we should take that spec as gospel.
+      let fontSpec = util.getFontSizeStyle(ts.fontSize);
       let keyWidth = this.getKeyWidth();
       let maxProportion = 0.90;
       let proportion = (keyWidth * maxProportion) / width; // How much of the key does the text want to take?
 
       // Never upscale keys past the default - only downscale them.
       if(proportion < 1) {
-        // TODO:  Instead, parse the current ts.fontSize value and scale that directly.
-        ts.fontSize = proportion + 'em';
+        if(fontSpec.absolute) {
+          ts.fontSize = proportion * fontSpec.val + 'px';
+        } else {
+          ts.fontSize = proportion * fontSpec.val + 'em';
+        }
       }
 
       // Finalize the key's text.
@@ -600,7 +608,6 @@ if(!window['keyman']['initialized']) {
     osk.keyPending = null;        // currently depressed key (if any)
     osk.fontFamily = '';          // layout-specified font for keyboard
     osk.fontSize = '1em';         // layout-specified fontsize for keyboard
-    osk.keyEmFontScale = 1.152;       // Detemines the cumulative scaling applied to '1em' for an OSK key.
     osk.layout = null;            // reference to complete layout
     osk.layers = null;            // reference to layout (layers array for this device)
     osk.layerId = 'default';      // currently active OSK layer (if any)
@@ -844,6 +851,24 @@ if(!window['keyman']['initialized']) {
       osk.saveCookie();
     }
 
+    osk.getKeyEmFontSize = function() {
+      // TODO:  properly parse the font size spec.
+      if(util.device.formFactor == 'desktop') {
+        let kbdFontSize = util.getFontSizeStyle(osk._DivVKbd)['val']; // This will be set to an exact size by osk.loadCookie().
+        let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
+        return kbdFontSize * keySquareScale;
+      } else {
+        // All set as hard-coded values in this file.  All are relative.
+        let boxFontScale = util.getFontSizeStyle(osk._Box)['val'];
+        let kbdFontScale = util.getFontSizeStyle(osk._DivVKbd)['val'];
+        let layerFontScale = util.getFontSizeStyle(osk._DivVKbd.firstChild)['val'];
+
+        let emSizeStr = getComputedStyle(document.body).fontSize;
+        let emSize = util.getFontSizeStyle(emSizeStr);
+        let emScale = boxFontScale * kbdFontScale * layerFontScale;
+        return emSize * emScale;
+      }
+    }
 
     /**
      * Get position of OSK window
@@ -4585,7 +4610,12 @@ if(!window['keyman']['initialized']) {
       //else if(screen.availHeight < 800) s.fontSize='11pt';
       //else s.fontSize='12pt';
       // TODO:  Note that this is PART of the font scaling that affects each key's '1em' value.
-      if(device.formFactor == 'phone') s.fontSize='1.6em';
+      if(device.formFactor == 'phone') {
+        s.fontSize='1.6em';
+        osk.boxFontScale = 1.6;
+      } else {
+        osk.boxFontScale = 1;
+      }
 
       osk._DivVKbd = osk._DivVKbdHelp = null;  // I1476 - Handle SELECT overlapping
       osk._Box.innerHTML = '';
