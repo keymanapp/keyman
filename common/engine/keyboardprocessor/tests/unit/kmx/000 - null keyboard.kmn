@@ -1,5 +1,5 @@
 c Description: Tests null keyboard 
-c keys: [K_A][RALT K_B][SHIFT K_C]
+c keys: [K_A][LALT K_B][SHIFT K_C]
 c expected: aC
 c context: 
 
