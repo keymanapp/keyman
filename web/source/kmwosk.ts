@@ -74,9 +74,9 @@ namespace com.keyman {
       } else if(units == '%') {
         // For desktop devices, each key is given a %age of the total OSK width.  We'll need to compute an
         // approximation for that.  `osk._DivVkbd` is the element controlling the OSK's width, set in px.
-        // ... and it's null whenever this method would be called during key construction.  GREAT.
-        var oskWidthSpec: string = "500"; //(<KeymanBase> window['keyman']).osk._DivVkbd.style.width;
-        let oskWidth = parseInt(oskWidthSpec.substr(0, oskWidthSpec.indexOf('px')));
+        // ... and since it's null whenever this method would be called during key construction, we simply
+        // grab it from the cookie (or its default values) instead.
+        let oskWidth = (<KeymanBase> window['keyman']).osk.getWidthFromCookie();
 
         // This is an approximation that tends to be a bit too large, but it's close enough to be useful.
         return Math.floor(oskWidth * this.spec['widthpc'] / 100);
@@ -4586,7 +4586,6 @@ if(!window['keyman']['initialized']) {
       //else if(screen.availHeight < 800) s.fontSize='11pt';
       //else s.fontSize='12pt';
 
-      // TODO:  Coalesce all mobile device scaling here.
       // Set scaling for mobile devices here.
       if(device.touchable) {
         var fontScale: number = 1;
@@ -4886,6 +4885,24 @@ if(!window['keyman']['initialized']) {
       if(osk.userPositioned && osk._Box) osk.setPos({'left':osk.x,'top':osk.y});
 
       return true;
+    }
+
+    osk.getWidthFromCookie = function(): number {
+      var c = util.loadCookie('KeymanWeb_OnScreenKeyboard');
+      if(typeof(c) == 'undefined' || c == null) {
+        return screen.width * 0.3;
+      }
+
+      // Restore OSK size - font size now fixed in relation to OSK height, unless overridden (in em) by keyboard
+      var newWidth=util.toNumber(c['width'], 0.3 * screen.width); // Default - 30% of screen's width.
+
+      if(newWidth < 0.2*screen.width) {
+        newWidth = 0.2*screen.width;
+      } else if(newWidth > 0.9*screen.width) {
+        newWidth=0.9*screen.width;
+      }
+
+      return newWidth;
     }
 
     osk.getFontSizeFromCookie = function(): number {
