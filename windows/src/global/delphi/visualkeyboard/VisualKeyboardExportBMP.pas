@@ -121,6 +121,7 @@ begin
   try
     osk.ParentWindow := hwnd;
 
+    osk.Transparent := False;
     osk.DisplayUnderlyingChar := kvkhDisplayUnderlying in FKbd.Header.Flags;
     osk.Display102Key := kvkh102 in FKbd.Header.Flags;
     osk.Width := FPixelWidth;
@@ -148,7 +149,7 @@ begin
         (not (kvkkUnicode in FKbd.Keys[i].Flags) and (not FUnicode))) then
       begin
         k := osk.Keys.ItemsByVK[FKbd.Keys[i].VKey];
-        if Assigned(k) then
+        if Assigned(k) and ((FKbd.Keys[i].Text <> '') or Assigned(FKbd.Keys[i].Bitmap)) then
         begin
           k.KeyValue := FKbd.Keys[i].Text;
           k.KeyGlyph := FKbd.Keys[i].Bitmap;
@@ -159,8 +160,9 @@ begin
 
     if not Result then Exit;
 
-    bmp.Width := osk.Width;
-    bmp.Height := osk.Height;
+    bmp.SetSize(osk.Width, osk.Height);
+    bmp.Canvas.Brush.Color := clWhite;
+    bmp.Canvas.FillRect(Rect(0, 0, osk.Width, osk.Height));
 
     osk.PaintTo(bmp.Canvas.Handle, 0, 0);
     osk.ParentWindow := 0;
