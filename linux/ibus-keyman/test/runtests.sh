@@ -29,6 +29,21 @@ tests=(
 
 #for test in ${tests}; do echo "$test"; done
 
+model=`setxkbmap -query|grep model|cut -d ':' -f 2|tr -d ' '`
+layout=`setxkbmap -query|grep layout|cut -d ':' -f 2|tr -d ' '`
+rules=`setxkbmap -query|grep rules|cut -d ':' -f 2|tr -d ' '`
+variant=`setxkbmap -query|grep variant|cut -d ':' -f 2|tr -d ' '`
+
+echo "System xkb keyboard"
+echo "model:$model"
+echo "layout:$layout"
+echo "rules:$rules"
+echo "variant:$variant"
+
+echo "Setting keyboard to us"
+setxkbmap us
+setxkbmap -query
+
 count=0
 passed=0
 failed=0
@@ -48,7 +63,16 @@ do
 	count=$(( $count + 1 ))
 done
 
+echo "Setting xkb keyboard back to system one"
+if [ "x$variant" == "x" ]; then
+	setxkbmap -model $model -layout $layout -rules $rules
+else
+	setxkbmap -model $model -layout $layout -rules $rules -variant $variant
+fi
+setxkbmap -query
+
 echo "-----------------------------------------------------"
 echo "Tests run : ${count}"
 echo "Passed    : ${passed}"
 echo "Failed    : ${failed}"
+

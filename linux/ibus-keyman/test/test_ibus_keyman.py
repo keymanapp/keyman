@@ -8,6 +8,12 @@ import time
 
 from pynput.keyboard import Key, Controller
 
+try:
+    from xkbgroup import XKeyboard
+    has_xkbgroup = True
+except:
+    has_xkbgroup = False
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, Gio
@@ -20,12 +26,11 @@ class TestView(Gtk.Window):
 
     def __init__(self, test_name):
         Gtk.Window.__init__(self, title=test_name)
-
         self.known_modifiers = { "SHIFT" : Key.shift,
             "LCTRL" : Key.ctrl_l,
             "RCTRL" : Key.ctrl_r,
             "LALT" : Key.alt,
-            "RALT" : Key.alt_gr }
+            "RALT" : Key.alt_r }
         self.known_keys = { "K_A" : "a",
             "K_B" : "b",
             "K_C" : "c",
@@ -76,6 +81,9 @@ class TestView(Gtk.Window):
 
     def do_keypresses(self, args, data):
         if self.keys and not self.haspressedkeys:
+            if has_xkbgroup:
+                with XKeyboard() as xkb:
+                    logging.info("xkb %d:%s:%s", xkb.group_num, xkb.group_symbol, xkb.group_name)
             localkeyboard = Controller()
             keys = self.keys.split("]")
             # print(keys)
