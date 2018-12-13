@@ -16,7 +16,7 @@ using namespace km::kbp;
 
 
 
-keyboard::keyboard(kbp::path const & path)
+keyboard::keyboard(km::kbp::path const & path)
 : _keyboard_id(path.stem()),
   _version_string(u"3.145"),
   _folder_path(path.parent()),

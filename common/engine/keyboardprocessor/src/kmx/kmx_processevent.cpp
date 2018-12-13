@@ -14,7 +14,7 @@ namespace km {
     kmx_processor::kmx_processor(km_kbp_keyboard_attrs const * kb_) : abstract_processor(kb_) {
       km::kbp::keyboard *kb = const_cast<km::kbp::keyboard *>(static_cast<km::kbp::keyboard const *>(kb_));
 
-      kbp::path p = kb->folder_path;
+      km::kbp::path p = kb->folder_path;
       p /= kb->id;
       p.replace_extension(".kmx");
       _valid = bool(_kmx.Load(p.c_str()));
