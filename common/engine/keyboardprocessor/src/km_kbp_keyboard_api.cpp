@@ -10,7 +10,6 @@
 */
 #include <cassert>
 #include <algorithm>
-#include <experimental/filesystem>
 #include <iterator>
 #include <sstream>
 #include <unordered_map>
@@ -33,11 +32,6 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path,
   if (!keyboard)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  //auto stat = std::filesystem::status(kb_path);
-  //
-  // if (stat.type() != std::filesystem::file_type::regular)
-  //   return KM_KBP_STATUS_INVALID_ARGUMENT;
-
   try
   {
     km::kbp::keyboard *kp = new km::kbp::keyboard(kb_path);
@@ -48,7 +42,7 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path,
     }
     *keyboard = static_cast<km_kbp_keyboard *>(kp);
   }
-  catch (std::bad_alloc) 
+  catch (std::bad_alloc)
   {
     return KM_KBP_STATUS_NO_MEM;
   }
