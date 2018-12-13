@@ -28,11 +28,11 @@ namespace kbp
   {
     std::u16string const                      _keyboard_id;
     std::u16string const                      _version_string;
-    kbp::path const                           _folder_path;
+    km::kbp::path const                       _folder_path;
     std::vector<km_kbp_option_item>           _default_opts;
     abstract_processor                       *_processor;
   public:
-    keyboard(kbp::path const &);
+    keyboard(km::kbp::path const &);
     ~keyboard() {
       delete _processor;
     }

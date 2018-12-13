@@ -28,9 +28,6 @@
 
 namespace
 {
-
-const auto base = km::kbp::path::join("kmtests", "unit", "kmx");
-
 bool g_beep_found = false;
 
 struct key_event {
@@ -394,8 +391,9 @@ int load_source(const km::kbp::path & path, std::string & keys, std::u16string &
     s_option_expected = "c expected option: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
-  std::ifstream kmn(path);
+  std::ifstream kmn(path.native());
   if (!kmn.good()) {
+    std::cerr << "could not open file: " << path << std::endl;
     return __LINE__;
   }
   std::string line;

@@ -30,26 +30,20 @@ namespace kbp
     static constexpr char_type const parent_separator = _KM_KBP_PATH_SEPARATOR,
                                      suffix_separator = _KM_KBP_EXT_SEPARATOR;
   private:
-    // template<typename C>
-    // static
-    // std::string to_string(std::basic_string<C> const &);
-    //
-    // template<typename C>
-    // static
-    // std::wstring to_wstring(std::basic_string<C> const &);
-    //
-    // template<typename C>
-    // static
-    //string_type to_native(std::basic_string<C> const &);
-
     string_type _path;
+
+    void normalise() {
+      #if '/' != _KM_KBP_PATH_SEPARATOR
+      std::replace(_path.begin(), _path.end(), '/',_KM_KBP_PATH_SEPARATOR);
+      #endif
+    }
 
   public:
     template<class... Args>
     static path join(path const &start, Args&&... args) {
       auto r = start;
       for (auto & p: {args...})
-        r._path.append(1,path::parent_separator).append(p);
+        r._path.append(path::parent_separator,1).append(p);
       return r;
     }
 
@@ -59,9 +53,9 @@ namespace kbp
     path & operator = (path const &) = default;
     path & operator = (path &&) = default;
 
-    path(std::string const & p):    _path(convert<char, char_type>(p)) {}
-    path(std::u16string const & p): _path(convert<char16_t, char_type>(p)) {}
-    path(std::wstring const & p):   _path(convert<wchar_t, char_type>(p)) {}
+    path(std::string const & p):    _path(convert<char, char_type>(p)) { normalise(); }
+    path(std::u16string const & p): _path(convert<char16_t, char_type>(p)) { normalise(); }
+    path(std::wstring const & p):   _path(convert<wchar_t, char_type>(p)) { normalise(); }
     template<typename C>
     path(C const * p): path(std::basic_string<C>(p)) {}
 
@@ -102,6 +96,8 @@ namespace kbp
     // bool operator != (T const * rhs) const { return _path != rhs; }
 
     bool operator != (path const &rhs) const { return _path != rhs._path; }
+
+    string_type const & native() const noexcept { return _path; }
 
     operator std::wstring () const { return convert<char_type,wchar_t>(_path); }
     operator std::string() const { return convert<char_type,char>(_path); };
