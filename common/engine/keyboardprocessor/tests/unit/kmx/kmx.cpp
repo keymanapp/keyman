@@ -356,11 +356,11 @@ std::u16string parse_source_string(std::string const & s) {
       p++;
       km_kbp_usv v;
       assert(p != s.end());
-      if (*p == 'u') {
+      if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
         size_t n;
-        std::string s1 = s.substr(p - s.begin(), 6);
+        std::string s1 = s.substr(p - s.begin(), 8);
         v = std::stoul(s1, &n, 16);
         assert(v >= 0x20 && v <= 0x10FFFF);
         p += n-1;
