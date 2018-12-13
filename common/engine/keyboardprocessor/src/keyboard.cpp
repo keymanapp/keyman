@@ -44,7 +44,7 @@ json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
 {
   j << json::object
       << "id" << std::u16string(kb.id)
-      << "folder" << static_cast<std::string>(kb._folder_path)
+      << "folder" << kb._folder_path
       << "version" << std::u16string(kb.version_string)
       << "rules" << json::array << json::close;
 

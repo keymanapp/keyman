@@ -8,10 +8,11 @@
 
 #pragma once
 
+#include <algorithm>
 #include <string>
-//#include <type_traits>
 
 #include <keyman/keyboardprocessor.h>
+#include <json.hpp>
 #include <utfcodec.hpp>
 
 // Forward declarations
@@ -134,7 +135,10 @@ namespace kbp
   template<typename T>
   bool operator != (T const * lhs, path const & rhs) { return rhs != lhs; }
 
-  json & operator << (json &, path const &);
+  inline
+  json & operator << (json &j, path const &p) {
+    return j << static_cast<std::string>(p);
+  }
 
   template<typename C>
   auto & operator << (std::basic_ostream<C> &os, path const &p) {
