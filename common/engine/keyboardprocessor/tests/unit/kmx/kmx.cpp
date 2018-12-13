@@ -256,7 +256,7 @@ int run_test(const std::string & source, const std::string & _compiled) {
     for (auto it = options.begin(); it != options.end(); it++) {
       if (it->type != KOT_INPUT) continue;
 
-      std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
+      std::cout << "input option-key: " << it->key << std::endl;
 
       std::u16string key = it->key;
       if (key[0] == u'&') {
@@ -319,9 +319,9 @@ int run_test(const std::string & source, const std::string & _compiled) {
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
 
-  std::cout << "expected: " << utf16_to_utf8(expected) << std::endl;
-  std::cout << "text store: " << utf16_to_utf8(text_store) << std::endl;
-  std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
+  std::cout << "expected: " << expected << std::endl;
+  std::cout << "text store: " << text_store << std::endl;
+  std::cout << "result: " << buf << std::endl;
 
   // Compare internal context with expected result
   if (buf != expected) return __LINE__;
@@ -334,10 +334,10 @@ int run_test(const std::string & source, const std::string & _compiled) {
 
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type != KOT_OUTPUT) continue;
-    std::cout << "output option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value);
+    std::cout << "output option-key: " << it->key << " expected: " << it->value;
     km_kbp_cp const *value;
     try_status(km_kbp_options_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
-    std::cout << " actual: " << utf16_to_utf8(value) << std::endl;
+    std::cout << " actual: " << value << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
     km_kbp_cp_dispose(value);
   }

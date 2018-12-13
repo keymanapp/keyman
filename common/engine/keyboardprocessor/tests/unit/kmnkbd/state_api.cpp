@@ -6,6 +6,7 @@
 */
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <string>
 
 #include <keyman/keyboardprocessor.h>
@@ -176,6 +177,9 @@ int main(int, char * [])
   // Test debug dump
   auto doc1 = get_json_doc(*test_state),
        doc2 = get_json_doc(*test_clone);
+
+  std::cout << doc1 << std::endl;
+  std::cout << doc2 << std::endl;
 
   // These should not be equal.
   if (doc1 == doc2)           return __LINE__;
