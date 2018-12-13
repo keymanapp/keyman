@@ -7,18 +7,13 @@
 #include <string>
 
 #include <keyman/keyboardprocessor.h>
-#include <experimental/filesystem>
-
-namespace std {
-  namespace filesystem = std::experimental::filesystem;
-}
-
+#include "path.hpp"
 
 //#include "keyboard.hpp"
 
 namespace
 {
-  std::filesystem::path const test_kb_path = "/a/dummy/keyboard.mock";
+  auto const test_kb_path = km::kbp::path::join("","a","dummy","keyboard.mock");
 }
 
 #define   try_status(expr) \
@@ -31,7 +26,7 @@ int main(int, char *[])
 
   try_status(km_kbp_keyboard_load(test_kb_path.c_str(), &test_kb));
   try_status(km_kbp_keyboard_get_attrs(test_kb, &kb_attrs));
-  if (kb_attrs->folder_path != test_kb_path.parent_path())
+  if (kb_attrs->folder_path != test_kb_path.parent())
     return __LINE__;
 
   km_kbp_keyboard_dispose(test_kb);

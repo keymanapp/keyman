@@ -10,6 +10,7 @@
 #include <string>
 
 #include <keyman/keyboardprocessor.h>
+#include "path.hpp"
 
 #include "state.hpp"
 
@@ -120,7 +121,7 @@ int main(int, char * [])
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr,
                * test_clone = nullptr;
-  try_status(km_kbp_keyboard_load(std::filesystem::path("dummy.mock").c_str(), &test_kb));
+  try_status(km_kbp_keyboard_load(km::kbp::path("dummy.mock").c_str(), &test_kb));
 
   // Simple sanity tests.
   try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));

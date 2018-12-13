@@ -15,21 +15,22 @@
 using namespace km::kbp;
 
 
-keyboard::keyboard(std::filesystem::path const & path)
-: _keyboard_id(path.stem().u16string()),
+
+keyboard::keyboard(kbp::path const & path)
+: _keyboard_id(path.stem()),
   _version_string(u"3.145"),
-  _folder_path(path.parent_path()),
+  _folder_path(path.parent()),
   _default_opts {KM_KBP_OPTIONS_END}
 {
   version_string = _version_string.c_str();
   id = _keyboard_id.c_str();
-  folder_path = _folder_path.native().c_str();
+  folder_path = _folder_path.c_str();
 
-  if (path.extension() == ".kmx" ||
-      path.extension() == ".KMX") { // Some legacy packages may include upper-case file extensions
+  if (path.suffix() == ".kmx" ||
+      path.suffix() == ".KMX") { // Some legacy packages may include upper-case file extensions
     _processor = new kmx_processor(this);
   }
-  else if (path.extension() == ".mock") {
+  else if (path.suffix() == ".mock") {
     _processor = new mock_processor(this);
   }
   else {

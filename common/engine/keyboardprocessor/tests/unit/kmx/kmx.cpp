@@ -15,6 +15,7 @@
 
 #include <keyman/keyboardprocessor.h>
 
+#include "path.hpp"
 #include "state.hpp"
 
 #define   try_status(expr) \
@@ -25,10 +26,10 @@
 #endif
 #define assert(expr) {if (!(expr)) std::exit(100*__LINE__); }
 
-std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
-
 namespace
 {
+
+const auto base = km::kbp::path::join("kmtests", "unit", "kmx");
 
 bool g_beep_found = false;
 
@@ -49,7 +50,7 @@ struct kmx_option {
 
 using kmx_options = std::vector<kmx_option>;
 
-int load_source(const std::string &, std::string &, std::u16string &,
+int load_source(const km::kbp::path &, std::string &, std::u16string &,
                 std::u16string &, kmx_options &, bool &);
 
 km_kbp_option_item test_env_opts[] =
@@ -203,32 +204,9 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   }
 }
 
-template<typename P>
-std::basic_string<
-  typename std::remove_const<
-    typename std::remove_pointer<P>::type>::type
->
-utf8_to(const std::string &);
-
-template<>
-inline
-std::basic_string<wchar_t> utf8_to<const wchar_t *>(const std::string & s)
-{
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-  return convert.from_bytes(s);
-}
-
-template<>
-inline
-std::basic_string<char> utf8_to<const char *>(const std::string & s)
-{
-  return s;
-}
-
-int run_test(const std::string & source, const std::string & _compiled) {
+int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
-  auto compiled = utf8_to<km_kbp_path_name>(_compiled);
   kmx_options options;
   bool expected_beep = false;
 
@@ -236,7 +214,7 @@ int run_test(const std::string & source, const std::string & _compiled) {
   if (result != 0) return result;
 
   std::cout << "source file   = " << source << std::endl
-            << "compiled file = " << _compiled << std::endl;
+            << "compiled file = " << compiled << std::endl;
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
@@ -408,7 +386,7 @@ bool is_token(const std::string token, std::string &line) {
   return false;
 }
 
-int load_source(const std::string & path, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
+int load_source(const km::kbp::path & path, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
   const std::string s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ",
