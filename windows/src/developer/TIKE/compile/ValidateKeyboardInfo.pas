@@ -88,8 +88,9 @@ var
   alangs: TJSONArray;
   langs: TJSONValue;
   i: Integer;
-  olangs: TJSONObject;
-  msg: string;
+  olangs, olang: TJSONObject;
+  id, msg: string;
+  languagesMigrated, nameAdded: Boolean;
 begin
   if not LoadJsonFile then
     Exit(False);
@@ -100,6 +101,8 @@ begin
     Exit(True);
 
   Result := True;
+  languagesMigrated := False;
+  nameAdded := False;
 
   // Migrate languages[] array to Object
   if langs is TJSONArray then
@@ -109,29 +112,57 @@ begin
     Result := MigrateLanguagesArray(alangs, olangs);
     json.RemovePair(TKeyboardInfoFile.SLanguages);
     json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
-
-    // Save and reload
-    if not SaveJsonFile then
-      Exit(Failed('Could not save updated keyboard_info file '+FJsonFile));
-
-    if not LoadJsonFile then
-      Exit(Failed('Cound not reopen updated keyboard info file'+FJsonFile));
-
     langs := json.Values[TKeyboardInfoFile.SLanguages];
+    languagesMigrated := True;
   end;
 
   olangs := langs as TJSONObject;
   for i := 0 to olangs.Count - 1 do
-    with TBCP47Tag.Create(olangs.Pairs[i].JsonString.Value) do
+  begin
+    id := olangs.Pairs[i].JsonString.Value;
+    with TBCP47Tag.Create(id) do
     try
       if not IsValid(False, msg) then
         Result := Failed(msg);
 
       if not IsCanonical(msg) then
         Result := Failed(msg);
+
+      // Validate subtag names
+      olang := olangs.Values[id] as TJSONObject;
+      if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SDisplayName) = nil) then
+      begin
+        olang.AddPair(TKeyboardInfoFile.SDisplayName, 'displayName1');
+        nameAdded := True;
+      end;
+
+      if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SLanguageName) = nil) then
+      begin
+        olang.AddPair(TKeyboardInfoFile.SLanguageName, 'languageName1');
+        nameAdded := True;
+      end;
+
+      if nameAdded then
+      begin
+        olangs.RemovePair(olangs.Pairs[i].JsonString.Value);
+        olangs.AddPair(olangs.Pairs[i].JsonString.Value, olang);
+      end;
+
     finally
       Free;
     end;
+
+  end;
+
+  if languagesMigrated or nameAdded then
+  begin
+    // Save and reload
+    if not SaveJsonFile then
+      Exit(Failed('Could not save updated keyboard_info file '+FJsonFile));
+
+    if not LoadJsonFile then
+      Exit(Failed('Cound not reopen updated keyboard info file'+FJsonFile));
+  end;
 end;
 
 function TValidateKeyboardInfo.Failed(message: string): Boolean;
