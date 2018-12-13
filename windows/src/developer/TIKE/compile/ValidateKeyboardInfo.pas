@@ -77,7 +77,7 @@ begin
 
       if not IsCanonical(msg) then
         Result := Failed(msg);
-      olangs.AddPair(alangs.Items[i].Value, 'something' );
+      olangs.AddPair(alangs.Items[i].Value, TJSONString.Create('something'));
     finally
       Free;
     end;
@@ -86,7 +86,7 @@ end;
 function TValidateKeyboardInfo.DoFieldValidation: Boolean;
 var
   alangs: TJSONArray;
-  langs: TJSONValue;
+  langs, lang: TJSONValue;
   i: Integer;
   olangs, olang: TJSONObject;
   id, msg: string;
@@ -129,25 +129,29 @@ begin
         Result := Failed(msg);
 
       // Validate subtag names
-      olang := olangs.Values[id] as TJSONObject;
-      if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SDisplayName) = nil) then
+      lang := olangs.Values[id];
+      if lang is TJSONObject then
       begin
-        olang.AddPair(TKeyboardInfoFile.SDisplayName, 'displayName1');
-        nameAdded := True;
-      end;
+        olang := lang as TJsonObject;
+        if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SDisplayName) = nil) then
+        begin
+          olang.AddPair(TKeyboardInfoFile.SDisplayName, TJSONString.Create('displayName1'));
+          nameAdded := True;
+        end;
 
-      if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SLanguageName) = nil) then
-      begin
-        olang.AddPair(TKeyboardInfoFile.SLanguageName, 'languageName1');
-        nameAdded := True;
-      end;
+        if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SLanguageName) = nil) then
+        begin
+          olang.AddPair(TKeyboardInfoFile.SLanguageName, TJSONString.Create('languageName1'));
+          nameAdded := True;
+        end;
 
-      if nameAdded then
-      begin
-        olangs.RemovePair(olangs.Pairs[i].JsonString.Value);
-        olangs.AddPair(olangs.Pairs[i].JsonString.Value, olang);
-      end;
+        if nameAdded then
+        begin
+          olangs.RemovePair(olangs.Pairs[i].JsonString.Value);
+          olangs.AddPair(olangs.Pairs[i].JsonString.Value, olang);
+        end;
 
+      end;
     finally
       Free;
     end;
