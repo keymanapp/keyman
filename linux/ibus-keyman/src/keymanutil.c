@@ -213,7 +213,7 @@ ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
                                         kbd_details->license, // license
                                         details->info.author_desc, // author name only, not email
                                         keyman_get_icon_file(abs_kmx), // icon full path
-                                        "en", // layout defaulting to en (en-US)
+                                        "us", // layout defaulting to us (en-US)
                                         keyboard->version));
                             g_free(lang);
                             g_free(id_with_lang);
@@ -233,7 +233,7 @@ ibus_keyman_add_engines(GList * engines, GList * kmpdir_list)
                                 kbd_details->license, // license
                                 details->info.author_desc, // author name only, not email
                                 keyman_get_icon_file(abs_kmx), // icon full path
-                                "en", // layout defaulting to en (en-US)
+                                "us", // layout defaulting to us (en-US)
                                 keyboard->version));
                 }
                 free_keyboard_details(kbd_details);
