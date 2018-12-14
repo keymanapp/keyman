@@ -73,6 +73,7 @@ class TestView(Gtk.Window):
 
     def do_keypresses(self, args, data):
         if self.keys and not self.haspressedkeys:
+            self.haspressedkeys = True
             if has_xkbgroup:
                 with XKeyboard() as xkb:
                     logging.info("xkb %d:%s:%s", xkb.group_num, xkb.group_symbol, xkb.group_name)
@@ -127,7 +128,6 @@ class TestView(Gtk.Window):
                         localkeyboard.press(self.known_keys[mainkey])
                         localkeyboard.release(self.known_keys[mainkey])
 
-            self.haspressedkeys = True
             time.sleep(1)
             with localkeyboard.pressed(Key.ctrl_l):
                 localkeyboard.press("a")
@@ -193,7 +193,6 @@ class TestView(Gtk.Window):
             logging.debug(preload_engines)
             ibus_settings.set_strv("preload-engines", preload_engines)
             bus.preload_engines(preload_engines)
-            #bus.exit(True)
         except Exception as e:
             logging.debug("Failed to reset keyboard")
             logging.debug(e)
@@ -207,14 +206,10 @@ class TestView(Gtk.Window):
                         self.keys = line[8:].rstrip()
                     if line.startswith("c expected: "):
                         expected = line[12:].rstrip()
-                        if expected == "\b":
-                            expected = ""
-                        # expected.replace("\b", "") # beep test should be sound
-                        self.expected = expected.encode("utf-8").decode('unicode-escape')
-                        # print(expected)
-                        # print(expected.encode("utf-8"))
-                        # self.expected = expected
-                        # self.expected = expected.replace("\U", "\u")
+                        if expected == "\\b": # beep test is sound not text
+                            self.expected = ""
+                        else:
+                            self.expected = expected.encode("utf-8").decode('unicode-escape')
                     if line.startswith("c context: "):
                         self.context = line[11:].rstrip()
 
