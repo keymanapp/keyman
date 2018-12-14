@@ -87,6 +87,7 @@ type
     procedure AddHelpLink;
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
+    procedure AddSubtagNames(id: String; var o: TJSONObject);
     function CheckOrMigrateLanguages: Boolean;
     function SaveJsonFile: Boolean;
     procedure CheckPackageKeyboardFilenames;
@@ -109,8 +110,10 @@ uses
 
   Keyman.System.RegExGroupHelperRSP19902,
 
+  BCP47Tag,
   JsonUtil,
   Keyman.System.KeyboardInfoFile,
+  Keyman.System.LanguageCodeUtils,
   utilfiletypes,
   VersionInfo;
 
@@ -421,16 +424,55 @@ begin
     json.AddPair('id', FID);
 end;
 
+procedure TMergeKeyboardInfo.AddSubtagNames(id: String; var o: TJSONObject);
+var
+  displayName, languageName, scriptName, regionName: String;
+  v: TJSONValue;
+begin
+  if id = '' then
+    Exit;
+  with TBCP47Tag.Create(id) do
+    try
+      TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, languageName);
+      TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, scriptName);
+      TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, regionName);
+            
+      displayName := TLanguageCodeUtils.LanguageName(languageName, scriptName, regionName);
+
+      v := o.Values[TKeyboardInfoFile.SDisplayName];
+      if not Assigned(v) then
+        o.AddPair(TKeyboardInfoFile.SDisplayName, displayName);
+
+      v := o.Values[TKeyboardInfoFile.SLanguageName];
+      if not Assigned(v) then
+        o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
+
+      v := o.Values[TKeyboardInfoFile.SScriptName];
+      if not Assigned(v) and (Script <> '') then
+        o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
+
+      v := o.Values[TKeyboardInfoFile.SRegionName];
+      if not Assigned(v) and (Region <> '') then
+        o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
+
+    finally
+      Free;
+  end;
+
+end;
+
 function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
 var
   v: TJSONValue;
   alangs: TJSONArray;
-  langs, lang: TJSONValue;
-  olangs, olang: TJSONObject;
+  olangs: TJSONObject; 
+  o: TJSONObject;
   nameAdded: Boolean;
   i: Integer;
-  msg: string;
+  id: string;
 begin
+  Result := True;
+  
   v := json.GetValue(TKeyboardInfoFile.SLanguages);
 
   // Migrate languages[] array to Object
@@ -438,9 +480,16 @@ begin
   begin
     alangs := v as TJSONArray;
     olangs := TJSONObject.Create;
+    o := TJSONObject.Create;
     try
       for i := 0 to alangs.Count - 1 do
-        olangs.AddPair(alangs.Items[i].Value, TJSONString.Create('something'));
+      begin
+        id := alangs.Items[i].Value;
+        if id = '' then
+          continue;
+        AddSubtagNames(id, o);
+        olangs.AddPair(id, o);
+      end;
 
       json.RemovePair(TKeyboardInfoFile.SLanguages);
       json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
@@ -453,10 +502,11 @@ begin
     end;
   end;
 
+  {
   // Populate subtag names if needed
   nameAdded := False;
   v := json.GetValue(TKeyboardInfoFile.SLanguages);
-  {
+  
   if v is TJSONObject then
   begin
     olang := lang as TJsonObject;
