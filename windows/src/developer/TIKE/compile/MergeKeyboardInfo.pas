@@ -467,7 +467,6 @@ var
   alangs: TJSONArray;
   olangs: TJSONObject; 
   o: TJSONObject;
-  nameAdded: Boolean;
   i: Integer;
   id: string;
 begin
@@ -493,6 +492,9 @@ begin
 
       json.RemovePair(TKeyboardInfoFile.SLanguages);
       json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
+
+      // Migration complete and subtags populated
+      Exit;
     except
       on E:Exception do
       begin
@@ -504,7 +506,6 @@ begin
 
   {
   // Populate subtag names if needed
-  nameAdded := False;
   v := json.GetValue(TKeyboardInfoFile.SLanguages);
   
   if v is TJSONObject then
