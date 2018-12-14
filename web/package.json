@@ -38,7 +38,6 @@
     "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^5.2.0",
     "modernizr": "^3.6.0",
-    "promise-polyfill": "^8.1.0",
     "typescript": "^3.1.6"
   },
   "scripts": {
@@ -46,5 +45,8 @@
     "test": "bash ./unit_tests/test.sh",
     "karma": "karma",
     "modernizr": "modernizr"
+  },
+  "dependencies": {
+    "promise-polyfill": "^8.1.0"
   }
 }
