@@ -34,7 +34,7 @@ namespace kbp
 
     void normalise() {
       #if '/' != _KM_KBP_PATH_SEPARATOR
-      std::replace(_path.begin(), _path.end(), '/',_KM_KBP_PATH_SEPARATOR);
+      std::replace(_path.begin(), _path.end(), char_type('/'), _KM_KBP_PATH_SEPARATOR);
       #endif
     }
 
