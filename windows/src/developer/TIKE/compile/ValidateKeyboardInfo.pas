@@ -14,10 +14,7 @@ type
     json: TJSONObject;
     function DoFieldValidation: Boolean;
     function LoadJsonFile: Boolean;
-    function SaveJsonFile: Boolean;
     constructor Create(AJsonFile: string; ASilent: Boolean);
-    function MigrateLanguagesArray(alangs: TJSONArray; 
-      var olangs: TJSONObject): Boolean;
     function Failed(message: string): Boolean;
   public
     class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
@@ -31,7 +28,6 @@ uses
   Winapi.Windows,
 
   BCP47Tag,
-  JsonUtil,
   Keyman.System.KeyboardInfoFile,
   Keyman.System.KMXFileLanguages;
 
@@ -62,35 +58,14 @@ begin
   FSilent := ASilent;
 end;
 
-function TValidateKeyboardInfo.MigrateLanguagesArray(alangs: TJSONArray; 
-  var olangs: TJSONObject): Boolean;
-var
-  i: Integer;
-  msg: string;
-begin
-  Result := True;
-  for i := 0 to alangs.Count - 1 do
-    with TBCP47Tag.Create(alangs.Items[i].Value) do
-    try
-      if not IsValid(False, msg) then
-        Result := Failed(msg);
-
-      if not IsCanonical(msg) then
-        Result := Failed(msg);
-      olangs.AddPair(alangs.Items[i].Value, TJSONString.Create('something'));
-    finally
-      Free;
-    end;
-end;
-
 function TValidateKeyboardInfo.DoFieldValidation: Boolean;
 var
   alangs: TJSONArray;
-  langs, lang: TJSONValue;
+  langs: TJSONValue;
   i: Integer;
-  olangs, olang: TJSONObject;
-  id, msg: string;
-  languagesMigrated, nameAdded: Boolean;
+  olangs: TJSONObject;
+  msg: string;
+
 begin
   if not LoadJsonFile then
     Exit(False);
@@ -101,71 +76,36 @@ begin
     Exit(True);
 
   Result := True;
-  languagesMigrated := False;
-  nameAdded := False;
 
-  // Migrate languages[] array to Object
   if langs is TJSONArray then
   begin
     alangs := langs as TJSONArray;
-    olangs := TJSONObject.Create;
-    Result := MigrateLanguagesArray(alangs, olangs);
-    json.RemovePair(TKeyboardInfoFile.SLanguages);
-    json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
-    langs := json.Values[TKeyboardInfoFile.SLanguages];
-    languagesMigrated := True;
-  end;
+    for i := 0 to alangs.Count - 1 do
+      with TBCP47Tag.Create(alangs.Items[i].Value) do
+      try
+        if not IsValid(False, msg) then
+          Result := Failed(msg);
 
-  olangs := langs as TJSONObject;
-  for i := 0 to olangs.Count - 1 do
-  begin
-    id := olangs.Pairs[i].JsonString.Value;
-    with TBCP47Tag.Create(id) do
-    try
-      if not IsValid(False, msg) then
-        Result := Failed(msg);
-
-      if not IsCanonical(msg) then
-        Result := Failed(msg);
-
-      // Validate subtag names
-      lang := olangs.Values[id];
-      if lang is TJSONObject then
-      begin
-        olang := lang as TJsonObject;
-        if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SDisplayName) = nil) then
-        begin
-          olang.AddPair(TKeyboardInfoFile.SDisplayName, TJSONString.Create('displayName1'));
-          nameAdded := True;
-        end;
-
-        if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SLanguageName) = nil) then
-        begin
-          olang.AddPair(TKeyboardInfoFile.SLanguageName, TJSONString.Create('languageName1'));
-          nameAdded := True;
-        end;
-
-        if nameAdded then
-        begin
-          olangs.RemovePair(olangs.Pairs[i].JsonString.Value);
-          olangs.AddPair(olangs.Pairs[i].JsonString.Value, olang);
-        end;
-
+        if not isCanonical(msg) then
+          Result := Failed(msg);
+      finally
+        Free;
       end;
-    finally
-      Free;
-    end;
-
-  end;
-
-  if languagesMigrated or nameAdded then
+  end
+  else
   begin
-    // Save and reload
-    if not SaveJsonFile then
-      Exit(Failed('Could not save updated keyboard_info file '+FJsonFile));
+    olangs := langs as TJSONObject;
+    for i := 0 to olangs.Count - 1 do
+      with TBCP47Tag.Create(olangs.Pairs[i].JsonString.Value) do
+      try
+        if not IsValid(False, msg) then
+          Result := Failed(msg);
 
-    if not LoadJsonFile then
-      Exit(Failed('Cound not reopen updated keyboard info file'+FJsonFile));
+        if not IsCanonical(msg) then
+          Result := Failed(msg);
+      finally
+        Free;
+      end;
   end;
 end;
 
@@ -191,26 +131,6 @@ begin
   end;
 
   Result := Assigned(json);
-end;
-
-function TValidateKeyboardInfo.SaveJsonFile: Boolean;
-var
-  str: TStringList;
-begin
-  str := TStringList.Create;
-  try
-    PrettyPrintJSON(json, str);
-    with TStringStream.Create(str.Text, TEncoding.UTF8) do
-    try
-      // Use TStringStream so we don't get a default BOM prolog
-      SaveToFile(FJsonFile);
-    finally
-      Free;
-    end;
-  finally
-    str.Free;
-  end;
-  Result := True;
 end;
 
 class function TValidateKeyboardInfo.Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;

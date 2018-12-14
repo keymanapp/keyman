@@ -87,6 +87,7 @@ type
     procedure AddHelpLink;
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
+    function CheckOrMigrateLanguages: Boolean;
     function SaveJsonFile: Boolean;
     procedure CheckPackageKeyboardFilenames;
     procedure AddIsRTL;
@@ -109,6 +110,7 @@ uses
   Keyman.System.RegExGroupHelperRSP19902,
 
   JsonUtil,
+  Keyman.System.KeyboardInfoFile,
   utilfiletypes,
   VersionInfo;
 
@@ -178,6 +180,7 @@ begin
     CheckPackageKeyboardFilenames;
 
     CheckOrAddID;
+    CheckOrMigrateLanguages;
     AddName;
     AddIsRTL;
     AddAuthor;
@@ -416,6 +419,67 @@ begin
   end
   else
     json.AddPair('id', FID);
+end;
+
+function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
+var
+  v: TJSONValue;
+  alangs: TJSONArray;
+  langs, lang: TJSONValue;
+  olangs, olang: TJSONObject;
+  nameAdded: Boolean;
+  i: Integer;
+  msg: string;
+begin
+  v := json.GetValue(TKeyboardInfoFile.SLanguages);
+
+  // Migrate languages[] array to Object
+  if v is TJSONArray then
+  begin
+    alangs := v as TJSONArray;
+    olangs := TJSONObject.Create;
+    try
+      for i := 0 to alangs.Count - 1 do
+        olangs.AddPair(alangs.Items[i].Value, TJSONString.Create('something'));
+
+      json.RemovePair(TKeyboardInfoFile.SLanguages);
+      json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
+    except
+      on E:Exception do
+      begin
+        Free;
+        Exit(Failed('Fatal error '+E.ClassName+': '+E.Message));
+      end;
+    end;
+  end;
+
+  // Populate subtag names if needed
+  nameAdded := False;
+  v := json.GetValue(TKeyboardInfoFile.SLanguages);
+  {
+  if v is TJSONObject then
+  begin
+    olang := lang as TJsonObject;
+    if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SDisplayName) = nil) then
+    begin
+      olang.AddPair(TKeyboardInfoFile.SDisplayName, TJSONString.Create('displayName1'));
+      nameAdded := True;
+    end;
+
+    if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SLanguageName) = nil) then
+    begin
+      olang.AddPair(TKeyboardInfoFile.SLanguageName, TJSONString.Create('languageName1'));
+      nameAdded := True;
+    end;
+
+    if nameAdded then
+    begin
+      olangs.RemovePair(olangs.Pairs[i].JsonString.Value);
+      olangs.AddPair(olangs.Pairs[i].JsonString.Value, olang);
+    end;
+
+  end;
+  }
 end;
 
 //
