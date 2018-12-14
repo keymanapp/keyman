@@ -119,50 +119,55 @@ begin
   hwnd := AllocateHWND(nil);
   osk := TOnScreenKeyboard.Create(nil);
   try
-    osk.ParentWindow := hwnd;
+    osk.BeginUpdate;
+    try
+      osk.ParentWindow := hwnd;
 
-    osk.Transparent := False;
-    osk.DisplayUnderlyingChar := kvkhDisplayUnderlying in FKbd.Header.Flags;
-    osk.Display102Key := kvkh102 in FKbd.Header.Flags;
-    osk.Width := FPixelWidth;
-    r := Rect(0, 0, osk.Width, 0);
-    osk.AdjustBoundsRect(r, True);
-    osk.Height := r.Bottom;
-    osk.LRShift := kvkhAltGr in FKbd.Header.Flags;
+      osk.Transparent := False;
+      osk.DisplayUnderlyingChar := kvkhDisplayUnderlying in FKbd.Header.Flags;
+      osk.Display102Key := kvkh102 in FKbd.Header.Flags;
+      osk.Width := FPixelWidth;
+      r := Rect(0, 0, osk.Width, 0);
+      osk.AdjustBoundsRect(r, True);
+      osk.Height := r.Bottom;
+      osk.LRShift := kvkhAltGr in FKbd.Header.Flags;
 
-{    if Assigned(FKeyBitmap.Bitmap) then
-    begin
-      osk. KeyBitmap := FKeyBitmap.Bitmap;
-      //kbd.Parameters := FKeyBitmap.Params;
-    end;
-}
-    if FUnicode
-      then osk.DataFont := FKbd.Header.UnicodeFont
-      else osk.DataFont := FKbd.Header.ANSIFont;
-
-    osk.Keys.ClearValues;
-
-    for i := 0 to FKbd.Keys.Count - 1 do
-    begin
-      if (FKbd.Keys[i].Shift = FShift) and
-        (((kvkkUnicode in FKbd.Keys[i].Flags) and (FUnicode)) or
-        (not (kvkkUnicode in FKbd.Keys[i].Flags) and (not FUnicode))) then
+  {    if Assigned(FKeyBitmap.Bitmap) then
       begin
-        k := osk.Keys.ItemsByVK[FKbd.Keys[i].VKey];
-        if Assigned(k) and ((FKbd.Keys[i].Text <> '') or Assigned(FKbd.Keys[i].Bitmap)) then
+        osk. KeyBitmap := FKeyBitmap.Bitmap;
+        //kbd.Parameters := FKeyBitmap.Params;
+      end;
+  }
+      if FUnicode
+        then osk.DataFont := FKbd.Header.UnicodeFont
+        else osk.DataFont := FKbd.Header.ANSIFont;
+
+      osk.Keys.ClearValues;
+
+      for i := 0 to FKbd.Keys.Count - 1 do
+      begin
+        if (FKbd.Keys[i].Shift = FShift) and
+          (((kvkkUnicode in FKbd.Keys[i].Flags) and (FUnicode)) or
+          (not (kvkkUnicode in FKbd.Keys[i].Flags) and (not FUnicode))) then
         begin
-          k.KeyValue := FKbd.Keys[i].Text;
-          k.KeyGlyph := FKbd.Keys[i].Bitmap;
-          Result := True;
+          k := osk.Keys.ItemsByVK[FKbd.Keys[i].VKey];
+          if Assigned(k) and ((FKbd.Keys[i].Text <> '') or Assigned(FKbd.Keys[i].Bitmap)) then
+          begin
+            k.KeyValue := FKbd.Keys[i].Text;
+            k.KeyGlyph := FKbd.Keys[i].Bitmap;
+            Result := True;
+          end;
         end;
       end;
+
+      if not Result then Exit;
+
+      bmp.SetSize(osk.Width, osk.Height);
+      bmp.Canvas.Brush.Color := clWhite;
+      bmp.Canvas.FillRect(Rect(0, 0, osk.Width, osk.Height));
+    finally
+      osk.EndUpdate;
     end;
-
-    if not Result then Exit;
-
-    bmp.SetSize(osk.Width, osk.Height);
-    bmp.Canvas.Brush.Color := clWhite;
-    bmp.Canvas.FillRect(Rect(0, 0, osk.Width, osk.Height));
 
     osk.PaintTo(bmp.Canvas.Handle, 0, 0);
     osk.ParentWindow := 0;
