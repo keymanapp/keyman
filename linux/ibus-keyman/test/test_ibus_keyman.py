@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 import time
+from threading import Timer
 
 from pynput.keyboard import Key, Controller
 
@@ -71,7 +72,11 @@ class TestView(Gtk.Window):
         logging.info("context %d:%s:" % (len(self.context), self.context))
         logging.info("expected %d:%s:" % (len(self.expected), self.expected))
 
-    def do_keypresses(self, args, data):
+    def on_focus_in(self, args, data):
+        t = Timer(1.0, self.do_keypresses)
+        t.start()
+
+    def do_keypresses(self):
         if self.keys and not self.haspressedkeys:
             self.haspressedkeys = True
             if has_xkbgroup:
@@ -127,11 +132,13 @@ class TestView(Gtk.Window):
                         logging.warning("too many modifiers %d:%s", len(mods), mods)
                         localkeyboard.press(self.known_keys[mainkey])
                         localkeyboard.release(self.known_keys[mainkey])
+                    # Use sleep to slow down keypresses to more natural level
+                    # At full speed ibus_set_surrounding_text events were coming in
+                    # which got text 1 or 2 keypresses behind
+                    time.sleep(0.2)
 
-            time.sleep(1)
-            with localkeyboard.pressed(Key.ctrl_l):
-                localkeyboard.press("a")
-                localkeyboard.release("a")
+            t = Timer(1.0, self.do_destroy)
+            t.start()
 
     def change_to_keyboard(self, keyboard_id, kmx_path):
         logging.debug(keyboard_id)
@@ -220,39 +227,23 @@ class TestView(Gtk.Window):
         self.grid.attach(scrolledwindow, 0, 1, 3, 1)
 
         self.textview = Gtk.TextView()
-        self.textview.connect("focus-in-event", self.do_keypresses)
-        self.textview.connect("select-all", self.on_select_all)
+        self.textview.connect("focus-in-event", self.on_focus_in)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.set_text(self.context)
-        # self.textbuffer.set_text("This is some text inside of a Gtk.TextView. "
-        #     + "Select text and click one of the buttons 'bold', 'italic', "
-        #     + "or 'underline' to modify the text accordingly.")
         scrolledwindow.add(self.textview)
 
-        # self.tag_bold = self.textbuffer.create_tag("bold",
-        #     weight=Pango.Weight.BOLD)
-        # self.tag_italic = self.textbuffer.create_tag("italic",
-        #     style=Pango.Style.ITALIC)
-        # self.tag_underline = self.textbuffer.create_tag("underline",
-        #     underline=Pango.Underline.SINGLE)
-        # self.tag_found = self.textbuffer.create_tag("found",
-        #     background="yellow")
-
-    def on_select_all(self, args, select):
-        self.on_destroy(args)
-        pass
-
-    def on_destroy(self, args):
+    def do_destroy(self):
         with open(self.test_name+".out", "wt") as f:
             start = self.textbuffer.get_start_iter()
             end = self.textbuffer.get_end_iter()
-            # start, end = self.textbuffer.get_bounds()
             text = self.textbuffer.get_text(start, end, True)
             logging.info("text buffer:%s", text)
             f.write(text)
         self.reset_keyboard(self.keyboard_id)
         Gtk.main_quit()
 
+    def on_destroy(self, args):
+        self.do_destroy()
 
 # Test view contains a single multiline edit
 
