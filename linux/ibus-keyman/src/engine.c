@@ -24,9 +24,8 @@
 #include <ibus.h>
 #include <string.h>
 #include <stdio.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
+
+#include <gdk/gdk.h>
 #include <keyman/keyboardprocessor.h>
 
 #include "keymanutil.h"
@@ -34,6 +33,11 @@
 #include "engine.h"
 
 #define Keyman_Pass_Backspace_To_IBus 254 // unused keycode to forward backspace back to ibus
+#define KEYMAN_BACKSPACE 14
+#define KEYMAN_LCTRL 29
+#define KEYMAN_LALT 56
+#define KEYMAN_RCTRL 97
+#define KEYMAN_RALT 100
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
@@ -46,11 +50,10 @@ struct _IBusKeymanEngine {
     km_kbp_state    *state;
     gchar           *ldmlfile;
     gchar           *kb_name;
+    guint            prev_modifier;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
-    Display         *display;
-
 };
 
 struct _IBusKeymanEngineClass {
@@ -277,7 +280,6 @@ ibus_keyman_engine_constructor (GType                   type,
         g_free(surrounding_text);
     }
 
-    keyman->display  = XOpenDisplay(NULL);
     return (GObject *) keyman;
 }
 
@@ -319,10 +321,6 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
         keyman->keyboard = NULL;
     }
 
-    if (keyman->display) {
-        XCloseDisplay(keyman->display);
-        keyman->display = NULL;
-    }
     g_free(keyman->kb_name);
     g_free(keyman->ldmlfile);
      
@@ -341,29 +339,11 @@ ibus_keyman_engine_commit_string (IBusKeymanEngine *kmfl,
     g_object_unref (text);
 }
 
-int is_key_pressed(Display * display, char *key_vec, KeySym keysym)
-{
-    unsigned char keycode;
-    keycode = XKeysymToKeycode(display, keysym);
-    // TE: Some documentation on the format of keycode might be helpful
-    // DG: Indeed
-    return key_vec[keycode >> 3] & (1 << (keycode & 7));
-}
-
-static void forward_keysym(IBusKeymanEngine *engine, unsigned int keysym, unsigned int state)
-{
-    unsigned char keycode;
-    g_debug("DAR: forward_keysym");
-    keycode = XKeysymToKeycode(engine->display, keysym);
-    ibus_engine_forward_key_event((IBusEngine *)engine, keysym, keycode-8, state);
-}
-
 static void forward_keycode(IBusKeymanEngine *engine, unsigned char keycode, unsigned int state)
 {
     g_debug("DAR: forward_keycode no keysym");
     ibus_engine_forward_key_event((IBusEngine *)engine, 0, keycode, state);
 }
-
 
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMHardwareKeyboardInterpreter.java
 // uses kernel keycodes which are X11 keycode - 8
@@ -471,7 +451,6 @@ static void reset_context(IBusEngine *engine)
     gchar *surrounding_text;
     guint cursor_pos, anchor_pos;
     km_kbp_context_item *context_items;
-
     g_message("reset_context");
     km_kbp_context_clear(km_kbp_state_context(keyman->state));
 
@@ -495,13 +474,41 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                                     guint           state)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
-    
+
     if (state & IBUS_RELEASE_MASK)
         return FALSE;
 
     if (keycode < 0 || keycode > 255)
     {
         g_warning("keycode %d out of range", keycode);
+        return FALSE;
+    }
+
+    g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
+
+    if (keycode_to_vk[keycode] == 0) // key we don't handle
+    {
+        //save if a possible Ctrl or Alt modifier
+        switch(keycode) {
+            case KEYMAN_LCTRL:
+                keyman->prev_modifier |= KM_KBP_MODIFIER_LCTRL;
+                g_message("adding LCTRL to prev_modifier");
+                break;
+            case KEYMAN_RCTRL:
+                keyman->prev_modifier |= KM_KBP_MODIFIER_RCTRL;
+                g_message("adding RCTRL to prev_modifier");
+                break;
+            case KEYMAN_LALT:
+                keyman->prev_modifier |= KM_KBP_MODIFIER_LALT;
+                g_message("adding LALT to prev_modifier");
+                break;
+            case KEYMAN_RALT:
+                keyman->prev_modifier |= KM_KBP_MODIFIER_RALT;
+                g_message("adding RALT to prev_modifier");
+                break;
+            default:
+                break;
+        }
         return FALSE;
     }
 
@@ -518,48 +525,28 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     }
     if (state & IBUS_MOD1_MASK)
     {
-        km_mod_state |= KM_KBP_MODIFIER_ALT;
-        g_message("modstate KM_KBP_MODIFIER_ALT");
-    }
-    if (state & IBUS_CONTROL_MASK) {
-        km_mod_state |= KM_KBP_MODIFIER_CTRL;
-        g_message("modstate KM_KBP_MODIFIER_CTRL");
-    }
-
-    g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
-
-    // // Let the application handle user generated backspaces after resetting the kmfl history
-    if (keycode == Keyman_Pass_Backspace_To_IBus) {
-        //clear_history(keyman->state);
-        g_message("IBUS_BackSpace");
-        return FALSE;
-    }
-
-    if (keycode_to_vk[keycode] == 0) // key we don't handle
-        return FALSE;
-
-    // If a modifier key is pressed, check to see if it is a right modifier key
-    // This is rather expensive so only do it if a shift state is active
-    if (state & (/*IBUS_SHIFT_MASK |*/ IBUS_CONTROL_MASK | IBUS_MOD1_MASK)) {
-        Display * m_display  = XOpenDisplay(NULL);;
-        char key_vec[32];
-        XQueryKeymap(m_display, key_vec);
-
-        if ((state & IBUS_MOD1_MASK) && is_key_pressed(m_display, key_vec, IBUS_Alt_R)) {
+        if (keyman->prev_modifier & KM_KBP_MODIFIER_RALT) {
             km_mod_state |= KM_KBP_MODIFIER_RALT;
-            g_message("modstate KM_KBP_MODIFIER_RALT from IBUS_Alt_R");
+            g_message("modstate KM_KBP_MODIFIER_RALT from prev_modifier");
         }
-
-        if ((state & IBUS_CONTROL_MASK) && is_key_pressed(m_display, key_vec, IBUS_Control_R)) {
-            km_mod_state |= KM_KBP_MODIFIER_RCTRL;
-            g_message("modstate KM_KBP_MODIFIER_RCTRL");
+        if (keyman->prev_modifier & KM_KBP_MODIFIER_LALT) {
+            km_mod_state |= KM_KBP_MODIFIER_LALT;
+            g_message("modstate KM_KBP_MODIFIER_LALT from prev_modifier");
         }
-        // ignoring right shift
-        // if ((state & IBUS_SHIFT_MASK) && is_key_pressed(m_display, key_vec, IBUS_Shift_R)) {
-        //     right_modifier_state |= (IBUS_SHIFT_MASK << 8);
-        // }
-        XCloseDisplay(m_display);
     }
+    if (state & IBUS_CONTROL_MASK)
+    {
+        if (keyman->prev_modifier & KM_KBP_MODIFIER_RCTRL) {
+            km_mod_state |= KM_KBP_MODIFIER_RCTRL;
+            g_message("modstate KM_KBP_MODIFIER_RCTRL from prev_modifier");
+        }
+        if (keyman->prev_modifier & KM_KBP_MODIFIER_LCTRL) {
+            km_mod_state |= KM_KBP_MODIFIER_LCTRL;
+            g_message("modstate KM_KBP_MODIFIER_LCTRL from prev_modifier");
+        }
+    }
+    keyman->prev_modifier = 0;
+
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
     km_kbp_status event_status = km_kbp_process_event(keyman->state,
                                    keycode_to_vk[keycode], km_mod_state);
@@ -593,6 +580,11 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_ALERT:
                 g_message("ALERT action");
+                GdkDisplay *display = gdk_display_open(NULL);
+                if (display != NULL) {
+                    gdk_display_beep(display);
+                    gdk_display_close(display);
+                }
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action");
@@ -611,7 +603,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_EMIT_KEYSTROKE:
                 g_message("EMIT_KEYSTROKE action");
-                return False;
+                return FALSE;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
                 g_message("INVALIDATE_CONTEXT action");
                 reset_context(engine);
