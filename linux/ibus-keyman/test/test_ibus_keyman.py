@@ -29,7 +29,7 @@ class TestView(Gtk.Window):
         self.known_modifiers = { "SHIFT" : Key.shift,
             "LCTRL" : Key.ctrl_l,
             "RCTRL" : Key.ctrl_r,
-            "LALT" : Key.alt,
+            "LALT" : Key.alt_l,
             "RALT" : Key.alt_r }
         self.known_keys = { "K_A" : "a",
             "K_B" : "b",
@@ -58,26 +58,18 @@ class TestView(Gtk.Window):
         self.kmn_path = os.path.join(keyboarddir, self.test_name + ".kmn")
         self.keyboard_id = "und:" + keyboarddir + "/" + self.test_name + ".kmx"
 
-        # self.set_default_size(-1, 350)
         self.load_source(self.kmn_path)
         self.change_to_keyboard(self.keyboard_id, self.kmx_path)
         with open(self.test_name+".in", "wt") as f:
-#             print(self.expected)
-#             print(self.expected.encode('utf-8'))
-# #            print([ord(c) for c in self.expected.encode('utf-8')])
-#             print(self.expected.encode('utf-8').decode("utf-8", "strict"))
             f.write(self.expected)
 
         self.grid = Gtk.Grid()
         self.add(self.grid)
-
         self.create_textview()
-        # self.create_toolbar()
-        # self.create_buttons()
+
         logging.info("keys %d:%s:" % (len(self.keys), self.keys))
         logging.info("context %d:%s:" % (len(self.context), self.context))
         logging.info("expected %d:%s:" % (len(self.expected), self.expected))
-        # self.do_keypresses(self.keys)
 
     def do_keypresses(self, args, data):
         if self.keys and not self.haspressedkeys:
@@ -105,9 +97,6 @@ class TestView(Gtk.Window):
                         # else:
                             # print("unknown part %s", part)
                     logging.info("key is %s with modifiers %s" % (mainkey, mods))
-                    # self.activate_focus()
-                    # self.grab_focus()
-                    # self.textview.grab_focus()
                     if len(mods) == 0:
                         localkeyboard.press(self.known_keys[mainkey])
                         localkeyboard.release(self.known_keys[mainkey])
@@ -137,7 +126,6 @@ class TestView(Gtk.Window):
                         logging.warning("too many modifiers %d:%s", len(mods), mods)
                         localkeyboard.press(self.known_keys[mainkey])
                         localkeyboard.release(self.known_keys[mainkey])
-                time.sleep(0.1)
 
             self.haspressedkeys = True
             time.sleep(1)
@@ -219,6 +207,9 @@ class TestView(Gtk.Window):
                         self.keys = line[8:].rstrip()
                     if line.startswith("c expected: "):
                         expected = line[12:].rstrip()
+                        if expected == "\b":
+                            expected = ""
+                        # expected.replace("\b", "") # beep test should be sound
                         self.expected = expected.encode("utf-8").decode('unicode-escape')
                         # print(expected)
                         # print(expected.encode("utf-8"))

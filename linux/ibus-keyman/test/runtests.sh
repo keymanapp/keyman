@@ -6,7 +6,7 @@ tests=(
 	'002 - basic input Unicode'
 	'003 - nul'
 	'004 - basic input (shift 2)'
-	'005 - nul with initial context'
+#	'005 - nul with initial context' # run manually because of initial context
 	'006 - vkey input (shift ctrl)'
 	'007 - vkey input (ctrl alt)'
 	'008 - vkey input (ctrl alt 2)'
@@ -19,7 +19,7 @@ tests=(
 	'019 - multiple deadkeys'
 	'020 - deadkeys and backspace'
 	'028 - smp'
-#	'029 - beep' # manual test
+	'029 - beep'
 	'030 - multiple groups'
 	)
 
@@ -50,6 +50,7 @@ failed=0
 while [ "x${tests[count]}" != "x" ]
 do
 	echo ${tests[count]}
+	setxkbmap us
 	python3 test_ibus_keyman.py "${tests[count]}"
 	diffret=`diff -uws "${tests[count]}.in" "${tests[count]}.out"`
 	# echo $?
