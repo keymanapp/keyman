@@ -636,6 +636,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         {
             case KM_KBP_IT_CHAR:
                 g_message("CHAR action %d/%d", i+1, (int)num_action_items);
+                keyman->hasonlymarker = FALSE;
                 if (g_unichar_type(action_items[i].character) == G_UNICODE_SURROGATE) {
                     if (keyman->firstsurrogate == 0) {
                         keyman->firstsurrogate = action_items[i].character;
@@ -670,14 +671,17 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     else {
                         g_message("unichar:U+%04x, bytes:%d, string:%s", action_items[i].character, numbytes, utf8);
                         if (keyman->char_buffer == NULL) {
+                            g_message("setting buffer to converted unichar");
                             keyman->char_buffer = utf8;
                         }
                         else {
+                            g_message("appending converted unichar to CHAR buffer");
                             gchar *new_buffer = g_strjoin("", keyman->char_buffer, utf8, NULL);
                             g_free(keyman->char_buffer);
                             g_free(utf8);
                             keyman->char_buffer = new_buffer;
                         }
+                        g_message("CHAR buffer is now %s", keyman->char_buffer);
                     }
                 }
                 break;
@@ -697,15 +701,30 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 g_message("BACK action %d/%d", i+1, (int)num_action_items);
                 if (keyman->hasonlymarker) {
                     keyman->hasonlymarker = FALSE;
+                    g_message("only deleting hasonlymarker status");
                 }
                 else {
                     if (keyman->char_buffer != NULL)
                     {
-                        ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                        // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                        g_message("removing one utf8 char from CHAR buffer");
+                        glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);
+                        gchar *new_buffer;
+                        if (end_pos == 1) {
+                            new_buffer = NULL;
+                            g_message("resetting CHAR buffer to NULL");
+                        }
+                        else {
+                            new_buffer = g_utf8_substring(keyman->char_buffer, 0 , end_pos - 1);
+                            g_message("changing CHAR buffer to :%s:", new_buffer);
+                        }
+                        if (g_strcmp0(keyman->char_buffer, new_buffer) == 0) {
+                            g_message("oops, CHAR buffer hasn't changed");
+                        }
                         g_free(keyman->char_buffer);
-                        keyman->char_buffer = NULL;
+                        keyman->char_buffer = new_buffer;
                     }
-                    if (ok_for_single_backspace(action_items, i, num_action_items)) {
+                    else if (ok_for_single_backspace(action_items, i, num_action_items)) {
                         // single backspace can be handled by ibus as normal
                         g_message("no char actions, just single back");
                         return FALSE;
