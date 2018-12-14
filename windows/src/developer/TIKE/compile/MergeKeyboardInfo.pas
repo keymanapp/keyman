@@ -479,29 +479,30 @@ begin
   begin
     alangs := v as TJSONArray;
     olangs := TJSONObject.Create;
-    o := TJSONObject.Create;
     try
-      for i := 0 to alangs.Count - 1 do
-      begin
-        id := alangs.Items[i].Value;
-        if id = '' then
-          continue;
-        AddSubtagNames(id, o);
-        olangs.AddPair(id, o);
+      o := TJSONObject.Create;
+      try
+        for i := 0 to alangs.Count - 1 do
+        begin
+          id := alangs.Items[i].Value;
+          if id = '' then
+            continue;
+          AddSubtagNames(id, o);
+          olangs.AddPair(id, o as TJSONValue);
+        end;
+      finally
+        Free;
       end;
 
       json.RemovePair(TKeyboardInfoFile.SLanguages);
       json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
 
-      // Migration complete and subtags populated
-      Exit;
-    except
-      on E:Exception do
-      begin
-        Free;
-        Exit(Failed('Fatal error '+E.ClassName+': '+E.Message));
-      end;
+    finally
+      Free;
     end;
+
+    // Migration complete and subtags populated
+    Exit;
   end;
 
   {
