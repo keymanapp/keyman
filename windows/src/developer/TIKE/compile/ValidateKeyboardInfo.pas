@@ -65,7 +65,6 @@ var
   i: Integer;
   olangs: TJSONObject;
   msg: string;
-
 begin
   if not LoadJsonFile then
     Exit(False);
@@ -86,7 +85,7 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not isCanonical(msg) then
+        if not IsCanonical(msg) then
           Result := Failed(msg);
       finally
         Free;
