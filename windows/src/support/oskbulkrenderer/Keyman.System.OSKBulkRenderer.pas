@@ -167,6 +167,7 @@ var
   s, destfilename: string;
   vk: TVisualKeyboard;
   vkep: TVisualKeyboardExportPNG;
+  FShift: Integer;
 const
   KeyboardAspect = 0.3412;
 begin
@@ -194,6 +195,17 @@ begin
 
       if vk.Header.UnderlyingLayout <> '' then
         WriteIndex('  <dt>Base Layout</dt><dd>'+vk.Header.UnderlyingLayout+'</dd>');
+
+      s := '';
+      for FShift := 0 to High(VKLegalShiftStates) do
+      begin
+        if vk.HasShiftState(VKLegalShiftStates[FShift].Shift) then
+        begin
+          if s <> '' then s := s + ', ';
+          s := s + VKLegalShiftStates[FShift].Desc;
+        end;
+      end;
+      WriteIndex('  <dt>Shift States</dt><dd>'+s+'</dd>');
       WriteIndex('  <dt>Associated Keyboard</dt><dd>'+vk.Header.AssociatedKeyboard+'</dd>');
       WriteIndex('</dl>');
       WriteIndex('<div><img src="'+ExtractFileName(destfilename)+'" alt="'+ExtractFileName(destfilename)+'"></div>');
