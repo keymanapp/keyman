@@ -16,9 +16,9 @@ clean: def-clean
     -rd /s/q Win32
 
 signcode:
-    # Not signing this utility
+    rem Not signing this utility
 
 backup:
-    # No source code backup needed
+    rem No source code backup needed
 
 !include ..\..\Target.mak
