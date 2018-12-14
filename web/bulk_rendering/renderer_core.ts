@@ -29,7 +29,7 @@ namespace com.keyman.renderer {
       return keyboardMap;
     }
 
-    private render(ele: HTMLElement, isMobile?: boolean) {
+    private render(resolve, ele: HTMLElement, layerIndex: number, isMobile?: boolean) {
       let html2canvas = window['html2canvas'];
 
       let imgOut = document.createElement('img');      
@@ -48,24 +48,63 @@ namespace com.keyman.renderer {
 
       html2canvas(ele, canvasParams).then(function(canvas) {
         imgOut.src = canvas.toDataURL();
+        resolve(layerIndex);
       });
     }
 
-    private process(kbd) {
+    private processKeyboard(kbd) {
       let keyman = window['keyman'];
-
       keyman.setActiveKeyboard(kbd['InternalName']);
+      let isMobile = keyman.util.device.formFactor != 'desktop';
 
       // Really could use promises to tie these two together...
       setTimeout(function() {
         let box: HTMLDivElement = keyman.osk._Box;
         keyman.osk.show(true);
-
+  
         // Forcing display, width, and height here helps to ensure a nice, consistent image.
         box.style.display = 'block';
+  
+        let layers = keyman.osk._DivVKbd.firstChild.childNodes;
 
-        this.render(box, keyman.util.device.formFactor != 'desktop');
+        let renderLayer = function(i) {
+          return new Promise(function(resolve) {
+            for(var j = 0; j < layers.length; j++) {
+              layers[j].style.display = 'none';
+            }
+
+            layers[i].style.display = 'block';
+
+            this.render(resolve, box, i, isMobile);
+          }.bind(this))
+        }.bind(this);
+
+        return this.arrayPromiseIteration(renderLayer, layers.length).then(function() {
+          console.log("All renders for the first keyboard should now be complete.");
+        });
       }.bind(this), 2500);
+    }
+
+    // Synchronously performs asynchronous operations across a loop, one at a time.
+    // Necessary due to the nature of KMW OSK rendering.
+    private arrayPromiseIteration(promiseGenerator: (i: number) => Promise<any>, length: number): Promise<any> {
+      let iteration = function(index: number): Promise<any> {
+        if(index < length) {
+          var promise = promiseGenerator(index);
+          return promise.then(function(index: number) {
+            return iteration(++index);
+          })
+        } else {
+          return Promise.resolve();
+        }
+        // return promise.then(function(index: number) {
+        //   if(++index < length) {
+        //       return iteration(index);
+        //   } // else instantly return.
+        // });
+      }
+
+      return iteration(0);
     }
 
     run() {
@@ -78,7 +117,7 @@ namespace com.keyman.renderer {
         console.log("Unique keyboard ids detected: " + Object.keys(kbds).length);
 
         // Temporary - just load the first keyboard.
-        this.process(kbds[Object.keys(kbds)[0]]);
+        this.processKeyboard(kbds[Object.keys(kbds)[0]]);
       } else {
         console.error("KeymanWeb not detected!");
       }
