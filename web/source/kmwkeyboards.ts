@@ -305,7 +305,7 @@ namespace com.keyman {
 
       // Fixed OSK font issue Github #7 (9/1/2015)
       if(typeof(lp['oskFont']) != 'undefined') {
-        sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? new KeyboardFont(lp['oskfont'], fontPath) : sp['KOskFont'];
+        sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? new KeyboardFont(lp['oskFont'], fontPath) : sp['KOskFont'];
       }           
 
       // Update the UI 
