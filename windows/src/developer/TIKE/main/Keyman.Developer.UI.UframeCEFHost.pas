@@ -110,8 +110,6 @@ type
     procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
       source: TCefFocusSource; out Result: Boolean);
   private
-    FBlockAllowSetFocus: Integer;
-
     FApplicationHandle: THandle;
     FNextURL: string;
     FOnLoadEnd: TNotifyEvent;
@@ -304,7 +302,6 @@ begin
     Exit;
   end;
 
-  InterlockedExchange(FBlockAllowSetFocus, 1);
   cef.LoadURL(FNextURL);
 end;
 
@@ -610,7 +607,7 @@ end;
 procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
-  Result := Boolean(InterlockedExchange(FBlockAllowSetFocus, 0));
+  Result := source = FOCUS_SOURCE_NAVIGATION;
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);
