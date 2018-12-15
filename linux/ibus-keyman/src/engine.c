@@ -50,7 +50,10 @@ struct _IBusKeymanEngine {
     km_kbp_state    *state;
     gchar           *ldmlfile;
     gchar           *kb_name;
-    guint            prev_modifier;
+    gboolean         lctrl_pressed;
+    gboolean         rctrl_pressed;
+    gboolean         lalt_pressed;
+    gboolean         ralt_pressed;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -213,6 +216,10 @@ ibus_keyman_engine_constructor (GType                   type,
 
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
+    keyman->lalt_pressed = FALSE;
+    keyman->lctrl_pressed = FALSE;
+    keyman->ralt_pressed = FALSE;
+    keyman->rctrl_pressed = FALSE;
     gchar **split_name = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
@@ -475,8 +482,28 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
+    g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
+
     if (state & IBUS_RELEASE_MASK)
+    {
+        switch(keycode) {
+            case KEYMAN_LCTRL:
+                keyman->lctrl_pressed = FALSE;
+                break;
+            case KEYMAN_RCTRL:
+                keyman->rctrl_pressed = FALSE;
+                break;
+            case KEYMAN_LALT:
+                keyman->lalt_pressed = FALSE;
+                break;
+            case KEYMAN_RALT:
+                keyman->ralt_pressed = FALSE;
+                break;
+            default:
+                break;
+        }
         return FALSE;
+    }
 
     if (keycode < 0 || keycode > 255)
     {
@@ -484,27 +511,21 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         return FALSE;
     }
 
-    g_message("DAR: ibus_keyman_engine_process_key_event - keyval=%02i, keycode=%02i, state=%02x", keyval, keycode, state);
-
     if (keycode_to_vk[keycode] == 0) // key we don't handle
     {
         //save if a possible Ctrl or Alt modifier
         switch(keycode) {
             case KEYMAN_LCTRL:
-                keyman->prev_modifier |= KM_KBP_MODIFIER_LCTRL;
-                g_message("adding LCTRL to prev_modifier");
+                keyman->lctrl_pressed = TRUE;
                 break;
             case KEYMAN_RCTRL:
-                keyman->prev_modifier |= KM_KBP_MODIFIER_RCTRL;
-                g_message("adding RCTRL to prev_modifier");
+                keyman->rctrl_pressed = TRUE;
                 break;
             case KEYMAN_LALT:
-                keyman->prev_modifier |= KM_KBP_MODIFIER_LALT;
-                g_message("adding LALT to prev_modifier");
+                keyman->lalt_pressed = TRUE;
                 break;
             case KEYMAN_RALT:
-                keyman->prev_modifier |= KM_KBP_MODIFIER_RALT;
-                g_message("adding RALT to prev_modifier");
+                keyman->ralt_pressed = TRUE;
                 break;
             default:
                 break;
@@ -525,27 +546,26 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
     }
     if (state & IBUS_MOD1_MASK)
     {
-        if (keyman->prev_modifier & KM_KBP_MODIFIER_RALT) {
+        if (keyman->ralt_pressed) {
             km_mod_state |= KM_KBP_MODIFIER_RALT;
-            g_message("modstate KM_KBP_MODIFIER_RALT from prev_modifier");
+            g_message("modstate KM_KBP_MODIFIER_RALT from ralt_pressed");
         }
-        if (keyman->prev_modifier & KM_KBP_MODIFIER_LALT) {
+        if (keyman->lalt_pressed) {
             km_mod_state |= KM_KBP_MODIFIER_LALT;
-            g_message("modstate KM_KBP_MODIFIER_LALT from prev_modifier");
+            g_message("modstate KM_KBP_MODIFIER_LALT from lalt_pressed");
         }
     }
     if (state & IBUS_CONTROL_MASK)
     {
-        if (keyman->prev_modifier & KM_KBP_MODIFIER_RCTRL) {
+        if (keyman->rctrl_pressed) {
             km_mod_state |= KM_KBP_MODIFIER_RCTRL;
-            g_message("modstate KM_KBP_MODIFIER_RCTRL from prev_modifier");
+            g_message("modstate KM_KBP_MODIFIER_RCTRL from rctrl_pressed");
         }
-        if (keyman->prev_modifier & KM_KBP_MODIFIER_LCTRL) {
+        if (keyman->lctrl_pressed) {
             km_mod_state |= KM_KBP_MODIFIER_LCTRL;
-            g_message("modstate KM_KBP_MODIFIER_LCTRL from prev_modifier");
+            g_message("modstate KM_KBP_MODIFIER_LCTRL from lctrl_pressed");
         }
     }
-    keyman->prev_modifier = 0;
 
     g_message("DAR: ibus_keyman_engine_process_key_event - km_mod_state=%x", km_mod_state);
     km_kbp_status event_status = km_kbp_process_event(keyman->state,
