@@ -449,7 +449,7 @@ begin
   v := o.Values[TKeyboardInfoFile.SLanguageName];
   if not Assigned(v) then
     o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
-  {
+
   v := o.Values[TKeyboardInfoFile.SScriptName];
   if not Assigned(v) and (scriptName <> '') then
     o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
@@ -457,7 +457,6 @@ begin
   v := o.Values[TKeyboardInfoFile.SRegionName];
   if not Assigned(v) and (regionName <> '') then
     o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
-  }
 end;
 
 function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
