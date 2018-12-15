@@ -436,29 +436,27 @@ begin
       TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, languageName);
       TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, scriptName);
       TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, regionName);
-            
-      displayName := TLanguageCodeUtils.LanguageName(languageName, scriptName, regionName);
-
-      v := o.Values[TKeyboardInfoFile.SDisplayName];
-      if not Assigned(v) then
-        o.AddPair(TKeyboardInfoFile.SDisplayName, displayName);
-
-      v := o.Values[TKeyboardInfoFile.SLanguageName];
-      if not Assigned(v) then
-        o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
-
-      v := o.Values[TKeyboardInfoFile.SScriptName];
-      if not Assigned(v) and (Script <> '') then
-        o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
-
-      v := o.Values[TKeyboardInfoFile.SRegionName];
-      if not Assigned(v) and (Region <> '') then
-        o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
-
     finally
       Free;
   end;
 
+  displayName := TLanguageCodeUtils.LanguageName(languageName, scriptName, regionName);
+
+  v := o.Values[TKeyboardInfoFile.SDisplayName];
+  if not Assigned(v) then
+    o.AddPair(TKeyboardInfoFile.SDisplayName, displayName);
+
+  v := o.Values[TKeyboardInfoFile.SLanguageName];
+  if not Assigned(v) then
+    o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
+
+  v := o.Values[TKeyboardInfoFile.SScriptName];
+  if not Assigned(v) and (scriptName <> '') then
+    o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
+
+  v := o.Values[TKeyboardInfoFile.SRegionName];
+  if not Assigned(v) and (regionName <> '') then
+    o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
 end;
 
 function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
@@ -488,15 +486,14 @@ begin
           if id = '' then
             continue;
           AddSubtagNames(id, o);
-          olangs.AddPair(id, o as TJSONValue);
+          olangs.AddPair(id, o);
         end;
+
+        json.RemovePair(TKeyboardInfoFile.SLanguages);
+        json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
       finally
         Free;
       end;
-
-      json.RemovePair(TKeyboardInfoFile.SLanguages);
-      json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
-
     finally
       Free;
     end;
