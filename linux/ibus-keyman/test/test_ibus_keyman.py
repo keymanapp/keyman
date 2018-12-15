@@ -135,7 +135,7 @@ class TestView(Gtk.Window):
                     # Use sleep to slow down keypresses to more natural level
                     # At full speed ibus_set_surrounding_text events were coming in
                     # which got text 1 or 2 keypresses behind
-                    time.sleep(0.2)
+                    time.sleep(0.3)
 
             t = Timer(1.0, self.do_destroy)
             t.start()
