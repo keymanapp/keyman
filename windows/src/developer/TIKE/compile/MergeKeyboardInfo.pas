@@ -432,12 +432,12 @@ begin
   if id = '' then
     Exit;
   with TBCP47Tag.Create(id) do
-    try
-      TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, languageName);
-      TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, scriptName);
-      TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, regionName);
-    finally
-      Free;
+  try
+    TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, languageName);
+    TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, scriptName);
+    TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, regionName);
+  finally
+    Free;
   end;
 
   displayName := TLanguageCodeUtils.LanguageName(languageName, scriptName, regionName);
@@ -449,7 +449,7 @@ begin
   v := o.Values[TKeyboardInfoFile.SLanguageName];
   if not Assigned(v) then
     o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
-
+  {
   v := o.Values[TKeyboardInfoFile.SScriptName];
   if not Assigned(v) and (scriptName <> '') then
     o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
@@ -457,6 +457,7 @@ begin
   v := o.Values[TKeyboardInfoFile.SRegionName];
   if not Assigned(v) and (regionName <> '') then
     o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
+  }
 end;
 
 function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
@@ -478,28 +479,29 @@ begin
     alangs := v as TJSONArray;
     olangs := TJSONObject.Create;
     try
-      o := TJSONObject.Create;
-      try
-        for i := 0 to alangs.Count - 1 do
-        begin
-          id := alangs.Items[i].Value;
-          if id = '' then
-            continue;
-          AddSubtagNames(id, o);
+      for i := 0 to alangs.Count - 1 do
+      begin
+        id := alangs.Items[i].Value;
+        if id = '' then
+          continue;
+
+        o := TJSONObject.Create;
+        try
           olangs.AddPair(id, o);
+          AddSubtagNames(id, o);
+        finally
+          o.Free;
         end;
-
-        json.RemovePair(TKeyboardInfoFile.SLanguages);
-        json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
-      finally
-        Free;
       end;
-    finally
-      Free;
-    end;
 
-    // Migration complete and subtags populated
-    Exit;
+      json.RemovePair(TKeyboardInfoFile.SLanguages);
+      json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
+
+      // Migration complete and subtags populated
+      Exit;
+    finally
+      olangs.Free;
+    end;
   end;
 
   {
