@@ -107,7 +107,11 @@ type
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
     procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
+    procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
+      source: TCefFocusSource; out Result: Boolean);
   private
+    FBlockAllowSetFocus: Integer;
+
     FApplicationHandle: THandle;
     FNextURL: string;
     FOnLoadEnd: TNotifyEvent;
@@ -300,6 +304,7 @@ begin
     Exit;
   end;
 
+  InterlockedExchange(FBlockAllowSetFocus, 1);
   cef.LoadURL(FNextURL);
 end;
 
@@ -600,6 +605,12 @@ begin
   AssertCefThread;
   // Return FALSE to show default context menu
   aResult := not FShouldShowContextMenu and (GetKeyState(VK_SHIFT) >= 0);
+end;
+
+procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
+  source: TCefFocusSource; out Result: Boolean);
+begin
+  Result := Boolean(InterlockedExchange(FBlockAllowSetFocus, 0));
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);
