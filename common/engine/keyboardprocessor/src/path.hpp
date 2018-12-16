@@ -43,7 +43,7 @@ namespace kbp
     static path join(path const &start, Args&&... args) {
       auto r = start;
       for (auto & p: {args...})
-        r._path.append(path::parent_separator,1).append(p);
+        r._path.append(1, path::parent_separator).append(p);
       return r;
     }
 
