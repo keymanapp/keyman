@@ -118,6 +118,10 @@ template<typename C>
 inline
 json & operator << (json & j, std::basic_string<C> const & s) throw() { return j << json::string(convert<C,char>(s).c_str()); }
 
+template<typename C>
+inline
+json & operator << (json & j, C const * s) throw() { return j << json::string(convert<C,char>(s).c_str()); }
+
 inline
 json & operator << (json & j, signed char d) throw()   { return j << json::integer(d); }
 
