@@ -28,12 +28,22 @@ namespace
 // Forward declarations
 
 
-option::option(km_kbp_option_scope s, std::u16string const & k, std::u16string const & v)
-: km_kbp_option_item { new km_kbp_cp[k.size()+1], new km_kbp_cp[v.size()+1],
-                uint8_t(s) }
+option::option(km_kbp_option_scope s, char16_t const *k, char16_t const *v)
+: option()
 {
-  std::copy_n(k.c_str(), k.size()+1, const_cast<km_kbp_cp *>(key));
-  std::copy_n(v.c_str(), v.size()+1, const_cast<km_kbp_cp *>(value));
+  if (k && v)
+  {
+    auto n_k = std::char_traits<char16_t>::length(k)+1,
+         n_v = std::char_traits<char16_t>::length(v)+1;
+    auto _key = new km_kbp_cp[n_k],
+         _val = new km_kbp_cp[n_v];
+    std::copy_n(k, n_k, _key);
+    std::copy_n(v, n_v, _val);
+
+    key = _key;
+    value = _val;
+    scope = s;
+  }
 }
 
 

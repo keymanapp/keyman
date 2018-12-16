@@ -26,25 +26,35 @@ namespace kbp
     option(): km_kbp_option_item KM_KBP_OPTIONS_END {}
     option(option const &);
     option(option &&);
+    option(km_kbp_option_scope, char16_t const *, char16_t const *);
     option(km_kbp_option_scope, std::u16string const &,
            std::u16string const &);
 
     ~option() noexcept;
 
     option & operator=(option && rhs);
+    option & operator=(option const &);
   };
+
+
+  inline
+  option::option(km_kbp_option_scope s,
+                 std::u16string const & k, std::u16string const & v)
+  : option(s, k.c_str(), v.c_str())
+  {}
+
 
   inline
   option::option(option const & rhs)
-  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value)
-  {}
+  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value) {}
+
 
   inline
-  option::option(option && rhs)
-  : km_kbp_option_item { rhs.key, rhs.value, rhs.scope }
+  option::option(option && rhs) : option()
   {
-    rhs.key = nullptr;
-    rhs.value = nullptr;
+    std::swap(key, rhs.key);
+    std::swap(value, rhs.value);
+    scope = rhs.scope;
   }
 
   inline
@@ -59,10 +69,15 @@ namespace kbp
   {
     delete [] key;
     delete [] value;
-    key = rhs.key;
-    value = rhs.value; rhs.key = nullptr;
-    scope = rhs.scope; rhs.value = nullptr;
-    return *this;
+    return *new (this) option(rhs);
+  }
+
+  inline
+  option & option::operator=(option const & rhs)
+  {
+    delete [] key;
+    delete [] value;
+    return *new (this) option(rhs);
   }
 
 
