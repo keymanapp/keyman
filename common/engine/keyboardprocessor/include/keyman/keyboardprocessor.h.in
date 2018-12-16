@@ -751,7 +751,7 @@ This must be disposed of by a call to `km_kbp_state_dispose`.
 */
 KMN_API
 km_kbp_status
-km_kbp_state_create(km_kbp_keyboard const *keyboard,
+km_kbp_state_create(km_kbp_keyboard *keyboard,
                     km_kbp_option_item const *env,
                     km_kbp_state **out);
 

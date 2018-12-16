@@ -9,11 +9,12 @@
 #include <algorithm>
 #include <memory>
 
+#include "json.hpp"
 #include "keyboard.hpp"
 #include "option.hpp"
-#include "json.hpp"
-#include "utfcodec.hpp"
+#include "processor.hpp"
 #include "state.hpp"
+#include "utfcodec.hpp"
 
 using namespace km::kbp;
 
@@ -76,9 +77,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
     if (save.key == key && save.scope == scope)
     {
       save = option(scope, key, value);
-
-      //((km::kbp::state *)state)->keyboard().
-      const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+      state->processor().update_option(state, scope, key, value);
 
       return &save;
     }
@@ -86,7 +85,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
 
   _saved.emplace_back(scope, key, value);
 
-  const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+  state->processor().update_option(state, scope, key, value);
 
   return &_saved.back();
 }

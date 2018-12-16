@@ -13,7 +13,7 @@
 #include <string>
 #include <type_traits>
 
-#include <keyman/keyboardprocessor.h>
+#include <kmx/kmx_processor.h>
 
 #include "path.hpp"
 #include "state.hpp"

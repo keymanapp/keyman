@@ -1,7 +1,6 @@
 #include <keyman/keyboardprocessor.h>
-#include "processor.hpp"
 #include "state.hpp"
-#include "keyboard.hpp"
+#include "kmx/kmx_processevent.hpp"
 
 namespace km {
   namespace kbp
@@ -10,21 +9,24 @@ namespace km {
     km_kbp_status kmx_processor::validate() const {
       return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
     }
-
-    kmx_processor::kmx_processor(km_kbp_keyboard_attrs const * kb_) : abstract_processor(kb_) {
-      km::kbp::keyboard *kb = const_cast<km::kbp::keyboard *>(static_cast<km::kbp::keyboard const *>(kb_));
-
-      km::kbp::path p = kb->folder_path;
-      p /= kb->id;
+    kmx_processor::kmx_processor(kbp::path p)
+    {
       p.replace_extension(".kmx");
       _valid = bool(_kmx.Load(p.c_str()));
 
-      if (_valid) {
-        _kmx.GetOptions()->Init(kb->default_opts());
-      }
+      keyboard_attributes::options_store defaults;
+      if (_valid)
+        _kmx.GetOptions()->Init(defaults);
+
+      // Fill out attributes
+      auto v = _kmx.GetKeyboard()->Keyboard->version;
+      auto vs = std::to_string(v >> 16) + "." + std::to_string(v & 0xffff);
+
+      _attributes = keyboard_attributes(static_cast<std::u16string>(p.stem()),
+                      std::u16string(vs.begin(), vs.end()), p.parent(), defaults);
     }
 
-    void kmx_processor::init_state(std::vector<km_kbp_option_item> *default_env) {
+    void kmx_processor::init_state(std::vector<option> &default_env) {
       _kmx.GetEnvironment()->Init(default_env);
     }
 
@@ -151,9 +153,8 @@ namespace km {
       "SIL International"
     };
 
-    km_kbp_attr const * kmx_processor::get_attrs() const {
-      //TODO
-      return &engine_attrs;
+    km_kbp_attr const & kmx_processor::attributes() const {
+      return engine_attrs;
     }
 
   } // namespace kbp

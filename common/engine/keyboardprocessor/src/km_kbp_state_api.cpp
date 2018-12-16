@@ -21,13 +21,14 @@
 #include <json.hpp>
 
 #include "context.hpp"
-#include "option.hpp"
 #include "keyboard.hpp"
+#include "option.hpp"
+#include "processor.hpp"
 #include "state.hpp"
 
 using namespace km::kbp;
 
-km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
+km_kbp_status km_kbp_state_create(km_kbp_keyboard * keyboard,
                                   km_kbp_option_item const *env,
                                   km_kbp_state ** out)
 {
@@ -37,9 +38,7 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard const * keyboard,
 
   try
   {
-    *out = new km_kbp_state(static_cast<km::kbp::keyboard const &>(*keyboard),
-      env);
-
+    *out = new km_kbp_state(static_cast<abstract_processor&>(*keyboard), env);
   }
   catch (std::bad_alloc)
   {
@@ -192,7 +191,7 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
     // Pretty print the document.
     jo << json::object
         << "$schema" << "keyman/keyboardprocessor/doc/introspection.schema"
-        << "keyboard" << state->keyboard()
+        << "keyboard" << state->processor().keyboard()
         << "options" << state->options()
         << "context" << state->context()
         << "actions" << state->actions

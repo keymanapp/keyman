@@ -47,9 +47,9 @@ void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
   assert(false);
 }
 
-void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
+void KMX_Options::Init(std::vector<option> &opts) {
 
-  opts->clear();
+  opts.clear();
 
   _kp->KeyboardOptions = new INTKEYBOARDOPTIONS[_kp->Keyboard->cxStoreArray];
   memset(_kp->KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * _kp->Keyboard->cxStoreArray);
@@ -77,8 +77,7 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
   }
 
   if (n == 0) {
-    km_kbp_option_item opt = KM_KBP_OPTIONS_END;
-    opts->emplace_back(opt);
+    opts.emplace_back(); // Terminate the options array
     return;
   }
 
@@ -87,16 +86,11 @@ void KMX_Options::Init(std::vector<km_kbp_option_item> *opts) {
   LPSTORE sp;
   for (n = 0, i = 0, ko = _kp->KeyboardOptions, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++, ko++) {
     if (ko->OriginalStore == NULL) continue;
-    km_kbp_option_item opt;
-    opt.key = sp->dpName;
-    opt.value = sp->dpString;
-    opt.scope = KM_KBP_OPT_KEYBOARD;
-    opts->emplace_back(opt);
+    opts.emplace_back(KM_KBP_OPT_KEYBOARD, sp->dpName, sp->dpString);
     n++;
   }
 
-  km_kbp_option_item opt = KM_KBP_OPTIONS_END;
-  opts->emplace_back(opt);
+  opts.emplace_back(); // Terminate the options array
 }
 
 KMX_Options::~KMX_Options()

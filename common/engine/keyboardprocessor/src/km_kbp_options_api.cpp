@@ -14,7 +14,8 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
-#include <keyman/keyboardprocessor.h>
+
+#include "processor.hpp"
 
 #include "option.hpp"
 #include "json.hpp"

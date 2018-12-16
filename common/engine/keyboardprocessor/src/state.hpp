@@ -7,6 +7,7 @@
 */
 
 #pragma once
+#include <cassert>
 #include <vector>
 
 #include <keyman/keyboardprocessor.h>
@@ -16,21 +17,26 @@
 #include "keyboard.hpp"
 
 
+
 namespace km {
 namespace kbp
 {
+//Forward declarations
+class abstract_processor;
+
 using action = km_kbp_action_item;
 
 class state
 {
 protected:
-    kbp::context          _ctxt;
-    kbp::options          _options;
-    kbp::keyboard const & _kb;
-    std::vector<km_kbp_option_item> _env;
+    kbp::context                    _ctxt;
+    kbp::options                    _options;
+    kbp::abstract_processor &       _processor;
+    std::vector<option> _env;
 
 public:
-    state(kbp::keyboard const & kb, km_kbp_option_item const * env);
+    state(kbp::abstract_processor & kb, km_kbp_option_item const *env);
+
     state(state const &) = default;
     state(state const &&) = delete;
 
@@ -40,7 +46,8 @@ public:
     kbp::options &          options() noexcept        { return _options; }
     kbp::options const &    options() const noexcept  { return _options; }
 
-    kbp::keyboard const &  keyboard() const noexcept      { return _kb; }
+    kbp::abstract_processor const & processor() const noexcept { return _processor; }
+    kbp::abstract_processor & processor() noexcept { return _processor; }
 };
 
 } // namespace kbp

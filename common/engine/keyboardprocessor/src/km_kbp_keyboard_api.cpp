@@ -17,16 +17,36 @@
 #include <vector>
 
 #include <keyman/keyboardprocessor.h>
+#include <kmx/kmx_processevent.hpp>
+#include <mock/mock_processor.hpp>
 #include <json.hpp>
 
 #include "keyboard.hpp"
 #include "option.hpp"
 
 
+using namespace km::kbp;
 
+namespace
+{
+  abstract_processor * processor_factory(path const & kb_path)
+  {
+    // Some legacy packages may include upper-case file extensions
+    if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
+      return new kmx_processor(kb_path);
+    }
+    else if (kb_path.suffix() == ".mock") {
+      return new mock_processor(kb_path);
+    }
+    else {
+      return new null_processor();
+    }
+  }
+
+
+}
 km_kbp_status
-km_kbp_keyboard_load(km_kbp_path_name kb_path,
-                                   km_kbp_keyboard **keyboard)
+km_kbp_keyboard_load(km_kbp_path_name kb_path, km_kbp_keyboard **keyboard)
 {
   assert(keyboard);
   if (!keyboard)
@@ -34,8 +54,8 @@ km_kbp_keyboard_load(km_kbp_path_name kb_path,
 
   try
   {
-    km::kbp::keyboard *kp = new km::kbp::keyboard(kb_path);
-    km_kbp_status status = kp->processor().validate();
+    abstract_processor *kp = processor_factory(kb_path);
+    km_kbp_status status = kp->validate();
     if (status != KM_KBP_STATUS_OK) {
       delete kp;
       return status;
@@ -63,6 +83,6 @@ km_kbp_keyboard_get_attrs(km_kbp_keyboard const *keyboard,
   if (!keyboard || !out)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  *out = keyboard;
+  *out = &keyboard->keyboard();
   return KM_KBP_STATUS_OK;
 }
