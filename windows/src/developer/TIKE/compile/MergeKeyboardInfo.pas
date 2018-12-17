@@ -87,7 +87,7 @@ type
     procedure AddHelpLink;
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
-    procedure AddSubtagNames(id: String; var o: TJSONObject);
+    procedure AddSubtagNames(id: String; o: TJSONObject);
     function CheckOrMigrateLanguages: Boolean;
     function SaveJsonFile: Boolean;
     procedure CheckPackageKeyboardFilenames;
@@ -424,20 +424,21 @@ begin
     json.AddPair('id', FID);
 end;
 
-procedure TMergeKeyboardInfo.AddSubtagNames(id: String; var o: TJSONObject);
+procedure TMergeKeyboardInfo.AddSubtagNames(id: String; o: TJSONObject);
 var
   displayName, languageName, scriptName, regionName: String;
   v: TJSONValue;
+  bcp47Tag: TBCP47Tag;
 begin
   if id = '' then
     Exit;
-  with TBCP47Tag.Create(id) do
+  bcp47Tag := TBCP47Tag.Create(id);
   try
-    TLanguageCodeUtils.BCP47Languages.TryGetValue(Language, languageName);
-    TLanguageCodeUtils.BCP47Scripts.TryGetValue(Script, scriptName);
-    TLanguageCodeUtils.BCP47Regions.TryGetValue(Region, regionName);
+    TLanguageCodeUtils.BCP47Languages.TryGetValue(bcp47Tag.Language, languageName);
+    TLanguageCodeUtils.BCP47Scripts.TryGetValue(bcp47Tag.Script, scriptName);
+    TLanguageCodeUtils.BCP47Regions.TryGetValue(bcp47Tag.Region, regionName);
   finally
-    Free;
+    bcp47Tag.Free;
   end;
 
   displayName := TLanguageCodeUtils.LanguageName(languageName, scriptName, regionName);
@@ -450,13 +451,19 @@ begin
   if not Assigned(v) then
     o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
 
-  v := o.Values[TKeyboardInfoFile.SScriptName];
-  if not Assigned(v) and (scriptName <> '') then
-    o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
+  if scriptName <> '' then
+  begin
+    v := o.Values[TKeyboardInfoFile.SScriptName];
+    if not Assigned(v) and (scriptName <> '') then
+      o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
+  end;
 
-  v := o.Values[TKeyboardInfoFile.SRegionName];
-  if not Assigned(v) and (regionName <> '') then
-    o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
+  if regionName <> '' then
+  begin
+    v := o.Values[TKeyboardInfoFile.SRegionName];
+    if not Assigned(v) and (regionName <> '') then
+      o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
+  end;
 end;
 
 function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
@@ -485,22 +492,18 @@ begin
           continue;
 
         o := TJSONObject.Create;
-        try
-          olangs.AddPair(id, o);
-          AddSubtagNames(id, o);
-        finally
-          o.Free;
-        end;
+        olangs.AddPair(id, o);
+        AddSubtagNames(id, o);
       end;
 
       json.RemovePair(TKeyboardInfoFile.SLanguages);
       json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
 
-      // Migration complete and subtags populated
-      Exit;
     finally
-      olangs.Free;
     end;
+
+    // Migration complete and subtags populated
+    Exit;
   end;
 
   {
