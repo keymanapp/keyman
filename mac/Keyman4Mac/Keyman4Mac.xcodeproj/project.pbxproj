@@ -13,6 +13,7 @@
 		9854389F19DBB27000C7B036 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9854389D19DBB27000C7B036 /* MainMenu.xib */; };
 		985438B519DBB9F100C7B036 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 985438B419DBB9F100C7B036 /* Quartz.framework */; };
 		98BF924C1BF025B40002126A /* KMBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98BF924B1BF025B40002126A /* KMBarView.m */; };
+		9A07BAC221C02C5100269A20 /* KeymanEngine4Mac.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E28239161F3CF96A00C3F560 /* KeymanEngine4Mac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E28239171F3CF96A00C3F560 /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E28239161F3CF96A00C3F560 /* KeymanEngine4Mac.framework */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				9A07BAC221C02C5100269A20 /* KeymanEngine4Mac.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,7 +173,7 @@
 		9854388919DBB27000C7B036 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					9854389019DBB27000C7B036 = {
@@ -233,7 +235,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4Mac/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"";
+			shellScript = "SRC_DIR=\"${PROJECT_DIR}/../KeymanEngine4Mac/build/${CONFIGURATION}\"\nDEST_DIR=\"${PROJECT_DIR}/Keyman4Mac/Frameworks\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nSRC_FRAMEWORK_PATH=\"${SRC_DIR}/KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Source: ${SRC_FRAMEWORK_PATH}\"\necho \"Dest: ${DEST_FRAMEWORK_PATH}\"\n\nif [ ! -d \"${SRC_FRAMEWORK_PATH}\" ]; then\n    if [ ! -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n        echo \"Keyman engine framework must be built first!\"\n        exit 1\n    fi\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${SRC_FRAMEWORK_PATH}\" \"${DEST_FRAMEWORK_PATH}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -290,12 +292,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -341,12 +345,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

@@ -53,7 +53,7 @@ const
   KMC_PROFILECHANGED = 18;  // 9.0.426.0   // I3933
 
   // KMC_KEYBOARDHOTKEY = 19;  // 9.0.459.0   // I4326 Deprecated in favour of language hotkeys
-  KMC_LANGUAGEHOTKEY = 20;  // 9.0.471.0   // I4451
+  // KMC_LANGUAGEHOTKEY = 20;  // 9.0.471.0   // I4451 Now using keyman.exe RegisterHotkey
 
 //TOUCH    KMC_CONTEXT = 19;
 
