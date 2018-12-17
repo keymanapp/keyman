@@ -143,51 +143,10 @@ LRESULT _kmnLowLevelKeyboardProc(
   else if (KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState)) {
     if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
   }
-  else {
-
-    /*
-    Process keyboard hotkeys
-    */
-
-    DWORD hk = (DWORD)hs->vkCode | FHotkeyShiftState;
-
-    Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
-
-    /*
-    Search for an interface or language hotkey
-    */
-
-    // TODO: deprecate KeymanUIDisabled, FSingleThread
-
-    if (hotkeys) {   // I4641
-      Hotkey *hotkey = hotkeys->GetHotkey(hk);
-      if (hotkey) {
-        if (isUp) {
-          if (hotkey->HotkeyType == hktInterface) {
-            SendDebugMessageFormat(0, sdmGlobal, 0, "Hotkey matched = {HotkeyValue: %x, Target: %d}",
-              hotkey->HotkeyValue,
-              hotkey->Target);
-            Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
-          }
-          else {
-            SendDebugMessageFormat(0, sdmGlobal, 0, "Hotkey matched = {HotkeyValue: %x, hkl: %x}",
-              hotkey->HotkeyValue,
-              hotkey->hkl);
-
-            // Send the hotkey value to the master controller, rather than the language HKL or profile GUID, because
-            // this is cheaper than constructing a string and posting it across.
-
-            Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_LANGUAGEHOTKEY, 0), (LPARAM)hotkey->HotkeyValue);   // I4451
-          }
-        }
-        return 1;
-      }
-    }
-  }
 
   /*
     
-    Not a hotkey, so we will use the serialized input model
+    Not the language switch hotkey, so we will use the serialized input model
   
   */
 
