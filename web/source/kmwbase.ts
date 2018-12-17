@@ -1,5 +1,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
+// Includes a promise polyfill (needed for IE)
+/// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
 // Defines the web-page interface object.
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
@@ -283,8 +285,8 @@ namespace com.keyman {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    ['setActiveKeyboard'](PInternalName: string, PLgCode: string) {
-      this.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
+    ['setActiveKeyboard'](PInternalName: string, PLgCode: string): Promise<void> {
+      return this.keyboardManager.setActiveKeyboard(PInternalName,PLgCode);
     }
     
     /**
