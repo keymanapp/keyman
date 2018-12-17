@@ -4,6 +4,10 @@ ibus-keyman tests
 Setup
 -----
 
+You need pynput to generate keypresses
+
+`pip3 install pynput`
+
 These tests assume that the test kmx and kmn are located in
 `~/.local/share/keyman/test_kmx`
 
