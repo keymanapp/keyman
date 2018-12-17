@@ -42,7 +42,7 @@ namespace kbp
     template<class... Args>
     static path join(path const &start, Args&&... args) {
       auto r = start;
-      for (auto & p: {args...})
+      for (path p: {args...})
         r._path.append(1, path::parent_separator).append(p);
       return r;
     }

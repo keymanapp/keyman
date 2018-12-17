@@ -13,7 +13,7 @@
 
 namespace
 {
-  auto const test_kb_path = km::kbp::path::join("","a","dummy","keyboard.mock");
+  km::kbp::path const test_kb_path = "/a/dummy/keyboard.mock";
 }
 
 #define   try_status(expr) \
