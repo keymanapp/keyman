@@ -57,7 +57,7 @@ namespace com.keyman.renderer {
 
     private processKeyboard(kbd) {
       let keyman = window['keyman'];
-      let p: Promise<void> = keyman.setActiveKeyboard('blah'/*kbd['InternalName']*/);
+      let p: Promise<void> = keyman.setActiveKeyboard(kbd['InternalName']);
       let isMobile = keyman.util.device.formFactor != 'desktop';
 
       // A nice, closure-friendly reference for use in our callbacks.
@@ -85,9 +85,8 @@ namespace com.keyman.renderer {
           })
         };
 
-        return renderer.arrayPromiseIteration(renderLayer, layers.length).then(function() {
-          console.log("All renders for the first keyboard should now be complete.");
-        });
+        // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
+        return renderer.arrayPromiseIteration(renderLayer, layers.length);
       }).catch(function() {
         console.log("Failed to load the \"" + kbd['InternalName'] + "\" keyboard for rendering!");
         return Promise.resolve();
@@ -120,10 +119,25 @@ namespace com.keyman.renderer {
 
         console.log("Unique keyboard ids detected: " + Object.keys(kbds).length);
 
-        // Temporary - just load the first keyboard.
-        this.processKeyboard(kbds[Object.keys(kbds)[0]]).then(function () {
-          console.log("First keyboard processed!");
+        let renderer = this;
+
+        let keyboardIterator = function(i) {
+          return new Promise(function(resolve) {
+            renderer.processKeyboard(kbds[Object.keys(kbds)[i]]).then(function () {
+              //console.log("Keyboard " + i + " processed!");
+              resolve(i);
+            });
+          });
+        };
+
+        this.arrayPromiseIteration(keyboardIterator, Object.keys(kbds).length).then(function() {
+          console.log("All keyboard renders are now complete!");
         });
+
+        // // Temporary - just load the first keyboard.
+        // this.processKeyboard(kbds[Object.keys(kbds)[0]]).then(function () {
+        //   console.log("First keyboard processed!");
+        // });
       } else {
         console.error("KeymanWeb not detected!");
       }
