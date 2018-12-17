@@ -75,17 +75,18 @@ type
     cef: TframeCEFHost;
 
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; out Result: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
 
     procedure ProjectRefresh(Sender: TObject);
     procedure ProjectRefreshCaption(Sender: TObject);
     procedure RefreshCaption;
     procedure WebCommand(Command: WideString; Params: TStringList);
     procedure RefreshHTML;
-    procedure WMUserWebCommand(var Message: TMessage); message WM_USER_WEBCOMMAND;
     procedure EditFileExternal(FileName: WideString);
     function DoNavigate(URL: string): Boolean;
     procedure ClearMessages;
+    function ShouldHandleNavigation(URL: string): Boolean;
   protected
     function GetHelpTopic: string; override;
   public
@@ -180,6 +181,7 @@ begin
   cef.Parent := Self;
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
   cef.OnLoadEnd := cefLoadEnd;
   RefreshHTML;
 end;
@@ -245,10 +247,15 @@ begin
   FreeAndNil(FNextCommandParams);
 end;
 
-procedure TfrmProject.cefBeforeBrowse(Sender: TObject;
-  const Url: string; out Result: Boolean);
+procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 begin
-  Result := DoNavigate(Url);
+  DoNavigate(Url);
+end;
+
+procedure TfrmProject.cefBeforeBrowseSync(Sender: TObject;
+  const Url: string; out Handled: Boolean);
+begin
+  Handled := ShouldHandleNavigation(Url);
 end;
 
 procedure TfrmProject.ClearMessages;
@@ -256,29 +263,50 @@ begin
   frmMessages.Clear;
 end;
 
+function TfrmProject.ShouldHandleNavigation(URL: string): Boolean;
+begin
+  Result := False;
+  if Copy(URL, 1, 7) = 'keyman:' then
+  begin
+    Result := True;
+  end
+  else if Copy(URL, 1, 5) = 'help:' then
+  begin
+    Result := True;
+  end
+  else if not URL.StartsWith(modWebHttpServer.GetLocalhostURL) and (Copy(URL, 1, 4) = 'http') then
+  begin
+    Result := True;
+  end
+end;
+
 function TfrmProject.DoNavigate(URL: string): Boolean;
 var
   n: Integer;
   s, command: WideString;
+  FCommandParams: TStringList;
 begin
   Result := False;
   if Copy(URL, 1, 7) = 'keyman:' then
   begin
     s := URL;
 
-    Delete(s,1,7);
-    n := Pos('?',s);
-    FNextCommandParams.Clear;
-    if n > 0 then
-    begin
-      command := Copy(s,1,n-1);
-      DecodeAndSetParams(Copy(s,n+1,Length(s)), FNextCommandParams);
-    end
-    else
-      command := s;
+    FCommandParams := TStringList.Create;
+    try
+      Delete(s,1,7);
+      n := Pos('?',s);
+      if n > 0 then
+      begin
+        command := Copy(s,1,n-1);
+        DecodeAndSetParams(Copy(s,n+1,Length(s)), FCommandParams);
+      end
+      else
+        command := s;
 
-    FNextCommand := LowerCase(Command);
-    PostMessage(Handle, WM_USER_WebCommand, WC_COMMAND, 0);
+      WebCommand(LowerCase(Command), FCommandParams);
+    finally
+      FCommandParams.Free;
+    end;
     Result := True;
   end
   else if Copy(URL, 1, 5) = 'help:' then
@@ -287,13 +315,13 @@ begin
     s := URL;
     Delete(s,1,5);
     FNextCommand := LowerCase(s);
-    PostMessage(Handle, WM_USER_WebCommand, WC_HELP, 0);
+    frmKeymanDeveloper.HelpTopic(LowerCase(s));
   end
   else if not URL.StartsWith(modWebHttpServer.GetLocalhostURL) and (Copy(URL, 1, 4) = 'http') then
   begin
     Result := True;
     FNextCommand := URL;
-    PostMessage(Handle, WM_USER_WebCommand, WC_OPENURL, 0);
+    TUtilExecute.URL(URL);
   end
 end;
 
@@ -333,7 +361,6 @@ var
   FDefaultExtension: string;
   i: Integer;
 begin
-
   pf := nil;
 
   if Command = 'fileaddnew' then
@@ -536,15 +563,6 @@ end;
 function TfrmProject.GetHelpTopic: string;
 begin
   Result := SHelpTopic_Context_Project;
-end;
-
-procedure TfrmProject.WMUserWebCommand(var Message: TMessage);
-begin
-  case Message.wParam of
-    WC_COMMAND: WebCommand(FNextCommand, FNextCommandParams);
-    WC_HELP: frmKeymanDeveloper.HelpTopic(FNextCommand);
-    WC_OPENURL: TUtilExecute.URL(FNextCommand);
-  end;
 end;
 
 end.

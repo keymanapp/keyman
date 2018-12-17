@@ -10,8 +10,11 @@ kmx = executable('kmx', 'kmx.cpp',
     include_directories: [inc, libsrc],
     link_args: links,
     objects: lib.extract_all_objects())
-    
-kmns = [
+
+copyfile = ['-c', 'import sys, shutil', 'shutil.copyfile(*sys.argv[1:])']
+kmcomp = find_program('kmcomp.exe', required: false)
+
+tests = [
   '000 - null keyboard',
   '001 - basic input UnicodeI',
   '002 - basic input Unicode',
@@ -29,7 +32,7 @@ kmns = [
   '018 - nul testing',
   '019 - multiple deadkeys',
   '020 - deadkeys and backspace',
-  
+
   '021 - options',
   '022 - options with preset',
   '023 - options with save',
@@ -38,34 +41,50 @@ kmns = [
 
   '026 - system stores',
   '027 - system stores 2',
-  
+
   '028 - smp',
   '029 - beep',
-  
+
   '030 - multiple groups',
   '031 - caps lock'
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 ]
 
-prog_kmcomp = find_program('kmcomp')
-
 # todo: if kmcomp is not found, use the .kmx in the source folder
 # therefore make kmcomp compile to the source folder and add to repo?
+if build_machine.system() == 'windows'
+  kmcomp_cmd = [kmcomp]
+else
+  wine = find_program('wine', required: false)
+  kmcomp_cmd = [wine, kmcomp]
+  if not wine.found()
+    # We assign the unfound wine external program object to kmcomp
+    # to cause the kmcomp object to fail too, as without wine we
+    # cannot execute kmcomp.exe on non-Windows systems.
+    # NOTE: a disabler() would be ideal here, but we need to support
+    # pre 0.45 versions of meson.
+    kmcomp = wine
+  endif
+endif
 
-foreach kmn : kmns 
-  kmn_test = custom_target(
-    kmn + '.kmn',
-    output: kmn + '.kmx',
-    input: 'kmn/' + kmn + '.kmn',
-    command : [prog_kmcomp, '-s', '@INPUT@', '@OUTPUT@']
-  )
-  
-  kmn_source = configure_file(
-    input: 'kmn/' + kmn + '.kmn',
-    output: kmn + '.kmn',
-    copy: true
-  )
+if kmcomp.found()
+  foreach kbd : tests
+    kbd_src = files(kbd + '.kmn')
+    kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
+    kbd_log = custom_target(kbd + '.kmx'.underscorify(),
+      output: kbd + '.log',
+      input: kbd_src,
+      command: kmcomp_cmd + ['-s', '@INPUT@', kbd_obj, '@OUTPUT@']
+    )
 
-  test(kmn, kmx, depends: [kmn_test], args: [kmn])
-endforeach
+    test(kbd, kmx, depends: kbd_log, args: [kbd_src, kbd_obj])
+  endforeach
+else
+  foreach kbd : tests
+    kbd_src = files(kbd + '.kmn')
+    kbd_obj = files(kbd + '.kmx')
+
+    test(kbd, kmx, args: [kbd_src, kbd_obj])
+  endforeach
+endif

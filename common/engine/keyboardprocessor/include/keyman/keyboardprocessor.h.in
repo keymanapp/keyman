@@ -227,6 +227,32 @@ km_kbp_context_items_from_utf16(km_kbp_cp const *text,
 
 /*
 ```
+### `km_kbp_context_items_from_utf8`
+##### Description:
+Convert an UTF8 encoded Unicode string into an array of `km_kbp_context_item`
+structures. Allocates memory as needed.
+##### Status:
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_NO_MEM`: In the event it cannot allocate enough memory for the
+  output buffer.
+- `KM_KBP_STATUS_INVALID_UTF`: In the event the UTF8 string cannot be
+decoded.
+##### Parameters:
+- __text__: a pointer to a null terminated array of utf8 encoded data.
+- __out_ptr__: a pointer to the result variable:
+    A pointer to the  start of the `km_kbp_context_item` array containing the
+    representation of the input string.
+    Terminated with a type of `KM_KBP_CT_END`.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_context_items_from_utf8(char const *text,
+                                km_kbp_context_item **out_ptr);
+
+/*
+```
 ### `km_kbp_context_items_to_utf16`
 ##### Description:
 Convert a context item array into a UTF-16 encoded string placing it into
@@ -255,6 +281,38 @@ KMN_API
 km_kbp_status
 km_kbp_context_items_to_utf16(km_kbp_context_item const *item,
                               km_kbp_cp *buf,
+                              size_t *buf_size);
+
+/*
+```
+### `km_kbp_context_items_to_utf8`
+##### Description:
+Convert a context item array into a UTF-8 encoded string placing it into
+the supplied buffer of specified size, and return the number codepoints
+actually used in the conversion. If null is passed as the buffer the
+number codeunits required is returned. This will strip markers from the
+context during the conversion.
+##### Return status:
+- `KM_KBP_STATUS_OK`: On success.
+- `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
+- `KM_KBP_STATUS_INSUFFICENT_BUFFER`: If the buffer is not large enough.
+  `buf_size` will contain the space required. The contents of the buffer are
+  undefined.
+##### Parameters:
+- __context_items__: A pointer to the start of an array `km_kbp_context_item`.
+    Must be terminated with a type of `KM_KBP_CT_END`.
+- __buf__: A pointer to the buffer to place the UTF-8 string into. May be be
+    null to request size calculation.
+- __buf_size__: a pointer to the result variable:
+    A pointer the size of the supplied buffer in codeunits or filled with the
+    size required if `buf` is null.
+
+```c
+*/
+KMN_API
+km_kbp_status
+km_kbp_context_items_to_utf8(km_kbp_context_item const *item,
+                              char *buf,
                               size_t *buf_size);
 
 /*
@@ -415,7 +473,7 @@ other actions.
 */
 typedef struct {
   uint8_t   type;
-  uint8_t   _reserved[3];
+  uint8_t   _reserved[sizeof(void*)-sizeof(uint8_t)];
   union {
     uintptr_t           marker;          // MARKER type
     km_kbp_option_item const * option;   // OPT types
@@ -432,14 +490,12 @@ enum km_kbp_action_type {
   KM_KBP_IT_ALERT       = 3,  // The keyboard has triggered a alert/beep/bell.
   KM_KBP_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
   KM_KBP_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
-  KM_KBP_IT_RESET_OPT   = 6,  // Set the indicated option from the last
-                              //  persisted value or defaults. This includes
-                              //  the pristine value from environment or
-                              //  keyboard options.
-  KM_KBP_IT_VKEYDOWN    = 7,  // A virtual key has been pressed.
-  KM_KBP_IT_VKEYUP      = 8,  // A virtual key has been released.
-  KM_KBP_IT_VSHIFTDOWN  = 9,  // A shifted virtual key has been pressed.
-  KM_KBP_IT_VSHIFTUP    = 10, // A shifted virtual key has been released.
+  KM_KBP_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
+  KM_KBP_IT_INVALIDATE_CONTEXT = 7, 
+                              // The processor requests that the context buffer be cleared;
+							  // for applications where context is cached, this clears the context;
+							  // for applications where context is read from the focused text store,
+							  // the context is just re-read and markers flushed.
   KM_KBP_IT_MAX_TYPE_ID
 };
 

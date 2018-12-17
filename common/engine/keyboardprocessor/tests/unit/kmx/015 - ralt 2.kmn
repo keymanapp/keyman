@@ -1,0 +1,12 @@
+c Description: Tests Right Alt processing with non-US kbds.
+c keys: [K_A][K_B][K_C][RALT K_A]
+c expected: abcd
+
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+'c' + [RAlt K_A] > "cd"
+

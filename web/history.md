@@ -2,6 +2,8 @@
 
 ## 11.0 alpha
 * Add `setNumericLayer()` for embedded platforms to change OSK to numeric layer.
+* Fixes issue where file extensions are upper-case, e.g. ".TTF"
+* Fixes keyboard layout issues after mobile device rotations. (#248) (#970)
 
 ## 2018-07-06 10.0.103 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)

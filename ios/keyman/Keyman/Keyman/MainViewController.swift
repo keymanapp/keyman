@@ -856,10 +856,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func confirmInstall(withTitle title: String, message msg: String,
-                         cancelButtonHandler cbHandler: ((UIAlertAction) -> Swift.Void)? = nil,
-                         installButtonHandler installHandler: ((UIAlertAction) -> Swift.Void)?) {
+                              cancelButtonHandler cbHandler: ((UIAlertAction) -> Swift.Void)? = nil,
+                              installButtonHandler installHandler: ((UIAlertAction) -> Swift.Void)?) {
     dismissGetStartedView(nil)
-    
+
     let alertController = UIAlertController(title: title, message: msg,
                                             preferredStyle: UIAlertControllerStyle.alert)
     alertController.addAction(UIAlertAction(title: "Cancel",
@@ -868,10 +868,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     alertController.addAction(UIAlertAction(title: "Install",
                                               style: UIAlertActionStyle.default,
                                               handler: installHandler))
-    
+
     self.present(alertController, animated: true, completion: nil)
   }
-  
+
   private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
     if let keyboard = keyboardToDownload {
       Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
@@ -949,7 +949,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let doneButton = navBar?.topItem?.rightBarButtonItem
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissGetStartedView)
-    
+
     Manager.shared.hideKeyboard()
 
     containerView.frame = containerView.frame.insetBy(dx: 15, dy: 140)
@@ -967,7 +967,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func dismissGetStartedView(_ sender: Any?) {
     overlayWindow.viewWithTag(getStartedViewTag)?.removeFromSuperview()
     overlayWindow.isHidden = true
-    
+
     Manager.shared.showKeyboard()
   }
 

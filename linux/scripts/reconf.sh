@@ -14,6 +14,31 @@ set -e
 # see ../test.sh for script to bring in
 # maybe make it a function to get the minor number?
 
+
+BASEDIR=`pwd`
+echo "basedir is $BASEDIR"
+autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
+extra_projects="keyboardprocessor keyman-config"
+
+if [ "$1" != "" ]; then
+    if [ "$1" == "keyboardprocessor" ]; then
+	echo "reconfiguring only keyboardprocessor"
+        extra_projects="keyboardprocessor"
+        autotool_projects=""
+    elif [ ! -d "$1" ]; then
+        echo "project $1 does not exist"
+        exit 1
+    elif [ "$1" == "keyman-config" ]; then
+	echo "reconfiguring only keyman-config"
+        extra_projects="keyman-config"
+        autotool_projects=""
+    else
+	echo "reconfiguring only $1"
+        autotool_projects="$1"
+        extra_projects=""
+    fi
+fi
+
 JENKINS=${JENKINS:="no"}
 oldvers=`cat VERSION`
 
@@ -22,24 +47,6 @@ oldvers=`cat VERSION`
 version
 
 echo "version: ${newvers}"
-
-BASEDIR=`pwd`
-autotool_projects="kmflcomp libkmfl ibus-kmfl"
-extra_project="keyman-config"
-
-if [ "$1" != "" ]; then
-    if [ ! -d "$1" ]; then
-        echo "project $1 does not exist"
-        exit 1
-    fi
-    if [ "$1" == "keyman-config" ]; then
-        autotool_projects=""
-    else
-        autotool_projects="$1"
-        extra_project=""
-    fi
-fi
-
 echo "${newvers}" > VERSION
 
 # autoreconf the projects
@@ -52,11 +59,18 @@ for proj in ${autotool_projects}; do
     fi
 done
 
-if [ "${extra_project}" == "keyman-config" ]; then
-    cd keyman-config/keyman_config
-    sed "s/_VERSION_/${newvers}/g" version.py.in > version.py
-fi
-cd $BASEDIR
+for proj in ${extra_projects}; do
+    if [ "${proj}" == "keyboardprocessor" ]; then
+        rm -rf keyboardprocessor
+        meson ../common/engine/keyboardprocessor keyboardprocessor
+    fi
+    if [ "${proj}" == "keyman-config" ]; then
+        majorvers=`cat ../resources/VERSION.md`
+        cd keyman-config/keyman_config
+        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${majorvers}/g" version.py.in > version.py
+    fi
+    cd $BASEDIR
+done
 
 # reset VERSION file
 echo "${oldvers}" > VERSION

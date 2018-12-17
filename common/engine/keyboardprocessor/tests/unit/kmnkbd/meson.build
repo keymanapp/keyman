@@ -11,7 +11,8 @@ defns=['-DKMN_KBP_STATIC']
 ctxt = executable('context-api', 'context_api.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],
-    objects: lib.extract_objects('km_kbp_context_api.cpp', 'json.cpp'))
+    link_args: links,
+    objects: lib.extract_all_objects())
 keyb = executable('keyboard-api', 'keyboard_api.cpp',
     cpp_args: defns,
     include_directories: [inc, libsrc],

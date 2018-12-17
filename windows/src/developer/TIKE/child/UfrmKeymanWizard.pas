@@ -567,6 +567,7 @@ uses
   kmxfile,
   OnlineConstants,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.UI.Project.ProjectFileUI,
   RegExpr,
   ErrorControlledRegistry,
@@ -652,6 +653,8 @@ begin
   GetCharMapDropTool.Handle(Self, cmimText);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
   frameSource.SetupCharMapDrop;
+  frameTouchLayout.SetupCharMapDrop;
+  frameTouchLayoutSource.SetupCharMapDrop;
 
   FillFeatureGrid;
 
@@ -1838,7 +1841,7 @@ begin
   Result := inherited GetProjectFile;
   if not Assigned(Result) then
   begin
-    FStandaloneProjectFile := TkmnProjectFile.Create(nil, FileName, nil);
+    FStandaloneProjectFile := TkmnProjectFileAction.Create(nil, FileName, nil);
     Result := FStandaloneProjectFile;
   end;
 end;
@@ -3143,7 +3146,7 @@ begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutCode then
   begin
     frameTouchLayoutSource.EditorText := frameTouchLayout.SaveToString;
-    DoFocus(frameTouchLayout);
+    DoFocus(frameTouchLayoutSource);
   end;
   FLoading := False;
 end;

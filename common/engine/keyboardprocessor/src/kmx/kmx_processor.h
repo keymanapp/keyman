@@ -110,7 +110,7 @@ extern const struct modifier_names s_modifier_names[];
 extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 
 #ifdef _MSC_VER
-#define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
+#define DebugLog(msg,...) (km::kbp::kmx::ShouldDebug() ? km::kbp::kmx::DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
 #define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
 #else 

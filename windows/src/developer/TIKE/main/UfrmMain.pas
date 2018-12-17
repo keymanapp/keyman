@@ -337,6 +337,7 @@ type
     procedure LoadDockLayout;
     procedure SaveDockLayout;
     procedure CEFShutdownComplete(Sender: TObject);
+    procedure ActivateActiveChild;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -352,6 +353,8 @@ type
       var Result: Boolean);
     procedure CharMapInsertCode(Sender: TObject; Control: TWinControl;
       DragObject: TCharacterDragObject);
+
+    procedure UpdateCaption;
 
     procedure DefaultDockLayout;
 
@@ -533,6 +536,8 @@ begin
 
   LoadDockLayout;
   Invalidate;
+
+  UpdateCaption;
 end;
 
 procedure TfrmKeymanDeveloper.CreateWnd;
@@ -1091,16 +1096,17 @@ begin
   end;
 end;
 
+procedure TfrmKeymanDeveloper.ActivateActiveChild;
+begin
+  if Assigned(ActiveChild) then
+    SendMessage(ActiveChild.Handle, CM_ACTIVATE, 0, 0);
+end;
+
 procedure TfrmKeymanDeveloper.pagesChange(Sender: TObject);
 begin
   inherited;
   //CharacterMapFormChanged(ActiveChild);
-  if Assigned(ActiveChild) then
-  begin
-    //if ActiveChild.SetFocus;
-    SendMessage(ActiveChild.Handle, CM_ACTIVATE, 0, 0);
-    if ActiveChild.Visible and Visible and CanFocus then ActiveChild.SetFocus;
-  end;
+  ActivateActiveChild;
 
   cbTextFileFormat.Enabled := Assigned(ActiveChild) and (ActiveChild is TfrmTikeEditor);   // I3733
   FocusActiveChild;
@@ -1121,7 +1127,7 @@ begin
     try
       ext := LowerCase(ExtractFileExt(FFileName));
 
-      if ext = '.kpj' then
+      if ext = Ext_ProjectSource then
         modActionsMain.OpenProject(FFileName)
       else
       begin
@@ -1192,6 +1198,7 @@ begin
   FreeGlobalProjectUI;
   LoadGlobalProjectUI('');
   ShowProject;
+  UpdateCaption;
 end;
 
 function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
@@ -1335,6 +1342,7 @@ begin
             //CharacterMapFormChanged(nil);
             Window.Parent := nil;
             pages.Pages[i].Free;
+            ActivateActiveChild;
             FocusActiveChild;
 
             if FIsClosing then
@@ -1451,6 +1459,15 @@ procedure TfrmKeymanDeveloper.UDUI_UpdateStatus(const Msg: WideString; Pos,
 begin
   if Assigned(FUnicodeDataStatusForm) then
     FUnicodeDataStatusForm.UpdateStatus(Msg, Pos, Max);
+end;
+
+procedure TfrmKeymanDeveloper.UpdateCaption;
+begin
+  if FGlobalProject.Untitled
+    then Caption := '(Untitled project) - Keyman Developer'
+    else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
+
+  Application.Title := Caption;
 end;
 
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);

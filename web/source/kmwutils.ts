@@ -5,12 +5,12 @@
 
 namespace com.keyman {
   class DOMEventTracking {
-    Pelem: HTMLElement|Document;
+    Pelem: EventTarget;
     Peventname: string;
     Phandler: (Object) => boolean;
     PuseCapture?: boolean
 
-    constructor(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
+    constructor(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
       this.Pelem = Pelem;
       this.Peventname = Peventname.toLowerCase();
       this.Phandler = Phandler;
@@ -191,7 +191,7 @@ namespace com.keyman {
      * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
      * Description  Attaches event handler to element DOM event
      */  
-    attachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
       Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
 
@@ -209,7 +209,7 @@ namespace com.keyman {
      * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
      * Description Detaches event handler from element [to prevent memory leaks]
      */  
-    detachDOMEvent(Pelem: HTMLElement|Document, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+    detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
 
       // Since we're detaching, we should drop the tracking data from the old event.
@@ -452,13 +452,21 @@ namespace com.keyman {
      * @return      {boolean}               
      */       
     landscapeView(): boolean	{ // new for I3363 (Build 301)
+      var orientation: number;
+
       // Assume portrait mode if orientation undefined
-      if(typeof(window.orientation) == 'undefined') {
-        return false;
+      if(typeof window.orientation != 'undefined') { // Used by iOS Safari
+        // Else landscape for +/-90, portrait for 0, +/-180   
+        orientation = window.orientation as number;
+      } else if(typeof window.screen.orientation != 'undefined') { // Used by Firefox, Chrome
+        orientation = window.screen.orientation.angle;
       }
       
-      // Else landscape for +/-90, portrait for 0, +/-180   
-      return (Math.abs(<number>window.orientation/90) == 1); 
+      if(orientation !== undefined) {
+        return (Math.abs(orientation/90) == 1); 
+      } else {
+        return false;
+      }
     }
     
     /**
@@ -678,10 +686,10 @@ namespace com.keyman {
       }
       
       for(i=0;i<fList.length;i++) {
-        if(fList[i].indexOf('.ttf') > 0) ttf=fList[i];
-        if(fList[i].indexOf('.woff') > 0) woff=fList[i];
-        if(fList[i].indexOf('.eot') > 0) eot=fList[i];
-        if(fList[i].indexOf('.svg') > 0) svg=fList[i];
+        if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
+        if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
+        if(fList[i].toLowerCase().indexOf('.eot') > 0) eot=fList[i];
+        if(fList[i].toLowerCase().indexOf('.svg') > 0) svg=fList[i];
       }
 
       // Font path qualified to support page-relative fonts (build 347)

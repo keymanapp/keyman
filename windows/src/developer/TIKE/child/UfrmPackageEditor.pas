@@ -298,6 +298,7 @@ uses
   CharMapInsertMode,
   CompilePackageInstaller,
   Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.kpsProjectFileAction,
   OnlineConstants,
   KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
@@ -467,7 +468,7 @@ begin
   Result := inherited GetProjectFile;
   if not Assigned(Result) then
   begin
-    FStandaloneProjectFile := TkpsProjectFile.Create(nil, FileName, nil);
+    FStandaloneProjectFile := TkpsProjectFileAction.Create(nil, FileName, nil);
     Result := FStandaloneProjectFile;
   end;
 end;

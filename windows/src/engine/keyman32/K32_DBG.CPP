@@ -48,16 +48,7 @@
 #include <stdarg.h>
 #include <evntprov.h>
 
-#include "keyman-debug-etw.h"
 //#define _FILELOG
-
-#ifdef _WIN64
-#define DEBUG_PLATFORM_STRING "x64"
-#define DEBUG_PLATFORM_STRINGW L"x64"
-#else
-#define DEBUG_PLATFORM_STRING "x86"
-#define DEBUG_PLATFORM_STRINGW L"x86"
-#endif
 
 #ifdef _FILELOG
 //FILE *fp = NULL;
@@ -158,8 +149,6 @@ int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *f
   return 0;
 }
 
-#define TAB "\t"
-
 /*void FillWindowInfo(HWND hwnd, char *sClassName, char *sWindowText)
 {
 	if(hwnd == 0 || !GetClassName(hwnd, sClassName, 32))
@@ -179,157 +168,16 @@ int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *f
 }*/
 
 
-int GetActualShiftState() {   // I4843
-  int state = 0;
-	if(GetKeyState(VK_NUMLOCK) & 1) state |= NUMLOCKFLAG;
-	if(GetKeyState(VK_CAPITAL) & 1) state |= CAPITALFLAG;
-	if(GetKeyState(VK_SHIFT) < 0) state |= K_SHIFTFLAG;
-	if(GetKeyState(VK_RCONTROL) < 0) state |= RCTRLFLAG;
-	if(GetKeyState(VK_LCONTROL) < 0) state |= LCTRLFLAG;
-	if(GetKeyState(VK_LMENU) < 0) state |= LALTFLAG;
-	if(GetKeyState(VK_RMENU) < 0) state |= RALTFLAG;
-
-  if (GetKeyState(VK_LSHIFT) < 0) state |= 0x10000;
-  if (GetKeyState(VK_RSHIFT) < 0) state |= 0x20000;
-
-  return state;
-}
-
 int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg)
 {
   UNREFERENCED_PARAMETER(hwnd);
   UNREFERENCED_PARAMETER(state);   // I3569
   UNREFERENCED_PARAMETER(kmn_lineno);
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return 0;
 
-  if (msg == NULL) {
-    return 0;
-  }
-
-	if(Globals::get_debug_KeymanLog()) {
-    GUITHREADINFO gti;
-    char
-      //sClassName[32], sWindowText[32], 
-      //sFocusClassName[32], sFocusWindowText[32], 
-      //sActiveClassName[32], sActiveWindowText[32], 
-      sProcessPath[256], sProcessName[32];
-
-    gti.cbSize = sizeof(gti);
-    GetGUIThreadInfo(GetCurrentThreadId(), &gti);
-
-    //FillWindowInfo(hwnd, sClassName, sWindowText);   // I3656
-    //FillWindowInfo(gti.hwndActive, sActiveClassName, sActiveWindowText);   // I3656
-    //FillWindowInfo(gti.hwndFocus, sFocusClassName, sFocusWindowText);   // I3656
-
-		GetModuleFileName(NULL, sProcessPath, 256);
-		_splitpath_s(sProcessPath, NULL, 0, NULL, 0, sProcessName, 32, NULL, 0);
-		sProcessName[31] = 0;
-
-		if(strlen(msg) > 256) msg[255] = 0;
-
-    if(Globals::get_debug_ToConsole()) {   // I3951
-      char windowinfo[1024];
-      wsprintf(windowinfo,
-        DEBUG_PLATFORM_STRING TAB //"Platform" TAB
-        "%s" TAB  //"Process" TAB
-        "%x" TAB  //"PID" TAB
-        "%x" TAB  //"TID" TAB
-      //  "%x" TAB  //"QueueStatus" TAB   // I3569
-        "%x" TAB  //"ShiftState" TAB
-        "%x" TAB  //"ActualShiftState" TAB   // I4843
-        "%d" TAB  //"TickCount" TAB
-      //  "%x" TAB  //"LogHWND" TAB   // I3569
-      //  "%s" TAB  //"LogWindowClassName" TAB   // I3569
-      //  "%s" TAB  //"LogWindowText" TAB   // I3569
-        "%x" TAB  //"FocusHWND" TAB
-      //  "%s" TAB  //"FocusWindowClassName" TAB   // I3569
-      //  "%s" TAB  //"FocusWindowText" TAB   // I3569
-      //  "%x" TAB  //"ActiveHWND" TAB   // I3569
-      //  "%s" TAB  //"ActiveWindowClassName" TAB   // I3569
-      //  "%s" TAB  //"ActiveWindowText" TAB   // I3569
-      //  "%x" TAB  //"ForegroundHWND" TAB  // I2690   // I3569
-      //  "%d" TAB  //"MessageType" TAB   // I3569
-      //  "%d" TAB  //"SourceLine" TAB   // I3569
-        "%8x" TAB //"ActiveHKL" TAB
-        "%s:%d" TAB  //"SourceFile" TAB
-        "%s",     //"Message"
-
-        sProcessName,                    //"Process" TAB
-        GetCurrentProcessId(),           //"PID" TAB
-        GetCurrentThreadId(),            //"TID" TAB
-    //    GetQueueStatus(QS_KEY),          //"QueueStatus" TAB   // I3569
-        Globals::get_ShiftState(),       //"ShiftState" TAB
-        GetActualShiftState(),  // ActualShiftState TAB   // I4843
-        GetTickCount(),                  //"TickCount" TAB
-
-    //    hwnd,                            //"LogHWND" TAB   // I3569
-    //    sClassName,                      //"LogWindowClassName" TAB   // I3569
-    //    sWindowText,                     //"LogWindowText" TAB   // I3569
-
-        gti.hwndFocus,                   //"FocusHWND" TAB
-    //    sFocusClassName,                 //"FocusWindowClassName" TAB   // I3569
-    //    sFocusWindowText,                //"FocusWindowText" TAB   // I3569
-
-    //    gti.hwndActive,                  //"ActiveHWND" TAB   // I3569
-    //    sActiveClassName,                //"ActiveWindowClassName" TAB   // I3569
-    //    sActiveWindowText,               //"ActiveWindowText" TAB   // I3569
-
-    //    GetForegroundWindow(),           //"ForegroundHWND" TAB // I2690   // I3569
-
-    //    state,                           //"MessageType" TAB   // I3569
-    //    kmn_lineno,                      //"SourceLine" TAB   // I3569
-        GetKeyboardLayout(0),            //"ActiveHKL" TAB
-        file, line,                      //"SourceFile" TAB
-        msg);                            //"Message"
-      OutputDebugString(windowinfo);   // I3570   // I3951
-      OutputDebugString("\n");   // I3570   // I3951
-    }
-
-    if (_td->etwRegHandle != NULL) {
-#define MAX_DESCRIPTORS 12
-
-      // TODO: convert debugging to Unicode
-      PWSTR sProcessNameW = strtowstr(sProcessName);
-      PWSTR fileW = strtowstr(file);
-      PWSTR msgW = strtowstr(msg);
-      EVENT_DATA_DESCRIPTOR Descriptors[MAX_DESCRIPTORS];
-      DWORD pid = GetCurrentProcessId();
-      DWORD tid = GetCurrentThreadId();
-      DWORD shiftState = Globals::get_ShiftState();
-      DWORD actualShiftState = GetActualShiftState();
-      DWORD tickCount = GetTickCount();
-      HKL activeHKL = GetKeyboardLayout(0);
-
-#ifdef _WIN64
-      DWORD platform = 2;
-#else
-      DWORD platform = 1;
-#endif
-
-      // These must match the manifest template in keyman-debug-etw.man
-      EventDataDescCreate(&Descriptors[0], &platform, sizeof(DWORD)); // <data name = "Platform" inType = "Platform" / >
-      EventDataDescCreate(&Descriptors[1], sProcessNameW, (ULONG) (wcslen(sProcessNameW) + 1) * sizeof(WCHAR)); //  <data name = "Process" inType = "win:UnicodeString" / >
-      EventDataDescCreate(&Descriptors[2], &pid, sizeof(DWORD)); //  <data name = "PID" inType = "win:UInt32" / >
-      EventDataDescCreate(&Descriptors[3], &tid, sizeof(DWORD)); //  <data name = "TID" inType = "win:UInt32" / >
-      EventDataDescCreate(&Descriptors[4], &shiftState, sizeof(DWORD)); //  <data name = "ShiftState" inType = "ShiftState" / >
-      EventDataDescCreate(&Descriptors[5], &actualShiftState, sizeof(DWORD)); //  <data name = "ActualShiftState" inType = "ShiftState" / >
-      EventDataDescCreate(&Descriptors[6], &tickCount, sizeof(DWORD)); //  <data name = "TickCount" inType = "win:UInt32" / >
-      EventDataDescCreate(&Descriptors[7], (PDWORD)&gti.hwndFocus, sizeof(DWORD)); //  <data name = "FocusHWND" inType = "win:UInt32" / >
-      EventDataDescCreate(&Descriptors[8], (PDWORD)&activeHKL, sizeof(DWORD)); //  <data name = "ActiveHKL" inType = "win:UInt32" / >
-      EventDataDescCreate(&Descriptors[9], fileW, (ULONG) (wcslen(fileW)+1) * sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
-      EventDataDescCreate(&Descriptors[10], (PDWORD)&line, sizeof(DWORD)); //  <data name = "SourceLine" inType = "win:UInt32" / >
-      EventDataDescCreate(&Descriptors[11], msgW, (ULONG) (wcslen(msgW)+1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
-
-      DWORD dwErr = EventWrite(_td->etwRegHandle, &DebugEvent, (ULONG)MAX_DESCRIPTORS, &Descriptors[0]);
-      if (dwErr != ERROR_SUCCESS) {
-        OutputDebugString("Keyman k32_dbg: Failed to call EventWrite");
-      }
-      delete sProcessNameW;
-      delete fileW;
-      delete msgW;
-    }
-	}
+  // TODO: convert debugging to Unicode
+  PWSTR msgW = strtowstr(msg);
+  Keyman_WriteDebugEvent(file, line, msgW);
+  delete msgW;
 
   return 0;
 }

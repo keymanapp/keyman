@@ -9,7 +9,7 @@
 import AudioToolbox
 import UIKit
 
-public class TextField: UITextField {
+public class TextField: UITextField, KeymanResponder {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -51,6 +51,8 @@ public class TextField: UITextField {
       inputAssistantItem.trailingBarButtonGroups = []
     }
 
+    self.inputView = Manager.shared.inputViewController.view
+
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
                                            name: .UITextFieldTextDidChange, object: self)
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
@@ -59,14 +61,13 @@ public class TextField: UITextField {
   }
 
   // MARK: - Class Overrides
-  public override var inputView: UIView? {
+  public override var inputViewController: UIInputViewController? {
     get {
-      Manager.shared.keymanWebDelegate = self
-      return Manager.shared.keymanWeb.view
+      return Manager.shared.inputViewController
     }
 
-    set(inputView) {
-      super.inputView = inputView
+    set(inputViewController) {
+      _ = inputViewController
     }
   }
 
@@ -97,18 +98,6 @@ public class TextField: UITextField {
   public func setKeymanDelegate(_ keymanDelegate: TextFieldDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
     log.debug("TextField: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
-  }
-
-  // Dismisses the keyboard if this textview is the first responder.
-  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
-  public func dismissKeyboard() {
-    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
-    resignFirstResponder()
-    Manager.shared.keymanWeb.view.endEditing(true)
-  }
-  
-  public func resumeKeyboard() {
-    becomeFirstResponder()
   }
 
   public override var text: String! {
@@ -180,44 +169,25 @@ public class TextField: UITextField {
   }
 }
 
-// MARK: - KeymanWebDelegate
-extension TextField: KeymanWebDelegate {
-  func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if keymanWeb.isSubKeysMenuVisible {
-      return
-    }
-
-    if isInputClickSoundEnabled {
-      AudioServicesPlaySystemSound(0x450)
-
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
-      isInputClickSoundEnabled = false
-      perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
-    }
-
-    let textRange = selectedTextRange!
-    let selRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-
-    if selRange.length != 0 {
-      self.text = (self.text! as NSString).replacingCharacters(in: selRange, with: newText)
-    } else {
-      for _ in 0..<numCharsToDelete {
-        deleteBackward()
-      }
-      insertText(newText)
-    }
+extension KeymanResponder where Self: TextField {
+  // Dismisses the keyboard if this textview is the first responder.
+  //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
+  public func dismissKeyboard() {
+    log.debug("TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
+    resignFirstResponder()
+    Manager.shared.inputViewController.endEditing(true)
+  }
+  
+  public func summonKeyboard() {
+    becomeFirstResponder()
   }
 
-  func hideKeyboard(_ keymanWeb: KeymanWebViewController) {
-    dismissKeyboard()
-  }
-
-  func menuKeyUp(_ keymanWeb: KeymanWebViewController) {
+  public func showKeyboardPicker() -> Bool {
     if let viewController = viewController {
       Manager.shared.showKeyboardPicker(in: viewController, shouldAddKeyboard: false)
+      return true
     } else {
-      _ = Manager.shared.switchToNextKeyboard()
+      return false
     }
   }
 }
@@ -276,8 +246,7 @@ extension TextField: UITextFieldDelegate {
   }
 
   public func textFieldDidBeginEditing(_ textField: UITextField) {
-    Manager.shared.keymanWebDelegate = self
-
+    Manager.shared.currentResponder = self
     let fontName: String?
     if let id = Manager.shared.currentKeyboardID {
       fontName = Manager.shared.fontNameForKeyboard(withFullID: id)

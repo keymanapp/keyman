@@ -42,8 +42,9 @@
     CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
     CGContextSetLineJoin(context, kCGLineJoinRound);
     CGContextSetLineWidth(context, 1.0);
-    CGContextSetStrokeColorWithColor(context, [NSColor clearColor].CGColor);
-    CGContextSetFillColorWithColor(context, [NSColor clearColor].CGColor);
+    CGColorRef cgClearColor = CGColorGetConstantColor(kCGColorClear);
+    CGContextSetStrokeColorWithColor(context, cgClearColor);
+    CGContextSetFillColorWithColor(context, cgClearColor);
     
     CGContextBeginPath(context);
     CGContextAddRect(context, CGRectMake(1.0, 1.0, rect.size.width-1.0, rect.size.height-1.0));

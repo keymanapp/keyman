@@ -73,6 +73,7 @@ uses
   KPInstallKeyboard, KPInstallVisualKeyboard,
   KPInstallPackageStartMenu,
   kmpinffile, getosversion, utilsystem, shlobj, inifiles, messages,
+  StockFileNames,
   OnlineConstants,
   kpinstallfont, utilfiletypes, PackageInfo, ErrorControlledRegistry,
   RegistryKeys, utilkeyman, utildir,
@@ -105,7 +106,7 @@ var
   i: Integer;
   FInstByAdmin: Boolean;
   buf: array[0..260] of Char;
-  InfFile: string;
+  JsonFile, InfFile: string;
   inf: TKMPInfFile;
   ki: array of TKeyboardInfo;
   PackageName, dest, prog, errmsg: string;
@@ -165,16 +166,26 @@ begin
         for i := 0 to FZip.FileCount - 1 do
         begin
           FZip.Extract(i, buf, False);
-          if LowerCase(FZip.Filename[i]) = 'kmp.inf' then
-            InfFile := FZip.Filename[i];
+          if LowerCase(FZip.Filename[i]) = PackageFile_KMPInf then
+            InfFile := FZip.Filename[i]
+          else if LowerCase(FZip.Filename[i]) = PackageFile_KMPJSON then
+            JsonFile := FZip.Filename[i];
         end;
 
-        if InfFile = '' then
+        if (InfFile = '') and (JsonFile = '') then
           Error(KMN_E_PackageInstall_UnableToFindInfFile);
 
         inf := TKMPInfFile.Create;
-        inf.FileName := FTempOutPath + InfFile;
-        inf.LoadIni;
+        if JsonFile <> '' then
+        begin
+          inf.FileName := FTempOutPath + JsonFile;
+          inf.LoadJson;
+        end
+        else
+        begin
+          inf.FileName := FTempOutPath + InfFile;
+          inf.LoadIni;
+        end;
 
         inf.CheckFiles(FTempOutPath);
 
@@ -209,7 +220,7 @@ begin
           if not OpenKey(SRegKey_InstalledPackages_LM+'\'+PackageName, True) then  // I2890
             RaiseLastRegistryError;
 
-          WriteString(SRegValue_PackageFile, dest + 'kmp.inf');
+          WriteString(SRegValue_PackageFile, dest + PackageFile_KMPInf);
           WriteString(SRegValue_PackageDescription, inf.Info.Desc[PackageInfoEntryTypeNames[pietName]]);
         finally
           Free;
