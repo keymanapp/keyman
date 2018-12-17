@@ -10,6 +10,7 @@ type KeyboardMap = {[id: string]: any};
 namespace com.keyman.renderer {
   export class BatchRenderer {
     static divMaster: HTMLDivElement;
+    static dummy: HTMLInputElement;
 
     // Filters the keyboard array to ensure only a single entry remains, rather than an entry per language.
     private filterKeyboards(): KeyboardMap {
@@ -54,10 +55,41 @@ namespace com.keyman.renderer {
       });
     }
 
+    createKeyboardHeader(kbd, loaded: boolean): HTMLDivElement {
+      let divHeader = document.createElement('div');
+      let eleName = document.createElement('h2');
+
+      eleName.textContent = 'ID:  ' + kbd['InternalName'];
+      divHeader.appendChild(eleName);
+
+      let eleDescription = document.createElement('p');
+
+      if(loaded) {
+
+        eleDescription.appendChild(document.createTextNode('Name: ' + kbd['Name']));
+        eleDescription.appendChild(document.createElement('br'));
+        eleDescription.appendChild(document.createTextNode('Font:  ' + window['keyman'].keyboardManager.activeKeyboard.KV.F));
+
+      } else {
+        eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
+      }
+      
+      divHeader.appendChild(eleDescription);
+
+      return divHeader;
+    }
+
     private processKeyboard(kbd) {
       let keyman = window['keyman'];
       let p: Promise<void> = keyman.setActiveKeyboard(kbd['InternalName']);
       let isMobile = keyman.util.device.formFactor != 'desktop';
+
+      // Establish common keyboard header info.
+      let divSummary = document.createElement('div');
+      // Establishes a linkable target for this keyboard's data.
+      divSummary.id = "summary-" + kbd['InternalName'];
+      
+      BatchRenderer.divMaster.insertAdjacentElement('afterbegin', divSummary);
 
       // A nice, closure-friendly reference for use in our callbacks.
       let renderer = this;
@@ -65,32 +97,56 @@ namespace com.keyman.renderer {
       // Once the keyboard's loaded, we can really get started.
       return p.then(function() {
         let box: HTMLDivElement = keyman.osk._Box;
+        
+        divSummary.appendChild(renderer.createKeyboardHeader(kbd, true));
+
+        let divRenders = document.createElement('div');
+        divSummary.appendChild(divRenders);
   
         // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
-        let layers = keyman.keyboardManager.activeKeyboard.KV.KLS;
+        var layers;
+        if(isMobile) {
+          layers = keyman.osk.layers;
+        } else {
+          // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
+          // We instead rely upon the KLS definition to ensure we keep the renders sparse.
+          layers = keyman.keyboardManager.activeKeyboard.KV.KLS;
+        }
 
         let renderLayer = function(i: number) {
           return new Promise(function(resolve) {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
-            keyman.osk.layerId = Object.keys(layers)[i];
+            if(isMobile) {
+              keyman.osk.layerId = layers[i].id;
+            } else {
+              keyman.osk.layerId = Object.keys(layers)[i];
+            }
+            // Make sure the active element's still set!
+            renderer.setActiveDummy();
             keyman.osk.show(true);
+            // Juuuust in case it's not otherwise showing.  (Sometimes happens after scrolling on touch-devices.)
+            box.style.display = 'block';
 
             renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
-              let br = document.createElement('br');
-              // BatchRenderer.divMaster.appendChild(imgOut);
-              // BatchRenderer.divMaster.appendChild(br);
+              let eleLayer = document.createElement('div');
+              let eleLayerId = document.createElement('p');
+              eleLayerId.textContent = 'Layer ID:  ' + (isMobile ? keyman.osk.layers[i].id : Object.keys(layers)[i]);
 
-              BatchRenderer.divMaster.insertAdjacentElement('afterbegin', br);
-              BatchRenderer.divMaster.insertAdjacentElement('afterbegin', imgEle);              
+              eleLayer.appendChild(eleLayerId);
+              eleLayer.appendChild(imgEle);
+              eleLayer.appendChild(document.createElement('br'));
+
+              divRenders.appendChild(eleLayer);          
               resolve(i);
             });
           })
         };
 
         // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
-        return renderer.arrayPromiseIteration(renderLayer, Object.keys(layers).length);
+        return renderer.arrayPromiseIteration(renderLayer, isMobile ? keyman.osk.layers.length : Object.keys(layers).length);
       }).catch(function() {
         console.log("Failed to load the \"" + kbd['InternalName'] + "\" keyboard for rendering!");
+        divSummary.appendChild(renderer.createKeyboardHeader(kbd, false));
         return Promise.resolve();
       });
     }
@@ -112,15 +168,39 @@ namespace com.keyman.renderer {
       return iteration(0);
     }
 
+    fillDeviceNotes() {
+      let description = document.createElement('p');
+      let device = new com.keyman.Device();
+      device.detect();
+
+      description.appendChild(document.createTextNode('Browser: ' + device.browser));
+      description.appendChild(document.createElement('br'));
+      description.appendChild(document.createTextNode('OS:  ' + device.OS));
+      description.appendChild(document.createElement('br'));
+      description.appendChild(document.createTextNode('Form factor: ' + device.formFactor));
+      description.appendChild(document.createElement('br'));
+      description.appendChild(document.createTextNode('Touchable:  ' + device.touchable));
+
+      document.getElementById('deviceNotes').appendChild(description);
+    }
+
+    setActiveDummy() {
+      com.keyman['DOMEventHandlers'].states.activeElement = BatchRenderer.dummy;
+    }
+
     run() {
       if(window['keyman']) {
         let keyman = window['keyman'];
 
         // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usualy uses.
-        let dummy = document.createElement('imput');
-        com.keyman['DOMEventHandlers'].states.activeElement = dummy;
+        BatchRenderer.dummy = document.createElement('input');
+        this.setActiveDummy();
 
         BatchRenderer.divMaster = <HTMLDivElement> document.getElementById('renderList');
+        if(BatchRenderer.divMaster.childElementCount > 0) {
+          console.log("Prior bulk-renderer run detected.  Terminating execution.");
+          return;
+        }
 
         // We want the renderer to control where the keyboard is displayed.
         // Also bypasses another 'fun' OSK complication.
@@ -143,7 +223,12 @@ namespace com.keyman.renderer {
         };
 
         this.arrayPromiseIteration(keyboardIterator, Object.keys(kbds).length).then(function() {
-          console.log("All keyboard renders are now complete!");
+          // Once all renders are done, we can now tidy the page up and prep it for final display + potential file-saving.
+          
+          // This will go at the top of the page when finished, but not when actively rendering.
+          // We want to leave as much space visible as possible when actively rendering keyboards
+          // so that auto-scrolling isn't an issue.
+          this.fillDeviceNotes();
         });
       } else {
         console.error("KeymanWeb not detected!");
