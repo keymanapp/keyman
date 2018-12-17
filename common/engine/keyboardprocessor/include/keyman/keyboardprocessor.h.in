@@ -478,8 +478,6 @@ typedef struct {
     uintptr_t           marker;          // MARKER type
     km_kbp_option_item const * option;   // OPT types
     km_kbp_usv          character;       // CHAR type
-    km_kbp_virtual_key  vkey;            // VKEY types
-    size_t              erased;          // BACK type
   };
 } km_kbp_action_item;
 
