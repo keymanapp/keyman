@@ -9,6 +9,8 @@ type KeyboardMap = {[id: string]: any};
 
 namespace com.keyman.renderer {
   export class BatchRenderer {
+    static divMaster: HTMLDivElement;
+
     // Filters the keyboard array to ensure only a single entry remains, rather than an entry per language.
     private filterKeyboards(): KeyboardMap {
       let keyman = window['keyman'];
@@ -29,29 +31,26 @@ namespace com.keyman.renderer {
       return keyboardMap;
     }
 
-    private render(resolve, ele: HTMLElement, layerIndex: number, isMobile?: boolean) {
+    private render(ele: HTMLElement, isMobile?: boolean): Promise<HTMLImageElement> {
       let html2canvas = window['html2canvas'];
 
       let imgOut = document.createElement('img');
-      let br = document.createElement('br');
-      document.body.appendChild(imgOut);
-      document.body.appendChild(br);
 
-      // Warning - needs Promises, so it'll need a polyfill for IE.
       let canvasParams = {
         'logging': false,
         'scale': 1,
         'width': window.innerWidth // Good for mobile, less-so for desktop.
       }
 
+      // So, if it's desktop, we set more reasonable values.
       if(!isMobile) {
         canvasParams['width'] = 500;
         ele.style.width = '500px';
       }
 
-      html2canvas(ele, canvasParams).then(function(canvas) {
+      return html2canvas(ele, canvasParams).then(function(canvas) {
         imgOut.src = canvas.toDataURL();
-        resolve(layerIndex);
+        return imgOut;
       });
     }
 
@@ -62,21 +61,29 @@ namespace com.keyman.renderer {
 
       // A nice, closure-friendly reference for use in our callbacks.
       let renderer = this;
-      // Really could use promises to tie these two together...
 
+      // Once the keyboard's loaded, we can really get started.
       return p.then(function() {
         let box: HTMLDivElement = keyman.osk._Box;
   
         // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
         let layers = keyman.keyboardManager.activeKeyboard.KV.KLS;
 
-        let renderLayer = function(i) {
+        let renderLayer = function(i: number) {
           return new Promise(function(resolve) {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
             keyman.osk.layerId = Object.keys(layers)[i];
             keyman.osk.show(true);
 
-            renderer.render(resolve, box, i, isMobile);
+            renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
+              let br = document.createElement('br');
+              // BatchRenderer.divMaster.appendChild(imgOut);
+              // BatchRenderer.divMaster.appendChild(br);
+
+              BatchRenderer.divMaster.insertAdjacentElement('afterbegin', br);
+              BatchRenderer.divMaster.insertAdjacentElement('afterbegin', imgEle);              
+              resolve(i);
+            });
           })
         };
 
@@ -112,6 +119,8 @@ namespace com.keyman.renderer {
         // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usualy uses.
         let dummy = document.createElement('imput');
         com.keyman['DOMEventHandlers'].states.activeElement = dummy;
+
+        BatchRenderer.divMaster = <HTMLDivElement> document.getElementById('renderList');
 
         // We want the renderer to control where the keyboard is displayed.
         // Also bypasses another 'fun' OSK complication.
