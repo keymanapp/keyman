@@ -9,21 +9,12 @@
                                     into keyboard.hpp
 */
 #include <cassert>
-#include <algorithm>
-#include <iterator>
-#include <sstream>
-#include <unordered_map>
-#include <string>
-#include <vector>
 
 #include <keyman/keyboardprocessor.h>
-#include <kmx/kmx_processevent.hpp>
-#include <mock/mock_processor.hpp>
-#include <json.hpp>
-
 #include "keyboard.hpp"
-#include "option.hpp"
-
+#include "processor.hpp"
+#include "kmx/kmx_processevent.hpp"
+#include "mock/mock_processor.hpp"
 
 using namespace km::kbp;
 

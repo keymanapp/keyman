@@ -9,16 +9,14 @@
                                     into option.hpp
 */
 #include <cassert>
-#include <algorithm>
-#include <iterator>
 #include <sstream>
-#include <unordered_map>
-#include <vector>
 
+#include <keyman/keyboardprocessor.h>
 #include "processor.hpp"
 
-#include "option.hpp"
 #include "json.hpp"
+#include "state.hpp"
+
 
 size_t
 km_kbp_options_list_size(km_kbp_option_item const *opts)

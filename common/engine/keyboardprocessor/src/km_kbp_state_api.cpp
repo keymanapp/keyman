@@ -10,23 +10,18 @@
 */
 #include <cassert>
 #include <algorithm>
-#include <iterator>
-#include <list>
 #include <sstream>
-#include <utility>
-#include <vector>
 
 #include <keyman/keyboardprocessor.h>
-#include <utfcodec.hpp>
-#include <json.hpp>
+#include "json.hpp"
 
-#include "context.hpp"
-#include "keyboard.hpp"
-#include "option.hpp"
 #include "processor.hpp"
 #include "state.hpp"
 
 using namespace km::kbp;
+
+// Forward declarations
+class context;
 
 km_kbp_status km_kbp_state_create(km_kbp_keyboard * keyboard,
                                   km_kbp_option_item const *env,

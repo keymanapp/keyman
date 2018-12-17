@@ -36,7 +36,7 @@ keyboard_attributes::keyboard_attributes(std::u16string const & kbid,
   _default_opts(opts)
 {
   // Ensure that the default_options array will be properly terminated.
-  _default_opts.push_back(option());
+  _default_opts.emplace_back();
   render();
 }
 
@@ -61,9 +61,9 @@ keyboard_attributes & keyboard_attributes::operator = (keyboard_attributes &&rhs
 json & km::kbp::operator << (json & j, km::kbp::keyboard_attributes const & kb)
 {
   j << json::object
-      << "id" << std::u16string(kb.id)
+      << "id" << kb.id
       << "folder" << kb._folder_path
-      << "version" << std::u16string(kb.version_string)
+      << "version" << kb.version_string
       << "rules" << json::array << json::close;
 
   return j << json::close;
