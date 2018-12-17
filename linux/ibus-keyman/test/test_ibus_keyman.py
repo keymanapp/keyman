@@ -7,7 +7,7 @@ import sys
 import time
 from threading import Timer
 
-from pynput.keyboard import Key, Controller
+from keypress_actions import KeyPressAction, KeyReleaseAction
 
 try:
     from xkbgroup import XKeyboard
@@ -27,29 +27,88 @@ class TestView(Gtk.Window):
 
     def __init__(self, test_name):
         Gtk.Window.__init__(self, title=test_name)
-        self.known_modifiers = { "SHIFT" : Key.shift,
-            "LCTRL" : Key.ctrl_l,
-            "RCTRL" : Key.ctrl_r,
-            "LALT" : Key.alt_l,
-            "RALT" : Key.alt_r }
-        self.known_keys = { "K_A" : "a",
-            "K_B" : "b",
-            "K_C" : "c",
-            "K_D" : "d",
-            "K_E" : "e",
-            "K_F" : "f",
-            "K_O" : "o",
-            "K_X" : "x",
-            "K_1" : "1",
-            "K_2" : "2",
-            "K_3" : "3",
-            "K_4" : "4",
-            "K_5" : "5",
-            "K_6" : "6",
-            "K_7" : "7",
-            "K_8" : "8",
-            "K_SPACE" : Key.space,
-            "K_BKSP" : Key.backspace }
+        self.known_modifiers = {
+            "LCTRL" : 37,
+            "RCTRL" : 105,
+            "LALT" : 64,
+            "RALT" : 108,
+            "SHIFT" : 50,
+            "ALT" : 64,
+            "CTRL" : 37 }
+
+        self.known_keys = {
+            "K_A" : 38,
+            "K_B" : 56,
+            "K_C" : 54,
+            "K_D" : 40,
+            "K_E" : 26,
+            "K_F" : 41,
+            "K_G" : 42,
+            "K_H" : 43,
+            "K_I" : 31,
+            "K_J" : 44,
+            "K_K" : 45,
+            "K_L" : 46,
+            "K_M" : 58,
+            "K_N" : 57,
+            "K_O" : 32,
+            "K_P" : 33,
+            "K_Q" : 24,
+            "K_R" : 27,
+            "K_S" : 39,
+            "K_T" : 28,
+            "K_U" : 30,
+            "K_V" : 55,
+            "K_W" : 25,
+            "K_X" : 53,
+            "K_Y" : 29,
+            "K_Z" : 52,
+            "K_COLON"   : 47, #      // &HBA
+            "K_EQUAL"   : 21, #      // &HBB
+            "K_COMMA"   : 59, #      // &HBC
+            "K_HYPHEN"  : 20, #   // &HBD
+            "K_PERIOD"  : 60, #   // &HBE
+            "K_SLASH"   : 61, #      // &HBF
+            "K_BKQUOTE" : 49, #    // &HC0
+            "K_LBRKT"   : 34, #      // &HDB
+            "K_BKSLASH" : 51, #    // &HDC
+            "K_RBRKT"   : 35, #      // &HDD
+            "K_QUOTE"   : 48, #      // &HDE
+            "K_oE2"     : 94, #      // &HE2
+            "K_0" : 19,
+            "K_1" : 10,
+            "K_2" : 11,
+            "K_3" : 12,
+            "K_4" : 13,
+            "K_5" : 14,
+            "K_6" : 15,
+            "K_7" : 16,
+            "K_8" : 17,
+            "K_9" : 18,
+            "K_F1" : 67,
+            "K_F2" : 68,
+            "K_F3" : 69,
+            "K_F4" : 70,
+            "K_F5" : 71,
+            "K_F6" : 72,
+            "K_F7" : 73,
+            "K_F8" : 74,
+            "K_F9" : 75,
+            "K_F10" : 76,
+            "K_F11" : 95,
+            "K_F12" : 96,
+            "K_CAPS" : 66,
+            "K_ENTER" : 36,
+            "K_ESC" : 9,
+            "K_SPACE" : 65,
+            "K_TAB" : 23,
+            "K_UP" : 111,
+            "K_DOWN" : 116,
+            "K_LEFT" : 113,
+            "K_RIGHT" : 114,
+            "K_HOME" : 110,
+            "K_END" : 115,
+            "K_BKSP" : 22 }
         self.keys = self.context = self.expected = ""
         self.haspressedkeys = False
         self.test_name = test_name
@@ -82,106 +141,59 @@ class TestView(Gtk.Window):
             if has_xkbgroup:
                 with XKeyboard() as xkb:
                     logging.info("xkb %d:%s:%s", xkb.group_num, xkb.group_symbol, xkb.group_name)
-            localkeyboard = Controller()
             keys = self.keys.split("]")
-            # print(keys)
             for key in keys:
                 if (key):
                     key = key[1:]
-                    # print(key)
                     keyparts = key.split(" ")
-                    # print(keyparts)
                     mods = []
                     for part in keyparts:
-                        # print(part)
                         if part in self.known_keys:
                             mainkey = part
-                            # print("mainkey:", mainkey)
                         elif part in self.known_modifiers:
                             mods.append(part)
-                            # print("mods:", mods)
-                        # else:
-                            # print("unknown part %s", part)
                     logging.info("key is %s with modifiers %s" % (mainkey, mods))
-                    if len(mods) == 0:
-                        localkeyboard.press(self.known_keys[mainkey])
-                        localkeyboard.release(self.known_keys[mainkey])
-                    elif len(mods) == 1:
-                        with localkeyboard.pressed(self.known_modifiers[mods[0]]):
-                            localkeyboard.press(self.known_keys[mainkey])
-                            localkeyboard.release(self.known_keys[mainkey])
-                    elif len(mods) == 2:
-                        with localkeyboard.pressed(self.known_modifiers[mods[0]]):
-                            with localkeyboard.pressed(self.known_modifiers[mods[1]]):
-                                localkeyboard.press(self.known_keys[mainkey])
-                                localkeyboard.release(self.known_keys[mainkey])
-                    elif len(mods) == 3:
-                        with localkeyboard.pressed(self.known_modifiers[mods[0]]):
-                            with localkeyboard.pressed(self.known_modifiers[mods[1]]):
-                                    with localkeyboard.pressed(self.known_modifiers[mods[2]]):
-                                        localkeyboard.press(self.known_keys[mainkey])
-                                        localkeyboard.release(self.known_keys[mainkey])
-                    elif len(mods) == 4:
-                        with localkeyboard.pressed(self.known_modifiers[mods[0]]):
-                            with localkeyboard.pressed(self.known_modifiers[mods[1]]):
-                                with localkeyboard.pressed(self.known_modifiers[mods[2]]):
-                                    with localkeyboard.pressed(self.known_modifiers[mods[3]]):
-                                        localkeyboard.press(self.known_keys[mainkey])
-                                        localkeyboard.release(self.known_keys[mainkey])
-                    else:
-                        logging.warning("too many modifiers %d:%s", len(mods), mods)
-                        localkeyboard.press(self.known_keys[mainkey])
-                        localkeyboard.release(self.known_keys[mainkey])
-                    # Use sleep to slow down keypresses to more natural level
-                    # At full speed ibus_set_surrounding_text events were coming in
-                    # which got text 1 or 2 keypresses behind
-                    time.sleep(0.3)
+                    keyval = self.known_keys[mainkey]
+                    logging.info("%s", keyval)
+                    for modifier in mods:
+                        modkeypress = KeyPressAction(self.known_modifiers[modifier])
+                        modkeypress._keyPress(self.known_modifiers[modifier])
+
+                    mainkeypress = KeyPressAction(keyval)
+                    mainkeyrelease = KeyReleaseAction(keyval)
+                    mainkeypress._keyPress(keyval)
+                    mainkeyrelease._keyRelease(keyval)
+
+                    for modifier in mods:
+                        modkeypress = KeyReleaseAction(self.known_modifiers[modifier])
+                        modkeypress._keyRelease(self.known_modifiers[modifier])
+
+                    time.sleep(0.05)
 
             t = Timer(1.0, self.do_destroy)
             t.start()
 
     def change_to_keyboard(self, keyboard_id, kmx_path):
         logging.debug(keyboard_id)
-        # bad_keyboard = "und:/home/daniel/.local/share/keyman/test_kmx/001 - basic input UnicodeI.kmn.kmx"
-        # bad_keyboard = "und:/home/daniel/.local/share/keyman/test_kmx/.kmx"
-        # bad_keyboard = "und:/home/daniel/.local/share/keyman/test_kmx/${tests[count]}.kmx"
-        bad_keyboard = "und:/home/daniel/.local/share/keyman/test_kmx/012 - ralt.kmn.kmx"
         try:
             logging.debug("getting bus")
             bus = IBus.Bus()
             logging.debug("getting default keyboard")
             self.default_keyboard = get_current_engine(bus)
             logging.debug(self.default_keyboard)
-            # if bus_has_engine(bus, keyboard_id) <= 0:
             logging.debug("installing to ibus")
             ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
-            # logging.debug(ibus_settings)
-            # list_keys = ibus_settings.list_keys()
-            # logging.debug(list_keys)
             preload_engines = ibus_settings.get_strv("preload-engines")
             logging.debug(preload_engines)
-            if bad_keyboard in preload_engines:
-                preload_engines.remove(bad_keyboard)
+            # if bad_keyboard in preload_engines:
+            #     preload_engines.remove(bad_keyboard)
             if keyboard_id not in preload_engines:
                 preload_engines.append(keyboard_id)
             logging.debug(preload_engines)
             ibus_settings.set_strv("preload-engines", preload_engines)
-            # ibus_settings.apply()
-            # ibus_settings.sync()
             bus.preload_engines(preload_engines)
-            # bus.exit(True)
-            # time.sleep(2)
-            # reconnected = False
-            # bus = IBus.Bus()
-            # while not reconnected:
-            #     reconnected = bus.is_connected()
-            # install_to_ibus("und", kmx_path)
-
             logging.info("changing keyboard to %s", keyboard_id)
             change_keyboard(bus, keyboard_id)
-            # logging.debug("changed keyboard to %s", keyboard_id)
-            # logging.debug("uninstalling from ibus")
-            # uninstall_from_ibus("und", kmx_path)
         except Exception as e:
             logging.debug("Failed to set up keyboard")
             logging.debug(e)
