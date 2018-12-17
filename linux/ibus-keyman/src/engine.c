@@ -52,7 +52,6 @@ struct _IBusKeymanEngine {
     gchar           *kb_name;
     gchar           *char_buffer;
     gunichar         firstsurrogate;
-    gboolean         hasonlymarker;
     gboolean         lctrl_pressed;
     gboolean         rctrl_pressed;
     gboolean         lalt_pressed;
@@ -221,7 +220,6 @@ static void reset_context(IBusEngine *engine)
         if (g_strcmp0(surrounding_text, current_context_utf8) != 0)
         {
             g_message("setting context because it has changed from expected");
-            keyman->hasonlymarker = FALSE;
             if (km_kbp_context_items_from_utf8(surrounding_text, &context_items) == KM_KBP_STATUS_OK) {
                 km_kbp_context_set(context, context_items);
             }
@@ -231,7 +229,6 @@ static void reset_context(IBusEngine *engine)
         g_free(current_context_utf8);
     }
     else {
-        keyman->hasonlymarker = FALSE;
         km_kbp_context_clear(context);
     }
 }
@@ -285,7 +282,6 @@ ibus_keyman_engine_constructor (GType                   type,
     keyman->kb_name = NULL;
     keyman->ldmlfile = NULL;
     keyman->firstsurrogate = 0;
-    keyman->hasonlymarker = FALSE;
     keyman->lalt_pressed = FALSE;
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
@@ -636,7 +632,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
         {
             case KM_KBP_IT_CHAR:
                 g_message("CHAR action %d/%d", i+1, (int)num_action_items);
-                keyman->hasonlymarker = FALSE;
                 if (g_unichar_type(action_items[i].character) == G_UNICODE_SURROGATE) {
                     if (keyman->firstsurrogate == 0) {
                         keyman->firstsurrogate = action_items[i].character;
@@ -686,7 +681,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 }
                 break;
             case KM_KBP_IT_MARKER:
-                keyman->hasonlymarker = TRUE;
                 g_message("MARKER action %d/%d", i+1, (int)num_action_items);
                 break;
             case KM_KBP_IT_ALERT:
@@ -699,53 +693,47 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_BACK:
                 g_message("BACK action %d/%d", i+1, (int)num_action_items);
-                if (keyman->hasonlymarker) {
-                    keyman->hasonlymarker = FALSE;
-                    g_message("only deleting hasonlymarker status");
-                }
-                else {
-                    if (keyman->char_buffer != NULL)
-                    {
-                        // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
-                        g_message("removing one utf8 char from CHAR buffer");
-                        glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);
-                        gchar *new_buffer;
-                        if (end_pos == 1) {
-                            new_buffer = NULL;
-                            g_message("resetting CHAR buffer to NULL");
-                        }
-                        else {
-                            new_buffer = g_utf8_substring(keyman->char_buffer, 0 , end_pos - 1);
-                            g_message("changing CHAR buffer to :%s:", new_buffer);
-                        }
-                        if (g_strcmp0(keyman->char_buffer, new_buffer) == 0) {
-                            g_message("oops, CHAR buffer hasn't changed");
-                        }
-                        g_free(keyman->char_buffer);
-                        keyman->char_buffer = new_buffer;
-                    }
-                    else if (ok_for_single_backspace(action_items, i, num_action_items)) {
-                        // single backspace can be handled by ibus as normal
-                        g_message("no char actions, just single back");
-                        return FALSE;
+                if (keyman->char_buffer != NULL)
+                {
+                    // ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
+                    g_message("removing one utf8 char from CHAR buffer");
+                    glong end_pos = g_utf8_strlen(keyman->char_buffer, -1);
+                    gchar *new_buffer;
+                    if (end_pos == 1) {
+                        new_buffer = NULL;
+                        g_message("resetting CHAR buffer to NULL");
                     }
                     else {
-                        g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
+                        new_buffer = g_utf8_substring(keyman->char_buffer, 0 , end_pos - 1);
+                        g_message("changing CHAR buffer to :%s:", new_buffer);
+                    }
+                    if (g_strcmp0(keyman->char_buffer, new_buffer) == 0) {
+                        g_message("oops, CHAR buffer hasn't changed");
+                    }
+                    g_free(keyman->char_buffer);
+                    keyman->char_buffer = new_buffer;
+                }
+                else if (ok_for_single_backspace(action_items, i, num_action_items)) {
+                    // single backspace can be handled by ibus as normal
+                    g_message("no char actions, just single back");
+                    return FALSE;
+                }
+                else {
+                    g_message("DAR: ibus_keyman_engine_process_key_event - client_capabilities=%x, %x", engine->client_capabilities,  IBUS_CAP_SURROUNDING_TEXT);
 
-                        if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
-                            g_message("deleting surrounding text 1 char");
-                            ibus_engine_delete_surrounding_text(engine, -1, 1);
-                        } else {
-                            g_message("forwarding backspace with reset context");
-                            km_kbp_context_item *context_items;
-                            km_kbp_context_get(km_kbp_state_context(keyman->state),
-                                &context_items);
-                            reset_context(engine);
-                            forward_keycode(keyman, KEYMAN_BACKSPACE, 0);
-                            km_kbp_context_set(km_kbp_state_context(keyman->state),
-                                context_items);
-                            km_kbp_context_items_dispose(context_items);
-                        }
+                    if ((engine->client_capabilities & IBUS_CAP_SURROUNDING_TEXT) != 0) {
+                        g_message("deleting surrounding text 1 char");
+                        ibus_engine_delete_surrounding_text(engine, -1, 1);
+                    } else {
+                        g_message("forwarding backspace with reset context");
+                        km_kbp_context_item *context_items;
+                        km_kbp_context_get(km_kbp_state_context(keyman->state),
+                            &context_items);
+                        reset_context(engine);
+                        forward_keycode(keyman, KEYMAN_BACKSPACE, 0);
+                        km_kbp_context_set(km_kbp_state_context(keyman->state),
+                            context_items);
+                        km_kbp_context_items_dispose(context_items);
                     }
                 }
                 break;
@@ -763,7 +751,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 return FALSE;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
                 g_message("INVALIDATE_CONTEXT action %d/%d", i+1, (int)num_action_items);
-                keyman->hasonlymarker = FALSE;
                 km_kbp_context_clear(km_kbp_state_context(keyman->state));
                 reset_context(engine);
                 break;
@@ -775,7 +762,6 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
                     g_free(keyman->char_buffer);
                     keyman->char_buffer = NULL;
-                    keyman->hasonlymarker = FALSE;
                 }
                 break;
             default:
