@@ -70,11 +70,11 @@ namespace km {
 
       _kmx.GetContext()->Set(ctxt.c_str());
       _kmx.GetActions()->ResetQueue();
-      state->actions.clear();
+      state->actions().clear();
 
       if (!_kmx.ProcessEvent(state, vk, modifier_state)) {
         // We need to output the default keystroke
-        state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_EMIT_KEYSTROKE, {0,}, {0} });
+        state->actions().push_emit_keystroke();
       }
 
       for (auto i = 0; i < _kmx.GetActions()->Length(); i++) {
@@ -91,16 +91,16 @@ namespace km {
         case QIT_VSHIFTUP:
           //TODO: eliminate??
           break;
-        case QIT_CHAR:          
-          state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR, {0,}, {(km_kbp_usv)a.dwData} });
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {(km_kbp_usv)a.dwData} });
+        case QIT_CHAR:
+          state->context().push_character(a.dwData);
+          state->actions().push_character(a.dwData);
           break;
         case QIT_DEADKEY:
-          state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_MARKER, {0,}, {(km_kbp_usv)a.dwData} });
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_MARKER, {0,}, {(uintptr_t)a.dwData} });
+          state->context().push_marker(a.dwData);
+          state->actions().push_marker(a.dwData);
           break;
         case QIT_BELL:
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_ALERT, {0,}, {0} });
+          state->actions().push_alert();
           break;
         case QIT_BACK:
           switch (a.dwData) {
@@ -108,7 +108,7 @@ namespace km {
             // This only happens if we know we have context to delete. Last item must be a character
             assert(!state->context().empty() && state->context().back().type != KM_KBP_IT_MARKER);
             if (!state->context().empty()) state->context().pop_back();
-            state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} });
+            state->actions().push_backspace();
             break;
           case BK_DEADKEY:
             // This only happens if we know we have context to delete. Last item must be a deadkey
@@ -124,14 +124,14 @@ namespace km {
             }
             // Even if context is empty, we send the backspace event, because we may not
             // know the context.
-            state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {0} }); 
+            state->actions().push_backspace();
             break;
           default:
             assert(false);
           }
           break;
         case QIT_INVALIDATECONTEXT:
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_INVALIDATE_CONTEXT, {0,}, {0} });
+          state->actions().push_invalidate_context();
           break;
         default:
           //std::cout << "Unexpected item type " << a.ItemType << ", " << a.dwData << std::endl;
@@ -139,7 +139,7 @@ namespace km {
         }
       }
 
-      state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
+      state->actions().commit();
 
       return KM_KBP_STATUS_OK;
     }
