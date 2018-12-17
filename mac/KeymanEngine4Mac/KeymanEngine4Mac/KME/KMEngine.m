@@ -73,7 +73,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Cr@shlyt!cs crash#KME", it will force a simulated crash to test reporting to fabric.io.
         NSString * kmxName = [[_kmx filePath] lastPathComponent];
         NSLog(@"Crashlytics - KME: _kmx name = %@", kmxName);
-        if ([kmxName isEqualToString:kEasterEggKmxName]) {
+        if ([kEasterEggKmxName isEqualToString:kmxName]) {
             NSLog(@"Crashlytics - KME: Preparing to detect Easter egg.");
             _easterEggForCrashlytics = [[NSMutableString alloc] init];
         }
@@ -132,7 +132,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
         NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
         NSLog(@"Crashlytics - KME: Adding character to Easter Egg code string: %@", characterToAdd);
         [_easterEggForCrashlytics appendString:characterToAdd];
-        if ([_easterEggForCrashlytics isEqualToString:kEasterEggText]) {
+        if ([kEasterEggText isEqualToString:_easterEggForCrashlytics]) {
             NSLog(@"Crashlytics - KME: Forcing crash now!");
             // Both of the following approaches do throw an exception that causes control to exit this method,
             // but at least in my debug builds locally, neither one seems to get picked up by Crashlytics in a
