@@ -21,6 +21,8 @@ tests=(
 	'028 - smp'
 	'029 - beep'
 	'030 - multiple groups'
+	'034 - punctkeys'
+	'035 - generic ctrlalt'
 	)
 
 
