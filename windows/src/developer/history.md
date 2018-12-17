@@ -10,6 +10,7 @@
 * Opening or creating a project now closes current editor files (#1242)
 * Projects can now include other related files such as history.md (#1243)
 * Keyman Developer now treats files as UTF-8 by default (#1244)
+* Update kmcomp to add language subtag names to keyboard_info files (#1426)
 
 ## 2018-11-28 10.0.1206 stable
 * Add parameter `-add-help-link` to kmcomp (#1346)

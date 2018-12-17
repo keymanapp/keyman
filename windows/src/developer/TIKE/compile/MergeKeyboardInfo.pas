@@ -26,6 +26,9 @@
   # version -- from kmp.inf, js
   # minKeymanVersion -- from kmp.inf, kmx, js
   # platformSupport -- deduce from whether kmp exists, js exists
+  # languages -- given the BCP 47 ids, generate the subtag names:
+  #              displayName, languageName - (required)
+  #              scriptName, regionName    - if not blank
 }
 unit MergeKeyboardInfo;
 
@@ -88,7 +91,7 @@ type
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
     procedure AddSubtagNames(id: String; o: TJSONObject);
-    function CheckOrMigrateLanguages: Boolean;
+    procedure CheckOrMigrateLanguages;
     function SaveJsonFile: Boolean;
     procedure CheckPackageKeyboardFilenames;
     procedure AddIsRTL;
@@ -466,22 +469,20 @@ begin
   end;
 end;
 
-function TMergeKeyboardInfo.CheckOrMigrateLanguages: Boolean;
+procedure TMergeKeyboardInfo.CheckOrMigrateLanguages;
 var
   v: TJSONValue;
   alangs: TJSONArray;
-  olangs: TJSONObject; 
-  o: TJSONObject;
+  olangs, o: TJSONObject;
+  pair: TJSONPair; 
   i: Integer;
   id: string;
 begin
-  Result := True;
-  
   v := json.GetValue(TKeyboardInfoFile.SLanguages);
 
-  // Migrate languages[] array to Object
   if v is TJSONArray then
   begin
+    // Migrate languages[] array to Object
     alangs := v as TJSONArray;
     olangs := TJSONObject.Create;
     try
@@ -491,6 +492,7 @@ begin
         if id = '' then
           continue;
 
+        // Populate subtag names  
         o := TJSONObject.Create;
         olangs.AddPair(id, o);
         AddSubtagNames(id, o);
@@ -498,41 +500,27 @@ begin
 
       json.RemovePair(TKeyboardInfoFile.SLanguages);
       json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
-
     finally
     end;
-
-    // Migration complete and subtags populated
-    Exit;
-  end;
-
-  {
-  // Populate subtag names if needed
-  v := json.GetValue(TKeyboardInfoFile.SLanguages);
-  
-  if v is TJSONObject then
+  end
+  else if v is TJSONObject then
   begin
-    olang := lang as TJsonObject;
-    if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SDisplayName) = nil) then
-    begin
-      olang.AddPair(TKeyboardInfoFile.SDisplayName, TJSONString.Create('displayName1'));
-      nameAdded := True;
-    end;
+    olangs := v as TJsonObject;
+    try
+      for i := 0 to olangs.Count - 1 do
+      begin
+        pair := olangs.Pairs[i];
+        id := pair.JSONString.Value;
+        if id = '' then
+          continue;
 
-    if (olang <> nil) and (olang.GetValue(TKeyboardInfoFile.SLanguageName) = nil) then
-    begin
-      olang.AddPair(TKeyboardInfoFile.SLanguageName, TJSONString.Create('languageName1'));
-      nameAdded := True;
+        // Populate subtag names  
+        o := pair.JsonValue as TJSONObject;
+        AddSubtagNames(id, o);
+      end;
+    finally
     end;
-
-    if nameAdded then
-    begin
-      olangs.RemovePair(olangs.Pairs[i].JsonString.Value);
-      olangs.AddPair(olangs.Pairs[i].JsonString.Value, olang);
-    end;
-
   end;
-  }
 end;
 
 //
