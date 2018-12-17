@@ -42,6 +42,11 @@ namespace com.keyman {
      * This version has been substantially modified to work for this particular application.
      */
     static getTextWidth(text: string, style: CSSStyleDeclaration) {
+      // A final fallback - having the right font selected makes a world of difference.
+      if(!style.fontFamily) {
+        style.fontFamily = getComputedStyle(document.body).fontFamily;
+      }
+
       let fontFamily = style.fontFamily;
 
       // Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
@@ -851,13 +856,11 @@ if(!window['keyman']['initialized']) {
     }
 
     osk.getKeyEmFontSize = function() {
-      // TODO:  properly parse the font size spec.
       if(util.device.formFactor == 'desktop') {
         let kbdFontSize = osk.getFontSizeFromCookie();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
         return kbdFontSize * keySquareScale;
       } else {
-        // All set as hard-coded values in this file.  All are relative.
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = util.getFontSizeStyle(emSizeStr).val;
         let emScale = util.getFontSizeStyle(osk._Box).val;
