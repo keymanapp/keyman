@@ -66,27 +66,22 @@ namespace com.keyman.renderer {
 
       return p.then(function() {
         let box: HTMLDivElement = keyman.osk._Box;
-        keyman.osk.show(true);
   
-        // Forcing display, width, and height here helps to ensure a nice, consistent image.
-        box.style.display = 'block';
-  
-        let layers = keyman.osk._DivVKbd.firstChild.childNodes;
+        // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
+        let layers = keyman.keyboardManager.activeKeyboard.KV.KLS;
 
         let renderLayer = function(i) {
           return new Promise(function(resolve) {
-            for(var j = 0; j < layers.length; j++) {
-              layers[j].style.display = 'none';
-            }
-
-            layers[i].style.display = 'block';
+            // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
+            keyman.osk.layerId = Object.keys(layers)[i];
+            keyman.osk.show(true);
 
             renderer.render(resolve, box, i, isMobile);
           })
         };
 
         // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
-        return renderer.arrayPromiseIteration(renderLayer, layers.length);
+        return renderer.arrayPromiseIteration(renderLayer, Object.keys(layers).length);
       }).catch(function() {
         console.log("Failed to load the \"" + kbd['InternalName'] + "\" keyboard for rendering!");
         return Promise.resolve();
@@ -114,6 +109,14 @@ namespace com.keyman.renderer {
       if(window['keyman']) {
         let keyman = window['keyman'];
 
+        // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usualy uses.
+        let dummy = document.createElement('imput');
+        com.keyman['DOMEventHandlers'].states.activeElement = dummy;
+
+        // We want the renderer to control where the keyboard is displayed.
+        // Also bypasses another 'fun' OSK complication.
+        keyman.osk.userPositioned = true;
+
         // Assumes that the keyboards have been preloaded for us.
         let kbds = this.filterKeyboards();
 
@@ -133,11 +136,6 @@ namespace com.keyman.renderer {
         this.arrayPromiseIteration(keyboardIterator, Object.keys(kbds).length).then(function() {
           console.log("All keyboard renders are now complete!");
         });
-
-        // // Temporary - just load the first keyboard.
-        // this.processKeyboard(kbds[Object.keys(kbds)[0]]).then(function () {
-        //   console.log("First keyboard processed!");
-        // });
       } else {
         console.error("KeymanWeb not detected!");
       }
