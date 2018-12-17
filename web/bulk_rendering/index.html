@@ -31,23 +31,21 @@
       var kmw=window.keyman;
       kmw.init({
         attachType:'auto'
+        }).then(function() {
+          var renderer_poll = function() {
+            if(kmw.getKeyboards().length == 0) {
+              window.setTimeout(function() {
+                renderer_poll();
+              }, 1000);
+            } else {
+              kmw_renderer.run();
+            }
+          }
+
+          renderer_poll();
         });
-      
-      // kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
-      //   filename:'./us-1.0.js'});
       kmw.addKeyboards();
 
-      var renderer_poll = function() {
-        window.setTimeout(function() {
-          if(kmw.getKeyboards().length == 0) {
-            renderer_poll();
-          } else {
-            kmw_renderer.run();
-          }
-        }, 1000);
-      }
-
-      renderer_poll();
     </script> 
   </head>
 
@@ -56,21 +54,5 @@
     <h2>KeymanWeb Bulk Rendering</h2>
   </div>
 
-  </body>
-  
-  <!-- 
-    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
-    *
-    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
-    * to display the special characters used in the On-Screen Keyboard. 
-    * 
-    * To work around this Firefox bug, navigate to <b>about:config</b> 
-    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b> 
-    * while testing. 
-    * 
-    * Firefox resolves website-based CSS URI references correctly without needing
-    * any configuration change, so this change should only be made for file-based testing.
-    *   
-    ***   
-  -->     
+  </body>  
 </html>

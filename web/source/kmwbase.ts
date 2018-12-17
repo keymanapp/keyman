@@ -393,8 +393,8 @@ namespace com.keyman {
      * @param       {Object}  arg     object array of user-defined properties
      * Description  KMW window initialization  
      */    
-    ['init'](arg) {
-      this.domManager.init(arg);
+    ['init'](arg): Promise<any> {
+      return this.domManager.init(arg);
     }
 
     /**
