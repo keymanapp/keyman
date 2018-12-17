@@ -457,14 +457,14 @@ begin
   if scriptName <> '' then
   begin
     v := o.Values[TKeyboardInfoFile.SScriptName];
-    if not Assigned(v) and (scriptName <> '') then
+    if not Assigned(v) then
       o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
   end;
 
   if regionName <> '' then
   begin
     v := o.Values[TKeyboardInfoFile.SRegionName];
-    if not Assigned(v) and (regionName <> '') then
+    if not Assigned(v) then
       o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
   end;
 end;
@@ -485,40 +485,34 @@ begin
     // Migrate languages[] array to Object
     alangs := v as TJSONArray;
     olangs := TJSONObject.Create;
-    try
-      for i := 0 to alangs.Count - 1 do
-      begin
-        id := alangs.Items[i].Value;
-        if id = '' then
-          continue;
+    for i := 0 to alangs.Count - 1 do
+    begin
+      id := alangs.Items[i].Value;
+      if id = '' then
+        continue;
 
-        // Populate subtag names  
-        o := TJSONObject.Create;
-        olangs.AddPair(id, o);
-        AddSubtagNames(id, o);
-      end;
-
-      json.RemovePair(TKeyboardInfoFile.SLanguages);
-      json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
-    finally
+      // Populate subtag names
+      o := TJSONObject.Create;
+      olangs.AddPair(id, o);
+      AddSubtagNames(id, o);
     end;
+
+    json.RemovePair(TKeyboardInfoFile.SLanguages);
+    json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
   end
   else if v is TJSONObject then
   begin
     olangs := v as TJsonObject;
-    try
-      for i := 0 to olangs.Count - 1 do
-      begin
-        pair := olangs.Pairs[i];
-        id := pair.JSONString.Value;
-        if id = '' then
-          continue;
+    for i := 0 to olangs.Count - 1 do
+    begin
+      pair := olangs.Pairs[i];
+      id := pair.JSONString.Value;
+      if id = '' then
+        continue;
 
-        // Populate subtag names  
-        o := pair.JsonValue as TJSONObject;
-        AddSubtagNames(id, o);
-      end;
-    finally
+      // Populate subtag names
+      o := pair.JsonValue as TJSONObject;
+      AddSubtagNames(id, o);
     end;
   end;
 end;
