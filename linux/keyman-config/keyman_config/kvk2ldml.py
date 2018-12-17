@@ -100,65 +100,64 @@ KVKS_RALT=                b'\x40'
 
 # from web/source/kmwosk.ts
 VKey_to_Iso = {
-    90 : "B01", # Z
-    88 : "B02", # X
-    67 : "B03", # C
-    86 : "B04", # V
-    66 : "B05", # B
-    78 : "B06", # N
-    77 : "B07", # M
-    188 : "B08", # ,
-    190 : "B09", # .
-    191 : "B10", # /
-    65 : "C01", # A
-    83 : "C02", # S
-    68 : "C03", # D
-    70 : "C04", # F
-    71 : "C05", # G
-    72 : "C06", # H
-    74 : "C07", # J
-    75 : "C08", # K
-    76 : "C09", # L
-    186 : "C10", # ;
-    222 : "C11", # '
-    81 : "D01", # Q
-    87 : "D02", # W
-    69 : "D03", # E
-    82 : "D04", # R
-    84 : "D05", # T
-    89 : "D06", # Y
-    85 : "D07", # U
-    73 : "D08", # I
-    79 : "D09", # O
-    80 : "D10", # P
-    219 : "D11", # [
-    221: "D12", # ]
-    49 : "E01", # 1
-    50 : "E02", # 2
-    51 : "E03", # 3
-    52 : "E04", # 4
-    53 : "E05", # 5
-    54 : "E06", # 6
-    55 : "E07", # 7
-    56 : "E08", # 8
-    57 : "E09", # 9
-    48 : "E10", # 0
-    189 : "E11", # -
-    187 : "E12", # =
-    192 : "E00", # `
-    220 : "B00", # \
-    226 : "C12", # extra key on european keyboards
-    32 : "A03", # space
-    96 : "A51", # "K_NP0"
-    97 : "B51", # "K_NP1"
-    98 : "B52", # "K_NP2"
-    99 : "B53", #  "K_NP3"
-    100 : "C51", #  "K_NP4"
-    101 : "C52", #  "K_NP5"
-    102 : "C53", # "K_NP6"
-    103 : "D51", # "K_NP7"
-    104 : "D52", # "K_NP8"
-    105 : "D53" # "K_NP9"
+    90  : { "code": "B01", "base" : "z", "shift" : "Z" }, # Z
+    88  : { "code": "B02", "base" : "x", "shift" : "X" }, # X
+    67  : { "code": "B03", "base" : "c", "shift" : "C" }, # C
+    86  : { "code": "B04", "base" : "v", "shift" : "V" }, # V
+    66  : { "code": "B05", "base" : "b", "shift" : "B" }, # B
+    78  : { "code": "B06", "base" : "n", "shift" : "N" }, # N
+    77  : { "code": "B07", "base" : "m", "shift" : "M" }, # M
+    188 : { "code": "B08", "base" : ",", "shift" : "<" }, # ,
+    190 : { "code": "B09", "base" : ".", "shift" : ">" }, # .
+    191 : { "code": "B10", "base" : "/", "shift" : "?" }, # /
+    65  : { "code": "C01", "base" : "a", "shift" : "A" }, # A
+    83  : { "code": "C02", "base" : "s", "shift" : "S" }, # S
+    68  : { "code": "C03", "base" : "d", "shift" : "D" }, # D
+    70  : { "code": "C04", "base" : "f", "shift" : "F" }, # F
+    71  : { "code": "C05", "base" : "g", "shift" : "G" }, # G
+    72  : { "code": "C06", "base" : "h", "shift" : "H" }, # H
+    74  : { "code": "C07", "base" : "j", "shift" : "J" }, # J
+    75  : { "code": "C08", "base" : "k", "shift" : "K" }, # K
+    76  : { "code": "C09", "base" : "l", "shift" : "L" }, # L
+    186 : { "code": "C10", "base" : ";", "shift" : ":" }, # ;
+    222 : { "code": "C11", "base" : "'", "shift" : '"' }, # '
+    81  : { "code": "D01", "base" : "q", "shift" : "Q" }, # Q
+    87  : { "code": "D02", "base" : "w", "shift" : "W" }, # W
+    69  : { "code": "D03", "base" : "e", "shift" : "E" }, # E
+    82  : { "code": "D04", "base" : "r", "shift" : "R" }, # R
+    84  : { "code": "D05", "base" : "t", "shift" : "T" }, # T
+    89  : { "code": "D06", "base" : "y", "shift" : "Y" }, # Y
+    85  : { "code": "D07", "base" : "u", "shift" : "U" }, # U
+    73  : { "code": "D08", "base" : "i", "shift" : "I" }, # I
+    79  : { "code": "D09", "base" : "o", "shift" : "O" }, # O
+    80  : { "code": "D10", "base" : "p", "shift" : "P" }, # P
+    219 : { "code": "D11", "base" : "[", "shift" : "{" }, # [
+    221 : { "code": "D12", "base" : "]", "shift" : "}" }, # ]
+    49  : { "code": "E01", "base" : "1", "shift" : "!" }, # 1
+    50  : { "code": "E02", "base" : "2", "shift" : "@" }, # 2
+    51  : { "code": "E03", "base" : "3", "shift" : "#" }, # 3
+    52  : { "code": "E04", "base" : "4", "shift" : "$" }, # 4
+    53  : { "code": "E05", "base" : "5", "shift" : "%" }, # 5
+    54  : { "code": "E06", "base" : "6", "shift" : "^" }, # 6
+    55  : { "code": "E07", "base" : "7", "shift" : "&" }, # 7
+    56  : { "code": "E08", "base" : "8", "shift" : "*" }, # 8
+    57  : { "code": "E09", "base" : "9", "shift" : "(" }, # 9
+    48  : { "code": "E10", "base" : "0", "shift" : ")" }, # 0
+    189 : { "code": "E11", "base" : "-", "shift" : "_" }, # -
+    187 : { "code": "E12", "base" : "=", "shift" : "+" }, # =
+    192 : { "code": "E00", "base" : "`", "shift" : "~" }, # `
+    220 : { "code": "C12", "base" : "\\","shift" : "|" }, # \
+    226 : { "code": "B00", "base" : "<", "shift" : ">" }, # extra key on european keyboards
+    32  : { "code": "A03", "base" : " ", "shift" : " " }, # space
+    97  : { "code": "B51", "base" : "1", "shift" : "1" }, # "K_NP1"
+    98  : { "code": "B52", "base" : "2", "shift" : "2" }, # "K_NP2"
+    99  : { "code": "B53", "base" : "3", "shift" : "3" }, #  "K_NP3"
+    100 : { "code": "C51", "base" : "4", "shift" : "4" }, #  "K_NP4"
+    101 : { "code": "C52", "base" : "5", "shift" : "5" }, #  "K_NP5"
+    102 : { "code": "C53", "base" : "6", "shift" : "6" }, # "K_NP6"
+    103 : { "code": "D51", "base" : "7", "shift" : "7" }, # "K_NP7"
+    104 : { "code": "D52", "base" : "8", "shift" : "8" }, # "K_NP8"
+    105 : { "code": "D53", "base" : "9", "shift" : "9" }, # "K_NP9"
 }
 
 
@@ -309,8 +308,34 @@ def convert_ldml(kvkData):
         else:
             keymaps[modifier] = (key,)
 
+    for vkey in VKey_to_Iso:
+        alreadyused = False
+        for key in keymaps["None"]:
+            if key.VKey == vkey:
+                alreadyused = True
+        if not alreadyused and vkey != 226:
+            uskey = NKey()
+            uskey.VKey = vkey
+            uskey.text = VKey_to_Iso[vkey]["base"]
+            if "None" in keymaps:
+                keymaps["None"] = keymaps["None"] + (uskey,)
+            else:
+                keymaps["None"] = (uskey,)
+        alreadyused = False
+        for key in keymaps["shift"]:
+            if key.VKey == vkey:
+                alreadyused = True
+        if not alreadyused and vkey != 226:
+            uskey = NKey()
+            uskey.VKey = vkey
+            uskey.text = VKey_to_Iso[vkey]["shift"]
+            if "shift" in keymaps:
+                keymaps["shift"] = keymaps["shift"] + (uskey,)
+            else:
+                keymaps["shift"] = (uskey,)
+
     ldml = etree.Element("keyboard", locale = "zzz-keyman")
-    etree.SubElement(ldml, "version", platform = "10")
+    etree.SubElement(ldml, "version", platform = "11")
     names = etree.SubElement(ldml, "names")
     names.append( etree.Element("name", value = "ZZZ") )
 
@@ -321,7 +346,7 @@ def convert_ldml(kvkData):
             keymap = etree.SubElement(ldml, "keyMap", modifiers = modifier)
         for key in keymaps[modifier]:
             if key.VKey in VKey_to_Iso:
-                iso_key = VKey_to_Iso[key.VKey]
+                iso_key = VKey_to_Iso[key.VKey]["code"]
                 keymap.append( etree.Element("map", iso = iso_key, to = key.text) )
             else:
                 logging.warning("Unknown vkey: %s", key.VKey)
