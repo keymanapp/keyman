@@ -8,10 +8,13 @@
 
 #pragma once
 
-//#include <string>
-//#include <keyman/keyboardprocessor.h>
-#include "keyboard.hpp"
+#include <string>
+#include <vector>
+#include <keyman/keyboardprocessor.h>
+
 #include "processor.hpp"
+#include "option.hpp"
+
 namespace km {
 namespace kbp
 {
@@ -29,7 +32,7 @@ namespace kbp
                                 uint16_t modifier_state) override;
 
     virtual km_kbp_attr const & attributes() const override;
-    km_kbp_status validate() const override;
+    km_kbp_status               validate() const override;
 
 
     void    update_option(km_kbp_state *state,

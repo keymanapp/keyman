@@ -491,11 +491,11 @@ enum km_kbp_action_type {
   KM_KBP_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
   KM_KBP_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
   KM_KBP_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
-  KM_KBP_IT_INVALIDATE_CONTEXT = 7, 
-                              // The processor requests that the context buffer be cleared;
-							  // for applications where context is cached, this clears the context;
-							  // for applications where context is read from the focused text store,
-							  // the context is just re-read and markers flushed.
+  KM_KBP_IT_INVALIDATE_CONTEXT = 7,
+          // The processor requests that the context buffer be cleared;
+          // for applications where context is cached, this clears the context;
+          // for applications where context is read from the focused text store,
+          // the context is just re-read and markers flushed.
   KM_KBP_IT_MAX_TYPE_ID
 };
 

@@ -9,6 +9,7 @@ namespace km {
     km_kbp_status kmx_processor::validate() const {
       return _valid ? KM_KBP_STATUS_OK : KM_KBP_STATUS_INVALID_KEYBOARD;
     }
+
     kmx_processor::kmx_processor(kbp::path p)
     {
       p.replace_extension(".kmx");
@@ -63,7 +64,7 @@ namespace km {
           assert(c->marker > 0);
           ctxt += UC_SENTINEL;
           ctxt += CODE_DEADKEY;
-          ctxt += c->marker; 
+          ctxt += c->marker;
           break;
         }
       }

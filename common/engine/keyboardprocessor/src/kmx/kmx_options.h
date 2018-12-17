@@ -3,8 +3,10 @@
 
 #include <string>
 #include <vector>
+
 #include <keyman/keyboardprocessor.h>
 #include "option.hpp"
+
 #include "kmx_base.h"
 
 namespace km {

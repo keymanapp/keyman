@@ -13,7 +13,7 @@
 #include "kmx_options.h"
 #include "kmx_environment.h"
 
-/***************************************************************************/ 
+/***************************************************************************/
 
 namespace km {
 namespace kbp {
@@ -42,8 +42,8 @@ private:
   /* File loading */
   LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
   KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
-  KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz);
-  KMX_BOOL VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz);
+  KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
+  KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
   PKMX_WCHAR StringOffset(PKMX_BYTE base, KMX_DWORD offset);
 #ifdef KMX_64BIT
   LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
@@ -115,7 +115,7 @@ extern KMX_BOOL g_debug_ToConsole, g_debug_KeymanLog, g_silent;
 #define DebugLog(msg,...) (km::kbp::kmx::ShouldDebug() ? km::kbp::kmx::DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg),__VA_ARGS__) : 0)
 #define console_error(msg,...) write_console(TRUE, (msg), __VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), __VA_ARGS__)
-#else 
+#else
 #define DebugLog(msg,...) (ShouldDebug() ? DebugLog_1(__FILE__, __LINE__, __FUNCTION__, (msg), ##__VA_ARGS__) : 0)
 #define console_error(msg,...) write_console(TRUE, (msg), ##__VA_ARGS__)
 #define console_log(msg,...) write_console(FALSE, (msg), ##__VA_ARGS__)

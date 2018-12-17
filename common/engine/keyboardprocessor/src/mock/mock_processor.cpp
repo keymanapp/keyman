@@ -10,7 +10,6 @@
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
 
-#include <keyman/keyboardprocessor.h>
 #include "mock/mock_processor.hpp"
 #include "state.hpp"
 

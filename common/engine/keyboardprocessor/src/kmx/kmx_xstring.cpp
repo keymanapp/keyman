@@ -149,7 +149,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
     return p-1;
   }
   else if(*(p-1) == UC_SENTINEL) return p-1;
-  else if(*(p-2) == UC_SENTINEL) 
+  else if(*(p-2) == UC_SENTINEL)
   {
     switch(*(p-1))
     {
@@ -160,17 +160,17 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
       case CODE_CLEARCONTEXT:
       case CODE_CALL:
       case CODE_CONTEXTEX:
-      case CODE_RESETOPT: 
-      case CODE_SAVEOPT:  
+      case CODE_RESETOPT:
+      case CODE_SAVEOPT:
         return p-2;
     }
   }
-  else if(*(p-3) == UC_SENTINEL) 
+  else if(*(p-3) == UC_SENTINEL)
   {
     switch(*(p-2))
     {
       case CODE_INDEX:
-      case CODE_SETOPT:   
+      case CODE_SETOPT:
       case CODE_SETSYSTEMSTORE:
         return p-3;
     }

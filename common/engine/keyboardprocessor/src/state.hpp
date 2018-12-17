@@ -7,6 +7,7 @@
 */
 
 #pragma once
+
 #include <cassert>
 #include <vector>
 
@@ -14,8 +15,6 @@
 
 #include "context.hpp"
 #include "option.hpp"
-#include "keyboard.hpp"
-
 
 
 namespace km {

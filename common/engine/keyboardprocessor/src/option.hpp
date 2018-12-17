@@ -32,8 +32,10 @@ namespace kbp
 
     ~option() noexcept;
 
+    option & operator=(option const & rhs);
     option & operator=(option && rhs);
-    option & operator=(option const &);
+
+    bool empty() const;
   };
 
 
@@ -64,13 +66,14 @@ namespace kbp
     delete [] value;
   }
 
+
   inline
-  option & option::operator=(option && rhs)
-  {
+  option & option::operator=(option && rhs) {
     delete [] key;
     delete [] value;
-    return *new (this) option(rhs);
+    return *new (this) option(std::move(rhs));
   }
+
 
   inline
   option & option::operator=(option const & rhs)
@@ -113,6 +116,7 @@ namespace kbp
   inline void options::set_default_env(km_kbp_option_item const *env) {
     _scopes[KM_KBP_OPT_ENVIRONMENT - 1] = env;
   }
+
 
 } // namespace kbp
 } // namespace km

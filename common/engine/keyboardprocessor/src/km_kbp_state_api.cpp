@@ -153,7 +153,6 @@ json & operator << (json & j, km_kbp_action_item const &act)
           << json::close
         << json::close;
       break;
-      break;
   }
   j << json::close;
 
