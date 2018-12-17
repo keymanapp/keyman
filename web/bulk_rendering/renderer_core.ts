@@ -204,7 +204,9 @@ namespace com.keyman.renderer {
 
         // We want the renderer to control where the keyboard is displayed.
         // Also bypasses another 'fun' OSK complication.
-        keyman.osk.userPositioned = true;
+        if(keyman.util.device.formFactor == 'desktop') {
+          keyman.osk.userPositioned = true;
+        }
 
         // Assumes that the keyboards have been preloaded for us.
         let kbds = this.filterKeyboards();
