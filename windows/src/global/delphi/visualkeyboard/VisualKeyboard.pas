@@ -116,6 +116,7 @@ type
     procedure LoadFromStream(Stream: TStream);
     class function IsBinaryFile(Stream: TStream): Boolean; static;
     procedure Clear;
+    function HasShiftState(Shift: Integer): Boolean;
     property Header: TVisualKeyboardHeader read FHeader;
     property Keys: TVisualKeyboardKeyList read FKeys;
     property LoadedFileFormat: TVisualKeyboardSaverFormat read FLoadedFileFormat;
@@ -252,6 +253,22 @@ begin
   FHeader.Free;
   FKeys.Free;
   inherited;
+end;
+
+function TVisualKeyboard.HasShiftState(Shift: Integer): Boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to Keys.Count - 1 do
+  begin
+    if (Keys[i].Shift = Shift) and (kvkkUnicode in Keys[i].Flags) then
+    begin
+      if (Keys[i].Text <> '') or Assigned(Keys[i].Bitmap) then
+        Exit(True);
+    end;
+  end;
+
+  Result := False;
 end;
 
 procedure TVisualKeyboard.LoadFromFile(FFileName: WideString);
