@@ -741,7 +741,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                             km_kbp_context_get(km_kbp_state_context(keyman->state),
                                 &context_items);
                             reset_context(engine);
-                            forward_keysym(keyman, XK_BackSpace, 0);
+                            forward_keycode(keyman, KEYMAN_BACKSPACE, 0);
                             km_kbp_context_set(km_kbp_state_context(keyman->state),
                                 context_items);
                             km_kbp_context_items_dispose(context_items);
