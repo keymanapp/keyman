@@ -336,6 +336,28 @@
       ]
     },
     {
+      "name": "032 - caps control",
+      "id": "032 - caps control",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "033 - caps always off",
+      "id": "033 - caps always off",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
       "name": "038 - punctkeys",
       "id": "038 - punctkeys",
       "version": "0.0",
@@ -357,5 +379,5 @@
         }
       ]
     }
-  ]
+   ]
 }

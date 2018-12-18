@@ -46,9 +46,11 @@ tests = [
   '029 - beep',
 
   '030 - multiple groups',
-  '031 - caps lock'
+  '031 - caps lock',
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
+  '038 - punctkeys',
+  '039 - generic ctrlalt'
 ]
 
 # todo: if kmcomp is not found, use the .kmx in the source folder
