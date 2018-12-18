@@ -325,8 +325,30 @@
       ]
     },
     {
-      "name": "031 - caps lock.kmx",
-      "id": "031 - caps lock.kmx",
+      "name": "031 - caps lock",
+      "id": "031 - caps lock",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "038 - punctkeys",
+      "id": "038 - punctkeys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "039 - generic ctrlalt",
+      "id": "039 - generic ctrlalt",
       "version": "0.0",
       "languages": [
         {
