@@ -124,8 +124,6 @@ namespace com.keyman.renderer {
             // Make sure the active element's still set!
             renderer.setActiveDummy();
             keyman.osk.show(true);
-            // Juuuust in case it's not otherwise showing.  (Sometimes happens after scrolling on touch-devices.)
-            box.style.display = 'block';
 
             renderer.render(box, isMobile).then(function(imgEle: HTMLImageElement) {
               let eleLayer = document.createElement('div');
