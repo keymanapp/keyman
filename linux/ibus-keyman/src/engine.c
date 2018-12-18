@@ -56,6 +56,7 @@ struct _IBusKeymanEngine {
     gboolean         rctrl_pressed;
     gboolean         lalt_pressed;
     gboolean         ralt_pressed;
+    gboolean         emitting_keystroke;
     IBusLookupTable *table;
     IBusProperty    *status_prop;
     IBusPropList    *prop_list;
@@ -286,6 +287,7 @@ ibus_keyman_engine_constructor (GType                   type,
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
+    keyman->emitting_keystroke = FALSE;
     gchar **split_name = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
     {
@@ -748,7 +750,8 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     keyman->char_buffer = NULL;
                 }
                 g_message("EMIT_KEYSTROKE action %d/%d", i+1, (int)num_action_items);
-                return FALSE;
+                keyman->emitting_keystroke = TRUE;
+                break;
             case KM_KBP_IT_INVALIDATE_CONTEXT:
                 g_message("INVALIDATE_CONTEXT action %d/%d", i+1, (int)num_action_items);
                 km_kbp_context_clear(km_kbp_state_context(keyman->state));
@@ -762,6 +765,10 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     ibus_keyman_engine_commit_string(keyman, keyman->char_buffer);
                     g_free(keyman->char_buffer);
                     keyman->char_buffer = NULL;
+                }
+                if (keyman->emitting_keystroke) {
+                    keyman->emitting_keystroke = FALSE;
+                    return FALSE;
                 }
                 break;
             default:
