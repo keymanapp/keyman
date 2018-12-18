@@ -336,8 +336,8 @@
       ]
     },
     {
-      "name": "034 - punctkeys",
-      "id": "034 - punctkeys",
+      "name": "038 - punctkeys",
+      "id": "038 - punctkeys",
       "version": "0.0",
       "languages": [
         {
@@ -347,8 +347,8 @@
       ]
     },
     {
-      "name": "035 - generic ctrlalt",
-      "id": "035 - generic ctrlalt",
+      "name": "039 - generic ctrlalt",
+      "id": "039 - generic ctrlalt",
       "version": "0.0",
       "languages": [
         {
