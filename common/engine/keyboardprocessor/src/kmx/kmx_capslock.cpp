@@ -4,7 +4,8 @@
 */
 #include <kmx/kmx_processor.h>
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 void KMX_Processor::ResetCapsLock(void)
 {
