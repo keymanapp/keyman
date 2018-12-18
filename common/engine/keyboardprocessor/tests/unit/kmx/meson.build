@@ -46,13 +46,15 @@ tests = [
   '029 - beep',
 
   '030 - multiple groups',
-  '031 - caps lock'
+  '031 - caps lock',
 #  '032 - caps control',   # TODO: support capsononly, capsalwaysoff, shiftfreescaps
 #  '033 - caps alwyas off' # TODO: support capsononly, capsalwaysoff, shiftfreescaps
+  '034 - options double set reset',
+  '035 - options double set staged',
+  '036 - options - double reset staged',
+  '037 - options - double reset',
 ]
 
-# todo: if kmcomp is not found, use the .kmx in the source folder
-# therefore make kmcomp compile to the source folder and add to repo?
 if build_machine.system() == 'windows'
   kmcomp_cmd = [kmcomp]
 else
