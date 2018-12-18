@@ -4097,7 +4097,20 @@ if(!window['keyman']['initialized']) {
       var Ls = osk._Box.style;
 
       // Do not display OSK until it has been positioned correctly
-      if(device.touchable && Ls.bottom == '') Ls.visibility='hidden';
+      if(device.touchable && Ls.bottom == '') {
+        Ls.visibility='hidden';
+      }
+
+      if(device.touchable) {
+        /* In case it's still '0' from a hide() operation.
+         * Happens when _Show is called before the transitionend events are processed,
+         * which can happen in bulk-rendering contexts.
+         * 
+         * (Opacity is only modified when device.touchable = true, though a couple of extra
+         * conditions may apply.)
+         */
+        Ls.opacity='1';
+      }
 
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(osk.ddOSK)
