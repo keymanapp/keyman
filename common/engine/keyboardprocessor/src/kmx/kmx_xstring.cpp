@@ -11,7 +11,8 @@
 
 
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {

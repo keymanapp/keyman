@@ -9,11 +9,12 @@
 #include <algorithm>
 #include <memory>
 
+#include "json.hpp"
 #include "keyboard.hpp"
 #include "option.hpp"
-#include "json.hpp"
-#include "utfcodec.hpp"
+#include "processor.hpp"
 #include "state.hpp"
+#include "utfcodec.hpp"
 
 using namespace km::kbp;
 
@@ -28,12 +29,22 @@ namespace
 // Forward declarations
 
 
-option::option(km_kbp_option_scope s, std::u16string const & k, std::u16string const & v)
-: km_kbp_option_item { new km_kbp_cp[k.size()+1], new km_kbp_cp[v.size()+1],
-                uint8_t(s) }
+option::option(km_kbp_option_scope s, char16_t const *k, char16_t const *v)
+: option()
 {
-  std::copy_n(k.c_str(), k.size()+1, const_cast<km_kbp_cp *>(key));
-  std::copy_n(v.c_str(), v.size()+1, const_cast<km_kbp_cp *>(value));
+  if (k && v)
+  {
+    auto n_k = std::char_traits<char16_t>::length(k)+1,
+         n_v = std::char_traits<char16_t>::length(v)+1;
+    auto _key = new km_kbp_cp[n_k],
+         _val = new km_kbp_cp[n_v];
+    std::copy_n(k, n_k, _key);
+    std::copy_n(v, n_v, _val);
+
+    key = _key;
+    value = _val;
+    scope = s;
+  }
 }
 
 
@@ -66,9 +77,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
     if (save.key == key && save.scope == scope)
     {
       save = option(scope, key, value);
-
-      //((km::kbp::state *)state)->keyboard().
-      const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+      state->processor().update_option(state, scope, key, value);
 
       return &save;
     }
@@ -76,7 +85,7 @@ km_kbp_option_item const * options::assign(km_kbp_state *state, km_kbp_option_sc
 
   _saved.emplace_back(scope, key, value);
 
-  const_cast<km::kbp::abstract_processor &>(static_cast<km::kbp::state *>(state)->keyboard().processor()).update_option(state, scope, key, value);
+  state->processor().update_option(state, scope, key, value);
 
   return &_saved.back();
 }

@@ -85,7 +85,9 @@ public:
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
   KMX_Options *GetOptions();
+  KMX_Options const *GetOptions() const;
   KMX_Environment *GetEnvironment();
+  KMX_Environment const *GetEnvironment() const;
   LPINTKEYBOARDINFO GetKeyboard();
 };
 

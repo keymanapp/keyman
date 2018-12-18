@@ -45,7 +45,10 @@ constexpr char const *doc1_expected = u8"\
         \"rules\" : []\n\
     },\n\
     \"options\" : {\n\
-        \"keyboard\" : {},\n\
+        \"keyboard\" : {\n\
+            \"__test_point\" : \"F2 pressed test save.\",\n\
+            \"hello\" : \"-\"\n\
+        },\n\
         \"environment\" : {\n\
             \"hello\" : \"-\"\n\
         },\n\
@@ -83,7 +86,10 @@ constexpr char const *doc2_expected = u8"\
         \"rules\" : []\n\
     },\n\
     \"options\" : {\n\
-        \"keyboard\" : {},\n\
+        \"keyboard\" : {\n\
+            \"__test_point\" : \"F2 pressed test save.\",\n\
+            \"hello\" : \"-\"\n\
+        },\n\
         \"environment\" : {\n\
             \"hello\" : \"-\"\n\
         },\n\

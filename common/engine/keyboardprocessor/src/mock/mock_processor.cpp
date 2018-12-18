@@ -11,7 +11,7 @@
 */
 
 #include <keyman/keyboardprocessor.h>
-#include "processor.hpp"
+#include "mock/mock_processor.hpp"
 #include "state.hpp"
 
 namespace
@@ -73,8 +73,22 @@ namespace
 namespace km {
   namespace kbp
   {
+    mock_processor::mock_processor(kbp::path const & path)
+    : abstract_processor(
+        keyboard_attributes(path.stem(), u"3.145", path.parent(), {
+          option{KM_KBP_OPT_KEYBOARD, u"__test_point", u"F2 pressed test save."},
+          option{KM_KBP_OPT_KEYBOARD, u"hello", u"-"}
+      }))
+    {
+    }
 
-    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
+
+    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state)
+    {
+      assert(state);
+      if (!state)
+        return KM_KBP_STATUS_INVALID_ARGUMENT;
+
       try
       {
         state->actions.clear();
@@ -123,11 +137,23 @@ namespace km {
 
     }
 
-    km_kbp_attr const * mock_processor::get_attrs() const {
-      return &engine_attrs;
+    void mock_processor::update_option(km_kbp_state *,
+                                       km_kbp_option_scope,
+                                       std::u16string const &,
+                                       std::u16string const &)
+    {};
+
+    void mock_processor::init_state(std::vector<option> &default_env) {
+      default_env.emplace_back(KM_KBP_OPT_ENVIRONMENT, u"hello", u"-");
+      default_env.emplace_back();
+    };
+
+    km_kbp_attr const & mock_processor::attributes() const {
+      return engine_attrs;
     }
 
     km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
+
     km_kbp_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }
   } // namespace kbp
 } // namespace km

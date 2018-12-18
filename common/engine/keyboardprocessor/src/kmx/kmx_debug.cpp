@@ -6,7 +6,8 @@
 #include <stdarg.h>
 #include <iostream>
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 #define TAB "\t"
 #define NL  "\n"

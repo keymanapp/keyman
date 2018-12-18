@@ -15,32 +15,50 @@
 using namespace km::kbp;
 
 
-
-keyboard::keyboard(km::kbp::path const & path)
-: _keyboard_id(path.stem()),
-  _version_string(u"3.145"),
-  _folder_path(path.parent()),
-  _default_opts {KM_KBP_OPTIONS_END}
+inline
+void keyboard_attributes::render()
 {
-  version_string = _version_string.c_str();
-  id = _keyboard_id.c_str();
-  folder_path = _folder_path.c_str();
-
-  if (path.suffix() == ".kmx" ||
-      path.suffix() == ".KMX") { // Some legacy packages may include upper-case file extensions
-    _processor = new kmx_processor(this);
-  }
-  else if (path.suffix() == ".mock") {
-    _processor = new mock_processor(this);
-  }
-  else {
-    _processor = new null_processor(this);
-  }
-
+  // Make attributes point to the stored values above.
+  id              = _keyboard_id.c_str();
+  version_string  = _version_string.c_str();
+  folder_path     = _folder_path.c_str();
   default_options = _default_opts.data();
 }
 
-json & km::kbp::operator << (json & j, km::kbp::keyboard const & kb)
+
+keyboard_attributes::keyboard_attributes(std::u16string const & kbid,
+    std::u16string const & version,
+    path_type const & path,
+    options_store const &opts)
+: _keyboard_id(kbid),
+  _version_string(version),
+  _folder_path(path),
+  _default_opts(opts)
+{
+  // Ensure that the default_options array will be properly terminated.
+  _default_opts.push_back(option());
+  render();
+}
+
+
+keyboard_attributes::keyboard_attributes(keyboard_attributes &&rhs)
+: _keyboard_id(std::move(rhs._keyboard_id)),
+  _version_string(std::move(rhs._version_string)),
+  _folder_path(std::move(rhs._folder_path)),
+  _default_opts(std::move(rhs._default_opts))
+{
+    rhs.id = rhs.version_string = nullptr;
+    render();
+}
+
+
+keyboard_attributes & keyboard_attributes::operator = (keyboard_attributes &&rhs)
+{
+  return *new (this) keyboard_attributes(std::move(rhs));
+}
+
+
+json & km::kbp::operator << (json & j, km::kbp::keyboard_attributes const & kb)
 {
   j << json::object
       << "id" << std::u16string(kb.id)
