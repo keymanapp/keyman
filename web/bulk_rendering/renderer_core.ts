@@ -228,7 +228,7 @@ namespace com.keyman.renderer {
           // This will go at the top of the page when finished, but not when actively rendering.
           // We want to leave as much space visible as possible when actively rendering keyboards
           // so that auto-scrolling isn't an issue.
-          this.fillDeviceNotes();
+          renderer.fillDeviceNotes();
         });
       } else {
         console.error("KeymanWeb not detected!");
