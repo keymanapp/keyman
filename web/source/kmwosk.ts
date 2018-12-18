@@ -4597,7 +4597,7 @@ if(!window['keyman']['initialized']) {
       if(device.touchable) {
         var fontScale: number = 1;
         if(device.formFactor == 'phone') {
-          fontScale = 1.6 * 0.6;  // Combines original scaling factor with one previously applied to the layer group.
+          fontScale = 1.6 * (keymanweb.isEmbedded ? 0.65 : 0.6);  // Combines original scaling factor with one previously applied to the layer group.
         }
 
         // This section was formerly used for a scaling parameter on osk._DivVKbd.
