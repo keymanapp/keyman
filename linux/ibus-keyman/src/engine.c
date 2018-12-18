@@ -324,7 +324,53 @@ ibus_keyman_engine_constructor (GType                   type,
     }
     g_free(kmx_file);
 
-    km_kbp_option_item options[1] = {KM_KBP_OPTIONS_END};
+    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 4);
+
+    keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
+    km_kbp_cp *cp = g_utf8_to_utf16 ("platform", -1, NULL, NULL, NULL);
+    keyboard_opts[0].key = cp;
+    cp = g_utf8_to_utf16 ("linux desktop hardware native", -1, NULL, NULL, NULL);
+    keyboard_opts[0].value = cp;
+
+    keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
+    cp = g_utf8_to_utf16 ("baseLayout", -1, NULL, NULL, NULL);
+    keyboard_opts[1].key = cp;
+    cp = g_utf8_to_utf16 ("kbdus.dll", -1, NULL, NULL, NULL);
+    keyboard_opts[1].value = cp;
+
+    keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
+    cp = g_utf8_to_utf16 ("baseLayoutAlt", -1, NULL, NULL, NULL);
+    keyboard_opts[2].key = cp;
+    #if 0 // in the future when mnemonic layouts are to be supported
+    const gchar *lang_env = g_getenv("LANG");
+    gchar *lang;
+    if (lang_env != NULL) {
+        g_message("LANG=%s", lang_env);
+        gchar **splitlang = g_strsplit(lang_env, ".", 2);
+        g_message("before . is %s", splitlang[0]);
+        if (g_strrstr(splitlang[0], "_")) {
+            g_message("splitting %s", splitlang[0]);
+            gchar **taglang = g_strsplit(splitlang[0], "_", 2);
+            g_message("lang of tag is %s", taglang[0]);
+            g_message("country of tag is %s", taglang[1]);
+            lang = g_strjoin("-", taglang[0], taglang[1], NULL);
+            g_strfreev(taglang);
+        }
+        else {
+            lang = g_strdup(splitlang[0]);
+        }
+        g_strfreev(splitlang);
+    }
+    else {
+        lang = strdup("en-US");
+    }
+    g_message("lang is %s", lang);
+    #endif
+    cp = g_utf8_to_utf16 ("en-US", -1, NULL, NULL, NULL);
+    // g_free(lang);
+    keyboard_opts[2].value = cp;
+
+    // keyboard_opts[3] already initialised to {0, 0, 0}
 
     km_kbp_status status_keyboard = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
@@ -335,12 +381,17 @@ ibus_keyman_engine_constructor (GType                   type,
     }
 
     km_kbp_status status_state = km_kbp_state_create(keyman->keyboard,
-                                  options,
+                                  keyboard_opts,
                                   &(keyman->state));
     if (status_state != KM_KBP_STATUS_OK)
     {
         g_warning("problem creating km_kbp_state");
     }
+    for (int i =0; i < 3; i++) {
+        km_kbp_cp_dispose(keyboard_opts[i].key);
+        km_kbp_cp_dispose(keyboard_opts[i].value);
+    }
+    g_free(keyboard_opts);
 
     reset_context(engine);
 
