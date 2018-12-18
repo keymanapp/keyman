@@ -38,12 +38,13 @@ struct key_event {
 
 typedef enum {
   KOT_INPUT,
-  KOT_OUTPUT
+  KOT_OUTPUT,
+  KOT_SAVED
 } kmx_option_type;
 
 struct kmx_option {
   kmx_option_type type;
-  std::u16string key, value;
+  std::u16string key, value, saved_value;
 };
 
 using kmx_options = std::vector<kmx_option>;
@@ -153,7 +154,7 @@ key_event next_key(std::string &keys) {
   }
 }
 
-void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16string & text_store) {
+void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16string & text_store, kmx_options &options) {
   switch (act.type)
   {
   case KM_KBP_IT_END:
@@ -188,11 +189,28 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     }
     break;
   case KM_KBP_IT_PERSIST_OPT:
-    std::cout << "action: option "
-              << (act.option->scope == KM_KBP_OPT_ENVIRONMENT ? "&" : "🖮 ")
-                            << act.option->key
-                            << "=" << act.option->value
-              << " persistance requested" << std::endl;
+    {
+      bool found = false;
+      for (auto it = options.begin(); it != options.end(); it++) {
+        if (it->type == KOT_SAVED) {
+          if (it->key.compare(act.option->key) == 0) {
+            found = true;
+            it->saved_value = act.option->value;
+            break;
+          }
+        }
+      }
+      std::cout << "action: option "
+                << (act.option->scope == KM_KBP_OPT_ENVIRONMENT ? "environment " : "keyboard ")
+                              << act.option->key
+                              << "=" << act.option->value
+                << " persistence requested" << std::endl;
+      if (!found) {
+        std::cout << "option " 
+                  << act.option->key 
+                  << " saved but no expected output found. Suggestion: update test to include saved option value." << std::endl;
+      }
+    }
     break;
   case KM_KBP_IT_INVALIDATE_CONTEXT:
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
@@ -284,7 +302,7 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
     try_status(km_kbp_process_event(test_state, p.vk, p.modifier_state));
 
     for (auto act = km_kbp_state_action_items(test_state, nullptr); act->type != KM_KBP_IT_END; act++) {
-      apply_action(test_state, *act, text_store);
+      apply_action(test_state, *act, text_store, options);
     }
   }
 
@@ -310,15 +328,18 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   if (text_store != expected) return __LINE__;
 
   // Test resultant options
-  // TODO: test also KM_KBP_IT_PERSIST_OPT and KM_KBP_IT_RESET_OPT actions
-
   for (auto it = options.begin(); it != options.end(); it++) {
-    if (it->type != KOT_OUTPUT) continue;
-    std::cout << "output option-key: " << it->key << " expected: " << it->value;
-    km_kbp_cp const *value;
-    try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
-    std::cout << " actual: " << value << std::endl;
-    if (it->value.compare(value) != 0) return __LINE__;
+    if (it->type == KOT_OUTPUT) {
+      std::cout << "output option-key: " << it->key << " expected: " << it->value;
+      km_kbp_cp const *value;
+      try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+      std::cout << " actual: " << value << std::endl;
+      if (it->value.compare(value) != 0) return __LINE__;
+    }
+    else if (it->type == KOT_SAVED) {
+      std::cout << "persisted option-key: " << it->key << " expected: " << it->value << " actual: " << it->saved_value << std::endl;
+      if (it->value.compare(it->saved_value) != 0) return __LINE__;
+    }
   }
 
   // Destroy them
@@ -392,7 +413,8 @@ int load_source(const km::kbp::path & path, std::string & keys, std::u16string &
     s_expected = "c expected: ",
     s_context = "c context: ",
     s_option = "c option: ",
-    s_option_expected = "c expected option: ";
+    s_option_expected = "c expected option: ",
+    s_option_saved = "c saved option: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
   std::ifstream kmn(path.native());
@@ -425,6 +447,9 @@ int load_source(const km::kbp::path & path, std::string & keys, std::u16string &
     }
     else if (is_token(s_option_expected, line)) {
       if (!parse_option_string(line, options, KOT_OUTPUT)) return __LINE__;
+    }
+    else if (is_token(s_option_saved, line)) {
+      if (!parse_option_string(line, options, KOT_SAVED)) return __LINE__;
     }
   }
 

@@ -3,6 +3,7 @@ c keys: [K_A][K_1][K_A][K_0][K_A][K_2]
 c expected: no foo.foo.no foo.
 c context: 
 c expected option: foo=0
+c saved option: foo=0
 
 store(&version) '10.0'
 
