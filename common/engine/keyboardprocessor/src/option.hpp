@@ -83,6 +83,11 @@ namespace kbp
     return *new (this) option(rhs);
   }
 
+  inline
+  bool option::empty() const {
+    return key == nullptr;
+  }
+
 
 
   class options
@@ -120,7 +125,3 @@ namespace kbp
 
 } // namespace kbp
 } // namespace km
-
-
-// Adaptor between internal km::kbp::options object and API definitiion.
-struct km_kbp_options: public km::kbp::options {};

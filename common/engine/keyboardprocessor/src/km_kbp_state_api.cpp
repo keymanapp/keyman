@@ -70,15 +70,6 @@ km_kbp_context *km_kbp_state_context(km_kbp_state *state)
 }
 
 
-km_kbp_options *km_kbp_state_options(km_kbp_state *state)
-{
-  assert(state);
-  if (!state) return nullptr;
-
-  return static_cast<km_kbp_options *>(&state->options());
-}
-
-
 km_kbp_action_item const * km_kbp_state_action_items(km_kbp_state const *state,
                                                      size_t *num_items)
 {
