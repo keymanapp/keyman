@@ -5,7 +5,8 @@
 #include "kmx_processor.h"
 #include "state.hpp"
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 /* Globals */
 

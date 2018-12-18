@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"inlineSources": true,
+	"module": "none",
+	"outFile": "../release/renderer/bulk_render.js",
+	"sourceMap": true,
+	"target": "es5"
+	},
+  "files": [
+		"renderer_core.ts"
+  ]
+}

@@ -872,7 +872,10 @@
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"{$PROJECT_DIR}/Keyman4MacIM",
+				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -899,7 +902,10 @@
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"{$PROJECT_DIR}/Keyman4MacIM",
+				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;

@@ -4,7 +4,8 @@
 */
 #include <kmx/kmx_processor.h>
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 /* KMX_Context */
 

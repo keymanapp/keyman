@@ -53,6 +53,8 @@ tests = [
   '035 - options double set staged',
   '036 - options - double reset staged',
   '037 - options - double reset',
+  '038 - punctkeys',
+  '039 - generic ctrlalt'
 ]
 
 if build_machine.system() == 'windows'

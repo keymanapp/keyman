@@ -1,0 +1,383 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "10.0.1099.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "kmx.cpp"
+  },
+  "info": {
+    "name": {
+      "description": "Test Keyboards"
+    },
+    "version": {
+      "description": "0.0"
+    },
+    "copyright": {
+      "description": "\u00A9 2018 SIL International"
+    },
+    "author": {
+      "description": ""
+    }
+  },
+  "files": [
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "000 - null keyboard",
+      "id": "000 - null keyboard",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "001 - basic input UnicodeI",
+      "id": "001 - basic input UnicodeI",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "002 - basic input Unicode",
+      "id": "002 - basic input Unicode",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "003 - nul",
+      "id": "003 - nul",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "004 - basic input (shift 2)",
+      "id": "004 - basic input (shift 2)",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "005 - nul with initial context",
+      "id": "005 - nul with initial context",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "006 - vkey input (shift ctrl)",
+      "id": "006 - vkey input (shift ctrl)",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "007 - vkey input (ctrl alt)",
+      "id": "007 - vkey input (ctrl alt)",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "008 - vkey input (ctrl alt 2)",
+      "id": "008 - vkey input (ctrl alt 2)",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "012 - ralt",
+      "id": "012 - ralt",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "013 - deadkeys",
+      "id": "013 - deadkeys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "014 - groups and virtual keys",
+      "id": "014 - groups and virtual keys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "015 - ralt 2",
+      "id": "015 - ralt 2",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "017 - space mnemonic kbd",
+      "id": "017 - space mnemonic kbd",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "018 - nul testing",
+      "id": "018 - nul testing",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "019 - multiple deadkeys",
+      "id": "019 - multiple deadkeys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "020 - deadkeys and backspace",
+      "id": "020 - deadkeys and backspace",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "021 - options",
+      "id": "021 - options",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "022 - options with preset",
+      "id": "022 - options with preset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "023 - options with save",
+      "id": "023 - options with save",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "024 - options with save and preset",
+      "id": "024 - options with save and preset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "025 - options with reset",
+      "id": "025 - options with reset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "026 - system stores",
+      "id": "026 - system stores",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "027 - system stores 2",
+      "id": "027 - system stores 2",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "028 - smp",
+      "id": "028 - smp",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "029 - beep",
+      "id": "029 - beep",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "030 - multiple groups",
+      "id": "030 - multiple groups",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "031 - caps lock",
+      "id": "031 - caps lock",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "032 - caps control",
+      "id": "032 - caps control",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "033 - caps always off",
+      "id": "033 - caps always off",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "038 - punctkeys",
+      "id": "038 - punctkeys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "039 - generic ctrlalt",
+      "id": "039 - generic ctrlalt",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    }
+   ]
+}

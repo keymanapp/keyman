@@ -6,8 +6,8 @@ c 4. Two deadkeys in a row in context         dk(4a) dk(4b) + BKSP = nul
 c 5. One char and two deadkeys in context     'a' dk(5a) dk(5b) 'b' + BKSP = 'a'
 c 6. One char and two deadkeys and one char and two deadkeys in context     'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d) + BKSP = 'a'
 c keys: [K_1][K_BKSP][K_2][K_BKSP][K_3][K_BKSP][K_4][K_BKSP][K_5][K_BKSP][K_6][K_BKSP]
-c expected: aa
-c context: 
+c expected: 12aa
+c context: 1234
 
 store(&VERSION) '9.0'
 

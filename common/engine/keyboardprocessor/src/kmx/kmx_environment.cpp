@@ -7,7 +7,8 @@
 #include <state.hpp>
 #include <option.hpp>
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 namespace {
   km_kbp_cp const

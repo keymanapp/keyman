@@ -1386,7 +1386,11 @@ var
           if FTextExtent.cx > (RText.Right - RText.Left) * FKeyboard.FScale then
           begin
             Font.Height := Trunc(Font.Height * (RText.Right - RText.Left) * FKeyboard.FScale / FTextExtent.cx);
-          end;
+          end
+          else if FTextExtent.cy > (RText.Bottom - RText.Top) * FKeyboard.FScale then
+          begin
+            Font.Height := Trunc(Font.Height * (RText.Bottom - RText.Top) * FKeyboard.FScale / FTextExtent.cy);
+          end
         end;
 
 

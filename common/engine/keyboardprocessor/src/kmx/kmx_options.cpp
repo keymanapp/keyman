@@ -6,7 +6,8 @@
 #include <option.hpp>
 #include <state.hpp>
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 int KMX_Options::_GetIndex(std::u16string const &key) const {
   auto i = 0U;

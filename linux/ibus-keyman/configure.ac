@@ -53,6 +53,12 @@ PKG_CHECK_MODULES(IBUS, [
     ibus-1.0 >= 1.2.0
 ])
 
+# check Gtk
+PKG_CHECK_MODULES(GTK, [
+    gtk+-3.0 >= 2.4
+])
+
+
 # check Json glib
 PKG_CHECK_MODULES(JSON_GLIB, [
     json-glib-1.0 >= 1.4.0

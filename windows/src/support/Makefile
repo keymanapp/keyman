@@ -1,13 +1,19 @@
 #
-# Addins Makefile
+# Support Makefile
 #
 
-TARGETS=nul
-# CLEANS=inst
+TARGETS=oskbulkrenderer
 
 !include ..\Header.mak
 
-nul:
-  # nada
+# ----------------------------------------------------------------------
+
+oskbulkrenderer:
+    cd $(ROOT)\src\support\oskbulkrenderer
+    $(MAKE) $(TARGET)
 
 !include ..\Target.mak
+
+# ----------------------------------------------------------------------
+# EOF
+# ----------------------------------------------------------------------

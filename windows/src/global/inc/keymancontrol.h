@@ -47,8 +47,8 @@
 
 #define KMC_PROFILECHANGED  18  // 9.0.426.0   // I3933
 
-#define KMC_KEYBOARDHOTKEY  19  // 9.0.459.0   // I4326
-#define KMC_LANGUAGEHOTKEY  20  // 9.0.460.0    // I4451
+//#define KMC_KEYBOARDHOTKEY  19  // 9.0.459.0   // I4326 Deprecated in favour of language hotkeys
+//#define KMC_LANGUAGEHOTKEY  20  // 9.0.460.0    // I4451 Now using keyman.exe RegisterHotkey
 //TOUCH  #define KMC_CONTEXT 19  // 9.0.450.0
 
 #define RWM_KEYMAN_CONTROL "WM_KEYMAN_CONTROL"
