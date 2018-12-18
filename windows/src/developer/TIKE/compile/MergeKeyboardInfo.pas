@@ -26,6 +26,9 @@
   # version -- from kmp.inf, js
   # minKeymanVersion -- from kmp.inf, kmx, js
   # platformSupport -- deduce from whether kmp exists, js exists
+  # languages -- given the BCP 47 ids, generate the subtag names:
+  #              displayName, languageName - (required)
+  #              scriptName, regionName    - if not blank
 }
 unit MergeKeyboardInfo;
 
@@ -87,6 +90,8 @@ type
     procedure AddHelpLink;
     procedure AddPlatformSupport;
     procedure CheckOrAddVersion;
+    procedure AddSubtagNames(id: String; o: TJSONObject);
+    procedure CheckOrMigrateLanguages;
     function SaveJsonFile: Boolean;
     procedure CheckPackageKeyboardFilenames;
     procedure AddIsRTL;
@@ -108,7 +113,10 @@ uses
 
   Keyman.System.RegExGroupHelperRSP19902,
 
+  BCP47Tag,
   JsonUtil,
+  Keyman.System.KeyboardInfoFile,
+  Keyman.System.LanguageCodeUtils,
   utilfiletypes,
   VersionInfo;
 
@@ -178,6 +186,7 @@ begin
     CheckPackageKeyboardFilenames;
 
     CheckOrAddID;
+    CheckOrMigrateLanguages;
     AddName;
     AddIsRTL;
     AddAuthor;
@@ -417,6 +426,96 @@ begin
   else
     json.AddPair('id', FID);
 end;
+
+ procedure TMergeKeyboardInfo.AddSubtagNames(id: String; o: TJSONObject);
+ var
+   displayName, languageName, scriptName, regionName: String;
+   v: TJSONValue;
+   bcp47Tag: TBCP47Tag;
+ begin
+   if id = '' then
+     Exit;
+   bcp47Tag := TBCP47Tag.Create(id);
+   try
+     TLanguageCodeUtils.BCP47Languages.TryGetValue(bcp47Tag.Language, languageName);
+     TLanguageCodeUtils.BCP47Scripts.TryGetValue(bcp47Tag.Script, scriptName);
+     TLanguageCodeUtils.BCP47Regions.TryGetValue(bcp47Tag.Region, regionName);
+   finally
+     bcp47Tag.Free;
+   end;
+
+    displayName := TLanguageCodeUtils.LanguageName(languageName, scriptName, regionName);
+
+    v := o.Values[TKeyboardInfoFile.SDisplayName];
+   if not Assigned(v) then
+     o.AddPair(TKeyboardInfoFile.SDisplayName, displayName);
+
+    v := o.Values[TKeyboardInfoFile.SLanguageName];
+   if not Assigned(v) then
+     o.AddPair(TKeyboardInfoFile.SLanguageName, languageName);
+
+    if scriptName <> '' then
+   begin
+     v := o.Values[TKeyboardInfoFile.SScriptName];
+     if not Assigned(v) then
+       o.AddPair(TKeyboardInfoFile.SScriptName, scriptName);
+   end;
+
+    if regionName <> '' then
+   begin
+     v := o.Values[TKeyboardInfoFile.SRegionName];
+     if not Assigned(v) then
+       o.AddPair(TKeyboardInfoFile.SRegionName, regionName);
+   end;
+ end;
+
+  procedure TMergeKeyboardInfo.CheckOrMigrateLanguages;
+ var
+   v: TJSONValue;
+   alangs: TJSONArray;
+   olangs, o: TJSONObject;
+   pair: TJSONPair;
+   i: Integer;
+   id: string;
+ begin
+   v := json.GetValue(TKeyboardInfoFile.SLanguages);
+
+    if v is TJSONArray then
+   begin
+     // Migrate languages[] array to Object
+     alangs := v as TJSONArray;
+     olangs := TJSONObject.Create;
+     for i := 0 to alangs.Count - 1 do
+     begin
+       id := alangs.Items[i].Value;
+       if id = '' then
+         continue;
+
+        // Populate subtag names
+       o := TJSONObject.Create;
+       olangs.AddPair(id, o);
+       AddSubtagNames(id, o);
+     end;
+
+      json.RemovePair(TKeyboardInfoFile.SLanguages);
+     json.AddPair(TKeyboardInfoFile.SLanguages, olangs);
+   end
+   else if v is TJSONObject then
+   begin
+     olangs := v as TJsonObject;
+     for i := 0 to olangs.Count - 1 do
+     begin
+       pair := olangs.Pairs[i];
+       id := pair.JSONString.Value;
+       if id = '' then
+         continue;
+
+        // Populate subtag names
+       o := pair.JsonValue as TJSONObject;
+       AddSubtagNames(id, o);
+     end;
+   end;
+ end;
 
 //
 // name -- from kmp.inf, js
