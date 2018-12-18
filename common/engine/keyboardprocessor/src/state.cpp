@@ -11,7 +11,7 @@
 using namespace km::kbp;
 
 void actions::push_persist(option const &opt) {
-  assert(!empty() && back().type != KM_KBP_IT_END);
+  assert(empty() || back().type != KM_KBP_IT_END);
   _option_items_stack.emplace_back(opt);
   km_kbp_action_item ai = {KM_KBP_IT_PERSIST_OPT, {0,}, {0}};
   ai.option = &_option_items_stack.back();
@@ -19,7 +19,7 @@ void actions::push_persist(option const &opt) {
 }
 
 void actions::push_persist(option const &&opt) {
-  assert(!empty() && back().type != KM_KBP_IT_END);
+  assert(empty() || back().type != KM_KBP_IT_END);
   _option_items_stack.emplace_back(opt);
   km_kbp_action_item ai = {KM_KBP_IT_PERSIST_OPT, {0,}, {0}};
   ai.option = &_option_items_stack.back();

@@ -75,7 +75,7 @@ namespace km {
     mock_processor::mock_processor(kbp::path const & path)
     : abstract_processor(
         keyboard_attributes(path.stem(), u"3.145", path.parent(), {
-          option{KM_KBP_OPT_KEYBOARD, u"__test_point", u"F2 pressed test save."},
+          option{KM_KBP_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
           option{KM_KBP_OPT_KEYBOARD, u"hello", u"-"}
       }))
     {
@@ -98,6 +98,22 @@ namespace km {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
           state->actions().push_backspace();
+          break;
+
+        case KM_KBP_VKEY_F2:
+        {
+          auto & opts = state->options();
+          auto opt = opts.assign(state,
+                                 KM_KBP_OPT_KEYBOARD,
+                                 u"__test_point",
+                                 u"F2 pressed test save.");
+          state->actions().push_persist(static_cast<option const &>(*opt));
+          break;
+        }
+
+        case KM_KBP_VKEY_F4:
+          state->context().push_marker(KM_KBP_VKEY_QUOTE);
+          state->actions().push_marker(KM_KBP_VKEY_QUOTE);
           break;
 
         default:

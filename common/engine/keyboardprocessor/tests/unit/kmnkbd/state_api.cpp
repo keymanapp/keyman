@@ -46,14 +46,16 @@ constexpr char const *doc1_expected = u8"\
     },\n\
     \"options\" : {\n\
         \"keyboard\" : {\n\
-            \"__test_point\" : \"F2 pressed test save.\",\n\
+            \"__test_point\" : \"not tiggered\",\n\
             \"hello\" : \"-\"\n\
         },\n\
         \"environment\" : {\n\
             \"hello\" : \"-\"\n\
         },\n\
         \"saved\" : {\n\
-            \"keyboard\" : {},\n\
+            \"keyboard\" : {\n\
+                \"__test_point\" : \"F2 pressed test save.\"\n\
+            },\n\
             \"environment\" : {\n\
                 \"hello\" : \"world\"\n\
             }\n\
@@ -72,7 +74,7 @@ constexpr char const *doc1_expected = u8"\
         \"L\"\n\
     ],\n\
     \"actions\" : [\n\
-        { \"character\" : \"L\" }\n\
+        { \"persist\" : { \"keyboard\" : { \"__test_point\" : \"F2 pressed test save.\" } } }\n\
     ]\n\
 }\n";
 
@@ -87,7 +89,7 @@ constexpr char const *doc2_expected = u8"\
     },\n\
     \"options\" : {\n\
         \"keyboard\" : {\n\
-            \"__test_point\" : \"F2 pressed test save.\",\n\
+            \"__test_point\" : \"not tiggered\",\n\
             \"hello\" : \"-\"\n\
         },\n\
         \"environment\" : {\n\
@@ -105,6 +107,11 @@ constexpr char const *doc2_expected = u8"\
 }\n";
 
 
+constexpr km_kbp_option_item const expected_persist_opt = {
+  u"__test_point",
+  u"F2 pressed test save.",
+  KM_KBP_OPT_KEYBOARD
+};
 
 inline
 bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs)
@@ -203,9 +210,9 @@ int main(int, char * [])
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
                                   KM_KBP_MODIFIER_SHIFT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}}));
-  //try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2,0));
-  // assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
-  //                     {uintptr_t(&expected_persist_opt)}}}));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2,0));
+  assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
+                      {uintptr_t(&expected_persist_opt)}}}));
 
   // Test debug dump
   auto doc1 = get_json_doc(*test_state),
