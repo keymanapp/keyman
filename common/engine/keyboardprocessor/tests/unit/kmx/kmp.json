@@ -336,6 +336,50 @@
       ]
     },
     {
+      "name": "034 - options double set reset",
+      "id": "034 - options double set reset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "035 - options double set staged",
+      "id": "035 - options double set staged",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "036 - options - double reset staged",
+      "id": "036 - options - double reset staged",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "037 - options - double reset",
+      "id": "037 - options - double reset",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
       "name": "038 - punctkeys",
       "id": "038 - punctkeys",
       "version": "0.0",
