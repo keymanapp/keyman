@@ -188,7 +188,11 @@ void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16
     }
     break;
   case KM_KBP_IT_PERSIST_OPT:
-    assert(false); // TODO
+    std::cout << "action: option "
+              << (act.option->scope == KM_KBP_OPT_ENVIRONMENT ? "&" : "🖮 ")
+                            << act.option->key
+                            << "=" << act.option->value
+              << " persistance requested" << std::endl;
     break;
   case KM_KBP_IT_INVALIDATE_CONTEXT:
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
