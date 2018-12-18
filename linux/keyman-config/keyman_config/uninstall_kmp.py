@@ -9,6 +9,9 @@ from shutil import rmtree
 from keyman_config.get_kmp import user_keyboard_dir, user_keyman_font_dir
 
 def uninstall_from_ibus(kmnfile):
+# need to uninstall for all installed langs
+
+
 	if sys.version_info.major == 3 and sys.version_info.minor < 6:
 		result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
 			stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
@@ -67,6 +70,7 @@ def uninstall_kmp_shared(keyboardid):
 		logging.info("Removed font directory: %s", kbfontdir)
 	else:
 		logging.info("No font directory")
+	# need to uninstall from ibus for all lang and all kmx in kmp
 	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
 	uninstall_from_ibus(kmnfile)
 	rmtree(kbdir)
@@ -85,6 +89,7 @@ def uninstall_kmp_user(keyboardid):
 		logging.error("Keyboard directory for %s does not exist. Aborting", keyboardid)
 		exit(3)
 	logging.info("Uninstalling local keyboard: %s", keyboardid)
+	# need to uninstall from ibus for all lang and all kmx in kmp
 	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
 	uninstall_from_ibus(kmnfile)
 	rmtree(kbdir)

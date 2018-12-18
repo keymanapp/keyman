@@ -10,8 +10,11 @@ import tempfile
 import zipfile
 from os import listdir, makedirs
 from shutil import copy2, rmtree
-from ast import literal_eval
+# from ast import literal_eval
 from enum import Enum
+
+gi.require_version('IBus', '1.0')
+from gi.repository import IBus
 
 import requests
 
@@ -165,7 +168,6 @@ def install_kmp_shared(inputfile, online=False):
 		inputfile (str): path to kmp file
 		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
 	"""
-	do_install_to_ibus = False
 	check_keyman_dir('/usr/local/share', "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman")
 	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
 	check_keyman_dir('/usr/local/share/fonts', "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
@@ -187,7 +189,6 @@ def install_kmp_shared(inputfile, online=False):
 				for kb in keyboards:
 					if kb['id'] != packageID:
 						process_keyboard_data(kb['id'], packageDir)
-			# do_install_to_ibus = True # temporarily disable
 
 		for f in files:
 			fpath = os.path.join(packageDir, f['name'])
@@ -218,9 +219,11 @@ def install_kmp_shared(inputfile, online=False):
 			elif ftype == KMFileTypes.KM_ICON:
 				logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 				checkandsaveico(fpath)
-		if do_install_to_ibus:
-			# install all keyboards not just packageID
-			install_to_ibus(kmn_file)
+		for kb in keyboards:
+			# install all kmx for first lang not just packageID
+			kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
+			install_to_ibus(lang, kmx_file)
+		restart_ibus()
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
 		logging.info("Contents of %s:", inputfile)
@@ -231,7 +234,6 @@ def install_kmp_shared(inputfile, online=False):
 		raise InstallError(InstallStatus.Abort, message)
 
 def install_kmp_user(inputfile, online=False):
-	do_install_to_ibus = False
 	packageID, ext = os.path.splitext(os.path.basename(inputfile))
 	packageDir=user_keyboard_dir(packageID)
 	if not os.path.isdir(packageDir):
@@ -248,7 +250,6 @@ def install_kmp_user(inputfile, online=False):
 				for kb in keyboards:
 					if kb['id'] != packageID:
 						process_keyboard_data(kb['id'], packageDir)
-			# do_install_to_ibus = True # temporarily disable
 
 		for f in files:
 			fpath = os.path.join(packageDir, f['name'])
@@ -274,10 +275,13 @@ def install_kmp_user(inputfile, online=False):
 			elif ftype == KMFileTypes.KM_SOURCE:
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
-		if do_install_to_ibus:
-			# install all keyboards not just packageID
-			kmn_file = os.path.join(packageDir, packageID + ".kmn")
-			install_to_ibus(kmn_file)
+
+		for kb in keyboards:
+			# install all kmx for first lang not just packageID
+			kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
+			install_to_ibus(lang, kmx_file)
+		restart_ibus()
+
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
 		logging.info("Contents of %s:", inputfile)
@@ -287,40 +291,32 @@ def install_kmp_user(inputfile, online=False):
 		message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
 		raise InstallError(InstallStatus.Abort, message)
 
+def install_to_ibus(lang, kmx_file):
+	try:
+		keyboard_id = "%s:%s" % (lang, kmx_file)
+		logging.debug("getting bus")
+		bus = IBus.Bus()
+		logging.debug("installing to ibus")
+		ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
+		preload_engines = ibus_settings.get_strv("preload-engines")
+		logging.debug(preload_engines)
+		if keyboard_id not in preload_engines:
+			preload_engines.append(keyboard_id)
+		logging.debug(preload_engines)
+		ibus_settings.set_strv("preload-engines", preload_engines)
+		bus.preload_engines(preload_engines)
+	except Exception as e:
+		logging.debug("Failed to set up install %s to IBus", keyboard_id)
+		logging.debug(e)
 
-
-def install_to_ibus(kmn_file):
-	if sys.version_info.major == 3 and sys.version_info.minor < 6:
-		dconfreadresult = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
-			stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
-		dconfread = dconfreadresult.stdout.decode("utf-8", "strict")
-	else:
-		dconfreadresult = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
-			stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
-		dconfread = dconfreadresult.stdout
-	if (dconfreadresult.returncode == 0) and dconfread:
-		preload_engines = literal_eval(dconfread)
-		preload_engines.append(kmn_file)
-		logging.info("Installing %s into IBus", kmn_file)
-		if sys.version_info.major == 3 and sys.version_info.minor < 6:
-			dconfwriteresult = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
-				stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
-		else:
-			dconfwriteresult = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
-				stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
-		if (dconfwriteresult.returncode == 0):
-			# restart IBus to be sure the keyboard is installed
-			ibusrestartresult = subprocess.run(["ibus", "restart"])
-			if (ibusrestartresult.returncode != 0):
-				message = "install_kmp.py: error %d: Could not restart IBus." % (ibusrestartresult.returncode)
-				raise InstallError(InstallStatus.Continue, message)
-		else:
-			message = "install_kmp.py: error %d: Could not install the keyboad to IBus." % (dconfwriteresult.returncode)
-			raise InstallError(InstallStatus.Continue, message)
-	else:
-		message = "install_kmp.py: error %d: Could not read dconf preload-engines entry so cannot install to IBus" % (dconfreadresult.returncode)
-		raise InstallError(InstallStatus.Continue, message)
-
+def restart_ibus():
+	try:
+		bus = IBus.Bus()
+		logging.info("restarting IBus")
+		bus.exit(True)
+	except Exception as e:
+		logging.debug("Failed to restart IBus")
+		logging.debug(e)
 
 
 def install_kmp(inputfile, online=False, sharedarea=False):
