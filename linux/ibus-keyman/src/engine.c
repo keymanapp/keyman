@@ -335,6 +335,7 @@ ibus_keyman_engine_constructor (GType                   type,
     keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
     cp = g_utf8_to_utf16 ("baseLayout", -1, NULL, NULL, NULL);
     keyboard_opts[1].key = cp;
+    #if 0 // in the future when mnemonic layouts are to be supported
     const gchar *lang_env = g_getenv("LANG");
     gchar *lang;
     if (lang_env != NULL) {
@@ -358,8 +359,9 @@ ibus_keyman_engine_constructor (GType                   type,
         lang = strdup("en-US");
     }
     g_message("lang is %s", lang);
-    cp = g_utf8_to_utf16 (lang, -1, NULL, NULL, NULL);
-    g_free(lang);
+    #endif
+    cp = g_utf8_to_utf16 ("en-US", -1, NULL, NULL, NULL);
+    // g_free(lang);
     keyboard_opts[1].value = cp;
 
     // keyboard_opts[2] already initialised to {0, 0, 0}
