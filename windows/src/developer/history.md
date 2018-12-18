@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2018-12-18 10.0.1207 stable
+* Update kmcomp to add language subtag names to keyboard_info files (#1444)
+
 ## 2018-11-28 10.0.1206 stable
 * Add parameter `-add-help-link` to kmcomp (#1346)
 
