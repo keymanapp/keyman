@@ -261,7 +261,7 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
 
     keyboard_opts[i] = KM_KBP_OPTIONS_END;
 
-    try_status(km_kbp_options_update(test_state, keyboard_opts));
+    try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
     delete [] keyboard_opts;
   }
@@ -312,10 +312,9 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
     if (it->type != KOT_OUTPUT) continue;
     std::cout << "output option-key: " << it->key << " expected: " << it->value;
     km_kbp_cp const *value;
-    try_status(km_kbp_options_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+    try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
     std::cout << " actual: " << value << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
-    km_kbp_cp_dispose(value);
   }
 
   // Destroy them

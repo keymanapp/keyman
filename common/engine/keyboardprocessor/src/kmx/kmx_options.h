@@ -25,9 +25,9 @@ public:
   ~KMX_Options();
 
   void Init(std::vector<option> &opts);
-  void Load(km_kbp_options *options, std::u16string const &key);
+  void Load(options *options, std::u16string const &key);
   void Set(int nStoreToSet, int nStoreToRead);
-  void Reset(km_kbp_options *options, int nStoreToReset);
+  void Reset(options *options, int nStoreToReset);
   void Save(km_kbp_state *state, int nStoreToSave);
 };
 

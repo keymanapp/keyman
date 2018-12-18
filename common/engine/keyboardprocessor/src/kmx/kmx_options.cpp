@@ -27,7 +27,7 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   }
 }
 
-void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
+void KMX_Options::Load(options *options, std::u16string const &key) {
   LPSTORE sp;
   KMX_DWORD i;
 
@@ -35,7 +35,7 @@ void KMX_Options::Load(km_kbp_options *options, std::u16string const &key) {
   assert(!key.empty());
 
   if (options == nullptr || key.empty()) return;
-  
+
   for (i = 0, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++) {
     if (_kp->KeyboardOptions[i].OriginalStore != NULL && sp->dpName != NULL && u16icmp(sp->dpName, key.c_str()) == 0) {
       Reset(options, i);
@@ -123,13 +123,13 @@ void KMX_Options::Set(int nStoreToSet, int nStoreToRead)
   {
     delete _kp->KeyboardOptions[nStoreToSet].Value;
   }
-   
+
   _kp->KeyboardOptions[nStoreToSet].Value = new KMX_WCHAR[u16len(sp->dpString)+1];
   u16cpy(_kp->KeyboardOptions[nStoreToSet].Value, /*u16len(sp->dpString)+1,*/ sp->dpString);
   _kp->Keyboard->dpStoreArray[nStoreToSet].dpString = _kp->KeyboardOptions[nStoreToSet].Value;
 }
 
-void KMX_Options::Reset(km_kbp_options *options, int nStoreToReset)
+void KMX_Options::Reset(options *options, int nStoreToReset)
 {
   assert(_kp != NULL);
   assert(_kp->Keyboard != NULL);
