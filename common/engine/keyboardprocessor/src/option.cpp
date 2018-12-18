@@ -95,19 +95,6 @@ void options::reset(km_kbp_option_scope scope, std::u16string const & key)
 
 
 
-json & operator << (json &j, char16_t const *u16str) {
-  char cps[5] = {0,};
-  int8_t l;
-  std::string u8str;
-
-  for (auto i = utf16::const_iterator(u16str); *i; ++i)
-  {
-    utf8::codec::put(reinterpret_cast<utf8::codeunit_t *>(cps), *i, l);
-    u8str.append(cps, size_t(l));
-  }
-  j << u8str;
-  return j;
-}
 
 
 json & km::kbp::operator << (json &j, options const &opts)

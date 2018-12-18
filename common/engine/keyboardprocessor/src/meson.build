@@ -22,7 +22,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-fvisibility=hidden',
     '-fvisibility-inlines-hidden'
   ]
-  links = ['-lstdc++fs']
+  links = []
 
   if compiler.get_id() == 'clang'
     warns += [

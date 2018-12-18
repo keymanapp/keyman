@@ -15,6 +15,7 @@
 
 #include <keyman/keyboardprocessor.h>
 
+#include "path.hpp"
 #include "state.hpp"
 
 #define   try_status(expr) \
@@ -25,11 +26,8 @@
 #endif
 #define assert(expr) {if (!(expr)) std::exit(100*__LINE__); }
 
-std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
-
 namespace
 {
-
 bool g_beep_found = false;
 
 struct key_event {
@@ -49,7 +47,7 @@ struct kmx_option {
 
 using kmx_options = std::vector<kmx_option>;
 
-int load_source(const std::string &, std::string &, std::u16string &,
+int load_source(const km::kbp::path &, std::string &, std::u16string &,
                 std::u16string &, kmx_options &, bool &);
 
 km_kbp_option_item test_env_opts[] =
@@ -203,32 +201,9 @@ void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, st
   }
 }
 
-template<typename P>
-std::basic_string<
-  typename std::remove_const<
-    typename std::remove_pointer<P>::type>::type
->
-utf8_to(const std::string &);
-
-template<>
-inline
-std::basic_string<wchar_t> utf8_to<const wchar_t *>(const std::string & s)
-{
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-  return convert.from_bytes(s);
-}
-
-template<>
-inline
-std::basic_string<char> utf8_to<const char *>(const std::string & s)
-{
-  return s;
-}
-
-int run_test(const std::string & source, const std::string & _compiled) {
+int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   std::string keys = "";
   std::u16string expected = u"", context = u"";
-  auto compiled = utf8_to<km_kbp_path_name>(_compiled);
   kmx_options options;
   bool expected_beep = false;
 
@@ -236,7 +211,7 @@ int run_test(const std::string & source, const std::string & _compiled) {
   if (result != 0) return result;
 
   std::cout << "source file   = " << source << std::endl
-            << "compiled file = " << _compiled << std::endl;
+            << "compiled file = " << compiled << std::endl;
 
   km_kbp_keyboard * test_kb = nullptr;
   km_kbp_state * test_state = nullptr;
@@ -256,7 +231,7 @@ int run_test(const std::string & source, const std::string & _compiled) {
     for (auto it = options.begin(); it != options.end(); it++) {
       if (it->type != KOT_INPUT) continue;
 
-      std::cout << "input option-key: " << utf16_to_utf8(it->key) << std::endl;
+      std::cout << "input option-key: " << it->key << std::endl;
 
       std::u16string key = it->key;
       if (key[0] == u'&') {
@@ -319,9 +294,9 @@ int run_test(const std::string & source, const std::string & _compiled) {
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
 
-  std::cout << "expected: " << utf16_to_utf8(expected) << std::endl;
-  std::cout << "text store: " << utf16_to_utf8(text_store) << std::endl;
-  std::cout << "result: " << utf16_to_utf8(buf) << std::endl;
+  std::cout << "expected: " << expected << std::endl;
+  std::cout << "text store: " << text_store << std::endl;
+  std::cout << "result: " << buf << std::endl;
 
   // Compare internal context with expected result
   if (buf != expected) return __LINE__;
@@ -334,10 +309,10 @@ int run_test(const std::string & source, const std::string & _compiled) {
 
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type != KOT_OUTPUT) continue;
-    std::cout << "output option-key: " << utf16_to_utf8(it->key) << " expected: " << utf16_to_utf8(it->value);
+    std::cout << "output option-key: " << it->key << " expected: " << it->value;
     km_kbp_cp const *value;
     try_status(km_kbp_options_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
-    std::cout << " actual: " << utf16_to_utf8(value) << std::endl;
+    std::cout << " actual: " << value << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
     km_kbp_cp_dispose(value);
   }
@@ -408,7 +383,7 @@ bool is_token(const std::string token, std::string &line) {
   return false;
 }
 
-int load_source(const std::string & path, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
+int load_source(const km::kbp::path & path, std::string & keys, std::u16string & expected, std::u16string & context, kmx_options &options, bool &expected_beep) {
   const std::string s_keys = "c keys: ",
     s_expected = "c expected: ",
     s_context = "c context: ",
@@ -416,8 +391,9 @@ int load_source(const std::string & path, std::string & keys, std::u16string & e
     s_option_expected = "c expected option: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected result
-  std::ifstream kmn(path);
+  std::ifstream kmn(path.native());
   if (!kmn.good()) {
+    std::cerr << "could not open file: " << path << std::endl;
     return __LINE__;
   }
   std::string line;

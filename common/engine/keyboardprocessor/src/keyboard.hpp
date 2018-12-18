@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <experimental/filesystem>
 #include <string>
 
 #include <keyman/keyboardprocessor.h>
@@ -16,9 +15,7 @@
 #include "option.hpp"
 #include "processor.hpp"
 
-namespace std {
-  namespace filesystem = std::experimental::filesystem;
-}
+#include "path.hpp"
 
 // Forward declarations
 class json;
@@ -31,11 +28,11 @@ namespace kbp
   {
     std::u16string const                      _keyboard_id;
     std::u16string const                      _version_string;
-    std::filesystem::path              const  _folder_path;
+    km::kbp::path const                       _folder_path;
     std::vector<km_kbp_option_item>           _default_opts;
     abstract_processor                       *_processor;
   public:
-    keyboard(std::filesystem::path const &);
+    keyboard(km::kbp::path const &);
     ~keyboard() {
       delete _processor;
     }
