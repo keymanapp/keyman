@@ -26,25 +26,37 @@ namespace kbp
     option(): km_kbp_option_item KM_KBP_OPTIONS_END {}
     option(option const &);
     option(option &&);
+    option(km_kbp_option_scope, char16_t const *, char16_t const *);
     option(km_kbp_option_scope, std::u16string const &,
            std::u16string const &);
 
     ~option() noexcept;
 
+    option & operator=(option const & rhs);
     option & operator=(option && rhs);
+
+    bool empty() const;
   };
+
+
+  inline
+  option::option(km_kbp_option_scope s,
+                 std::u16string const & k, std::u16string const & v)
+  : option(s, k.c_str(), v.c_str())
+  {}
+
 
   inline
   option::option(option const & rhs)
-  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value)
-  {}
+  : option(km_kbp_option_scope(rhs.scope), rhs.key, rhs.value) {}
+
 
   inline
-  option::option(option && rhs)
-  : km_kbp_option_item { rhs.key, rhs.value, rhs.scope }
+  option::option(option && rhs) : option()
   {
-    rhs.key = nullptr;
-    rhs.value = nullptr;
+    std::swap(key, rhs.key);
+    std::swap(value, rhs.value);
+    scope = rhs.scope;
   }
 
   inline
@@ -54,15 +66,26 @@ namespace kbp
     delete [] value;
   }
 
+
   inline
-  option & option::operator=(option && rhs)
+  option & option::operator=(option && rhs) {
+    delete [] key;
+    delete [] value;
+    return *new (this) option(std::move(rhs));
+  }
+
+
+  inline
+  option & option::operator=(option const & rhs)
   {
     delete [] key;
     delete [] value;
-    key = rhs.key;
-    value = rhs.value; rhs.key = nullptr;
-    scope = rhs.scope; rhs.value = nullptr;
-    return *this;
+    return *new (this) option(rhs);
+  }
+
+  inline
+  bool option::empty() const {
+    return key == nullptr;
   }
 
 
@@ -99,9 +122,6 @@ namespace kbp
     _scopes[KM_KBP_OPT_ENVIRONMENT - 1] = env;
   }
 
+
 } // namespace kbp
 } // namespace km
-
-
-// Adaptor between internal km::kbp::options object and API definitiion.
-struct km_kbp_options: public km::kbp::options {};

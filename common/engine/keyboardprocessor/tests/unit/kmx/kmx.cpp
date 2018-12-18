@@ -13,10 +13,11 @@
 #include <string>
 #include <type_traits>
 
-#include <keyman/keyboardprocessor.h>
+#include <kmx/kmx_processor.h>
 
 #include "path.hpp"
 #include "state.hpp"
+#include "utfcodec.hpp"
 
 #define   try_status(expr) \
 {auto __s = (expr); if (__s != KM_KBP_STATUS_OK) std::exit(100*__LINE__+__s);}
@@ -84,7 +85,7 @@ key_event char_to_event(char ch) {
   };
 }
 
-uint16_t const get_modifier(std::string const m) {
+uint16_t get_modifier(std::string const m) {
   for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
     if (m == km::kbp::kmx::s_modifier_names[i].name) {
       return km::kbp::kmx::s_modifier_names[i].modifier;
@@ -93,7 +94,7 @@ uint16_t const get_modifier(std::string const m) {
   return 0;
 }
 
-km_kbp_virtual_key const get_vk(std::string const & vk) {
+km_kbp_virtual_key get_vk(std::string const & vk) {
   for (int i = 1; i < 256; i++) {
     if (vk == km::kbp::kmx::s_key_names[i]) {
       return i;
@@ -102,7 +103,7 @@ km_kbp_virtual_key const get_vk(std::string const & vk) {
   return 0;
 }
 
-key_event const vkey_to_event(std::string const & vk_event) {
+key_event vkey_to_event(std::string const & vk_event) {
   // vkey format is MODIFIER MODIFIER K_NAME
   //std::cout << "VK=" << vk_event << std::endl;
 
@@ -133,7 +134,7 @@ key_event const vkey_to_event(std::string const & vk_event) {
 
 key_event next_key(std::string &keys) {
   // Parse the next element of the string, chop it off, and return it
-  if (keys.length() == 0) return { 0 };
+  if (keys.length() == 0) return { 0, 0 };
   char ch = keys[0];
   if (ch == '[') {
     if (keys.length() > 1 && keys[1] == '[') {
@@ -152,7 +153,7 @@ key_event next_key(std::string &keys) {
   }
 }
 
-void apply_action(km_kbp_state const * state, km_kbp_action_item const & act, std::u16string & text_store) {
+void apply_action(km_kbp_state const *, km_kbp_action_item const & act, std::u16string & text_store) {
   switch (act.type)
   {
   case KM_KBP_IT_END:
@@ -260,7 +261,7 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
 
     keyboard_opts[i] = KM_KBP_OPTIONS_END;
 
-    try_status(km_kbp_options_update(test_state, keyboard_opts));
+    try_status(km_kbp_state_options_update(test_state, keyboard_opts));
 
     delete [] keyboard_opts;
   }
@@ -311,10 +312,9 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
     if (it->type != KOT_OUTPUT) continue;
     std::cout << "output option-key: " << it->key << " expected: " << it->value;
     km_kbp_cp const *value;
-    try_status(km_kbp_options_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
+    try_status(km_kbp_state_option_lookup(test_state, KM_KBP_OPT_KEYBOARD, it->key.c_str(), &value));
     std::cout << " actual: " << value << std::endl;
     if (it->value.compare(value) != 0) return __LINE__;
-    km_kbp_cp_dispose(value);
   }
 
   // Destroy them

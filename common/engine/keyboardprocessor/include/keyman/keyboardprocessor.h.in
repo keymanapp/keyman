@@ -478,8 +478,6 @@ typedef struct {
     uintptr_t           marker;          // MARKER type
     km_kbp_option_item const * option;   // OPT types
     km_kbp_usv          character;       // CHAR type
-    km_kbp_virtual_key  vkey;            // VKEY types
-    size_t              erased;          // BACK type
   };
 } km_kbp_action_item;
 
@@ -491,11 +489,11 @@ enum km_kbp_action_type {
   KM_KBP_IT_BACK        = 4,  // Delete the codepoint preceding the insertion point.
   KM_KBP_IT_PERSIST_OPT = 5,  // The indicated option needs to be stored.
   KM_KBP_IT_EMIT_KEYSTROKE = 6,  // Emit the current keystroke to the application
-  KM_KBP_IT_INVALIDATE_CONTEXT = 7, 
-                              // The processor requests that the context buffer be cleared;
-							  // for applications where context is cached, this clears the context;
-							  // for applications where context is read from the focused text store,
-							  // the context is just re-read and markers flushed.
+  KM_KBP_IT_INVALIDATE_CONTEXT = 7,
+          // The processor requests that the context buffer be cleared;
+          // for applications where context is cached, this clears the context;
+          // for applications where context is read from the focused text store,
+          // the context is just re-read and markers flushed.
   KM_KBP_IT_MAX_TYPE_ID
 };
 
@@ -554,7 +552,7 @@ km_kbp_options_list_size(km_kbp_option_item const *opts);
 
 /*
 ```
-### `km_kbp_options_lookup`
+### `km_kbp_state_option_lookup`
 ##### Description:
 Lookup an option based on its key, in an options list.
 ##### Return status:
@@ -567,22 +565,21 @@ Lookup an option based on its key, in an options list.
 - __scope__: Which key-value store to interrogate.
 - __key__: A UTF-16 string that matches the key in the target `km_kbp_option_item`.
 - __value__: A pointer to the result variable:
-  A pointer to a copy of the UTF-16 string value; undefined if return status
-  is anything other than `KM_KBP_STATUS_OK`. This memory must be disposed of
-  with `km_kbp_cp_dispose`.
-
+  A pointer to a UTF-16 string value owned by the state or keyboard object at
+  the time of the call. This pointer is only valid *until* the next call to any
+  function on this API and should be used immediately.
 ```c
 */
 KMN_API
 km_kbp_status
-km_kbp_options_lookup(km_kbp_state const *state,
+km_kbp_state_option_lookup(km_kbp_state const *state,
                       uint8_t scope,
                       km_kbp_cp const *key,
                       km_kbp_cp const **value);
 
 /*
 ```
-### `km_kbp_options_update`
+### `km_kbp_state_options_update`
 ##### Description:
 Adds or updates one or more options from a list of `km_kbp_option_item`s.
 ##### Return status:
@@ -591,7 +588,7 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 - `KM_KBP_STATUS_KEY_ERROR`: The key cannot be found.
 ##### Parameters:
-- __state__: An opaque pointer to a `km_kbp_state`.
+- __state__: An opaque pointer to a state object.
 - __new_opts__: An array of `km_kbp_option_item` objects to update or add. Must be
     terminated with `KM_KBP_OPTIONS_END`.
 
@@ -599,12 +596,12 @@ Adds or updates one or more options from a list of `km_kbp_option_item`s.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_update(km_kbp_state *state,
+km_kbp_state_options_update(km_kbp_state *state,
                       km_kbp_option_item const *new_opts);
 
 /*
 ```
-### `km_kbp_options_to_json`
+### `km_kbp_state_options_to_json`
 ##### Description:
 Export the contents of a `km_kbp_options` array to a JSON formatted document and
 place it in the supplied buffer, reporting how much space was used. If null is
@@ -616,7 +613,7 @@ undefined. The returned buffer uses UTF-8 encoding.
 - `KM_KBP_STATUS_INVALID_ARGUMENT`: If non-optional parameters are null.
 - `KM_KBP_STATUS_NO_MEM`: In the event an internal memory allocation fails.
 ##### Parameters:
-- __opts__: An opaque pointer to an options object.
+- __opts__: An opaque pointer to a state object.
 - __buf__: A pointer to the buffer to place the C string containing the JSON
 document into, can be null.
 - __space__: A pointer to a size_t variable. This variable must contain the
@@ -627,7 +624,7 @@ null. On return it will hold how many bytes were used.
 */
 KMN_API
 km_kbp_status
-km_kbp_options_to_json(km_kbp_options const *opts,
+km_kbp_state_options_to_json(km_kbp_state const *state,
                        char *buf,
                        size_t *space);
 
@@ -751,7 +748,7 @@ This must be disposed of by a call to `km_kbp_state_dispose`.
 */
 KMN_API
 km_kbp_status
-km_kbp_state_create(km_kbp_keyboard const *keyboard,
+km_kbp_state_create(km_kbp_keyboard *keyboard,
                     km_kbp_option_item const *env,
                     km_kbp_state **out);
 
@@ -814,23 +811,6 @@ of the state object. If null is passed in, then null is returned.
 KMN_API
 km_kbp_context *
 km_kbp_state_context(km_kbp_state *state);
-
-/*
-```
-### `km_kpb_state_options`
-##### Description:
-Get access to the state object's options.
-##### Return:
-A pointer to an opaque state object. This pointer is valid for the lifetime
-of the state object. If null is passed in, then null is returned.
-##### Parameters:
-- __state__: A pointer to the opaque state object to be queried.
-
-```c
-*/
-KMN_API
-km_kbp_options *
-km_kbp_state_options(km_kbp_state *state);
 
 /*
 ```
@@ -928,22 +908,6 @@ structure.
 KMN_API
 km_kbp_attr const *
 km_kbp_get_engine_attrs(km_kbp_state const *state);
-
-/*
-```
-### `km_kbp_cp_dispose`
-##### Description:
-Free the allocated memory belonging to a `km_kbp_cp` array previously
-returned by `km_kbp_options_lookup`.
-##### Parameters:
-- __cp__: A pointer to the start of the `km_kbp_cp` array
-    to be disposed of.
-
-```c
-*/
-KMN_API
-void
-km_kbp_cp_dispose(km_kbp_cp const *cp);
 
 /*
 ```

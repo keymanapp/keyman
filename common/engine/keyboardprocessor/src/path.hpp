@@ -10,13 +10,13 @@
 
 #include <algorithm>
 #include <string>
+#include <type_traits>
 
 #include <keyman/keyboardprocessor.h>
-#include <json.hpp>
-#include <utfcodec.hpp>
+#include "json.hpp"
+#include "utfcodec.hpp"
 
 // Forward declarations
-class json;
 
 namespace km {
 namespace kbp

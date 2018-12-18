@@ -10,6 +10,7 @@
 #include <keyman/keyboardprocessor.h>
 
 #include "option.hpp"
+#include "state.hpp"
 
 #define   try_status(expr) \
 {auto __s = (expr); if (__s != KM_KBP_STATUS_OK) std::exit(100*__LINE__+__s);}
@@ -51,20 +52,16 @@ namespace
   km_kbp_option_item const empty_options_list[] = {KM_KBP_OPTIONS_END};
 
 #if 0
-  km::kbp::options mock_options(test_kb, test_env);
-  km::kbp::options empty_options(empty_options_list, empty_options_list);
-  km_kbp_options * api_mock_options = static_cast<km_kbp_options *>(
-                                              &mock_options),
-                 * api_empty_options = static_cast<km_kbp_options *>(
-                                              &empty_options);
+  km::kbp::state mock_state(test_kb, test_env);
+  km::kbp::state empty_state(empty_options_list, empty_options_list);
 #endif
 
-  std::string get_json_doc(km_kbp_options * const opts)
+  std::string get_json_doc(km_kbp_state * const state)
   {
     size_t sz = 0;
-    try_status(km_kbp_options_to_json(opts, nullptr, &sz));
+    try_status(km_kbp_state_options_to_json(state, nullptr, &sz));
     std::string buf(sz-1, 0);
-    try_status(km_kbp_options_to_json(opts, &buf[0], &sz));
+    try_status(km_kbp_state_options_to_json(state, &buf[0], &sz));
 
     return buf;
   }
@@ -74,17 +71,14 @@ namespace
   {
 #if 0
     km_kbp_cp const * ret = nullptr;
-    auto s = km_kbp_options_lookup(api_mock_options, scope,
+    auto s = km_kbp_state_option_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
     bool v = s == KM_KBP_STATUS_OK && ret == value;
-    if (s == KM_KBP_STATUS_OK) {
-      km_kbp_cp_dispose(ret);
-    }
     return v;
 #else
     return true;
-#endif;
+#endif
   }
 
 constexpr char const *empty_json = "\

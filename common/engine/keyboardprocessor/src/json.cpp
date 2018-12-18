@@ -8,10 +8,12 @@
                 25 Oct 2018 - TSE - Relicensed under the MIT license for
                                     inclusion in the Keyman project.
 */
-
-#include <cstdio>
+#include <cassert>
+#include <iomanip>
 #include <limits>
+
 #include "json.hpp"
+
 
 #if defined(_MSC_VER)
 #define FORMAT_INTMAX "%lli"

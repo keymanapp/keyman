@@ -22,13 +22,12 @@ namespace {
 KMX_Environment::KMX_Environment() {
 }
 
-void KMX_Environment::InitOption(std::vector<km_kbp_option_item> *default_env, km_kbp_cp const *key, km_kbp_cp const *default_value) {
-  km_kbp_option_item opt = { (km_kbp_cp*) key, (km_kbp_cp*) default_value, KM_KBP_OPT_ENVIRONMENT };
-  default_env->emplace_back(opt);
+void KMX_Environment::InitOption(std::vector<option> &default_env, km_kbp_cp const *key, km_kbp_cp const *default_value) {
+  default_env.emplace_back(KM_KBP_OPT_ENVIRONMENT, key, default_value);
   Load(key, default_value);
 }
 
-void KMX_Environment::Init(std::vector<km_kbp_option_item> *default_env) {
+void KMX_Environment::Init(std::vector<option> &default_env) {
   InitOption(default_env, KM_KBP_KMX_ENV_PLATFORM, DEFAULT_PLATFORM);
   InitOption(default_env, KM_KBP_KMX_ENV_BASELAYOUT, DEFAULT_BASELAYOUT);
   InitOption(default_env, KM_KBP_KMX_ENV_BASELAYOUTALT, DEFAULT_BASELAYOUTALT);
@@ -37,13 +36,13 @@ void KMX_Environment::Init(std::vector<km_kbp_option_item> *default_env) {
   InitOption(default_env, KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT, DEFAULT_BASELAYOUTGIVESCTRLRALTFORRALT);
 
   // TODO refactor this and the keyboard option terminator into state.cpp and keyboard.cpp respectively
-  km_kbp_option_item opt = KM_KBP_OPTIONS_END;
-  default_env->emplace_back(opt);
+  default_env.emplace_back();
 }
+
 
 void KMX_Environment::Load(std::u16string const & key, std::u16string const & value) {
   assert(!key.empty());
-  
+
   if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_PLATFORM)) {
     _platform = value;
   }
@@ -55,7 +54,7 @@ void KMX_Environment::Load(std::u16string const & key, std::u16string const & va
   }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_SIMULATEALTGR)) {
     _simulateAltGr = value == u"1";
-  } 
+  }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_CAPSLOCK)) {
     _capsLock = value == u"1";
   }

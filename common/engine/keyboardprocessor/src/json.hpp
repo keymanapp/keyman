@@ -11,11 +11,10 @@
 */
 #pragma once
 
-#include <cassert>
 #include <cstdint>
-#include <iomanip>
 #include <ostream>
 #include <vector>
+
 #include "utfcodec.hpp"
 
 class json

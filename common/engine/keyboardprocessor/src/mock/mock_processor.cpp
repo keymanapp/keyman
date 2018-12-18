@@ -10,8 +10,7 @@
   History:      17 Oct 2018 - TSE - Initial implementation.
 */
 
-#include <keyman/keyboardprocessor.h>
-#include "processor.hpp"
+#include "mock/mock_processor.hpp"
 #include "state.hpp"
 
 namespace
@@ -73,18 +72,48 @@ namespace
 namespace km {
   namespace kbp
   {
+    mock_processor::mock_processor(kbp::path const & path)
+    : abstract_processor(
+        keyboard_attributes(path.stem(), u"3.145", path.parent(), {
+          option{KM_KBP_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
+          option{KM_KBP_OPT_KEYBOARD, u"hello", u"-"}
+      }))
+    {
+    }
 
-    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {
+
+    km_kbp_status mock_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state)
+    {
+      assert(state);
+      if (!state)
+        return KM_KBP_STATUS_INVALID_ARGUMENT;
+
       try
       {
-        state->actions.clear();
+        // At the start of every process_event allways clear the action_items
+        state->actions().clear();
 
         switch (vk)
         {
         case KM_KBP_VKEY_BKSP:
           state->context().pop_back();
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_BACK, {0,}, {1} });
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
+          state->actions().push_backspace();
+          break;
+
+        case KM_KBP_VKEY_F2:
+        {
+          auto & opts = state->options();
+          auto opt = opts.assign(state,
+                                 KM_KBP_OPT_KEYBOARD,
+                                 u"__test_point",
+                                 u"F2 pressed test save.");
+          state->actions().push_persist(static_cast<option const &>(*opt));
+          break;
+        }
+
+        case KM_KBP_VKEY_F4:
+          state->context().push_marker(KM_KBP_VKEY_QUOTE);
+          state->actions().push_marker(KM_KBP_VKEY_QUOTE);
           break;
 
         default:
@@ -98,24 +127,25 @@ namespace km {
             for (auto c = char_seq; *c; ++c)
             {
               km_kbp_usv usv = *c;
-              state->context().emplace_back(km_kbp_context_item{ KM_KBP_CT_CHAR,{0,},{usv} });
-              state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_CHAR, {0,}, {usv} });
+              state->context().push_character(usv);
+              state->actions().push_character(usv);
             }
-            state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
+            state->actions().commit();
 
             return KM_KBP_STATUS_OK;
           }
 
           // Both shift states output nothing, generate an alert.
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_ALERT, {0,}, {0} });
-          state->actions.emplace_back(km_kbp_action_item{ KM_KBP_IT_END, {0,}, {0} });
+          state->actions().push_alert();
           break;
         }
         }
+
+        state->actions().commit();
       }
       catch (std::bad_alloc)
       {
-        state->actions.clear();
+        state->actions().clear();
         return KM_KBP_STATUS_NO_MEM;
       }
 
@@ -123,11 +153,23 @@ namespace km {
 
     }
 
-    km_kbp_attr const * mock_processor::get_attrs() const {
-      return &engine_attrs;
+    void mock_processor::update_option(km_kbp_state *,
+                                       km_kbp_option_scope,
+                                       std::u16string const &,
+                                       std::u16string const &)
+    {};
+
+    void mock_processor::init_state(std::vector<option> &default_env) {
+      default_env.emplace_back(KM_KBP_OPT_ENVIRONMENT, u"hello", u"-");
+      default_env.emplace_back();
+    };
+
+    km_kbp_attr const & mock_processor::attributes() const {
+      return engine_attrs;
     }
 
     km_kbp_status mock_processor::validate() const { return KM_KBP_STATUS_OK; }
+
     km_kbp_status null_processor::validate() const { return KM_KBP_STATUS_INVALID_ARGUMENT; }
   } // namespace kbp
 } // namespace km

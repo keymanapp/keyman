@@ -3,6 +3,7 @@
   Authors:          mcdurdin
 */
 #include "kmx_processor.h"
+#include "state.hpp"
 
 using namespace km::kbp::kmx;
 
@@ -88,7 +89,7 @@ KMX_BOOL KMX_Processor::ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWO
   LPGROUP gp = &kbd->dpGroupArray[kbd->StartGroup[BEGIN_UNICODE]];
 
   KMX_BOOL fOutputKeystroke = FALSE;
-   
+
   ProcessGroup(gp, &fOutputKeystroke);
 
   m_kbp_state = nullptr;
@@ -166,12 +167,12 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
       {
         if(kkp->dpContext[0] != 0) break; else continue;
       }
-  
+
       //if(kkp->Key == m_state.vkey)
-      //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x", 
+      //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x",
       //  kkp->Key, kkp->ShiftFlags);
 
-      /* Keyman 6.0: support Virtual Characters */ 
+      /* Keyman 6.0: support Virtual Characters */
       if(IsEquivalentShift(kkp->ShiftFlags, m_modifiers))
       {
         if(kkp->Key > VK__MAX && kkp->Key == m_state.vkey) break; // I3438   // I4582
@@ -218,12 +219,12 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     }
     else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0)
     {
-      /* NoMatch rule found, and is a character key */ 
+      /* NoMatch rule found, and is a character key */
       PostString(gp->dpNoMatch, m_keyboard.Keyboard, NULL, pOutputKeystroke);
     }
     else if (m_state.charCode != 0 && m_state.charCode != 0xFFFF && gp->fUsingKeys)
     {
-      /* No rule found, is a character key */ 
+      /* No rule found, is a character key */
       m_actions.QueueAction(QIT_CHAR, m_state.charCode);
     }
 
@@ -270,14 +271,14 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           case CODE_DEADKEY: m_actions.QueueAction(QIT_BACK, BK_DEADKEY); break;
           case CODE_NUL: break; // 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
         }
-      else 
+      else
       {
         m_actions.QueueAction(QIT_BACK, 0);
       }
     }
     p = kkp->dpOutput;
   }
-  else 
+  else
     p = incxstr(p);       // otherwise, the "context" entry has to be jumped over
 
   /* Use PostString to post the rest of the output string. */
@@ -294,7 +295,7 @@ KMX_BOOL KMX_Processor::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
 }
 
 /*
-* int PostString( PKMX_CHAR str, KMX_BOOL *useMode, LPMSG mp, 
+* int PostString( PKMX_CHAR str, KMX_BOOL *useMode, LPMSG mp,
 * LPKEYBOARD lpkb );
 *
 * Parameters: str   Pointer to string to send
@@ -326,7 +327,7 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
      {
       case CODE_EXTENDED:       // Start of a virtual key section w/shift codes
         p++;
-        
+
         shift = *p; //(*p<<8) | *(p+1);
         m_actions.QueueAction(QIT_VSHIFTDOWN, shift);
 
@@ -336,7 +337,7 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         m_actions.QueueAction(QIT_VKEYUP, *p);
 
         m_actions.QueueAction(QIT_VSHIFTUP, shift);
-        
+
         p++; // CODE_EXTENDEDEND
         ////// CODE_EXTENDEDEND will be incremented by loop
 
@@ -372,7 +373,7 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
         p++;
         DebugLog("CallDLL not supported [store=%d].\n", *p-1);
         FoundUse = TRUE;
-        break; 
+        break;
       case CODE_USE:          // use another group
         p++;
         ProcessGroup(&lpkb->dpGroupArray[*p-1], pOutputKeystroke);
@@ -401,7 +402,7 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Reset(km_kbp_state_options(m_kbp_state), n1);
+        GetOptions()->Reset(&m_kbp_state->options(), n1);
         break;
       case CODE_SAVEOPT:
         p++;
@@ -440,13 +441,13 @@ KMX_BOOL KMX_Processor::IsMatchingPlatformString(PKMX_WCHAR platform)  // I3432
   PKMX_WCHAR p = u16tok(t, u' ', &context);
   while (p != NULL) {
     if (u16icmp(platform, p) == 0) {
-      delete t;
+      delete [] t;
       return TRUE;
     }
     p = u16tok(NULL, u' ', &context);
   }
 
-  delete t;
+  delete [] t;
   return FALSE;
 }
 
@@ -461,14 +462,14 @@ KMX_BOOL KMX_Processor::IsMatchingPlatform(LPSTORE s)  // I3432
     if(!IsMatchingPlatformString(platform))
     {
       s->dwSystemID = TSS_PLATFORM_NOMATCH;
-      delete t;
+      delete [] t;
       return FALSE;
     }
     platform = u16tok(NULL, u' ', &context);
   }
 
   s->dwSystemID = TSS_PLATFORM_MATCH;
-  delete t;
+  delete [] t;
   return TRUE;
 }
 
@@ -493,7 +494,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
   KMX_BOOL bEqual;
 
   memset(m_indexStack, 0, GLOBAL_ContextStackSize*sizeof(KMX_WORD));
-  
+
   p = kkp->dpContext;
 
   if(*p == 0)
@@ -515,7 +516,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
     {
       s = &m_keyboard.Keyboard->dpStoreArray[(*(pp+2))-1];
       t = &m_keyboard.Keyboard->dpStoreArray[(*(pp+4))-1];
-      
+
       bEqual = u16cmp(s->dpString, t->dpString) == 0;
       if(*(pp+3) == 1 && bEqual) return FALSE;
       if(*(pp+3) == 2 && !bEqual) return FALSE;
@@ -545,7 +546,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
           bEqual = u16cmp(ss, t->dpString) == 0;
         }
       }
-      
+
       if(*(pp+3) == 1 && bEqual) return FALSE;
       if(*(pp+3) == 2 && !bEqual) return FALSE;
     }
@@ -576,7 +577,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
         s = &m_keyboard.Keyboard->dpStoreArray[(*(p+2))-1];
 
         temp = xstrchr(s->dpString, q);
-        
+
         if(temp != NULL)
           *indexp = (KMX_WORD) xstrpos(temp, s->dpString);
 
@@ -587,7 +588,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
         s = &m_keyboard.Keyboard->dpStoreArray[(*(p+2))-1];
 
         if((temp = xstrchr(s->dpString, q)) != NULL)
-          return FALSE; 
+          return FALSE;
 
         break;
       case CODE_INDEX:
@@ -596,7 +597,7 @@ KMX_BOOL KMX_Processor::ContextMatch(LPKEY kkp)
 
         for(temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
         if(n != 0) return FALSE;
-        if(xchrcmp(temp, q) != 0) return FALSE; 
+        if(xchrcmp(temp, q) != 0) return FALSE;
         break;
       case CODE_CONTEXTEX:
         // only the nth character
@@ -637,7 +638,15 @@ KMX_Options *KMX_Processor::GetOptions() {
   return &m_options;
 }
 
+KMX_Options const *KMX_Processor::GetOptions() const {
+  return &m_options;
+}
+
 KMX_Environment *KMX_Processor::GetEnvironment() {
+  return &m_environment;
+}
+
+KMX_Environment const *KMX_Processor::GetEnvironment() const {
   return &m_environment;
 }
 

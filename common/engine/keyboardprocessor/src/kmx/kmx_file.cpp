@@ -6,14 +6,14 @@
 
 using namespace km::kbp::kmx;
 
-#if defined(_WIN32) || defined(_WIN64) 
+#if defined(_WIN32) || defined(_WIN64)
 #include <share.h>
 #endif
 
 KMX_BOOL KMX_Processor::Load(km_kbp_path_name KeyboardName)
 {
   if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
-  
+
   return TRUE;
 }
 
@@ -70,13 +70,12 @@ unsigned long CalculateBufferCRC(unsigned long count, KMX_BYTE *p)
     temp2 = CRCTable[((int) crc ^ *p++) & 0xff];
     crc = temp1 ^ temp2;
   }
-    
+
   return crc;
 }
 
 KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard)
 {
-  long sz;
   PKMX_BYTE buf;
   FILE *fp;
   LPKEYBOARD kbp;
@@ -89,7 +88,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
     return FALSE;
   }
 
-#if defined(_WIN32) || defined(_WIN64) 
+#if defined(_WIN32) || defined(_WIN64)
   fp = _wfsopen(fileName, L"rb", _SH_DENYWR);
 #else
   fp = fopen(fileName, "rb");
@@ -106,7 +105,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
     return FALSE;
   }
 
-  sz = ftell(fp);
+  auto sz = ftell(fp);
   if (sz < 0) {
     fclose(fp);
     return FALSE;
@@ -146,7 +145,7 @@ KMX_BOOL KMX_Processor::LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKe
 
   if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
   {
-    delete buf; 
+    delete buf;
     DebugLog("Invalid file - signature is invalid");
     return FALSE;
   }
@@ -208,14 +207,14 @@ LPKEYBOARD KMX_Processor::CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base)
 
   kbp->dpGroupArray = (LPGROUP) bufp;
   bufp += sizeof(GROUP) * kbp->cxGroupArray;
-  
+
   PCOMP_STORE csp;
   LPSTORE sp;
   KMX_DWORD i;
 
   for(
-    csp = (PCOMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0; 
-    i < kbp->cxStoreArray; 
+    csp = (PCOMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0;
+    i < kbp->cxStoreArray;
     i++, sp++, csp++)
   {
     sp->dwSystemID = csp->dwSystemID;
@@ -284,7 +283,7 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
 
   for(gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)
   {
-    gp->dpName = StringOffset(base, cgp->dpName); 
+    gp->dpName = StringOffset(base, cgp->dpName);
     gp->dpKeyArray = (LPKEY) (base + cgp->dpKeyArray);
     if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
     if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
@@ -301,7 +300,7 @@ LPKEYBOARD KMX_Processor::FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWOR
 
 #endif
 
-KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz)
+KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, size_t sz)
 {
   KMX_DWORD tempcs;
   PCOMP_KEYBOARD ckbp;
@@ -314,20 +313,20 @@ KMX_BOOL KMX_Processor::VerifyChecksum(PKMX_BYTE buf, KMX_DWORD sz)
   return tempcs == CalculateBufferCRC(sz, buf);
 }
 
-KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz)
+KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, size_t sz)
 {
   KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
   PCOMP_STORE csp;
 
-  /* Check file version */ 
+  /* Check file version */
 
-  if(ckbp->dwFileVersion < VERSION_MIN || 
-     ckbp->dwFileVersion > VERSION_MAX) 
-  { 
-    /* Old or new version -- identify the desired program version */ 
-    if(VerifyChecksum(filebase, sz)) 
-    { 
+  if(ckbp->dwFileVersion < VERSION_MIN ||
+     ckbp->dwFileVersion > VERSION_MAX)
+  {
+    /* Old or new version -- identify the desired program version */
+    if(VerifyChecksum(filebase, sz))
+    {
       for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++)
         if(csp->dwSystemID == TSS_COMPILEDVERSION)
         {
@@ -339,9 +338,9 @@ KMX_BOOL KMX_Processor::VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD sz)
         }
     }
     DebugLog("errWrongFileVersion");
-    return FALSE; 
+    return FALSE;
   }
-  
+
   if(!VerifyChecksum(filebase, sz)) { DebugLog("errBadChecksum"); return FALSE; }
 
   return TRUE;
