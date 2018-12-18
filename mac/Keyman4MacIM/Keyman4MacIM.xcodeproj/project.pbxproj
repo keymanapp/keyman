@@ -874,6 +874,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"{$PROJECT_DIR}/Keyman4MacIM/KMAboutWindow",
 					"{$PROJECT_DIR}/Keyman4MacIM",
 				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
@@ -904,6 +905,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"{$PROJECT_DIR}/Keyman4MacIM/KMAboutWindow",
 					"{$PROJECT_DIR}/Keyman4MacIM",
 				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;

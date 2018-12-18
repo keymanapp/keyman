@@ -176,7 +176,11 @@ NSMutableArray *servers;
         // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
         // TODO: This bug should be fixed in 10.13.4, so after that has been available for a few weeks, we
         // can create a PR for branch mac-revert-high-sierra-showPreferences-workaround and merge it.
-        [self.AppDelegate showConfigurationWindow];
+        // rrb: where available (everywhere but 10.13.1-10.13.3?) call showPreferences, otherwise, call our workaround
+        if ([self respondsToSelector:@selector(showPreferences:)])
+            [self showPreferences:sender];
+        else
+            [self.AppDelegate showConfigurationWindow];
     }
     else if (itag == 3) {
         [self.AppDelegate showOSK];
