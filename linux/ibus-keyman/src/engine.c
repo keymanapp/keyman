@@ -324,7 +324,7 @@ ibus_keyman_engine_constructor (GType                   type,
     }
     g_free(kmx_file);
 
-    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 3);
+    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 4);
 
     keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
     km_kbp_cp *cp = g_utf8_to_utf16 ("platform", -1, NULL, NULL, NULL);
@@ -335,6 +335,12 @@ ibus_keyman_engine_constructor (GType                   type,
     keyboard_opts[1].scope = KM_KBP_OPT_ENVIRONMENT;
     cp = g_utf8_to_utf16 ("baseLayout", -1, NULL, NULL, NULL);
     keyboard_opts[1].key = cp;
+    cp = g_utf8_to_utf16 ("kbdus.dll", -1, NULL, NULL, NULL);
+    keyboard_opts[1].value = cp;
+
+    keyboard_opts[2].scope = KM_KBP_OPT_ENVIRONMENT;
+    cp = g_utf8_to_utf16 ("baseLayoutAlt", -1, NULL, NULL, NULL);
+    keyboard_opts[2].key = cp;
     #if 0 // in the future when mnemonic layouts are to be supported
     const gchar *lang_env = g_getenv("LANG");
     gchar *lang;
@@ -362,9 +368,9 @@ ibus_keyman_engine_constructor (GType                   type,
     #endif
     cp = g_utf8_to_utf16 ("en-US", -1, NULL, NULL, NULL);
     // g_free(lang);
-    keyboard_opts[1].value = cp;
+    keyboard_opts[2].value = cp;
 
-    // keyboard_opts[2] already initialised to {0, 0, 0}
+    // keyboard_opts[3] already initialised to {0, 0, 0}
 
     km_kbp_status status_keyboard = km_kbp_keyboard_load(abs_kmx_path, &(keyman->keyboard));
     g_free(abs_kmx_path);
