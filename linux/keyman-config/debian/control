@@ -26,6 +26,7 @@ Description: Keyman for Linux configuration
  packages.
 
 Package: keyman
+Section: utils
 Architecture: all
 Depends: ${misc:Depends}, python3-keyman-config
 Description: Type in your language with Keyman for Linux
