@@ -1,6 +1,6 @@
 #! /bin/bash
 # 
-# Compile the KeymanWeb Recorder module for use with developing/running engine tests.
+# Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
 #
 
 # Fails the build if a specified file does not exist.
