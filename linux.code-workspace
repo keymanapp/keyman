@@ -1,13 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "linux"
 		},
 		{
-			"path": "../onboard-keyman"
+			"path": "onboard-keyman"
 		},
 		{
-			"path": "../common/engine/keyboardprocessor"
+			"path": "common/engine/keyboardprocessor"
 		}
 	],
 	"settings": {
