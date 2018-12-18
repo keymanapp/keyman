@@ -47,6 +47,10 @@ namespace com.keyman {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
       }
 
+      if(!style.fontSize || style.fontSize == "") {
+        style.fontSize = '1em';
+      }
+
       let fontFamily = style.fontFamily;
 
       // Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
