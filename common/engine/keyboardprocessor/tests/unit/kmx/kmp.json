@@ -346,7 +346,7 @@
         }
       ]
     },
-     {
+    {
       "name": "033 - caps always off",
       "id": "033 - caps always off",
       "version": "0.0",
@@ -357,7 +357,7 @@
         }
       ]
     },
-     {
+    {
       "name": "038 - punctkeys",
       "id": "038 - punctkeys",
       "version": "0.0",
@@ -367,6 +367,17 @@
           "id": "und"
         }
       ]
+    },
+    {
+      "name": "039 - generic ctrlalt",
+      "id": "039 - generic ctrlalt",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
     }
-  ]
+   ]
 }
