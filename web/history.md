@@ -4,6 +4,8 @@
 * Add `setNumericLayer()` for embedded platforms to change OSK to numeric layer.
 * Fixes issue where file extensions are upper-case, e.g. ".TTF"
 * Fixes keyboard layout issues after mobile device rotations. (#248) (#970)
+* Fixes issue with oversized key text on some keyboards. (#382)
+* Fixes issue with diacritics not displaying on some keyboards.  (#1070)
 * Adds support for Promises to init() and setActiveKeyboard(). (#100)
 
 ## 2018-07-06 10.0.103 stable

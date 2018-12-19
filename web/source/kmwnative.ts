@@ -306,7 +306,19 @@ if(!window['keyman']['initialized']) {
         kts.height = canvas.height+'px';
 
         var px=util.getStyleInt(kc,'font-size');
-        if(px != 0) kts.fontSize = (previewFontScale * px)+'px';
+        if(px != 0) {
+          let popupFS = previewFontScale * px;
+          kts.fontSize = popupFS + 'px';
+
+          let textWidth = com.keyman.OSKKey.getTextWidth(ktLabel.textContent, kts);
+          // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
+          let proportion = canvas.width * 0.9 / (textWidth);
+
+          // Prevent the preview from overrunning its display area.
+          if(proportion < 1) {
+            kts.fontSize = (popupFS * proportion) + 'px';
+          }
+        }
         
         ktLabel.textContent = kc.textContent;
         ktls.display = 'block';
@@ -365,10 +377,10 @@ if(!window['keyman']['initialized']) {
       switch(edge)
       {
         case -1:
-          w1 -= dx; w2 -= dx; w3 -= dx;
+          w1 -= dx; w2 -= dx;
           break;
         case 1:
-          w0 += dx; w1 += dx; w2 += dx;
+          w1 += dx; w2 += dx;
           break;
       }
       

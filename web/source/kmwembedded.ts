@@ -224,10 +224,8 @@
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     b=b.firstChild.firstChild; bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    if(device.formFactor == 'phone') fs = 0.65;
     pad = Math.round(0.15*rowHeight);
 
-    bs.fontSize=fs+'em';  
     var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
  
     for(nLayer=0;nLayer<layers.length; nLayer++)
