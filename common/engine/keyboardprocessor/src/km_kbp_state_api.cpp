@@ -176,7 +176,7 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
     jo << json::object
         << "$schema" << "keyman/keyboardprocessor/doc/introspection.schema"
         << "keyboard" << state->processor().keyboard()
-        << "options" << state->options()
+//        << "options" << state->options()  TODO: Fix
         << "context" << state->context()
         << "actions" << state->actions()
         << json::close;

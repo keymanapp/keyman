@@ -11,6 +11,10 @@
 
 namespace km {
 namespace kbp {
+
+class abstract_processor;
+class state;
+
 namespace kmx {
 
 class KMX_Options
@@ -27,12 +31,13 @@ public:
   ~KMX_Options();
 
   void Init(std::vector<option> &opts);
-  void Load(options *options, std::u16string const &key);
+  void Load(abstract_processor &, std::u16string const &key);
+  char16_t const * LookUp(std::u16string const &key) const;
   void Set(int nStoreToSet, int nStoreToRead);
   void Set(int nStoreToSet, std::u16string const &value);
   void Set(std::u16string const &key, std::u16string const &value);
-  void Reset(options *options, int nStoreToReset);
-  void Save(km_kbp_state *state, int nStoreToSave);
+  void Reset(abstract_processor &, int nStoreToReset);
+  void Save(state & state, int nStoreToSave);
 
   STORE const * begin() const;
   STORE const * end() const;
@@ -41,7 +46,7 @@ public:
 inline
 void KMX_Options::Set(std::u16string const &key, std::u16string const &value) {
   auto i = _GetIndex(key);
-  if (i != signed(_kp->Keyboard->cxStoreArray))   Set(i, value);
+  if (i >= 0)   Set(i, value);
 }
 
 inline

@@ -19,6 +19,11 @@ namespace km {
       if (_valid)
         _kmx.GetOptions()->Init(defaults);
 
+      for (auto const & opt: defaults)
+      {
+        if (!opt.empty() && opt.scope == KM_KBP_OPT_KEYBOARD  )
+          persisted_store()[opt.key] = opt.value;
+      }
       // Fill out attributes
       auto v = _kmx.GetKeyboard()->Keyboard->version;
       auto vs = std::to_string(v >> 16) + "." + std::to_string(v & 0xffff);
@@ -27,21 +32,41 @@ namespace km {
                       std::u16string(vs.begin(), vs.end()), p.parent(), defaults);
     }
 
-    void kmx_processor::init_state(std::vector<option> &default_env) {
-      _kmx.GetEnvironment()->Init(default_env);
+
+    char16_t const * kmx_processor::lookup_option(km_kbp_option_scope scope, std::u16string const & key) const
+    {
+      char16_t const * pValue = nullptr;
+      switch(scope)
+      {
+        case KM_KBP_OPT_KEYBOARD:
+          pValue = _kmx.GetOptions()->LookUp(key);
+          break;
+        case KM_KBP_OPT_ENVIRONMENT:
+          pValue = _kmx.GetEnvironment()->LookUp(key);
+          break;
+        default:
+          break;
+      }
+
+      return pValue ? pValue : nullptr;
     }
 
-    void kmx_processor::update_option(km_kbp_state *state, km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value) {
+    option kmx_processor::update_option(km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value)
+    {
       switch(scope) {
         case KM_KBP_OPT_KEYBOARD:
-          _kmx.GetOptions()->Load(&state->options(), key);
+          _kmx.GetOptions()->Set(key, value);
+          persisted_store()[key] = value;
           break;
         case KM_KBP_OPT_ENVIRONMENT:
           _kmx.GetEnvironment()->Load(key, value);
           break;
         default:
+          return option();
           break;
       }
+
+      return option(scope, key, value);
     }
 
     km_kbp_status kmx_processor::process_event(km_kbp_state *state, km_kbp_virtual_key vk, uint16_t modifier_state) {

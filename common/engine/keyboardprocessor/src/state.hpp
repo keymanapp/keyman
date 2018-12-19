@@ -122,8 +122,6 @@ protected:
     kbp::context              _ctxt;
     kbp::abstract_processor & _processor;
     kbp::actions              _actions;
-    kbp::options              _options;
-    std::vector<option>       _env;
 
 public:
     state(kbp::abstract_processor & kb, km_kbp_option_item const *env);
@@ -133,9 +131,6 @@ public:
 
     kbp::context       &  context() noexcept            { return _ctxt; }
     kbp::context const &  context() const noexcept      { return _ctxt; }
-
-    kbp::options &          options() noexcept        { return _options; }
-    kbp::options const &    options() const noexcept  { return _options; }
 
     kbp::abstract_processor const & processor() const noexcept { return _processor; }
     kbp::abstract_processor &       processor() noexcept { return _processor; }

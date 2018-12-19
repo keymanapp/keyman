@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include <keyman/keyboardprocessor.h>
 
@@ -19,8 +20,9 @@ namespace kbp
 {
   class abstract_processor
   {
+    std::unordered_map<std::u16string, std::u16string>  _persisted;
   protected:
-    keyboard_attributes _attributes;
+    keyboard_attributes                                 _attributes;
 
   public:
     abstract_processor() {}
@@ -31,6 +33,9 @@ namespace kbp
       return _attributes;
     }
 
+    auto & persisted_store() const noexcept { return _persisted; }
+    auto & persisted_store() noexcept { return _persisted; }
+
     virtual km_kbp_status process_event(km_kbp_state *,
                                         km_kbp_virtual_key,
                                         uint16_t modifier_state) = 0;
@@ -38,13 +43,16 @@ namespace kbp
     virtual km_kbp_attr const & attributes() const = 0;
     virtual km_kbp_status       validate() const = 0;
 
-    virtual void    update_option(km_kbp_state *state,
-                                  km_kbp_option_scope,
+    virtual char16_t const * lookup_option(km_kbp_option_scope,
+                                  std::u16string const & key) const = 0;
+    virtual option  update_option(km_kbp_option_scope,
                                   std::u16string const & key,
                                   std::u16string const & value) = 0;
 
-    virtual void init_state(std::vector<option> &default_env) = 0;
+    friend json & operator << (json &j, abstract_processor const &opts);
   };
+
+  json & operator << (json &j, abstract_processor const &opts);
 
 } // namespace kbp
 } // namespace km

@@ -76,9 +76,31 @@ namespace km {
     : abstract_processor(
         keyboard_attributes(path.stem(), u"3.145", path.parent(), {
           option{KM_KBP_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
-          option{KM_KBP_OPT_KEYBOARD, u"hello", u"-"}
-      }))
+        })),
+      _options({
+          {u"\x01__test_point", u"not tiggered"},
+          {u"\x02hello", u"-"}
+      })
     {
+    }
+
+    char16_t const * mock_processor::lookup_option(km_kbp_option_scope scope,
+                                    std::u16string const & key) const
+    {
+      auto i = _options.find(char16_t(scope) + key);
+      return i != _options.end() ? i->second.c_str() : nullptr;
+    }
+
+    option mock_processor::update_option(km_kbp_option_scope scope,
+                       std::u16string const & key,
+                       std::u16string const & value)
+    {
+      auto i = _options.find(char16_t(scope) + key);
+      if (i == _options.end()) return option();
+
+      i->second = value;
+      persisted_store()[key] = value;
+      return option(scope, key, i->second);
     }
 
 
@@ -102,12 +124,10 @@ namespace km {
 
         case KM_KBP_VKEY_F2:
         {
-          auto & opts = state->options();
-          auto opt = opts.assign(state,
-                                 KM_KBP_OPT_KEYBOARD,
-                                 u"__test_point",
-                                 u"F2 pressed test save.");
-          state->actions().push_persist(static_cast<option const &>(*opt));
+          state->actions().push_persist(
+            update_option(KM_KBP_OPT_KEYBOARD,
+                        u"__test_point",
+                        u"F2 pressed test save."));
           break;
         }
 
@@ -152,17 +172,6 @@ namespace km {
       return KM_KBP_STATUS_OK;
 
     }
-
-    void mock_processor::update_option(km_kbp_state *,
-                                       km_kbp_option_scope,
-                                       std::u16string const &,
-                                       std::u16string const &)
-    {};
-
-    void mock_processor::init_state(std::vector<option> &default_env) {
-      default_env.emplace_back(KM_KBP_OPT_ENVIRONMENT, u"hello", u"-");
-      default_env.emplace_back();
-    };
 
     km_kbp_attr const & mock_processor::attributes() const {
       return engine_attrs;
