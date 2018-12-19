@@ -612,7 +612,22 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       }
 
       button.addTarget(self, action: #selector(subKeyButtonClick), for: .touchUpInside)
-      button.setTitle(subKeyText, for: .normal)
+
+      // Detect the text width for subkeys.  The 'as Any' silences an inappropriate warning from Swift.
+      let textSize = subKeyText.size(withAttributes: [NSAttributedStringKey.font: button.titleLabel?.font! as Any])
+      var displayText = subKeyText
+      
+      if textSize.width <= 0 && subKeyText.count > 0 {
+        // It's probably a diacritic in need of a combining character!
+        // Also check if the language is RTL!
+        if Manager.shared.currentKeyboard?.isRTL ?? false {
+          displayText = "\u{200f}\u{25cc}" + subKeyText
+        } else {
+          displayText = "\u{25cc}" + subKeyText
+        }
+      }
+
+      button.setTitle(displayText, for: .normal)
       button.tintColor = UIColor(red: 181.0 / 255.0, green: 181.0 / 255.0, blue: 181.0 / 255.0, alpha: 1.0)
       button.isEnabled = false
       return button
