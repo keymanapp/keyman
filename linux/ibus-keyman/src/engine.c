@@ -34,6 +34,7 @@
 
 #define MAXCONTEXT_ITEMS 128
 #define KEYMAN_BACKSPACE 14
+#define KEYMAN_BACKSPACE_KEYSYM 0xff08
 #define KEYMAN_LCTRL 29
 #define KEYMAN_LALT 56
 #define KEYMAN_RCTRL 97
@@ -454,10 +455,10 @@ ibus_keyman_engine_commit_string (IBusKeymanEngine *kmfl,
     g_object_unref (text);
 }
 
-static void forward_keycode(IBusKeymanEngine *engine, unsigned char keycode, unsigned int state)
+static void forward_backspace(IBusKeymanEngine *engine, unsigned int state)
 {
-    g_debug("DAR: forward_keycode no keysym");
-    ibus_engine_forward_key_event((IBusEngine *)engine, 0, keycode, state);
+    g_message("DAR: forward_backspace %d no keysym state %d", KEYMAN_BACKSPACE, state);
+    ibus_engine_forward_key_event((IBusEngine *)engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, state);
 }
 
 // from android/KMEA/app/src/main/java/com/tavultesoft/kmea/KMHardwareKeyboardInterpreter.java
@@ -783,7 +784,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                         km_kbp_context_get(km_kbp_state_context(keyman->state),
                             &context_items);
                         reset_context(engine);
-                        forward_keycode(keyman, KEYMAN_BACKSPACE, 0);
+                        forward_backspace(keyman, 0);
                         km_kbp_context_set(km_kbp_state_context(keyman->state),
                             context_items);
                         km_kbp_context_items_dispose(context_items);
