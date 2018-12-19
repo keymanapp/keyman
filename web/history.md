@@ -7,6 +7,7 @@
 * Fixes issue with oversized key text on some keyboards. (#382)
 * Fixes issue with diacritics not displaying on some keyboards.  (#1070)
 * Adds support for Promises to init() and setActiveKeyboard(). (#100)
+* Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
 
 ## 2018-07-06 10.0.103 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)

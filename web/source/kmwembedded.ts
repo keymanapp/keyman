@@ -190,10 +190,10 @@
   /**
    * Align input fields (should not be needed with KMEI, KMEA)
    * 
-   *  @param  {boolean}   align    align and make visible, else hide
+   *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
    * 
    **/
-  keymanweb.alignInputs = function(align) {};
+  keymanweb.alignInputs = function(eleList: HTMLElement[]) {};
 
   /**
    * Use rotation events to adjust OSK element positions and scaling if necessary
