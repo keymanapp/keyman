@@ -2,6 +2,7 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
+#include "processor.hpp"
 #include "kmx_processor.h"
 #include <option.hpp>
 #include <state.hpp>
@@ -41,20 +42,19 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
   }
 }
 
-void KMX_Options::Load(options *options, std::u16string const &key) {
+void KMX_Options::Load(abstract_processor & ap, std::u16string const &key) {
   LPSTORE sp;
   auto i = 0U;
 
-  assert(options != nullptr);
   assert(!key.empty());
 
-  if (options == nullptr || key.empty()) return;
+  if (key.empty()) return;
 
   for (i = 0, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++) {
     if (_kp->KeyboardOptions[i].OriginalStore != NULL
         && sp->dpName != NULL
         && u16icmp(sp->dpName, key.c_str()) == 0) {
-      Reset(options, i);
+      Reset(ap, i);
       return;
     }
   }
@@ -124,6 +124,16 @@ KMX_Options::~KMX_Options()
   _kp->KeyboardOptions = NULL;
 }
 
+
+char16_t const * KMX_Options::LookUp(std::u16string const &key) const
+{
+  auto idx = _GetIndex(key);
+  if (idx < 0)  return nullptr;
+
+  return _kp->Keyboard->dpStoreArray[idx].dpString;
+}
+
+
 void KMX_Options::Set(int nStoreToSet, std::u16string const & rValueToSet)
 {
   assert(_kp != NULL);
@@ -158,8 +168,7 @@ void KMX_Options::Set(int nStoreToSet, int nStoreToRead)
   Set(nStoreToSet, rStoreToReadValue);
 }
 
-
-void KMX_Options::Reset(options *options, int nStoreToReset)
+void KMX_Options::Reset(abstract_processor & ap, int nStoreToReset)
 {
   assert(_kp != NULL);
   assert(_kp->Keyboard != NULL);
@@ -179,17 +188,17 @@ void KMX_Options::Reset(options *options, int nStoreToReset)
   if(rStoreToReset.dpName == nullptr) return;
 
   // Now we need to go back and get any saved value from KPAPI. internal_value is owned by options api
-  km_kbp_cp const *internal_value = options->lookup(km_kbp_option_scope(KM_KBP_OPT_KEYBOARD), _kp->Keyboard->dpStoreArray[nStoreToReset].dpName);
-  if(internal_value) {
+  auto i = ap.persisted_store().find(rStoreToReset.dpName);
+  if(i != ap.persisted_store().end()) {
     // Copy the value from KPAPI
-    _kp->KeyboardOptions[nStoreToReset].Value = new KMX_WCHAR[u16len(internal_value) + 1];
-    u16cpy(_kp->KeyboardOptions[nStoreToReset].Value, /*u16len(val) + 1,*/ internal_value);
-    _kp->Keyboard->dpStoreArray[nStoreToReset].dpString = _kp->KeyboardOptions[nStoreToReset].Value;
+    rOptionToReset.Value = new KMX_WCHAR[i->second.size() + 1];
+    u16cpy(rOptionToReset.Value, /*u16len(val) + 1,*/ i->second.c_str());
+    rStoreToReset.dpString = rOptionToReset.Value;
   }
 }
 
 
-void KMX_Options::Save(km_kbp_state *state, int nStoreToSave)
+void KMX_Options::Save(state & state, int nStoreToSave)
 {
   assert(_kp != NULL);
   assert(_kp->Keyboard != NULL);
@@ -200,6 +209,7 @@ void KMX_Options::Save(km_kbp_state *state, int nStoreToSave)
   auto const & rStoreToSave = _kp->Keyboard->dpStoreArray[nStoreToSave];
   if (rStoreToSave.dpName == nullptr) return;
 
-  auto opt_ = state->options().assign(state, KM_KBP_OPT_KEYBOARD, rStoreToSave.dpName, rStoreToSave.dpString);
-  state->actions().push_persist(*static_cast<option const *>(opt_));
+  state.processor().persisted_store()[rStoreToSave.dpName] = rStoreToSave.dpString;
+  state.actions().push_persist(
+    option{KM_KBP_OPT_KEYBOARD, rStoreToSave.dpName, rStoreToSave.dpString});
 }

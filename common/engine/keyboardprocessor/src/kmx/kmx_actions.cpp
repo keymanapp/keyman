@@ -4,7 +4,8 @@
 */
 #include <kmx/kmx_processor.h>
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 void KMX_Actions::ResetQueue()
 {
@@ -31,7 +32,7 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
   QueueSize++;
 
   int result = TRUE;
-  
+
   switch(ItemType)
   {
   case QIT_VKEYDOWN:

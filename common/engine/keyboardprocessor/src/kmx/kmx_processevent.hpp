@@ -30,12 +30,11 @@ namespace kbp
     km_kbp_attr const & attributes() const override;
     km_kbp_status       validate() const override;
 
-    void    update_option(km_kbp_state *state,
-                          km_kbp_option_scope scope,
+    option  lookup_option(km_kbp_option_scope,
+                          std::u16string const & key)  const override;
+    option  update_option(km_kbp_option_scope scope,
                           std::u16string const & key,
                           std::u16string const & value) override;
-
-    void init_state(std::vector<option> &) override;
   };
 
 } // namespace kbp

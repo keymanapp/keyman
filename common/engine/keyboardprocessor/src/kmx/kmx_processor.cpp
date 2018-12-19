@@ -403,12 +403,12 @@ int KMX_Processor::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR endstr
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Reset(&m_kbp_state->options(), n1);
+        GetOptions()->Reset(m_kbp_state->processor(), n1);
         break;
       case CODE_SAVEOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Save(m_kbp_state, n1);
+        GetOptions()->Save(*m_kbp_state, n1);
         break;
       case CODE_IFSYSTEMSTORE:
         p+=3;
