@@ -4597,21 +4597,15 @@ if(!window['keyman']['initialized']) {
       if(device.touchable) {
         var fontScale: number = 1;
         if(device.formFactor == 'phone') {
-          fontScale = 1.6 * (keymanweb.isEmbedded ? 0.65 : 0.6);  // Combines original scaling factor with one previously applied to the layer group.
-        }
-
-        // This section was formerly used for a scaling parameter on osk._DivVKbd.
-        // Adjust keyboard font sizes
-        if(device.formFactor == 'phone') { // I3363 (Build 301)
-          fontScale *= 1.2;
+          fontScale = 1.6 * (keymanweb.isEmbedded ? 0.65 : 0.6) * 1.2;  // Combines original scaling factor with one previously applied to the layer group.
         } else {
           // The following is a *temporary* fix for small format tablets, e.g. PendoPad
           var pixelRatio = 1;
           if(device.OS == 'Android' && 'devicePixelRatio' in window) {
             pixelRatio = window.devicePixelRatio;
           }
-          if(device.OS == 'Android' && device.formFactor == 'tablet' &&
-              parseInt(osk.getHeight(),10) < 300 * pixelRatio) {
+          
+          if(device.OS == 'Android' && device.formFactor == 'tablet' && parseInt(osk.getHeight(),10) < 300 * pixelRatio) {
             fontScale *= 1.2;
           } else {
             fontScale *= 2; //'2.5em';
