@@ -1,9 +1,9 @@
 c Description: Tests basic option rules with save reset+reset
 c keys: [K_A][K_B][K_B][K_A]
 c expected: foo.foo.
-c context: 
+c context:
 c option: foo=1
-c expected option: foo=1
+c expected option: foo=2
 
 store(&version) '10.0'
 
