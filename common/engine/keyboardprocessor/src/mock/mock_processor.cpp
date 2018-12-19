@@ -99,6 +99,7 @@ namespace km {
       if (i == _options.end()) return option();
 
       i->second = value;
+      persisted_store()[key] = value;
       return option(scope, key, i->second);
     }
 

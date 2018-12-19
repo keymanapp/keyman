@@ -56,6 +56,7 @@ namespace km {
       switch(scope) {
         case KM_KBP_OPT_KEYBOARD:
           _kmx.GetOptions()->Set(key, value);
+          persisted_store()[key] = value;
           break;
         case KM_KBP_OPT_ENVIRONMENT:
           _kmx.GetEnvironment()->Load(key, value);
