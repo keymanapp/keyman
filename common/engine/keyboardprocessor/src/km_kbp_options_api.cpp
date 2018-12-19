@@ -44,7 +44,7 @@ km_kbp_state_option_lookup(km_kbp_state const *state,
 
   auto & processor = state->processor();
 
-  *value_out = processor.lookup_option(km_kbp_option_scope(scope), key).value;
+  *value_out = processor.lookup_option(km_kbp_option_scope(scope), key);
   if (!*value_out)  return KM_KBP_STATUS_KEY_ERROR;
 
   return KM_KBP_STATUS_OK;

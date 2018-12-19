@@ -84,11 +84,11 @@ namespace km {
     {
     }
 
-    option mock_processor::lookup_option(km_kbp_option_scope scope,
+    char16_t const * mock_processor::lookup_option(km_kbp_option_scope scope,
                                     std::u16string const & key) const
     {
       auto i = _options.find(char16_t(scope) + key);
-      return i != _options.end() ? option(scope, key, i->second) : option();
+      return i != _options.end() ? i->second.c_str() : nullptr;
     }
 
     option mock_processor::update_option(km_kbp_option_scope scope,

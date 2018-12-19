@@ -43,7 +43,7 @@ namespace kbp
     virtual km_kbp_attr const & attributes() const = 0;
     virtual km_kbp_status       validate() const = 0;
 
-    virtual option  lookup_option(km_kbp_option_scope,
+    virtual char16_t const * lookup_option(km_kbp_option_scope,
                                   std::u16string const & key) const = 0;
     virtual option  update_option(km_kbp_option_scope,
                                   std::u16string const & key,

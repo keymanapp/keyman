@@ -33,7 +33,7 @@ namespace km {
     }
 
 
-    option kmx_processor::lookup_option(km_kbp_option_scope scope, std::u16string const & key) const
+    char16_t const * kmx_processor::lookup_option(km_kbp_option_scope scope, std::u16string const & key) const
     {
       char16_t const * pValue = nullptr;
       switch(scope)
@@ -48,7 +48,7 @@ namespace km {
           break;
       }
 
-      return pValue ? option(scope, key, pValue) : option();
+      return pValue ? pValue : nullptr;
     }
 
     option kmx_processor::update_option(km_kbp_option_scope scope, std::u16string const & key, std::u16string const & value)

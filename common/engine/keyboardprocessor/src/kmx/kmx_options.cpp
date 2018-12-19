@@ -16,7 +16,7 @@ int KMX_Options::_GetIndex(std::u16string const &key) const {
   for (auto sp = _kp->Keyboard->dpStoreArray;
        i != _kp->Keyboard->cxStoreArray; ++i, ++sp)
   {
-    if (sp->dpName && sp->dpName == key) break;
+    if (sp->dpName && sp->dpName == key) return i;
   }
 
   return -1;

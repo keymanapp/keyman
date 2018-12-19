@@ -35,7 +35,7 @@ namespace kbp
 
 
 
-    option  lookup_option(km_kbp_option_scope,
+    char16_t const * lookup_option(km_kbp_option_scope,
                   std::u16string const & key) const override;
     option  update_option(km_kbp_option_scope,
                   std::u16string const & key,
