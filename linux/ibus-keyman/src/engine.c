@@ -388,8 +388,8 @@ ibus_keyman_engine_constructor (GType                   type,
         g_warning("problem creating km_kbp_state");
     }
     for (int i =0; i < 3; i++) {
-        km_kbp_cp_dispose(keyboard_opts[i].key);
-        km_kbp_cp_dispose(keyboard_opts[i].value);
+        g_free((km_kbp_cp *)keyboard_opts[i].key);
+        g_free((km_kbp_cp *)keyboard_opts[i].value);
     }
     g_free(keyboard_opts);
 
