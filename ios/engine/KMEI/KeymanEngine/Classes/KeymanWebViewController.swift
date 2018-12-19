@@ -617,7 +617,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       let textSize = subKeyText.size(withAttributes: [NSAttributedStringKey.font: button.titleLabel?.font! as Any])
       var displayText = subKeyText
       
-      if textSize.width <= 0 {
+      if textSize.width <= 0 && subKeyText.count > 0 {
         // It's probably a diacritic in need of a combining character!
         // Also check if the language is RTL!
         if Manager.shared.currentKeyboard?.isRTL ?? false {
