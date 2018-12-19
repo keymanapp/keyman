@@ -41,7 +41,7 @@ namespace com.keyman {
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
      * This version has been substantially modified to work for this particular application.
      */
-    static getTextWidth(text: string, style: CSSStyleDeclaration) {
+    static getTextWidth(text: string, style: {fontFamily?: string, fontSize: string}) {
       // A final fallback - having the right font selected makes a world of difference.
       if(!style.fontFamily) {
         style.fontFamily = getComputedStyle(document.body).fontFamily;
@@ -147,7 +147,6 @@ namespace com.keyman {
 
       // Grab our default for the key's font and font size.
       let osk = (<KeymanBase> window['keyman']).osk;
-      ts.fontFamily = osk.fontFamily; // Helps with style sheet calculations.
       ts.fontSize=osk.fontSize;     //Build 344, KMEW-90
 
       //Override font spec if set for this key in the layout
@@ -161,8 +160,18 @@ namespace com.keyman {
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
 
+      // For some reason, fonts will sometimes 'bug out' for the embedded iOS page if we
+      // instead assign fontFamily to the existing style 'ts'.  (Occurs in iOS 12.)
+      let styleSpec: {fontFamily?: string, fontSize: string} = {fontSize: ts.fontSize};
+
+      if(ts.fontFamily) {
+        styleSpec.fontFamily = ts.fontFamily;
+      } else {
+        styleSpec.fontFamily = osk.fontFamily; // Helps with style sheet calculations.
+      }
+
       // Check the key's display width - does the key visualize well?
-      var width: number = OSKKey.getTextWidth(keyText, ts);
+      var width: number = OSKKey.getTextWidth(keyText, styleSpec);
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
         keyText = '\u25cc' + keyText;
@@ -173,7 +182,7 @@ namespace com.keyman {
         }
         
         // Recompute the new width for use in autoscaling calculations below, just in case.
-        width = OSKKey.getTextWidth(keyText, ts);
+        width = OSKKey.getTextWidth(keyText, styleSpec);
       }
 
       let fontSpec = util.getFontSizeStyle(ts.fontSize);
