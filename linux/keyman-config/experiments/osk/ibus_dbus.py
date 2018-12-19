@@ -1,24 +1,52 @@
 #!/usr/bin/python3
+
+def try_ibus():
+  try:
+    bus = IBus.Bus()
+    if not bus.is_connected():
+      print("x", end='')
+      #print("Can not connect to ibus-daemon")
+    else:
+      print(".", end='')
+      if bus.is_global_engine_enabled():
+        print("+", end='')
+      #print("Is global engine enabled:", bus.is_global_engine_enabled())
+      #print("Is global engine used:", bus.get_use_global_engine())
+      #for e in bus.list_active_engines():
+      #  print("Active engine:", e.get_name())
+      #print("Global engine name:", bus.get_global_engine().get_name())
+      #for e in bus.list_engines():
+      #    print(e.get_name())
+    bus.destroy()
+    print("-", end='')
+  except Exception as e:
+    print("Failed to connect to iBus")
+    print(e)
+
+
 try:
   import gi
   gi.require_version('IBus', '1.0')
   gi.require_version('DBus', '1.0')
   from gi.repository import IBus
   from gi.repository import DBus
+
+  for i in range(10000):
+      try_ibus()
   #import dbus #,vim
-  bus = IBus.Bus()
-  if not bus.is_connected():
-    print("Can not connect to ibus-daemon")
-  else:
-    print("Is global engine enabled:", bus.is_global_engine_enabled())
-    print("Is global engine used:", bus.get_use_global_engine())
-    for e in bus.list_active_engines():
-        print("Active engine:", e.get_name())
-    print("Global engine name:", bus.get_global_engine().get_name())
-    #for e in bus.list_engines():
-    #    print(e.get_name())
+#  bus = IBus.Bus()
+#  if not bus.is_connected():
+#    print("Can not connect to ibus-daemon")
+#  else:
+#    print("Is global engine enabled:", bus.is_global_engine_enabled())
+#    print("Is global engine used:", bus.get_use_global_engine())
+#    for e in bus.list_active_engines():
+#        print("Active engine:", e.get_name())
+#    print("Global engine name:", bus.get_global_engine().get_name())
+#    #for e in bus.list_engines():
+#    #    print(e.get_name())
 except Exception as e:
-  print("Failed to connect to iBus")
+  print("Failed to run test")
   print(e)
 
 #  dbusconn = bus.get_connection()

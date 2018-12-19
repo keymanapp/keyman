@@ -13,16 +13,14 @@ from shutil import copy2, rmtree
 # from ast import literal_eval
 from enum import Enum
 
-gi.require_version('IBus', '1.0')
-from gi.repository import IBus
-
 import requests
 
 from keyman_config.get_kmp import get_keyboard_data, get_kmp, user_keyboard_dir, user_keyman_dir, user_keyman_font_dir
-from keyman_config.kmpmetadata import parseinfdata, parsemetadata, infmetadata_to_json, KMFileTypes
+from keyman_config.kmpmetadata import parseinfdata, parsemetadata, get_metadata, infmetadata_to_json, KMFileTypes
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.convertico import checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
+from keyman_config.ibus_util import install_to_ibus, restart_ibus, get_ibus_bus
 
 #TODO userdir install
 # special processing for kmn if needed
@@ -53,49 +51,6 @@ def list_files(directory, extension):
 def extract_kmp(kmpfile, directory):
 	with zipfile.ZipFile(kmpfile,"r") as zip_ref:
 		zip_ref.extractall(directory)
-
-def get_metadata(tmpdirname):
-	"""
-	Get metadata from kmp.json if it exists.
-	If it does not exist then will return get_and_convert_infdata
-
-	Args:
-		inputfile (str): path to kmp file
-		tmpdirname(str): temp directory to extract kmp
-
-	Returns:
-		list[5]: info, system, options, keyboards, files
-			see kmpmetadata.parsemetadata for details
-	"""
-	kmpjson = os.path.join(tmpdirname, "kmp.json")
-	if os.path.isfile(kmpjson):
-		return parsemetadata(kmpjson, False)
-	else:
-		return get_and_convert_infdata(tmpdirname)
-
-def get_and_convert_infdata(tmpdirname):
-	"""
-	Get metadata from kmp.inf if it exists.
-	Convert it to kmp.json if possible
-
-	Args:
-		inputfile (str): path to kmp file
-		tmpdirname(str): temp directory to extract kmp
-
-	Returns:
-		list[5]: info, system, options, keyboards, files
-			see kmpmetadata.parseinfdata for details
-	"""
-	kmpinf = os.path.join(tmpdirname, "kmp.inf")
-	if os.path.isfile(kmpinf):
-		info, system, options, keyboards, files =  parseinfdata(kmpinf, False)
-		j = infmetadata_to_json(info, system, options, keyboards, files)
-		kmpjson = os.path.join(tmpdirname, "kmp.json")
-		with open(kmpjson, "w") as write_file:
-			print(j, file=write_file)
-		return info, system, options, keyboards, files
-	else:
-		return None, None, None, None, None
 
 def download_source(keyboardID, packageDir, sourcePath):
 	# just get latest version of kmn unless there turns out to be a way to get the version of a file at a date
@@ -179,6 +134,9 @@ def install_kmp_shared(inputfile, online=False):
 	if not os.path.isdir(packageDir):
 		os.makedirs(packageDir)
 	extract_kmp(inputfile, packageDir)
+	#restart IBus so it knows about the keyboards being installed
+	logging.debug("restarting IBus")
+	restart_ibus()
 	info, system, options, keyboards, files = get_metadata(packageDir)
 
 	if keyboards:
@@ -223,7 +181,6 @@ def install_kmp_shared(inputfile, online=False):
 			# install all kmx for first lang not just packageID
 			kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
 			install_to_ibus(lang, kmx_file)
-		restart_ibus()
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
 		logging.info("Contents of %s:", inputfile)
@@ -240,6 +197,8 @@ def install_kmp_user(inputfile, online=False):
 		os.makedirs(packageDir)
 
 	extract_kmp(inputfile, packageDir)
+	#restart IBus so it knows about the keyboards being installed
+	restart_ibus()
 	info, system, options, keyboards, files = get_metadata(packageDir)
 
 	if keyboards:
@@ -275,13 +234,7 @@ def install_kmp_user(inputfile, online=False):
 			elif ftype == KMFileTypes.KM_SOURCE:
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
-
-		for kb in keyboards:
-			# install all kmx for first lang not just packageID
-			kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
-			install_to_ibus(lang, kmx_file)
-		restart_ibus()
-
+		install_keyboards_to_ibus(keyboards, packageDir)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
 		logging.info("Contents of %s:", inputfile)
@@ -291,32 +244,22 @@ def install_kmp_user(inputfile, online=False):
 		message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
 		raise InstallError(InstallStatus.Abort, message)
 
-def install_to_ibus(lang, kmx_file):
-	try:
-		keyboard_id = "%s:%s" % (lang, kmx_file)
-		logging.debug("getting bus")
-		bus = IBus.Bus()
-		logging.debug("installing to ibus")
-		ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
-		preload_engines = ibus_settings.get_strv("preload-engines")
-		logging.debug(preload_engines)
-		if keyboard_id not in preload_engines:
-			preload_engines.append(keyboard_id)
-		logging.debug(preload_engines)
-		ibus_settings.set_strv("preload-engines", preload_engines)
-		bus.preload_engines(preload_engines)
-	except Exception as e:
-		logging.debug("Failed to set up install %s to IBus", keyboard_id)
-		logging.debug(e)
-
-def restart_ibus():
-	try:
-		bus = IBus.Bus()
-		logging.info("restarting IBus")
-		bus.exit(True)
-	except Exception as e:
-		logging.debug("Failed to restart IBus")
-		logging.debug(e)
+def install_keyboards_to_ibus(keyboards, packageDir):
+		bus = get_ibus_bus()
+		if bus:
+			# install all kmx for first lang not just packageID
+			for kb in keyboards:
+				kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
+				if "languages" in kb:
+					logging.debug(kb["languages"][0])
+					keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
+				else:
+					keyboard_id = kmx_file
+				install_to_ibus(bus, keyboard_id)
+			restart_ibus(bus)
+			bus.destroy()
+		else:
+			logging.debug("could not install keyboards to IBus")
 
 
 def install_kmp(inputfile, online=False, sharedarea=False):
