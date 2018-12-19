@@ -4,6 +4,7 @@ c expected: foo.foo.no foo.
 c context: 
 c option: foo=1
 c expected option: foo=0
+c saved option: foo=0
 
 store(&version) '10.0'
 
@@ -17,4 +18,4 @@ if(foo = '1') + 'a' > 'foo.'
 if(foo = '0') + 'a' > 'no foo.'
 + '1' > set(foo = '1')
 + '0' > set(foo = '0')
-+ '2' > save(foo)
+if(foo = '0') + '2' > save(foo) 

@@ -7,14 +7,10 @@
   History:       7 Nov 2018 - TSE - Refactored into option.hpp & option.cpp.
 */
 #include <algorithm>
-#include <memory>
 
-#include "json.hpp"
-#include "keyboard.hpp"
 #include "option.hpp"
 #include "processor.hpp"
 #include "state.hpp"
-#include "utfcodec.hpp"
 
 using namespace km::kbp;
 

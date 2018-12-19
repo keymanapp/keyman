@@ -11,11 +11,10 @@
 */
 #pragma once
 
-#include <string>
 #include <cstdint>
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
+#include <string>
 
 typedef uint32_t  uchar_t;
 
@@ -293,4 +292,14 @@ auto & operator << (std::basic_ostream<T> &os, std::u16string const &p) {
 template<typename T>
 auto & operator << (std::basic_ostream<T> &os, std::u32string const &p) {
   return std::operator << (os, convert<char32_t,T>(p));
+}
+
+template<typename T>
+auto & operator << (std::basic_ostream<T> &os, char16_t const *s) {
+  return std::operator << (os, convert<char16_t,T>(s));
+}
+
+template<typename T>
+auto & operator << (std::basic_ostream<T> &os, char32_t const *s) {
+  return std::operator << (os, convert<char32_t,T>(s));
 }

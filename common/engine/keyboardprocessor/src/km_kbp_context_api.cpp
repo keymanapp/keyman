@@ -10,7 +10,6 @@
 */
 #include <cassert>
 #include <algorithm>
-#include <iterator>
 #include <vector>
 
 #include <keyman/keyboardprocessor.h>

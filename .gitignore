@@ -233,3 +233,6 @@
 .DS_Store
 
 *.kpj.user
+
+# Atom/Nuclide
+compile_flags.txt

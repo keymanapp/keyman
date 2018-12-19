@@ -150,7 +150,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
     return p-1;
   }
   else if(*(p-1) == UC_SENTINEL) return p-1;
-  else if(*(p-2) == UC_SENTINEL) 
+  else if(*(p-2) == UC_SENTINEL)
   {
     switch(*(p-1))
     {
@@ -161,17 +161,17 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p)
       case CODE_CLEARCONTEXT:
       case CODE_CALL:
       case CODE_CONTEXTEX:
-      case CODE_RESETOPT: 
-      case CODE_SAVEOPT:  
+      case CODE_RESETOPT:
+      case CODE_SAVEOPT:
         return p-2;
     }
   }
-  else if(*(p-3) == UC_SENTINEL) 
+  else if(*(p-3) == UC_SENTINEL)
   {
     switch(*(p-2))
     {
       case CODE_INDEX:
-      case CODE_SETOPT:   
+      case CODE_SETOPT:
       case CODE_SETSYSTEMSTORE:
         return p-3;
     }
@@ -229,20 +229,11 @@ int km::kbp::kmx::xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2)
 
 PKMX_WCHAR km::kbp::kmx::strtowstr(PKMX_CHAR in)
 {
-  km_kbp_cp *result;
+  PKMX_WCHAR result;
 
-#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1916 /* VS 2017 19.16 */
-  std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
-#else 
-  std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-#endif
-  auto s = convert.from_bytes(in, strchr(in, 0));
-  result = new KMX_WCHAR[s.length() + 1];
-#if _MSC_VER >= 1900 /* VS 2015 */ && _MSC_VER <= 1916 /* VS 2017 19.16 */
-  s.copy(reinterpret_cast<int16_t *>(result), s.length());
-#else
+  auto s = convert<char,char16_t>(in);
+  result = new char16_t[s.length() + 1];
   s.copy(result, s.length());
-#endif
   result[s.length()] = 0;
   return result;
 }

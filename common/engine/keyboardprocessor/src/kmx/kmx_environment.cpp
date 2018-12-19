@@ -40,9 +40,10 @@ void KMX_Environment::Init(std::vector<option> &default_env) {
   default_env.emplace_back();
 }
 
+
 void KMX_Environment::Load(std::u16string const & key, std::u16string const & value) {
   assert(!key.empty());
-  
+
   if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_PLATFORM)) {
     _platform = value;
   }
@@ -54,7 +55,7 @@ void KMX_Environment::Load(std::u16string const & key, std::u16string const & va
   }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_SIMULATEALTGR)) {
     _simulateAltGr = value == u"1";
-  } 
+  }
   else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_CAPSLOCK)) {
     _capsLock = value == u"1";
   }

@@ -46,14 +46,16 @@ constexpr char const *doc1_expected = u8"\
     },\n\
     \"options\" : {\n\
         \"keyboard\" : {\n\
-            \"__test_point\" : \"F2 pressed test save.\",\n\
+            \"__test_point\" : \"not tiggered\",\n\
             \"hello\" : \"-\"\n\
         },\n\
         \"environment\" : {\n\
             \"hello\" : \"-\"\n\
         },\n\
         \"saved\" : {\n\
-            \"keyboard\" : {},\n\
+            \"keyboard\" : {\n\
+                \"__test_point\" : \"F2 pressed test save.\"\n\
+            },\n\
             \"environment\" : {\n\
                 \"hello\" : \"world\"\n\
             }\n\
@@ -72,7 +74,7 @@ constexpr char const *doc1_expected = u8"\
         \"L\"\n\
     ],\n\
     \"actions\" : [\n\
-        { \"character\" : \"L\" }\n\
+        { \"persist\" : { \"keyboard\" : { \"__test_point\" : \"F2 pressed test save.\" } } }\n\
     ]\n\
 }\n";
 
@@ -87,7 +89,7 @@ constexpr char const *doc2_expected = u8"\
     },\n\
     \"options\" : {\n\
         \"keyboard\" : {\n\
-            \"__test_point\" : \"F2 pressed test save.\",\n\
+            \"__test_point\" : \"not tiggered\",\n\
             \"hello\" : \"-\"\n\
         },\n\
         \"environment\" : {\n\
@@ -104,6 +106,37 @@ constexpr char const *doc2_expected = u8"\
     \"actions\" : []\n\
 }\n";
 
+
+constexpr km_kbp_option_item const expected_persist_opt = {
+  u"__test_point",
+  u"F2 pressed test save.",
+  KM_KBP_OPT_KEYBOARD
+};
+
+inline
+bool operator==(km_kbp_option_item const & lhs, km_kbp_option_item const & rhs)
+{
+  return lhs.scope == rhs.scope
+      && std::u16string(lhs.key) == rhs.key
+      && std::u16string(lhs.value) == rhs.value;
+}
+
+
+bool operator==(km_kbp_action_item const & lhs,
+                km_kbp_action_item const & rhs)
+{
+  if (lhs.type != rhs.type) return false;
+  switch(lhs.type)
+  {
+    case KM_KBP_IT_CHAR:        return lhs.character == rhs.character;
+    case KM_KBP_IT_MARKER:      return lhs.marker == rhs.marker;
+    case KM_KBP_IT_PERSIST_OPT: return *lhs.option == *rhs.option;
+    default: break;
+  }
+
+  return true;
+}
+
 #ifdef assert
 #undef assert
 #endif
@@ -115,7 +148,7 @@ bool action_items(km_kbp_state const * state,
   auto act = km_kbp_state_action_items(state, &n);
 
   for (auto &rhs: expected)
-    if (std::memcmp(act++, &rhs, sizeof rhs) != 0) return false;
+    if (!(*act++ == rhs)) return false;
 
   return true;
 }
@@ -134,8 +167,6 @@ int main(int, char * [])
   try_status(km_kbp_state_clone(test_state, &test_clone));
   // Check sub objects have been copied and not shared.
   if (km_kbp_state_context(test_state) == km_kbp_state_context(test_clone))
-    return __LINE__;
-  if (km_kbp_state_options(test_state) == km_kbp_state_options(test_clone))
     return __LINE__;
   size_t n_actions = 0;
   if (km_kbp_state_action_items(test_state, &n_actions) == nullptr
@@ -156,8 +187,7 @@ int main(int, char * [])
   km_kbp_option_item new_opt[] = {
     {u"hello", u"globe", KM_KBP_OPT_ENVIRONMENT},
     KM_KBP_OPTIONS_END};
-  try_status(
-    km_kbp_options_update(test_clone, new_opt));
+  try_status(km_kbp_state_options_update(test_clone, new_opt));
 
   // Test the engine
   auto attrs = km_kbp_get_engine_attrs(test_state);
@@ -176,10 +206,13 @@ int main(int, char * [])
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('l')}}}));
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_BKSP, 0));
-  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {1}}}));
+  assert(action_items(test_state, {{KM_KBP_IT_BACK, {0,}, {0}}}));
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_L,
                                   KM_KBP_MODIFIER_SHIFT));
   assert(action_items(test_state, {{KM_KBP_IT_CHAR, {0,}, {km_kbp_usv('L')}}}));
+  try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_F2,0));
+  assert(action_items(test_state, {{KM_KBP_IT_PERSIST_OPT, {0,},
+                      {uintptr_t(&expected_persist_opt)}}}));
 
   // Test debug dump
   auto doc1 = get_json_doc(*test_state),

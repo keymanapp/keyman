@@ -17,5 +17,4 @@ if(foo = '1') + 'a' > 'foo.'
 if(foo = '0') + 'a' > 'no foo.'
 + '1' > set(foo = '1')
 + '0' > set(foo = '0')
-+ '2' > save(foo)
 + '3' > reset(foo)
