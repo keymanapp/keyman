@@ -20,6 +20,7 @@
 
 AM_CFLAGS = \
 	@IBUS_CFLAGS@ \
+	@GTK_CFLAGS@ \
 	@JSON_GLIB_CFLAGS@ \
 	@KEYMAN_PROC_CFLAGS@ \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
@@ -27,9 +28,9 @@ AM_CFLAGS = \
 
 AM_LDFLAGS = \
 	@IBUS_LIBS@ \
+	@GTK_LIBS@ \
 	@JSON_GLIB_LIBS@ \
 	@KEYMAN_PROC_LIBS@ \
-	-lX11 \
 	$(NULL)
 
 check_PROGRAMS = \
@@ -71,16 +72,17 @@ ibus_engine_keyman_SOURCES = \
 
 ibus_engine_keyman_CFLAGS = \
 	@IBUS_CFLAGS@ \
+	@GTK_CFLAGS@ \
 	@JSON_GLIB_CFLAGS@ \
 	@KEYMAN_PROC_CFLAGS@ \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	$(NULL)
 
 ibus_engine_keyman_LDFLAGS = \
+	@GTK_LIBS@ \
 	@IBUS_LIBS@ \
 	@JSON_GLIB_LIBS@ \
 	@KEYMAN_PROC_LIBS@ \
-	-lX11 \
 	$(NULL)
 
 component_DATA = \

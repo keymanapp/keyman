@@ -40,6 +40,7 @@ const SStockFileNames: array[0..4] of string = (
 
 const
   PackageFile_KMPInf   = 'kmp.inf';
+  PackageFile_KMPJSON  = 'kmp.json';
   PackageFile_FontsInf = 'fonts.inf';   // created on installation so we know which fonts were installed with the package
   PackageFile_Welcome  = 'welcome.htm'; // do not localise
   PackageFile_Usage    = 'usage.htm';   // do not localise

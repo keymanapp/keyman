@@ -653,6 +653,8 @@ begin
   GetCharMapDropTool.Handle(Self, cmimText);
   GetCharMapDropTool.Handle(editKeyOutputCode, cmimCode);
   frameSource.SetupCharMapDrop;
+  frameTouchLayout.SetupCharMapDrop;
+  frameTouchLayoutSource.SetupCharMapDrop;
 
   FillFeatureGrid;
 
@@ -3144,7 +3146,7 @@ begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutCode then
   begin
     frameTouchLayoutSource.EditorText := frameTouchLayout.SaveToString;
-    DoFocus(frameTouchLayout);
+    DoFocus(frameTouchLayoutSource);
   end;
   FLoading := False;
 end;

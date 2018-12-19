@@ -182,7 +182,7 @@ var
   FTempOutPath: string;
   i: Integer;
   buf: array[0..260] of Char;
-  InfFile: string;
+  JsonFile, InfFile: string;
 begin
   if not FileExists(FFileName) then
     raise Exception.Create('File '+FFileName+' does not exist.');
@@ -211,21 +211,34 @@ begin
     for i := 0 to FZip.FileCount - 1 do
     begin
       FZip.Extract(i, buf, False);
-      if LowerCase(FZip.Filename[i]) = 'kmp.inf' then
+      if LowerCase(FZip.Filename[i]) = PackageFile_KMPInf then
       begin
         InfFile := FZip.Filename[i];
+      end
+      else if LowerCase(FZip.Filename[i]) = PackageFile_KMPJSON then
+      begin
+        JsonFile := FZip.Filename[i];
       end;
     end;
 
-    if InfFile = '' then
-      raise Exception.Create('The file kmp.inf was not found in this archive.');
+    if (InfFile = '') and (JsonFile = '') then
+      raise Exception.Create('Neither kmp.inf nor kmp.json was found in this archive.');
   finally
     FZip.Free;
   end;
 
   FKMPInf := TKMPInfFile.Create;
-  FKMPInf.FileName := FTempOutPath + InfFile;
-  FKMPInf.LoadIni;
+
+  if JsonFile <> '' then
+  begin
+    FKMPInf.FileName := FTempOutPath + JsonFile;
+    FKMPInf.LoadJson;
+  end
+  else
+  begin
+    FKMPInf.FileName := FTempOutPath + InfFile;
+    FKMPInf.LoadIni;
+  end;
 
   FKMPInf.CheckFiles(FTempOutPath);
 end;

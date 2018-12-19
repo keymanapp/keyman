@@ -4,7 +4,8 @@
 */
 #include "kmx_processor.h"
 
-using namespace km::kbp::kmx;
+using namespace km::kbp;
+using namespace kmx;
 
 /* Globals */
 
@@ -637,7 +638,15 @@ KMX_Options *KMX_Processor::GetOptions() {
   return &m_options;
 }
 
+KMX_Options const *KMX_Processor::GetOptions() const {
+  return &m_options;
+}
+
 KMX_Environment *KMX_Processor::GetEnvironment() {
+  return &m_environment;
+}
+
+KMX_Environment const *KMX_Processor::GetEnvironment() const {
   return &m_environment;
 }
 

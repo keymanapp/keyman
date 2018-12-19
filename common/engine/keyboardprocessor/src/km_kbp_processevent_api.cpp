@@ -16,14 +16,12 @@ km_kbp_status
 km_kbp_process_event(km_kbp_state *state,
                           km_kbp_virtual_key vk, uint16_t modifier_state)
 {
-  km::kbp::keyboard const & k = state->keyboard();
-  return const_cast<km::kbp::abstract_processor&>(k.processor()).process_event(state, vk, modifier_state);
+  return state->processor().process_event(state, vk, modifier_state);
 }
 
 
 km_kbp_attr const * 
 km_kbp_get_engine_attrs(km_kbp_state const *state)
 {
-  return state->keyboard().processor().get_attrs();
+  return &state->processor().attributes();
 }
-

@@ -127,7 +127,7 @@ begin
     Free;
   end;
 
-  FInternalOptions.Save;
+  FInternalOptions.Save(Context);
 
   if FOldBaseLayout <> Get_Items('koBaseLayout').Value then
     for I := 0 to Context.Keyboards.Count - 1 do   // I4169

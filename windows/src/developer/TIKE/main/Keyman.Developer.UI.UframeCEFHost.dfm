@@ -36,6 +36,7 @@ inherited frameCEFHost: TframeCEFHost
   object cef: TChromium
     OnWidgetCompMsg = cefWidgetCompMsg
     OnLoadEnd = cefLoadEnd
+    OnSetFocus = cefSetFocus
     OnRunContextMenu = cefRunContextMenu
     OnPreKeyEvent = cefPreKeyEvent
     OnConsoleMessage = cefConsoleMessage

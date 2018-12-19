@@ -11,6 +11,8 @@
 */
 #pragma once
 
+#include <string>
+#include <cstdint>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -257,3 +259,38 @@ struct utf
 typedef utf<uint32_t> utf32;
 typedef utf<uint16_t> utf16;
 typedef utf<uint8_t>  utf8;
+
+
+template<typename F, typename T>
+std::basic_string<T> convert(std::basic_string<F> const &src);
+
+template<>
+inline
+std::basic_string<char> convert(std::basic_string<char> const &src) {
+  return src;
+}
+
+template<typename F, typename T>
+std::basic_string<T> convert(std::basic_string<F> const &src) {
+  using utf_const_iter = typename utf<typename utf<F>::codeunit_t>::const_iterator;
+  using codeunit_t = typename utf<T>::codeunit_t;
+  auto r = std::basic_string<T>();
+  codeunit_t buf[4];
+  int8_t l = 1;
+  for (auto i = utf_const_iter(src.data()),
+            e = decltype(i)(src.data() + src.size()); i != e && l > 0; ++i) {
+      utf<T>::codec::put(buf, uchar_t(*i), l);
+      r.append(reinterpret_cast<T *>(&buf[0]), l);
+  }
+  return r;
+}
+
+template<typename T>
+auto & operator << (std::basic_ostream<T> &os, std::u16string const &p) {
+  return std::operator << (os, convert<char16_t,T>(p));
+}
+
+template<typename T>
+auto & operator << (std::basic_ostream<T> &os, std::u32string const &p) {
+  return std::operator << (os, convert<char32_t,T>(p));
+}

@@ -1,6 +1,6 @@
 c Description: Tests SMP characters
 c keys: [K_1][K_2]
-c expected: \u1F642hi\u1F600
+c expected: \U0001F642hi\U0001F600
 c context: 
 
 store(&version) '10.0'

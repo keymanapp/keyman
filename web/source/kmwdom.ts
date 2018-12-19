@@ -1467,7 +1467,7 @@ namespace com.keyman {
      * @param       {Object}  arg     object array of user-defined properties
      * Description  KMW window initialization  
      */    
-    init(arg) { 
+    init: (arg:any) => Promise<any> = function(arg): Promise<any> { 
       var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
@@ -1496,7 +1496,7 @@ namespace com.keyman {
 
         // Otherwise, assume relative to source path
         return this.keyman.srcPath+p;
-      }            
+      }.bind(this);
       
       // Explicit (user-defined) parameter initialization       
       opt=this.keyman.options;
@@ -1537,7 +1537,7 @@ namespace com.keyman {
       
       // Only do remainder of initialization once!  
       if(this.keyman.initialized) {
-        return;
+        return Promise.resolve();
       }
 
       var keyman: KeymanBase = this.keyman;
@@ -1546,10 +1546,13 @@ namespace com.keyman {
       // Do not initialize until the document has been fully loaded
       if(document.readyState !== 'complete')
       {
-        window.setTimeout(function(){
-          domManager.init(arg);
-        }, 50);
-        return;
+        return new Promise(function(resolve) {
+          window.setTimeout(function(){
+            domManager.init(arg).then(function() {
+              resolve();
+            });
+          }, 50);
+        });
       }
 
       this.keyman._MasterDocument = window.document;
@@ -1592,7 +1595,7 @@ namespace com.keyman {
         if(!this.keyman.keyboardManager.setDefaultKeyboard()) {
           console.error("No keyboard stubs exist - cannot initialize keyboard!");
         }
-        return;
+        return Promise.resolve();
       }
 
       // Determine the default font for mapped elements
@@ -1716,7 +1719,8 @@ namespace com.keyman {
 
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
       this.keyman.setInitialized(2);
-    }
+      return Promise.resolve();
+    }.bind(this);
 
     /**
      * Initialize the desktop user interface as soon as it is ready

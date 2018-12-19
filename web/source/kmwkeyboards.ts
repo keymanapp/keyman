@@ -60,7 +60,7 @@ namespace com.keyman {
     'KOskFont': KeyboardFont;
 
     // Used when loading a stub's keyboard.
-    asyncLoader: any;
+    asyncLoader?: any;
 
     constructor(id: string, langCode: string) {
       this['KI'] = 'Keyboard_' + id;
@@ -305,7 +305,7 @@ namespace com.keyman {
 
       // Fixed OSK font issue Github #7 (9/1/2015)
       if(typeof(lp['oskFont']) != 'undefined') {
-        sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? new KeyboardFont(lp['oskfont'], fontPath) : sp['KOskFont'];
+        sp['KOskFont'] = (typeof sp['KOskFont'] === 'undefined') ? new KeyboardFont(lp['oskFont'], fontPath) : sp['KOskFont'];
       }           
 
       // Update the UI 
@@ -357,7 +357,7 @@ namespace com.keyman {
      * @param       {string}    PInternalName   Internal name
      * @param       {string}    PLgCode         Language code
      */    
-    setActiveKeyboard(PInternalName: string, PLgCode: string) {
+    setActiveKeyboard(PInternalName: string, PLgCode: string): Promise<void> {
       //TODO: This does not make sense: the callbacks should be in _SetActiveKeyboard, not here,
       //      since this is always called FROM the UI, which should not need notification.
       //      If UI callbacks are needed at all, they should be within _SetActiveKeyboard 
@@ -368,7 +368,7 @@ namespace com.keyman {
       }
 
       this.doBeforeKeyboardChange(PInternalName,PLgCode);     
-      this._SetActiveKeyboard(PInternalName,PLgCode,true);    
+      let p = this._SetActiveKeyboard(PInternalName,PLgCode,true);    
       if(this.keymanweb.domManager.getLastActiveElement() != null) {
         this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
       }
@@ -378,6 +378,8 @@ namespace com.keyman {
       //   PLgCode = (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
       // }
       this.doKeyboardChange(PInternalName, PLgCode);
+
+      return p;
     }
     
     /**
@@ -395,7 +397,7 @@ namespace com.keyman {
      * @param       {string=}    PLgCode
      * @param       {boolean=}   saveCookie   
      */    
-    _SetActiveKeyboard(PInternalName: string, PLgCode?: string, saveCookie?: boolean) {
+    _SetActiveKeyboard(PInternalName: string, PLgCode?: string, saveCookie?: boolean): Promise<void> {
       var n, Ln;
 
       var util = this.keymanweb.util;
@@ -430,7 +432,7 @@ namespace com.keyman {
       if(this.activeStub && this.activeKeyboard && this.activeKeyboard['KI'] == PInternalName 
         && this.activeStub['KI'] == PInternalName     //this part of test should not be necessary, but keep anyway
         && this.activeStub['KLC'] == PLgCode && !this.keymanweb.mustReloadKeyboard                                 
-        ) return;   
+        ) return Promise.resolve();   
 
       // Check if current keyboard matches requested keyboard, but not stub
       if(this.activeKeyboard && (this.activeKeyboard['KI'] == PInternalName)) {
@@ -448,7 +450,7 @@ namespace com.keyman {
             if(this.keymanweb.mustReloadKeyboard) {
               osk._Load();
             }
-            return;
+            return Promise.resolve();
           }
         }
       }
@@ -464,7 +466,7 @@ namespace com.keyman {
           util.wait(false);
         }
 
-        return;
+        return Promise.resolve();
       }
 
       // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
@@ -552,12 +554,14 @@ namespace com.keyman {
               // It works much more reliably if deferred (KMEW-101, build 356)
               // The effect of a delay can also be tested, for example, by setting the timeout to 5000
               var manager = this;
-              window.setTimeout(function(){
-                manager.installKeyboard(loadingStub);
-              },0);
-            }          
+              loadingStub.asyncLoader.promise = new Promise(function(resolve, reject) {
+                window.setTimeout(function(){
+                  manager.installKeyboard(resolve, reject, loadingStub);
+                },0);
+              });
+            }
             this.activeStub=this.keyboardStubs[Ln];
-            return;
+            return this.keyboardStubs[Ln].asyncLoader.promise;
           }
         }
         this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
@@ -569,15 +573,17 @@ namespace com.keyman {
       
       // Initialize the OSK (provided that the base code has been loaded)
       osk._Load();
+      return Promise.resolve();
     }
 
-      /**
+    /**
      * Install a keyboard script that has been downloaded from a keyboard server
+     * Operates as the core of a Promise, hence the 'resolve' and 'reject' parameters.
      * 
      *  @param  {Object}  kbdStub   keyboard stub to be loaded.
      *    
      **/      
-    installKeyboard(kbdStub: KeyboardStub) {
+    installKeyboard(resolve: () => void, reject: () => void, kbdStub: KeyboardStub) {
       var util = this.keymanweb.util;
       var osk = this.keymanweb.osk;
 
@@ -607,6 +613,8 @@ namespace com.keyman {
         // We already know the load has failed... why wait?
         kbdStub.asyncLoader.callback('Cannot find the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'warn');
         kbdStub.asyncLoader = null;
+
+        reject();
       }, false);
 
       
@@ -644,23 +652,31 @@ namespace com.keyman {
           if(!manager.keymanweb.isEmbedded) {
             util.wait(false);
           }
+
+          kbdStub.asyncLoader = null; 
+          resolve();
           // A handler portion for cases where the new <script> block loads, but fails to process.
         } else {  // Output error messages even when embedded - they're useful when debugging the apps and KMEA/KMEI engines.
           kbdStub.asyncLoader.callback('Error registering the ' + kbdName + ' keyboard for ' + kbdLang + '.', 'error');
+          kbdStub.asyncLoader = null; 
+          reject();
         }
-        kbdStub.asyncLoader = null; 
       }, false);
 
       // IE likes to instantly start loading the file when assigned to an element, so we do this after the rest
       // of our setup.  This method is not relocated here (yet) b/c it varies based upon 'native' vs 'embedded'.
       Lscript.src = this.keymanweb.getKeyboardPath(kbdFile);
 
-      try {                                  
+      try {
         document.body.appendChild(Lscript);
         this.linkedScripts.push(Lscript);
       }
-      catch(ex) {                                                     
-        document.getElementsByTagName('head')[0].appendChild(Lscript);
+      catch(ex) {
+        try {
+          document.getElementsByTagName('head')[0].appendChild(Lscript);
+        } catch(ex2) {
+          reject();
+        }
       }            
     }
 

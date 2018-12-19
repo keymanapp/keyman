@@ -3,19 +3,29 @@
 . $HOME/ci-builder-scripts/bash/common.sh
 init --no-package
 
+keyman_projects="keyman-keyboardprocessor kmflcomp libkmfl ibus-kmfl keyman-config ibus-keyman"
+
 if [ "$1" == "keyman-keyboardprocessor" ]; then
 	sourcename="keyboardprocessor"
 	sourcedir="../common/engine/keyboardprocessor"
 else
-	sourcename="$1"
-	sourcedir="$1"
+	# check if project is known
+	if [[ $keyman_projects =~ (^|[[:space:]])$1($|[[:space:]]) ]]; then
+		sourcename="$1"
+		sourcedir="$1"
+	else
+		stderr "$1 not in known projects ($keyman_projects)"
+		exit -1
+	fi
 fi
 
 # clean up prev deb builds
 log "cleaning previous builds of $1"
+
+
 rm -rf builddebs
-rm -rf $1/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
-rm -rf ${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
+rm -rf $sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
+rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $sourcename"
 log "reconfigure"

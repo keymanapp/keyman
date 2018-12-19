@@ -10,10 +10,11 @@
 
 using namespace km::kbp;
 
-state::state(km::kbp::keyboard const & kb, km_kbp_option_item const * env)
-  : _options(kb.default_options), _kb(kb)
+state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
+  : _options(ap.keyboard().default_options),
+    _processor(ap)
 {
-  const_cast<km::kbp::abstract_processor&>(_kb.processor()).init_state(&_env);
+  ap.init_state(_env);
   _options.set_default_env(_env.data());
 
   for (; env && env->key != nullptr; env++) {

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <keyman/keyboardprocessor.h>
+#include "option.hpp"
 #include "kmx_base.h"
 
 namespace km {
@@ -21,7 +22,7 @@ public:
   KMX_Options(LPINTKEYBOARDINFO kp) : _kp(kp) {}
   ~KMX_Options();
 
-  void Init(std::vector<km_kbp_option_item> *opts);
+  void Init(std::vector<option> &opts);
   void Load(km_kbp_options *options, std::u16string const &key);
   void Set(int nStoreToSet, int nStoreToRead);
   void Reset(km_kbp_options *options, int nStoreToReset);

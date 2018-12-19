@@ -44,7 +44,9 @@ interface
 uses
   System.Classes,
   System.Contnrs,
+  System.Win.Registry,
   keymanapi_TLB,
+  KeymanContext,
   KeymanOptionNames,
   ErrorControlledRegistry,
   RegistryKeys;
@@ -64,7 +66,7 @@ type
     FOptionType: KeymanOptionType;
     FDefaultBoolValue: Boolean;
     procedure Load(reg: TRegistryErrorControlled);  // I2890
-    procedure Save(reg: TRegistryErrorControlled);  // I2890
+    procedure Save(AContext: TKeymanContext; reg: TRegistryErrorControlled);  // I2890
     function GetID: string;
     procedure CustomLoad;
     procedure CustomSave;
@@ -100,7 +102,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Load;
-    procedure Save;
+    procedure Save(AContext: TKeymanContext);
     function OptionByName(const Name: string): TUtilKeymanOptionEntry;
     property Option[opt: TUtilKeymanOption]: TUtilKeymanOptionEntry read GetOption; default;
   end;
@@ -147,14 +149,13 @@ const KeymanOptionInfo: array[0..13] of TKeymanOptionInfo = (  // I3331   // I36
   (opt: koDebugging;                         RegistryName: SRegValue_KeymanDebug;                      OptionType: kotBool; BoolValue: False; GroupName: 'kogAdvanced')   // I4393
   );
 
-var
-  FKeymanOptions: TUtilKeymanOptions = nil;
-
 implementation
 
 uses
   System.TypInfo,
+  System.Variants,
   GetOSVersion,
+  keymanerrorcodes,
   KeymanPaths,
   SysUtils,
   Windows;
@@ -234,7 +235,7 @@ begin
   end;
 end;
 
-procedure TUtilKeymanOptions.Save;
+procedure TUtilKeymanOptions.Save(AContext: TKeymanContext);
 var
   reg: TRegistryErrorControlled;  // I2890
   i: Integer;
@@ -244,7 +245,7 @@ begin
     reg.RootKey := HKEY_CURRENT_USER;
     if reg.OpenKey(SRegKey_KeymanEngine_CU, True) then
       for i := 0 to FOptions.Count - 1 do
-        FOptions[i].Save(reg);
+        FOptions[i].Save(AContext, reg);
 
     reg.CloseKey;
   finally
@@ -348,38 +349,46 @@ begin
     end;
 end;
 
-procedure TUtilKeymanOptionEntry.Save(reg: TRegistryErrorControlled);  // I2890
+procedure TUtilKeymanOptionEntry.Save(AContext: TKeymanContext; reg: TRegistryErrorControlled);  // I2890
 begin
-  if FRegistryName = '' then
-  begin
-    CustomSave;
-    Exit;
-  end;
+  try
+    if FRegistryName = '' then
+    begin
+      CustomSave;
+      Exit;
+    end;
 
-  case FOptionType of
-    kotBool:
-      if FBoolValue <> FDefaultBoolValue then
-      begin
-        reg.WriteBool(FRegistryName, FBoolValue);
-        Exit;
-      end;
-    kotLong:
-      if FIntValue <> FDefaultIntValue then
-      begin
-        reg.WriteString(FRegistryName, IntToHex(FIntValue, 8));
-        Exit;
-      end;
-    kotString:
-      if FStringValue <> FDefaultStringValue then
-      begin
-        reg.WriteString(FRegistryName, FStringValue);
-        Exit;
-      end;
+    case FOptionType of
+      kotBool:
+        if FBoolValue <> FDefaultBoolValue then
+        begin
+          reg.WriteBool(FRegistryName, FBoolValue);
+          Exit;
+        end;
+      kotLong:
+        if FIntValue <> FDefaultIntValue then
+        begin
+          reg.WriteString(FRegistryName, IntToHex(FIntValue, 8));
+          Exit;
+        end;
+      kotString:
+        if FStringValue <> FDefaultStringValue then
+        begin
+          reg.WriteString(FRegistryName, FStringValue);
+          Exit;
+        end;
+    end;
+    // If we get here, then the value must be default, so
+    // remove from registry
+    if reg.ValueExists(FRegistryName) then
+      reg.DeleteValue(FRegistryName);
+  except
+    on E:ERegistryException do
+    begin
+      AContext.Errors.AddFmt(KMN_W_Options_UnableToSaveValue, VarArrayOf([GetID]), kesWarning);
+      // Add an error entry
+    end;
   end;
-  // If we get here, then the value must be default, so
-  // remove from registry
-  if reg.ValueExists(FRegistryName) then
-    reg.DeleteValue(FRegistryName);
 end;
 
 end.

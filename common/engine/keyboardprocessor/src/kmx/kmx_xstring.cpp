@@ -7,10 +7,12 @@
 #include <codecvt>
 #include <locale>
 #include "kmx_processor.h"
+#include "utfcodec.hpp"
 
-std::string utf16_to_utf8(std::u16string utf16_string); // defined in keyboard.cpp
 
-using namespace km::kbp::kmx;
+
+using namespace km::kbp;
+using namespace kmx;
 
 const km_kbp_cp *km::kbp::kmx::u16chr(const km_kbp_cp *p, km_kbp_cp ch) {
   while (*p) {
@@ -250,7 +252,7 @@ PKMX_CHAR km::kbp::kmx::wstrtostr(PKMX_WCHAR in)
 {
   PKMX_CHAR result;
 
-  auto s = ::utf16_to_utf8(in);
+  auto s = convert<char16_t,char>(in);
   result = new char[s.length() + 1];
   s.copy(result, s.length());
   result[s.length()] = 0;
