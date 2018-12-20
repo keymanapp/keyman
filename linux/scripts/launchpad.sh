@@ -4,7 +4,7 @@
 
 # must be run from linux dir
 
-# parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] ./scripts/launchpad.sh
+# parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
 # PROJECT="<project>" only upload this project
 # DIST="<dist>" only upload for this distribution
@@ -34,6 +34,13 @@ if [ "${DIST}" != "" ]; then
 else
     distributions="xenial bionic cosmic disco"
 fi
+
+if [ "${PACKAGEVERSION}" != "" ]; then
+    packageversion="${PACKAGEVERSION}"
+else
+    packageversion="1~sil1"
+fi
+
 
 BASEDIR=`pwd`
 
@@ -70,13 +77,13 @@ for proj in ${projects}; do
     #TODO separate source builds and dputs for each of $dists?
     for dist in ${distributions}; do
         cp ../${proj}-changelog debian/changelog
-        dch -v ${version}-1~${dist} "source package for PPA"
+        dch -v ${version}-${packageversion}~${dist} "source package for PPA"
         dch -D ${dist} -r ""
         debuild -d -S -sa -Zxz
     done
     cd ..
     for dist in ${distributions}; do
-        dput ${SIM} ppa:keymanapp/keyman-daily ${proj}_${version}-1~${dist}_source.changes
+        dput ${SIM} ppa:keymanapp/keyman-daily ${proj}_${version}-${packageversion}~${dist}_source.changes
     done
     cd ${BASEDIR}
 done
