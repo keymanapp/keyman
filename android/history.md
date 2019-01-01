@@ -1,20 +1,28 @@
 # Keyman for Android
 
+## 2019-01-02 11.0.600.0 beta
+* Initial beta release of Keyman for Android 11
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Aandroid+-label%3Acherry-pick+-label%3Astable)
 
-## 11.0 alpha
-* Move to 11.0
-* Add round launcher icons (#1077)
-* Change default keyboard from `european` to `sil_euro_latin` (#1112)
-* Remove deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
-* Add splash screen (#1151)
-* Update app to use Material Design theme (#681)
-* Fix globe button when pausing WebBrowser (#1213)
-* Change system keyboard to "numeric" layer for digit/phone number text fields (#1218)
-* Add feature to vibrate device when Keyman Web calls `beep` (#1227)
-* Add support for extra key found on European hardware keyboards (#1291)
-* Add feature for keyboard picker to switch to next keyboard (#1283)
-* Update to Cloud API 4.0 for downloading keyboards (#1320)
-* Fixes issue where file extensions are upper-case, e.g. ".TTF" (#1333)
+* New Features:
+  * System keyboard changes to "numeric" layer for digit/phone number text fields (#1218)
+  * Device vibrates when Keyman Web calls `beep` -- when invalid combinations are pressed (#1227)
+  * Added support for 102nd key found on European hardware keyboards (#1291)
+  * Keyboard picker can now switch to next system keyboard (#1283)
+
+* Changes:
+  * Added round launcher icons (#1077)
+  * Added splash screen (#1151)
+  * Updated app to use Material Design theme (#681, #1378, #1303)
+  * Updated to Cloud API 4.0 for downloading keyboards (#1320)
+  * Removed deprecated ad-hoc distribution of keyboards via `keyman://` protocol (#1109)
+  * Changed default keyboard from `european` to `sil_euro_latin` (#1112, #1400)
+
+* Bug fixes:
+  * Diacritics now display more consistently on key caps (#1407)
+  * Fixed globe button when pausing WebBrowser (#1213)
+  * Fixed issue where file extensions are upper-case, e.g. ".TTF" (#1333)
+  * Fixed various crashes (#1108, #1057)
 
 ## 2018-11-14 10.0.508 stable
 * Fix crash that can occur when text selection ends before the starting position (#1313)

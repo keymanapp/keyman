@@ -1,17 +1,25 @@
 # Keyman for macOS Version History
 
-## 11.0 alpha
-* Refactored target-action call from keyView
-* Added SIL logo and copyright information to About box and DMG image (#1163)
+## 2019-01-02 11.0.200.0 beta
+* Initial beta release of Keyman for macOS 11
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Amac+-label%3Acherry-pick+-label%3Astable)
+
+* Changes:
+  * Code refactoring and cleanup (#1050, #1053)
+  * Added SIL logo and copyright information to About box and DMG image (#1163)
+  
+* Bug Fixes:
+  * In some situations, Keyman for Mac would use the wrong rule in a keyboard (#1091, #1099)
+  * Various crashes (#1424, #1066, #1080)
 
 ## 2018-08-14 10.0.111 stable 
 * CORRECLTY fixed bug in engine that caused incorrect rules to be used (#1095, #1099)
 
- ## 2018-08-10 10.0.110 stable
- * No change
+## 2018-08-10 10.0.110 stable
+* No change (DO NOT USE; use 10.0.111 or later)
 
- ## 2018-08-10 10.0.109 stable
- * DO NOT USE - Faulty attempt at bug fix in engine (#1091)
+## 2018-08-10 10.0.109 stable
+* DO NOT USE (use 10.0.111 or later) - Faulty attempt at bug fix in engine (#1091)
 
 ## 2018-07-12 10.0.104 stable
 * Removed help button from OSK for versions of macOS < 10.10 to prevent crash (#1080, #1081)
