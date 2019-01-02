@@ -33,7 +33,7 @@
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
     <string name="keyboard_updates_available" translatable="false">Keyboard Updates Available</string>
-    <string name="loading" translatable="false">Loading&#8230;</string>
+    <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
     <string name="updating_keyboards" translatable="false">Updating keyboards&#8230;</string>
 
     <!-- Keyboard Info -->

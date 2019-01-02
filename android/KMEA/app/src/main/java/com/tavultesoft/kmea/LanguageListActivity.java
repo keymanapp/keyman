@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.BuildConfig;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -337,10 +338,23 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           loadFromCache = true;
       }
 
+      loadFromCache = false; // DDW don't commit
       if (hasConnection && !loadFromCache) {
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage(getString(R.string.loading));
-        progressDialog.setCancelable(false);
+        progressDialog = new ProgressDialog(context, R.style.ProgressDialog);
+        progressDialog.setMessage(getString(R.string.getting_keyboard_catalog));
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.label_cancel),
+          new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+              cancel(true);
+              progressDialog.dismiss();
+              progressDialog = null;
+              LanguageListActivity.this.finish();
+              return;
+            }
+          });
+        progressDialog.setCancelable(true);
         if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
         } else {

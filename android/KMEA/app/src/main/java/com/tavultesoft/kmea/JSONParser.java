@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -44,6 +45,10 @@ public final class JSONParser {
       Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
       jsonObj = null;
       System.err.println(e);
+    } catch (InterruptedIOException e) {
+      // Disregard from cancelling action
+      Log.e(logTag, (e.getMessage() == null)  ? "InterruptedIOException" : e.getMessage());
+      jsonObj = null;
     } catch (IOException e) {
       Log.e(logTag, (e.getMessage() == null) ? "IOException" : e.getMessage());
       jsonObj = null;
