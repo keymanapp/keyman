@@ -1,5 +1,7 @@
 # Keyman Developer Version History
 
+## 12.0 alpha
+
 ## 2019-01-02 11.0.1300.0 beta
 * Initial beta release of Keyman Developer 11
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Adeveloper+-label%3Acherry-pick+-label%3Astable)
