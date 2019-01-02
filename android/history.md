@@ -1,6 +1,6 @@
 # Keyman for Android
 
-## 2019-01-02 11.0.500.0 beta
+## 2019-01-02 11.0.2050.0 beta
 * Initial beta release of Keyman for Android 11
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Aandroid+-label%3Acherry-pick+-label%3Astable)
 
