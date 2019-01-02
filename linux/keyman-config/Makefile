@@ -28,7 +28,8 @@ uninstall: # run as sudo
 	rm -f /usr/local/bin/km-package-uninstall
 
 clean:
-	-rm -rf dist make_deb build keyman_config/version.py
+	python3 setup.py clean
+	-rm -rf dist make_deb build keyman_config/version.py *.egg-info
 
 devdist: version
 	python3 setup.py egg_info -b.`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M` sdist
