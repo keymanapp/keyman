@@ -147,7 +147,7 @@ if(!window['keyman']['initialized']) {
     }      
 
     /**
-     * Align input fields (should not be needed with KMEI, KMEA)
+     * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.
      * 
      *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
      * 
@@ -187,8 +187,7 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
-     * Align all input fields with underlying elements after a rotation, resize, or change of element font
-     * and/or set visibility     
+     * Programatically hides all input fields with underlying elements.  Restore with .alignInputs.    
      * 
      *  @param  {boolean}   align    align and make visible, else hide
      * 
