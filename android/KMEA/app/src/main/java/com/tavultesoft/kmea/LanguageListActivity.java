@@ -338,7 +338,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           loadFromCache = true;
       }
 
-      loadFromCache = false; // DDW don't commit
       if (hasConnection && !loadFromCache) {
         progressDialog = new ProgressDialog(context, R.style.ProgressDialog);
         progressDialog.setMessage(getString(R.string.getting_keyboard_catalog));
