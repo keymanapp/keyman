@@ -5,8 +5,12 @@ set -e
 case "$1" in
 
   configure)
-    # Restart IBus
-    ibus-daemon --xim --replace --daemonize
+    # Restart IBus if it is running
+    ibuspid=`ps -C ibus-daemon -o pid=`
+
+    if [ "x$ibuspid" != "x" ]; then
+      ibus restart
+    fi
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)
