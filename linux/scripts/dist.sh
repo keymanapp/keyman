@@ -78,8 +78,7 @@ for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         cd ../common/engine
         vers=`grep -Po "\d.\d.\d" keyboardprocessor/meson.build`
-        datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
-        kbpvers="keyman-keyboardprocessor-$vers~$datevers"
+        kbpvers="keyman-keyboardprocessor-$vers"
         cp -a keyboardprocessor $kbpvers
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
         rm -rf $kbpvers
