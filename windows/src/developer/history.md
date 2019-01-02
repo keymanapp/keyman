@@ -1,5 +1,7 @@
 # Keyman Developer Version History
 
+## 12.0 alpha
+
 ## 11.0 alpha
 * Refactor how keyboard_info metadata is generated (#1158)
 * New Feature: New Project from template and Import Keyboard (#1210)

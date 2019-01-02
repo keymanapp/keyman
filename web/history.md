@@ -1,5 +1,7 @@
 # KeymanWeb Version History
 
+## 12.0 alpha
+
 ## 11.0 alpha
 * Add `setNumericLayer()` for embedded platforms to change OSK to numeric layer.
 * Fixes issue where file extensions are upper-case, e.g. ".TTF"
