@@ -1,5 +1,7 @@
 # Keyman Desktop Version History
 
+## 12.0 alpha
+
 ## 11.0 alpha
 * Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1226, #1229, #1236)
 * Debug logging now uses Event Tracing for Windows (#1261)

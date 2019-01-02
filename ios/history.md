@@ -1,5 +1,7 @@
 # Keyman for iPhone and iPad Version History
 
+## 12.0 alpha
+
 ## 11.0 alpha
 * Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
 * Bookmark add button is enabled only when title/url fields have text (#1073)

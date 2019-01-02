@@ -1,5 +1,7 @@
 # Keyman for macOS Version History
 
+## 12.0 alpha
+
 ## 11.0 alpha
 * Refactored target-action call from keyView
 * Added SIL logo and copyright information to About box and DMG image (#1163)

@@ -1,5 +1,7 @@
 # Keyman for Linux Version History
 
+## 12.0 alpha
+
 ## 11.0 alpha
 * Import KMFL into Keyman
 * kmflcomp 0.9.10
