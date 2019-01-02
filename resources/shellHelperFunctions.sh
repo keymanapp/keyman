@@ -29,7 +29,7 @@ verify_project() {
 }
 
 # The list of valid platforms that our build scripts ought expect.
-platforms=("android" "ios" "mac" "web" "desktop" "developer")
+platforms=("android" "ios" "mac" "web" "desktop" "developer" "linux")
 
 # Used to validate a specified 'platform' parameter.
 verify_platform() {

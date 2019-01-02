@@ -104,14 +104,12 @@
 ## 2018-03-22 10.0.31 beta
 * Initial beta release of Keyman 10 for macOS
 
-## 10.0.29 alpha
-* Detection of context changes due to mouse clicks and command keys in "legacy" apps (#394)
-
 ## 10.0 alpha
 * New feature: install keyboard packages by double-clicking the kmp file (#511)
 * Added support for L/R Alt and Ctrl modifiers for keyboards (#178)
 * Display the version number in the download dialog
 * Added support for Keyman version 10.0 keyboards
+* Detection of context changes due to mouse clicks and command keys in "legacy" apps (#394)
 
 ## 2017-11-21 1.2.0 beta
 * Works around bug in macOS High Sierra so that Configuration dialog can be opened (#368)
