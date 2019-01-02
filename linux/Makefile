@@ -5,7 +5,6 @@ default: # builds only
 
 clean:
 	rm -rf build-*
-	cd keyman-config && make clean
 
 reconf: clean
 	./scripts/reconf.sh
