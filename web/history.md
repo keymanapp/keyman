@@ -3,6 +3,9 @@
 ## 2019-01-03 11.0.201 beta
 * New Feature:
   * Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
+  
+* Bug Fix:
+  * Fixed keyboard layer transition bug on mobile devices. (#978)
 
 ## 2019-01-02 11.0.200 beta
 * Initial beta release of KeymanWeb 11
