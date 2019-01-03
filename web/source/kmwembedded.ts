@@ -592,7 +592,7 @@
         kbdInterface.defaultBackspace();
         return true;
     }
-    var ch = osk.defaultKeyOutput(keyName, code, shift, false, null);
+    var ch = osk.defaultKeyOutput(keyName, code, shift, false, undefined);
     if(ch) {
         kbdInterface.output(0, Lelem, ch);
         return true;

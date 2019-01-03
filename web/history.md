@@ -1,7 +1,15 @@
 # KeymanWeb Version History
 
 ## 2019-01-04 11.0.202 beta
-* Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
+* Bug Fix:
+  * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
+
+## 2019-01-03 11.0.201 beta
+* New Feature:
+  * Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
+
+* Bug Fix:
+  * Fix keyboard layer transition bug on mobile devices. (#978)
 
 ## 2019-01-02 11.0.200 beta
 * Initial beta release of KeymanWeb 11
