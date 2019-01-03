@@ -74,7 +74,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   private static String filename;
 
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
-
+  
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -372,7 +372,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param showProgressDialog
    */
   public static void download(final Context context, final boolean showProgressDialog) {
-
     new DownloadTask(context, showProgressDialog).execute();
   }
 
