@@ -459,6 +459,51 @@ def parsemetadata(jsonfile, verbose=False):
 				print_files(files, extracted_dir)
 	return info, system, options, keyboards, files
 
+def get_metadata(tmpdirname):
+	"""
+	Get metadata from kmp.json if it exists.
+	If it does not exist then will return get_and_convert_infdata
+
+	Args:
+		inputfile (str): path to kmp file
+		tmpdirname(str): temp directory to extract kmp
+
+	Returns:
+		list[5]: info, system, options, keyboards, files
+			see kmpmetadata.parsemetadata for details
+	"""
+	kmpjson = os.path.join(tmpdirname, "kmp.json")
+	if os.path.isfile(kmpjson):
+		return parsemetadata(kmpjson, False)
+	else:
+		return get_and_convert_infdata(tmpdirname)
+
+def get_and_convert_infdata(tmpdirname):
+	"""
+	Get metadata from kmp.inf if it exists.
+	Convert it to kmp.json if possible
+
+	Args:
+		inputfile (str): path to kmp file
+		tmpdirname(str): temp directory to extract kmp
+
+	Returns:
+		list[5]: info, system, options, keyboards, files
+			see kmpmetadata.parseinfdata for details
+	"""
+	kmpinf = os.path.join(tmpdirname, "kmp.inf")
+	if os.path.isfile(kmpinf):
+		info, system, options, keyboards, files =  parseinfdata(kmpinf, False)
+		j = infmetadata_to_json(info, system, options, keyboards, files)
+		kmpjson = os.path.join(tmpdirname, "kmp.json")
+		with open(kmpjson, "w") as write_file:
+			print(j, file=write_file)
+		return info, system, options, keyboards, files
+	else:
+		return None, None, None, None, None
+
+
+
 def infmetadata_to_json(info, system, options, keyboards, files):
 	jsonfiles = []
 	for entry in files:

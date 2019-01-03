@@ -28,14 +28,14 @@ void actions::push_persist(option const &&opt) {
 
 
 state::state(km::kbp::abstract_processor & ap, km_kbp_option_item const *env)
-  : _options(ap.keyboard().default_options),
-    _processor(ap)
+  : _processor(ap)
 {
-  ap.init_state(_env);
-  _options.set_default_env(_env.data());
-
   for (; env && env->key != nullptr; env++) {
     //assert(env->scope == KM_KBP_OPT_ENVIRONMENT); // todo do we need scope? or can we find a way to eliminate it?
-    assert(_options.assign(static_cast<km_kbp_state *>(this), (km_kbp_option_scope) KM_KBP_OPT_ENVIRONMENT, env->key, env->value) != nullptr);
+    ap.update_option(env->scope
+                        ? km_kbp_option_scope(env->scope)
+                        : KM_KBP_OPT_ENVIRONMENT, 
+                     env->key,
+                     env->value);
   }
 }

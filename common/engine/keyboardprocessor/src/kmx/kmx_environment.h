@@ -21,7 +21,7 @@ private:
 public:
   KMX_Environment();
   void Load(std::u16string const & key, std::u16string const & value);
-  void Init(std::vector<option> &default_env);
+  char16_t const * LookUp(std::u16string const & key) const;
 
   KMX_BOOL capsLock() const noexcept { return _capsLock; }
   KMX_BOOL simulateAltGr() const noexcept { return _simulateAltGr; }

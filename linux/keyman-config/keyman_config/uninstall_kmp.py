@@ -1,53 +1,31 @@
 #!/usr/bin/python3
 
-import ast
 import logging
 import subprocess
 import sys
 import os.path
 from shutil import rmtree
+
 from keyman_config.get_kmp import user_keyboard_dir, user_keyman_font_dir
+from keyman_config.kmpmetadata import get_metadata
+from keyman_config.ibus_util import uninstall_from_ibus, get_ibus_bus, restart_ibus
 
-def uninstall_from_ibus(kmnfile):
-	if sys.version_info.major == 3 and sys.version_info.minor < 6:
-		result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
-			stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
-		logging.debug(result.stdout.decode("utf-8", "strict"))
-		dconfread = result.stdout.decode("utf-8", "strict")
-	else:
-		result = subprocess.run(["dconf", "read", "/desktop/ibus/general/preload-engines"],
-			stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
-		dconfread = result.stdout
-	if (result.returncode == 0) and dconfread:
-		preload_engines = ast.literal_eval(dconfread)
-		if kmnfile not in preload_engines:
-			logging.info("%s is not installed in IBus", kmnfile)
-			return
-		preload_engines.remove(kmnfile)
-		logging.info("Uninstalling %s from IBus", kmnfile)
-		if sys.version_info.major == 3 and sys.version_info.minor < 6:
-			result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
-				stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
-		else:
-			result2 = subprocess.run(["dconf", "write", "/desktop/ibus/general/preload-engines", str(preload_engines)],
-				stdout=subprocess.PIPE, stderr= subprocess.STDOUT, encoding="UTF8")
-
-def uninstall_kmp_shared(keyboardid):
+def uninstall_kmp_shared(packageID):
 	"""
 	Uninstall a kmp from /usr/local/share/keyman
 
 	Args:
-		keyboardid (str): Keyboard ID
+		packageID (str): Keyboard package ID
 	"""
-	kbdir = os.path.join('/usr/local/share/keyman', keyboardid)
+	kbdir = os.path.join('/usr/local/share/keyman', packageID)
 	if not os.path.isdir(kbdir):
-		logging.error("Keyboard directory for %s does not exist. Aborting", keyboardid)
+		logging.error("Keyboard directory for %s does not exist. Aborting", packageID)
 		exit(3)
 
-	kbdocdir = os.path.join('/usr/local/share/doc/keyman', keyboardid)
-	kbfontdir = os.path.join('/usr/local/share/fonts/keyman', keyboardid)
+	kbdocdir = os.path.join('/usr/local/share/doc/keyman', packageID)
+	kbfontdir = os.path.join('/usr/local/share/fonts/keyman', packageID)
 
-	logging.info("Uninstalling shared keyboard: %s", keyboardid)
+	logging.info("Uninstalling shared keyboard: %s", packageID)
 	if not os.access(kbdir, os.X_OK | os.W_OK): # Check for write access of keyman dir
 		logging.error("You do not have permissions to uninstall the keyboard files. You need to run this with `sudo`")
 		exit(3)
@@ -67,45 +45,70 @@ def uninstall_kmp_shared(keyboardid):
 		logging.info("Removed font directory: %s", kbfontdir)
 	else:
 		logging.info("No font directory")
-	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
-	uninstall_from_ibus(kmnfile)
+
+	# need to uninstall from ibus for all lang and all kmx in kmp
+	info, system, options, keyboards, files = get_metadata(kbdir)
+	if keyboards:
+		uninstall_keyboards_from_ibus(keyboards, kbdir)
+	else:
+		logging.warning("could not uninstall keyboards from IBus")
+
 	rmtree(kbdir)
 	logging.info("Removed keyman directory: %s", kbdir)
-	logging.info("Finished uninstalling shared keyboard: %s", keyboardid)
+	logging.info("Finished uninstalling shared keyboard: %s", packageID)
 
-def uninstall_kmp_user(keyboardid):
+def uninstall_keyboards_from_ibus(keyboards, packageDir):
+		bus = get_ibus_bus()
+		if bus:
+			# install all kmx for first lang not just packageID
+			for kb in keyboards:
+				kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
+				if "languages" in kb:
+					logging.debug(kb["languages"][0])
+					keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
+				else:
+					keyboard_id = kmx_file
+				uninstall_from_ibus(bus, keyboard_id)
+			restart_ibus(bus)
+		else:
+			logging.warning("could not uninstall keyboards from IBus")
+
+def uninstall_kmp_user(packageID):
 	"""
 	Uninstall a kmp from ~/.local/share/keyman
 
 	Args:
-		keyboardid (str): Keyboard ID
+		packageID (str): Keyboard package ID
 	"""
-	kbdir=user_keyboard_dir(keyboardid)
+	kbdir=user_keyboard_dir(packageID)
 	if not os.path.isdir(kbdir):
-		logging.error("Keyboard directory for %s does not exist. Aborting", keyboardid)
+		logging.error("Keyboard directory for %s does not exist. Aborting", packageID)
 		exit(3)
-	logging.info("Uninstalling local keyboard: %s", keyboardid)
-	kmnfile = os.path.join(kbdir, keyboardid+".kmn")
-	uninstall_from_ibus(kmnfile)
+	logging.info("Uninstalling local keyboard: %s", packageID)
+	info, system, options, keyboards, files = get_metadata(kbdir)
+	if keyboards:
+		uninstall_keyboards_from_ibus(keyboards, kbdir)
+	else:
+		logging.warning("could not uninstall keyboards from IBus")
 	rmtree(kbdir)
 	logging.info("Removed user keyman directory: %s", kbdir)
-	fontdir=os.path.join(user_keyman_font_dir(), keyboardid)
+	fontdir=os.path.join(user_keyman_font_dir(), packageID)
 	if os.path.isdir(fontdir):
 		rmtree(fontdir)
 		logging.info("Removed user keyman font directory: %s", fontdir)
-	logging.info("Finished uninstalling local keyboard: %s", keyboardid)
+	logging.info("Finished uninstalling local keyboard: %s", packageID)
 
 
 
-def uninstall_kmp(keyboardid, sharedarea=False):
+def uninstall_kmp(packageID, sharedarea=False):
 	"""
 	Uninstall a kmp
 
 	Args:
-		keyboardid (str): Keyboard ID
+		packageID (str): Keyboard package ID
 		sharedarea (str): whether to uninstall from shared /usr/local or ~/.local
 	"""
 	if sharedarea:
-		uninstall_kmp_shared(keyboardid)
+		uninstall_kmp_shared(packageID)
 	else:
-		uninstall_kmp_user(keyboardid)
+		uninstall_kmp_user(packageID)

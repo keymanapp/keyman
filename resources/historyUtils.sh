@@ -109,7 +109,7 @@ validate_history_line() {
     fi
   elif [ $line_type = "pending-version" ]; then
     if [[ ${BASH_REMATCH[2]} = "stable" || ${BASH_REMATCH[2]} = "beta" ]]; then
-      warn "Error in entry for version ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} - build number missing for ${BASH_REMATCH[3]} tier."
+      warn "Error in entry for version ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} - build number missing for ${BASH_REMATCH[2]} tier."
       validation_error=true
     fi
   elif [ $line_type = "legacy-version" ]; then
@@ -130,11 +130,18 @@ validate_history_line() {
   elif [ $line_type = "erroneous-version" ]; then
     if [ ${BASH_REMATCH[3]} = "alpha" ]; then
       warn "Error in entry for version ${BASH_REMATCH[2]} ${BASH_REMATCH[3]} - alphas should not be dated."
+	  validation_error=true
     else
-      warn "Error in entry for version ${BASH_REMATCH[2]} ${BASH_REMATCH[3]} - build number missing for ${BASH_REMATCH[3]} tier."
+	  version="${BASH_REMATCH[2]}"
+	  tier="${BASH_REMATCH[3]}"
+	  
+	  # This branch's conditional lack of error 'grandfathers' Android versions 1.0-2.4 stable, which are dated but lack build numbers.
+    [[ "${BASH_REMATCH[2]}" =~ $re_v_major ]]
+      if [ "${BASH_REMATCH[1]}" -ge "10" ]; then
+        warn "Error in entry for version ${version} ${tier} - build number missing for ${tier} tier."
+        validation_error=true
+      fi
     fi
-
-    validation_error=true
   fi
 }
 

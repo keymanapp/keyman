@@ -21,23 +21,41 @@ namespace {
 }
 
 KMX_Environment::KMX_Environment() {
+  Load(KM_KBP_KMX_ENV_PLATFORM, DEFAULT_PLATFORM);
+  Load(KM_KBP_KMX_ENV_BASELAYOUT, DEFAULT_BASELAYOUT);
+  Load(KM_KBP_KMX_ENV_BASELAYOUTALT, DEFAULT_BASELAYOUTALT);
+  Load(KM_KBP_KMX_ENV_SIMULATEALTGR, DEFAULT_SIMULATEALTGR);
+  Load(KM_KBP_KMX_ENV_CAPSLOCK, DEFAULT_CAPSLOCK);
+  Load(KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT, DEFAULT_BASELAYOUTGIVESCTRLRALTFORRALT);
 }
 
-void KMX_Environment::InitOption(std::vector<option> &default_env, km_kbp_cp const *key, km_kbp_cp const *default_value) {
-  default_env.emplace_back(KM_KBP_OPT_ENVIRONMENT, key, default_value);
-  Load(key, default_value);
-}
 
-void KMX_Environment::Init(std::vector<option> &default_env) {
-  InitOption(default_env, KM_KBP_KMX_ENV_PLATFORM, DEFAULT_PLATFORM);
-  InitOption(default_env, KM_KBP_KMX_ENV_BASELAYOUT, DEFAULT_BASELAYOUT);
-  InitOption(default_env, KM_KBP_KMX_ENV_BASELAYOUTALT, DEFAULT_BASELAYOUTALT);
-  InitOption(default_env, KM_KBP_KMX_ENV_SIMULATEALTGR, DEFAULT_SIMULATEALTGR);
-  InitOption(default_env, KM_KBP_KMX_ENV_CAPSLOCK, DEFAULT_CAPSLOCK);
-  InitOption(default_env, KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT, DEFAULT_BASELAYOUTGIVESCTRLRALTFORRALT);
+char16_t const * KMX_Environment::LookUp(std::u16string const & key) const {
+  assert(!key.empty());
+  if (!key.empty()) return nullptr;
 
-  // TODO refactor this and the keyboard option terminator into state.cpp and keyboard.cpp respectively
-  default_env.emplace_back();
+  if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_PLATFORM)) {
+    return _platform.c_str();
+  }
+  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_BASELAYOUT)) {
+    return _baseLayout.c_str();
+  }
+  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_BASELAYOUTALT)) {
+    return _baseLayoutAlt.c_str();
+  }
+  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_SIMULATEALTGR)) {
+    return _simulateAltGr ? u"1" : u"0";
+  }
+  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_CAPSLOCK)) {
+    return _capsLock ? u"1" : u"0";
+  }
+  else if (!u16icmp(key.c_str(), KM_KBP_KMX_ENV_BASELAYOUTGIVESCTRLRALTFORRALT)) {
+    return _baseLayoutGivesCtrlRAltForRAlt ? u"1" : u"0";
+  }
+  else {
+    // Unsupported key
+    return nullptr;
+  }
 }
 
 

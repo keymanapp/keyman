@@ -44,23 +44,6 @@ constexpr char const *doc1_expected = u8"\
         \"version\" : \"3.145\",\n\
         \"rules\" : []\n\
     },\n\
-    \"options\" : {\n\
-        \"keyboard\" : {\n\
-            \"__test_point\" : \"not tiggered\",\n\
-            \"hello\" : \"-\"\n\
-        },\n\
-        \"environment\" : {\n\
-            \"hello\" : \"-\"\n\
-        },\n\
-        \"saved\" : {\n\
-            \"keyboard\" : {\n\
-                \"__test_point\" : \"F2 pressed test save.\"\n\
-            },\n\
-            \"environment\" : {\n\
-                \"hello\" : \"world\"\n\
-            }\n\
-        }\n\
-    },\n\
     \"context\" : [\n\
         \"H\",\n\
         \"e\",\n\
@@ -86,21 +69,6 @@ constexpr char const *doc2_expected = u8"\
         \"folder\" : \"\",\n\
         \"version\" : \"3.145\",\n\
         \"rules\" : []\n\
-    },\n\
-    \"options\" : {\n\
-        \"keyboard\" : {\n\
-            \"__test_point\" : \"not tiggered\",\n\
-            \"hello\" : \"-\"\n\
-        },\n\
-        \"environment\" : {\n\
-            \"hello\" : \"-\"\n\
-        },\n\
-        \"saved\" : {\n\
-            \"keyboard\" : {},\n\
-            \"environment\" : {\n\
-                \"hello\" : \"globe\"\n\
-            }\n\
-        }\n\
     },\n\
     \"context\" : [],\n\
     \"actions\" : []\n\

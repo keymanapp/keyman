@@ -42,9 +42,9 @@ km_kbp_state_option_lookup(km_kbp_state const *state,
   if (scope == KM_KBP_OPT_UNKNOWN || scope > KM_KBP_OPT_MAX_SCOPES)
     return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  auto & opts = state->options();
+  auto & processor = state->processor();
 
-  *value_out = opts.lookup(km_kbp_option_scope(scope), key);
+  *value_out = processor.lookup_option(km_kbp_option_scope(scope), key);
   if (!*value_out)  return KM_KBP_STATUS_KEY_ERROR;
 
   return KM_KBP_STATUS_OK;
@@ -57,7 +57,7 @@ km_kbp_state_options_update(km_kbp_state *state, km_kbp_option_item const *opt)
   assert(state); assert(opt);
   if (!state|| !opt)  return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-  auto & opts = state->options();
+  auto & processor = state->processor();
 
   try
   {
@@ -66,7 +66,10 @@ km_kbp_state_options_update(km_kbp_state *state, km_kbp_option_item const *opt)
       if (opt->scope == KM_KBP_OPT_UNKNOWN || opt->scope > KM_KBP_OPT_MAX_SCOPES)
         return KM_KBP_STATUS_INVALID_ARGUMENT;
 
-      if (!opts.assign(state, km_kbp_option_scope(opt->scope), opt->key, opt->value))
+      if (processor.update_option(
+            km_kbp_option_scope(opt->scope),
+            opt->key,
+            opt->value).empty())
         return KM_KBP_STATUS_KEY_ERROR;
     }
   }
@@ -92,7 +95,8 @@ km_kbp_state_options_to_json(km_kbp_state const *state, char *buf, size_t *space
 
   try
   {
-    jo << state->options();
+// TODO: Fix
+//    jo << state->options();
   }
   catch (std::bad_alloc)
   {

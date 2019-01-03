@@ -9,7 +9,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 #include <keyman/keyboardprocessor.h>
 
 #include "processor.hpp"
@@ -20,9 +20,8 @@ namespace kbp
 {
   class mock_processor : public abstract_processor
   {
-    std::vector<option> _options;
-    option const * _find_option(km_kbp_option_scope scope,
-                                std::u16string const & key) const;
+    std::unordered_map<std::u16string, std::u16string> _options;
+
   public:
     mock_processor(km::kbp::path const &);
 //    ~mock_processor() override;
@@ -35,12 +34,12 @@ namespace kbp
     km_kbp_status               validate() const override;
 
 
-    void    update_option(km_kbp_state *state,
-                          km_kbp_option_scope scope,
-                          std::u16string const & key,
-                          std::u16string const & value) override;
 
-    void init_state(std::vector<option> &) override;
+    char16_t const * lookup_option(km_kbp_option_scope,
+                  std::u16string const & key) const override;
+    option  update_option(km_kbp_option_scope,
+                  std::u16string const & key,
+                  std::u16string const & value) override;
   };
 
   class null_processor : public mock_processor {

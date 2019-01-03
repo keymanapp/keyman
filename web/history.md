@@ -1,13 +1,30 @@
 # KeymanWeb Version History
 
-## 11.0 alpha
-* Add `setNumericLayer()` for embedded platforms to change OSK to numeric layer.
-* Fixes issue where file extensions are upper-case, e.g. ".TTF"
-* Fixes keyboard layout issues after mobile device rotations. (#248) (#970)
-* Fixes issue with oversized key text on some keyboards. (#382)
-* Fixes issue with diacritics not displaying on some keyboards.  (#1070)
-* Adds support for Promises to init() and setActiveKeyboard(). (#100)
-* Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
+## 2019-01-03 11.0.201 beta
+* New Feature:
+  * Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
+
+## 2019-01-02 11.0.200 beta
+* Initial beta release of KeymanWeb 11
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Aweb+-label%3Acherry-pick+-label%3Astable)
+
+* New Features:
+  * Added `setNumericLayer()` for embedded platforms to change OSK to numeric layer. (#1218)
+  * Added support for Promises to `init()` and `setActiveKeyboard()`. (#1432)
+  
+* Changes:
+  * Added OSK bulk rendering script for testing (#1432)
+  * Code refactors (#1403)
+
+* Bug Fixes:
+  * Fixed issue where file extensions are upper-case, e.g. ".TTF" (#1333)
+  * Fixed keyboard layout issues after mobile device rotations. (#1393)
+  * Fixed issue with oversized key text on some keyboards. (#1421)
+  * Fixed issue with diacritics not displaying on some keyboards.  (#1407)
+  * Fixed issue with virtual key case sensitivity (#1394)
+  * Fixed multiple issues on iOS (#1393)
+  * Fixed issues with language duplication in toolbar UI (#1284)
+  * Fixed crashes (#1057)
 
 ## 2018-07-06 10.0.103 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)
