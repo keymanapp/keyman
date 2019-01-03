@@ -62,6 +62,7 @@ done
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         rm -rf keyboardprocessor
+        sed -i "s/version: '.*'/version: '${newvers}'/" ../common/engine/keyboardprocessor/meson.build
         meson ../common/engine/keyboardprocessor keyboardprocessor
     fi
     if [ "${proj}" == "keyman-config" ]; then

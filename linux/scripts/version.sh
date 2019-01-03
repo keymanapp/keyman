@@ -2,14 +2,24 @@
 
 version()
 {
+    if [[ -z "${TIER}" ]]; then
+        tier="beta"
+    else
+        tier="${TIER}"
+    fi
+    echo "tier is ${tier}"
     local catvers=`cat VERSION`
+    echo "VERSION is ${catvers}"
     local datevers=`TZ=UTC git log -1 --pretty=format:%cd --date=format-local:%Y%m%d%H%M`
-    local num=`git describe --abbrev=0 --match=linux-release-*| cut -d '.' -f3`
+    local num=`git describe --abbrev=0 --match=linux-release-${tier}*| cut -d '.' -f3`
+    if [[ -z "${num}" ]]; then
+        num="0"
+    fi
     echo "current tag number ${num}"
     local next=$((num+1))
     echo "next tag number ${next}"
 
-    local current_tag=`git tag -l --points-at HEAD|grep "linux"|grep ${num}`
+    local current_tag=`git tag -l --points-at HEAD|grep "linux-release-${tier}"|grep "${catvers}.${num}"`
 
     if [ -n "${current_tag}" ]; then
         echo "tag is on current commit, use $num"
