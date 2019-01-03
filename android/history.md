@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2019-01-04 11.0.2052 beta
+* Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
+
 ## 2019-01-03 11.0.2051 beta
 * Add option to cancel when downloading the keyboard catalog (#1470)
 
