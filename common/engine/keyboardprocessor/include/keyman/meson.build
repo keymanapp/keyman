@@ -6,7 +6,7 @@
 # History:     6 Oct 2018 - TSE - Move into keyman folder.
 #
 
-ver = meson.project_version().split('.')
+ver = lib_version.split('.')
 
 cfg = configuration_data()
 cfg.set('lib_curr', ver[0])

@@ -6,12 +6,14 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        version: '0.0.0',
+        version: '11.0.0',
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14'])
 
 compiler = meson.get_compiler('cpp')
+
+lib_version = '0.0.0'
 
 if compiler.get_id() == 'msvc'
   add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
