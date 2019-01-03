@@ -4,8 +4,9 @@
 
 # must be run from linux dir
 
-# parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
+# parameters: [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
+# TIER="<tier>" alpha, beta or stable, default beta
 # PROJECT="<project>" only upload this project
 # DIST="<dist>" only upload for this distribution
 
@@ -17,6 +18,13 @@ if [ "${UPLOAD}" == "yes" ]; then
 else
     SIM="-s"
 fi
+
+if [[ -z "${TIER}" ]]; then
+    tier="beta"
+else
+    tier="${TIER}"
+fi
+
 
 if [ ! `which xmllint` ]; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
@@ -69,7 +77,7 @@ for proj in ${projects}; do
     mv ${tarname}-${version}.tar.gz ${BASEDIR}/launchpad
     rm ${proj}*.debian.tar.xz
     cd ${BASEDIR}/launchpad
-    wget -N https://downloads.keyman.com/linux/alpha/${dirversion}/SHA256SUMS
+    wget -N https://downloads.keyman.com/linux/${tier}/${dirversion}/SHA256SUMS
     sha256sum -c --ignore-missing SHA256SUMS |grep ${tarname}
     cd ${proj}-${version}
     echo `pwd`
