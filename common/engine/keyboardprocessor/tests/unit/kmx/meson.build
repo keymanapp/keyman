@@ -73,6 +73,8 @@ else
 endif
 
 if kmcomp.found()
+  # This is only expected to work in meson 0.48+
+  # so not on bionic or xenial without using pip
   foreach kbd : tests
     kbd_src = files(kbd + '.kmn')
     kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
