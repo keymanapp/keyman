@@ -6,7 +6,7 @@ default: # builds only
 clean:
 	rm -rf build-*
 
-reconf:
+reconf: clean
 	./scripts/reconf.sh
 
 configure:
