@@ -582,12 +582,17 @@
     if (code == osk.keyCodes.K_SPACE) {
         kbdInterface.output(0, Lelem, ' ');
         return true;
-    }
-    else if (code == osk.keyCodes.K_ENTER) {
+    } else if (code == osk.keyCodes.K_ENTER) {
         kbdInterface.output(0, Lelem, '\n');
         return true;
+    } else if (code == osk.keyCodes.K_TAB) {
+        kbdInterface.output(0, Lelem, '\t');
+        return true;
+    } else if (code == osk.keyCodes.K_BKSP) {
+        kbdInterface.defaultBackspace();
+        return true;
     }
-    var ch = osk.defaultKeyOutput(keyName, code, shift, false);
+    var ch = osk.defaultKeyOutput(keyName, code, shift, false, null);
     if(ch) {
         kbdInterface.output(0, Lelem, ch);
         return true;
