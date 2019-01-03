@@ -1667,76 +1667,82 @@ if(!window['keyman']['initialized']) {
       var s=osk.layerId,idx=id;
       var i;
 
-      // Need to test if target layer is a standard layer (based on the plain 'default')
-      var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
+      if((<KeymanBase>keymanweb).util.device.formFactor == 'desktop') {
+        // Need to test if target layer is a standard layer (based on the plain 'default')
+        var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
-      for(i=0; i < replacements.length; i++) {
-        // Don't forget to remove the kebab-case hyphens!
-        idx=idx.replace(replacements[i] + '-', '');
-        idx=idx.replace(replacements[i],'');
-      }
-
-      // If we are presently on the default layer, drop the 'default' and go straight to the shifted mode.
-      // If on a common symbolic layer, drop out of symbolic mode and go straight to the shifted mode.
-      if(osk.layerId == 'default' || osk.layerId == 'numeric' || osk.layerId == 'symbol' || osk.layerId == 'currency' || idx != '') {
-        s = id;
-      }
-      // Otherwise, we are based upon the a layer that accepts modifier variations.
-      // Modify the layer according to the current state and key pressed.
-      //
-      // TODO:  Consider:  should this ever be allowed for a base layer other than 'default'?  If not,
-      // if(idx == '') with accompanying if-else structural shift would be a far better test here.
-      else
-      {
-        // Save our current modifier state.
-        var modifier=osk.getModifierState(s);
-
-        // Strip down to the base modifiable layer.
         for(i=0; i < replacements.length; i++) {
           // Don't forget to remove the kebab-case hyphens!
-          s=s.replace(replacements[i] + '-', '');
-          s=s.replace(replacements[i],'');
+          idx=idx.replace(replacements[i] + '-', '');
+          idx=idx.replace(replacements[i],'');
         }
 
-        // Toggle the modifier represented by our input argument.
-        switch(id)
-        {
-          case 'shift':
-            modifier ^= osk.modifierCodes['SHIFT'];
-            break;
-          case 'leftctrl':
-            modifier ^= osk.modifierCodes['LCTRL'];
-            break;
-          case 'rightctrl':
-            modifier ^= osk.modifierCodes['RCTRL'];
-            break;
-          case 'ctrl':
-            modifier ^= osk.modifierCodes['CTRL'];
-            break;
-          case 'leftalt':
-            modifier ^= osk.modifierCodes['LALT'];
-            break;
-          case 'rightalt':
-            modifier ^= osk.modifierCodes['RALT'];
-            break;
-          case 'alt':
-            modifier ^= osk.modifierCodes['ALT'];
-            break;
-          default:
-            s = id;
+        // If we are presently on the default layer, drop the 'default' and go straight to the shifted mode.
+        // If on a common symbolic layer, drop out of symbolic mode and go straight to the shifted mode.
+        if(osk.layerId == 'default' || osk.layerId == 'numeric' || osk.layerId == 'symbol' || osk.layerId == 'currency' || idx != '') {
+          s = id;
         }
-        // Combine our base modifiable layer and attach the new modifier variation info to obtain our destination layer.
-        if(s != 'default') {
-          if(s == '') {
-            s = osk.getLayerId(modifier);
-          } else {
-            s = osk.getLayerId(modifier) + '-' + s;
+        // Otherwise, we are based upon the a layer that accepts modifier variations.
+        // Modify the layer according to the current state and key pressed.
+        //
+        // TODO:  Consider:  should this ever be allowed for a base layer other than 'default'?  If not,
+        // if(idx == '') with accompanying if-else structural shift would be a far better test here.
+        else
+        {
+          // Save our current modifier state.
+          var modifier=osk.getModifierState(s);
+
+          // Strip down to the base modifiable layer.
+          for(i=0; i < replacements.length; i++) {
+            // Don't forget to remove the kebab-case hyphens!
+            s=s.replace(replacements[i] + '-', '');
+            s=s.replace(replacements[i],'');
+          }
+
+          // Toggle the modifier represented by our input argument.
+          switch(id)
+          {
+            case 'shift':
+              modifier ^= osk.modifierCodes['SHIFT'];
+              break;
+            case 'leftctrl':
+              modifier ^= osk.modifierCodes['LCTRL'];
+              break;
+            case 'rightctrl':
+              modifier ^= osk.modifierCodes['RCTRL'];
+              break;
+            case 'ctrl':
+              modifier ^= osk.modifierCodes['CTRL'];
+              break;
+            case 'leftalt':
+              modifier ^= osk.modifierCodes['LALT'];
+              break;
+            case 'rightalt':
+              modifier ^= osk.modifierCodes['RALT'];
+              break;
+            case 'alt':
+              modifier ^= osk.modifierCodes['ALT'];
+              break;
+            default:
+              s = id;
+          }
+          // Combine our base modifiable layer and attach the new modifier variation info to obtain our destination layer.
+          if(s != 'default') {
+            if(s == '') {
+              s = osk.getLayerId(modifier);
+            } else {
+              s = osk.getLayerId(modifier) + '-' + s;
+            }
           }
         }
-      }
-      
-      if(s == '') {
-        s = 'default';
+        
+        if(s == '') {
+          s = 'default';
+        }
+      } else {
+        // Mobile form-factor.  Either the layout is specified by a keyboard developer with direct layer name references
+        // or all layers are accessed via subkey of a single layer-shifting key - no need for modifier-combining logic.
+        s = id;
       }
 
       // Actually set the new layer id.
@@ -4778,7 +4784,7 @@ if(!window['keyman']['initialized']) {
       util.addFontFaceStyleSheet(kfd); util.addFontFaceStyleSheet(ofd);
 
       // Temporarily hide duplicated elements on non-desktop browsers
-      keymanweb.alignInputs(false);
+      keymanweb.hideInputs();
 
       // Build the style string and append (or replace) the font style sheet
       // Note: Some browsers do not download the font-face font until it is applied,
@@ -4791,7 +4797,9 @@ if(!window['keyman']['initialized']) {
       osk.styleSheet = util.addStyleSheet(customStyle); //Build 360
 
       // Wait until font is loaded then align duplicated input elements with page elements
-      if(osk.waitForFonts(kfd,ofd)) keymanweb.alignInputs(true);
+      if(osk.waitForFonts(kfd,ofd)) {
+        keymanweb.alignInputs();
+      }
     }
 
     /**

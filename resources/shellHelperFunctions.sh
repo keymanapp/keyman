@@ -2,6 +2,22 @@
 
 _shf_base_dir=$(dirname "$BASH_SOURCE")/..
 
+# Designed to determine which set of browsers should be available for local testing,
+# based upon the current system OS.
+get_builder_OS ( ) {
+  # Default value, since it's the most general case/configuration to detect.
+  os_id="linux"
+
+  # Subject to change with future improvements.
+  if [[ "${OSTYPE}" = "darwin"* ]]; then
+    os_id="mac"
+  elif [[ "${OSTYPE}" = "msys" ]]; then
+    os_id="win"
+  elif [[ "${OSTYPE}" = "cygwin" ]]; then
+    os_id="win"
+  fi
+}
+
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
   if [[ "${OSTYPE}" != "darwin"* ]]; then
