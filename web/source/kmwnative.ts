@@ -147,28 +147,60 @@ if(!window['keyman']['initialized']) {
     }      
 
     /**
-     * Align all input fields with underlying elements after a rotation, resize, or change of element font
-     * and/or set visibility     
+     * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.
+     * 
+     *  @param  {object}   eleList    A list of specific elements to align.  If nil, selects all elements.
+     * 
+     **/
+    keymanweb.alignInputs = function(eleList: HTMLElement[]) {
+      if(device.touchable) {
+        var domManager = keymanweb.domManager;
+        var processList: HTMLElement[] = [];
+
+        if(eleList) {
+          // Did the user specify the actual element or the touch-alias?
+          eleList.forEach(function(element: HTMLElement){
+            if(element.base) {
+              // It's a touch-alias element, which is what we wish to perform alignment on.
+              processList.push(element);
+            } else {
+              // This retrieves an element's touch-alias, should it exist.
+              let touchAlias = element['kmw_ip'] as HTMLDivElement;
+              if(touchAlias) {
+                processList.push(element['kmw_ip']);
+              }
+            }
+          });
+        } else {
+          processList = domManager.inputList;
+        }
+
+        // Supported by IE 9 and all modern browsers.
+        processList.forEach(function(element: HTMLElement) {
+          domManager.touchHandlers.updateInput(element);
+          element.style.visibility = 'visible';
+          if(element.base.textContent.length > 0) {
+            element.base.style.visibility = 'hidden';
+          }
+        })      
+      }
+    }
+
+    /**
+     * Programatically hides all input fields with underlying elements.  Restore with .alignInputs.    
      * 
      *  @param  {boolean}   align    align and make visible, else hide
      * 
      **/
-    keymanweb.alignInputs = function(align) {
+    keymanweb.hideInputs = function() {
       var domManager = keymanweb.domManager;
       if(device.touchable) {
         for(var i=0; i<domManager.inputList.length; i++) {
-          if(align) {     
-            domManager.touchHandlers.updateInput(domManager.inputList[i]);
-            domManager.inputList[i].style.visibility='visible';
-            if(domManager.inputList[i].base.textContent.length > 0)
-              domManager.inputList[i].base.style.visibility='hidden';
-          } else {
-            domManager.inputList[i].style.visibility='hidden';
-            domManager.inputList[i].base.style.visibility='visible';
-          }
+          domManager.inputList[i].style.visibility='hidden';
+          domManager.inputList[i].base.style.visibility='visible';
         }        
       }
-    }    
+    }
 
     /**
      * Test if caret position is determined from the active element, or 
@@ -527,7 +559,7 @@ if(!window['keyman']['initialized']) {
         {
           window.clearInterval(keymanweb.fontCheckTimer);
           keymanweb.fontCheckTimer=null;
-          keymanweb.alignInputs(true);    
+          keymanweb.alignInputs();    
         }    
       },100);
       
@@ -538,7 +570,7 @@ if(!window['keyman']['initialized']) {
         {
           window.clearInterval(keymanweb.fontCheckTimer);
           keymanweb.fontCheckTimer=null;
-          keymanweb.alignInputs(true);
+          keymanweb.alignInputs();
           // Don't notify - this is a management issue, not anything the user needs to deal with
           // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
           //util.alert('Unable to download the font normally used with '+ks['KN']+'.');

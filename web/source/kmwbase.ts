@@ -82,7 +82,9 @@ namespace com.keyman {
     getKeyboardPath(f, p?){return f;}
     KC_(n, ln, Pelem){return '';} 
     handleRotationEvents(){}
-    alignInputs(b){}
+    // Will serve as an API function for a workaround, in case of future touch-alignment issues.
+    ['alignInputs'](eleList?: HTMLElement[]){}
+    hideInputs() {};
     namespaceID(Pstub) {};
     preserveID(Pk) {};
 
