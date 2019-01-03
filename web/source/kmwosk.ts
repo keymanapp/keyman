@@ -4784,7 +4784,7 @@ if(!window['keyman']['initialized']) {
       util.addFontFaceStyleSheet(kfd); util.addFontFaceStyleSheet(ofd);
 
       // Temporarily hide duplicated elements on non-desktop browsers
-      keymanweb.alignInputs(false);
+      keymanweb.hideInputs();
 
       // Build the style string and append (or replace) the font style sheet
       // Note: Some browsers do not download the font-face font until it is applied,
@@ -4797,7 +4797,9 @@ if(!window['keyman']['initialized']) {
       osk.styleSheet = util.addStyleSheet(customStyle); //Build 360
 
       // Wait until font is loaded then align duplicated input elements with page elements
-      if(osk.waitForFonts(kfd,ofd)) keymanweb.alignInputs(true);
+      if(osk.waitForFonts(kfd,ofd)) {
+        keymanweb.alignInputs();
+      }
     }
 
     /**

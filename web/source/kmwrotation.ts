@@ -42,7 +42,7 @@ namespace com.keyman {
     }
 
     resolve() {
-      this.keyman.alignInputs(true);
+      this.keyman.alignInputs();
 
       var osk = this.keyman.osk;
       osk.hideLanguageList();
