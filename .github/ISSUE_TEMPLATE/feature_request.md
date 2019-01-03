@@ -16,5 +16,8 @@ A clear and concise description of what you want to happen.
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
 
+**Product context**
+ - OS: [e.g. Windows 7, Windows 10 1803, macOS Mojave, Ubuntu 18.04, Android 8.1]
+
 **Additional context**
 Add any other context or screenshots about the feature request here.
