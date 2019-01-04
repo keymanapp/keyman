@@ -32,7 +32,9 @@ namespace com.keyman.osk {
         if(e.touches.length > 2) {
           var sX=e.touches[1].pageX,sY=e.touches[1].pageY;
           if(sX > osk.spaceBar.offsetLeft && sX < osk.spaceBar.offsetLeft+osk.spaceBar.offsetWidth &&
-            sY > osk.spaceBar.offsetTop && sY < osk.spaceBar.offsetTop+osk.spaceBar.offsetHeight) osk.showBuild();
+            sY > osk.spaceBar.offsetTop && sY < osk.spaceBar.offsetTop+osk.spaceBar.offsetHeight) {
+              osk.showBuild();
+            }
         }
       },false);
 
@@ -310,7 +312,7 @@ namespace com.keyman.osk {
       // Get current scale factor (reciprocal of viewport scale)
       var scale=Math.round(100/util.getViewportScale())/100;
 
-      var dx,lgBar,kList,i,kb,activeLanguageIndex=-1;
+      var dx,lgBar,i,kb,activeLanguageIndex=-1;
       for(k=0; k<langs.length; k++) {
         dx=util._CreateElement('div');
         dx.className='kbd-list-closed';
@@ -464,7 +466,11 @@ namespace com.keyman.osk {
       // Touch release (click) event selects touched list item
       var touchEnd=function(e: TouchEvent) {
         e.preventDefault();
-        if(typeof(e.stopImmediatePropagation) != 'undefined') e.stopImmediatePropagation();else e.stopPropagation();
+        if(typeof(e.stopImmediatePropagation) != 'undefined') {
+          e.stopImmediatePropagation();
+        } else {
+          e.stopPropagation();
+        }
 
         if(languageMenu.scrolling) {
           this.className=this.className.replace(/\s*selected/,'');
