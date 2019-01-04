@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2019-01-05 11.0.2053 beta
+* Fix default handling of 102nd key found on European hardware keyboards (#1491)
+
 ## 2019-01-04 11.0.2052 beta
 * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
 
