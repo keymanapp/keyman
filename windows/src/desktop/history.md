@@ -2,14 +2,28 @@
 
 ## 12.0 alpha
 
-## 11.0 alpha
-* Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1226, #1229, #1236)
-* Debug logging now uses Event Tracing for Windows (#1261)
-* Introduce support for Metro-style (UWP) applications such as Edge, Skype (#1265)
-* Fixed conflicts with Game Bar (#1272)
-* Added Kannada localization (#1273)
-* Added SIL logo to startup (#1194)
-* Removed hard coded version numbers, versioned paths and registry settings for simpler future upgrades (#1171, 1175)
+## 2019-01-02 11.0.1300.0 beta
+* Initial beta release of Keyman Desktop 11
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Awindows+-label%3Acherry-pick+-label%3Astable)
+
+* New Features:
+  * Introduce support for Metro-style (UWP) applications such as Edge, Skype (#1265, #1377)
+  * Added Kannada localization (#1273)
+  
+* Changes:
+  * Debug logging now uses Event Tracing for Windows (#1261, #1286)
+  * Added SIL logo to startup (#1194)
+  * Removed hard coded version numbers, versioned paths and registry settings for simpler future upgrades (#1171, #1175)
+  * Upgraded to WiX 3.11 to build installers (#1098, #1178)
+  * Support for Delphi Community Edition (#1104)
+  
+* Bug Fixes:
+  * Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1226, #1229, #1236, #1439, #1300)
+  * Improved On Screen Keyboard key cap font size for scripts such as Tai Dam (#1434)
+  * Fixed conflicts with Game Bar (#1272)
+  * Package names and metadata display always uses Unicode JSON metadata now when available (#1413)
+  * Various crashes (#1410, #1409)
+  * Fixed documentation links (#1068)
 
 ## 2018-06-28 10.0.1200 stable
 * 10.0 stable release
