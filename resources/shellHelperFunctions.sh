@@ -27,7 +27,7 @@ verify_on_mac() {
 }
 
 # The list of valid projects that our build scripts ought expect.
-projects=("android" "ios" "mac" "web" "windows")
+projects=("android" "ios" "linux" "mac" "web" "windows")
 
 # Used to validate a specified 'project' parameter.
 verify_project() {
@@ -45,7 +45,7 @@ verify_project() {
 }
 
 # The list of valid platforms that our build scripts ought expect.
-platforms=("android" "ios" "mac" "web" "desktop" "developer")
+platforms=("android" "ios" "linux" "mac" "web" "desktop" "developer")
 
 # Used to validate a specified 'platform' parameter.
 verify_platform() {

@@ -2,16 +2,27 @@
 
 ## 12.0 alpha
 
-## 11.0 alpha
-* Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
-* Bookmark add button is enabled only when title/url fields have text (#1073)
-* Removed deprecated code to to support keyman:// scheme for ad-hoc distribution (#1160)
-* Updated the default keyboard to SIL EuroLatin (#1288)
-* Fixed bug behind some crashes of system keyboard (#1166)
-* Added support for keypress error feedback (#257)
-* Fixed ongoing issues with keyboard rotation and sizing, including the iPhone X notch. (#444) (#1045)
-* Fixed keyboard display/overlap of "Getting Started" info panel, added keyboard hide/display API functions. (#1084)
-* Fixes issues with keyboard keycap scaling and diacritic display. (#1070)
+## 2019-01-02 11.0.300 beta
+* Initial beta release of Keyman for iPhone and iPad 11
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Aios+-label%3Acherry-pick+-label%3Astable)
+
+* New Features:
+  * Added support for keypress error feedback with vibration (#1314)
+
+* Changes:
+  * Replaced deprecated calls to UIAlertView and cleaned up extraneous blank buttons (#1002)
+  * Removed deprecated code to to support keyman:// scheme for ad-hoc distribution (#1160)
+  * Updated the default keyboard to `sil_euro_latin` (#1417, #1288)
+  * Added SIL logo to info page (#1164)
+  
+* Bug Fixes:
+  * Bookmark add button is enabled only when title/url fields have text (#1073)
+  * Fixed bug behind some crashes of system keyboard (#1166)
+  * Fixed ongoing issues with keyboard rotation and sizing, including the iPhone X notch. (#1347, #1318, #1089, #1045)
+  * Fixed keyboard display/overlap of "Getting Started" info panel, added keyboard hide/display API functions (#1084)
+  * Fixed issues with keyboard keycap scaling and diacritic display (#1445, #1407, #1070)
+  * Fixed issue with incorrect font on key caps in some situations (#1450)
+  * Various crashes (#1057, #1301)
 
 ## 2018-08-02 10.0.208 stable 
 * Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159) 

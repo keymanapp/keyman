@@ -2,17 +2,36 @@
 
 ## 12.0 alpha
 
-## 11.0 alpha
-* Refactor how keyboard_info metadata is generated (#1158)
-* New Feature: New Project from template and Import Keyboard (#1210)
-* New Feature: kmconvert command line utility (#1207)
-* New code editor using open source Monaco component (#1153, #1154, #1252)
-* Tidy up of installer to make future upgrades easier (#1175)
-* Support Linux targets (#1239)
-* Opening or creating a project now closes current editor files (#1242)
-* Projects can now include other related files such as history.md (#1243)
-* Keyman Developer now treats files as UTF-8 by default (#1244)
-* Update kmcomp to add language subtag names to keyboard_info files (#1426)
+## 2019-01-02 11.0.1300.0 beta
+* Initial beta release of Keyman Developer 11
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Adeveloper+-label%3Acherry-pick+-label%3Astable)
+
+* New Features:
+  * New Project from template and Import Keyboard (#1210, #1216, #1240)
+  * kmconvert command line utility (#1207)
+  * New code editor using open source Monaco component (#1153, #1154, #1155, #1156, #1252, #1274)
+  * Web views now use Chromium, not MSHTML (IE) (#1078, #1086, #1435, #1374, #1354, #1248)
+  * Support Linux targets (#1239)
+  * Added oskbulkrenderer tool for generating sample on screen keyboards (#1428)
+
+* Changes:
+  * Tidy up of installer to make future upgrades easier (#1175)
+  * Opening or creating a project now closes current editor files (#1242)
+  * Projects can now include other related files such as history.md (#1243)
+  * Keyman Developer now treats files as UTF-8 by default (#1244, #1355)
+  * kmcomp now adds language subtag names to keyboard_info files (#1426)
+  * kmcomp now supports `-add-help-link` parameter when bulding .keyboard_info files (#1346)
+  * Refactored how keyboard_info metadata is generated (#1158)
+  * Improved performance of web server (#1433)
+  * Current project is now shown in title bar (#1369)
+  * Tweaked setup user interface and structure (#1098, #1175, #1178, #1245, #1238)
+  
+* Bug Fixes:
+  * Support for display (avoiding crash) when loading large icons (#1416)
+  * Importing .kvks into .keyman-touch-layout no longer uses incorrect layer names for some rare modifiers (#1415)
+  * Various bug fixes for touch layout editor (#1414, #1405)
+  * Various bug fixes and regressions for project view (#1368, #1247, #1241, #1228, #1157)
+  * Fixed surrogate pair support in some debugger status views (#1246)
 
 ## 2018-11-28 10.0.1206 stable
 * Add parameter `-add-help-link` to kmcomp (#1346)
