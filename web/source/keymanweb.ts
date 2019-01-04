@@ -129,8 +129,10 @@ if(!window['keyman']['initialized']) {
 
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);  
 
-    util.attachDOMEvent(window, 'focus', keymanweb.interface.resetVKShift.bind(keymanweb.interface), false);  // I775
-    util.attachDOMEvent(window, 'blur', keymanweb.interface.resetVKShift.bind(keymanweb.interface), false);   // I775
+    // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
+    keymanweb['pageFocusHandler'] = keymanweb.interface.resetVKShift.bind(keymanweb.interface);
+    util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
+    util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
     
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(false);    
