@@ -1,5 +1,6 @@
 /// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+/// <reference path="osk/defaultLayouts.ts" /> // Includes the default layout specification.
 
 namespace com.keyman {
   export class OSKKeySpec {
@@ -3398,7 +3399,7 @@ if(!window['keyman']['initialized']) {
       var layout;
 
       // Build a layout using the default for the device
-      var layoutType=formFactor, dfltLayout=keymanweb['dfltLayout'];
+      var layoutType=formFactor, dfltLayout=com.keyman.osk.Layouts.dfltLayout;
       if(typeof dfltLayout[layoutType] != 'object') {
         layoutType = 'desktop';
       }
