@@ -1,7 +1,7 @@
 # Keyman for iPhone and iPad Version History
 
 ## 2019 01-04 11.0.302 beta
-* Improves loading efficiency of system keyboard, helping prevent related crashes (#1169, #1170, #1172)
+* Improves loading efficiency of system keyboard, helping prevent related crashes (#1475)
 
 ## 2019-01-02 11.0.300 beta
 * Initial beta release of Keyman for iPhone and iPad 11
