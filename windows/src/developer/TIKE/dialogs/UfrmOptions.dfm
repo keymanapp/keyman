@@ -109,96 +109,122 @@ inherited frmOptions: TfrmOptions
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
-      object lblIndentSize: TLabel
-        Left = 8
-        Top = 60
-        Width = 51
-        Height = 13
-        Caption = '&Indent size'
-        FocusControl = editIndentSize
-      end
-      object lblEditorTheme: TLabel
-        Left = 3
-        Top = 162
-        Width = 62
-        Height = 13
-        Caption = 'Editor &theme:'
-      end
-      object lblEditorCustomTheme: TLabel
-        Left = 120
-        Top = 186
-        Width = 187
-        Height = 13
-        AutoSize = False
-        Caption = '(custom theme filename)'
-      end
-      object chkUseTab: TCheckBox
-        Left = 8
-        Top = 12
-        Width = 129
-        Height = 17
-        Caption = '&Use tab character (x9)'
+      ExplicitLeft = -44
+      ExplicitTop = 0
+      object gbEditorSpaces: TGroupBox
+        Left = 11
+        Top = 16
+        Width = 353
+        Height = 89
+        Caption = 'Tabs/Spaces'
         TabOrder = 0
+        object lblIndentSize: TLabel
+          Left = 13
+          Top = 55
+          Width = 51
+          Height = 13
+          Caption = '&Indent size'
+          FocusControl = editIndentSize
+        end
+        object chkUseTab: TCheckBox
+          Left = 13
+          Top = 28
+          Width = 129
+          Height = 17
+          Caption = '&Use tab character (x9)'
+          TabOrder = 0
+        end
+        object editIndentSize: TEdit
+          Left = 72
+          Top = 51
+          Width = 45
+          Height = 21
+          TabOrder = 1
+        end
       end
-      object editIndentSize: TEdit
-        Left = 68
-        Top = 56
-        Width = 45
-        Height = 21
+      object gbEditorFonts: TGroupBox
+        Left = 11
+        Top = 111
+        Width = 353
+        Height = 121
+        Caption = 'Fonts'
         TabOrder = 1
+        object chkLinkFontSizes: TCheckBox
+          Left = 13
+          Top = 20
+          Width = 213
+          Height = 17
+          Caption = '&Link quoted font size to primary font size'
+          TabOrder = 0
+        end
+        object cmdQuotedFont: TButton
+          Left = 12
+          Top = 80
+          Width = 101
+          Height = 25
+          Caption = '&Quoted font...'
+          TabOrder = 3
+          OnClick = cmdQuotedFontClick
+        end
+        object panQuotedFontSample: TPanel
+          Left = 124
+          Top = 80
+          Width = 187
+          Height = 25
+          BevelOuter = bvLowered
+          Caption = '<font name>'
+          TabOrder = 4
+        end
+        object panFontSample: TPanel
+          Left = 124
+          Top = 48
+          Width = 187
+          Height = 25
+          BevelOuter = bvLowered
+          Caption = '<font name>'
+          TabOrder = 2
+        end
+        object cmdDefaultFont: TButton
+          Left = 12
+          Top = 48
+          Width = 101
+          Height = 25
+          Caption = 'Default &font...'
+          TabOrder = 1
+          OnClick = cmdDefaultFontClick
+        end
       end
-      object cmdDefaultFont: TButton
-        Left = 8
-        Top = 96
-        Width = 101
-        Height = 25
-        Caption = 'Default &font...'
+      object gbEditorTheme: TGroupBox
+        Left = 11
+        Top = 238
+        Width = 353
+        Height = 82
+        Caption = 'Theme'
         TabOrder = 2
-        OnClick = cmdDefaultFontClick
-      end
-      object panFontSample: TPanel
-        Left = 120
-        Top = 96
-        Width = 187
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = '<font name>'
-        TabOrder = 3
-      end
-      object cmdQuotedFont: TButton
-        Left = 8
-        Top = 128
-        Width = 101
-        Height = 25
-        Caption = '&Quoted font...'
-        TabOrder = 4
-        OnClick = cmdQuotedFontClick
-      end
-      object panQuotedFontSample: TPanel
-        Left = 120
-        Top = 128
-        Width = 187
-        Height = 25
-        BevelOuter = bvLowered
-        Caption = '<font name>'
-        TabOrder = 5
-      end
-      object chkLinkFontSizes: TCheckBox
-        Left = 8
-        Top = 32
-        Width = 213
-        Height = 17
-        Caption = '&Link quoted font size to primary font size'
-        TabOrder = 6
-      end
-      object cbEditorTheme: TComboBox
-        Left = 120
-        Top = 159
-        Width = 187
-        Height = 21
-        Style = csDropDownList
-        TabOrder = 7
-        OnClick = cbEditorThemeClick
+        object lblEditorCustomTheme: TLabel
+          Left = 124
+          Top = 47
+          Width = 187
+          Height = 13
+          AutoSize = False
+          Caption = '(custom theme filename)'
+        end
+        object lblEditorTheme: TLabel
+          Left = 13
+          Top = 23
+          Width = 62
+          Height = 13
+          Caption = 'Editor &theme:'
+        end
+        object cbEditorTheme: TComboBox
+          Left = 124
+          Top = 20
+          Width = 187
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 0
+          OnClick = cbEditorThemeClick
+        end
       end
     end
     object tabDebugger: TTabSheet
