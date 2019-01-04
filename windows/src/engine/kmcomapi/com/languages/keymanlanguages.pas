@@ -126,16 +126,16 @@ begin
         FWin8Language := nil;
         if FWin8Languages.IsSupported then
         begin
+          // Find the corresponding Win8 language registry entry
+          // If it is missing, it usually means the language is
+          // dynamically loaded, but even in that situation we can
+          // still provide information for hotkeys, etc
           for j := 0 to FWin8Languages.Count - 1 do
             if FWin8Languages[J].LangID = pLangID^ then
             begin
               FWin8Language := FWin8Languages[j];
               Break;
             end;
-
-          // Language is not installed, just loaded, so we ignore it
-          if FWin8Language = nil then
-            Continue;
         end;
 
         FProfileMgr.EnumProfiles(pLangID^, ppEnum);
