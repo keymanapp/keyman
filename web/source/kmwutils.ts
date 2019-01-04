@@ -935,7 +935,7 @@ namespace com.keyman {
      * Description  Makes an actual copy (not a reference) of an object, copying simple members, 
      *              arrays and member objects but not functions, so use with care!
      */              
-    deepCopy<T>(p:T, c0): T {
+    deepCopy<T>(p:T, c0?): T {
       var c = c0 || {};
       for (var i in p) {
         if(typeof p[i] === 'object') {
