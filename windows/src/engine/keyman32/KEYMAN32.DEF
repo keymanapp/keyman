@@ -1,17 +1,13 @@
 LIBRARY   KEYMAN32
 
 EXPORTS
-            Keyman_GetInitialised
+      Keyman_GetInitialised
 			Keyman_Initialise
 			Keyman_Exit
 			Keyman_ForceKeyboard
 			Keyman_StopForcingKeyboard
-			Keyman_BuildKeyboardList
 			Keyman_GetLastActiveWindow
 			Keyman_GetLastFocusWindow
-			GetKeymanKeyboardInfo
-			GetKeymanInfo
-			GetSystemStore
 			KMSetOutput
 			KMGetContext
 			KMQueueAction
@@ -29,7 +25,6 @@ EXPORTS
 			Keyman_RegisterControllerWindow
 			Keyman_UnregisterControllerWindow
 			Keyman_RestartEngine
-			Keyman_GetAPIVersion
 			
       Keyman_SendMasterController
       Keyman_PostControllers
@@ -38,4 +33,4 @@ EXPORTS
       Keyman_StartExit
       Keyman_ResetInitialisation
       
-	  Keyman_WriteDebugEvent
+  	  Keyman_WriteDebugEvent

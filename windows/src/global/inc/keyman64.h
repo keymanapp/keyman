@@ -119,6 +119,23 @@
 
 #define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
 
+/***************************************************************************/
+// wm_keyman
+
+#define RWM_KEYMAN "wm_keyman"
+
+// wParam for wm_keyman
+// These messages should be posted to a window
+#define KM_DISABLEUI	1
+#define KM_ENABLEUI		2
+// These messages should be sent to a window
+//#define KM_GETUISTATE	3
+#define KM_FOCUSCHANGED	5		// Never use this flag: internal to Keyman
+#define KM_ACTIVECHANGED 6  // Never use this flag: internal to Keyman
+#define KM_EXITFLUSH  8 // Disconnects GetMessage hook 
+
+#define KMF_WINDOWCHANGED 1
+
 /***************************************************************************/ 
 
 typedef struct tagSTORE
@@ -348,7 +365,7 @@ WORD HKLToLayoutID(HKL hkl);
 DWORD EthnologueCodeToKeymanID(DWORD EthCode);
 DWORD EthnologueStringCodeToDWord(PWSTR EthCode);
 
-extern "C" PWSTR  _declspec(dllexport) WINAPI GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
+PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
 DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 
@@ -369,7 +386,6 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd);
 
 #include "capsstate.h"
 #include "keystate.h"
-#include "km95api.h"
 #endif
 
 #include "registry.h"
