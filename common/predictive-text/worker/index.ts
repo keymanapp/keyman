@@ -62,10 +62,28 @@ interface PredictMessage {
   // transform: Transform;
 }
 
+/**
+ * The model implementation, within the Worker.
+ */
+interface WorkerInternalModel {
+  // TODO: configuration
+}
+
+/**
+ * Constructors that return worker internal models. 
+ */
+interface WorkerInternalModelConstructor {
+  // TODO: new should take (cap: Capabilities)
+  new (): WorkerInternalModel;
+}
+
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
   */
 class LMLayerWorker {
+  // All
+  static models: {[key: string]: WorkerInternalModelConstructor} = {};
+
   /**
    * By default, it's self.postMessage(), but can be overridden
    * so that this can be tested **outside of a Worker**.
@@ -190,6 +208,11 @@ class LMLayerWorker {
     scope.onmessage = worker.onMessage.bind(worker);
 
     return worker;
+  }
+}
+
+LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
+  constructor() {
   }
 }
 
