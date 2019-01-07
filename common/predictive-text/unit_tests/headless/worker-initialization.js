@@ -113,7 +113,8 @@ describe('LMLayerWorker', function() {
       })), lastMessageAsString(fakePostMessage));
     });
 
-    it('should run the code for the model', function () {
+    // TODO: this should no longer worker in future versions
+    it.skip('should run the code for the model', function () {
       var fakePostMessage;
       var worker = new LMLayerWorker({
         postMessage: fakePostMessage = sinon.fake(), // required, but ignored in this test case
