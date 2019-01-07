@@ -52,6 +52,7 @@ import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONObject;
@@ -1461,6 +1462,39 @@ public final class KMManager {
     KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
       super(context, k);
     }
+    private static final String HANDLER_TAG = "IAK: JS Handler";
+
+    @JavascriptInterface
+    public boolean dispatchKey(final int code, final int shift) {
+      Handler mainLoop = new Handler(Looper.getMainLooper());
+      mainLoop.post(new Runnable() {
+        public void run() {
+          if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
+            if ((KMTextView.activeView == null) && isDebugMode()) {
+              Log.w(HANDLER_TAG, "dispatchKey failed: activeView is null");
+            }
+            return;
+          }
+
+          // Handle tab or enter since KMW didn't process it
+          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code);
+          KMTextView textView = (KMTextView) KMTextView.activeView;
+          KeyEvent event = null;
+          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
+            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_TAB");
+            event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, 0, 0, 0, 0);
+          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
+            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_ENTER");
+            event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0, 0);
+          }
+
+          if (event != null) {
+            textView.dispatchKeyEvent(event);
+          }
+        }
+      });
+      return true;
+    }
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
@@ -1552,6 +1586,45 @@ public final class KMManager {
     KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
       super(context, k);
     }
+    private static final String HANDLER_TAG = "SWK: JS Handler";
+
+    @JavascriptInterface
+    public boolean dispatchKey(final int code, final int shift) {
+      Handler mainLoop = new Handler(Looper.getMainLooper());
+      mainLoop.post(new Runnable() {
+        public void run() {
+          if (SystemKeyboard.subKeysWindow != null) {
+            return;
+          }
+
+          InputConnection ic = IMService.getCurrentInputConnection();
+          if (ic == null) {
+            if (isDebugMode()) {
+              Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
+            }
+            return;
+          }
+
+          SystemKeyboard.dismissHelpBubble();
+
+          // Handle tab or enter since KMW didn't process it
+          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", shift: " + shift);
+          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
+            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_TAB");
+            int metaState = 0;
+            if (shift == KMModifierCodes.get("SHIFT")) {
+              metaState = KeyEvent.META_SHIFT_ON;
+            }
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, metaState, 0, 0, 0);
+            ic.sendKeyEvent(event);
+          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
+            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_ENTER");
+            keyDownUp(KeyEvent.KEYCODE_ENTER);
+          }
+        }
+      });
+      return true;
+    }
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
@@ -1566,7 +1639,7 @@ public final class KMManager {
           InputConnection ic = IMService.getCurrentInputConnection();
           if (ic == null) {
             if (isDebugMode()) {
-              Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+              Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
             }
             return;
           }
