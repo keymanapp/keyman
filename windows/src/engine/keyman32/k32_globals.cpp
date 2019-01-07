@@ -78,7 +78,6 @@ UINT
   wm_keyman_keyevent = 0,   // for serialized input
 	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
-	wm_kmmessage = 0,					// message to Keyman window   // I4412
 	wm_keymankeydown = 0,
 	wm_keymankeyup = 0,
   wm_keyman_grabwindowproc = 0,

@@ -27,7 +27,6 @@
 #include "pch.h"   // I4262
 #include "kmtip.h"
 #include "keyman64.h"
-#include "keymanapi.h"
 
 //+---------------------------------------------------------------------------
 //
