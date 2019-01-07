@@ -104,9 +104,9 @@ uses
 
   Keyman.System.LanguageCodeUtils,
   BCP47Tag,
-  UfrmMain,
   utilstr,
   utilsystem,
+  dmActionsMain,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
@@ -143,9 +143,18 @@ begin
       kpt.Author := f.Author;
       kpt.Version := f.Version;
       kpt.BCP47Tags := f.BCP47Tags;
-      kpt.Generate;
 
-      frmKeymanDeveloper.OpenProject(kpt.ProjectFilename);
+      try
+        kpt.Generate;
+      except
+        on E:EFOpenError do
+        begin
+          ShowMessage('Unable to create project: '+E.Message);
+          Exit(False);
+        end;
+      end;
+
+      modActionsMain.OpenProject(kpt.ProjectFilename);
       Result := True;
 
     finally

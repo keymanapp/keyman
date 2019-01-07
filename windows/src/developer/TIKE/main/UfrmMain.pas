@@ -366,7 +366,6 @@ type
     property ActiveChildIndex: Integer read GetActiveChildIndex write SetActiveChildIndex;
 
     function BeforeOpenProject: Boolean;
-    procedure OpenProject(const ProjectFilename: string);
     procedure ShowProject;
     function ProjectForm: TfrmProject;
     procedure ToggleProject;
@@ -1128,7 +1127,10 @@ begin
       ext := LowerCase(ExtractFileExt(FFileName));
 
       if ext = Ext_ProjectSource then
-        modActionsMain.OpenProject(FFileName)
+      begin
+        if BeforeOpenProject then
+          modActionsMain.OpenProject(FFileName);
+      end
       else
       begin
         if FCloseNewFile then
@@ -1183,22 +1185,6 @@ begin
       Exit(False);
 
   Result := True;
-end;
-
-procedure TfrmKeymanDeveloper.OpenProject(const ProjectFilename: string);
-var
-  i: Integer;
-begin
-  // Close child windows
-  for i := 0 to FChildWindows.Count - 1 do
-    FChildWindows[i].Close;
-
-  FGlobalProject.Save;
-  ProjectForm.Free;
-  FreeGlobalProjectUI;
-  LoadGlobalProjectUI('');
-  ShowProject;
-  UpdateCaption;
 end;
 
 function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
@@ -1385,7 +1371,10 @@ end;
 procedure TfrmKeymanDeveloper.mnuProjectRecentFileClick(Sender: TObject);
 begin
   with Sender as TMenuItem do
-    modActionsMain.OpenProject(Hint);
+  begin
+    if BeforeOpenProject then
+      modActionsMain.OpenProject(Hint);
+  end;
 end;
 
 procedure TfrmKeymanDeveloper.cbTextFileFormatItemClick(Sender: TObject);

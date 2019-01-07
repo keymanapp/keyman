@@ -1,7 +1,9 @@
 # Keyman Developer Version History
 
-## 2019-01-04 11.0.1301.0 beta
-* Bug Fix: Developer would sometimes ask for ethnologue.txt on upgrade (#1481)
+## 2019-01-07 11.0.1301.0 beta
+* Bug fix: Developer does not open a new project after it is created (#1499)
+* Bug fix: Developer does not enable Install button in Package Editor after compile (#1498)
+* Bug fix: Developer would sometimes ask for ethnologue.txt on upgrade (#1481)
 * Change: Options dialog Editor tab layout polished (#1482)
 
 ## 2019-01-02 11.0.1300.0 beta
