@@ -211,11 +211,6 @@ class LMLayerWorker {
   }
 }
 
-LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
-  constructor() {
-  }
-}
-
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
