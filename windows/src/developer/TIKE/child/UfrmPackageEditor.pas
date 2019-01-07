@@ -265,6 +265,7 @@ type
     procedure HandlePackageRefreshError(Sender: TObject; msg: string;
       State: TProjectLogState);
     procedure RefreshTargetPanels;
+    procedure EnableControls;
 
   protected
     function GetHelpTopic: string; override;
@@ -347,9 +348,9 @@ begin
   try
     pages.ActivePage := pageFiles;
     pack := TKPSFile.Create;
-    EnableStartMenuControls;
-    EnableDetailsTabControls;
-    EnableCompileTabControls;
+
+    EnableControls;
+
     UpdateStartMenuPrograms;
     UpdateReadme;
     UpdateImageFiles;
@@ -1053,6 +1054,7 @@ begin
     DoAction(pfaCompile);
   end;
   UpdateOutPath;
+  EnableControls;
 end;
 
 procedure TfrmPackageEditor.cmdInstallClick(Sender: TObject);
@@ -1466,6 +1468,13 @@ begin
     then k.OSKFont := nil
     else k.OSKFont := cbKeyboardOSKFont.Items.Objects[cbKeyboardOSKFont.ItemIndex] as TPackageContentFile;
   Modified := True;
+end;
+
+procedure TfrmPackageEditor.EnableControls;
+begin
+  EnableStartMenuControls;
+  EnableDetailsTabControls;
+  EnableCompileTabControls;
 end;
 
 procedure TfrmPackageEditor.EnableCompileTabControls;
