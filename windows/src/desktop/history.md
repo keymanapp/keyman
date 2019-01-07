@@ -2,6 +2,7 @@
 
 ## 2019-01-04 11.0.1301.0 beta
 * Bug Fix: Hotkeys are now correctly assigned to keyboards when installed (#1485)
+* Change: Removed legacy API: Keyman_BuildKeyboardList, Keyman_GetAPIVersion, GetKeymanKeyboardInfo, GetKeymanInfo, GetSystemStore (#1503)
 
 ## 2019-01-02 11.0.1300.0 beta
 * Initial beta release of Keyman Desktop 11
