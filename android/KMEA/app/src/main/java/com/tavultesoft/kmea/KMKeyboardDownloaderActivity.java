@@ -1,5 +1,6 @@
 package com.tavultesoft.kmea;
 
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
@@ -293,8 +294,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       String kbUrl = kbBaseUri + kbFilename;
       ArrayList<String> urls = new ArrayList<String>();
       urls.add(kbUrl);
+
       JSONObject jsonFont = keyboard.optJSONObject(KMManager.KMKey_Font);
       JSONObject jsonOskFont = keyboard.optJSONObject(KMManager.KMKey_OskFont);
+
+      if (jsonFont != null) {
+        findTTF(jsonFont);
+      }
       ArrayList<String> fontUrls = fontUrls(jsonFont, fontBaseUri, true);
       ArrayList<String> oskFontUrls = fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null)
@@ -384,6 +390,67 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     return ret;
   }
 
+  // If a font JSONObject contains multiple font font files, only keep the .ttf source
+  private static void findTTF(JSONObject jsonFont) {
+    boolean updateJsonFont = false;
+    try {
+      JSONArray fontSource = jsonFont.optJSONArray(KMManager.KMKey_FontSource);
+      if (fontSource != null) {
+        boolean containsTTF = hasTTFFont(fontSource);
+        if (containsTTF) {
+          for (int i = fontSource.length() - 1; i >= 0; i--) {
+            String s = fontSource.getString(i);
+            if (!FileUtils.isTTFFont(s)) {
+              updateJsonFont = true;
+              if (Build.VERSION.SDK_INT > 19) {
+                fontSource.remove(i);
+              } else {
+                fontSource = removeJsonObjectAtIndex(fontSource, i);
+              }
+            }
+          }
+
+          if (updateJsonFont) {
+            JSONArray copy = fontSource;
+            jsonFont.remove(KMManager.KMKey_FontSource);
+            jsonFont.put(KMManager.KMKey_FontSource, copy);
+          }
+        }
+      }
+    } catch (JSONException e) {
+
+    }
+  }
+
+  private static boolean hasTTFFont(JSONArray fontSource) {
+    try {
+      for (int i = 0; i < fontSource.length(); i++) {
+        String s = fontSource.getString(i);
+        if (s.toLowerCase().endsWith(FileUtils.TRUETYPEFONT)) {
+          return true;
+        }
+      }
+      return false;
+    } catch (JSONException e) {
+      return false;
+    }
+  }
+
+  // From https://stackoverflow.com/questions/27427999/remove-jsonobeject-before-android-api-lvl-19
+  private static JSONArray removeJsonObjectAtIndex(JSONArray source, int index) throws JSONException {
+    if (index < 0 || index > source.length() - 1) {
+      throw new IndexOutOfBoundsException();
+    }
+
+    final JSONArray copy = new JSONArray();
+    for (int i=0, count = source.length(); i<count; i++) {
+      if (i != index) {
+        copy.put(source.get(i));
+      }
+    }
+    return copy;
+  }
+
   private static ArrayList<String> fontUrls(JSONObject jsonFont, String baseUri, boolean isOskFont) {
     if (jsonFont == null)
       return null;
@@ -392,10 +459,21 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     JSONArray fontSource = jsonFont.optJSONArray(KMManager.KMKey_FontSource);
     if (fontSource != null) {
       int fcCount = fontSource.length();
+      boolean containsTTF = hasTTFFont(fontSource);
       for (int i = 0; i < fcCount; i++) {
         String fontSourceString;
         try {
           fontSourceString = fontSource.getString(i);
+          // Prioritize .ttf if it exists
+          if (!FileUtils.isTTFFont(fontSourceString) && containsTTF) {
+            if (Build.VERSION.SDK_INT > 19) {
+              fontSource.remove(i);
+            } else {
+              fontSource = removeJsonObjectAtIndex(fontSource, i);
+            }
+            continue;
+          }
+
           if (FileUtils.hasFontExtension(fontSourceString)) {
             urls.add(baseUri + fontSourceString);
           } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
