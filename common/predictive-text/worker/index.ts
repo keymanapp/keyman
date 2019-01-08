@@ -19,63 +19,17 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+/**
+ * @file index.ts
+ * 
+ * The main LMLayerWorker class, the top-level class within the Web Worker.
+ * The LMLayerWorker handles the keyboard/worker communication
+ * protocol, delegating prediction requests to the language
+ * model implementations.
+ */
+
 /// <reference path="../message.d.ts" />
-
-/**
- * The signature of self.postMessage(), so that unit tests can mock it.
- */
-type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
-
-/**
- * The valid outgoing message types.
- */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-
-/**
- * The structure of an initialization message. It should include the model (either in
- * source code or parameter form), as well as the keyboard's capabilities.
- */
-interface InitializeMessage {
-  /**
-   * The model, and its configuration.
-   * TODO: write a description of what this actually is!
-   */
-  model: any;
-
-  /**
-   * The configuration that the keyboard can offer to the model.
-   */
-  capabilities: Capabilities;
-}
-
-/**
- * The structure of the message back to the keyboard.
- */
-interface ReadyMessage {
-  configuration: Configuration;
-}
-
-interface PredictMessage {
-  // TODO:
-  // token: Token;
-  // context: Context;
-  // transform: Transform;
-}
-
-/**
- * The model implementation, within the Worker.
- */
-interface WorkerInternalModel {
-  // TODO: configuration
-}
-
-/**
- * Constructors that return worker internal models. 
- */
-interface WorkerInternalModelConstructor {
-  // TODO: new should take (cap: Capabilities)
-  new (): WorkerInternalModel;
-}
 
  /**
   * Encapsulates all the state required for the LMLayer's worker thread.
