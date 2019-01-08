@@ -1,5 +1,9 @@
 # Keyman Desktop Version History
 
+## 2019-01-08 11.0.1302.0 beta
+* Bug Fix: Switching between keyboards in same language would sometimes fail (#1505)
+* Bug Fix: Caps Lock control headers are now handled correctly by Keyman (#1506)
+
 ## 2019-01-07 11.0.1301.0 beta
 * Bug Fix: Hotkeys are now correctly assigned to keyboards when installed (#1485)
 * Change: Removed legacy API: Keyman_BuildKeyboardList, Keyman_GetAPIVersion, GetKeymanKeyboardInfo, GetKeymanInfo, GetSystemStore (#1503)
