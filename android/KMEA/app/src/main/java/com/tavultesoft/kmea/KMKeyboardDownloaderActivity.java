@@ -301,6 +301,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       if (jsonFont != null) {
         findTTF(jsonFont);
       }
+      if (jsonOskFont != null) {
+        findTTF(jsonOskFont);
+      }
       ArrayList<String> fontUrls = fontUrls(jsonFont, fontBaseUri, true);
       ArrayList<String> oskFontUrls = fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null)
