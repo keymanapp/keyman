@@ -35,7 +35,14 @@
   * Encapsulates all the state required for the LMLayer's worker thread.
   */
 class LMLayerWorker {
-  // All
+  /**
+   * All of the bundled model implementations will add themselves here:
+   * Note: the models will add themselves by including this
+   * file using a triple-slash directive:
+   * /// <reference path="path/to/this/file.ts" />
+   * then adding the constructor to this static object:
+   * LMLayerWorker.models.MyModelImplementation = class {}
+   */
   static models: {[key: string]: WorkerInternalModelConstructor} = {};
 
   /**

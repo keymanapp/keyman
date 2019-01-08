@@ -32,10 +32,12 @@
  * The signature of self.postMessage(), so that unit tests can mock it.
  */
 type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+
 /**
  * The valid outgoing message types.
  */
 type OutgoingMessageKind = 'ready' | 'suggestions';
+
 /**
  * The structure of an initialization message. It should include the model (either in
  * source code or parameter form), as well as the keyboard's capabilities.
@@ -51,6 +53,7 @@ interface InitializeMessage {
    */
   capabilities: Capabilities;
 }
+
 /**
  * The structure of the message back to the keyboard.
  */
@@ -59,11 +62,13 @@ interface ReadyMessage {
 }
 interface PredictMessage {
 }
+
 /**
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
 }
+
 /**
  * Constructors that return worker internal models.
  */
