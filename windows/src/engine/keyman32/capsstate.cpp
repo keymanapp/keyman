@@ -26,12 +26,6 @@
 */
 #include "pch.h"
 
-static BYTE kbstate[256];
-extern BOOL FShouldIgnoreNextKey[256];
-
-//extern "C" void FAR PASCAL keybd_event(void);
-
-
 void ResetCapsLock(void)
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -63,7 +57,8 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 
 	if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSONONLY)
 	{
-		if(FIsUp && !(GetKeyState(VK_CAPITAL) & 1))		// I267 - 24/11/2006 invert GetKeyState test
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "KeyCapsLockPress: KF_CAPSONONLY: FIsUp=%d CapsState=%d", FIsUp, GetKeyState(VK_CAPITAL) & 1);
+    if(FIsUp && !(GetKeyState(VK_CAPITAL) & 1))		// I267 - 24/11/2006 invert GetKeyState test
 		{
 			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
 			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
@@ -71,7 +66,8 @@ void KeyCapsLockPress(BOOL FIsUp)  // I3284 - void   // I3529
 	}
 	else if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_CAPSALWAYSOFF)
 	{
-		if(!FIsUp && (GetKeyState(VK_CAPITAL) & 1))  
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "KeyCapsLockPress: KF_CAPSALWAYSOFF: FIsUp=%d CapsState=%d", FIsUp, GetKeyState(VK_CAPITAL) & 1);
+    if(!FIsUp && (GetKeyState(VK_CAPITAL) & 1))
 		{												// I267 - 24/11/2006 invert GetKeyState test
 			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
 			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
@@ -86,11 +82,10 @@ void KeyShiftPress(BOOL FIsUp)  // I3284 - void   // I3529
   if(!_td) return;
 	if(!_td->lpActiveKeyboard) return;		// pass through to window
 			
-	if((GetKeyState(VK_CAPITAL) & 1) == 0) return;
-
 	if(_td->lpActiveKeyboard->Keyboard->dwFlags & KF_SHIFTFREESCAPS)
 	{
-		if(!FIsUp)
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "KeyShiftPress: KF_SHIFTFREESCAPS: FIsUp=%d CapsState=%d", FIsUp, GetKeyState(VK_CAPITAL) & 1);
+    if(!FIsUp && (GetKeyState(VK_CAPITAL) & 1))
 		{
 			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
 			keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);

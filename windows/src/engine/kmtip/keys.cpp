@@ -174,7 +174,8 @@ STDAPI CKMTipTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPA
 {
   LogKey("CKMTipTextService::OnTestKeyDown", 0, wParam, lParam);
   // If the keystroke is a Keyman-generated key, ignore it
-  if((lParam & 0x00FF0000L) == 0xFF0000L)   // I3566
+  if((lParam & 0x00FF0000L) == 0xFF0000L &&
+    wParam != VK_CAPITAL)   // I3566
     *pfEaten = FALSE;
   else
 	  *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
@@ -208,7 +209,8 @@ STDAPI CKMTipTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM 
 STDAPI CKMTipTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
   LogKey("CKMTipTextService::OnTestKeyUp", 2, wParam, lParam);
-  if((lParam & 0x00FF0000L) == 0xFF0000L)   // I3566
+  if((lParam & 0x00FF0000L) == 0xFF0000L &&
+    wParam != VK_CAPITAL)   // I3566
     *pfEaten = FALSE;
   else
   {
@@ -230,7 +232,8 @@ STDAPI CKMTipTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARA
 STDAPI CKMTipTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
   LogKey("CKMTipTextService::OnKeyUp", 3, wParam, lParam);
-  if((lParam & 0x00FF0000L) == 0xFF0000L)   // I3566   // I3605
+  if((lParam & 0x00FF0000L) == 0xFF0000L &&
+    wParam != VK_CAPITAL)   // I3566   // I3605
     *pfEaten = FALSE;
   else
   {
