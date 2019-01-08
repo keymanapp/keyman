@@ -75,21 +75,136 @@ describe('LMLayerWorker dummy model', function() {
       var model = new DummyModel(defaultCapabilities());
 
       var suggestions = model.predict(
+        // Type a 't'
         {
-          // Type a 't'
-          transform: {
-            insert: 't',
-            deleteLeft: 0,
-          },
-          context: {
-            left: "I'm a little ",
-            startOfBuffer: true,
-            endOfBuffer: true,
-          }
+          insert: 't',
+          deleteLeft: 0,
+        },
+        {
+          left: "I'm a little ",
+          startOfBuffer: true,
+          endOfBuffer: true,
         },
         expectedSuggestions
      );
      assert.deepEqual(suggestions, expectedSuggestions);
+    });
+
+    it('can be injected with multiple suggestions to send back', function () {
+      // Based on suggestions produced my phone's personal language model.
+      var futureSuggestions = [
+        // Initial suggestions
+        [
+          {
+            transform: {
+              insert: 'I ',
+              deleteLeft: 0
+            },
+            displayAs: 'I',
+          },
+          {
+            transform: {
+              insert: "I'm ",
+            deleteLeft: 0
+            },
+            displayAs: "I'm",
+          },
+          {
+            transform: {
+              insert: "Oh ",
+              deleteLeft: 0
+            },
+            displayAs: "Oh ",
+          }
+        ],
+        // Second set of suggestions, after choosing "I"
+        [
+          {
+            transform: {
+              insert: 'love ',
+              deleteLeft: 0
+            },
+            displayAs: 'love',
+          },
+          {
+            transform: {
+              insert: "am ",
+              deleteLeft: 0
+            },
+            displayAs: "am",
+          },
+          {
+            transform: {
+              insert: "got ",
+              deleteLeft: 0
+            },
+            displayAs: "got",
+          }
+        ],
+        // Third set of suggestions, after choosing "got"
+        [
+          {
+            transform: {
+              insert: 'distracted ',
+              deleteLeft: 0
+            },
+            displayAs: 'distracted by',
+          },
+          {
+            transform: {
+              insert: "distracted ",
+              deleteLeft: 0
+            },
+            displayAs: "distracted",
+          },
+          {
+            transform: {
+              insert: "a ",
+              deleteLeft: 0
+            },
+            displayAs: "a",
+          }
+        ],
+        // Last set of suggestions, after choosing "distracted by"
+        [
+          {
+            transform: {
+              insert: 'Hazel ',
+              deleteLeft: 0
+            },
+            displayAs: 'Hazel',
+          },
+          {
+            transform: {
+              insert: 'the ',
+              deleteLeft: 0
+            },
+            displayAs: 'the',
+          },
+          {
+            transform: {
+              insert: 'a ',
+              deleteLeft: 0
+            },
+            displayAs: 'the',
+          },
+        ],
+      ];
+
+      var model = new DummyModel(defaultCapabilities, {
+        futureSuggestions: futureSuggestions
+      });
+
+      // The dummy model should give suggestions in order,
+      // regardless of the provided transform and context.
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+                       futureSuggestions[0]);
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+                       futureSuggestions[1]);
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+                       futureSuggestions[2]);
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+                       futureSuggestions[4]);
     });
   });
 
@@ -102,6 +217,31 @@ describe('LMLayerWorker dummy model', function() {
   function defaultCapabilities() {
     return {
       maxLeftContextCodeUnits: 64,
+    };
+  }
+
+  /**
+   * Returns a transform that does nothing.
+   *
+   * @returns Transform
+   */
+  function zeroTransform() {
+    return {
+      insert: '',
+      deleteLeft: 0,
+    };
+  }
+
+  /**
+   * Returns a context of an empty buffer.
+   *
+   * @returns Context
+   */
+  function emptyContext() {
+    return {
+      left: '',
+      startOfBuffer: true,
+      endOfBuffer: true
     };
   }
 });
