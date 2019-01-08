@@ -67,6 +67,7 @@ interface PredictMessage {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
+  predict(transform: Transform, context: Context): Suggestion[];
 }
 
 /**

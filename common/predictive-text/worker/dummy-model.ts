@@ -39,4 +39,8 @@ LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalMode
     options = options || {};
     this.configuration = options.configuration || {};
   }
+
+  predict(transform: Transform, context: Context): Suggestion[] {
+    return [];
+  }
 };

@@ -90,3 +90,84 @@ interface Configuration {
    */
   rightContextCodeUnits: number;
 }
+
+/**
+ * Describes how to change a buffer at the cursor position.
+ * first, you delete the specified amount amount from the left
+ * and right, then you insert the provided text.
+ */
+interface Transform {
+  /**
+   * The Unicode scalar values (i.e., characters) to be inserted at the
+   * cursor position.
+   *
+   * Corresponds to `s` in com.keyman.KeyboardInterface.output.
+   */
+  insert: USVString;
+
+  /**
+   * The number of code units to delete to the left of the cursor.
+   *
+   * Corresponds to `dn` in com.keyman.KeyboardInterface.output.
+   */
+  deleteLeft: number;
+
+  /**
+   * The number of code units to delete to the right of the cursor.
+   * Not available on all platforms.
+   */
+  deleteRight?: number;
+}
+
+/**
+ * The text and environment surrounding the insertion point (text cursor).
+ */
+interface Context {
+  /**
+   * Up to maxLeftContextCodeUnits code units of Unicode scalar value
+   * (i. e., characters) to the left of the insertion point in the
+   * buffer. If there is nothing to the left of the buffer, this is
+   * an empty string.
+   */
+  left: USVString;
+
+  /**
+   * Up to maxRightContextCodeUnits code units of Unicode scalar value
+   * (i. e., characters) to the right of the insertion point in the
+   * buffer. If there is nothing to the right of the buffer, this is
+   * an empty string.
+   * 
+   * This property may be missing entirely.
+   */
+  right?: USVString;
+
+  /**
+   * Whether the insertion point is at the start of the buffer.
+   */
+  startOfBuffer: boolean;
+
+  /**
+   * Whether the insertion point is at the end of the buffer.
+   */
+  endOfBuffer: boolean;
+}
+
+/**
+ * A concrete suggestion
+ */
+interface Suggestion {
+  /**
+   * The suggested update to the buffer. Note that this transform should
+   * be applied AFTER the instigating transform, if any.
+   */
+  transform: Transform;
+
+  /**
+   * A string to display the suggestion to the typist.
+   * This should aid the typist understand what the transform
+   * will do to their text.
+   * 
+   * When suggesting a word, `displayAs` should be that entire word.
+   */
+  displayAs: string;
+}
