@@ -162,10 +162,18 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
     switch(wParam) {
     case VK_CAPITAL:
       if(!isUp) ProcessToggleChange((UINT) wParam);   // I4793
-      if(!Updateable) KeyCapsLockPress(isUp);   // I4548
+      if (!Updateable) {
+        // We only want to process the Caps Lock key event once -- 
+        // in the first pass (!Updateable).
+        KeyCapsLockPress(isUp);   // I4548
+      }
       return FALSE;
     case VK_SHIFT:
-      if (!Updateable) KeyShiftPress(isUp);   // I4548
+      if (!Updateable) {
+        // We only want to process the Shift key event once -- 
+        // in the first pass (!Updateable).
+        KeyShiftPress(isUp);   // I4548
+      }
       // Fall through
     case VK_MENU:
     case VK_CONTROL:
