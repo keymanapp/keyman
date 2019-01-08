@@ -33,6 +33,10 @@
  * The Dummy Model that returns nonsensical, but predictable results. 
  */
 LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
-  constructor(capabilities: Capabilities) {
+  configuration: Configuration;
+
+  constructor(capabilities: Capabilities, options?: any) {
+    options = options || {};
+    this.configuration = options.configuration || {};
   }
 };
