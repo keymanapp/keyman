@@ -204,7 +204,7 @@ describe('LMLayerWorker dummy model', function() {
       assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
                        futureSuggestions[2]);
       assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
-                       futureSuggestions[4]);
+                       futureSuggestions[3]);
     });
   });
 

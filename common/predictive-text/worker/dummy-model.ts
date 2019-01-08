@@ -34,15 +34,21 @@
  */
 LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
   configuration: Configuration;
+  private _futureSuggestions: Suggestion[][];
 
   constructor(capabilities: Capabilities, options?: any) {
     options = options || {};
     this.configuration = options.configuration || {};
+    // Create a shallow copy of the suggestions;
+    // this class mutates the array.
+    this._futureSuggestions = options.futureSuggestions
+      ? options.futureSuggestions.slice() : [];
   }
 
   predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Suggestion[] {
     if (injectedSuggestions) {
       return injectedSuggestions;
     }
+    return this._futureSuggestions.shift();
   }
 };
