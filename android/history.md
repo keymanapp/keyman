@@ -1,9 +1,10 @@
 # Keyman for Android
 
-## 2019-01-05 11.0.2053 beta
-* Fix default handling of 102nd key found on European hardware keyboards (#1491)
+## 2019-01-09 11.0.2053 beta
+* Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
 
 ## 2019-01-04 11.0.2052 beta
+* Fix default handling of 102nd key found on European hardware keyboards (#1491)
 * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
 
 ## 2019-01-03 11.0.2051 beta
