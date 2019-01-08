@@ -53,16 +53,22 @@ BOOL CKMTipTextService::_InitKeystrokeSink()
   if (!_pThreadMgr) 
     return FALSE;   // I3714 -> app hangs when switching kmtip off when keyman32 not loaded, due to not init.   // I3714
 
+  if (_keystrokeSinkInitialized) {
+    _UninitKeystrokeSink();
+  }
+
+  _keystrokeSinkInitialized = FALSE;
+
   if (_pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void **)&pKeystrokeMgr) != S_OK)
     return FALSE;
-
+  
   hr = pKeystrokeMgr->AdviseKeyEventSink(_tfClientId, (ITfKeyEventSink *)this, TRUE);
 
   pKeystrokeMgr->Release();
 
 	memset(fEatenBuf, 0, sizeof(fEatenBuf));
 
-  return (hr == S_OK);
+  return _keystrokeSinkInitialized = (hr == S_OK);
 }
 
 BOOL CKMTipTextService::_InitPreservedKeys() {   // I4274
