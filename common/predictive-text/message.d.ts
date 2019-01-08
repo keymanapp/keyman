@@ -85,7 +85,7 @@ interface Configuration {
    *
    * Affects the `context` property sent in `predict` messages.
    *
-   * While the left context MUST NOT bisect surrogate pairs, they MAY
+   * While the right context MUST NOT bisect surrogate pairs, they MAY
    * bisect graphical clusters.
    */
   rightContextCodeUnits: number;

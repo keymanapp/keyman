@@ -14,4 +14,22 @@ describe('LMLayerWorker dummy model', function() {
     });
     assert.isObject(model);
   });
+
+  it('supports dependency-injected configuration', function () {
+    let configuration = {
+      leftContextCodeUnits: 64,
+      rightContextCodeUnits: 0
+    };
+
+    var model = new DummyModel(
+      {
+        maxLeftContextCodeUnits: 64,
+      },
+      {
+        configuration: configuration,
+      }
+    );
+
+    assert.deepEqual(model.configuration, configuration);
+  });
 });
