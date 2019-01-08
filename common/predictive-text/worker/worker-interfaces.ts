@@ -73,6 +73,9 @@ interface WorkerInternalModel {
  * Constructors that return worker internal models.
  */
 interface WorkerInternalModelConstructor {
-  // TODO: new should take (cap: Capabilities)
-  new(): WorkerInternalModel;
+  /**
+   * WorkerInternalModel instances are all given the keyboard's
+   * capabilities.
+   */
+  new(capabilities: Capabilities): WorkerInternalModel;
 }
