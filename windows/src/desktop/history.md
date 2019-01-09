@@ -1,5 +1,11 @@
 # Keyman Desktop Version History
 
+## 2019-01-09 10.0.1203 stable
+* Bug Fixes backported from 11.0 beta (#1514):
+  * Switching between keyboards in same language would sometimes fail (#1505)
+  * Avoid crash when security software blocks Keyman Configuration from setting various registry values. (#1410)
+  * Crash when upgrading and TSF TIP enumeration fails (#1409)
+
 ## 2018-09-12 10.0.1202 stable
 * Fix links to Keyman for macOS in help files (#1067)
 
