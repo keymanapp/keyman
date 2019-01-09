@@ -8,13 +8,6 @@
 
 set -e
 
-# maybe don't need dev any more
-# from git can determine whether to use current tagnum or next
-# and whether to use current.datetime
-# see ../test.sh for script to bring in
-# maybe make it a function to get the minor number?
-
-
 BASEDIR=`pwd`
 echo "basedir is $BASEDIR"
 autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
@@ -62,12 +55,14 @@ done
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         rm -rf keyboardprocessor
+        sed -i "s/version: '.*'/version: '${newvers}'/" ../common/engine/keyboardprocessor/meson.build
         meson ../common/engine/keyboardprocessor keyboardprocessor
     fi
     if [ "${proj}" == "keyman-config" ]; then
-        majorvers=`cat ../resources/VERSION.md`
-        cd keyman-config/keyman_config
-        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${majorvers}/g" version.py.in > version.py
+        cd keyman-config
+        make clean
+        cd keyman_config
+        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${oldvers}/g" version.py.in > version.py
     fi
     cd $BASEDIR
 done

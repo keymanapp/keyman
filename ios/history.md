@@ -2,6 +2,9 @@
 
 ## 12.0 alpha
 
+## 2019 01-04 11.0.302 beta
+* Improves loading efficiency of system keyboard, helping prevent related crashes (#1475)
+
 ## 2019-01-02 11.0.300 beta
 * Initial beta release of Keyman for iPhone and iPad 11
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Aios+-label%3Acherry-pick+-label%3Astable)

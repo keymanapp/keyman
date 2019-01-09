@@ -23,9 +23,6 @@
 */
 #include "pch.h"   // I4551
 
-BYTE kbstate[256];
-
-
 #define MAX_RSHIFT 24
 #define MAX_KSHIFT 18
 

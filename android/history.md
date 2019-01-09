@@ -2,6 +2,16 @@
 
 ## 12.0 alpha
 
+## 2019-01-09 11.0.2053 beta
+* Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
+
+## 2019-01-04 11.0.2052 beta
+* Fix default handling of 102nd key found on European hardware keyboards (#1491)
+* Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
+
+## 2019-01-03 11.0.2051 beta
+* Add option to cancel when downloading the keyboard catalog (#1470)
+
 ## 2019-01-02 11.0.2050 beta
 * Initial beta release of Keyman for Android 11
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Aandroid+-label%3Acherry-pick+-label%3Astable)

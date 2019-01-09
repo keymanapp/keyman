@@ -580,17 +580,31 @@
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
     if (code == osk.keyCodes.K_SPACE) {
-        kbdInterface.output(0, Lelem, ' ');
-        return true;
+      kbdInterface.output(0, Lelem, ' ');
+      return true;
+    } else if (code == osk.keyCodes.K_ENTER) {
+      kbdInterface.output(0, Lelem, '\n');
+      return true;
+    } else if (code == osk.keyCodes.K_TAB) {
+      kbdInterface.output(0, Lelem, '\t');
+      return true;
+    } else if (code == osk.keyCodes.K_BKSP) {
+      kbdInterface.defaultBackspace();
+      return true;
+    } else if (code == osk.keyCodes.K_oE2) {
+      // Using defaults of English US layout for the 102nd key
+      if (shift == osk.modifierCodes['SHIFT']) {
+        kbdInterface.output(0, Lelem, '|');
+      } else {
+        kbdInterface.output(0, Lelem, '\\');
+      }
+      return true;
     }
-    else if (code == osk.keyCodes.K_ENTER) {
-        kbdInterface.output(0, Lelem, '\n');
-        return true;
-    }
-    var ch = osk.defaultKeyOutput(keyName, code, shift, false);
+
+    var ch = osk.defaultKeyOutput(keyName, code, shift, false, undefined);
     if(ch) {
-        kbdInterface.output(0, Lelem, ch);
-        return true;
+      kbdInterface.output(0, Lelem, ch);
+      return true;
     }
 
     return false;

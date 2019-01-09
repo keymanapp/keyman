@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>11.0.1300.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Name URL="">caps_lock_shift_frees_caps</Name>
+    <Copyright URL="">©</Copyright>
+    <Author URL=""></Author>
+    <Version URL="">1.0</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\caps_lock_shift_frees_caps.kmx</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>..\build\caps_lock_shift_frees_caps.kvk</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>welcome.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\build\caps_lock_caps_on_only.kvk</Name>
+      <Description>File caps_lock_caps_on_only.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>..\build\caps_lock_caps_always_off.kmx</Name>
+      <Description>Keyboard caps_lock_caps_on_only</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>..\build\caps_lock_caps_always_off.kvk</Name>
+      <Description>File caps_lock_caps_always_off.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>..\build\caps_lock_caps_on_only.kmx</Name>
+      <Description>Keyboard caps_lock_caps_always_off</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>caps_lock_shift_frees_caps</Name>
+      <ID>caps_lock_shift_frees_caps</ID>
+      <Version>1.0</Version>
+      <Languages/>
+    </Keyboard>
+    <Keyboard>
+      <Name>caps_lock_caps_on_only</Name>
+      <ID>caps_lock_caps_always_off</ID>
+      <Version>1.0</Version>
+      <Languages/>
+    </Keyboard>
+    <Keyboard>
+      <Name>caps_lock_caps_always_off</Name>
+      <ID>caps_lock_caps_on_only</ID>
+      <Version>1.0</Version>
+      <Languages/>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

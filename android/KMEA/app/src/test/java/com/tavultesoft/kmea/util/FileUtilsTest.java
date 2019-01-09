@@ -108,6 +108,21 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void test_isTTFFont() {
+    String filename = "test/abc.ttf";
+    Assert.assertTrue(FileUtils.isTTFFont(filename));
+
+    filename = "test/abc.TTF";
+    Assert.assertTrue(FileUtils.isTTFFont(filename));
+
+    filename = "test/abc.ttfo";
+    Assert.assertFalse(FileUtils.isTTFFont(filename));
+
+    filename = "";
+    Assert.assertFalse(FileUtils.isTTFFont(filename));
+  }
+
+  @Test
   public void test_isWelcomeFile() {
     String filename = "test/welcome.htm";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));

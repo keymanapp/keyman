@@ -129,15 +129,6 @@ type
     function UDUI_ShouldStartRebuildOnError(const Msg: WideString): Boolean;
   end;
 
-  TEthnologueLanguage = record   // I4257
-    Code: string;
-    Name: string;
-    Country: string;
-    Status: Char;
-  end;
-
-  TEthnologueLanguages = array of TEthnologueLanguage;   // I4257
-
   TUnicodeData = class
   private
     FBlocks: TUnicodeBlockList;
@@ -173,8 +164,6 @@ type
     procedure BuildFontCharTable(const AFontName: WideString);
     procedure SetFontName(const Value: WideString);
     procedure SetDBPathToAppData;
-    procedure ImportEthnologue;   // I4257
-//    function FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage;   // I4257
   public
     constructor Create(const SourcePath: WideString; AUnicodeDataUIManager: IUnicodeDataUIManager; const ADBPath: string = ''; AForceDBPathToAppDataOnBuild: Boolean = True); // I2845
     destructor Destroy; override;
@@ -188,9 +177,6 @@ type
     property Rebuilt: Boolean read FRebuilt;
     property Blocks: TUnicodeBlockList read FBlocks;
     property FontName: WideString read FFontName write SetFontName;
-
-//    function FindLanguageByCode(code: string): TEthnologueLanguage;   // I4257
-//    function FindLanguagesByName(name: string): TEthnologueLanguages;   // I4257
 
     property UnicodeDataUIManager: IUnicodeDataUIManager read FUnicodeDataUIManager;
   end;
@@ -494,7 +480,6 @@ begin
     ImportBlocks;
     ImportChars;
     ImportUnihan;
-    ImportEthnologue;   // I4257
   except
     on E:Exception do
     begin
@@ -581,47 +566,6 @@ begin
     fs.Free;
   end;
   LoadBlocks;
-end;
-
-procedure TUnicodeData.ImportEthnologue;   // I4257
-var
-  FUnicodeSourceFile: string;
-  elanguage: ADODB_TLB.Recordset;
-  line, str: TStringList;
-  i: Integer;
-begin
-  // Handles typical distribution layout
-  FUnicodeSourceFile := FUnicodeSourcePath + 'ethnologue.txt';
-  if not FileExists(FUnicodeSourceFile) then
-    // Handles source layout
-    FUnicodeSourceFile := FUnicodeSourcePath + '..\ethnologue\ethnologue.txt';
-
-  str := TStringList.Create;
-  line := TStringList.Create;
-  try
-    str.LoadFromFile(FUnicodeSourcefile, TEncoding.UTF8);
-
-    elanguage := CoRecordset.Create;
-    elanguage.Open('eLanguage', FDatabase, adOpenForwardOnly, adLockOptimistic, adCmdTable);// Execute('eCharacter', vRecords, adCmdTable);
-    try
-      for i := 1 to str.Count - 1 do  // Skip column names
-      begin
-        line.CommaText := str[i];
-
-        elanguage.AddNew(_, _);
-        elanguage.Collect['LanguageCode'] := line[0];
-        elanguage.Collect['Country'] := line[1];
-        elanguage.Collect['Status'] := line[2];
-        elanguage.Collect['Name'] := line[3];
-        elanguage.Update(_, _);
-      end;
-    finally
-      elanguage := nil;
-    end;
-  finally
-    str.Free;
-    line.Free;
-  end;
 end;
 
 function TUnicodeData.IsSpecialChar(ch: Integer): Boolean;
@@ -1183,61 +1127,6 @@ begin
     rec := nil;
   end;
 end;
-
-{function TUnicodeData.FillLanguageData(rec: ADODB_TLB.Recordset): TEthnologueLanguage; //rec: DaoRecordset): TUnicodeCharacter;   // I4257
-begin
-  Result.Code := rec.Collect['LanguageCode'];
-  Result.Name := rec.Collect['Name'];
-  Result.Country := rec.Collect['Country'];
-  Result.Status := Copy(rec.Collect['Status'], 1, 1)[1];
-end;}
-
-{function TUnicodeData.FindLanguageByCode(code: string): TEthnologueLanguage;
-var
-  rec: ADODB_TLB.Recordset;
-  vRecords: OleVariant;
-begin
-  Result.Code := '';
-  Result.Name := '';
-  Result.Country := '';
-  Result.Status := #0;
-
-  if FDisabled then Exit;
-  if not Assigned(FDatabase) then Exit;
-
-  rec := FDatabase.Execute('EXECUTE qLanguageByCode '+QuotedStr(code), vRecords, adCmdText);
-
-  try
-    if not rec.EOF then
-      Result := FillLanguageData(rec)
-  finally
-    rec := nil;
-  end;
-end;}
-
-{function TUnicodeData.FindLanguagesByName(name: string): TEthnologueLanguages;
-var
-  rec: ADODB_TLB.Recordset;
-  vRecords: OleVariant;
-begin
-  SetLength(Result, 0);
-
-  if FDisabled then Exit;
-  if not Assigned(FDatabase) then Exit;
-
-  rec := FDatabase.Execute('EXECUTE qLanguagesByName '+QuotedStr(name+'%'), vRecords, adCmdText);
-
-  try
-    while not rec.EOF do
-    begin
-      SetLength(Result, Length(Result)+1);
-      Result[Length(Result)-1] := FillLanguageData(rec);
-      rec.MoveNext;
-    end;
-  finally
-    rec := nil;
-  end;
-end;}
 
 procedure TUnicodeData.CleanupFilter(var filter: WideString; FBlock: Boolean);
 var

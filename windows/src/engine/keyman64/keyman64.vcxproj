@@ -250,7 +250,6 @@
     <ClCompile Include="..\keyman32\hookutils.cpp" />
     <ClCompile Include="..\keyman32\K32_DBG.CPP" />
     <ClCompile Include="..\keyman32\k32_globals.cpp" />
-    <ClCompile Include="..\keyman32\K32_info.cpp" />
     <ClCompile Include="..\keyman32\K32_load.cpp" />
     <ClCompile Include="..\keyman32\k32_tsf.cpp" />
     <ClCompile Include="..\keyman32\keybd_shift.cpp">
@@ -354,14 +353,11 @@
     <ClInclude Include="..\keyman32\k32_res.h" />
     <ClInclude Include="..\keyman32\KBD.H" />
     <ClInclude Include="..\..\global\inc\keyman64.h" />
-    <ClInclude Include="..\..\global\inc\keymanapi.h" />
     <ClInclude Include="..\..\global\inc\keymancontrol.h" />
     <ClInclude Include="..\..\global\inc\KEYNAMES.H" />
     <ClInclude Include="..\keyman32\keyman-debug-etw.h" />
     <ClInclude Include="..\keyman32\keyeventsenderthread.h" />
     <ClInclude Include="..\keyman32\keystate.h" />
-    <ClInclude Include="..\..\global\inc\Kl95api.h" />
-    <ClInclude Include="..\..\global\inc\Km95api.h" />
     <ClInclude Include="..\..\global\inc\Kmnreg.h" />
     <ClInclude Include="..\keyman32\kmprot.h" />
     <ClInclude Include="..\..\global\inc\kmprot_hwkey.h" />

@@ -82,7 +82,7 @@ uses
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager,
-  UfrmMain,
+  dmActionsMain,
   utilsystem;
 
 function ShowNewProjectForm(Owner: TComponent): Boolean;
@@ -108,7 +108,7 @@ begin
       Result := ShowNewProjectParameters(Owner);
     kptBlank:
       begin
-        frmKeymanDeveloper.OpenProject('');
+        modActionsMain.OpenProject('');
         Result := True;
       end;
     kptImportWindowsKeyboard:

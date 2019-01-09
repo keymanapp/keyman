@@ -57,12 +57,18 @@ BOOL CKMTipTextService::_InitKeystrokeSink()
     return FALSE;   // I3714 -> app hangs when switching kmtip off when keyman32 not loaded, due to not init.   // I3714
   }
 
+  if (_keystrokeSinkInitialized) {
+    _UninitKeystrokeSink();
+  }
+
+  _keystrokeSinkInitialized = FALSE;
+
   hr = _pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void **)&pKeystrokeMgr);
   if(hr!= S_OK) {
     DebugLastError0(L"QueryInterface(ITfKeystrokeMgr)", hr);
     return FALSE;
   }
-
+  
   hr = pKeystrokeMgr->AdviseKeyEventSink(_tfClientId, (ITfKeyEventSink *)this, TRUE);
   if (hr != S_OK) {
     DebugLastError0(L"AdviseKeyEventSink", hr);
@@ -72,7 +78,7 @@ BOOL CKMTipTextService::_InitKeystrokeSink()
 
 	memset(fEatenBuf, 0, sizeof(fEatenBuf));
 
-  return (hr == S_OK);
+  return _keystrokeSinkInitialized = (hr == S_OK);
 }
 
 BOOL CKMTipTextService::_InitPreservedKeys() {   // I4274
@@ -168,11 +174,16 @@ STDAPI CKMTipTextService::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPA
 {
   LogKey("CKMTipTextService::OnTestKeyDown", 0, wParam, lParam);
   // If the keystroke is a Keyman-generated key, ignore it
-  if((lParam & 0x00FF0000L) == 0xFF0000L)   // I3566
+  // But we need to pass Caps Lock through, even if we generated it, so we can track Caps Lock state.
+  // TODO: Fix magic constants
+  if ((lParam & 0x00FF0000L) == 0xFF0000L &&
+    wParam != VK_CAPITAL) {
     *pfEaten = FALSE;
-  else
-	  *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
+  }
+  else {
+    *pfEaten = _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
 //  SendDebugMessageFormat("CKMTipTextService::OnTestKeyDown(pfEaten=%s)", *pfEaten ? "TRUE" : "FALSE");
+  }
   return S_OK;
 }
 
@@ -202,12 +213,15 @@ STDAPI CKMTipTextService::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM 
 STDAPI CKMTipTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
   LogKey("CKMTipTextService::OnTestKeyUp", 2, wParam, lParam);
-  if((lParam & 0x00FF0000L) == 0xFF0000L)   // I3566
+  // If the keystroke is a Keyman-generated key, ignore it
+  // But we need to pass Caps Lock through, even if we generated it, so we can track Caps Lock state.
+  if ((lParam & 0x00FF0000L) == 0xFF0000L &&
+    wParam != VK_CAPITAL) {  // I3566
     *pfEaten = FALSE;
-  else
-  {
-	  _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
-	  *pfEaten = fEatenBuf[wParam];
+  }
+  else {
+    _KeymanProcessKeystroke(pContext, wParam, lParam, FALSE, FALSE);   // I3588
+    *pfEaten = fEatenBuf[wParam];
   }
 //  SendDebugMessageFormat("CKMTipTextService::OnTestKeyUp(pfEaten=%s)", *pfEaten ? "TRUE" : "FALSE");
   return S_OK;
@@ -224,8 +238,12 @@ STDAPI CKMTipTextService::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARA
 STDAPI CKMTipTextService::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pfEaten)
 {
   LogKey("CKMTipTextService::OnKeyUp", 3, wParam, lParam);
-  if((lParam & 0x00FF0000L) == 0xFF0000L)   // I3566   // I3605
+  // If the keystroke is a Keyman-generated key, ignore it
+  // But we need to pass Caps Lock through, even if we generated it, so we can track Caps Lock state.
+  if ((lParam & 0x00FF0000L) == 0xFF0000L &&
+    wParam != VK_CAPITAL) {   // I3566   // I3605
     *pfEaten = FALSE;
+  }
   else
   {
   	_KeymanProcessKeystroke(pContext, wParam, lParam, TRUE, FALSE);   // I3588   // I3605
