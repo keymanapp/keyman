@@ -356,7 +356,7 @@ begin
       Exit;
   end;
 
-  if not FSilent and (FMode <> fmRepair) then   // I4773
+  if not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout]) then   // I4773
   begin
     if not TKeyboardTIPCheck.CheckKeyboardTIPInstallStatus then
     begin
