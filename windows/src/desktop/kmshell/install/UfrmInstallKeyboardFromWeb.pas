@@ -153,7 +153,7 @@ var
               end;
             end
             else
-              if InstallFile(Self, FTempFileName, False, False) then Result := True;   // I4414
+              if InstallFile(Self, FTempFileName, False, False, '') then Result := True;   // I4414
           finally
             if FileExists(FTempFileName) then
               DeleteFile(FTempFileName);

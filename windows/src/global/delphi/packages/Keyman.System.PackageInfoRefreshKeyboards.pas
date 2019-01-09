@@ -207,6 +207,9 @@ function TPackageInfoRefreshKeyboards.IsKeyboardFileByContent(f: TPackageContent
 var
   id: string;
 begin
+  if not FileExists(f.FileName) then
+    Exit(True);
+
   id := TKeyboardUtils.GetKeymanWebCompiledNameFromFileName(f.FileName);
   // Look for Keyboard_<id>
   with TStringStream.Create('', TEncoding.UTF8) do
@@ -230,7 +233,7 @@ begin
 
   // Need to test if the JS is a valid keyboard file.
   // This is a bit of a pain... but we have to stick with .js for compat
-  if IsKeyboardFileByContent(f) then
+  if not FileExists(f.FileName) or IsKeyboardFileByContent(f) then
     Exit(ftJavascript);
 
   Exit(ftOther);
@@ -294,6 +297,9 @@ class function TPackageInfoRefreshKeyboards.FillKeyboardDetails(f: TPackageConte
 var
   ki: TKeyboardInfo;
 begin
+  if not FileExists(f.FileName) then
+    Exit(False);
+
   Result := True;
   pki.ID := TKeyboardUtils.KeyboardFileNameToID(f.FileName);
   pki.RTL := False;

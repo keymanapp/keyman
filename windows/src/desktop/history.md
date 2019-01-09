@@ -1,10 +1,16 @@
 # Keyman Desktop Version History
 
-## 2019-01-09 10.0.1203 stable
+## 2019-01-09 10.0.1206 stable
 * Bug Fixes backported from 11.0 beta (#1514):
   * Switching between keyboards in same language would sometimes fail (#1505)
   * Avoid crash when security software blocks Keyman Configuration from setting various registry values. (#1410)
   * Crash when upgrading and TSF TIP enumeration fails (#1409)
+
+## 2018-11-02 10.0.1205 stable
+* Mitigation for issue with Windows 10 1803, 1809 where keyboards installed with Amharic, Tigrinya and Sinhala languages do not work
+
+## 2018-10-29 10.0.1204 stable
+* Include Kannada user interface translation (#1287)
 
 ## 2018-09-12 10.0.1202 stable
 * Fix links to Keyman for macOS in help files (#1067)
