@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2019-01-09 11.0.1302.0 beta
+* Bug Fix: Keyman can no longer show a "Damaged Profile" dialog box during silent installs (#1508)
+
 ## 2019-01-07 11.0.1301.0 beta
 * Bug Fix: Hotkeys are now correctly assigned to keyboards when installed (#1485)
 * Change: Removed legacy API: Keyman_BuildKeyboardList, Keyman_GetAPIVersion, GetKeymanKeyboardInfo, GetKeymanInfo, GetSystemStore (#1503)
