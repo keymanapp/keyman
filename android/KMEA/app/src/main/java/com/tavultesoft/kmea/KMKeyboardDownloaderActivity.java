@@ -48,6 +48,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
+  private static final String TAG = "KMKeyboardDownloaderActivity";
+
   // Keyman public keys
   public static final String KMKey_URL = "url";
   public static final String KMKey_Keyboard = "keyboard";
@@ -197,7 +199,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         ret = downloadNonKMPKeyboard(remoteUrl);
       } catch (Exception e) {
         ret = -1;
-        Log.e("Keyboard download", "Error: " + e);
+        Log.e(TAG, "Error: " + e);
       }
 
       return ret;
@@ -398,43 +400,44 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     boolean updateJsonFont = false;
     try {
       JSONArray fontSource = jsonFont.optJSONArray(KMManager.KMKey_FontSource);
-      if (fontSource != null) {
-        boolean containsTTF = hasTTFFont(fontSource);
-        if (containsTTF) {
-          for (int i = fontSource.length() - 1; i >= 0; i--) {
-            String s = fontSource.getString(i);
-            if (!FileUtils.isTTFFont(s)) {
-              updateJsonFont = true;
-              if (Build.VERSION.SDK_INT > 19) {
-                fontSource.remove(i);
-              } else {
-                fontSource = removeJsonObjectAtIndex(fontSource, i);
-              }
+      if ((fontSource != null) && hasTTFFont(fontSource)) {
+        for (int i = fontSource.length() - 1; i >= 0; i--) {
+          String s = fontSource.getString(i);
+          if (!FileUtils.isTTFFont(s)) {
+            updateJsonFont = true;
+            // remove() was added in API 19
+            // https://developer.android.com/reference/org/json/JSONArray#remove(int)
+            if (Build.VERSION.SDK_INT > 19) {
+              fontSource.remove(i);
+            } else {
+              fontSource = removeJsonObjectAtIndex(fontSource, i);
             }
           }
+        }
 
-          if (updateJsonFont) {
-            JSONArray copy = fontSource;
-            jsonFont.remove(KMManager.KMKey_FontSource);
-            jsonFont.put(KMManager.KMKey_FontSource, copy);
-          }
+        if (updateJsonFont) {
+          JSONArray copy = fontSource;
+          jsonFont.remove(KMManager.KMKey_FontSource);
+          jsonFont.put(KMManager.KMKey_FontSource, copy);
         }
       }
     } catch (JSONException e) {
-
+      Log.e(TAG, "findTTF exception" + e);
     }
   }
 
+  // Parse the fontSource JSONArray to see if it contains a .ttf font
   private static boolean hasTTFFont(JSONArray fontSource) {
     try {
       for (int i = 0; i < fontSource.length(); i++) {
         String s = fontSource.getString(i);
-        if (s.toLowerCase().endsWith(FileUtils.TRUETYPEFONT)) {
+        if (FileUtils.isTTFFont(s)) {
           return true;
         }
       }
       return false;
     } catch (JSONException e) {
+      Log.e(TAG, "hasTTFFont exception" + e);
       return false;
     }
   }
@@ -462,20 +465,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     JSONArray fontSource = jsonFont.optJSONArray(KMManager.KMKey_FontSource);
     if (fontSource != null) {
       int fcCount = fontSource.length();
-      boolean containsTTF = hasTTFFont(fontSource);
       for (int i = 0; i < fcCount; i++) {
         String fontSourceString;
         try {
           fontSourceString = fontSource.getString(i);
-          // Prioritize .ttf if it exists
-          if (!FileUtils.isTTFFont(fontSourceString) && containsTTF) {
-            if (Build.VERSION.SDK_INT > 19) {
-              fontSource.remove(i);
-            } else {
-              fontSource = removeJsonObjectAtIndex(fontSource, i);
-            }
-            continue;
-          }
 
           if (FileUtils.hasFontExtension(fontSourceString)) {
             urls.add(baseUri + fontSourceString);
