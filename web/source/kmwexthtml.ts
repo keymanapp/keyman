@@ -49,5 +49,11 @@ interface CSSStyleDeclaration {
     MozUserSelect: any, // Not necessary with Firefox 52+, which was released... in 2017.
     KhtmlUserSelect: any, // No dating information for the rest at present.
     UserSelect: any,
-    WebkitUserSelect: any
+    WebkitUserSelect: any,
+
+    WebkitOverflowScrolling?: string
+}
+
+interface TouchEvent {
+  pageY?: number
 }
