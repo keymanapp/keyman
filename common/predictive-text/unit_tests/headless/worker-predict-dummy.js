@@ -3,7 +3,6 @@
  */
 
 var assert = require('chai').assert;
-var sinon = require('sinon');
 
 var DummyModel = require('../../build/intermediate').models.DummyModel;
 
@@ -186,7 +185,7 @@ describe('LMLayerWorker dummy model', function() {
               insert: 'a ',
               deleteLeft: 0
             },
-            displayAs: 'the',
+            displayAs: 'a',
           },
         ],
       ];
