@@ -1,6 +1,8 @@
 # Keyman Desktop Version History
 
 ## 2019-01-09 11.0.1302.0 beta
+* Bug Fix: Switching between keyboards in same language would sometimes fail (#1505)
+* Bug Fix: Caps Lock control headers are now handled correctly by Keyman (#1506)
 * Bug Fix: Keyman can no longer show a "Damaged Profile" dialog box during silent installs (#1508)
 
 ## 2019-01-07 11.0.1301.0 beta
