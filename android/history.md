@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2019-01-10 11.0.2054 beta
+* Fix "Get Started" default keyboard status on engineering builds (#1515)
+
 ## 2019-01-09 11.0.2053 beta
 * Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
 
