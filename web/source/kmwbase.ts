@@ -134,6 +134,10 @@ namespace com.keyman {
      * multiple times to test the different initialization paths.
      */
     ['shutdown']() {
+      // Disable page focus/blur events, which can sometimes trigger and cause parallel KMW instances in testing.
+      this.util.detachDOMEvent(window, 'focus', this['pageFocusHandler'], false);
+      this.util.detachDOMEvent(window, 'blur', this['pageFocusHandler'], false);
+
       this.domManager.shutdown();
       this.osk.shutdown();
       this.util.shutdown();

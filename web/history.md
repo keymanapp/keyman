@@ -1,5 +1,7 @@
 # KeymanWeb Version History
 
+## 12.0 alpha
+
 ## 2019-01-04 11.0.202 beta
 * Bug Fix:
   * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
@@ -32,6 +34,7 @@
   * Fixed multiple issues on iOS (#1393)
   * Fixed issues with language duplication in toolbar UI (#1284)
   * Fixed crashes (#1057)
+  * Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#1452)
 
 ## 2018-07-06 10.0.103 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)

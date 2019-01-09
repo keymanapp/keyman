@@ -1,5 +1,7 @@
 # Keyman for Android
 
+## 12.0 alpha
+
 ## 2019-01-09 11.0.2053 beta
 * Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
 
