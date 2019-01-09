@@ -10,7 +10,7 @@ Homepage: http://www.keyman.com
 
 Package: ibus-keyman
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ibus (>= 1.3.7)
+Depends: ${shlibs:Depends}, ${misc:Depends}, ibus (>= 1.3.7), sudo
 Description: Keyman engine for IBus
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
  open source keyboarding platform which allows anyone to write a keyboard layout
