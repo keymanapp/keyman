@@ -613,17 +613,16 @@ public final class KMManager {
   public static Typeface getFontTypeface(Context context, String fontFilename) {
     Typeface font = null;
 
-    if (fontFilename != null) {
-      if (FileUtils.hasFontExtension(fontFilename)) {
+    try {
+      if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
         File file = new File(fontFilename);
         if (file.exists()) {
           font = Typeface.createFromFile(file);
-        } else {
-          font = null;
         }
       }
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to create Typeface: " + fontFilename);
     }
-
     return font;
   }
 
