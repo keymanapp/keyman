@@ -359,7 +359,7 @@ namespace com.keyman {
     }
 
     // Found a bit of magic formatting that allows dynamic return typing for a specified element tag!
-    _CreateElement<E extends "style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
+    _CreateElement<E extends "p"|"style"|"script"|"div"|"canvas"|"span">(nodeName:E) {
       var e = document.createElement<E>(nodeName);
 
       // Make element unselectable (Internet Explorer)
@@ -935,7 +935,7 @@ namespace com.keyman {
      * Description  Makes an actual copy (not a reference) of an object, copying simple members, 
      *              arrays and member objects but not functions, so use with care!
      */              
-    deepCopy<T>(p:T, c0): T {
+    deepCopy<T>(p:T, c0?): T {
       var c = c0 || {};
       for (var i in p) {
         if(typeof p[i] === 'object') {
