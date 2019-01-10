@@ -58,10 +58,15 @@ PKG_CHECK_MODULES(GTK, [
     gtk+-3.0 >= 2.4
 ])
 
+# check atkspi 2.0
+#PKG_CHECK_MODULES(ATSPI, [
+#    atspi-2 >= 2.0
+#])
+
 
 # check Json glib
 PKG_CHECK_MODULES(JSON_GLIB, [
-    json-glib-1.0 >= 1.4.0
+    json-glib-1.0 >= 1.0
 ])
 
 # check Keyman keyboard processor
