@@ -79,8 +79,17 @@ class LMLayer {
     });
   }
 
-  // TODO: asynchronous predict() method, based on 
-  //       https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L64-L80
+  predict(transform: Transform, context: Context): Promise<Suggestion[]> {
+    return new Promise((resolve, _reject) => {
+      this._worker.postMessage({
+        message: 'predict',
+        transform: transform,
+        context: context
+        // TODO: tokens! implement the PromiseStore:
+        // https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L133-L186
+      });
+    });
+  }
 
   // TODO: asynchronous close() method.
   //       Worker code must recognize message and call self.close().
