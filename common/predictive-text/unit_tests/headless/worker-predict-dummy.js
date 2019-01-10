@@ -206,41 +206,4 @@ describe('LMLayerWorker dummy model', function() {
                        futureSuggestions[3]);
     });
   });
-
-  /**
-   * Capabilities of a keyboard that will ONLY send left-sided capabilities.
-   * The keyboard does not support deleting to the right.
-   * 
-   * @returns Capabilities
-   */
-  function defaultCapabilities() {
-    return {
-      maxLeftContextCodeUnits: 64,
-    };
-  }
-
-  /**
-   * Returns a transform that does nothing.
-   *
-   * @returns Transform
-   */
-  function zeroTransform() {
-    return {
-      insert: '',
-      deleteLeft: 0,
-    };
-  }
-
-  /**
-   * Returns a context of an empty buffer.
-   *
-   * @returns Context
-   */
-  function emptyContext() {
-    return {
-      left: '',
-      startOfBuffer: true,
-      endOfBuffer: true
-    };
-  }
 });

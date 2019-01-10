@@ -48,47 +48,4 @@ describe('LMLayerWorker', function () {
       sinon.restore();
     });
   });
-
-  // Helpers (TODO: factor out!)
-
-  /**
-   * Creates a MessageEvent (for inter-worker communication), with the given data payload.
-   * @param {*} data 
-   */
-  function createMessageEventWithData(data) {
-    return { data };
-  }
-
-  /**
-   * A valid model that suggests exactly what you want it to suggest.
-   */
-  function dummyModel(futureSuggestions) {
-    return {
-      type: 'dummy',
-      futureSuggestions: futureSuggestions || []
-    };
-  }
-  /**
-   * Returns reasonable defaults for the default capabilities
-   * to initialize the LMLayer.
-   */
-  function defaultCapabilities() {
-    return {
-      maxLeftContextCodeUnits: 64
-    };
-  }
-
-  /**
-   * Context of an empty buffer; no text, at both the start and end of the buffer.
-   */
-  function emptyContext() {
-    return { left: '', startOfBuffer: true, endOfBuffer: true };
-  }
-
-  /**
-   * This transform, when applied, makes no changes to the buffer.
-   */
-  function zeroTransform() {
-    return { insert: '', deleteLeft: 0 };
-  }
 });
