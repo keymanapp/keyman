@@ -30,9 +30,6 @@ class AIWin2000Unicode:public AppIntegration
 {
 private:
 
-	BYTE kbstate[256];
-	BOOL FUnicharOkay;
-	
 	BOOL PostKeys();
 
 

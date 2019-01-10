@@ -223,7 +223,6 @@ void DoChangeWindowMessageFilter()
 
 	DoCWMF(wm_keyman);   // I3594
   DoCWMF(wm_keyman_keyevent);
-    DoCWMF(wm_kmmessage);   // I4412
     DoCWMF(wm_keymankeydown);
     DoCWMF(wm_keymankeyup);
     DoCWMF(wm_keyman_grabwindowproc);
@@ -314,7 +313,6 @@ BOOL InitialiseProcess(HWND hwnd)
 
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
   wm_keyman_keyevent = RegisterWindowMessage("WM_KEYMAN_KEYEVENT");
-	wm_kmmessage = RegisterWindowMessage(RWM_KMMESSAGE);
 	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
 	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
 	wm_keyman_grabwindowproc = RegisterWindowMessage("WM_KEYMAN_GRABWINDOWPROC");
@@ -945,45 +943,32 @@ void ReleaseKeyboards(BOOL Lock)
 	if(!_td->ForceFileName[0]) _td->lpActiveKeyboard = NULL;
 }
 
-#include "keymanapi.h"
-
-extern "C" BOOL _declspec(dllexport) WINAPI Keyman_BuildKeyboardList(LPKEYBOARDINFO kbd, int *n) {   // I4461
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
-  int nKeyboards = 0;
-
-	for(int i = 0; i < _td->nKeyboards; i++) {
-		if(!_td->lpKeyboards[i].Keyboard) LoadlpKeyboard(i);
-    if(_td->lpKeyboards[i].nProfiles > 0) nKeyboards++;
-  }
-
-	if(!kbd) {
-    *n = nKeyboards;
-  }	else {
-		for(int i = 0, j = 0; j < *n && i < _td->nKeyboards; i++)	{   // I4461
-      if(_td->lpKeyboards[i].nProfiles > 0) {   // I4461
-			  memcpy(&kbd[j++], &_td->lpKeyboards[i], sizeof(KEYBOARDINFO));
-      }
-		}
-	}
-	return TRUE;
-}
-
-extern "C" DWORD _declspec(dllexport) WINAPI Keyman_GetAPIVersion()
-{
-	return 0x0600;
-}
-
+/**
+  Keyman_GetLastActiveWindow and Keyman_GetLastFocusWindow were previously published as part of keymanapi.h.
+  They are now used only by the COM API internally.
+*/
 extern "C" HWND  _declspec(dllexport) WINAPI Keyman_GetLastActiveWindow()
 {
   return (HWND) Globals::SendMasterController(wm_keyman_control, KMC_GETLASTACTIVE, 0);
 }
 
-extern "C" HWND WINAPI Keyman_GetLastFocusWindow()
+extern "C" HWND _declspec(dllexport) WINAPI Keyman_GetLastFocusWindow()
 {
   return (HWND) Globals::SendMasterController(wm_keyman_control, KMC_GETLASTFOCUS, 0);
 }
+
+/**
+  GetSystemStore was previously published as an internal API. It is now available
+  only within keyman32/keyman64.
+*/
+PWSTR GetSystemStore(LPKEYBOARD kb, DWORD SystemID)
+{
+  for (DWORD i = 0; i < kb->cxStoreArray; i++)
+    if (kb->dpStoreArray[i].dwSystemID == SystemID) return kb->dpStoreArray[i].dpString;
+
+  return NULL;
+}
+
 
 BOOL ShouldAttachToProcess()
 {

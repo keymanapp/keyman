@@ -73,6 +73,8 @@ else
 endif
 
 if kmcomp.found()
+  # This is only expected to work in meson 0.48+
+  # so not on bionic or xenial without using pip
   foreach kbd : tests
     kbd_src = files(kbd + '.kmn')
     kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
@@ -86,8 +88,10 @@ if kmcomp.found()
   endforeach
 else
   foreach kbd : tests
-    kbd_src = files(kbd + '.kmn')
-    kbd_obj = files(kbd + '.kmx')
+    # meson 0.40 on xenial backports aborts if files used in args
+    # was e.g. kbd_src = files(kbd + '.kmn')
+    kbd_src = join_paths(meson.current_source_dir(),kbd) + '.kmn'
+    kbd_obj = join_paths(meson.current_source_dir(),kbd) + '.kmx'
 
     test(kbd, kmx, args: [kbd_src, kbd_obj])
   endforeach

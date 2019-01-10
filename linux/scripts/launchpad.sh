@@ -4,8 +4,9 @@
 
 # must be run from linux dir
 
-# parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] ./scripts/launchpad.sh
+# parameters: [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
+# TIER="<tier>" alpha, beta or stable, default beta
 # PROJECT="<project>" only upload this project
 # DIST="<dist>" only upload for this distribution
 
@@ -17,6 +18,17 @@ if [ "${UPLOAD}" == "yes" ]; then
 else
     SIM="-s"
 fi
+
+if [[ -z "${TIER}" ]]; then
+    # This is the tier that the latest version is currently found on
+    # This should be changed to stable before the first stable build
+    # In master branch this should be alpha and the debian/watch files should check alpha dir
+    tier="beta"
+#    tier="stable"
+else
+    tier="${TIER}"
+fi
+
 
 if [ ! `which xmllint` ]; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
@@ -34,6 +46,13 @@ if [ "${DIST}" != "" ]; then
 else
     distributions="xenial bionic cosmic disco"
 fi
+
+if [ "${PACKAGEVERSION}" != "" ]; then
+    packageversion="${PACKAGEVERSION}"
+else
+    packageversion="1~sil1"
+fi
+
 
 BASEDIR=`pwd`
 
@@ -62,7 +81,7 @@ for proj in ${projects}; do
     mv ${tarname}-${version}.tar.gz ${BASEDIR}/launchpad
     rm ${proj}*.debian.tar.xz
     cd ${BASEDIR}/launchpad
-    wget -N https://downloads.keyman.com/linux/alpha/${dirversion}/SHA256SUMS
+    wget -N https://downloads.keyman.com/linux/${tier}/${dirversion}/SHA256SUMS
     sha256sum -c --ignore-missing SHA256SUMS |grep ${tarname}
     cd ${proj}-${version}
     echo `pwd`
@@ -70,13 +89,13 @@ for proj in ${projects}; do
     #TODO separate source builds and dputs for each of $dists?
     for dist in ${distributions}; do
         cp ../${proj}-changelog debian/changelog
-        dch -v ${version}-1~${dist} "source package for PPA"
+        dch -v ${version}-${packageversion}~${dist} "source package for PPA"
         dch -D ${dist} -r ""
         debuild -d -S -sa -Zxz
     done
     cd ..
     for dist in ${distributions}; do
-        dput ${SIM} ppa:keymanapp/keyman-daily ${proj}_${version}-1~${dist}_source.changes
+        dput ${SIM} ppa:keymanapp/keyman-daily ${proj}_${version}-${packageversion}~${dist}_source.changes
     done
     cd ${BASEDIR}
 done

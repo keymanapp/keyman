@@ -242,6 +242,11 @@ public final class FileUtils {
     return f.endsWith(KEYBOARDPACKAGE);
   }
 
+  public static boolean isTTFFont(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(TRUETYPEFONT);
+  }
+
   public static boolean isWelcomeFile(String filename) {
     String f = getFilename(filename);
     return f.equalsIgnoreCase(WELCOME_HTM);

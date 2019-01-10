@@ -74,7 +74,7 @@ lib = library('kmnkbp0',
     'utfcodec.cpp',
     cpp_args: defns + warns + flags,
     link_args: links,
-    version: meson.project_version(),
+    version: lib_version,
     include_directories: inc,
     install: true)
 

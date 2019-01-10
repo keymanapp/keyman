@@ -16,7 +16,7 @@ uses
 
   Keyman.Developer.System.ImportWindowsKeyboard,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
-  UfrmMain,
+  dmActionsMain,
   UfrmSelectSystemKeyboard;
 
 function ShowImportWindowsKeyboard(Owner: TComponent): Boolean;
@@ -81,7 +81,7 @@ begin
     f.Free;
   end;
 
-  frmKeymanDeveloper.OpenProject(ProjectFilename);
+  modActionsMain.OpenProject(ProjectFilename);
   Result := True;
 end;
 

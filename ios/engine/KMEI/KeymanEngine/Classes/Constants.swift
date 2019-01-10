@@ -49,7 +49,8 @@ public enum Defaults {
 public enum Resources {
   /// Keyman Web resources
   public static let bundle: Bundle = {
-    let frameworkBundle =  Bundle(identifier: "org.sil.Keyman.ios.Engine")!
+    // If we're executing this code, KMEI's framework should already be loaded.  Just use that.
+    let frameworkBundle = Bundle(for: Manager.self) //Bundle(identifier: "org.sil.Keyman.ios.Engine")!
     return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
   }()
 

@@ -87,9 +87,7 @@ BOOL AIWin2000Unicode::IsWindowHandled(HWND ahwnd)
 BOOL AIWin2000Unicode::IsUnicode() 
 { 
   BOOL Result = IsWindowUnicode(hwnd);
-
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "IsWindowUnicode=%s WM_UNICHAR:%s", 
-		Result ? "Yes" : "No", FUnicharOkay ? "Yes" : "No");
+  SendDebugMessageFormat(0, sdmAIDefault, 0, "IsWindowUnicode=%s", Result ? "Yes" : "No");
 	return Result; 
 }
 

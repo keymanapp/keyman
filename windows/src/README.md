@@ -153,4 +153,4 @@ source the binary files from the https://github.com/keymanapp/CEF4Delphi_binary 
 The `KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of this
 repo on your local machine.
 
-Keyman Desktop does not depend on this component.
+Keyman Desktop does not currently depend on this component.
