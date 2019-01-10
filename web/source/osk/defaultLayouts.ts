@@ -26,12 +26,19 @@ namespace com.keyman.osk {
 
   export type LayoutLayer = {
     "id": string,
-    "row": LayoutRow[]
+    "row": LayoutRow[],
+
+    // Post-processing elements.
+    shiftKey?: LayoutKey,
+    capsKey?: LayoutKey,
+    numKey?: LayoutKey,
+    scrollKey?: LayoutKey
   }
 
   export type LayoutFormFactor = {
     "font": string,
-    "layer": LayoutLayer[]
+    "layer": LayoutLayer[],
+    keyLabels?: boolean
   }
 
   export type LayoutSpec = {
@@ -88,6 +95,12 @@ namespace com.keyman.osk {
       'leftctrl-shift': '*LCtrlShift*',
       'rightctrl-shift': '*RCtrlShift*'
     };
+
+    static _BaseLayout: string = 'us';       // default BaseLayout
+    static _BaseLayoutEuro: {[code: string]: string} = {
+      'se': '\u00a71234567890+´~~~QWERTYUIOP\u00c5\u00a8\'~~~ASDFGHJKL\u00d6\u00c4~~~~~<ZXCVBNM,.-~~~~~ ',  // Swedish
+      'uk': '`1234567890-=~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ ' // UK
+    };     // I1299 (not currently exposed, but may need to be e.g. for external users)
     
     /**
     * Build a default layout for keyboards with no explicit layout
@@ -97,9 +110,8 @@ namespace com.keyman.osk {
     * @param   {string}  formFactor
     * @return  {Object}
     */
-    static buildDefaultLayout(PVK, kbdBitmask: number, formFactor: string) {
-      let keyman = (<KeymanBase> window['keyman']);
-      let osk = keyman.osk;
+    static buildDefaultLayout(PVK, kbdBitmask: number, formFactor: string): LayoutFormFactor {
+      let keyman = com.keyman.singleton;
       let util = keyman.util;
 
       // Build a layout using the default for the device
@@ -110,11 +122,11 @@ namespace com.keyman.osk {
       }
 
       // Clone the default layout object for this device
-      var layout=util.deepCopy(Layouts.dfltLayout[layoutType]);
+      var layout: LayoutFormFactor = util.deepCopy(Layouts.dfltLayout[layoutType]);
 
       var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
-      var i, j, k, m, row, rows, key, keys;
-      var chiral: boolean = (kbdBitmask & osk.modifierBitmasks.IS_CHIRAL) != 0;
+      var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
+      var chiral: boolean = (kbdBitmask & VisualKeyboard.modifierBitmasks.IS_CHIRAL) != 0;
 
       var kmw10Plus = !(typeof keyLabels == 'undefined' || !keyLabels);
       if(!kmw10Plus) {
@@ -165,7 +177,7 @@ namespace com.keyman.osk {
 
       if(kmw10Plus && formFactor != 'desktop') { // KLS exists, so we know the exact layer set.
         // Find the SHIFT key...
-        var shiftKey = null;
+        var shiftKey: LayoutKey = null;
 
         rows = layers[0]['row'];
         for(var r=0; r < rows.length; r++) {
@@ -190,7 +202,7 @@ namespace com.keyman.osk {
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
             var specialChar = Layouts.modifierSpecials[layerID];
-            shiftKey['sk'].push(new com.keyman.OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
           }
         } else {
           // Seriously, this should never happen.  It's here for the debugging log only.
@@ -211,20 +223,17 @@ namespace com.keyman.osk {
       }
 
       // *** Step 2: Layer objects now exist; time to fill them with the appropriate key labels and key styles ***
-      for(n=0; n<layers.length; n++)
-      {
-        var layer=layers[n], kx, shiftKey=null, nextKey=null, allText='';
-        var capsKey = null, numKey = null, scrollKey = null;  // null if not in the OSK layout.
+      for(n=0; n<layers.length; n++) {
+        var layer=layers[n], kx, shiftKey: LayoutKey = null, nextKey=null, allText='';
+        var capsKey: LayoutKey = null, numKey: LayoutKey = null, scrollKey: LayoutKey = null;  // null if not in the OSK layout.
         var layerSpec = keyLabels[layer['id']];
         var isShift = layer['id'] == 'shift' ? 1 : 0;
         var isDefault = layer['id'] == 'default' || isShift ? 1 : 0;
 
         rows=layer['row'];
-        for(i=0; i<rows.length; i++)
-        {
+        for(i=0; i<rows.length; i++) {
           keys=rows[i]['key'];
-          for(j=0; j<keys.length; j++)
-          {
+          for(j=0; j<keys.length; j++) {
             key=keys[j];
             kx=Layouts.dfltCodes.indexOf(key['id']);
 
@@ -238,16 +247,17 @@ namespace com.keyman.osk {
               // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
               // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
               if(isDefault) {
-                if((key['text'] == '' || typeof key['text'] == 'undefined') &&  key['id'] != 'K_SPACE' && kx+65 * isShift < Layouts.dfltText.length) {
-                  key['text']=Layouts.dfltText[kx+65*isShift];
+                if(key['id'] != 'K_SPACE' && kx+65 * isShift < Layouts.dfltText.length && key['text'] !== null) {
+                  key['text'] = key['text'] || Layouts.dfltText[kx+65*isShift];
                 }
               }
             }
 
             // Leave any unmarked key caps as null strings
-            if(typeof(key['text']) == 'undefined') { 
-              key['text']='';
+            if(key['text'] !== null) {
+              key['text'] = key['text'] || '';
             }
+
             // Detect important tracking keys.
             switch(key['id']) {
               case "K_SHIFT":
@@ -309,7 +319,7 @@ namespace com.keyman.osk {
      * Description  Get name of layer from code, where the modifer order is determined by ascending bit-flag value.
      */
     static getLayerId(m: number): string {
-      let modifierCodes = (<KeymanBase> window['keyman']).osk.modifierCodes;
+      let modifierCodes = VisualKeyboard.modifierCodes;
 
       var s='';
       if(m == 0) {
@@ -345,10 +355,10 @@ namespace com.keyman.osk {
      * @param   {Object=}   keyLabels
      * @return  {boolean}
      */
-    static emulatesAltGr(keyLabels: KLS): boolean { // TODO:  typing for keyLabels (corresponds to KLS)
+    static emulatesAltGr(keyLabels?: KLS): boolean { // TODO:  typing for keyLabels (corresponds to KLS)
       var layers;
       let keyman = <KeymanBase> window['keyman'];
-      let modifierCodes = keyman.osk.modifierCodes;
+      let modifierCodes = VisualKeyboard.modifierCodes;
 
       // If we're not chiral, we're not emulating.
       if(!keyman.keyboardManager.isChiral()) {

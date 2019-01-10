@@ -234,12 +234,12 @@ namespace com.keyman {
     
       // Force display of OSK for touch input device, or if a CJK keyboard, to ensure visibility of pick list
       if(device.touchable) {
-        osk._Enabled=1;
+        osk._Enabled = true;
       } else {
         // Conditionally show the OSK when control receives the focus
         if(osk.ready) {
           if(this.keyman.keyboardManager.isCJK()) {
-            osk._Enabled=1;
+            osk._Enabled = true;
           }
           if(osk._Enabled) {
             osk._Show();
@@ -473,7 +473,8 @@ namespace com.keyman {
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
     _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
-      var s = new com.keyman.KeyEvent();
+      var s = new KeyEvent();
+      let VisualKeyboard = osk.VisualKeyboard;
 
       e = this.keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       s.Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
@@ -493,14 +494,14 @@ namespace com.keyman {
         return null;
       }
 
-      var osk = this.keyman.osk, activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+      var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
 
       if(activeKeyboard && activeKeyboard['KM']) {
         // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
-        if(s.Lcode != osk.keyCodes['K_SPACE']) {
+        if(s.Lcode != VisualKeyboard.keyCodes['K_SPACE']) {
           // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
           // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-          var mappedChar: string = osk.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+          var mappedChar: string = com.keyman.singleton.osk.vkbd.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
           if(mappedChar) {
             s.Lcode = mappedChar.charCodeAt(0);
           } // No 'else' - avoid blocking modifier keys, etc.
@@ -511,20 +512,21 @@ namespace com.keyman {
       var prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
+      let keyCodes = VisualKeyboard.keyCodes;
       switch(s.Lcode) {
-        case osk.keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
-        case osk.keyCodes['K_LCTRL']:
-        case osk.keyCodes['K_RCTRL']:
-        case osk.keyCodes['K_CONTROL']:
-        case osk.keyCodes['K_LCONTROL']:
-        case osk.keyCodes['K_RCONTROL']:
+        case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+        case keyCodes['K_LCTRL']:
+        case keyCodes['K_RCTRL']:
+        case keyCodes['K_CONTROL']:
+        case keyCodes['K_LCONTROL']:
+        case keyCodes['K_RCONTROL']:
           ctrlEvent = true;
           break;
-        case osk.keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
-        case osk.keyCodes['K_RMENU']:
-        case osk.keyCodes['K_ALT']:
-        case osk.keyCodes['K_LALT']:
-        case osk.keyCodes['K_RALT']:
+        case keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+        case keyCodes['K_RMENU']:
+        case keyCodes['K_ALT']:
+        case keyCodes['K_LALT']:
+        case keyCodes['K_RALT']:
           altEvent = true;
           break;
       }
@@ -546,14 +548,15 @@ namespace com.keyman {
 
       curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
+      let modifierCodes = VisualKeyboard.modifierCodes;
       if(e.getModifierState("Control")) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
-          (e.location == 1 ? osk.modifierCodes['LCTRL'] : osk.modifierCodes['RCTRL']) : // Condition 1
+          (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
           prevModState & 0x0003);                                                       // Condition 2
       }
       if(e.getModifierState("Alt")) {
         curModState |= ((e.location != 0 && altEvent) ? 
-          (e.location == 1 ? osk.modifierCodes['LALT'] : osk.modifierCodes['RALT']) :   // Condition 1
+          (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
           prevModState & 0x000C);                                                       // Condition 2
       }
 
@@ -561,21 +564,21 @@ namespace com.keyman {
       s.Lstates = 0;
       
       if(e.getModifierState("CapsLock")) {
-        s.Lstates = osk.modifierCodes['CAPS'];
+        s.Lstates = modifierCodes['CAPS'];
       } else {
-        s.Lstates = osk.modifierCodes['NO_CAPS'];
+        s.Lstates = modifierCodes['NO_CAPS'];
       }
 
       if(e.getModifierState("NumLock")) {
-        s.Lstates |= osk.modifierCodes['NUM_LOCK'];
+        s.Lstates |= modifierCodes['NUM_LOCK'];
       } else {
-        s.Lstates |= osk.modifierCodes['NO_NUM_LOCK'];
+        s.Lstates |= modifierCodes['NO_NUM_LOCK'];
       }
 
       if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
-        s.Lstates |= osk.modifierCodes['SCROLL_LOCK'];
+        s.Lstates |= modifierCodes['SCROLL_LOCK'];
       } else {
-        s.Lstates |= osk.modifierCodes['NO_SCROLL_LOCK'];
+        s.Lstates |= modifierCodes['NO_SCROLL_LOCK'];
       }
 
       // We need these states to be tracked as well for proper OSK updates.
@@ -595,32 +598,33 @@ namespace com.keyman {
       }
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-      var altGrMask = osk.modifierCodes['RALT'] | osk.modifierCodes['LCTRL'];
+      var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
       if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
         // We just released AltGr - make sure it's all released.
         curModState &= ~ altGrMask;
       }
       // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-      if(curModState & osk.modifierCodes['RALT']) {
-        curModState &= ~osk.modifierCodes['LCTRL'];
+      if(curModState & modifierCodes['RALT']) {
+        curModState &= ~modifierCodes['LCTRL'];
       }
 
+      let modifierBitmasks = VisualKeyboard.modifierBitmasks;
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
       if(this.keyman.keyboardManager.isChiral()) {
-        s.Lmodifiers = curModState & osk.modifierBitmasks.CHIRAL;
+        s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
         // AltGr / Right-alt simulation.
-        if(osk.emulatesAltGr() && (s.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM']) {
-          s.Lmodifiers ^= osk.modifierBitmasks['ALT_GR_SIM'];
-          s.Lmodifiers |= osk.modifierCodes['RALT'];
+        if(osk.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= modifierCodes['RALT'];
         }
       } else {
         // No need to sim AltGr here; we don't need chiral ALTs.
         s.Lmodifiers = 
           (curModState & 0x10) | // SHIFT
-          ((curModState & (osk.modifierCodes['LCTRL'] | osk.modifierCodes['RCTRL'])) ? 0x20 : 0) | 
-          ((curModState & (osk.modifierCodes['LALT'] | osk.modifierCodes['RALT']))   ? 0x40 : 0); 
+          ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) | 
+          ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
@@ -685,7 +689,7 @@ namespace com.keyman {
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
           this.keyman.keyboardManager.notifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
           if(!util.device.touchable) {
-            return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+            return osk.vkbd._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
             return true;
           }
@@ -693,7 +697,7 @@ namespace com.keyman {
 
       if(Levent.LmodifierChange) {
         this.keyman.keyboardManager.notifyKeyboard(0,Levent.Ltarg,1); 
-        osk._UpdateVKShift(Levent, 0, 1);
+        osk.vkbd._UpdateVKShift(Levent, 0, 1);
       }
 
       if(!window.event) {
@@ -713,7 +717,7 @@ namespace com.keyman {
 
         var LeventMatched=0;
         /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-        var Lbase=this.keyman.keyMapManager.languageMap[osk._BaseLayout];
+        var Lbase=this.keyman.keyMapManager.languageMap[com.keyman.osk.Layouts._BaseLayout];
         if(Lbase && Lbase['k'+Levent.Lcode]) {
           Levent.Lcode=Lbase['k'+Levent.Lcode];
         }
@@ -790,7 +794,7 @@ namespace com.keyman {
       if(typeof((Levent.Ltarg as HTMLElement).base) != 'undefined') {
         // Simulated touch elements have no default text-processing - we need to rely on a strategy similar to
         // that of the OSK here.
-        var ch = osk.defaultKeyOutput('',Levent.Lcode,Levent.Lmodifiers,false,Levent.Ltarg);
+        var ch = osk.vkbd.defaultKeyOutput('',Levent.Lcode,Levent.Lmodifiers,false,Levent.Ltarg);
         if(ch) {
           kbdInterface.output(0, Levent.Ltarg, ch);
           return false;
@@ -909,7 +913,7 @@ namespace com.keyman {
         case 145:
           keyboardManager.notifyKeyboard(Levent.Lcode,Levent.Ltarg,0);
           if(!this.keyman.util.device.touchable) {
-            return osk._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+            return osk.vkbd._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
           } else {
             return true;
           }
@@ -917,7 +921,7 @@ namespace com.keyman {
       
       if(Levent.LmodifierChange){
         keyboardManager.notifyKeyboard(0,Levent.Ltarg,0); 
-        osk._UpdateVKShift(Levent, 0, 1);  // I2187
+        osk.vkbd._UpdateVKShift(Levent, 0, 1);  // I2187
       }
       
       return false;

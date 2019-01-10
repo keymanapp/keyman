@@ -31,8 +31,9 @@ namespace com.keyman.osk {
         // Display build only if touching menu, space *and* one other point on screen (build 369)
         if(e.touches.length > 2) {
           var sX=e.touches[1].pageX,sY=e.touches[1].pageY;
-          if(sX > osk.spaceBar.offsetLeft && sX < osk.spaceBar.offsetLeft+osk.spaceBar.offsetWidth &&
-            sY > osk.spaceBar.offsetTop && sY < osk.spaceBar.offsetTop+osk.spaceBar.offsetHeight) {
+          let spaceBar = osk.vkbd.spaceBar;
+          if(sX > spaceBar.offsetLeft && sX < spaceBar.offsetLeft+spaceBar.offsetWidth &&
+            sY > spaceBar.offsetTop && sY < spaceBar.offsetTop+spaceBar.offsetHeight) {
               osk.showBuild();
             }
         }
@@ -210,7 +211,7 @@ namespace com.keyman.osk {
 
       var menu=this.lgList, m2=<HTMLElement>menu.firstChild, m3=<HTMLElement>m2.firstChild,
         barWidth=0,s=menu.style,mx=<HTMLElement>menu.childNodes[1],
-        maxHeight=window.innerHeight-osk.lgKey.offsetHeight-16,
+        maxHeight=window.innerHeight-osk.vkbd.lgKey.offsetHeight-16,
         nItems=m3.childNodes.length+nKbds-1,      // Number of (visible) keyboard selectors
         itemHeight=(<HTMLElement>m3.firstChild.firstChild).offsetHeight,
         menuHeight=nItems*itemHeight;
@@ -227,7 +228,7 @@ namespace com.keyman.osk {
       }
 
       // Explicitly set position and height
-      s.left=util._GetAbsoluteX(osk.lgKey)+'px';
+      s.left=util._GetAbsoluteX(osk.vkbd.lgKey)+'px';
       if(menuHeight > maxHeight) {
         menuHeight=maxHeight;
       }
@@ -505,7 +506,7 @@ namespace com.keyman.osk {
 
       let languageMenu = this;
       if(this.lgList) {
-        osk.highlightKey(osk.lgKey.firstChild,false);
+        osk.vkbd.highlightKey(<HTMLElement> osk.vkbd.lgKey.firstChild,false);
         this.lgList.style.visibility='hidden';
 
         window.setTimeout(function(){

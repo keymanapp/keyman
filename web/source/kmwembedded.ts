@@ -1,4 +1,7 @@
+// Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+// References the base Keyman object (and consequently, the rest of the core objects).
+/// <reference path="kmwbase.ts" />
 
 // KeymanWeb 10.0
 // Copyright 2017 SIL International
@@ -9,9 +12,173 @@
 /*                                       */
 /*****************************************/
 
+namespace com.keyman.osk {
+    // Send the subkey array to iOS, with centre,top of base key position
+  /**
+   * Create a popup key array natively 
+   * 
+   * @param {Object}  key   base key element
+   */            
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key) { 
+    let util = com.keyman.singleton.util;       
+    if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
+      var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
+          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(this.kbdDiv);      
+      
+      if(util.device.formFactor == 'phone') {
+        this.prependBaseKey(key);
+      }
+
+      this.popupBaseKey = key;
+      this.popupPending=true;      
+      window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+    }
+  };
+
+  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: HTMLElement, keyName: string, keyDown: boolean) {
+    let keyman = com.keyman.singleton;
+
+    if(keyName.indexOf('K_LOPT') >= 0) {
+      if(keyDown) {
+        this.menuEvent = e;
+        if(typeof keyman['showKeyboardList'] == 'function') {
+          keyman['showKeyboardList']();
+        }
+      } else {
+        if(this.menuEvent) {
+          this.highlightKey(this.menuEvent, false);
+        }
+        if(typeof(window['menuKeyUp']) == 'function') {
+          window['menuKeyUp']();
+        }
+        this.menuEvent = null;
+      }
+    } else if(keyName.indexOf('K_ROPT') >= 0) {
+      if(keyDown) {
+        this.highlightKey(e,false);            
+        if(typeof keyman['hideKeyboard'] == 'function') {
+          keyman['hideKeyboard']();
+        }
+      }
+    }
+  };
+
+  // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
+  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key, on) {
+    let util = com.keyman.singleton.util;
+    var tip = this.keytip,
+        showPreview = window['oskCreateKeyPreview'],
+        clearPreview = window['oskClearKeyPreview'];
+
+    if(tip == null || (key == tip.key && on == tip.state)) {
+      return;
+    }
+
+    if(on && (typeof showPreview == 'function')) {
+      var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
+          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(this.kbdDiv), kc;
+
+      // Find key text element
+      for(var i=0; i<key.childNodes.length; i++) {
+        kc = key.childNodes[i];
+        if(util.hasClass(kc,'kmw-key-text')) {
+          break;
+        }
+      }
+        
+      if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
+        showPreview(xBase,yBase,key.offsetWidth,key.offsetHeight,kc.innerHTML);
+      }
+    } else if(!on && (typeof clearPreview == 'function')) {
+      if(this.touchCount == 0 || key == null) {
+        clearPreview();
+      }
+    }
+
+    tip.key = key;
+    tip.state = on;
+  };
+
+  // Create a keytip (dummy call - actual keytip handled by native code)
+  VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
+    if(com.keyman.singleton.util.device.formFactor == 'phone') {
+      this.keytip = {key:null, state:false};
+    }
+  };
+
+  /**
+   * Adjust the absolute height of each keyboard element after a rotation - modified for KMEI, 13/11/14
+   *    
+   **/      
+  VisualKeyboard.prototype.adjustHeights=function(this: VisualKeyboard): boolean {
+    let keyman = com.keyman.singleton;
+    let osk = keyman.osk;
+    let _Box = osk._Box;
+    let util = keyman.util;
+    let device = util.device;
+
+    if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
+      return false;
+    }
+
+    var layers=_Box.firstChild.firstChild.childNodes,
+        nRows=layers[0].childNodes.length,
+        oskHeight=osk.getHeight(),
+        rowHeight=Math.floor(oskHeight/nRows),
+        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      rowHeight = rowHeight/window.devicePixelRatio;
+    }
+
+    oskHeight=nRows*rowHeight;
+
+    var b: HTMLElement = osk._Box, bs=b.style;
+    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    b = <HTMLElement> b.firstChild.firstChild;
+    bs=b.style;
+    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    pad = Math.round(0.15*rowHeight);
+
+    var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
+ 
+    for(nLayer=0;nLayer<layers.length; nLayer++) {
+      // Check the heights of each row, in case different layers have different row counts.
+      nRows=layers[nLayer].childNodes.length;
+      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';
+
+      for(nRow=0; nRow<nRows; nRow++) {
+        rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
+        rs.bottom=(nRows-nRow-1)*rowHeight+'px';
+        rs.maxHeight=rs.height=rowHeight+'px';
+        keys=layers[nLayer].childNodes[nRow].childNodes;
+        nKeys=keys.length;
+        for(nKey=0;nKey<nKeys;nKey++) {
+          key=keys[nKey];
+          // Must set the height of the text DIV, not the label (if any)
+          for(j=0;j<key.childNodes.length;j++) {
+            if(util.hasClass(key.childNodes[j],'kmw-key')) {
+              break;
+            }
+          }
+          ks=key.childNodes[j].style;
+          ks.bottom=rs.bottom;
+          ks.height=ks.minHeight=(rowHeight-pad)+'px';
+                          
+          // Rescale keycap labels on iPhone (iOS 7)
+          if(resizeLabels && (j > 0)) key.childNodes[0].style.fontSize='6px';
+        }
+      }
+    }
+
+    return true;
+  };
+}
+
 (function() {
   // Declare KeymanWeb and related objects
-  var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
+  var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'],device=util.device;
+  var Layouts = com.keyman.osk.Layouts;
   var kbdInterface=keymanweb['interface'];
 
   // Allow definition of application name
@@ -23,7 +190,7 @@
   // Skip full page initialization - skips native-mode only code
   keymanweb.isEmbedded = true;
 
-  osk.popupDelay = 400;  // Delay must be less than native touch-hold delay 
+  com.keyman.osk.VisualKeyboard.prototype.popupDelay = 400;  // Delay must be less than native touch-hold delay 
   
   // Set default device options
   keymanweb.setDefaultDeviceOptions = function(opt) {
@@ -199,65 +366,6 @@
    * Use rotation events to adjust OSK element positions and scaling if necessary
    */     
   keymanweb.handleRotationEvents = function() {};
-
-  /**
-   * Adjust the absolute height of each keyboard element after a rotation - modified for KMEI, 13/11/14
-   *    
-   **/      
-  osk.adjustHeights=function()
-  {        
-    if(!osk._Box || !osk._Box.firstChild || !osk._Box.firstChild.firstChild || !osk._Box.firstChild.firstChild.childNodes)
-      return false;
-    
-    var layers=osk._Box.firstChild.firstChild.childNodes,
-        nRows=layers[0].childNodes.length,
-        oskHeight=osk.getHeight(),
-        rowHeight=Math.floor(oskHeight/nRows),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
-        
-    if(device.OS == 'Android' && 'devicePixelRatio' in window) 
-      rowHeight = rowHeight/window.devicePixelRatio;
-    
-    oskHeight=nRows*rowHeight;
-
-    var b=osk._Box,bs=b.style;
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b=b.firstChild.firstChild; bs=b.style;
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    pad = Math.round(0.15*rowHeight);
-
-    var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
- 
-    for(nLayer=0;nLayer<layers.length; nLayer++)
-    {
-      // Check the heights of each row, in case different layers have different row counts.
-      nRows=layers[nLayer].childNodes.length;
-      layers[nLayer].style.height=(oskHeight+3)+'px';       
-      for(nRow=0; nRow<nRows; nRow++)
-      {                                  
-        rs=layers[nLayer].childNodes[nRow].style;
-        rs.bottom=(nRows-nRow-1)*rowHeight+'px';       
-        rs.maxHeight=rs.height=rowHeight+'px';      
-        keys=layers[nLayer].childNodes[nRow].childNodes;
-        nKeys=keys.length;     
-        for(nKey=0;nKey<nKeys;nKey++)
-        {                      
-          key=keys[nKey];
-          // Must set the height of the text DIV, not the label (if any)
-          for(j=0;j<key.childNodes.length;j++)
-            if(osk.hasClass(key.childNodes[j],'kmw-key')) break;
-          ks=key.childNodes[j].style;
-          ks.bottom=rs.bottom; 
-          ks.height=ks.minHeight=(rowHeight-pad)+'px'; 
-                          
-          // Rescale keycap labels on iPhone (iOS 7)
-          if(resizeLabels && (j > 0)) key.childNodes[0].style.fontSize='6px'; 
-        }
-      }    
-    } 
-    
-    return true;
-  };
   
   /**
    * Caret position always determined from the active (but hidden) element
@@ -273,27 +381,8 @@
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    if(osk.adjustHeights()) {
+    if(osk.vkbd.adjustHeights()) {
       osk._Load();
-    }
-  };
-
-  // Send the subkey array to iOS, with centre,top of base key position
-  /**
-   * Create a popup key array natively 
-   * 
-   * @param {Object}  key   base key element
-   */            
-  osk.touchHold = function(key)
-  {        
-    if(key.subKeys && (typeof(window['oskCreatePopup']) == 'function'))
-    {
-      var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(osk._DivVKbd)+key.offsetWidth/2,
-          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(osk._DivVKbd);      
-      
-      if(device.formFactor == 'phone') osk.prependBaseKey(key);
-      osk.popupBaseKey = key; osk.popupPending=true;      
-      window['oskCreatePopup'](key.subKeys,xBase,yBase,key.offsetWidth,key.offsetHeight);
     }
   };
 
@@ -305,79 +394,8 @@
    **/                
   keymanweb['popupVisible'] = function(isVisible)
   {
-    osk.popupVisible = isVisible;
+    osk.vkbd.popupVisible = isVisible;
   };
-
-  // Popup key highlighting (managed by device, dummy call)
-  osk.highlightSubKeys = function(k,x,y){};
-
-  // Create a keytip (dummy call - actual keytip handled by native code)
-  osk.createKeyTip = function()
-  {
-      if(device.formFactor == 'phone') osk.keytip = {key:null,state:false};
-  };
-    
-  // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
-  osk.showKeyTip = function(key,on) 
-  {  
-    var tip = osk.keytip, 
-        showPreview = window['oskCreateKeyPreview'],
-        clearPreview = window['oskClearKeyPreview'];
-
-    if(tip == null || (key == tip.key && on == tip.state)) return;  
-
-    if(on && (typeof showPreview == 'function'))
-    {
-      var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(osk._DivVKbd)+key.offsetWidth/2,
-          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(osk._DivVKbd), kc;  
-
-      // Find key text element
-      for(var i=0; i<key.childNodes.length; i++)
-      {
-        kc = key.childNodes[i];
-        if(osk.hasClass(kc,'kmw-key-text')) break;    
-      }
-        
-      if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0)
-        showPreview(xBase,yBase,key.offsetWidth,key.offsetHeight,kc.innerHTML);
-    }
-    else if(!on && (typeof clearPreview == 'function')) 
-    {           
-      if(osk.touchCount == 0 || key == null) clearPreview();
-    }
-    tip.key = key; tip.state = on;
-  };
-
-  osk.menuEvent = null;
-  osk.optionKey = function(e,keyName,keyDown)
-  {
-    if(keyName.indexOf('K_LOPT') >= 0)
-    {
-      if(keyDown)
-      {
-        osk.menuEvent = e;
-        if('showKeyboardList' in keymanweb) keymanweb['showKeyboardList']();
-      }
-      else
-      {
-        if(osk.menuEvent) osk.highlightKey(osk.menuEvent,false);
-        if(typeof(window['menuKeyUp']) == 'function') window['menuKeyUp']();
-        osk.menuEvent = null;
-      }
-    }
-    else if(keyName.indexOf('K_ROPT') >= 0)
-    {
-      if(keyDown)
-      {
-        osk.highlightKey(e,false);            
-        if('hideKeyboard' in keymanweb) keymanweb['hideKeyboard']();
-      }
-    }
-  };
-
-  // For KMEI and KMEA will always assume fonts are already installed
-  osk.waitForFonts = function(kfd,ofd){return true;};
-
 
   /**
    *  Return position of language menu key to KeymanTouch
@@ -387,18 +405,25 @@
    **/
   keymanweb['touchMenuPos'] = function()
   {
-    if(osk.lgKey == null) return '';  
-    var key=osk.lgKey;
+    if(osk.vkbd.lgKey == null) {
+      return '';
+    }
+
+    var key: HTMLElement = osk.vkbd.lgKey;
     // A CSS change of kmd-key-square from position:fixed to position:static was needed
     // for Android 4.3 to display the OSK correctly, but resulted in the position of
     // the menu key not being returned correctly.  The following line gets the 
     // key element, instead of the key-square element, fixes this.  It should be 
     // removed again when the key-square elements are all removed as planned.
-    if(typeof key.firstChild != 'undefined' && key.firstChild != null && osk.hasClass(key.firstChild,'kmw-key')) key = key.firstChild;  
+    if(typeof key.firstChild != 'undefined' && key.firstChild != null && util.hasClass(key.firstChild,'kmw-key')) {
+      key = <HTMLElement> key.firstChild;
+    }
+
     var w=key.offsetWidth, 
         h=key.offsetHeight,
-        x=util._GetAbsoluteX(key) - util._GetAbsoluteX(osk._DivVKbd) + w/2,
-        y=util._GetAbsoluteY(key) - util._GetAbsoluteY(osk._DivVKbd);
+        x=util._GetAbsoluteX(key) - util._GetAbsoluteX(osk.vkbd.kbdDiv) + w/2,
+        y=util._GetAbsoluteY(key) - util._GetAbsoluteY(osk.vkbd.kbdDiv);
+
     return x+','+y+','+w+','+h;
   };
   
@@ -409,28 +434,30 @@
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
       var origArg = keyName;
-      if(!keymanweb.keyboardManager.activeKeyboard) return false;
+      if(!keymanweb.keyboardManager.activeKeyboard || !osk.vkbd) {
+        return false;
+      }
 
       /* Clear any pending (non-popup) key */
-      osk.keyPending = null;
+      osk.vkbd.keyPending = null;
 
       // Changes for Build 353 to resolve KMEI popup key issues      
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
       
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.layerId);
+      var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.vkbd.layerId);
       keyName=t[t.length-1];
-      if(layer == 'undefined') layer=osk.layerId;
+      if(layer == 'undefined') layer=osk.vkbd.layerId;
               
-      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=osk.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=osk.vkbd.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
       var nextLayer: string;
 
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
-      if(osk.popupBaseKey && osk.popupBaseKey.key) {
+      if(osk.vkbd.popupBaseKey && osk.vkbd.popupBaseKey['key']) {
         // This is set with the base key of our current subkey elsewhere within the engine.
-        var baseKey = osk.popupBaseKey.key;
+        var baseKey = osk.vkbd.popupBaseKey['key'];
         var found = false;
 
         if(baseKey.id == keyName) {
@@ -456,24 +483,27 @@
       }
       
       // Process modifier key action
-      if(osk.selectLayer(keyName, undefined)) {
+      if(osk.vkbd.selectLayer(keyName, undefined)) {
         return true;      
       }
+
+      let VisualKeyboard = com.keyman.osk.VisualKeyboard;
+      let modifierCodes = VisualKeyboard.modifierCodes;
       
       // Check the virtual key 
-      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0,Lcode:osk.keyCodes[keyName],LisVirtualKey:true};
+      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0, Lcode: VisualKeyboard.keyCodes[keyName],LisVirtualKey:true};
 
       // Set the flags for the state keys.
-      Lkc.Lstates |= osk._stateKeys['K_CAPS']    ? osk.modifierCodes['CAPS'] : osk.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= osk._stateKeys['K_NUMLOCK'] ? osk.modifierCodes['NUM_LOCK'] : osk.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= osk._stateKeys['K_SCROLL']  ? osk.modifierCodes['SCROLL_LOCK'] : osk.modifierCodes['NO_SCROLL_LOCK'];
+      Lkc.Lstates |= osk.vkbd.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= osk.vkbd.stateKeys['K_NUMLOCK'] ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= osk.vkbd.stateKeys['K_SCROLL']  ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
 
       // Get code for non-physical keys
       if(typeof Lkc.Lcode == 'undefined') {
-          Lkc.Lcode = osk.getVKDictionaryCode(keyName);
+          Lkc.Lcode = osk.vkbd.getVKDictionaryCode(keyName);
           if (!Lkc.Lcode) {
               // Special case for U_xxxx keys
               Lkc.Lcode = 1;
@@ -485,18 +515,19 @@
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          osk.selectLayer(keyName, nextLayer);
+          osk.vkbd.selectLayer(keyName, nextLayer);
         }
         return false;
       }
 
       // Define modifiers value for sending to keyboard mapping function
       Lkc.Lmodifiers = keyShiftState;
+      let modifierBitmasks = VisualKeyboard.modifierBitmasks;
 
       // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-      if((Lkc.Lmodifiers & osk.modifierBitmasks['ALT_GR_SIM']) == osk.modifierBitmasks['ALT_GR_SIM'] && osk.emulatesAltGr()) {
-          Lkc.Lmodifiers &= ~osk.modifierBitmasks['ALT_GR_SIM'];
-          Lkc.Lmodifiers |= osk.modifierCodes['RALT'];
+      if((Lkc.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM'] && Layouts.emulatesAltGr()) {
+          Lkc.Lmodifiers &= ~modifierBitmasks['ALT_GR_SIM'];
+          Lkc.Lmodifiers |= modifierCodes['RALT'];
       }
 
       Lkc.vkCode=Lkc.Lcode;
@@ -508,7 +539,7 @@
       if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) {
         // Make sure we don't affect the current layer until the keystroke has been processed!
         if(nextLayer) {
-          osk.selectLayer(keyName, nextLayer);
+          osk.vkbd.selectLayer(keyName, nextLayer);
         }
 
         return true;
@@ -518,7 +549,7 @@
 
       if(nextLayer) {
         // Final nextLayer check.
-        osk.selectLayer(keyName, nextLayer);
+        osk.vkbd.selectLayer(keyName, nextLayer);
       }
 
       return true;
@@ -538,7 +569,7 @@
     }
 
     // Clear any pending (non-popup) key
-    osk.keyPending = null;
+    osk.vkbd.keyPending = null;
             
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
@@ -579,15 +610,16 @@
    *  @return {boolean}         true if key code successfully processed
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
-    if (code == osk.keyCodes.K_SPACE) {
+    let VisualKeyboard = com.keyman.osk.VisualKeyboard;
+    if (code == VisualKeyboard.keyCodes.K_SPACE) {
         kbdInterface.output(0, Lelem, ' ');
         return true;
     }
-    else if (code == osk.keyCodes.K_ENTER) {
+    else if (code == VisualKeyboard.keyCodes.K_ENTER) {
         kbdInterface.output(0, Lelem, '\n');
         return true;
     }
-    var ch = osk.defaultKeyOutput(keyName, code, shift, false);
+    var ch = osk.vkbd.defaultKeyOutput(keyName, code, shift, false);
     if(ch) {
         kbdInterface.output(0, Lelem, ch);
         return true;

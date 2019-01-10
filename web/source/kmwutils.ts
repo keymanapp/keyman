@@ -241,6 +241,17 @@ namespace com.keyman {
     }
 
     /**
+     * More reliable way of identifying  element class
+     * @param   {Object}  e HTML element
+     * @param   {string}  name  class name
+     * @return  {boolean}
+     */
+    hasClass(e: HTMLElement, name: string): boolean {
+      var className = " " + name + " ";
+      return (" " + e.className + " ").replace(/[\n\t\r\f]/g, " ").indexOf(className) >= 0;
+    }
+
+    /**
      * Function     setOption
      * Scope        Public
      * @param       {string}    optionName  Name of option
@@ -374,6 +385,26 @@ namespace com.keyman {
       return e;
     }
 
+        /**
+     * Function     _CancelMouse
+     * Scope        Private
+     * @param       {Object}      e     event
+     * @return      {boolean}           always false
+     * Description  Closes mouse click event
+     */
+    _CancelMouse=function(e: MouseEvent) {
+      e = com.keyman.singleton._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
+      if(e && e.preventDefault) {
+        e.preventDefault();
+      }
+      if(e) {
+        e.cancelBubble=true;
+        e.returnValue=false;
+      } // I2409 - Avoid focus loss for visual keyboard events
+      
+      return false;
+    }
+
     createElement = this._CreateElement;
                 
     /**
@@ -441,7 +472,7 @@ namespace com.keyman {
      * @param       {number=}     d             default value if NaN   
      * @return      {number}                    integer value of style
      */       
-    getStyleInt(e: HTMLElement, s: string, d:number): number {
+    getStyleInt(e: HTMLElement, s: string, d?: number): number {
       var x=parseInt(this.getStyleValue(e,s),10);
       if(!isNaN(x)) {
         return x;
