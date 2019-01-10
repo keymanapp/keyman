@@ -139,8 +139,6 @@ class LMLayerWorker {
       rightContextCodeUnits: 0
     };
 
-    console.log({ modelCode })
-
     if (typeof modelCode === 'string') {
       console.warn("Deprecated: model defined as a string.")
       // Deprecated! The model should not be source code.

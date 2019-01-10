@@ -25,9 +25,9 @@ describe('LMLayerWorker', function () {
         ]),
         capabilities: defaultCapabilities()
       }));
-      assert(fakePostMessage.calledOnceWith(sinon.match({
-        message: 'ready'
-      })));
+      sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
+        message: 'ready',
+      });
 
       // Now predict! We should get the suggestions back.
       worker.onMessage(createMessageEventWithData({
