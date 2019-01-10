@@ -33,18 +33,11 @@
  */
 type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
 
+
 /**
  * The valid incoming message kinds.
  */
 type IncomingMessageKind = 'initialize' | 'predict';
-
-/**
- * The valid outgoing message kinds.
- */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-
-
-
 
 /**
  * The structure of an initialization message. It should include the model (either in
@@ -73,9 +66,15 @@ interface PredictMessage {
 }
 
 /**
+ * The valid outgoing message kinds.
+ */
+type OutgoingMessageKind = 'ready' | 'suggestions';
+
+/**
  * The structure of the message back to the keyboard.
  */
 interface ReadyMessage {
+  message: 'ready';
   configuration: Configuration;
 }
 
