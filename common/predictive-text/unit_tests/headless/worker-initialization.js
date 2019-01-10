@@ -104,13 +104,13 @@ describe('LMLayerWorker', function() {
         }
       }));
 
-      assert(fakePostMessage.calledOnceWith(sinon.match({
+      sinon.assert.calledWithMatch(fakePostMessage, {
         message: 'ready',
         configuration: {
           leftContextCodeUnits: maxCodeUnits,
           rightContextCodeUnits: 0,
         }
-      })), lastMessageAsString(fakePostMessage));
+      });
     });
   });
 
@@ -122,14 +122,5 @@ describe('LMLayerWorker', function() {
   // TODO: Use dummyModel defined in unit_tests/helpers.js
   function dummyModel() {
     return 'return {model: {}, configuration: {}}';
-  }
-
-  /**
-   * Returns the last message received in a pretty string format. 
-   * @param {sinon.SinonFake} fakePostMessage 
-   * @returns {string}
-   */
-  function lastMessageAsString(fakePostMessage) {
-    return JSON.stringify(fakePostMessage.lastCall.args[0], null, 2);
   }
 });
