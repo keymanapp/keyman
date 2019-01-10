@@ -36,11 +36,16 @@ describe('LMLayerWorker', function () {
         transform: zeroTransform(),
         context: emptyContext()
       }));
-      assert(fakePostMessage.calledOnceWith(sinon.match({
+      sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'suggestions',
         // TODO: token
-        suggestions: [suggestion]
-      })));
+        suggestions: sinon.match.array.deepEquals([suggestion])
+      });
+    });
+
+    afterEach(function () {
+      // Restore all fakes.
+      sinon.restore();
     });
   });
 
