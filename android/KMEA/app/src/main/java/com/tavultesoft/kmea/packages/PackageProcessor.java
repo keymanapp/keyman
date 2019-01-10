@@ -244,9 +244,9 @@ public class PackageProcessor {
       JSONObject oldInfoJSON = loadPackageInfo(oldPath);
       String originalVersion = getPackageVersion(oldInfoJSON);
 
-      if(KMManager.compareVersions(newVersion, originalVersion) == 1) {
+      if(FileUtils.compareVersions(newVersion, originalVersion) == FileUtils.VERSION_GREATER) {
         return 1;
-      } else if(KMManager.compareVersions(newVersion, originalVersion) == 0){
+      } else if(FileUtils.compareVersions(newVersion, originalVersion) == FileUtils.VERSION_EQUAL){
         return 0;
       } else {
         return -1;
