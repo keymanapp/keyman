@@ -45,6 +45,8 @@ class LMLayerWorker {
    */
   static models: {[key: string]: WorkerInternalModelConstructor} = {};
 
+  private model?: WorkerInternalModel;
+
   /**
    * By default, it's self.postMessage(), but can be overridden
    * so that this can be tested **outside of a Worker**.
@@ -77,6 +79,16 @@ class LMLayerWorker {
     // We must have gotten a message!
     if (!message) {
       throw new Error(`Missing required 'message' attribute: ${event.data}`)
+    }
+
+    // TODO: state pattern
+    // TODO: update worker-communication-protocol document.
+    if (message === 'predict' && this.model) {
+      let {transform, context} = message.data;
+      this.cast('suggestions', {
+        suggestions: this.model.predict(transform, context)
+      })
+      return;
     }
 
     // ...that message must have been 'initialize'!
@@ -121,17 +133,24 @@ class LMLayerWorker {
    * @param capabilities Capabilities on offer from the keyboard.
    */
   private loadModel(modelCode: any, capabilities: Capabilities) {
-    let model: ModelDescription = null;
+    let model = null;
     let configuration: Configuration = {
       leftContextCodeUnits: 0,
       rightContextCodeUnits: 0
     };
 
     if (typeof modelCode === 'string') {
+      console.warn("Deprecated: model defined as a string.")
       // Deprecated! The model should not be source code.
       let result = new Function('configuration', modelCode)(capabilities);
       model = result.model;
       configuration = result.configuration;
+    } else if (modelCode.type === 'dummy') {
+      this.model = new LMLayerWorker.models.DummyModel(capabilities, {
+        futureSuggestions: modelCode.futureSuggestions
+      });
+    } else {
+      throw new Error('Invalid model');
     }
     // TODO: when model is object with kind 'wordlist' or 'fst'
 

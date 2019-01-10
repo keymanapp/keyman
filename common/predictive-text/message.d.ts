@@ -61,8 +61,13 @@ interface Capabilities {
   supportsDeleteRight?: false,
 }
 
-// TODO: Define what a valid model description is!
-interface ModelDescription {}
+/**
+ * TODO: discriminated union of different model types.
+ */
+interface ModelDescription {
+  type: 'dummy';
+  futureSuggestions?: Suggestion[][];
+}
 
 /**
  * Configuration of the LMLayer, sent back to the keyboard.

@@ -38,16 +38,16 @@ type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
  */
 type OutgoingMessageKind = 'ready' | 'suggestions';
 
+
 /**
  * The structure of an initialization message. It should include the model (either in
  * source code or parameter form), as well as the keyboard's capabilities.
  */
 interface InitializeMessage {
   /**
-   * The model, and its configuration.
-   * TODO: write a description of what this actually is!
+   * The model type, and all of its parameters.
    */
-  model: any;
+  model: ModelDescription;
   /**
    * The configuration that the keyboard can offer to the model.
    */
@@ -76,7 +76,7 @@ interface WorkerInternalModel {
 interface WorkerInternalModelConstructor {
   /**
    * WorkerInternalModel instances are all given the keyboard's
-   * capabilities.
+   * capabilities, plus any parameters they require.
    */
-  new(capabilities: Capabilities): WorkerInternalModel;
+  new(capabilities: Capabilities, ...modelParameters: any[]): WorkerInternalModel;
 }
