@@ -19,10 +19,10 @@ describe('LMLayer using dummy model', function () {
       // Tower of promises!
       return lmLayer.initialize(
         capabilities,
-        { model: {
+        {
             type: 'dummy',
             futureSuggestions: iGotDistractedByHazel()
-        }}
+        }
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

@@ -9,12 +9,12 @@ describe('LMLayer', function () {
   });
 
   describe('#initialize()', function () {
-    it('should yield a reasonable configuration', function () {
+    it.skip('should yield a reasonable configuration', function () {
       let maxLeftContext = 64;
       let lmLayer = new LMLayer();
       return lmLayer.initialize(
         { maxLeftContextCodeUnits: maxLeftContext },
-        { model: { kind: 'wordlist', words: ['foo', 'bar']} }
+        { model: { type: 'dummy' } }
       ).then(function (configuration) {
         assert.isAtMost(configuration.leftContextCodeUnits, maxLeftContext);
         assert.propertyVal(configuration, 'rightContextCodeUnits', 0);
