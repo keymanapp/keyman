@@ -62,26 +62,7 @@ class LMLayerWorker {
     postMessage: null,
   }) {
     this._postMessage = options.postMessage || postMessage;
-
-    // Initial state.
-    this.state = {
-      name: 'uninitialized',
-      handleMessage: (payload) => {
-        // ...that message must have been 'initialize'!
-        if (payload.message !== 'initialize') {
-          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
-        }
-
-        // TODO: validate configuration?
-        let {model, configuration} = this.loadModel(
-          // TODO: validate configuration, and provide valid configuration in tests.
-          payload.model, payload.capabilities
-        );
-
-        this.transitionToReadyState(model);
-        this.cast('ready', { configuration });
-      }
-    };
+    this.setupInitialState();
   }
 
   /**
@@ -170,8 +151,38 @@ class LMLayerWorker {
   }
 
   /**
-   * With a model, changes the current state to the 'ready'
-   * @param model 
+   * Sets the initial state, i.e., `uninitialized`.
+   * This state only handles `initialized` messages, and will
+   * transition to the `ready` state once it receives a model
+   * description and capabilities.
+   */
+  private setupInitialState() {
+    this.state = {
+      name: 'uninitialized',
+      handleMessage: (payload) => {
+        // ...that message must have been 'initialize'!
+        if (payload.message !== 'initialize') {
+          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
+        }
+
+        // TODO: validate configuration?
+        let {model, configuration} = this.loadModel(
+          // TODO: validate configuration, and provide valid configuration in tests.
+          payload.model, payload.capabilities
+        );
+
+        this.transitionToReadyState(model);
+        this.cast('ready', { configuration });
+      }
+    };
+  }
+
+  /**
+   * Sets the state to `ready`. This requires a
+   * fully-instantiated model. The `ready` state only responds
+   * to `predict` message, and is an accepting state.
+   *
+   * @param model The initialized language model.
    */
   private transitionToReadyState(model: WorkerInternalModel) {
     this.state = {
