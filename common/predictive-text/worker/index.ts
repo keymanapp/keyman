@@ -84,7 +84,7 @@ class LMLayerWorker {
     // TODO: state pattern
     // TODO: update worker-communication-protocol document.
     if (message === 'predict' && this.model) {
-      let {transform, context} = message.data;
+      let {transform, context} = event.data;
       this.cast('suggestions', {
         suggestions: this.model.predict(transform, context)
       })
@@ -138,6 +138,8 @@ class LMLayerWorker {
       leftContextCodeUnits: 0,
       rightContextCodeUnits: 0
     };
+
+    console.log({ modelCode })
 
     if (typeof modelCode === 'string') {
       console.warn("Deprecated: model defined as a string.")

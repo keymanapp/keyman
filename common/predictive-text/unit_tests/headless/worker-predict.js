@@ -32,11 +32,13 @@ describe('LMLayerWorker', function () {
       // Now predict! We should get the suggestions back.
       worker.onMessage(createMessageEventWithData({
         message: 'predict',
+        // TODO: token
         transform: zeroTransform(),
         context: emptyContext()
       }));
       assert(fakePostMessage.calledOnceWith(sinon.match({
         message: 'suggestions',
+        // TODO: token
         suggestions: [suggestion]
       })));
     });
@@ -57,7 +59,7 @@ describe('LMLayerWorker', function () {
    */
   function dummyModel(futureSuggestions) {
     return {
-      model: 'dummy',
+      type: 'dummy',
       futureSuggestions: futureSuggestions || []
     };
   }
