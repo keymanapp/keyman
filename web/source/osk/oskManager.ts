@@ -4,8 +4,13 @@
 /// <reference path="defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
-// Generates the visual keyboard specific to each keyboard.  (class="okm-osk-inner-frame")
+// Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
+
+/***
+   KeymanWeb 10.0
+   Copyright 2017 SIL International
+***/
 
 namespace com.keyman.osk {
   type MouseHandler = (this: GlobalEventHandlers, ev: MouseEvent) => any;
@@ -1281,13 +1286,13 @@ namespace com.keyman.osk {
             Ls.top=this.y+'px';
           } else {
             var el=keymanweb.domManager.getActiveElement();
-            if(this.dfltX != '') {
+            if(this.dfltX) {
               Ls.left=this.dfltX;
             } else if(typeof el != 'undefined' && el != null) {
               Ls.left=keymanweb.util._GetAbsoluteX(el) + 'px';
             }
 
-            if(this.dfltY != '') {
+            if(this.dfltY) {
               Ls.top=this.dfltY;
             } else if(typeof el != 'undefined' && el != null) {
               Ls.top=(keymanweb.util._GetAbsoluteY(el) + el.offsetHeight)+'px';
@@ -1517,80 +1522,3 @@ namespace com.keyman.osk {
     }
   }
 }
-
-/***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
-***/
-
-// // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the
-// // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
-// // load of KMW.
-// if(!window['keyman']['initialized']) {
-//   /*****************************************/
-//   /*                                       */
-//   /*   On-Screen (Visual) Keyboard Code    */
-//   /*                                       */
-//   /*****************************************/
-
-//   (function() {
-//     // Declare KeymanWeb and member objects
-//     var keymanweb=window['keyman'], osk=keymanweb['osk'], util=keymanweb['util'], device=util.device, dbg=keymanweb.debug;
-//     var Layouts = com.keyman.osk.Layouts;
-
-//     osk._Box = null;              // Main DIV for OSK
-//     osk._DivVKbd = null;
-//     osk._DivVKbdHelp = null;
-//     osk._Visible = 0;             // Whether or not actually visible
-//     osk._Enabled = 1;             // Whether or not enabled by UI
-//     osk._VShift = [];
-//     osk._VKeySpans = [];
-//     osk._VKeyDown = null;
-//     osk._VKbdContainer = null;
-//     osk._VOriginalWidth = 1;      // Non-zero default value needed
-
-//     // Additional members (mainly for touch input devices)
-//     osk.lgTimer = null;           // language switching timer
-//     osk.lgKey = null;             // language menu key element
-//     osk.hkKey = null;             // OSK hide key element
-//     osk.spaceBar = null;          // space bar key element
-//     osk.frameColor = '#ad4a28';   // KeymanWeb standard frame color
-//     osk.keyPending = null;        // currently depressed key (if any)
-//     osk.fontFamily = '';          // layout-specified font for keyboard
-//     osk.fontSize = '1em';         // layout-specified fontsize for keyboard
-//     osk.layout = null;            // reference to complete layout
-//     osk.layers = null;            // reference to layout (layers array for this device)
-//     osk.layerId = 'default';      // currently active OSK layer (if any)
-//     osk.nextLayer = 'default';    // layer to be activated after pressing key in current layer
-//     osk.layerIndex = 0;           // currently displayed layer index
-//     osk.subkeyDelayTimer = null;  // id for touch-hold delay timer
-//     osk.popupPending = false;     // Device popup pending flag
-//     osk.popupVisible = false;     // Device popup displayed
-//     osk.popupCallout = null;      // OSK popup callout element
-//     osk.styleSheet = null;        // current OSK style sheet object, if any
-//     osk.loadRetry = 0;            // counter for delayed loading, if keyboard loading prevents OSK being ready at start
-//     osk.popupDelay = 500;         // Delay must be less than native touch-hold delay (build 352)
-//     osk.currentTarget = null;     // Keep track of currently touched key when moving over keyboard
-//     osk.touchCount = 0;           // Number of active (unreleased) touch points
-//     osk.touchX = 0;               // First touch point x (to check for sliding off screen)
-//     osk.deleting = 0;             // Backspace repeat timer
-
-//     // Additional members for desktop OSK
-//     osk.x = 99;                   // last visible offset left
-//     osk.y = 0;                    // last visible offset top
-//     osk.width = 1;                // Saved width of OSK (since actual width only available if visible)
-//     osk.height = 1;               // Saved height of OSK
-//     osk.rowHeight = 1;            // Current row height in px
-//     osk.nRows = 1;                // Number of rows in each layer of current layout
-//     osk.vpScale = 1;              // Current viewport scale factor  (not valid until initialized)
-//     osk.resizeIcon = null;        // resizing icon
-//     osk.resizing = 0;             // resizing flag
-//     osk.pinImg = null;            // icon to restore OSK to default position
-//     osk.userPositioned = 0;       // Set to true(<>0) if dragged by user
-//     osk.dfltX = '';               // Left position set by page code
-//     osk.dfltY = '';               // Top position set by page code
-//     osk.keytip = null;            // Key preview (phones)
-//     osk.touchY = 0;               // First y position of touched key
-//   })();
-
-// }
