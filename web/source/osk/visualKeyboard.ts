@@ -317,7 +317,6 @@ namespace com.keyman.osk {
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId(osk);
-      // Keyman 12 goal:  convert btn['key'] to use the 'this' reference instead.
       btn['key']=this;  //attach reference to key layout spec to element
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
@@ -404,9 +403,7 @@ namespace com.keyman.osk {
       osk.setButtonClass(spec,btn);
 
       btn.id = this.getId(osk);
-
-      // Plan for Keyman 12:  swap to use the 'this' reference.
-      btn['key'] = spec;
+      btn['key'] = this;
 
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
@@ -590,12 +587,12 @@ namespace com.keyman.osk {
     // Function fields (fleshed out by kmwnative.ts and/or kmwembedded.ts)
     touchHold: (key: HTMLElement) => void;
     optionKey: (e: HTMLElement, keyName: string, keyDown: boolean) => void;
-    highlightSubKeys: (key: HTMLElement, x: number, y: number) => void = function(k,x,y) {};
+    highlightSubKeys: (key: HTMLElement, x: number, y: number) => void = this.highlightSubKeys || function(k,x,y) {};
     showKeyTip: (key: HTMLElement, on: boolean) => void;
-    drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void = function(c,w,h,e) {};
+    drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void = this.drawPreview || function(c,w,h,e) {};
     createKeyTip: () => void;
-    addCallout: (key: HTMLElement) => HTMLDivElement = function(key) {return null};
-    waitForFonts: (kfd,ofd) => boolean = function(kfd,ofd){return true;}; // Default is used by embedded.
+    addCallout: (key: HTMLElement) => HTMLDivElement = this.addCallout || function(key) {return null};
+    waitForFonts: (kfd,ofd) => boolean = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
     adjustHeights: () => boolean;
 
     //#region OSK constructor and helpers
