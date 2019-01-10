@@ -285,9 +285,6 @@ namespace com.keyman.osk {
         }
       }
 
-      // Create the key preview (for phones)
-      this.vkbd.createKeyTip();
-
       // Correct the classname for the (inner) OSK frame (Build 360)
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
         kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
@@ -296,9 +293,15 @@ namespace com.keyman.osk {
       }
       innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
 
-      // Append a stylesheet for this keyboard for keyboard specific styles
-      // or if needed to specify an embedded font
-      this.vkbd.appendStyleSheet();
+      if(this.vkbd) {
+        // Create the key preview (for phones)
+        this.vkbd.createKeyTip();
+
+        // Append a stylesheet for this keyboard for keyboard specific styles
+        // or if needed to specify an embedded font
+        this.vkbd.appendStyleSheet();
+      }
+
       if(this._Enabled) {
         this._Show();
       }
