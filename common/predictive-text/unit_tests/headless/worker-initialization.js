@@ -113,14 +113,4 @@ describe('LMLayerWorker', function() {
       });
     });
   });
-
-  /**
-   * Deprecation warning: Soon, models will not be required to be passed as source code;
-   * when this happens, tests should refrain from sending source code for the model
-   * parameter.
-   */
-  // TODO: Use dummyModel defined in unit_tests/helpers.js
-  function dummyModel() {
-    return 'return {model: {}, configuration: {}}';
-  }
 });
