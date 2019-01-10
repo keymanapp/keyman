@@ -1352,7 +1352,9 @@ namespace com.keyman {
     }
 
     resetContext() {
-      this.keymanweb.osk.vkbd.layerId = 'default';
+      if(this.keymanweb.osk.vkbd) {
+        this.keymanweb.osk.vkbd.layerId = 'default';
+      }
 
       this.clearDeadkeys();
       this.resetContextCache();

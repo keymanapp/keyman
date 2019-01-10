@@ -6,8 +6,8 @@ KeymanWeb.KR(new Keyboard_test_deadkeys());
 }
 function Keyboard_test_deadkeys()
 {
-  var modCodes = keyman.osk.modifierCodes;
-  var keyCodes = keyman.osk.keyCodes;
+  var modCodes = com.keyman.osk.VisualKeyboard.modifierCodes;
+  var keyCodes = com.keyman.osk.VisualKeyboard.keyCodes;
 
   this.KI="Keyboard_test_deadkeys";
   this.KN="Keyman Deadkey Stress-Tester";

@@ -1272,7 +1272,10 @@ namespace com.keyman.osk {
 
       //TODO: may need to return here for touch devices??
       Ls.display='block'; //Ls.visibility='visible';
-      this.vkbd.showLanguage();
+
+      if(this.vkbd) {
+        this.vkbd.showLanguage();
+      }
 
       if(device.formFactor == 'desktop') {
         Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';

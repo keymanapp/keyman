@@ -457,7 +457,7 @@ namespace com.keyman.osk {
       // This should be set if we're within this method... but it's best to guard against nulls here, just in case.
       if(osk.vkbd.popupBaseKey && osk.vkbd.popupBaseKey['key']) {
         // This is set with the base key of our current subkey elsewhere within the engine.
-        var baseKey = osk.vkbd.popupBaseKey['key'];
+        var baseKey: com.keyman.osk.OSKKeySpec = osk.vkbd.popupBaseKey['key'].spec;
         var found = false;
 
         if(baseKey.id == keyName) {
