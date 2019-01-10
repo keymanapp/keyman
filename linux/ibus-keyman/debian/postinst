@@ -10,7 +10,7 @@ case "$1" in
 
     if [ "x$ibuspid" != "x" ]; then
       ibususer=`ps -C ibus-daemon -o user=`
-      sudo -u $ibususer ibus restart
+      sudo -u "$ibususer" ibus restart
     fi
   ;;
 
