@@ -603,11 +603,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
                 keyboardVersions.put(kbKey, newKbVersion);
               }
 
-              if (Float.valueOf(newKbVersion) > Float.valueOf(kbVersion)) {
+              if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
                 ret++;
               }
             }
           } catch (Exception e) {
+            Log.e("KeyboardPickerActivity", "Failed to compare keyboard version. Error: " + e);
             keyboardVersions = null;
             ret = -1;
           }
@@ -654,7 +655,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
                   String newKbVersion = keyboardVersions.get(kbKey);
                   if (newKbVersion != null) {
                     keyboardVersions.put(kbKey, newKbVersion);
-                    if (Float.valueOf(newKbVersion) > Float.valueOf(kbVersion)) {
+                    if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
                       if (updateProgress == null || !updateProgress.isShowing()) {
                         updateProgress = new ProgressDialog(context);
                         updateProgress.setMessage(context.getString(R.string.updating_keyboards));

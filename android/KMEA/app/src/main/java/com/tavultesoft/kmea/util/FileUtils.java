@@ -25,6 +25,11 @@ public final class FileUtils {
   public static final int DOWNLOAD_ERROR = -1;
   public static final int DOWNLOAD_SUCCESS = 1;
 
+  public static final int VERSION_INVALID = -2;
+  public static final int VERSION_EQUAL = 0;
+  public static final int VERSION_LOWER = -1;
+  public static final int VERSION_GREATER = 1;
+
   // File extensions and file types
   public static final String JAVASCRIPT = ".js";
   public static final String TRUETYPEFONT = ".ttf";
@@ -214,6 +219,147 @@ public final class FileUtils {
       filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
+  }
+
+  /**
+   * Utility to compare two version strings
+   * @param v1 String
+   * @param v2 String
+   * @return int
+   *   -2 if v1 or v2 is invalid
+   *    0 if v1 = v2
+   *   -1 if v1 < v2
+   *    1 if v1 > v2
+   */
+  public static int compareVersions(String v1, String v2) {
+    // returns;
+
+    if (v1 == null || v2 == null) {
+      return VERSION_INVALID;
+    }
+
+    if (v1.isEmpty() || v2.isEmpty()) {
+      return VERSION_INVALID;
+    }
+
+    String[] v1Values = v1.split("\\.");
+    String[] v2Values = v2.split("\\.");
+
+    int len = (v1Values.length >= v2Values.length ? v1Values.length : v2Values.length);
+    for (int i = 0; i < len; i++) {
+      String vStr1 = "0";
+      if (i < v1Values.length) {
+        vStr1 = v1Values[i];
+      }
+
+      String vStr2 = "0";
+      if (i < v2Values.length) {
+        vStr2 = v2Values[i];
+      }
+
+      Integer vInt1 = parseInteger(vStr1);
+      Integer vInt2 = parseInteger(vStr2);
+      int iV1, iV2, iV1_, iV2_;
+
+      if (vInt1 != null) {
+        iV1 = vInt1.intValue();
+        iV1_ = 0;
+      } else {
+        iV1 = 0;
+        iV1_ = 0;
+      }
+
+      if (vInt2 != null) {
+        iV2 = vInt2.intValue();
+        iV2_ = 0;
+      } else {
+        iV2 = 0;
+        iV2_ = 0;
+      }
+
+      if (vInt1 == null) {
+        if (i != (v1Values.length - 1)) {
+          return VERSION_INVALID;
+        }
+
+        if (vStr1.toLowerCase().endsWith("b")) {
+          Integer vInt1_ = parseInteger(vStr1.substring(0, vStr1.length() - 1));
+          if (vInt1_ == null) {
+            return VERSION_INVALID;
+          }
+
+          iV1 = vInt1_.intValue();
+          iV1_ = -100;
+        } else if (vStr1.toLowerCase().endsWith("a")) {
+          Integer vInt1_ = parseInteger(vStr1.substring(0, vStr1.length() - 1));
+          if (vInt1_ == null) {
+            return VERSION_INVALID;
+          }
+
+          iV1 = vInt1_.intValue();
+          iV1_ = -200;
+        } else {
+          return VERSION_INVALID;
+        }
+      }
+
+      if (vInt2 == null) {
+        if (i != (v2Values.length - 1)) {
+          return VERSION_INVALID;
+        }
+
+        if (vStr2.toLowerCase().endsWith("b")) {
+          Integer vInt2_ = parseInteger(vStr2.substring(0, vStr2.length() - 1));
+          if (vInt2_ == null) {
+            return VERSION_INVALID;
+          }
+
+          iV2 = vInt2_.intValue();
+          iV2_ = -100;
+        } else if (vStr2.toLowerCase().endsWith("a")) {
+          Integer vInt2_ = parseInteger(vStr2.substring(0, vStr2.length() - 1));
+          if (vInt2_ == null) {
+            return VERSION_INVALID;
+          }
+
+          iV2 = vInt2_.intValue();
+          iV2_ = -200;
+        } else {
+          return VERSION_INVALID;
+        }
+      }
+
+      if (iV1 == iV2) {
+        if (iV1_ == iV2_) {
+          continue;
+        }
+        if (iV1_ < iV2_) {
+          return VERSION_LOWER;
+        }
+        if (iV1_ > iV2_) {
+          return VERSION_GREATER;
+        }
+      } else if (iV1 < iV2) {
+        return VERSION_LOWER;
+      } else if (iV1 > iV2) {
+        return VERSION_GREATER;
+      }
+    }
+
+    return VERSION_EQUAL;
+  }
+
+  private static Integer parseInteger(String s) {
+    Integer retVal = null;
+    try {
+      int i = Integer.parseInt(s);
+      retVal = new Integer(i);
+    } catch (Exception e) {
+      Log.e("FileUtils", "parseInteger Error: " + e);
+      retVal = null;
+    }
+
+    return retVal;
   }
 
   /**

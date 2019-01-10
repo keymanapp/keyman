@@ -789,14 +789,12 @@ public final class KMManager {
         String kbKey = String.format("%s_%s", languageID, keyboardID);
         HashMap<String, String> kbInfo = keyboardsInfo.get(kbKey);
         String kbVersion = "1.0";
-        if (kbInfo != null)
+        if (kbInfo != null) {
           kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
+        }
 
-        try {
-          if (kbVersion != null && compareVersions(kbVersion, latestVersion) > 0)
-            kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
-        } catch (Exception e) {
-          Log.e("KMManager", "getKeyboardState Error: " + e);
+        if (kbVersion != null && (FileUtils.compareVersions(kbVersion, latestVersion) == FileUtils.VERSION_GREATER)) {
+          kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
         }
       }
     }
@@ -848,10 +846,10 @@ public final class KMManager {
           int lastIndex = filename.toLowerCase().lastIndexOf(".js");
           String v = filename.substring(firstIndex, lastIndex);
           if (kbFileVersion != null) {
-            if (compareVersions(v, kbFileVersion) > 0) {
+            if (FileUtils.compareVersions(v, kbFileVersion) == FileUtils.VERSION_GREATER) {
               kbFileVersion = v;
             }
-          } else if (compareVersions(v, v) == 0) {
+          } else if (FileUtils.compareVersions(v, v) == FileUtils.VERSION_EQUAL) {
             kbFileVersion = v;
           }
         }
@@ -874,146 +872,6 @@ public final class KMManager {
     }
 
     return kbFileVersion;
-  }
-
-  /**
-   * Compare two version strings
-   * @param v1 String
-   * @param v2 String
-   * @return int
-   *   -2 if v1 or v2 is invalid
-   *    0 if v1 = v2
-   *   -1 if v1 < v2
-   *    1 if v1 > v2
-   */
-  public static int compareVersions(String v1, String v2) {
-    // returns;
-
-    if (v1 == null || v2 == null) {
-      return -2;
-    }
-
-    if (v1.isEmpty() || v2.isEmpty()) {
-      return -2;
-    }
-
-    String[] v1Values = v1.split("\\.");
-    String[] v2Values = v2.split("\\.");
-
-    int len = (v1Values.length >= v2Values.length ? v1Values.length : v2Values.length);
-    for (int i = 0; i < len; i++) {
-      String vStr1 = "0";
-      if (i < v1Values.length) {
-        vStr1 = v1Values[i];
-      }
-
-      String vStr2 = "0";
-      if (i < v2Values.length) {
-        vStr2 = v2Values[i];
-      }
-
-      Integer vInt1 = parseInteger(vStr1);
-      Integer vInt2 = parseInteger(vStr2);
-      int iV1, iV2, iV1_, iV2_;
-
-      if (vInt1 != null) {
-        iV1 = vInt1.intValue();
-        iV1_ = 0;
-      } else {
-        iV1 = 0;
-        iV1_ = 0;
-      }
-
-      if (vInt2 != null) {
-        iV2 = vInt2.intValue();
-        iV2_ = 0;
-      } else {
-        iV2 = 0;
-        iV2_ = 0;
-      }
-
-      if (vInt1 == null) {
-        if (i != (v1Values.length - 1)) {
-          return -2;
-        }
-
-        if (vStr1.toLowerCase().endsWith("b")) {
-          Integer vInt1_ = parseInteger(vStr1.substring(0, vStr1.length() - 1));
-          if (vInt1_ == null) {
-            return -2;
-          }
-
-          iV1 = vInt1_.intValue();
-          iV1_ = -100;
-        } else if (vStr1.toLowerCase().endsWith("a")) {
-          Integer vInt1_ = parseInteger(vStr1.substring(0, vStr1.length() - 1));
-          if (vInt1_ == null) {
-            return -2;
-          }
-
-          iV1 = vInt1_.intValue();
-          iV1_ = -200;
-        } else {
-          return -2;
-        }
-      }
-
-      if (vInt2 == null) {
-        if (i != (v2Values.length - 1)) {
-          return -2;
-        }
-
-        if (vStr2.toLowerCase().endsWith("b")) {
-          Integer vInt2_ = parseInteger(vStr2.substring(0, vStr2.length() - 1));
-          if (vInt2_ == null) {
-            return -2;
-          }
-
-          iV2 = vInt2_.intValue();
-          iV2_ = -100;
-        } else if (vStr2.toLowerCase().endsWith("a")) {
-          Integer vInt2_ = parseInteger(vStr2.substring(0, vStr2.length() - 1));
-          if (vInt2_ == null) {
-            return -2;
-          }
-
-          iV2 = vInt2_.intValue();
-          iV2_ = -200;
-        } else {
-          return -2;
-        }
-      }
-
-      if (iV1 == iV2) {
-        if (iV1_ == iV2_) {
-          continue;
-        }
-        if (iV1_ < iV2_) {
-          return -1;
-        }
-        if (iV1_ > iV2_) {
-          return 1;
-        }
-      } else if (iV1 < iV2) {
-        return -1;
-      } else if (iV1 > iV2) {
-        return 1;
-      }
-    }
-
-    return 0;
-  }
-
-  private static Integer parseInteger(String s) {
-    Integer retVal = null;
-    try {
-      int i = Integer.parseInt(s);
-      retVal = new Integer(i);
-    } catch (Exception e) {
-      retVal = null;
-    }
-
-    return retVal;
   }
 
   public static void addKeyboardEventListener(OnKeyboardEventListener listener) {

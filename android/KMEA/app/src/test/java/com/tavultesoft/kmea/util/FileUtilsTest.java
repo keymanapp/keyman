@@ -12,6 +12,41 @@ import org.robolectric.RobolectricTestRunner;
 public class FileUtilsTest {
 
   @Test
+  public void test_compareVersions() {
+    Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions(null, "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("" , "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("1.0", null));
+    Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("1.0", ""));
+    Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions(null, null));
+    Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("", ""));
+
+    Assert.assertEquals(FileUtils.VERSION_EQUAL, FileUtils.compareVersions("0.1", "0.1"));
+    Assert.assertEquals(FileUtils.VERSION_EQUAL, FileUtils.compareVersions("1.0", "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_EQUAL, FileUtils.compareVersions("1.0a", "1.0a"));
+    Assert.assertEquals(FileUtils.VERSION_EQUAL, FileUtils.compareVersions("1.0.1", "1.0.1"));
+
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("-1.0", "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("0", "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("0.1", "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("1.0", "1.0.1"));
+
+    // 1.0 alpha < 1.0 beta < 1.0
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("1.0a", "1.0b"));
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("1.0a", "1.0"));
+    Assert.assertEquals(FileUtils.VERSION_LOWER, FileUtils.compareVersions("1.0b", "1.0"));
+
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0", "-1.0"));
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0", "0"));
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0", "0.1"));
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0.1", "1.0"));
+
+    // 1.0 > 1.0 beta > 1.0 alpha
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0", "1.0b"));
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0", "1.0a"));
+    Assert.assertEquals(FileUtils.VERSION_GREATER, FileUtils.compareVersions("1.0b", "1.0a"));
+  }
+
+  @Test
   public void test_hasFontExtension() {
     String filename = "test/abc.ttf";
     Assert.assertTrue(FileUtils.hasFontExtension(filename));
