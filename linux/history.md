@@ -2,7 +2,7 @@
 
 ## 2019-01-10 11.0.105 beta
 * add icons for km-config and .kmp files (#1495)
-* restart ibus as user (#1510)
+* restart ibus as user and on gnome-shell (#1510,#1521)
 * build on xenial (#1518,#1477)
 
 ## 2019-01-02 11.0.100 beta
