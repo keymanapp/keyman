@@ -31,9 +31,9 @@
 
 /// <reference path="../message.d.ts" />
 
- /**
-  * Encapsulates all the state required for the LMLayer's worker thread.
-  */
+/**
+ * Encapsulates all the state required for the LMLayer's worker thread.
+ */
 class LMLayerWorker {
   /**
    * All of the bundled model implementations will add themselves here:
@@ -45,7 +45,12 @@ class LMLayerWorker {
    */
   static models: {[key: string]: WorkerInternalModelConstructor} = {};
 
-  private model?: WorkerInternalModel;
+  /**
+   * State pattern. This object handles onMessage().
+   * handleMessage() can transition to a different state, if
+   * necessary.
+   */
+  private state: LMLayerWorkerState;
 
   /**
    * By default, it's self.postMessage(), but can be overridden
@@ -57,6 +62,26 @@ class LMLayerWorker {
     postMessage: null,
   }) {
     this._postMessage = options.postMessage || postMessage;
+
+    // Initial state.
+    this.state = {
+      name: 'uninitialized',
+      handleMessage: (payload) => {
+        // ...that message must have been 'initialize'!
+        if (payload.message !== 'initialize') {
+          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
+        }
+
+        // TODO: validate configuration?
+        let {model, configuration} = this.loadModel(
+          // TODO: validate configuration, and provide valid configuration in tests.
+          payload.model, payload.capabilities
+        );
+
+        this.transitionToReadyState(model);
+        this.cast('ready', { configuration });
+      }
+    };
   }
 
   /**
@@ -76,35 +101,14 @@ class LMLayerWorker {
    */
   onMessage(event: MessageEvent) {
     const {message} = event.data;
-    // We must have gotten a message!
+    // Ensure the message is tagged with a valid message tag.
     if (!message) {
-      throw new Error(`Missing required 'message' attribute: ${event.data}`)
+      throw new Error(`Missing required 'message' property: ${event.data}`)
     }
-
-    // TODO: state pattern
     // TODO: update worker-communication-protocol document.
-    if (message === 'predict' && this.model) {
-      let {transform, context} = event.data;
-      this.cast('suggestions', {
-        suggestions: this.model.predict(transform, context)
-      })
-      return;
-    }
 
-    // ...that message must have been 'initialize'!
-    if (message !== 'initialize') {
-      throw new Error(`invalid message; expected 'initialize' but got ${message}`);
-    }
-
-    let payload: InitializeMessage = event.data;
-
-    let {model, configuration} = this.loadModel(
-      // TODO: validate configuration, and provide valid configuration in tests.
-      payload.model, payload.capabilities
-    );
-
-    // TODO: validate configuration?
-    this.cast('ready', { configuration });
+    // We got a message! Delegate to the current state.
+    this.state.handleMessage(event.data as IncomingMessage);
   }
 
   /**
@@ -146,7 +150,7 @@ class LMLayerWorker {
       model = result.model;
       configuration = result.configuration;
     } else if (modelCode.type === 'dummy') {
-      this.model = new LMLayerWorker.models.DummyModel(capabilities, {
+      model = new LMLayerWorker.models.DummyModel(capabilities, {
         futureSuggestions: modelCode.futureSuggestions
       });
     } else {
@@ -163,6 +167,26 @@ class LMLayerWorker {
     }
 
     return {model, configuration};
+  }
+
+  /**
+   * With a model, changes the current state to the 'ready'
+   * @param model 
+   */
+  private transitionToReadyState(model: WorkerInternalModel) {
+    this.state = {
+      name: 'ready',
+      handleMessage: (payload) => {
+        if (payload.message !== 'predict') {
+          throw new Error(`invalid message; expected 'predict' but got ${payload.message}`);
+        }
+
+        let {transform, context} = payload;
+        this.cast('suggestions', {
+          suggestions: model.predict(transform, context)
+        });
+      }
+    };
   }
 
   /**

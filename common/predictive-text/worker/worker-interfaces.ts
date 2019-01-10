@@ -34,9 +34,16 @@
 type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
 
 /**
- * The valid outgoing message types.
+ * The valid incoming message kinds.
+ */
+type IncomingMessageKind = 'initialize' | 'predict';
+
+/**
+ * The valid outgoing message kinds.
  */
 type OutgoingMessageKind = 'ready' | 'suggestions';
+
+
 
 
 /**
@@ -44,6 +51,8 @@ type OutgoingMessageKind = 'ready' | 'suggestions';
  * source code or parameter form), as well as the keyboard's capabilities.
  */
 interface InitializeMessage {
+  message: 'initialize';
+
   /**
    * The model type, and all of its parameters.
    */
@@ -55,12 +64,33 @@ interface InitializeMessage {
 }
 
 /**
+ * Message to suggestion text.
+ */
+interface PredictMessage {
+  message: 'predict';
+  transform: Transform;
+  context: Context;
+}
+
+/**
  * The structure of the message back to the keyboard.
  */
 interface ReadyMessage {
   configuration: Configuration;
 }
-interface PredictMessage {
+
+type IncomingMessage = InitializeMessage | PredictMessage;
+
+/**
+ * Represents a state in the LMLayer.
+ */
+interface LMLayerWorkerState {
+  /**
+   * Informative property. Name of the state. Currently, the LMLayerWorker can only
+   * be the following states:
+   */
+  name: 'uninitialized' | 'ready';
+  handleMessage(payload: IncomingMessage): void;
 }
 
 /**
