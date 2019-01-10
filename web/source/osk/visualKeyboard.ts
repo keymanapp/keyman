@@ -1201,10 +1201,14 @@ namespace com.keyman.osk {
 
       // Each button id is of the form <layer>-<keyCode>, e.g. 'shift-ctrl-K_Q' or 'popup-shift-K_501', etc.
       var t=e.id.split('-');
-      if(t.length < 2) return true; //shouldn't happen, but...
+      if(t.length < 2) {
+        return true; //shouldn't happen, but...
+      }
 
       // Remove popup prefix before processing keystroke (KMEW-93)
-      if(t[0] == 'popup') t.splice(0,1);
+      if(t[0] == 'popup') {
+        t.splice(0,1);
+      }
 
       if(Lelem != null) {
         // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
@@ -1218,7 +1222,7 @@ namespace com.keyman.osk {
         }
 
         if(typeof(e['key']) != 'undefined') {
-          nextLayer=e['key']['nextlayer'];
+          nextLayer=e['key'].spec['nextlayer'];
         }
         keyman.domManager.initActiveElement(Lelem);
 
@@ -1262,8 +1266,6 @@ namespace com.keyman.osk {
         kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
         //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
-
-
         // First check the virtual key, and process shift, control, alt or function keys
         Lkc = {
           Ltarg:Lelem,
@@ -1293,7 +1295,7 @@ namespace com.keyman.osk {
         }
 
         // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-        var lx=(typeof e['key'] == 'undefined' ? null : e['key']['layer']);
+        var lx=(typeof e['key'] == 'undefined' ? null : e['key'].spec['layer']);
         if(lx == null) {
           keyShiftState=this.getModifierState(layer);
         } else {
@@ -1344,8 +1346,7 @@ namespace com.keyman.osk {
           Lkc.Lcode=Lkc.vkCode;
 
           // Handle unmapped keys, including special keys
-          switch(keyName)
-          {
+          switch(keyName) {
             case 'K_CAPS':
             case 'K_NUMLOCK':
             case 'K_SCROLL':
@@ -1362,7 +1363,7 @@ namespace com.keyman.osk {
         }
 
         // Test if this key has a non-default next layer
-        let keySpec: OSKKeySpec = e['key']; // Gets key element's attached layout-specification object.
+        let keySpec: OSKKeySpec = e['key'] ? e['key'].spec : null; // Gets key element's attached layout-specification object.
         if(typeof keySpec != 'undefined' && keySpec !== null) {
           this.nextLayer = keySpec['nextlayer'];
         }
@@ -1374,6 +1375,7 @@ namespace com.keyman.osk {
         Lelem._KeymanWebSelectionStart=null;
         Lelem._KeymanWebSelectionEnd=null;
       }
+      
       keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return true;
     }
@@ -2186,9 +2188,9 @@ namespace com.keyman.osk {
         var i, 
           idx = e.id.split('-'), 
           baseId = idx[idx.length-1], 
-          layer = e['key'] && e['key']['layer'] ? e['key']['layer'] : (idx.length > 1 ? idx[0] : ''),
-          sp = e['key'] && e['key']['sp'],
-          nextlayer = e['key'] && e['key']['nextlayer'] ? e['key']['nextlayer'] : null;
+          layer = e['key'] && e['key'].spec['layer'] ? e['key'].spec['layer'] : (idx.length > 1 ? idx[0] : ''),
+          sp = e['key'] && e['key'].spec['sp'],
+          nextlayer = e['key'] && e['key'].spec['nextlayer'] ? e['key'].spec['nextlayer'] : null;
         if(typeof subKeys != 'undefined' && subKeys.length > 0 && (subKeys[0].id != baseId || subKeys[0].layer != layer)) {
           var eCopy = new OSKKeySpec(baseId, '', undefined, sp, nextlayer);  // {'id':baseId,'layer':'','key':undefined};
           if(layer != '') {
