@@ -9,8 +9,16 @@ case "$1" in
     ! ibuspid=`ps -C ibus-daemon -o pid=`
 
     if [ "x$ibuspid" != "x" ]; then
-      ibususer=`ps -C ibus-daemon -o user=`
-      sudo -u "$ibususer" ibus restart
+      # check for gnome-shell as it works differently
+      ! gspid=`ps -C gnome-shell -o pid=`
+      if [ "x$gspid" == "x" ]; then
+        ibususer=`ps -C ibus-daemon -o user=`
+        sudo -H -u "$ibususer" ibus restart
+      else
+        # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
+        ibususer=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
+        sudo -H -u "$ibususer" ibus exit
+      fi
     fi
   ;;
 
