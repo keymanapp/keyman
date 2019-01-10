@@ -6,10 +6,11 @@ case "$1" in
 
   remove)
     # Restart IBus if it is running
-    ibuspid=`ps -C ibus-daemon -o pid=`
+    ! ibuspid=`ps -C ibus-daemon -o pid=`
 
     if [ "x$ibuspid" != "x" ]; then
-      ibus restart
+      ibususer=`ps -C ibus-daemon -o user=`
+      sudo -u "$ibususer" ibus restart
     fi
   ;;
 
