@@ -487,11 +487,11 @@ namespace com.keyman.osk {
         return true;      
       }
 
-      let VisualKeyboard = com.keyman.osk.VisualKeyboard;
-      let modifierCodes = VisualKeyboard.modifierCodes;
+      let Codes = com.keyman.text.Codes;
+      let modifierCodes = Codes.modifierCodes;
       
       // Check the virtual key 
-      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0, Lcode: VisualKeyboard.keyCodes[keyName],LisVirtualKey:true};
+      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0, Lcode: Codes.keyCodes[keyName],LisVirtualKey:true};
 
       // Set the flags for the state keys.
       Lkc.Lstates |= osk.vkbd.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
@@ -522,7 +522,7 @@ namespace com.keyman.osk {
 
       // Define modifiers value for sending to keyboard mapping function
       Lkc.Lmodifiers = keyShiftState;
-      let modifierBitmasks = VisualKeyboard.modifierBitmasks;
+      let modifierBitmasks = Codes.modifierBitmasks;
 
       // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
       if((Lkc.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM'] && Layouts.emulatesAltGr()) {
@@ -610,22 +610,22 @@ namespace com.keyman.osk {
    *  @return {boolean}         true if key code successfully processed
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
-    let VisualKeyboard = com.keyman.osk.VisualKeyboard;
-    if (code == VisualKeyboard.keyCodes.K_SPACE) {
+    let Codes = com.keyman.text.Codes;
+    if (code == Codes.keyCodes.K_SPACE) {
       kbdInterface.output(0, Lelem, ' ');
       return true;
-    } else if (code == VisualKeyboard.keyCodes.K_ENTER) {
+    } else if (code == Codes.keyCodes.K_ENTER) {
       kbdInterface.output(0, Lelem, '\n');
       return true;
-    } else if (code == VisualKeyboard.keyCodes.K_TAB) {
+    } else if (code == Codes.keyCodes.K_TAB) {
       kbdInterface.output(0, Lelem, '\t');
       return true;
-    } else if (code == VisualKeyboard.keyCodes.K_BKSP) {
+    } else if (code == Codes.keyCodes.K_BKSP) {
       kbdInterface.defaultBackspace();
       return true;
-    } else if (code == VisualKeyboard.keyCodes.K_oE2) {
+    } else if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
-      if (shift == VisualKeyboard.modifierCodes['SHIFT']) {
+      if (shift == Codes.modifierCodes['SHIFT']) {
         kbdInterface.output(0, Lelem, '|');
       } else {
         kbdInterface.output(0, Lelem, '\\');
@@ -633,7 +633,7 @@ namespace com.keyman.osk {
       return true;
     }
 
-    var ch = osk.vkbd.defaultKeyOutput(keyName, code, shift, false, undefined);
+    var ch = keymanweb.textProcessor.defaultKeyOutput(keyName, code, shift, false, undefined);
     if(ch) {
       kbdInterface.output(0, Lelem, ch);
       return true;

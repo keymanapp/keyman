@@ -501,7 +501,7 @@ namespace com.keyman {
         if(s.Lcode != Codes.keyCodes['K_SPACE']) {
           // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
           // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-          var mappedChar: string = com.keyman.singleton.osk.vkbd.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+          var mappedChar: string = com.keyman.singleton.textProcessor.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
           if(mappedChar) {
             s.Lcode = mappedChar.charCodeAt(0);
           } // No 'else' - avoid blocking modifier keys, etc.
@@ -794,7 +794,7 @@ namespace com.keyman {
       if(typeof((Levent.Ltarg as HTMLElement).base) != 'undefined') {
         // Simulated touch elements have no default text-processing - we need to rely on a strategy similar to
         // that of the OSK here.
-        var ch = osk.vkbd.defaultKeyOutput('',Levent.Lcode,Levent.Lmodifiers,false,Levent.Ltarg);
+        var ch = this.keyman.textProcessor.defaultKeyOutput('',Levent.Lcode,Levent.Lmodifiers,false,Levent.Ltarg);
         if(ch) {
           kbdInterface.output(0, Levent.Ltarg, ch);
           return false;
