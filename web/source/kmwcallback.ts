@@ -1413,9 +1413,10 @@ namespace com.keyman {
      * Reset OSK shift states when entering or exiting the active element
      **/    
     resetVKShift() {
+      let processor = com.keyman.singleton.textProcessor;
       if(!this.keymanweb.uiManager.isActivating && this.keymanweb.osk.vkbd) {
-        if(this.keymanweb.osk.vkbd._UpdateVKShift) {
-          this.keymanweb.osk.vkbd._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
+        if(processor._UpdateVKShift) {
+          processor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
         }
       }
     }

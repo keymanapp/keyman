@@ -433,6 +433,8 @@ namespace com.keyman.osk {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
+      let Processor = (<KeymanBase> keymanweb).textProcessor;
+
       var origArg = keyName;
       if(!keymanweb.keyboardManager.activeKeyboard || !osk.vkbd) {
         return false;
@@ -448,7 +450,7 @@ namespace com.keyman.osk {
       keyName=t[t.length-1];
       if(layer == 'undefined') layer=osk.vkbd.layerId;
               
-      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=osk.vkbd.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=Processor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -483,7 +485,7 @@ namespace com.keyman.osk {
       }
       
       // Process modifier key action
-      if(osk.vkbd.selectLayer(keyName, undefined)) {
+      if(Processor.selectLayer(keyName)) {
         return true;      
       }
 
@@ -494,16 +496,16 @@ namespace com.keyman.osk {
       Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0, Lcode: Codes.keyCodes[keyName],LisVirtualKey:true};
 
       // Set the flags for the state keys.
-      Lkc.Lstates |= osk.vkbd.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= osk.vkbd.stateKeys['K_NUMLOCK'] ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= osk.vkbd.stateKeys['K_SCROLL']  ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
+      Lkc.Lstates |= Processor.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= Processor.stateKeys['K_NUMLOCK'] ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= Processor.stateKeys['K_SCROLL']  ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
 
       // Get code for non-physical keys
       if(typeof Lkc.Lcode == 'undefined') {
-          Lkc.Lcode = osk.vkbd.getVKDictionaryCode(keyName);
+          Lkc.Lcode = keymanweb.textProcessor.getVKDictionaryCode(keyName);
           if (!Lkc.Lcode) {
               // Special case for U_xxxx keys
               Lkc.Lcode = 1;
@@ -515,7 +517,7 @@ namespace com.keyman.osk {
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          osk.vkbd.selectLayer(keyName, nextLayer);
+          Processor.selectLayer(keyName, nextLayer);
         }
         return false;
       }
@@ -539,7 +541,7 @@ namespace com.keyman.osk {
       if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) {
         // Make sure we don't affect the current layer until the keystroke has been processed!
         if(nextLayer) {
-          osk.vkbd.selectLayer(keyName, nextLayer);
+          Processor.selectLayer(keyName, nextLayer);
         }
 
         return true;
@@ -549,7 +551,7 @@ namespace com.keyman.osk {
 
       if(nextLayer) {
         // Final nextLayer check.
-        osk.vkbd.selectLayer(keyName, nextLayer);
+        Processor.selectLayer(keyName, nextLayer);
       }
 
       return true;

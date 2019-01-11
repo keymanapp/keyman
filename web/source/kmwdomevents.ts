@@ -646,6 +646,7 @@ namespace com.keyman {
     _KeyDown: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
       var Ldv: Document, eClass='';
       var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+      let processor = this.keyman.textProcessor;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
       var kbdInterface = this.keyman['interface'];
@@ -689,7 +690,7 @@ namespace com.keyman {
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
           this.keyman.keyboardManager.notifyKeyboard(Levent.Lcode,Levent.Ltarg,1); 
           if(!util.device.touchable) {
-            return osk.vkbd._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+            return processor._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
             return true;
           }
@@ -697,7 +698,7 @@ namespace com.keyman {
 
       if(Levent.LmodifierChange) {
         this.keyman.keyboardManager.notifyKeyboard(0,Levent.Ltarg,1); 
-        osk.vkbd._UpdateVKShift(Levent, 0, 1);
+        processor._UpdateVKShift(Levent, 0, 1);
       }
 
       if(!window.event) {
@@ -877,6 +878,7 @@ namespace com.keyman {
      */       
     _KeyUp: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
       var keyboardManager = this.keyman.keyboardManager;
+      let processor = this.keyman.textProcessor;
       var osk = this.keyman.osk;
 
       var Levent = this._GetKeyEventProperties(e, false);
@@ -913,7 +915,7 @@ namespace com.keyman {
         case 145:
           keyboardManager.notifyKeyboard(Levent.Lcode,Levent.Ltarg,0);
           if(!this.keyman.util.device.touchable) {
-            return osk.vkbd._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
+            return processor._UpdateVKShift(Levent, Levent.Lcode-15, 1);  // I2187
           } else {
             return true;
           }
@@ -921,7 +923,7 @@ namespace com.keyman {
       
       if(Levent.LmodifierChange){
         keyboardManager.notifyKeyboard(0,Levent.Ltarg,0); 
-        osk.vkbd._UpdateVKShift(Levent, 0, 1);  // I2187
+        processor._UpdateVKShift(Levent, 0, 1);  // I2187
       }
       
       return false;
