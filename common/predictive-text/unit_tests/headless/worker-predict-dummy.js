@@ -19,14 +19,12 @@ describe('LMLayerWorker dummy model', function() {
         rightContextCodeUnits: 0
       };
 
-      var model = new DummyModel(
-        {
-          maxLeftContextCodeUnits: 64,
-        },
-        {
-          configuration: configuration,
-        }
-      );
+      var model = new DummyModel({
+        maxLeftContextCodeUnits: 64,
+      },
+      {
+        configuration: configuration,
+      });
 
       assert.deepEqual(model.configuration, configuration);
     });
@@ -73,19 +71,16 @@ describe('LMLayerWorker dummy model', function() {
 
       var model = new DummyModel(defaultCapabilities());
 
-      var suggestions = model.predict(
-        // Type a 't'
-        {
-          insert: 't',
-          deleteLeft: 0,
-        },
-        {
-          left: "I'm a little ",
-          startOfBuffer: true,
-          endOfBuffer: true,
-        },
-        expectedSuggestions
-     );
+      // Type a 't'
+      var suggestions = model.predict({
+        insert: 't',
+        deleteLeft: 0,
+      },
+      {
+        left: "I'm a little ",
+        startOfBuffer: true,
+        endOfBuffer: true,
+      }, expectedSuggestions);
      assert.deepEqual(suggestions, expectedSuggestions);
     });
 
