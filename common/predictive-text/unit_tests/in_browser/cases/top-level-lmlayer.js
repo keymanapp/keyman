@@ -9,6 +9,7 @@ describe('LMLayer', function () {
   });
 
   describe('#initialize()', function () {
+    // TODO: implement configuration negotiation?
     it.skip('should yield a reasonable configuration', function () {
       let maxLeftContext = 64;
       let lmLayer = new LMLayer();

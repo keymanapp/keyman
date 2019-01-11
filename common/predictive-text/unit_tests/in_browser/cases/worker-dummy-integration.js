@@ -16,7 +16,9 @@ describe('LMLayer using dummy model', function () {
         maxLefContextCodeUnits: 32 + ~~Math.random() * 32
       };
 
-      // Tower of promises!
+      // We're testing many as asynchronous messages in a row.
+      // this would be cleaner using async/await syntax, but
+      // alas some of our browsers don't support it.
       return lmLayer.initialize(
         capabilities,
         {
@@ -52,103 +54,6 @@ describe('LMLayer using dummy model', function () {
   }
 
   function iGotDistractedByHazel() {
-    return [
-      [
-        {
-          transform: {
-            insert: 'I ',
-            deleteLeft: 0
-          },
-          displayAs: 'I',
-        },
-        {
-          transform: {
-            insert: "I'm ",
-            deleteLeft: 0
-          },
-          displayAs: "I'm",
-        },
-        {
-          transform: {
-            insert: "Oh ",
-            deleteLeft: 0
-          },
-          displayAs: "Oh ",
-        }
-      ],
-      // Second set of suggestions, after choosing "I"
-      [
-        {
-          transform: {
-            insert: 'love ',
-            deleteLeft: 0
-          },
-          displayAs: 'love',
-        },
-        {
-          transform: {
-            insert: "am ",
-            deleteLeft: 0
-          },
-          displayAs: "am",
-        },
-        {
-          transform: {
-            insert: "got ",
-            deleteLeft: 0
-          },
-          displayAs: "got",
-        }
-      ],
-      // Third set of suggestions, after choosing "got"
-      [
-        {
-          transform: {
-            insert: 'distracted ',
-            deleteLeft: 0
-          },
-          displayAs: 'distracted by',
-        },
-        {
-          transform: {
-            insert: "distracted ",
-            deleteLeft: 0
-          },
-          displayAs: "distracted",
-        },
-        {
-          transform: {
-            insert: "a ",
-            deleteLeft: 0
-          },
-          displayAs: "a",
-        }
-      ],
-      // Last set of suggestions, after choosing "distracted by"
-      [
-        {
-          transform: {
-            insert: 'Hazel ',
-            deleteLeft: 0
-          },
-          displayAs: 'Hazel',
-        },
-        {
-          transform: {
-            insert: 'the ',
-            deleteLeft: 0
-          },
-          displayAs: 'the',
-        },
-        {
-          transform: {
-            insert: 'a ',
-            deleteLeft: 0
-          },
-          displayAs: 'a',
-        },
-      ],
-
-    ]
+    return __json__['future_suggestions/i_got_distracted_by_hazel']
   }
 });
