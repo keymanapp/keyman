@@ -1,4 +1,8 @@
+// Defines key code constants
+/// <reference path="../text/codes.ts" />
+
 namespace com.keyman.osk {
+  let Codes = com.keyman.text.Codes;
   //#region Definition of the KeyElement merger type
   class KeyData {
     ['key']: OSKKey;
@@ -259,7 +263,7 @@ namespace com.keyman.osk {
     // Produces a small reference label for the corresponding physical key on a US keyboard.
     private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)
-      var x = VisualKeyboard.keyCodes[this.spec.id];
+      var x = Codes.keyCodes[this.spec.id];
       switch(x) {
         // Converts the keyman key id code for common symbol keys into its representative ASCII code.
         // K_COLON -> K_BKQUOTE
@@ -463,73 +467,6 @@ namespace com.keyman.osk {
   //#endregion
 
   export class VisualKeyboard {
-    //#region Keyboard-related static constants
-    // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
-    static modifierCodes = {
-      "LCTRL":0x0001,
-      "RCTRL":0x0002,
-      "LALT":0x0004,
-      "RALT":0x0008,
-      "SHIFT":0x0010,
-      "CTRL":0x0020,
-      "ALT":0x0040,
-      "CAPS":0x0100,
-      "NO_CAPS":0x0200,
-      "NUM_LOCK":0x0400,
-      "NO_NUM_LOCK":0x0800,
-      "SCROLL_LOCK":0x1000,
-      "NO_SCROLL_LOCK":0x2000,
-      "VIRTUAL_KEY":0x4000
-    };
-
-    static modifierBitmasks = {
-      "ALL":0x007F,
-      "ALT_GR_SIM": (VisualKeyboard.modifierCodes['LCTRL'] | VisualKeyboard.modifierCodes['LALT']),
-      "CHIRAL":0x001F,    // The base bitmask for chiral keyboards.  Includes SHIFT, which is non-chiral.
-      "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
-      "NON_CHIRAL":0x0070 // The default bitmask, for non-chiral keyboards
-    };
-
-    static stateBitmasks = {
-      "ALL":0x3F00,
-      "CAPS":0x0300,
-      "NUM_LOCK":0x0C00,
-      "SCROLL_LOCK":0x3000
-    };
-
-    // Define standard keycode numbers (exposed for use by other modules)
-    static keyCodes = {
-      "K_BKSP":8,"K_TAB":9,"K_ENTER":13,
-      "K_SHIFT":16,"K_CONTROL":17,"K_ALT":18,"K_PAUSE":19,"K_CAPS":20,
-      "K_ESC":27,"K_SPACE":32,"K_PGUP":33,
-      "K_PGDN":34,"K_END":35,"K_HOME":36,"K_LEFT":37,"K_UP":38,
-      "K_RIGHT":39,"K_DOWN":40,"K_SEL":41,"K_PRINT":42,"K_EXEC":43,
-      "K_INS":45,"K_DEL":46,"K_HELP":47,"K_0":48,
-      "K_1":49,"K_2":50,"K_3":51,"K_4":52,"K_5":53,"K_6":54,"K_7":55,
-      "K_8":56,"K_9":57,"K_A":65,"K_B":66,"K_C":67,"K_D":68,"K_E":69,
-      "K_F":70,"K_G":71,"K_H":72,"K_I":73,"K_J":74,"K_K":75,"K_L":76,
-      "K_M":77,"K_N":78,"K_O":79,"K_P":80,"K_Q":81,"K_R":82,"K_S":83,
-      "K_T":84,"K_U":85,"K_V":86,"K_W":87,"K_X":88,"K_Y":89,"K_Z":90,
-      "K_NP0":96,"K_NP1":97,"K_NP2":98,
-      "K_NP3":99,"K_NP4":100,"K_NP5":101,"K_NP6":102,
-      "K_NP7":103,"K_NP8":104,"K_NP9":105,"K_NPSTAR":106,
-      "K_NPPLUS":107,"K_SEPARATOR":108,"K_NPMINUS":109,"K_NPDOT":110,
-      "K_NPSLASH":111,"K_F1":112,"K_F2":113,"K_F3":114,"K_F4":115,
-      "K_F5":116,"K_F6":117,"K_F7":118,"K_F8":119,"K_F9":120,
-      "K_F10":121,"K_F11":122,"K_F12":123,"K_NUMLOCK":144,"K_SCROLL":145,
-      "K_LSHIFT":160,"K_RSHIFT":161,"K_LCONTROL":162,"K_RCONTROL":163,
-      "K_LALT":164,"K_RALT":165,
-      "K_COLON":186,"K_EQUAL":187,"K_COMMA":188,"K_HYPHEN":189,
-      "K_PERIOD":190,"K_SLASH":191,"K_BKQUOTE":192,
-      "K_LBRKT":219,"K_BKSLASH":220,"K_RBRKT":221,
-      "K_QUOTE":222,"K_oE2":226,
-      "K_LOPT":50001,"K_ROPT":50002,
-      "K_NUMERALS":50003,"K_SYMBOLS":50004,"K_CURRENCIES":50005,
-      "K_UPPER":50006,"K_LOWER":50007,"K_ALPHA":50008,
-      "K_SHIFTED":50009,"K_ALTGR":50010,
-      "K_TABBACK":50011,"K_TABFWD":50012
-    };
-
     // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
     static specialCharacters = {
       '*Shift*':    8,
@@ -565,12 +502,6 @@ namespace com.keyman.osk {
       '*LCtrlShift*':     0x69,
       '*RCtrlShift*':     0x70
     };
-
-    static codesUS = [
-      ['0123456789',';=,-./`', '[\\]\''],
-      [')!@#$%^&*(',':+<_>?~', '{|}"']
-    ];
-    //#endregion
 
     // Tracks the OSK-based state of supported state keys.
     // Using the exact keyCode name from above allows for certain optimizations elsewhere in the code.
@@ -1388,14 +1319,14 @@ namespace com.keyman.osk {
           Ltarg:Lelem,
           Lmodifiers:0,
           Lstates:0,
-          Lcode:VisualKeyboard.keyCodes[keyName],
+          Lcode: Codes.keyCodes[keyName],
           LisVirtualKey:true
         };
 
         // Set the flags for the state keys.
-        Lkc.Lstates |= this.stateKeys['K_CAPS']    ? VisualKeyboard.modifierCodes['CAPS'] : VisualKeyboard.modifierCodes['NO_CAPS'];
-        Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? VisualKeyboard.modifierCodes['NUM_LOCK'] : VisualKeyboard.modifierCodes['NO_NUM_LOCK'];
-        Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? VisualKeyboard.modifierCodes['SCROLL_LOCK'] : VisualKeyboard.modifierCodes['NO_SCROLL_LOCK'];
+        Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
+        Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
+        Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
 
         // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
         if(keyName.substr(0,2) == 'U_') Lkc.LisVirtualKey=false;
@@ -1418,15 +1349,15 @@ namespace com.keyman.osk {
         Lkc.Lmodifiers = keyShiftState;
 
         // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-        if((Lkc.Lmodifiers & VisualKeyboard.modifierBitmasks['ALT_GR_SIM']) == VisualKeyboard.modifierBitmasks['ALT_GR_SIM'] && Layouts.emulatesAltGr()) {
-          Lkc.Lmodifiers &= ~VisualKeyboard.modifierBitmasks['ALT_GR_SIM'];
-          Lkc.Lmodifiers |= VisualKeyboard.modifierCodes['RALT'];
+        if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && Layouts.emulatesAltGr()) {
+          Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
+          Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
         }
 
         // Include *limited* support for mnemonic keyboards (Sept 2012)
         // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
         if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && formFactor != 'desktop')) {
-          if(Lkc.Lcode != VisualKeyboard.keyCodes['K_SPACE']) { // exception required, March 2013
+          if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) { // exception required, March 2013
             Lkc.vkCode = Lkc.Lcode;
             // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
             // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
@@ -1620,25 +1551,25 @@ namespace com.keyman.osk {
           // Toggle the modifier represented by our input argument.
           switch(id) {
             case 'shift':
-              modifier ^= VisualKeyboard.modifierCodes['SHIFT'];
+              modifier ^= Codes.modifierCodes['SHIFT'];
               break;
             case 'leftctrl':
-              modifier ^= VisualKeyboard.modifierCodes['LCTRL'];
+              modifier ^= Codes.modifierCodes['LCTRL'];
               break;
             case 'rightctrl':
-              modifier ^= VisualKeyboard.modifierCodes['RCTRL'];
+              modifier ^= Codes.modifierCodes['RCTRL'];
               break;
             case 'ctrl':
-              modifier ^= VisualKeyboard.modifierCodes['CTRL'];
+              modifier ^= Codes.modifierCodes['CTRL'];
               break;
             case 'leftalt':
-              modifier ^= VisualKeyboard.modifierCodes['LALT'];
+              modifier ^= Codes.modifierCodes['LALT'];
               break;
             case 'rightalt':
-              modifier ^= VisualKeyboard.modifierCodes['RALT'];
+              modifier ^= Codes.modifierCodes['RALT'];
               break;
             case 'alt':
-              modifier ^= VisualKeyboard.modifierCodes['ALT'];
+              modifier ^= Codes.modifierCodes['ALT'];
               break;
             default:
               s = id;
@@ -1686,34 +1617,34 @@ namespace com.keyman.osk {
     getModifierState(layerId: string): number {
       var modifier=0;
       if(layerId.indexOf('shift') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['SHIFT'];
+        modifier |= Codes.modifierCodes['SHIFT'];
       }
 
       // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
       var ctrlMatched=false;
       if(layerId.indexOf('leftctrl') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['LCTRL'];
+        modifier |= Codes.modifierCodes['LCTRL'];
         ctrlMatched=true;
       } 
       if(layerId.indexOf('rightctrl') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['RCTRL'];
+        modifier |= Codes.modifierCodes['RCTRL'];
         ctrlMatched=true;
       } 
       if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
-        modifier |= VisualKeyboard.modifierCodes['CTRL'];
+        modifier |= Codes.modifierCodes['CTRL'];
       }
 
       var altMatched=false;
       if(layerId.indexOf('leftalt') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['LALT'];
+        modifier |= Codes.modifierCodes['LALT'];
         altMatched=true;
       } 
       if(layerId.indexOf('rightalt') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['RALT'];
+        modifier |= Codes.modifierCodes['RALT'];
         altMatched=true;
       } 
       if(layerId.indexOf('alt')  >= 0 && !altMatched) {
-        modifier |= VisualKeyboard.modifierCodes['ALT'];
+        modifier |= Codes.modifierCodes['ALT'];
       }
 
       return modifier;
@@ -1739,7 +1670,7 @@ namespace com.keyman.osk {
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
         checkCodes = true;
-      } else if (keyShiftState == VisualKeyboard.modifierCodes['SHIFT']) {
+      } else if (keyShiftState == Codes.modifierCodes['SHIFT']) {
         checkCodes = true; 
         keyShiftState = 1; // It's used as an index.
       } else {
@@ -1748,25 +1679,25 @@ namespace com.keyman.osk {
 
       // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
       if(touchAlias || usingOSK) {
-        var code = VisualKeyboard.keyCodes[keyName];
+        var code = Codes.keyCodes[keyName];
         if(!code) {
           code = n;
         }
 
         switch(code) {
-          case VisualKeyboard.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
+          case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
             keyman.interface.defaultBackspace();
             break;
-          case VisualKeyboard.keyCodes['K_TAB']:
+          case Codes.keyCodes['K_TAB']:
             domManager.moveToNext(keyShiftState);
             break;
-          case VisualKeyboard.keyCodes['K_TABBACK']:
+          case Codes.keyCodes['K_TABBACK']:
             domManager.moveToNext(true);
             break;
-          case VisualKeyboard.keyCodes['K_TABFWD']:
+          case Codes.keyCodes['K_TABFWD']:
             domManager.moveToNext(false);
             break;
-          case VisualKeyboard.keyCodes['K_ENTER']:
+          case Codes.keyCodes['K_ENTER']:
             // Insert new line in text area fields
             if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA')) {
               return '\n';
@@ -1787,7 +1718,7 @@ namespace com.keyman.osk {
               }
             }
             break;
-          case VisualKeyboard.keyCodes['K_SPACE']:
+          case Codes.keyCodes['K_SPACE']:
             return ' ';
           // break;
           //
@@ -1842,14 +1773,14 @@ namespace com.keyman.osk {
         // Hereafter, we refer to keyCodes.
       } else if(checkCodes) { // keyShiftState can only be '1' or '2'.
         try {
-          if(n >= VisualKeyboard.keyCodes['K_0'] && n <= VisualKeyboard.keyCodes['K_9']) { // The number keys.
-            ch = VisualKeyboard.codesUS[keyShiftState][0][n-VisualKeyboard.keyCodes['K_0']];
-          } else if(n >=VisualKeyboard.keyCodes['K_A'] && n <= VisualKeyboard.keyCodes['K_Z']) { // The base letter keys
+          if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
+            ch = Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
+          } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
             ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
-          } else if(n >= VisualKeyboard.keyCodes['K_COLON'] && n <= VisualKeyboard.keyCodes['K_BKQUOTE']) {
-            ch = VisualKeyboard.codesUS[keyShiftState][1][n-VisualKeyboard.keyCodes['K_COLON']];
-          } else if(n >= VisualKeyboard.keyCodes['K_LBRKT'] && n <= VisualKeyboard.keyCodes['K_QUOTE']) {
-            ch = VisualKeyboard.codesUS[keyShiftState][2][n-VisualKeyboard.keyCodes['K_LBRKT']];
+          } else if(n >= Codes.keyCodes['K_COLON'] && n <= Codes.keyCodes['K_BKQUOTE']) {
+            ch = Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
+          } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
+            ch = Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
           }
         } catch (e) {
           console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
@@ -1881,21 +1812,21 @@ namespace com.keyman.osk {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keyman.keyboardManager.isChiral() && Layouts.emulatesAltGr() && 
-            (com.keyman.DOMEventHandlers.states.modStateFlags & VisualKeyboard.modifierBitmasks['ALT_GR_SIM']) == VisualKeyboard.modifierBitmasks['ALT_GR_SIM']) {
-          keyShiftState |= VisualKeyboard.modifierBitmasks['ALT_GR_SIM'];
-          keyShiftState &= ~VisualKeyboard.modifierCodes['RALT'];
+            (com.keyman.DOMEventHandlers.states.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
+          keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
+          keyShiftState &= ~Codes.modifierCodes['RALT'];
         }
 
         for(i=0; i < lockNames.length; i++) {
-          if(lockStates & VisualKeyboard.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = lockStates & VisualKeyboard.modifierCodes[lockNames[i]];
+          if(lockStates & Codes.stateBitmasks[lockNames[i]]) {
+            this.stateKeys[lockKeys[i]] = lockStates & Codes.modifierCodes[lockNames[i]];
           }
         }
       } else if(d) {
         keyShiftState |= v;
 
         for(i=0; i < lockNames.length; i++) {
-          if(v & VisualKeyboard.stateBitmasks[lockNames[i]]) {
+          if(v & Codes.stateBitmasks[lockNames[i]]) {
             this.stateKeys[lockKeys[i]] = true;
           }
         }
@@ -1903,7 +1834,7 @@ namespace com.keyman.osk {
         keyShiftState &= ~v;
 
         for(i=0; i < lockNames.length; i++) {
-          if(v & VisualKeyboard.stateBitmasks[lockNames[i]]) {
+          if(v & Codes.stateBitmasks[lockNames[i]]) {
             this.stateKeys[lockKeys[i]] = false;
           }
         }

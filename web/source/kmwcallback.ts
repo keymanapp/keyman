@@ -566,8 +566,9 @@ namespace com.keyman {
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
       var bitmask = this.keymanweb.keyboardManager.getKeyboardModifierBitmask();
-      var modifierBitmask = bitmask & com.keyman.osk.VisualKeyboard.modifierBitmasks["ALL"];
-      var stateBitmask = bitmask & com.keyman.osk.VisualKeyboard.stateBitmasks["ALL"];
+      let Codes = com.keyman.text.Codes;
+      var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
+      var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts

@@ -474,7 +474,7 @@ namespace com.keyman {
      */    
     _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
       var s = new KeyEvent();
-      let VisualKeyboard = osk.VisualKeyboard;
+      let Codes = text.Codes;
 
       e = this.keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
       s.Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
@@ -498,7 +498,7 @@ namespace com.keyman {
 
       if(activeKeyboard && activeKeyboard['KM']) {
         // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
-        if(s.Lcode != VisualKeyboard.keyCodes['K_SPACE']) {
+        if(s.Lcode != Codes.keyCodes['K_SPACE']) {
           // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
           // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
           var mappedChar: string = com.keyman.singleton.osk.vkbd.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
@@ -512,7 +512,7 @@ namespace com.keyman {
       var prevModState = DOMEventHandlers.states.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
-      let keyCodes = VisualKeyboard.keyCodes;
+      let keyCodes = Codes.keyCodes;
       switch(s.Lcode) {
         case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
         case keyCodes['K_LCTRL']:
@@ -548,7 +548,7 @@ namespace com.keyman {
 
       curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
-      let modifierCodes = VisualKeyboard.modifierCodes;
+      let modifierCodes = Codes.modifierCodes;
       if(e.getModifierState("Control")) {
         curModState |= ((e.location != 0 && ctrlEvent) ? 
           (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
@@ -608,7 +608,7 @@ namespace com.keyman {
         curModState &= ~modifierCodes['LCTRL'];
       }
 
-      let modifierBitmasks = VisualKeyboard.modifierBitmasks;
+      let modifierBitmasks = Codes.modifierBitmasks;
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
       if(this.keyman.keyboardManager.isChiral()) {
         s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;

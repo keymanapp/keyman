@@ -4,6 +4,8 @@
 /// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
+// Defines key-code constants.
+/// <reference path="text/codes.ts" />
 // Defines the web-page interface object.
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.

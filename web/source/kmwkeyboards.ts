@@ -819,7 +819,7 @@ namespace com.keyman {
         k0 = this.getKeyboardByID(k0);
       }
 
-      return !!(this.getKeyboardModifierBitmask(k0) & osk.VisualKeyboard.modifierBitmasks.IS_CHIRAL);
+      return !!(this.getKeyboardModifierBitmask(k0) & text.Codes.modifierBitmasks.IS_CHIRAL);
     }
 
     /**
@@ -844,7 +844,7 @@ namespace com.keyman {
         return k['KMBM'];
       }
 
-      return osk.VisualKeyboard.modifierBitmasks['NON_CHIRAL'];
+      return text.Codes.modifierBitmasks['NON_CHIRAL'];
     }
 
     getFont(k0?) {
