@@ -49,8 +49,8 @@ See also: [XML-RPC][]
 
 Messages are **not** methods. That is, there is no assumption that
 a client will receive a reply when a message is sent. However, some
-pairs of messages, such as `predict` and `suggestions`, lightly assume
-request/response semantics.
+pairs of messages, such as `predict` and `suggestions`, assume
+(non-blocking!) request/response semantics.
 
 [discriminated union]: http://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions
 [open-closed principle]: https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle
@@ -117,7 +117,7 @@ Currently there are four message types:
 
 Message       | Direction          | Parameters          | Expected reply      | Uses token
 --------------|--------------------|---------------------|---------------------|---------------
-`initialize`  | keyboard → LMLayer | initialization      | Yes — `ready`       | No
+`initialize`  | keyboard → LMLayer | capabilities, model | Yes — `ready`       | No
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
 `predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
@@ -135,27 +135,31 @@ sending `initialize`. The keyboard **SHOULD NOT** send another message
 to the keyboard until it receives `ready` message from the LMLayer
 before sending another message.
 
-These are the configurations, and platform restrictions sent to
-initialize the LMLayer and its model.
+The LMLayer needs to know the platform's abilities and restrictions (capabilities), as well as which concrete language model to instantiate. These properties are passed as `capabilities` and `model`, respectively.
 
 ```typescript
 interface InitializeMessage {
   message: 'initialize';
 
   /**
-   * Path to the model. There are no concrete restrictions on the path
-   * to the model, so long as the LMLayer can successfully use it to
-   * initialize the model.
+   * A ModelDescription that describes the language model and its parameters.
+   * The concrete documentation on is a valid ModelDescription
+   * can be found elsewhere.
    */
-  model: string;
-
-  configuration: {
+  model: {
     /**
-     * Whether the platform supports right contexts.
-     * The absence of this rule implies false.
+     * What kind of model to instantiate. This is subject to availability,
+     * but common examples are 'wordlist', 'fst', and 'dummy'.
      */
-    supportsRightContexts?: false,
+    type: string;
+    /**
+     * Each model type defines a set of configurable parameters. Please
+     * see the corresponding model's documentation for an extensive list.
+     */
+    ...parameters: any;
+  };
 
+  capabilities: {
     /**
      * Whether the platform supports deleting to the right.
      * The absence of this rule implies false.
@@ -171,7 +175,7 @@ interface InitializeMessage {
     /**
      * The maximum amount of code units that the keyboard will provide to
      * the right of the cursor, as an integer. The absence of this rule
-     * implies 0.
+     * implies the platform is incapable of supplying right contexts. 
      * See also, [[supportsRightContexts]].
      */
     maxRightContextCodeUnits?: number,
@@ -247,13 +251,13 @@ of their original input.
 **NOTE**: The keyboard **MAY** send the `predict` message after it has
 applied the `transform` associated with the input event to the buffer.
 Regardless of the actual sequence, the semantics **MUST** remain the
-same:the prediction happens from the perspective before the `transform`
+same: the prediction happens from the perspective before the `transform`
 has been applied. Therefore, if the keyboard eagerly transforms the
-buffer before it has sent `predict` message, it must anticipate _undoing_
-the `transform` it has already applied if it is to apply a `transfrom`
-send in the `suggestions` message. The keyboard must act as if it has
-never applied the `transform` associated with the input event in the
-first place.
+buffer before it has sent the `predict` message, it must anticipate
+_undoing_ the `transform` it has already applied should it apply a
+`transfrom` sent in the `suggestions` message. The keyboard must act
+as if it has never applied the `transform` associated with the input
+event in the first place.
 
 The context is the text surrounding the insertion point, _before_ the
 transform is applied to the buffer.
@@ -306,7 +310,7 @@ interface Transform {
    *
    * Corresponds to `dn` in com.keyman.KeyboardInterface.output.
    */
-  delete: number;
+  deleteLeft: number;
 
   /**
    * The number of code units to delete to the right of the cursor.

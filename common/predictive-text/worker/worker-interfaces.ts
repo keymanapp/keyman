@@ -61,7 +61,21 @@ interface InitializeMessage {
  */
 interface PredictMessage {
   message: 'predict';
-  transform: Transform;
+  /**
+   * How the input event will transform the buffer.
+   * If this is not provided, then the prediction is not
+   * assumed to be associated with an input event (for example,
+   * when a user starts typing on an empty text field).
+   * 
+   * TODO: test for absent transform!
+   */
+  transform?: Transform;
+
+  /**
+   * The context (text to the left and text to right) at the
+   * insertion point/text cursor, at the moment before the
+   * transform is applied to the buffer.
+   */
   context: Context;
 }
 
