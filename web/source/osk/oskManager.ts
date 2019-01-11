@@ -1427,9 +1427,8 @@ namespace com.keyman.osk {
       this._Visible=false;
       os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
 
-      // Remove highlighting from hide keyboard key, if applied
-      if(this.vkbd && this.vkbd.hkKey && typeof(this.vkbd.hkKey) != 'undefined') {
-        this.vkbd.highlightKey(<HTMLElement> this.vkbd.hkKey.firstChild,false);
+      if(this.vkbd) {
+        this.vkbd.onHide();
       }
     }.bind(this);
 

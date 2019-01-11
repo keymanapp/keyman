@@ -1,4 +1,45 @@
 namespace com.keyman.osk {
+  //#region Definition of the KeyElement merger type
+  class KeyData {
+    ['key']: OSKKey;
+    ['keyId']: string;
+    ['subKeys']?: OSKKeySpec[];
+    
+    constructor(keyData: OSKKey, keyId: string) {
+      this['key'] = keyData;
+      this['keyId'] = keyId;
+    }
+  }
+
+  export type KeyElement = HTMLDivElement & KeyData;
+
+  // Many thanks to https://www.typescriptlang.org/docs/handbook/advanced-types.html for this.
+  function link(elem: HTMLDivElement, data: KeyData): KeyElement {
+    let e = <KeyElement> elem;
+    
+    // Merges all properties and methods of KeyData onto the underlying HTMLDivElement, creating a merged class.
+    for(let id in data) {
+      if(!e.hasOwnProperty(id)) {
+        (<any>e)[id] = (<any>data)[id];
+      }
+    }
+
+    return e;
+  }
+
+  export function isKey(elem: Node): boolean {
+    return elem && ('key' in elem) && ((<any> elem['key']) instanceof OSKKey);
+  }
+
+  export function getKeyFrom(elem: Node): KeyElement {
+    if(isKey(elem)) {
+      return <KeyElement> elem;
+    } else {
+      return null;
+    }
+  }
+  //#endregion
+
   //#region OSK key objects and construction
   export class OSKKeySpec {
     id: string;
@@ -252,7 +293,7 @@ namespace com.keyman.osk {
       }
     }
 
-    private processSubkeys(btn: HTMLDivElement) {
+    private processSubkeys(btn: KeyElement) {
       // Add reference to subkey array if defined
       var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
@@ -278,7 +319,6 @@ namespace com.keyman.osk {
       spec.layer = layerId;
 
       let kDiv=util._CreateElement('div');
-      kDiv['keyId']=spec['id'];
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
@@ -286,7 +326,9 @@ namespace com.keyman.osk {
 
       let originalPercent = totalPercent;
       
-      let btn=util._CreateElement('div');
+      let btnEle=util._CreateElement('div');
+      let btn = link(btnEle, new KeyData(this, spec['id']));
+
       // Set button class
       osk.setButtonClass(spec,btn,layout);
 
@@ -317,7 +359,6 @@ namespace com.keyman.osk {
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId(osk);
-      btn['key']=this;  //attach reference to key layout spec to element
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
@@ -387,7 +428,6 @@ namespace com.keyman.osk {
       }
 
       kDiv.className='kmw-key-square-ex';
-      kDiv['keyId']=spec['id'];
       if(topMargin) {
         ks.marginTop='5px';
       }
@@ -399,11 +439,11 @@ namespace com.keyman.osk {
       }
       ks.height=baseKey.offsetHeight+'px';
 
-      let btn=document.createElement('div');
-      osk.setButtonClass(spec,btn);
+      let btnEle=document.createElement('div');
+      let btn = link(btnEle, new KeyData(this, spec['id']));
 
+      osk.setButtonClass(spec,btn);
       btn.id = this.getId(osk);
-      btn['key'] = this;
 
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
@@ -558,40 +598,40 @@ namespace com.keyman.osk {
     // State-related properties
     ddOSK: boolean = false;
     popupVisible: boolean;
-    keyPending: HTMLElement;
-    deleteKey: HTMLElement;
+    keyPending: KeyElement;
+    deleteKey: KeyElement;
     deleting: number; // Tracks a timer id for repeated deletions.
     nextLayer: string;
     currentKey: string;
 
     // Special keys (for the currently-visible layer)
-    lgKey: HTMLDivElement;
-    hkKey: HTMLDivElement; // currently highlighted key
-    spaceBar: HTMLDivElement;
+    lgKey: KeyElement;
+    hkKey: KeyElement; // hide keyboard key
+    spaceBar: KeyElement;
 
     // Touch-tracking properties
     touchX: number;
     touchY: number;
     touchCount: number;
-    currentTarget: HTMLElement;
+    currentTarget: KeyElement;
 
     // Popup key management
-    popupBaseKey: HTMLElement;
+    popupBaseKey: KeyElement;
     popupPending: boolean = false;
     subkeyDelayTimer: number;
     popupDelay: number = 500;
-    menuEvent: HTMLElement; // Used by embedded-mode.
-    keytip: {key: HTMLElement, state: boolean, element?: HTMLDivElement};
+    menuEvent: KeyElement; // Used by embedded-mode.
+    keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
     popupCallout: HTMLDivElement;
 
     // Function fields (fleshed out by kmwnative.ts and/or kmwembedded.ts)
-    touchHold: (key: HTMLElement) => void;
-    optionKey: (e: HTMLElement, keyName: string, keyDown: boolean) => void;
-    highlightSubKeys: (key: HTMLElement, x: number, y: number) => void = this.highlightSubKeys || function(k,x,y) {};
-    showKeyTip: (key: HTMLElement, on: boolean) => void;
+    touchHold: (key: KeyElement) => void;
+    optionKey: (e: KeyElement, keyName: string, keyDown: boolean) => void;
+    highlightSubKeys: (key: KeyElement, x: number, y: number) => void = this.highlightSubKeys || function(k,x,y) {};
+    showKeyTip: (key: KeyElement, on: boolean) => void;
     drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void = this.drawPreview || function(c,w,h,e) {};
     createKeyTip: () => void;
-    addCallout: (key: HTMLElement) => HTMLDivElement = this.addCallout || function(key) {return null};
+    addCallout: (key: KeyElement) => HTMLDivElement = this.addCallout || function(key) {return null};
     waitForFonts: (kfd,ofd) => boolean = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
     adjustHeights: () => boolean;
 
@@ -712,9 +752,14 @@ namespace com.keyman.osk {
       for(n=0; n<layers.length; n++) {
         layer=layers[n]; rows=layer['row'];
         for(i=rows.length; i>0; i--) {
-          if(rows[i-1]['key'].length > 0) break;
+          if(rows[i-1]['key'].length > 0) {
+            break;
+          }
         }
-        if(i < rows.length) rows.splice(i-rows.length,rows.length-i);
+
+        if(i < rows.length) {
+          rows.splice(i-rows.length,rows.length-i);
+        }
       }
       // ...remove to here when compiler bug fixed ***
 
@@ -766,21 +811,16 @@ namespace com.keyman.osk {
 
         // Calculate the maximum row width (in layout units)
         var totalWidth=0;
-        for(i=0; i<rows.length; i++)
-        {
+        for(i=0; i<rows.length; i++) {
           var width=0;
           row=rows[i]; keys=row['key'];
-          for(j=0; j<keys.length; j++)
-          {
+          for(j=0; j<keys.length; j++) {
             key=keys[j];
 
             // Test for a trailing comma included in spec, added as null object by IE
-            if(key == null)
-            {
+            if(key == null) {
               keys.length = keys.length-1;
-            }
-            else
-            {
+            } else {
               var kw, kp;
               kw = (typeof key['width'] == 'string' && key['width'] != '') ? parseInt(key['width'],10) : 100;
               if(isNaN(kw) || kw == 0) kw = 100;
@@ -793,7 +833,9 @@ namespace com.keyman.osk {
               //if(typeof key['pad'] == 'string' && key['pad'] != '') width += parseInt(key['pad'],10); else width += 5;
             }
           }
-          if(width > totalWidth) totalWidth = width;
+          if(width > totalWidth) {
+            totalWidth = width;
+          }
         }
 
         // Add default right margin
@@ -805,8 +847,7 @@ namespace com.keyman.osk {
           totalWidth += 15;
         }
 
-        for(i=0; i<rows.length; i++)
-        {
+        for(i=0; i<rows.length; i++) {
           rDiv=util._CreateElement('div');
           rDiv.className='kmw-key-row';
           // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
@@ -815,7 +856,8 @@ namespace com.keyman.osk {
           rDiv.onmousedown=util.mouseDownPreventDefaultHandler; // Build 360
           //util.attachDOMEvent(rDiv,'mousedown',function(e){if(e)e.preventDefault();
 
-          row=rows[i]; rs=rDiv.style;
+          row=rows[i];
+          rs=rDiv.style;
 
           // Set row height. (Phone and tablet heights are later recalculated
           // and set in px, allowing for viewport scaling.)
@@ -823,8 +865,7 @@ namespace com.keyman.osk {
 
           // Apply defaults, setting the width and other undefined properties for each key
           keys=row['key'];
-          for(j=0; j<keys.length; j++)
-          {
+          for(j=0; j<keys.length; j++) {
             key=keys[j];
             for(var tp in tKey) { // tKey = osk.getDefaultKeyObject();
               if(typeof key[tp] != 'string') key[tp]=tKey[tp];
@@ -833,8 +874,7 @@ namespace com.keyman.osk {
             // Modify the key type for special keys with non-standard labels
             // to allow the keyboard font to ovveride the SpecialOSK font.
             // Blank keys are no longer reclassed - can use before/after CSS to add text
-            switch(key['sp'])
-            {
+            switch(key['sp']) {
               case '1':
                 if(!specialLabel.test(key['text']) && key['text'] != '') key['sp']='3';
                 break;
@@ -970,7 +1010,7 @@ namespace com.keyman.osk {
       }
     }.bind(this);
 
-        /**
+    /**
      * OSK touch release event handler
      *
      *  @param  {Event} e   touch release event object
@@ -1111,7 +1151,7 @@ namespace com.keyman.osk {
       // Use the popup duplicate of the base key if a phone with a visible popup array
       var sk=document.getElementById('kmw-popup-keys');
       if(sk && sk.style.visibility == 'visible' && util.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
-        key1 = <HTMLElement> sk.childNodes[0].firstChild;
+        key1 = <KeyElement> sk.childNodes[0].firstChild;
       }
 
       // Identify current touch position (to manage off-key release)
@@ -1188,7 +1228,7 @@ namespace com.keyman.osk {
      * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    clickKey(e: HTMLElement) {
+    clickKey(e: KeyElement) {
       let keyman = com.keyman.singleton;
       var Lelem = keyman.domManager.getLastActiveElement(), Ls, Le, Lkc;
 
@@ -1210,17 +1250,17 @@ namespace com.keyman.osk {
       if(Lelem != null) {
         // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
         // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-        var layer=t[0], keyName=t[t.length-1].toUpperCase(), keyShiftState=this.getModifierState(this.layerId),
-          nextLayer = keyShiftState;
+        var layer=t[0], keyName=t[t.length-1].toUpperCase(), keyShiftState=this.getModifierState(this.layerId);
+          //nextLayer: number | string = keyShiftState;
+        var nextLayer: string;
 
         // Make sure to get the full current layer, since layers are now kebab-case.
         for(var i=1; i < t.length-1; i++) {
           layer = layer + "-" + t[i];
         }
 
-        if(typeof(e['key']) != 'undefined') {
-          nextLayer=e['key'].spec['nextlayer'];
-        }
+        nextLayer=e['key'].spec['nextlayer'];
+
         keyman.domManager.initActiveElement(Lelem);
 
         // Exclude menu and OSK hide keys from normal click processing
@@ -1292,12 +1332,7 @@ namespace com.keyman.osk {
         }
 
         // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-        var lx=(typeof e['key'] == 'undefined' ? null : e['key'].spec['layer']);
-        if(lx == null) {
-          keyShiftState=this.getModifierState(layer);
-        } else {
-          keyShiftState=this.getModifierState(lx);
-        }
+        keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
 
         // Define modifiers value for sending to keyboard mapping function
         Lkc.Lmodifiers = keyShiftState;
@@ -1359,13 +1394,8 @@ namespace com.keyman.osk {
           }
         }
 
-        // Test if this key has a non-default next layer
-        let keySpec: OSKKeySpec = e['key'] ? e['key'].spec : null; // Gets key element's attached layout-specification object.
-        if(typeof keySpec != 'undefined' && keySpec !== null) {
-          this.nextLayer = keySpec['nextlayer'];
-        }
-
         // Swap layer as appropriate.
+        this.nextLayer = nextLayer;
         this.selectLayer(keyName, nextLayer);
 
         /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
@@ -1395,7 +1425,7 @@ namespace com.keyman.osk {
      * @param   {Object}  t   element at touch point
      * @return  {Object}      the key element (or null)
      **/
-    keyTarget(target: HTMLElement | EventTarget): HTMLElement {
+    keyTarget(target: HTMLElement | EventTarget): KeyElement {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
       let t = <HTMLElement> target;
@@ -1403,13 +1433,13 @@ namespace com.keyman.osk {
       try {
         if(t) {
           if(util.hasClass(t,'kmw-key')) {
-            return t;
+            return getKeyFrom(t);
           }
           if(t.parentNode && util.hasClass(<HTMLElement> t.parentNode,'kmw-key')) {
-            return <HTMLElement> t.parentNode;
+            return getKeyFrom(t.parentNode);
           }
           if(t.firstChild && util.hasClass(<HTMLElement> t.firstChild,'kmw-key')) {
-            return <HTMLElement> t.firstChild;
+            return getKeyFrom(t.firstChild);
           }
         }
       } catch(ex) {}
@@ -1425,7 +1455,7 @@ namespace com.keyman.osk {
      *  @return {Object}      nearest key to touch point
      *
      **/
-    findNearestKey(e: TouchEvent, t: HTMLElement): HTMLElement {
+    findNearestKey(e: TouchEvent, t: HTMLElement): KeyElement {
       if((!e) || (typeof e.changedTouches == 'undefined')
         || (e.changedTouches.length == 0)) {
         return null;
@@ -1471,7 +1501,7 @@ namespace com.keyman.osk {
         }
 
         if(((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-          return <HTMLElement> t.firstChild;
+          return <KeyElement> t.firstChild;
         }
       }
       return null;
@@ -1665,7 +1695,7 @@ namespace com.keyman.osk {
       this.layerId='default';
     }
 
-        /**
+    /**
      * Get modifier key state from layer id
      *
      * @param       {string}      layerId       layer id (e.g. ctrlshift)
@@ -2047,7 +2077,7 @@ namespace com.keyman.osk {
      * Display touch-hold array of 'sub-keys' above the currently touched key
      * @param       {Object}    e      primary key element
      */
-    showSubKeys(e: HTMLElement) {
+    showSubKeys(e: KeyElement) {
       // Do not show subkeys if key already released
       if(this.keyPending == null) {
         return;
@@ -2164,7 +2194,7 @@ namespace com.keyman.osk {
 
       // Highlight the duplicated base key (if a phone)
       if(device.formFactor == 'phone') {
-        var bk = <HTMLDivElement> subKeys.childNodes[0].firstChild;
+        var bk = <KeyElement> subKeys.childNodes[0].firstChild;
         this.keyPending = bk;
         this.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
       }
@@ -2175,7 +2205,7 @@ namespace com.keyman.osk {
      *
      * @param {Object}  e   base key object
      */
-    prependBaseKey(e: HTMLElement) {
+    prependBaseKey(e: KeyElement) {
       // This is a tag we set on the key element during its construction.
       let subKeys: OSKKeySpec[] = e['subKeys'];
       let keyman = com.keyman.singleton;
@@ -2185,9 +2215,10 @@ namespace com.keyman.osk {
         var i, 
           idx = e.id.split('-'), 
           baseId = idx[idx.length-1], 
-          layer = e['key'] && e['key'].spec['layer'] ? e['key'].spec['layer'] : (idx.length > 1 ? idx[0] : ''),
-          sp = e['key'] && e['key'].spec['sp'],
-          nextlayer = e['key'] && e['key'].spec['nextlayer'] ? e['key'].spec['nextlayer'] : null;
+          layer = e['key'].spec['layer'] ? e['key'].spec['layer'] : (idx.length > 1 ? idx[0] : ''),
+          sp = e['key'].spec['sp'],
+          nextlayer = e['key'].spec['nextlayer'];
+
         if(typeof subKeys != 'undefined' && subKeys.length > 0 && (subKeys[0].id != baseId || subKeys[0].layer != layer)) {
           var eCopy = new OSKKeySpec(baseId, '', undefined, sp, nextlayer);  // {'id':baseId,'layer':'','key':undefined};
           if(layer != '') {
@@ -2259,7 +2290,7 @@ namespace com.keyman.osk {
      *  @param    {Object}    key   key affected
      *  @param    {boolean}   on    add or remove highlighting
      **/
-    highlightKey(key: HTMLElement, on: boolean) {
+    highlightKey(key: KeyElement, on: boolean) {
       // Do not change element class unless a key
       if(!key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 
@@ -2301,12 +2332,15 @@ namespace com.keyman.osk {
       if(t.nodeName == 'SPAN') {
         t = <HTMLElement> t.parentNode;
       }
+
+      let key = getKeyFrom(t);
+
       if(util.eventType(e) == 'mousedown') {
-        this.currentKey=t.id;
+        this.currentKey=key.id;
         util._CancelMouse(e);
-        this.highlightKey(t, true);
+        this.highlightKey(key, true);
       } else if(t.id == this.currentKey) {
-        this.highlightKey(t, true);
+        this.highlightKey(key, true);
       }
     }.bind(this);
 
@@ -2320,17 +2354,21 @@ namespace com.keyman.osk {
       let util = keyman.util;
 
       var t=<HTMLElement> util.eventTarget(e);
-      if(t === null || util.device.formFactor != 'desktop') return;
+      if(t === null || util.device.formFactor != 'desktop') {
+        return;
+      }
 
       if(t.nodeName == 'SPAN') {
         t = <HTMLElement> t.parentNode;
       }
-      this.highlightKey(t,false);
+
+      let key = getKeyFrom(t);
+      this.highlightKey(key, false);
 
       // Process as click if mouse button released anywhere over key
       if(util.eventType(e) == 'mouseup') {
-        if(t.id == this.currentKey) {
-          this.clickKey(t);
+        if(key.id == this.currentKey) {
+          this.clickKey(getKeyFrom(key));
         }
         this.currentKey='';
       }
@@ -2377,7 +2415,7 @@ namespace com.keyman.osk {
      *  @param    {string}  keyId   key identifier
      *  @return   {Object}          Reference to key
      */
-    getSpecialKey(nLayer: number, keyId: string): HTMLDivElement {
+    getSpecialKey(nLayer: number, keyId: string): KeyElement {
       let layers = this.kbdDiv.childNodes[0].childNodes;
 
       if(nLayer >= 0 && nLayer < layers.length) {
@@ -2385,8 +2423,8 @@ namespace com.keyman.osk {
         let rows = layers[nLayer].childNodes;
         let keys = rows[rows.length-1].childNodes;
         for(var k=0; k<keys.length; k++) {
-          let key = <HTMLDivElement> keys[k];
-          if(key['keyId'] == keyId) {
+          let key = getKeyFrom(keys[k].firstChild);
+          if(key && key['keyId'] == keyId) {
             return key;
           }
         }
@@ -2664,6 +2702,13 @@ namespace com.keyman.osk {
       // Add a faint border
       kbd.style.border='1px solid #ccc';
       return kbd;
+    }
+
+    onHide() {
+      // Remove highlighting from hide keyboard key, if applied
+      if(this.hkKey) {
+        this.highlightKey(this.hkKey,false);
+      }
     }
   }
 }

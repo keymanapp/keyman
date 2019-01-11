@@ -19,7 +19,7 @@ namespace com.keyman.osk {
    * 
    * @param {Object}  key   base key element
    */            
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key) { 
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) { 
     let util = com.keyman.singleton.util;       
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
       var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
@@ -35,7 +35,7 @@ namespace com.keyman.osk {
     }
   };
 
-  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: HTMLElement, keyName: string, keyDown: boolean) {
+  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
 
     if(keyName.indexOf('K_LOPT') >= 0) {
@@ -64,7 +64,7 @@ namespace com.keyman.osk {
   };
 
   // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
-  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key, on) {
+  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
     let util = com.keyman.singleton.util;
     var tip = this.keytip,
         showPreview = window['oskCreateKeyPreview'],
