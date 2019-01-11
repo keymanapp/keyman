@@ -64,7 +64,7 @@ public abstract class KMKeyboardJSHandler {
   }
 
   @JavascriptInterface
-  public  abstract boolean dispatchKey(final int code, final int shift);
+  public  abstract boolean dispatchKey(final int code, final int eventModifiers);
 
   // Insert the selected string s
   @JavascriptInterface

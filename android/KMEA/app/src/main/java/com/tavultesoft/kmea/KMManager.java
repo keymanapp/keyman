@@ -199,23 +199,23 @@ public final class KMManager {
     IMService = service;
   }
 
-  public static boolean executeHardwareKeystroke(int code, int shift, int lstates) {
+  public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     if (SystemKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates, eventModifiers);
     } else if (InAppKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP, lstates);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP, lstates, eventModifiers);
     }
 
     return false;
   }
 
   public static boolean executeHardwareKeystroke(
-    int code, int shift, KeyboardType keyboard, int lstates) {
+    int code, int shift, KeyboardType keyboard, int lstates, int eventModifiers) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.executeHardwareKeystroke(code, shift, lstates);
+      InAppKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.executeHardwareKeystroke(code, shift, lstates);
+      SystemKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
     }
 
@@ -1465,7 +1465,7 @@ public final class KMManager {
     private static final String HANDLER_TAG = "IAK: JS Handler";
 
     @JavascriptInterface
-    public boolean dispatchKey(final int code, final int shift) {
+    public boolean dispatchKey(final int code, final int eventModifiers) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1477,18 +1477,12 @@ public final class KMManager {
           }
 
           // Handle tab or enter since KMW didn't process it
-          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code);
           KMTextView textView = (KMTextView) KMTextView.activeView;
-          KeyEvent event = null;
           if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
-            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_TAB");
-            event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, 0, 0, 0, 0);
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
+            textView.dispatchKeyEvent(event);
           } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
-            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_ENTER");
-            event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0, 0);
-          }
-
-          if (event != null) {
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
             textView.dispatchKeyEvent(event);
           }
         }
@@ -1589,7 +1583,7 @@ public final class KMManager {
     private static final String HANDLER_TAG = "SWK: JS Handler";
 
     @JavascriptInterface
-    public boolean dispatchKey(final int code, final int shift) {
+    public boolean dispatchKey(final int code, final int eventModifiers) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1608,18 +1602,13 @@ public final class KMManager {
           SystemKeyboard.dismissHelpBubble();
 
           // Handle tab or enter since KMW didn't process it
-          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", shift: " + shift);
+          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
           if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
-            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_TAB");
-            int metaState = 0;
-            if (shift == KMModifierCodes.get("SHIFT")) {
-              metaState = KeyEvent.META_SHIFT_ON;
-            }
-            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, metaState, 0, 0, 0);
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
             ic.sendKeyEvent(event);
           } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
-            Log.d(HANDLER_TAG, "Dispatching KeyEvent.KEYCODE_ENTER");
-            keyDownUp(KeyEvent.KEYCODE_ENTER);
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
+            ic.sendKeyEvent(event);
           }
         }
       });

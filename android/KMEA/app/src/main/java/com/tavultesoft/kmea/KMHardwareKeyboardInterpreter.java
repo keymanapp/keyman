@@ -70,7 +70,7 @@ public class KMHardwareKeyboardInterpreter implements KeyEvent.Callback {
     }
 
     // Send keystroke to KeymanWeb for processing: will return true to swallow the keystroke
-    return KMManager.executeHardwareKeystroke(code, keymanModifiers, keyboardType, Lstates);
+    return KMManager.executeHardwareKeystroke(code, keymanModifiers, keyboardType, Lstates, androidModifiers);
   }
 
   @Override
