@@ -936,6 +936,7 @@ namespace com.keyman.osk {
     }
     //#endregion
 
+    //#region OSK touch handlers
     /**
      * The main OSK touch start event handler
      *
@@ -972,8 +973,7 @@ namespace com.keyman.osk {
       }
 
       // Get key name (K_...) from element ID
-      var keyIdComponents = key.id.split('-');
-      var keyName=keyIdComponents[keyIdComponents.length-1];
+      let keyName = key['keyId'];
 
       // Highlight the touched key
       this.highlightKey(key,true);
@@ -1220,6 +1220,105 @@ namespace com.keyman.osk {
     }.bind(this);
 
     /**
+     * Get the current key target from the touch point element within the key
+     *
+     * @param   {Object}  t   element at touch point
+     * @return  {Object}      the key element (or null)
+     **/
+    keyTarget(target: HTMLElement | EventTarget): KeyElement {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+      let t = <HTMLElement> target;
+
+      try {
+        if(t) {
+          if(util.hasClass(t,'kmw-key')) {
+            return getKeyFrom(t);
+          }
+          if(t.parentNode && util.hasClass(<HTMLElement> t.parentNode,'kmw-key')) {
+            return getKeyFrom(t.parentNode);
+          }
+          if(t.firstChild && util.hasClass(<HTMLElement> t.firstChild,'kmw-key')) {
+            return getKeyFrom(t.firstChild);
+          }
+        }
+      } catch(ex) {}
+      return null;
+    }
+
+    /**
+     * Identify the key nearest to the touch point if at the end of a key row,
+     * but return null more than about 0.6 key width from the nearest key.
+     *
+     *  @param  {Event}   e   touch event
+     *  @param  {Object}  t   HTML object at touch point
+     *  @return {Object}      nearest key to touch point
+     *
+     **/
+    findNearestKey(e: TouchEvent, t: HTMLElement): KeyElement {
+      if((!e) || (typeof e.changedTouches == 'undefined')
+        || (e.changedTouches.length == 0)) {
+        return null;
+      }
+
+      // Get touch point on screen
+      var x = e.changedTouches[0].pageX;
+
+      // Get key-row beneath touch point
+      while(t && t.className.indexOf('key-row') < 0) {
+        t = <HTMLElement> t.parentNode;
+      }
+      if(!t) {
+        return null;
+      }
+
+      // Find minimum distance from any key
+      var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
+      for(k = 0; k < t.childNodes.length; k++) {
+        if((<HTMLElement> t.childNodes[k].firstChild).className.indexOf('key-hidden') >= 0) {
+          continue;
+        }
+        x1 = (<HTMLElement> t.childNodes[k]).offsetLeft;
+        x2 = x1 + (<HTMLElement> t.childNodes[k]).offsetWidth;
+        dx =x1 - x;
+        if(dx >= 0 && dx < dxMin) {
+          k0 = k; dxMin = dx;
+        }
+        dx = x - x2;
+        if(dx >= 0 && dx < dxMin) {
+          k0 = k; dxMin = dx;
+        }
+      }
+
+      if(dxMin < 100000) {
+        t = <HTMLElement> t.childNodes[k0];
+        x1 = t.offsetLeft;
+        x2 = x1 + t.offsetWidth;
+
+        // Limit extended touch area to the larger of 0.6 of key width and 24 px
+        if(t.offsetWidth > 40) {
+          dxMax = 0.6 * t.offsetWidth;
+        }
+
+        if(((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
+          return <KeyElement> t.firstChild;
+        }
+      }
+      return null;
+    }
+
+    /**
+     *  Repeat backspace as long as the backspace key is held down
+     **/
+    repeatDelete: () => void = function(this: VisualKeyboard) {
+      if(this.deleting) {
+        this.clickKey(this.deleteKey);
+        this.deleting = window.setTimeout(this.repeatDelete,100);
+      }
+    }.bind(this);
+    //#endregion
+
+    /**
      * Simulate a keystroke according to the touched keyboard button element
      *
      * Note that the test-case oriented 'recorder' stubs this method to facilitate OSK-based input
@@ -1236,30 +1335,11 @@ namespace com.keyman.osk {
       let kbdInterface = keyman.interface;
       let formFactor = keyman.util.device.formFactor;
 
-      // Each button id is of the form <layer>-<keyCode>, e.g. 'shift-ctrl-K_Q' or 'popup-shift-K_501', etc.
-      var t=e.id.split('-');
-      if(t.length < 2) {
-        return true; //shouldn't happen, but...
-      }
-
-      // Remove popup prefix before processing keystroke (KMEW-93)
-      if(t[0] == 'popup') {
-        t.splice(0,1);
-      }
-
       if(Lelem != null) {
         // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
         // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-        var layer=t[0], keyName=t[t.length-1].toUpperCase(), keyShiftState=this.getModifierState(this.layerId);
-          //nextLayer: number | string = keyShiftState;
-        var nextLayer: string;
-
-        // Make sure to get the full current layer, since layers are now kebab-case.
-        for(var i=1; i < t.length-1; i++) {
-          layer = layer + "-" + t[i];
-        }
-
-        nextLayer=e['key'].spec['nextlayer'];
+        var layer=e['key'].spec.layer || '', keyName=e['keyId'].toUpperCase(), keyShiftState=this.getModifierState(this.layerId);
+        var nextLayer: string = e['key'].spec['nextlayer'];
 
         keyman.domManager.initActiveElement(Lelem);
 
@@ -1407,105 +1487,7 @@ namespace com.keyman.osk {
       return true;
     }
 
-    /**
-     *  Repeat backspace as long as the backspace key is held down
-     **/
-    repeatDelete: () => void = function(this: VisualKeyboard) {
-      if(this.deleting) {
-        this.clickKey(this.deleteKey);
-        this.deleting = window.setTimeout(this.repeatDelete,100);
-      }
-    }.bind(this);
-
     // cancel = function(e) {} //cancel event is never generated by iOS
-
-    /**
-     * Get the current key target from the touch point element within the key
-     *
-     * @param   {Object}  t   element at touch point
-     * @return  {Object}      the key element (or null)
-     **/
-    keyTarget(target: HTMLElement | EventTarget): KeyElement {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
-      let t = <HTMLElement> target;
-
-      try {
-        if(t) {
-          if(util.hasClass(t,'kmw-key')) {
-            return getKeyFrom(t);
-          }
-          if(t.parentNode && util.hasClass(<HTMLElement> t.parentNode,'kmw-key')) {
-            return getKeyFrom(t.parentNode);
-          }
-          if(t.firstChild && util.hasClass(<HTMLElement> t.firstChild,'kmw-key')) {
-            return getKeyFrom(t.firstChild);
-          }
-        }
-      } catch(ex) {}
-      return null;
-    }
-
-    /**
-     * Identify the key nearest to the touch point if at the end of a key row,
-     * but return null more than about 0.6 key width from the nearest key.
-     *
-     *  @param  {Event}   e   touch event
-     *  @param  {Object}  t   HTML object at touch point
-     *  @return {Object}      nearest key to touch point
-     *
-     **/
-    findNearestKey(e: TouchEvent, t: HTMLElement): KeyElement {
-      if((!e) || (typeof e.changedTouches == 'undefined')
-        || (e.changedTouches.length == 0)) {
-        return null;
-      }
-
-      // Get touch point on screen
-      var x = e.changedTouches[0].pageX;
-
-      // Get key-row beneath touch point
-      while(t && t.className.indexOf('key-row') < 0) {
-        t = <HTMLElement> t.parentNode;
-      }
-      if(!t) {
-        return null;
-      }
-
-      // Find minimum distance from any key
-      var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
-      for(k = 0; k < t.childNodes.length; k++) {
-        if((<HTMLElement> t.childNodes[k].firstChild).className.indexOf('key-hidden') >= 0) {
-          continue;
-        }
-        x1 = (<HTMLElement> t.childNodes[k]).offsetLeft;
-        x2 = x1 + (<HTMLElement> t.childNodes[k]).offsetWidth;
-        dx =x1 - x;
-        if(dx >= 0 && dx < dxMin) {
-          k0 = k; dxMin = dx;
-        }
-        dx = x - x2;
-        if(dx >= 0 && dx < dxMin) {
-          k0 = k; dxMin = dx;
-        }
-      }
-
-      if(dxMin < 100000) {
-        t = <HTMLElement> t.childNodes[k0];
-        x1 = t.offsetLeft;
-        x2 = x1 + t.offsetWidth;
-
-        // Limit extended touch area to the larger of 0.6 of key width and 24 px
-        if(t.offsetWidth > 40) {
-          dxMax = 0.6 * t.offsetWidth;
-        }
-
-        if(((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-          return <KeyElement> t.firstChild;
-        }
-      }
-      return null;
-    }
 
     /**
      * Select the next keyboard layer for layer switching keys
@@ -2073,6 +2055,7 @@ namespace com.keyman.osk {
       return res ? res : 0;
     }
 
+    //#region 'native'-mode subkey handling
     /**
      * Display touch-hold array of 'sub-keys' above the currently touched key
      * @param       {Object}    e      primary key element
@@ -2108,26 +2091,6 @@ namespace com.keyman.osk {
       if(device.formFactor == 'phone') {
         this.prependBaseKey(e);
       }
-      var idx = e.id.split('-'), baseId = idx[idx.length-1];
-
-      // Newly removed via comment-out - this is exactly what the previous if-block addresses.
-      //
-      // // If not, insert at start
-      // if(device.formFactor == 'phone' && subKeySpec[0].id != baseId) {
-      //   var eCopy={'id':baseId,'layer':''};
-      //   if(idx.length > 1) {
-      //     eCopy['layer'] = idx[0];
-      //   }
-      //   for(i=0; i<e.childNodes.length; i++) {
-      //     if(util.hasClass(<HTMLElement> e.childNodes[i],'kmw-key-text')) {
-      //       break;
-      //     }
-      //   }
-      //   if(i < e.childNodes.length) {
-      //     eCopy['text'] = e.childNodes[i].textContent;
-      //   }
-      //   subKeySpec.splice(0,0,eCopy);
-      // }
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
@@ -2214,8 +2177,8 @@ namespace com.keyman.osk {
         //TODO: refactor this, it's pretty messy...
         var i, 
           idx = e.id.split('-'), 
-          baseId = idx[idx.length-1], 
-          layer = e['key'].spec['layer'] ? e['key'].spec['layer'] : (idx.length > 1 ? idx[0] : ''),
+          baseId = e['keyId'],
+          layer = e['key'].spec['layer'],
           sp = e['key'].spec['sp'],
           nextlayer = e['key'].spec['nextlayer'];
 
@@ -2237,6 +2200,7 @@ namespace com.keyman.osk {
         }
       }
     }
+    //#endregion
 
     /**
      * Indicate the current language and keyboard on the space bar
@@ -2315,6 +2279,7 @@ namespace com.keyman.osk {
       }
     }
 
+    //#region Mouse-event handling
     /**
      * Mouse down/mouse over event handler (desktop only)
      *
@@ -2373,6 +2338,7 @@ namespace com.keyman.osk {
         this.currentKey='';
       }
     }.bind(this);
+    //#endregion
 
     getKeyEmFontSize() {
       let keyman = com.keyman.singleton;
