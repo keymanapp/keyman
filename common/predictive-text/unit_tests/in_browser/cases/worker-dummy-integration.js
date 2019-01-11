@@ -54,6 +54,6 @@ describe('LMLayer using dummy model', function () {
   }
 
   function iGotDistractedByHazel() {
-    return __json__['future_suggestions/i_got_distracted_by_hazel']
+    return __json__['future_suggestions/i_got_distracted_by_hazel'];
   }
 });
