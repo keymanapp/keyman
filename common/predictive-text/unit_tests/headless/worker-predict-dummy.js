@@ -43,27 +43,24 @@ describe('LMLayerWorker dummy model', function() {
       //   «I'm a little teapot|      » [Send]
 
       var expectedSuggestions = [
-        // The transforms are a bit redundant, but slightly
-        // easier to program; they undo the 't' input, only to
-        // type suggestions with that all start with 't'.
         {
           transform: {
             insert: 'teapot',
-            deleteLeft: 1,
+            deleteLeft: 0,
           },
           displayAs: '🍵',
         },
         {
           transform: {
             insert: 'too',
-            deleteLeft: 1,
+            deleteLeft: 0,
           },
           displayAs: 'too',
         },
         {
           transform: {
             insert: 'tired',
-            deleteLeft: 1,
+            deleteLeft: 0,
           },
           displayAs: '😪',
         },
