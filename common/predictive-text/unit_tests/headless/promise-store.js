@@ -59,10 +59,15 @@ describe('PromiseStore', function () {
         promises.break(token, error);
       });
 
-      return promise.catch(function (actualError) {
-        assert.strictEqual(actualError, error);
-        assert.lengthOf(promises, 0);
-      });
+      // inspired by:
+      // https://gist.github.com/haroldtreen/5f1055eee5fcf01da3e0e15b8ec86bf6#gistcomment-2623170
+      return promise.then(
+        function () { return Promise.reject('should not be called'); },
+        function (actualError) {
+          assert.strictEqual(actualError, error);
+          assert.lengthOf(promises, 0);
+        }
+      );
     });
   });
 
