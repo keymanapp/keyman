@@ -28,17 +28,19 @@ describe('LMLayerWorker', function () {
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'ready',
       });
+      
+      var token = randomToken();
 
       // Now predict! We should get the suggestions back.
       worker.onMessage(createMessageEventWithData({
         message: 'predict',
-        // TODO: token
+        token: token,
         transform: zeroTransform(),
         context: emptyContext()
       }));
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'suggestions',
-        // TODO: token
+        token: token,
         suggestions: sinon.match.array.deepEquals([suggestion])
       });
     });
@@ -48,4 +50,11 @@ describe('LMLayerWorker', function () {
       sinon.restore();
     });
   });
+
+  // TODO: factor into helpers.
+  function randomToken() {
+    var range =  Number.MAX_SAFE_INTEGER - Number.MIN_SAFE_INTEGER;
+    return Math.random() * range + Number.MIN_SAFE_INTEGER;
+  }
+
 });
