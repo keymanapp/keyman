@@ -137,9 +137,80 @@ class LMLayer {
   }
 }
 
+/**
+ * Shh! Tokens are just signed 31-bit integers!
+ */
+type Token = number;
+type Resolve<T> = (value?: T | PromiseLike<T>) => void;
+type Reject = (reason?: any) => void;
+interface PromiseCallbacks<T> {
+  resolve: Resolve<T>;
+  reject: Reject;
+}
+
+/**
+ * Associate tokens with promises.
+ *
+ * First, .make() a promise -- associate a token with resolve/reject callbacks.
+ * 
+ * You can either .keep() a promise -- resolve() and forget it; 
+ * Or you may also .break() a promise -- reject() and forget it.
+ */
+class PromiseStore<T> {
+  private _promises: Map<Token, PromiseCallbacks<T>>;
+
+  constructor() {
+    this._promises = new Map();
+  }
+
+  /**
+   * Associate a token with its respective resolve and reject callbacks.
+   */
+  make(token: Token, resolve: Resolve<T>, reject: Reject): void {
+    if (this._promises.has(token)) {
+      reject(`Existing request with token ${token}`);
+    }
+    this._promises.set(token, {reject, resolve});
+  }
+
+  /**
+   * Fetch a promise's resolution function.
+   *
+   * Calling the resolution function will stop tracking the promise.
+   */
+  keep(token: Token): Resolve<T> {
+    let callbacks = this._promises.get(token);
+    if (!callbacks) {
+      throw new Error(`No promise associated with token: ${token}`);
+    }
+    let accept = callbacks.resolve;
+
+    // This acts like the resolve function, BUT, it removes the promise from
+    // the store -- because it's resolved!
+    return (resolvedValue: T) => {
+      this._promises.delete(token);
+      return accept(resolvedValue);
+    };
+  }
+
+  /**
+   * Instantly reject and forget a promise associated with the token.
+   */
+  break(token: Token, reason?: any): void {
+    let callbacks = this._promises.get(token);
+    if (!callbacks) {
+      throw new Error(`No promise associated with token: ${token}`);
+    }
+    this._promises.delete(token);
+    callbacks.reject(reason);
+  }
+}
+
 // Let LMLayer be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayer;
+  //@ts-ignore
+  LMLayer.PromiseStore = PromiseStore;
 } else {
   //@ts-ignore
   window.LMLayer = LMLayer;
