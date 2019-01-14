@@ -43,7 +43,7 @@ namespace {
       *out_ptr = new km_kbp_context_item[res.size()];
       std::move(res.begin(), res.end(), *out_ptr);
     }
-    catch(std::bad_alloc)
+    catch (std::bad_alloc &)
     {
       return KM_KBP_STATUS_NO_MEM;
     }
@@ -159,7 +159,7 @@ km_kbp_status km_kbp_context_get(km_kbp_context const *ctxt,
   {
     *out_ptr = new km_kbp_context_item[ctxt->size() + 1];
   }
-  catch (std::bad_alloc)
+  catch (std::bad_alloc &)
   {
     return KM_KBP_STATUS_NO_MEM;
   }
@@ -199,7 +199,7 @@ km_kbp_status km_kbp_context_append(km_kbp_context *ctxt,
     {
       ctxt->emplace_back(*ci);
     }
-  } catch(std::bad_alloc) {
+  } catch (std::bad_alloc &) {
     return KM_KBP_STATUS_NO_MEM;
   }
 
@@ -226,7 +226,7 @@ km_kbp_status km_kbp_context_shrink(km_kbp_context *ctxt, size_t num,
         ci++;
       }
     }
-  } catch(std::bad_alloc) {
+  } catch (std::bad_alloc &) {
     return KM_KBP_STATUS_NO_MEM;
   }
 

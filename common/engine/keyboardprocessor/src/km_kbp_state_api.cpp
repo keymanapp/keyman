@@ -35,7 +35,7 @@ km_kbp_status km_kbp_state_create(km_kbp_keyboard * keyboard,
   {
     *out = new km_kbp_state(static_cast<abstract_processor&>(*keyboard), env);
   }
-  catch (std::bad_alloc)
+  catch (std::bad_alloc &)
   {
     return KM_KBP_STATUS_NO_MEM;
   }
@@ -181,7 +181,7 @@ km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
         << "actions" << state->actions()
         << json::close;
   }
-  catch (std::bad_alloc)
+  catch (std::bad_alloc &)
   {
     *space = 0;
     return KM_KBP_STATUS_NO_MEM;
