@@ -578,7 +578,7 @@ namespace com.keyman.osk {
     keymanweb.domManager.initActiveElement(Lelem);
 
     // Check the virtual key 
-    var Lkc = {
+    var Lkc: com.keyman.text.KeyEvent = {
       Ltarg: keymanweb.domManager.getActiveElement(),
       Lmodifiers: shift,
       vkCode: code,

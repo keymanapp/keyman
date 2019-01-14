@@ -2,6 +2,24 @@
 /// <reference path="codes.ts" />
 
 namespace com.keyman.text {
+  export class KeyEvent {
+    Ltarg: HTMLElement;
+    Lcode: number;
+    Lstates: number;
+    LmodifierChange?: boolean;
+    Lmodifiers: number;
+    LisVirtualKeyCode?: boolean;
+    LisVirtualKey: boolean;
+    vkCode: number
+  };
+
+  export class LegacyKeyEvent {
+    Ltarg: HTMLElement;
+    Lcode: number;
+    Lmodifiers: number;
+    LisVirtualKey: number;
+  }
+
   export class Processor {
 
     // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
@@ -194,20 +212,6 @@ namespace com.keyman.text {
         return null;
       }
 
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-
-      if(activeKeyboard && activeKeyboard['KM']) {
-        // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
-        if(s.Lcode != Codes.keyCodes['K_SPACE']) {
-          // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
-          // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-          var mappedChar: string = com.keyman.singleton.textProcessor.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
-          if(mappedChar) {
-            s.Lcode = mappedChar.charCodeAt(0);
-          } // No 'else' - avoid blocking modifier keys, etc.
-        }
-      }
-
       // Stage 1 - track the true state of the keyboard's modifiers.
       var prevModState = this.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
@@ -263,23 +267,10 @@ namespace com.keyman.text {
       // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
       s.Lstates = 0;
       
-      if(e.getModifierState("CapsLock")) {
-        s.Lstates = modifierCodes['CAPS'];
-      } else {
-        s.Lstates = modifierCodes['NO_CAPS'];
-      }
-
-      if(e.getModifierState("NumLock")) {
-        s.Lstates |= modifierCodes['NUM_LOCK'];
-      } else {
-        s.Lstates |= modifierCodes['NO_NUM_LOCK'];
-      }
-
-      if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
-        s.Lstates |= modifierCodes['SCROLL_LOCK'];
-      } else {
-        s.Lstates |= modifierCodes['NO_SCROLL_LOCK'];
-      }
+      s.Lstates |= e.getModifierState('CapsLock') ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
+      s.Lstates |= e.getModifierState('NumLock') ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+      s.Lstates |= (e.getModifierState('ScrollLock') || e.getModifierState("Scroll")) // "Scroll" for IE9.
+        ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
 
       // We need these states to be tracked as well for proper OSK updates.
       curModState |= s.Lstates;
@@ -287,16 +278,6 @@ namespace com.keyman.text {
       // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
       s.LmodifierChange = this.modStateFlags != curModState;
       this.modStateFlags = curModState;
-
-      // Flip the shift bit if Caps Lock is active on mnemonic keyboards.
-      // Avoid signaling a change in the shift key's modifier state.  (The reason for this block's positioning.)
-      // TODO:  This is probably wrong, given that 96 - 111 provide key codes for the num pad region.
-      if(activeKeyboard && activeKeyboard['KM'] && e.getModifierState("CapsLock")) {
-        if((s.Lcode >= 65 && s.Lcode <= 90) /* 'A' - 'Z' */ || (s.Lcode >= 97 && s.Lcode <= 122) /* 'a' - 'z' */) {
-          curModState ^= 0x10; // Flip the 'shift' bit.
-          s.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
-        }
-      }
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
       var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
@@ -328,6 +309,15 @@ namespace com.keyman.text {
           ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
       }
 
+      // Mnemonic handling.
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+
+      if(activeKeyboard && activeKeyboard['KM']) {
+        // The following will never set a code corresponding to a modifier key, so it's fine to do this,
+        // which may change the value of Lcode, here.
+        this.setMnemonicCode(s, e.getModifierState("Shift"), e.getModifierState("CapsLock"));
+      }
+
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
       s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
@@ -346,7 +336,7 @@ namespace com.keyman.text {
      */
     clickKey(e: osk.KeyElement) {
       let keyman = com.keyman.singleton;
-      var Lelem = keyman.domManager.getLastActiveElement(), Ls, Le, Lkc;
+      var Lelem = keyman.domManager.getLastActiveElement(), Ls, Le;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let kbdInterface = keyman.interface;
@@ -403,12 +393,13 @@ namespace com.keyman.text {
 
         // Start:  mirrors _GetKeyEventProperties
         // First check the virtual key, and process shift, control, alt or function keys
-        Lkc = {
+        var Lkc: KeyEvent = {
           Ltarg: Lelem,
-          Lmodifiers:0,
-          Lstates:0,
+          Lmodifiers: 0,
+          Lstates: 0,
           Lcode: Codes.keyCodes[keyName],
-          LisVirtualKey:true
+          LisVirtualKey: true,
+          vkCode: 0
         };
 
         // Set the flags for the state keys.
@@ -417,7 +408,9 @@ namespace com.keyman.text {
         Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
 
         // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-        if(keyName.substr(0,2) == 'U_') Lkc.LisVirtualKey=false;
+        if(keyName.substr(0,2) == 'U_') {
+          Lkc.LisVirtualKey=false;
+        }
 
         // Get code for non-physical keys (T_KOKAI, U_05AB etc)
         if(typeof Lkc.Lcode == 'undefined') {
@@ -448,24 +441,9 @@ namespace com.keyman.text {
         // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
         if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && formFactor != 'desktop')) {
           if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) { // exception required, March 2013
+            // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
             Lkc.vkCode = Lkc.Lcode;
-            // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
-            // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-            var mappedChar: string = keyman.textProcessor.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
-            if(mappedChar) {
-              // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
-              // to numpad keys!
-              Lkc.Lcode = mappedChar.charCodeAt(0);
-            } // No 'else' - avoid remapping control + modifier keys!
-
-            // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
-            // to numpad keys!
-            if(this.stateKeys['K_CAPS']) {
-              if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
-                Lkc.Lmodifiers ^= 0x10; // Flip the 'shift' bit.
-                Lkc.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
-              }
-            }
+            this.setMnemonicCode(Lkc, layer.indexOf('shift') != -1, this.stateKeys['K_CAPS']);
           }
         } else {
           Lkc.vkCode=Lkc.Lcode;
@@ -490,12 +468,13 @@ namespace com.keyman.text {
             case 'K_NUMLOCK':
             case 'K_SCROLL':
               this.stateKeys[keyName] = ! this.stateKeys[keyName];
-              // Will call VisualKeyboard._UpdateVKShiftStyle, updating state key visualization.
+
+              // Will also call VisualKeyboard._UpdateVKShiftStyle, updating the OSK's state key visualization.
               com.keyman.singleton.osk._Show();
               break;
             default:
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-              var ch = keyman.textProcessor.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState,true,Lelem);
+              var ch = this.defaultKeyOutput(keyName, Lkc.Lcode, keyShiftState, true, Lelem);
               if(ch) {
                 kbdInterface.output(0, Lelem, ch);
               }
@@ -513,6 +492,30 @@ namespace com.keyman.text {
       
       keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       return true;
+    }
+
+    // FIXME:  makes some bad assumptions.
+    setMnemonicCode(Lkc: KeyEvent, shifted: boolean, capsActive: boolean) {
+      // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
+      // It's also a "exception required, March 2013" for clickKey, so at least they both have this requirement.
+      if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) {
+        // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+        // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+        var mappedChar: string = this.defaultKeyOutput('K_xxxx', Lkc.Lcode, (shifted ? 0x10 : 0), false, null);
+        if(mappedChar) {
+          // FIXME;  Warning - will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
+          Lkc.Lcode = mappedChar.charCodeAt(0);
+        } // No 'else' - avoid blocking modifier keys, etc.
+      }
+
+      if(capsActive) {
+        // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
+        // to numpad keys!  (Physical keyboard section has its own issues here.)
+        if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
+          Lkc.Lmodifiers ^= 0x10;  // Flip the 'shifted' bit, so it'll act as the opposite key.
+          Lkc.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+        }
+      }
     }
 
     /**
@@ -602,7 +605,7 @@ namespace com.keyman.text {
      * @param       {number}            v     keyboard shift state
      * @param       {(boolean|number)}  d     set (1) or clear(0) shift state bits
      * @return      {boolean}                 Always true
-     * Description  Update the current shift state within KMW
+     * Description  Updates the current shift state within KMW, updating the OSK's visualization thereof.
      */
     _UpdateVKShift(e, v: number, d: boolean|number): boolean {
       var keyShiftState=0, lockStates=0, i;
@@ -757,7 +760,6 @@ namespace com.keyman.text {
      */
     updateLayer(id: string) {
       let keyman = com.keyman.singleton;
-      let processor = keyman.textProcessor;
       let vkbd = keyman['osk'].vkbd;
 
       if(!vkbd) {
@@ -797,7 +799,7 @@ namespace com.keyman.text {
         // if(idx == '') with accompanying if-else structural shift would be a far better test here.
         else {
           // Save our current modifier state.
-          var modifier=processor.getModifierState(s);
+          var modifier=this.getModifierState(s);
 
           // Strip down to the base modifiable layer.
           for(i=0; i < replacements.length; i++) {
@@ -961,7 +963,7 @@ namespace com.keyman.text {
         
         if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-          var Levent2: com.keyman.LegacyKeyEvent = {
+          var Levent2: LegacyKeyEvent = {
             Lcode: keyMapManager._USKeyCodeToCharCode(Levent),
             Ltarg: Levent.Ltarg,
             Lmodifiers: 0,

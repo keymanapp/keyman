@@ -8,6 +8,14 @@
 ***/
 
 namespace com.keyman {
+  type KeyEvent = com.keyman.text.KeyEvent;
+
+  export class KeyInformation {
+    vk: boolean;
+    code: number;
+    modifiers: number;
+  }
+
   /*
   * Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
   * No constructors or methods since keyboards will not utilize the same backing prototype, and
@@ -1307,7 +1315,7 @@ namespace com.keyman {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device, element: HTMLElement, keystroke:KeyEvent|LegacyKeyEvent) {
+    processKeystroke(device, element: HTMLElement, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
       // Clear internal state tracking data from prior keystrokes.
       (<any>this.keymanweb)._CachedSelectionStart = null; // I3319     
       this._DeadkeyResetMatched();       // I3318    

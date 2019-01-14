@@ -1,15 +1,4 @@
 namespace com.keyman {
-  export class KeyEvent {
-      Ltarg: HTMLElement;
-      Lcode: number;
-      Lstates: number;
-      LmodifierChange: boolean;
-      Lmodifiers: number;
-      LisVirtualKeyCode: boolean;
-      LisVirtualKey: boolean;
-      vkCode: number
-  };
-
   export class AttachmentInfo {
     /**
      * Tracks the control's independent keyboard selection, when applicable.
@@ -33,19 +22,6 @@ namespace com.keyman {
       this.keyboard = kbd;
       this.touchEnabled = touch;
     }
-  }
-
-  export class LegacyKeyEvent {
-    Ltarg: HTMLElement;
-    Lcode: number;
-    Lmodifiers: number;
-    LisVirtualKey: number;
-  }
-
-  export class KeyInformation {
-    vk: boolean;
-    code: number;
-    modifiers: number;
   }
 
   export class StyleCommand {
