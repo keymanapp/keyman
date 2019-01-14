@@ -143,7 +143,7 @@ uses
 
   extctrls, stdctrls, comctrls;
 
-procedure FirstRun(FQuery: string); forward;  // I2562
+function FirstRun(FQuery: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 
@@ -381,7 +381,9 @@ begin
       PrintKeyboard(FirstKeyboardFileName);
 
     fmFirstRun:  // I2562
-      FirstRun(FQuery);
+      if FirstRun(FQuery)
+        then ExitCode := 0
+        else ExitCode := 2;
 
     fmOnlineUpdateAdmin:
       OnlineUpdateAdmin(FirstKeyboardFileName);
@@ -495,16 +497,17 @@ begin
   FreeAndNil(FMutex);  // I2720
 end;
 
-procedure FirstRun(FQuery: string); // I2562
+function FirstRun(FQuery: string): Boolean; // I2562
 var
   DoAdmin: Boolean;
 begin
+  Result := True;
   DoAdmin := kmcom.SystemInfo.IsAdministrator;
 
   if not DoAdmin then
   begin
     // I2651 - options not matching, case sensitivity, 8.0.309.0
-    FirstRunInstallDefaults(Pos('installdefaults', FQuery) > 0, Pos('startwithwindows', FQuery) > 0, Pos('checkforupdates', FQuery) > 0);  // I2651, I2753
+    Result := FirstRunInstallDefaults(Pos('installdefaults', FQuery) > 0, Pos('startwithwindows', FQuery) > 0, Pos('checkforupdates', FQuery) > 0);  // I2651, I2753
   end;
 
   UpdateAllLocaleDoctypes; // I2605

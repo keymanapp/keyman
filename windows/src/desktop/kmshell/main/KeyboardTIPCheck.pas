@@ -68,7 +68,9 @@ begin
     begin
       Found := False;
 
-      ippm.EnumProfiles(k.Languages[j].LangID, ppe);
+      if not Succeeded(ippm.EnumProfiles(k.Languages[j].LangID, ppe)) then
+        Exit(False);
+
       while ppe.Next(1, profile, n) = S_OK do
       begin
         if IsEqualGUID(k.Languages[j].ProfileGUID, profile.guidProfile) then
