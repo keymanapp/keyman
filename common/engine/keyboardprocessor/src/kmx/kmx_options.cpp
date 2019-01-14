@@ -33,7 +33,7 @@ void KMX_Options::AddOptionsStoresFromXString(PKMX_WCHAR s) {
       case CODE_SAVEOPT:
       case CODE_RESETOPT:
         idx = *(s + 2) - 1;
-        if (idx >= 0 && idx < _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
+        if (idx < _kp->Keyboard->cxStoreArray && _kp->Keyboard->dpStoreArray[idx].dpName != NULL) {
           _kp->KeyboardOptions[idx].OriginalStore = _kp->Keyboard->dpStoreArray[idx].dpString;
         }
         break;
