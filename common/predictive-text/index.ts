@@ -164,6 +164,13 @@ class PromiseStore<T> {
   }
 
   /**
+   * How many promises are currently being tracked?
+   */
+  get length(): number {
+    return this._promises.size;
+  }
+
+  /**
    * Associate a token with its respective resolve and reject callbacks.
    */
   make(token: Token, resolve: Resolve<T>, reject: Reject): void {
