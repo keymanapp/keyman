@@ -532,8 +532,8 @@ $(function () {
     $('#selSubKeyLayerOverride option').remove();
     $('#addLayerList option').remove();
 
-    add($selKeyLayerOverride, '', '(layer default)');
-    add($selSubKeyLayerOverride, '', '(layer default)');
+    add($selKeyLayerOverride, '', '(current layer)');
+    add($selSubKeyLayerOverride, '', '(current layer)');
     add($addLayerList, '', '(custom)');
     
         
