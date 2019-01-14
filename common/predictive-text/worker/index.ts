@@ -194,6 +194,7 @@ class LMLayerWorker {
 
         let {transform, context} = payload;
         this.cast('suggestions', {
+          token: payload.token,
           suggestions: model.predict(transform, context)
         });
       }

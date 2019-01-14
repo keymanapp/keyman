@@ -38,6 +38,7 @@ type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
  * The valid incoming message kinds.
  */
 type IncomingMessageKind = 'initialize' | 'predict';
+type IncomingMessage = InitializeMessage | PredictMessage;
 
 /**
  * The structure of an initialization message. It should include the model (either in
@@ -61,6 +62,12 @@ interface InitializeMessage {
  */
 interface PredictMessage {
   message: 'predict';
+
+  /**
+   * Opaque, unique token that pairs this predict message with its suggestions.
+   */
+  token: Token;
+
   /**
    * How the input event will transform the buffer.
    * If this is not provided, then the prediction is not
@@ -83,16 +90,30 @@ interface PredictMessage {
  * The valid outgoing message kinds.
  */
 type OutgoingMessageKind = 'ready' | 'suggestions';
+type OutgoingMessage = ReadyMessage | SuggestionMessage;
 
 /**
- * The structure of the message back to the keyboard.
+ * Tells the keyboard that the LMLayer is ready. Provides
+ * negotiated configuration.
  */
 interface ReadyMessage {
   message: 'ready';
   configuration: Configuration;
 }
 
-type IncomingMessage = InitializeMessage | PredictMessage;
+/**
+ * Sends the keyboard an ordered list of suggestions.
+ */
+interface SuggestionMessage {
+  message: 'suggestions';
+
+  /**
+   * Opaque, unique token that pairs this suggestions message
+   * with the predict message that initiated it.
+   */
+  token: Token;
+}
+
 
 /**
  * Represents a state in the LMLayer.

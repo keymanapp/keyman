@@ -45,7 +45,8 @@ class LMLayer {
    */
   private _worker: Worker;
   /** Call this when the LMLayer has sent us the 'ready' message! */
-  private _declareLMLayerReady: (Configuration) => void;
+  private _declareLMLayerReady: (conf: Configuration) => void;
+  private _promises: PromiseStore<any>;
 
   /**
    * Construct the top-level LMLayer interface. This also starts the underlying Worker.
@@ -59,6 +60,7 @@ class LMLayer {
     this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
     this._worker.onmessage = this.onMessage.bind(this)
     this._declareLMLayerReady = null;
+    this._promises = new PromiseStore;
   }
 
   /**
@@ -84,7 +86,7 @@ class LMLayer {
       this._worker.postMessage({
         message: 'predict',
         transform: transform,
-        context: context
+        context: context,
         // TODO: tokens! implement the PromiseStore:
         // https://github.com/eddieantonio/keyman-lmlayer-prototype/blob/f8e6268b03190d08cf5d35f9428cf9150d6d219e/index.ts#L133-L186
       });
@@ -137,10 +139,6 @@ class LMLayer {
   }
 }
 
-/**
- * Shh! Tokens are just signed 31-bit integers!
- */
-type Token = number;
 type Resolve<T> = (value?: T | PromiseLike<T>) => void;
 type Reject = (reason?: any) => void;
 interface PromiseCallbacks<T> {

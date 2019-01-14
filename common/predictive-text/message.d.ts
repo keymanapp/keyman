@@ -33,6 +33,10 @@
  */	
 type USVString = string;
 
+/**
+ * Tokens are signed 31-bit integers!
+ */
+type Token = number;
 
 /**
  * Describes the capabilities of the keyboard's platform.
