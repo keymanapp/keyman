@@ -1271,8 +1271,8 @@ namespace com.keyman.osk {
       layer=this.layers[n];
       
       // Set the on/off state of any visible state keys.
-      var states =['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
-      var keys   =[layer.capsKey, layer.numKey, layer.scrollKey];
+      var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
+      var keys   = [layer.capsKey, layer.numKey, layer.scrollKey];
 
       for(i=0; i < keys.length; i++) {
         // Skip any keys not in the OSK!

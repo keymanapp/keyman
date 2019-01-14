@@ -160,6 +160,182 @@ namespace com.keyman.text {
     }
 
     /**
+     * Function     _GetKeyEventProperties
+     * Scope        Private
+     * @param       {Event}       e         Event object
+     * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
+     * @return      {Object.<string,*>}     KMW keyboard event object: 
+     * Description  Get object with target element, key code, shift state, virtual key state 
+     *                Ltarg=target element
+     *                Lcode=keyCode
+     *                Lmodifiers=shiftState
+     *                LisVirtualKeyCode e.g. ctrl/alt key
+     *                LisVirtualKey     e.g. Virtual key or non-keypress event
+     */    
+    _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
+      var s = new KeyEvent();
+      let keyman = com.keyman.singleton;
+
+      e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
+      s.Ltarg = keyman.util.eventTarget(e) as HTMLElement;
+      if (s.Ltarg == null) {
+        return null;
+      }
+      if(e.cancelBubble === true) {
+        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
+      }      
+
+      if (s.Ltarg.nodeType == 3) {// defeat Safari bug
+        s.Ltarg = s.Ltarg.parentNode as HTMLElement;
+      }
+
+      s.Lcode = this._GetEventKeyCode(e);
+      if (s.Lcode == null) {
+        return null;
+      }
+
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+
+      if(activeKeyboard && activeKeyboard['KM']) {
+        // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
+        if(s.Lcode != Codes.keyCodes['K_SPACE']) {
+          // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+          // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+          var mappedChar: string = com.keyman.singleton.textProcessor.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+          if(mappedChar) {
+            s.Lcode = mappedChar.charCodeAt(0);
+          } // No 'else' - avoid blocking modifier keys, etc.
+        }
+      }
+
+      // Stage 1 - track the true state of the keyboard's modifiers.
+      var prevModState = this.modStateFlags, curModState = 0x0000;
+      var ctrlEvent = false, altEvent = false;
+      
+      let keyCodes = Codes.keyCodes;
+      switch(s.Lcode) {
+        case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+        case keyCodes['K_LCTRL']:
+        case keyCodes['K_RCTRL']:
+        case keyCodes['K_CONTROL']:
+        case keyCodes['K_LCONTROL']:
+        case keyCodes['K_RCONTROL']:
+          ctrlEvent = true;
+          break;
+        case keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+        case keyCodes['K_RMENU']:
+        case keyCodes['K_ALT']:
+        case keyCodes['K_LALT']:
+        case keyCodes['K_RALT']:
+          altEvent = true;
+          break;
+      }
+
+      /**
+       * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
+       * 
+       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
+       *     Problem: its layer isn't presently activated within the OSK.
+       * 
+       * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+       *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
+       *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
+       * 
+       * In either case, `e.getModifierState("Control")` is set to true, but as a result does nothing to tell us which case is active.
+       * 
+       * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
+       */
+
+      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
+
+      let modifierCodes = Codes.modifierCodes;
+      if(e.getModifierState("Control")) {
+        curModState |= ((e.location != 0 && ctrlEvent) ? 
+          (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
+          prevModState & 0x0003);                                                       // Condition 2
+      }
+      if(e.getModifierState("Alt")) {
+        curModState |= ((e.location != 0 && altEvent) ? 
+          (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
+          prevModState & 0x000C);                                                       // Condition 2
+      }
+
+      // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
+      s.Lstates = 0;
+      
+      if(e.getModifierState("CapsLock")) {
+        s.Lstates = modifierCodes['CAPS'];
+      } else {
+        s.Lstates = modifierCodes['NO_CAPS'];
+      }
+
+      if(e.getModifierState("NumLock")) {
+        s.Lstates |= modifierCodes['NUM_LOCK'];
+      } else {
+        s.Lstates |= modifierCodes['NO_NUM_LOCK'];
+      }
+
+      if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
+        s.Lstates |= modifierCodes['SCROLL_LOCK'];
+      } else {
+        s.Lstates |= modifierCodes['NO_SCROLL_LOCK'];
+      }
+
+      // We need these states to be tracked as well for proper OSK updates.
+      curModState |= s.Lstates;
+
+      // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
+      s.LmodifierChange = this.modStateFlags != curModState;
+      this.modStateFlags = curModState;
+
+      // Flip the shift bit if Caps Lock is active on mnemonic keyboards.
+      // Avoid signaling a change in the shift key's modifier state.  (The reason for this block's positioning.)
+      // TODO:  This is probably wrong, given that 96 - 111 provide key codes for the num pad region.
+      if(activeKeyboard && activeKeyboard['KM'] && e.getModifierState("CapsLock")) {
+        if((s.Lcode >= 65 && s.Lcode <= 90) /* 'A' - 'Z' */ || (s.Lcode >= 97 && s.Lcode <= 122) /* 'a' - 'z' */) {
+          curModState ^= 0x10; // Flip the 'shift' bit.
+          s.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+        }
+      }
+
+      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
+      var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
+      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
+        // We just released AltGr - make sure it's all released.
+        curModState &= ~ altGrMask;
+      }
+      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
+      if(curModState & modifierCodes['RALT']) {
+        curModState &= ~modifierCodes['LCTRL'];
+      }
+
+      let modifierBitmasks = Codes.modifierBitmasks;
+      // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
+      if(keyman.keyboardManager.isChiral()) {
+        s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
+
+        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
+        // AltGr / Right-alt simulation.
+        if(osk.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= modifierCodes['RALT'];
+        }
+      } else {
+        // No need to sim AltGr here; we don't need chiral ALTs.
+        s.Lmodifiers = 
+          (curModState & 0x10) | // SHIFT
+          ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) | 
+          ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
+      }
+
+      // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
+      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
+      s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
+      
+      return s;
+    }
+
+    /**
      * Simulate a keystroke according to the touched keyboard button element
      *
      * Note that the test-case oriented 'recorder' stubs this method to facilitate OSK-based input
@@ -277,9 +453,13 @@ namespace com.keyman.text {
             // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
             var mappedChar: string = keyman.textProcessor.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
             if(mappedChar) {
+              // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
+              // to numpad keys!
               Lkc.Lcode = mappedChar.charCodeAt(0);
             } // No 'else' - avoid remapping control + modifier keys!
 
+            // TODO:  Needs fixing - does not properly mirror physical keystrokes, as Lcode range 96-111 corresponds
+            // to numpad keys!
             if(this.stateKeys['K_CAPS']) {
               if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
                 Lkc.Lmodifiers ^= 0x10; // Flip the 'shift' bit.
@@ -297,6 +477,8 @@ namespace com.keyman.text {
           Lkc.LisVirtualKey=false;
         }
 
+        // End mnemonic management.
+
         // Pass this key code and state to the keyboard program
         if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, Lelem, Lkc))) {
           // Restore the virtual key code if a mnemonic keyboard is being used
@@ -308,6 +490,7 @@ namespace com.keyman.text {
             case 'K_NUMLOCK':
             case 'K_SCROLL':
               this.stateKeys[keyName] = ! this.stateKeys[keyName];
+              // Will call VisualKeyboard._UpdateVKShiftStyle, updating state key visualization.
               com.keyman.singleton.osk._Show();
               break;
             default:
@@ -691,181 +874,6 @@ namespace com.keyman.text {
       } else {
         return null;
       }
-    }
-
-    /**
-     * Function     _GetKeyEventProperties
-     * Scope        Private
-     * @param       {Event}       e         Event object
-     * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
-     * @return      {Object.<string,*>}     KMW keyboard event object: 
-     * Description  Get object with target element, key code, shift state, virtual key state 
-     *                Ltarg=target element
-     *                Lcode=keyCode
-     *                Lmodifiers=shiftState
-     *                LisVirtualKeyCode e.g. ctrl/alt key
-     *                LisVirtualKey     e.g. Virtual key or non-keypress event
-     */    
-    _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
-      var s = new KeyEvent();
-      let keyman = com.keyman.singleton;
-
-      e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
-      s.Ltarg = keyman.util.eventTarget(e) as HTMLElement;
-      if (s.Ltarg == null) {
-        return null;
-      }
-      if(e.cancelBubble === true) {
-        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
-      }      
-
-      if (s.Ltarg.nodeType == 3) {// defeat Safari bug
-        s.Ltarg = s.Ltarg.parentNode as HTMLElement;
-      }
-
-      s.Lcode = this._GetEventKeyCode(e);
-      if (s.Lcode == null) {
-        return null;
-      }
-
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-
-      if(activeKeyboard && activeKeyboard['KM']) {
-        // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
-        if(s.Lcode != Codes.keyCodes['K_SPACE']) {
-          // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
-          // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-          var mappedChar: string = com.keyman.singleton.textProcessor.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
-          if(mappedChar) {
-            s.Lcode = mappedChar.charCodeAt(0);
-          } // No 'else' - avoid blocking modifier keys, etc.
-        }
-      }
-
-      // Stage 1 - track the true state of the keyboard's modifiers.
-      var prevModState = this.modStateFlags, curModState = 0x0000;
-      var ctrlEvent = false, altEvent = false;
-      
-      let keyCodes = Codes.keyCodes;
-      switch(s.Lcode) {
-        case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
-        case keyCodes['K_LCTRL']:
-        case keyCodes['K_RCTRL']:
-        case keyCodes['K_CONTROL']:
-        case keyCodes['K_LCONTROL']:
-        case keyCodes['K_RCONTROL']:
-          ctrlEvent = true;
-          break;
-        case keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
-        case keyCodes['K_RMENU']:
-        case keyCodes['K_ALT']:
-        case keyCodes['K_LALT']:
-        case keyCodes['K_RALT']:
-          altEvent = true;
-          break;
-      }
-
-      /**
-       * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
-       * 
-       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
-       *     Problem: its layer isn't presently activated within the OSK.
-       * 
-       * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
-       *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
-       *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
-       * 
-       * In either case, `e.getModifierState("Control")` is set to true, but as a result does nothing to tell us which case is active.
-       * 
-       * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
-       */
-
-      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
-
-      let modifierCodes = Codes.modifierCodes;
-      if(e.getModifierState("Control")) {
-        curModState |= ((e.location != 0 && ctrlEvent) ? 
-          (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
-          prevModState & 0x0003);                                                       // Condition 2
-      }
-      if(e.getModifierState("Alt")) {
-        curModState |= ((e.location != 0 && altEvent) ? 
-          (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
-          prevModState & 0x000C);                                                       // Condition 2
-      }
-
-      // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
-      s.Lstates = 0;
-      
-      if(e.getModifierState("CapsLock")) {
-        s.Lstates = modifierCodes['CAPS'];
-      } else {
-        s.Lstates = modifierCodes['NO_CAPS'];
-      }
-
-      if(e.getModifierState("NumLock")) {
-        s.Lstates |= modifierCodes['NUM_LOCK'];
-      } else {
-        s.Lstates |= modifierCodes['NO_NUM_LOCK'];
-      }
-
-      if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
-        s.Lstates |= modifierCodes['SCROLL_LOCK'];
-      } else {
-        s.Lstates |= modifierCodes['NO_SCROLL_LOCK'];
-      }
-
-      // We need these states to be tracked as well for proper OSK updates.
-      curModState |= s.Lstates;
-
-      // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
-      s.LmodifierChange = this.modStateFlags != curModState;
-      this.modStateFlags = curModState;
-
-      // Flip the shift bit if Caps Lock is active on mnemonic keyboards.
-      // Avoid signaling a change in the shift key's modifier state.  (The reason for this block's positioning.)
-      if(activeKeyboard && activeKeyboard['KM'] && e.getModifierState("CapsLock")) {
-        if((s.Lcode >= 65 && s.Lcode <= 90) /* 'A' - 'Z' */ || (s.Lcode >= 97 && s.Lcode <= 122) /* 'a' - 'z' */) {
-          curModState ^= 0x10; // Flip the 'shift' bit.
-          s.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
-        }
-      }
-
-      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-      var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
-      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
-        // We just released AltGr - make sure it's all released.
-        curModState &= ~ altGrMask;
-      }
-      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-      if(curModState & modifierCodes['RALT']) {
-        curModState &= ~modifierCodes['LCTRL'];
-      }
-
-      let modifierBitmasks = Codes.modifierBitmasks;
-      // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
-      if(keyman.keyboardManager.isChiral()) {
-        s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
-
-        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
-        // AltGr / Right-alt simulation.
-        if(osk.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
-          s.Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
-          s.Lmodifiers |= modifierCodes['RALT'];
-        }
-      } else {
-        // No need to sim AltGr here; we don't need chiral ALTs.
-        s.Lmodifiers = 
-          (curModState & 0x10) | // SHIFT
-          ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) | 
-          ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
-      }
-
-      // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
-      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
-      s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
-      
-      return s;
     }
 
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
