@@ -220,12 +220,10 @@
       var kmw=window['keyman'];
       //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
-        if (r == false) {
+        if (!kmw['executeHardwareKeystroke'](code, shift, lstates)) {
           // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
-          var k = window.jsInterface.dispatchKey(code, eventModifiers);
+          window.jsInterface.dispatchKey(code, eventModifiers);
         }
-        //window.console.log('executeHardwareKeystroke completed with '+r);
       } catch(e) {
         window.console.log('executeHardwareKeystroke exception: '+e);
       }
