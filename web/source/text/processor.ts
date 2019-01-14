@@ -12,6 +12,14 @@ namespace com.keyman.text {
       "K_SCROLL":false
     };
 
+    // Tracks the most recent modifier state information in order to quickly detect changes
+    // in keyboard state not otherwise captured by the hosting page in the browser.
+    // Needed for AltGr simulation.
+    modStateFlags: number = 0;
+    // Denotes whether or not KMW needs to 'swallow' the next keypress.
+    swallowKeypress: boolean = false;
+
+
     /**
      * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
      * Otherwise, lookup the  virtual key code (physical keyboard mapping)
@@ -186,6 +194,7 @@ namespace com.keyman.text {
         keyman['osk'].vkbd.highlightKey(e,false);
 
         // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
+        // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
         if(formFactor == 'desktop') {
           if(this.selectLayer(keyName, nextLayer)) {
             return true;
@@ -216,9 +225,10 @@ namespace com.keyman.text {
         kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
         //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
+        // Start:  mirrors _GetKeyEventProperties
         // First check the virtual key, and process shift, control, alt or function keys
         Lkc = {
-          Ltarg:Lelem,
+          Ltarg: Lelem,
           Lmodifiers:0,
           Lstates:0,
           Lcode: Codes.keyCodes[keyName],
@@ -255,6 +265,8 @@ namespace com.keyman.text {
           Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
           Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
         }
+
+        // End - mirrors _GetKeyEventProperties
 
         // Include *limited* support for mnemonic keyboards (Sept 2012)
         // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
@@ -423,7 +435,7 @@ namespace com.keyman.text {
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
         if(keyman.keyboardManager.isChiral() && osk.Layouts.emulatesAltGr() && 
-            (com.keyman.DOMEventHandlers.states.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
+            (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~Codes.modifierCodes['RALT'];
         }
@@ -663,6 +675,418 @@ namespace com.keyman.text {
           vkbd.showLayer('default');
         }
       }
+    }
+
+    /**
+     * Function     _GetEventKeyCode
+     * Scope        Private
+     * @param       {Event}       e         Event object
+     * Description  Finds the key code represented by the event.
+     */
+    _GetEventKeyCode(e: KeyboardEvent) {
+      if (e.keyCode) {
+        return e.keyCode;
+      } else if (e.which) {
+        return e.which;
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Function     _GetKeyEventProperties
+     * Scope        Private
+     * @param       {Event}       e         Event object
+     * @param       {boolean=}    keyState  true if call results from a keyDown event, false if keyUp, undefined if keyPress
+     * @return      {Object.<string,*>}     KMW keyboard event object: 
+     * Description  Get object with target element, key code, shift state, virtual key state 
+     *                Ltarg=target element
+     *                Lcode=keyCode
+     *                Lmodifiers=shiftState
+     *                LisVirtualKeyCode e.g. ctrl/alt key
+     *                LisVirtualKey     e.g. Virtual key or non-keypress event
+     */    
+    _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
+      var s = new KeyEvent();
+      let keyman = com.keyman.singleton;
+
+      e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
+      s.Ltarg = keyman.util.eventTarget(e) as HTMLElement;
+      if (s.Ltarg == null) {
+        return null;
+      }
+      if(e.cancelBubble === true) {
+        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
+      }      
+
+      if (s.Ltarg.nodeType == 3) {// defeat Safari bug
+        s.Ltarg = s.Ltarg.parentNode as HTMLElement;
+      }
+
+      s.Lcode = this._GetEventKeyCode(e);
+      if (s.Lcode == null) {
+        return null;
+      }
+
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+
+      if(activeKeyboard && activeKeyboard['KM']) {
+        // K_SPACE is not handled by defaultKeyOutput for physical keystrokes unless using touch-aliased elements.
+        if(s.Lcode != Codes.keyCodes['K_SPACE']) {
+          // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
+          // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
+          var mappedChar: string = com.keyman.singleton.textProcessor.defaultKeyOutput('K_xxxx', s.Lcode, (e.getModifierState("Shift") ? 0x10 : 0), false, null);
+          if(mappedChar) {
+            s.Lcode = mappedChar.charCodeAt(0);
+          } // No 'else' - avoid blocking modifier keys, etc.
+        }
+      }
+
+      // Stage 1 - track the true state of the keyboard's modifiers.
+      var prevModState = this.modStateFlags, curModState = 0x0000;
+      var ctrlEvent = false, altEvent = false;
+      
+      let keyCodes = Codes.keyCodes;
+      switch(s.Lcode) {
+        case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
+        case keyCodes['K_LCTRL']:
+        case keyCodes['K_RCTRL']:
+        case keyCodes['K_CONTROL']:
+        case keyCodes['K_LCONTROL']:
+        case keyCodes['K_RCONTROL']:
+          ctrlEvent = true;
+          break;
+        case keyCodes['K_LMENU']:     // The 2 "K_*MENU" entries exist in some legacy keyboards.
+        case keyCodes['K_RMENU']:
+        case keyCodes['K_ALT']:
+        case keyCodes['K_LALT']:
+        case keyCodes['K_RALT']:
+          altEvent = true;
+          break;
+      }
+
+      /**
+       * Two separate conditions exist that should trigger chiral modifier detection.  Examples below use CTRL but also work for ALT.
+       * 
+       * 1.  The user literally just pressed CTRL, so the event has a valid `location` property we can utilize.  
+       *     Problem: its layer isn't presently activated within the OSK.
+       * 
+       * 2.  CTRL has been held a while, so the OSK layer is valid, but the key event doesn't tell us the chirality of the active CTRL press.
+       *     Bonus issue:  RAlt simulation may cause erasure of this location property, but it should ONLY be empty if pressed in this case.
+       *     We default to the 'left' variants since they're more likely to exist and cause less issues with RAlt simulation handling.
+       * 
+       * In either case, `e.getModifierState("Control")` is set to true, but as a result does nothing to tell us which case is active.
+       * 
+       * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
+       */
+
+      curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
+
+      let modifierCodes = Codes.modifierCodes;
+      if(e.getModifierState("Control")) {
+        curModState |= ((e.location != 0 && ctrlEvent) ? 
+          (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
+          prevModState & 0x0003);                                                       // Condition 2
+      }
+      if(e.getModifierState("Alt")) {
+        curModState |= ((e.location != 0 && altEvent) ? 
+          (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
+          prevModState & 0x000C);                                                       // Condition 2
+      }
+
+      // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
+      s.Lstates = 0;
+      
+      if(e.getModifierState("CapsLock")) {
+        s.Lstates = modifierCodes['CAPS'];
+      } else {
+        s.Lstates = modifierCodes['NO_CAPS'];
+      }
+
+      if(e.getModifierState("NumLock")) {
+        s.Lstates |= modifierCodes['NUM_LOCK'];
+      } else {
+        s.Lstates |= modifierCodes['NO_NUM_LOCK'];
+      }
+
+      if(e.getModifierState("ScrollLock") || e.getModifierState("Scroll")) {  // "Scroll" for IE9.
+        s.Lstates |= modifierCodes['SCROLL_LOCK'];
+      } else {
+        s.Lstates |= modifierCodes['NO_SCROLL_LOCK'];
+      }
+
+      // We need these states to be tracked as well for proper OSK updates.
+      curModState |= s.Lstates;
+
+      // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
+      s.LmodifierChange = this.modStateFlags != curModState;
+      this.modStateFlags = curModState;
+
+      // Flip the shift bit if Caps Lock is active on mnemonic keyboards.
+      // Avoid signaling a change in the shift key's modifier state.  (The reason for this block's positioning.)
+      if(activeKeyboard && activeKeyboard['KM'] && e.getModifierState("CapsLock")) {
+        if((s.Lcode >= 65 && s.Lcode <= 90) /* 'A' - 'Z' */ || (s.Lcode >= 97 && s.Lcode <= 122) /* 'a' - 'z' */) {
+          curModState ^= 0x10; // Flip the 'shift' bit.
+          s.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
+        }
+      }
+
+      // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
+      var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
+      if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
+        // We just released AltGr - make sure it's all released.
+        curModState &= ~ altGrMask;
+      }
+      // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
+      if(curModState & modifierCodes['RALT']) {
+        curModState &= ~modifierCodes['LCTRL'];
+      }
+
+      let modifierBitmasks = Codes.modifierBitmasks;
+      // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
+      if(keyman.keyboardManager.isChiral()) {
+        s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
+
+        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
+        // AltGr / Right-alt simulation.
+        if(osk.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
+          s.Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
+          s.Lmodifiers |= modifierCodes['RALT'];
+        }
+      } else {
+        // No need to sim AltGr here; we don't need chiral ALTs.
+        s.Lmodifiers = 
+          (curModState & 0x10) | // SHIFT
+          ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) | 
+          ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0); 
+      }
+
+      // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
+      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
+      s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
+      
+      return s;
+    }
+
+    // Returns true if the key event is a modifier press, allowing keyPress to return selectively
+    // in those cases.
+    private doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
+      let keyman = com.keyman.singleton;
+
+      switch(Levent.Lcode) {
+        case 8: 
+          keyman.interface.clearDeadkeys();
+          break; // I3318 (always clear deadkeys after backspace) 
+        case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
+        case 17: 
+        case 18: 
+        case 20: //"K_CAPS":20, "K_NUMLOCK":144,"K_SCROLL":145
+        case 144:
+        case 145:
+          // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
+          keyman.keyboardManager.notifyKeyboard(Levent.Lcode, Levent.Ltarg, 1); 
+          if(!keyman.util.device.touchable) {
+            return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
+          } else {
+            return true;
+          }
+      }
+
+      if(Levent.LmodifierChange) {
+        keyman.keyboardManager.notifyKeyboard(0, Levent.Ltarg, 1); 
+        this._UpdateVKShift(Levent, 0, 1);
+      }
+
+      // No modifier keypresses detected.
+      return false;
+    }
+
+    /**
+     * Function     keyDown
+     * Scope        Public
+     * Description  Processes keydown event and passes data to keyboard. 
+     * 
+     * Note that the test-case oriented 'recorder' stubs this method to facilitate keystroke
+     * recording for use in test cases.  If changing this function, please ensure the recorder is
+     * not affected.
+     */ 
+    keyDown(e: KeyboardEvent): boolean {
+      let keyman = com.keyman.singleton;
+      let activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      let util = keyman.util;
+      let kbdInterface = keyman['interface'];
+      let keyMapManager = keyman.keyMapManager;
+
+      this.swallowKeypress = false;
+
+      // Get event properties  
+      var Levent = this._GetKeyEventProperties(e, true);
+      if(Levent == null) {
+        return true;
+      }
+
+      if(this.doModifierPress(Levent, true)) {
+        return true;
+      }
+
+      if(!window.event) {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(keyMapManager.browserMap.FF['k'+Levent.Lcode]) {
+          Levent.Lcode=keyMapManager.browserMap.FF['k'+Levent.Lcode];
+        }
+      } //else 
+      //{
+      // Safari, IE, Opera?
+      //}
+      
+      if(!activeKeyboard['KM']) {
+        // Positional Layout
+
+        var LeventMatched=0;
+        /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
+        var Lbase=keyMapManager.languageMap[com.keyman.osk.Layouts._BaseLayout];
+        if(Lbase && Lbase['k'+Levent.Lcode]) {
+          Levent.Lcode=Lbase['k'+Levent.Lcode];
+        }
+        /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
+        
+        if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(Levent.Lmodifiers & 0x60)) {
+          // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+          var Levent2: com.keyman.LegacyKeyEvent = {
+            Lcode: keyMapManager._USKeyCodeToCharCode(Levent),
+            Ltarg: Levent.Ltarg,
+            Lmodifiers: 0,
+            LisVirtualKey: 0
+          };
+
+          if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg, Levent2)) {
+            LeventMatched=1;
+          }
+        }
+        
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+        
+        // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
+        if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
+          kbdInterface.defaultBackspace();
+        }
+      } else {
+        // Mnemonic layout
+        if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
+          this.swallowKeypress = true;
+          if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+            kbdInterface.defaultBackspace(); // I3363 (Build 301)
+          }
+          return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
+        } else {
+          this.swallowKeypress = false;
+          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+        }
+      }
+
+      // Translate numpad keystrokes into their non-numpad equivalents
+      if(!LeventMatched  &&  Levent.Lcode >= Codes.keyCodes["K_NP0"]  &&  Levent.Lcode <= Codes.keyCodes["K_NPSLASH"] && !activeKeyboard['KM']) {
+        // Number pad, numlock on
+        //      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
+
+        if(Levent.Lcode < 106) {
+          var Lch = Levent.Lcode-48;
+        } else {
+          Lch = Levent.Lcode-64;
+        }
+        kbdInterface.output(0, Levent.Ltarg, String._kmwFromCharCode(Lch)); //I3319
+
+        LeventMatched = 1;
+      }
+
+      // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
+      if(LeventMatched) {
+        if(e  &&  e.preventDefault) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        this.swallowKeypress = (e ? this._GetEventKeyCode(e) != 0 : false);
+        return false;
+      } else {
+        this.swallowKeypress = false;
+      }
+      
+      // Special backspace handling.
+      if(Levent.Lcode == 8) {
+        /* Backspace - delete deadkeys, also special rule if desired? */
+        // This is needed to prevent jumping to previous page, but why???  // I3363 (Build 301)
+        if(Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
+          return false;
+        }
+      }
+
+      // Default text output emulation (for simulated touch elements)
+      if(typeof((Levent.Ltarg as HTMLElement).base) != 'undefined') {
+        // Simulated touch elements have no default text-processing - we need to rely on a strategy similar to
+        // that of the OSK here.
+        var ch = this.defaultKeyOutput('', Levent.Lcode, Levent.Lmodifiers, false, Levent.Ltarg);
+        if(ch) {
+          kbdInterface.output(0, Levent.Ltarg, ch);
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    // KeyUp basically exists for two purposes:
+    // 1)  To detect browser form submissions (handled in kmwdomevents.ts)
+    // 2)  To detect modifier state changes.
+    keyUp(e: KeyboardEvent): boolean {
+      var Levent = this._GetKeyEventProperties(e, false);
+      if(Levent == null) {
+        return true;
+      }
+
+      return this.doModifierPress(Levent, false);
+    }
+
+    keyPress(e: KeyboardEvent): boolean {
+      let keyman = com.keyman.singleton;
+
+      var Levent = this._GetKeyEventProperties(e);
+      if(Levent == null || Levent.LisVirtualKey) {
+        return true;
+      }
+
+      // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
+
+      /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
+      if(!keyman.keyboardManager.activeKeyboard['KM']) {
+        if(!this.swallowKeypress) {
+          return true;
+        }
+        if(Levent.Lcode < 0x20 || ((<any>keyman)._BrowserIsSafari  &&  (Levent.Lcode > 0xF700  &&  Levent.Lcode < 0xF900))) {
+          return true;
+        }
+
+        e = keyman._GetEventObject<KeyboardEvent>(e);   // I2404 - Manage IE events in IFRAMEs
+        if(e) {
+          e.returnValue = false;
+        }
+        return false;
+      }
+      /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
+      
+      // Only reached if it's a mnemonic keyboard.
+      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
+        this.swallowKeypress = false;
+        if(e && e.preventDefault) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return false;
+      }
+
+      this.swallowKeypress = false;
+      return true;
     }
   }
 }
