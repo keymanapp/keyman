@@ -32,9 +32,7 @@ describe('PromiseStore', function () {
       var randomPayload = randomToken();
       doLater(function () {
         assert.lengthOf(promises, 1);
-        // TODO: this API probably should not return a resolve function;
-        // it should call it immediately.
-        promises.keep(token)(randomPayload);
+        promises.keep(token, randomPayload);
       });
 
       return promise.then(function (actual) {

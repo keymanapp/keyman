@@ -46,7 +46,7 @@ class LMLayer {
   private _worker: Worker;
   /** Call this when the LMLayer has sent us the 'ready' message! */
   private _declareLMLayerReady: (conf: Configuration) => void;
-  private _promises: PromiseStore<any>;
+  private _promises: PromiseStore<Suggestion[]>;
   private _nextToken: number;
 
   /**
@@ -104,7 +104,7 @@ class LMLayer {
     if (payload.message === 'ready') {
       this._declareLMLayerReady(event.data.configuration);
     } else if (payload.message === 'suggestions') {
-      this._promises.keep(payload.token)(payload.suggestions);
+      this._promises.keep(payload.token, payload.suggestions);
     } else {
       // This branch should never execute, but just in case...
       //@ts-ignore
@@ -186,23 +186,18 @@ class PromiseStore<T> {
   }
 
   /**
-   * Fetch a promise's resolution function.
-   *
-   * Calling the resolution function will stop tracking the promise.
+   * Resolve the promise associated with a token (with a value!).
+   * Once the promise is resolved, the token is removed..
    */
-  keep(token: Token): Resolve<T> {
+  keep(token: Token, value: T) {
     let callbacks = this._promises.get(token);
     if (!callbacks) {
       throw new Error(`No promise associated with token: ${token}`);
     }
     let accept = callbacks.resolve;
 
-    // This acts like the resolve function, BUT, it removes the promise from
-    // the store -- because it's resolved!
-    return (resolvedValue: T) => {
-      this._promises.delete(token);
-      return accept(resolvedValue);
-    };
+    this._promises.delete(token);
+    return accept(value);
   }
 
   /**
