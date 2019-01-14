@@ -121,33 +121,33 @@ public class PackageProcessor {
 
     String keyboardId = jsonKeyboard.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
-      HashMap<String, String>[] keyboards = new HashMap[languages.length()];
-
-      for (int i = 0; i < languages.length(); i++) {
-        keyboards[i] = new HashMap<>();
-        keyboards[i].put(KMManager.KMKey_PackageID, packageId);
-        keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
-        keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
-        keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
-        keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
-        keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
-        if (jsonKeyboard.has("displayFont")) {
-          keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
-        }
-        if (jsonKeyboard.has("oskFont")) {
-          keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
-        }
-
-        // For now, all KMP distributed keyboards are custom
-        keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
-        if (welcomeExists(packageId)) {
-          File kmpFile = new File(packageId + ".kmp");
-          File packageDir = constructPath(kmpFile, false);
-          File welcomeFile = new File(packageDir, "welcome.htm");
-          // Only storing relative instead of absolute paths as a convenience for unit tests.
-          keyboards[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
-        }
+      // Only use the first language
+      HashMap<String, String>[] keyboards = new HashMap[1];
+      int i=0;
+      keyboards[i] = new HashMap<>();
+      keyboards[i].put(KMManager.KMKey_PackageID, packageId);
+      keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
+      keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
+      keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
+      if (jsonKeyboard.has("displayFont")) {
+        keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
       }
+      if (jsonKeyboard.has("oskFont")) {
+        keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
+      }
+
+      // For now, all KMP distributed keyboards are custom
+      keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
+      if (welcomeExists(packageId)) {
+        File kmpFile = new File(packageId + ".kmp");
+        File packageDir = constructPath(kmpFile, false);
+        File welcomeFile = new File(packageDir, "welcome.htm");
+        // Only storing relative instead of absolute paths as a convenience for unit tests.
+        keyboards[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+      }
+
       return keyboards;
     } else {
       return null;

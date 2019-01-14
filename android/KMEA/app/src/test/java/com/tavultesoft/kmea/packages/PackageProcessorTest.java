@@ -40,7 +40,7 @@ public class PackageProcessorTest {
   private static final File TEST_GFF_KMP_TARGET_UNDEFINED_VER = new File(TEST_EXTRACTION_ROOT, "packages" +
     File.separator + TEST_GFF_KMP_NAME_UNDEFINED_VER);
 
-  private static final int TEST_GFF_KBD_COUNT = 2;
+  private static final int TEST_GFF_KBD_COUNT = 1;
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
@@ -128,7 +128,8 @@ public class PackageProcessorTest {
     Assert.assertNotNull(json);
 
     Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
-    Assert.assertEquals(2, keyboards.length);
+    // Only the first language is installed with the keyboard
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
     amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
@@ -142,6 +143,8 @@ public class PackageProcessorTest {
 
     Assert.assertEquals(amharic, keyboards[0]);
 
+    /*
+    Keyboard has a second language, but won't be installed
     HashMap<String, String> geez = new HashMap<String, String>();
     geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
     geez.put(KMManager.KMKey_KeyboardName, "Amharic");
@@ -153,6 +156,7 @@ public class PackageProcessorTest {
     geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     Assert.assertEquals(geez, keyboards[1]);
+    */
   }
 
   @Test
