@@ -86,7 +86,6 @@ class LMLayerWorker {
     if (!message) {
       throw new Error(`Missing required 'message' property: ${event.data}`)
     }
-    // TODO: update worker-communication-protocol document.
 
     // We got a message! Delegate to the current state.
     this.state.handleMessage(event.data as IncomingMessage);
