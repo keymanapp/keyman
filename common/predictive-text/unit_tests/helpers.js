@@ -65,3 +65,13 @@ _.zeroTransform = function zeroTransform() {
     deleteLeft: 0,
   };
 }
+
+/**
+ * Returns a random token. NOT guaranteed to be unique.
+ *
+ * @returns {Token}
+ */
+_.randomToken = function randomToken() {
+  var range =  Number.MAX_SAFE_INTEGER - Number.MIN_SAFE_INTEGER;
+  return Math.random() * range + Number.MIN_SAFE_INTEGER;
+}

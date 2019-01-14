@@ -50,11 +50,4 @@ describe('LMLayerWorker', function () {
       sinon.restore();
     });
   });
-
-  // TODO: factor into helpers.
-  function randomToken() {
-    var range =  Number.MAX_SAFE_INTEGER - Number.MIN_SAFE_INTEGER;
-    return Math.random() * range + Number.MIN_SAFE_INTEGER;
-  }
-
 });

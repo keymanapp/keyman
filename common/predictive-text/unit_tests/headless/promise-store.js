@@ -71,11 +71,6 @@ describe('PromiseStore', function () {
     });
   });
 
-  function randomToken() {
-    var range =  Number.MAX_SAFE_INTEGER - Number.MIN_SAFE_INTEGER;
-    return Math.random() * range + Number.MIN_SAFE_INTEGER;
-  }
-
   // Do something asynchronously.
   function doLater(callback) {
     return setTimeout(callback, 0);
