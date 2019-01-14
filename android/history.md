@@ -1,12 +1,13 @@
 # Keyman for Android
 
-## 2019-01-11 11.0.2055 beta
-* Fix keyboard version comparison that was causing "Unable to contact Keyman server" notifications (#1520)
+## 2019-01-14 11.0.2055 beta
+* Keyman for Android 11 requires a minimum version of Android 4.1 (Jelly Bean) (#1532)
 
 ## 2019-01-10 11.0.2054 beta
-* Fix "Get Started" default keyboard status on engineering builds (#1515)
+* Fix keyboard version comparison that was causing "Unable to contact Keyman server" notifications (#1520)
 
 ## 2019-01-09 11.0.2053 beta
+* Fix "Get Started" default keyboard status on engineering builds (#1515)
 * Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
 
 ## 2019-01-04 11.0.2052 beta
