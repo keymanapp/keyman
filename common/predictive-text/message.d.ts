@@ -39,6 +39,40 @@ type USVString = string;
 type Token = number;
 
 /**
+ * The valid outgoing message kinds.
+ */
+type OutgoingMessageKind = 'ready' | 'suggestions';
+type OutgoingMessage = ReadyMessage | SuggestionMessage;
+
+/**
+ * Tells the keyboard that the LMLayer is ready. Provides
+ * negotiated configuration.
+ */
+interface ReadyMessage {
+  message: 'ready';
+  configuration: Configuration;
+}
+
+/**
+ * Sends the keyboard an ordered list of suggestions.
+ */
+interface SuggestionMessage {
+  message: 'suggestions';
+
+  /**
+   * Opaque, unique token that pairs this suggestions message
+   * with the predict message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * Ordered array of suggestions, most probable first, least
+   * probable last.
+   */
+  suggestions: Suggestion[];
+}
+
+/**
  * Describes the capabilities of the keyboard's platform.
  * This includes upper bounds for how much text will be sent on each
  * prediction, as well as what operations the keyboard is allowed to do on the

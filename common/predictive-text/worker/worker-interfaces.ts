@@ -86,33 +86,6 @@ interface PredictMessage {
   context: Context;
 }
 
-/**
- * The valid outgoing message kinds.
- */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-type OutgoingMessage = ReadyMessage | SuggestionMessage;
-
-/**
- * Tells the keyboard that the LMLayer is ready. Provides
- * negotiated configuration.
- */
-interface ReadyMessage {
-  message: 'ready';
-  configuration: Configuration;
-}
-
-/**
- * Sends the keyboard an ordered list of suggestions.
- */
-interface SuggestionMessage {
-  message: 'suggestions';
-
-  /**
-   * Opaque, unique token that pairs this suggestions message
-   * with the predict message that initiated it.
-   */
-  token: Token;
-}
 
 
 /**
