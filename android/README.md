@@ -6,7 +6,7 @@
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
 ## Minimum Android Requirements
-Keyman for Android has a minSdkVersion of 15 for [Android 4.0.3 Ice Cream Sandwich](https://developer.android.com/about/versions/android-4.0.3.html)
+Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)
 
 ## Setup Android Studio
 
@@ -131,10 +131,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:25.2.0'
-    implementation 'com.google.firebase:firebase-core:11.8.0'
-    implementation 'com.google.firebase:firebase-crash:11.8.0'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation 'com.google.firebase:firebase-crash:15.0.2'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
         transitive = true
     }
     api (name:'keyman-engine', ext:'aar')
