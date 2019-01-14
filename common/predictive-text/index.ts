@@ -21,6 +21,7 @@
  */
 
 /// <reference path="node_modules/promise-polyfill/lib/polyfill.js" />
+/// <reference path="promise-store.ts" />
 
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
@@ -143,73 +144,6 @@ class LMLayer {
     let code = LMLayer.unwrap(fn);
     let blob = new Blob([code], { type: 'text/javascript' });
     return URL.createObjectURL(blob);
-  }
-}
-
-type Resolve<T> = (value?: T | PromiseLike<T>) => void;
-type Reject = (reason?: any) => void;
-interface PromiseCallbacks<T> {
-  resolve: Resolve<T>;
-  reject: Reject;
-}
-
-/**
- * Associate tokens with promises.
- *
- * First, .make() a promise -- associate a token with resolve/reject callbacks.
- * 
- * You can either .keep() a promise -- resolve() and forget it; 
- * Or you may also .break() a promise -- reject() and forget it.
- */
-class PromiseStore<T> {
-  private _promises: Map<Token, PromiseCallbacks<T>>;
-
-  constructor() {
-    this._promises = new Map();
-  }
-
-  /**
-   * How many promises are currently being tracked?
-   */
-  get length(): number {
-    return this._promises.size;
-  }
-
-  /**
-   * Associate a token with its respective resolve and reject callbacks.
-   */
-  make(token: Token, resolve: Resolve<T>, reject: Reject): void {
-    if (this._promises.has(token)) {
-      reject(`Existing request with token ${token}`);
-    }
-    this._promises.set(token, {reject, resolve});
-  }
-
-  /**
-   * Resolve the promise associated with a token (with a value!).
-   * Once the promise is resolved, the token is removed..
-   */
-  keep(token: Token, value: T) {
-    let callbacks = this._promises.get(token);
-    if (!callbacks) {
-      throw new Error(`No promise associated with token: ${token}`);
-    }
-    let accept = callbacks.resolve;
-
-    this._promises.delete(token);
-    return accept(value);
-  }
-
-  /**
-   * Instantly reject and forget a promise associated with the token.
-   */
-  break(token: Token, reason?: any): void {
-    let callbacks = this._promises.get(token);
-    if (!callbacks) {
-      throw new Error(`No promise associated with token: ${token}`);
-    }
-    this._promises.delete(token);
-    callbacks.reject(reason);
   }
 }
 
