@@ -44,6 +44,28 @@ describe('PromiseStore', function () {
     });
   });
 
+  describe('.break()', function () {
+    it('should call the reject() function', function () {
+      var promises = new PromiseStore();
+      var token = randomToken();
+      var promise = new Promise(function (resolve, reject) {
+        promises.make(token, resolve, reject);
+      });
+
+      // Resolve the promise asynchronously.
+      var error = new Error();
+      doLater(function () {
+        assert.lengthOf(promises, 1);
+        promises.break(token, error);
+      });
+
+      return promise.catch(function (actualError) {
+        assert.strictEqual(actualError, error);
+        assert.lengthOf(promises, 0);
+      });
+    });
+  });
+
   function randomToken() {
     var range =  Number.MAX_SAFE_INTEGER - Number.MIN_SAFE_INTEGER;
     return Math.random() * range + Number.MIN_SAFE_INTEGER;
