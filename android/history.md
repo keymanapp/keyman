@@ -1,7 +1,7 @@
 # Keyman for Android
 
 ## 2019-01-14 11.0.2055 beta
-* Update minimum Android SDK version to 16 (#1532)
+* Keyman for Android 11 requires a minimum version of Android 4.1 (Jelly Bean) (#1532)
 
 ## 2019-01-10 11.0.2054 beta
 * Fix keyboard version comparison that was causing "Unable to contact Keyman server" notifications (#1520)
