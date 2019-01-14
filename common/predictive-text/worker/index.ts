@@ -33,6 +33,25 @@
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
+ * 
+ * Implements the state pattern. There are two states:
+ * 
+ *  - `uninitialized` (initial state)
+ *  - `ready`         (accepting state)
+ * 
+ * Transitions are initiated by valid messages. Invalid
+ * messages are errors, and do not lead to transitions.
+ * 
+ *         +-----------------+            +---------+
+ *         |                 | initialize |         |
+ *  +------>  uninitialized  +----------->+  ready  +---+
+ *         |                 |            |         |   |
+ *         +-----------------+            +----^----+   | predict
+ *                                             |        |
+ *                                             +--------+
+ * 
+ * The model and the configuration are ONLY relevant in the `ready` state;
+ * as such, they are NOT direct properties of the LMLayerWorker.
  */
 class LMLayerWorker {
   /**
