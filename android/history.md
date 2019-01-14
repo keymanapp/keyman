@@ -2,6 +2,7 @@
 
 ## 2019-01-14 11.0.2055 beta
 * Keyman for Android 11 requires a minimum version of Android 4.1 (Jelly Bean) (#1532)
+* When KMW doesn't process external "tab" or "enter" keys, have the Android app dispatch the keys (#1526)
 
 ## 2019-01-10 11.0.2054 beta
 * Fix keyboard version comparison that was causing "Unable to contact Keyman server" notifications (#1520)

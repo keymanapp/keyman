@@ -52,6 +52,7 @@ import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONObject;
@@ -198,23 +199,23 @@ public final class KMManager {
     IMService = service;
   }
 
-  public static boolean executeHardwareKeystroke(int code, int shift, int lstates) {
+  public static boolean executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
     if (SystemKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_SYSTEM, lstates, eventModifiers);
     } else if (InAppKeyboard != null) {
-      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP, lstates);
+      return executeHardwareKeystroke(code, shift, KeyboardType.KEYBOARD_TYPE_INAPP, lstates, eventModifiers);
     }
 
     return false;
   }
 
   public static boolean executeHardwareKeystroke(
-    int code, int shift, KeyboardType keyboard, int lstates) {
+    int code, int shift, KeyboardType keyboard, int lstates, int eventModifiers) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.executeHardwareKeystroke(code, shift, lstates);
+      InAppKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.executeHardwareKeystroke(code, shift, lstates);
+      SystemKeyboard.executeHardwareKeystroke(code, shift, lstates, eventModifiers);
       return true;
     }
 
@@ -1461,6 +1462,33 @@ public final class KMManager {
     KMInAppKeyboardJSHandler(Context context, KMKeyboard k) {
       super(context, k);
     }
+    private static final String HANDLER_TAG = "IAK: JS Handler";
+
+    @JavascriptInterface
+    public boolean dispatchKey(final int code, final int eventModifiers) {
+      Handler mainLoop = new Handler(Looper.getMainLooper());
+      mainLoop.post(new Runnable() {
+        public void run() {
+          if (InAppKeyboard.subKeysWindow != null || KMTextView.activeView == null || KMTextView.activeView.getClass() != KMTextView.class) {
+            if ((KMTextView.activeView == null) && isDebugMode()) {
+              Log.w(HANDLER_TAG, "dispatchKey failed: activeView is null");
+            }
+            return;
+          }
+
+          // Handle tab or enter since KMW didn't process it
+          KMTextView textView = (KMTextView) KMTextView.activeView;
+          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
+            textView.dispatchKeyEvent(event);
+          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
+            textView.dispatchKeyEvent(event);
+          }
+        }
+      });
+      return true;
+    }
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
@@ -1552,6 +1580,40 @@ public final class KMManager {
     KMSystemKeyboardJSHandler(Context context, KMKeyboard k) {
       super(context, k);
     }
+    private static final String HANDLER_TAG = "SWK: JS Handler";
+
+    @JavascriptInterface
+    public boolean dispatchKey(final int code, final int eventModifiers) {
+      Handler mainLoop = new Handler(Looper.getMainLooper());
+      mainLoop.post(new Runnable() {
+        public void run() {
+          if (SystemKeyboard.subKeysWindow != null) {
+            return;
+          }
+
+          InputConnection ic = IMService.getCurrentInputConnection();
+          if (ic == null) {
+            if (isDebugMode()) {
+              Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
+            }
+            return;
+          }
+
+          SystemKeyboard.dismissHelpBubble();
+
+          // Handle tab or enter since KMW didn't process it
+          Log.d(HANDLER_TAG, "dispatchKey called with code: " + code + ", eventModifiers: " + eventModifiers);
+          if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_TAB]) {
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_TAB, 0, eventModifiers, 0, 0, 0);
+            ic.sendKeyEvent(event);
+          } else if (code == KMScanCodeMap.scanCodeMap[KMScanCodeMap.KEY_ENTER]) {
+            KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_ENTER, 0, eventModifiers, 0, 0, 0);
+            ic.sendKeyEvent(event);
+          }
+        }
+      });
+      return true;
+    }
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
@@ -1566,7 +1628,7 @@ public final class KMManager {
           InputConnection ic = IMService.getCurrentInputConnection();
           if (ic == null) {
             if (isDebugMode()) {
-              Log.w("SWK: JS Handler", "insertText failed: InputConnection is null");
+              Log.w(HANDLER_TAG, "insertText failed: InputConnection is null");
             }
             return;
           }

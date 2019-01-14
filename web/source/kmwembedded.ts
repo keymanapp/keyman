@@ -579,14 +579,11 @@
    *  @return {boolean}         true if key code successfully processed
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
+    // Default handling for external keys.
+    // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
+    // to the mobile apps to handle (insert characters or navigate forms).
     if (code == osk.keyCodes.K_SPACE) {
       kbdInterface.output(0, Lelem, ' ');
-      return true;
-    } else if (code == osk.keyCodes.K_ENTER) {
-      kbdInterface.output(0, Lelem, '\n');
-      return true;
-    } else if (code == osk.keyCodes.K_TAB) {
-      kbdInterface.output(0, Lelem, '\t');
       return true;
     } else if (code == osk.keyCodes.K_BKSP) {
       kbdInterface.defaultBackspace();
@@ -601,6 +598,7 @@
       return true;
     }
 
+    // Determine the character from the OSK
     var ch = osk.defaultKeyOutput(keyName, code, shift, false, undefined);
     if(ch) {
       kbdInterface.output(0, Lelem, ch);
