@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Basic WebWorker test</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+      button { font-size: 18pt }
+      textarea { font-size: 24pt; min-width: 40%; }
+    </style>
+
+	<script>
+	</script>
+  </head>
+
+<!-- Sample page HTML -->
+  <body>
+    <h2>LM Layer Testing - suggestion with dummy model </h2>
+	<p>This page uses a dummy model for providing suggestions. </p>
+
+    <div class="suggestion-buttons">
+        <button data-rank="1" class="rank-1" data-insert="I ">???</button>
+        <button data-rank="2" class="rank-2" data-insert="I'm ">???</button>
+        <button data-rank="3" class="rank-3" data-insert="Oh ">???</button>
+    </div>
+
+    <textarea id="compose"></textarea>
+
+    <output id="output"></output>
+
+    <script src="./index.js"></script><!-- LMLayer bundle -->
+    <script>
+      let output = document.getElementById('output');
+      let compose = document.getElementById('compose');
+      let buttons = document.querySelectorAll('button[data-insert]');
+
+      var lmLayer = new LMLayer;
+      (async function () {
+        await lmLayer.initialize({
+          maxLeftContext: 64
+        }, {
+          type: 'dummy',
+          futureSuggestions: iGotDistractedByHazel()
+        });
+        console.log("LMLayer ready!");
+
+        fetchNextSuggestions();
+
+        for (let btn of buttons) {
+          btn.addEventListener('click', function (evt) {
+            let text = evt.target.attributes['data-insert'].value;
+            compose.value += text;
+            fetchNextSuggestions();
+          });
+        }
+
+        async function fetchNextSuggestions() {
+          let initialSuggestions = await lmLayer.predict({}, {});
+          updateButtons(initialSuggestions);
+        }
+      }());
+
+
+      function updateButtons(suggestions) {
+        if (!suggestions) {
+          console.log("No suggestions available.");
+          return;
+        }
+
+        console.log("Updating buttons with suggestions");
+        console.table(suggestions);
+        for (let el of buttons) {
+          let rank = +el.attributes['data-rank'].value;
+          let sugg = suggestions[rank - 1];
+          el.attributes['data-insert'].value = sugg.transform.insert;
+          el.innerText = sugg.displayAs;
+        }
+      }
+
+      function iGotDistractedByHazel() {
+        return [
+          [
+            {
+              "transform": {
+                "insert": "I ",
+                "deleteLeft": 0
+              },
+              "displayAs": "I"
+            },
+            {
+              "transform": {
+                "insert": "I'm ",
+                "deleteLeft": 0
+              },
+              "displayAs": "I'm"
+            },
+            {
+              "transform": {
+                "insert": "Oh ",
+                "deleteLeft": 0
+              },
+              "displayAs": "Oh "
+            }
+          ],
+          [
+            {
+              "transform": {
+                "insert": "love ",
+                "deleteLeft": 0
+              },
+              "displayAs": "love"
+            },
+            {
+              "transform": {
+                "insert": "am ",
+                "deleteLeft": 0
+              },
+              "displayAs": "am"
+            },
+            {
+              "transform": {
+                "insert": "got ",
+                "deleteLeft": 0
+              },
+              "displayAs": "got"
+            }
+          ],
+          [
+            {
+              "transform": {
+                "insert": "distracted by ",
+                "deleteLeft": 0
+              },
+              "displayAs": "distracted by"
+            },
+            {
+              "transform": {
+                "insert": "distracted ",
+                "deleteLeft": 0
+              },
+              "displayAs": "distracted"
+            },
+            {
+              "transform": {
+                "insert": "a ",
+                "deleteLeft": 0
+              },
+              "displayAs": "a"
+            }
+          ],
+          [
+            {
+              "transform": {
+                "insert": "Hazel ",
+                "deleteLeft": 0
+              },
+              "displayAs": "Hazel"
+            },
+            {
+              "transform": {
+                "insert": "the ",
+                "deleteLeft": 0
+              },
+              "displayAs": "the"
+            },
+            {
+              "transform": {
+                "insert": "a ",
+                "deleteLeft": 0
+              },
+              "displayAs": "a"
+            }
+          ]
+        ]
+      }
+    </script>
+
+   <h3><a href="../index.html">Return to testing home page</a></h3>
+  </body>
+</html>
