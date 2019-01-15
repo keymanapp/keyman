@@ -61,6 +61,12 @@ namespace com.keyman.osk {
     _VPreviousCursor: string;
     _VPreviousMouseButton: number;
 
+    // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
+    modifierCodes = text.Codes.modifierCodes;
+    modifierBitmasks = text.Codes.modifierBitmasks;
+    stateBitmasks = text.Codes.stateBitmasks;
+    keyCodes = text.Codes.keyCodes;
+
     // First time initialization of OSK
     prepare() {
       let keymanweb = com.keyman.singleton;
