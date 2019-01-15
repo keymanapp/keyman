@@ -332,6 +332,11 @@ namespace com.keyman {
         btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
       }
 
+      // Make sure the key text is the element's first child - processSubkeys()
+      // will add an extra element if subkeys exist, which can interfere with
+      // keyboard/language name display on the space bar!
+      btn.appendChild(this.generateKeyText());
+
       // Handle subkey-related tasks.
       if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
         this.processSubkeys(btn);
@@ -340,7 +345,6 @@ namespace com.keyman {
       }
       
       // Add text to button and button to placeholder div
-      btn.appendChild(this.generateKeyText());
       kDiv.appendChild(btn);
 
       // Prevent user selection of key captions
