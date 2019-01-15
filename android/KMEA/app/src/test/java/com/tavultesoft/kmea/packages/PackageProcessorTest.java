@@ -94,7 +94,7 @@ public class PackageProcessorTest {
 
   @Test
   public void tempPackageExtraction() {
-    File infoFile = new File(tempPkg, "kmp.json");
+    File infoFile = new File(tempPkg, PackageProcessor.PPDefault_Metadata);
 
     Assert.assertTrue(infoFile.exists());
   }

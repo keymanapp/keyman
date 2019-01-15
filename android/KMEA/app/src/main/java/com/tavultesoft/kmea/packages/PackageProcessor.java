@@ -34,6 +34,7 @@ import org.json.JSONObject;
 public class PackageProcessor {
   private static File resourceRoot = null;
   public static final String PPDefault_Version = "1.0";
+  public static final String PPDefault_Metadata = "kmp.json";
 
   public static void initialize(File resourceRoot) {
     PackageProcessor.resourceRoot = resourceRoot;
@@ -95,7 +96,7 @@ public class PackageProcessor {
    * @return A metadata JSONObject for the package version.
    */
   static JSONObject loadPackageInfo(File packagePath) {
-    File infoFile = new File(packagePath, "kmp.json");
+    File infoFile = new File(packagePath, PPDefault_Metadata);
 
     if(infoFile.exists()) {
       JSONParser parser = new JSONParser();
