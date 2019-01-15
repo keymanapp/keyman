@@ -41,22 +41,22 @@ public class JSONUtils {
           try {
             JSONObject kmp = parser.getJSONObjectFromFile(file);
             JSONArray kmpKeyboards = kmp.getJSONArray("keyboards");
-            for (int i=0; i<kmpKeyboards.length()-1; i++) {
+            for (int i=0; i<kmpKeyboards.length(); i++) {
               JSONObject kmpKeyboardObj = kmpKeyboards.getJSONObject(i);
               String kbdName = kmpKeyboardObj.getString("name");
               String kbdID = kmpKeyboardObj.getString("id");
               String kbdVersion = kmpKeyboardObj.getString("version");
               String kbdFilename = packageID.getName() + "/" + kbdID + "-" + kbdVersion + ".js";
 
-              JSONArray languageArray = kmpKeyboardObj.getJSONArray("languages");
-              for (int j=0; j<languageArray.length()-1; j++) {
-                JSONObject languageObj = languageArray.getJSONObject(j);
+              JSONArray kmpLanguageArray = kmpKeyboardObj.getJSONArray("languages");
+              for (int j=0; j<kmpLanguageArray.length(); j++) {
+                JSONObject languageObj = kmpLanguageArray.getJSONObject(j);
                 String languageName = languageObj.getString("name");
                 String languageID = languageObj.getString("id");
 
-                // Check if language-keyboard pair exists
+                // Populate new entry entry into languagesArray
                 int index = findLanguageID(languagesArray, languageID);
-                if (index == -1) {
+                if (languagesArray.length() == 0 || index == -1) {
                   JSONObject kbdObj = new JSONObject();
                   kbdObj.put("id", kbdID);
                   kbdObj.put("name", kbdName);
@@ -72,7 +72,7 @@ public class JSONUtils {
                   tempLanguageObj.put("name", languageName);
                   tempLanguageObj.put("keyboards", tempKbdArray);
 
-                  languageArray.put(tempLanguageObj);
+                  languagesArray.put(tempLanguageObj);
                 } else {
                   JSONObject kbdObj = new JSONObject();
                   kbdObj.put("id", kbdID);
@@ -81,7 +81,8 @@ public class JSONUtils {
                   kbdObj.put("version", kbdVersion);
                   kbdObj.put("custom", "Y");
 
-                  JSONArray tempKbdArray = languagesArray.getJSONObject(index).getJSONArray("keyboards");
+                  JSONObject tempLanguageObj = languagesArray.getJSONObject(index);
+                  JSONArray tempKbdArray = tempLanguageObj.getJSONArray("keyboards");
                   tempKbdArray.put(kbdObj);
 
                 }
@@ -95,7 +96,7 @@ public class JSONUtils {
       }
     }
 
-    return languages;
+    return languagesArray;
   }
 
   /**
@@ -104,7 +105,7 @@ public class JSONUtils {
    * @param languageID String of the langugae ID
    * @return int - Index if the language ID is found (starting with 0). -1 if the language ID doesn't exist
    */
-  private static int findLanguageID(JSONArray languageArray, String languageID) {
+  public static int findLanguageID(JSONArray languageArray, String languageID) {
     int ret = -1;
 
     if ((languageArray == null) || (languageArray.length() == 0) ||
@@ -113,7 +114,7 @@ public class JSONUtils {
     }
 
     try {
-      for (int i = 0; i < languageArray.length() - 1; i++) {
+      for (int i=0; i < languageArray.length(); i++) {
         JSONObject o = languageArray.getJSONObject(i);
         if (o.getString("id").equals(languageID)) {
           return i;

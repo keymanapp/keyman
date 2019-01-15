@@ -1,6 +1,11 @@
 package com.tavultesoft.kmea.packages;
 
 
+import com.tavultesoft.kmea.JSONParser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +27,24 @@ public class JSONUtilsTest {
 
   @Test
   public void test_getLanguages() {
-    JSONUtils.getLanguages();
+    JSONArray result = JSONUtils.getLanguages();
 
+  }
+
+  @Test
+  public void test_findLanguagesID() {
+    JSONParser parser = new JSONParser();
+    JSONObject kmp = parser.getJSONObjectFromFile(new File(TEST_RESOURCE_ROOT, "galaxie_greek_hebrew_mnemonic" + File.separator + "kmp.json"));
+
+    try {
+      JSONArray keyboardsArray = kmp.getJSONArray("keyboards");
+      JSONArray languagesArray = keyboardsArray.getJSONObject(0).getJSONArray("languages");
+      Assert.assertEquals(-1, JSONUtils.findLanguageID(languagesArray, "am"));
+      Assert.assertEquals(0, JSONUtils.findLanguageID(languagesArray, "hbo-Hebr"));
+
+    } catch (JSONException e) {
+
+    }
   }
 
 }
