@@ -119,6 +119,8 @@ begin
           Result := CompileVisualKeyboard(FKVKSourceFile, FKVKTargetFile);
       end;
 
+      CheckFilenameConventions;
+
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
       if Result

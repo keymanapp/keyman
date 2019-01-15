@@ -130,6 +130,7 @@ begin
     Exit;
   end;
 
+  CheckFilenameConventions;
   CheckForDangerousFiles;
   CheckKeyboardVersions;
   CheckKeyboardLanguages;

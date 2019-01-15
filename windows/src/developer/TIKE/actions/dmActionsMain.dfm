@@ -53,6 +53,7 @@ object modActionsMain: TmodActionsMain
       Category = 'File'
       Caption = 'Save &As...'
       Dialog.Title = 'Save As'
+      Dialog.OnCanClose = actFileSaveAsSaveDialogCanClose
       Hint = 'Save As|Saves the active file with a new name'
       BeforeExecute = actFileSaveAsBeforeExecute
       OnAccept = actFileSaveAsAccept
@@ -255,6 +256,7 @@ object modActionsMain: TmodActionsMain
       Dialog.Filter = 'Keyman Developer Project Files (*.kpj)|*.kpj|All Files (*.*)|*.*'
       Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
       Dialog.Title = 'Save Project As'
+      Dialog.OnCanClose = actProjectSaveAsSaveDialogCanClose
       Hint = 'Save Project As|Saves the current project with a new name'
       BeforeExecute = actProjectSaveAsBeforeExecute
       OnAccept = actProjectSaveAsAccept
@@ -482,7 +484,7 @@ object modActionsMain: TmodActionsMain
     Left = 304
     Top = 236
     Bitmap = {
-      494C01010A000E00780010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010A000E007C0010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -891,7 +893,7 @@ object modActionsMain: TmodActionsMain
     Left = 124
     Top = 116
     Bitmap = {
-      494C0101110013008C0020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300900020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000080000000A000000001002000000000000040
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000A8CAFF00A8CA

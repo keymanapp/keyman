@@ -326,6 +326,8 @@ begin
     FTabStop := '';
   end;
 
+  CheckFilenameConventions;
+
   if Assigned(AOwnerProject) then   // I4865   // I4866
   begin
     FCompilerWarningsAsErrors := AOwnerProject.Options.CompilerWarningsAsErrors;

@@ -114,6 +114,9 @@ end;
 
 procedure TfrmNew.cmdOKClick(Sender: TObject);
 begin
+  if not CheckFilenameConventions then
+    Exit;
+
   if FileExists(FileName) then
   begin
     if MessageDlg('The file '+FileName+' already exists.  Overwrite it and create a new file?',
