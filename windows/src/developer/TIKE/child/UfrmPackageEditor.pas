@@ -588,6 +588,9 @@ var
 begin
   if pack.Files.FromFileNameEx(FileName) <> nil then Exit; // Already added
 
+  if not CheckFilenameConventions(FileName) then
+    Exit;
+
   f := TPackageContentFile.Create(pack);
   f.FileName := FileName;
 
