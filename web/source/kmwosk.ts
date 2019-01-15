@@ -200,11 +200,7 @@ namespace com.keyman {
       }
 
       // Finalize the key's text.
-      if(keyText != '\xa0') {
-        t.innerHTML = keyText;
-      } else {
-        t.innerHTML = '';
-      }
+      t.innerHTML = keyText;
 
       return t;
     }
