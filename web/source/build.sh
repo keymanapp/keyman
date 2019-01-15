@@ -184,6 +184,8 @@ INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
 
+VERSION=`cat ../../resources/VERSION.md`
+
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
 readonly SOURCE
@@ -347,7 +349,7 @@ if [ $BUILD_FULLWEB = true ] && [ $DO_MINIFY = true ]; then
     copy_resources "$WEB_OUTPUT"
     # Update build number if successful
     echo
-    echo KeymanWeb 2 build $BUILD compiled and saved under $WEB_OUTPUT
+    echo KeymanWeb $VERSION build $BUILD compiled and saved under $WEB_OUTPUT
     echo
 fi
 
