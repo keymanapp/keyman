@@ -75,3 +75,17 @@ _.randomToken = function randomToken() {
   var range =  Number.MAX_SAFE_INTEGER - Number.MIN_SAFE_INTEGER;
   return Math.random() * range + Number.MIN_SAFE_INTEGER;
 }
+
+// Use fixtures used in browser tests IN NODE!
+if (typeof require === 'function') {
+  // Assuming this file structure:
+  //     . common/predictive-text/unit_tests/
+  //     > in_browser/
+  //     | > json/
+  //     |   > future_suggestions/
+  //     |     > i_got_distracted_by_hazel.json
+  //     > helpers.js
+  _.iGotDistractedByHazel = function () {
+    return require('./in_browser/json/future_suggestions/i_got_distracted_by_hazel');
+  }
+}

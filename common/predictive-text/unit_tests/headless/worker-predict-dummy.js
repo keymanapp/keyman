@@ -82,105 +82,13 @@ describe('LMLayerWorker dummy model', function() {
     });
 
     it('can be injected with multiple suggestions to send back', function () {
-      // Based on suggestions produced my phone's personal language model.
-      var futureSuggestions = [
-        // Initial suggestions
-        [
-          {
-            transform: {
-              insert: 'I ',
-              deleteLeft: 0
-            },
-            displayAs: 'I',
-          },
-          {
-            transform: {
-              insert: "I'm ",
-            deleteLeft: 0
-            },
-            displayAs: "I'm",
-          },
-          {
-            transform: {
-              insert: "Oh ",
-              deleteLeft: 0
-            },
-            displayAs: "Oh ",
-          }
-        ],
-        // Second set of suggestions, after choosing "I"
-        [
-          {
-            transform: {
-              insert: 'love ',
-              deleteLeft: 0
-            },
-            displayAs: 'love',
-          },
-          {
-            transform: {
-              insert: "am ",
-              deleteLeft: 0
-            },
-            displayAs: "am",
-          },
-          {
-            transform: {
-              insert: "got ",
-              deleteLeft: 0
-            },
-            displayAs: "got",
-          }
-        ],
-        // Third set of suggestions, after choosing "got"
-        [
-          {
-            transform: {
-              insert: 'distracted ',
-              deleteLeft: 0
-            },
-            displayAs: 'distracted by',
-          },
-          {
-            transform: {
-              insert: "distracted ",
-              deleteLeft: 0
-            },
-            displayAs: "distracted",
-          },
-          {
-            transform: {
-              insert: "a ",
-              deleteLeft: 0
-            },
-            displayAs: "a",
-          }
-        ],
-        // Last set of suggestions, after choosing "distracted by"
-        [
-          {
-            transform: {
-              insert: 'Hazel ',
-              deleteLeft: 0
-            },
-            displayAs: 'Hazel',
-          },
-          {
-            transform: {
-              insert: 'the ',
-              deleteLeft: 0
-            },
-            displayAs: 'the',
-          },
-          {
-            transform: {
-              insert: 'a ',
-              deleteLeft: 0
-            },
-            displayAs: 'a',
-          },
-        ],
-      ];
+      // See the fixture. It's based on suggestions produced my phone's personal
+      // language model.
+      var futureSuggestions = iGotDistractedByHazel();
+      assert.isDefined(futureSuggestions[0]);
+      assert.isDefined(futureSuggestions[1]);
+      assert.isDefined(futureSuggestions[2]);
+      assert.isDefined(futureSuggestions[3]);
 
       var model = new DummyModel(defaultCapabilities, {
         futureSuggestions: futureSuggestions
