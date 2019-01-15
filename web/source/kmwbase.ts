@@ -19,7 +19,7 @@
 
 /***
    KeymanWeb 11.0
-   Copyright 2017-2018 SIL International
+   Copyright 2017-2019 SIL International
 ***/
 namespace com.keyman {
   export class KeymanBase {
@@ -115,7 +115,7 @@ namespace com.keyman {
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
 
-      this['version'] = "10.0";
+      this['version'] = "11.0";
       this['helpURL'] = 'http://help.keyman.com/go';
       this.setInitialized(0);
 

@@ -1,7 +1,7 @@
 /// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
 
-// KeymanWeb 10.0
-// Copyright 2017 SIL International
+// KeymanWeb 11.0
+// Copyright 2019 SIL International
 
 /*****************************************/
 /*                                       */
