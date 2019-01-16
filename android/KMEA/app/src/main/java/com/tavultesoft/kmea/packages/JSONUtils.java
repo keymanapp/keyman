@@ -3,10 +3,11 @@ package com.tavultesoft.kmea.packages;
 import android.util.Log;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
+import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.JSONParser;
 
 import org.json.JSONArray;
@@ -41,29 +42,62 @@ public class JSONUtils {
           try {
             JSONObject kmp = parser.getJSONObjectFromFile(file);
             JSONArray kmpKeyboards = kmp.getJSONArray("keyboards");
+
+            // Determine if kmp contains welcome.htm help file
+            JSONArray kmpFiles = kmp.getJSONArray("files");
+            boolean containsHelp = JSONUtils.findHelp(kmpFiles);
+
             for (int i=0; i<kmpKeyboards.length(); i++) {
               JSONObject kmpKeyboardObj = kmpKeyboards.getJSONObject(i);
               String kbdName = kmpKeyboardObj.getString("name");
               String kbdID = kmpKeyboardObj.getString("id");
               String kbdVersion = kmpKeyboardObj.getString("version");
-              String kbdFilename = packageID.getName() + "/" + kbdID + "-" + kbdVersion + ".js";
+              String kbdFilename = packageID.getName() + "/" + kbdID + ".js";
 
+              // Create optional font JSON object
+              JSONObject fontObj = new JSONObject();
+              String kmpFont = kmpKeyboardObj.optString("oskFont");
+              if (kmpFont.isEmpty()) {
+                kmpFont = kmpKeyboardObj.optString("displayFont");
+              }
+              if (!kmpFont.isEmpty()) {
+                JSONArray kmpFontArray = new JSONArray();
+                // TODO: does this need a fuller path (include package ID?)
+                kmpFontArray.put(kmpFont);
+                fontObj.put("family", kmpFont);
+                fontObj.put("source", kmpFontArray);
+              }
+
+              // Merge languages
               JSONArray kmpLanguageArray = kmpKeyboardObj.getJSONArray("languages");
               for (int j=0; j<kmpLanguageArray.length(); j++) {
                 JSONObject languageObj = kmpLanguageArray.getJSONObject(j);
                 String languageName = languageObj.getString("name");
                 String languageID = languageObj.getString("id");
 
-                // Populate new entry entry into languagesArray
-                int index = findLanguageID(languagesArray, languageID);
-                if (languagesArray.length() == 0 || index == -1) {
-                  JSONObject kbdObj = new JSONObject();
-                  kbdObj.put("id", kbdID);
-                  kbdObj.put("name", kbdName);
-                  kbdObj.put("filename", kbdFilename);
-                  kbdObj.put("version", kbdVersion);
-                  kbdObj.put("custom", "Y");
+                JSONObject kbdObj = new JSONObject();
+                kbdObj.put("id", kbdID);
+                kbdObj.put("name", kbdName);
+                kbdObj.put("filename", kbdFilename);
+                kbdObj.put("version", kbdVersion);
+                kbdObj.put("custom", "Y");
+                if (fontObj != null) {
+                  kbdObj.put("font", fontObj);
+                }
+                if (containsHelp) {
+                  kbdObj.put("helpFile", packageID + "/welcome.htm");
+                }
 
+                File jsFile = new File(packageID, kbdID + ".js");
+                if (jsFile.exists()) {
+                  SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+                  kbdObj.put("lastModified", sdf.format(jsFile.lastModified()));
+                }
+                // TODO: source, filesize
+
+                int index = findID(languagesArray, languageID);
+                if (languagesArray.length() == 0 || index == -1) {
+                  // Populate new entry entry into languagesArray
                   JSONArray tempKbdArray = new JSONArray();
                   tempKbdArray.put(kbdObj);
 
@@ -74,21 +108,12 @@ public class JSONUtils {
 
                   languagesArray.put(tempLanguageObj);
                 } else {
-                  JSONObject kbdObj = new JSONObject();
-                  kbdObj.put("id", kbdID);
-                  kbdObj.put("name", kbdName);
-                  kbdObj.put("filename", kbdFilename);
-                  kbdObj.put("version", kbdVersion);
-                  kbdObj.put("custom", "Y");
-
                   JSONObject tempLanguageObj = languagesArray.getJSONObject(index);
                   JSONArray tempKbdArray = tempLanguageObj.getJSONArray("keyboards");
                   tempKbdArray.put(kbdObj);
-
                 }
               }
             }
-
           } catch (JSONException e) {
             Log.e(TAG, "getLanguages() Error parsing " + file.getName());
           }
@@ -100,29 +125,52 @@ public class JSONUtils {
   }
 
   /**
-   * Iterate through a JSON object to determine if a language ID exists.
-   * @param languageArray JSONArray to search
-   * @param languageID String of the langugae ID
-   * @return int - Index if the language ID is found (starting with 0). -1 if the language ID doesn't exist
+   * Iterate through a JSONArray to determine if a language/keyboard ID exists.
+   * @param {a} JSONArray to search
+   * @param {id} String of the language/keyboard ID
+   * @return int - Index if the ID is found (starting with 0). -1 if the ID doesn't exist
    */
-  public static int findLanguageID(JSONArray languageArray, String languageID) {
+  public static int findID(JSONArray a, String id) {
     int ret = -1;
 
-    if ((languageArray == null) || (languageArray.length() == 0) ||
-      (languageID == null) || (languageID.isEmpty())) {
+    if ((a == null) || (a.length() == 0) ||
+      (id == null) || (id.isEmpty())) {
       return ret;
     }
 
     try {
-      for (int i=0; i < languageArray.length(); i++) {
-        JSONObject o = languageArray.getJSONObject(i);
-        if (o.getString("id").equals(languageID)) {
+      for (int i=0; i < a.length(); i++) {
+        JSONObject o = a.getJSONObject(i);
+        if (o.getString("id").equals(id)) {
           return i;
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "findLanguageID() error " + e);
+      Log.e(TAG, "find ID() error: " + e);
     }
     return ret;
+  }
+
+  /**
+   * Iterate through a JSONArray to determine if welcome.htm help file exists.
+   * @param {a} JSONArray of files to search
+   * @return boolean - if welcome.htm file is found
+   */
+  public static boolean findHelp(JSONArray a) {
+    if ((a == null) || (a.length() == 0)) {
+      return false;
+    }
+
+    try {
+      for (int i=0; i<a.length(); i++) {
+        JSONObject o = a.getJSONObject(i);
+        if (FileUtils.isWelcomeFile(o.getString("name"))) {
+          return true;
+        }
+      }
+    } catch (JSONException e) {
+      Log.e(TAG, "findHelp() error: " + e);
+    }
+    return false;
   }
 }

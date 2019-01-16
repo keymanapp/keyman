@@ -84,6 +84,10 @@
         {
           "name": "Hebrew (Hebrew)",
           "id": "he-Hebr"
+        },
+        {
+          "name": "Afade (Latin)",
+          "id": "aal-Latn"
         }
       ]
     },

@@ -24,6 +24,8 @@ import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -405,7 +407,10 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         }
       }
 
-      if (jsonObj == null) {
+      // Consolidate kmp.json info from packages/
+      JSONArray kmpLanguagesArray = JSONUtils.getLanguages();
+
+      if (jsonObj == null && kmpLanguagesArray.length() == 0) {
         Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
         finish();
         return;
@@ -418,6 +423,42 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
+
+        // Merge kmpLanguagesArray with languages
+        for(int i=0; i<kmpLanguagesArray.length(); i++) {
+          JSONObject kmpLanguage = kmpLanguagesArray.getJSONObject(i);
+          String kmpLanguageID = kmpLanguage.getString("id");
+          int languageIndex = JSONUtils.findID(languages, kmpLanguageID);
+          if (languageIndex == -1) {
+            // Add new language object
+            languages.put(kmpLanguage);
+          } else {
+            // Merge language info
+            JSONObject language = languages.getJSONObject(languageIndex);
+            JSONArray keyboards = language.getJSONArray("keyboards");
+            JSONArray kmpKeyboards = kmpLanguage.getJSONArray("keyboards");
+            for(int j=0; j<kmpKeyboards.length(); j++) {
+              JSONObject kmpKeyboard = kmpKeyboards.getJSONObject(j);
+              String kmpKeyboardID =  kmpKeyboard.getString("id");
+              int keyboardIndex = JSONUtils.findID(keyboards, kmpKeyboardID);
+              if (keyboardIndex == -1) {
+                // Add new keyboard object
+                keyboards.put(kmpKeyboard);
+              } else {
+                // Merge keyboard info
+                JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
+
+                String keyboardVersion = keyboard.getString("version");
+                String kmpKeyboardVersion = kmpKeyboard.getString("version");
+                if (FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion) == FileUtils.VERSION_GREATER) {
+                  // Replace keyboard entry from kmp
+                  keyboards.put(keyboardIndex, kmpKeyboard);
+                }
+              }
+            }
+
+          }
+        }
 
         int langLength = languages.length();
         for (int i = 0; i < langLength; i++) {
