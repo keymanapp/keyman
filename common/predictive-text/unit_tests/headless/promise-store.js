@@ -20,11 +20,16 @@ describe('PromiseStore', function () {
     it('should reject the promise when a token is reused', function () {
       var promises = new PromiseStore();
       
-      var duplicatedToken = randomToken();
-
+      var reusedToken = randomToken();
+      // These two fakes are to ensure the original is called.
+      var originalResolve;
+      var overwrittenResolve;
+      
+      
       // Add a promise, and an unrelated promise.
       new Promise(function (resolve, reject) {
-        promises.make(duplicatedToken, resolve, reject);
+        originalResolve = sinon.fake(resolve);
+        promises.make(reusedToken, originalResolve, reject);
       });
       new Promise(function (resolve, reject) {
         promises.make(randomToken(), resolve, reject);
@@ -32,17 +37,24 @@ describe('PromiseStore', function () {
       assert.lengthOf(promises, 2);
 
       // Now, reuse the token of the first (unresolved) promise:
-      (new Promise(function (resolve, reject) {
-        promises.make(duplicatedToken, resolve, reject);
+      return (new Promise(function (resolve, reject) {
+        overwrittenResolve = sinon.fake(resolve);
+        promises.make(reusedToken, overwrittenResolve, reject);
       })).then(
         function (resolve) { return promise.reject('Should not have gotten here!'); },
         // It SHOULD reject.
         function (error) {
-          assert.isObject(error);
+          assert.match(error, /existing/i);
+          assert.include(error, reusedToken.toString());
           // It did NOT track a new promise.
           assert.lengthOf(promises, 2);
         }
-      );
+      ).then(function () {
+        promises.keep(reusedToken);
+        sinon.assert.notCalled(overwrittenResolve);
+        sinon.assert.called(originalResolve);
+        assert.isTrue(false);
+      });
     });
   });
 
