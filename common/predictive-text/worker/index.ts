@@ -19,53 +19,58 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+/**
+ * @file index.ts
+ * 
+ * The main LMLayerWorker class, the top-level class within the Web Worker.
+ * The LMLayerWorker handles the keyboard/worker communication
+ * protocol, delegating prediction requests to the language
+ * model implementations.
+ */
+
 /// <reference path="../message.d.ts" />
 
 /**
- * The signature of self.postMessage(), so that unit tests can mock it.
+ * Encapsulates all the state required for the LMLayer's worker thread.
+ * 
+ * Implements the state pattern. There are two states:
+ * 
+ *  - `uninitialized` (initial state)
+ *  - `ready`         (accepting state)
+ * 
+ * Transitions are initiated by valid messages. Invalid
+ * messages are errors, and do not lead to transitions.
+ * 
+ *         +-----------------+            +---------+
+ *         |                 | initialize |         |
+ *  +------>  uninitialized  +----------->+  ready  +---+
+ *         |                 |            |         |   |
+ *         +-----------------+            +----^----+   | predict
+ *                                             |        |
+ *                                             +--------+
+ * 
+ * The model and the configuration are ONLY relevant in the `ready` state;
+ * as such, they are NOT direct properties of the LMLayerWorker.
  */
-type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
-
-/**
- * The valid outgoing message types.
- */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-
-/**
- * The structure of an initialization message. It should include the model (either in
- * source code or parameter form), as well as the keyboard's capabilities.
- */
-interface InitializeMessage {
-  /**
-   * The model, and its configuration.
-   * TODO: write a description of what this actually is!
-   */
-  model: any;
-
-  /**
-   * The configuration that the keyboard can offer to the model.
-   */
-  capabilities: Capabilities;
-}
-
-/**
- * The structure of the message back to the keyboard.
- */
-interface ReadyMessage {
-  configuration: Configuration;
-}
-
-interface PredictMessage {
-  // TODO:
-  // token: Token;
-  // context: Context;
-  // transform: Transform;
-}
-
- /**
-  * Encapsulates all the state required for the LMLayer's worker thread.
-  */
 class LMLayerWorker {
+  /**
+   * All of the bundled model implementations will add themselves here:
+   * Note: the models will add themselves by including this
+   * file using a triple-slash directive:
+   * /// <reference path="path/to/this/file.ts" />
+   * then adding the constructor to this static object:
+   * LMLayerWorker.models.MyModelImplementation = class {}
+   */
+  static models: {[key: string]: WorkerInternalModelConstructor} = {};
+
+  /**
+   * State pattern. This object handles onMessage().
+   * handleMessage() can transition to a different state, if
+   * necessary.
+   */
+  private state: LMLayerWorkerState;
+
   /**
    * By default, it's self.postMessage(), but can be overridden
    * so that this can be tested **outside of a Worker**.
@@ -76,6 +81,7 @@ class LMLayerWorker {
     postMessage: null,
   }) {
     this._postMessage = options.postMessage || postMessage;
+    this.setupInitialState();
   }
 
   /**
@@ -95,25 +101,13 @@ class LMLayerWorker {
    */
   onMessage(event: MessageEvent) {
     const {message} = event.data;
-    // We must have gotten a message!
+    // Ensure the message is tagged with a valid message tag.
     if (!message) {
-      throw new Error(`Missing required 'message' attribute: ${event.data}`)
+      throw new Error(`Missing required 'message' property: ${event.data}`)
     }
 
-    // ...that message must have been 'initialize'!
-    if (message !== 'initialize') {
-      throw new Error(`invalid message; expected 'initialize' but got ${message}`);
-    }
-
-    let payload: InitializeMessage = event.data;
-
-    let {model, configuration} = this.loadModel(
-      // TODO: validate configuration, and provide valid configuration in tests.
-      payload.model, payload.capabilities
-    );
-
-    // TODO: validate configuration?
-    this.cast('ready', { configuration });
+    // We got a message! Delegate to the current state.
+    this.state.handleMessage(event.data as IncomingMessage);
   }
 
   /**
@@ -142,17 +136,24 @@ class LMLayerWorker {
    * @param capabilities Capabilities on offer from the keyboard.
    */
   private loadModel(modelCode: any, capabilities: Capabilities) {
-    let model: ModelDescription = null;
+    let model = null;
     let configuration: Configuration = {
       leftContextCodeUnits: 0,
       rightContextCodeUnits: 0
     };
 
     if (typeof modelCode === 'string') {
+      console.warn("Deprecated: model defined as a string.")
       // Deprecated! The model should not be source code.
       let result = new Function('configuration', modelCode)(capabilities);
       model = result.model;
       configuration = result.configuration;
+    } else if (modelCode.type === 'dummy') {
+      model = new LMLayerWorker.models.DummyModel(capabilities, {
+        futureSuggestions: modelCode.futureSuggestions
+      });
+    } else {
+      throw new Error('Invalid model');
     }
     // TODO: when model is object with kind 'wordlist' or 'fst'
 
@@ -165,6 +166,57 @@ class LMLayerWorker {
     }
 
     return {model, configuration};
+  }
+
+  /**
+   * Sets the initial state, i.e., `uninitialized`.
+   * This state only handles `initialized` messages, and will
+   * transition to the `ready` state once it receives a model
+   * description and capabilities.
+   */
+  private setupInitialState() {
+    this.state = {
+      name: 'uninitialized',
+      handleMessage: (payload) => {
+        // ...that message must have been 'initialize'!
+        if (payload.message !== 'initialize') {
+          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
+        }
+
+        // TODO: validate configuration?
+        let {model, configuration} = this.loadModel(
+          // TODO: validate configuration, and provide valid configuration in tests.
+          payload.model, payload.capabilities
+        );
+
+        this.transitionToReadyState(model);
+        this.cast('ready', { configuration });
+      }
+    };
+  }
+
+  /**
+   * Sets the state to `ready`. This requires a
+   * fully-instantiated model. The `ready` state only responds
+   * to `predict` message, and is an accepting state.
+   *
+   * @param model The initialized language model.
+   */
+  private transitionToReadyState(model: WorkerInternalModel) {
+    this.state = {
+      name: 'ready',
+      handleMessage: (payload) => {
+        if (payload.message !== 'predict') {
+          throw new Error(`invalid message; expected 'predict' but got ${payload.message}`);
+        }
+
+        let {transform, context} = payload;
+        this.cast('suggestions', {
+          token: payload.token,
+          suggestions: model.predict(transform, context)
+        });
+      }
+    };
   }
 
   /**
