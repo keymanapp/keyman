@@ -54,6 +54,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
   private static final String jsonCacheFilename = "jsonCache.dat";
+  private static final String TAG = "LanguageListActivity";
 
   private static JSONArray languages = null;
 
@@ -182,7 +183,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       kbInfo.put(KMManager.KMKey_Font, kbFont);
     } catch (JSONException e) {
       kbInfo = null;
-      Log.e("getKeyboardInfo", "JSON Error: " + e);
+      Log.e(TAG, "getKeyboardInfo - JSON Error: " + e);
     }
 
     return kbInfo;
@@ -221,7 +222,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           int kbLength = langKeyboards.length();
           if (kbLength == 1) {
             keyboard = langKeyboards.getJSONObject(0);
-            pkgID = keyboard.getString(KMManager.KMKey_PackageID);
+            pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
             kbID = keyboard.getString(KMManager.KMKey_ID);
             kbName = keyboard.getString(KMManager.KMKey_Name);
             kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -266,6 +267,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
         return keyboardsInfo;
       } catch (Exception e) {
+        Log.e(TAG, "getKeyboardsInfo() error: " + e);
         return null;
       }
     }
