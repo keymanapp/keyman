@@ -53,7 +53,6 @@ describe('PromiseStore', function () {
         promises.keep(reusedToken);
         sinon.assert.notCalled(overwrittenResolve);
         sinon.assert.called(originalResolve);
-        assert.isTrue(false);
       });
     });
   });

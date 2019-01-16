@@ -57,7 +57,7 @@ class PromiseStore<T> {
    */
   make(token: Token, resolve: Resolve<T>, reject: Reject): void {
     if (this._promises.has(token)) {
-      reject(`Existing request with token ${token}`);
+      return reject(`Existing request with token ${token}`);
     }
     this._promises.set(token, { reject, resolve });
   }
