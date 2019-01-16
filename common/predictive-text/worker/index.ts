@@ -131,26 +131,19 @@ class LMLayerWorker {
    * Loads a model by executing the given source code, and
    * passing in the appropriate configuration.
    *
-   * @param modelCode Source code for a function that takes
-   *                  configuration, and returns { model, configuration }
+   * @param desc         Type of the model to instantiate and its parameters.
    * @param capabilities Capabilities on offer from the keyboard.
    */
-  private loadModel(modelCode: any, capabilities: Capabilities) {
-    let model = null;
+  private loadModel(desc: ModelDescription, capabilities: Capabilities) {
+    let model: WorkerInternalModel;
     let configuration: Configuration = {
       leftContextCodeUnits: 0,
       rightContextCodeUnits: 0
     };
 
-    if (typeof modelCode === 'string') {
-      console.warn("Deprecated: model defined as a string.")
-      // Deprecated! The model should not be source code.
-      let result = new Function('configuration', modelCode)(capabilities);
-      model = result.model;
-      configuration = result.configuration;
-    } else if (modelCode.type === 'dummy') {
+    if (desc.type === 'dummy') {
       model = new LMLayerWorker.models.DummyModel(capabilities, {
-        futureSuggestions: modelCode.futureSuggestions
+        futureSuggestions: desc.futureSuggestions
       });
     } else {
       throw new Error('Invalid model');
