@@ -17,7 +17,33 @@ describe('PromiseStore', function () {
       assert.lengthOf(promises, 1);
     });
 
-    // TODO: test existing token
+    it('should reject the promise when a token is reused', function () {
+      var promises = new PromiseStore();
+      
+      var duplicatedToken = randomToken();
+
+      // Add a promise, and an unrelated promise.
+      new Promise(function (resolve, reject) {
+        promises.make(duplicatedToken, resolve, reject);
+      });
+      new Promise(function (resolve, reject) {
+        promises.make(randomToken(), resolve, reject);
+      });
+      assert.lengthOf(promises, 2);
+
+      // Now, reuse the token of the first (unresolved) promise:
+      (new Promise(function (resolve, reject) {
+        promises.make(duplicatedToken, resolve, reject);
+      })).then(
+        function (resolve) { return promise.reject('Should not have gotten here!'); },
+        // It SHOULD reject.
+        function (error) {
+          assert.isObject(error);
+          // It did NOT track a new promise.
+          assert.lengthOf(promises, 2);
+        }
+      );
+    });
   });
 
   describe('.keep()', function () {
