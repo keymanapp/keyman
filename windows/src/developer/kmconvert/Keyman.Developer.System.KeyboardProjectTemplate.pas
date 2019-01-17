@@ -260,6 +260,7 @@ begin
     kpj.Options.BuildPath := '$PROJECTPATH\build';
     kpj.Options.WarnDeprecatedCode := True;
     kpj.Options.CompilerWarningsAsErrors := True;
+    kpj.Options.CheckFilenameConventions := True;
 
     kpj.Files.Add(TkmnProjectFile.Create(kpj, GetKeyboardFilename, nil));
     kpj.Files.Add(TkpsProjectFile.Create(kpj, GetPackageFilename, nil));

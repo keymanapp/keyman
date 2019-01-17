@@ -209,6 +209,7 @@ type
       var CanClose: Boolean);   // I4807
   private
     procedure AboutShowStartup(Sender: TObject);
+    function CheckFilenameConventions(FileName: string): Boolean;
   public
     procedure OpenProject(FileName: WideString);
   end;
@@ -228,6 +229,7 @@ uses
   OnlineConstants,
   OnlineUpdateCheck,
   Printers,
+  Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
@@ -355,6 +357,29 @@ begin
     actFileSaveAs.Dialog.DefaultExt := ActiveEditor.DefaultExt;
     actFileSaveAs.Dialog.Filter := ActiveEditor.FileNameFilter;
     actFileSaveAs.Dialog.FileName := ActiveEditor.FileName;
+  end;
+end;
+
+function TmodActionsMain.CheckFilenameConventions(FileName: string): Boolean;
+begin
+  if not FGlobalProject.Options.CheckFilenameConventions then Exit(True);
+
+  if (GetFileTypeFromFileName(FileName) in [ftKeymanSource, ftPackageSource]) or
+    SameText(ExtractFileExt(FileName), Ext_ProjectSource) then
+  begin
+    if TKeyboardUtils.DoesKeyboardFilenameFollowConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Prompt, [FileName]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
+  end
+  else
+  begin
+    if TKeyboardUtils.DoesFilenameFollowConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Prompt, [FileName]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
   end;
 end;
 

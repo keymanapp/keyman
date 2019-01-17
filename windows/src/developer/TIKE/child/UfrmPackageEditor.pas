@@ -266,6 +266,7 @@ type
       State: TProjectLogState);
     procedure RefreshTargetPanels;
     procedure EnableControls;
+    function CheckFilenameConventions(FileName: string): Boolean;
 
   protected
     function GetHelpTopic: string; override;
@@ -578,6 +579,18 @@ end;
 {-------------------------------------------------------------------------------
  - Files page                                                                  -
  -------------------------------------------------------------------------------}
+
+function TfrmPackageEditor.CheckFilenameConventions(FileName: string): Boolean;
+begin
+  if not FGlobalProject.Options.CheckFilenameConventions then
+    Exit(True);
+
+  if TKeyboardUtils.DoesFilenameFollowConventions(FileName) then
+    Exit(True);
+
+  Result := MessageDlg(Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Prompt, [FileName]),
+    mtConfirmation, mbOkCancel, 0) = mrOk;
+end;
 
 procedure TfrmPackageEditor.AddFile(FileName: WideString);
 var
