@@ -87,5 +87,12 @@ namespace com.keyman.dom {
     getText(): string {
       return this.root.value;
     }
+
+    deleteCharsFromContext(dn: number) {
+      if(dn > 0) {
+        let curText = this.getTextBeforeCaret();
+        this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
+      }
+    }
   }
 }

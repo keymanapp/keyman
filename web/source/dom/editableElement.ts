@@ -90,5 +90,11 @@ namespace com.keyman.dom {
      * Gets the element's full text, including any text that is actively selected.
      */
     getText(): string;
+
+    /**
+     * Performs context deletions as needed by the KeymanWeb engine.
+     * @param dn The number of characters to delete.  If negative, context will be left unchanged.
+     */
+    deleteCharsFromContext(dn: number): void
   }
 }
