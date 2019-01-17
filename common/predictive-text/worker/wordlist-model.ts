@@ -36,7 +36,6 @@
  * at predicting the next word.
  */
 LMLayerWorker.models.WordListModel = class WordListModel implements WorkerInternalModel {
-
   predict(_transform: Transform, _context: Context): Suggestion[] {
     return [];
   }
