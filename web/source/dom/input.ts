@@ -32,11 +32,9 @@ namespace com.keyman.dom {
     }
 
     clearSelection(): void {
-      let Pelem = this.root;
-
       // Processes our codepoint-based variants of selectionStart and selectionEnd.
       let caret = this.getCaret();
-      Pelem.value = Pelem.value._kmwSubstring(0, caret) + Pelem.value._kmwSubstring(this.processedSelectionEnd); //I3319
+      this.root.value = this.root.value._kmwSubstring(0, caret) + this.root.value._kmwSubstring(this.processedSelectionEnd); //I3319
 
       this.setCaret(caret);
     }
@@ -47,6 +45,7 @@ namespace com.keyman.dom {
 
     invalidateSelection() {
       // Since .selectionStart will never return this value, we use it to indicate
+      // the need to refresh our processed indices.
       this._cachedSelectionStart = -1;
     }
 
@@ -73,15 +72,16 @@ namespace com.keyman.dom {
     }
 
     setTextBeforeCaret(text: string) {
+      this.getCaret();
       let newCaret = text._kmwLength();
-      this.root.value = text + this.getTextAfterCaret();
+      this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
 
       this.setCaret(newCaret);
     }
 
     getTextAfterCaret(): string {
       this.getCaret();
-      return this.getText()._kmwSubstring(0, this.processedSelectionEnd);
+      return this.getText()._kmwSubstring(this.processedSelectionEnd);
     }
 
     getText(): string {

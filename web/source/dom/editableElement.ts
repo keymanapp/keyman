@@ -81,12 +81,13 @@ namespace com.keyman.dom {
     setTextBeforeCaret(text: string);
 
     /**
-     * Relative to the caret, gets the element's text not considered part of the context.
+     * Relative to the caret (and/or active selection), gets the element's text after the caret,
+     * excluding any actively selected text that would be immediately replaced upon text entry.
      */
     getTextAfterCaret(): string;
 
     /**
-     * Gets the element's text.
+     * Gets the element's full text, including any text that is actively selected.
      */
     getText(): string;
   }
