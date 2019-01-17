@@ -282,21 +282,21 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 4);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.normal.substr(0, 4), "Failed to properly return correct substring for a simple string");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 8);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.smp.substr(0, 8), "Failed to properly return correct substring for an SMP string");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 5);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.mixed.substr(0, 5), "Failed to properly return correct substring for a mixed SMP string");
       String.kmwEnableSupplementaryPlane(false);
     }
@@ -353,21 +353,21 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 4);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.normal.substr(4), "Failed to properly return correct substring for a simple string");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 8);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.smp.substr(8), "Failed to properly return correct substring for an SMP string");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 5);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.mixed.substr(5), "Failed to properly return correct substring for a mixed SMP string");
       String.kmwEnableSupplementaryPlane(false);
     }
@@ -446,7 +446,7 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 4);
       pair.wrapper.setTextBeforeCaret(Apple.normal.substr(0, 2))
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 2) + Apple.normal.substr(4), "Error replacing text in a simple string");
       String.kmwEnableSupplementaryPlane(false);
@@ -454,7 +454,7 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 8);
       pair.wrapper.setTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 4) + Apple.smp.substr(8), "Error replacing text in an SMP string");
       String.kmwEnableSupplementaryPlane(false);
@@ -462,7 +462,7 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 5);
       pair.wrapper.setTextBeforeCaret(Apple.smp.substr(0, 4))
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 4) + Apple.mixed.substr(5), "Error replacing text in a mixed SMP string");
       String.kmwEnableSupplementaryPlane(false);
@@ -502,7 +502,7 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 4);
       pair.wrapper.deleteCharsFromContext(1);
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 3) + Apple.normal.substr(4), "Error deleting context chars from a simple string");
       String.kmwEnableSupplementaryPlane(false);
@@ -510,7 +510,7 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
-      pair.wrapper.setCaret(4);
+      testObj.setCaret(pair, 8);
       pair.wrapper.deleteCharsFromContext(1);
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 6) + Apple.smp.substr(8), "Error deleting context chars from an SMP string");
       String.kmwEnableSupplementaryPlane(false);
@@ -518,7 +518,7 @@ if(typeof InterfaceTests == 'undefined') {
 
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
-      pair.wrapper.setCaret(3);
+      testObj.setCaret(pair, 4);
       pair.wrapper.deleteCharsFromContext(2);
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 1) + Apple.mixed.substr(4), "Error deleting context chars from a mixed SMP string");
       String.kmwEnableSupplementaryPlane(false);

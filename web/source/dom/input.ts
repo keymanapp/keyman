@@ -91,7 +91,10 @@ namespace com.keyman.dom {
     deleteCharsFromContext(dn: number) {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
+        let caret = this.getCaret();
+
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
+        this.setCaret(caret - dn);
       }
     }
   }

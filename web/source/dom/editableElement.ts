@@ -56,19 +56,6 @@ namespace com.keyman.dom {
     hasSelection(): boolean;
     
     /**
-     * Gets the current position of the caret within the element.  If the caret is not
-     * within the element, returns -1.
-     */
-    getCaret(): number;
-
-    /**
-     * Sets the current position of the caret within the element, based upon KMW's extended
-     * version of string indices.  
-     * @param caret The KMW code point index at which to place the caret.
-     */
-    setCaret(caret: number);
-
-    /**
      * Relative to the caret, gets the current context within the wrapper's element.
      */
     getTextBeforeCaret(): string;
