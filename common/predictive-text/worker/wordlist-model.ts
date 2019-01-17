@@ -36,7 +36,41 @@
  * at predicting the next word.
  */
 LMLayerWorker.models.WordListModel = class WordListModel implements WorkerInternalModel {
-  predict(_transform: Transform, _context: Context): Suggestion[] {
-    return [];
+  private _wordlist: string[];
+
+  constructor(_capabilities: Capabilities, wordlist: string[]) {
+    this._wordlist = wordlist;
+  }
+
+  predict(transform: Transform, _context: Context): Suggestion[] {
+    const MAX_SUGGESTIONS = 3;
+    let prefix = transform.insert;
+    let suggestions: Suggestion[] = [];
+
+    // TODO: support astral code points (1 code point === length of 2)
+    if (prefix.length !== 1) {
+      throw new Error('Invalid prefix length')
+    }
+    
+    // naïve O(n) exhaustive search through the entire word list.
+    for (let word of this._wordlist) {
+      let suggestionPrefix = word.substr(0, 1)
+      if (prefix === suggestionPrefix) {
+        suggestions.push({
+          transform: {
+            insert: word + ' ',
+            deleteLeft: 0,
+          },
+          displayAs: word,
+        });
+      }
+
+      // Do not exceed the limit on suggestions.
+      if (suggestions.length >= MAX_SUGGESTIONS) {
+        break;
+      }
+    }
+
+    return suggestions;
   }
 }

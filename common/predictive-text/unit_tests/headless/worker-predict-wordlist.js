@@ -25,7 +25,6 @@ describe('LMLayerWorker word list model', function() {
         jsonFixture('wordlists/english-1000')
       );
 
-      var suggestion;
       var suggestions = model.predict({
         insert: 't',
         deleteLeft: 0,
@@ -33,12 +32,12 @@ describe('LMLayerWorker word list model', function() {
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 't'
+      var suggestion;
+      var suggestedWord;
       for (var i = 0; i < MIN_SUGGESTIONS; i++) {
-        suggestions = suggestions[i];
-        assert.strictEqual(
-          suggestion.transform.insert.substr(0, 1),
-          't',
-        );
+        suggestion = suggestions[i];
+        suggestedWord = suggestion.transform.insert;
+        assert.strictEqual(suggestedWord.substr(0, 1), 't');
       }
     });
   });
