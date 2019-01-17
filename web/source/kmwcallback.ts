@@ -8,6 +8,14 @@
 ***/
 
 namespace com.keyman {
+  type KeyEvent = com.keyman.text.KeyEvent;
+
+  export class KeyInformation {
+    vk: boolean;
+    code: number;
+    modifiers: number;
+  }
+
   /*
   * Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
   * No constructors or methods since keyboards will not utilize the same backing prototype, and
@@ -566,8 +574,9 @@ namespace com.keyman {
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
       var bitmask = this.keymanweb.keyboardManager.getKeyboardModifierBitmask();
-      var modifierBitmask = bitmask & this.keymanweb.osk.modifierBitmasks["ALL"];
-      var stateBitmask = bitmask & this.keymanweb.osk.stateBitmasks["ALL"];
+      let Codes = com.keyman.text.Codes;
+      var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
+      var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -1101,7 +1110,7 @@ namespace com.keyman {
     ifStore(systemId: number, strValue: string, Pelem: HTMLElement): boolean {
       var result=true;
       if(systemId == this.TSS_LAYER) {
-        result = (this.keymanweb.osk.layerId === strValue);
+        result = (this.keymanweb.osk.vkbd.layerId === strValue);
       } else if(systemId == this.TSS_PLATFORM) {
         var i,constraint,constraints=strValue.split(' ');
         for(i=0; i<constraints.length; i++) {
@@ -1176,7 +1185,7 @@ namespace com.keyman {
     setStore(systemId: number, strValue: string, Pelem: HTMLElement): boolean {
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
-        return this.keymanweb.osk.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
+        return this.keymanweb.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
         return false;
       }
@@ -1306,7 +1315,7 @@ namespace com.keyman {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device, element: HTMLElement, keystroke:KeyEvent|LegacyKeyEvent) {
+    processKeystroke(device, element: HTMLElement, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
       // Clear internal state tracking data from prior keystrokes.
       (<any>this.keymanweb)._CachedSelectionStart = null; // I3319     
       this._DeadkeyResetMatched();       // I3318    
@@ -1352,7 +1361,9 @@ namespace com.keyman {
     }
 
     resetContext() {
-      this.keymanweb.osk.layerId = 'default';
+      if(this.keymanweb.osk.vkbd) {
+        this.keymanweb.osk.vkbd.layerId = 'default';
+      }
 
       this.clearDeadkeys();
       this.resetContextCache();
@@ -1363,9 +1374,10 @@ namespace com.keyman {
 
     setNumericLayer() {
       var i;
-      for(i=0; i<this.keymanweb.osk.layers.length; i++) {
-        if (this.keymanweb.osk.layers[i].id == 'numeric') {
-          this.keymanweb.osk.layerId = 'numeric';
+      let osk = this.keymanweb.osk.vkbd;
+      for(i=0; i<osk.layers.length; i++) {
+        if (osk.layers[i].id == 'numeric') {
+          osk.layerId = 'numeric';
           this.keymanweb.osk._Show();
         }
       }
@@ -1409,10 +1421,10 @@ namespace com.keyman {
      * Reset OSK shift states when entering or exiting the active element
      **/    
     resetVKShift() {
-      if(!this.keymanweb.uiManager.isActivating) 
-      {
-        if(this.keymanweb.osk._UpdateVKShift) {
-          this.keymanweb.osk._UpdateVKShift(null,15,0);  //this should be enabled !!!!! TODO
+      let processor = com.keyman.singleton.textProcessor;
+      if(!this.keymanweb.uiManager.isActivating && this.keymanweb.osk.vkbd) {
+        if(processor._UpdateVKShift) {
+          processor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
         }
       }
     }

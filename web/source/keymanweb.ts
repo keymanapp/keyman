@@ -110,9 +110,9 @@ if(!window['keyman']['initialized']) {
 
     // I732 START - Support for European underlying keyboards #1
     if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 
-      osk._BaseLayout = window['KeymanWeb_BaseLayout'];
+      com.keyman.osk.Layouts._BaseLayout = window['KeymanWeb_BaseLayout'];
     else
-      osk._BaseLayout = 'us';    
+      com.keyman.osk.Layouts._BaseLayout = 'us';    
     
     
     keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      

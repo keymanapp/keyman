@@ -485,7 +485,7 @@ namespace com.keyman {
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
         this.clearLastActiveElement();
         this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
-        this.keyman.osk._Hide();
+        this.keyman.osk._Hide(false);
       }
       
       return;
@@ -1116,12 +1116,13 @@ namespace com.keyman {
      * Scope        Private
      * Description  Remove handlers before detaching KMW window  
      */    
-    _WindowUnload: () => void = function() {
+    _WindowUnload: () => void = function(this: DOMManager) {
       // Allow the UI to release its own resources
       this.keyman.uiManager.doUnload();
       
       // Allow the OSK to release its own resources
       if(this.keyman.osk.ready) {
+        this.keyman.osk.shutdown();
         this.keyman.osk._Unload(); // I3363 (Build 301)
       }
       

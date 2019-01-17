@@ -50,10 +50,14 @@ interface CSSStyleDeclaration {
     KhtmlUserSelect: any, // No dating information for the rest at present.
     UserSelect: any,
     WebkitUserSelect: any,
-
-    WebkitOverflowScrolling?: string
+    WebkitOverflowScrolling?: string,
+    msTransition?: string,
+    MozTransition?: string,
+    WebkitTransition?: string
 }
 
 interface TouchEvent {
-  pageY?: number
+  pageY?: number,
+  clientX?: number,
+  clientY?: number
 }
