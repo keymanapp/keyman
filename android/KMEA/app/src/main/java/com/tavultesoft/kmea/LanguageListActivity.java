@@ -169,7 +169,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String kbID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_ID);
       String kbName = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_Name);
       String kbVersion = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_KeyboardVersion, "1.0");
-      String isCustom = "N";
+      String isCustom = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_CustomKeyboard, "N");
       String kbFont = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_Font, "");
 
       kbInfo = new HashMap<String, String>();
@@ -450,8 +450,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
                 // Merge keyboard info
                 JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
 
-                String keyboardVersion = keyboard.getString("version");
-                String kmpKeyboardVersion = kmpKeyboard.getString("version");
+                String keyboardVersion = keyboard.getString(KMManager.KMKey_KeyboardVersion);
+                String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
                 if (FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion) == FileUtils.VERSION_GREATER) {
                   // Replace keyboard entry from kmp
                   keyboards.put(keyboardIndex, kmpKeyboard);

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.JSONParser;
 
@@ -36,8 +37,8 @@ public class JSONUtils {
     JSONArray languagesArray = new JSONArray();
     JSONParser parser = new JSONParser();
 
-    for (File packageID: packages) {
-      for (File file: packageID.listFiles()) {
+    for (File pkg: packages) {
+      for (File file: pkg.listFiles()) {
         if (file.getName().toLowerCase().endsWith(PackageProcessor.PPDefault_Metadata)) {
           try {
             JSONObject kmp = parser.getJSONObjectFromFile(file);
@@ -49,49 +50,43 @@ public class JSONUtils {
 
             for (int i=0; i<kmpKeyboards.length(); i++) {
               JSONObject kmpKeyboardObj = kmpKeyboards.getJSONObject(i);
-              String kbdName = kmpKeyboardObj.getString("name");
-              String kbdID = kmpKeyboardObj.getString("id");
-              String kbdVersion = kmpKeyboardObj.getString("version");
-              String kbdFilename = packageID.getName() + "/" + kbdID + ".js";
-
-              // Create optional font JSON object
-              JSONObject fontObj = new JSONObject();
-              String kmpFont = kmpKeyboardObj.optString("oskFont");
-              if (kmpFont.isEmpty()) {
-                kmpFont = kmpKeyboardObj.optString("displayFont");
-              }
-              if (!kmpFont.isEmpty()) {
-                JSONArray kmpFontArray = new JSONArray();
-                // TODO: does this need a fuller path (include package ID?)
-                kmpFontArray.put(kmpFont);
-                fontObj.put("family", kmpFont);
-                fontObj.put("source", kmpFontArray);
-              }
+              String kbdName = kmpKeyboardObj.getString(KMManager.KMKey_Name);
+              String kbdID = kmpKeyboardObj.getString(KMManager.KMKey_ID);
+              String kbdVersion = kmpKeyboardObj.getString(KMManager.KMKey_KeyboardVersion);
+              String kbdFilename = pkg.getName() + "/" + kbdID + ".js";
 
               // Merge languages
               JSONArray kmpLanguageArray = kmpKeyboardObj.getJSONArray("languages");
               for (int j=0; j<kmpLanguageArray.length(); j++) {
                 JSONObject languageObj = kmpLanguageArray.getJSONObject(j);
-                String languageName = languageObj.getString("name");
-                String languageID = languageObj.getString("id");
+                String packageID = pkg.getName();
+                String languageName = languageObj.getString(KMManager.KMKey_Name);
+                String languageID = languageObj.getString(KMManager.KMKey_ID);
 
                 JSONObject kbdObj = new JSONObject();
-                kbdObj.put("id", kbdID);
-                kbdObj.put("name", kbdName);
+                kbdObj.put(KMManager.KMKey_PackageID, packageID);
+                kbdObj.put(KMManager.KMKey_ID, kbdID);
+                kbdObj.put(KMManager.KMKey_Name, kbdName);
                 kbdObj.put("filename", kbdFilename);
-                kbdObj.put("version", kbdVersion);
-                kbdObj.put("custom", "Y");
-                if (fontObj != null) {
-                  kbdObj.put("font", fontObj);
+                kbdObj.put(KMManager.KMKey_KeyboardVersion, kbdVersion);
+                kbdObj.put(KMManager.KMKey_CustomKeyboard, "Y");
+                if (kmpKeyboardObj.has(KMManager.KMKey_DisplayFont)) {
+                 kbdObj.put(KMManager.KMKey_Font, kmpKeyboardObj.getString(KMManager.KMKey_DisplayFont));
+                }
+                if (kmpKeyboardObj.has(KMManager.KMKey_OskFont)) {
+                  kbdObj.put(KMManager.KMKey_OskFont, kmpKeyboardObj.getString(KMManager.KMKey_OskFont));
                 }
                 if (containsHelp) {
-                  kbdObj.put("helpFile", packageID + "/welcome.htm");
+                  File welcomeFile = new File(pkg, "welcome.htm");
+                  kbdObj.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
                 }
 
-                File jsFile = new File(packageID, kbdID + ".js");
+                File jsFile = new File(pkg, kbdID + ".js");
                 if (jsFile.exists()) {
                   SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
                   kbdObj.put("lastModified", sdf.format(jsFile.lastModified()));
+                } else {
+                  Log.d(TAG, "getLanguages() can't generate modified date for " + jsFile);
                 }
                 // TODO: source, filesize
 
@@ -102,8 +97,8 @@ public class JSONUtils {
                   tempKbdArray.put(kbdObj);
 
                   JSONObject tempLanguageObj = new JSONObject();
-                  tempLanguageObj.put("id", languageID);
-                  tempLanguageObj.put("name", languageName);
+                  tempLanguageObj.put(KMManager.KMKey_ID, languageID);
+                  tempLanguageObj.put(KMManager.KMKey_Name, languageName);
                   tempLanguageObj.put("keyboards", tempKbdArray);
 
                   languagesArray.put(tempLanguageObj);

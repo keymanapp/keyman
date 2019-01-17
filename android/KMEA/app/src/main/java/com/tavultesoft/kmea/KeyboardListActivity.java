@@ -102,6 +102,26 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
           final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
           String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
           String langName = kbInfo.get(KMManager.KMKey_LanguageName);
+          String kFont = kbInfo.getOrDefault(KMManager.KMKey_Font, "");
+          String kOskFont = kbInfo.getOrDefault(KMManager.KMKey_OskFont, kFont);
+          String isCustom = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N");
+          if (isCustom.toUpperCase().equals("Y")) {
+            // Custom keyboard already exists in packages/ so just add the language association
+            KeyboardPickerActivity.addKeyboard(context, kbInfo);
+            if (KMManager.InAppKeyboard != null) {
+              KMManager.InAppKeyboard.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+            }
+            if (KMManager.SystemKeyboard != null) {
+              KMManager.SystemKeyboard.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+            }
+            Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+
+            ((AppCompatActivity) context).finish();
+            //LanguageListActivity.this.finish();
+            //finish();
+
+            return;
+          }
 
           Bundle args = new Bundle();
           args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
