@@ -164,7 +164,7 @@ namespace com.keyman {
      * @return      {number}                Character code 
      * Description Translate keyboard codes to standard US layout codes
      */    
-    _USKeyCodeToCharCode(Levent: KeyEvent) {
+    _USKeyCodeToCharCode(Levent: com.keyman.text.KeyEvent) {
       return this._usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
     };
   }

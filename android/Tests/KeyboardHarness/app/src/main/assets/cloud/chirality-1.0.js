@@ -42,8 +42,8 @@ function Keyboard_chirality() {
   };
   this.g0 = function (t, e) {
     var k = KeymanWeb, r = 0, m = 0;
-    var osk = keyman.osk.vkbd;
-    var Constants = com.keyman.osk.VisualKeyboard;
+    var Processor = keyman.textProcessor;
+    var Constants = com.keyman.text.Codes;
     
     // Handwritten time!
     var kls = this.KV.KLS;
@@ -54,7 +54,7 @@ function Keyboard_chirality() {
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
       // The following uses a non-public property potentially subject to change in the future.
-      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | osk.getModifierState(layers[i]);
+      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | Processor.getModifierState(layers[i]);
       var layer = layers[i];
       
       for(var key=0; key < kls[layer].length; key++) {
