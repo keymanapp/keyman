@@ -40,20 +40,6 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
   }
 }
 
-var toSupplementaryPairString = function(code){
-  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-  var L = (code - 0x10000) % 0x400 + 0xDC00;
-
-  return String.fromCharCode(H, L);
-}
-
-var toEscapedSupplementaryPairString = function(code){
-  var H = (Math.floor((code - 0x10000) / 0x400) + 0xD800).toString(16);
-  var L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
-
-  return "\\u"+H+"\\u"+L;
-}
-
 /*
  *  Start definition of isolated rule tests for validity of `fullContextMatch` (KFCM) components.
  */

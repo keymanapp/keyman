@@ -36,6 +36,7 @@ module.exports = {
     'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
     'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
                                           // Includes KMW's Device class, which is used by test_utils below.
+    'unit_tests/element-interface.js', // Defines element wrappers for basic processing DOM-interface tests.
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
     'unit_tests/cases/**/*.js', // Where the tests actually reside.
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
@@ -49,6 +50,7 @@ module.exports = {
     {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
     {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'unit_tests/recorder_InputEvents.js.map', watched: true, served: true, included: false},
+    {pattern: 'unit_tests/element-interface.js.map', watched: true, served: true, included: false},
     {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
   ],
 

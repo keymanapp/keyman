@@ -29,8 +29,16 @@ if [ $? -ne 0 ]; then
 fi
 
 # Definition of global compile constants
-COMPILED_FILE="recorder_InputEvents.js"
-OUTPUT="../release/recorder"
+SCRIPT_TAGS=( "recorder"                "element-interface" )
+PRODUCTS=(    "recorder_InputEvents.js" "element-interface.js")
+FOLDERS=(     "recorder"                "element-interface")
+OUTPUT_BASE="../release"
+PRODUCT_COUNT=${#PRODUCTS[@]}
+
+# COMPILED_FILE="recorder_InputEvents.js"
+# SCRIPT_TAG="recorder"
+# OUTPUT="../release/recorder"
+
 NODE_SOURCE="source"
 ENGINE_TEST_OUTPUT="../unit_tests/"
 
@@ -45,10 +53,18 @@ PATH="../../node_modules/.bin:$PATH"
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-$compilecmd -p $NODE_SOURCE/tsconfig.recorder.json
-if [ $? -ne 0 ]; then
-    fail "Typescript compilation failed."
-fi
+for (( n=0; n<$PRODUCT_COUNT; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
+do
+  $compilecmd -p $NODE_SOURCE/tsconfig.${SCRIPT_TAGS[$n]}.json
+  if [ $? -ne 0 ]; then
+      fail "Typescript compilation failed for '${SCRIPT_TAGS[$n]}'."
+  fi
 
-cp $OUTPUT/$COMPILED_FILE $ENGINE_TEST_OUTPUT
-cp $OUTPUT/$COMPILED_FILE.map $ENGINE_TEST_OUTPUT
+  PRODUCT=$OUTPUT_BASE/${FOLDERS[$n]}/${PRODUCTS[$n]}
+  cp $PRODUCT $ENGINE_TEST_OUTPUT
+  cp $PRODUCT.map $ENGINE_TEST_OUTPUT
+# ###
+#   target=${args[$n]}
+#   cp -f $INTERMEDIATE/$target $dest/$target
+#   cp -f $INTERMEDIATE/$target.map $dest/$target.map
+done
