@@ -2,6 +2,8 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes a promise polyfill (needed for IE)
 /// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
+// Defines build-environment includes, since `tsc` doesn't provide a compile-time define.
+/// <reference path="environment.inc.ts" />
 // Defines the web-page interface object.
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
@@ -115,7 +117,7 @@ namespace com.keyman {
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
 
-      this['version'] = "11.0";
+      this['version'] = com.keyman.environment.VERSION;
       this['helpURL'] = 'http://help.keyman.com/go';
       this.setInitialized(0);
 
