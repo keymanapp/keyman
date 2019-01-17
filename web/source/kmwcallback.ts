@@ -8,6 +8,14 @@
 ***/
 
 namespace com.keyman {
+  type KeyEvent = com.keyman.text.KeyEvent;
+
+  export class KeyInformation {
+    vk: boolean;
+    code: number;
+    modifiers: number;
+  }
+
   /*
   * Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
   * No constructors or methods since keyboards will not utilize the same backing prototype, and
@@ -566,8 +574,9 @@ namespace com.keyman {
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
       var bitmask = this.keymanweb.keyboardManager.getKeyboardModifierBitmask();
-      var modifierBitmask = bitmask & com.keyman.osk.VisualKeyboard.modifierBitmasks["ALL"];
-      var stateBitmask = bitmask & com.keyman.osk.VisualKeyboard.stateBitmasks["ALL"];
+      let Codes = com.keyman.text.Codes;
+      var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
+      var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
       if(e.vkCode > 255) {
         keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -1306,7 +1315,7 @@ namespace com.keyman {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device, element: HTMLElement, keystroke:KeyEvent|LegacyKeyEvent) {
+    processKeystroke(device, element: HTMLElement, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
       // Clear internal state tracking data from prior keystrokes.
       (<any>this.keymanweb)._CachedSelectionStart = null; // I3319     
       this._DeadkeyResetMatched();       // I3318    
@@ -1412,9 +1421,10 @@ namespace com.keyman {
      * Reset OSK shift states when entering or exiting the active element
      **/    
     resetVKShift() {
+      let processor = com.keyman.singleton.textProcessor;
       if(!this.keymanweb.uiManager.isActivating && this.keymanweb.osk.vkbd) {
-        if(this.keymanweb.osk.vkbd._UpdateVKShift) {
-          this.keymanweb.osk.vkbd._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
+        if(processor._UpdateVKShift) {
+          processor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
         }
       }
     }

@@ -1,4 +1,46 @@
 namespace com.keyman.osk {
+  let Codes = com.keyman.text.Codes;
+  //#region Definition of the KeyElement merger type
+  class KeyData {
+    ['key']: OSKKey;
+    ['keyId']: string;
+    ['subKeys']?: OSKKeySpec[];
+    
+    constructor(keyData: OSKKey, keyId: string) {
+      this['key'] = keyData;
+      this['keyId'] = keyId;
+    }
+  }
+
+  export type KeyElement = HTMLDivElement & KeyData;
+
+  // Many thanks to https://www.typescriptlang.org/docs/handbook/advanced-types.html for this.
+  function link(elem: HTMLDivElement, data: KeyData): KeyElement {
+    let e = <KeyElement> elem;
+    
+    // Merges all properties and methods of KeyData onto the underlying HTMLDivElement, creating a merged class.
+    for(let id in data) {
+      if(!e.hasOwnProperty(id)) {
+        (<any>e)[id] = (<any>data)[id];
+      }
+    }
+
+    return e;
+  }
+
+  export function isKey(elem: Node): boolean {
+    return elem && ('key' in elem) && ((<any> elem['key']) instanceof OSKKey);
+  }
+
+  export function getKeyFrom(elem: Node): KeyElement {
+    if(isKey(elem)) {
+      return <KeyElement> elem;
+    } else {
+      return null;
+    }
+  }
+  //#endregion
+
   //#region OSK key objects and construction
   export class OSKKeySpec {
     id: string;
@@ -218,7 +260,7 @@ namespace com.keyman.osk {
     // Produces a small reference label for the corresponding physical key on a US keyboard.
     private generateKeyCapLabel(): HTMLDivElement {
       // Create the default key cap labels (letter keys, etc.)
-      var x = VisualKeyboard.keyCodes[this.spec.id];
+      var x = Codes.keyCodes[this.spec.id];
       switch(x) {
         // Converts the keyman key id code for common symbol keys into its representative ASCII code.
         // K_COLON -> K_BKQUOTE
@@ -252,7 +294,7 @@ namespace com.keyman.osk {
       }
     }
 
-    private processSubkeys(btn: HTMLDivElement) {
+    private processSubkeys(btn: KeyElement) {
       // Add reference to subkey array if defined
       var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
       // Transform any special keys into their PUA representations.
@@ -278,7 +320,6 @@ namespace com.keyman.osk {
       spec.layer = layerId;
 
       let kDiv=util._CreateElement('div');
-      kDiv['keyId']=spec['id'];
       kDiv.className='kmw-key-square';
 
       let ks=kDiv.style;
@@ -286,7 +327,9 @@ namespace com.keyman.osk {
 
       let originalPercent = totalPercent;
       
-      let btn=util._CreateElement('div');
+      let btnEle=util._CreateElement('div');
+      let btn = link(btnEle, new KeyData(this, spec['id']));
+
       // Set button class
       osk.setButtonClass(spec,btn,layout);
 
@@ -317,7 +360,6 @@ namespace com.keyman.osk {
 
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
       btn.id=this.getId(osk);
-      btn['key']=this;  //attach reference to key layout spec to element
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
@@ -391,7 +433,6 @@ namespace com.keyman.osk {
       }
 
       kDiv.className='kmw-key-square-ex';
-      kDiv['keyId']=spec['id'];
       if(topMargin) {
         ks.marginTop='5px';
       }
@@ -403,11 +444,11 @@ namespace com.keyman.osk {
       }
       ks.height=baseKey.offsetHeight+'px';
 
-      let btn=document.createElement('div');
-      osk.setButtonClass(spec,btn);
+      let btnEle=document.createElement('div');
+      let btn = link(btnEle, new KeyData(this, spec['id']));
 
+      osk.setButtonClass(spec,btn);
       btn.id = this.getId(osk);
-      btn['key'] = this;
 
       // Must set button size (in px) dynamically, not from CSS
       let bs=btn.style;
@@ -427,73 +468,6 @@ namespace com.keyman.osk {
   //#endregion
 
   export class VisualKeyboard {
-    //#region Keyboard-related static constants
-    // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
-    static modifierCodes = {
-      "LCTRL":0x0001,
-      "RCTRL":0x0002,
-      "LALT":0x0004,
-      "RALT":0x0008,
-      "SHIFT":0x0010,
-      "CTRL":0x0020,
-      "ALT":0x0040,
-      "CAPS":0x0100,
-      "NO_CAPS":0x0200,
-      "NUM_LOCK":0x0400,
-      "NO_NUM_LOCK":0x0800,
-      "SCROLL_LOCK":0x1000,
-      "NO_SCROLL_LOCK":0x2000,
-      "VIRTUAL_KEY":0x4000
-    };
-
-    static modifierBitmasks = {
-      "ALL":0x007F,
-      "ALT_GR_SIM": (VisualKeyboard.modifierCodes['LCTRL'] | VisualKeyboard.modifierCodes['LALT']),
-      "CHIRAL":0x001F,    // The base bitmask for chiral keyboards.  Includes SHIFT, which is non-chiral.
-      "IS_CHIRAL":0x000F, // Used to test if a bitmask uses a chiral modifier.
-      "NON_CHIRAL":0x0070 // The default bitmask, for non-chiral keyboards
-    };
-
-    static stateBitmasks = {
-      "ALL":0x3F00,
-      "CAPS":0x0300,
-      "NUM_LOCK":0x0C00,
-      "SCROLL_LOCK":0x3000
-    };
-
-    // Define standard keycode numbers (exposed for use by other modules)
-    static keyCodes = {
-      "K_BKSP":8,"K_TAB":9,"K_ENTER":13,
-      "K_SHIFT":16,"K_CONTROL":17,"K_ALT":18,"K_PAUSE":19,"K_CAPS":20,
-      "K_ESC":27,"K_SPACE":32,"K_PGUP":33,
-      "K_PGDN":34,"K_END":35,"K_HOME":36,"K_LEFT":37,"K_UP":38,
-      "K_RIGHT":39,"K_DOWN":40,"K_SEL":41,"K_PRINT":42,"K_EXEC":43,
-      "K_INS":45,"K_DEL":46,"K_HELP":47,"K_0":48,
-      "K_1":49,"K_2":50,"K_3":51,"K_4":52,"K_5":53,"K_6":54,"K_7":55,
-      "K_8":56,"K_9":57,"K_A":65,"K_B":66,"K_C":67,"K_D":68,"K_E":69,
-      "K_F":70,"K_G":71,"K_H":72,"K_I":73,"K_J":74,"K_K":75,"K_L":76,
-      "K_M":77,"K_N":78,"K_O":79,"K_P":80,"K_Q":81,"K_R":82,"K_S":83,
-      "K_T":84,"K_U":85,"K_V":86,"K_W":87,"K_X":88,"K_Y":89,"K_Z":90,
-      "K_NP0":96,"K_NP1":97,"K_NP2":98,
-      "K_NP3":99,"K_NP4":100,"K_NP5":101,"K_NP6":102,
-      "K_NP7":103,"K_NP8":104,"K_NP9":105,"K_NPSTAR":106,
-      "K_NPPLUS":107,"K_SEPARATOR":108,"K_NPMINUS":109,"K_NPDOT":110,
-      "K_NPSLASH":111,"K_F1":112,"K_F2":113,"K_F3":114,"K_F4":115,
-      "K_F5":116,"K_F6":117,"K_F7":118,"K_F8":119,"K_F9":120,
-      "K_F10":121,"K_F11":122,"K_F12":123,"K_NUMLOCK":144,"K_SCROLL":145,
-      "K_LSHIFT":160,"K_RSHIFT":161,"K_LCONTROL":162,"K_RCONTROL":163,
-      "K_LALT":164,"K_RALT":165,
-      "K_COLON":186,"K_EQUAL":187,"K_COMMA":188,"K_HYPHEN":189,
-      "K_PERIOD":190,"K_SLASH":191,"K_BKQUOTE":192,
-      "K_LBRKT":219,"K_BKSLASH":220,"K_RBRKT":221,
-      "K_QUOTE":222,"K_oE2":226,
-      "K_LOPT":50001,"K_ROPT":50002,
-      "K_NUMERALS":50003,"K_SYMBOLS":50004,"K_CURRENCIES":50005,
-      "K_UPPER":50006,"K_LOWER":50007,"K_ALPHA":50008,
-      "K_SHIFTED":50009,"K_ALTGR":50010,
-      "K_TABBACK":50011,"K_TABFWD":50012
-    };
-
     // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
     static specialCharacters = {
       '*Shift*':    8,
@@ -530,20 +504,6 @@ namespace com.keyman.osk {
       '*RCtrlShift*':     0x70
     };
 
-    static codesUS = [
-      ['0123456789',';=,-./`', '[\\]\''],
-      [')!@#$%^&*(',':+<_>?~', '{|}"']
-    ];
-    //#endregion
-
-    // Tracks the OSK-based state of supported state keys.
-    // Using the exact keyCode name from above allows for certain optimizations elsewhere in the code.
-    stateKeys = {
-      "K_CAPS":false,
-      "K_NUMLOCK":false,
-      "K_SCROLL":false
-    };
-
     private layout: LayoutFormFactor;
     layers: LayoutLayer[];
     layerId: string = "default";
@@ -562,40 +522,40 @@ namespace com.keyman.osk {
     // State-related properties
     ddOSK: boolean = false;
     popupVisible: boolean;
-    keyPending: HTMLElement;
-    deleteKey: HTMLElement;
+    keyPending: KeyElement;
+    deleteKey: KeyElement;
     deleting: number; // Tracks a timer id for repeated deletions.
     nextLayer: string;
     currentKey: string;
 
     // Special keys (for the currently-visible layer)
-    lgKey: HTMLDivElement;
-    hkKey: HTMLDivElement; // currently highlighted key
-    spaceBar: HTMLDivElement;
+    lgKey: KeyElement;
+    hkKey: KeyElement; // hide keyboard key
+    spaceBar: KeyElement;
 
     // Touch-tracking properties
     touchX: number;
     touchY: number;
     touchCount: number;
-    currentTarget: HTMLElement;
+    currentTarget: KeyElement;
 
     // Popup key management
-    popupBaseKey: HTMLElement;
+    popupBaseKey: KeyElement;
     popupPending: boolean = false;
     subkeyDelayTimer: number;
     popupDelay: number = 500;
-    menuEvent: HTMLElement; // Used by embedded-mode.
-    keytip: {key: HTMLElement, state: boolean, element?: HTMLDivElement};
+    menuEvent: KeyElement; // Used by embedded-mode.
+    keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
     popupCallout: HTMLDivElement;
 
     // Function fields (fleshed out by kmwnative.ts and/or kmwembedded.ts)
-    touchHold: (key: HTMLElement) => void;
-    optionKey: (e: HTMLElement, keyName: string, keyDown: boolean) => void;
-    highlightSubKeys: (key: HTMLElement, x: number, y: number) => void = this.highlightSubKeys || function(k,x,y) {};
-    showKeyTip: (key: HTMLElement, on: boolean) => void;
+    touchHold: (key: KeyElement) => void;
+    optionKey: (e: KeyElement, keyName: string, keyDown: boolean) => void;
+    highlightSubKeys: (key: KeyElement, x: number, y: number) => void = this.highlightSubKeys || function(k,x,y) {};
+    showKeyTip: (key: KeyElement, on: boolean) => void;
     drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void = this.drawPreview || function(c,w,h,e) {};
     createKeyTip: () => void;
-    addCallout: (key: HTMLElement) => HTMLDivElement = this.addCallout || function(key) {return null};
+    addCallout: (key: KeyElement) => HTMLDivElement = this.addCallout || function(key) {return null};
     waitForFonts: (kfd,ofd) => boolean = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
     adjustHeights: () => boolean;
 
@@ -716,9 +676,14 @@ namespace com.keyman.osk {
       for(n=0; n<layers.length; n++) {
         layer=layers[n]; rows=layer['row'];
         for(i=rows.length; i>0; i--) {
-          if(rows[i-1]['key'].length > 0) break;
+          if(rows[i-1]['key'].length > 0) {
+            break;
+          }
         }
-        if(i < rows.length) rows.splice(i-rows.length,rows.length-i);
+
+        if(i < rows.length) {
+          rows.splice(i-rows.length,rows.length-i);
+        }
       }
       // ...remove to here when compiler bug fixed ***
 
@@ -770,21 +735,16 @@ namespace com.keyman.osk {
 
         // Calculate the maximum row width (in layout units)
         var totalWidth=0;
-        for(i=0; i<rows.length; i++)
-        {
+        for(i=0; i<rows.length; i++) {
           var width=0;
           row=rows[i]; keys=row['key'];
-          for(j=0; j<keys.length; j++)
-          {
+          for(j=0; j<keys.length; j++) {
             key=keys[j];
 
             // Test for a trailing comma included in spec, added as null object by IE
-            if(key == null)
-            {
+            if(key == null) {
               keys.length = keys.length-1;
-            }
-            else
-            {
+            } else {
               var kw, kp;
               kw = (typeof key['width'] == 'string' && key['width'] != '') ? parseInt(key['width'],10) : 100;
               if(isNaN(kw) || kw == 0) kw = 100;
@@ -797,7 +757,9 @@ namespace com.keyman.osk {
               //if(typeof key['pad'] == 'string' && key['pad'] != '') width += parseInt(key['pad'],10); else width += 5;
             }
           }
-          if(width > totalWidth) totalWidth = width;
+          if(width > totalWidth) {
+            totalWidth = width;
+          }
         }
 
         // Add default right margin
@@ -809,8 +771,7 @@ namespace com.keyman.osk {
           totalWidth += 15;
         }
 
-        for(i=0; i<rows.length; i++)
-        {
+        for(i=0; i<rows.length; i++) {
           rDiv=util._CreateElement('div');
           rDiv.className='kmw-key-row';
           // The following event trap is needed to prevent loss of focus in IE9 when clicking on a key gap.
@@ -819,7 +780,8 @@ namespace com.keyman.osk {
           rDiv.onmousedown=util.mouseDownPreventDefaultHandler; // Build 360
           //util.attachDOMEvent(rDiv,'mousedown',function(e){if(e)e.preventDefault();
 
-          row=rows[i]; rs=rDiv.style;
+          row=rows[i];
+          rs=rDiv.style;
 
           // Set row height. (Phone and tablet heights are later recalculated
           // and set in px, allowing for viewport scaling.)
@@ -827,8 +789,7 @@ namespace com.keyman.osk {
 
           // Apply defaults, setting the width and other undefined properties for each key
           keys=row['key'];
-          for(j=0; j<keys.length; j++)
-          {
+          for(j=0; j<keys.length; j++) {
             key=keys[j];
             for(var tp in tKey) { // tKey = osk.getDefaultKeyObject();
               if(typeof key[tp] != 'string') key[tp]=tKey[tp];
@@ -837,8 +798,7 @@ namespace com.keyman.osk {
             // Modify the key type for special keys with non-standard labels
             // to allow the keyboard font to ovveride the SpecialOSK font.
             // Blank keys are no longer reclassed - can use before/after CSS to add text
-            switch(key['sp'])
-            {
+            switch(key['sp']) {
               case '1':
                 if(!specialLabel.test(key['text']) && key['text'] != '') key['sp']='3';
                 break;
@@ -900,6 +860,7 @@ namespace com.keyman.osk {
     }
     //#endregion
 
+    //#region OSK touch handlers
     /**
      * The main OSK touch start event handler
      *
@@ -907,6 +868,7 @@ namespace com.keyman.osk {
      *
      */
     touch: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+      let Processor = com.keyman.singleton.textProcessor;
       // Identify the key touched
       var t = <HTMLElement> e.changedTouches[0].target, key = this.keyTarget(t);
 
@@ -936,8 +898,7 @@ namespace com.keyman.osk {
       }
 
       // Get key name (K_...) from element ID
-      var keyIdComponents = key.id.split('-');
-      var keyName=keyIdComponents[keyIdComponents.length-1];
+      let keyName = key['keyId'];
 
       // Highlight the touched key
       this.highlightKey(key,true);
@@ -945,7 +906,7 @@ namespace com.keyman.osk {
       // Special function keys need immediate action
       if(keyName == 'K_LOPT' || keyName == 'K_ROPT')      {
         window.setTimeout(function(this: VisualKeyboard){
-          this.clickKey(key);
+          Processor.clickKey(key);
         }.bind(this),0);
         this.keyPending = null;
 
@@ -953,14 +914,14 @@ namespace com.keyman.osk {
       } else if(keyName == 'K_BKSP') {
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        this.clickKey(key);
+        Processor.clickKey(key);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-          this.clickKey(this.keyPending);
+          Processor.clickKey(this.keyPending);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -974,13 +935,15 @@ namespace com.keyman.osk {
       }
     }.bind(this);
 
-        /**
+    /**
      * OSK touch release event handler
      *
      *  @param  {Event} e   touch release event object
      *
      **/
     release: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
+      let Processor = com.keyman.singleton.textProcessor;
+
       // Prevent incorrect multi-touch behaviour if native or device popup visible
       var sk = document.getElementById('kmw-popup-keys'), t = this.currentTarget;
 
@@ -1020,7 +983,7 @@ namespace com.keyman.osk {
 
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          this.clickKey(this.keyPending);
+          Processor.clickKey(this.keyPending);
         }
         this.clearPopup();
         this.keyPending = null;
@@ -1115,7 +1078,7 @@ namespace com.keyman.osk {
       // Use the popup duplicate of the base key if a phone with a visible popup array
       var sk=document.getElementById('kmw-popup-keys');
       if(sk && sk.style.visibility == 'visible' && util.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
-        key1 = <HTMLElement> sk.childNodes[0].firstChild;
+        key1 = <KeyElement> sk.childNodes[0].firstChild;
       }
 
       // Identify current touch position (to manage off-key release)
@@ -1184,222 +1147,12 @@ namespace com.keyman.osk {
     }.bind(this);
 
     /**
-     * Simulate a keystroke according to the touched keyboard button element
-     *
-     * Note that the test-case oriented 'recorder' stubs this method to facilitate OSK-based input
-     * recording for use in test cases.  If changing this function, please ensure the recorder is
-     * not affected.
-     * 
-     * @param       {Object}      e      element touched (or clicked)
-     */
-    clickKey(e: HTMLElement) {
-      let keyman = com.keyman.singleton;
-      var Lelem = keyman.domManager.getLastActiveElement(), Ls, Le, Lkc;
-
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      let kbdInterface = keyman.interface;
-      let formFactor = keyman.util.device.formFactor;
-
-      // Each button id is of the form <layer>-<keyCode>, e.g. 'shift-ctrl-K_Q' or 'popup-shift-K_501', etc.
-      var t=e.id.split('-');
-      if(t.length < 2) {
-        return true; //shouldn't happen, but...
-      }
-
-      // Remove popup prefix before processing keystroke (KMEW-93)
-      if(t[0] == 'popup') {
-        t.splice(0,1);
-      }
-
-      if(Lelem != null) {
-        // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
-        // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-        var layer=t[0], keyName=t[t.length-1].toUpperCase(), keyShiftState=this.getModifierState(this.layerId),
-          nextLayer = keyShiftState;
-
-        // Make sure to get the full current layer, since layers are now kebab-case.
-        for(var i=1; i < t.length-1; i++) {
-          layer = layer + "-" + t[i];
-        }
-
-        if(typeof(e['key']) != 'undefined') {
-          nextLayer=e['key'].spec['nextlayer'];
-        }
-        keyman.domManager.initActiveElement(Lelem);
-
-        // Exclude menu and OSK hide keys from normal click processing
-        if(keyName == 'K_LOPT' || keyName == 'K_ROPT') {
-          this.optionKey(e, keyName, true);
-          return true;
-        }
-
-        // Turn off key highlighting (or preview)
-        this.highlightKey(e,false);
-
-        // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
-        if(formFactor == 'desktop') {
-          if(this.selectLayer(keyName, nextLayer)) {
-            return true;
-          }
-        }
-
-        // Prevent any output from 'ghost' (unmapped) keys
-        if(keyName != 'K_SPACE') {
-          var keyText=(<HTMLElement> e.childNodes[0]).innerHTML;
-          //// if(keyText == '' || keyText == '&nbsp;') return true; --> why?
-        }
-
-        Ls=Lelem._KeymanWebSelectionStart;
-        Le=Lelem._KeymanWebSelectionEnd;
-        keyman.uiManager.setActivatingUI(true);
-        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        keyman.domManager.focusLastActiveElement();
-        if(keyman.domManager._IsMozillaEditableIframe(<HTMLIFrameElement> Lelem,0)) {
-          Lelem = (<HTMLIFrameElement> Lelem).contentDocument.documentElement;
-        }
-        Lelem._KeymanWebSelectionStart=Ls;
-        Lelem._KeymanWebSelectionEnd=Le;
-        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-        // ...end I3363 (Build 301)
-        (<any>keyman)._CachedSelectionStart = null; // I3319
-        // Deadkey matching continues to be troublesome.
-        // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-        kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
-        //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
-
-        // First check the virtual key, and process shift, control, alt or function keys
-        Lkc = {
-          Ltarg:Lelem,
-          Lmodifiers:0,
-          Lstates:0,
-          Lcode:VisualKeyboard.keyCodes[keyName],
-          LisVirtualKey:true
-        };
-
-        // Set the flags for the state keys.
-        Lkc.Lstates |= this.stateKeys['K_CAPS']    ? VisualKeyboard.modifierCodes['CAPS'] : VisualKeyboard.modifierCodes['NO_CAPS'];
-        Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? VisualKeyboard.modifierCodes['NUM_LOCK'] : VisualKeyboard.modifierCodes['NO_NUM_LOCK'];
-        Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? VisualKeyboard.modifierCodes['SCROLL_LOCK'] : VisualKeyboard.modifierCodes['NO_SCROLL_LOCK'];
-
-        // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-        if(keyName.substr(0,2) == 'U_') Lkc.LisVirtualKey=false;
-
-        // Get code for non-physical keys (T_KOKAI, U_05AB etc)
-        if(typeof Lkc.Lcode == 'undefined') {
-          Lkc.Lcode = this.getVKDictionaryCode(keyName);// Updated for Build 347
-          if(!Lkc.Lcode) {
-            // Special case for U_xxxx keys. This vk code will never be used
-            // in a keyboard, so we use this to ensure that keystroke processing
-            // occurs for the key.
-            Lkc.Lcode = 1; 
-          }
-        }
-
-        // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-        var lx=(typeof e['key'] == 'undefined' ? null : e['key'].spec['layer']);
-        if(lx == null) {
-          keyShiftState=this.getModifierState(layer);
-        } else {
-          keyShiftState=this.getModifierState(lx);
-        }
-
-        // Define modifiers value for sending to keyboard mapping function
-        Lkc.Lmodifiers = keyShiftState;
-
-        // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-        if((Lkc.Lmodifiers & VisualKeyboard.modifierBitmasks['ALT_GR_SIM']) == VisualKeyboard.modifierBitmasks['ALT_GR_SIM'] && Layouts.emulatesAltGr()) {
-          Lkc.Lmodifiers &= ~VisualKeyboard.modifierBitmasks['ALT_GR_SIM'];
-          Lkc.Lmodifiers |= VisualKeyboard.modifierCodes['RALT'];
-        }
-
-        // Include *limited* support for mnemonic keyboards (Sept 2012)
-        // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-        if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && formFactor != 'desktop')) {
-          if(Lkc.Lcode != VisualKeyboard.keyCodes['K_SPACE']) { // exception required, March 2013
-            Lkc.vkCode = Lkc.Lcode;
-            // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
-            // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-            var mappedChar: string = this.defaultKeyOutput('K_xxxx', Lkc.Lcode, (layer.indexOf('shift') != -1 ? 0x10 : 0), false, null);
-            if(mappedChar) {
-              Lkc.Lcode = mappedChar.charCodeAt(0);
-            } // No 'else' - avoid remapping control + modifier keys!
-
-            if(this.stateKeys['K_CAPS']) {
-              if((Lkc.Lcode >= 65 && Lkc.Lcode <= 90) /* 'A' - 'Z' */ || (Lkc.Lcode >= 97 && Lkc.Lcode <= 122) /* 'a' - 'z' */) {
-                Lkc.Lmodifiers ^= 0x10; // Flip the 'shift' bit.
-                Lkc.Lcode ^= 0x20; // Flips the 'upper' vs 'lower' bit for the base 'a'-'z' ASCII alphabetics.
-              }
-            }
-          }
-        } else {
-          Lkc.vkCode=Lkc.Lcode;
-        }
-
-        // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-        if(typeof activeKeyboard['KM'] == 'undefined') {
-          Lkc.Lcode=keyman.keyMapManager._USKeyCodeToCharCode(Lkc);
-          Lkc.LisVirtualKey=false;
-        }
-
-        // Pass this key code and state to the keyboard program
-        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, Lelem, Lkc))) {
-          // Restore the virtual key code if a mnemonic keyboard is being used
-          Lkc.Lcode=Lkc.vkCode;
-
-          // Handle unmapped keys, including special keys
-          switch(keyName) {
-            case 'K_CAPS':
-            case 'K_NUMLOCK':
-            case 'K_SCROLL':
-              this.stateKeys[keyName] = ! this.stateKeys[keyName];
-              com.keyman.singleton.osk._Show();
-              break;
-            default:
-              // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-              var ch = this.defaultKeyOutput(keyName,Lkc.Lcode,keyShiftState,true,Lelem);
-              if(ch) {
-                kbdInterface.output(0, Lelem, ch);
-              }
-          }
-        }
-
-        // Test if this key has a non-default next layer
-        let keySpec: OSKKeySpec = e['key'] ? e['key'].spec : null; // Gets key element's attached layout-specification object.
-        if(typeof keySpec != 'undefined' && keySpec !== null) {
-          this.nextLayer = keySpec['nextlayer'];
-        }
-
-        // Swap layer as appropriate.
-        this.selectLayer(keyName, nextLayer);
-
-        /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-        Lelem._KeymanWebSelectionStart=null;
-        Lelem._KeymanWebSelectionEnd=null;
-      }
-      
-      keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-      return true;
-    }
-
-    /**
-     *  Repeat backspace as long as the backspace key is held down
-     **/
-    repeatDelete: () => void = function(this: VisualKeyboard) {
-      if(this.deleting) {
-        this.clickKey(this.deleteKey);
-        this.deleting = window.setTimeout(this.repeatDelete,100);
-      }
-    }.bind(this);
-
-    // cancel = function(e) {} //cancel event is never generated by iOS
-
-    /**
      * Get the current key target from the touch point element within the key
      *
      * @param   {Object}  t   element at touch point
      * @return  {Object}      the key element (or null)
      **/
-    keyTarget(target: HTMLElement | EventTarget): HTMLElement {
+    keyTarget(target: HTMLElement | EventTarget): KeyElement {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
       let t = <HTMLElement> target;
@@ -1407,13 +1160,13 @@ namespace com.keyman.osk {
       try {
         if(t) {
           if(util.hasClass(t,'kmw-key')) {
-            return t;
+            return getKeyFrom(t);
           }
           if(t.parentNode && util.hasClass(<HTMLElement> t.parentNode,'kmw-key')) {
-            return <HTMLElement> t.parentNode;
+            return getKeyFrom(t.parentNode);
           }
           if(t.firstChild && util.hasClass(<HTMLElement> t.firstChild,'kmw-key')) {
-            return <HTMLElement> t.firstChild;
+            return getKeyFrom(t.firstChild);
           }
         }
       } catch(ex) {}
@@ -1429,7 +1182,7 @@ namespace com.keyman.osk {
      *  @return {Object}      nearest key to touch point
      *
      **/
-    findNearestKey(e: TouchEvent, t: HTMLElement): HTMLElement {
+    findNearestKey(e: TouchEvent, t: HTMLElement): KeyElement {
       if((!e) || (typeof e.changedTouches == 'undefined')
         || (e.changedTouches.length == 0)) {
         return null;
@@ -1475,442 +1228,26 @@ namespace com.keyman.osk {
         }
 
         if(((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-          return <HTMLElement> t.firstChild;
+          return <KeyElement> t.firstChild;
         }
       }
       return null;
     }
 
     /**
-     * Select the next keyboard layer for layer switching keys
-     * The next layer will be determined from the key name unless otherwise specifed
-     *
-     *  @param  {string}                    keyName     key identifier
-     *  @param  {number|string|undefined}   nextLayerIn optional next layer identifier
-     *  @return {boolean}                               return true if keyboard layer changed
-     */
-    selectLayer(keyName: string, nextLayerIn: number | string): boolean {
-      var nextLayer = arguments.length < 2 ? null : nextLayerIn;
-      let keyman = com.keyman.singleton;
-      var isChiral = keyman.keyboardManager.isChiral();
+     *  Repeat backspace as long as the backspace key is held down
+     **/
+    repeatDelete: () => void = function(this: VisualKeyboard) {
+      let Processor = com.keyman.singleton.textProcessor;
 
-      // Layer must be identified by name, not number (27/08/2015)
-      if(typeof nextLayer == 'number') {
-        nextLayer = Layouts.getLayerId(nextLayer * 0x10);
+      if(this.deleting) {
+        Processor.clickKey(this.deleteKey);
+        this.deleting = window.setTimeout(this.repeatDelete,100);
       }
+    }.bind(this);
+    //#endregion
 
-      // Identify next layer, if required by key
-      if(!nextLayer) {
-        switch(keyName) {
-          case 'K_LSHIFT':
-          case 'K_RSHIFT':
-          case 'K_SHIFT':
-            nextLayer = 'shift'; break;
-          case 'K_LCONTROL':
-          case 'K_LCTRL':
-            if(isChiral) {
-              nextLayer = 'leftctrl';
-              break;
-            }
-          case 'K_RCONTROL':
-          case 'K_RCTRL':
-            if(isChiral) {
-              nextLayer = 'rightctrl';
-              break;
-            }
-          case 'K_CTRL':
-            nextLayer = 'ctrl'; break;
-          case 'K_LMENU':
-          case 'K_LALT':
-            if(isChiral) {
-              nextLayer = 'leftalt';
-              break;
-            }
-          case 'K_RMENU':
-          case 'K_RALT':
-            if(isChiral) {
-              nextLayer = 'rightalt';
-              break;
-            }
-          case 'K_ALT':
-            nextLayer = 'alt'; break;
-          case 'K_ALTGR':
-            if(isChiral) {
-              nextLayer = 'leftctrl-rightalt';
-            } else {
-              nextLayer = 'ctrl-alt';
-            }
-            break;
-          case 'K_CURRENCIES':
-          case 'K_NUMERALS':
-          case 'K_SHIFTED':
-          case 'K_UPPER':
-          case 'K_LOWER':
-          case 'K_SYMBOLS':
-            nextLayer = 'default'; break;
-        }
-      }
-
-      if(!nextLayer) {
-        return false;
-      }
-
-      // Do not change layer unless needed (27/08/2015)
-      if(nextLayer == this.layerId && keyman.util.device.formFactor != 'desktop') {
-        return false;
-      }
-
-      // Change layer and refresh OSK
-      this.updateLayer(nextLayer);
-      com.keyman.singleton.osk._Show();
-
-      return true;
-    }
-
-    /**
-     * Sets the new layer id, allowing for toggling shift/ctrl/alt while preserving the remainder
-     * of the modifiers represented by the current layer id (where applicable)
-     *
-     * @param       {string}      id      layer id (e.g. ctrlshift)
-     */
-    updateLayer(id: string) {
-      var s=this.layerId, idx=id;
-      var i;
-      let keyman = com.keyman.singleton;
-
-      if(keyman.util.device.formFactor == 'desktop') {
-        // Need to test if target layer is a standard layer (based on the plain 'default')
-        var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
-
-        for(i=0; i < replacements.length; i++) {
-          // Don't forget to remove the kebab-case hyphens!
-          idx=idx.replace(replacements[i] + '-', '');
-          idx=idx.replace(replacements[i],'');
-        }
-
-        // If we are presently on the default layer, drop the 'default' and go straight to the shifted mode.
-        // If on a common symbolic layer, drop out of symbolic mode and go straight to the shifted mode.
-        if(this.layerId == 'default' || this.layerId == 'numeric' || this.layerId == 'symbol' || this.layerId == 'currency' || idx != '') {
-          s = id;
-        }
-        // Otherwise, we are based upon the a layer that accepts modifier variations.
-        // Modify the layer according to the current state and key pressed.
-        //
-        // TODO:  Consider:  should this ever be allowed for a base layer other than 'default'?  If not,
-        // if(idx == '') with accompanying if-else structural shift would be a far better test here.
-        else {
-          // Save our current modifier state.
-          var modifier=this.getModifierState(s);
-
-          // Strip down to the base modifiable layer.
-          for(i=0; i < replacements.length; i++) {
-            // Don't forget to remove the kebab-case hyphens!
-            s=s.replace(replacements[i] + '-', '');
-            s=s.replace(replacements[i],'');
-          }
-
-          // Toggle the modifier represented by our input argument.
-          switch(id) {
-            case 'shift':
-              modifier ^= VisualKeyboard.modifierCodes['SHIFT'];
-              break;
-            case 'leftctrl':
-              modifier ^= VisualKeyboard.modifierCodes['LCTRL'];
-              break;
-            case 'rightctrl':
-              modifier ^= VisualKeyboard.modifierCodes['RCTRL'];
-              break;
-            case 'ctrl':
-              modifier ^= VisualKeyboard.modifierCodes['CTRL'];
-              break;
-            case 'leftalt':
-              modifier ^= VisualKeyboard.modifierCodes['LALT'];
-              break;
-            case 'rightalt':
-              modifier ^= VisualKeyboard.modifierCodes['RALT'];
-              break;
-            case 'alt':
-              modifier ^= VisualKeyboard.modifierCodes['ALT'];
-              break;
-            default:
-              s = id;
-          }
-
-          // Combine our base modifiable layer and attach the new modifier variation info to obtain our destination layer.
-          if(s != 'default') {
-            if(s == '') {
-              s = Layouts.getLayerId(modifier);
-            } else {
-              s = Layouts.getLayerId(modifier) + '-' + s;
-            }
-          }
-        }
-        
-        if(s == '') {
-          s = 'default';
-        }
-      } else {
-        // Mobile form-factor.  Either the layout is specified by a keyboard developer with direct layer name references
-        // or all layers are accessed via subkey of a single layer-shifting key - no need for modifier-combining logic.
-        s = id;
-      }
-
-      // Actually set the new layer id.
-      this.layerId = s;
-
-      // Check that requested layer is defined   (KMEA-1, but does not resolve issue)
-      for(i=0; i<this.layers.length; i++) {
-        if(this.layerId == this.layers[i].id) {
-          return;
-        }
-      }
-
-      // Show default layer if an undefined layer has been requested
-      this.layerId='default';
-    }
-
-        /**
-     * Get modifier key state from layer id
-     *
-     * @param       {string}      layerId       layer id (e.g. ctrlshift)
-     * @return      {number}                    modifier key state (desktop keyboards)
-     */
-    getModifierState(layerId: string): number {
-      var modifier=0;
-      if(layerId.indexOf('shift') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['SHIFT'];
-      }
-
-      // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
-      var ctrlMatched=false;
-      if(layerId.indexOf('leftctrl') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['LCTRL'];
-        ctrlMatched=true;
-      } 
-      if(layerId.indexOf('rightctrl') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['RCTRL'];
-        ctrlMatched=true;
-      } 
-      if(layerId.indexOf('ctrl')  >= 0 && !ctrlMatched) {
-        modifier |= VisualKeyboard.modifierCodes['CTRL'];
-      }
-
-      var altMatched=false;
-      if(layerId.indexOf('leftalt') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['LALT'];
-        altMatched=true;
-      } 
-      if(layerId.indexOf('rightalt') >= 0) {
-        modifier |= VisualKeyboard.modifierCodes['RALT'];
-        altMatched=true;
-      } 
-      if(layerId.indexOf('alt')  >= 0 && !altMatched) {
-        modifier |= VisualKeyboard.modifierCodes['ALT'];
-      }
-
-      return modifier;
-    }
-
-    /**
-     * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
-     * Otherwise, lookup the  virtual key code (physical keyboard mapping)
-     *
-     * @param   {string}  keyName Name of the key
-     * @param   {number}  n
-     * @param   {number}  keyShiftState
-     * @param   {boolean} usingOSK
-     * @param   {Object=} Lelem
-     * @return  {string}
-     */
-    defaultKeyOutput(keyName: string, n: number, keyShiftState: number, usingOSK: boolean, Lelem?: HTMLElement): string {
-      let keyman = com.keyman.singleton;
-      let domManager = keyman.domManager;
-
-      var ch = '', checkCodes = false;
-      var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
-      // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if(keyShiftState == 0) {
-        checkCodes = true;
-      } else if (keyShiftState == VisualKeyboard.modifierCodes['SHIFT']) {
-        checkCodes = true; 
-        keyShiftState = 1; // It's used as an index.
-      } else {
-        console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
-      }
-
-      // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
-      if(touchAlias || usingOSK) {
-        var code = VisualKeyboard.keyCodes[keyName];
-        if(!code) {
-          code = n;
-        }
-
-        switch(code) {
-          case VisualKeyboard.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            keyman.interface.defaultBackspace();
-            break;
-          case VisualKeyboard.keyCodes['K_TAB']:
-            domManager.moveToNext(keyShiftState);
-            break;
-          case VisualKeyboard.keyCodes['K_TABBACK']:
-            domManager.moveToNext(true);
-            break;
-          case VisualKeyboard.keyCodes['K_TABFWD']:
-            domManager.moveToNext(false);
-            break;
-          case VisualKeyboard.keyCodes['K_ENTER']:
-            // Insert new line in text area fields
-            if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA')) {
-              return '\n';
-            // Or move to next field from TEXT fields
-            } else if(usingOSK) {
-              var inputEle: HTMLInputElement;
-              if(com.keyman.Util.instanceof(Lelem, "HTMLInputElement")) {
-                inputEle = <HTMLInputElement> Lelem;
-              } else if(typeof(Lelem.base) != 'undefined' && com.keyman.Util.instanceof(Lelem.base, "HTMLInputElement")) {
-                inputEle = <HTMLInputElement> Lelem.base;
-              }
-
-              if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
-                inputEle.disabled=false;
-                inputEle.form.submit();
-              } else {
-                domManager.moveToNext(false);
-              }
-            }
-            break;
-          case VisualKeyboard.keyCodes['K_SPACE']:
-            return ' ';
-          // break;
-          //
-          // // Problem:  clusters, and doing them right.
-          // // The commented-out code below should be a decent starting point, but clusters make it complex.
-          //
-          // case VisualKeyboard.keyCodes['K_LEFT']:
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos - 1 >= 0 ? caretPos - 1 : 0);
-          //   }
-          //   break;
-          // case VisualKeyboard.keyCodes['K_RIGHT']:
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-          //   }
-          //   if(code == VisualKeyboard.keyCodes['K_RIGHT']) {
-          //     break;
-          //   }
-          // // Should we include this?  It could be tricky to do correctly...
-          // case VisualKeyboard.keyCodes['K_DEL']:
-          //   // Move caret right one unit, then backspace.
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-          //     if(caretPos == keymanweb.getTextCaret(Lelem)) {
-          //       // Failed to move right - there's nothing to delete.
-          //       break;
-          //     }
-          //     kbdInterface.defaultBackspace();
-          //   }
-        }
-      }
-
-      // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
-
-      // Test for fall back to U_xxxxxx key id
-      // For this first test, we ignore the keyCode and use the keyName
-      if((keyName.substr(0,2) == 'U_')) {
-        var codePoint = parseInt(keyName.substr(2,6), 16);
-        if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
-          // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
-          // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-          console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
-          return ch;
-        } else {
-          // String.fromCharCode() is inadequate to handle the entire range of Unicode
-          // Someday after upgrading to ES2015, can use String.fromCodePoint()
-          ch=String.kmwFromCharCode(codePoint);
-        }
-        // Hereafter, we refer to keyCodes.
-      } else if(checkCodes) { // keyShiftState can only be '1' or '2'.
-        try {
-          if(n >= VisualKeyboard.keyCodes['K_0'] && n <= VisualKeyboard.keyCodes['K_9']) { // The number keys.
-            ch = VisualKeyboard.codesUS[keyShiftState][0][n-VisualKeyboard.keyCodes['K_0']];
-          } else if(n >=VisualKeyboard.keyCodes['K_A'] && n <= VisualKeyboard.keyCodes['K_Z']) { // The base letter keys
-            ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
-          } else if(n >= VisualKeyboard.keyCodes['K_COLON'] && n <= VisualKeyboard.keyCodes['K_BKQUOTE']) {
-            ch = VisualKeyboard.codesUS[keyShiftState][1][n-VisualKeyboard.keyCodes['K_COLON']];
-          } else if(n >= VisualKeyboard.keyCodes['K_LBRKT'] && n <= VisualKeyboard.keyCodes['K_QUOTE']) {
-            ch = VisualKeyboard.codesUS[keyShiftState][2][n-VisualKeyboard.keyCodes['K_LBRKT']];
-          }
-        } catch (e) {
-          console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
-        }
-      }
-      return ch;
-    }
-
-    /**
-     * Function     _UpdateVKShift
-     * Scope        Private
-     * @param       {Object}            e     OSK event
-     * @param       {number}            v     keyboard shift state
-     * @param       {(boolean|number)}  d     set (1) or clear(0) shift state bits
-     * @return      {boolean}                 Always true
-     * Description  Update the current shift state within KMW
-     */
-    _UpdateVKShift(e, v: number, d: boolean|number): boolean {
-      var keyShiftState=0, lockStates=0, i;
-      let keyman = com.keyman.singleton;
-
-      var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-      var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
-
-      if(e) {
-        // read shift states from Pevent
-        keyShiftState = e.Lmodifiers;
-        lockStates = e.Lstates;
-
-        // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(keyman.keyboardManager.isChiral() && Layouts.emulatesAltGr() && 
-            (com.keyman.DOMEventHandlers.states.modStateFlags & VisualKeyboard.modifierBitmasks['ALT_GR_SIM']) == VisualKeyboard.modifierBitmasks['ALT_GR_SIM']) {
-          keyShiftState |= VisualKeyboard.modifierBitmasks['ALT_GR_SIM'];
-          keyShiftState &= ~VisualKeyboard.modifierCodes['RALT'];
-        }
-
-        for(i=0; i < lockNames.length; i++) {
-          if(lockStates & VisualKeyboard.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = lockStates & VisualKeyboard.modifierCodes[lockNames[i]];
-          }
-        }
-      } else if(d) {
-        keyShiftState |= v;
-
-        for(i=0; i < lockNames.length; i++) {
-          if(v & VisualKeyboard.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = true;
-          }
-        }
-      } else {
-        keyShiftState &= ~v;
-
-        for(i=0; i < lockNames.length; i++) {
-          if(v & VisualKeyboard.stateBitmasks[lockNames[i]]) {
-            this.stateKeys[lockKeys[i]] = false;
-          }
-        }
-      }
-
-      // Find and display the selected OSK layer
-      this.layerId=Layouts.getLayerId(keyShiftState);
-
-      // osk._UpdateVKShiftStyle will be called automatically upon the next _Show.
-      if(keyman.osk._Visible) {
-        keyman.osk._Show();
-      }
-
-      return true;
-    }
+    // cancel = function(e) {} //cancel event is never generated by iOS
 
     /**
      * Function     _UpdateVKShiftStyle
@@ -1920,6 +1257,7 @@ namespace com.keyman.osk {
      */
     _UpdateVKShiftStyle(layerId?: string) {
       var i, n, layer=null, layerElement=null;
+      let Processor = com.keyman.singleton.textProcessor;
 
       if(layerId) {
         for(n=0; n<this.layers.length; n++) {
@@ -1937,8 +1275,8 @@ namespace com.keyman.osk {
       layer=this.layers[n];
       
       // Set the on/off state of any visible state keys.
-      var states =['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
-      var keys   =[layer.capsKey, layer.numKey, layer.scrollKey];
+      var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
+      var keys   = [layer.capsKey, layer.numKey, layer.scrollKey];
 
       for(i=0; i < keys.length; i++) {
         // Skip any keys not in the OSK!
@@ -1946,7 +1284,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = this.stateKeys[states[i]] ? Layouts.buttonClasses['SHIFT-ON'] : Layouts.buttonClasses['SHIFT'];
+        keys[i]['sp'] = Processor.stateKeys[states[i]] ? Layouts.buttonClasses['SHIFT-ON'] : Layouts.buttonClasses['SHIFT'];
         var btn = document.getElementById(layerId+'-'+states[i]);
 
         this.setButtonClass(keys[i], btn, this.layout);
@@ -2008,50 +1346,13 @@ namespace com.keyman.osk {
       }
       this.popupBaseKey = null;
     }
-
-    /**
-     * @summary Look up a custom virtual key code in the virtual key code dictionary KVKD.  On first run, will build the dictionary.
-     *
-     * `VKDictionary` is constructed from the keyboard's `KVKD` member. This list is constructed 
-     * at compile-time and is a list of 'additional' virtual key codes, starting at 256 (i.e. 
-     * outside the range of standard virtual key codes). These additional codes are both 
-     * `[T_xxx]` and `[U_xxxx]` custom key codes from the Keyman keyboard language. However, 
-     * `[U_xxxx]` keys only generate an entry in `KVKD` if there is a corresponding rule that 
-     * is associated with them in the keyboard rules. If the `[U_xxxx]` key code is only 
-     * referenced as the id of a key in the touch layout, then it does not get an entry in 
-     * the `KVKD` property.
-     *
-     * @private
-     * @param       {string}      keyName   custom virtual key code to lookup in the dictionary
-     * @return      {number}                key code > 255 on success, or 0 if not found
-     */
-    getVKDictionaryCode(keyName: string) {
-      let keyman = com.keyman.singleton;
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      if(!activeKeyboard['VKDictionary']) {
-        var a=[];
-        if(typeof activeKeyboard['KVKD'] == 'string') {
-          // Build the VK dictionary
-          // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  
-          // Makes the VKDictionary member unnecessary.
-          //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
-          var s=activeKeyboard['KVKD'].split(' ');
-          for(var i=0; i<s.length; i++) {
-            a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
-          }
-        }
-        activeKeyboard['VKDictionary']=a;
-      }
-
-      var res=activeKeyboard['VKDictionary'][keyName.toUpperCase()];
-      return res ? res : 0;
-    }
-
+    
+    //#region 'native'-mode subkey handling
     /**
      * Display touch-hold array of 'sub-keys' above the currently touched key
      * @param       {Object}    e      primary key element
      */
-    showSubKeys(e: HTMLElement) {
+    showSubKeys(e: KeyElement) {
       // Do not show subkeys if key already released
       if(this.keyPending == null) {
         return;
@@ -2082,26 +1383,6 @@ namespace com.keyman.osk {
       if(device.formFactor == 'phone') {
         this.prependBaseKey(e);
       }
-      var idx = e.id.split('-'), baseId = idx[idx.length-1];
-
-      // Newly removed via comment-out - this is exactly what the previous if-block addresses.
-      //
-      // // If not, insert at start
-      // if(device.formFactor == 'phone' && subKeySpec[0].id != baseId) {
-      //   var eCopy={'id':baseId,'layer':''};
-      //   if(idx.length > 1) {
-      //     eCopy['layer'] = idx[0];
-      //   }
-      //   for(i=0; i<e.childNodes.length; i++) {
-      //     if(util.hasClass(<HTMLElement> e.childNodes[i],'kmw-key-text')) {
-      //       break;
-      //     }
-      //   }
-      //   if(i < e.childNodes.length) {
-      //     eCopy['text'] = e.childNodes[i].textContent;
-      //   }
-      //   subKeySpec.splice(0,0,eCopy);
-      // }
 
       // Must set position dynamically, not in CSS
       var ss=subKeys.style;
@@ -2168,7 +1449,7 @@ namespace com.keyman.osk {
 
       // Highlight the duplicated base key (if a phone)
       if(device.formFactor == 'phone') {
-        var bk = <HTMLDivElement> subKeys.childNodes[0].firstChild;
+        var bk = <KeyElement> subKeys.childNodes[0].firstChild;
         this.keyPending = bk;
         this.highlightKey(bk,true);//bk.className = bk.className+' kmw-key-touched';
       }
@@ -2179,7 +1460,7 @@ namespace com.keyman.osk {
      *
      * @param {Object}  e   base key object
      */
-    prependBaseKey(e: HTMLElement) {
+    prependBaseKey(e: KeyElement) {
       // This is a tag we set on the key element during its construction.
       let subKeys: OSKKeySpec[] = e['subKeys'];
       let keyman = com.keyman.singleton;
@@ -2188,10 +1469,11 @@ namespace com.keyman.osk {
         //TODO: refactor this, it's pretty messy...
         var i, 
           idx = e.id.split('-'), 
-          baseId = idx[idx.length-1], 
-          layer = e['key'] && e['key'].spec['layer'] ? e['key'].spec['layer'] : (idx.length > 1 ? idx[0] : ''),
-          sp = e['key'] && e['key'].spec['sp'],
-          nextlayer = e['key'] && e['key'].spec['nextlayer'] ? e['key'].spec['nextlayer'] : null;
+          baseId = e['keyId'],
+          layer = e['key'].spec['layer'],
+          sp = e['key'].spec['sp'],
+          nextlayer = e['key'].spec['nextlayer'];
+
         if(typeof subKeys != 'undefined' && subKeys.length > 0 && (subKeys[0].id != baseId || subKeys[0].layer != layer)) {
           var eCopy = new OSKKeySpec(baseId, '', undefined, sp, nextlayer);  // {'id':baseId,'layer':'','key':undefined};
           if(layer != '') {
@@ -2210,6 +1492,7 @@ namespace com.keyman.osk {
         }
       }
     }
+    //#endregion
 
     /**
      * Indicate the current language and keyboard on the space bar
@@ -2263,7 +1546,7 @@ namespace com.keyman.osk {
      *  @param    {Object}    key   key affected
      *  @param    {boolean}   on    add or remove highlighting
      **/
-    highlightKey(key: HTMLElement, on: boolean) {
+    highlightKey(key: KeyElement, on: boolean) {
       // Do not change element class unless a key
       if(!key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
 
@@ -2288,6 +1571,7 @@ namespace com.keyman.osk {
       }
     }
 
+    //#region Mouse-event handling
     /**
      * Mouse down/mouse over event handler (desktop only)
      *
@@ -2305,12 +1589,15 @@ namespace com.keyman.osk {
       if(t.nodeName == 'SPAN') {
         t = <HTMLElement> t.parentNode;
       }
+
+      let key = getKeyFrom(t);
+
       if(util.eventType(e) == 'mousedown') {
-        this.currentKey=t.id;
+        this.currentKey=key.id;
         util._CancelMouse(e);
-        this.highlightKey(t, true);
+        this.highlightKey(key, true);
       } else if(t.id == this.currentKey) {
-        this.highlightKey(t, true);
+        this.highlightKey(key, true);
       }
     }.bind(this);
 
@@ -2324,21 +1611,26 @@ namespace com.keyman.osk {
       let util = keyman.util;
 
       var t=<HTMLElement> util.eventTarget(e);
-      if(t === null || util.device.formFactor != 'desktop') return;
+      if(t === null || util.device.formFactor != 'desktop') {
+        return;
+      }
 
       if(t.nodeName == 'SPAN') {
         t = <HTMLElement> t.parentNode;
       }
-      this.highlightKey(t,false);
+
+      let key = getKeyFrom(t);
+      this.highlightKey(key, false);
 
       // Process as click if mouse button released anywhere over key
       if(util.eventType(e) == 'mouseup') {
-        if(t.id == this.currentKey) {
-          this.clickKey(t);
+        if(key.id == this.currentKey) {
+          keyman.textProcessor.clickKey(getKeyFrom(key));
         }
         this.currentKey='';
       }
     }.bind(this);
+    //#endregion
 
     getKeyEmFontSize() {
       let keyman = com.keyman.singleton;
@@ -2381,7 +1673,7 @@ namespace com.keyman.osk {
      *  @param    {string}  keyId   key identifier
      *  @return   {Object}          Reference to key
      */
-    getSpecialKey(nLayer: number, keyId: string): HTMLDivElement {
+    getSpecialKey(nLayer: number, keyId: string): KeyElement {
       let layers = this.kbdDiv.childNodes[0].childNodes;
 
       if(nLayer >= 0 && nLayer < layers.length) {
@@ -2389,8 +1681,8 @@ namespace com.keyman.osk {
         let rows = layers[nLayer].childNodes;
         let keys = rows[rows.length-1].childNodes;
         for(var k=0; k<keys.length; k++) {
-          let key = <HTMLDivElement> keys[k];
-          if(key['keyId'] == keyId) {
+          let key = getKeyFrom(keys[k].firstChild);
+          if(key && key['keyId'] == keyId) {
             return key;
           }
         }
@@ -2445,6 +1737,13 @@ namespace com.keyman.osk {
      */
     showLayer(id: string): boolean {
       let keyman = com.keyman.singleton;
+
+      // Do not change layer unless needed (27/08/2015)
+      if(id == this.layerId && keyman.util.device.formFactor != 'desktop') {
+        // The layer's already shown, so report success.
+        return true;
+      }
+
       if(keyman.keyboardManager.activeKeyboard) {
         for(var i=0; i<this.layers.length; i++) {
           if(this.layers[i].id == id) {
@@ -2454,6 +1753,7 @@ namespace com.keyman.osk {
           }
         }
       }
+      
       return false;
     }
 
@@ -2668,6 +1968,13 @@ namespace com.keyman.osk {
       // Add a faint border
       kbd.style.border='1px solid #ccc';
       return kbd;
+    }
+
+    onHide() {
+      // Remove highlighting from hide keyboard key, if applied
+      if(this.hkKey) {
+        this.highlightKey(this.hkKey,false);
+      }
     }
   }
 }

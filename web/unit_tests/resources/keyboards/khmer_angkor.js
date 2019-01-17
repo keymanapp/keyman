@@ -6,8 +6,8 @@ KeymanWeb.KR(new Keyboard_khmer_angkor());
 }
 function Keyboard_khmer_angkor()
 {
-  var modCodes = com.keyman.osk.VisualKeyboard.modifierCodes;
-  var keyCodes = com.keyman.osk.VisualKeyboard.keyCodes;
+  var modCodes = com.keyman.text.Codes.modifierCodes;
+  var keyCodes = com.keyman.text.Codes.keyCodes;
 
   this.KI="Keyboard_khmer_angkor";
   this.KN="Khmer Angkor";

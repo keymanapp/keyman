@@ -14,7 +14,7 @@ namespace com.keyman.osk {
    * 
    * @param   {Object}  key   base key object
    */
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key) {
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
     // Clear and restart the popup timer
     if(this.subkeyDelayTimer) {
       window.clearTimeout(this.subkeyDelayTimer);
@@ -30,7 +30,7 @@ namespace com.keyman.osk {
     }
   };
 
-  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: HTMLElement, keyName: string, keyDown: boolean) {
+  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
     let oskManager = keyman.osk;
     if(keyDown) {
@@ -46,7 +46,7 @@ namespace com.keyman.osk {
   };
 
   // Manage popup key highlighting
-  VisualKeyboard.prototype.highlightSubKeys=function(this: VisualKeyboard, k: HTMLElement, x: number, y: number) {
+  VisualKeyboard.prototype.highlightSubKeys=function(this: VisualKeyboard, k: KeyElement, x: number, y: number) {
     let util = com.keyman.singleton.util;
 
     // Test for subkey array, return if none
@@ -86,7 +86,7 @@ namespace com.keyman.osk {
    * @param   {Object}  key   HTML key element
    * @param   {boolean} on    show or hide
    */              
-  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: HTMLElement, on: boolean) {
+  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
     let keyman = com.keyman.singleton;
     let util = keyman.util;
     let oskManager = keyman.osk;
@@ -286,7 +286,7 @@ namespace com.keyman.osk {
    * @param   {Object}  key   HTML key element
    * @return  {Object}        callout object   
    */              
-  VisualKeyboard.prototype.addCallout = function(this: VisualKeyboard, key: HTMLElement): HTMLDivElement {   
+  VisualKeyboard.prototype.addCallout = function(this: VisualKeyboard, key: KeyElement): HTMLDivElement {   
     let keyman = com.keyman.singleton;
     let util = keyman.util;
 

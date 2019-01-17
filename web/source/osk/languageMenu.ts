@@ -506,7 +506,7 @@ namespace com.keyman.osk {
 
       let languageMenu = this;
       if(this.lgList) {
-        osk.vkbd.highlightKey(<HTMLElement> osk.vkbd.lgKey.firstChild,false);
+        osk.vkbd.highlightKey(osk.vkbd.lgKey,false);
         this.lgList.style.visibility='hidden';
 
         window.setTimeout(function(){

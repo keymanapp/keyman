@@ -4,6 +4,8 @@
 /// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
+// Defines the core text processor.
+/// <reference path="text/processor.ts" />
 // Defines the web-page interface object.
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
@@ -66,6 +68,7 @@ namespace com.keyman {
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
     keyMapManager: KeyMapManager;
+    textProcessor: text.Processor;
 
     touchAliasing: DOMEventHandlers;
 
@@ -112,6 +115,7 @@ namespace com.keyman {
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);
       this.keyMapManager = new KeyMapManager();
+      this.textProcessor = new text.Processor();
 
       // Load properties from their static variants.
       this['build'] = KeymanBase.__BUILD__;

@@ -4,6 +4,8 @@
 ***/
 
 namespace com.keyman.osk {
+  let Codes = com.keyman.text.Codes;
+
   export type KLS = {[layerName: string]: string[]};
 
   // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
@@ -126,7 +128,7 @@ namespace com.keyman.osk {
 
       var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
       var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
-      var chiral: boolean = (kbdBitmask & VisualKeyboard.modifierBitmasks.IS_CHIRAL) != 0;
+      var chiral: boolean = (kbdBitmask & Codes.modifierBitmasks.IS_CHIRAL) != 0;
 
       var kmw10Plus = !(typeof keyLabels == 'undefined' || !keyLabels);
       if(!kmw10Plus) {
@@ -319,7 +321,7 @@ namespace com.keyman.osk {
      * Description  Get name of layer from code, where the modifer order is determined by ascending bit-flag value.
      */
     static getLayerId(m: number): string {
-      let modifierCodes = VisualKeyboard.modifierCodes;
+      let modifierCodes = Codes.modifierCodes;
 
       var s='';
       if(m == 0) {
@@ -358,7 +360,7 @@ namespace com.keyman.osk {
     static emulatesAltGr(keyLabels?: KLS): boolean { // TODO:  typing for keyLabels (corresponds to KLS)
       var layers;
       let keyman = <KeymanBase> window['keyman'];
-      let modifierCodes = VisualKeyboard.modifierCodes;
+      let modifierCodes = Codes.modifierCodes;
 
       // If we're not chiral, we're not emulating.
       if(!keyman.keyboardManager.isChiral()) {

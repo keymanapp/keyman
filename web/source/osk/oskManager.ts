@@ -61,6 +61,12 @@ namespace com.keyman.osk {
     _VPreviousCursor: string;
     _VPreviousMouseButton: number;
 
+    // Key code definition aliases for legacy keyboards  (They expect window['keyman']['osk'].___)
+    modifierCodes = text.Codes.modifierCodes;
+    modifierBitmasks = text.Codes.modifierBitmasks;
+    stateBitmasks = text.Codes.stateBitmasks;
+    keyCodes = text.Codes.keyCodes;
+
     // First time initialization of OSK
     prepare() {
       let keymanweb = com.keyman.singleton;
@@ -1427,9 +1433,8 @@ namespace com.keyman.osk {
       this._Visible=false;
       os.transition=os.msTransition=os.MozTransition=os.WebkitTransition='';
 
-      // Remove highlighting from hide keyboard key, if applied
-      if(this.vkbd && this.vkbd.hkKey && typeof(this.vkbd.hkKey) != 'undefined') {
-        this.vkbd.highlightKey(<HTMLElement> this.vkbd.hkKey.firstChild,false);
+      if(this.vkbd) {
+        this.vkbd.onHide();
       }
     }.bind(this);
 
