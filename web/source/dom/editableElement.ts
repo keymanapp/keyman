@@ -61,13 +61,6 @@ namespace com.keyman.dom {
     getTextBeforeCaret(): string;
 
     /**
-     * Relative to the caret, overwrites the context within the wrapper's element, leaving
-     * any text not part of the context unchanged.
-     * @param text Text to replace the existing context.
-     */
-    setTextBeforeCaret(text: string);
-
-    /**
      * Relative to the caret (and/or active selection), gets the element's text after the caret,
      * excluding any actively selected text that would be immediately replaced upon text entry.
      */
@@ -79,9 +72,17 @@ namespace com.keyman.dom {
     getText(): string;
 
     /**
-     * Performs context deletions as needed by the KeymanWeb engine.
+     * Performs context deletions (from the left of the caret) as needed by the KeymanWeb engine.
      * @param dn The number of characters to delete.  If negative, context will be left unchanged.
      */
-    deleteCharsFromContext(dn: number): void
+    deleteCharsBeforeCaret(dn: number): void;
+
+    /**
+     * Inserts text immediately before the caret's current position, moving the caret after the
+     * newly inserted text in the process.
+     * 
+     * @param s Text to insert before the caret's current position.
+     */
+    insertTextBeforeCaret(s: string): void;
   }
 }

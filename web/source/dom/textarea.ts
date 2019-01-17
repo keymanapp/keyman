@@ -119,7 +119,7 @@ namespace com.keyman.dom {
       }
     }
 
-    deleteCharsFromContext(dn: number) {
+    deleteCharsBeforeCaret(dn: number) {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
         let caret = this.getCaret();
@@ -127,6 +127,19 @@ namespace com.keyman.dom {
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
         this.setCaret(caret - dn);
       }
+    }
+
+    insertTextBeforeCaret(s: string) {
+      if(!s) {
+        return;
+      }
+
+      let caret = this.getCaret();
+      let front = this.getTextBeforeCaret();
+      let back = this.getText()._kmwSubstring(this.processedSelectionStart);
+
+      this.root.value = front + s + back;
+      this.setCaret(caret + s._kmwLength());
     }
   }
 }

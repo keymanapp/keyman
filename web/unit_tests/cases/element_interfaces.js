@@ -111,6 +111,7 @@ if(typeof InterfaceTests == 'undefined') {
     //#region Defines common test patterns across element tests
     InterfaceTests.Tests = {};
 
+    // Corresponds to a helper method for certain classes.
     InterfaceTests.Tests.getCaretNoSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
@@ -136,6 +137,7 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(false);
     }
 
+    // Corresponds to a helper method for certain classes.
     InterfaceTests.Tests.getCaretWithSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
@@ -168,6 +170,7 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(false);
     }
 
+    // Corresponds to a helper method for certain classes.
     InterfaceTests.Tests.setCaretNoSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
@@ -193,6 +196,7 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(false);
     }
 
+    // Corresponds to a helper method for certain classes.
     InterfaceTests.Tests.setCaretWithSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
@@ -440,6 +444,7 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(false);
     }
 
+    // Corresponds to a helper method for certain subclasses.
     InterfaceTests.Tests.setTextBeforeCaretNoSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
@@ -496,14 +501,14 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(false);
     }
 
-    InterfaceTests.Tests.deleteCharsFromContextNoSelection = function(testObj) {
+    InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
 
       String.kmwEnableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
-      pair.wrapper.deleteCharsFromContext(1);
+      pair.wrapper.deleteCharsBeforeCaret(1);
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 3) + Apple.normal.substr(4), "Error deleting context chars from a simple string");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
@@ -511,7 +516,7 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
-      pair.wrapper.deleteCharsFromContext(1);
+      pair.wrapper.deleteCharsBeforeCaret(1);
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 6) + Apple.smp.substr(8), "Error deleting context chars from an SMP string");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
@@ -519,22 +524,78 @@ if(typeof InterfaceTests == 'undefined') {
       String.kmwEnableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 4);
-      pair.wrapper.deleteCharsFromContext(2);
+      pair.wrapper.deleteCharsBeforeCaret(2);
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 1) + Apple.mixed.substr(4), "Error deleting context chars from a mixed SMP string");
       String.kmwEnableSupplementaryPlane(false);
     }
 
-    InterfaceTests.Tests.deleteCharsFromContextWithSelection = function(testObj) {
+    InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
 
       String.kmwEnableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 2, 4);
-      pair.wrapper.deleteCharsFromContext(1);
+      pair.wrapper.deleteCharsBeforeCaret(1);
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 1) + Apple.normal.substr(2), "Selected text erroneously deleted from selection");
       String.kmwEnableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
+    }
+
+    InterfaceTests.Tests.insertTextBeforeCaretNoSelection = function(testObj) {
+      var Apple = InterfaceTests.Strings.Apple;
+      var pair = testObj.setupElement();
+
+      String.kmwEnableSupplementaryPlane(false);
+      testObj.resetWithText(pair, Apple.normal);
+      testObj.setCaret(pair, 4);
+      pair.wrapper.insertTextBeforeCaret(Apple.normal.substr(0, 2))
+      assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 4) + Apple.normal.substr(0, 2) + Apple.normal.substr(4), "Error inserting text in a simple string");
+      String.kmwEnableSupplementaryPlane(false);
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(true);
+      testObj.resetWithText(pair, Apple.smp);
+      testObj.setCaret(pair, 8);
+      pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
+      assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 8) + Apple.smp.substr(0, 4) + Apple.smp.substr(8), "Error inserting text in an SMP string");
+      String.kmwEnableSupplementaryPlane(false);
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(true);
+      testObj.resetWithText(pair, Apple.mixed);
+      testObj.setCaret(pair, 5);
+      pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
+      assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 5) + Apple.smp.substr(0, 4) + Apple.mixed.substr(5), "Error inserting text in a mixed SMP string");
+      String.kmwEnableSupplementaryPlane(false);
+    }
+
+    InterfaceTests.Tests.insertTextBeforeCaretWithSelection = function(testObj) {
+      var Apple = InterfaceTests.Strings.Apple;
+      var pair = testObj.setupElement();
+
+      String.kmwEnableSupplementaryPlane(true);
+      testObj.resetWithText(pair, Apple.mixed);
+      testObj.setSelectionRange(pair, 3, 5);
+      pair.wrapper.insertTextBeforeCaret("");
+      assert.equal(pair.wrapper.getText(), Apple.mixed, "Actively-selected text was erroneously removed");
+      String.kmwEnableSupplementaryPlane(false);
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(true);
+      testObj.resetWithText(pair, Apple.mixed);
+      testObj.setSelectionRange(pair, 3, 5);
+      pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
+      assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement: forward-order selection");
+      String.kmwEnableSupplementaryPlane(false);
+      pair.wrapper.invalidateSelection();
+
+      String.kmwEnableSupplementaryPlane(true);
+      testObj.resetWithText(pair, Apple.mixed);
+      testObj.setSelectionRange(pair, 5, 3);
+      pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
+      assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement:  backward-order selection");
+      String.kmwEnableSupplementaryPlane(false);
     }
     //#endregion
 
@@ -626,23 +687,23 @@ describe('Element Input/Output Interfacing', function() {
         });
       });
 
-      describe('setTextBeforeCaret', function() {
-        it("correctly replaces the element's 'context' (no active selection)", function() {
-          InterfaceTests.Tests.setTextBeforeCaretNoSelection(InterfaceTests.Input);
-        });
-
-        it("correctly replaces the element's 'context' (with active selection)", function() {
-          InterfaceTests.Tests.setTextBeforeCaretWithSelection(InterfaceTests.Input);
-        });
-      });
-
-      describe('deleteCharsFromContext', function() {
+      describe('deleteCharsBeforeCaret', function() {
         it("correctly deletes characters from 'context' (no active selection)", function() {
-          InterfaceTests.Tests.deleteCharsFromContextNoSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.Input);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function() {
-          InterfaceTests.Tests.deleteCharsFromContextWithSelection(InterfaceTests.Input);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.Input);
+        });
+      });
+
+      describe('insertTextBeforeCaret', function() {
+        it("correctly replaces the element's 'context' (no active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Input);
+        });
+
+        it("correctly replaces the element's 'context' (with active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.Input);
         });
       });
     });
@@ -715,23 +776,23 @@ describe('Element Input/Output Interfacing', function() {
         });
       });
 
-      describe('setTextBeforeCaret', function() {
-        it("correctly replaces the element's 'context' (no active selection)", function() {
-          InterfaceTests.Tests.setTextBeforeCaretNoSelection(InterfaceTests.TextArea);
-        });
-
-        it("correctly replaces the element's 'context' (with active selection)", function() {
-          InterfaceTests.Tests.setTextBeforeCaretWithSelection(InterfaceTests.TextArea);
-        });
-      });
-
-      describe('deleteCharsFromContext', function() {
+      describe('deleteCharsBeforeCaret', function() {
         it("correctly deletes characters from 'context' (no active selection)", function() {
-          InterfaceTests.Tests.deleteCharsFromContextNoSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.TextArea);
         });
 
         it("correctly deletes characters from 'context' (with active selection)", function() {
-          InterfaceTests.Tests.deleteCharsFromContextWithSelection(InterfaceTests.TextArea);
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.TextArea);
+        });
+      });
+
+      describe('insertTextBeforeCaret', function() {
+        it("correctly replaces the element's 'context' (no active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.TextArea);
+        });
+
+        it("correctly replaces the element's 'context' (with active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.TextArea);
         });
       });
     });
