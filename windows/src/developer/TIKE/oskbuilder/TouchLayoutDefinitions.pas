@@ -73,9 +73,10 @@ const
     (Name: 'row'; ClassType: TJSONArray; Required: True; Value: @RowDef[0]; ValueSize: Length(RowDef))
   );
 
-  PlatformDef: array[0..2] of TJSONDef = (
+  PlatformDef: array[0..3] of TJSONDef = (
     (Name: 'font'; ClassType: TJSONString),
     (Name: 'fontsize'; ClassType: TJSONString),   // I4062
+    (Name: 'displayUnderlying'; ClassType: TJSONBool),
     (Name: 'layer'; ClassType: TJSONArray; Required: True; Value: @LayerDef[0]; ValueSize: Length(LayerDef))
   );
 

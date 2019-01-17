@@ -31,15 +31,22 @@
                         <button id='btnImport'>Import from On Screen</button>
                     </div>
                     <div id='layoutToolbar'>
-                        Platform: <select id='selPlatform'></select>
-                        <button id='btnAddPlatform'>Add</button>
-                        <button id='btnDelPlatform'>Del</button>
-                        Layer: <select id='selLayer'></select>
-                        <button id='btnAddLayer'>Add</button>
-                        <button id='btnDelLayer'>Del</button>
-                        <button id='btnEditLayer'>Edit</button>
-                        Presentation: <select id='selPlatformPresentation'></select>
-                        <input type='checkbox' id='chkShowAllModifierOptions'/> <label for='chkShowAllModifierOptions'>Show all modifier options</label>
+                        <div>
+                          Platform: <select id='selPlatform'></select>
+                          <button id='btnAddPlatform'>Add</button>
+                          <button id='btnDelPlatform'>Del</button>
+                          <input type='checkbox' id='chkDisplayUnderlying'/> <label for='chkDisplayUnderlying'>Display underlying</label>
+                        </div>
+                        <div>
+                          Layer: <select id='selLayer'></select>
+                          <button id='btnAddLayer'>Add</button>
+                          <button id='btnDelLayer'>Del</button>
+                          <button id='btnEditLayer'>Edit</button>
+                        </div>
+                        <div>
+                          Presentation: <select id='selPlatformPresentation'></select>
+                          <input type='checkbox' id='chkShowAllModifierOptions'/> <label for='chkShowAllModifierOptions'>Show all modifier options</label>
+                        </div>
                     </div>
                     <br class='clear' />
                 </div>

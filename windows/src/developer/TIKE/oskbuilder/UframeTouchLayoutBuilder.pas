@@ -77,7 +77,6 @@ type
     FLastError: string;   // I4083
     FLastErrorOffset: Integer;   // I4083
     FFilename: string;
-    FSourceWasRegistered: Boolean;
     function GetLayoutJS: string;
     procedure DoModified;
     procedure DoLoad;
@@ -92,7 +91,6 @@ type
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
     procedure RegisterSource;
-    procedure UnregisterSource;
     procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
@@ -227,23 +225,14 @@ end;
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);
 begin
   inherited;
-  UnregisterSource;
+  if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFilename) then
+    modWebHttpServer.AppSource.UnregisterSource(FFilename);
 end;
 
 procedure TframeTouchLayoutBuilder.RegisterSource;
 begin
   if FFilename <> '' then
     modWebHttpServer.AppSource.RegisterSource(FFilename, FSavedLayoutJS);
-
-  FSourceWasRegistered := True;
-end;
-
-procedure TframeTouchLayoutBuilder.UnregisterSource;
-begin
-  if (FFilename <> '') and FSourceWasRegistered then
-    modWebHttpServer.AppSource.UnregisterSource(FFilename);
-
-  FSourceWasRegistered := False;
 end;
 
 procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   // I3945
@@ -324,11 +313,6 @@ begin
 
   if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFilename) then
     modWebHttpServer.AppSource.UnregisterSource(FFilename);
-
-//  FreeAndNil(FHTMLTempFilename);   // I4195
-//  FHTMLTempFilename := TTempFileManager.Get('.html');   // I4195
-
-  UnregisterSource;
 
   if ALoadFromString then
   begin

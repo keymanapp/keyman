@@ -3626,7 +3626,12 @@ if(!window['keyman']['initialized']) {
       if('font' in layout) osk.fontFamily=layout['font']; else osk.fontFamily='';
 
       // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels=activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      if(typeof layout['displayUnderlying'] != 'undefined') {
+        layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+      } else {
+        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      }
+
       LdivC=osk.deviceDependentLayout(layout,device.formFactor);
 
       osk.ddOSK = true;
@@ -3705,8 +3710,13 @@ if(!window['keyman']['initialized']) {
         layout=osk.buildDefaultLayout(PVK,keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
 
       // Cannot create an OSK if no layout defined, just return empty DIV
-      if(layout != null)
-        layout.keyLabels=((typeof(PKbd['KDU']) != 'undefined') && PKbd['KDU']);
+      if(layout != null) {
+        if(typeof layout['displayUnderlying'] != 'undefined') {
+          layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+        } else {
+          layout.keyLabels = typeof(PKbd['KDU']) != 'undefined' && PKbd['KDU'];
+        }
+      }
 
       kbd=osk.deviceDependentLayout(layout,formFactor);
       kbd.className=formFactor+'-static kmw-osk-inner-frame';
