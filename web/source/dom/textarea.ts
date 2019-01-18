@@ -1,6 +1,3 @@
-// Defines KMW's string extension functions.
-/// <reference path="../kmwstring.ts" />
-
 namespace com.keyman.dom {
   export class TextArea implements EditableElement {
     root: HTMLTextAreaElement;

@@ -108,6 +108,83 @@ if(typeof InterfaceTests == 'undefined') {
     }
     //#endregion
 
+    //#region Defines helpers related to ContentEditable element test setup.
+    
+    // These functions simply make the basic (within a single text node) tests
+    // compatible with the more advanced element types; more complex tests may
+    // be in order.
+    InterfaceTests.ContentEditable = {};
+
+    InterfaceTests.ContentEditable.setupElement = function() {
+      var id = DynamicElements.addEditable();
+      var elem = document.getElementById(id);
+      var wrapper = new com.keyman.dom.ContentEditable(elem);
+
+      return {elem: elem, wrapper: wrapper, node: null};
+    }
+
+    InterfaceTests.ContentEditable.resetWithText = function(pair, string) {
+      this.setText(pair, string);
+      this.setSelectionRange(pair, 0, 0);
+    }
+
+    // Implemented for completeness and generality with other tests.
+    InterfaceTests.ContentEditable.setCaret = function(pair, index) {
+      this.setSelectionRange(pair, index, index);
+    }
+
+    // Implemented for completeness and generality with other tests.
+    InterfaceTests.ContentEditable.getCaret = function(pair) {
+      var sel = document.getSelection();
+
+      if(sel.focusNode.compareDocumentPosition(pair.elem) == 16) { // Contained by
+        return sel.focusOffset;
+      } else {
+        console.warn("Selection during test is in unexpected configuration!");
+      }
+    }
+
+    InterfaceTests.ContentEditable.setSelectionRange = function(pair, start, end) {
+      var device = new com.keyman.Device();
+      device.detect();
+
+      var node = pair.elem.childNodes[0];
+      var sel = document.getSelection();
+      if(node.nodeType == 3) {
+        if(device.browser == 'ie') {
+          if(start > end) {
+            // The Range API doesn't allow 'backward' configurations.
+            var temp = end;
+            end = start;
+            start = temp;
+          }
+
+          var range = document.createRange();
+          range.setStart(node, start);
+          range.setEnd(node, end);
+
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else {
+          // Does not work on IE!
+          sel.setPosition(node, start);
+          sel.extend(node, end);
+        }
+      } else {
+        console.warn("Problem detected when setting up a selection range for content-editables!");
+        var range = document.createRange();
+        range.setStart(node, start);
+        range.setEnd(node, start);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+
+    InterfaceTests.ContentEditable.setText = function(pair, text) {
+      pair.elem.innerText = text;
+    }
+    //#endregion
+
     //#region Defines common test patterns across element tests
     InterfaceTests.Tests = {};
 
@@ -597,6 +674,48 @@ if(typeof InterfaceTests == 'undefined') {
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement:  backward-order selection");
       String.kmwEnableSupplementaryPlane(false);
     }
+
+    InterfaceTests.Tests.getSelectionOwned = function(testObj) {
+      var Apple = InterfaceTests.Strings.Apple;
+      var pair = testObj.setupElement();
+
+      // All we need is some basic sample text to get started.
+      testObj.resetWithText(pair, Apple.mixed);
+
+      testObj.setSelectionRange(pair, 0, 7);
+      assert.isTrue(pair.wrapper.hasSelection(), "Failed to recognize ownership of full, forward-order selection.");
+
+      testObj.setSelectionRange(pair, 7, 0);
+      assert.isTrue(pair.wrapper.hasSelection(), "Failed to recognize ownership of full, backward-order selection.")
+
+      testObj.setSelectionRange(pair, 1, 3);
+      assert.isTrue(pair.wrapper.hasSelection(), "Failed to recognize ownership of partial, forward-order selection.");
+
+      testObj.setSelectionRange(pair, 3, 1);
+      assert.isTrue(pair.wrapper.hasSelection(), "Failed to recognize ownership of partial, backward-order selection.")
+    }
+
+    InterfaceTests.Tests.getSelectionUnowned = function(testObj) {
+      var Apple = InterfaceTests.Strings.Apple;
+      var pair = testObj.setupElement();
+      var dummy = testObj.setupElement();
+
+      // All we need is some basic sample text to get started.
+      testObj.resetWithText(pair, Apple.mixed);
+      testObj.resetWithText(dummy, Apple.mixed);
+
+      testObj.setSelectionRange(dummy, 0, 7);
+      assert.isFalse(pair.wrapper.hasSelection(), "Falsely claimed ownership of full, forward-order selection.");
+
+      testObj.setSelectionRange(dummy, 7, 0);
+      assert.isFalse(pair.wrapper.hasSelection(), "Falsely claimed ownership of full, backward-order selection.")
+
+      testObj.setSelectionRange(dummy, 1, 3);
+      assert.isFalse(pair.wrapper.hasSelection(), "Falsely claimed ownership of partial, forward-order selection.");
+
+      testObj.setSelectionRange(dummy, 3, 1);
+      assert.isFalse(pair.wrapper.hasSelection(), "Falsely claimed ownership of partial, backward-order selection.")
+    }
     //#endregion
 
   })();
@@ -793,6 +912,85 @@ describe('Element Input/Output Interfacing', function() {
 
         it("correctly replaces the element's 'context' (with active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.TextArea);
+        });
+      });
+    });
+  });
+
+  /**
+   * TODO:  Design and implement some 'complex', cross-Node selection tests.
+   */
+  describe('Wrapper: Content-Editable Elements (using DIVs)', function() {
+    describe('Caret Handling', function() {
+      describe('hasSelection', function() {
+        it('correctly recognizes Selection ownership', function () {
+          InterfaceTests.Tests.getSelectionOwned(InterfaceTests.ContentEditable);
+        });
+
+        it('correctly rejects lack of Selection ownership', function () {
+          InterfaceTests.Tests.getSelectionUnowned(InterfaceTests.ContentEditable);
+        });
+
+        // Need to design a test (and necessary helpers!) for a 'partial ownership rejection' test.
+      });
+    });
+
+    describe('Text Retrieval', function(){
+      describe('getText', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.ContentEditable);
+        });
+
+        it('correctly returns text (with active selection)', function() {
+          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.ContentEditable);
+        });
+      });
+
+      describe('getTextBeforeCaret', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.ContentEditable);
+        });
+
+        it('correctly returns text (with active selection)', function() {
+          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
+        });
+      });
+
+      describe('getTextAfterCaret', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.ContentEditable);
+        });
+
+        it('correctly returns text (with active selection)', function() {
+          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.ContentEditable);
+        });
+      });
+    });
+
+    describe('Text Mutation', function() {
+      describe('clearSelection', function() {
+        it('properly deletes selected text', function() {
+          InterfaceTests.Tests.clearSelection(InterfaceTests.ContentEditable);
+        });
+      });
+
+      describe('deleteCharsBeforeCaret', function() {
+        it("correctly deletes characters from 'context' (no active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.ContentEditable);
+        });
+
+        it("correctly deletes characters from 'context' (with active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.ContentEditable);
+        });
+      });
+
+      describe('insertTextBeforeCaret', function() {
+        it("correctly replaces the element's 'context' (no active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.ContentEditable);
+        });
+
+        it("correctly replaces the element's 'context' (with active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
         });
       });
     });

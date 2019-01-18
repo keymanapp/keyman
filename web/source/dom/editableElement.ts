@@ -1,7 +1,11 @@
+// Defines KMW's string extension functions.
+/// <reference path="../kmwstring.ts" />
 // Defines a basic HTMLInputElement wrapper.
 ///<reference path="input.ts" />
 // Defines a basic HTMLTextAreaElement wrapper.
 ///<reference path="textarea.ts" />
+// Defines a basic content-editable wrapper.
+///<reference path="contentEditable.ts" />
 // Makes TS aware of Window-based type prototypes
 ///<reference path="../kmwexthtml.ts" />
 
@@ -27,6 +31,8 @@ namespace com.keyman.dom {
       return new Input(e);
     } else if(e instanceof e.ownerDocument.defaultView.HTMLTextAreaElement) {
       return new TextArea(e);
+    } else if(e.isContentEditable) {
+      return new ContentEditable(e);
     }
     
     return null;
