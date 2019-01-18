@@ -166,6 +166,7 @@ if(typeof InterfaceTests == 'undefined') {
           sel.removeAllRanges();
           sel.addRange(range);
         } else {
+          sel.removeAllRanges();
           // Does not work on IE!
           sel.setPosition(node, start);
           sel.extend(node, end);
@@ -828,6 +829,7 @@ describe('Element Input/Output Interfacing', function() {
     });
   });
 
+  // TODO:  (if possible) Implement support for scroll-restoration checks.
   describe('Wrapper: HTMLTextAreaElement', function() {
     /**
      * The design of these tests is to ensure that all caret handling works correctly, 
