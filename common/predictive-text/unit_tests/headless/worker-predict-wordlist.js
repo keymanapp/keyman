@@ -56,11 +56,14 @@ describe('LMLayerWorker word list model', function() {
         jsonFixture('wordlists/english-1000')
       );
 
+      var initialPrefix = 't';
+      var insertedLetter = 'h';
+      var truePrefix = initialPrefix + insertedLetter;
       var suggestions = model.predict({
-        insert: 'h',
+        insert: insertedLetter,
         deleteLeft: 0,
       }, {
-        left: 't',
+        left: initialPrefix,
         startOfBuffer: false,
         endOfBuffer: true
       });
@@ -69,13 +72,22 @@ describe('LMLayerWorker word list model', function() {
       // Ensure all of the suggestions actually start with 'th'
       var suggestion;
       var suggestedWord;
+
+      // XXX: this tests knows TOO MUCH about the implementation of the function.
+      // Need a test that asserts behavior; not how it got there.
       for (var i = 0; i < MIN_SUGGESTIONS; i++) {
         suggestion = suggestions[i];
-        suggestedWord = suggestion.transform.insert;
-        assert.strictEqual(suggestedWord.substr(0, 2), 'th');
-        assert.strictEqual(suggestion.transform.deleteLeft, 1);
+        suggestedWord = suggestion.displayAs;
+        // Assuming the transform where nothing is deleted, but
+        // the rest of the suggested word is inserted.
+        assert.strictEqual(suggestion.transform.deleteLeft, 0);
+        // The first two characters should match the prefix WITH the transform.
+        assert.strictEqual(suggestedWord.substr(0, truePrefix.length), truePrefix);
+        assert.strictEqual(suggestion.transform.insert[0], insertedLetter);
       }
     });
+
+    // TODO: predict empty buffer, empty transform
   });
 });
 

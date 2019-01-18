@@ -35,6 +35,7 @@
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
+// TODO: define this in an IIFE.
 LMLayerWorker.models.WordListModel = class WordListModel implements WorkerInternalModel {
   private _wordlist: string[];
 
@@ -42,23 +43,23 @@ LMLayerWorker.models.WordListModel = class WordListModel implements WorkerIntern
     this._wordlist = wordlist;
   }
 
-  predict(transform: Transform, _context: Context): Suggestion[] {
+  predict(transform: Transform, context: Context): Suggestion[] {
     const MAX_SUGGESTIONS = 3;
-    let prefix = transform.insert;
+    // All text to the left of the cursor INCLUDING anything that has
+    // just been typed.
+    let leftContext = context.left || '';
+    let prefix = leftContext + (transform.insert || '');
     let suggestions: Suggestion[] = [];
 
-    // TODO: support astral code points (1 code point === length of 2)
-    if (prefix.length !== 1) {
-      throw new Error('Invalid prefix length')
-    }
-    
-    // naïve O(n) exhaustive search through the entire word list.
+    // Naïve O(n) exhaustive search through the entire word
+    // list, up to the suggestion limit.
     for (let word of this._wordlist) {
-      let suggestionPrefix = word.substr(0, 1)
+      let suggestionPrefix = word.substr(0, prefix.length);
       if (prefix === suggestionPrefix) {
         suggestions.push({
           transform: {
-            insert: word + ' ',
+            // The left part of the word has already been entered.
+            insert: word.substr(leftContext.length) + ' ',
             deleteLeft: 0,
           },
           displayAs: word,
