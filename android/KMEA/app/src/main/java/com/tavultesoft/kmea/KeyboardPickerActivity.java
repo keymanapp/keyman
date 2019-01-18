@@ -68,6 +68,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   private static boolean updateFailed = false;
   private static Calendar lastUpdateCheck = null;
   private static int selectedIndex = 0;
+  private static final String TAG = "KeyboardPickerActivity";
 
   protected static int selectedIndex() {
     return selectedIndex;
@@ -173,7 +174,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
+        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
+          KeyboardPickerActivity.hasCustomKeyboard()){
           dismissOnSelect = false;
           Intent i = new Intent(context, LanguageListActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -299,6 +301,19 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return pos;
   }
 
+  private static boolean hasCustomKeyboard() {
+    for(HashMap<String, String> kbInfo: keyboardsList) {
+      if (kbInfo.containsKey(KMManager.KMKey_CustomKeyboard)) {
+        String customKeyboard = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N").toUpperCase();
+        if (customKeyboard.equals("Y")) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   private static boolean saveKeyboardsList(Context context) {
     boolean result;
     try {
@@ -309,7 +324,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e("KeyboardPickerActivity", "Failed to save keyboards list. Error: " + e);
+      Log.e(TAG, "Failed to save keyboards list. Error: " + e);
       result = false;
     }
 
@@ -424,7 +439,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e("KeyboardPickerActivity", "Failed to read keyboards list. Error: " + e);
+        Log.e(TAG, "Failed to read keyboards list. Error: " + e);
         list = null;
       }
     }
@@ -603,7 +618,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
               }
             }
           } catch (Exception e) {
-            Log.e("KeyboardPickerActivity", "Failed to compare keyboard version. Error: " + e);
+            Log.e(TAG, "Failed to compare keyboard version. Error: " + e);
             keyboardVersions = null;
             ret = -1;
           }

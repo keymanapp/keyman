@@ -418,15 +418,29 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
 
       try {
-        options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
 
         if (!hasConnection) {
           // When offline, only use keyboards available from kmp.json
+          // Use default options
+          options = new JSONObject();
+          options.put("context", "language");
+          options.put("dateFormat", "standard");
+          String deviceType = context.getString(R.string.device_type);
+          if (deviceType.equals("AndroidTablet")) {
+            deviceType = "androidtablet";
+          } else {
+            deviceType = "androidphone";
+          }
+          options.put("device", deviceType);
+          options.put("keyboardBaseUri", "https://s.keyman.com/keyboard/");
+          options.put("fontBaseUri", "https://s.keyman.com/font/deploy/");
+          options.put("keyboardVersion", "current");
           languages = kmpLanguagesArray;
         } else {
           // Otherwise, merge kmpLanguagesArray with cloud languagesArray
+          options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
           languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
           for (int i = 0; i < kmpLanguagesArray.length(); i++) {
             JSONObject kmpLanguage = kmpLanguagesArray.getJSONObject(i);
