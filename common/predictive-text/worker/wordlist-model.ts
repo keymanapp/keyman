@@ -49,9 +49,12 @@ LMLayerWorker.models.WordListModel = (function () {
     }
 
     predict(transform: Transform, context: Context): Suggestion[] {
+      // EVERYTHING to the left of the cursor: 
+      let fullLeftContext = context.left || '';
+      // Stuff to the left of the cursor in the current word.
+      let leftContext = fullLeftContext.split(/\s+/).pop() || '';
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
-      let leftContext = context.left || '';
       let prefix = leftContext + (transform.insert || '');
       let suggestions: Suggestion[] = [];
 
