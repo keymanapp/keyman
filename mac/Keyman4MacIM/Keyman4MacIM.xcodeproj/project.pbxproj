@@ -874,7 +874,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"{$PROJECT_DIR}/Keyman4MacIM",
+					"$(PROJECT_DIR)/Keyman4MacIM",
 				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -904,7 +904,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"{$PROJECT_DIR}/Keyman4MacIM",
+					"$(PROJECT_DIR)/Keyman4MacIM",
 				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
