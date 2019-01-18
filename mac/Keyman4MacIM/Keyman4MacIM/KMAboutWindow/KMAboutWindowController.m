@@ -13,6 +13,9 @@
 @property (nonatomic, weak) IBOutlet NSTextField *versionLabel;
 @property (nonatomic, weak) IBOutlet NSTextField *copyrightLabel;
 @property (nonatomic, weak) IBOutlet NSButton *licenseButton;
+// not needed at the moment but might be:
+@property (nonatomic, weak) IBOutlet NSButton *closeButton;
+@property (nonatomic, weak) IBOutlet NSButton *configureButton;
 @end
 
 @implementation KMAboutWindowController
