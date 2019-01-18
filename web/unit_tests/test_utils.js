@@ -333,6 +333,25 @@ if(typeof(DynamicElements) == 'undefined') {
     masterDiv.appendChild(frame);
     return frame.id;
   }
+
+  DynamicElements.addDesignIFrame = function(loadCallback) {
+    var masterDiv = document.getElementById('DynamicElements');
+    var frame = document.createElement("iframe");
+    var i = inputCounter++;
+    
+    frame.height = "100";
+    frame.id = 'designIFrame' + i;
+    frame.src = "resources/html/editableFrame.html";
+    
+    if(loadCallback) {
+      frame.addEventListener('load', function() {
+        loadCallback();
+      });
+    }
+      
+    masterDiv.appendChild(frame);
+    return frame.id;
+  }
   
   DynamicElements.addEditable = function() {
     var masterDiv = document.getElementById('DynamicElements');

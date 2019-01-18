@@ -6,6 +6,8 @@
 ///<reference path="textarea.ts" />
 // Defines a basic content-editable wrapper.
 ///<reference path="contentEditable.ts" />
+// Defines a basic design-mode IFrame wrapper.
+///<reference path="designIFrame.ts" />
 // Makes TS aware of Window-based type prototypes
 ///<reference path="../kmwexthtml.ts" />
 

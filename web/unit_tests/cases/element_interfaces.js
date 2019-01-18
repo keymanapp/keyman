@@ -112,10 +112,18 @@ if(typeof InterfaceTests == 'undefined') {
     
     // These functions simply make the basic (within a single text node) tests
     // compatible with the more advanced element types; more complex tests may
-    // be in order.
+    // be in order.  They can probably be shared with design-mode IFrames.
     InterfaceTests.ContentEditable = {};
 
     InterfaceTests.ContentEditable.setupElement = function() {
+      var id = DynamicElements.addEditable();
+      var elem = document.getElementById(id);
+      var wrapper = new com.keyman.dom.ContentEditable(elem);
+
+      return {elem: elem, wrapper: wrapper, node: null};
+    }
+
+    InterfaceTests.ContentEditable.setupDummyElement = function() {
       var id = DynamicElements.addEditable();
       var elem = document.getElementById(id);
       var wrapper = new com.keyman.dom.ContentEditable(elem);
@@ -194,6 +202,114 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.ContentEditable.setText = function(pair, text) {
       pair.elem.innerText = text;
+    }
+    //#endregion
+
+    //#region Defines helpers related to design-mode IFrame test setup.
+    
+    // These functions simply make the basic (within a single text node) tests
+    // compatible with the more advanced element types; more complex tests may
+    // be in order.  They can probably be shared with ContentEditables.
+    InterfaceTests.DesignIFrame = {};
+
+    InterfaceTests.DesignIFrame.InitAsyncElements = function(done) {
+      // DynamicElements.addDesignIFrame takes an async callback
+      // triggered upon the IFrame's load.
+      var obj = this;
+      
+      var id1 = DynamicElements.addDesignIFrame(function() {
+        var id2 = DynamicElements.addDesignIFrame(function() {
+          elem1 = document.getElementById(id1);
+          elem2 = document.getElementById(id2);
+
+          obj.mainPair =  {elem: elem1, wrapper: new com.keyman.dom.DesignIFrame(elem1), document: elem1.contentWindow.document};
+          obj.dummyPair = {elem: elem2, wrapper: new com.keyman.dom.DesignIFrame(elem2), document: elem1.contentWindow.document};
+
+          done();
+        });
+      });
+    }
+
+    InterfaceTests.DesignIFrame.setupElement = function() {
+      return this.mainPair;
+    }
+
+    InterfaceTests.DesignIFrame.setupDummyElement = function() {
+      return this.dummyPair;
+    }
+
+    InterfaceTests.DesignIFrame.resetWithText = function(pair, string) {
+      this.setText(pair, string);
+      this.setSelectionRange(pair, 0, 0);
+    }
+
+    // Implemented for completeness and generality with other tests.
+    InterfaceTests.DesignIFrame.setCaret = function(pair, index) {
+      this.setSelectionRange(pair, index, index);
+    }
+
+    // Implemented for completeness and generality with other tests.
+    InterfaceTests.DesignIFrame.getCaret = function(pair) {
+      var sel = pair.document.getSelection();
+
+      if(sel.focusNode.compareDocumentPosition(pair.elem) == 16) { // Contained by
+        return sel.focusOffset;
+      } else {
+        console.warn("Selection during test is in unexpected configuration!");
+      }
+    }
+
+    InterfaceTests.DesignIFrame.setSelectionRange = function(pair, start, end) {
+      var device = new com.keyman.Device();
+      device.detect();
+
+      var node = pair.document.documentElement.childNodes[0];
+      var sel = pair.document.getSelection();
+      var range;
+
+      var setIESelection = function(node, sel, start, end) {
+        if(start > end) {
+          // The Range API doesn't allow 'backward' configurations.
+          var temp = end;
+          end = start;
+          start = temp;
+        }
+
+        range = pair.document.createRange();
+        range.setStart(node, start);
+        range.setEnd(node, end);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      if(node.nodeType == 3) {
+        if(device.browser == 'ie') {
+          setIESelection(node, sel, start, end);
+        } else {
+          sel.removeAllRanges();
+          // Does not work on IE!
+          try {
+            sel.setPosition(node, start);
+            sel.extend(node, end);
+          } catch (e) {
+            // Sometimes fails in Firefox during CI.  Not sure why.
+            console.warn("Error occurred while setting Selection via setPosition/extend: " + e.toString());
+            setIESelection(node, sel, start, end);
+          }
+        }
+      } else {
+        console.warn("Problem detected when setting up a selection range!");
+        range = pair.document.createRange();
+        range.setStart(node, start);
+        range.setEnd(node, start);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+
+    InterfaceTests.DesignIFrame.setText = function(pair, text) {
+      pair.document.documentElement.innerText = text;
     }
     //#endregion
 
@@ -710,7 +826,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.Tests.getSelectionUnowned = function(testObj) {
       var Apple = InterfaceTests.Strings.Apple;
       var pair = testObj.setupElement();
-      var dummy = testObj.setupElement();
+      var dummy = testObj.setupDummyElement();
 
       // All we need is some basic sample text to get started.
       testObj.resetWithText(pair, Apple.mixed);
@@ -1004,6 +1120,100 @@ describe('Element Input/Output Interfacing', function() {
 
         it("correctly replaces the element's 'context' (with active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
+        });
+      });
+    });
+  });
+
+  /**
+   * TODO:  Design and implement some 'complex', cross-doc selection tests if possible.
+   */
+  describe('Wrapper: Design-Mode IFrames', function() {
+    // We're asynchronously loading IFrames, and sequentially at that.
+    // We'll need a larger timeout.
+    this.timeout(kmwconfig.timeouts.scriptLoad);
+
+    beforeEach(function(done) {
+      // Per-test creation of reg. pair and dummy elements, since IFrames are async.
+      // Relies on the main-level's renewal of the overall fixture to be processed first.
+      InterfaceTests.DesignIFrame.InitAsyncElements(done);
+    });
+
+    /**
+     * Sadly, JavaScript appears to disallow programmatically setting an outer document's selection
+     * to Nodes inside an iframe's document, which would be needed to properly emulate actual use-case
+     * selections we'd want to test with these methods.  :(
+     */
+    // describe.skip('Caret Handling', function() {
+    //   describe('hasSelection', function() {
+    //     it('correctly recognizes Selection ownership', function () {
+    //       InterfaceTests.Tests.getSelectionOwned(InterfaceTests.DesignIFrame);
+    //     });
+
+    //     it('correctly rejects lack of Selection ownership', function () {
+    //       InterfaceTests.Tests.getSelectionUnowned(InterfaceTests.DesignIFrame);
+    //     });
+
+    //     // Need to design a test (and necessary helpers!) for a 'partial ownership rejection' test.
+    //   });
+    // });
+
+    describe('Text Retrieval', function(){
+      describe('getText', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.DesignIFrame);
+        });
+
+        it('correctly returns text (with active selection)', function() {
+          InterfaceTests.Tests.getTextWithSelection(InterfaceTests.DesignIFrame);
+        });
+      });
+
+      describe('getTextBeforeCaret', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.DesignIFrame);
+        });
+
+        it('correctly returns text (with active selection)', function() {
+          InterfaceTests.Tests.getTextBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
+        });
+      });
+
+      describe('getTextAfterCaret', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.DesignIFrame);
+        });
+
+        it('correctly returns text (with active selection)', function() {
+          InterfaceTests.Tests.getTextAfterCaretWithSelection(InterfaceTests.DesignIFrame);
+        });
+      });
+    });
+
+    describe('Text Mutation', function() {
+      describe('clearSelection', function() {
+        it('properly deletes selected text', function() {
+          InterfaceTests.Tests.clearSelection(InterfaceTests.DesignIFrame);
+        });
+      });
+
+      describe('deleteCharsBeforeCaret', function() {
+        it("correctly deletes characters from 'context' (no active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.DesignIFrame);
+        });
+
+        it("correctly deletes characters from 'context' (with active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
+        });
+      });
+
+      describe('insertTextBeforeCaret', function() {
+        it("correctly replaces the element's 'context' (no active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.DesignIFrame);
+        });
+
+        it("correctly replaces the element's 'context' (with active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
         });
       });
     });
