@@ -150,26 +150,37 @@ if(typeof InterfaceTests == 'undefined') {
 
       var node = pair.elem.childNodes[0];
       var sel = document.getSelection();
+
+      var setIESelection = function(node, sel, start, end) {
+        if(start > end) {
+          // The Range API doesn't allow 'backward' configurations.
+          var temp = end;
+          end = start;
+          start = temp;
+        }
+
+        var range = document.createRange();
+        range.setStart(node, start);
+        range.setEnd(node, end);
+
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
       if(node.nodeType == 3) {
         if(device.browser == 'ie') {
-          if(start > end) {
-            // The Range API doesn't allow 'backward' configurations.
-            var temp = end;
-            end = start;
-            start = temp;
-          }
-
-          var range = document.createRange();
-          range.setStart(node, start);
-          range.setEnd(node, end);
-
-          sel.removeAllRanges();
-          sel.addRange(range);
+          setIESelection(node, sel, start, end);
         } else {
           sel.removeAllRanges();
           // Does not work on IE!
-          sel.setPosition(node, start);
-          sel.extend(node, end);
+          try {
+            sel.setPosition(node, start);
+            sel.extend(node, end);
+          } catch (e) {
+            // Sometimes fails in Firefox during CI.  Not sure why.
+            console.warn("Error occurred while setting Selection via setPosition/extend: " + e.toString());
+            setIESelection(node, sel, start, end);
+          }
         }
       } else {
         console.warn("Problem detected when setting up a selection range for content-editables!");

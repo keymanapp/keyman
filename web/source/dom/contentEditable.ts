@@ -35,7 +35,7 @@ namespace com.keyman.dom {
     }
 
     hasSelection(): boolean {
-      let Lsel = document.getSelection();
+      let Lsel = this.root.ownerDocument.getSelection();
       
       // We can't completely rely on this.root.contains because of a weird IE 11 bug.
       // Apparently, the text node contains the HTMLElement?
@@ -62,7 +62,7 @@ namespace com.keyman.dom {
 
     clearSelection(): void {
       if(this.hasSelection()) {
-        let Lsel = document.getSelection();
+        let Lsel = this.root.ownerDocument.getSelection();
 
         if(!Lsel.isCollapsed) {
           Lsel.deleteFromDocument();  // I2134, I2192
@@ -77,7 +77,7 @@ namespace com.keyman.dom {
                                    */  }
 
     getCarets(): SelectionRange {
-      let Lsel = document.getSelection();
+      let Lsel = this.root.ownerDocument.getSelection();
       let code = Lsel.anchorNode.compareDocumentPosition(Lsel.focusNode);
 
       if(Lsel.isCollapsed) {
@@ -146,7 +146,7 @@ namespace com.keyman.dom {
         return; // No context to delete characters from.
       }
 
-      let range = document.createRange();
+      let range = this.root.ownerDocument.createRange();
       let dnOffset = start.offset - start.node.nodeValue.substr(0, start.offset)._kmwSubstr(-dn).length;
 
       range.setStart(start.node, dnOffset);
@@ -164,7 +164,7 @@ namespace com.keyman.dom {
 
       let start = this.getCarets().start;
       let delta = s._kmwLength();
-      let Lsel = document.getSelection();
+      let Lsel = this.root.ownerDocument.getSelection();
 
       if(delta == 0) {
         return;
@@ -173,7 +173,7 @@ namespace com.keyman.dom {
       // While Selection.extend() is really nice for this, IE doesn't support it whatsoever.
       // However, IE (11, at least) DOES support setting selections via ranges, so we can still
       // manage the caret properly.
-      let finalCaret = document.createRange();
+      let finalCaret = this.root.ownerDocument.createRange();
 
       if(start.node.nodeType == 3) {
         let textStart = <Text> start.node;
@@ -183,7 +183,7 @@ namespace com.keyman.dom {
         // Create a new text node - empty control
         var n = start.node.ownerDocument.createTextNode(s);
 
-        let range = document.createRange();
+        let range = this.root.ownerDocument.createRange();
         range.setStart(start.node, s.length);
         range.collapse(true);
         range.insertNode(n);
