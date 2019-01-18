@@ -241,6 +241,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           } else {
             for (int j = 0; j < kbLength; j++) {
               keyboard = langKeyboards.getJSONObject(j);
+              pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
               kbID = keyboard.getString(KMManager.KMKey_ID);
               kbName = keyboard.getString(KMManager.KMKey_Name);
               kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -248,6 +249,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
               kbKey = String.format("%s_%s", langID, kbID);
               HashMap<String, String> hashMap = new HashMap<String, String>();
+              hashMap.put(KMManager.KMKey_PackageID, pkgID);
               hashMap.put(KMManager.KMKey_KeyboardName, kbName);
               hashMap.put(KMManager.KMKey_LanguageName, langName);
               hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
