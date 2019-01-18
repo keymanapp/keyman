@@ -174,6 +174,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
+        // Check that available keyboard information can be obtained via:
+        // 1. connection to cloud catalog
+        // 2. cached file
+        // 3. local kmp.json files in packages/
         if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
           KeyboardPickerActivity.hasKeyboardFromPackage()){
           dismissOnSelect = false;

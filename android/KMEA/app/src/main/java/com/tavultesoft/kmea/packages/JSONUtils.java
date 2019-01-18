@@ -168,4 +168,29 @@ public class JSONUtils {
     }
     return false;
   }
+
+  /**
+   * Mirror options information that comes from keyboard cloud catalog
+   * @param String deviceType
+   * @return JSONObject
+   */
+  public static JSONObject defaultOptions(String deviceType) {
+    JSONObject options = new JSONObject();
+    try {
+      options.put("context", "language");
+      options.put("dateFormat", "standard");
+      if (deviceType.equals("AndroidTablet")) {
+        deviceType = "androidtablet";
+      } else {
+        deviceType = "androidphone";
+      }
+      options.put("device", deviceType);
+      options.put("keyboardBaseUri", "https://s.keyman.com/keyboard/");
+      options.put("fontBaseUri", "https://s.keyman.com/font/deploy/");
+      options.put("keyboardVersion", "current");
+    } catch (JSONException e) {
+      Log.e(TAG, "defaultOptions() error: " + e);
+    }
+    return options;
+  }
 }
