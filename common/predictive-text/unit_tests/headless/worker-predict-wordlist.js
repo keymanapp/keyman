@@ -87,7 +87,27 @@ describe('LMLayerWorker word list model', function() {
       }
     });
 
-    // TODO: predict empty buffer, empty transform
+    it('should produce suggestions with an empty buffer and a zero transform', function () {
+      // Predicting when the user has activated an empty text field:
+      //
+      //   «|                         » [Send]
+      //   [   I'm  ] [    I    ] [    Hey    ]
+      var model = new WordListModel(
+        defaultCapabilities(),
+        jsonFixture('wordlists/english-1000')
+      );
+
+      var suggestions = model.predict(zeroTransform(), emptyContext());
+      assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
+
+      // Ensure all of the suggestions seem valid.
+      var suggestion;
+      for (var i = 0; i < MIN_SUGGESTIONS; i++) {
+        suggestion = suggestions[i];
+        assert.isNotEmpty(suggestion.transform.insert);
+        assert.strictEqual(suggestion.transform.deleteLeft, 0);
+        assert.isNotEmpty(suggestion.displayAs);
+      }
+    });
   });
 });
-
