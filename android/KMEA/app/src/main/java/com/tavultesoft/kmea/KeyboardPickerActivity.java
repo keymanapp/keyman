@@ -342,12 +342,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    if (KMManager.InAppKeyboard != null) {
-      KMManager.InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-    }
-    if (KMManager.SystemKeyboard != null) {
-      KMManager.SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-    }
+    KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {

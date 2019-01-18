@@ -137,12 +137,9 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-      if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
+      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
+      KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
       finish();
     } else {
       Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
@@ -421,44 +418,48 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
 
       try {
-        languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
         options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
 
-        // Merge kmpLanguagesArray with languages
-        for(int i=0; i<kmpLanguagesArray.length(); i++) {
-          JSONObject kmpLanguage = kmpLanguagesArray.getJSONObject(i);
-          String kmpLanguageID = kmpLanguage.getString("id");
-          int languageIndex = JSONUtils.findID(languages, kmpLanguageID);
-          if (languageIndex == -1) {
-            // Add new language object
-            languages.put(kmpLanguage);
-          } else {
-            // Merge language info
-            JSONObject language = languages.getJSONObject(languageIndex);
-            JSONArray keyboards = language.getJSONArray("keyboards");
-            JSONArray kmpKeyboards = kmpLanguage.getJSONArray("keyboards");
-            for(int j=0; j<kmpKeyboards.length(); j++) {
-              JSONObject kmpKeyboard = kmpKeyboards.getJSONObject(j);
-              String kmpKeyboardID =  kmpKeyboard.getString("id");
-              int keyboardIndex = JSONUtils.findID(keyboards, kmpKeyboardID);
-              if (keyboardIndex == -1) {
-                // Add new keyboard object
-                keyboards.put(kmpKeyboard);
-              } else {
-                // Merge keyboard info
-                JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
+        if (!hasConnection) {
+          // When offline, only use keyboards available from kmp.json
+          languages = kmpLanguagesArray;
+        } else {
+          // Otherwise, merge kmpLanguagesArray with cloud languagesArray
+          languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+          for (int i = 0; i < kmpLanguagesArray.length(); i++) {
+            JSONObject kmpLanguage = kmpLanguagesArray.getJSONObject(i);
+            String kmpLanguageID = kmpLanguage.getString("id");
+            int languageIndex = JSONUtils.findID(languages, kmpLanguageID);
+            if (languageIndex == -1) {
+              // Add new language object
+              languages.put(kmpLanguage);
+            } else {
+              // Merge language info
+              JSONObject language = languages.getJSONObject(languageIndex);
+              JSONArray keyboards = language.getJSONArray("keyboards");
+              JSONArray kmpKeyboards = kmpLanguage.getJSONArray("keyboards");
+              for (int j = 0; j < kmpKeyboards.length(); j++) {
+                JSONObject kmpKeyboard = kmpKeyboards.getJSONObject(j);
+                String kmpKeyboardID = kmpKeyboard.getString("id");
+                int keyboardIndex = JSONUtils.findID(keyboards, kmpKeyboardID);
+                if (keyboardIndex == -1) {
+                  // Add new keyboard object
+                  keyboards.put(kmpKeyboard);
+                } else {
+                  // Merge keyboard info
+                  JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
 
-                String keyboardVersion = keyboard.getString(KMManager.KMKey_KeyboardVersion);
-                String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
-                if (FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion) == FileUtils.VERSION_GREATER) {
-                  // Replace keyboard entry from kmp
-                  keyboards.put(keyboardIndex, kmpKeyboard);
+                  String keyboardVersion = keyboard.getString(KMManager.KMKey_KeyboardVersion);
+                  String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
+                  if (FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion) == FileUtils.VERSION_GREATER) {
+                    // Replace keyboard entry from kmp
+                    keyboards.put(keyboardIndex, kmpKeyboard);
+                  }
                 }
               }
             }
-
           }
         }
 
@@ -562,17 +563,28 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
               final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
               final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
-
-              Bundle bundle = new Bundle();
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-              bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-              Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-              i.putExtras(bundle);
-              startActivity(i);
+              String kFont = kbInfo.getOrDefault(KMManager.KMKey_Font, "");
+              String kOskFont = kbInfo.getOrDefault(KMManager.KMKey_OskFont, "");
+              String isCustom = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N");
+              if (isCustom.toUpperCase().equals("Y")) {
+                // Custom keyboard already exists in packages/ so just add the language association
+                KeyboardPickerActivity.addKeyboard(context, kbInfo);
+                KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+                Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+                ((AppCompatActivity) context).finish();
+              } else {
+                // Keyboard needs to be downloaded
+                Bundle bundle = new Bundle();
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+                bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+                Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+                i.putExtras(bundle);
+                startActivity(i);
+              }
             }
           }
         });

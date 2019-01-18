@@ -108,18 +108,9 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
           if (isCustom.toUpperCase().equals("Y")) {
             // Custom keyboard already exists in packages/ so just add the language association
             KeyboardPickerActivity.addKeyboard(context, kbInfo);
-            if (KMManager.InAppKeyboard != null) {
-              KMManager.InAppKeyboard.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
-            }
-            if (KMManager.SystemKeyboard != null) {
-              KMManager.SystemKeyboard.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
-            }
+            KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
             Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
-
             ((AppCompatActivity) context).finish();
-            //LanguageListActivity.this.finish();
-            //finish();
-
             return;
           }
 
@@ -181,12 +172,9 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
       String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-      if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
+      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
+      KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
       finish();
     } else {
       Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
