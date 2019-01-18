@@ -55,6 +55,17 @@ LMLayerWorker.models.WordListModel = (function () {
       let prefix = leftContext + (transform.insert || '');
       let suggestions: Suggestion[] = [];
 
+      // Special-case the empty buffer/transform: return the top suggestions.
+      if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
+        return this._wordlist.slice(0, MAX_SUGGESTIONS).map(word => ({
+          transform: {
+            insert: word + ' ',
+            deleteLeft: 0
+          },
+          displayAs: word
+        }));
+      }
+
       // Naïve O(n) exhaustive search through the entire word
       // list, up to the suggestion limit.
       for (let word of this._wordlist) {
