@@ -580,7 +580,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               String kFont = kbInfo.getOrDefault(KMManager.KMKey_Font, "");
               String kOskFont = kbInfo.getOrDefault(KMManager.KMKey_OskFont, "");
               String isCustom = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N");
-              if (isCustom.toUpperCase().equals("Y")) {
+
+              if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
                 // Custom keyboard already exists in packages/ so just add the language association
                 KeyboardPickerActivity.addKeyboard(context, kbInfo);
                 KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
@@ -594,7 +595,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
                 bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
                 bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
                 bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-                bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+                bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
                 Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
                 i.putExtras(bundle);
                 startActivity(i);

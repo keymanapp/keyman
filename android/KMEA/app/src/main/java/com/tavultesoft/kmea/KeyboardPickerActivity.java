@@ -175,7 +175,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
-          KeyboardPickerActivity.hasCustomKeyboard()){
+          KeyboardPickerActivity.hasKeyboardFromPackage()){
           dismissOnSelect = false;
           Intent i = new Intent(context, LanguageListActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -301,13 +301,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return pos;
   }
 
-  private static boolean hasCustomKeyboard() {
+  private static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
-      if (kbInfo.containsKey(KMManager.KMKey_CustomKeyboard)) {
-        String customKeyboard = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N").toUpperCase();
-        if (customKeyboard.equals("Y")) {
-          return true;
-        }
+      String packageID = kbInfo.getOrDefault(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      if (!packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+        return true;
       }
     }
 

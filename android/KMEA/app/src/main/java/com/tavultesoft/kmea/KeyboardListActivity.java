@@ -97,7 +97,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           HashMap<String, String> kbInfo = LanguageListActivity.getKeyboardInfo(langIndex, position);
-          final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
+          final String pkgID = kbInfo.getOrDefault(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
           final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
           final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
           String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
@@ -105,8 +105,9 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
           String kFont = kbInfo.getOrDefault(KMManager.KMKey_Font, "");
           String kOskFont = kbInfo.getOrDefault(KMManager.KMKey_OskFont, kFont);
           String isCustom = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N");
-          if (isCustom.toUpperCase().equals("Y")) {
-            // Custom keyboard already exists in packages/ so just add the language association
+
+          if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+            // keyboard already exists in packages/ so just add the language association
             KeyboardPickerActivity.addKeyboard(context, kbInfo);
             KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
             Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
@@ -120,7 +121,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
           args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
           args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
           args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-          args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+          args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);
