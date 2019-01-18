@@ -29,33 +29,40 @@
  */
 
 /**
+ * @class WordListModel
+ *
  * Defines the word list model, or the unigram model.
  * Unigram models throw away all preceding words, and search
  * for the next word exclusively. As such, they can perform simple
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
-// TODO: define this in an IIFE.
-LMLayerWorker.models.WordListModel = class WordListModel implements WorkerInternalModel {
-  private _wordlist: string[];
+LMLayerWorker.models.WordListModel = (function () {
+  /** Upper bound on the amount of suggestions to generate. */
+  const MAX_SUGGESTIONS = 3;
 
-  constructor(_capabilities: Capabilities, wordlist: string[]) {
-    this._wordlist = wordlist;
-  }
+  return class WordListModel implements WorkerInternalModel {
+    private _wordlist: string[];
 
-  predict(transform: Transform, context: Context): Suggestion[] {
-    const MAX_SUGGESTIONS = 3;
-    // All text to the left of the cursor INCLUDING anything that has
-    // just been typed.
-    let leftContext = context.left || '';
-    let prefix = leftContext + (transform.insert || '');
-    let suggestions: Suggestion[] = [];
+    constructor(_capabilities: Capabilities, wordlist: string[]) {
+      this._wordlist = wordlist;
+    }
 
-    // Naïve O(n) exhaustive search through the entire word
-    // list, up to the suggestion limit.
-    for (let word of this._wordlist) {
-      let suggestionPrefix = word.substr(0, prefix.length);
-      if (prefix === suggestionPrefix) {
+    predict(transform: Transform, context: Context): Suggestion[] {
+      // All text to the left of the cursor INCLUDING anything that has
+      // just been typed.
+      let leftContext = context.left || '';
+      let prefix = leftContext + (transform.insert || '');
+      let suggestions: Suggestion[] = [];
+
+      // Naïve O(n) exhaustive search through the entire word
+      // list, up to the suggestion limit.
+      for (let word of this._wordlist) {
+        let suggestionPrefix = word.substr(0, prefix.length);
+        if (prefix !== suggestionPrefix) {
+          continue;
+        }
+
         suggestions.push({
           transform: {
             // The left part of the word has already been entered.
@@ -64,14 +71,14 @@ LMLayerWorker.models.WordListModel = class WordListModel implements WorkerIntern
           },
           displayAs: word,
         });
+
+        // Do not exceed the limit on suggestions.
+        if (suggestions.length >= MAX_SUGGESTIONS) {
+          break;
+        }
       }
 
-      // Do not exceed the limit on suggestions.
-      if (suggestions.length >= MAX_SUGGESTIONS) {
-        break;
-      }
+      return suggestions;
     }
-
-    return suggestions;
-  }
-}
+  };
+}());
