@@ -28,7 +28,7 @@ describe('LMLayer using the word list model', function () {
       }).then(function (suggestions) {
         // TODO: not super sure what to assert here!
         assert.isAtLeast(suggestions.length, EXPECTED_SUGGESTIONS);
-        return lmLayer.predict(type('t'), emptyContext());
+        return lmLayer.predict(type('t'), atEndOfBuffer(''));
       }).then(function (suggestions) {
         assert.isAtLeast(suggestions.length, EXPECTED_SUGGESTIONS);
         return lmLayer.predict(type('h'), atEndOfBuffer('t'));
