@@ -11,6 +11,7 @@
 */
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <cstddef>
 #include <cstdlib>
@@ -75,9 +76,11 @@ public:
         if (usv < 0x10000)  { l = 1; cp[0] = codeunit_t(usv); }
         else
         {
-            cp[0] = codeunit_t(lead_offset + (usv >> 10));
-            cp[1] = codeunit_t(0xDC00 + (usv & 0x3FF));
-            l = 2;
+          l -= 2; if (l < 0) return;
+          // We have space so continue.
+          cp[0] = codeunit_t(lead_offset + (usv >> 10));
+          cp[1] = codeunit_t(0xDC00 + (usv & 0x3FF));
+          l = 2;
         }
     }
 
@@ -85,13 +88,12 @@ public:
     static uchar_t get(const codeunit_t * cp, int8_t & l) throw()
     {
         const uint32_t    uh = cp[0];
-        l = 1;
 
-        if (uh < 0xD800|| uh > 0xDFFF) { return uh; }
-        if (uh > 0xDBFF) { l = -1; return 0xFFFD; }
+        if (uh < 0xD800|| uh > 0xDFFF) { l = 1; return uh; }
+        if (uh > 0xDBFF || l < 2) { l = -1; return 0xFFFD; }
         const uint32_t ul = cp[1];
         if (ul < 0xDC00 || ul > 0xDFFF) { l = -1; return 0xFFFD; }
-        ++l;
+        l = 2;
         return (uh<<10) + ul + surrogate_offset;
     }
 
@@ -126,10 +128,10 @@ public:
     inline
     static void put(codeunit_t * cp, const uchar_t usv, int8_t & l) throw()
     {
-        if (usv < 0x80)     {l = 1; cp[0] = usv; return; }
-        if (usv < 0x0800)   {l = 2; cp[0] = 0xC0 + (usv >> 6);  cp[1] = 0x80 + (usv & 0x3F); return; }
-        if (usv < 0x10000)  {l = 3; cp[0] = 0xE0 + (usv >> 12); cp[1] = 0x80 + ((usv >> 6) & 0x3F);  cp[2] = 0x80 + (usv & 0x3F); return; }
-        else                {l = 4; cp[0] = 0xF0 + (usv >> 18); cp[1] = 0x80 + ((usv >> 12) & 0x3F); cp[2] = 0x80 + ((usv >> 6) & 0x3F); cp[3] = 0x80 + (usv & 0x3F); return; }
+        --l; if (usv < 0x80)     {l = 1; cp[0] = usv; return; }
+        --l; if (usv < 0x0800)   {if (l < 0) return; l = 2; cp[0] = 0xC0 + (usv >> 6);  cp[1] = 0x80 + (usv & 0x3F); return; };
+        --l; if (usv < 0x10000)  {if (l < 0) return; l = 3; cp[0] = 0xE0 + (usv >> 12); cp[1] = 0x80 + ((usv >> 6) & 0x3F);  cp[2] = 0x80 + (usv & 0x3F); return; }
+        else                {if (--l < 0) return; l = 4; cp[0] = 0xF0 + (usv >> 18); cp[1] = 0x80 + ((usv >> 12) & 0x3F); cp[2] = 0x80 + ((usv >> 6) & 0x3F); cp[3] = 0x80 + (usv & 0x3F); return; };
     }
 
     inline
@@ -137,20 +139,21 @@ public:
     {
         const int8_t seq_sz = sz_lut[*cp >> 4];
         uchar_t u = *cp & mask_lut[seq_sz];
-        l = 1;
-        bool toolong = false;
+        if (l < seq_sz) { l = -l; return 0xFFFD; }
 
+        auto rl = 1;
+        bool toolong = false;
         switch(seq_sz) {
-            case 4:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++l; toolong  = (u < 0x10); fallthrough;
-            case 3:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++l; toolong |= (u < 0x20); fallthrough;
-            case 2:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++l; toolong |= (u < 0x80); fallthrough;
-            case 1:     break;
+            case 4:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong  = (u < 0x10); fallthrough;
+            case 3:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong |= (u < 0x20); fallthrough;
+            case 2:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong |= (u < 0x80); fallthrough;
+            case 1:     l = seq_sz; break;
             case 0:     l = -1; return 0xFFFD;
         }
 
-        if (l != seq_sz || toolong  || u >= limit)
+        if (rl != seq_sz || toolong  || u >= limit)
         {
-            l = -l;
+            l = -rl;
             return 0xFFFD;
         }
         return u;
@@ -182,7 +185,8 @@ class _utf_iterator
     typedef _utf_codec<sizeof(C)*8> codec;
 
     C             * cp;
-    mutable int8_t    sl;
+    mutable int8_t  sl,
+                    sz;
 
 public:
     typedef C           codeunit_type;
@@ -195,18 +199,18 @@ public:
 
         reference(const _utf_iterator & i): _i(i) {}
     public:
-        operator value_type () const throw ()                   { return codec::get(_i.cp, _i.sl); }
-        reference & operator = (const value_type usv) throw()   { codec::put(_i.cp, usv, _i.sl); return *this; }
+        operator value_type () const throw ()                   { return codec::get(_i.cp, _i.sl = _i.sz); }
+        reference & operator = (const value_type usv) throw()   { codec::put(_i.cp, usv, _i.sl = _i.sz); return *this; }
 
         friend class _utf_iterator;
     };
 
 
-    _utf_iterator(const void * us=0)    : cp(reinterpret_cast<C *>(const_cast<void *>(us))), sl(1) { }
+    _utf_iterator(const void * us=0)    : cp(reinterpret_cast<C *>(const_cast<void *>(us))), sl(1), sz(127) { }
 
     _utf_iterator   & operator ++ ()    { cp += abs(sl); return *this; }
 
-    bool operator == (const _utf_iterator & rhs) const throw() { return cp >= rhs.cp; }
+    bool operator == (const _utf_iterator & rhs) const throw() { sz = std::min(ptrdiff_t(rhs.cp - cp),ptrdiff_t(127)); return 0 >= sz; }
     bool operator != (const _utf_iterator & rhs) const throw() { return !operator==(rhs); }
 
     reference   operator * () const throw() { return *this; }
@@ -245,9 +249,6 @@ struct utf
     typedef _utf_iterator<C>        iterator;
     typedef _utf_iterator<const C>  const_iterator;
 
-    typedef _utf_sentinal_iterator<C>       sentinal_iterator;
-    typedef _utf_sentinal_iterator<const C> const_sentinal_iterator;
-
     inline
     static bool validate(codeunit_t * s, codeunit_t * e) throw() {
         return _utf_codec<sizeof(C)*8>::validate(s,e);
@@ -275,9 +276,9 @@ std::basic_string<T> convert(std::basic_string<F> const &src) {
   using codeunit_t = typename utf<T>::codeunit_t;
   auto r = std::basic_string<T>();
   codeunit_t buf[4];
-  int8_t l = 1;
+  int8_t l = 4;
   for (auto i = utf_const_iter(src.data()),
-            e = decltype(i)(src.data() + src.size()); i != e && l > 0; ++i) {
+            e = decltype(i)(src.data() + src.size()); i != e && l > 0; ++i, l = 4) {
       utf<T>::codec::put(buf, uchar_t(*i), l);
       r.append(reinterpret_cast<T *>(&buf[0]), l);
   }
