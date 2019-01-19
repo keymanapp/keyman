@@ -111,6 +111,8 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
             KeyboardPickerActivity.addKeyboard(context, kbInfo);
             KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
             Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+            // Setting result to 1 so calling activity will finish too
+            setResult(1);
             ((AppCompatActivity) context).finish();
             return;
           }

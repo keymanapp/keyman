@@ -123,6 +123,13 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   }
 
   @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (resultCode == 1) {
+      finish();
+    }
+  }
+
+  @Override
   public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
     // Do nothing
   }
@@ -562,7 +569,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               View v = listView.getChildAt(0);
               int offsetY = (v == null) ? 0 : v.getTop();
               i.putExtra("offsetY", offsetY);
-              startActivity(i);
+              startActivityForResult(i, 1);
             } else {
               HashMap<String, String> kbInfo = getKeyboardInfo(selectedIndex, 0);
               final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
