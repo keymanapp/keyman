@@ -457,8 +457,9 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
                   String keyboardVersion = keyboard.getString(KMManager.KMKey_KeyboardVersion);
                   String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
-                  if (FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion) == FileUtils.VERSION_GREATER) {
-                    // Replace keyboard entry from kmp
+                  int versionComparison = FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion);
+                  if ((versionComparison == FileUtils.VERSION_GREATER) || (versionComparison == FileUtils.VERSION_EQUAL)) {
+                    // Keyboard from package >= Keyboard from cloud so replace keyboard entry with local kmp info
                     keyboards.put(keyboardIndex, kmpKeyboard);
                   }
                 }
@@ -576,6 +577,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
                 KeyboardPickerActivity.addKeyboard(context, kbInfo);
                 KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
                 Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
                 ((AppCompatActivity) context).finish();
               } else {
                 // Keyboard needs to be downloaded
