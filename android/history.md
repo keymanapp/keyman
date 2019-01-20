@@ -1,22 +1,41 @@
 # Keyman for Android
 
+## 2019-01-21 10.0.2059 beta
+* Bug fix:
+  * Change installation of ad-hoc keyboards via .kmp packages to only add the first language for each keyboard.
+    Additional languages can be added offline from the .kmp package. (#1550)
+
+## 2019-01-18 10.0.2058 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #1537)
+
+## 2019-01-17 10.0.2057 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #1539)
+
+## 2019-01-15 10.0.2056 beta
+* No changes to Keyman for Android (updated Keyman Web Engine, #1540)
+
 ## 2019-01-14 11.0.2055 beta
-* Keyman for Android 11 requires a minimum version of Android 4.1 (Jelly Bean) (#1532)
-* When KMW doesn't process external "tab" or "enter" keys, have the Android app dispatch the keys (#1526)
+* Changes:
+  * Keyman for Android 11 requires a minimum version of Android 4.1 (Jelly Bean) (#1532)
+  * When KMW doesn't process external "tab" or "enter" keys, have the Android app dispatch the keys (#1526)
 
 ## 2019-01-10 11.0.2054 beta
-* Fix keyboard version comparison that was causing "Unable to contact Keyman server" notifications (#1520)
+* Bug fix:
+  * Fix keyboard version comparison that was causing "Unable to contact Keyman server" notifications (#1520)
 
 ## 2019-01-09 11.0.2053 beta
-* Fix "Get Started" default keyboard status on engineering builds (#1515)
-* Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
+* Bug fixes:
+  * Fix "Get Started" default keyboard status on engineering builds (#1515)
+  * Fix crash involving certain fonts. Prioritize using .ttf font in keyboards (#1507)
 
 ## 2019-01-04 11.0.2052 beta
-* Fix default handling of 102nd key found on European hardware keyboards (#1491)
-* Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
+* Bug fixes:
+  * Fix default handling of 102nd key found on European hardware keyboards (#1491)
+  * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
 
 ## 2019-01-03 11.0.2051 beta
-* Add option to cancel when downloading the keyboard catalog (#1470)
+* New Feature:
+  * Add option to cancel when downloading the keyboard catalog (#1470)
 
 ## 2019-01-02 11.0.2050 beta
 * Initial beta release of Keyman for Android 11
