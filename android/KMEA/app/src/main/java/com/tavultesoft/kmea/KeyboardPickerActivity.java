@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AlertDialog;
@@ -307,7 +308,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
   private static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
-      String packageID = kbInfo.getOrDefault(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      String packageID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       if (!packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
         return true;
       }
