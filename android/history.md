@@ -3,7 +3,7 @@
 ## 2019-01-21 10.0.2059 beta
 * Bug fix:
   * Change installation of ad-hoc keyboards via .kmp packages to only add the first language for each keyboard.
-    Additional languages can be added offline from the .kmp package. (#1550)
+    Additional languages can be added offline from the .kmp package. (#1550, 1554)
 
 ## 2019-01-18 10.0.2058 beta
 * No changes to Keyman for Android (updated Keyman Web Engine, #1537)
