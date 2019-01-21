@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -97,14 +98,14 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           HashMap<String, String> kbInfo = LanguageListActivity.getKeyboardInfo(langIndex, position);
-          final String pkgID = kbInfo.getOrDefault(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+          final String pkgID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
           final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
           final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
           String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
           String langName = kbInfo.get(KMManager.KMKey_LanguageName);
-          String kFont = kbInfo.getOrDefault(KMManager.KMKey_Font, "");
-          String kOskFont = kbInfo.getOrDefault(KMManager.KMKey_OskFont, kFont);
-          String isCustom = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N");
+          String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
+          String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, kFont);
+          String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
 
           if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
             // keyboard already exists in packages/ so just add the language association
