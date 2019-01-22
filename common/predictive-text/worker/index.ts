@@ -145,6 +145,8 @@ class LMLayerWorker {
       model = new LMLayerWorker.models.DummyModel(capabilities, {
         futureSuggestions: desc.futureSuggestions
       });
+    } else if (desc.type === 'wordlist') {
+      model = new LMLayerWorker.models.WordListModel(capabilities, desc.wordlist);
     } else {
       throw new Error('Invalid model');
     }

@@ -78,14 +78,23 @@ _.randomToken = function randomToken() {
 
 // Use fixtures used in browser tests IN NODE!
 if (typeof require === 'function') {
-  // Assuming this file structure:
-  //     . common/predictive-text/unit_tests/
-  //     > in_browser/
-  //     | > json/
-  //     |   > future_suggestions/
-  //     |     > i_got_distracted_by_hazel.json
-  //     > helpers.js
   _.iGotDistractedByHazel = function () {
-    return require('./in_browser/json/future_suggestions/i_got_distracted_by_hazel');
+    return jsonFixture('future_suggestions/i_got_distracted_by_hazel');
+  }
+
+  /**
+   * Return a JSON fixture
+   */
+  _.jsonFixture = function (name) {
+    // Assuming this file structure:
+    // .
+    // ├── helpers.js
+    // └── in_browser
+    //     └── json
+    //         ├── future_suggestions
+    //         │   └── ...
+    //         └── wordlists
+    //             └── ...
+    return require('./in_browser/json/' + name);
   }
 }
