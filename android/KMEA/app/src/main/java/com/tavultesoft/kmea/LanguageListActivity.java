@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -575,9 +576,9 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
               final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
               final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
-              String kFont = kbInfo.getOrDefault(KMManager.KMKey_Font, "");
-              String kOskFont = kbInfo.getOrDefault(KMManager.KMKey_OskFont, "");
-              String isCustom = kbInfo.getOrDefault(KMManager.KMKey_CustomKeyboard, "N");
+              String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
+              String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, "");
+              String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
 
               if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
                 // Custom keyboard already exists in packages/ so just add the language association
