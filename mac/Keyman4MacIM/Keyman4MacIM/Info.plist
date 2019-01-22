@@ -51,7 +51,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(PRODUCT_VERSION)</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Keyman $(PRODUCT_VERSION) for macOS, Copyright $(COPYRIGHT_YEARS), SIL International&quot;</string>
+	<string>$(GET_INFO_STRING)</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -79,7 +79,7 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>$(COPYRIGHT_STRING)</string>
+	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
