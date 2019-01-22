@@ -34,6 +34,7 @@
         <activity
             android:name="com.tavultesoft.kmea.KMKeyboardDownloaderActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
+            android:label=""
             android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
     </application>
