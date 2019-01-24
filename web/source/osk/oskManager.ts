@@ -1077,17 +1077,17 @@ namespace com.keyman.osk {
       var p: OSKRect = {};
 
       if(this.vkbd) {
-        p['left'] = p.left = util._GetAbsoluteX(this.vkbd.kbdDiv);
-        p['top']  = p.top  = util._GetAbsoluteY(this.vkbd.kbdDiv);
-        p['width']  = p.width  = util._GetAbsoluteX(this.vkbd.kbdHelpDiv) -
-          util._GetAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
-        p['height'] = p.height = util._GetAbsoluteY(this.vkbd.kbdHelpDiv) -
-          util._GetAbsoluteY(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetHeight;
+        p['left'] = p.left = dom.Utils.getAbsoluteX(this.vkbd.kbdDiv);
+        p['top']  = p.top  = dom.Utils.getAbsoluteY(this.vkbd.kbdDiv);
+        p['width']  = p.width  = dom.Utils.getAbsoluteX(this.vkbd.kbdHelpDiv) -
+          dom.Utils.getAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
+        p['height'] = p.height = dom.Utils.getAbsoluteY(this.vkbd.kbdHelpDiv) -
+          dom.Utils.getAbsoluteY(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetHeight;
       } else {
-        p['left'] = p.left = util._GetAbsoluteX(this._Box);
-        p['top']  = p.top  = util._GetAbsoluteY(this._Box);
-        p['width']  = p.width  = util._GetAbsoluteX(this._Box) + this._Box.offsetWidth;
-        p['height'] = p.height = util._GetAbsoluteY(this._Box) + this._Box.offsetHeight;
+        p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
+        p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
+        p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
+        p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
       }
       return p;
     }
@@ -1106,12 +1106,12 @@ namespace com.keyman.osk {
 
       var b = this._Box, bs = b.style;
       if('left' in p) {
-        bs.left=(p['left']-util._GetAbsoluteX(b)+b.offsetLeft)+'px';
+        bs.left=(p['left']-dom.Utils.getAbsoluteX(b)+b.offsetLeft)+'px';
         this.dfltX=bs.left;
       }
 
       if('top' in p) {
-        bs.top=(p['top']-util._GetAbsoluteY(b)+b.offsetTop)+'px';
+        bs.top=(p['top']-dom.Utils.getAbsoluteY(b)+b.offsetTop)+'px';
         this.dfltY=bs.top;
       }
 
@@ -1301,13 +1301,13 @@ namespace com.keyman.osk {
             if(this.dfltX) {
               Ls.left=this.dfltX;
             } else if(typeof el != 'undefined' && el != null) {
-              Ls.left=keymanweb.util._GetAbsoluteX(el) + 'px';
+              Ls.left=dom.Utils.getAbsoluteX(el) + 'px';
             }
 
             if(this.dfltY) {
               Ls.top=this.dfltY;
             } else if(typeof el != 'undefined' && el != null) {
-              Ls.top=(keymanweb.util._GetAbsoluteY(el) + el.offsetHeight)+'px';
+              Ls.top=(dom.Utils.getAbsoluteY(el) + el.offsetHeight)+'px';
             }
           }
         }

@@ -617,7 +617,7 @@ namespace com.keyman {
         target?: EventTarget;
       };
 
-      if(Util.instanceof(e, "TouchEvent")) {
+      if(dom.Utils.instanceof(e, "TouchEvent")) {
           tEvent=(e as TouchEvent).touches[0];
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
         tEvent={clientX:0, clientY:0}
@@ -635,7 +635,7 @@ namespace com.keyman {
       var scroller: HTMLElement;
 
       // Identify the scroller element
-      if(Util.instanceof(tTarg, "HTMLSpanElement")) {
+      if(dom.Utils.instanceof(tTarg, "HTMLSpanElement")) {
         scroller=tTarg.parentNode as HTMLElement;
       } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
         scroller=tTarg.firstChild as HTMLElement;
@@ -669,9 +669,9 @@ namespace com.keyman {
       }
       
       // If clicked on DIV, set caret to end of text
-      if(Util.instanceof(tTarg, "HTMLDivElement")) { 
+      if(dom.Utils.instanceof(tTarg, "HTMLDivElement")) { 
         var x,cp;
-        x=util._GetAbsoluteX(scroller.firstChild as HTMLElement);        
+        x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);        
         if(target.dir == 'rtl') { 
           x += (scroller.firstChild as HTMLElement).offsetWidth;        
           cp=(touchX > x ? 0 : 100000);
@@ -694,18 +694,18 @@ namespace com.keyman {
           yRow=Math.round(target.base.offsetHeight/(target.base as HTMLTextAreaElement).rows);     
           for(iLoop=0; iLoop<16; iLoop++)
           {
-            y=util._GetAbsoluteY(caret)-dy;  //top of caret            
+            y=dom.Utils.getAbsoluteY(caret)-dy;  //top of caret            
             if(y > touchY && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
             else if(y < touchY-yRow && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
             else break;
             this.setTextCaret(target,cp);
           }
 
-          while(util._GetAbsoluteY(caret)-dy > touchY && cp > cpMin) {
+          while(dom.Utils.getAbsoluteY(caret)-dy > touchY && cp > cpMin) {
             this.setTextCaret(target,--cp);
           }
 
-          while(util._GetAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
+          while(dom.Utils.getAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
             this.setTextCaret(target,++cp);
           }
         }
@@ -726,7 +726,7 @@ namespace com.keyman {
         }
 
         for(iLoop=0; iLoop<16; iLoop++) {
-          x=util._GetAbsoluteX(caret);  //left of caret            
+          x=dom.Utils.getAbsoluteX(caret);  //left of caret            
           if(snapOrder(x, touchX) && cp > cpMin && cp != cpMax) {
             cpMax=cp; 
             cp=Math.round((cp+cpMin)/2);
@@ -739,10 +739,10 @@ namespace com.keyman {
           this.setTextCaret(target,cp);
         }
 
-        while(snapOrder(util._GetAbsoluteX(caret), touchX) && cp > cpMin) {
+        while(snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp > cpMin) {
           this.setTextCaret(target,--cp);
         }
-        while(!snapOrder(util._GetAbsoluteX(caret), touchX) && cp < cpMax) {
+        while(!snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp < cpMax) {
           this.setTextCaret(target,++cp);
         }
       }
@@ -934,12 +934,12 @@ namespace com.keyman {
           s=window.getComputedStyle(b,null),
           mLeft=parseInt(s.marginLeft,10),
           mTop=parseInt(s.marginTop,10),
-          x1=util._GetAbsoluteX(b), y1=util._GetAbsoluteY(b);
+          x1=dom.Utils.getAbsoluteX(b), y1=dom.Utils.getAbsoluteY(b);
 
       var p=x.offsetParent as HTMLElement;
       if(p) {
-        x1=x1-util._GetAbsoluteX(p);
-        y1=y1-util._GetAbsoluteY(p);
+        x1=x1-dom.Utils.getAbsoluteX(p);
+        y1=y1-dom.Utils.getAbsoluteY(p);
       }
       
       if(isNaN(mLeft)) {
@@ -1097,7 +1097,7 @@ namespace com.keyman {
       // Identify the target from the touch list or the event argument (IE 10 only)
       var target: HTMLElement;
       
-      if(Util.instanceof(e, "TouchEvent")) {
+      if(dom.Utils.instanceof(e, "TouchEvent")) {
         target = (e as TouchEvent).targetTouches[0].target as HTMLElement;
       } else {
         target = e.target as HTMLElement;
@@ -1113,7 +1113,7 @@ namespace com.keyman {
       
       var x, y;
 
-      if(Util.instanceof(e, "TouchEvent")) {
+      if(dom.Utils.instanceof(e, "TouchEvent")) {
         x = (e as TouchEvent).touches[0].screenX;
         y = (e as TouchEvent).touches[0].screenY;
       } else {
@@ -1143,7 +1143,7 @@ namespace com.keyman {
           if(dx < -4 || dx > 4)
           {
             // Limit dragging beyond the defined text (to avoid dragging the text completely out of view)
-            var xMin=0,xMax=this.keyman.util._GetAbsoluteX(target)+target.offsetWidth-scroller.offsetWidth-32;
+            var xMin=0, xMax= dom.Utils.getAbsoluteX(target)+target.offsetWidth-scroller.offsetWidth-32;
             if(target.base.dir == 'rtl')xMin=16; else xMax=xMax-24;            
             x1=xOffset-dx;
             if(x1 > xMin) x1=xMin;
@@ -1177,8 +1177,8 @@ namespace com.keyman {
 
       // Get the actual absolute position of the caret and the element 
       var s2=scroller.childNodes[1] as HTMLElement,
-        cx=util._GetAbsoluteX(s2),cy=util._GetAbsoluteY(s2),
-        ex=util._GetAbsoluteX(e),ey=util._GetAbsoluteY(e),
+        cx=dom.Utils.getAbsoluteX(s2),cy=dom.Utils.getAbsoluteY(s2),
+        ex=dom.Utils.getAbsoluteX(e),ey=dom.Utils.getAbsoluteY(e),
         x=parseInt(scroller.style.left,10),
         y=parseInt(scroller.style.top,10),
         dx=0,dy=0; 
@@ -1216,7 +1216,7 @@ namespace com.keyman {
       }
 
       // Get the absolute position of the caret
-      var s2=<HTMLElement>e.firstChild.childNodes[1], y=util._GetAbsoluteY(s2), t=window.pageYOffset,dy=0;
+      var s2=<HTMLElement>e.firstChild.childNodes[1], y=dom.Utils.getAbsoluteY(s2), t=window.pageYOffset,dy=0;
       if(y < t) {
         dy=y-t;
       } else {

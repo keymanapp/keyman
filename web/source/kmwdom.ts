@@ -897,7 +897,7 @@ namespace com.keyman {
           case 'email':
           case 'url':
             if(t1[i].className.indexOf('kmw-disabled') < 0) {
-              eList.push({ip:t1[i],x:util._GetAbsoluteX(t1[i]),y:util._GetAbsoluteY(t1[i])});
+              eList.push({ip:t1[i], x: dom.Utils.getAbsoluteX(t1[i]), y: dom.Utils.getAbsoluteY(t1[i])});
             }
             break;    
         }
@@ -905,7 +905,7 @@ namespace com.keyman {
 
       for(i=0; i<t2.length; i++) { 
         if(t2[i].className.indexOf('kmw-disabled') < 0)
-          eList.push({ip:t2[i],x:util._GetAbsoluteX(t2[i]),y:util._GetAbsoluteY(t2[i])});
+          eList.push({ip:t2[i], x: dom.Utils.getAbsoluteX(t2[i]), y: dom.Utils.getAbsoluteY(t2[i])});
       }
       
       /**

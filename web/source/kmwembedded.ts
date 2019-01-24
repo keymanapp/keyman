@@ -22,8 +22,8 @@ namespace com.keyman.osk {
   VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) { 
     let util = com.keyman.singleton.util;       
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(this.kbdDiv);      
+      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
+          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv);      
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
@@ -75,8 +75,8 @@ namespace com.keyman.osk {
     }
 
     if(on && (typeof showPreview == 'function')) {
-      var xBase=util._GetAbsoluteX(key)-util._GetAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=util._GetAbsoluteY(key)-util._GetAbsoluteY(this.kbdDiv), kc;
+      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
+          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv), kc;
 
       // Find key text element
       for(var i=0; i<key.childNodes.length; i++) {
@@ -178,6 +178,7 @@ namespace com.keyman.osk {
 (function() {
   // Declare KeymanWeb and related objects
   var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'],device=util.device;
+  var dom = com.keyman.dom;
   var Layouts = com.keyman.osk.Layouts;
   var kbdInterface=keymanweb['interface'];
 
@@ -421,8 +422,8 @@ namespace com.keyman.osk {
 
     var w=key.offsetWidth, 
         h=key.offsetHeight,
-        x=util._GetAbsoluteX(key) - util._GetAbsoluteX(osk.vkbd.kbdDiv) + w/2,
-        y=util._GetAbsoluteY(key) - util._GetAbsoluteY(osk.vkbd.kbdDiv);
+        x=dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(osk.vkbd.kbdDiv) + w/2,
+        y=dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(osk.vkbd.kbdDiv);
 
     return x+','+y+','+w+','+h;
   };

@@ -17,11 +17,11 @@ module.exports = {
      */
     args: [{
       type: "timeouts", // This base is designed for local machine testing.
-      eventDelay: 50, // Designed for small delays to allow time for event handling to occur before proceeding.
+      eventDelay: 60, // Designed for small delays to allow time for event handling to occur before proceeding.
                       // Make sure this stays under 1/4 of 'standard', as multiple eventDelays may occur within a test.
-      standard: 4000,
-      scriptLoad: 6000,
-      uiLoad: 24000, // Loads two scripts + includes internal setup/timeout time requirements.
+      standard: 5000,
+      scriptLoad: 8000,
+      uiLoad: 30000, // Loads two scripts + includes internal setup/timeout time requirements.
                      // At this time of writing this, UI script loading is one of the longest checks.
       mobileFactor: 1 // An extra timeout modifier to be applied when running on a mobile device.
     }]
@@ -37,7 +37,12 @@ module.exports = {
     'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
                                           // Includes KMW's Device class, which is used by test_utils below.
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
-    'unit_tests/cases/**/*.js', // Where the tests actually reside.
+
+
+    //'unit_tests/cases/**/*.js', // Where the tests actually reside. // TEMP - commented out for test case dev.
+    'unit_tests/cases/element_interfaces.js', // TEMP - do not let see production.
+
+
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
     {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
