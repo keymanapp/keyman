@@ -69,7 +69,7 @@ namespace com.keyman.osk {
     for(i=0; i < k['subKeys'].length; i++) {
       try {
         sk=<HTMLElement> skBox.childNodes[i].firstChild;
-        x0=util._GetAbsoluteX(sk); y0=util._GetAbsoluteY(sk);//-document.body.scrollTop;
+        x0=dom.Utils.getAbsoluteX(sk); y0=dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
         x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
         onKey=(x > x0 && x < x1 && y > y0 && y < y1);
         this.highlightKey(sk, onKey);
@@ -103,10 +103,10 @@ namespace com.keyman.osk {
 
     // Create and display the preview
     if(on && !popup) {                                                       
-      var y0 = util._GetAbsoluteY(oskManager._Box),
+      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
           h0 = oskManager._Box.offsetHeight,  
-          xLeft = util._GetAbsoluteX(key),
-          xTop = util._GetAbsoluteY(key),
+          xLeft = dom.Utils.getAbsoluteX(key),
+          xTop = dom.Utils.getAbsoluteY(key),
           xWidth = key.offsetWidth,
           xHeight = key.offsetHeight,
           kc = <HTMLElement> key.firstChild,

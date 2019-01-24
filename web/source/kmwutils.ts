@@ -2,6 +2,8 @@
 /// <reference path="kmwexthtml.ts" />
 // Includes the Device definition set.
 /// <reference path="kmwdevice.ts" />
+// Includes the DOM utils, since our UI modules need access to certain methods here.
+/// <reference path="dom/utils.ts" />
 
 namespace com.keyman {
   class DOMEventTracking {
@@ -261,78 +263,16 @@ namespace com.keyman {
     setOption(optionName,value) {
       this.keyman.options[optionName] = value;
     }
-    
-    /**
-     * Function     getAbsoluteX
-     * Scope        Public
-     * @param       {Object}    Pobj        HTML element
-     * @return      {number}               
-     * Description  Returns x-coordinate of Pobj element absolute position with respect to page
-     */
-    _GetAbsoluteX(Pobj: HTMLElement): number { // I1476 - Handle SELECT overlapping END
-      var Lobj: HTMLElement
 
-      if(!Pobj) {
-        return 0;
-      }
-      
-      var Lcurleft = Pobj.offsetLeft ? Pobj.offsetLeft : 0;
-      Lobj = Pobj;   	// I2404 - Support for IFRAMEs
-
-      if (Lobj.offsetParent) {
-        while (Lobj.offsetParent) {
-          Lobj = Lobj.offsetParent as HTMLElement;
-          Lcurleft += Lobj.offsetLeft;
-        }
-      }
-      // Correct position if element is within a frame (but not if the controller is in document within that frame)
-      if(Lobj && Lobj.ownerDocument && (Pobj.ownerDocument != this.keyman._MasterDocument)) {
-        var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
-
-        if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
-          return Lcurleft + this._GetAbsoluteX(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollLeft;
-        }
-      }
-      return Lcurleft;
+    //  Unofficial API used by our desktop UIs.
+    getAbsoluteX(Pobj: HTMLElement): number {
+      return dom.Utils.getAbsoluteX(Pobj);
     }
 
-    getAbsoluteX = this._GetAbsoluteX;
-
-    /**
-     * Function     getAbsoluteY
-     * Scope        Public
-     * @param       {Object}    Pobj        HTML element
-     * @return      {number}               
-     * Description  Returns y-coordinate of Pobj element absolute position with respect to page
-     */  
-    _GetAbsoluteY(Pobj: HTMLElement): number {
-      var Lobj: HTMLElement
-
-      if(!Pobj) {
-        return 0;
-      }
-      var Lcurtop = Pobj.offsetTop ? Pobj.offsetTop : 0;
-      Lobj = Pobj;  // I2404 - Support for IFRAMEs
-
-      if (Lobj.ownerDocument && Lobj instanceof Lobj.ownerDocument.defaultView.HTMLElement) {
-        while (Lobj.offsetParent) {
-          Lobj = Lobj.offsetParent as HTMLElement;
-          Lcurtop += Lobj.offsetTop;
-        }
-      }
-
-      // Correct position if element is within a frame (but not if the controller is in document within that frame)
-      if(Lobj && Lobj.ownerDocument && (Pobj.ownerDocument != this.keyman._MasterDocument)) {
-        var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
-
-        if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
-          return Lcurtop + this._GetAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
-        }
-      }
-      return Lcurtop;
+    //  Unofficial API used by our desktop UIs.
+    getAbsoluteY(Pobj: HTMLElement): number {
+      return dom.Utils.getAbsoluteY(Pobj);
     }
-
-    getAbsoluteY = this._GetAbsoluteY;
 
     /**
      * Function     getAbsolute
@@ -344,13 +284,14 @@ namespace com.keyman {
     _GetAbsolute(Pobj: HTMLElement) {
       var p={
         /* @ export */
-        x: this._GetAbsoluteX(Pobj),
+        x: this.getAbsoluteX(Pobj),
         /* @ export */
-        y: this._GetAbsoluteY(Pobj)
+        y: this.getAbsoluteY(Pobj)
       };
       return p;
     }
 
+    //  Unofficial API used by our desktop UIs.
     getAbsolute = this._GetAbsolute;
     
     /**
@@ -1257,45 +1198,6 @@ namespace com.keyman {
       }
 
       return this.checkFont(fd);
-    }
-
-    /**
-     * Checks the type of an input DOM-related object while ensuring that it is checked against the correct prototype,
-     * as class prototypes are (by specification) scoped upon the owning Window.
-     * 
-     * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
-     * for more details.
-     * 
-     * @param {Element|Event}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
-     * @param {string}          className   The plain-text name of the expected Element type.
-     * @return {boolean}
-     */
-    static instanceof(Pelem: Event|EventTarget, className: string): boolean {
-      var scopedClass;
-
-      if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
-        return className == 'Window';
-      } else if (Pelem['defaultView']) { // Covers Document.
-        scopedClass = Pelem['defaultView'][className];
-      } else if(Pelem['ownerDocument']) {
-        scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
-      } else if(Pelem['target']) {
-        var event = Pelem as Event;
-
-        if(this.instanceof(event.target, 'Window')) {
-          scopedClass = event.target[className]; 
-        } else if(this.instanceof(event.target, 'Document')) {
-          scopedClass = (event.target as Document).defaultView[className];
-        } else if(this.instanceof(event.target, 'HTMLElement')) {
-          scopedClass = (event.target as HTMLElement).ownerDocument.defaultView[className];
-        }
-      }
-
-      if(scopedClass) {
-        return Pelem instanceof scopedClass;
-      } else {
-        return false;
-      }
     }
   }
 }

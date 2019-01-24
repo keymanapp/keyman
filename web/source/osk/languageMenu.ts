@@ -228,14 +228,14 @@ namespace com.keyman.osk {
       }
 
       // Explicitly set position and height
-      s.left=util._GetAbsoluteX(osk.vkbd.lgKey)+'px';
+      s.left=dom.Utils.getAbsoluteX(osk.vkbd.lgKey)+'px';
       if(menuHeight > maxHeight) {
         menuHeight=maxHeight;
       }
       s.height=menuHeight+'px';
 
       // Position menu at bottom of screen, but referred to top (works for both iOS and Firefox)
-      s.top=(util._GetAbsoluteY(osk._Box)+osk._Box.offsetHeight-menuHeight+window.pageYOffset-6)+'px';
+      s.top=(dom.Utils.getAbsoluteY(osk._Box)+osk._Box.offsetHeight-menuHeight+window.pageYOffset-6)+'px';
       s.bottom='auto';
 
       // Explicitly set the scroller and index heights to the container height

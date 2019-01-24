@@ -92,9 +92,9 @@ namespace com.keyman.text {
             // Or move to next field from TEXT fields
             } else if(usingOSK) {
               var inputEle: HTMLInputElement;
-              if(com.keyman.Util.instanceof(Lelem, "HTMLInputElement")) {
+              if(dom.Utils.instanceof(Lelem, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem;
-              } else if(typeof(Lelem.base) != 'undefined' && com.keyman.Util.instanceof(Lelem.base, "HTMLInputElement")) {
+              } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem.base;
               }
 

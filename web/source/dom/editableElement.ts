@@ -12,27 +12,25 @@
 ///<reference path="../kmwexthtml.ts" />
 
 namespace com.keyman.dom {
-  export function wrapElement(elem: Element|Document): EditableElement {
+  export function wrapElement(e: HTMLElement): EditableElement {
     // Complex type scoping is implemented here so that kmwutils.ts is not a dependency for test compilations.
+    // TODO:  Use dom.Utils.instanceof instead of the current mild code replication done here.
 
-    if (elem['defaultView']) { // A property held by Document.
-      let v: Window = elem['defaultView'];
+    if(Utils.instanceof(e, "HTMLInputElement")) {
+      return new Input(<HTMLInputElement> e);
+    } else if(Utils.instanceof(e, "HTMLTextAreaElement")) {
+      return new TextArea(<HTMLTextAreaElement> e);
+    } else if(Utils.instanceof(e, "HTMLIFrameElement")) {
+      let iframe = <HTMLIFrameElement> e;
 
-      if(elem instanceof v.Document) {
-        let Ldoc = <Document> elem;
-
-        return null; // TODO:  Wrap the document if editable.
-      } else if(!elem['ownerDocument'] || elem['ownerDocument'] == null) { // Property held by HTMLElements, useful to scope the class.
+      if(iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.designMode == "on") {
+        return new DesignIFrame(iframe);
+      } else if (e.isContentEditable) {
+        // Do content-editable <iframe>s make sense?
+        return new ContentEditable(e);
+      } else {
         return null;
       }
-    } 
-    
-    let e = <HTMLElement> elem;
-
-    if(e instanceof e.ownerDocument.defaultView.HTMLInputElement) {
-      return new Input(e);
-    } else if(e instanceof e.ownerDocument.defaultView.HTMLTextAreaElement) {
-      return new TextArea(e);
     } else if(e.isContentEditable) {
       return new ContentEditable(e);
     }

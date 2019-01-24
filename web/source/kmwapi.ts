@@ -28,8 +28,8 @@ goog.exportSymbol("com.keyman.Util.prototype.attachDOMEvent", com.keyman.Util.pr
 goog.exportSymbol("com.keyman.Util.prototype.detachDOMEvent", com.keyman.Util.prototype.detachDOMEvent);
 goog.exportSymbol("com.keyman.Util.prototype.getOption", com.keyman.Util.prototype.getOption);
 goog.exportSymbol("com.keyman.Util.prototype.setOption", com.keyman.Util.prototype.setOption);
-goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteX", com.keyman.Util.prototype._GetAbsoluteX);
-goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteY", com.keyman.Util.prototype._GetAbsoluteY);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteX", com.keyman.Util.prototype.getAbsoluteX);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteY", com.keyman.Util.prototype.getAbsoluteY);
 goog.exportSymbol("com.keyman.Util.prototype.getAbsolute", com.keyman.Util.prototype._GetAbsolute);
 goog.exportSymbol("com.keyman.Util.prototype.createElement", com.keyman.Util.prototype.createElement);
 goog.exportSymbol("com.keyman.Util.prototype.getIEVersion", com.keyman.Util.prototype.getIEVersion);
