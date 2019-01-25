@@ -4,11 +4,14 @@
 /// <reference path="../kmwexthtml.ts" />
 // References device-specific code checks (separable module from KMW)
 /// <reference path="../kmwdevice.ts" />
+// References common DOM utility functions (separate module from KMW)
+/// <reference path="utils.ts" />
 
 namespace com.keyman.dom {
   /**
    * As our touch-alias elements have historically been based on <div>s, this
    * defines the root element of touch-aliases as a merger type with HTMLDivElements.
+   * 
    */
   export type TouchAliasElement = HTMLDivElement & TouchAliasData;
 
@@ -26,6 +29,19 @@ namespace com.keyman.dom {
     return e;
   }
 
+  export function constructTouchAlias(base?: HTMLElement): TouchAliasElement {
+    let div = document.createElement("div");
+    let ele = link(div, new TouchAliasData());
+
+    if(base) {
+      ele.initWithBase(base);
+    } else {
+      ele.init();
+    }
+
+    return ele;
+  }
+
   /**
    * The core definition for touch-alias 'subclassing' of HTMLDivElement.
    * It's 'merged' with HTMLDivElement to avoid issues with DOM inheritance and DOM element creation.
@@ -36,6 +52,10 @@ namespace com.keyman.dom {
     __preCaret:  HTMLSpanElement;
     __postCaret: HTMLSpanElement;
     __scrollDiv: HTMLDivElement;
+    __scrollBar: HTMLDivElement;
+
+    __caretDiv: HTMLDivElement;
+    __caretTimerId: number;
 
     __resizeHandler: () => void;
 
@@ -56,6 +76,30 @@ namespace com.keyman.dom {
       return this.getDevice().OS;
     }
 
+    initCaret(): void {
+      /**
+       * Create a caret to be appended to the scroller of the focussed input field. 
+       * The caret is appended to the scroller so that it will automatically be clipped 
+       * when the user manually scrolls it outside the element boundaries.          
+       * It is positioned exactly over the hidden span (__caretSpan) that is inserted
+       * between the text spans before and after the insertion point.          
+       */
+      this.__caretDiv = <HTMLDivElement> document.createElement('DIV');
+      var cs=this.__caretDiv.style;
+      cs.position='absolute';
+      cs.height='16px';           // default height, actual height set from element properties
+      cs.width='2px';
+      cs.backgroundColor='blue';
+      cs.border='none';
+      cs.left=cs.top='0px';           // actual position set relative to parent when displayed
+      cs.display='block';         
+      cs.visibility='hidden';
+      cs.zIndex='9998';           // immediately below the OSK
+
+      // Start the caret flash timer
+      this.__caretTimerId = window.setInterval(this.flashCaret,500);
+    }
+
     init() {
       // Remember, this type exists to be merged into HTMLDivElements, so this will work.
       // We have to trick TS a bit to make it happy, though.
@@ -73,7 +117,7 @@ namespace com.keyman.dom {
       xs.borderRadius='5px';
 
       // Add a scroll bar (horizontal for INPUT elements, vertical for TEXTAREA elements)
-      var sb=document.createElement<'div'>('div'), sbs=sb.style;
+      var sb = this.__scrollBar = document.createElement<'div'>('div'), sbs=sb.style;
       sbs.position='absolute';
       sbs.height=sbs.width='4px';
       sbs.left=sbs.top='0';
@@ -129,6 +173,8 @@ namespace com.keyman.dom {
 
       ds.minWidth=xs.width;
       ds.height=xs.height;
+
+      this.initCaret();
     }
 
     initWithBase(base: HTMLElement) {
@@ -229,12 +275,10 @@ namespace com.keyman.dom {
       }
         
       // And copy the text content
-      this._setText(textValue, null); 
+      this.setText(textValue, null); 
     }
 
-    private _setText(t?: string, cp?: number): void {
-      let e = <TouchAliasElement> (<any> this);
-      
+    private setText(t?: string, cp?: number): void {
       var tLen=0;
       var t1: string, t2: string;
       
@@ -263,11 +307,38 @@ namespace com.keyman.dom {
       this.updateBaseElement(); // KMW-3, KMW-29
     }
 
+    getTextBeforeCaret() {
+      return this.__preCaret.textContent;
+    }
+        
+    setTextBeforeCaret(e: HTMLElement, t: string): void {
+      var tLen=0;
+      
+      // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
+      if(e.base.nodeName != 'TEXTAREA') {
+        t=t.replace(/\s+$/,' ');
+      }
+      this.__preCaret.textContent=t;
+      // Test total length in order to control base element visibility
+      tLen=t.length;
+      tLen=tLen+this.__postCaret.textContent.length;
+  
+      // Update the base element then scroll into view if necessary      
+      this.updateBaseElement(); //KMW-3, KMW-29      
+      this.scrollInput(); 
+    }
+
+    getTextCaret(e: HTMLElement): number {
+      return this.getTextBeforeCaret()._kmwLength();
+    }
+    
+    setTextCaret(cp: number): void {
+      this.setText(null,cp);
+      this.showCaret();
+    }
+
     /**
      * Set content, visibility, background and borders of input and base elements (KMW-3,KMW-29) 
-     *
-     * @param       {Object}        e     input element 
-     * @param       {number}        n     length of text in field
      */                      
     updateBaseElement() {
       let e = <TouchAliasElement> (<any> this);
@@ -285,6 +356,73 @@ namespace com.keyman.dom {
 
       if(TouchAliasData.getOS() == 'iOS') {
         e.base.style.visibility=(n==0?'visible':'hidden');
+      }
+    }
+
+    flashCaret: () => void = function(this: TouchAliasData): void {
+      // TODO:  How to detect if this is the active Touch Alias w/o referencing KMW code?
+      if(/*this.keyman.util.device.touchable &&*/ DOMEventHandlers.states.activeElement != null) {
+        var cs=this.__caretDiv.style;
+        cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
+      }
+    }.bind(this);
+
+    /**
+     * Position the caret at the start of the second span within the scroller
+     */
+    showCaret() {                          
+      var scroller=this.__scrollDiv, cs=this.__caretDiv.style, sp2=this.__caretSpan;
+      
+      // Attach the caret to this scroller and position it over the caret span
+      if(this.__caretDiv.parentNode != <Node>scroller) {
+        scroller.appendChild(this.__caretDiv);
+      }
+
+      cs.left=sp2.offsetLeft+'px'; 
+      cs.top=sp2.offsetTop+'px';
+      cs.height=(sp2.offsetHeight-1)+'px';
+      cs.visibility='hidden';   // best to wait for timer to display caret
+      
+      // Scroll into view if required
+      this.scrollBody();
+    
+      // Display and position the scrollbar if necessary
+      this.setScrollBar();
+    }
+
+    hideCaret() {
+      var e= <TouchAliasElement> (<any> this);
+
+      // Always copy text back to underlying field on blur
+      if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement
+          ||e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
+        e.base.value = this.getText();
+      }
+      
+      // And set the scroller caret to the end of the element content (null preserves text)
+      this.setText(null, 100000);
+      
+      // Set the element scroll to zero (or max for RTL INPUT)
+      var ss=(e.firstChild as HTMLElement).style;
+      if(e.base.nodeName == 'TEXTAREA') {
+        ss.top='0'; 
+      } else {
+        if(e.base.dir == 'rtl') {
+          ss.left=(e.offsetWidth-(e.firstChild as HTMLElement).offsetWidth-8)+'px';
+        } else {
+          ss.left='0';
+        }
+      }
+      
+      
+      // And hide the caret and scrollbar       
+      if(this.__caretDiv.parentNode) {
+        this.__caretDiv.parentNode.removeChild(this.__caretDiv);
+      }
+
+      this.__caretDiv.style.visibility='hidden';
+      if(e.childNodes.length > 1 ) {
+        (e.childNodes[1] as HTMLElement).style.visibility='hidden';
       }
     }
 
@@ -374,6 +512,108 @@ namespace com.keyman.dom {
         xs.width=w+'px';
         xs.height=h+'px';
       } 
+    }
+
+    /**
+     * Scroll the input field horizontally (INPUT base element) or 
+     * vertically (TEXTAREA base element) to bring the caret into view
+     * as text is entered or deleted form an element
+     */         
+    scrollInput() {
+      var scroller=this.__scrollDiv;
+      let divThis = <TouchAliasElement> (<any> this);
+
+      // Get the actual absolute position of the caret and the element 
+      var s2=this.__caretSpan,
+        cx=dom.Utils.getAbsoluteX(s2),cy=dom.Utils.getAbsoluteY(s2),
+        ex=dom.Utils.getAbsoluteX(divThis),ey=dom.Utils.getAbsoluteY(divThis),
+        x=parseInt(scroller.style.left,10),
+        y=parseInt(scroller.style.top,10),
+        dx=0,dy=0; 
+      
+      // Scroller offsets must default to zero
+      if(isNaN(x)) x=0; if(isNaN(y)) y=0;
+
+      // Scroll input field vertically if necessary
+      if(divThis.base instanceof divThis.base.ownerDocument.defaultView.HTMLTextAreaElement) { 
+        var rowHeight=Math.round(divThis.offsetHeight/divThis.base.rows);
+        if(cy < ey) {
+          dy=cy-ey;
+        }
+        if(cy > ey+divThis.offsetHeight-rowHeight) {
+          dy=cy-ey-divThis.offsetHeight+rowHeight;
+        }
+        if(dy != 0){
+          scroller.style.top=(y<dy?y-dy:0)+'px';
+        }
+      } else { // or scroll horizontally if needed
+        if(cx < ex+8) {
+          dx=cx-ex-12;
+        }
+        if(cx > ex+divThis.offsetWidth-12) {
+          dx=cx-ex-divThis.offsetWidth+12;
+        }
+        if(dx != 0) {
+          scroller.style.left=(x<dx?x-dx:0)+'px';
+        }
+      }    
+
+      // Display the caret (and scroll into view if necessary)
+      this.showCaret();
+    }
+
+    /**
+     * Scroll the document body vertically to bring the active input into view
+     */         
+    scrollBody(): void {
+      // Note the deliberate lack of typing; we don't want to include KMW's core in isolated
+      // element interface testing, so we can't use it here.
+      var oskHeight: number = 0;
+
+      if(window['keyman']) {
+        var osk = window['keyman'].osk;
+        oskHeight = osk._Box.offsetHeight;
+      }
+
+      // Get the absolute position of the caret
+      var s2=this.__caretSpan, y=dom.Utils.getAbsoluteY(s2), t=window.pageYOffset,dy=0;
+      if(y < t) {
+        dy=y-t;
+      } else {
+        dy=y-t-(window.innerHeight - oskHeight - s2.offsetHeight - 2);
+        if(dy < 0) {
+          dy=0;
+        }
+      }    
+      // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
+      if(dy != 0) {
+        window.scrollTo(0,dy+window.pageYOffset);
+      }
+    }
+
+    /**
+     * Display and position a scrollbar in the input field if needed
+     */
+    setScrollBar() {
+      let e = <TouchAliasElement> (<any> this);
+
+      // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
+      var scroller=this.__scrollDiv, sbs=this.__scrollBar.style;
+      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && (e.base.nodeName != 'TEXTAREA')) {
+        sbs.height='4px';
+        sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
+        sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';
+        sbs.top='0';
+        sbs.visibility='visible';  
+      } else if(scroller.offsetHeight > e.offsetHeight || scroller.offsetTop < 0) {
+        sbs.width='4px';
+        sbs.height=100*(e.offsetHeight/scroller.offsetHeight)+'%';
+        sbs.top=100*(-scroller.offsetTop/scroller.offsetHeight)+'%';
+        sbs.left='0';    
+        sbs.visibility='visible';        
+      } else {
+        sbs.visibility='hidden';
+      }
     }
   }
 }

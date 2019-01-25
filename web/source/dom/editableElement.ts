@@ -20,7 +20,7 @@ namespace com.keyman.dom {
       return new Input(<HTMLInputElement> e);
     } else if(Utils.instanceof(e, "HTMLTextAreaElement")) {
       return new TextArea(<HTMLTextAreaElement> e);
-    } else if(Utils.instanceof(e, "HTMLDivElement") && e['base'] !== undefined) {
+    } else if(Utils.instanceof(e, "TouchAliasElement")) {
       // Touch-alias mode!
     } else if(Utils.instanceof(e, "HTMLIFrameElement")) {
       let iframe = <HTMLIFrameElement> e;
