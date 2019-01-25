@@ -14,7 +14,7 @@ import android.widget.Toast;
  */
 public class ConfirmDialogFragment extends DialogFragment {
   public static final String ARG_TITLE = "ConfirmDialogFragment.title";
-  public static final String ARG_MESSAGE = "ConfirmationDialogFragment.message";
+  public static final String ARG_MESSAGE = "ConfirmDialogFragment.message";
 
   public static ConfirmDialogFragment newInstance(String title, String message) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
