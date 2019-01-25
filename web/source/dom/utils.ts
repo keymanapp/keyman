@@ -84,6 +84,18 @@ namespace com.keyman.dom {
      * @return {boolean}
      */
     static instanceof(Pelem: Event|EventTarget, className: string): boolean {
+      // We must write special checks for our custom-defined element types!
+      if(className == "TouchAliasElement") {
+        if(this.instanceof(Pelem, "HTMLDivElement")) {
+          let div = <HTMLDivElement> Pelem;
+
+          // We should probably implement a slightly more robust check, but this should get us started well enough.
+          return div['base'] !== undefined;
+        } else {
+          return false;
+        }
+      }
+
       var scopedClass;
 
       if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
