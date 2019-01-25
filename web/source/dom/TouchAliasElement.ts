@@ -48,14 +48,15 @@ namespace com.keyman.dom {
    */
   class TouchAliasData {
     ['base']: HTMLElement = null; // NOT undefined; we can use this distinction for 'type-checking'.
-    __caretSpan: HTMLSpanElement;
     __preCaret:  HTMLSpanElement;
     __postCaret: HTMLSpanElement;
     __scrollDiv: HTMLDivElement;
     __scrollBar: HTMLDivElement;
 
+    __caretSpan: HTMLSpanElement;
     __caretDiv: HTMLDivElement;
     __caretTimerId: number;
+    __activeCaret: boolean = false;
 
     __resizeHandler: () => void;
 
@@ -310,12 +311,16 @@ namespace com.keyman.dom {
     getTextBeforeCaret() {
       return this.__preCaret.textContent;
     }
-        
-    setTextBeforeCaret(e: HTMLElement, t: string): void {
+    
+    getTextAfterCaret() {
+      return this.__postCaret.textContent;
+    }
+
+    setTextBeforeCaret(t: string): void {
       var tLen=0;
       
       // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
-      if(e.base.nodeName != 'TEXTAREA') {
+      if(this['base'].nodeName != 'TEXTAREA') {
         t=t.replace(/\s+$/,' ');
       }
       this.__preCaret.textContent=t;
@@ -328,7 +333,7 @@ namespace com.keyman.dom {
       this.scrollInput(); 
     }
 
-    getTextCaret(e: HTMLElement): number {
+    getTextCaret(): number {
       return this.getTextBeforeCaret()._kmwLength();
     }
     
@@ -360,8 +365,10 @@ namespace com.keyman.dom {
     }
 
     flashCaret: () => void = function(this: TouchAliasData): void {
-      // TODO:  How to detect if this is the active Touch Alias w/o referencing KMW code?
-      if(/*this.keyman.util.device.touchable &&*/ DOMEventHandlers.states.activeElement != null) {
+      // Significant change - each element manages its own caret, and its activation is managed through show/hideCaret()
+      // without referencing core KMW code.  (KMW must thus check if the active element is a TouchAliasElement, then use these
+      // methods as appropriate.)
+      if(this.__activeCaret) {
         var cs=this.__caretDiv.style;
         cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
       }
@@ -382,6 +389,7 @@ namespace com.keyman.dom {
       cs.top=sp2.offsetTop+'px';
       cs.height=(sp2.offsetHeight-1)+'px';
       cs.visibility='hidden';   // best to wait for timer to display caret
+      this.__activeCaret = true;
       
       // Scroll into view if required
       this.scrollBody();
@@ -395,7 +403,7 @@ namespace com.keyman.dom {
 
       // Always copy text back to underlying field on blur
       if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement
-          ||e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
+          || e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
         e.base.value = this.getText();
       }
       
@@ -403,12 +411,12 @@ namespace com.keyman.dom {
       this.setText(null, 100000);
       
       // Set the element scroll to zero (or max for RTL INPUT)
-      var ss=(e.firstChild as HTMLElement).style;
+      var ss=this.__scrollDiv.style;
       if(e.base.nodeName == 'TEXTAREA') {
         ss.top='0'; 
       } else {
         if(e.base.dir == 'rtl') {
-          ss.left=(e.offsetWidth-(e.firstChild as HTMLElement).offsetWidth-8)+'px';
+          ss.left=(e.offsetWidth - this.__scrollDiv.offsetWidth-8)+'px';
         } else {
           ss.left='0';
         }
@@ -421,9 +429,9 @@ namespace com.keyman.dom {
       }
 
       this.__caretDiv.style.visibility='hidden';
-      if(e.childNodes.length > 1 ) {
-        (e.childNodes[1] as HTMLElement).style.visibility='hidden';
-      }
+      this.__scrollBar.style.visibility='hidden';
+
+      this.__activeCaret = false;
     }
 
     getText(): string {
