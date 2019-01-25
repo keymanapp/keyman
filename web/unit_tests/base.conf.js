@@ -40,8 +40,6 @@ module.exports = {
 
 
     //'unit_tests/cases/**/*.js', // Where the tests actually reside. // TEMP - commented out for test case dev.
-    'unit_tests/cases/element_interfaces.js', // TEMP - do not let see production.
-
 
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
