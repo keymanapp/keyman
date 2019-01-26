@@ -1,5 +1,10 @@
 # Keyman for Android
 
+## 2019-01-27 10.0.2060 beta
+* Bug fixes:
+  * Clean up styling of dialogs when downloading keyboards
+  * Fix "Get Started" checkbox label to display on older Android versions
+
 ## 2019-01-21 10.0.2059 beta
 * Bug fix:
   * Change installation of ad-hoc keyboards via .kmp packages to only add the first language for each keyboard.
