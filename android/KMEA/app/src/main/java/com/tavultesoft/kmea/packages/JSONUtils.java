@@ -83,7 +83,7 @@ public class JSONUtils {
 
                 File jsFile = new File(pkg, kbdID + ".js");
                 if (jsFile.exists()) {
-                  SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD");
                   kbdObj.put("lastModified", sdf.format(jsFile.lastModified()));
                 } else {
                   Log.d(TAG, "getLanguages() can't generate modified date for " + jsFile);

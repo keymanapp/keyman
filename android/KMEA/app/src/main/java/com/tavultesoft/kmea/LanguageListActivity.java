@@ -30,6 +30,7 @@ import com.tavultesoft.kmea.util.MapCompat;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -350,7 +351,11 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
 
       if (hasConnection && !loadFromCache) {
-        progressDialog = new ProgressDialog(context, R.style.ProgressDialog);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+          progressDialog = new ProgressDialog(context, R.style.AppTheme_Dialog_Progress);
+        } else {
+          progressDialog = new ProgressDialog(context);
+        }
         progressDialog.setMessage(getString(R.string.getting_keyboard_catalog));
         progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.label_cancel),
           new DialogInterface.OnClickListener() {
