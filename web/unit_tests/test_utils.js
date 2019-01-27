@@ -256,7 +256,7 @@ function retrieveAndReset(Pelem) {
   var val = "";
   if(alias) {
     val = alias.textContent;
-    keyman.touchAliasing.setText(alias, "", 0);
+    alias.setText("", 0);
   } else {
     val = Pelem.value;
     Pelem.value = "";

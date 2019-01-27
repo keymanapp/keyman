@@ -24,7 +24,7 @@ function focusReceiver() {
 setElementText = function(ele, text) {
   ele.value = text;
   if(ele['kmw_ip']) {
-    keyman.touchAliasing.setTextBeforeCaret(ele['kmw_ip'], ele.value);
+    ele['kmw_ip'].setTextBeforeCaret(ele.value);
   }
 }
 
