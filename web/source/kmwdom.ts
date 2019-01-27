@@ -678,7 +678,7 @@ namespace com.keyman {
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
               if(this.sortedInputs[k]['kmw_ip']) {
-                this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
+                this.sortedInputs[k]['kmw_ip'].updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
           }.bind(this), 1);
@@ -710,7 +710,7 @@ namespace com.keyman {
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
               if(this.sortedInputs[k]['kmw_ip']) {
-                this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
+                this.sortedInputs[k]['kmw_ip'].updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
           }.bind(this), 1);
@@ -847,7 +847,7 @@ namespace com.keyman {
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
               if(this.sortedInputs[k]['kmw_ip']) {
-                this.keyman.touchAliasing.updateInput(this.sortedInputs[k]['kmw_ip']);
+                this.sortedInputs[k]['kmw_ip'].updateInput();
               }
             }
           }.bind(this), 1);
