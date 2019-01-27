@@ -36,10 +36,13 @@ module.exports = {
     'unit_tests/modernizr.js', // A dependency-managed utility script that helps with browser feature detection.
     'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
                                           // Includes KMW's Device class, which is used by test_utils below.
+    'unit_tests/dom.js',        // Defines com.keyman.dom objects separate from KMW for unit testing.
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
 
 
     //'unit_tests/cases/**/*.js', // Where the tests actually reside. // TEMP - commented out for test case dev.
+    'unit_tests/cases/touch_aliases.js', // TEMP - do not let see production.
+
 
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
@@ -52,6 +55,7 @@ module.exports = {
     {pattern: 'release/unminified/web/*.js', watched: true, served: true, included: false},  // The actual KMW code.
     {pattern: 'release/unminified/web/*.map', watched: true, served: true, included: false}, // + sourcemaps.
     {pattern: 'unit_tests/recorder_InputEvents.js.map', watched: true, served: true, included: false},
+    {pattern: 'unit_tests/dom.js.map', watched: true, served: true, included: false},
     {pattern: 'unit_tests/fixtures/**/*.html', watched: true} // HTML structures useful for testing.
   ],
 

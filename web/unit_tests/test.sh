@@ -44,7 +44,7 @@ get_browser_set_for_OS ( ) {
     if [ $os_id = "mac" ]; then
         BROWSERS="--browsers Firefox,Chrome,Safari"
     elif [ $os_id = "win" ]; then
-        BROWSERS="--browsers Firefox,Chrome,IE,Edge"
+        BROWSERS="--browsers Firefox,Chrome,IE" # TODO:  readd ",Edge" # Has interesting domain-related issues.
     else
         BROWSERS="--browsers Firefox,Chrome"
     fi
@@ -100,7 +100,7 @@ fi
 BASE_PATH=`dirname $BASH_SOURCE`
 cd $BASE_PATH/../source
 
-./build_recorder.sh
+./build_dev_resources.sh
 
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm --no-color run karma -- start --log-level=debug $FLAGS $BROWSERS unit_tests/$CONFIG
