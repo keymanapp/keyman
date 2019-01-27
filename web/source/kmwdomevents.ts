@@ -664,7 +664,7 @@ namespace com.keyman {
      * Close OSK and remove simulated caret on losing focus
      */          
     cancelInput(): void { 
-      if(DOMEventHandlers.states.activeElement.hideCaret) {
+      if(DOMEventHandlers.states.activeElement && DOMEventHandlers.states.activeElement.hideCaret) {
         DOMEventHandlers.states.activeElement.hideCaret();
       }
       DOMEventHandlers.states.activeElement=null; 
