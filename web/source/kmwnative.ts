@@ -39,7 +39,10 @@ namespace com.keyman.osk {
       } else if(keyName.indexOf('K_ROPT') >= 0) {
         keyman.uiManager.setActivatingUI(false);
         oskManager._Hide(true); 
-        keyman.touchAliasing.hideCaret();
+        let active = keyman.domManager.getActiveElement();
+        if(dom.Utils.instanceof(active, "TouchAliasElement")) {
+          (active as dom.TouchAliasElement).hideCaret();
+        }
         keyman.domManager.clearLastActiveElement();
       }
     }
@@ -502,6 +505,7 @@ if(!window['keyman']['initialized']) {
     // Declare KeymanWeb object
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
     var dbg=keymanweb.debug;
+    var dom = com.keyman.dom;
 
     // Force full initialization
     keymanweb.isEmbedded = false;
@@ -592,7 +596,7 @@ if(!window['keyman']['initialized']) {
       }
 
       if(device.touchable) {
-        tempContext = keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
+        tempContext = Pelem.getTextBeforeCaret();
       } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
         (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
         // I2457 - support contentEditable elements in mozilla, webkit
@@ -658,7 +662,9 @@ if(!window['keyman']['initialized']) {
 
         // Supported by IE 9 and all modern browsers.
         processList.forEach(function(element: HTMLElement) {
-          domManager.touchHandlers.updateInput(element);
+          if(dom.Utils.instanceof(element, "TouchAliasElement")) {
+            (element as com.keyman.dom.TouchAliasElement).updateInput();
+          }
           element.style.visibility = 'visible';
           if(element.base.textContent.length > 0) {
             element.base.style.visibility = 'hidden';

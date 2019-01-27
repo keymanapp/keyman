@@ -102,7 +102,7 @@ namespace com.keyman.dom {
       cs.zIndex='9998';           // immediately below the OSK
 
       // Start the caret flash timer
-      this.__caretTimerId = window.setInterval(this.flashCaret,500);
+      this.__caretTimerId = window.setInterval(this.flashCaret.bind(this), 500);
     }
 
     init() {
@@ -197,6 +197,8 @@ namespace com.keyman.dom {
       let preCaretStyle  = this.__preCaret.style;
       let postCaretStyle = this.__postCaret.style;
 
+      divThis.dir = base.dir;
+
       preCaretStyle.fontFamily = postCaretStyle.fontFamily = scrollDivStyle.fontFamily = baseStyle.fontFamily;
 
       // Set vertical centering for input elements
@@ -206,9 +208,11 @@ namespace com.keyman.dom {
         }
       }
 
-      // Should be altered for Android, but that's something a bit more Keyman-internal.
-      // We're trying to keep this area disentangled from the rest of KMW.
-      scrollDivStyle.backgroundColor = baseStyle.backgroundColor;
+      if(TouchAliasData.getOS() == 'Android' && baseStyle.backgroundColor == 'transparent') {
+        scrollDivStyle.backgroundColor = '#fff';
+      } else {
+        scrollDivStyle.backgroundColor = baseStyle.backgroundColor;
+      }
 
       if(divThis.base.nodeName.toLowerCase() == 'textarea') {
         preCaretStyle.whiteSpace=postCaretStyle.whiteSpace='pre-wrap'; //scroll vertically
@@ -217,6 +221,7 @@ namespace com.keyman.dom {
       }
       
       divThis.base.parentNode.appendChild(divThis);
+      divThis.updateInput();
 
       let style = divThis.style; 
       style.color=baseStyle.color;
@@ -229,6 +234,13 @@ namespace com.keyman.dom {
       style.margin=baseStyle.margin; 
       style.border=baseStyle.border;
       style.borderRadius=baseStyle.borderRadius;
+
+      //xs.color='red';  //use only for checking alignment
+
+      // Prevent highlighting of underlying element (Android)
+      if('webkitTapHighlightColor' in style) {
+        style.webkitTapHighlightColor='rgba(0,0,0,0)';
+      }
 
       if(base instanceof base.ownerDocument.defaultView.HTMLTextAreaElement) {
         // Correct rows value if defaulted and box height set by CSS
@@ -373,7 +385,7 @@ namespace com.keyman.dom {
       }
     }
 
-    flashCaret: () => void = function(this: TouchAliasData): void {
+    flashCaret(): void {
       // Significant change - each element manages its own caret, and its activation is managed through show/hideCaret()
       // without referencing core KMW code.  (KMW must thus check if the active element is a TouchAliasElement, then use these
       // methods as appropriate.)
@@ -381,7 +393,7 @@ namespace com.keyman.dom {
         var cs=this.__caretDiv.style;
         cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
       }
-    }.bind(this);
+    };
 
     /**
      * Position the caret at the start of the second span within the scroller

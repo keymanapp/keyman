@@ -884,14 +884,15 @@ namespace com.keyman {
       var Li, Ldv;
     
       if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-        var t=this.keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
+        let alias = <dom.TouchAliasElement> Pelem;
+        var t=Pelem.getTextBeforeCaret();
         if(dn > 0) {
           t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
         } else {
           t=t+s;
         }
         
-        this.keymanweb.touchAliasing.setTextBeforeCaret(Pelem,t);
+        Pelem.setTextBeforeCaret(t);
 
         // Adjust deadkey positions
         this._DeadkeyDeleteMatched(); // I3318
@@ -1394,7 +1395,7 @@ namespace com.keyman {
       var Ldoc: Document, Ldv: Window, isMSIE=(Device._GetIEVersion()<999); // I3363 (Build 301)
 
       if((<any>this.keymanweb).isPositionSynthesized())
-        return this.keymanweb.touchAliasing.getTextCaret(Pelem);
+        return (<dom.TouchAliasElement> Pelem).getTextCaret();
 
       if(Pelem._KeymanWebSelectionStart) {
         return Pelem._KeymanWebSelectionStart;
