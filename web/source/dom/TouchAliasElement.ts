@@ -77,6 +77,10 @@ namespace com.keyman.dom {
       return this.getDevice().OS;
     }
 
+    isMultiline(): boolean {
+      return this['base'] && this['base'].nodeName == "TEXTAREA";
+    }
+
     initCaret(): void {
       /**
        * Create a caret to be appended to the scroller of the focussed input field. 
@@ -320,7 +324,7 @@ namespace com.keyman.dom {
       var tLen=0;
       
       // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
-      if(this['base'].nodeName != 'TEXTAREA') {
+      if(!this.isMultiline()) {
         t=t.replace(/\s+$/,' ');
       }
       this.__preCaret.textContent=t;
@@ -417,7 +421,7 @@ namespace com.keyman.dom {
       
       // Set the element scroll to zero (or max for RTL INPUT)
       var ss=this.__scrollDiv.style;
-      if(e.base.nodeName == 'TEXTAREA') {
+      if(e.isMultiline()) {
         ss.top='0'; 
       } else {
         if(e.base.dir == 'rtl') {
@@ -440,7 +444,7 @@ namespace com.keyman.dom {
     }
 
     getText(): string {
-      return (<TouchAliasElement> (<any> this) ).textContent;
+      return (<TouchAliasElement> (<any> this)).textContent;
     }
 
     updateInput() {
@@ -508,7 +512,7 @@ namespace com.keyman.dom {
             xs.paddingTop=(pTop+1)+'px';
             xs.paddingLeft=pLeft+'px';
             
-            if(b.nodeName == 'TEXTAREA') {
+            if(this.isMultiline()) {
               xs.marginTop='1px';
             } else {
               xs.marginLeft='1px';
@@ -548,8 +552,8 @@ namespace com.keyman.dom {
       if(isNaN(x)) x=0; if(isNaN(y)) y=0;
 
       // Scroll input field vertically if necessary
-      if(divThis.base instanceof divThis.base.ownerDocument.defaultView.HTMLTextAreaElement) { 
-        var rowHeight=Math.round(divThis.offsetHeight/divThis.base.rows);
+      if(divThis.isMultiline()) { 
+        var rowHeight=Math.round(divThis.offsetHeight/(<HTMLTextAreaElement> divThis.base).rows);
         if(cy < ey) {
           dy=cy-ey;
         }
@@ -612,7 +616,7 @@ namespace com.keyman.dom {
 
       // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
       var scroller=this.__scrollDiv, sbs=this.__scrollBar.style;
-      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && ((!e.base) || e.base.nodeName != 'TEXTAREA')) {
+      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && !e.isMultiline()) {
         sbs.height='4px';
         sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
         sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';

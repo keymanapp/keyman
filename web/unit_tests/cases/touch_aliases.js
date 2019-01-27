@@ -9,6 +9,11 @@ describe('TouchAliasElement', function() {
 
   beforeEach(function() {
     fixture.load("robustAttachment.html");
+
+    // Default:  KMW's SMP extensions shouldn't be enabled.
+    // Even if not used, this also ensures certain key functions are available; this
+    // initializes KMW's specialized String methods are available.
+    String.kmwEnableSupplementaryPlane(false);
   });
 
   describe("Without ['base']", function() {
@@ -61,9 +66,72 @@ describe('TouchAliasElement', function() {
         ta.setText("1234567");
         assert.equal(ta.getTextCaret(), 7, "does not relocate caret to end by default after a 'setText' call");
         // End "White-box" part of test.
-
-        String.kmwEnableSupplementaryPlane(false);
       });
+    });
+
+    it('manipulates text correctly', function() {
+      var ta = document.getElementById(DynamicElements.addTouchAlias());
+      // Should be empty by default for base-less elements.
+      assert.equal("", ta.getText());
+
+      // Set up initial conditions
+      ta.setTextBeforeCaret("apples and oranges");
+
+      // Check that setTextCaret works properly as part of our setup for the rest of this case.
+      ta.setTextCaret(6);
+      assert.equal(ta.getTextBeforeCaret(), "apples");
+
+      // Now for the interesting part - do public text & caret handling methods work correctly?
+      ta.setTextBeforeCaret("bananas");
+      assert.equal(ta.getTextCaret(), "bananas".length, "Did not properly move text caret after inserting text");
+      assert.equal(ta.getText(), "bananas and oranges", "Did not properly manage text after insertions");
+    });
+  });
+
+  describe("With ['base']", function(done) {
+    it('correctly aliases upon construction', function() {
+      var input = document.getElementById(DynamicElements.addInput());
+      input.value = "apples";
+
+      var ta = document.getElementById(DynamicElements.addTouchAlias(input));
+      assert.equal(ta.getText(), "apples", "Did not correctly initialize text from ['base']");
+
+      var inputStyle = window.getComputedStyle(input);
+      var aliasStyle = window.getComputedStyle(ta);
+
+      // TouchAliasElements require a 1ms timeout post-creation to properly overlay their base element.
+      window.setTimeout(function() {
+        assert.isTrue(parseInt(aliasStyle.zIndex, 10) > parseInt(inputStyle.zIndex), "Positioning:  CSS 'zIndex' does not place alias over the base");
+
+        // inputStyle will report 'auto' for .top and .left... we need to rely on com.keyman.dom.Utils for a proper check here.
+        assert.equal(aliasStyle.top, com.keyman.dom.Utils.getAbsoluteY(input) + 'px', "Positioning:  CSS 'top' does not match base");
+        assert.equal(aliasStyle.left, com.keyman.dom.Utils.getAbsoluteX(input) + 'px', "Positioning:  CSS 'left' does not match base");
+        assert.equal(aliasStyle.width, inputStyle.width, "Positioning:  CSS 'width' does not match base");
+        assert.equal(aliasStyle.height, inputStyle.height, "Positioning:  CSS 'top' does not match base");
+
+        // To consider - should we write tests for bases with borders/padding?
+        // .width and .height checks will require more complex logic to verify for those, so
+        // they've been left unwritten so far.
+
+        // Tell Mocha we're done with the test.
+        done();
+      }, 50);
+    });
+
+    it('manipulates base-element text correctly', function() {
+      var input = document.getElementById(DynamicElements.addInput());
+      var ta = document.getElementById(DynamicElements.addTouchAlias(input));
+      // Should be empty by default for input elements without pre-set text.
+      assert.equal("", ta.getText());
+
+      // Assignment when no pre-existing text is present
+      ta.setTextBeforeCaret("apples and oranges");
+      assert.equal(input.value, "apples and oranges", "did not copy text to base element when previously empty");
+
+      // Now for the interesting part - do public text & caret handling methods work correctly?
+      ta.setTextCaret(6);
+      ta.setTextBeforeCaret("bananas");
+      assert.equal(input.value, "bananas and oranges", "did not correctly set text to base element after text modification");
     });
   });
 });
