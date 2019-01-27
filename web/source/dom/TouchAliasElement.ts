@@ -296,7 +296,7 @@ namespace com.keyman.dom {
 
       tLen=t._kmwLength();
       
-      if(cp === null || cp > tLen) {
+      if(cp === null || cp === undefined || cp > tLen) {
         cp=tLen;
       }
       t1=t._kmwSubstr(0,cp);
@@ -347,6 +347,11 @@ namespace com.keyman.dom {
      */                      
     updateBaseElement() {
       let e = <TouchAliasElement> (<any> this);
+
+      // Only proceed if we actually have a base element.
+      if(!e['base']) {
+        return;
+      }
 
       var Ldv = e.base.ownerDocument.defaultView;
       if(e.base instanceof Ldv.HTMLInputElement || e.base instanceof Ldv.HTMLTextAreaElement) {
@@ -607,7 +612,7 @@ namespace com.keyman.dom {
 
       // Display the scrollbar if necessary.  Added TEXTAREA condition to correct rotation issue KMW-5.  Fixed for 310 beta.
       var scroller=this.__scrollDiv, sbs=this.__scrollBar.style;
-      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && (e.base.nodeName != 'TEXTAREA')) {
+      if((scroller.offsetWidth > e.offsetWidth || scroller.offsetLeft < 0) && ((!e.base) || e.base.nodeName != 'TEXTAREA')) {
         sbs.height='4px';
         sbs.width=100*(e.offsetWidth/scroller.offsetWidth)+'%';
         sbs.left=100*(-scroller.offsetLeft/scroller.offsetWidth)+'%';
