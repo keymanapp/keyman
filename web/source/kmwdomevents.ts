@@ -490,9 +490,7 @@ namespace com.keyman {
      *      
      */       
     setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(this: DOMTouchHandlers, e?: TouchEvent|MSPointerEvent): void {
-      var kmw = this.keyman;
       var osk = this.keyman.osk;
-      var util = this.keyman.util;
 
       DOMEventHandlers.states.setFocusTimer();
 
@@ -645,6 +643,7 @@ namespace com.keyman {
 
       // With the attachment API update, we now directly track the old legacy control behavior.
       DOMEventHandlers.states.lastActiveElement = target;
+      target.showCaret();
 
       /**
        * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
