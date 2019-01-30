@@ -39,5 +39,27 @@
         <Copyright>© 2018 SIL International</Copyright>
       </Details>
     </File>
+    <File>
+      <ID>id_f18f72025a9bd68f099cafc00834927f</ID>
+      <Filename>ladder_hieroglyphic_v9.kmn</Filename>
+      <Filepath>ladder_hieroglyphic_v9.kmn</Filepath>
+      <FileVersion>1.3</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Ladder Test Hieroglyphic V9</Name>
+        <Copyright>© 2010-2018 Christian Casey</Copyright>
+      </Details>
+    </File>
+    <File>
+      <ID>id_25b6ef747207463efde839932a5fcbbf</ID>
+      <Filename>ladder_hieroglyphic_v11.kmn</Filename>
+      <Filepath>ladder_hieroglyphic_v11.kmn</Filepath>
+      <FileVersion>1.3</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>Ladder Test Hieroglyphic V11</Name>
+        <Copyright>© 2010-2018 Christian Casey</Copyright>
+      </Details>
+    </File>
   </Files>
 </KeymanDeveloperProject>

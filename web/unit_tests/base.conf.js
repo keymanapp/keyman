@@ -37,7 +37,7 @@ module.exports = {
     'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
                                           // Includes KMW's Device class, which is used by test_utils below.
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
-    'unit_tests/cases/**/*.js', // Where the tests actually reside.
+    'unit_tests/cases/**/compiler_ladders.js', // Where the tests actually reside.
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
     {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources

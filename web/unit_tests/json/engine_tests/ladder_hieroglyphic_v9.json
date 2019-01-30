@@ -1,0 +1,46 @@
+{
+  "keyboard": {
+    "id": "ladder_hieroglyphic_v9",
+    "name": "Ladder Test Hieroglyphic (V9 Broken Ladder)",
+    "filename": "resources/keyboards/ladder_hieroglyphic_v9.js",
+    "languages": [
+      {
+        "id": "egy-Egyp",
+        "name": "Egyptian, Ancient",
+        "region": "Africa"
+      }
+    ]
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": ["firefox"]
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "key": "Shift",
+              "code": "ShiftLeft",
+              "keyCode": 16,
+              "modifierSet": 7,
+              "location": 1
+            },
+            {
+              "type": "key",
+              "key": "S",
+              "code": "KeyS",
+              "keyCode": 83,
+              "modifierSet": 1,
+              "location": 0
+            }
+          ],
+          "output": "\u0161"
+        }
+      ]
+    }
+  ]
+}
