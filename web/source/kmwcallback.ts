@@ -878,143 +878,30 @@ namespace com.keyman {
       if('oninserttext' in this.keymanweb) {
         this.keymanweb['oninserttext'](dn,s);
       }
-
-      var Ldoc: Document;
-      if(Pelem.body) {
-        Ldoc=Pelem;
-      } else {
-        Ldoc=Pelem.ownerDocument;	// I1481 - integration with rich editors not working 100%
-      }
-      var Ldv: Window;
     
-      // Handles touch-alias element editing.
-      if(Pelem.className.indexOf('keymanweb-input') >= 0) {
-        let alias = <dom.TouchAliasElement> Pelem;
-        var t=Pelem.getTextBeforeCaret();
-        if(dn > 0) {
-          t=t._kmwSubstr(0,t._kmwLength()-dn)+s; 
-        } else {
-          t=t+s;
-        }
+      if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
+        let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
+        var _CacheableCommands: StyleCommand[];
         
-        Pelem.setTextBeforeCaret(t);
-
-        // Adjust deadkey positions
-        this._DeadkeyDeleteMatched(); // I3318
-        if(dn >= 0) {        
-          this._DeadkeyAdjustPos(this._SelPos(Pelem), -dn + s._kmwLength()); // I3318,I3319
+        if(wrapper instanceof dom.DesignIFrame) {
+          _CacheableCommands = this._CacheCommands(wrapper.doc);
         }
-
-        if((dn >= 0 || s) && Pelem == DOMEventHandlers.states.activeElement) {
-          // Record that we've made an edit.
-          DOMEventHandlers.states.changed = true;
-        }
-        return;
-      }
-    
-      if (Ldoc && (Ldv=Ldoc.defaultView) && Ldv.getSelection  &&  
-          (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')      
-        ) { // I2457 - support contentEditable elements in mozilla, webkit
-        /* Editable iframe and contentEditable elements for mozilla */
-        var _IsEditableIframe = Ldoc.designMode.toLowerCase() == 'on';
-        if(_IsEditableIframe) {
-          var _CacheableCommands = this._CacheCommands(Ldoc);
-        }
-      
-        var Lsel: Selection = Ldv.getSelection();
-        var LselectionStart = Lsel.focusNode.nodeValue ? (<Text> Lsel.focusNode).substringData(0,Lsel.focusOffset)._kmwLength() : 0;  // I3319
-        
-        if(!Lsel.isCollapsed) {
-          Lsel.deleteFromDocument();  // I2134, I2192
-        }
-        //KeymanWeb._Debug('KO: focusOffset='+Lsel.focusOffset+', dn='+dn+', s='+s+' focusNode.type='+Lsel.focusNode.nodeType+', focusNode.parentNode.tagName='+(Lsel.focusNode.parentNode?Lsel.focusNode.parentNode.tagName:'NULL') );
-
-        var Lrange = Lsel.getRangeAt(0);
-        if(dn > 0) {
-          Lrange.setStart(Lsel.focusNode, Lsel.focusOffset - Lsel.focusNode.nodeValue.substr(0,Lsel.focusOffset)._kmwSubstr(-dn).length); // I3319
-          Lrange.deleteContents();
-        }
-
-        //KeymanWeb._Debug('KO: focusOffset='+Lsel.focusOffset+', dn='+dn+', s='+s+' focusNode.type='+Lsel.focusNode.nodeType+', focusNode.parentNode.tagName='+(Lsel.focusNode.parentNode?Lsel.focusNode.parentNode.tagName:'NULL') );
-
-        if(s._kmwLength() > 0) { // I2132 - exception if s.length > 0, I3319
-          if(Lsel.focusNode.nodeType == 3) { // Therefore, (focusNode instanceof Text) == true
-            // I2134, I2192
-            // Already in a text node
-            //KeymanWeb._Debug('KO: Already in a text node, adding "'+s+'": '+Lsel.focusOffset + '-> '+Lsel.toString());
-            var LfocusOffset = Lsel.focusOffset;
-            //KeymanWeb._Debug('KO: node.text="'+Lsel.focusNode.data+'", node.length='+Lsel.focusNode.length);
-            (<Text> Lsel.focusNode).insertData(Lsel.focusOffset, s);
-            try {
-              Lsel.extend(Lsel.focusNode, LfocusOffset + s.length); 
-            } catch(e) {
-              // Chrome (through 4.0 at least) throws an exception because it has not synchronised its content with the selection.  scrollIntoView synchronises the content for selection
-              (<Element> Lsel.focusNode.parentNode).scrollIntoView();
-              Lsel.extend(Lsel.focusNode, LfocusOffset + s.length);
-            }
-          } else {
-            // Create a new text node - empty control
-            //KeymanWeb._Debug('KO: Creating a new text node for "'+s+'"');
-            var n = Ldoc.createTextNode(s);
-            Lrange.insertNode(n);
-            Lsel.extend(n,s.length);
-          }
-        }
-
-        if(_IsEditableIframe) {
-          this._CacheCommandsReset(Ldoc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
-        }
-        
-        Lsel.collapseToEnd();
-
-        // Adjust deadkey positions 
         if(dn >= 0) {
-          this._DeadkeyDeleteMatched();                                  // I3318
-          this._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318
-        } // Internet Explorer   (including IE9.  focusNode and focusOffset do not exist for IE9.  Unknown for Safari.)   
-      } else if ((<HTMLInputElement|HTMLTextAreaElement> Pelem).setSelectionRange) {   
-        // Ccovers basic element editing.                                     
-        var LselectionStart: number, LselectionEnd;
-              
-        if(Pelem._KeymanWebSelectionStart != null) {// changed to allow a value of 0
-          LselectionStart = Pelem._KeymanWebSelectionStart;
-          LselectionEnd = Pelem._KeymanWebSelectionEnd;
-        } else {
-          LselectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart);  // I3319
-          LselectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);      // I3319
+          wrapper.deleteCharsBeforeCaret(dn);
         }
-        
-        var LscrollTop, LscrollLeft;
-        if(Pelem.type.toLowerCase() == 'textarea' && typeof(Pelem.scrollTop) != 'undefined') {
-          LscrollTop = Pelem.scrollTop;
-          LscrollLeft = Pelem.scrollLeft;
-        }
+        wrapper.insertTextBeforeCaret(s);
 
-        if(dn < 0) {// Don't delete, leave context alone (dn = -1)
-          Pelem.value = Pelem.value._kmwSubstring(0,LselectionStart) + s + Pelem.value._kmwSubstring(LselectionEnd);    //I3319
-          dn = 0;
-        } else if(LselectionStart < dn) {
-          Pelem.value = s + Pelem.value._kmwSubstring(LselectionEnd); //I3319
-        } else {
-          Pelem.value = Pelem.value._kmwSubstring(0,LselectionStart-dn) + s + Pelem.value._kmwSubstring(LselectionEnd); //I3319
+        if(wrapper instanceof dom.DesignIFrame) {
+          this._CacheCommandsReset(wrapper.doc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
         }
 
         // Adjust deadkey positions 
         if(dn >= 0) {
           this._DeadkeyDeleteMatched(); // I3318
-          this._DeadkeyAdjustPos(LselectionStart, -dn + s._kmwLength()); // I3318,I3319
+          this._DeadkeyAdjustPos(wrapper.getDeadkeyCaret(), -dn + s._kmwLength()); // I3318,I3319
         }
-
-        if (typeof(LscrollTop) != 'undefined') {
-          Pelem.scrollTop = LscrollTop;
-          Pelem.scrollLeft = LscrollLeft;
-        } 
-        var caretPos=LselectionStart-dn+s._kmwLength();                   // I3319
-        var caretPosUnits=Pelem.value._kmwCodePointToCodeUnit(caretPos);  // I3319
-        
-        Pelem.setSelectionRange(caretPosUnits, caretPosUnits);             // I3319
-        Pelem._KeymanWebSelectionStart = null;
-        Pelem._KeymanWebSelectionEnd = null;      
+      } else {
+        throw "No element wrapper available to produce output!";
       }
 
       // Refresh element content after change (if needed)
@@ -1067,7 +954,7 @@ namespace com.keyman {
         new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
         new StyleCommand('superscript',0), new StyleCommand('underline',0)
       ];
-      
+
       if(_Document.defaultView) {
         this.keymanweb._push(_CacheableCommands, new StyleCommand('hilitecolor',1));
       }
@@ -1406,30 +1293,12 @@ namespace com.keyman {
      * Description  Get start of selection (with supplementary plane modifications)
      */   
     _SelPos(Pelem: HTMLElement) {
-      var Ldoc: Document, Ldv: Window, isMSIE=(Device._GetIEVersion()<999); // I3363 (Build 301)
-
-      if((<any>this.keymanweb).isPositionSynthesized())
-        return (<dom.TouchAliasElement> Pelem).getTextCaret();
-
-      if(Pelem._KeymanWebSelectionStart) {
-        return Pelem._KeymanWebSelectionStart;
-      } else if ((Ldoc = Pelem.ownerDocument) && (Ldv=Ldoc.defaultView)) {
-        // Mozilla, IE9 
-        if(Pelem instanceof Ldv.HTMLInputElement || Pelem instanceof Ldv.HTMLTextAreaElement) {
-          if(Pelem.setSelectionRange) {
-            return Pelem.value.substr(0, Pelem.selectionStart)._kmwLength();
-          } // contentEditable elements, Mozilla midas
-        } else if(Ldv.getSelection &&  Pelem.ownerDocument.designMode.toLowerCase() == 'on') {
-          var Lsel = Ldv.getSelection();
-          if(Lsel.focusNode.nodeType == 3) 
-            return (Lsel.focusNode as Text).substringData(0,Lsel.focusOffset)._kmwLength(); 
-        }
+      if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
+        let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
+        return wrapper.getDeadkeyCaret();
+      } else {
+        throw "No element interface to provide a caret position!";
       }
-      
-
-    
-      
-      return 0;
     }
 
     /**

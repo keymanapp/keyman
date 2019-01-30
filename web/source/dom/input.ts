@@ -58,6 +58,10 @@ namespace com.keyman.dom {
       }
     }
 
+    getDeadkeyCaret(): number {
+      return this.getCaret();
+    }
+
     setCaret(caret: number) {
       let domCaret = this.root.value._kmwCodePointToCodeUnit(caret);
       this.root.setSelectionRange(domCaret, domCaret);

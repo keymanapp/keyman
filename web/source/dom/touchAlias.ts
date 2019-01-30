@@ -30,6 +30,10 @@ namespace com.keyman.dom {
       return true;
     }
 
+    getDeadkeyCaret(): number {
+      return this.root.getTextCaret();
+    }
+
     getTextBeforeCaret(): string {
       return this.root.getTextBeforeCaret();
     }

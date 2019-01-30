@@ -93,6 +93,10 @@ namespace com.keyman.dom {
       }
     }
 
+    getDeadkeyCaret(): number {
+      return this.getCarets().start.offset;
+    }
+
     getTextBeforeCaret(): string {
       if(!this.hasSelection()) {
         return;
@@ -126,16 +130,14 @@ namespace com.keyman.dom {
     }
 
     deleteCharsBeforeCaret(dn: number) {
-      if(!this.hasSelection()) {
+      if(!this.hasSelection() || dn <= 0) {
         return;
       }
 
       let start = this.getCarets().start;
 
       if(start.node.nodeType != 3) {
-        if(dn > 0) {
-          console.warn("Deletion of characters requested without available context!");
-        }
+        console.warn("Deletion of characters requested without available context!");
         return; // No context to delete characters from.
       }
 

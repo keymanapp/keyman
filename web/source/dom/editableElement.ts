@@ -64,6 +64,11 @@ namespace com.keyman.dom {
      * or is part of (or possesses) the DOM's active selection.
      */
     hasSelection(): boolean;
+
+    /**
+     * Returns an index corresponding to the caret's position for use with deadkeys.
+     */
+    getDeadkeyCaret(): number;
     
     /**
      * Relative to the caret, gets the current context within the wrapper's element.

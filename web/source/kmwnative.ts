@@ -588,40 +588,13 @@ if(!window['keyman']['initialized']) {
      *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
      */    
     keymanweb.KC_ = function(n, ln, Pelem) {
-      var Ldv, tempContext = '';
-      if(Pelem.body) {
-        var Ldoc=Pelem; 
-      } else {
-        var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
-      }
+      var tempContext = '';
 
-      if(device.touchable) {
-        tempContext = Pelem.getTextBeforeCaret();
-      } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
-        (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
-        // I2457 - support contentEditable elements in mozilla, webkit
-        /* Mozilla midas html editor and editable elements */
-        var Lsel = Ldv.getSelection();
-        if(Lsel.focusNode.nodeType == 3) {
-          tempContext = Lsel.focusNode.substringData(0, Lsel.focusOffset);
-        }
-      } else if (Pelem.setSelectionRange) {
-        /* Mozilla other controls */
-        var LselectionStart, LselectionEnd;
-        if(Pelem._KeymanWebSelectionStart) {
-          LselectionStart = Pelem._KeymanWebSelectionStart;
-          LselectionEnd = Pelem._KeymanWebSelectionEnd;
-          //KeymanWeb._Debug('KeymanWeb.KC: _KeymanWebSelectionStart=TRUE LselectionStart='+LselectionStart+'; LselectionEnd='+LselectionEnd);
-        } else {
-          if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) { // I3319, KMW-1
-            keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
-            keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
-            keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
-          }
-          LselectionStart = keymanweb._CachedSelectionStart; // I3319
-          LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
-        }
-        tempContext = Pelem.value._kmwSubstr(0, LselectionStart);
+      if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
+        let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
+        tempContext = wrapper.getTextBeforeCaret();
+      } else {
+        throw "No element wrapper available to provide context!";
       }
 
       if(tempContext._kmwLength() < n) {
