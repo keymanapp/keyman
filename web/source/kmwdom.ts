@@ -459,7 +459,17 @@ namespace com.keyman {
       if(x._kmwAttachment) {
         return;
       } else {
-        x._kmwAttachment = new AttachmentInfo(null, this.keyman.util.device.touchable);
+        // Problem:  tries to wrap IFrames that aren't design-mode.
+        // The elements in the contained document get separately wrapped, so this doesn't need a proper wrapper.
+        //
+        // Its attachment process might need some work.
+        let eleInterface = dom.wrapElement(x);
+        // May should filter better for IFrames.
+        if(!(eleInterface || dom.Utils.instanceof(x, "HTMLIFrameElement"))) {
+          console.warn("Could not create processing interface for newly-attached element!");
+        }
+
+        x._kmwAttachment = new AttachmentInfo(eleInterface, null, this.keyman.util.device.touchable);
       }
     }
 
@@ -495,6 +505,9 @@ namespace com.keyman {
             util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
             util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
             util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+
+            // Set up a reference alias; the internal document will need the same attachment info!
+            Lelem.body._kmwAttachment = Pelem._kmwAttachment;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
             this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
@@ -527,6 +540,9 @@ namespace com.keyman {
             util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
             util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
             util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+
+            // Remove the reference to our prior attachment data!
+            Lelem.body._kmwAttachment = null;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
             this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
@@ -869,20 +885,26 @@ namespace com.keyman {
         var domManager = this;
 
         var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
-          domManager.attachToControl(Pelem);
+          // Provide a minor delay to allow 'load' event handlers to set the design-mode property.
+          window.setTimeout(function() { 
+            domManager.attachToControl(Pelem);
+          }, 1);
         };
 
         Pelem.addEventListener('load', attachFunctor);
 
-        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
-        * go ahead and perform our callback's contents.
-        * 
-        * keymanweb.domManager.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
-        * problems.
-        */
-        if(Pelem.contentDocument.readyState == 'complete') {
-          window.setTimeout(attachFunctor, 1);
-        }
+        // The following block breaks for design-mode iframes, at least in Chrome; a blank document may exist
+        // before the load of the desired actual document. 
+        //
+        // /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+        // * go ahead and perform our callback's contents.
+        // * 
+        // * keymanweb.domManager.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+        // * problems.
+        // */
+        // if(Pelem.contentDocument.readyState == 'complete') {
+        //   window.setTimeout(attachFunctor, 1);
+        // }
       } else {
         this.attachToControl(Pelem);
       }  
