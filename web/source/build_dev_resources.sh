@@ -1,6 +1,6 @@
 #! /bin/bash
 # 
-# Compile the KeymanWeb Recorder module for use with developing/running engine tests.
+# Compiles development-related KeymanWeb resources for use with developing/running tests.
 #
 
 # Fails the build if a specified file does not exist.

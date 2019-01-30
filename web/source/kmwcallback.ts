@@ -1067,15 +1067,19 @@ namespace com.keyman {
         new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
         new StyleCommand('superscript',0), new StyleCommand('underline',0)
       ];
+      
       if(_Document.defaultView) {
-        this.keymanweb._push(_CacheableCommands,['hilitecolor',1]);
+        this.keymanweb._push(_CacheableCommands, new StyleCommand('hilitecolor',1));
       }
         
       for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
+        let cmd = _CacheableCommands[n];
         //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);
-        this.keymanweb._push(_CacheableCommands[n], _CacheableCommands[n][1] ?
-            _Document.queryCommandValue(_CacheableCommands[n][0]) :
-            _Document.queryCommandState(_CacheableCommands[n][0]));
+        if(cmd.stateType == 1) {
+          cmd.cache = _Document.queryCommandValue(cmd.cmd);
+        } else {
+          cmd.cache = _Document.queryCommandState(cmd.cmd);
+        }
       }
       return _CacheableCommands;
     }
@@ -1089,21 +1093,23 @@ namespace com.keyman {
      * Description  Restore styles in IFRAMEs (??)
      */    
     private _CacheCommandsReset = function(_Document: HTMLDocument, _CacheableCommands: StyleCommand[], _func: () => void): void {
-      for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
+      for(var n=0; n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
+        let cmd = _CacheableCommands[n];
+
         //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
-        if(_CacheableCommands[n][1]) {
-          if(_Document.queryCommandValue(_CacheableCommands[n][0]) != _CacheableCommands[n][2]) {
+        if(cmd.stateType == 1) {
+          if(_Document.queryCommandValue(cmd.cmd) != cmd.cache) {
             if(_func) {
               _func();
             }
-            _Document.execCommand(_CacheableCommands[n][0], false, _CacheableCommands[n][2]);
+            _Document.execCommand(cmd.cmd, false, <string> cmd.cache);
           }
-        } else if(_Document.queryCommandState(_CacheableCommands[n][0]) != _CacheableCommands[n][2]) {
+        } else if(_Document.queryCommandState(cmd.cmd) != cmd.cache) {
           if(_func) {
             _func();
           }
           //KeymanWeb._Debug('executing command '+_CacheableCommand[n][0]);
-          _Document.execCommand(_CacheableCommands[n][0], false, null);
+          _Document.execCommand(cmd.cmd, false, null);
         }
       }
     }
