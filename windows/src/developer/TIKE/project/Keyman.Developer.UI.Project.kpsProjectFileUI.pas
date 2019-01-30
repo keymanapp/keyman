@@ -31,9 +31,6 @@ uses
 type
   TkpsProjectFileUI = class(TOpenableProjectFileUI)
   private
-    procedure MenuEventCompile(Sender: TObject);
-    procedure MenuEventTest(Sender: TObject);
-
     function TestPackage: Boolean;
     function TestPackageOnline: Boolean;
     function InstallPackage: Boolean;
@@ -46,7 +43,6 @@ type
     function TestPackageState(FCompiledName: string; FSilent: Boolean): Boolean;
   public
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
-    procedure BuildMenu(Menu: TPopupMenu); override;
     property ProjectFile: TkpsProjectFileAction read GetProjectFile;
   end;
 
@@ -72,23 +68,6 @@ uses
   KeymanDeveloperUtils,
   PackageInfo;
 
-procedure TkpsProjectFileUI.BuildMenu(Menu: TPopupMenu);
-var
-  mi: TMenuItem;
-begin
-  inherited BuildMenu(Menu);
-
-  mi := TMenuItem.Create(Menu);
-  mi.Caption := '&Compile';
-  mi.OnClick := MenuEventCompile;
-  Menu.Items.Add(mi);
-
-  mi := TMenuItem.Create(Menu);
-  mi.Caption := '&Test';
-  mi.OnClick := MenuEventTest;
-  Menu.Items.Add(mi);
-end;
-
 function TkpsProjectFileUI.CompilePackage(FSilent: Boolean): Boolean;
 begin
   Result := False;
@@ -111,7 +90,6 @@ function TkpsProjectFileUI.DoAction(action: TProjectFileAction; FSilent: Boolean
 begin
   case action of
     pfaCompile: Result := CompilePackage(FSilent);
-    pfaTest: Result := TestPackage;
     pfaInstall: Result := InstallPackage;
     pfaUninstall: Result := UninstallPackage;
     pfaCompileInstaller: Result := CompilePackageInstaller(FSilent);
@@ -143,17 +121,6 @@ begin
   if not TestPackageState(FCompiledName, False) then Exit;
   KeymanDeveloperUtils.InstallPackage(FCompiledName, True);
   Result := True;
-end;
-
-procedure TkpsProjectFileUI.MenuEventCompile(Sender: TObject);
-begin
-  frmMessages.Clear;
-  CompilePackage(False);
-end;
-
-procedure TkpsProjectFileUI.MenuEventTest(Sender: TObject);
-begin
-  TestPackage;
 end;
 
 function TkpsProjectFileUI.TestPackage: Boolean;
