@@ -1,6 +1,8 @@
 #! /bin/bash
 # 
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
+#   - the Recorder module (for engine tests)
+#   - the DOM module (for touch-alias and element-interface tests)
 #
 
 # Fails the build if a specified file does not exist.
