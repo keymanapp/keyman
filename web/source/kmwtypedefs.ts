@@ -1,5 +1,12 @@
+/// <reference path="dom/editableElement.ts" />
+
 namespace com.keyman {
   export class AttachmentInfo {
+    /**
+     * Provides the core interface between the DOM and the actual keyboard.
+     */
+    interface:      dom.EditableElement;
+
     /**
      * Tracks the control's independent keyboard selection, when applicable.
      */
@@ -18,19 +25,21 @@ namespace com.keyman {
      */
     touchEnabled:   boolean;
 
-    constructor(kbd: string, touch: boolean) {
+    constructor(eleInterface: dom.EditableElement, kbd: string, touch?: boolean) {
+      this.interface = eleInterface;
       this.keyboard = kbd;
-      this.touchEnabled = touch;
+      this.touchEnabled = touch || false;
     }
   }
 
   export class StyleCommand {
     cmd: string;
-    state: number;
+    stateType: number;
+    cache: string|boolean;
 
     constructor(c: string, s:number) {
       this.cmd = c;
-      this.state = s;
+      this.stateType = s;
     }
   }
 }

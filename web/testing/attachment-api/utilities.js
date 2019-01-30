@@ -189,12 +189,7 @@ function addDesignIFrame() {
   frame.id = 'designIFrame' + i;
   frame.src = "editableFrame.html";
   
-  // var doc = frame.contentDocument;
-  // doc.designMode = "on";
-  
-  frame.onload = function() {
-    keyman.attachToControl(frame);
-  }
+  // The iframe's document sets design-mode on with its body.onload handler.
  
   var newDiv = generateDiagnosticDiv(frame);
   masterDiv.appendChild(newDiv);
