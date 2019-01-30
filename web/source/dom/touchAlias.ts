@@ -1,5 +1,7 @@
 // Defines the TouchAliasElement merged type.
-/// <reference path="TouchAliasElement.ts" />
+/// <reference path="touchAliasElement.ts" />
+// Defines the EditableElement interface.
+/// <reference path="editableElement.ts" />
 
 namespace com.keyman.dom {
   export class TouchAlias implements EditableElement {
