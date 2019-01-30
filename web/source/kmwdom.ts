@@ -141,7 +141,8 @@ namespace com.keyman {
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
       let x=dom.constructTouchAlias(Pelem);
-      x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
+      this.setupElementAttachment(x); // The touch-alias should have its own wrapper.
+      //x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
       
       // Set font for base element
       this.enableInputElement(x, true);
