@@ -1,0 +1,199 @@
+/* 
+===========
+==General==
+===========
+*/
+body {
+	margin: 30px; 
+	font-family: 'Arial Unicode MS', Helvetica, sans-serif; 
+	font-size: 11pt;color: #2D2C2C;}
+img {border: none; }
+
+p {font-size: 11pt; margin:5px 0px 0px;}
+.example {margin-left:40px}
+section {clear:both;}
+
+article{clear:left; margin-bottom:60px;}
+	
+/* Headers */
+h1, h2, h3{color: #AD4A28; font-weight: bold;clear:both;}
+
+h1 {font-size: 22pt; margin: 22px 0px 11px; padding:0px;}
+h2 {font-size: 16pt; margin: 14px 0px 7px; padding:0px;}
+h3 {font-size: 12pt; margin: 12px 0px 6px; padding:0px;}
+h4 {font-size: 11pt; margin: 10px 0px 5px; padding:0px;}
+
+/* Links */
+a:link {color: #AD4A28; text-decoration: none;}
+a:visited {color: #AD4A28;text-decoration: none;}
+a:hover {color: #AD4A28;text-decoration: underline;}
+
+/* Language + Keyboard */
+samp{font-family: Gardiner, Aegyptus; color:blue;}
+kbd {color:black;}
+
+/* Printing */
+.break {clear:both !important; page-break-before:always !important;}
+
+/*
+===========
+==Welcome==
+===========
+*/
+/* Notes (Asides) */
+aside {background-color:#eee;border:2px solid #ddd;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;margin:10px 0px; padding:0px 10px 5px;font-size:10pt;}
+aside h4 {color:#AD4A28; text-align:left;padding:0px 0px 5px;margin-top:5px;font-size:11pt;}
+aside p {font-size:10pt;}
+aside kbd {color:black; font:9pt Arial; border:solid 1px grey; background:#ccc; margin:0px 1px;  padding:2px 4px; vertical-align:middle; line-height:2em; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;}
+
+
+/* Tables */
+table {border-collapse:collapse !important; margin:10px 0px 20px 40px;}
+.grid col {text-align:center;  background-color:#ffffff;}
+.grid th {text-align:center; font-weight:bold}
+.grid td, .grid th {padding:2px 5px;border-bottom:1px solid #ddd;}
+.grid tr {text-align:center; font-weight:normal; height:80px;}
+.grid thead tr,.grid .headrow{height:30px;}
+.grid .headrow {font-weight:bold; color:#AD4A28; background-color:#eee;}
+.gardiner {font-family:Gardiner, Aegyptus; font-size:24pt;line-height:20px;vertical-align:-2px;}
+col.trans {width:60px;}
+col.keys  {width:50px;}
+col.signs {width:85px;}
+#guidemdc col.keys {width:120px;}
+#guidemdc col.signs{width:465px;}
+#guidegardiner col.signs{width:125px;}
+#guidegardiner col.keys {width:115px;}
+tr.halfrow {border-bottom:2px solid white !important;}
+td samp {font-size:24pt}
+td samp.hiero {vertical-align:middle;font-size:49pt;}
+table kbd {color:black; font:12pt Arial; border:solid 1px grey; background:#ccc; margin:0px 1px;  padding:2px 4px; vertical-align:middle; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;}
+
+/* Columns + Psuedo-Columns (Floats)*/
+.columns  {width:375px; -webkit-column-count: 2; -webkit-column-gap: 10px; -moz-column-count: 2; -moz-column-gap: 10px; column-count: 2; column-gap: 10px;}
+.colleft, .colright {position:relative; float:left;}
+.colright {padding-left:40px;}
+
+/* Language Examples */
+p samp {font-size:22pt; line-height:.8em;}
+p kbd {color:black; font:9pt Arial; border:solid 1px grey; background:#ccc; margin:0px 1px; padding:0px 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;}
+samp.hiero {font-size:44pt; line-height:43px; font-family:Gardiner, Aegyptus;}
+samp .cyc {font-size:30pt; color:#2D2C2C;}
+
+/* OSK Keys */
+        .key { 
+            float: left;
+            display: block; 
+            position: relative;
+            overflow: hidden;
+            height: 35px;
+            margin: 2px 0px 0px 2px;
+            border: solid 1px grey;
+			-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;     
+        }
+        .plain {
+          background-repeat: no-repeat;
+          width: 34px;
+        }	
+		.empty {
+		  background:#eee;
+		}
+		.K_BKQUOTE {
+		width:34px;
+		}
+        .K_BKSP {
+		width: 60px;
+		}
+		.K_TAB {
+		width: 52px;		
+		}
+        .K_BKSLASH {
+        width: 42px; 
+        }
+		.K_CAPS {
+		width: 62px;
+		}
+		.K_ENTER {
+        width: 70px; 
+		}		
+		.K_ENTER-EU1 {
+        width: 42px; 
+		-webkit-border-radius: 3px 3px 0px; -moz-border-radius: 3px 3px 0px; border-radius: 3px 3px 0px;
+		}
+		.K_ENTER-EU1 .key kbd {
+		left:3px !important;
+		}   
+		.K_ENTER-EU2 {
+        width: 32px; 
+		margin-top:-1px !important; 
+		border-top:none !important;
+		height:39px !important;
+		-webkit-border-radius: 0px 0px 3px 3px; -moz-border-radius: 0px 0px 3px 3px; border-radius: 0px 0px 3px 3px;
+		}		
+        .K_SHIFTL {
+          width: 85px;
+        }                
+        .K_SHIFTL-EU {
+          width: 47px;
+        }    
+        .K_oE2 {
+          display:none;        
+        }     
+		.K_SHIFTR {
+          width: 85px;
+        }  
+		.K_CTRLL {
+		  width:60px;
+		  margin-right: 40px; 
+        } 		
+		.K_ALTL {
+          width: 40px;
+        }   
+        .K_SPACE , .K_SPACE samp{
+          width: 224px;  
+        } 
+		.K_ALTR {
+          width: 40px;
+        } 		
+		.K_CTRLR {
+          width: 60px;
+		  margin-left: 76px;
+		}
+
+        
+        .special {
+          background-repeat: no-repeat;
+		  background: #c0c0c0;
+        }
+        
+        .key kbd {
+          font: bold 7pt Arial; 
+          position: absolute; 
+          left: 3px; 
+          top: 3px;
+        }
+        
+        .key kbd {          
+          display: block;
+        }
+        
+        .special kbd {
+          display: block;
+        }
+        
+        .key samp {
+		  font-size: 19pt;
+          position: absolute; 
+          display: block;
+          right: 5px;
+          bottom: 0px;
+          color: blue;
+        }	
+
+		.LTN {
+		  font-family:Arial !important;
+		  font-size:12px !important;
+		  color: #AD4A28 !important;
+		  right:2px !important;
+		  bottom:2px !important; 
+		  font-variant:small-caps;
+		}
