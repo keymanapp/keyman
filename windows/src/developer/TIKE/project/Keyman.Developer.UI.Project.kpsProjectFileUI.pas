@@ -31,7 +31,6 @@ uses
 type
   TkpsProjectFileUI = class(TOpenableProjectFileUI)
   private
-    function TestPackage: Boolean;
     function TestPackageOnline: Boolean;
     function InstallPackage: Boolean;
     function UninstallPackage: Boolean;
@@ -120,32 +119,6 @@ begin
   FCompiledName := ProjectFile.TargetFilename;
   if not TestPackageState(FCompiledName, False) then Exit;
   KeymanDeveloperUtils.InstallPackage(FCompiledName, True);
-  Result := True;
-end;
-
-function TkpsProjectFileUI.TestPackage: Boolean;
-var
-  pack: TKPSFile;
-  FTargetFileName: string;
-begin
-  if Assigned(MDIChild) then
-    with MDIChild as TfrmPackageEditor do pack := GetPack
-  else
-  begin
-    pack := TKPSFile.Create;
-    pack.FileName := ProjectFile.FileName;
-    pack.LoadXML;
-  end;
-
-  try
-    FTargetFileName := ProjectFile.TargetFilename;
-    if not TUtilExecute.Shell(frmKeymanDeveloper.Handle, FTargetFileName, ExtractFileDir(FTargetFileName)) then  // I3349
-      ShowMessage(SysErrorMessage(GetLastError));
-  finally
-    if not Assigned(MDIChild) then
-      pack.Free;
-  end;
-
   Result := True;
 end;
 
