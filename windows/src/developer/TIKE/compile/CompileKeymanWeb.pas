@@ -687,10 +687,8 @@ function TCompileKeymanWeb.JavaScript_Rules(fgp: PFILE_GROUP): string;
 var
   j: Integer;
   HasRules: Boolean;
-  linecomment: string;
   fkp2, fkp: PFILE_KEY;
   processed_rule: array of Boolean;
-  i: Integer;
   LocalHasRules: Boolean;
   LocalCounter: Integer;
   Counter: Integer;
