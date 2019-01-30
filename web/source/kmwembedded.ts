@@ -307,24 +307,16 @@ namespace com.keyman.osk {
     else if (Pelem.setSelectionRange)
     {
       /* Mozilla other controls */
-      var LselectionStart, LselectionEnd;
-      if(Pelem._KeymanWebSelectionStart) 
+      var LselectionStart;
+      
+      if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) // I3319, KMW-1
       {
-        LselectionStart = Pelem._KeymanWebSelectionStart;
-        LselectionEnd = Pelem._KeymanWebSelectionEnd;
-        //KeymanWeb._Debug('KeymanWeb.KC: _KeymanWebSelectionStart=TRUE LselectionStart='+LselectionStart+'; LselectionEnd='+LselectionEnd);
+        keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
+        keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
+        keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
       }
-      else
-      {
-        if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) // I3319, KMW-1
-        {
-          keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
-          keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
-          keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
-        }
-        LselectionStart = keymanweb._CachedSelectionStart; // I3319
-        LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
-      }
+      LselectionStart = keymanweb._CachedSelectionStart; // I3319
+
       if(LselectionStart < n)
       {
         // Looking for context before start of text buffer so return non-characters to pad result

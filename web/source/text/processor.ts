@@ -373,19 +373,17 @@ namespace com.keyman.text {
           //// if(keyText == '' || keyText == '&nbsp;') return true; --> why?
         }
 
-        Ls=Lelem._KeymanWebSelectionStart;
-        Le=Lelem._KeymanWebSelectionEnd;
         keyman.uiManager.setActivatingUI(true);
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
         if(keyman.domManager._IsMozillaEditableIframe(<HTMLIFrameElement> Lelem,0)) {
           Lelem = (<HTMLIFrameElement> Lelem).contentDocument.documentElement;
         }
-        Lelem._KeymanWebSelectionStart=Ls;
-        Lelem._KeymanWebSelectionEnd=Le;
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         // ...end I3363 (Build 301)
-        (<any>keyman)._CachedSelectionStart = null; // I3319
+        if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+          Lelem._kmwAttachment.interface.invalidateSelection();
+        }
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
         kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing

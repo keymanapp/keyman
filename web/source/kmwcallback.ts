@@ -251,10 +251,8 @@ namespace com.keyman {
     insertText(Ptext: string, PdeadKey:number): boolean {
       this.resetContextCache();
       //_DebugEnter('InsertText');
-      var Lelem: Document|HTMLElement = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lv=false;
+      var Lelem: HTMLElement = this.keymanweb.domManager.getLastActiveElement(), Ls, Le, Lkc, Lv=false;
       if(Lelem != null) {
-        Ls=Lelem._KeymanWebSelectionStart;
-        Le=Lelem._KeymanWebSelectionEnd;
 
         this.keymanweb.uiManager.setActivatingUI(true);
         DOMEventHandlers.states._IgnoreNextSelChange = 100;
@@ -265,8 +263,6 @@ namespace com.keyman {
           Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
         }
         
-        Lelem._KeymanWebSelectionStart=Ls;
-        Lelem._KeymanWebSelectionEnd=Le;
         DOMEventHandlers.states._IgnoreNextSelChange = 0;
         if(Ptext!=null) {
           this.output(0, Lelem, Ptext);
@@ -274,8 +270,10 @@ namespace com.keyman {
         if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
           this.deadkeyOutput(0, Lelem, PdeadKey);
         }
-        Lelem._KeymanWebSelectionStart=null;
-        Lelem._KeymanWebSelectionEnd=null;
+        
+        if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+          Lelem._kmwAttachment.interface.invalidateSelection();
+        }
         Lv=true;
       }
       //_DebugExit('InsertText');
@@ -1219,7 +1217,10 @@ namespace com.keyman {
      */
     processKeystroke(device, element: HTMLElement, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
       // Clear internal state tracking data from prior keystrokes.
-      (<any>this.keymanweb)._CachedSelectionStart = null; // I3319     
+      if(element._kmwAttachment && element._kmwAttachment.interface) {
+        element._kmwAttachment.interface.invalidateSelection();
+      }
+
       this._DeadkeyResetMatched();       // I3318    
       this.resetContextCache();
 

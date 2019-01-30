@@ -133,8 +133,6 @@ namespace com.keyman {
         return true;
       };
 
-      Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
-
       // Set element directionality (but only if element is empty)
       if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
         this.keyman.domManager._SetTargDir(Ltarg);
@@ -206,14 +204,6 @@ namespace com.keyman {
       if(Ltarg.ownerDocument) {
         if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
           Ltarg=Ltarg.contentWindow.document;
-        }
-          
-        if (Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLInputElement 
-            || Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
-          //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
-          //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
-          Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
-          Ltarg._KeymanWebSelectionEnd = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionEnd);  //I3319
         }
       }
       
