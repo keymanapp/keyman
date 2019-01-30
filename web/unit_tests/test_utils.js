@@ -256,7 +256,7 @@ function retrieveAndReset(Pelem) {
   var val = "";
   if(alias) {
     val = alias.textContent;
-    keyman.touchAliasing.setText(alias, "", 0);
+    alias.setText("", 0);
   } else {
     val = Pelem.value;
     Pelem.value = "";
@@ -367,6 +367,18 @@ if(typeof(DynamicElements) == 'undefined') {
     return editable.id;
   }
 
+  // base: takes an optional element to use as the touch alias's ['base'] property.
+  DynamicElements.addTouchAlias = function(base) {
+    var masterDiv = document.getElementById('DynamicElements');
+    var touchAlias = com.keyman.dom.constructTouchAlias(base);
+    var i = inputCounter++;
+
+    touchAlias.id = 'touchAlias' + i;
+
+    masterDiv.appendChild(touchAlias);
+    return touchAlias.id;
+  }
+
   DynamicElements.assertAttached = function(ele, done) {
     var assertion = function() {
       assert.isTrue(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not attached!");
@@ -395,6 +407,8 @@ if(typeof(DynamicElements) == 'undefined') {
     }
   }
 
+  // Is utilized only by the attachmentAPI test case, but it was originally defined as part of the same
+  // object as the rest of DynamicElements, which is useful for numerous test cases.
   DynamicElements.init = function() {
     var s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
     DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEvent(s_key_json);

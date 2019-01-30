@@ -53,92 +53,6 @@ namespace com.keyman {
       // Touch-only handler.
     }.bind(this);
     
-    /**
-     * Get simulated input field content
-     *    
-     * @param       {Object}        e     element (object) of simulated input field
-     * @return      {string}              entire text in simulated input field
-     */       
-    getText(e: HTMLElement): string {
-      // Touch-only method.
-      return '';
-    }
-    
-    /**
-     *Insert text into simulated input field at indicated character position
-      * 
-      * @param       {Object}      e     simulated input field DIV
-      * @param       {?string}     t     text to insert in element
-      * @param       {?number}     cp    caret position (characters)     
-      */       
-    setText(e: HTMLElement, t?: string, cp?: number): void {
-      // Touch-only method.
-    }
-    
-    /**
-     * Get text up to the caret from simulated input field 
-     *    
-     * @return      {string}   
-     */       
-    getTextBeforeCaret(e: HTMLElement): string {
-      // Touch-only method.
-      return '';
-    }
-
-    /**
-     * Replace text up to the caret in the simulated input field 
-     *    
-     * @param       {Object}        e     element (object) of simulated input field
-     * @param       {string}        t     Context for simulated input field
-     */       
-    setTextBeforeCaret(e: HTMLElement, t: string): void {
-      // Touch-only method.
-    }
-
-    /**
-     * Description  Get current position of caret in simulated input field 
-     *    
-     * @param       {Object}        e     element (object) of simulated input field
-     * @return      {number}              caret character position in simulated input field
-     */       
-    getTextCaret(e: HTMLElement): number {
-      // Touch-only method.
-      return 0;
-    }
-    
-    /**
-     * Set current position of caret in simulated input field then display the caret 
-     *    
-     * @param       {Object}        e     element (object) of simulated input field
-     * @param       {number}        cp    caret character position in simulated input field
-     */       
-    setTextCaret(e: HTMLElement, cp: number): void {
-      // Touch-only method.
-    }
-    
-    /**
-     * Hides the simulated caret for touch-aliased elements.
-     */       
-    hideCaret(): void {
-      // Touch-only method.
-    }
-    
-    /**
-     * Toggle state of caret in simulated input field
-     */       
-    flashCaret: () => void = function(): void {
-      // Touch-only handler.
-    }.bind(this);
-
-    /**
-     * Correct the position and size of a duplicated input element
-     *    
-     * @param       {Object}        x     element
-     */       
-    updateInput(x: HTMLElement) {
-      // Touch-only method.
-    }
-
     /** 
      * Handles touch-based loss of focus events.
      */
@@ -277,12 +191,13 @@ namespace com.keyman {
         return true;
       }
 
-      DOMEventHandlers.states.activeElement = null; // I3363 (Build 301)
-
       // Hide the touch device input caret, if applicable  I3363 (Build 301)
-      if(this instanceof DOMTouchHandlers) {
-        this.hideCaret();
+      if(dom.Utils.instanceof(DOMEventHandlers.states.activeElement, "TouchAliasElement")) {
+        let lastAlias = <dom.TouchAliasElement> DOMEventHandlers.states.activeElement;
+        lastAlias.hideCaret();
       }
+
+      DOMEventHandlers.states.activeElement = null; // I3363 (Build 301)
       
       if (Ltarg.nodeType == 3) { // defeat Safari bug
         Ltarg = Ltarg.parentNode as HTMLElement;
@@ -560,10 +475,6 @@ namespace com.keyman {
    * Defines numerous functions for handling and modeling touch-based aliases.
    */
   export class DOMTouchHandlers extends DOMEventHandlers {
-    // Stores the simulated caret element.
-    caret: HTMLDivElement;
-    caretTimerId: number;
-
     firstTouch: {
       x: number;
       y: number;
@@ -572,32 +483,6 @@ namespace com.keyman {
     
     constructor(keyman: KeymanBase) {
       super(keyman);
-
-      this.initCaret();
-    }
-
-    initCaret(): void {
-      /**
-       * Create a caret to be appended to the scroller of the focussed input field. 
-       * The caret is appended to the scroller so that it will automatically be clipped 
-       * when the user manually scrolls it outside the element boundaries.          
-       * It is positioned exactly over the hidden span that is inserted between the
-       * text spans before and after the insertion point.          
-       */
-      this.caret=<HTMLDivElement> document.createElement('DIV');
-      var cs=this.caret.style;
-      cs.position='absolute';
-      cs.height='16px';           // default height, actual height set from element properties
-      cs.width='2px';
-      cs.backgroundColor='blue';
-      cs.border='none';
-      cs.left=cs.top='0px';           // actual position set relative to parent when displayed
-      cs.display='block';         
-      cs.visibility='hidden';
-      cs.zIndex='9998';           // immediately below the OSK
-
-      // Start the caret flash timer
-      this.caretTimerId = window.setInterval(this.flashCaret,500);
     }
 
     /**
@@ -605,9 +490,7 @@ namespace com.keyman {
      *      
      */       
     setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(this: DOMTouchHandlers, e?: TouchEvent|MSPointerEvent): void {
-      var kmw = this.keyman;
       var osk = this.keyman.osk;
-      var util = this.keyman.util;
 
       DOMEventHandlers.states.setFocusTimer();
 
@@ -644,12 +527,15 @@ namespace com.keyman {
       }
 
       // And the actual target element        
-      var target=scroller.parentNode as HTMLElement;
+      var target=scroller.parentNode as dom.TouchAliasElement;
 
       // Move the caret and refocus if necessary     
       if(DOMEventHandlers.states.activeElement != target) {
         // Hide the KMW caret
-        this.hideCaret(); 
+        let prevTarget = <dom.TouchAliasElement> DOMEventHandlers.states.activeElement;
+        if(prevTarget) {
+          prevTarget.hideCaret();
+        }
         DOMEventHandlers.states.activeElement=target;
         // The issue here is that touching a DIV does not actually set the focus for iOS, even when enabled to accept focus (by setting tabIndex=0)
         // We must explicitly set the focus in order to remove focus from any non-KMW input
@@ -669,7 +555,7 @@ namespace com.keyman {
       }
       
       // If clicked on DIV, set caret to end of text
-      if(dom.Utils.instanceof(tTarg, "HTMLDivElement")) { 
+      if(dom.Utils.instanceof(tTarg, "TouchAliasElement")) {
         var x,cp;
         x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);        
         if(target.dir == 'rtl') { 
@@ -679,14 +565,14 @@ namespace com.keyman {
           cp=(touchX<x ? 0 : 100000);
         }
     
-        this.setTextCaret(target,cp);
-        this.scrollInput(target);        
+        target.setTextCaret(cp);
+        target.scrollInput();        
       } else { // Otherwise, if clicked on text in SPAN, set at touch position
         var caret,cp,cpMin,cpMax,x,y,dy,yRow,iLoop;
         caret=scroller.childNodes[1]; //caret span
         cpMin=0;
-        cpMax=this.getText(target)._kmwLength();
-        cp=this.getTextCaret(target);
+        cpMax=target.getText()._kmwLength();
+        cp=target.getTextCaret();
         dy=document.body.scrollTop;
 
         // Vertical scrolling
@@ -698,15 +584,15 @@ namespace com.keyman {
             if(y > touchY && cp > cpMin && cp != cpMax) {cpMax=cp; cp=Math.round((cp+cpMin)/2);}
             else if(y < touchY-yRow && cp < cpMax && cp != cpMin) {cpMin=cp; cp=Math.round((cp+cpMax)/2);}
             else break;
-            this.setTextCaret(target,cp);
+            target.setTextCaret(cp);
           }
 
           while(dom.Utils.getAbsoluteY(caret)-dy > touchY && cp > cpMin) {
-            this.setTextCaret(target,--cp);
+            target.setTextCaret(--cp);
           }
 
           while(dom.Utils.getAbsoluteY(caret)-dy < touchY-yRow && cp < cpMax) {
-            this.setTextCaret(target,++cp);
+            target.setTextCaret(++cp);
           }
         }
 
@@ -736,14 +622,14 @@ namespace com.keyman {
           } else {
             break;
           }
-          this.setTextCaret(target,cp);
+          target.setTextCaret(cp);
         }
 
         while(snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp > cpMin) {
-          this.setTextCaret(target,--cp);
+          target.setTextCaret(--cp);
         }
         while(!snapOrder(dom.Utils.getAbsoluteX(caret), touchX) && cp < cpMax) {
-          this.setTextCaret(target,++cp);
+          target.setTextCaret(++cp);
         }
       }
 
@@ -757,6 +643,7 @@ namespace com.keyman {
 
       // With the attachment API update, we now directly track the old legacy control behavior.
       DOMEventHandlers.states.lastActiveElement = target;
+      target.showCaret();
 
       /**
        * If we 'just activated' the KeymanWeb UI, we need to save the new keyboard change as appropriate.
@@ -771,270 +658,15 @@ namespace com.keyman {
         return;
       }
     }.bind(this);
-        
-    getText(e: HTMLElement): string {
-      if(e == null) {
-        return '';
-      }
-
-      return e.textContent;
-    } 
-
-    setText(e: HTMLElement, t?: string, cp?: number): void {
-      if(e && e.childNodes.length > 0) {
-        var d=e.firstChild,tLen=0;
-        if(d.childNodes.length >= 3) {
-          var s1=<HTMLElement> d.childNodes[0], s2=<HTMLElement> d.childNodes[2],t1,t2;
-          
-          // Read current text if null passed (for caret positioning)
-          if(t === null) {
-            t1=s1.textContent;
-            t2=s2.textContent;
-            t=t1+t2;        
-          }
-
-          if(cp < 0) {
-            cp = 0;    //if(typeof t._kmwLength == 'undefined') return;
-          }
-          tLen=t._kmwLength();
-          
-          if(cp === null || cp > tLen) {
-            cp=tLen;
-          }
-          t1=t._kmwSubstr(0,cp);
-          t2=t._kmwSubstr(cp);
-                              
-          s1.textContent=t1;
-          s2.textContent=t2;
-        }
-      }
-
-      this.updateBaseElement(e,tLen); // KMW-3, KMW-29
-    }
-
-    getTextBeforeCaret(e: HTMLElement) {
-      if(e && e.childNodes.length > 1) {
-        var d=e.firstChild;
-        if(d.childNodes.length > 0) {
-          var s1=<HTMLElement> d.childNodes[0];
-          return s1.textContent;
-        }
-      }
-
-      return '';    
-    }
-        
-    setTextBeforeCaret(e: HTMLElement, t: string): void {
-      if(e && e.childNodes.length > 0) {
-        var d=e.firstChild,tLen=0;
-        if(d.childNodes.length > 1) {
-          var s1=<HTMLElement> d.childNodes[0], s2=<HTMLElement> d.childNodes[2];
-          // Collapse (trailing) whitespace to a single space for INPUT fields (also prevents wrapping)
-          if(e.base.nodeName != 'TEXTAREA') {
-            t=t.replace(/\s+$/,' ');
-          }
-          s1.textContent=t;
-          // Test total length in order to control base element visibility 
-          tLen=t.length;
-          tLen=tLen+s2.textContent.length;           
-        }
-      }
-      
-      // Update the base element then scroll into view if necessary      
-      this.updateBaseElement(e,tLen); //KMW-3, KMW-29      
-      this.scrollInput(e); 
-    }
-
-    getTextCaret(e: HTMLElement): number {
-      return this.getTextBeforeCaret(e)._kmwLength();
-    }
-    
-    setTextCaret(e: HTMLElement, cp: number): void {
-      this.setText(e,null,cp);
-      this.showCaret(e);
-    }
-
-    hideCaret() {
-      var e=DOMEventHandlers.states.lastActiveElement, s=null;
-      if(e && e.className != null && e.className.indexOf('keymanweb-input') >= 0) {
-        // Always copy text back to underlying field on blur
-        if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement
-            ||e.base instanceof e.base.ownerDocument.defaultView.HTMLInputElement) {
-          e.base.value = this.getText(e);
-        }
-        
-        // And set the scroller caret to the end of the element content
-        this.setText(e, null, 100000);
-        
-        // Set the element scroll to zero (or max for RTL INPUT)
-        var ss=(e.firstChild as HTMLElement).style;
-        if(e.base.nodeName == 'TEXTAREA') {
-          ss.top='0'; 
-        } else {
-          if(e.base.dir == 'rtl') {
-            ss.left=(e.offsetWidth-(e.firstChild as HTMLElement).offsetWidth-8)+'px';
-          } else {
-            ss.left='0';
-          }
-        }
-        
-        
-        // And hide the caret and scrollbar       
-        if(this.caret.parentNode) {
-          this.caret.parentNode.removeChild(this.caret);
-        }
-
-        this.caret.style.visibility='hidden';
-        if(e.childNodes.length > 1 ) {
-          (e.childNodes[1] as HTMLElement).style.visibility='hidden';
-        }
-      }    
-    }
-
-    flashCaret: () => void = function(this: DOMTouchHandlers): void {
-      if(this.keyman.util.device.touchable && DOMEventHandlers.states.activeElement != null) {
-        var cs=this.caret.style;
-        cs.visibility = cs.visibility != 'visible' ? 'visible' : 'hidden';
-      }
-    }.bind(this);
-
-    /**
-     * Position the caret at the start of the second span within the scroller
-     *      
-     * @param   {Object}  e   input DIV element (copy of INPUT or TEXTAREA)
-     */
-    showCaret(e: HTMLElement) {                          
-      if(!e || !e.firstChild || (e.firstChild.childNodes.length<3)) {
-        return;
-      }
-
-      var scroller=e.firstChild, cs=this.caret.style, sp2=<HTMLElement>scroller.childNodes[1];
-      
-      // Attach the caret to this scroller and position it over the caret span
-      if(this.caret.parentNode != <Node>scroller) {
-        scroller.appendChild(this.caret);
-      }
-
-      cs.left=sp2.offsetLeft+'px'; 
-      cs.top=sp2.offsetTop+'px';
-      cs.height=(sp2.offsetHeight-1)+'px';
-      cs.visibility='hidden';   // best to wait for timer to display caret
-      
-      // Scroll into view if required
-      this.scrollBody(e);
-    
-      // Display and position the scrollbar if necessary
-      this.setScrollBar(e);
-    }
-          
-    updateInput(x: HTMLDivElement) {
-      var util = this.keyman.util;
-
-      var xs=x.style,b=x.base,
-          s=window.getComputedStyle(b,null),
-          mLeft=parseInt(s.marginLeft,10),
-          mTop=parseInt(s.marginTop,10),
-          x1=dom.Utils.getAbsoluteX(b), y1=dom.Utils.getAbsoluteY(b);
-
-      var p=x.offsetParent as HTMLElement;
-      if(p) {
-        x1=x1-dom.Utils.getAbsoluteX(p);
-        y1=y1-dom.Utils.getAbsoluteY(p);
-      }
-      
-      if(isNaN(mLeft)) {
-        mLeft=0;
-      }
-      if(isNaN(mTop)) {
-        mTop=0;
-      }
-      
-      xs.left=(x1-mLeft)+'px';
-      xs.top=(y1-mTop)+'px';
-
-      // FireFox does not want the offset!
-      if(typeof(s.MozBoxSizing) != 'undefined') {
-        xs.left=x1+'px';
-        xs.top=y1+'px';
-      }     
-
-      var w=b.offsetWidth, h=b.offsetHeight,
-          pLeft=parseInt(s.paddingLeft,10), pRight=parseInt(s.paddingRight,10),      
-          pTop=parseInt(s.paddingTop,10), pBottom=parseInt(s.paddingBottom,10),
-          bLeft=parseInt(s.borderLeft,10), bRight=parseInt(s.borderRight,10),    
-          bTop=parseInt(s.borderTop,10), bBottom=parseInt(s.borderBottom,10);
-    
-      // If using content-box model, must subtract the padding and border, 
-      // but *not* for border-box (as for WordPress PlugIn)
-      var boxSizing='undefined';
-      if(typeof(s.boxSizing) != 'undefined') {
-        boxSizing=s.boxSizing;
-      } else if(typeof(s.MozBoxSizing) != 'undefined') {
-        boxSizing=s.MozBoxSizing;
-      }
-
-      if(boxSizing == 'content-box') {
-        if(!isNaN(pLeft)) w -= pLeft;
-        if(!isNaN(pRight)) w -= pRight;
-        if(!isNaN(bLeft)) w -= bLeft;
-        if(!isNaN(bRight)) w -= bRight;
-        
-        if(!isNaN(pTop)) h -= pTop;
-        if(!isNaN(pBottom)) h -= pBottom;
-        if(!isNaN(bTop)) h -= bTop;
-        if(!isNaN(bBottom)) h -= bBottom;
-      }
-    
-      if(util.device.OS == 'Android') {
-        // FireFox - adjust padding to match input and text area defaults 
-        if(typeof(s.MozBoxSizing) != 'undefined') {
-          xs.paddingTop=(pTop+1)+'px';
-          xs.paddingLeft=pLeft+'px';
-          
-          if(x.base.nodeName == 'TEXTAREA') {
-            xs.marginTop='1px';
-          } else {
-            xs.marginLeft='1px';
-          }
-
-          w--;
-          h--;
-        } else { // Chrome, Opera, native browser (?)
-          w++;
-          h++;
-        }
-      }
-
-      xs.width=w+'px';
-      xs.height=h+'px';   
-    }
-
-    /**
-     * Set content, visibility, background and borders of input and base elements (KMW-3,KMW-29) 
-     *
-     * @param       {Object}        e     input element 
-     * @param       {number}        n     length of text in field
-     */                      
-    updateBaseElement(e: HTMLElement, n: number) {
-      var Ldv = e.base.ownerDocument.defaultView;
-      if(e.base instanceof Ldv.HTMLInputElement ||e.base instanceof Ldv.HTMLTextAreaElement) {
-        e.base.value = this.getText(e); //KMW-29
-      } else {
-        e.base.textContent = this.getText(e);
-      }
-
-      e.style.backgroundColor=(n==0?'transparent':window.getComputedStyle(e.base,null).backgroundColor);
-      if(this.keyman.util.device.OS == 'iOS') {
-        e.base.style.visibility=(n==0?'visible':'hidden');
-      }
-    }
 
     /**
      * Close OSK and remove simulated caret on losing focus
      */          
     cancelInput(): void { 
+      if(DOMEventHandlers.states.activeElement && DOMEventHandlers.states.activeElement.hideCaret) {
+        DOMEventHandlers.states.activeElement.hideCaret();
+      }
       DOMEventHandlers.states.activeElement=null; 
-      this.hideCaret(); 
       this.keyman.osk.hideNow();
     };
 
@@ -1155,52 +787,6 @@ namespace com.keyman {
       }
       this.setScrollBar(target);
     }.bind(this);
-
-    /**
-     * Scroll the input field horizontally (INPUT base element) or 
-     * vertically (TEXTAREA base element) to bring the caret into view
-     * as text is entered or deleted form an element     
-     *      
-     * @param       {Object}      e        simulated input field object with focus
-     */         
-    scrollInput(e: HTMLElement) {
-      if(!e || !e.firstChild || e.className == null || e.className.indexOf('keymanweb-input') < 0 ) {
-        return;
-      }
-
-      var scroller=e.firstChild as HTMLElement;
-      if(scroller.childNodes.length < 3) {
-        return;
-      }
-
-      var util = this.keyman.util;
-
-      // Get the actual absolute position of the caret and the element 
-      var s2=scroller.childNodes[1] as HTMLElement,
-        cx=dom.Utils.getAbsoluteX(s2),cy=dom.Utils.getAbsoluteY(s2),
-        ex=dom.Utils.getAbsoluteX(e),ey=dom.Utils.getAbsoluteY(e),
-        x=parseInt(scroller.style.left,10),
-        y=parseInt(scroller.style.top,10),
-        dx=0,dy=0; 
-      
-      // Scroller offsets must default to zero
-      if(isNaN(x)) x=0; if(isNaN(y)) y=0;
-
-      // Scroll input field vertically if necessary
-      if(e.base instanceof e.base.ownerDocument.defaultView.HTMLTextAreaElement) { 
-        var rowHeight=Math.round(e.offsetHeight/e.base.rows);
-        if(cy < ey) dy=cy-ey;
-        if(cy > ey+e.offsetHeight-rowHeight) dy=cy-ey-e.offsetHeight+rowHeight;   
-        if(dy != 0)scroller.style.top=(y<dy?y-dy:0)+'px';
-      } else { // or scroll horizontally if needed
-        if(cx < ex+8) dx=cx-ex-12;
-        if(cx > ex+e.offsetWidth-12) dx=cx-ex-e.offsetWidth+12;   
-        if(dx != 0)scroller.style.left=(x<dx?x-dx:0)+'px';
-      }    
-
-      // Display the caret (and scroll into view if necessary)
-      this.showCaret(e);
-    }
 
     /**
      * Scroll the document body vertically to bring the active input into view

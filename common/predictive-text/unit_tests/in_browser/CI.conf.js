@@ -100,7 +100,7 @@ module.exports = function(config) {
     bs_native_android: {
       os: 'android',
       os_version: '7.1',
-      browser: 'android',
+      browser: 'firefox',
       real_mobile: true,
       device: 'Samsung Galaxy Note 8'
     },

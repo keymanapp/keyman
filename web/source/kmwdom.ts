@@ -6,6 +6,8 @@
 /// <reference path="kmwdomevents.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="kmwstring.ts" />
+// Defines the touch-alias element structure used for mobile devices.
+/// <reference path="dom/touchAliasElement.ts" />
 
 namespace com.keyman {
   /**
@@ -138,103 +140,14 @@ namespace com.keyman {
       }
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
-      var x=document.createElement<'div'>('div'); 
-      x['base']=x.base=Pelem;
+      let x=dom.constructTouchAlias(Pelem);
       x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
       
       // Set font for base element
       this.enableInputElement(x, true);
 
-      // Add the exposed member 'kmw_ip' to allow page to refer to duplicated element
-      Pelem['kmw_ip']=x;
-      Pelem.disabled = true;
-
       // Superimpose custom input fields for each input or textarea, unless readonly or disabled 
-
-      // Copy essential styles from each base element to the new DIV      
-      var d,bs,xs,ds,ss1,ss2,ss3,x1,y1;
-
-      x.className='keymanweb-input';
-      x.dir=x.base.dir;
       
-      // Add a scrollable interior div 
-      d=document.createElement<'div'>('div'); 
-      bs=window.getComputedStyle(x.base,null);
-      xs=x.style;
-      xs.overflow='hidden';
-      xs.position='absolute';
-      //xs.border='1px solid gray';
-      xs.border='hidden';      // hide when element empty - KMW-3
-      xs.border='none';
-      xs.borderRadius='5px';
-
-      // Add a scroll bar (horizontal for INPUT elements, vertical for TEXTAREA elements)
-      var sb=document.createElement<'div'>('div'), sbs=sb.style;
-      sbs.position='absolute';
-      sbs.height=sbs.width='4px';
-      sbs.left=sbs.top='0';
-      sbs.display='block';
-      sbs.visibility='hidden';          
-      sbs.backgroundColor='#808080';
-      sbs.borderRadius='2px';
-      
-      var s1: HTMLSpanElement, s2: HTMLSpanElement, s3: HTMLSpanElement;
-
-      // And add two spans for the text content before and after the caret, and a caret span
-      s1=document.createElement<'span'>('span');
-      s2=document.createElement<'span'>('span');
-      s3=document.createElement<'span'>('span');      
-      s1.innerHTML=s2.innerHTML=s3.innerHTML='';
-      s1.className=s2.className=s3.className='keymanweb-font';
-      d.appendChild(s1);
-      d.appendChild(s3);
-      d.appendChild(s2);
-      x.appendChild(d);
-      x.appendChild(sb);
-
-      // Adjust input element properties so that it matches the base element as closely as possible
-      ds=d.style;
-      ds.position='absolute'; 
-
-      ss1=s1.style;ss2=s2.style;ss3=s3.style;ss1.border=ss2.border='none';
-      //ss1.backgroundColor='rgb(220,220,255)';ss2.backgroundColor='rgb(220,255,220)'; //only for testing 
-      ss1.height=ss2.height='100%';          
-      ss1.fontFamily=ss2.fontFamily=ds.fontFamily=bs.fontFamily;
-
-      // Set vertical centering for input elements
-      if(x.base.nodeName.toLowerCase() == 'input') {
-        if(!isNaN(parseInt(bs.height,10))) {
-          ss1.lineHeight=ss2.lineHeight=bs.height;      
-        }
-      }
-      
-      // The invisible caret-positioning span must have a border to ensure that 
-      // it remains in the layout, but colour doesn't matter, as it is never visible.
-      // Span margins are adjusted to compensate for the border and maintain text positioning.  
-      ss3.border='1px solid red';  
-      ss3.visibility='hidden';       
-      ss3.marginLeft=ss3.marginRight='-1px';
-      
-      // Set the outer element padding *after* appending the element, 
-      // otherwise Firefox misaligns the two elements
-      xs.padding='8px';
-      
-      // Set internal padding to match the TEXTAREA and INPUT elements
-      ds.padding='0px 2px'; // OK for iPad, possibly device-dependent
-
-      if(this.keyman.util.device.OS == 'Android' && bs.backgroundColor == 'transparent') {
-        ds.backgroundColor='#fff';
-      } else {
-        ds.backgroundColor=bs.backgroundColor;
-      }
-      
-      // Set the tabindex to 0 to allow a DIV to accept focus and keyboard input 
-      // c.f. http://www.w3.org/WAI/GL/WCAG20/WD-WCAG20-TECHS/SCR29.html
-      x.tabIndex=0; 
-
-      // Disable (internal) pan and zoom on KMW input elements for IE10
-      x.style.msTouchAction='none';
-
       // On touch event, reposition the text caret and prepare for OSK input
       // Removed 'onfocus=' as that resulted in handling the event twice (on iOS, anyway) 
 
@@ -265,80 +178,6 @@ namespace com.keyman {
       
       // Note that touchend event propagates and is processed by body touchend handler
       // re-setting the first touch point for a drag
-
-      if(x.base.nodeName.toLowerCase() == 'textarea') {
-        s1.style.whiteSpace=s2.style.whiteSpace='pre-wrap'; //scroll vertically
-      } else {
-        s1.style.whiteSpace=s2.style.whiteSpace='pre';      //scroll horizontally
-      }
-      
-      x.base.parentNode.appendChild(x);
-    
-      // Refresh style pointers, and match the field sizes
-      touchHandlers.updateInput(x);
-      xs=x.style; 
-      xs.color=bs.color; //xs.backgroundColor=bs.backgroundColor; 
-      xs.fontFamily=bs.fontFamily; xs.fontSize=bs.fontSize;
-      xs.fontWeight=bs.fontWeight; xs.textDecoration=bs.textDecoration;
-      xs.padding=bs.padding; xs.margin=bs.margin; 
-      xs.border=bs.border; xs.borderRadius=bs.borderRadius;
-    
-      //xs.color='red';  //use only for checking alignment
-
-      // Prevent highlighting of underlying element (Android)
-      if('webkitTapHighlightColor' in xs) {
-        xs.webkitTapHighlightColor='rgba(0,0,0,0)';
-      }
-
-      if(x.base instanceof x.base.ownerDocument.defaultView.HTMLTextAreaElement) {
-        // Correct rows value if defaulted and box height set by CSS
-        // The rows value is used when setting the caret vertically
-
-        if(x.base.rows == 2) { // 2 is default value
-          var h=parseInt(bs.height,10)-parseInt(bs.paddingTop,10)-parseInt(bs.paddingBottom,10),
-            dh=parseInt(bs.fontSize,10),calcRows=Math.round(h/dh);
-          if(calcRows > x.base.rows+1) {
-            x.base.rows=calcRows;
-          }
-        }
-        ds.width=xs.width; ds.minHeight=xs.height;
-      } else {
-        ds.minWidth=xs.width; ds.height=xs.height;
-      }
-      x.base.style.visibility='hidden'; // hide by default: KMW-3
-      
-      // Add an explicit event listener to allow the duplicated input element 
-      // to be adjusted for any changes in base element location or size
-      // This will be called for each element after any rotation, as well as after user-initiated changes
-      // It has to be wrapped in an anonymous function to preserve scope and be applied to each element.
-      (function(xx){
-        xx._kmwResizeHandler = function(e){
-          /* A timeout is needed to let the base element complete its resizing before our 
-          * simulated element can properly resize itself.
-          * 
-          * Not doing this causes errors if the input elements are resized for whatever reason, such as
-          * changing languages to a text with greater height.
-          */
-          window.setTimeout(function (){
-            touchHandlers.updateInput(xx);
-          }, 1);
-        };
-
-        xx.base.addEventListener('resize', xx._kmwResizeHandler, false);
-        xx.base.addEventListener('orientationchange', xx._kmwResizeHandler, false);
-      })(x);
-
-      var textValue: string;
-
-      if(x.base instanceof x.base.ownerDocument.defaultView.HTMLTextAreaElement 
-          || x.base instanceof x.base.ownerDocument.defaultView.HTMLInputElement) {
-        textValue = x.base.value;
-      } else {
-        textValue = x.base.textContent;
-      }
-        
-      // And copy the text content
-      touchHandlers.setText(x, textValue, null);  
 
       return true;
     }
@@ -801,9 +640,10 @@ namespace com.keyman {
 
       if(Ptarg) {
         if(this.keyman.util.device.touchable) {
+          let alias = <dom.TouchAliasElement> Ptarg;
           if(Ptarg.textContent.length == 0) {
-            Ptarg.base.dir=Ptarg.dir=elDir;
-            this.getHandlers(Ptarg).setTextCaret(Ptarg,10000);
+            alias.base.dir=alias.dir=elDir;
+            alias.setTextCaret(10000);
           }
         } else {
           if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement 
@@ -838,7 +678,7 @@ namespace com.keyman {
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
               if(this.sortedInputs[k]['kmw_ip']) {
-                this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
+                this.sortedInputs[k]['kmw_ip'].updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
           }.bind(this), 1);
@@ -870,7 +710,7 @@ namespace com.keyman {
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
               if(this.sortedInputs[k]['kmw_ip']) {
-                this.getHandlers(Pelem).updateInput(this.sortedInputs[k]['kmw_ip']);
+                this.sortedInputs[k]['kmw_ip'].updateInput(this.sortedInputs[k]['kmw_ip']);
               }
             }
           }.bind(this), 1);
@@ -1007,7 +847,7 @@ namespace com.keyman {
 
             for(var k = 0; k < this.sortedInputs.length; k++) {
               if(this.sortedInputs[k]['kmw_ip']) {
-                this.keyman.touchAliasing.updateInput(this.sortedInputs[k]['kmw_ip']);
+                this.sortedInputs[k]['kmw_ip'].updateInput();
               }
             }
           }.bind(this), 1);
@@ -1352,9 +1192,10 @@ namespace com.keyman {
         if(typeof(target) == 'undefined') {
           t[i].focus();
         } else { // Or reposition the caret on the input DIV if mapped
+          let alias = <dom.TouchAliasElement> target;
           this.keyman.domManager.setActiveElement(target); // Handles both `lastActive` + `active`.
-          this.touchHandlers.setTextCaret(target,10000); // Safe b/c touchable == true.
-          this.touchHandlers.scrollInput(target);   // mousedown check
+          alias.setTextCaret(10000); // Safe b/c touchable == true.
+          alias.scrollInput();   // mousedown check
           target.focus();
         }
       } else { // Behaviour for desktop browsers

@@ -8,20 +8,6 @@ describe('LMLayer', function () {
     });
   });
 
-  describe('#initialize()', function () {
-    it('should yield a reasonable configuration', function () {
-      let maxLeftContext = 64;
-      let lmLayer = new LMLayer();
-      return lmLayer.initialize(
-        { maxLeftContextCodeUnits: maxLeftContext },
-        { model: { kind: 'wordlist', words: ['foo', 'bar']} }
-      ).then(function (configuration) {
-        assert.isAtMost(configuration.leftContextCodeUnits, maxLeftContext);
-        assert.propertyVal(configuration, 'rightContextCodeUnits', 0);
-      });
-    });
-  });
-
   describe('#asBlobURI()', function () {
     // #asBlobURI() requires browser APIs, hence why it cannot be tested headless in Node.
     it('should take a function and convert it into a blob function', function (done) {

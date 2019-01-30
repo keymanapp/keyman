@@ -39,13 +39,13 @@ test-browsers ( ) {
     _FLAGS="$_FLAGS -CI -reporter teamcity"
   fi
 
-  in_browser/browser-test.sh $_FLAGS $os_id
+  in_browser/browser-test.sh $os_id $_FLAGS
 }
 
 # Defaults
 get_builder_OS  # return:  os_id="linux"|"mac"|"win" 
 
-FLAGS=
+FLAGS="--require ./unit_tests/helpers"
 CI_REPORTING=0
 RUN_HEADLESS=1
 RUN_BROWSERS=1
