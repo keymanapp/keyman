@@ -605,7 +605,7 @@ namespace KMWRecorder {
 
       if(!setHasRun) {
         // The sets CAN be empty, allowing silent failure if/when we actually want that.
-        console.warn("No test sets for this keyboard were applicable for this device!");
+        console.warn("No test sets for keyboard "+(this.keyboard?this.keyboard.id:'???')+" were applicable for this device!");
       }
 
       // Allow the method's caller to trigger a 'fail'.

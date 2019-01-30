@@ -54,6 +54,8 @@ get_browser_set_for_OS ( ) {
 get_OS
 get_browser_set_for_OS
 
+BROWSERS="--browsers Firefox,Chrome"
+
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=

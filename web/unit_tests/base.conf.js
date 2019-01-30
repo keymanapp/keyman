@@ -38,7 +38,7 @@ module.exports = {
                                           // Includes KMW's Device class, which is used by test_utils below.
     'unit_tests/dev_resources.js',  // Defines com.keyman.dom objects separate from KMW for unit testing.
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
-    'unit_tests/cases/**/*.js', // Where the tests actually reside.
+    'unit_tests/cases/**/compiler_ladders.js', // Where the tests actually reside.
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.
     {pattern: 'unit_tests/resources/**/*.*', watched: true, served: true, included: false}, // General testing resources.
     {pattern: 'release/unminified/web/**/*.css', watched: false, served: true, included: false}, // OSK resources
