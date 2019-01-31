@@ -32,9 +32,8 @@ This is only for testing the build, not for running ibus-kmfl or ibus-keyman in 
 
 - The process to build and install everything is:
 
-    * `make devreconf` (or `make reconf`) to create the build system and set the version
-    * `make configure`
-    * `make` to build
+    * `make reconf` to create the build system and set the version
+    * `make fullbuild` to configure and build <-- ld error >
     * `sudo make install` to install to /usr/local
 
 - Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
