@@ -16,6 +16,10 @@ describe('TouchAliasElement', function() {
     String.kmwEnableSupplementaryPlane(false);
   });
 
+  afterEach(function() {
+    fixture.cleanup();
+  });
+
   describe("Without ['base']", function() {
     describe("White-box", function() {
       it('correctly reports the state of its content and caret (no SMP)', function() {

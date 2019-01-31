@@ -141,8 +141,12 @@ namespace com.keyman {
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
       let x=dom.constructTouchAlias(Pelem);
-      this.setupElementAttachment(x); // The touch-alias should have its own wrapper.
-      //x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
+      if(this.isAttached(x)) {
+        x._kmwAttachment.interface = dom.wrapElement(x);
+      } else {
+        this.setupElementAttachment(x); // The touch-alias should have its own wrapper.
+      }
+      Pelem._kmwAttachment = x._kmwAttachment; // It's an object reference we need to alias.
       
       // Set font for base element
       this.enableInputElement(x, true);
@@ -210,6 +214,7 @@ namespace com.keyman {
 
         // Disable touch-related handling code.
         this.disableInputElement(Pelem['kmw_ip']);
+        Pelem._kmwAttachment.interface = dom.wrapElement(Pelem);
         
         // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
         if(Pelem.parentNode) {
@@ -259,10 +264,15 @@ namespace com.keyman {
      */       
     enableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
       var baseElement = isAlias ? Pelem['base'] : Pelem;
+
       if(!this.isKMWDisabled(baseElement)) {
         if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
           this._AttachToIframe(Pelem);
-        } else { 
+        } else {
+          if(!isAlias) {
+            this.setupElementAttachment(Pelem);
+          }
+
           baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
           this.inputList.push(Pelem);
 
@@ -366,7 +376,6 @@ namespace com.keyman {
       }
 
       if(this.isKMWInput(Pelem)) {
-        this.setupElementAttachment(Pelem);
         if(!this.isKMWDisabled(Pelem)) {
           if(touchable) {
             this.enableTouchElement(Pelem);
@@ -390,7 +399,7 @@ namespace com.keyman {
      * Description  Detaches KMW from a control (or IFrame) 
      */  
     detachFromControl(Pelem: HTMLElement) {
-      if(!this.isAttached(Pelem)) {
+      if(!(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement)) {
         return;  // We never were attached.
       }
 
@@ -508,6 +517,7 @@ namespace com.keyman {
             util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
 
             // Set up a reference alias; the internal document will need the same attachment info!
+            this.setupElementAttachment(Pelem);
             Lelem.body._kmwAttachment = Pelem._kmwAttachment;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
@@ -682,7 +692,8 @@ namespace com.keyman {
      * Description  Disable KMW control element 
      */    
     _DisableControl(Pelem: HTMLElement) {
-      if(this.isAttached(Pelem)) { // Only operate on attached elements!        
+      // Only operate on attached elements!  Non-design-mode IFrames don't get attachment markers, so we check them specifically instead.
+      if(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
         if(this.keyman.util.device.touchable) {
           this.disableTouchElement(Pelem);
           this.setupNonKMWTouchElement(Pelem);
@@ -1024,14 +1035,6 @@ namespace com.keyman {
       } else {
         Pelem._kmwAttachment.keyboard = Pkbd;
         Pelem._kmwAttachment.languageCode = Plc;
-
-        var aliasedElem = Pelem ? Pelem['base'] || Pelem['kmw_ip'] : null;
-
-        // If the element is touch-aliased, we need to set its keyboard to match!
-        if(aliasedElem) {
-          aliasedElem._kmwAttachment.keyboard = Pkbd;
-          aliasedElem._kmwAttachment.languageCode = Plc;
-        }
 
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
         // 'kmw_ip' is the touch-alias for the original page's control.

@@ -270,16 +270,10 @@ namespace com.keyman {
       }
       
       var lastElem = DOMEventHandlers.states.lastActiveElement;
-      var aliasedElem = lastElem ? lastElem['base'] || lastElem['kmw_ip'] : null;
 
-      if((lastElem && lastElem._kmwAttachment.keyboard != null) || (aliasedElem && aliasedElem._kmwAttachment.keyboard != null)) {
+      if(lastElem && lastElem._kmwAttachment.keyboard != null) {
         lastElem._kmwAttachment.keyboard = keyboardID;
         lastElem._kmwAttachment.languageCode = langCode;
-
-        if(aliasedElem) {
-          aliasedElem._kmwAttachment.keyboard = keyboardID;
-          aliasedElem._kmwAttachment.languageCode = langCode;
-        }
       } else {
         this.keyman.globalKeyboard = keyboardID;
         this.keyman.globalLanguageCode = langCode;
@@ -295,7 +289,7 @@ namespace com.keyman {
      */ 
     _FocusKeyboardSettings(blockGlobalChange: boolean) {
       var lastElem = DOMEventHandlers.states.lastActiveElement;
-      
+
       if(lastElem && lastElem._kmwAttachment.keyboard != null) {
         this.keyman.keyboardManager.setActiveKeyboard(lastElem._kmwAttachment.keyboard,
           lastElem._kmwAttachment.languageCode);
