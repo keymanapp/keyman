@@ -32,12 +32,6 @@ uses
 type
   TkmnProjectFileUI = class(TOpenableProjectFileUI)
   private
-    procedure MenuEventCompile(Sender: TObject);
-    procedure MenuEventClean(Sender: TObject);
-    procedure MenuEventTest(Sender: TObject);
-    procedure MenuEventDebug(Sender: TObject);
-
-    function TestKeyboard(FSilent: Boolean): Boolean;
     function TestKeymanWeb(FSilent: Boolean): Boolean;
     function DebugKeyboard(FSilent: Boolean): Boolean;
     function FontHelper(FSilent: Boolean): Boolean;
@@ -51,10 +45,8 @@ type
     procedure SetDebug(const Value: Boolean);
     function CompileKeyboard(FSilent: Boolean): Boolean;
     function TestKeyboardState(FCompiledName: string; FSilent: Boolean): Boolean;
-
   public
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
-    procedure BuildMenu(Menu: TPopupMenu); override;
     property Debug: Boolean read GetDebug write SetDebug;
     property ProjectFile: TkmnProjectFileAction read GetProjectFile;
   end;
@@ -82,43 +74,10 @@ uses
   System.Variants,
   utilsystem;
 
-procedure TkmnProjectFileUI.BuildMenu(Menu: TPopupMenu);
-var
-  mi: TMenuItem;
-begin
-  inherited BuildMenu(Menu);
-
-  mi := TMenuItem.Create(Menu);
-  mi.Caption := '&Compile';
-  mi.OnClick := MenuEventCompile;
-  Menu.Items.Add(mi);
-
-  mi := TMenuItem.Create(Menu);
-  mi.Caption := 'C&lean';
-  mi.OnClick := MenuEventClean;
-  Menu.Items.Add(mi);
-
-  if FKeymanDeveloperOptions.UseOldDebugger then
-  begin
-    mi := TMenuItem.Create(Menu);
-    mi.Caption := '&Test';
-    mi.OnClick := MenuEventTest;
-    Menu.Items.Add(mi);
-  end
-  else
-  begin
-    mi := TMenuItem.Create(Menu);
-    mi.Caption := '&Debug';
-    mi.OnClick := MenuEventDebug;
-    Menu.Items.Add(mi);
-  end;
-end;
-
 function TkmnProjectFileUI.DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean;
 begin
   case action of
     pfaCompile:   Result := CompileKeyboard(FSilent);
-    pfaTest:      Result := TestKeyboard(FSilent);
     pfaTestKeymanWeb: Result := TestKeymanWeb(FSilent);
     pfaInstall:   Result := InstallKeyboard;
     pfaUninstall: Result := UninstallKeyboard;
@@ -228,42 +187,9 @@ begin
   Result := True;
 end;
 
-procedure TkmnProjectFileUI.MenuEventClean(Sender: TObject);
-begin
-  frmMessages.Clear;
-  ProjectFile.Clean;
-end;
-
-procedure TkmnProjectFileUI.MenuEventCompile(Sender: TObject);
-begin
-  frmMessages.Clear;
-  CompileKeyboard(False);
-end;
-
-procedure TkmnProjectFileUI.MenuEventTest(Sender: TObject);
-begin
-  TestKeyboard(False);
-end;
-
-procedure TkmnProjectFileUI.MenuEventDebug(Sender: TObject);
-begin
-  DebugKeyboard(False);
-end;
-
 procedure TkmnProjectFileUI.SetDebug(const Value: Boolean);
 begin
   ProjectFile.Debug := Value;
-end;
-
-function TkmnProjectFileUI.TestKeyboard(FSilent: Boolean): Boolean;
-var
-  FCompiledName: string;
-begin
-  Result := False;
-  FCompiledName := ProjectFile.TargetFileName;
-  if not TestKeyboardState(FCompiledName, FSilent) then Exit;
-  frmKeymanDeveloper.OpenTestWindow(FCompiledName);
-  Result := True;
 end;
 
 function TkmnProjectFileUI.TestKeymanWeb(FSilent: Boolean): Boolean;   // I4409

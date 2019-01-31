@@ -33,7 +33,7 @@ uses
   TempFileManager;
 
 type
-  TProjectFileAction = (pfaCompile, pfaTest, pfaInstall, pfaUninstall, pfaDebug, pfaPackage, pfaEncrypt,
+  TProjectFileAction = (pfaCompile, pfaInstall, pfaUninstall, pfaDebug, pfaPackage, pfaEncrypt,
     pfaTestKeymanWeb, pfaCompileInstaller, pfaFontHelper, pfaFontDialog, pfaClean);   // I4057
 
   TProjectUI = class(TProject)
@@ -82,7 +82,6 @@ type
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; virtual; abstract;
 
     procedure NewFile; virtual; abstract;
-    procedure BuildMenu(Menu: TPopupMenu); virtual; abstract;
     procedure DefaultEvent(Sender: TObject); virtual; abstract;
   end;
 
