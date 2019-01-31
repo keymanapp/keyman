@@ -394,6 +394,9 @@ const
   SRegValue_IDEOptSMTPServer = 'smtp server';                                       // CU   // I4506
   SRegValue_IDEOptTestEmailAddresses = 'test email addresses';                      // CU   // I4506
 
+  SRegValue_IDEOpt_WebLadderLength = 'web ladder length';                           // CU
+  CRegValue_IDEOpt_WebLadderLength_Default = 100;
+
   { SRegKey_KCT values }
 
 //  SRegValue_KCTTemplatePath = 'template path';                                      // LM

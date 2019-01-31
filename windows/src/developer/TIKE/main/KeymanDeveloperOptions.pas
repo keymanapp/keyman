@@ -59,6 +59,7 @@ type
     FOpenKeyboardFilesInSourceView: Boolean;   // I4751
     FDisplayTheme: string;
     FEditorTheme: string;
+    FFix183_LadderLength: Integer;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -83,6 +84,7 @@ type
     property CharMapAutoLookup: Boolean read FCharMapAutoLookup write FCharMapAutoLookup;
     property CharMapDisableDatabaseLookups: Boolean read FCharMapDisableDatabaseLookups write FCharMapDisableDatabaseLookups;
 
+    property Fix183_LadderLength: Integer read FFix183_LadderLength write FFix183_LadderLength;
     property DebuggerBreakWhenExitingLine: Boolean read FDebuggerBreakWhenExitingLine write FDebuggerBreakWhenExitingLine;
     property DebuggerSingleStepAfterBreak: Boolean read FDebuggerSingleStepAfterBreak write FDebuggerSingleStepAfterBreak;
     property DebuggerShowStoreOffset: Boolean read FDebuggerShowStoreOffset write FDebuggerShowStoreOffset;
@@ -196,6 +198,8 @@ begin
     FExternalEditorPath := regReadString(SRegValue_IDEOptExternalEditorPath, '');
     FSMTPServer := regReadString(SRegValue_IDEOptSMTPServer, '');   // I4506
     FTestEmailAddresses := regReadString(SRegValue_IDEOptTestEmailAddresses, '');   // I4506
+
+    FFix183_LadderLength := regReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
   finally
     CloseRegistry;
   end;
@@ -233,6 +237,8 @@ begin
     regWriteString(SRegValue_IDEOptExternalEditorPath,          FExternalEditorPath);
     regWriteString(SRegValue_IDEOptSMTPServer,                  FSMTPServer);   // I4506
     regWriteString(SRegValue_IDEOptTestEmailAddresses,          FTestEmailAddresses);   // I4506
+
+    regWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
   finally
     CloseRegistry;
   end;

@@ -211,7 +211,8 @@ type
     FTabStop: string;   // I3681
     fMnemonic: Boolean;
     FCompilerWarningsAsErrors: Boolean;
-    FTouchLayoutFont: string;   // I4872
+    FTouchLayoutFont: string;
+    FFix183_LadderLength: Integer;   // I4872
 
     function JavaScript_String(ch: DWord): string;  // I2242
 
@@ -266,6 +267,7 @@ uses
 
   CompileErrorCodes,
   JsonUtil,
+  KeymanDeveloperOptions,
   KeyboardParser,
   Keyman.System.KeyboardUtils,
   KeymanWebKeyCodes,
@@ -379,6 +381,7 @@ end;
 constructor TCompileKeymanWeb.Create;
 begin
   FillChar(fk, sizeof(fk), 0);
+  FFix183_LadderLength := FKeymanDeveloperOptions.Fix183_LadderLength; // How frequently to break ladders
 end;
 
 destructor TCompileKeymanWeb.Destroy;
@@ -711,9 +714,6 @@ begin
       // We know the rules are sorted by key code.
       // First pass, break the grouping down by key code.
 
-//      Result := Result + FTabstop+FTabstop;   // I3681
-//      if HasRules then Result := Result + 'else ';
-//      HasRules := True;
       if fgp.fUsingKeys then
       begin
         Result := Result + Format('%s%sif(k.KKM(e,%s,%s)) {%s',
@@ -733,14 +733,13 @@ begin
         LocalCounter := 0;
         while (j < Integer(fgp.cxKeyArray)) and (fkp2.Key = fkp.Key) and (fkp2.ShiftFlags = fkp.ShiftFlags) do
         begin
-  //writeln(Format('%d of %d [%d]', [j, fgp.cxKeyArray, fkp.Line]));
-
           if not RuleIsExcludedByPlatform(fkp) then
           begin
             processed_rule[j] := True;
             Result := Result + JavaScript_Rule(FTabStop + FTabStop + FTabStop, IfThen(LocalHasRules, 'else ', ''), fgp, fkp);
             Inc(LocalCounter);
-            if (LocalCounter mod 100) = 0 then
+
+            if (FFix183_LadderLength <> 0) and ((LocalCounter mod FFix183_LadderLength) = 0) then
             begin
               // Break if/else ladders
               Result := Result + Format('%sif(m) {}%s', [FTabStop + FTabStop + FTabStop, nl]);
@@ -756,7 +755,7 @@ begin
       end
       else
       begin
-        //TODO
+        // TODO: context character level switches instead of full context comparisons
         Result := Result + JavaScript_Rule(FTabStop + FTabStop + FTabStop, IfThen(HasRules, 'else ', ''), fgp, fkp);
         HasRules := True;
         Inc(Counter);
@@ -764,7 +763,7 @@ begin
         Inc(j);
       end;
 
-      if (Counter mod 100) = 0 then
+      if (FFix183_LadderLength <> 0) and ((Counter mod FFix183_LadderLength) = 0) then
       begin
         // Break if/else ladders
         // We need to only match if no previous line is matched (i.e. m is false)
