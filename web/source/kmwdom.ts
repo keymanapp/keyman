@@ -1025,6 +1025,14 @@ namespace com.keyman {
         Pelem._kmwAttachment.keyboard = Pkbd;
         Pelem._kmwAttachment.languageCode = Plc;
 
+        var aliasedElem = Pelem ? Pelem['base'] || Pelem['kmw_ip'] : null;
+
+        // If the element is touch-aliased, we need to set its keyboard to match!
+        if(aliasedElem) {
+          aliasedElem._kmwAttachment.keyboard = Pkbd;
+          aliasedElem._kmwAttachment.languageCode = Plc;
+        }
+
         // If Pelem is the focused element/active control, we should set the keyboard in place now.
         // 'kmw_ip' is the touch-alias for the original page's control.
 
