@@ -1137,8 +1137,13 @@ namespace com.keyman {
         e=document.getElementById(e);
       }
 
-      // Non-attached elements cannot be set as active.
-      if(!this.isAttached(e) && !this.keyman.isEmbedded) {
+      if(this.keyman.isEmbedded) {
+        // If we're in embedded mode, auto-attach to the element specified by the page.
+        if(!this.isAttached(e)) {
+          this.attachToControl(e);
+        }
+        // Non-attached elements cannot be set as active.
+      } else if(!this.isAttached(e)) {
         console.warn("Cannot set an element KMW is not attached to as the active element.");
         return;
       }

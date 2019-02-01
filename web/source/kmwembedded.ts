@@ -283,51 +283,23 @@ namespace com.keyman.osk {
    *             KC(3,3,Pelem) == "def"
    *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
    */    
-  keymanweb.KC_ = function(n, ln, Pelem) 
-  {
-    var Ldv, Ldoc;
-    if(Pelem.body) Ldoc=Pelem; else Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
-   
-    if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
-      (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) //  &&  Pelem.tagName == 'HTML')  &&  Pelem.tagName == 'HTML')
-      // I2457 - support contentEditable elements in mozilla, webkit
-    {
-      /* Mozilla midas html editor and editable elements */
-      var Lsel = Ldv.getSelection();
-      if(Lsel.focusNode.nodeType == 3)
-      {
-        if(Lsel.focusOffset > 2*n)  // I3319 SMP extension
-          return Lsel.focusNode.substringData(Lsel.focusOffset - 2*n, 2*n)._kmwSubstr(-n)._kmwSubstr(0,ln); // I3319
-        else
-          return Lsel.focusNode.substringData(0, Lsel.focusOffset)._kmwSubstr(-n)._kmwSubstr(0,ln);         // I3319
-      }
-      else
-        return "";
-    }
-    else if (Pelem.setSelectionRange)
-    {
-      /* Mozilla other controls */
-      var LselectionStart;
-      
-      if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) // I3319, KMW-1
-      {
-        keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
-        keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
-        keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
-      }
-      LselectionStart = keymanweb._CachedSelectionStart; // I3319
+  keymanweb.KC_ = function(n, ln, Pelem: HTMLElement) {
+    // So, this is a perfect copy of kmwnative.ts's implementation; at present, this suffices... though we could likely
+    // do without a web element eventually.
+    var tempContext: string;
 
-      if(LselectionStart < n)
-      {
-        // Looking for context before start of text buffer so return non-characters to pad result
-        var tempContext = Array(n-LselectionStart+1).join("\uFFFE") + Pelem.value._kmwSubstr(0,LselectionStart);
-        return tempContext._kmwSubstr(0,ln); 
-      }
-//dbg(n+' '+ln+' '+Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln));
-      return Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln); //I3319, KMW-1
+    if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
+      let wrapper = Pelem._kmwAttachment.interface;
+      tempContext = wrapper.getTextBeforeCaret();
+    } else {
+      console.error("Interfacing web element isn't properly attached - its element interface for keyboard processing is missing!");
     }
-
-    return "";
+    
+    if(tempContext._kmwLength() < n) {
+      tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
+    }
+    
+    return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
   };
 
   /**
@@ -442,7 +414,10 @@ namespace com.keyman.osk {
       var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.vkbd.layerId);
       keyName=t[t.length-1];
       if(layer == 'undefined') layer=osk.vkbd.layerId;
-              
+      
+      
+      // Note:  this assumes Lelem is properly attached and has an element interface.
+      // Currently true in the Android and iOS apps.
       var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=Processor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
@@ -565,7 +540,9 @@ namespace com.keyman.osk {
 
     // Clear any pending (non-popup) key
     osk.vkbd.keyPending = null;
-            
+    
+    // Note:  this assumes Lelem is properly attached and has an element interface.
+    // Currently true in the Android and iOS apps.
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
     keymanweb.domManager.initActiveElement(Lelem);
@@ -605,6 +582,8 @@ namespace com.keyman.osk {
    *  @return {boolean}         true if key code successfully processed
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
+    // Note:  this assumes Lelem is properly attached and has an element interface.
+    // Currently true in the Android and iOS apps.
     let Codes = com.keyman.text.Codes;
     if (code == Codes.keyCodes.K_SPACE) {
       kbdInterface.output(0, Lelem, ' ');
