@@ -222,6 +222,11 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       ((AppCompatActivity) context).finish();
       if (result > 0) {
         notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+
+        if (result == 2) {
+          Toast.makeText(context, "Warning: Font failed to download.",
+            Toast.LENGTH_LONG).show();
+        }
       }
     }
 
@@ -342,10 +347,20 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           }
         }
 
+        if (FileUtils.hasJavaScriptExtension(url)) {
+          // TEST stub: DDW
+          url = "invalid-" + url;
+        }
+
         result = FileUtils.download(context, url, destination, filename);
         if (result < 0) {
-          ret = -1;
-          break;
+          if (FileUtils.hasFontExtension(url)) {
+            // Propogate warning about font failing to download
+            ret = 2;
+          } else {
+            ret = -1;
+            break;
+          }
         }
       }
 
