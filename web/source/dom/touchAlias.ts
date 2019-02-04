@@ -56,5 +56,13 @@ namespace com.keyman.dom {
     insertTextBeforeCaret(s: string): void {
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);
     }
+
+    saveProperties() {
+      // Stub implementation.
+    }
+
+    restoreProperties() {
+      // Stub implementation.
+    }
   }
 }

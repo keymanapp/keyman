@@ -879,23 +879,14 @@ namespace com.keyman {
     
       if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
         let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
-        
-        if(wrapper instanceof dom.DesignIFrame) {
-          wrapper.saveCommands();
-        } else if(wrapper instanceof dom.TextArea) {
-          wrapper.saveScroll();
-        }
+        wrapper.saveProperties();
 
         if(dn >= 0) {
           wrapper.deleteCharsBeforeCaret(dn);
         }
         wrapper.insertTextBeforeCaret(s);
 
-        if(wrapper instanceof dom.DesignIFrame) {
-          wrapper.restoreCommands(); // I2457 - support contentEditable elements in mozilla, webkit
-        } else if(wrapper instanceof dom.TextArea) {
-          wrapper.restoreScroll();
-        }
+        wrapper.restoreProperties();
 
         // Adjust deadkey positions 
         if(dn >= 0) {

@@ -102,7 +102,7 @@ namespace com.keyman.dom {
     /**
      * Facilitates temporary caching of the TextArea's scroll position.
      */
-    saveScroll() {
+    saveProperties() {
       this.scrollLeft = this.root.scrollLeft;
       this.scrollTop = this.root.scrollTop;
     }
@@ -110,7 +110,7 @@ namespace com.keyman.dom {
     /**
      * Restores a previously-saved scroll position for the TextArea.
      */
-    restoreScroll() {
+    restoreProperties() {
       if(this.scrollLeft !== undefined) {
         this.root.scrollLeft = this.scrollLeft;
         this.root.scrollTop = this.scrollTop;

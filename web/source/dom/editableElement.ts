@@ -99,5 +99,17 @@ namespace com.keyman.dom {
      * @param s Text to insert before the caret's current position.
      */
     insertTextBeforeCaret(s: string): void;
+
+    /**
+     * Saves element-specific state properties prone to mutation, enabling restoration after
+     * text-output operations.
+     */
+    saveProperties(): void;
+
+    /**
+     * Restores previously-saved element-specific state properties.  Designed for use after text-output
+     * ops to facilitate more-seamless web-dev and user interactions.
+     */
+    restoreProperties(): void;
   }
 }

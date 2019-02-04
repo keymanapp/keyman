@@ -203,5 +203,13 @@ namespace com.keyman.dom {
       }
       Lsel.collapseToEnd();
     }
+
+    saveProperties() {
+      // Stub implementation.
+    }
+
+    restoreProperties() {
+      // Stub implementation.
+    }
   }
 }

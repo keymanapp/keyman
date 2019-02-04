@@ -211,11 +211,12 @@ namespace com.keyman.dom {
     }
 
     /**
-     * Function     saveCommands
+     * Function     saveProperties
      * Scope        Private
      * Description  Build and create list of styles that can be applied in iframes
      */
-    saveCommands() {
+    saveProperties() {
+      // Formerly _CacheCommands.
       var _CacheableCommands=[
         new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1), 
         new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0), 
@@ -240,11 +241,12 @@ namespace com.keyman.dom {
     }
 
     /**
-     * Function     restoreCommands
+     * Function     restoreProperties
      * Scope        Private
      * Description  Restore styles in IFRAMEs (??)
      */
-    restoreCommands(_func?: () => void): void {
+    restoreProperties(_func?: () => void): void {
+      // Formerly _CacheCommandsReset.
       if(!this.commandCache) {
         console.error("No command cache exists to restore!");
       }
