@@ -195,6 +195,15 @@ namespace com.keyman {
     before(other: Deadkey): boolean {
       return this.o < other.o;
     }
+
+    static sortFunc = function(a: Deadkey, b: Deadkey) {
+      // We want descending order, so we want 'later' deadkeys first.
+      if(a.p != b.p) {
+        return b.p - a.p;
+      } else {
+        return b.o - a.o;
+      }
+    };
   }
 
   class BeepData {
@@ -208,6 +217,90 @@ namespace com.keyman {
 
     reset(): void {
       this.e.style.backgroundColor = this.c;
+    }
+  }
+
+  // Object-orients deadkey management.
+  export class DeadkeyTracker {
+    dks: Deadkey[] = [];
+
+    toArray(): Deadkey[] {
+      var arr = [].concat(this.dks);
+      return arr.sort(Deadkey.sortFunc);
+    }
+
+    /**
+     * Function     isMatch      
+     * Scope        Public
+     * @param       {number}      caretPos  current cursor position
+     * @param       {number}      n         expected offset of deadkey from cursor
+     * @param       {number}      d         deadkey
+     * @return      {boolean}               True if deadkey found selected context matches val
+     * Description  Match deadkey at current cursor position
+     */    
+    isMatch(caretPos: number, n: number, d: number): boolean {
+      if(this.dks.length == 0) {
+        return false; // I3318
+      }
+
+      var sp=caretPos;
+      n = sp - n;
+      for(var i = 0; i < this.dks.length; i++) {
+        // Don't re-match an already-matched deadkey.  It's possible to have two identical 
+        // entries, and they should be kept separately.
+        if(this.dks[i].match(n, d) && !this.dks[i].matched) {
+          this.dks[i].set();
+          // Assumption:  since we match the first possible entry in the array, we
+          // match the entry with the lower ordinal - the 'first' deadkey in the position.
+          return true; // I3318
+        }
+      }
+
+      this.resetMatched(); // I3318
+
+      return false;
+    }
+
+    add(dk: Deadkey) {
+      this.dks = this.dks.concat(dk);
+    }
+
+    remove(dk: Deadkey) {
+      var index = this.dks.indexOf(dk);
+      this.dks.splice(index, 1);
+    }
+
+    clear() {
+      this.dks = [];
+    }
+
+    resetMatched() {
+      for(let dk of this.dks) {
+        dk.reset();
+      }
+    }
+   
+    deleteMatched(): void {      
+      for(var Li = 0; Li < this.dks.length; Li++) {
+        if(this.dks[Li].matched) {
+          this.dks.splice(Li--, 1); // Don't forget to decrement!
+        }
+      }
+    }
+
+    /**
+     * Function     adjustPositions (formerly _DeadkeyAdjustPos)
+     * Scope        Private
+     * @param       {number}      Lstart      start position in context
+     * @param       {number}      Ldelta      characters to adjust by   
+     * Description  Adjust saved positions of deadkeys in context
+     */       
+    adjustPositions(Lstart: number, Ldelta: number): void {
+      for(let dk of this.dks) {
+        if(dk.p > Lstart) {
+          dk.p += Ldelta;
+        }
+      }
     }
   }
 
@@ -225,7 +318,8 @@ namespace com.keyman {
     _BeepObjects: BeepData[] = [];  // BeepObjects - maintains a list of active 'beep' visual feedback elements
     _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
                                     // Set to 1 if there is an active 'beep', otherwise leave as '0'.
-    _DeadKeys: Deadkey[] = [];      // DeadKeys - array of matched deadkeys
+    
+    _DeadKeys: DeadkeyTracker = new DeadkeyTracker();
 
     constructor(kmw: KeymanBase) {
       this.keymanweb = kmw;
@@ -364,7 +458,7 @@ namespace com.keyman {
       if(cx === val) {
         return true; // I3318
       }
-      this._DeadkeyResetMatched(); // I3318
+      this._DeadKeys.resetMatched(); // I3318
       return false;
     }
 
@@ -377,7 +471,7 @@ namespace com.keyman {
      * @return      {Array}               Context array (of strings and numbers) 
      */
     private _BuildExtendedContext(n: number, ln: number, Ptarg: HTMLElement): CachedExEntry {
-      var cache = this.cachedContextEx.get(n, ln); 
+      var cache: CachedExEntry = this.cachedContextEx.get(n, ln); 
       if(cache !== null) {
         return cache;
       } else {
@@ -386,16 +480,7 @@ namespace com.keyman {
         cache = this.cachedContextEx.get(n, n);
         if(cache === null) {
           // First, let's make sure we have a cloned, sorted copy of the deadkey array.
-          this._DeadKeys.sort(function(a: Deadkey, b: Deadkey) {
-            // We want descending order, so we want 'later' deadkeys first.
-            if(a.p != b.p) {
-              return b.p - a.p;
-            } else {
-              return b.o - a.o;
-            }
-          });
-
-          var unmatchedDeadkeys = [].concat(this._DeadKeys);
+          let unmatchedDeadkeys = this._DeadKeys.toArray();
 
           // Time to build from scratch!
           var index = 0;
@@ -407,7 +492,7 @@ namespace com.keyman {
             if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
               // Take the deadkey.
               cache.deadContext[n-cache.valContext.length-1] = unmatchedDeadkeys[0];
-              cache.valContext = [unmatchedDeadkeys[0].d].concat(cache.valContext);
+              cache.valContext = ([unmatchedDeadkeys[0].d] as (string|number)[]).concat(cache.valContext);
               unmatchedDeadkeys.splice(0, 1);
             } else {
               // Take the character.  We get "\ufffe" if it doesn't exist.
@@ -540,7 +625,7 @@ namespace com.keyman {
 
       if(mismatch) {
         // Reset the matched 'any' indices, if any.
-        this._DeadkeyResetMatched();
+        this._DeadKeys.resetMatched();
         this._AnyIndices = [];
       }
 
@@ -593,7 +678,7 @@ namespace com.keyman {
         retVal = (keyCode == Lrulekey); // I3318, I3555
       }
       if(!retVal) {
-        this._DeadkeyResetMatched();  // I3318
+        this._DeadKeys.resetMatched();  // I3318
       }
       return retVal; // I3318
     };
@@ -634,25 +719,8 @@ namespace com.keyman {
      * Description  Match deadkey at current cursor position
      */    
     deadkeyMatch(n: number, Ptarg: HTMLElement, d: number): boolean {
-      if(this._DeadKeys.length == 0) {
-        return false; // I3318
-      }
-
       var sp=this._SelPos(Ptarg);
-      n = sp - n;
-      for(var i = 0; i < this._DeadKeys.length; i++) {
-        // Don't re-match an already-matched deadkey.  It's possible to have two identical 
-        // entries, and they should be kept separately.
-        if(this._DeadKeys[i].match(n, d) && !this._DeadKeys[i].matched) {
-          this._DeadKeys[i].set();
-          // Assumption:  since we match the first possible entry in the array, we
-          // match the entry with the lower ordinal - the 'first' deadkey in the position.
-          return true; // I3318
-        }
-      }
-      this._DeadkeyResetMatched(); // I3318
-
-      return false;
+      return this._DeadKeys.isMatch(sp, n, d);
     }
     
     /**
@@ -845,8 +913,7 @@ namespace com.keyman {
 
           if(dk) {
             // Remove deadkey in context.
-            var index = this._DeadKeys.indexOf(dk);
-            this._DeadKeys.splice(index, 1);
+            this._DeadKeys.remove(dk);
 
             // Reduce our reported context size.
             dn--;
@@ -855,7 +922,7 @@ namespace com.keyman {
       }
 
       // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
-      this._DeadkeyResetMatched();
+      this._DeadKeys.resetMatched();
 
       // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
       this.output(dn, Pelem, '');
@@ -890,8 +957,8 @@ namespace com.keyman {
 
         // Adjust deadkey positions 
         if(dn >= 0) {
-          this._DeadkeyDeleteMatched(); // I3318
-          this._DeadkeyAdjustPos(wrapper.getDeadkeyCaret(), -dn + s._kmwLength()); // I3318,I3319
+          this._DeadKeys.deleteMatched(); // I3318
+          this._DeadKeys.adjustPositions(wrapper.getDeadkeyCaret(), -dn + s._kmwLength()); // I3318,I3319
         }
       } else {
         throw "No element wrapper available to produce output!";
@@ -926,8 +993,7 @@ namespace com.keyman {
 
       var Lc: Deadkey = new Deadkey(this._SelPos(Pelem as HTMLElement), Pd);
 
-      // Aim to put the newest deadkeys first.
-      this._DeadKeys=[Lc].concat(this._DeadKeys);      
+      this._DeadKeys.add(Lc);
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
     }
     
@@ -1065,52 +1131,6 @@ namespace com.keyman {
       this.cachedContext.reset();
       this.cachedContextEx.reset();
     }
-    
-    // I3318 - deadkey changes START
-    /**
-     * Function     _DeadkeyResetMatched
-     * Scope        Private
-     * Description  Clear all matched deadkey flags
-     */       
-    _DeadkeyResetMatched(): void {                   
-      for(let dk of this._DeadKeys) {
-        dk.reset();
-      }
-    }
-
-    /**
-     * Function     _DeadkeyDeleteMatched
-     * Scope        Private
-     * Description  Delete matched deadkeys from context
-     */       
-    _DeadkeyDeleteMatched(): void {              
-      var _Dk = this._DeadKeys;
-      for(var Li = 0; Li < _Dk.length; Li++) {
-        if(_Dk[Li].matched) {
-          _Dk.splice(Li--,1); // Don't forget to decrement!
-        }
-      }
-    }
-
-    /**
-     * Function     _DeadkeyAdjustPos
-     * Scope        Private
-     * @param       {number}      Lstart      start position in context
-     * @param       {number}      Ldelta      characters to adjust by   
-     * Description  Adjust saved positions of deadkeys in context
-     */       
-    _DeadkeyAdjustPos(Lstart: number, Ldelta: number): void {
-      for(let dk of this._DeadKeys) {
-        if(dk.p > Lstart) {
-          dk.p += Ldelta;
-        }
-      }
-    }
-
-    clearDeadkeys = function(): void {
-      this._DeadKeys = [];
-    }
-    // I3318 - deadkey changes END
 
     doInputEvent(_target: HTMLElement|Document) {
       var event: Event;
@@ -1153,7 +1173,7 @@ namespace com.keyman {
         element._kmwAttachment.interface.invalidateSelection();
       }
 
-      this._DeadkeyResetMatched();       // I3318    
+      this._DeadKeys.resetMatched();       // I3318    
       this.resetContextCache();
 
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
@@ -1200,7 +1220,7 @@ namespace com.keyman {
         this.keymanweb.osk.vkbd.layerId = 'default';
       }
 
-      this.clearDeadkeys();
+      this._DeadKeys.clear();
       this.resetContextCache();
       this.resetVKShift();
 

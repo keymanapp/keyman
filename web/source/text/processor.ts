@@ -386,7 +386,7 @@ namespace com.keyman.text {
         }
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-        kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
+        kbdInterface._DeadKeys.deleteMatched();      // Delete any matched deadkeys before continuing
         //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
         // Start:  mirrors _GetKeyEventProperties
@@ -883,7 +883,7 @@ namespace com.keyman.text {
 
       switch(Levent.Lcode) {
         case 8: 
-          keyman.interface.clearDeadkeys();
+          keyman.interface._DeadKeys.clear();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 

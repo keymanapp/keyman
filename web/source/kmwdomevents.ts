@@ -320,8 +320,7 @@ namespace com.keyman {
       DOMEventHandlers.states._DisableInput = false; 
 
       if(!uiManager.justActivated) {
-        // Needs refactor when the Callbacks interface PR goes through!
-        this.keyman['interface']._DeadKeys = [];
+        this.keyman['interface']._DeadKeys.clear();
         this.keyman.keyboardManager.notifyKeyboard(0,target,1);  // I2187
       }
     
