@@ -31,15 +31,4 @@ namespace com.keyman {
       this.touchEnabled = touch || false;
     }
   }
-
-  export class StyleCommand {
-    cmd: string;
-    stateType: number;
-    cache: string|boolean;
-
-    constructor(c: string, s:number) {
-      this.cmd = c;
-      this.stateType = s;
-    }
-  }
 }

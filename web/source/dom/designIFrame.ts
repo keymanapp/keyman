@@ -19,10 +19,23 @@ namespace com.keyman.dom {
     }
   }
 
+  class StyleCommand {
+    cmd: string;
+    stateType: number;
+    cache: string|boolean;
+
+    constructor(c: string, s:number) {
+      this.cmd = c;
+      this.stateType = s;
+    }
+  }
+
   export class DesignIFrame implements EditableElement {
     root: HTMLIFrameElement;
     doc: Document;
     docRoot: HTMLElement;
+
+    commandCache: StyleCommand[];
 
     constructor(ele: HTMLIFrameElement) {
       this.root = ele;
@@ -195,6 +208,66 @@ namespace com.keyman.dom {
         Lsel.addRange(finalCaret);
       }
       Lsel.collapseToEnd();
+    }
+
+    /**
+     * Function     saveCommands
+     * Scope        Private
+     * Description  Build and create list of styles that can be applied in iframes
+     */
+    saveCommands() {
+      var _CacheableCommands=[
+        new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1), 
+        new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0), 
+        new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
+        new StyleCommand('superscript',0), new StyleCommand('underline',0)
+      ];
+
+      if(this.doc.defaultView) {
+        _CacheableCommands.push(new StyleCommand('hilitecolor',1));
+      }
+        
+      for(var n=0; n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
+        let cmd = _CacheableCommands[n];
+        //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);
+        if(cmd.stateType == 1) {
+          cmd.cache = this.doc.queryCommandValue(cmd.cmd);
+        } else {
+          cmd.cache = this.doc.queryCommandState(cmd.cmd);
+        }
+      }
+      this.commandCache = _CacheableCommands;
+    }
+
+    /**
+     * Function     restoreCommands
+     * Scope        Private
+     * Description  Restore styles in IFRAMEs (??)
+     */
+    restoreCommands(_func?: () => void): void {
+      if(!this.commandCache) {
+        console.error("No command cache exists to restore!");
+      }
+
+      for(var n=0; n < this.commandCache.length; n++) { // I1511 - array prototype extended
+        let cmd = this.commandCache[n];
+
+        //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
+        if(cmd.stateType == 1) {
+          if(this.doc.queryCommandValue(cmd.cmd) != cmd.cache) {
+            if(_func) {
+              _func();
+            }
+            this.doc.execCommand(cmd.cmd, false, <string> cmd.cache);
+          }
+        } else if(this.doc.queryCommandState(cmd.cmd) != cmd.cache) {
+          if(_func) {
+            _func();
+          }
+          //KeymanWeb._Debug('executing command '+_CacheableCommand[n][0]);
+          this.doc.execCommand(cmd.cmd, false, null);
+        }
+      }
     }
   }
 }

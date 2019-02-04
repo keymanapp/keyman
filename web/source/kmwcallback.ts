@@ -879,10 +879,9 @@ namespace com.keyman {
     
       if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
         let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
-        var _CacheableCommands: StyleCommand[];
         
         if(wrapper instanceof dom.DesignIFrame) {
-          _CacheableCommands = this._CacheCommands(wrapper.doc);
+          wrapper.saveCommands();
         }
         if(dn >= 0) {
           wrapper.deleteCharsBeforeCaret(dn);
@@ -890,7 +889,7 @@ namespace com.keyman {
         wrapper.insertTextBeforeCaret(s);
 
         if(wrapper instanceof dom.DesignIFrame) {
-          this._CacheCommandsReset(wrapper.doc, _CacheableCommands, null);// I2457 - support contentEditable elements in mozilla, webkit
+          wrapper.restoreCommands();// I2457 - support contentEditable elements in mozilla, webkit
         }
 
         // Adjust deadkey positions 
@@ -934,69 +933,6 @@ namespace com.keyman {
       // Aim to put the newest deadkeys first.
       this._DeadKeys=[Lc].concat(this._DeadKeys);      
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
-    }
-
-    /**
-     * Function     _CacheCommands
-     * Scope        Private
-     * @param       {Object}    _Document
-     * @return      {Array.<string>}        List of style commands that are cacheable
-     * Description  Build reate list of styles that can be applied in iframes
-     */    
-    private _CacheCommands = function(_Document: Document): StyleCommand[] { // I1204 - style application in IFRAMEs, I2192, I2134, I2192   
-      //var _CacheableBackColor='backcolor';
-
-      var _CacheableCommands=[
-        new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1), 
-        new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0), 
-        new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
-        new StyleCommand('superscript',0), new StyleCommand('underline',0)
-      ];
-
-      if(_Document.defaultView) {
-        this.keymanweb._push(_CacheableCommands, new StyleCommand('hilitecolor',1));
-      }
-        
-      for(var n=0;n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
-        let cmd = _CacheableCommands[n];
-        //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);
-        if(cmd.stateType == 1) {
-          cmd.cache = _Document.queryCommandValue(cmd.cmd);
-        } else {
-          cmd.cache = _Document.queryCommandState(cmd.cmd);
-        }
-      }
-      return _CacheableCommands;
-    }
-    
-    /**
-     * Function     _CacheCommandReset
-     * Scope        Private
-     * @param       {Object} _Document
-     *             _CacheableCommands
-     *             _func      
-     * Description  Restore styles in IFRAMEs (??)
-     */    
-    private _CacheCommandsReset = function(_Document: HTMLDocument, _CacheableCommands: StyleCommand[], _func: () => void): void {
-      for(var n=0; n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
-        let cmd = _CacheableCommands[n];
-
-        //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
-        if(cmd.stateType == 1) {
-          if(_Document.queryCommandValue(cmd.cmd) != cmd.cache) {
-            if(_func) {
-              _func();
-            }
-            _Document.execCommand(cmd.cmd, false, <string> cmd.cache);
-          }
-        } else if(_Document.queryCommandState(cmd.cmd) != cmd.cache) {
-          if(_func) {
-            _func();
-          }
-          //KeymanWeb._Debug('executing command '+_CacheableCommand[n][0]);
-          _Document.execCommand(cmd.cmd, false, null);
-        }
-      }
     }
     
     /**
