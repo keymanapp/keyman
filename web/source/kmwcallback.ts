@@ -882,14 +882,19 @@ namespace com.keyman {
         
         if(wrapper instanceof dom.DesignIFrame) {
           wrapper.saveCommands();
+        } else if(wrapper instanceof dom.TextArea) {
+          wrapper.saveScroll();
         }
+
         if(dn >= 0) {
           wrapper.deleteCharsBeforeCaret(dn);
         }
         wrapper.insertTextBeforeCaret(s);
 
         if(wrapper instanceof dom.DesignIFrame) {
-          wrapper.restoreCommands();// I2457 - support contentEditable elements in mozilla, webkit
+          wrapper.restoreCommands(); // I2457 - support contentEditable elements in mozilla, webkit
+        } else if(wrapper instanceof dom.TextArea) {
+          wrapper.restoreScroll();
         }
 
         // Adjust deadkey positions 
