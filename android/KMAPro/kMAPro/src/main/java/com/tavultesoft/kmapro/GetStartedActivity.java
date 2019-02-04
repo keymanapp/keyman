@@ -188,6 +188,6 @@ public class GetStartedActivity extends AppCompatActivity {
 
   protected static boolean isDefaultKB(Context context) {
     String inputMethod = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
-    return inputMethod.equals("com.tavultesoft.kmapro/com.keyman.android.SystemKeyboard");
+    return inputMethod.equals(context.getPackageName() + "/com.keyman.android.SystemKeyboard");
   }
 }

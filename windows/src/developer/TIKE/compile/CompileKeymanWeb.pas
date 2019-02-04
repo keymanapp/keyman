@@ -234,7 +234,7 @@ type
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
     function RequotedString(s: WideString): string;
     function VisualKeyboardFromFile(
-      const FVisualKeyboardFileName: string): WideString;
+      const FVisualKeyboardFileName: string; var fDisplayUnderlying: Boolean): WideString;
     function WriteCompiledKeyboard: string;
     procedure CheckStoreForInvalidFunctions(key: PFILE_KEY; store: PFILE_STORE);  // I1971
     function GetCodeName(code: Integer): string;  // I3438
@@ -1238,7 +1238,7 @@ begin
   Result := False;
 end;
 
-function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName: string): WideString;
+function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName: string; var fDisplayUnderlying: Boolean): WideString;
 
   function WideQuote(s: WideString): WideString;
   var
@@ -1362,7 +1362,6 @@ function TCompileKeymanWeb.VisualKeyboardFromFile(const FVisualKeyboardFileName:
 var
   FVK: TVisualKeyboard;
   f102, fbold, fitalic: string;
-  fDisplayUnderlying: string;
 begin
   Result := '';
   FVK := TVisualKeyboard.Create;
@@ -1371,10 +1370,9 @@ begin
     if fsBold in FVK.Header.UnicodeFont.Style then fbold := 'bold ' else fbold := '';
     if fsItalic in FVK.Header.UnicodeFont.Style then fitalic := 'italic ' else fitalic := '';
     if kvkh102 in FVK.Header.Flags then f102 := '1' else f102 := '0';
-    if kvkhDisplayUnderlying in FVK.Header.Flags then fDisplayUnderlying := '1' else fDisplayUnderlying := '0';   // I3886
+    fDisplayUnderlying := kvkhDisplayUnderlying in FVK.Header.Flags;
 
-    Result := Format('{F:''%s%s 1em "%s"'',K102:%s', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
-    Result := Result + Format('};%s%sthis.KDU=%s', [nl,FTabStop,fDisplayUnderlying]);   // I3946   // I3956
+    Result := Format('{F:''%s%s 1em "%s"'',K102:%s}', [fitalic, fbold, FVK.Header.UnicodeFont.Name, f102]);   // I3886   // I3956
     Result := Result + ';'+VisualKeyboardToKLS(FVK);
     Result := Result + ';'+BuildBKFromKLS;
   finally
@@ -1605,6 +1603,7 @@ var
   linecomment: string;  // I3438
   HasRules: Boolean;
   sModifierBitmask: string;
+  fDisplayUnderlying: Boolean;
 begin
   Result := '';//UTF16SignatureW;  // + '// compiled by Keyman Developer'+nl;  // I3474
 	{ Locate the name of the keyboard }
@@ -1732,6 +1731,11 @@ begin
     end;
   end;
 
+  // Default to hide underlying layout characters. This is overridden by touch
+  // layout platform.displayUnderlying property or, if that is not present for
+  // the given platform, by the OSK property.
+  fDisplayUnderlying := False;
+
   if sVisualKeyboard <> '' then
   begin
     try
@@ -1739,7 +1743,7 @@ begin
       // .kvks to a .kvk during the build. Earlier in the build, the visual keyboard
       // would have been compiled, so we need to account for that and use that file.
 
-      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FOutFile) + sVisualKeyboard);
+      sVisualKeyboard := VisualKeyboardFromFile(ExtractFilePath(FOutFile) + sVisualKeyboard, fDisplayUnderlying);
     except
       on E:EFOpenError do   // I3947
       begin
@@ -1769,6 +1773,7 @@ begin
     '%sthis.KN="%s";%s'+
     '%sthis.KMINVER="%d.%d";%s'+
     '%sthis.KV=%s;%s'+
+    '%sthis.KDU=%s;%s'+
     '%sthis.KH=%s;%s'+
     '%sthis.KM=%d;%s'+
     '%sthis.KBVER="%s";%s'+   // I4155
@@ -1785,6 +1790,7 @@ begin
     FTabStop, RequotedString(sFullName), nl,
     FTabStop, (fk.version and VERSION_MASK_MAJOR) shr 8, fk.version and VERSION_MASK_MINOR, nl,
     FTabStop, sVisualKeyboard, nl,
+    FTabStop, IfThen(fDisplayUnderlying, '1', '0'), nl,
     FTabStop, sHelp, nl,
     FTabStop, vMnemonic, nl,
     FTabStop, FKeyboardVersion, nl,   // I4155

@@ -4,8 +4,8 @@
 /// <reference path="kmwrotation.ts" />
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2019 SIL International
 ***/
 
 namespace com.keyman.osk {

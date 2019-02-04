@@ -6,10 +6,19 @@ case "$1" in
 
   configure)
     # Restart IBus if it is running
-    ibuspid=`ps -C ibus-daemon -o pid=`
+    ! ibuspid=`ps -C ibus-daemon -o pid=|head -n 1`
 
     if [ "x$ibuspid" != "x" ]; then
-      ibus restart
+      # check for gnome-shell as it works differently
+      ! gspid=`ps -C gnome-shell -o pid=|head -n 1`
+      if [ "x$gspid" != "x" ]; then
+        # gnome-shell has multiple ibus-daemon processes and needs exit instead of restart
+        ibususer=`ps -C ibus-daemon -o user=|grep -v gdm|uniq`
+        sudo -H -u "$ibususer" ibus exit
+      else
+        ibususer=`ps -C ibus-daemon -o user=`
+        sudo -H -u "$ibususer" ibus restart
+      fi
     fi
   ;;
 

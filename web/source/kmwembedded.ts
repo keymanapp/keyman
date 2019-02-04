@@ -3,8 +3,8 @@
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 
-// KeymanWeb 10.0
-// Copyright 2017 SIL International
+// KeymanWeb 11.0
+// Copyright 2019 SIL International
 
 /*****************************************/
 /*                                       */
@@ -613,6 +613,10 @@ namespace com.keyman.osk {
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
     let Codes = com.keyman.text.Codes;
+
+    // Default handling for external keys.
+    // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
+    // to the mobile apps to handle (insert characters or navigate forms).
     if (code == Codes.keyCodes.K_SPACE) {
       kbdInterface.output(0, Lelem, ' ');
       return true;
@@ -629,6 +633,7 @@ namespace com.keyman.osk {
       return true;
     }
 
+    // Determine the character from the OSK
     var ch = keymanweb.textProcessor.defaultKeyOutput(keyName, code, shift, false, undefined);
     if(ch) {
       kbdInterface.output(0, Lelem, ch);

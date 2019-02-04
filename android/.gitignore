@@ -16,6 +16,10 @@
 # Gradle generated files
 **/.gradle/
 build_file_checksums.ser
+gradle_models.ser
+
+# Layout Inspector files
+**/captures/*.li
 
 # OS-specific files
 **/.DS_Store
