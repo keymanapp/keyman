@@ -1,5 +1,5 @@
 // Defines KMW's string extension functions.
-/// <reference path="../kmwstring.ts" />
+///<reference path="../kmwstring.ts" />
 // Makes TS aware of Window-based type prototypes
 ///<reference path="../kmwexthtml.ts" />
 // Defines deadkey management in a manner attachable to each element interface.
@@ -13,14 +13,14 @@ namespace com.keyman.dom {
       this._dks = new text.DeadkeyTracker();
     }
 
-    getDeadkeys(): text.DeadkeyTracker {
+    deadkeys(): text.DeadkeyTracker {
       return this._dks;
     }
 
     /**
      * Returns the underlying element / document modeled by the wrapper.
      */
-    abstract getElement(): Element;
+    abstract getElement(): HTMLElement;
 
     /**
      * Clears any selected text within the wrapper's element(s).

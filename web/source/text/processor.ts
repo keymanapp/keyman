@@ -325,6 +325,14 @@ namespace com.keyman.text {
       return s;
     }
 
+    getOutputTarget(Lelem: HTMLElement): dom.EditableElement {
+      if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+        return Lelem._kmwAttachment.interface;
+      } else {
+        throw "OSK could not find element output target data!";
+      }
+    }
+
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
@@ -380,11 +388,12 @@ namespace com.keyman.text {
           Lelem = (<HTMLIFrameElement> Lelem).contentDocument.documentElement;
         }
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+
         // ...end I3363 (Build 301)
-        if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
-          // TODO:  This seems wrong... why is it here?
-          Lelem._kmwAttachment.interface.invalidateSelection();
-        }
+        let outputTarget = this.getOutputTarget(Lelem);
+        
+        // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+        outputTarget.invalidateSelection();
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
         kbdInterface._DeadKeys.deleteMatched();      // Delete any matched deadkeys before continuing
@@ -457,7 +466,7 @@ namespace com.keyman.text {
         // End mnemonic management.
 
         // Pass this key code and state to the keyboard program
-        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, Lelem, Lkc))) {
+        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, outputTarget, Lkc))) {
           // Restore the virtual key code if a mnemonic keyboard is being used
           Lkc.Lcode=Lkc.vkCode;
 
@@ -475,7 +484,7 @@ namespace com.keyman.text {
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
               var ch = this.defaultKeyOutput(keyName, Lkc.Lcode, keyShiftState, true, Lelem);
               if(ch) {
-                kbdInterface.output(0, Lelem, ch);
+                kbdInterface.output(0, outputTarget, ch);
               }
           }
         }
@@ -948,6 +957,8 @@ namespace com.keyman.text {
       //{
       // Safari, IE, Opera?
       //}
+
+      let outputTarget = this.getOutputTarget(Levent.Ltarg);
       
       if(!activeKeyboard['KM']) {
         // Positional Layout
@@ -969,12 +980,12 @@ namespace com.keyman.text {
             LisVirtualKey: 0
           };
 
-          if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg, Levent2)) {
+          if(kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent2)) {
             LeventMatched=1;
           }
         }
         
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
@@ -984,13 +995,13 @@ namespace com.keyman.text {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           this.swallowKeypress = true;
-          if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+          if(!kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent)) {
             kbdInterface.defaultBackspace(); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
         } else {
           this.swallowKeypress = false;
-          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
         }
       }
 
@@ -1004,7 +1015,7 @@ namespace com.keyman.text {
         } else {
           Lch = Levent.Lcode-64;
         }
-        kbdInterface.output(0, Levent.Ltarg, String._kmwFromCharCode(Lch)); //I3319
+        kbdInterface.output(0, outputTarget, String._kmwFromCharCode(Lch)); //I3319
 
         LeventMatched = 1;
       }
@@ -1037,7 +1048,7 @@ namespace com.keyman.text {
         // that of the OSK here.
         var ch = this.defaultKeyOutput('', Levent.Lcode, Levent.Lmodifiers, false, Levent.Ltarg);
         if(ch) {
-          kbdInterface.output(0, Levent.Ltarg, ch);
+          kbdInterface.output(0, outputTarget, ch);
           return false;
         }
       }
@@ -1083,9 +1094,10 @@ namespace com.keyman.text {
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
+      let outputTarget = this.getOutputTarget(Levent.Ltarg);
       
       // Only reached if it's a mnemonic keyboard.
-      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
+      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, outputTarget, Levent)) {
         this.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();

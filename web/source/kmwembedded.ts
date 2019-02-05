@@ -283,17 +283,12 @@ namespace com.keyman.osk {
    *             KC(3,3,Pelem) == "def"
    *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
    */    
-  keymanweb.KC_ = function(n, ln, Pelem: HTMLElement) {
+  keymanweb.KC_ = function(n, ln, outputTarget: com.keyman.dom.EditableElement) {
     // So, this is a perfect copy of kmwnative.ts's implementation; at present, this suffices... though we could likely
     // do without a web element eventually.
     var tempContext: string;
 
-    if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
-      let wrapper = Pelem._kmwAttachment.interface;
-      tempContext = wrapper.getTextBeforeCaret();
-    } else {
-      console.error("Interfacing web element isn't properly attached - its element interface for keyboard processing is missing!");
-    }
+    tempContext = outputTarget.getTextBeforeCaret();
     
     if(tempContext._kmwLength() < n) {
       tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;

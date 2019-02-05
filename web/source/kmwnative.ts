@@ -587,15 +587,10 @@ if(!window['keyman']['initialized']) {
      *             KC(3,3,Pelem) == "def"
      *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
      */    
-    keymanweb.KC_ = function(n, ln, Pelem) {
+    keymanweb.KC_ = function(n, ln, outputTarget: com.keyman.dom.EditableElement) {
       var tempContext = '';
 
-      if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
-        let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
-        tempContext = wrapper.getTextBeforeCaret();
-      } else {
-        throw "No element wrapper available to provide context!";
-      }
+      tempContext = outputTarget.getTextBeforeCaret();
 
       if(tempContext._kmwLength() < n) {
         tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
