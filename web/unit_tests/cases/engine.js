@@ -26,7 +26,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       ruleSeq.simulateSequenceOn(inputElem);
 
       // Now for the real test!
-      var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem, ruleDef.rule);
+      var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem._kmwAttachment.interface, ruleDef.rule);
 
       var msg = matchTest.msg;
       if(!msg) {
@@ -829,7 +829,7 @@ describe('Engine', function() {
         ruleSeq.simulateSequenceOn(inputElem);
 
         // Now for the real test!
-        var res = keyman.interface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem);
+        var res = keyman.interface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem._kmwAttachment.interface);
 
         assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);
 

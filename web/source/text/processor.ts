@@ -325,8 +325,10 @@ namespace com.keyman.text {
       return s;
     }
 
-    getOutputTarget(Lelem: HTMLElement): dom.EditableElement {
-      if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+    static getOutputTarget(Lelem: HTMLElement): dom.EditableElement {
+      if(!Lelem) {
+        return null;
+      } else if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
         return Lelem._kmwAttachment.interface;
       } else {
         throw "OSK could not find element output target data!";
@@ -390,13 +392,13 @@ namespace com.keyman.text {
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
 
         // ...end I3363 (Build 301)
-        let outputTarget = this.getOutputTarget(Lelem);
+        let outputTarget = Processor.getOutputTarget(Lelem);
         
         // Clear any cached codepoint data; we can rebuild it if it's unchanged.
         outputTarget.invalidateSelection();
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-        kbdInterface._DeadKeys.deleteMatched();      // Delete any matched deadkeys before continuing
+        outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
         //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
         // Start:  mirrors _GetKeyEventProperties
@@ -893,7 +895,7 @@ namespace com.keyman.text {
 
       switch(Levent.Lcode) {
         case 8: 
-          keyman.interface._DeadKeys.clear();
+          Processor.getOutputTarget(Levent.Ltarg).deadkeys().clear();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -958,7 +960,7 @@ namespace com.keyman.text {
       // Safari, IE, Opera?
       //}
 
-      let outputTarget = this.getOutputTarget(Levent.Ltarg);
+      let outputTarget = Processor.getOutputTarget(Levent.Ltarg);
       
       if(!activeKeyboard['KM']) {
         // Positional Layout
@@ -1094,7 +1096,7 @@ namespace com.keyman.text {
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
-      let outputTarget = this.getOutputTarget(Levent.Ltarg);
+      let outputTarget = Processor.getOutputTarget(Levent.Ltarg);
       
       // Only reached if it's a mnemonic keyboard.
       if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, outputTarget, Levent)) {

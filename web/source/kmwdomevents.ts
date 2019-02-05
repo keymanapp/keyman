@@ -69,7 +69,7 @@ namespace com.keyman {
      * Respond to KeymanWeb-aware input element receiving focus 
      */    
     _ControlFocus: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement | Document, Ln;
+      var Ltarg: HTMLElement, Ln;
       var device = this.keyman.util.device;
       var osk = this.keyman.osk;
 
@@ -113,7 +113,7 @@ namespace com.keyman {
           
       if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) { //**TODO: check case reference
         this.keyman.domManager._AttachToIframe(Ltarg as HTMLIFrameElement);
-        Ltarg=Ltarg.contentWindow.document;
+        Ltarg=Ltarg.contentWindow.document.body;
       }
 
       //??keymanweb._Selection = null;
@@ -306,7 +306,7 @@ namespace com.keyman {
      *                      The return value indicates whether (true) or not (false) the calling event handler 
      *                      should be terminated immediately after the call.
      */
-    _CommonFocusHelper(target: HTMLElement|Document): boolean {
+    _CommonFocusHelper(target: HTMLElement): boolean {
       var uiManager = this.keyman.uiManager;
       //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
       //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
@@ -320,8 +320,10 @@ namespace com.keyman {
       DOMEventHandlers.states._DisableInput = false; 
 
       if(!uiManager.justActivated) {
-        this.keyman['interface']._DeadKeys.clear();
-        this.keyman.keyboardManager.notifyKeyboard(0,target,1);  // I2187
+        if(text.Processor.getOutputTarget(target)) {
+          text.Processor.getOutputTarget(target).deadkeys().clear();
+        }
+        this.keyman.keyboardManager.notifyKeyboard(0, target, 1);  // I2187
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
