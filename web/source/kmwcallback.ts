@@ -820,6 +820,7 @@ namespace com.keyman {
         let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
         wrapper.saveProperties();
 
+        wrapper.clearSelection();
         if(dn >= 0) {
           wrapper.deleteCharsBeforeCaret(dn);
         }
