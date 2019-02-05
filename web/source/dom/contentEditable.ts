@@ -19,11 +19,12 @@ namespace com.keyman.dom {
     }
   }
 
-  export class ContentEditable implements EditableElement {
+  export class ContentEditable extends EditableElement {
     root: HTMLElement;
 
     constructor(ele: HTMLElement) {
       if(ele.isContentEditable) {
+        super();
         this.root = ele;
       } else {
         throw "Specified element is not already content-editable!";
@@ -202,14 +203,6 @@ namespace com.keyman.dom {
         Lsel.addRange(finalCaret);
       }
       Lsel.collapseToEnd();
-    }
-
-    saveProperties() {
-      // Stub implementation.
-    }
-
-    restoreProperties() {
-      // Stub implementation.
     }
   }
 }

@@ -30,7 +30,7 @@ namespace com.keyman.dom {
     }
   }
 
-  export class DesignIFrame implements EditableElement {
+  export class DesignIFrame extends EditableElement {
     root: HTMLIFrameElement;
     doc: Document;
     docRoot: HTMLElement;
@@ -38,6 +38,7 @@ namespace com.keyman.dom {
     commandCache: StyleCommand[];
 
     constructor(ele: HTMLIFrameElement) {
+      super();
       this.root = ele;
 
       if(ele.contentWindow && ele.contentWindow.document && ele.contentWindow.document.designMode == 'on') {

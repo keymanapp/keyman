@@ -382,6 +382,7 @@ namespace com.keyman.text {
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         // ...end I3363 (Build 301)
         if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+          // TODO:  This seems wrong... why is it here?
           Lelem._kmwAttachment.interface.invalidateSelection();
         }
         // Deadkey matching continues to be troublesome.

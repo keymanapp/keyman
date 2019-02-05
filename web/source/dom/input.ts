@@ -1,5 +1,8 @@
+/// <reference path="editableElement.ts" />
+
 namespace com.keyman.dom {
-  export class Input implements EditableElement {
+
+  export class Input extends EditableElement {
     root: HTMLInputElement;
 
     /**
@@ -20,6 +23,8 @@ namespace com.keyman.dom {
     private processedSelectionEnd: number;
 
     constructor(ele: HTMLInputElement) {
+      super();
+
       this.root = ele;
       this._cachedSelectionStart = -1;
     }
@@ -110,14 +115,6 @@ namespace com.keyman.dom {
 
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
-    }
-
-    saveProperties() {
-      // Stub implementation.
-    }
-
-    restoreProperties() {
-      // Stub implementation.
     }
   }
 }

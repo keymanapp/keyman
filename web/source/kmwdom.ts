@@ -8,6 +8,7 @@
 /// <reference path="kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
 /// <reference path="dom/touchAliasElement.ts" />
+/// <reference path="dom/wrapElement.ts" />
 
 namespace com.keyman {
   /**

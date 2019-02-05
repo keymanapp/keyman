@@ -4,10 +4,11 @@
 /// <reference path="editableElement.ts" />
 
 namespace com.keyman.dom {
-  export class TouchAlias implements EditableElement {
+  export class TouchAlias extends EditableElement {
     root: TouchAliasElement;
 
     constructor(e: TouchAliasElement) {
+      super();
       this.root = e;
     }
 
@@ -55,14 +56,6 @@ namespace com.keyman.dom {
     
     insertTextBeforeCaret(s: string): void {
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);
-    }
-
-    saveProperties() {
-      // Stub implementation.
-    }
-
-    restoreProperties() {
-      // Stub implementation.
     }
   }
 }

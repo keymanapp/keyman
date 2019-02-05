@@ -1,6 +1,5 @@
-/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
-/// <reference path="kmwtypedefs.ts" /> // Includes type definitions for basic KMW types.
 /// <reference path="kmwbase.ts" />
+/// <reference path="text/deadkeys.ts" />
 
 /***
    KeymanWeb 11.0
@@ -133,7 +132,7 @@ namespace com.keyman {
     }
   };
 
-  type CachedExEntry = {valContext: (string|number)[], deadContext: Deadkey[]};
+  type CachedExEntry = {valContext: (string|number)[], deadContext: text.Deadkey[]};
   /** 
    * An extended version of cached context storing designed to work with 
    * `fullContextMatch` and its helper functions.
@@ -163,49 +162,6 @@ namespace com.keyman {
     }
   };
 
-  // Defines the base Deadkey-tracking object.
-  class Deadkey {
-    p: number;  // Position of deadkey
-    d: number;  // Numerical id of the deadkey
-    o: number;  // Ordinal value of the deadkey (resolves same-place conflicts)
-    matched: number;
-
-    static ordinalSeed: number = 0;
-
-    constructor(pos: number, id: number) {
-      this.p = pos;
-      this.d = id;
-      this.o = Deadkey.ordinalSeed++;
-    }
-
-    match(p: number, d: number): boolean {
-      var result:boolean = (this.p == p && this.d == d);
-
-      return result;
-    }
-
-    set(): void {
-      this.matched = 1;
-    }
-
-    reset(): void {
-      this.matched = 0;
-    }
-
-    before(other: Deadkey): boolean {
-      return this.o < other.o;
-    }
-
-    static sortFunc = function(a: Deadkey, b: Deadkey) {
-      // We want descending order, so we want 'later' deadkeys first.
-      if(a.p != b.p) {
-        return b.p - a.p;
-      } else {
-        return b.o - a.o;
-      }
-    };
-  }
-
   class BeepData {
     e: HTMLElement;
     c: string;
@@ -217,90 +173,6 @@ namespace com.keyman {
 
     reset(): void {
       this.e.style.backgroundColor = this.c;
-    }
-  }
-
-  // Object-orients deadkey management.
-  export class DeadkeyTracker {
-    dks: Deadkey[] = [];
-
-    toArray(): Deadkey[] {
-      var arr = [].concat(this.dks);
-      return arr.sort(Deadkey.sortFunc);
-    }
-
-    /**
-     * Function     isMatch      
-     * Scope        Public
-     * @param       {number}      caretPos  current cursor position
-     * @param       {number}      n         expected offset of deadkey from cursor
-     * @param       {number}      d         deadkey
-     * @return      {boolean}               True if deadkey found selected context matches val
-     * Description  Match deadkey at current cursor position
-     */    
-    isMatch(caretPos: number, n: number, d: number): boolean {
-      if(this.dks.length == 0) {
-        return false; // I3318
-      }
-
-      var sp=caretPos;
-      n = sp - n;
-      for(var i = 0; i < this.dks.length; i++) {
-        // Don't re-match an already-matched deadkey.  It's possible to have two identical 
-        // entries, and they should be kept separately.
-        if(this.dks[i].match(n, d) && !this.dks[i].matched) {
-          this.dks[i].set();
-          // Assumption:  since we match the first possible entry in the array, we
-          // match the entry with the lower ordinal - the 'first' deadkey in the position.
-          return true; // I3318
-        }
-      }
-
-      this.resetMatched(); // I3318
-
-      return false;
-    }
-
-    add(dk: Deadkey) {
-      this.dks = this.dks.concat(dk);
-    }
-
-    remove(dk: Deadkey) {
-      var index = this.dks.indexOf(dk);
-      this.dks.splice(index, 1);
-    }
-
-    clear() {
-      this.dks = [];
-    }
-
-    resetMatched() {
-      for(let dk of this.dks) {
-        dk.reset();
-      }
-    }
-   
-    deleteMatched(): void {      
-      for(var Li = 0; Li < this.dks.length; Li++) {
-        if(this.dks[Li].matched) {
-          this.dks.splice(Li--, 1); // Don't forget to decrement!
-        }
-      }
-    }
-
-    /**
-     * Function     adjustPositions (formerly _DeadkeyAdjustPos)
-     * Scope        Private
-     * @param       {number}      Lstart      start position in context
-     * @param       {number}      Ldelta      characters to adjust by   
-     * Description  Adjust saved positions of deadkeys in context
-     */       
-    adjustPositions(Lstart: number, Ldelta: number): void {
-      for(let dk of this.dks) {
-        if(dk.p > Lstart) {
-          dk.p += Ldelta;
-        }
-      }
     }
   }
 
@@ -319,7 +191,7 @@ namespace com.keyman {
     _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
                                     // Set to 1 if there is an active 'beep', otherwise leave as '0'.
     
-    _DeadKeys: DeadkeyTracker = new DeadkeyTracker();
+    _DeadKeys: text.DeadkeyTracker = new text.DeadkeyTracker();
 
     constructor(kmw: KeymanBase) {
       this.keymanweb = kmw;
@@ -991,7 +863,7 @@ namespace com.keyman {
         this.output(Pdn,Pelem,"");  //I3318 corrected to >=
       }
 
-      var Lc: Deadkey = new Deadkey(this._SelPos(Pelem as HTMLElement), Pd);
+      var Lc: text.Deadkey = new text.Deadkey(this._SelPos(Pelem as HTMLElement), Pd);
 
       this._DeadKeys.add(Lc);
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);

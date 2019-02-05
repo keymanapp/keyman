@@ -1,5 +1,5 @@
 namespace com.keyman.dom {
-  export class TextArea implements EditableElement {
+  export class TextArea extends EditableElement {
     root: HTMLTextAreaElement;
 
     /**
@@ -30,6 +30,8 @@ namespace com.keyman.dom {
     private scrollLeft?: number;
 
     constructor(ele: HTMLTextAreaElement) {
+      super();
+      
       this.root = ele;
       this._cachedSelectionStart = -1;
     }
