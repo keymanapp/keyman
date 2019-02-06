@@ -845,6 +845,7 @@ namespace com.keyman.text {
         keyman['oninserttext'](dn,s);
       }
 
+      let startCaret = outputTarget.getDeadkeyCaret();
       outputTarget.saveProperties();
       outputTarget.clearSelection();
       if(dn >= 0) {
@@ -853,14 +854,10 @@ namespace com.keyman.text {
       outputTarget.insertTextBeforeCaret(s);
       outputTarget.restoreProperties();
 
+      outputTarget.deadkeys().deleteMatched(); // I3318
+
       // Adjust deadkey positions 
-      if(dn >= 0) {
-        outputTarget.deadkeys().deleteMatched(); // I3318
-        // TODO:  Check this against original code - we've got to worry about the original caret's position.
-        // Also, what about the inserted text's length?
-        // Also, what are some good tests we can use for this?
-        outputTarget.deadkeys().adjustPositions(outputTarget.getDeadkeyCaret(), -dn + s._kmwLength()); // I3318,I3319
-      }
+      outputTarget.deadkeys().adjustPositions(startCaret, (dn >= 0 ? -dn : 0) + s._kmwLength()); // I3318,I3319
 
       // Refresh element content after change (if needed)
       if(typeof(keyman.refreshElementContent) == 'function') {
