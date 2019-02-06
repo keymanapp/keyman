@@ -889,11 +889,9 @@ namespace com.keyman {
 
         wrapper.restoreProperties();
 
+        this._DeadkeyDeleteMatched(); // I3318
         // Adjust deadkey positions 
-        if(dn >= 0) {
-          this._DeadkeyDeleteMatched(); // I3318
-          this._DeadkeyAdjustPos(wrapper.getDeadkeyCaret(), -dn + s._kmwLength()); // I3318,I3319
-        }
+        this._DeadkeyAdjustPos(wrapper.getDeadkeyCaret(), (dn >= 0 ? -dn : 0) + s._kmwLength()); // I3318,I3319
       } else {
         throw "No element wrapper available to produce output!";
       }
