@@ -340,11 +340,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           }
         }
 
-        if (FileUtils.hasJavaScriptExtension(url)) {
-          // TEST stub: DDW
-          url = "invalid-" + url;
-        }
-
         result = FileUtils.download(context, url, destination, filename);
         if (result < 0) {
           if (FileUtils.hasFontExtension(url)) {
