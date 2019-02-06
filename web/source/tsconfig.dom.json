@@ -8,6 +8,7 @@
 	"target": "es5"
 	},
   "files": [
-		"dom/editableElement.ts"
+    "dom/editableElement.ts",
+    "text/mock.ts"
   ]
 }

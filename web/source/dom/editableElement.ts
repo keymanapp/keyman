@@ -18,6 +18,14 @@ namespace com.keyman.dom {
     }
 
     /**
+     * Needed to properly clone deadkeys for use with Mock element interfaces toward predictive text purposes.
+     * @param {object}  dks   An existing set of deadkeys to deep-copy for use by this element interface.
+     */
+    protected setDeadkeys(dks: text.DeadkeyTracker) {
+      this._dks = dks.clone();
+    }
+
+    /**
      * Returns the underlying element / document modeled by the wrapper.
      */
     abstract getElement(): HTMLElement;

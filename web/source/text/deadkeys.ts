@@ -48,8 +48,15 @@ namespace com.keyman.text {
     dks: Deadkey[] = [];
 
     toArray(): Deadkey[] {
-      var arr = [].concat(this.dks);
-      return arr.sort(Deadkey.sortFunc);
+      this.dks.sort(Deadkey.sortFunc);
+      return [].concat(this.dks);
+    }
+
+    clone(): DeadkeyTracker {
+      let dkt = new DeadkeyTracker();
+      dkt.dks = this.toArray();
+
+      return dkt;
     }
   
     /**
