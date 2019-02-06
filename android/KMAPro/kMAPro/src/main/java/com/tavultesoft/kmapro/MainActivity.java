@@ -807,7 +807,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
       }
     } else {
-      Toast.makeText(this, "Keyboard " + keyboardID + " download failed", Toast.LENGTH_SHORT).show();
+      // Error notifications handled in LanguageListActivity
     }
   }
 

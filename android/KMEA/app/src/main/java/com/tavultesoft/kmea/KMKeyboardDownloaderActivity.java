@@ -220,14 +220,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       }
 
       ((AppCompatActivity) context).finish();
-      if (result > 0) {
-        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
-
-        if (result == 2) {
-          Toast.makeText(context, "Warning: Font failed to download.",
-            Toast.LENGTH_LONG).show();
-        }
-      }
+      notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
     }
 
     /**
