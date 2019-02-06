@@ -325,13 +325,22 @@ namespace com.keyman.text {
       return s;
     }
 
-    static getOutputTarget(Lelem: HTMLElement): dom.EditableElement {
-      if(!Lelem) {
-        return null;
-      } else if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+    static getOutputTarget(Lelem?: HTMLElement): dom.EditableElement {
+      let keyman = com.keyman.singleton;
+
+      if(!Lelem && !keyman.isHeadless) {
+        Lelem = keyman.domManager.getLastActiveElement();
+        if(!Lelem) {
+          // If we're trying to find an active target but one doesn't exist, just return null.
+          return null;
+        }
+      }
+
+      // If we were provided an element or found an active element but it's improperly attached, that should cause an error.
+      if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
         return Lelem._kmwAttachment.interface;
       } else {
-        throw "OSK could not find element output target data!";
+        throw new Error("OSK could not find element output target data!");
       }
     }
 
@@ -346,7 +355,7 @@ namespace com.keyman.text {
      */
     clickKey(e: osk.KeyElement) {
       let keyman = com.keyman.singleton;
-      var Lelem = keyman.domManager.getLastActiveElement(), Ls, Le;
+      var Lelem = keyman.domManager.getLastActiveElement();
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let kbdInterface = keyman.interface;
@@ -496,8 +505,6 @@ namespace com.keyman.text {
         this.selectLayer(keyName, nextLayer);
 
         /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-        Lelem._KeymanWebSelectionStart=null;
-        Lelem._KeymanWebSelectionEnd=null;
       }
       
       keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI

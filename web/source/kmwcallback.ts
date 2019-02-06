@@ -179,7 +179,6 @@ namespace com.keyman {
   //#endregion
 
   export class KeyboardInterface {
-    keymanweb: KeymanBase;
     cachedContext: CachedContext = new CachedContext();
     cachedContextEx: CachedContextEx = new CachedContextEx();
 
@@ -193,8 +192,7 @@ namespace com.keyman {
     _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
                                     // Set to 1 if there is an active 'beep', otherwise leave as '0'.
 
-    constructor(kmw: KeymanBase) {
-      this.keymanweb = kmw;
+    constructor() {
     }
 
     /**
@@ -203,7 +201,10 @@ namespace com.keyman {
      * Description  Save keyboard focus
      */    
     saveFocus(): void {
-      DOMEventHandlers.states._IgnoreNextSelChange = 1;
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless) {
+        DOMEventHandlers.states._IgnoreNextSelChange = 1;
+      }
     }
       
     /**
@@ -215,31 +216,19 @@ namespace com.keyman {
      * Description  Insert text into active control
      */    
     insertText(Ptext: string, PdeadKey:number): boolean {
+      let keyman = com.keyman.singleton;
       this.resetContextCache();
-      //_DebugEnter('InsertText');
-      var Lelem: HTMLElement, Lv=false;
-      var outputTarget: dom.EditableElement;
 
-      if(this.activeTargetOutput) {
-        outputTarget = this.activeTargetOutput;
-        Lelem = outputTarget.getElement();
-      } else {
-        Lelem = this.keymanweb.domManager.getLastActiveElement();
-        outputTarget = text.Processor.getOutputTarget(Lelem);
-      }
+      // Find the correct output target to manipulate.
+      let outputTarget: dom.EditableElement = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
 
-      if(Lelem != null) {
-
-        this.keymanweb.uiManager.setActivatingUI(true);
-        DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        this.keymanweb.domManager.focusLastActiveElement();
-        
-        if(Lelem.ownerDocument && Lelem instanceof Lelem.ownerDocument.defaultView.HTMLIFrameElement 
-            && this.keymanweb.domManager._IsMozillaEditableIframe(Lelem, 0)) {
-          Lelem = (<any>Lelem).documentElement;  // I3363 (Build 301)
+      if(outputTarget != null) {
+        if(!keyman.isHeadless) {
+          keyman.uiManager.setActivatingUI(true);
+          DOMEventHandlers.states._IgnoreNextSelChange = 100;
+          keyman.domManager.focusLastActiveElement();
+          DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
-        
-        DOMEventHandlers.states._IgnoreNextSelChange = 0;
 
         if(Ptext!=null) {
           this.output(0, outputTarget, Ptext);
@@ -250,10 +239,9 @@ namespace com.keyman {
         }
 
         outputTarget.invalidateSelection();
-        Lv=true;
+        return true;
       }
-      //_DebugExit('InsertText');
-      return Lv;
+      return false;
     }
     
     /**
@@ -263,7 +251,8 @@ namespace com.keyman {
      * Description  Register and load the keyboard
      */    
     registerKeyboard(Pk): void {
-      this.keymanweb.keyboardManager._registerKeyboard(Pk);
+      let keyman = com.keyman.singleton;
+      keyman.keyboardManager._registerKeyboard(Pk);
     }
 
     /**
@@ -276,7 +265,8 @@ namespace com.keyman {
      * @return      {?number}               1 if already registered, else null
      */    
     registerStub(Pstub): number {
-      return this.keymanweb.keyboardManager._registerStub(Pstub);
+      let keyman = com.keyman.singleton;
+      return keyman.keyboardManager._registerStub(Pstub);
     }
 
     /**
@@ -299,9 +289,34 @@ namespace com.keyman {
         return v;
       }
       
-      var r = this.keymanweb.KC_(n, ln, outputTarget);
+      var r = this.KC_(n, ln, outputTarget);
       this.cachedContext.set(n, ln, r);
       return r;
+    }
+
+    /**
+     * Get (uncached) keyboard context for a specified range, relative to caret
+     * 
+     * @param       {number}      n       Number of characters to move back from caret
+     * @param       {number}      ln      Number of characters to return
+     * @param       {Object}      Pelem   Element to work with (must be currently focused element)
+     * @return      {string}              Context string 
+     * 
+     * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
+     *             KC(2,1,Pelem) == "e"
+     *             KC(3,3,Pelem) == "def"
+     *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
+     */    
+    private KC_(n: number, ln: number, outputTarget: dom.EditableElement): string {
+      var tempContext = '';
+
+      tempContext = outputTarget.getTextBeforeCaret();
+
+      if(tempContext._kmwLength() < n) {
+        tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
+      }
+
+      return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
     }
     
     /**
@@ -335,7 +350,6 @@ namespace com.keyman {
      * Description  Test keyboard context for match
      */    
     contextMatch(n: number, outputTarget: dom.EditableElement, val: string, ln: number): boolean {
-      //KeymanWeb._Debug('KeymanWeb.KCM(n='+n+', Ptarg, val='+val+', ln='+ln+'): return '+(kbdInterface.context(n,ln,Ptarg)==val)); 
       var cx=this.context(n, ln, outputTarget);
       if(cx === val) {
         return true; // I3318
@@ -369,7 +383,7 @@ namespace com.keyman {
           cache = { valContext: [], deadContext: []};
           while(cache.valContext.length < n) {
             // As adapted from `deadkeyMatch`.
-            var sp=this._SelPos(outputTarget);
+            var sp = outputTarget.getDeadkeyCaret();
             var deadPos = sp - index;
             if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
               // Take the deadkey.
@@ -522,10 +536,11 @@ namespace com.keyman {
      * Description  Test if event as a keypress event
      */    
     isKeypress(e: KeyEvent):boolean {
-      if(this.keymanweb.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
+      let keyman = com.keyman.singleton;
+      if(keyman.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
-        return this.keymanweb.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
+        return keyman.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
       }
     }
     
@@ -542,7 +557,8 @@ namespace com.keyman {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-      var bitmask = this.keymanweb.keyboardManager.getKeyboardModifierBitmask();
+      let keyman = com.keyman.singleton;
+      let bitmask = keyman.keyboardManager.getKeyboardModifierBitmask();
       let Codes = com.keyman.text.Codes;
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
@@ -601,7 +617,7 @@ namespace com.keyman {
      * Description  Match deadkey at current cursor position
      */    
     deadkeyMatch(n: number, outputTarget: dom.EditableElement, d: number): boolean {
-      var sp=this._SelPos(outputTarget);
+      var sp = outputTarget.getDeadkeyCaret();
       return outputTarget.deadkeys().isMatch(sp, n, d);
     }
     
@@ -630,8 +646,9 @@ namespace com.keyman {
     beep(outputTarget: dom.EditableElement): void {
       this.resetContextCache();
 
-      if ('beepKeyboard' in this.keymanweb) {
-        this.keymanweb['beepKeyboard']();
+      let keyman = com.keyman.singleton;
+      if ('beepKeyboard' in keyman) {
+        keyman['beepKeyboard']();
       }
       
       var Pelem: HTMLElement = outputTarget.getElement();
@@ -654,7 +671,7 @@ namespace com.keyman {
         }
       }
       
-      this._BeepObjects = this.keymanweb._push(this._BeepObjects, new BeepData(Pelem));
+      this._BeepObjects = keyman._push(this._BeepObjects, new BeepData(Pelem));
       Pelem.style.backgroundColor = '#000000';
       if(this._BeepTimeout == 0) {
         this._BeepTimeout = 1;
@@ -664,7 +681,8 @@ namespace com.keyman {
 
     _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
       if(typeof(store) == 'string') {
-        var kbdTag = this.keymanweb.keyboardManager.getActiveKeyboardTag();
+        let keyman = com.keyman.singleton;
+        var kbdTag = keyman.keyboardManager.getActiveKeyboardTag();
 
         // Is the result cached?
         if(kbdTag.stores[store]) {
@@ -822,10 +840,11 @@ namespace com.keyman {
      */
     output(dn: number, outputTarget: dom.EditableElement, s:string): void {
       this.resetContextCache();
+      let keyman = com.keyman.singleton;
       
       // KeymanTouch for Android uses direct insertion of the character string
-      if('oninserttext' in this.keymanweb) {
-        this.keymanweb['oninserttext'](dn,s);
+      if('oninserttext' in keyman) {
+        keyman['oninserttext'](dn,s);
       }
 
       outputTarget.saveProperties();
@@ -843,8 +862,8 @@ namespace com.keyman {
       }
 
       // Refresh element content after change (if needed)
-      if(typeof(this.keymanweb.refreshElementContent) == 'function') {
-        this.keymanweb.refreshElementContent(outputTarget.getElement());
+      if(typeof(keyman.refreshElementContent) == 'function') {
+        keyman.refreshElementContent(outputTarget.getElement());
       }
 
       if((dn >= 0 || s) && outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
@@ -869,7 +888,7 @@ namespace com.keyman {
         this.output(Pdn, outputTarget,"");  //I3318 corrected to >=
       }
 
-      var Lc: text.Deadkey = new text.Deadkey(this._SelPos(outputTarget), Pd);
+      var Lc: text.Deadkey = new text.Deadkey(outputTarget.getDeadkeyCaret(), Pd);
 
       outputTarget.deadkeys().add(Lc);
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
@@ -884,9 +903,12 @@ namespace com.keyman {
      * @return      {boolean}                 True if the test succeeds 
      */       
     ifStore(systemId: number, strValue: string, outputTarget: dom.EditableElement): boolean {
+      let keyman = com.keyman.singleton;
+
       var result=true;
       if(systemId == this.TSS_LAYER) {
-        result = (this.keymanweb.osk.vkbd.layerId === strValue);
+        // How would this be handled in an eventual headless mode?
+        result = (keyman.osk.vkbd.layerId === strValue);
       } else if(systemId == this.TSS_PLATFORM) {
         var i,constraint,constraints=strValue.split(' ');
         for(i=0; i<constraints.length; i++) {
@@ -894,7 +916,7 @@ namespace com.keyman {
           switch(constraint) {
             case 'touch':
             case 'hardware':
-              if(this.keymanweb.util.activeDevice.touchable != (constraint == 'touch')) {
+              if(keyman.util.activeDevice.touchable != (constraint == 'touch')) {
                 result=false;
               }
               break;
@@ -908,7 +930,7 @@ namespace com.keyman {
             case 'android':
             case 'ios':
             case 'linux':
-              if(this.keymanweb.util.activeDevice.OS.toLowerCase() != constraint) {
+              if(keyman.util.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
               }
               break;
@@ -916,13 +938,13 @@ namespace com.keyman {
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(this.keymanweb.util.device.formFactor != constraint) {
+              if(keyman.util.device.formFactor != constraint) {
                 result=false;
               }
               break;
 
             case 'web':
-              if(this.keymanweb.util.device.browser == 'native') {
+              if(keyman.util.device.browser == 'native') {
                 result=false; // web matches anything other than 'native'
               }
               break;
@@ -935,7 +957,7 @@ namespace com.keyman {
             case 'safari':
             case 'edge':
             case 'opera':
-              if(this.keymanweb.util.device.browser != constraint) {
+              if(keyman.util.device.browser != constraint) {
                 result=false;
               }
               break;
@@ -959,9 +981,11 @@ namespace com.keyman {
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
     setStore(systemId: number, strValue: string, outputTarget: dom.EditableElement): boolean {
+      let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
-        return this.keymanweb.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
+        // How would this be handled in an eventual headless mode?
+        return keyman.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
         return false;
       }
@@ -976,8 +1000,9 @@ namespace com.keyman {
      * @return      {string}                  current or default option value   
      */    
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
+      let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=this.keymanweb.util.loadCookie(cName);
+      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=keyman.util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
         return decodeURIComponent(cValue[storeName]);
       } else {
@@ -993,15 +1018,16 @@ namespace com.keyman {
      * @return      {boolean}                 true if save successful
      */    
     saveStore(storeName:string, optValue:string): boolean {
+      let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var kbd=this.keymanweb.keyboardManager.activeKeyboard;
+      var kbd=keyman.keyboardManager.activeKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
         return false;
       }
       
       var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
 
-      this.keymanweb.util.saveCookie(cName,cValue);
+      keyman.util.saveCookie(cName,cValue);
       return true;
     }
 
@@ -1029,11 +1055,8 @@ namespace com.keyman {
 
     defaultBackspace(outputTarget?: dom.EditableElement) {
       if(!outputTarget) {
-        if(this.activeTargetOutput) {
-          outputTarget = this.activeTargetOutput;
-        } else {
-          outputTarget = text.Processor.getOutputTarget(this.keymanweb.domManager.getLastActiveElement());
-        }
+        // Find the correct output target to manipulate.
+        outputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
       }
 
       this.output(1, outputTarget, "");
@@ -1052,6 +1075,8 @@ namespace com.keyman {
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
     processKeystroke(device: Device, outputTarget: dom.EditableElement, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
+      let keyman = com.keyman.singleton;
+
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
@@ -1064,11 +1089,11 @@ namespace com.keyman {
 
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
-      this.keymanweb.util.activeDevice = device;
+      keyman.util.activeDevice = device;
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = this.keymanweb.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
+      var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       if(matched && outputTarget.getElement()) {
@@ -1082,73 +1107,85 @@ namespace com.keyman {
      * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
      */
     ['getLastActiveElement'](): HTMLElement {
-      return this.keymanweb.domManager.getLastActiveElement(); 
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless) {
+        return keyman.domManager.getLastActiveElement(); 
+      } else {
+        // What are the IMEs looking for with this method?  Would an element interface suffice?
+        return null;
+      }
     }
 
-    ['focusLastActiveElement'](): void { 
-      this.keymanweb.domManager.focusLastActiveElement(); 
+    ['focusLastActiveElement'](): void {
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless) {
+        keyman.domManager.focusLastActiveElement(); 
+      }
     }
 
     //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
     ['hideHelp'](): void {
-      this.keymanweb.osk._Hide(true);
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless) {
+        keyman.osk._Hide(true);
+      }
     }
 
     ['showHelp'](Px: number, Py: number): void {
-      this.keymanweb.osk._Show(Px,Py);
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless) {
+        keyman.osk._Show(Px,Py);
+      }
     }
 
     ['showPinnedHelp'](): void {
-      this.keymanweb.osk.userPositioned=true; 
-      this.keymanweb.osk._Show(-1,-1);
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless) {
+        keyman.osk.userPositioned=true; 
+        keyman.osk._Show(-1,-1);
+      }
     }
 
     resetContext() {
-      if(this.keymanweb.osk.vkbd) {
-        this.keymanweb.osk.vkbd.layerId = 'default';
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless && keyman.osk.vkbd) {
+        keyman.osk.vkbd.layerId = 'default';
       }
 
-      var outputTarget = this.activeTargetOutput;
-      if(!outputTarget) {
-        outputTarget = text.Processor.getOutputTarget(this.keymanweb.domManager.getLastActiveElement());
-      }
+      // Find the correct output target to manipulate.
+      let outputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
       if(outputTarget) {
         outputTarget.deadkeys().clear();
       }
       this.resetContextCache();
       this.resetVKShift();
 
-      this.keymanweb.osk._Show();
+      if(!keyman.isHeadless) {
+        keyman.osk._Show();
+      }
     };
 
     setNumericLayer() {
+      let keyman = com.keyman.singleton;
       var i;
-      let osk = this.keymanweb.osk.vkbd;
-      for(i=0; i<osk.layers.length; i++) {
-        if (osk.layers[i].id == 'numeric') {
-          osk.layerId = 'numeric';
-          this.keymanweb.osk._Show();
+      if(!keyman.isHeadless) {
+        let osk = keyman.osk.vkbd;
+        for(i=0; i<osk.layers.length; i++) {
+          if (osk.layers[i].id == 'numeric') {
+            osk.layerId = 'numeric';
+            keyman.osk._Show();
+          }
         }
       }
     };
 
     /**
-     * Function     _SelPos
-     * Scope        Private
-     * @param       {Object}  Pelem   Element
-     * @return      {number}          Selection start
-     * Description  Get start of selection (with supplementary plane modifications)
-     */   
-    _SelPos(outputTarget: dom.EditableElement) {
-      return outputTarget.getDeadkeyCaret();
-    }
-
-    /**
      * Reset OSK shift states when entering or exiting the active element
      **/    
     resetVKShift() {
+      let keyman = com.keyman.singleton;
       let processor = com.keyman.singleton.textProcessor;
-      if(!this.keymanweb.uiManager.isActivating && this.keymanweb.osk.vkbd) {
+      if(!keyman.isHeadless && !keyman.uiManager.isActivating && keyman.osk.vkbd) {
         if(processor._UpdateVKShift) {
           processor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
         }

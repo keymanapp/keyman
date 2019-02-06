@@ -320,7 +320,7 @@ namespace com.keyman {
       DOMEventHandlers.states._DisableInput = false; 
 
       if(!uiManager.justActivated) {
-        if(text.Processor.getOutputTarget(target)) {
+        if(target && text.Processor.getOutputTarget(target)) {
           text.Processor.getOutputTarget(target).deadkeys().clear();
         }
         this.keyman.keyboardManager.notifyKeyboard(0, target, 1);  // I2187
