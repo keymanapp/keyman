@@ -1,15 +1,13 @@
-/// <reference path="kmwbase.ts" />
-/// <reference path="text/deadkeys.ts" />
+/// <reference path="deadkeys.ts" />
+/// <reference path="../kmwbase.ts" />
 
 /***
    KeymanWeb 11.0
    Copyright 2017-2018 SIL International
 ***/
 
-namespace com.keyman {
+namespace com.keyman.text {
   //#region Helper type definitions
-  
-  type KeyEvent = com.keyman.text.KeyEvent;
 
   export class KeyInformation {
     vk: boolean;
@@ -858,6 +856,9 @@ namespace com.keyman {
       // Adjust deadkey positions 
       if(dn >= 0) {
         outputTarget.deadkeys().deleteMatched(); // I3318
+        // TODO:  Check this against original code - we've got to worry about the original caret's position.
+        // Also, what about the inserted text's length?
+        // Also, what are some good tests we can use for this?
         outputTarget.deadkeys().adjustPositions(outputTarget.getDeadkeyCaret(), -dn + s._kmwLength()); // I3318,I3319
       }
 

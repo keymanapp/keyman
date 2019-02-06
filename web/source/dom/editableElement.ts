@@ -1,5 +1,5 @@
 // Defines KMW's string extension functions.
-///<reference path="../kmwstring.ts" />
+///<reference path="../text/kmwstring.ts" />
 // Makes TS aware of Window-based type prototypes
 ///<reference path="../kmwexthtml.ts" />
 // Defines deadkey management in a manner attachable to each element interface.
