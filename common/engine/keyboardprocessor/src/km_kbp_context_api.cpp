@@ -32,7 +32,7 @@ namespace {
     {
       std::vector<km_kbp_context_item> res;
 
-      for (auto i = typename U::const_sentinal_iterator(text); i; ++i)
+      for (auto i = typename U::const_iterator(text); *i; ++i)
       {
         if(i.error())   return KM_KBP_STATUS_INVALID_UTF;
         res.emplace_back(km_kbp_context_item {KM_KBP_CT_CHAR, {0,}, {*i}});
@@ -65,7 +65,7 @@ namespace {
       auto i = typename U::iterator(buf);
       auto const e = decltype(i)(buf + buf_size - 1);
 
-      for (;i != e && ci->type != KM_KBP_CT_END; ++ci)
+      for (;i != e && ci->type != KM_KBP_CT_END && !i.error(); ++ci)
       {
         if (ci->type == KM_KBP_CT_CHAR)
         {
@@ -83,13 +83,13 @@ namespace {
     else
     {
       auto n = 0;
-      typename U::codeunit_t cps[4/sizeof(typename U::codeunit_t)];
+      typename U::codeunit_t cps[4];
 
       do
       {
         if (ci->type == KM_KBP_CT_CHAR)
         {
-          int8_t l;
+          int8_t l = 4;
           U::codec::put(cps, ci->character, l);
           n += l;
         }
@@ -242,8 +242,8 @@ json & operator << (json & j, km::kbp::context const & ctxt) {
 
 json & operator << (json & j, km_kbp_context_item const & i)
 {
-  utf8::codeunit_t cps[5] = {0,};
-  int8_t l;
+  utf8::codeunit_t cps[4] = {0,};
+  int8_t l = 4;
 
   switch (i.type)
   {

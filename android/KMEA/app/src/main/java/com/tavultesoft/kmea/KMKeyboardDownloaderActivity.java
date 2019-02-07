@@ -126,10 +126,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       title = String.format("%s: %s", langName, kbName);
     }
 
-    DialogFragment dialog = new ConfirmDialogFragment();
-      args.putString(ConfirmDialogFragment.ARG_TITLE, title);
-      dialog.setArguments(args);
-      dialog.show(getFragmentManager(), "dialog");
+    DialogFragment dialog = ConfirmDialogFragment.newInstance(title, getString(R.string.confirm_download));
+    dialog.show(getFragmentManager(), "dialog");
   }
 
   /**

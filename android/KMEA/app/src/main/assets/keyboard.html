@@ -216,12 +216,14 @@
       kmw['executePopupKey'](keyID);
     }
 
-    function executeHardwareKeystroke(code, shift, lstates) {
+    function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
       var kmw=window['keyman'];
       //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        var r = kmw['executeHardwareKeystroke'](code, shift, lstates);
-        //window.console.log('executeHardwareKeystroke completed with '+r);
+        if (!kmw['executeHardwareKeystroke'](code, shift, lstates)) {
+          // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
+          window.jsInterface.dispatchKey(code, eventModifiers);
+        }
       } catch(e) {
         window.console.log('executeHardwareKeystroke exception: '+e);
       }

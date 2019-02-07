@@ -52,10 +52,13 @@ type
     function GetValue(const name: string; var value: TJSONValue): Boolean; overload;
     function GetValue(const name: string; var value: string): Boolean; overload;
     function GetValue(const name: string; var value: Integer): Boolean; overload;
+    function GetValue(const name: string; var value: Boolean): Boolean; overload;
 
     procedure AddJSONValue(JSON: TJSONObject; const name, value: string); overload;
     procedure AddJSONValue(JSON: TJSONObject; const name: string;
       value: Integer); overload;
+    procedure AddJSONValue(JSON: TJSONObject; const name: string;
+      value: Boolean); overload;
 
     //function GetArray(const name: string): TJSONArray; overload;
     procedure ReadArray(const name: string; cls: TTouchLayoutClass; add: TTouchLayoutAddProc);
@@ -183,6 +186,7 @@ type
     FName: string;
     FLayers: TTouchLayoutLayers;
     FFontSize: Integer;   // I4062
+    FDisplayUnderlying: Boolean;
     FFont: string;
   protected
     procedure DoRead; override;
@@ -190,6 +194,7 @@ type
   public
     constructor Create(AParent: TTouchLayoutObject); override;
     destructor Destroy; override;
+    property DisplayUnderlying: Boolean read FDisplayUnderlying write FDisplayUnderlying;
     property Name: string read FName write FName;
     property Font: string read FFont write FFont;
     property FontSize: Integer read FFontSize write FFontSize;   // I4062
@@ -529,7 +534,7 @@ procedure TTouchLayout.Validate(v: TJSONObject);
     for i := Low(Def) to High(Def) do
     begin
       TouchAssert(not Def[i].Required or (AObject.Get(Def[i].Name) <> nil),
-        'Member '+Def[i].Name+' is requred', AObject);
+        'Member '+Def[i].Name+' is required', AObject);
     end;
 
     // Validate all members
@@ -614,6 +619,11 @@ begin
   Result := True;
 end;
 
+procedure TTouchLayoutObject.AddJSONValue(JSON: TJSONObject; const name: string; value: Boolean);
+begin
+  JSON.AddPair(name, TJSONBool.Create(value));
+end;
+
 constructor TTouchLayoutObject.Create(AParent: TTouchLayoutObject);
 begin
   inherited Create;
@@ -657,6 +667,17 @@ end;
 procedure TTouchLayoutObject.Write(JSON: TJSONObject);
 begin
   DoWrite(JSON);
+end;
+
+function TTouchLayoutObject.GetValue(const name: string;
+  var value: Boolean): Boolean;
+var
+  p: TJSONPair;
+begin
+  value := False;
+  p := FJSON.Get(name);
+  if not Assigned(p) then Exit(False);
+  Result := p.JsonValue.TryGetValue<Boolean>(value);
 end;
 
 { TTouchLayoutSubKey }
@@ -729,6 +750,7 @@ procedure TTouchLayoutPlatform.DoRead;
 begin
   GetValue('font', FFont);
   GetValue('fontsize', FFontSize);
+  GetValue('displayUnderlying', FDisplayUnderlying);
   ReadArray('layer', TTouchLayoutLayer,
     procedure (obj: TTouchLayoutObject) begin FLayers.Add(obj as TTouchLayoutLayer); end);
 end;
@@ -741,6 +763,7 @@ var
 begin
   AddJSONValue(JSON, 'font', FFont);
   AddJSONValue(JSON, 'fontsize', FFontSize);
+  AddJSONValue(JSON, 'displayUnderlying', FDisplayUnderlying);
 
   if FLayers.Count > 0 then
   begin

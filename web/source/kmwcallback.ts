@@ -4,7 +4,7 @@
 
 /***
    KeymanWeb 11.0
-   Copyright 2017-2018 SIL International
+   Copyright 2019 SIL International
 ***/
 
 namespace com.keyman {

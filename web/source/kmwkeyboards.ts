@@ -229,7 +229,7 @@ namespace com.keyman {
     /**
      *  Create or update a keyboard meta-data 'stub' during keyboard registration
      * 
-     *  Cross-reference with https://help.keyman.com/developer/engine/web/10.0/reference/core/addKeyboards.
+     *  Cross-reference with https://help.keyman.com/developer/engine/web/11.0/reference/core/addKeyboards.
      *  
      *  @param  {Object}  kp  (partial) keyboard meta-data object (`spec` object)
      *  @param  {Object}  lp  language object (`spec.languages` object)
