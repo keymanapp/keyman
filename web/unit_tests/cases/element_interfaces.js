@@ -1450,6 +1450,10 @@ describe('Element Input/Output Interfacing', function() {
           InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Mock);
         });
       });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TouchAlias);
+      });
     });
   });
 });
