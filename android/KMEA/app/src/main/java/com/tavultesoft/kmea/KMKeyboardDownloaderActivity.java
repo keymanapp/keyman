@@ -226,7 +226,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     /**
      * Download a non-KMP Keyman keyboard from Keyman cloud via JSON
      * @param remoteUrl String
-     * @return ret int -1 for fail
+     * @return ret int -1 for fail; >0 for success; 2 for keyboard downloading but not font
      * @throws Exception
      */
     protected int downloadNonKMPKeyboard(String remoteUrl) throws Exception {
@@ -343,7 +343,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         result = FileUtils.download(context, url, destination, filename);
         if (result < 0) {
           if (FileUtils.hasFontExtension(url)) {
-            // Propogate warning about font failing to download
+            // Propagate warning about font failing to download
             ret = 2;
           } else {
             ret = -1;
