@@ -11,7 +11,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
 // Defines the keyboard callback object.
-/// <reference path="kmwcallback.ts" />
+/// <reference path="text/kbdInterface.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
 // Defines built-in keymapping.
@@ -63,7 +63,7 @@ namespace com.keyman {
     ['util']: Util;
     ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
-    ['interface']: KeyboardInterface;
+    ['interface']: text.KeyboardInterface;
     keyboardManager: KeyboardManager;
     domManager: DOMManager;
     hotkeyManager: HotkeyManager;
@@ -107,7 +107,7 @@ namespace com.keyman {
     constructor() {
       // Allow internal minification of the public modules.
       this.util = this['util'] = new Util(this);
-      window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface();
+      window['KeymanWeb'] = this.interface = this['interface'] = new text.KeyboardInterface();
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
       this.ui = this['ui'] = {};
 

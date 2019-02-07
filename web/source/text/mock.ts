@@ -1,7 +1,7 @@
-///<reference path="../dom/editableElement.ts" />
+///<reference path="outputTarget.ts" />
 
 namespace com.keyman.text {
-  export class Mock extends dom.EditableElement {
+  export class Mock extends OutputTarget {
     text: string;
     caretIndex: number;
 
@@ -13,7 +13,7 @@ namespace com.keyman.text {
     }
 
     // Clones the state of an existing EditableElement, creating a Mock version of its state.
-    static from(outputTarget: dom.EditableElement) {
+    static from(outputTarget: OutputTarget) {
       let preText = outputTarget.getTextBeforeCaret();
       let caretIndex = preText._kmwLength();
 

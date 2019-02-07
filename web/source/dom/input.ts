@@ -1,8 +1,8 @@
-/// <reference path="editableElement.ts" />
+/// <reference path="../text/outputTarget.ts" />
 
 namespace com.keyman.dom {
 
-  export class Input extends EditableElement {
+  export class Input extends text.OutputTarget {
     root: HTMLInputElement;
 
     /**
@@ -99,6 +99,7 @@ namespace com.keyman.dom {
         let curText = this.getTextBeforeCaret();
         let caret = this.getCaret();
 
+        this.adjustDeadkeys(-dn);
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
         this.setCaret(caret - dn);
       }
@@ -113,6 +114,7 @@ namespace com.keyman.dom {
       let front = this.getTextBeforeCaret();
       let back = this.getText()._kmwSubstring(this.processedSelectionStart);
 
+      this.adjustDeadkeys(s._kmwLength());
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
     }

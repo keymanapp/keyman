@@ -1,5 +1,6 @@
 /// <reference path="../kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
-/// <reference path="../kmwstring.ts" />  // Includes KMW string extension declarations.
+// Includes KMW string extension declarations.
+/// <reference path="../text/kmwstring.ts" /> 
 // Includes the default layout specification.
 /// <reference path="defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
