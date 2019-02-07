@@ -29,6 +29,13 @@ and mobile platforms.
 
   <launchable type="desktop-id">km-config.desktop</launchable>
 
+  <screenshots>
+    <screenshot type="default">
+      <caption>The Keyman Keyboards main window with a keyboard welcome window.</caption>
+      <image type="source" width="920" height="518">https://keyman.com/cdn/deploy/img/linux-configuration.e6fee253e7bf355e0e8ce07a9fad634a.png</image>
+    </screenshot>
+  </screenshots>
+
   <url type="homepage">https://keyman.com/linux/</url>
   <url type="bugtracker">https://github.com/keymanapp/keyman/issues</url>
   <url type="contact">https://community.software.sil.org/c/keyman</url>
