@@ -5,8 +5,8 @@
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
 
-namespace com.keyman.dom {
-  export abstract class EditableElement {
+namespace com.keyman.text {
+  export abstract class OutputTarget {
     private _dks: text.DeadkeyTracker;
 
     constructor() {

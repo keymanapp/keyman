@@ -19,7 +19,7 @@ namespace com.keyman.dom {
     }
   }
 
-  export class ContentEditable extends EditableElement {
+  export class ContentEditable extends text.OutputTarget {
     root: HTMLElement;
 
     constructor(ele: HTMLElement) {

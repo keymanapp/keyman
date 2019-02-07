@@ -1,11 +1,11 @@
-/// <reference path="dom/editableElement.ts" />
+/// <reference path="text/outputTarget.ts" />
 
 namespace com.keyman {
   export class AttachmentInfo {
     /**
      * Provides the core interface between the DOM and the actual keyboard.
      */
-    interface:      dom.EditableElement;
+    interface:      text.OutputTarget;
 
     /**
      * Tracks the control's independent keyboard selection, when applicable.
@@ -25,7 +25,7 @@ namespace com.keyman {
      */
     touchEnabled:   boolean;
 
-    constructor(eleInterface: dom.EditableElement, kbd: string, touch?: boolean) {
+    constructor(eleInterface: text.OutputTarget, kbd: string, touch?: boolean) {
       this.interface = eleInterface;
       this.keyboard = kbd;
       this.touchEnabled = touch || false;

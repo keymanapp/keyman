@@ -2,7 +2,7 @@ var assert = chai.assert;
 
 var InterfaceTests;
 
-// Define common interface testing functions that can be run upon the EditableElement interface.
+// Define common interface testing functions that can be run upon the OutputTarget interface.
 if(typeof InterfaceTests == 'undefined') {
   InterfaceTests = {};
 

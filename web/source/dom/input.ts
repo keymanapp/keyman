@@ -1,8 +1,8 @@
-/// <reference path="editableElement.ts" />
+/// <reference path="../text/outputTarget.ts" />
 
 namespace com.keyman.dom {
 
-  export class Input extends EditableElement {
+  export class Input extends text.OutputTarget {
     root: HTMLInputElement;
 
     /**

@@ -1,10 +1,10 @@
 // Defines the TouchAliasElement merged type.
 /// <reference path="touchAliasElement.ts" />
-// Defines the EditableElement interface.
-/// <reference path="editableElement.ts" />
+// Defines the OutputTarget interface.
+/// <reference path="../text/outputTarget.ts" />
 
 namespace com.keyman.dom {
-  export class TouchAlias extends EditableElement {
+  export class TouchAlias extends text.OutputTarget {
     root: TouchAliasElement;
 
     constructor(e: TouchAliasElement) {

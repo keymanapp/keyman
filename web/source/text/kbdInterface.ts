@@ -180,7 +180,7 @@ namespace com.keyman.text {
     cachedContext: CachedContext = new CachedContext();
     cachedContextEx: CachedContextEx = new CachedContextEx();
 
-    activeTargetOutput: dom.EditableElement;
+    activeTargetOutput: OutputTarget;
 
     TSS_LAYER:    number = 33;
     TSS_PLATFORM: number = 31;
@@ -218,7 +218,7 @@ namespace com.keyman.text {
       this.resetContextCache();
 
       // Find the correct output target to manipulate.
-      let outputTarget: dom.EditableElement = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
+      let outputTarget: OutputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
 
       if(outputTarget != null) {
         if(!keyman.isHeadless) {
@@ -281,7 +281,7 @@ namespace com.keyman.text {
      *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
      */    
     
-    context(n: number, ln: number, outputTarget: dom.EditableElement): string {
+    context(n: number, ln: number, outputTarget: OutputTarget): string {
       var v = this.cachedContext.get(n, ln);
       if(v !== null) {
         return v;
@@ -305,7 +305,7 @@ namespace com.keyman.text {
      *             KC(3,3,Pelem) == "def"
      *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
      */    
-    private KC_(n: number, ln: number, outputTarget: dom.EditableElement): string {
+    private KC_(n: number, ln: number, outputTarget: OutputTarget): string {
       var tempContext = '';
 
       tempContext = outputTarget.getTextBeforeCaret();
@@ -330,7 +330,7 @@ namespace com.keyman.text {
      *             KN(2,Pelem) == FALSE
      *             KN(4,Pelem) == TRUE
      */    
-    nul(n: number, outputTarget: dom.EditableElement): boolean {
+    nul(n: number, outputTarget: OutputTarget): boolean {
       var cx=this.context(n+1, 1, outputTarget);
       
       // With #31, the result will be a replacement character if context is empty.
@@ -347,7 +347,7 @@ namespace com.keyman.text {
      * @return      {boolean}             True if selected context matches val
      * Description  Test keyboard context for match
      */    
-    contextMatch(n: number, outputTarget: dom.EditableElement, val: string, ln: number): boolean {
+    contextMatch(n: number, outputTarget: OutputTarget, val: string, ln: number): boolean {
       var cx=this.context(n, ln, outputTarget);
       if(cx === val) {
         return true; // I3318
@@ -364,7 +364,7 @@ namespace com.keyman.text {
      * @param       {Object}      Pelem   Element to work with (must be currently focused element)
      * @return      {Array}               Context array (of strings and numbers) 
      */
-    private _BuildExtendedContext(n: number, ln: number, outputTarget: dom.EditableElement): CachedExEntry {
+    private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTarget): CachedExEntry {
       var cache: CachedExEntry = this.cachedContextEx.get(n, ln); 
       if(cache !== null) {
         return cache;
@@ -429,7 +429,7 @@ namespace com.keyman.text {
      * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
      * near-directly modeling (externally) the compiled form of Desktop rules' context section.
      */
-    fullContextMatch(n: number, outputTarget: dom.EditableElement, rule: ContextEntry[]): boolean {
+    fullContextMatch(n: number, outputTarget: OutputTarget, rule: ContextEntry[]): boolean {
       // Stage one:  build the context index map.
       var fullContext = this._BuildExtendedContext(n, rule.length, outputTarget);
       var context = fullContext.valContext;
@@ -614,7 +614,7 @@ namespace com.keyman.text {
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
      */    
-    deadkeyMatch(n: number, outputTarget: dom.EditableElement, d: number): boolean {
+    deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
       var sp = outputTarget.getDeadkeyCaret();
       return outputTarget.deadkeys().isMatch(sp, n, d);
     }
@@ -641,7 +641,7 @@ namespace com.keyman.text {
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
      */    
-    beep(outputTarget: dom.EditableElement): void {
+    beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
       let keyman = com.keyman.singleton;
@@ -762,7 +762,7 @@ namespace com.keyman.text {
      * @param       {Object}      Pelem   element to output to
      * Description  Output a character selected from the string according to the offset in the index array
      */
-    indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: dom.EditableElement): void {
+    indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: OutputTarget): void {
       this.resetContextCache();
 
       var assertNever = function(x: never): never {
@@ -802,7 +802,7 @@ namespace com.keyman.text {
      * @param       {string}      s       string to output   
      * Description  Keyboard output
      */
-    deleteContext(dn: number, outputTarget: dom.EditableElement): void {
+    deleteContext(dn: number, outputTarget: OutputTarget): void {
       var context: CachedExEntry;
 
       // We want to control exactly which deadkeys get removed.
@@ -836,7 +836,7 @@ namespace com.keyman.text {
      * @param       {string}      s       string to output   
      * Description  Keyboard output
      */
-    output(dn: number, outputTarget: dom.EditableElement, s:string): void {
+    output(dn: number, outputTarget: OutputTarget, s:string): void {
       this.resetContextCache();
       let keyman = com.keyman.singleton;
       
@@ -879,7 +879,7 @@ namespace com.keyman.text {
      * @param       {number}      Pd      deadkey id
      * Description  Record a deadkey at current cursor position, deleting Pdn characters first
      */    
-    deadkeyOutput(Pdn: number, outputTarget: dom.EditableElement, Pd: number): void {
+    deadkeyOutput(Pdn: number, outputTarget: OutputTarget, Pd: number): void {
       this.resetContextCache();
 
       if(Pdn >= 0) {
@@ -900,7 +900,7 @@ namespace com.keyman.text {
      * @param       {Object}      Pelem       Currently active element (may be needed by future tests)     
      * @return      {boolean}                 True if the test succeeds 
      */       
-    ifStore(systemId: number, strValue: string, outputTarget: dom.EditableElement): boolean {
+    ifStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       let keyman = com.keyman.singleton;
 
       var result=true;
@@ -978,7 +978,7 @@ namespace com.keyman.text {
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
-    setStore(systemId: number, strValue: string, outputTarget: dom.EditableElement): boolean {
+    setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
@@ -1051,7 +1051,7 @@ namespace com.keyman.text {
       }
     }
 
-    defaultBackspace(outputTarget?: dom.EditableElement) {
+    defaultBackspace(outputTarget?: OutputTarget) {
       if(!outputTarget) {
         // Find the correct output target to manipulate.
         outputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
@@ -1072,7 +1072,7 @@ namespace com.keyman.text {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device: Device, outputTarget: dom.EditableElement, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
+    processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
       let keyman = com.keyman.singleton;
 
       // Clear internal state tracking data from prior keystrokes.

@@ -325,7 +325,7 @@ namespace com.keyman.text {
       return s;
     }
 
-    static getOutputTarget(Lelem?: HTMLElement): dom.EditableElement {
+    static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
       let keyman = com.keyman.singleton;
 
       if(!Lelem && !keyman.isHeadless) {

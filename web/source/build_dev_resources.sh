@@ -31,9 +31,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # Definition of global compile constants
-SCRIPT_TAGS=( "recorder"                "dom" )
-PRODUCTS=(    "recorder_InputEvents.js" "dom.js")
-FOLDERS=(     "recorder"                "dom")
+SCRIPT_TAGS=( "recorder"                "dev_resources" )
+PRODUCTS=(    "recorder_InputEvents.js" "dev_resources.js")
+FOLDERS=(     "recorder"                "dev_resources")
 OUTPUT_BASE="../release"
 PRODUCT_COUNT=${#PRODUCTS[@]}
 
