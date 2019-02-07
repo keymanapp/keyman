@@ -33,6 +33,9 @@ namespace com.keyman.text {
       return this.o < other.o;
     }
 
+    /**
+     * Sorts the deadkeys in reverse order.
+     */
     static sortFunc = function(a: Deadkey, b: Deadkey) {
       // We want descending order, so we want 'later' deadkeys first.
       if(a.p != b.p) {
@@ -47,7 +50,7 @@ namespace com.keyman.text {
   export class DeadkeyTracker {
     dks: Deadkey[] = [];
 
-    toArray(): Deadkey[] {
+    toSortedArray(): Deadkey[] {
       var arr = [].concat(this.dks);
       return arr.sort(Deadkey.sortFunc);
     }
@@ -119,6 +122,10 @@ namespace com.keyman.text {
      * Description  Adjust saved positions of deadkeys in context
      */
     adjustPositions(Lstart: number, Ldelta: number): void {
+      if(Ldelta == 0) {
+        return;
+      }
+      
       for(let dk of this.dks) {
         if(dk.p > Lstart) {
           dk.p += Ldelta;

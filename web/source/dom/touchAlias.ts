@@ -50,11 +50,13 @@ namespace com.keyman.dom {
     deleteCharsBeforeCaret(dn: number): void {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
+        this.adjustDeadkeys(-dn);
         this.root.setTextBeforeCaret(curText.kmwSubstring(0, this.root.getTextCaret() - dn));
       }
     }
     
     insertTextBeforeCaret(s: string): void {
+      this.adjustDeadkeys(s._kmwLength());
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);
     }
   }

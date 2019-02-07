@@ -17,6 +17,25 @@ namespace com.keyman.text {
       return this._dks;
     }
 
+    hasDeadkeyMatch(n: number, d: number): boolean {
+      return this.deadkeys().isMatch(this.getDeadkeyCaret(), n, d);
+    }
+
+    insertDeadkeyBeforeCaret(d: number) {
+      var dk: Deadkey = new Deadkey(this.getDeadkeyCaret(), d);
+      this.deadkeys().add(dk);
+    }
+
+    /**
+     * Should be called by each output target immediately before text mutation operations occur.
+     * 
+     * Maintains solutions to old issues:  I3318,I3319
+     * @param {number} delta  Use negative values if characters were deleted, positive if characters were added.
+     */
+    protected adjustDeadkeys(delta: number) {
+      this.deadkeys().adjustPositions(this.getDeadkeyCaret(), delta); 
+    }
+
     /**
      * Returns the underlying element / document modeled by the wrapper.
      */
@@ -61,14 +80,17 @@ namespace com.keyman.text {
     abstract getText(): string;
 
     /**
-     * Performs context deletions (from the left of the caret) as needed by the KeymanWeb engine.
+     * Performs context deletions (from the left of the caret) as needed by the KeymanWeb engine and
+     * corrects the location of any affected deadkeys.
+     * 
+     * Does not delete deadkeys (b/c KMW 1 & 2 behavior maintenance).
      * @param dn The number of characters to delete.  If negative, context will be left unchanged.
      */
     abstract deleteCharsBeforeCaret(dn: number): void;
 
     /**
      * Inserts text immediately before the caret's current position, moving the caret after the
-     * newly inserted text in the process.
+     * newly inserted text in the process along with any affected deadkeys.
      * 
      * @param s Text to insert before the caret's current position.
      */

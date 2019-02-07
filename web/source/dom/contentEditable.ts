@@ -155,6 +155,7 @@ namespace com.keyman.dom {
       range.setStart(start.node, dnOffset);
       range.setEnd(start.node, start.offset);
 
+      this.adjustDeadkeys(-dn);
       range.deleteContents();
       // No need to reposition the caret - the DOM will auto-move the selection accordingly, since
       // we didn't use the selection to delete anything.
@@ -172,6 +173,8 @@ namespace com.keyman.dom {
       if(delta == 0) {
         return;
       }
+
+      this.adjustDeadkeys(delta);
 
       // While Selection.extend() is really nice for this, IE doesn't support it whatsoever.
       // However, IE (11, at least) DOES support setting selections via ranges, so we can still

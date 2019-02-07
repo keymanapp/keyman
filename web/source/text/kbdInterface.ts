@@ -374,7 +374,7 @@ namespace com.keyman.text {
         cache = this.cachedContextEx.get(n, n);
         if(cache === null) {
           // First, let's make sure we have a cloned, sorted copy of the deadkey array.
-          let unmatchedDeadkeys = outputTarget.deadkeys().toArray();
+          let unmatchedDeadkeys = outputTarget.deadkeys().toSortedArray(); // Is reverse-order sorted for us already.
 
           // Time to build from scratch!
           var index = 0;
@@ -383,7 +383,11 @@ namespace com.keyman.text {
             // As adapted from `deadkeyMatch`.
             var sp = outputTarget.getDeadkeyCaret();
             var deadPos = sp - index;
-            if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
+            if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p > deadPos) {
+              // We have deadkeys at the right-hand side of the caret!  They don't belong in the context, so pop 'em off.
+              unmatchedDeadkeys.splice(0, 1);
+              continue;
+            } else if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p == deadPos) {
               // Take the deadkey.
               cache.deadContext[n-cache.valContext.length-1] = unmatchedDeadkeys[0];
               cache.valContext = ([unmatchedDeadkeys[0].d] as (string|number)[]).concat(cache.valContext);
@@ -608,15 +612,14 @@ namespace com.keyman.text {
     /**
      * Function     deadkeyMatch  KDM      
      * Scope        Public
-     * @param       {number}      n       current cursor position
+     * @param       {number}      n       offset from current cursor position
      * @param       {Object}      Ptarg   target element
      * @param       {number}      d       deadkey
      * @return      {boolean}             True if deadkey found selected context matches val
      * Description  Match deadkey at current cursor position
      */    
     deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
-      var sp = outputTarget.getDeadkeyCaret();
-      return outputTarget.deadkeys().isMatch(sp, n, d);
+      return outputTarget.hasDeadkeyMatch(n, d);
     }
     
     /**
@@ -845,19 +848,16 @@ namespace com.keyman.text {
         keyman['oninserttext'](dn,s);
       }
 
-      let startCaret = outputTarget.getDeadkeyCaret();
       outputTarget.saveProperties();
       outputTarget.clearSelection();
+      outputTarget.deadkeys().deleteMatched(); // I3318
       if(dn >= 0) {
+        // Automatically manages affected deadkey positions.  Does not delete deadkeys b/c legacy behavior support.
         outputTarget.deleteCharsBeforeCaret(dn);
       }
+      // Automatically manages affected deadkey positions.
       outputTarget.insertTextBeforeCaret(s);
       outputTarget.restoreProperties();
-
-      outputTarget.deadkeys().deleteMatched(); // I3318
-
-      // Adjust deadkey positions 
-      outputTarget.deadkeys().adjustPositions(startCaret, (dn >= 0 ? -dn : 0) + s._kmwLength()); // I3318,I3319
 
       // Refresh element content after change (if needed)
       if(typeof(keyman.refreshElementContent) == 'function') {
@@ -886,9 +886,7 @@ namespace com.keyman.text {
         this.output(Pdn, outputTarget,"");  //I3318 corrected to >=
       }
 
-      var Lc: text.Deadkey = new text.Deadkey(outputTarget.getDeadkeyCaret(), Pd);
-
-      outputTarget.deadkeys().add(Lc);
+      outputTarget.insertDeadkeyBeforeCaret(Pd);
       //    _DebugDeadKeys(Pelem, 'KDeadKeyOutput: dn='+Pdn+'; deadKey='+Pd);
     }
     
