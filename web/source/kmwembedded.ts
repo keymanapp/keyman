@@ -1,5 +1,6 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+// Includes KMW string extension declarations.
+/// <reference path="text/kmwstring.ts" />
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 
@@ -530,7 +531,7 @@ namespace com.keyman.osk {
     try {
       // Pass this key code and state to the keyboard program
       // If key is mapped, return true
-      if((kbdInterface as com.keyman.KeyboardInterface).processKeystroke(util.physicalDevice, outputTarget, Lkc)) {
+      if((kbdInterface as com.keyman.text.KeyboardInterface).processKeystroke(util.physicalDevice, outputTarget, Lkc)) {
         return true;
       }
 
