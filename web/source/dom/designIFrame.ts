@@ -108,7 +108,7 @@ namespace com.keyman.dom {
     }
 
     getDeadkeyCaret(): number {
-      return this.getCarets().start.offset;
+      return this.getTextBeforeCaret().kmwLength();
     }
 
     getTextBeforeCaret(): string {

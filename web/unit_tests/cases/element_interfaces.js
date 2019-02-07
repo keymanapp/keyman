@@ -16,7 +16,7 @@ if(typeof InterfaceTests == 'undefined') {
     InterfaceTests.Strings.Apple.normal = 'apple';
     // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
     InterfaceTests.Strings.Apple.smp = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
-    InterfaceTests.Strings.Apple.mixed = 'a'+u(0x1d5c9)+'p'+'l'+u(0x1d5be); 
+    InterfaceTests.Strings.Apple.mixed = 'a'+u(0x1d5c9)+'p'+'l'+u(0x1d5be);
 
     //#region Defines helpers related to HTMLInputElement / Input test setup.
     InterfaceTests.Input = {};
@@ -887,6 +887,44 @@ if(typeof InterfaceTests == 'undefined') {
       testObj.setSelectionRange(dummy, 3, 1);
       assert.isFalse(pair.wrapper.hasSelection(), "Falsely claimed ownership of partial, backward-order selection.")
     }
+
+    InterfaceTests.Tests.deadkeyMaintenance = function(testObj) {
+      // Rather than messing with keystroke rules, we can directly test the deadkey maintenance logic.
+      var Apple = InterfaceTests.Strings.Apple;
+      var pair = testObj.setupElement();
+
+      String.kmwEnableSupplementaryPlane(true);
+
+      testObj.resetWithText(pair, Apple.mixed);
+      testObj.setCaret(pair, 1);
+      pair.wrapper.insertDeadkeyBeforeCaret(1); // unmatched
+      pair.wrapper.insertDeadkeyBeforeCaret(2); // matched (by next line)
+      pair.wrapper.deadkeys().isMatch(1, 0, 2);
+      testObj.setCaret(pair, 5); // True caret point:  4 (one SMP character before this)
+      pair.wrapper.insertDeadkeyBeforeCaret(3); // unmatched
+
+      testObj.setCaret(pair, 3); // After SMP character 1.
+
+      pair.wrapper.deadkeys().deleteMatched();
+      assert.equal(pair.wrapper.deadkeys().count(), 2, "Failed to delete 'matched' deadkey");
+
+      // Failure here likely reflects incorrect logic in .getDeadkeyCaret()!
+      assert.isTrue(pair.wrapper.deadkeys().isMatch(4, 0, 3), "Failed to correctly note position of deadkey after an SMP character!");
+      pair.wrapper.deadkeys().resetMatched();
+
+      pair.wrapper.deleteCharsBeforeCaret(1);
+      assert.equal(pair.wrapper.deadkeys().count(), 2, "Erroneously deleted deadkey after pre-caret deletions");
+      assert.isTrue(pair.wrapper.deadkeys().isMatch(1, 0, 1), "Failed to leave deadkey before caret unmoved after pre-caret deletions");
+      assert.isTrue(pair.wrapper.deadkeys().isMatch(3, 0, 3), "Failed to properly adjust position of post-caret deadkey after pre-caret deletions");
+
+      pair.wrapper.deadkeys().resetMatched();
+      pair.wrapper.insertTextBeforeCaret(Apple.mixed);
+      assert.isTrue(pair.wrapper.deadkeys().isMatch(1, 0, 1), "Failed to leave deadkey before caret unmoved after text insertion");
+      assert.isTrue(pair.wrapper.deadkeys().isMatch(8, 0, 3), "Failed to properly adjust position of post-caret deadkey after text insertion");
+
+      String.kmwEnableSupplementaryPlane(false);
+    }
+
     //#endregion
 
   })();
@@ -996,6 +1034,10 @@ describe('Element Input/Output Interfacing', function() {
           InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.Input);
         });
       });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.Input);
+      });
     });
   });
 
@@ -1086,6 +1128,10 @@ describe('Element Input/Output Interfacing', function() {
           InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.TextArea);
         });
       });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TextArea);
+      });
     });
   });
 
@@ -1164,6 +1210,10 @@ describe('Element Input/Output Interfacing', function() {
         it("correctly replaces the element's 'context' (with active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.ContentEditable);
         });
+      });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.ContentEditable);
       });
     });
   });
@@ -1259,6 +1309,10 @@ describe('Element Input/Output Interfacing', function() {
           InterfaceTests.Tests.insertTextBeforeCaretWithSelection(InterfaceTests.DesignIFrame);
         });
       });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.DesignIFrame);
+      });
     });
   });
 
@@ -1307,6 +1361,10 @@ describe('Element Input/Output Interfacing', function() {
         it("correctly replaces the element's 'context' (no active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.TouchAlias);
         });
+      });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TouchAlias);
       });
     });
   });

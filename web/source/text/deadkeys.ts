@@ -132,5 +132,9 @@ namespace com.keyman.text {
         }
       }
     }
+
+    count(): number {
+      return this.dks.length;
+    }
   }
 }
