@@ -84,9 +84,18 @@ Jenkins now continuously builds Debian packages on every commit to master
 Periodically test packages will be uploaded to https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily
 
 #### Launchpad
-To upload the packages to launchpad, run the following script from the `linux` directory:
+1. If you don't have one, create an account at https://launchpad.net
+2. Request to join the ["Keyman for Linux"](https://launchpad.net/~keymanapp) team.
+3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key and associate it to your launchpad account
+4. Set the following environment variables  
+  `export GPGKEY=[key_id]` using the `key_id` of your GPG key  
+  `DEBEMAIL="your.email.address@example.org"`  
+  `DEBFULLNAME="Firstname Lastname"`  
+  `export DEBEMAIL DEBFULLNAME`  
+
+To upload the packages to launchpad, run the following script from the `linux/` directory:
 ```
-./scripts/launchpad.sh [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>] [PACKAGEVERSION="<version>"]
+./scripts/launchpad.sh [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
 ```
 **Parameters**  
 UPLOAD="yes" do the dput for real  
