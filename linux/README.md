@@ -83,11 +83,13 @@ Nightly builds upload the most recent new master build to https://downloads.keym
 Jenkins now continuously builds Debian packages on every commit to master
 Periodically test packages will be uploaded to https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily
 
-#### Launchpad
+### Launchpad
+This section is primarily for "Keyman for Linux" team members, and not needed for general building.
+
 1. If you don't have one, create an account at https://launchpad.net
 2. Request to join the ["Keyman for Linux"](https://launchpad.net/~keymanapp) team.
 3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key and associate it to your launchpad account
-4. Set the following environment variables  
+4. Set the following environment variables in your ~/.profile or ~/.bashrc (so you don't have to set them every time)  
   `export GPGKEY=[key_id]` using the `key_id` of your GPG key  
   `DEBEMAIL="your.email.address@example.org"`  
   `DEBFULLNAME="Firstname Lastname"`  
@@ -99,9 +101,12 @@ To upload the packages to launchpad, run the following script from the `linux/` 
 ```
 **Parameters**  
 UPLOAD="yes" do the dput for real  
-TIER="<tier"> alpha, beta, or stable, default beta  
+TIER="\<tier>" alpha, beta, or stable, default beta  
 PROJECT="\<project>" only upload this project  
 DIST="\<dist>" only upload for this distribution  
+PACKAGEVERSION="\<version>" normally use the default so don't specify it. But if you change packaging and run another upload you need to increment the number at the end of `PACKAGEVERSION`. e.g. next one is `1~sil2` then `1~sil3`...
+
+Refer to https://help.launchpad.net/Packaging/PPA/Uploading for troubleshooting and setting up for dput upload.
 
 ### Testing
 Tests to be created as there are no current tests
