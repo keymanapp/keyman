@@ -2,6 +2,7 @@
 
 ## 2019-02-13 11.0.1308.0 beta
 * Change: Adds option to check filename conventions (#1549)
+* Bug Fix: Package RTL keyboard metadata was being overwritten if .kmx was after .js in package file list (#1219)
 
 ## 2019-02-01 11.0.1307.0 beta
 * Change: Removed unused test window (#1560)
