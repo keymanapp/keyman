@@ -15,6 +15,7 @@ type
   TkmnProjectFileAction = class(TkmnProjectFile)
   private
     function CompileVisualKeyboard(const AKVKSourceFile, AKVKTargetFile: string): Boolean;
+    procedure CheckFilenameConventions;
   public
     function CompileKeyboard: Boolean;
     function Clean: Boolean;
@@ -84,6 +85,27 @@ begin
   Result := True;
 end;
 
+procedure TkmnProjectFileAction.CheckFilenameConventions;
+begin
+  if not OwnerProject.Options.CheckFilenameConventions then
+    Exit;
+
+  if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(FileName) then
+  begin
+    HasCompileWarning := True;
+    Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(FileName)]));
+  end;
+
+  if KVKFileName <> '' then
+  begin
+    if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(KVKFileName) then
+    begin
+      HasCompileWarning := True;
+      Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(KVKFileName)]));
+    end;
+  end;
+end;
+
 function TkmnProjectFileAction.CompileKeyboard: Boolean;
 var
   KMXFileName: String;
@@ -100,6 +122,8 @@ begin
   FKVKTargetFile := OwnerProject.GetTargetFileName(ChangeFileExt(FKVKSourceFile, '.kvk'), FileName, FileVersion);
 
   try
+    CheckFilenameConventions;
+
     if Targets * KMXKeymanTargets <> [] then
     begin
       TargetNames := KeymanTargetsToNames(Targets * KMXKeymanTargets);

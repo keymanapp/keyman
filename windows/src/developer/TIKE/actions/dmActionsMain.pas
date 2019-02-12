@@ -202,9 +202,14 @@ type
     procedure actViewCodeUpdate(Sender: TObject);   // I4678
     procedure actViewCodeExecute(Sender: TObject);   // I4678
     procedure actViewCharacterIdentifierExecute(Sender: TObject);   // I4807
-    procedure actViewCharacterIdentifierUpdate(Sender: TObject);   // I4807
+    procedure actViewCharacterIdentifierUpdate(Sender: TObject);
+    procedure actFileSaveAsSaveDialogCanClose(Sender: TObject;
+      var CanClose: Boolean);
+    procedure actProjectSaveAsSaveDialogCanClose(Sender: TObject;
+      var CanClose: Boolean);   // I4807
   private
     procedure AboutShowStartup(Sender: TObject);
+    function CheckFilenameConventions(FileName: string): Boolean;
   public
     procedure OpenProject(FileName: WideString);
   end;
@@ -224,6 +229,7 @@ uses
   OnlineConstants,
   OnlineUpdateCheck,
   Printers,
+  Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
@@ -354,6 +360,35 @@ begin
   end;
 end;
 
+function TmodActionsMain.CheckFilenameConventions(FileName: string): Boolean;
+begin
+  if not FGlobalProject.Options.CheckFilenameConventions then Exit(True);
+
+  if (GetFileTypeFromFileName(FileName) in [ftKeymanSource, ftPackageSource]) or
+    SameText(ExtractFileExt(FileName), Ext_ProjectSource) then
+  begin
+    if TKeyboardUtils.DoesKeyboardFilenameFollowConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Prompt, [FileName]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
+  end
+  else
+  begin
+    if TKeyboardUtils.DoesFilenameFollowConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Prompt, [FileName]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
+  end;
+end;
+
+procedure TmodActionsMain.actFileSaveAsSaveDialogCanClose(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  CanClose := CheckFilenameConventions((Sender as TSaveDialog).FileName);
+end;
+
 procedure TmodActionsMain.actFileSaveAsUpdate(Sender: TObject);
 begin
   with frmKeymanDeveloper do
@@ -472,7 +507,8 @@ var
   i: Integer;
 begin
   for i := 0 to actProjectAddFiles.Dialog.Files.Count - 1 do
-    if FGlobalProject.Files.IndexOfFileName(actProjectAddFiles.Dialog.Files[i]) < 0 then
+    if (FGlobalProject.Files.IndexOfFileName(actProjectAddFiles.Dialog.Files[i]) < 0) and
+      CheckFilenameConventions(actProjectAddFiles.Dialog.Files[i]) then
       CreateProjectFile(FGlobalProject, actProjectAddFiles.Dialog.Files[i], nil);
   frmKeymanDeveloper.ShowProject;
 end;
@@ -517,6 +553,12 @@ end;
 procedure TmodActionsMain.actProjectSaveAsBeforeExecute(Sender: TObject);
 begin
   actProjectSaveAs.Dialog.FileName := FGlobalProject.FileName;
+end;
+
+procedure TmodActionsMain.actProjectSaveAsSaveDialogCanClose(Sender: TObject;
+  var CanClose: Boolean);
+begin
+  CanClose := CheckFilenameConventions((Sender as TSaveDialog).FileName);
 end;
 
 procedure TmodActionsMain.actProjectSaveExecute(Sender: TObject);
