@@ -106,7 +106,7 @@ begin
     begin
       // If the keyboard already exists, don't change language information because
       // it may have been edited by the user. However, do refresh the fields we
-      // need to keep in sync: name and version
+      // need to keep in sync: name, version and rtl (js keyboards only)
 
       k := FindKeyboardByFileName(pack.Files[i].FileName);
       if not Assigned(k) then
@@ -121,7 +121,11 @@ begin
         k.Name := pki.Name;
         k.ID := pki.ID;
         k.Version := pki.Version;
-        k.RTL := pki.RTL;
+        if IsKeyboardFileByName(pack.Files[i]) = ftJavascript then
+          // RTL flag is currently only relevant for KMW so although the
+          // information can be read from .kmx we only copy it over for
+          // js keyboards.
+          k.RTL := pki.RTL;
       end;
     end;
   end;
@@ -307,6 +311,7 @@ begin
       GetKeyboardInfo(f.FileName, False, ki, False);
       pki.Name := ki.KeyboardName;
       pki.Version := ki.KeyboardVersion;
+      pki.RTL := ki.KMW_RTL;
     except
       on E:EKMXError do Result := False;
       on E:EFOpenError do Result := False;
