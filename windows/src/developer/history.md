@@ -1,7 +1,7 @@
 # Keyman Developer Version History
 
 ## 2019-02-13 11.0.1308.0 beta
-* No changes to Keyman Developer
+* Change: Adds option to check filename conventions (#1549)
 
 ## 2019-02-01 11.0.1307.0 beta
 * Change: Removed unused test window (#1560)
