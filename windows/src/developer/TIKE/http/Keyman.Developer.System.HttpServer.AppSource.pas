@@ -29,10 +29,12 @@ type
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure RespondTouchEditor(const AFilename: string; AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
-    function TryGetSource(const Filename: string; var Data: string): Boolean;
     procedure RespondTouchEditorLib(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     function TrySetSource(const Filename, Data: string): Boolean;
+    procedure RespondTouchEditorState(const AFilename: string;
+      AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo;
+      AResponseInfo: TIdHTTPResponseInfo);
   public
     constructor Create;
     destructor Destroy; override;
@@ -44,6 +46,7 @@ type
     procedure UnregisterSource(const Filename: string);
     function IsSourceRegistered(const Filename: string): Boolean;
     function GetSource(const Filename: string): string;
+    function TryGetSource(const Filename: string; var Data: string): Boolean;
     procedure SetSource(const Filename, Data: string);
   end;
 
@@ -112,6 +115,11 @@ begin
     Filename := ARequestInfo.Params.Values['Filename'];
     RespondTouchEditor(Filename, AContext, ARequestInfo, AResponseInfo);
   end
+  else if ARequestInfo.Document = '/app/source/toucheditor/state' then
+  begin
+    Filename := ARequestInfo.Params.Values['Filename'];
+    RespondTouchEditorState(Filename, AContext, ARequestInfo, AResponseInfo);
+  end
   else if ARequestInfo.Document.StartsWith('/app/source/toucheditor/lib/') then
   begin
     RespondTouchEditorLib(AContext, ARequestInfo, AResponseInfo);
@@ -120,6 +128,27 @@ begin
   begin
     Respond404(AContext, ARequestInfo, AResponseInfo);
     Exit;
+  end;
+end;
+
+procedure TAppSourceHttpResponder.RespondTouchEditorState(const AFilename: string;
+  AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo;
+  AResponseInfo: TIdHTTPResponseInfo);
+var
+  FData: string;
+begin
+  if ARequestInfo.CommandType = hcGET then
+  begin
+    AResponseInfo.ContentType := 'application/json';
+    AResponseInfo.Charset := 'UTF-8';
+    if TryGetSource(AFilename + '#state', FData)
+      then AResponseInfo.ContentText := FData
+      else AResponseInfo.ContentText := '{}';
+  end
+  else if ARequestInfo.CommandType = hcPOST then
+  begin
+    FData := ARequestInfo.Params.Values['State'];
+    RegisterSource(AFilename + '#state', FData, True);
   end;
 end;
 
