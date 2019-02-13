@@ -1,26 +1,26 @@
 # Keyman for Android
 
-## 2019-02-08 10.0.2061 beta
+## 2019-02-07 11.0.2061 beta
 * Bug fix:
   * Add notifications when keyboard or font fails to download from Keyman cloud (#1570)
 
-## 2019-01-27 10.0.2060 beta
+## 2019-01-27 11.0.2060 beta
 * Bug fixes:
   * Clean up styling of dialogs when downloading keyboards
   * Fix "Get Started" checkbox label to display on older Android versions
 
-## 2019-01-21 10.0.2059 beta
+## 2019-01-21 11.0.2059 beta
 * Bug fix:
   * Change installation of ad-hoc keyboards via .kmp packages to only add the first language for each keyboard.
     Additional languages can be added offline from the .kmp package. (#1550, #1554)
 
-## 2019-01-18 10.0.2058 beta
+## 2019-01-18 11.0.2058 beta
 * No changes to Keyman for Android (updated Keyman Web Engine, #1537)
 
-## 2019-01-17 10.0.2057 beta
+## 2019-01-17 11.0.2057 beta
 * No changes to Keyman for Android (updated Keyman Web Engine, #1539)
 
-## 2019-01-15 10.0.2056 beta
+## 2019-01-15 11.0.2056 beta
 * No changes to Keyman for Android (updated Keyman Web Engine, #1540)
 
 ## 2019-01-14 11.0.2055 beta
