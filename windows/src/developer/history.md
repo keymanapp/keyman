@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2019-02-14 11.0.1308.0 beta
+* Bug fix: Developer does not focus the text editor automatically after load (#1582)
+
 ## 2019-01-07 11.0.1301.0 beta
 * Bug fix: Developer does not open a new project after it is created (#1499)
 * Bug fix: Developer does not enable Install button in Package Editor after compile (#1498)
