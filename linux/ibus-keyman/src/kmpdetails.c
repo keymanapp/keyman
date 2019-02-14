@@ -133,11 +133,14 @@ void kmp_languages_foreach (JsonArray *array,
                      gpointer user_data)
 {
     JsonObject *lang_object;
-    kmp_keyboard *keyboard = (kmp_keyboard *) user_data;
-    kmp_language *language = g_new0(kmp_language, 1);
+    kmp_keyboard *keyboard;
+    kmp_language *language;
 
     if (JSON_NODE_HOLDS_OBJECT(element_node)){
         lang_object = json_node_get_object(element_node);
+        keyboard = (kmp_keyboard *) user_data;
+        language = g_new0(kmp_language, 1);
+
         get_detail_from_object(lang_object, "name",
             &(language->name));
         get_detail_from_object(lang_object, "id",
@@ -157,11 +160,14 @@ void kmp_keyboards_foreach (JsonArray *array,
     GList *l;
     gchar *l_kmx_file, *l_kvk_file;
     kmp_fileinfo *fileinfo;
-    kmp_details *details = (kmp_details *) user_data;
-    kmp_keyboard *keyboard = g_new0(kmp_keyboard, 1);
+    kmp_details *details;
+    kmp_keyboard *keyboard;
 
     if (JSON_NODE_HOLDS_OBJECT(element_node)){
         keyboard_object = json_node_get_object(element_node);
+        details = (kmp_details *) user_data;
+        keyboard = g_new0(kmp_keyboard, 1);
+
         get_detail_from_object(keyboard_object, "name",
             &(keyboard->name));
         get_detail_from_object(keyboard_object, "id",
@@ -208,11 +214,14 @@ void kmp_files_foreach (JsonArray *array,
                      gpointer user_data)
 {
     JsonObject *file_object;
-    kmp_details *details = (kmp_details *) user_data;
-    kmp_fileinfo *fileinfo = g_new0(kmp_fileinfo, 1);
+    kmp_details *details;
+    kmp_fileinfo *fileinfo;
 
     if (JSON_NODE_HOLDS_OBJECT(element_node)){
         file_object = json_node_get_object(element_node);
+        details = (kmp_details *) user_data;
+        fileinfo = g_new0(kmp_fileinfo, 1);
+
         get_detail_from_object(file_object, "name",
             &(fileinfo->name));
         get_detail_from_object(file_object, "description",
