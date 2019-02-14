@@ -1,5 +1,27 @@
 # Keyman Developer Version History
 
+## 2019-02-13 11.0.1308.0 beta
+* Change: Adds option to check filename conventions (#1549)
+* Bug Fix: Package RTL keyboard metadata was being overwritten if .kmx was after .js in package file list (#1219)
+
+## 2019-02-01 11.0.1307.0 beta
+* Change: Removed unused test window (#1560)
+
+## 2019-01-18 11.0.1306.0 beta
+* Change: Update included KeymanWeb to 11.0.206 (#1537)
+
+## 2019-01-17 11.0.1305.0 beta
+* Change: Allow the "display underlying" flag to be set for each platform (#1539)
+
+## 2019-01-15 11.0.1304.0 beta
+* Change: Tidy up ambiguities in user interface in touch layout editor (#1534)
+
+## 2019-01-15 11.0.1303.0 beta
+* No changes to Keyman Developer
+
+## 2019-01-10 11.0.1302.0 beta
+* Change: Update included KeymanWeb to 11.0.205
+
 ## 2019-01-07 11.0.1301.0 beta
 * Bug fix: Developer does not open a new project after it is created (#1499)
 * Bug fix: Developer does not enable Install button in Package Editor after compile (#1498)
