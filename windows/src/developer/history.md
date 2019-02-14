@@ -2,8 +2,9 @@
 
 ## 2019-02-14 11.0.1308.0 beta
 * Change: Adds option to check filename conventions (#1549)
-* Bug fix: Developer now maintains the view state when switching between Design and Code views of touch layout editor (#1579)
+* Bug fix: Developer does not focus the text editor automatically after load (#1582)
 * Bug fix: Developer was not maintaining project state between page loads (#1580)
+* Bug fix: Developer now maintains the view state when switching between Design and Code views of touch layout editor (#1579)
 * Bug fix: New Project Wizard wasn't adding metadata files to project (#1578)
 * Bug Fix: Package RTL keyboard metadata was being overwritten if .kmx was after .js in package file list (#1576)
 
