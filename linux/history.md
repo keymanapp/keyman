@@ -1,7 +1,7 @@
 # Keyman for Linux Version History
 
-## 2019-02-17 11.0.108 beta
-* handle keyboard package install/uninstall when languages aren't defined
+## 2019-02-15 11.0.108 beta
+* handle keyboard package install/uninstall when languages aren't defined (#1585)
 
 ## 2019-02-08 11.0.107 beta
 * add disco distribution information (#1572)
