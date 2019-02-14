@@ -3,7 +3,7 @@ object frmProjectSettings: TfrmProjectSettings
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Project Settings'
-  ClientHeight = 213
+  ClientHeight = 219
   ClientWidth = 418
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -82,23 +82,23 @@ object frmProjectSettings: TfrmProjectSettings
   end
   object cmdOK: TButton
     Left = 131
-    Top = 180
+    Top = 186
     Width = 75
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 3
+    TabOrder = 4
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
     Left = 212
-    Top = 180
+    Top = 186
     Width = 75
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 5
   end
   object chkCompilerWarningsAsErrors: TCheckBox
     Left = 81
@@ -115,5 +115,13 @@ object frmProjectSettings: TfrmProjectSettings
     Height = 17
     Caption = 'Warn on &deprecated code'
     TabOrder = 2
+  end
+  object chkCheckFilenameConventions: TCheckBox
+    Left = 81
+    Top = 160
+    Width = 160
+    Height = 17
+    Caption = '&Check filename conventions'
+    TabOrder = 3
   end
 end
