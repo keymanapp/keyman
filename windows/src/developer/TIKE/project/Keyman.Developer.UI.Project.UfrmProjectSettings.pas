@@ -41,6 +41,7 @@ type
     Label7: TLabel;
     chkCompilerWarningsAsErrors: TCheckBox;
     chkWarnDeprecatedCode: TCheckBox;
+    chkCheckFilenameConventions: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
@@ -61,6 +62,7 @@ begin
   FGlobalProject.Options.BuildPath := Trim(editOutputPath.Text);
   FGlobalProject.Options.CompilerWarningsAsErrors := chkCompilerWarningsAsErrors.Checked;   // I4865
   FGlobalProject.Options.WarnDeprecatedCode := chkWarnDeprecatedCode.Checked;   // I4866
+  FGlobalProject.Options.CheckFilenameConventions := chkCheckFilenameConventions.Checked;
   FGlobalProject.Save;
   ModalResult := mrOk;
 end;
@@ -70,6 +72,7 @@ begin
   editOutputPath.Text := FGlobalProject.Options.BuildPath;
   chkCompilerWarningsAsErrors.Checked := FGlobalProject.Options.CompilerWarningsAsErrors;   // I4865
   chkWarnDeprecatedCode.Checked := FGlobalProject.Options.WarnDeprecatedCode;   // I4866
+  chkCheckFilenameConventions.Checked := FGlobalProject.Options.CheckFilenameConventions;
   if editOutputPath.Text = '' then editOutputPath.Text := '$SOURCEPATH';
 end;
 
