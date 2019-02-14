@@ -10,6 +10,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
 #import "KMInputMethodSafariClientEventHandler.h"
+#import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 
 @implementation KMInputController
@@ -174,13 +175,18 @@ NSMutableArray *servers;
     if (itag == 2) {
         // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
         // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-        // TODO: This bug should be fixed in 10.13.4, so after that has been available for a few weeks, we
-        // can create a PR for branch mac-revert-high-sierra-showPreferences-workaround and merge it.
-        // rrb: where available (everywhere but 10.13.1-10.13.3?) call showPreferences, otherwise, call our workaround
-        if ([self respondsToSelector:@selector(showPreferences:)])
-            [self showPreferences:sender];
+        // rrb: where available (everywhere but 10.13.1-10.13.3) call showPreferences, otherwise, call our workaround
+        u_int16_t systemVersion = [KMOSVersion SystemVersion];
+        if (0x0AD1 <= systemVersion && systemVersion <= 0x0AD3) // between 10.13.1 and 10.13.3 inclusive
+        {
+            NSLog(@"Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
+            [self.AppDelegate showConfigurationWindow]; // call our workaround
+        }
         else
-            [self.AppDelegate showConfigurationWindow];
+        {
+            NSLog(@"Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
+            [self showPreferences:sender]; // call Apple API
+        }
     }
     else if (itag == 3) {
         [self.AppDelegate showOSK];
