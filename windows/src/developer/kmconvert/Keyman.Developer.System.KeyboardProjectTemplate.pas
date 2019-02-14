@@ -277,6 +277,7 @@ begin
     kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;
     kpj.Options.WarnDeprecatedCode := True;
     kpj.Options.CompilerWarningsAsErrors := True;
+    kpj.Options.CheckFilenameConventions := True;
 
     // Add keyboard and package to project
     kpj.Files.Add(TkmnProjectFile.Create(kpj, GetKeyboardFilename, nil));
