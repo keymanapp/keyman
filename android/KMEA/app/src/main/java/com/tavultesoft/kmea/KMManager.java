@@ -51,6 +51,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -111,6 +112,7 @@ public final class KMManager {
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";
   public static final String KMKey_Font = "font";
+  public static final String KMKey_DisplayFont = "displayFont";
   public static final String KMKey_OskFont = "oskFont";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
@@ -193,6 +195,7 @@ public final class KMManager {
     // Initializes the PackageProcessor with the base resource directory, which is the parent directory
     // for the final location corresponding to KMDefault_AssetPackages.
     PackageProcessor.initialize(new File(getResourceRoot()));
+    JSONUtils.initialize(new File(getPackagesDir()));
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -856,7 +859,7 @@ public final class KMManager {
         }
       }
     } else {
-      path = getPackagesDir() + packageID + File.separator + "kmp.json";
+      path = getPackagesDir() + packageID + File.separator + PackageProcessor.PPDefault_Metadata;
 
       try {
         File kmpJSONFile = new File(path);

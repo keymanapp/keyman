@@ -120,6 +120,16 @@ body {
   cursor: pointer;
 }
 
+.key .underlying {
+  font-family: Tahoma;
+  font-size: 10px;
+  color: #666666;
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  text-align: left;
+}
+
 .key.key-modifier .id {
   color: #808080;
 }
@@ -199,10 +209,17 @@ br.clear {
 }
 
 #toolbar div {
-    background: #DCDCDD;
-    margin: -1px -1px -1px 0;
-    padding: 8px;
-    float: left;
+  background: #DCDCDD;
+  margin: -1px -1px -1px 0;
+  padding: 8px;
+  float: left;
+}
+
+#toolbar #layoutToolbar > div {
+  margin: 0;
+  padding: 0 8px;
+  border-left: 1px solid #444444;
+  line-height: 24px;
 }
 
 button, input, select {

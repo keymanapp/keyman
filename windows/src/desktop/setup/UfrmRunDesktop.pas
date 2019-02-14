@@ -857,8 +857,8 @@ var
   str: TStringList;
   n: Integer;
 begin
-  FCanUpgrade9 := False;
-  FRunUpgrade9 := False;
+  FCanUpgrade10 := False;
+  FRunUpgrade10 := False;
 
   str := TStringList.Create;
   n := 0;

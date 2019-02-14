@@ -72,6 +72,7 @@ type
     function GetAddToProject: Boolean;
     function GetFileName: string;
     function GetDefaultExt: string;
+    function CheckFilenameConventions: Boolean;
   protected
     function GetHelpTopic: string; override;
   public
@@ -84,8 +85,8 @@ implementation
 
 uses
   Keyman.Developer.System.HelpTopics,
-
   Keyman.Developer.System.Project.Project,
+  Keyman.System.KeyboardUtils,
   shlobj,
   utilsystem;
 
@@ -112,8 +113,34 @@ begin
   end;
 end;
 
+function TfrmNew.CheckFilenameConventions: Boolean;
+begin
+  if not FGlobalProject.Options.CheckFilenameConventions then
+    Exit(True);
+
+  if FileType in [ftKeymanSource, ftPackageSource] then
+  begin
+    if TKeyboardUtils.DoesKeyboardFilenameFollowConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Prompt, [editFileName.Text]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
+  end
+  else
+  begin
+    if TKeyboardUtils.DoesFilenameFollowConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Prompt, [editFileName.Text]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
+  end;
+end;
+
 procedure TfrmNew.cmdOKClick(Sender: TObject);
 begin
+  if not CheckFilenameConventions then
+    Exit;
+
   if FileExists(FileName) then
   begin
     if MessageDlg('The file '+FileName+' already exists.  Overwrite it and create a new file?',
@@ -220,7 +247,7 @@ begin
     Exit('');
 
   if Pos('\', editFileName.Text) > 0 then   // I4798
-    Exit;
+    Exit('');
 
   s := ExtractFileExt(editFileName.Text);
   if (CompareText(GetDefaultExt, '.html') = 0) or (CompareText(GetDefaultExt, '.htm') = 0) then

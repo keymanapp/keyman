@@ -336,7 +336,7 @@ var
 begin
   e := (Trim(editKeyboardName.Text) <> '') and
     (Trim(editPath.Text) <> '') and
-    TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text)) and
+    TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text), True) and
     (GetTargets <> []);
   cmdOK.Enabled := e;
 
@@ -422,7 +422,7 @@ function TfrmNewProjectParameters.Validate: Boolean;
 var
   ProjectFolder: string;
 begin
-  Result := TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text));
+  Result := TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text), True);
 
   if Result then
   begin

@@ -332,6 +332,11 @@ namespace com.keyman {
         btn.onmouseup=btn.onmouseout=osk.mouseUpMouseOutHandler; //Build 360
       }
 
+      // Make sure the key text is the element's first child - processSubkeys()
+      // will add an extra element if subkeys exist, which can interfere with
+      // keyboard/language name display on the space bar!
+      btn.appendChild(this.generateKeyText());
+
       // Handle subkey-related tasks.
       if(typeof(spec['sk']) != 'undefined' && spec['sk'] != null) {
         this.processSubkeys(btn);
@@ -340,7 +345,6 @@ namespace com.keyman {
       }
       
       // Add text to button and button to placeholder div
-      btn.appendChild(this.generateKeyText());
       kDiv.appendChild(btn);
 
       // Prevent user selection of key captions
@@ -428,8 +432,8 @@ namespace com.keyman {
 }
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2019 SIL International
 ***/
 
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the
@@ -3622,7 +3626,12 @@ if(!window['keyman']['initialized']) {
       if('font' in layout) osk.fontFamily=layout['font']; else osk.fontFamily='';
 
       // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels=activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      if(typeof layout['displayUnderlying'] != 'undefined') {
+        layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+      } else {
+        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      }
+
       LdivC=osk.deviceDependentLayout(layout,device.formFactor);
 
       osk.ddOSK = true;
@@ -3701,8 +3710,13 @@ if(!window['keyman']['initialized']) {
         layout=osk.buildDefaultLayout(PVK,keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
 
       // Cannot create an OSK if no layout defined, just return empty DIV
-      if(layout != null)
-        layout.keyLabels=((typeof(PKbd['KDU']) != 'undefined') && PKbd['KDU']);
+      if(layout != null) {
+        if(typeof layout['displayUnderlying'] != 'undefined') {
+          layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+        } else {
+          layout.keyLabels = typeof(PKbd['KDU']) != 'undefined' && PKbd['KDU'];
+        }
+      }
 
       kbd=osk.deviceDependentLayout(layout,formFactor);
       kbd.className=formFactor+'-static kmw-osk-inner-frame';
