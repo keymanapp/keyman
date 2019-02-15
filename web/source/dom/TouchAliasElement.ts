@@ -63,11 +63,11 @@ namespace com.keyman.dom {
     private static device: Device;
 
     private static getDevice(): Device {
-      if(!this.device) {
+      if(!TouchAliasData.device) {
         let device = new com.keyman.Device();
         device.detect();
 
-        this.device = device;
+        TouchAliasData.device = device;
       }
 
       return TouchAliasData.device;
@@ -274,7 +274,7 @@ namespace com.keyman.dom {
           * changing languages to a text with greater height.
           */
           window.setTimeout(function (){
-            divThis.updateInput();
+            xx.updateInput();
           }, 1);
         };
 
