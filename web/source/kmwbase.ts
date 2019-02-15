@@ -11,7 +11,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
 // Defines the keyboard callback object.
-/// <reference path="kmwcallback.ts" />
+/// <reference path="text/kbdInterface.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
 // Defines built-in keymapping.
@@ -44,10 +44,11 @@ namespace com.keyman {
     globalKeyboard = null;     // Indicates the currently-active keyboard for controls without independent keyboard settings.
     globalLanguageCode = null; // Indicates the language code corresponding to `globalKeyboard`.
     isEmbedded = false;        // Indicates if the KeymanWeb instance is embedded within a mobile app.
-                                // Blocks full page initialization when set to `true`.
+                               // Blocks full page initialization when set to `true`.
     refocusTimer = 0;          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
 
     initialized: number;       // Signals the initialization state of the KeymanWeb system.
+    isHeadless = false;        // Indicates that KMW lacks any access to the DOM.  Nothing yet implemented for '= true'.
     'build' = 300;           // TS needs this to be defined within the class.
 
     // Used as placeholders during initialization.
@@ -62,7 +63,7 @@ namespace com.keyman {
     ['util']: Util;
     ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
-    ['interface']: KeyboardInterface;
+    ['interface']: text.KeyboardInterface;
     keyboardManager: KeyboardManager;
     domManager: DOMManager;
     hotkeyManager: HotkeyManager;
@@ -106,7 +107,7 @@ namespace com.keyman {
     constructor() {
       // Allow internal minification of the public modules.
       this.util = this['util'] = new Util(this);
-      window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
+      window['KeymanWeb'] = this.interface = this['interface'] = new text.KeyboardInterface();
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
       this.ui = this['ui'] = {};
 

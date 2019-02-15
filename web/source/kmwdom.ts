@@ -5,9 +5,10 @@
 // References DOM event handling interfaces and classes.
 /// <reference path="kmwdomevents.ts" />
 // Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
+/// <reference path="text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
 /// <reference path="dom/touchAliasElement.ts" />
+/// <reference path="dom/wrapElement.ts" />
 
 namespace com.keyman {
   /**

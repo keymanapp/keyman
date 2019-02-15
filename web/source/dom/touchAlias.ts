@@ -1,13 +1,14 @@
 // Defines the TouchAliasElement merged type.
 /// <reference path="touchAliasElement.ts" />
-// Defines the EditableElement interface.
-/// <reference path="editableElement.ts" />
+// Defines the OutputTarget interface.
+/// <reference path="../text/outputTarget.ts" />
 
 namespace com.keyman.dom {
-  export class TouchAlias implements EditableElement {
+  export class TouchAlias extends text.OutputTarget {
     root: TouchAliasElement;
 
     constructor(e: TouchAliasElement) {
+      super();
       this.root = e;
     }
 
@@ -49,20 +50,14 @@ namespace com.keyman.dom {
     deleteCharsBeforeCaret(dn: number): void {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
+        this.adjustDeadkeys(-dn);
         this.root.setTextBeforeCaret(curText.kmwSubstring(0, this.root.getTextCaret() - dn));
       }
     }
     
     insertTextBeforeCaret(s: string): void {
+      this.adjustDeadkeys(s._kmwLength());
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);
-    }
-
-    saveProperties() {
-      // Stub implementation.
-    }
-
-    restoreProperties() {
-      // Stub implementation.
     }
   }
 }

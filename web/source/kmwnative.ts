@@ -1,5 +1,5 @@
 // Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
+/// <reference path="text/kmwstring.ts" />
 // Contains event management for mobile device rotation events.
 /// <reference path="kmwrotation.ts" />
 
@@ -573,36 +573,6 @@ if(!window['keyman']['initialized']) {
       var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');   
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
     }
-    
-    /**
-     * Get (uncached) keyboard context for a specified range, relative to caret
-     * 
-     * @param       {number}      n       Number of characters to move back from caret
-     * @param       {number}      ln      Number of characters to return
-     * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-     * @return      {string}              Context string 
-     * 
-     * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
-     *             KC(2,1,Pelem) == "e"
-     *             KC(3,3,Pelem) == "def"
-     *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
-     */    
-    keymanweb.KC_ = function(n, ln, Pelem) {
-      var tempContext = '';
-
-      if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
-        let wrapper = Pelem._kmwAttachment.interface as com.keyman.dom.EditableElement;
-        tempContext = wrapper.getTextBeforeCaret();
-      } else {
-        throw "No element wrapper available to provide context!";
-      }
-
-      if(tempContext._kmwLength() < n) {
-        tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
-      }
-      
-      return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
-    }      
 
     /**
      * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.

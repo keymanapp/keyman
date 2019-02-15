@@ -1,5 +1,5 @@
 // References the KMW string extensions.
-/// <reference path="../kmwstring.ts" />
+/// <reference path="../text/kmwstring.ts" />
 // References extra HTML definitions not included by default in TS.
 /// <reference path="../kmwexthtml.ts" />
 // References device-specific code checks (separable module from KMW)

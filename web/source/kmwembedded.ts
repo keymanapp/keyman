@@ -1,5 +1,6 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+// Includes KMW string extension declarations.
+/// <reference path="text/kmwstring.ts" />
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 
@@ -267,40 +268,6 @@ namespace com.keyman.osk {
     // Empty stub - this function should not be implemented or used within embedded code routes.
     console.warn("util.alert() call attempted in embedded mode!");  // Sends log message to embedding app.
   };
- 
-  // TODO: This needs to be discussed with Serkan - can possibly get context without any reference to Pelem?? 
-  
-  /**
-   * Get (uncached) keyboard context for a specified range, relative to caret
-   * 
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {number}      ln      Number of characters to return
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-   * @return      {string}              Context string 
-   * 
-   * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
-   *             KC(2,1,Pelem) == "e"
-   *             KC(3,3,Pelem) == "def"
-   *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
-   */    
-  keymanweb.KC_ = function(n, ln, Pelem: HTMLElement) {
-    // So, this is a perfect copy of kmwnative.ts's implementation; at present, this suffices... though we could likely
-    // do without a web element eventually.
-    var tempContext: string;
-
-    if(Pelem._kmwAttachment && Pelem._kmwAttachment.interface) {
-      let wrapper = Pelem._kmwAttachment.interface;
-      tempContext = wrapper.getTextBeforeCaret();
-    } else {
-      console.error("Interfacing web element isn't properly attached - its element interface for keyboard processing is missing!");
-    }
-    
-    if(tempContext._kmwLength() < n) {
-      tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
-    }
-    
-    return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
-  };
 
   /**
    * Refresh element content after change of text (if required)
@@ -558,14 +525,17 @@ namespace com.keyman.osk {
       LisVirtualKeyCode: false
     }; 
 
+    let Processor = com.keyman.text.Processor;
+    let outputTarget = Processor.getOutputTarget(Lelem);
+
     try {
       // Pass this key code and state to the keyboard program
       // If key is mapped, return true
-      if(kbdInterface.processKeystroke(util.physicalDevice, Lelem, Lkc)) {
+      if((kbdInterface as com.keyman.text.KeyboardInterface).processKeystroke(util.physicalDevice, outputTarget, Lkc)) {
         return true;
       }
 
-      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, Lelem, '');
+      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, outputTarget, '');
     } catch (err) {
       console.error(err.message, err);
       return false;

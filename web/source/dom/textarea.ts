@@ -1,5 +1,5 @@
 namespace com.keyman.dom {
-  export class TextArea implements EditableElement {
+  export class TextArea extends text.OutputTarget {
     root: HTMLTextAreaElement;
 
     /**
@@ -30,6 +30,8 @@ namespace com.keyman.dom {
     private scrollLeft?: number;
 
     constructor(ele: HTMLTextAreaElement) {
+      super();
+      
       this.root = ele;
       this._cachedSelectionStart = -1;
     }
@@ -125,6 +127,7 @@ namespace com.keyman.dom {
         let curText = this.getTextBeforeCaret();
         let caret = this.getCaret();
 
+        this.adjustDeadkeys(-dn);
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
         this.setCaret(caret - dn);
       }
@@ -139,6 +142,7 @@ namespace com.keyman.dom {
       let front = this.getTextBeforeCaret();
       let back = this.getText()._kmwSubstring(this.processedSelectionStart);
 
+      this.adjustDeadkeys(s._kmwLength());
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
     }

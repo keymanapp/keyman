@@ -19,11 +19,12 @@ namespace com.keyman.dom {
     }
   }
 
-  export class ContentEditable implements EditableElement {
+  export class ContentEditable extends text.OutputTarget {
     root: HTMLElement;
 
     constructor(ele: HTMLElement) {
       if(ele.isContentEditable) {
+        super();
         this.root = ele;
       } else {
         throw "Specified element is not already content-editable!";
@@ -101,7 +102,7 @@ namespace com.keyman.dom {
     }
 
     getDeadkeyCaret(): number {
-      return this.getCarets().start.offset;
+      return this.getTextBeforeCaret().kmwLength();
     }
 
     getTextBeforeCaret(): string {
@@ -154,6 +155,7 @@ namespace com.keyman.dom {
       range.setStart(start.node, dnOffset);
       range.setEnd(start.node, start.offset);
 
+      this.adjustDeadkeys(-dn);
       range.deleteContents();
       // No need to reposition the caret - the DOM will auto-move the selection accordingly, since
       // we didn't use the selection to delete anything.
@@ -171,6 +173,8 @@ namespace com.keyman.dom {
       if(delta == 0) {
         return;
       }
+
+      this.adjustDeadkeys(delta);
 
       // While Selection.extend() is really nice for this, IE doesn't support it whatsoever.
       // However, IE (11, at least) DOES support setting selections via ranges, so we can still
@@ -202,14 +206,6 @@ namespace com.keyman.dom {
         Lsel.addRange(finalCaret);
       }
       Lsel.collapseToEnd();
-    }
-
-    saveProperties() {
-      // Stub implementation.
-    }
-
-    restoreProperties() {
-      // Stub implementation.
     }
   }
 }

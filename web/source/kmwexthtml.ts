@@ -13,17 +13,9 @@ interface Window {
     TouchEvent:          typeof TouchEvent;
 }
 
-interface Document {
-    _KeymanWebSelectionStart: number,
-    _KeymanWebSelectionEnd: number
-}
-
 interface Element {
     _kmwAttachment: com.keyman.AttachmentInfo,     // Used to track each input element's attachment data.
     shim: HTMLElement,                  // Used in subkey elements for smooth fading.
-
-    _KeymanWebSelectionStart: number,
-    _KeymanWebSelectionEnd: number,
 
     // Touch element extensions
     base: HTMLElement,                  // Refers to the aliased element.  Is a property of the alias.
