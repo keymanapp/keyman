@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import os.path
+import re
 import subprocess
 import sys
 import tempfile
@@ -234,6 +235,13 @@ def install_kmp_user(inputfile, online=False):
 			elif ftype == KMFileTypes.KM_SOURCE:
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
+			elif ftype == KMFileTypes.KM_KMX:
+				# Sanity check case-sensitivity of keyboard file
+				kmx_id = re.sub('.kmx', '', f['name'])
+				for index, kb in enumerate(keyboards):
+					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
+						keyboards[index]['file'] = f['name']
+
 		install_keyboards_to_ibus(keyboards, packageDir)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
@@ -249,7 +257,10 @@ def install_keyboards_to_ibus(keyboards, packageDir):
 		if bus:
 			# install all kmx for first lang not just packageID
 			for kb in keyboards:
-				kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
+				if kb['file']:
+					kmx_file = os.path.join(packageDir, kb['file'])
+				else:
+					kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
 				if "languages" in kb and len(kb["languages"]) > 0:
 					logging.debug(kb["languages"][0])
 					keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
