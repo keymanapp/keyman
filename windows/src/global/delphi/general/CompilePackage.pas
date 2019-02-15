@@ -30,7 +30,7 @@ uses
   kpsfile, kmpinffile, PackageInfo,
   Keyman.Developer.System.Project.ProjectLog;
 
-function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
+function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
 
 implementation
 
@@ -50,6 +50,7 @@ uses
   kmxfile,
   KeymanDeveloperOptions,
 
+  Keyman.System.KeyboardUtils,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.PackageInfoRefreshKeyboards,
 
@@ -67,23 +68,25 @@ type
 
     FOutputFileName: string;
     FTempFiles: TTempFiles;
+    FCheckFilenameConventions: Boolean;
 
     procedure FatalMessage(const msg: string);
     procedure WriteMessage(AState: TProjectLogState; const msg: string);   // I4706
 
     function BuildKMP: Boolean;
 
-    constructor Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string);   // I4688
+    constructor Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string);   // I4688
     destructor Destroy; override;
     function Compile: Boolean;
     procedure CheckForDangerousFiles;
     procedure CheckKeyboardVersions;
     procedure CheckKeyboardLanguages;
+    procedure CheckFilenameConventions;
   end;
 
-function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
+function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
 begin
-  with TCompilePackage.Create(pack, AMessageEvent, ASilent, AOutputFileName) do   // I4688
+  with TCompilePackage.Create(pack, AMessageEvent, ASilent, ACheckFilenameConventions, AOutputFileName) do   // I4688
   try
     Result := Compile;
   finally
@@ -92,7 +95,7 @@ begin
 end;
 
 
-constructor TCompilePackage.Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string);   // I4688
+constructor TCompilePackage.Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string);   // I4688
 begin
   inherited Create;
   pack := APack;
@@ -100,12 +103,30 @@ begin
   FSilent := ASilent;
   FOutputFileName := AOutputFileName;
   FTempFiles := TTempFiles.Create;
+  FCheckFilenameConventions := ACheckFilenameConventions;
 end;
 
 destructor TCompilePackage.Destroy;
 begin
   FreeAndNil(FTempFiles);
   inherited Destroy;
+end;
+
+procedure TCompilePackage.CheckFilenameConventions;
+var
+  i: Integer;
+begin
+  if not FCheckFilenameConventions then
+    Exit;
+
+  if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(pack.FileName) then
+    WriteMessage(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(pack.FileName)]));
+
+  for i := 0 to pack.Files.Count - 1 do
+  begin
+    if not TKeyboardUtils.DoesFilenameFollowConventions(pack.Files[i].FileName) then
+      WriteMessage(plsWarning, Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Message, [ExtractFileName(pack.Files[i].FileName)]));
+  end;
 end;
 
 function TCompilePackage.Compile: Boolean;
@@ -130,6 +151,7 @@ begin
     Exit;
   end;
 
+  CheckFilenameConventions;
   CheckForDangerousFiles;
   CheckKeyboardVersions;
   CheckKeyboardLanguages;
