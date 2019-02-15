@@ -13,7 +13,7 @@ android {
     }
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
 
         //dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration

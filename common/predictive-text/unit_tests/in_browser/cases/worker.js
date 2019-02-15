@@ -18,7 +18,7 @@ describe('LMLayerWorker', function () {
       };
       worker.postMessage({
         message: 'initialize',
-        model: "return {model: {}, configuration: {}}",
+        model: { type: 'dummy' },
         capabilities: { maxLeftContextCodeUnits: 64 }
       });
     });

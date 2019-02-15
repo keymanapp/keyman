@@ -70,9 +70,15 @@ int main(int, char * [])
   try_status(km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer, &ctxt_size));
   if (initial_smp_context != ctxt_buffer) return __LINE__;
   // Test buffer overrun protection.
-  ctxt_size=smp_ctxt_size/3;
+  ctxt_size=4; // This includes space for the null terminator
   if (km_kbp_context_items_to_utf16(ctxt2, ctxt_buffer, &ctxt_size)
-      != KM_KBP_STATUS_INSUFFICENT_BUFFER)
+        != KM_KBP_STATUS_INSUFFICENT_BUFFER
+      || ctxt_size != 4)
+    return __LINE__;
+  ctxt_size=8; // This includes space for the null terminator
+  if (km_kbp_context_items_to_utf8(ctxt4, ctxt_u8_buffer, &ctxt_size)
+        != KM_KBP_STATUS_INSUFFICENT_BUFFER
+      || ctxt_size != 6)
     return __LINE__;
 
   // Create a mock context object and set the items

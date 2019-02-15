@@ -39,6 +39,9 @@ interface PromiseCallbacks<T> {
  * <T> is the type of resolved value (value yielded successfully by promise).
  */
 class PromiseStore<T> {
+  // IE11 offers partial support for new Map().
+  // Assume only .get(), .set(), .has(), .delete(), and .size work.
+  // See: http://kangax.github.io/compat-table/es6/#test-Map
   private _promises: Map<Token, PromiseCallbacks<T>>;
   constructor() {
     this._promises = new Map();
@@ -54,7 +57,7 @@ class PromiseStore<T> {
    */
   make(token: Token, resolve: Resolve<T>, reject: Reject): void {
     if (this._promises.has(token)) {
-      reject(`Existing request with token ${token}`);
+      return reject(`Existing request with token ${token}`);
     }
     this._promises.set(token, { reject, resolve });
   }

@@ -23,17 +23,31 @@
             android:layout_alignParentTop="true"
             android:background="@color/keyman_orange" />
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width = "wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/checkbox_margin_left"
-            android:layout_marginStart="@dimen/checkbox_margin_left"
-            android:layout_marginTop="@dimen/checkbox_padding"
-            android:layout_marginBottom="@dimen/checkbox_padding"
-            android:paddingTop="@dimen/checkbox_padding"
-            android:paddingBottom="@dimen/checkbox_padding"
-            android:text="@string/dont_show_again" />
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/checkbox_margin_left"
+                android:layout_marginStart="@dimen/checkbox_margin_left"
+                android:layout_marginTop="@dimen/checkbox_padding"
+                android:layout_marginBottom="@dimen/checkbox_padding"
+                android:paddingTop="@dimen/checkbox_padding"
+                android:paddingBottom="@dimen/checkbox_padding" />
+
+            <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="@dimen/checkbox_margin_left"
+              android:layout_marginStart="@dimen/checkbox_margin_left"
+              android:layout_gravity="center_vertical"
+              android:text="@string/dont_show_again" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 </LinearLayout>

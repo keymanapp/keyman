@@ -175,9 +175,9 @@ final class KMKeyboard extends WebView {
     loadUrl(jsString);
   }
 
-  public void executeHardwareKeystroke(int code, int shift, int lstates) {
-    String jsFormat = "javascript:executeHardwareKeystroke(%d,%d, %d)";
-    String jsString = String.format(jsFormat, code, shift, lstates);
+  public void executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
+    String jsFormat = "javascript:executeHardwareKeystroke(%d,%d, %d, %d)";
+    String jsString = String.format(jsFormat, code, shift, lstates, eventModifiers);
     loadUrl(jsString);
   }
 

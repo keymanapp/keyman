@@ -100,11 +100,19 @@ interface Capabilities {
 }
 
 /**
- * TODO: discriminated union of different model types.
+ * Describes what kind of model to instantiate.
  */
-interface ModelDescription {
+type ModelDescription = DummyModelDescription | WordListModelDescription;
+interface DummyModelDescription {
   type: 'dummy';
   futureSuggestions?: Suggestion[][];
+}
+interface WordListModelDescription {
+  type: 'wordlist';
+  /**
+   * Words to predict, one word per entry in the array.
+   */
+  wordlist: string[];
 }
 
 /**

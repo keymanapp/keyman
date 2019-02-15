@@ -36,13 +36,11 @@ uses
 type
   TShellProjectFileUI = class(TProjectFileUI)
   private
-    procedure MenuEventOpen(Sender: TObject);
     function GetProjectFile: TShellProjectFile;
   protected
     procedure OpenFile; override;
   public
     procedure NewFile; override;
-    procedure BuildMenu(Menu: TPopupMenu); override;
     procedure DefaultEvent(Sender: TObject); override;
 
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
@@ -81,23 +79,7 @@ begin
   Result := True;
 end;
 
-procedure TShellProjectFileUI.BuildMenu(Menu: TPopupMenu);
-var
-  mi: TMenuItem;
-begin
-  mi := TMenuItem.Create(Menu);
-  mi.Caption := '&Open';
-  mi.Default := True;
-  mi.OnClick := MenuEventOpen;
-  Menu.Items.Insert(0, mi);
-end;
-
 procedure TShellProjectFileUI.DefaultEvent(Sender: TObject);
-begin
-  MenuEventOpen(Sender);
-end;
-
-procedure TShellProjectFileUI.MenuEventOpen(Sender: TObject);
 begin
   if WindowOpen then
     OpenFile
