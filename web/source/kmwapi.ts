@@ -1,7 +1,7 @@
 /// <reference path="closure.ts" />
 /// <reference path="kmwbase.ts" />
 /// <reference path="kmwutils.ts" />
-/// <reference path="kmwcallback.ts" />
+/// <reference path="text/kbdInterface.ts" />
 
 // Allows proper minification handling.
 /// <reference path="../node_modules/google-closure-library/closure/goog/base.js" />
@@ -28,8 +28,8 @@ goog.exportSymbol("com.keyman.Util.prototype.attachDOMEvent", com.keyman.Util.pr
 goog.exportSymbol("com.keyman.Util.prototype.detachDOMEvent", com.keyman.Util.prototype.detachDOMEvent);
 goog.exportSymbol("com.keyman.Util.prototype.getOption", com.keyman.Util.prototype.getOption);
 goog.exportSymbol("com.keyman.Util.prototype.setOption", com.keyman.Util.prototype.setOption);
-goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteX", com.keyman.Util.prototype._GetAbsoluteX);
-goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteY", com.keyman.Util.prototype._GetAbsoluteY);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteX", com.keyman.Util.prototype.getAbsoluteX);
+goog.exportSymbol("com.keyman.Util.prototype.getAbsoluteY", com.keyman.Util.prototype.getAbsoluteY);
 goog.exportSymbol("com.keyman.Util.prototype.getAbsolute", com.keyman.Util.prototype._GetAbsolute);
 goog.exportSymbol("com.keyman.Util.prototype.createElement", com.keyman.Util.prototype.createElement);
 goog.exportSymbol("com.keyman.Util.prototype.getIEVersion", com.keyman.Util.prototype.getIEVersion);
@@ -57,33 +57,33 @@ goog.exportSymbol("com.keyman.Util.prototype.alert", com.keyman.Util.prototype.a
   }
 
   var exportKBCallbackWithArgs = function(miniName: string, longName: string, func:(...args: any[]) => any) {
-    goog.exportSymbol("com.keyman.KeyboardInterface.prototype." + longName, func);
-    goog.exportSymbol("com.keyman.KeyboardInterface.prototype." + miniName, func);
+    goog.exportSymbol("com.keyman.text.KeyboardInterface.prototype." + longName, func);
+    goog.exportSymbol("com.keyman.text.KeyboardInterface.prototype." + miniName, func);
   }
 
-  exportKBCallback('KSF', 'saveFocus', com.keyman.KeyboardInterface.prototype.saveFocus);
-  exportKBCallback('KBR', 'beepReset', com.keyman.KeyboardInterface.prototype.beepReset);
+  exportKBCallback('KSF', 'saveFocus', com.keyman.text.KeyboardInterface.prototype.saveFocus);
+  exportKBCallback('KBR', 'beepReset', com.keyman.text.KeyboardInterface.prototype.beepReset);
 
-  exportKBCallbackWithArgs('KT', 'insertText', com.keyman.KeyboardInterface.prototype.insertText);
-  exportKBCallbackWithArgs('KR', 'registerKeyboard', com.keyman.KeyboardInterface.prototype.registerKeyboard);
-  exportKBCallbackWithArgs('KRS', 'registerStub', com.keyman.KeyboardInterface.prototype.registerStub);
-  exportKBCallbackWithArgs('KC', 'context', com.keyman.KeyboardInterface.prototype.context);
-  exportKBCallbackWithArgs('KN', 'nul', com.keyman.KeyboardInterface.prototype.nul);
-  exportKBCallbackWithArgs('KCM', 'contextMatch', com.keyman.KeyboardInterface.prototype.contextMatch);
-  exportKBCallbackWithArgs('KFCM', 'fullContextMatch', com.keyman.KeyboardInterface.prototype.fullContextMatch);
-  exportKBCallbackWithArgs('KIK', 'isKeypress', com.keyman.KeyboardInterface.prototype.isKeypress);
-  exportKBCallbackWithArgs('KKM', 'keyMatch', com.keyman.KeyboardInterface.prototype.keyMatch);
-  exportKBCallbackWithArgs('KSM', 'stateMatch', com.keyman.KeyboardInterface.prototype.stateMatch);
-  exportKBCallbackWithArgs('KKI', 'keyInformation', com.keyman.KeyboardInterface.prototype.keyInformation);
-  exportKBCallbackWithArgs('KDM', 'deadkeyMatch', com.keyman.KeyboardInterface.prototype.deadkeyMatch);
-  exportKBCallbackWithArgs('KB', 'beep', com.keyman.KeyboardInterface.prototype.beep);
-  exportKBCallbackWithArgs('KA', 'any', com.keyman.KeyboardInterface.prototype.any);
-  exportKBCallbackWithArgs('KDC', 'deleteContext', com.keyman.KeyboardInterface.prototype.deleteContext);
-  exportKBCallbackWithArgs('KO', 'output', com.keyman.KeyboardInterface.prototype.output);
-  exportKBCallbackWithArgs('KDO', 'deadkeyOutput', com.keyman.KeyboardInterface.prototype.deadkeyOutput);
-  exportKBCallbackWithArgs('KIO', 'indexOutput', com.keyman.KeyboardInterface.prototype.indexOutput);
-  exportKBCallbackWithArgs('KIFS', 'ifStore', com.keyman.KeyboardInterface.prototype.ifStore);
-  exportKBCallbackWithArgs('KSETS', 'setStore', com.keyman.KeyboardInterface.prototype.setStore);
-  exportKBCallbackWithArgs('KLOAD', 'loadStore', com.keyman.KeyboardInterface.prototype.loadStore);
-  exportKBCallbackWithArgs('KSAVE', 'saveStore', com.keyman.KeyboardInterface.prototype.saveStore);
+  exportKBCallbackWithArgs('KT', 'insertText', com.keyman.text.KeyboardInterface.prototype.insertText);
+  exportKBCallbackWithArgs('KR', 'registerKeyboard', com.keyman.text.KeyboardInterface.prototype.registerKeyboard);
+  exportKBCallbackWithArgs('KRS', 'registerStub', com.keyman.text.KeyboardInterface.prototype.registerStub);
+  exportKBCallbackWithArgs('KC', 'context', com.keyman.text.KeyboardInterface.prototype.context);
+  exportKBCallbackWithArgs('KN', 'nul', com.keyman.text.KeyboardInterface.prototype.nul);
+  exportKBCallbackWithArgs('KCM', 'contextMatch', com.keyman.text.KeyboardInterface.prototype.contextMatch);
+  exportKBCallbackWithArgs('KFCM', 'fullContextMatch', com.keyman.text.KeyboardInterface.prototype.fullContextMatch);
+  exportKBCallbackWithArgs('KIK', 'isKeypress', com.keyman.text.KeyboardInterface.prototype.isKeypress);
+  exportKBCallbackWithArgs('KKM', 'keyMatch', com.keyman.text.KeyboardInterface.prototype.keyMatch);
+  exportKBCallbackWithArgs('KSM', 'stateMatch', com.keyman.text.KeyboardInterface.prototype.stateMatch);
+  exportKBCallbackWithArgs('KKI', 'keyInformation', com.keyman.text.KeyboardInterface.prototype.keyInformation);
+  exportKBCallbackWithArgs('KDM', 'deadkeyMatch', com.keyman.text.KeyboardInterface.prototype.deadkeyMatch);
+  exportKBCallbackWithArgs('KB', 'beep', com.keyman.text.KeyboardInterface.prototype.beep);
+  exportKBCallbackWithArgs('KA', 'any', com.keyman.text.KeyboardInterface.prototype.any);
+  exportKBCallbackWithArgs('KDC', 'deleteContext', com.keyman.text.KeyboardInterface.prototype.deleteContext);
+  exportKBCallbackWithArgs('KO', 'output', com.keyman.text.KeyboardInterface.prototype.output);
+  exportKBCallbackWithArgs('KDO', 'deadkeyOutput', com.keyman.text.KeyboardInterface.prototype.deadkeyOutput);
+  exportKBCallbackWithArgs('KIO', 'indexOutput', com.keyman.text.KeyboardInterface.prototype.indexOutput);
+  exportKBCallbackWithArgs('KIFS', 'ifStore', com.keyman.text.KeyboardInterface.prototype.ifStore);
+  exportKBCallbackWithArgs('KSETS', 'setStore', com.keyman.text.KeyboardInterface.prototype.setStore);
+  exportKBCallbackWithArgs('KLOAD', 'loadStore', com.keyman.text.KeyboardInterface.prototype.loadStore);
+  exportKBCallbackWithArgs('KSAVE', 'saveStore', com.keyman.text.KeyboardInterface.prototype.saveStore);
 }());

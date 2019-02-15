@@ -1,5 +1,5 @@
 // Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
+/// <reference path="text/kmwstring.ts" />
 // Contains event management for mobile device rotation events.
 /// <reference path="kmwrotation.ts" />
 
@@ -39,7 +39,10 @@ namespace com.keyman.osk {
       } else if(keyName.indexOf('K_ROPT') >= 0) {
         keyman.uiManager.setActivatingUI(false);
         oskManager._Hide(true); 
-        keyman.touchAliasing.hideCaret();
+        let active = keyman.domManager.getActiveElement();
+        if(dom.Utils.instanceof(active, "TouchAliasElement")) {
+          (active as dom.TouchAliasElement).hideCaret();
+        }
         keyman.domManager.clearLastActiveElement();
       }
     }
@@ -69,7 +72,7 @@ namespace com.keyman.osk {
     for(i=0; i < k['subKeys'].length; i++) {
       try {
         sk=<HTMLElement> skBox.childNodes[i].firstChild;
-        x0=util._GetAbsoluteX(sk); y0=util._GetAbsoluteY(sk);//-document.body.scrollTop;
+        x0=dom.Utils.getAbsoluteX(sk); y0=dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
         x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
         onKey=(x > x0 && x < x1 && y > y0 && y < y1);
         this.highlightKey(sk, onKey);
@@ -103,10 +106,10 @@ namespace com.keyman.osk {
 
     // Create and display the preview
     if(on && !popup) {                                                       
-      var y0 = util._GetAbsoluteY(oskManager._Box),
+      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
           h0 = oskManager._Box.offsetHeight,  
-          xLeft = util._GetAbsoluteX(key),
-          xTop = util._GetAbsoluteY(key),
+          xLeft = dom.Utils.getAbsoluteX(key),
+          xTop = dom.Utils.getAbsoluteY(key),
           xWidth = key.offsetWidth,
           xHeight = key.offsetHeight,
           kc = <HTMLElement> key.firstChild,
@@ -502,6 +505,7 @@ if(!window['keyman']['initialized']) {
     // Declare KeymanWeb object
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
     var dbg=keymanweb.debug;
+    var dom = com.keyman.dom;
 
     // Force full initialization
     keymanweb.isEmbedded = false;
@@ -569,63 +573,6 @@ if(!window['keyman']['initialized']) {
       var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');   
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
     }
-    
-    /**
-     * Get (uncached) keyboard context for a specified range, relative to caret
-     * 
-     * @param       {number}      n       Number of characters to move back from caret
-     * @param       {number}      ln      Number of characters to return
-     * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-     * @return      {string}              Context string 
-     * 
-     * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
-     *             KC(2,1,Pelem) == "e"
-     *             KC(3,3,Pelem) == "def"
-     *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
-     */    
-    keymanweb.KC_ = function(n, ln, Pelem) {
-      var Ldv, tempContext = '';
-      if(Pelem.body) {
-        var Ldoc=Pelem; 
-      } else {
-        var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
-      }
-
-      if(device.touchable) {
-        tempContext = keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
-      } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
-        (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
-        // I2457 - support contentEditable elements in mozilla, webkit
-        /* Mozilla midas html editor and editable elements */
-        var Lsel = Ldv.getSelection();
-        if(Lsel.focusNode.nodeType == 3) {
-          tempContext = Lsel.focusNode.substringData(0, Lsel.focusOffset);
-        }
-      } else if (Pelem.setSelectionRange) {
-        /* Mozilla other controls */
-        var LselectionStart, LselectionEnd;
-        if(Pelem._KeymanWebSelectionStart) {
-          LselectionStart = Pelem._KeymanWebSelectionStart;
-          LselectionEnd = Pelem._KeymanWebSelectionEnd;
-          //KeymanWeb._Debug('KeymanWeb.KC: _KeymanWebSelectionStart=TRUE LselectionStart='+LselectionStart+'; LselectionEnd='+LselectionEnd);
-        } else {
-          if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) { // I3319, KMW-1
-            keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
-            keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
-            keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
-          }
-          LselectionStart = keymanweb._CachedSelectionStart; // I3319
-          LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
-        }
-        tempContext = Pelem.value._kmwSubstr(0, LselectionStart);
-      }
-
-      if(tempContext._kmwLength() < n) {
-        tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
-      }
-      
-      return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
-    }      
 
     /**
      * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.
@@ -658,7 +605,9 @@ if(!window['keyman']['initialized']) {
 
         // Supported by IE 9 and all modern browsers.
         processList.forEach(function(element: HTMLElement) {
-          domManager.touchHandlers.updateInput(element);
+          if(dom.Utils.instanceof(element, "TouchAliasElement")) {
+            (element as com.keyman.dom.TouchAliasElement).updateInput();
+          }
           element.style.visibility = 'visible';
           if(element.base.textContent.length > 0) {
             element.base.style.visibility = 'hidden';

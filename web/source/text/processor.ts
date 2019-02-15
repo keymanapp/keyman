@@ -92,9 +92,9 @@ namespace com.keyman.text {
             // Or move to next field from TEXT fields
             } else if(usingOSK) {
               var inputEle: HTMLInputElement;
-              if(com.keyman.Util.instanceof(Lelem, "HTMLInputElement")) {
+              if(dom.Utils.instanceof(Lelem, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem;
-              } else if(typeof(Lelem.base) != 'undefined' && com.keyman.Util.instanceof(Lelem.base, "HTMLInputElement")) {
+              } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem.base;
               }
 
@@ -325,6 +325,25 @@ namespace com.keyman.text {
       return s;
     }
 
+    static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
+      let keyman = com.keyman.singleton;
+
+      if(!Lelem && !keyman.isHeadless) {
+        Lelem = keyman.domManager.getLastActiveElement();
+        if(!Lelem) {
+          // If we're trying to find an active target but one doesn't exist, just return null.
+          return null;
+        }
+      }
+
+      // If we were provided an element or found an active element but it's improperly attached, that should cause an error.
+      if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
+        return Lelem._kmwAttachment.interface;
+      } else {
+        throw new Error("OSK could not find element output target data!");
+      }
+    }
+
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
@@ -336,7 +355,7 @@ namespace com.keyman.text {
      */
     clickKey(e: osk.KeyElement) {
       let keyman = com.keyman.singleton;
-      var Lelem = keyman.domManager.getLastActiveElement(), Ls, Le;
+      var Lelem = keyman.domManager.getLastActiveElement();
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let kbdInterface = keyman.interface;
@@ -373,22 +392,22 @@ namespace com.keyman.text {
           //// if(keyText == '' || keyText == '&nbsp;') return true; --> why?
         }
 
-        Ls=Lelem._KeymanWebSelectionStart;
-        Le=Lelem._KeymanWebSelectionEnd;
         keyman.uiManager.setActivatingUI(true);
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
         if(keyman.domManager._IsMozillaEditableIframe(<HTMLIFrameElement> Lelem,0)) {
           Lelem = (<HTMLIFrameElement> Lelem).contentDocument.documentElement;
         }
-        Lelem._KeymanWebSelectionStart=Ls;
-        Lelem._KeymanWebSelectionEnd=Le;
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+
         // ...end I3363 (Build 301)
-        (<any>keyman)._CachedSelectionStart = null; // I3319
+        let outputTarget = Processor.getOutputTarget(Lelem);
+        
+        // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+        outputTarget.invalidateSelection();
         // Deadkey matching continues to be troublesome.
         // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-        kbdInterface._DeadkeyDeleteMatched();      // Delete any matched deadkeys before continuing
+        outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
         //kbdInterface._DeadkeyResetMatched();       // I3318   (Not needed if deleted first?)
 
         // Start:  mirrors _GetKeyEventProperties
@@ -458,7 +477,7 @@ namespace com.keyman.text {
         // End mnemonic management.
 
         // Pass this key code and state to the keyboard program
-        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, Lelem, Lkc))) {
+        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, outputTarget, Lkc))) {
           // Restore the virtual key code if a mnemonic keyboard is being used
           Lkc.Lcode=Lkc.vkCode;
 
@@ -476,7 +495,7 @@ namespace com.keyman.text {
               // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
               var ch = this.defaultKeyOutput(keyName, Lkc.Lcode, keyShiftState, true, Lelem);
               if(ch) {
-                kbdInterface.output(0, Lelem, ch);
+                kbdInterface.output(0, outputTarget, ch);
               }
           }
         }
@@ -486,8 +505,6 @@ namespace com.keyman.text {
         this.selectLayer(keyName, nextLayer);
 
         /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-        Lelem._KeymanWebSelectionStart=null;
-        Lelem._KeymanWebSelectionEnd=null;
       }
       
       keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
@@ -885,7 +902,7 @@ namespace com.keyman.text {
 
       switch(Levent.Lcode) {
         case 8: 
-          keyman.interface.clearDeadkeys();
+          Processor.getOutputTarget(Levent.Ltarg).deadkeys().clear();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -949,6 +966,8 @@ namespace com.keyman.text {
       //{
       // Safari, IE, Opera?
       //}
+
+      let outputTarget = Processor.getOutputTarget(Levent.Ltarg);
       
       if(!activeKeyboard['KM']) {
         // Positional Layout
@@ -970,12 +989,12 @@ namespace com.keyman.text {
             LisVirtualKey: 0
           };
 
-          if(kbdInterface.processKeystroke(util.physicalDevice, Levent2.Ltarg, Levent2)) {
+          if(kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent2)) {
             LeventMatched=1;
           }
         }
         
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
         
         // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
         if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
@@ -985,13 +1004,13 @@ namespace com.keyman.text {
         // Mnemonic layout
         if(Levent.Lcode == 8) { // I1595 - Backspace for mnemonic
           this.swallowKeypress = true;
-          if(!kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent)) {
+          if(!kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent)) {
             kbdInterface.defaultBackspace(); // I3363 (Build 301)
           }
           return false;  //added 16/3/13 to fix double backspace on mnemonic layouts on desktop
         } else {
           this.swallowKeypress = false;
-          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice,Levent.Ltarg,Levent);
+          LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
         }
       }
 
@@ -1005,7 +1024,7 @@ namespace com.keyman.text {
         } else {
           Lch = Levent.Lcode-64;
         }
-        kbdInterface.output(0, Levent.Ltarg, String._kmwFromCharCode(Lch)); //I3319
+        kbdInterface.output(0, outputTarget, String._kmwFromCharCode(Lch)); //I3319
 
         LeventMatched = 1;
       }
@@ -1038,7 +1057,7 @@ namespace com.keyman.text {
         // that of the OSK here.
         var ch = this.defaultKeyOutput('', Levent.Lcode, Levent.Lmodifiers, false, Levent.Ltarg);
         if(ch) {
-          kbdInterface.output(0, Levent.Ltarg, ch);
+          kbdInterface.output(0, outputTarget, ch);
           return false;
         }
       }
@@ -1084,9 +1103,10 @@ namespace com.keyman.text {
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
+      let outputTarget = Processor.getOutputTarget(Levent.Ltarg);
       
       // Only reached if it's a mnemonic keyboard.
-      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
+      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, outputTarget, Levent)) {
         this.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();

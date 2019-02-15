@@ -69,7 +69,7 @@ namespace com.keyman {
   }
 
   export class KeyboardTag {
-    stores: {[text: string]: ComplexKeyboardStore} = {};
+    stores: {[text: string]: text.ComplexKeyboardStore} = {};
   }
 
   export class KeyboardManager {
