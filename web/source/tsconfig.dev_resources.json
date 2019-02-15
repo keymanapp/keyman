@@ -8,6 +8,7 @@
 	"target": "es5"
 	},
   "files": [
-		"text/outputTarget.ts"
+    "text/outputTarget.ts",
+    "text/mock.ts"
   ]
 }

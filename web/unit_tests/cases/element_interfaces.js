@@ -356,6 +356,34 @@ if(typeof InterfaceTests == 'undefined') {
     }
     //#endregion
 
+    //#region Defines helpers related to HTMLInputElement / Input test setup.
+    InterfaceTests.Mock = {};
+
+    InterfaceTests.Mock.setupElement = function() {
+      return {wrapper: new com.keyman.text.Mock()};
+    }
+
+    InterfaceTests.Mock.resetWithText = function(pair, string) {
+      pair.wrapper.text = string;
+      pair.wrapper.caretIndex = 0;
+    }
+
+    // Implemented for completeness and generality with other tests.
+    InterfaceTests.Mock.setCaret = function(pair, index) {
+      var text = pair.wrapper.getText();
+      pair.wrapper.caretIndex = text._kmwCodeUnitToCodePoint(index);
+    }
+
+    // Implemented for completeness and generality with other tests.
+    InterfaceTests.Mock.getCaret = function(pair) {
+      return pair.wrapper.getDeadkeyCaret();
+    }
+
+    InterfaceTests.Mock.setText = function(pair, text) {
+      pair.wrapper.text = text;
+    }
+    //#endregion
+
     //#region Defines common test patterns across element tests
     InterfaceTests.Tests = {};
 
@@ -1360,6 +1388,66 @@ describe('Element Input/Output Interfacing', function() {
       describe('insertTextBeforeCaret', function() {
         it("correctly replaces the element's 'context' (no active selection)", function() {
           InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.TouchAlias);
+        });
+      });
+
+      it('correctly maintains deadkeys', function() {
+        InterfaceTests.Tests.deadkeyMaintenance(InterfaceTests.TouchAlias);
+      });
+    });
+  });
+
+  describe('The "Mock" output target', function() {
+    // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
+    // TODO:  This.
+
+    // Test with Input / TextArea source
+    // - with/without pre-existing deadkeys
+    // - with/without existing selected text in the source element
+    // - text operations on the Mock are not aliased / do not affect the source element.
+    describe('Mocking', function() {
+      describe('Initialization', function() {
+        // the Mock's state matches the source element's state
+        // with/without deadkeys
+        // with/without selected text
+      });
+
+      describe('Deep-Copying', function() {
+        // is properly independent of the source element with no cross-effects
+        // with/without deadkeys
+      })
+    });
+
+    describe('Text Retrieval', function(){
+      describe('getText', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextNoSelection(InterfaceTests.Mock);
+        });
+      });
+
+      describe('getTextBeforeCaret', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextBeforeCaretNoSelection(InterfaceTests.Mock);
+        });
+      });
+
+      describe('getTextAfterCaret', function() {
+        it('correctly returns text (no active selection)', function() {
+          InterfaceTests.Tests.getTextAfterCaretNoSelection(InterfaceTests.Mock);
+        });
+      });
+    });
+
+    describe('Text Mutation', function() {
+      describe('deleteCharsBeforeCaret', function() {
+        it("correctly deletes characters from 'context' (no active selection)", function() {
+          InterfaceTests.Tests.deleteCharsBeforeCaretNoSelection(InterfaceTests.Mock);
+        });
+      });
+
+      describe('insertTextBeforeCaret', function() {
+        it("correctly replaces the element's 'context' (no active selection)", function() {
+          InterfaceTests.Tests.insertTextBeforeCaretNoSelection(InterfaceTests.Mock);
         });
       });
 
