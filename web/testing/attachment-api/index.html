@@ -84,6 +84,7 @@
 	<input type='button' id='btnInput' onclick='addInput();' value='Create Inputs.' />
 	<input type="button" id='btnText' onClick='addText();' value='Create Textarea.' />
 	<input type='button' id='btnIFrame' onclick='addIFrame();' value='Create IFrame.' />
+  <input type='button' id='btnDesignIFrame' onclick='addDesignIFrame();' value='Create design-mode IFrame.' />
 	<input type='button' id='btnEditable' onclick='addEditable();' value='Create editable DIV.' />
 	<hr/>
     <div>
@@ -97,6 +98,10 @@
     <div id='DynamicInputs'><h3>Inputs:</h3></div>
 		<div id='DynamicTextareas'><h3>Textareas:</h3></div>
 		<div id='DynamicIFrames'><h3>IFrames:</h3>
+			<p><em>Note:</em> The iframe section should not actually attach/enable for touch devices 
+			and does not support <code>setKeyboardForControl</code>.</p>
+		</div>
+    <div id='DynamicDesignFrames'><h3>Design-mode IFrames:</h3>
 			<p><em>Note:</em> The iframe section should not actually attach/enable for touch devices 
 			and does not support <code>setKeyboardForControl</code>.</p>
 		</div>

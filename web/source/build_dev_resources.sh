@@ -1,10 +1,9 @@
 #! /bin/bash
 # 
 # Compiles development-related KeymanWeb resources for use with developing/running tests.
-#
-# Includes:
 #   - the Recorder module (for engine tests)
-#   - the DOM module (for touch-alias tests)
+#   - the DOM module (for touch-alias and element-interface tests)
+#
 
 # Fails the build if a specified file does not exist.
 assert ( ) {
@@ -32,9 +31,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # Definition of global compile constants
-SCRIPT_TAGS=( "recorder"                "dom" )
-PRODUCTS=(    "recorder_InputEvents.js" "dom.js")
-FOLDERS=(     "recorder"                "dom")
+SCRIPT_TAGS=( "recorder"                "dev_resources" )
+PRODUCTS=(    "recorder_InputEvents.js" "dev_resources.js")
+FOLDERS=(     "recorder"                "dev_resources")
 OUTPUT_BASE="../release"
 PRODUCT_COUNT=${#PRODUCTS[@]}
 

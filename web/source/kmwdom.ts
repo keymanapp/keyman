@@ -5,9 +5,10 @@
 // References DOM event handling interfaces and classes.
 /// <reference path="kmwdomevents.ts" />
 // Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
+/// <reference path="text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
 /// <reference path="dom/touchAliasElement.ts" />
+/// <reference path="dom/wrapElement.ts" />
 
 namespace com.keyman {
   /**
@@ -141,7 +142,12 @@ namespace com.keyman {
 
       // The simulated touch element doesn't already exist?  Time to initialize it.
       let x=dom.constructTouchAlias(Pelem);
-      x._kmwAttachment = Pelem._kmwAttachment; // It's an object reference we need to alias.
+      if(this.isAttached(x)) {
+        x._kmwAttachment.interface = dom.wrapElement(x);
+      } else {
+        this.setupElementAttachment(x); // The touch-alias should have its own wrapper.
+      }
+      Pelem._kmwAttachment = x._kmwAttachment; // It's an object reference we need to alias.
       
       // Set font for base element
       this.enableInputElement(x, true);
@@ -209,6 +215,7 @@ namespace com.keyman {
 
         // Disable touch-related handling code.
         this.disableInputElement(Pelem['kmw_ip']);
+        Pelem._kmwAttachment.interface = dom.wrapElement(Pelem);
         
         // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
         if(Pelem.parentNode) {
@@ -258,10 +265,15 @@ namespace com.keyman {
      */       
     enableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
       var baseElement = isAlias ? Pelem['base'] : Pelem;
+
       if(!this.isKMWDisabled(baseElement)) {
         if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
           this._AttachToIframe(Pelem);
-        } else { 
+        } else {
+          if(!isAlias) {
+            this.setupElementAttachment(Pelem);
+          }
+
           baseElement.className = baseElement.className ? baseElement.className + ' keymanweb-font' : 'keymanweb-font';
           this.inputList.push(Pelem);
 
@@ -365,7 +377,6 @@ namespace com.keyman {
       }
 
       if(this.isKMWInput(Pelem)) {
-        this.setupElementAttachment(Pelem);
         if(!this.isKMWDisabled(Pelem)) {
           if(touchable) {
             this.enableTouchElement(Pelem);
@@ -389,7 +400,7 @@ namespace com.keyman {
      * Description  Detaches KMW from a control (or IFrame) 
      */  
     detachFromControl(Pelem: HTMLElement) {
-      if(!this.isAttached(Pelem)) {
+      if(!(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement)) {
         return;  // We never were attached.
       }
 
@@ -459,7 +470,17 @@ namespace com.keyman {
       if(x._kmwAttachment) {
         return;
       } else {
-        x._kmwAttachment = new AttachmentInfo(null, this.keyman.util.device.touchable);
+        // Problem:  tries to wrap IFrames that aren't design-mode.
+        // The elements in the contained document get separately wrapped, so this doesn't need a proper wrapper.
+        //
+        // Its attachment process might need some work.
+        let eleInterface = dom.wrapElement(x);
+        // May should filter better for IFrames.
+        if(!(eleInterface || dom.Utils.instanceof(x, "HTMLIFrameElement"))) {
+          console.warn("Could not create processing interface for newly-attached element!");
+        }
+
+        x._kmwAttachment = new AttachmentInfo(eleInterface, null, this.keyman.util.device.touchable);
       }
     }
 
@@ -495,6 +516,10 @@ namespace com.keyman {
             util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
             util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
             util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+
+            // Set up a reference alias; the internal document will need the same attachment info!
+            this.setupElementAttachment(Pelem);
+            Lelem.body._kmwAttachment = Pelem._kmwAttachment;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
             this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
@@ -527,6 +552,9 @@ namespace com.keyman {
             util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
             util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
             util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+
+            // Remove the reference to our prior attachment data!
+            Lelem.body._kmwAttachment = null;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
             this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
@@ -665,7 +693,8 @@ namespace com.keyman {
      * Description  Disable KMW control element 
      */    
     _DisableControl(Pelem: HTMLElement) {
-      if(this.isAttached(Pelem)) { // Only operate on attached elements!        
+      // Only operate on attached elements!  Non-design-mode IFrames don't get attachment markers, so we check them specifically instead.
+      if(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
         if(this.keyman.util.device.touchable) {
           this.disableTouchElement(Pelem);
           this.setupNonKMWTouchElement(Pelem);
@@ -869,20 +898,26 @@ namespace com.keyman {
         var domManager = this;
 
         var attachFunctor = function() {  // Triggers at the same time as iframe's onload property, after its internal document loads.
-          domManager.attachToControl(Pelem);
+          // Provide a minor delay to allow 'load' event handlers to set the design-mode property.
+          window.setTimeout(function() { 
+            domManager.attachToControl(Pelem);
+          }, 1);
         };
 
         Pelem.addEventListener('load', attachFunctor);
 
-        /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
-        * go ahead and perform our callback's contents.
-        * 
-        * keymanweb.domManager.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
-        * problems.
-        */
-        if(Pelem.contentDocument.readyState == 'complete') {
-          window.setTimeout(attachFunctor, 1);
-        }
+        // The following block breaks for design-mode iframes, at least in Chrome; a blank document may exist
+        // before the load of the desired actual document. 
+        //
+        // /* If the iframe has somehow already loaded, we can't expect the onload event to be raised.  We ought just
+        // * go ahead and perform our callback's contents.
+        // * 
+        // * keymanweb.domManager.attachToControl() is now idempotent, so even if our call 'whiffs', it won't cause long-lasting
+        // * problems.
+        // */
+        // if(Pelem.contentDocument.readyState == 'complete') {
+        //   window.setTimeout(attachFunctor, 1);
+        // }
       } else {
         this.attachToControl(Pelem);
       }  
@@ -1103,8 +1138,13 @@ namespace com.keyman {
         e=document.getElementById(e);
       }
 
-      // Non-attached elements cannot be set as active.
-      if(!this.isAttached(e) && !this.keyman.isEmbedded) {
+      if(this.keyman.isEmbedded) {
+        // If we're in embedded mode, auto-attach to the element specified by the page.
+        if(!this.isAttached(e)) {
+          this.attachToControl(e);
+        }
+        // Non-attached elements cannot be set as active.
+      } else if(!this.isAttached(e)) {
         console.warn("Cannot set an element KMW is not attached to as the active element.");
         return;
       }

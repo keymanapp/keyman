@@ -69,7 +69,7 @@ namespace com.keyman {
      * Respond to KeymanWeb-aware input element receiving focus 
      */    
     _ControlFocus: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement | Document, Ln;
+      var Ltarg: HTMLElement, Ln;
       var device = this.keyman.util.device;
       var osk = this.keyman.osk;
 
@@ -113,7 +113,7 @@ namespace com.keyman {
           
       if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) { //**TODO: check case reference
         this.keyman.domManager._AttachToIframe(Ltarg as HTMLIFrameElement);
-        Ltarg=Ltarg.contentWindow.document;
+        Ltarg=Ltarg.contentWindow.document.body;
       }
 
       //??keymanweb._Selection = null;
@@ -132,8 +132,6 @@ namespace com.keyman {
       if(this._CommonFocusHelper(Ltarg)) {
         return true;
       };
-
-      Ltarg._KeymanWebSelectionStart = Ltarg._KeymanWebSelectionEnd = null; // I3363 (Build 301)
 
       // Set element directionality (but only if element is empty)
       if(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
@@ -207,14 +205,6 @@ namespace com.keyman {
         if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
           Ltarg=Ltarg.contentWindow.document;
         }
-          
-        if (Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLInputElement 
-            || Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
-          //Ltarg._KeymanWebSelectionStart = Ltarg.selectionStart;
-          //Ltarg._KeymanWebSelectionEnd = Ltarg.selectionEnd;
-          Ltarg._KeymanWebSelectionStart = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionStart);  //I3319
-          Ltarg._KeymanWebSelectionEnd = Ltarg.value._kmwCodeUnitToCodePoint(Ltarg.selectionEnd);  //I3319
-        }
       }
       
       ////keymanweb._SelectionControl = null;    
@@ -280,6 +270,7 @@ namespace com.keyman {
       }
       
       var lastElem = DOMEventHandlers.states.lastActiveElement;
+
       if(lastElem && lastElem._kmwAttachment.keyboard != null) {
         lastElem._kmwAttachment.keyboard = keyboardID;
         lastElem._kmwAttachment.languageCode = langCode;
@@ -298,10 +289,11 @@ namespace com.keyman {
      */ 
     _FocusKeyboardSettings(blockGlobalChange: boolean) {
       var lastElem = DOMEventHandlers.states.lastActiveElement;
-      if(lastElem && lastElem._kmwAttachment.keyboard != null) {      
-        this.keyman.keyboardManager.setActiveKeyboard(lastElem._kmwAttachment.keyboard, 
-          lastElem._kmwAttachment.languageCode); 
-      } else if(!blockGlobalChange) { 
+
+      if(lastElem && lastElem._kmwAttachment.keyboard != null) {
+        this.keyman.keyboardManager.setActiveKeyboard(lastElem._kmwAttachment.keyboard,
+          lastElem._kmwAttachment.languageCode);
+      } else if(!blockGlobalChange) {
         this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
       }
     }
@@ -314,7 +306,7 @@ namespace com.keyman {
      *                      The return value indicates whether (true) or not (false) the calling event handler 
      *                      should be terminated immediately after the call.
      */
-    _CommonFocusHelper(target: HTMLElement|Document): boolean {
+    _CommonFocusHelper(target: HTMLElement): boolean {
       var uiManager = this.keyman.uiManager;
       //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
       //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
@@ -328,9 +320,10 @@ namespace com.keyman {
       DOMEventHandlers.states._DisableInput = false; 
 
       if(!uiManager.justActivated) {
-        // Needs refactor when the Callbacks interface PR goes through!
-        this.keyman['interface']._DeadKeys = [];
-        this.keyman.keyboardManager.notifyKeyboard(0,target,1);  // I2187
+        if(target && text.Processor.getOutputTarget(target)) {
+          text.Processor.getOutputTarget(target).deadkeys().clear();
+        }
+        this.keyman.keyboardManager.notifyKeyboard(0, target, 1);  // I2187
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {

@@ -1,5 +1,6 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-/// <reference path="kmwstring.ts" />  // Includes KMW string extension declarations.
+// Includes KMW string extension declarations.
+/// <reference path="text/kmwstring.ts" />
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 
@@ -267,76 +268,6 @@ namespace com.keyman.osk {
     // Empty stub - this function should not be implemented or used within embedded code routes.
     console.warn("util.alert() call attempted in embedded mode!");  // Sends log message to embedding app.
   };
- 
-  // TODO: This needs to be discussed with Serkan - can possibly get context without any reference to Pelem?? 
-  
-  /**
-   * Get (uncached) keyboard context for a specified range, relative to caret
-   * 
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {number}      ln      Number of characters to return
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-   * @return      {string}              Context string 
-   * 
-   * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
-   *             KC(2,1,Pelem) == "e"
-   *             KC(3,3,Pelem) == "def"
-   *             KC(10,10,Pelem) == "abcdef"  i.e. return as much as possible of the requested string
-   */    
-  keymanweb.KC_ = function(n, ln, Pelem) 
-  {
-    var Ldv, Ldoc;
-    if(Pelem.body) Ldoc=Pelem; else Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
-   
-    if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
-      (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) //  &&  Pelem.tagName == 'HTML')  &&  Pelem.tagName == 'HTML')
-      // I2457 - support contentEditable elements in mozilla, webkit
-    {
-      /* Mozilla midas html editor and editable elements */
-      var Lsel = Ldv.getSelection();
-      if(Lsel.focusNode.nodeType == 3)
-      {
-        if(Lsel.focusOffset > 2*n)  // I3319 SMP extension
-          return Lsel.focusNode.substringData(Lsel.focusOffset - 2*n, 2*n)._kmwSubstr(-n)._kmwSubstr(0,ln); // I3319
-        else
-          return Lsel.focusNode.substringData(0, Lsel.focusOffset)._kmwSubstr(-n)._kmwSubstr(0,ln);         // I3319
-      }
-      else
-        return "";
-    }
-    else if (Pelem.setSelectionRange)
-    {
-      /* Mozilla other controls */
-      var LselectionStart, LselectionEnd;
-      if(Pelem._KeymanWebSelectionStart) 
-      {
-        LselectionStart = Pelem._KeymanWebSelectionStart;
-        LselectionEnd = Pelem._KeymanWebSelectionEnd;
-        //KeymanWeb._Debug('KeymanWeb.KC: _KeymanWebSelectionStart=TRUE LselectionStart='+LselectionStart+'; LselectionEnd='+LselectionEnd);
-      }
-      else
-      {
-        if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) // I3319, KMW-1
-        {
-          keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
-          keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
-          keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
-        }
-        LselectionStart = keymanweb._CachedSelectionStart; // I3319
-        LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
-      }
-      if(LselectionStart < n)
-      {
-        // Looking for context before start of text buffer so return non-characters to pad result
-        var tempContext = Array(n-LselectionStart+1).join("\uFFFE") + Pelem.value._kmwSubstr(0,LselectionStart);
-        return tempContext._kmwSubstr(0,ln); 
-      }
-//dbg(n+' '+ln+' '+Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln));
-      return Pelem.value._kmwSubstring(LselectionStart-n,LselectionStart-n+ln); //I3319, KMW-1
-    }
-
-    return "";
-  };
 
   /**
    * Refresh element content after change of text (if required)
@@ -450,7 +381,10 @@ namespace com.keyman.osk {
       var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.vkbd.layerId);
       keyName=t[t.length-1];
       if(layer == 'undefined') layer=osk.vkbd.layerId;
-              
+      
+      
+      // Note:  this assumes Lelem is properly attached and has an element interface.
+      // Currently true in the Android and iOS apps.
       var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=Processor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
@@ -573,7 +507,9 @@ namespace com.keyman.osk {
 
     // Clear any pending (non-popup) key
     osk.vkbd.keyPending = null;
-            
+    
+    // Note:  this assumes Lelem is properly attached and has an element interface.
+    // Currently true in the Android and iOS apps.
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
     keymanweb.domManager.initActiveElement(Lelem);
@@ -589,14 +525,17 @@ namespace com.keyman.osk {
       LisVirtualKeyCode: false
     }; 
 
+    let Processor = com.keyman.text.Processor;
+    let outputTarget = Processor.getOutputTarget(Lelem);
+
     try {
       // Pass this key code and state to the keyboard program
       // If key is mapped, return true
-      if(kbdInterface.processKeystroke(util.physicalDevice, Lelem, Lkc)) {
+      if((kbdInterface as com.keyman.text.KeyboardInterface).processKeystroke(util.physicalDevice, outputTarget, Lkc)) {
         return true;
       }
 
-      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, Lelem, '');
+      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, outputTarget, '');
     } catch (err) {
       console.error(err.message, err);
       return false;
@@ -613,6 +552,8 @@ namespace com.keyman.osk {
    *  @return {boolean}         true if key code successfully processed
    */
   keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
+    // Note:  this assumes Lelem is properly attached and has an element interface.
+    // Currently true in the Android and iOS apps.
     let Codes = com.keyman.text.Codes;
     if (code == Codes.keyCodes.K_SPACE) {
       kbdInterface.output(0, Lelem, ' ');

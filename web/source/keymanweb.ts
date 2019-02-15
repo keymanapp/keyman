@@ -1,7 +1,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
 // Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
+/// <reference path="text/kmwstring.ts" />
 // Includes type definitions for basic KMW types.
 /// <reference path="kmwtypedefs.ts" />
 

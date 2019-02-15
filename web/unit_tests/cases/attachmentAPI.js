@@ -285,7 +285,8 @@ Modernizr.on('touchevents', function(result) {
             var ele = document.getElementById(ID);
             var innerEle = ele.contentDocument.getElementById('iframe_input');
 
-            assert.isTrue(keyman.isAttached(ele));
+            // No need to track data on the iframe itself.
+            assert.isFalse(keyman.isAttached(ele));
             assert.isNotNull(innerEle);
             assert.isTrue(keyman.isAttached(innerEle));
             keyman.detachFromControl(ele);
