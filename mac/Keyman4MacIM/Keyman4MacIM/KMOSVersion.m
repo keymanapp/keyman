@@ -29,7 +29,7 @@ static CFStringRef sSystemVersionPath = CFSTR("/System/Library/CoreServices/Syst
     if (systemVersionStringParts.count < 2)
     {
         NSLog(@"Too few parts to the system version (probably): %@", systemVersionString);
-        return [systemVersionString intValue]; // hopefully this will at least be the major OS version, e.g., 10 (all versino so far!)
+        return [systemVersionString intValue]; // hopefully this will at least be the major OS version, e.g., 10 (all versions so far!)
     }
 
     NSString *majVersionStr = systemVersionStringParts[0];
