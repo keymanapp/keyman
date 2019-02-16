@@ -48,4 +48,14 @@ static CFStringRef sSystemVersionPath = CFSTR("/System/Library/CoreServices/Syst
     return systemVersion;
 }
 
++(u_int16_t)Version_10_13_1
+{
+    return 0x0AD1; // 10.13.1 in hex by nibbles, the way the old Gestalt call used to do it
+}
+
++(u_int16_t)Version_10_13_3
+{
+    return 0x0AD3; // 10.13.3 in hex by nibbles, the way the old Gestalt call used to do it
+}
+
 @end

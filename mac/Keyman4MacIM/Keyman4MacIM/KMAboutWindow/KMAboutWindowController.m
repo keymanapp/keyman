@@ -50,9 +50,9 @@
 - (IBAction)configAction:(id)sender {
     // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
     // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-    // rrb: where available (everywhere but 10.13.1-10.13.3) call showPreferences, otherwise, call our workaround
+    // rrb: where Apple's API is broken (10.13.1-10.13.3) call our workaround, otherwise, call showPreferences
     u_int16_t systemVersion = [KMOSVersion SystemVersion];
-    if (0x0AD1 <= systemVersion && systemVersion <= 0x0AD3) // between 10.13.1 and 10.13.3 inclusive
+    if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
     {
         NSLog(@"About Box: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
         [self.AppDelegate showConfigurationWindow]; // call our workaround
