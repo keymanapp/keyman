@@ -116,6 +116,10 @@ def check_keyman_dir(basedir, error_message):
 			raise InstallError(InstallStatus.Abort, error_message)
 		os.mkdir(keyman_dir)
 
+def extract_package_id(inputfile):
+	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	return packageID.lower(), ext
+
 def install_kmp_shared(inputfile, online=False):
 	"""
 	Install a kmp file to /usr/local/share/keyman
@@ -128,7 +132,7 @@ def install_kmp_shared(inputfile, online=False):
 	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
 	check_keyman_dir('/usr/local/share/fonts', "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
 
-	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	packageID, ext = extract_package_id(inputfile)
 	packageDir = os.path.join('/usr/local/share/keyman', packageID)
 	kmpdocdir = os.path.join('/usr/local/share/doc/keyman', packageID)
 	kmpfontdir = os.path.join('/usr/local/share/fonts/keyman', packageID)
@@ -192,7 +196,7 @@ def install_kmp_shared(inputfile, online=False):
 		raise InstallError(InstallStatus.Abort, message)
 
 def install_kmp_user(inputfile, online=False):
-	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	packageID, ext = extract_package_id(inputfile)
 	packageDir=user_keyboard_dir(packageID)
 	if not os.path.isdir(packageDir):
 		os.makedirs(packageDir)
@@ -236,11 +240,11 @@ def install_kmp_user(inputfile, online=False):
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
 			elif ftype == KMFileTypes.KM_KMX:
-				# Sanity check case-sensitivity of keyboard file
+				# Sanitize keyboard filename if not lower case
 				kmx_id = re.sub('.kmx', '', f['name'])
 				for index, kb in enumerate(keyboards):
 					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
-						keyboards[index]['file'] = f['name']
+						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
 
 		install_keyboards_to_ibus(keyboards, packageDir)
 	else:
@@ -257,10 +261,7 @@ def install_keyboards_to_ibus(keyboards, packageDir):
 		if bus:
 			# install all kmx for first lang not just packageID
 			for kb in keyboards:
-				if kb['file']:
-					kmx_file = os.path.join(packageDir, kb['file'])
-				else:
-					kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
+				kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
 				if "languages" in kb and len(kb["languages"]) > 0:
 					logging.debug(kb["languages"][0])
 					keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
