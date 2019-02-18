@@ -67,6 +67,7 @@ async function loadSettings() {
       function (response) {
         context.loading = true;
         editor.setValue(response);
+        editor.focus();
         context.loading = false;
       },
       "text"

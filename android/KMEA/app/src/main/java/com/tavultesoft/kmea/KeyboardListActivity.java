@@ -179,10 +179,8 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
 
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
       KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-      finish();
-    } else {
-      Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
     }
+    finish();
   }
 
   @Override

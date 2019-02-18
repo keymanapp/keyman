@@ -281,7 +281,7 @@ begin
         FPackageOutputFileName := ExtractFilePath(FOutputFilename) + ChangeFileExt(ExtractFileName(FPack.FileName), '.kmp');   // I4741
         if FBuildPackage then
         begin
-          if not DoCompilePackage(FPack, FOnMessage, True, FPackageOutputFileName) then Exit;
+          if not DoCompilePackage(FPack, FOnMessage, True, False, FPackageOutputFileName) then Exit;
         end
         else if not FileExists(FPackageOutputFileName) then
         begin

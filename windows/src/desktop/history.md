@@ -2,6 +2,24 @@
 
 ## 12.0 alpha
 
+## 2019-02-13 11.0.1308.0 beta
+* Bug Fix: Upgrading from 9.0 to 11.0 did not preserve keyboards and settings (#1548)
+
+## 2019-02-01 11.0.1307.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-18 11.0.1306.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-17 11.0.1305.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-15 11.0.1304.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-15 11.0.1303.0 beta
+* No changes to Keyman Desktop
+
 ## 2019-01-09 11.0.1302.0 beta
 * Bug Fix: Switching between keyboards in same language would sometimes fail (#1505)
 * Bug Fix: Caps Lock control headers are now handled correctly by Keyman (#1506)

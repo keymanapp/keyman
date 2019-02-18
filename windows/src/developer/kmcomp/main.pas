@@ -103,6 +103,7 @@ var
   FClean: Boolean;
   FFullySilent: Boolean;
   FWarnAsError: Boolean;
+  FCheckFilenameConventions: Boolean;
   FValidating: Boolean;
   FMerging: Boolean;
   FParamInfile2: string;
@@ -123,6 +124,7 @@ begin
   FClean := False;
   FNologo := False;
   FWarnAsError := False;
+  FCheckFilenameConventions := False;
   FValidating := False;
   FJsonExtract := False;
   FMerging := False;
@@ -153,6 +155,7 @@ begin
     else if s = '-u' then FUpdateInstaller := True
     else if s = '-d' then FDebug := True
     else if s = '-w' then FWarnAsError := True   // I4706
+    else if s = '-cfc' then FCheckFilenameConventions := True
     else if s = '-t' then   // I4699
     begin
       Inc(i);
@@ -217,7 +220,7 @@ begin
   if FError or (FParamInfile = '') then
   begin
     writeln('');
-    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-v[s|d]] [-source-path path] [-schema-path path] ');
+    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('              [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
     writeln('              [-add-help-link path]');
     writeln('              [-extract-keyboard-info field[,field...]]');
@@ -233,6 +236,7 @@ begin
     writeln('          -c       clean target (only for .kpj)');
     writeln('          -d       include debug information');
     writeln('          -w       treat warnings as errors');
+    writeln('          -cfc     check filename conventions');
     writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
     writeln('          -add-help-link path to help file on https://help.keyman.com/keyboards');
     writeln;
@@ -268,9 +272,9 @@ begin
     else if FJsonExtract then
       FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, @CompilerMessage)
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
-      Ferror := not DoKCCompileProject(FParamInfile, FFullySilent, FSilent, FDebug, FClean, FWarnAsError, FParamTarget)   // I4706   // I4707
+      Ferror := not DoKCCompileProject(FParamInfile, FFullySilent, FSilent, FDebug, FClean, FWarnAsError, FCheckFilenameConventions, FParamTarget)   // I4706   // I4707
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kps' then
-      FError := not DoKCCompilePackage(FParamInfile, FFullySilent, FSilent, FWarnAsError, FInstaller, FInstallerMSI, FUpdateInstaller)   // I4706
+      FError := not DoKCCompilePackage(FParamInfile, FFullySilent, FSilent, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller)   // I4706
     else
       FError := not CompileKeyboard(FParamInfile, FParamOutfile, FDebug, FSilent, FWarnAsError);   // I4706
 

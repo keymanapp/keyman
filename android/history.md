@@ -3,6 +3,10 @@
 ## 12.0 alpha
 * Started work on Keyman for Android 12.
 
+## 2019-02-07 11.0.2061 beta
+* Bug fix:
+  * Add notifications when keyboard or font fails to download from Keyman cloud (#1570)
+
 ## 2019-01-27 11.0.2060 beta
 * Bug fixes:
   * Clean up styling of dialogs when downloading keyboards

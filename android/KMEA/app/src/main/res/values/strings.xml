@@ -32,6 +32,8 @@
     <string name="confirm_update" translatable="false">Would you like to update keyboards now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
+    <string name="font_failed_to_download" translatable="false">Warning: Font failed to download</string>
+    <string name="keyboard_failed_to_download" translatable="false">Error: Keyboard failed to download</string>
     <string name="keyboard_updates_available" translatable="false">Keyboard Updates Available</string>
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
     <string name="updating_keyboards" translatable="false">Updating keyboards&#8230;</string>

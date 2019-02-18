@@ -3,6 +3,15 @@
 ## 12.0 alpha
 * Started work on Keyman for Linux 12
 
+## 2019-02-15 11.0.108 beta
+* handle keyboard package install/uninstall when languages aren't defined (#1585)
+
+## 2019-02-08 11.0.107 beta
+* add disco distribution information (#1572)
+
+## 2019-02-05 11.0.106 beta
+* update readme about packaging and fix build.sh script (#1565)
+
 ## 2019-01-10 11.0.105 beta
 * add icons for km-config and .kmp files (#1495)
 * restart ibus as user and on gnome-shell (#1510,#1521)

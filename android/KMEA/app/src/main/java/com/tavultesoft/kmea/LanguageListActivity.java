@@ -31,6 +31,7 @@ import com.tavultesoft.kmea.util.MapCompat;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -74,6 +75,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private static HashMap<String, String> keyboardModifiedDates = null;
 
   private int selectedIndex = 0;
+  private static AlertDialog alertDialog;
   //protected static int selectedIndex() { return selectedIndex; }
 
   @Override
@@ -138,20 +140,25 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
+    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
+    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
     if (result > 0) {
       String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
       String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
 
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
       KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+
+      if (result == 2) {
+        Toast.makeText(context, context.getString(R.string.font_failed_to_download), Toast.LENGTH_LONG).show();
+      }
       finish();
     } else {
-      Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
+      String title = String.format("%s: %s", languageName, keyboardName);
+      showErrorDialog(context, title, context.getString(R.string.keyboard_failed_to_download));
     }
   }
 
@@ -616,4 +623,24 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
     }
   }
+
+  private static void showErrorDialog(Context context, String title, String message) {
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+    alertDialogBuilder.setTitle(title);
+    alertDialogBuilder
+      .setMessage(message)
+      .setCancelable(false)
+      .setPositiveButton(context.getString(R.string.label_close),new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog,int id) {
+        if (dialog != null) {
+          dialog.dismiss();
+        }
+        }
+      });
+
+    alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
+  }
+
 }
