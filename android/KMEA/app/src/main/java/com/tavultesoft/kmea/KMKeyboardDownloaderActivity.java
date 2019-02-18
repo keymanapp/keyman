@@ -126,10 +126,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       title = String.format("%s: %s", langName, kbName);
     }
 
-    DialogFragment dialog = new ConfirmDialogFragment();
-      args.putString(ConfirmDialogFragment.ARG_TITLE, title);
-      dialog.setArguments(args);
-      dialog.show(getFragmentManager(), "dialog");
+    DialogFragment dialog = ConfirmDialogFragment.newInstance(title, getString(R.string.confirm_download));
+    dialog.show(getFragmentManager(), "dialog");
   }
 
   /**
@@ -222,15 +220,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       }
 
       ((AppCompatActivity) context).finish();
-      if (result > 0) {
-        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
-      }
+      notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
     }
 
     /**
      * Download a non-KMP Keyman keyboard from Keyman cloud via JSON
      * @param remoteUrl String
-     * @return ret int -1 for fail
+     * @return ret int -1 for fail; >0 for success; 2 for keyboard downloading but not font
      * @throws Exception
      */
     protected int downloadNonKMPKeyboard(String remoteUrl) throws Exception {
@@ -346,8 +342,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
         result = FileUtils.download(context, url, destination, filename);
         if (result < 0) {
-          ret = -1;
-          break;
+          if (FileUtils.hasFontExtension(url)) {
+            // Propagate warning about font failing to download
+            ret = 2;
+          } else {
+            ret = -1;
+            break;
+          }
         }
       }
 

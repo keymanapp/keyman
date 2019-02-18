@@ -55,7 +55,7 @@ for proj in kmflcomp libkmfl ibus-kmfl ibus-keyman; do
 		else	# install ibus-kmfl and ibus-keyman into ibus
 			../$proj/configure KEYMAN_PROC_CFLAGS="-I\$(top_builddir)/../keyboardprocessor/include -I\$(top_builddir)/../../common/engine/keyboardprocessor/include" \
 				CPPFLAGS="-I\$(top_builddir)/../build-kmflcomp -I\$(top_builddir)/../build-libkmfl" \
-				LDFLAGS="-L`pwd`/../build-kmflcomp/src" \
+				LDFLAGS="-L`pwd`/../build-kmflcomp/src -L`pwd`/../build-libkmfl/src" \
 				KEYMAN_PROC_LIBS="-L`pwd`/../build-libkmfl/src -L`pwd`/../keyboardprocessor/src -lkmnkbp0" \
 				--prefix=${INSTALLDIR} --libexecdir=${INSTALLDIR}/lib/ibus --datadir=/usr/share
 		fi

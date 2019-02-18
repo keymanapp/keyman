@@ -105,6 +105,10 @@ begin
     if VarIsNull(node.ChildValues['WarnDeprecatedCode'])   // I4866
       then FProject.Options.WarnDeprecatedCode := True
       else FProject.Options.WarnDeprecatedCode := node.ChildValues['WarnDeprecatedCode'];
+
+    if VarIsNull(node.ChildValues['CheckFilenameConventions'])
+      then FProject.Options.CheckFilenameConventions := False // existing projects default to FALSE (new projects default to TRUE)
+      else FProject.Options.CheckFilenameConventions := node.ChildValues['CheckFilenameConventions'];
   end;
 
   { Load root nodes first - I708 }

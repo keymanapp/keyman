@@ -119,13 +119,13 @@ public final class FileUtils {
           ret = DOWNLOAD_ERROR;
         }
       } else {
-        if (file.exists()) {
+        if (file != null && file.exists()) {
           file.delete();
         }
-        if (tmpFile.exists()) {
+        if (tmpFile != null && tmpFile.exists()) {
           tmpFile.delete();
         }
-        Log.e("FileUtils", "Could not download filename " + file.toString());
+        Log.e("FileUtils", "Could not download filename " + filename);
       }
 
       Connection.disconnect();

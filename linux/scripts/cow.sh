@@ -3,7 +3,7 @@
 # If needed set cowbuilder up for building Keyman Debian packages
 # Then cowbuilder update
 
-distributions='bionic xenial'
+distributions='disco cosmic bionic xenial'
 
 dpkgcheck=`dpkg-query -l cowbuilder`
 if [ $? != 0 ]; then
@@ -26,11 +26,9 @@ else
 fi
 
 for dist in $distributions; do
-    if [ ! -d /var/cache/pbuilder/base-${dist}.cow ]; then
-        echo "making ${dist} cowbuilder"
-        sudo DIST=${dist} cowbuilder --create --distribution ${dist} --basepath /var/cache/pbuilder/base-${dist}.cow  --hookdir /var/cache/pbuilder/hook.d/${dist}
-    else
-        echo "already have ${dist} cowbuilder"
+    sudo mkdir -p /var/cache/pbuilder/result/${dist}
+    if [ ! -e /var/cache/pbuilder/result/${dist}/Packages ]; then
+        sudo touch /var/cache/pbuilder/result/${dist}/Packages
     fi
     sudo mkdir -p /var/cache/pbuilder/hook.d/${dist}
     if [ ! -e /var/cache/pbuilder/hook.d/${dist}/D70results ]; then
@@ -44,9 +42,11 @@ for dist in $distributions; do
     if [ ! -e /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild ]; then
         sudo ln -s /usr/share/doc/pbuilder/examples/D80no-man-db-rebuild /var/cache/pbuilder/hook.d/${dist}/D80no-man-db-rebuild
     fi
-    sudo mkdir -p /var/cache/pbuilder/result/${dist}
-    if [ ! -e /var/cache/pbuilder/result/${dist}/Packages ]; then
-        sudo touch /var/cache/pbuilder/result/${dist}/Packages
+    if [ ! -d /var/cache/pbuilder/base-${dist}.cow ]; then
+        echo "making ${dist} cowbuilder"
+        sudo DIST=${dist} cowbuilder --create --distribution ${dist} --basepath /var/cache/pbuilder/base-${dist}.cow  --hookdir /var/cache/pbuilder/hook.d/${dist}
+    else
+        echo "already have ${dist} cowbuilder"
     fi
     sudo DIST=${dist} cowbuilder --update --distribution ${dist} --basepath /var/cache/pbuilder/base-${dist}.cow --override-config --othermirror="deb [trusted=yes] file:/var/cache/pbuilder/result/${dist} ./" --bindmounts /var/cache/pbuilder/result/${dist} --hookdir /var/cache/pbuilder/hook.d/${dist}
 done

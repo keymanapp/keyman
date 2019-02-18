@@ -48,6 +48,7 @@
 		98FE105E1B4DE8F400525F54 /* NSWindow+SuppMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE105D1B4DE8F400525F54 /* NSWindow+SuppMethods.m */; };
 		98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */; };
 		98FE10641B4DEE5600525F54 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */; };
+		9A3D6C5D221531B0008785A3 /* KMOSVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3D6C5C221531B0008785A3 /* KMOSVersion.m */; };
 		E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769C20E182DD00F8065D /* NoContextTestClient.m */; };
 		E21176A020E18C5200F8065D /* AppleCompliantTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */; };
 		E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */; };
@@ -192,6 +193,8 @@
 		98FE10601B4DEE5600525F54 /* KMInfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KMInfoWindowController.h; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.h; sourceTree = "<group>"; };
 		98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KMInfoWindowController.m; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.m; sourceTree = "<group>"; };
 		98FE10621B4DEE5600525F54 /* KMInfoWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = KMInfoWindowController.xib; path = Keyman4MacIM/KMInfoWindow/KMInfoWindowController.xib; sourceTree = "<group>"; };
+		9A3D6C5B221531B0008785A3 /* KMOSVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMOSVersion.h; sourceTree = "<group>"; };
+		9A3D6C5C221531B0008785A3 /* KMOSVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMOSVersion.m; sourceTree = "<group>"; };
 		9E7FB3417C46A01721AD32D0 /* libPods-KeymanTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KeymanTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E211769B20E1826800F8065D /* NoContextTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NoContextTestClient.h; sourceTree = "<group>"; };
 		E211769C20E182DD00F8065D /* NoContextTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoContextTestClient.m; sourceTree = "<group>"; };
@@ -399,6 +402,8 @@
 				9836B3631AE5F11D00780482 /* ZipArchive */,
 				E240F597202DED300000067D /* KMPackage.h */,
 				E240F598202DED740000067D /* KMPackage.m */,
+				9A3D6C5B221531B0008785A3 /* KMOSVersion.h */,
+				9A3D6C5C221531B0008785A3 /* KMOSVersion.m */,
 			);
 			path = Keyman4MacIM;
 			sourceTree = "<group>";
@@ -716,6 +721,7 @@
 			files = (
 				9836B3731AE5F11D00780482 /* zip.c in Sources */,
 				98F3C8931A8D739500F675E3 /* KMConfigurationWindowController.m in Sources */,
+				9A3D6C5D221531B0008785A3 /* KMOSVersion.m in Sources */,
 				989C9C111A7876DE00A20425 /* main.m in Sources */,
 				98BF924F1BF02DC20002126A /* KMBarView.m in Sources */,
 				E240F599202DED740000067D /* KMPackage.m in Sources */,
@@ -900,7 +906,8 @@
 				GET_INFO_STRING = "Keyman $(PRODUCT_VERSION) for macOS, $(COPYRIGHT_STRING_RIGHTS)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Keyman4MacIM",
+					"{$PROJECT_DIR}/Keyman4MacIM/KMAboutWindow",
+					"{$PROJECT_DIR}/Keyman4MacIM",
 				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -935,7 +942,8 @@
 				GET_INFO_STRING = "Keyman $(PRODUCT_VERSION) for macOS, $(COPYRIGHT_STRING_RIGHTS)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Keyman4MacIM",
+					"{$PROJECT_DIR}/Keyman4MacIM/KMAboutWindow",
+					"{$PROJECT_DIR}/Keyman4MacIM",
 				);
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";

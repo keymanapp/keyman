@@ -94,6 +94,7 @@ EXTRA_DIST = \
 	keyman.xml.in \
 	test/print_kmpdetails.test \
 	test/print_kmp.test \
+	test/kmp.json \
 	$(NULL)
 
 CLEANFILES = \
