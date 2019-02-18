@@ -20,7 +20,6 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "google-closure-compiler": "^20171203.0.0",
-    "google-closure-library": "^20171203.0.0",
     "html2canvas": "^1.0.0-alpha.12",
     "karma": "^3.1.4",
     "karma-browserstack-launcher": "^1.4.0",
