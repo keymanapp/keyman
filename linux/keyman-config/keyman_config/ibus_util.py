@@ -27,7 +27,7 @@ def install_to_ibus(bus, keyboard_id):
         # bus = IBus.Bus()
         logging.debug("installing to ibus")
         ibus_settings = Gio.Settings.new("org.freedesktop.ibus.general")
-        preload_engines = ibus_settings.getr_strv("preload-engines")
+        preload_engines = ibus_settings.get_strv("preload-engines")
         logging.debug(preload_engines)
         if keyboard_id not in preload_engines:
             preload_engines.clear()
