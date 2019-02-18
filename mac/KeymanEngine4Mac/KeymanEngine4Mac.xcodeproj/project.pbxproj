@@ -289,6 +289,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 984C2AE81A79C98D0023F89D /* Build configuration list for PBXNativeTarget "KeymanEngine4Mac" */;
 			buildPhases = (
+				9A5A4B1221F788BF00B31301 /* Assert version number same as git branch */,
 				984C2ACD1A79C98D0023F89D /* Sources */,
 				984C2ACE1A79C98D0023F89D /* Frameworks */,
 				984C2ACF1A79C98D0023F89D /* Headers */,
@@ -379,6 +380,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		9A5A4B1221F788BF00B31301 /* Assert version number same as git branch */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Assert version number same as git branch";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# check that our PRODUCT_VERSION matches this git branch's KM_VERSION from ../../resources/VERSION.md\n(cd .. ; ./is_same_version.sh KeymanEngine4Mac || exit 1 ; cd -)\n";
+		};
 		E2588F2F1F2647A50061C9C4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -390,7 +409,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SRC_DIR=\"${BUILT_PRODUCTS_DIR}\"\nDEST_DIR=\"${PROJECT_DIR}/build/${CONFIGURATION}\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${BUILT_PRODUCTS_DIR}/KeymanEngine4Mac.framework\" \"${DEST_FRAMEWORK_PATH}\"";
+			shellScript = "SRC_DIR=\"${BUILT_PRODUCTS_DIR}\"\nDEST_DIR=\"${PROJECT_DIR}/build/${CONFIGURATION}\"\nFRAMEWORK_NAME=\"KeymanEngine4Mac.framework\"\nDEST_FRAMEWORK_PATH=\"${DEST_DIR}/${FRAMEWORK_NAME}\"\nif [[ \"${SRC_DIR}\" == \"${DEST_DIR}\" ]]; then\n    exit 0\nfi\n\necho \"Copying Keyman Engine framework from ${SRC_DIR} to ${DEST_DIR}...\"\n\nif [ ! -d \"${DEST_DIR}\" ]; then\n    if [ -e \"${DEST_DIR}\" ]; then\n        echo \"${DEST_DIR} exists, but it is not a directory!\"\n        exit 1\n    else\n        mkdir -p \"$DEST_DIR\"\n    fi\nelif [ -d \"${DEST_FRAMEWORK_PATH}\" ]; then\n    rm -rf \"${DEST_FRAMEWORK_PATH}\"\nfi\n\ncp -Rf \"${BUILT_PRODUCTS_DIR}/KeymanEngine4Mac.framework\" \"${DEST_FRAMEWORK_PATH}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -547,17 +566,22 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
+				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
+				COPYRIGHT_YEARS = "2017-2019";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GET_INFO_STRING = "Keyman Engine $(PRODUCT_VERSION) for macOS. $(COPYRIGHT_STRING_RIGHTS)";
 				INFOPLIST_FILE = KeymanEngine4Mac/Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_VERSION = 12.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -569,6 +593,9 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
+				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
+				COPYRIGHT_YEARS = "2017-2019";
 				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -576,11 +603,13 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GET_INFO_STRING = "Keyman Engine $(PRODUCT_VERSION) for macOS. $(COPYRIGHT_STRING_RIGHTS)";
 				INFOPLIST_FILE = KeymanEngine4Mac/Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_VERSION = 12.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;

@@ -384,15 +384,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International. All rights reserved.";
+				COPYRIGHT_YEARS = "2017-2019";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
 					"$(PROJECT_DIR)",
 				);
+				GET_INFO_VERSION = "Keyman $(PRODUCT_VERSION) for macOS";
 				INFOPLIST_FILE = Keyman4Mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_VERSION = 12.0;
 			};
 			name = Debug;
 		};
@@ -401,15 +405,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International. All rights reserved.";
+				COPYRIGHT_YEARS = "2017-2019";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
 					"$(PROJECT_DIR)",
 				);
+				GET_INFO_VERSION = "Keyman $(PRODUCT_VERSION) for macOS";
 				INFOPLIST_FILE = Keyman4Mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_VERSION = 12.0;
 			};
 			name = Release;
 		};
