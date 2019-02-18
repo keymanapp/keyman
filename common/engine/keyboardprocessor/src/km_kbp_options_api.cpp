@@ -73,7 +73,7 @@ km_kbp_state_options_update(km_kbp_state *state, km_kbp_option_item const *opt)
         return KM_KBP_STATUS_KEY_ERROR;
     }
   }
-  catch (std::bad_alloc)
+  catch (std::bad_alloc &)
   {
     return KM_KBP_STATUS_NO_MEM;
   }
@@ -98,7 +98,7 @@ km_kbp_state_options_to_json(km_kbp_state const *state, char *buf, size_t *space
 // TODO: Fix
 //    jo << state->options();
   }
-  catch (std::bad_alloc)
+  catch (std::bad_alloc &)
   {
     *space = 0;
     return KM_KBP_STATUS_NO_MEM;

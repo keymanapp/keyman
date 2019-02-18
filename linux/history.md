@@ -1,5 +1,8 @@
 # Keyman for Linux Version History
 
+## 12.0 alpha
+* Started work on Keyman for Linux 12
+
 ## 2019-02-15 11.0.108 beta
 * handle keyboard package install/uninstall when languages aren't defined (#1585)
 

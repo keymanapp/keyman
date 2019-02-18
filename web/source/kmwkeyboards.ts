@@ -69,7 +69,7 @@ namespace com.keyman {
   }
 
   export class KeyboardTag {
-    stores: {[text: string]: ComplexKeyboardStore} = {};
+    stores: {[text: string]: text.ComplexKeyboardStore} = {};
   }
 
   export class KeyboardManager {
@@ -111,9 +111,11 @@ namespace com.keyman {
       return this.activeKeyboard ? this.activeKeyboard['_kmw'] : null;
     }
 
-    getActiveLanguage(): string {
+    getActiveLanguage(fullName?: boolean): string {
       if(this.activeStub == null) {
         return '';
+      } else if(fullName) {
+        return this.activeStub['KL'];
       } else {
         return this.activeStub['KLC'];
       }
@@ -444,7 +446,7 @@ namespace com.keyman {
             
             // Append a stylesheet for this keyboard for keyboard specific styles 
             // or if needed to specify an embedded font
-            osk.appendStyleSheet();
+            osk.vkbd.appendStyleSheet();
             
             // Re-initializate OSK before returning if required
             if(this.keymanweb.mustReloadKeyboard) {
@@ -493,7 +495,7 @@ namespace com.keyman {
             && ((this.keyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---'))) {
             // Force OSK display for CJK keyboards (keyboards using a pick list)
             if(this.isCJK(this.keyboardStubs[Ln]) || util.device.touchable) {
-              osk._Enabled = 1;
+              osk._Enabled = true;
             }
 
             // Create a script to load from the server - when it finishes loading, it will register itself, 
@@ -817,7 +819,7 @@ namespace com.keyman {
         k0 = this.getKeyboardByID(k0);
       }
 
-      return !!(this.getKeyboardModifierBitmask(k0) & this.keymanweb.osk.modifierBitmasks.IS_CHIRAL);
+      return !!(this.getKeyboardModifierBitmask(k0) & text.Codes.modifierBitmasks.IS_CHIRAL);
     }
 
     /**
@@ -842,7 +844,7 @@ namespace com.keyman {
         return k['KMBM'];
       }
 
-      return this.keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
+      return text.Codes.modifierBitmasks['NON_CHIRAL'];
     }
 
     getFont(k0?) {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public final class KMModifierCodes {
 
-  // Note: Keep this table in sync with web/source/kmwosk.js osk.modifierCodes
+  // Note: Keep this table in sync with web/source/text/codes.ts, Codes.modifierCodes.
   final static HashMap<String, Integer> codes = new HashMap<String, Integer>() {{
     put("LCTRL", 0x0001);
     put("RCTRL", 0x0002);

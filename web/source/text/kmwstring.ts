@@ -16,8 +16,8 @@ interface String {
   kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
   kmwSlice(beginSlice: number, endSlice: number) : string,
   kmwSubstring(start: number, length: number) : string,
-  kmwSubstr(start: number, length: number) : string,
-  kmwBMPSubstr(start: number, length: number) : string,
+  kmwSubstr(start: number, length?: number) : string,
+  kmwBMPSubstr(start: number, length?: number) : string,
   kmwLength(): number,
   kmwBMPLength(): number,
   kmwNextChar(codeUnitIndex: number): number,
@@ -182,10 +182,10 @@ String.prototype.kmwSlice = function(beginSlice, endSlice) {
  * 
  * @param  {number}  start         The start code point index in the string to 
  *                                 extract from
- * @param  {number}  length        Optional length to extract
+ * @param  {number=}  length        Optional length to extract
  * @return {string}                The substring as selected by start and length
  */
-String.prototype.kmwSubstr = function(start, length)
+String.prototype.kmwSubstr = function(start, length?)
 {
   var str = String(this);
   if(start < 0) 
@@ -429,10 +429,10 @@ String.prototype.kmwBMPLength = function()
  * Returns a substring 
  *
  * @param  {number}  n
- * @param  {number}  ln
+ * @param  {number=}  ln
  * @return {string}                   
  */ 
-String.prototype.kmwBMPSubstr = function(n,ln)
+String.prototype.kmwBMPSubstr = function(n,ln?)
 {
   var str=String(this);
   if(n > -1) 
