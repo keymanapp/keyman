@@ -86,6 +86,10 @@ async function loadSettings() {
     // Setup callbacks
     //
 
+    window.addEventListener('resize', function() {
+      editor.layout();
+    });
+
     const model = editor.getModel();
 
     context.reloadSettings();
