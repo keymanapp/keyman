@@ -2,7 +2,6 @@
  * Defines the reference-path tags necessary to link properly with common/predictive-text.
  */
 
-// Defines the main interface of the Language Modeling Layer (LMLayer).
-///<reference path="../../../common/predictive-text/index.ts" />
-// Defines interfaces to be used for LMLayer messaging.
-///<reference path="../../../common/predictive-text/message.d.ts" />
+// Defines the main interface of the Language Modeling Layer (LMLayer) and its original typing information.
+///<reference path="../../../common/predictive-text/build/index.d.ts" />
+///<reference path="../../../common/predictive-text/build/index.js" />
