@@ -84,14 +84,6 @@ describe('OutputTarget Mocking', function() {
   })
 
   describe('The "Mock" output target', function() {
-    // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
-    // TODO:  This.
-
-    // Test with Input / TextArea source
-    // - with/without pre-existing deadkeys
-    // - with/without existing selected text in the source element
-    // - text operations on the Mock are not aliased / do not affect the source element.
-
     describe('Initialization', function() {
       it('copies an existing OutputTarget without a text selection', function() {
         var base = MockTests.setupBase(4);
