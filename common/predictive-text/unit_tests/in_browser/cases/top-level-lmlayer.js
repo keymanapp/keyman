@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var LMLayer = com.keyman.text.prediction.LMLayer;
 
 describe('LMLayer', function () {
   describe('[[constructor]]', function () {

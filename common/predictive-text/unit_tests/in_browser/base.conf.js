@@ -31,10 +31,10 @@ module.exports = {
 
   // list of files / patterns to load in the browser
   files: [
-    'cases/**/*.js', // Where the tests actually reside.
-
-    // Include the generated worker code.
+    // Include the generated worker code.  Make sure it's linked before any of the test cases.
     '../../build/index.js',
+
+    'cases/**/*.js', // Where the tests actually reside.
     
     // We don't have anything in these locations... yet.  But they'll be useful for test resources.
     'json/**/*.json', // Where pre-loaded JSON resides.
