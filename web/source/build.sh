@@ -48,6 +48,7 @@ npm install --no-optional
 
 # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
 cd ../../common/predictive-text/
+echo ""
 echo "Compiling the Language Modeling layer module..."
 ./build.sh || fail "Failed to compile the language modeling layer module."
 echo "Language Modeling layer compilation successful."
