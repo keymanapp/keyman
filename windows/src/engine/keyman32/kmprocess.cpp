@@ -281,6 +281,13 @@ BOOL ProcessGroup(LPGROUP gp)
               fOutputKeystroke = TRUE;   // I4933
               return FALSE;   // I4933
             }
+            if (Uni_IsSurrogate1(*pdeletecontext) && Uni_IsSurrogate2(*(pdeletecontext+1))) {
+              // 2 backspaces to delete both parts of surrogate pair
+              // This only needs to be done for non-legacy apps as legacy apps
+              // will receive a BKSP WM_KEYDOWN event which results in deleting
+              // both parts in one action
+              _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
+            }
           }
 				  _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
         }
