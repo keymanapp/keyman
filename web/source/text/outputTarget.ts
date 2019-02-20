@@ -5,7 +5,24 @@
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
 
+///<reference path="transcription.ts" />
+
 namespace com.keyman.text {
+  class TextTransform implements Transform {
+    readonly insert: string;
+    readonly deleteLeft: number;
+    readonly deleteRight?: number;
+
+    constructor(insert: string, deleteLeft: number, deleteRight?: number) {
+      this.insert = insert;
+      this.deleteLeft = deleteLeft;
+
+      if(deleteRight) {
+        this.deleteRight = deleteRight;
+      }
+    }
+  }
+
   export abstract class OutputTarget {
     private _dks: text.DeadkeyTracker;
 
@@ -42,6 +59,81 @@ namespace com.keyman.text {
      */
     protected setDeadkeys(dks: text.DeadkeyTracker) {
       this._dks = dks.clone();
+    }
+
+    /**
+     * Determines the basic operations needed to reconstruct the current OutputTarget's text from the prior state specified
+     * by another OutputTarget based on their text and caret positions.
+     * 
+     * This is designed for use as a "before and after" comparison to determine the effect of a single keyboard rule at a time.
+     * As such, it assumes that the caret is immediately after any inserted text.
+     * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
+     */
+    private buildTransformFrom(original: Mock): Transform {
+      let to = this.getText();
+      let from = original.getText();
+
+      let fromCaret = original.getDeadkeyCaret();
+      let toCaret = this.getDeadkeyCaret();
+
+      // Step 1:  Determine the number of left-deletions.
+      for(var newCaret=0; newCaret < fromCaret; newCaret++) {
+        if(from._kmwCharAt(newCaret) != to._kmwCharAt(newCaret)) {
+          break;
+        }
+      }
+
+      let deletedLeft = fromCaret - newCaret;
+
+      // Step 2:  Determine the other properties.
+      // Since the 'after' OutputTarget's caret indicates the end of any inserted text, we
+      // can easily calculate the rest.
+      let insertedLength = toCaret - newCaret;
+      let delta = to._kmwSubstr(newCaret, insertedLength);
+
+      let undeletedRight = to._kmwLength() - toCaret;
+      let originalRight = from._kmwLength() - fromCaret;
+
+      return new TextTransform(delta, deletedLeft, originalRight - undeletedRight);
+    }
+
+    buildTranscriptionFrom(original: Mock, keyEvent: KeyEvent): Transcription {
+      let transform = this.buildTransformFrom(original);
+
+      // Determine what deadkeys were removed and added.
+      let fromDks = original.deadkeys().toSortedArray();
+      let toDks = this.deadkeys().toSortedArray();
+      
+      let commonDks: Deadkey[] = [];
+      let removedDks: Deadkey[] = [];
+      let insertedDks: Deadkey[] = [];
+      
+      // Since the ordinals of any original deadkey are preserved, we can check for the (id, ordinal).
+      fromDks.forEach(function(dk: Deadkey){
+        for(var i=0; i < toDks.length; i++) {
+          if(toDks[i].d == dk.d && toDks[i].o == dk.o) {
+            commonDks.push(dk);
+            return;
+          }
+        }
+
+        // Wasn't found to be in common?  Must have been removed.
+        removedDks.push(dk);
+      });
+
+      toDks.forEach(function(dk: Deadkey) {
+        for(var i=0; i < commonDks.length; i++) {
+          if(commonDks[i].d == dk.d && commonDks[i].o == dk.o) {
+            // It's a common one.
+            return;
+          }
+        }
+
+        // Wasn't found to be in common?  Must have been inserted.
+        insertedDks.push(dk);
+      });
+
+      return new Transcription(keyEvent, transform, Mock.from(original), removedDks, insertedDks);
     }
 
     /**
@@ -118,6 +210,78 @@ namespace com.keyman.text {
      */
     restoreProperties(){
       // Most element interfaces won't need anything here. 
+    }
+  }
+
+  // Due to some interesting requirements on compile ordering in TS,
+  // this needs to be in the same file as OutputTarget now.
+  export class Mock extends OutputTarget {
+    text: string;
+    caretIndex: number;
+
+    constructor(text?: string, caretPos?: number) {
+      super();
+
+      this.text = text ? text : "";
+      this.caretIndex = caretPos ? caretPos : 0;
+    }
+
+    // Clones the state of an existing EditableElement, creating a Mock version of its state.
+    static from(outputTarget: OutputTarget) {
+      let preText = outputTarget.getTextBeforeCaret();
+      let caretIndex = preText._kmwLength();
+
+      // We choose to ignore (rather, pre-emptively remove) any actively-selected text,
+      // as since it's always removed instantly during any text mutation operations.
+      let clone = new Mock(preText + outputTarget.getTextAfterCaret(), caretIndex);
+
+      clone.setDeadkeys(outputTarget.deadkeys());
+
+      return clone;
+    }
+
+    getElement(): HTMLElement {
+      return null;
+    }
+    
+    clearSelection(): void {
+      return;
+    }
+
+    invalidateSelection(): void {
+      return;
+    }
+
+    hasSelection(): boolean {
+      return true;
+    }
+
+    getDeadkeyCaret(): number {
+      return this.caretIndex;
+    }
+
+    getTextBeforeCaret(): string {
+      return this.text.kmwSubstr(0, this.caretIndex);
+    }
+
+    getTextAfterCaret(): string {
+      return this.text.kmwSubstr(this.caretIndex);
+    }
+
+    getText(): string {
+      return this.text;
+    }
+
+    deleteCharsBeforeCaret(dn: number): void {
+      if(dn >= 0) {
+        this.text = this.text.kmwSubstr(0, this.caretIndex - dn) + this.getTextAfterCaret();
+        this.caretIndex -= dn;
+      }
+    }
+
+    insertTextBeforeCaret(s: string): void {
+      this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
+      this.caretIndex += s.kmwLength();
     }
   }
 }
