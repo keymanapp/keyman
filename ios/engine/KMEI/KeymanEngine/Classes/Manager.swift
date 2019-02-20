@@ -390,7 +390,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                   languageID: languageId,
                   languageName: languageName,
                   version: version,
-                  isRTL: false,
+                  isRTL: false, // rrb: how do we know this? possible source of losing RTL flag?
                   font: displayFont,
                   oskFont: oskFont,
                   isCustom: false))
@@ -434,6 +434,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 throw KMPError.copyFiles
               }
               Manager.shared.addKeyboard(keyboard)
+                break
             }
           }
         }
