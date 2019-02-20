@@ -21,7 +21,13 @@
       <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
+		<style> 
+			* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />;
+			  } 
+		</style>
+        <title>
+			<xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/>
+		</title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>jquery.min.js</xsl:attribute><xsl:text> </xsl:text></script>
