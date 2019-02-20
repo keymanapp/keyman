@@ -617,10 +617,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 log.error("Error saving the download: \(error)")
                 throw KMPError.copyFiles
               }
-                if !haveInstalledOne {
-                    Manager.shared.addKeyboard(keyboard)
-                    haveInstalledOne = true
-                }
+              if !haveInstalledOne {
+                Manager.shared.addKeyboard(keyboard)
+                haveInstalledOne = true
+              }
             }
           }
         }
