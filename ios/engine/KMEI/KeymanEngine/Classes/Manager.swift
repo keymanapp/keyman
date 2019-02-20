@@ -586,6 +586,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
               throw KMPError.fileSystem
             }
             
+            var haveInstalledOne = false
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               
@@ -614,8 +615,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 log.error("Error saving the download: \(error)")
                 throw KMPError.copyFiles
               }
-              Manager.shared.addKeyboard(keyboard)
-                break
+                if !haveInstalledOne {
+                    Manager.shared.addKeyboard(keyboard)
+                    haveInstalledOne = true
+                }
             }
           }
         }
