@@ -5,8 +5,6 @@
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
 
-///<reference path="transcription.ts" />
-
 namespace com.keyman.text {
   class TextTransform implements Transform {
     readonly insert: string;
@@ -20,6 +18,27 @@ namespace com.keyman.text {
       if(deleteRight) {
         this.deleteRight = deleteRight;
       }
+    }
+  }
+
+  export class Transcription {
+    readonly token: number;
+    readonly keystroke: KeyEvent;
+    readonly transform: Transform;
+    readonly preInput: Mock;
+    readonly removedDks: Deadkey[];
+    readonly insertedDks: Deadkey[];
+
+    private static tokenSeed: number = 0;
+
+    constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, removedDks: Deadkey[], insertedDks: Deadkey[]) {
+      this.token = Transcription.tokenSeed++;
+
+      this.keystroke = keystroke;
+      this.transform = transform;
+      this.preInput = preInput;
+      this.removedDks = removedDks;
+      this.insertedDks = insertedDks;
     }
   }
 
