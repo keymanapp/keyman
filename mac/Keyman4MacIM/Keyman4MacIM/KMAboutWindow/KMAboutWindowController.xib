@@ -42,13 +42,13 @@
                         </constraints>
                     </customView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ln9-LY-e8d">
-                        <rect key="frame" x="20" y="39" width="256" height="15"/>
+                        <rect key="frame" x="20" y="37" width="256" height="15"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="15" id="G4Q-fU-0ZT"/>
                         </constraints>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Version 1.0.100" id="69w-EI-e3y">
                             <font key="font" metaFont="miniSystem"/>
-                            <color key="textColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -56,8 +56,8 @@
                         <rect key="frame" x="20" y="20" width="256" height="11"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Copyright ©2017-2019" id="fjZ-Vg-DtW">
                             <font key="font" metaFont="miniSystem"/>
-                            <color key="textColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sgd-KC-LbG">
@@ -74,7 +74,7 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
-                        <color key="contentTintColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                        <color key="contentTintColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <connections>
                             <action selector="closeAction:" target="-2" id="frJ-pm-Iyg"/>
                         </connections>
@@ -89,7 +89,7 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
-                        <color key="contentTintColor" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                        <color key="contentTintColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <connections>
                             <action selector="configAction:" target="-2" id="3W6-cm-6P5"/>
                         </connections>
@@ -110,7 +110,7 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="miniSystem"/>
                         </buttonCell>
-                        <color key="contentTintColor" name="systemGreenColor" catalog="System" colorSpace="catalog"/>
+                        <color key="contentTintColor" name="linkColor" catalog="System" colorSpace="catalog"/>
                         <connections>
                             <action selector="licenseAction:" target="-2" id="DOO-Wo-6Sv"/>
                         </connections>
@@ -127,15 +127,15 @@
                     <constraint firstItem="xqc-bi-pPI" firstAttribute="leading" secondItem="IcZ-9F-kwH" secondAttribute="trailing" constant="8" symbolic="YES" id="FM1-dK-Ex8"/>
                     <constraint firstItem="i8D-2n-KYh" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="Hlq-gA-2d5"/>
                     <constraint firstItem="IcZ-9F-kwH" firstAttribute="bottom" secondItem="xqc-bi-pPI" secondAttribute="bottom" id="Kz8-go-bM4"/>
-                    <constraint firstAttribute="bottom" secondItem="FYn-ZH-f76" secondAttribute="bottom" priority="750" constant="93" id="L7A-L6-Rcz"/>
+                    <constraint firstAttribute="bottom" secondItem="FYn-ZH-f76" secondAttribute="bottom" priority="750" constant="95" id="L7A-L6-Rcz"/>
                     <constraint firstItem="UOr-Co-IuK" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="8" id="Ovf-6T-VEs"/>
                     <constraint firstItem="UOr-Co-IuK" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Wq2-xT-mCh"/>
                     <constraint firstItem="XIT-T3-xre" firstAttribute="leading" secondItem="xqc-bi-pPI" secondAttribute="trailing" constant="8" symbolic="YES" id="Xu7-qs-jYd"/>
                     <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="UOr-Co-IuK" secondAttribute="bottom" id="ZZw-D6-rjh"/>
                     <constraint firstItem="XIT-T3-xre" firstAttribute="bottom" secondItem="xqc-bi-pPI" secondAttribute="bottom" id="cSa-p4-Xov"/>
                     <constraint firstItem="ln9-LY-e8d" firstAttribute="trailing" secondItem="IcZ-9F-kwH" secondAttribute="trailing" id="dyb-wg-u34"/>
-                    <constraint firstItem="IcZ-9F-kwH" firstAttribute="top" secondItem="ln9-LY-e8d" secondAttribute="bottom" constant="8" symbolic="YES" id="enO-bO-PxF"/>
-                    <constraint firstItem="ln9-LY-e8d" firstAttribute="top" secondItem="i8D-2n-KYh" secondAttribute="bottom" constant="8" symbolic="YES" id="ifk-FX-W2G"/>
+                    <constraint firstItem="IcZ-9F-kwH" firstAttribute="top" secondItem="ln9-LY-e8d" secondAttribute="bottom" constant="6" id="enO-bO-PxF"/>
+                    <constraint firstItem="ln9-LY-e8d" firstAttribute="top" secondItem="i8D-2n-KYh" secondAttribute="bottom" constant="10" id="ifk-FX-W2G"/>
                     <constraint firstItem="FYn-ZH-f76" firstAttribute="top" secondItem="wFc-QI-nGq" secondAttribute="bottom" id="kuI-RR-4wa"/>
                     <constraint firstItem="i8D-2n-KYh" firstAttribute="top" secondItem="FYn-ZH-f76" secondAttribute="bottom" constant="14" id="n5K-FQ-XsJ"/>
                     <constraint firstAttribute="trailing" secondItem="XIT-T3-xre" secondAttribute="trailing" constant="10" id="pJs-ap-Bgn"/>
@@ -147,7 +147,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="132" y="133"/>
+            <point key="canvasLocation" x="31" y="126"/>
         </window>
     </objects>
     <resources>
