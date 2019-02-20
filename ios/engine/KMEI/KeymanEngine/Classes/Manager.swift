@@ -615,7 +615,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 throw KMPError.copyFiles
               }
               Manager.shared.addKeyboard(keyboard)
-                break
             }
           }
         }
