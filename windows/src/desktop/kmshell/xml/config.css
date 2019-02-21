@@ -169,7 +169,8 @@ html
 {
   padding: 4px 4px 0 0;
   float: right;
-  font-size: 12px;  
+  font-size: 12px; 
+  font-weight: normal;
 }
 .helplinks a
 {
