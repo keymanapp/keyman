@@ -85,6 +85,13 @@ describe('OutputTarget Mocking', function() {
 
   describe('The "Mock" output target', function() {
     describe('Initialization', function() {
+      it('properly initializes from a raw string', function() {
+        var mock = new com.keyman.text.Mock(MockTests.Apple.mixed);
+
+        assert.equal(mock.getText(), MockTests.Apple.mixed);
+        assert.equal(mock.getDeadkeyCaret(), 5);
+      });
+
       it('copies an existing OutputTarget without a text selection', function() {
         var base = MockTests.setupBase(4);
         

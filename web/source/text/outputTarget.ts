@@ -1,9 +1,11 @@
 // Defines KMW's string extension functions.
 ///<reference path="../text/kmwstring.ts" />
-// Makes TS aware of Window-based type prototypes
-///<reference path="../kmwexthtml.ts" />
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
+// Defines relevant LMLayer-related interfaces.
+///<reference path="../includes/lmMsgs.d.ts" />
+// Defines the KeyEvent type.
+///<reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
   class TextTransform implements Transform {
@@ -14,10 +16,7 @@ namespace com.keyman.text {
     constructor(insert: string, deleteLeft: number, deleteRight?: number) {
       this.insert = insert;
       this.deleteLeft = deleteLeft;
-
-      if(deleteRight) {
-        this.deleteRight = deleteRight;
-      }
+      this.deleteRight = deleteRight || 0;
     }
   }
 
@@ -26,6 +25,9 @@ namespace com.keyman.text {
     readonly keystroke: KeyEvent;
     readonly transform: Transform;
     readonly preInput: Mock;
+
+    // While not presently needed, there's a chance we'll want to have this information tracked
+    // for developments later down the line.  May as well resolve the logic now.
     readonly removedDks: Deadkey[];
     readonly insertedDks: Deadkey[];
 
@@ -118,6 +120,9 @@ namespace com.keyman.text {
 
     buildTranscriptionFrom(original: Mock, keyEvent: KeyEvent): Transcription {
       let transform = this.buildTransformFrom(original);
+
+      // While not presently needed, there's a chance we'll want to have Deadkey mutation tracked
+      // for developments later down the line.  May as well resolve the logic now.
 
       // Determine what deadkeys were removed and added.
       let fromDks = original.deadkeys().toSortedArray();
@@ -242,7 +247,8 @@ namespace com.keyman.text {
       super();
 
       this.text = text ? text : "";
-      this.caretIndex = caretPos ? caretPos : 0;
+      var defaultLength = this.text._kmwLength();
+      this.caretIndex = caretPos ? caretPos : defaultLength;
     }
 
     // Clones the state of an existing EditableElement, creating a Mock version of its state.
@@ -277,6 +283,13 @@ namespace com.keyman.text {
 
     getDeadkeyCaret(): number {
       return this.caretIndex;
+    }
+
+    setDeadkeyCaret(index: number) {
+      if(index < 0 || index > this.text._kmwLength()) {
+        throw new Error("Provided caret index is out of range.");
+      }
+      this.caretIndex = index;
     }
 
     getTextBeforeCaret(): string {
