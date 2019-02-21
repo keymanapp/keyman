@@ -464,9 +464,15 @@ procedure TframeTouchLayoutBuilder.Save(const AFilename: string);
 var
   s: string;
 begin
+  if (FFilename = '') and (AFilename <> '') then
+  begin
+    Load(AFilename, not FileExists(AFilename), False);
+  end;
+
   if not IsModified and FileExists(AFilename) then   // I4047   // I4147
     Exit;
   s := GetLayoutJS;
+
   if s = '' then
     Exit;
   FSavedLayoutJS := s;

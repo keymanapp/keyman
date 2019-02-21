@@ -370,7 +370,6 @@ begin
     try
       BaseFileName := FGlobalProject.FileName;
       FileType := FileTypeFromParamType;
-      if FileType = ftOther then Exit;
 
       if ShowModal = mrOk then
       begin
@@ -385,7 +384,6 @@ begin
   begin
     { locate an existing file, add it to the project }
     FFileType := FileTypeFromParamType;
-    if FFileType = ftOther then Exit;
 
     dlgOpenFile.Filter := GetFileTypeFilter(FFileType, FDefaultExtension);
     dlgOpenFile.DefaultExt := FDefaultExtension;

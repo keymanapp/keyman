@@ -1,5 +1,6 @@
 ./keyman_config/icons/* /usr/share/keyman/icons/
 debian/km-config.desktop /usr/share/applications
+debian/com.keyman.config.appdata.xml /usr/share/metainfo
 ./icons/24/km-config.png /usr/share/icons/hicolor/24x24/apps/
 ./icons/32/km-config.png /usr/share/icons/hicolor/32x32/apps/
 ./icons/48/km-config.png /usr/share/icons/hicolor/48x48/apps/
