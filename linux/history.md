@@ -7,7 +7,7 @@
 * update readme about launchpad (#1574)
 
 ## 2019-02-18 11.0.109 beta
-* add appstream appdata file for keyman-config (#1543)
+* create appstream appdata for keyman-config (#1543)
 
 ## 2019-02-15 11.0.108 beta
 * handle keyboard package install/uninstall when languages aren't defined (#1585)
