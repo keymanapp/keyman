@@ -170,7 +170,6 @@ html
   padding: 4px 4px 0 0;
   float: right;
   font-size: 12px;  
- //   font: 12px Tahoma;
 }
 .helplinks a
 {
@@ -768,7 +767,6 @@ th
   margin: 6px 0px 0 10px;
   font-size: 12pt !important;
   font-weight: bold;
-//  font-family: Calibri !important;
   height: 32px !important;
   background: #0AB8A0;
   color: white;
@@ -799,16 +797,14 @@ th
 {
   clear: left;
   float: left;
-//  font: bold 11px Tahoma;
   font-size: 11px;
-  font-style: bold;
+  font-weight: bold;
   color: #333;
 }
 .support_line_content
 {
   float: left;
   margin-left: 20px;
-//  font: 11px Tahoma;
   font-size: 11px;
   color: black;
 }
@@ -827,7 +823,6 @@ th
 }
 .support_content_header
 {
-//  font: 16px Tahoma;
   font-size: 16px;
   margin: 10px 0;
   color: #333;
@@ -865,7 +860,6 @@ th
 
 #pro_content {
   padding: 5px 20px 5px 20px;
-//  font-family: Calibri !important;
 }
 
 .pro_title {
@@ -893,7 +887,6 @@ th
 #pro_upgrade_button_bottom input {
   font-size: 14pt !important;
   font-weight: bold;
-//  font-family: Calibri !important;
   height: 32px !important;
   background: #0AB8A0;
   color: white;
@@ -907,7 +900,6 @@ th
 #pro_content p {
   font-size: 14pt;
   color: #444444;
-//  font-family: Calibri;
   font-weight: bold;
 }
 
@@ -921,7 +913,6 @@ th
   border: solid 1px #cccccc;
   font-size: 11pt;
   padding: 4px 8px;
-//  font-family: Calibri !important;
 }
 
 #pro_features th {
