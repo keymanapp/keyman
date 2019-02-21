@@ -1,1 +1,1 @@
-///<reference path="../../../common/predictive-text/build/index.d.ts" />
+///<reference path="../../../common/predictive-text/message.d.ts" />
