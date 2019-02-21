@@ -177,10 +177,17 @@ def install_kmp_shared(inputfile, online=False):
 				name, ext = os.path.splitext(f['name'])
 				ldmlfile = os.path.join(packageDir, name+".ldml")
 				output_ldml(ldmlfile, ldml)
-				# Special handling of icon to convert to PNG
 			elif ftype == KMFileTypes.KM_ICON:
+				# Special handling of icon to convert to PNG
 				logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 				checkandsaveico(fpath)
+			elif ftype == KMFileTypes.KM_KMX:
+				# Sanitize keyboard filename if not lower case
+				kmx_id, ext = os.path.splitext(os.path.basename(f['name']))
+				for kb in keyboards:
+					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
+						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+
 		for kb in keyboards:
 			# install all kmx for first lang not just packageID
 			kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
