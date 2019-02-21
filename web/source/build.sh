@@ -46,6 +46,15 @@ EMBED_TARGET=( "keyman.js" )
 echo "Node.js + dependencies check"
 npm install --no-optional
 
+# Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
+cd ../../common/predictive-text/
+echo ""
+echo "Compiling the Language Modeling layer module..."
+./build.sh || fail "Failed to compile the language modeling layer module."
+echo "Language Modeling layer compilation successful."
+echo ""
+cd ../../web/source
+
 if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 fi
