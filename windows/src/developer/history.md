@@ -1,5 +1,7 @@
 # Keyman Developer Version History
 
+## 12.0 alpha
+
 ## 2019-02-14 11.0.1308.0 beta
 * Change: Adds option to check filename conventions (#1549)
 * Bug fix: Developer does not focus the text editor automatically after load (#1582)

@@ -1,16 +1,12 @@
-namespace com.keyman {
-  export class KeyEvent {
-      Ltarg: HTMLElement;
-      Lcode: number;
-      Lstates: number;
-      LmodifierChange: boolean;
-      Lmodifiers: number;
-      LisVirtualKeyCode: boolean;
-      LisVirtualKey: boolean;
-      vkCode: number
-  };
+/// <reference path="text/outputTarget.ts" />
 
+namespace com.keyman {
   export class AttachmentInfo {
+    /**
+     * Provides the core interface between the DOM and the actual keyboard.
+     */
+    interface:      text.OutputTarget;
+
     /**
      * Tracks the control's independent keyboard selection, when applicable.
      */
@@ -29,32 +25,10 @@ namespace com.keyman {
      */
     touchEnabled:   boolean;
 
-    constructor(kbd: string, touch: boolean) {
+    constructor(eleInterface: text.OutputTarget, kbd: string, touch?: boolean) {
+      this.interface = eleInterface;
       this.keyboard = kbd;
-      this.touchEnabled = touch;
-    }
-  }
-
-  export class LegacyKeyEvent {
-    Ltarg: HTMLElement;
-    Lcode: number;
-    Lmodifiers: number;
-    LisVirtualKey: number;
-  }
-
-  export class KeyInformation {
-    vk: boolean;
-    code: number;
-    modifiers: number;
-  }
-
-  export class StyleCommand {
-    cmd: string;
-    state: number;
-
-    constructor(c: string, s:number) {
-      this.cmd = c;
-      this.state = s;
+      this.touchEnabled = touch || false;
     }
   }
 }

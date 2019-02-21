@@ -1,5 +1,8 @@
 # Keyman for Linux Version History
 
+## 12.0 alpha
+* Started work on Keyman for Linux 12
+
 ## 2019-02-18 11.0.109 beta
 * create appstream appdata for keyman-config (#1543)
 

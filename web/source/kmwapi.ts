@@ -1,7 +1,7 @@
 /// <reference path="closure.ts" />
 /// <reference path="kmwbase.ts" />
 /// <reference path="kmwutils.ts" />
-/// <reference path="kmwcallback.ts" />
+/// <reference path="text/kbdInterface.ts" />
 
 /**
  * This file generates aliases linking renamed functions to some of our published developer API for KMW.
@@ -25,7 +25,7 @@
 
 // Keyboard callbacks
 (function() {
-  let prototype = com.keyman.KeyboardInterface.prototype;
+  let prototype = com.keyman.text.KeyboardInterface.prototype;
 
   var exportKBCallback = function(miniName: string, longName: string) {
     prototype[miniName] = prototype[longName];

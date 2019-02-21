@@ -1,5 +1,7 @@
 # Keyman Desktop Version History
 
+## 12.0 alpha
+
 ## 2019-02-13 11.0.1308.0 beta
 * Bug Fix: Upgrading from 9.0 to 11.0 did not preserve keyboards and settings (#1548)
 

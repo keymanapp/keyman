@@ -1,5 +1,13 @@
 # KeymanWeb Version History
 
+## 12.0 alpha
+* Resumed TypeScript conversion work, resulting in significant internal restructuring and reorganization while leaving our published API intact.
+  * Mobile web "touch alias" elements have been refactored into their own type.
+  * Heavily reorganizes and refactors the keystroke processing engine of KMW.
+    * Attachment to all supported element types has now been abstracted, splitting keystroke processing from related DOM management.
+    * Centralizes code paths to improve parity between hardware and OSK-based keystrokes.
+  * In both cases above, significant unit testing was facilitated and has been added as a result, further improving code maintainability into the future.
+
 ## 2019-01-04 11.0.202 beta
 * Bug Fix:
   * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
@@ -32,6 +40,7 @@
   * Fixed multiple issues on iOS (#1393)
   * Fixed issues with language duplication in toolbar UI (#1284)
   * Fixed crashes (#1057)
+  * Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#1452)
 
 ## 2018-07-06 10.0.103 stable
 * Fixes issue for embedded Android, iOS apps where a keyboard with varying row counts in different layers could crash (#1055)

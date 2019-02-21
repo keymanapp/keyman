@@ -163,7 +163,7 @@ namespace km {
 
         state->actions().commit();
       }
-      catch (std::bad_alloc)
+      catch (std::bad_alloc &)
       {
         state->actions().clear();
         return KM_KBP_STATUS_NO_MEM;

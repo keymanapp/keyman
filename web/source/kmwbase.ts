@@ -5,11 +5,15 @@
 // Defines build-environment includes, since `tsc` doesn't provide a compile-time define.
 /// <reference path="environment.inc.ts" />
 // Defines the web-page interface object.
+/// <reference path="singleton.ts" />
+// Defines the core text processor.
+/// <reference path="text/processor.ts" />
+// Defines the web-page interface object.
 /// <reference path="kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
 // Defines the keyboard callback object.
-/// <reference path="kmwcallback.ts" />
+/// <reference path="text/kbdInterface.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="kmwkeyboards.ts" />
 // Defines built-in keymapping.
@@ -18,6 +22,8 @@
 /// <reference path="kmwhotkeys.ts" />
 // Defines the ui management code that tracks UI activation and such.
 /// <reference path="kmwuimanager.ts" />
+// Defines OSK management code.
+/// <reference path="osk/oskManager.ts" />
 
 /***
    KeymanWeb 11.0
@@ -40,10 +46,11 @@ namespace com.keyman {
     globalKeyboard = null;     // Indicates the currently-active keyboard for controls without independent keyboard settings.
     globalLanguageCode = null; // Indicates the language code corresponding to `globalKeyboard`.
     isEmbedded = false;        // Indicates if the KeymanWeb instance is embedded within a mobile app.
-                                // Blocks full page initialization when set to `true`.
+                               // Blocks full page initialization when set to `true`.
     refocusTimer = 0;          // Tracks a timeout event that aids of OSK modifier/state key tracking when the document loses focus.
 
     initialized: number;       // Signals the initialization state of the KeymanWeb system.
+    isHeadless = false;        // Indicates that KMW lacks any access to the DOM.  Nothing yet implemented for '= true'.
     'build' = 300;           // TS needs this to be defined within the class.
 
     // Used as placeholders during initialization.
@@ -56,14 +63,15 @@ namespace com.keyman {
 
     // Internal objects
     ['util']: Util;
-    ['osk']: any;
+    ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
-    ['interface']: KeyboardInterface;
+    ['interface']: text.KeyboardInterface;
     keyboardManager: KeyboardManager;
     domManager: DOMManager;
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
     keyMapManager: KeyMapManager;
+    textProcessor: text.Processor;
 
     touchAliasing: DOMEventHandlers;
 
@@ -101,15 +109,16 @@ namespace com.keyman {
     constructor() {
       // Allow internal minification of the public modules.
       this.util = this['util'] = new Util(this);
-      window['KeymanWeb'] = this.interface = this['interface'] = new KeyboardInterface(this);
-      this.osk = this['osk'] = {ready:false};
-      this.ui = this['ui'] = null;
+      window['KeymanWeb'] = this.interface = this['interface'] = new text.KeyboardInterface();
+      this.osk = this['osk'] = new com.keyman.osk.OSKManager();
+      this.ui = this['ui'] = {};
 
       this.keyboardManager = new KeyboardManager(this);
       this.domManager = new DOMManager(this);
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);
       this.keyMapManager = new KeyMapManager();
+      this.textProcessor = new text.Processor();
 
       // Load properties from their static variants.
       this['build'] = KeymanBase.__BUILD__;
@@ -136,6 +145,10 @@ namespace com.keyman {
      * multiple times to test the different initialization paths.
      */
     ['shutdown']() {
+      // Disable page focus/blur events, which can sometimes trigger and cause parallel KMW instances in testing.
+      this.util.detachDOMEvent(window, 'focus', this['pageFocusHandler'], false);
+      this.util.detachDOMEvent(window, 'blur', this['pageFocusHandler'], false);
+
       this.domManager.shutdown();
       this.osk.shutdown();
       this.util.shutdown();
@@ -306,11 +319,12 @@ namespace com.keyman {
     /**
      * Function    getActiveLanguage
      * Scope       Public
+     * @param      {boolean=}        true to retrieve full language name, false/undefined to retrieve code.
      * @return     {string}         language code
      * Description Return language code for currently selected language
      */    
-    ['getActiveLanguage'](): string {
-      return this.keyboardManager.getActiveLanguage();
+    ['getActiveLanguage'](fullName?: boolean): string {
+      return this.keyboardManager.getActiveLanguage(fullName);
     }
 
     ['isAttached'](x: HTMLElement): boolean {
@@ -558,6 +572,24 @@ namespace com.keyman {
     // Functions that might be added later
     ['beepKeyboard']: () => void;
     ['oninserttext']: (dn: number, s: string) => void;
+
+    /**
+     * Create copy of the OSK that can be used for embedding in documentation or help
+     * The currently active keyboard will be returned if PInternalName is null
+     *
+     *  @param  {string}          PInternalName   internal name of keyboard, with or without Keyboard_ prefix
+     *  @param  {number}          Pstatic         static keyboard flag  (unselectable elements)
+     *  @param  {string=}         argFormFactor   layout form factor, defaulting to 'desktop'
+     *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
+     *  @return {Object}                          DIV object with filled keyboard layer content
+     */
+    ['BuildVisualKeyboard'](PInternalName, Pstatic, argFormFactor, argLayerId): HTMLElement {
+      if(this.osk.vkbd) {
+        return this.osk.vkbd.buildDocumentationKeyboard(PInternalName, Pstatic, argFormFactor, argLayerId);
+      } else {
+        return null;
+      }
+    }
   }
 }
 
@@ -596,17 +628,6 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
      * We only recreate the 'keyman' object if it's not been loaded.
      * As this is the base object, not creating it prevents a KMW system reset.
      */
-    var keymanweb = window['keyman'] = new KeymanBase();
-    
-    // Define public OSK, user interface and utility function objects 
-
-    var osk: any = keymanweb['osk'];
-    var ui: any = keymanweb['ui'] = {};
-    
-    osk.highlightSubKeys = function(k,x,y){}
-    osk.createKeyTip = function(){}
-    osk.optionKey = function(e,keyName,keyDown){}
-    osk.showKeyTip = function(key,on){}  
-    osk.waitForFonts = function(kfd,ofd){return true;}
+    window['keyman'] = com.keyman.singleton = new KeymanBase();
   })();
 }
