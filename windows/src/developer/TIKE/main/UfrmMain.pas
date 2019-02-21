@@ -974,7 +974,7 @@ begin
       finally
         EndDockLoading;
       end;
-    end;
+    end;
   finally
     Free;
   end;

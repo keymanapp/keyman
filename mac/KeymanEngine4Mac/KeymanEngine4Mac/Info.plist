@@ -15,13 +15,15 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>10.0.0</string>
+	<string>Keyman Engine $(PRODUCT_VERSION) for macOS</string>
+	<key>CFBundleGetInfoString</key>
+	<string>$(GET_INFO_STRING)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>10.0.0</string>
+	<string>$(PRODUCT_VERSION)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2017 SIL International. All rights reserved.</string>
+	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
