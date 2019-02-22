@@ -386,18 +386,9 @@ namespace com.keyman.text {
           }
         }
 
-        // Prevent any output from 'ghost' (unmapped) keys
-        if(keyName != 'K_SPACE') {
-          var keyText=(<HTMLElement> e.childNodes[0]).innerHTML;
-          //// if(keyText == '' || keyText == '&nbsp;') return true; --> why?
-        }
-
         keyman.uiManager.setActivatingUI(true);
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
-        if(keyman.domManager._IsMozillaEditableIframe(<HTMLIFrameElement> Lelem,0)) {
-          Lelem = (<HTMLIFrameElement> Lelem).contentDocument.documentElement;
-        }
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
 
         // ...end I3363 (Build 301)
