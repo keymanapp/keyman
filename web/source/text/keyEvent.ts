@@ -6,6 +6,8 @@ namespace com.keyman.text {
     LmodifierChange?: boolean;
     Lmodifiers: number;
     LisVirtualKey: boolean;
-    vkCode: number
+    vkCode: number;
+    kName: string;
+    kLayer?: string;
   };
 }

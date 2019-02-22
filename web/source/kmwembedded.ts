@@ -522,7 +522,7 @@ namespace com.keyman.osk {
       Lcode: code,
       Lstates: lstates,
       LisVirtualKey: true,
-      LisVirtualKeyCode: false
+      kName: ''
     }; 
 
     let Processor = com.keyman.text.Processor;
