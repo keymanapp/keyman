@@ -2,7 +2,7 @@
 <!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
 <Locale Version="10.0.1100.0" OnlineProductID="30">
   <String Type="PlainText" Id="S_LocaleAuthors">www.ಸಿರಿಗನ್ನಡ.com (www.sirigannada.com)</String>
-  <String Type="PlainText" Id="SK_UIFontName">&quot;Noto Sans Kannada&quot;</String>
+  <String Type="PlainText" Id="SK_UIFontName">Noto Sans Kannada</String>
   <String Type="PlainText" Id="SK_UIFontSize">10</String>
   <String Type="PlainText" Id="S_ShortProductName">&Name_CNV;</String>
   <String Type="PlainText" Id="S_Yes">ಹೌದು</String>
