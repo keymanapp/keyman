@@ -319,8 +319,8 @@ namespace com.keyman.text {
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
-      s.LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
-      s.LisVirtualKey = s.LisVirtualKeyCode || e.type != 'keypress';
+      var LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
+      s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
       
       return s;
     }
@@ -624,7 +624,7 @@ namespace com.keyman.text {
      * @return      {boolean}                 Always true
      * Description  Updates the current shift state within KMW, updating the OSK's visualization thereof.
      */
-    _UpdateVKShift(e, v: number, d: boolean|number): boolean {
+    _UpdateVKShift(e: KeyEvent, v: number, d: boolean|number): boolean {
       var keyShiftState=0, lockStates=0, i;
       let keyman = com.keyman.singleton;
 
