@@ -1,5 +1,11 @@
 # Keyman for Linux Version History
 
+## 2019-02-22 11.0.111 beta
+* use lowercase ID and kmx filenames when installing .kmp packages (#1601)
+
+## 2019-02-20 11.0.110 beta
+* update readme about launchpad (#1574)
+
 ## 2019-02-18 11.0.109 beta
 * create appstream appdata for keyman-config (#1543)
 
