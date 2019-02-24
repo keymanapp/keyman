@@ -5,7 +5,7 @@
   Description:      
   Create Date:      23 Aug 2006
 
-  Modified Date:    4 Nov 2014
+  Modified Date:    24 Feb 2019
   Authors:          mcdurdin
   Related Files:    
   Dependencies:     
@@ -24,6 +24,7 @@
                     08 Jun 2012 - mcdurdin - I3310 - V9.0 - Unicode in Delphi fixes
                     28 Feb 2014 - mcdurdin - I4098 - V9.0 - OSK is still 8.0 style
                     04 Nov 2014 - mcdurdin - I4488 - V9.0 - The character map is not falling back to system fonts well when Code2000 missing
+                    24 Feb 2019 - mayura   - V11.0 - Removed font fallback and coloring code, since it is not required in windows 7 and above
 *)
 unit CleartypeDrawCharacter;
 
@@ -136,11 +137,9 @@ type
       cch: Integer; FitRect, Uniscribe: Boolean): HRESULT;
     procedure CreateFonts;
     procedure SetShowPrefix(const Value: Boolean);
-    function SelectSupportedFontForText(Handle: THandle; const Text: WideString): Boolean;
     function GetGlyphIndex(Handle: THandle; const Text: WideString;
       var Index: Integer): Boolean;
     function SelectFont(Handle: THandle; FFont: TClearTypeFont): THandle;
-    procedure SelectFallbackFont(Handle: THandle; const Text: WideString);
     procedure FreeFonts;
   public
     constructor Create;
@@ -205,7 +204,6 @@ function TClearTypeDrawCharacter.CalcTextSize(Handle: THandle; ARect: TRect;
       end;
 begin
   SelectFont(Handle, ctfSelected);
-  SelectSupportedFontForText(Handle, Text);
   Result := DoCalcTextSize;
 end;
 
@@ -321,37 +319,6 @@ begin
   end;
 end;
 
-procedure TClearTypeDrawCharacter.SelectFallbackFont(Handle: THandle; const Text: WideString);
-var
-  uc: DWord;
-begin
-  try
-    uc := Char.ConvertToUtf32(Text, 0);  // I3310
-  except
-    on E:EArgumentOutOfRangeException do
-      uc := $FFFD;  // Not a character, invalid Unicode
-  end;
-  if uc < $10000 then      SelectFont(Handle, ctfCode2000)
-  else if uc < $20000 then SelectFont(Handle, ctfCode2001)
-  else if uc < $30000 then SelectFont(Handle, ctfCode2002)
-  else
-  begin
-    SelectFont(Handle, ctfSelected);
-    Exit;
-  end;
-  SetTextColor(Handle, ColorToRGB(clBlue));
-end;
-
-function TClearTypeDrawCharacter.SelectSupportedFontForText(Handle: THandle; const Text: WideString): Boolean;
-var
-  ch: Integer;
-begin
-  Result := True;
-  if not GetGlyphIndex(Handle, Text, ch) then
-    Result := False
-  else if ch = $FFFF then
-    SelectFallbackFont(Handle, Text);
-end;
 
 procedure TClearTypeDrawCharacter.DrawText(Handle: THandle; TextAlign, X, Y: Integer; ARect: TRect; const Text: WideString; Fit: Boolean = False; Uniscribe: Boolean = False);
 var
@@ -367,9 +334,6 @@ begin
   hOrigFont := SelectFont(Handle, ctfSelected); // SelectObject(Handle, hFonts[FSelectedFont]);
 
   { Draw character[s] }
-
-  if not SelectSupportedFontForText(Handle, Text) then
-    SetTextColor(Handle, ColorToRGB(clRed));
 
   FOldAlign := SetTextAlign(Handle, TextAlign); // TA_CENTER or TA_TOP);
 
@@ -428,9 +392,6 @@ begin
   hOrigFont := SelectFont(Handle, ctfSelected);
 
   { Draw character[s] }
-
-  if not SelectSupportedFontForText(Handle, Text) then
-    SetTextColor(Handle, ColorToRGB(clRed));
 
   GetTextExtentPoint32W(Handle, PWideChar(Text), Length(Text), sz);
 
