@@ -1,7 +1,19 @@
 # Keyman Desktop Version History
 
-## 2019-02-13 11.0.1308.0 beta
+## 2019-02-21 11.0.1312.0 beta
+* Bug Fix: Make sure backspace in Word (TSF) deletes both halves of surrogate pair for supplementary multilingual plane scripts (#1603)
+
+## 2019-02-20 11.0.1311.0 beta
+* Minor tweaks to Kannada localization (#1598)
+
+## 2019-02-19 11.0.1310.0 beta
+* No changes to Keyman Desktop
+
+## 2019-02-15 11.0.1309.0 beta
 * Bug Fix: Upgrading from 9.0 to 11.0 did not preserve keyboards and settings (#1548)
+
+## 2019-02-14 11.0.1308.0 beta
+* No changes to Keyman Desktop
 
 ## 2019-02-01 11.0.1307.0 beta
 * No changes to Keyman Desktop

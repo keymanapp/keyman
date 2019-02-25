@@ -1,15 +1,27 @@
 # KeymanWeb Version History
 
+## 2019-02-25 11.0.208 beta
+* KeymanWeb now works again in Safari on iOS 9.3.5 (#1588)
+
+## 2019-01-18 11.0.206 beta
+* Change: Update beta version and remove hardcoded version strings (#1537)
+
+## 2019-01-17 11.0.205 beta
+* New Feature: The `displayUnderlying` flag for showing base layout key caps is now available per-platform. (#1539)
+* Bug Fix: Fix missing text on spacebar and update Karma version (#1540)
+
+## 2019-01-15 11.0.204 beta
+* No changes
+
+## 2019-01-11 11.0.203 beta
+* Add default mapping for K_oE2 (102nd key) (#1491)
+
 ## 2019-01-04 11.0.202 beta
-* Bug Fix:
-  * Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
+* Bug Fix: Fixed external keyboard keys "tab" and "backspace" for embedded platforms (#1474)
 
 ## 2019-01-03 11.0.201 beta
-* New Feature:
-  * Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
-
-* Bug Fix:
-  * Fixed keyboard layer transition bug on mobile devices. (#978)
+* New Feature: Adds the alignInputs() API function to facilitate touch-alias element work-arounds in case of future issues. (#69)
+* Bug Fix: Fixed keyboard layer transition bug on mobile devices. (#978)
 
 ## 2019-01-02 11.0.200 beta
 * Initial beta release of KeymanWeb 11
