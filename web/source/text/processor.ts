@@ -8,9 +8,11 @@ namespace com.keyman.text {
     Lstates: number;
     LmodifierChange?: boolean;
     Lmodifiers: number;
-    LisVirtualKeyCode?: boolean;
     LisVirtualKey: boolean;
-    vkCode: number
+    vkCode: number;
+    kName: string;
+    kLayer?: string;
+    kNextLayer?: string;
   };
 
   export class LegacyKeyEvent {
