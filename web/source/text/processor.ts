@@ -58,6 +58,7 @@ namespace com.keyman.text {
 
       let keyman = com.keyman.singleton;
       let domManager = keyman.domManager;
+      let activeKeyboard = keyman.keyboardManager.activeKeyboard;
 
       var ch = '', checkCodes = false;
       var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
@@ -81,7 +82,7 @@ namespace com.keyman.text {
         switch(code) {
           case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
             keyman.interface.defaultBackspace();
-            break;
+            return '';
           case Codes.keyCodes['K_TAB']:
             domManager.moveToNext(keyShiftState);
             break;
@@ -146,13 +147,29 @@ namespace com.keyman.text {
           //     kbdInterface.defaultBackspace();
           //   }
         }
+      } else if(Lkc.Lcode == 8) {  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
+        keyman.interface.defaultBackspace();
+        return '';
+      }
+
+      // Translate numpad keystrokes into their non-numpad equivalents
+      // TODO:  Make part of 'defaultKeyOutput'.
+      if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {
+        // Number pad, numlock on
+        if(Lkc.Lcode < 106) {
+          var Lch = Lkc.Lcode-48;
+        } else {
+          Lch = Lkc.Lcode-64;
+        }
+        ch = String._kmwFromCharCode(Lch); //I3319
+        return ch;
       }
 
       // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
 
       // Test for fall back to U_xxxxxx key id
       // For this first test, we ignore the keyCode and use the keyName
-      if((keyName.substr(0,2) == 'U_')) {
+      if(keyName && keyName.substr(0,2) == 'U_') {
         var codePoint = parseInt(keyName.substr(2,6), 16);
         if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
           // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
@@ -202,7 +219,7 @@ namespace com.keyman.text {
       }
     }
 
-    clickKey_GetKeyEventProperties(e: osk.KeyElement, Lelem: HTMLElement) {
+    _GetClickEventProperties(e: osk.KeyElement, Lelem: HTMLElement): KeyEvent {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
@@ -235,7 +252,8 @@ namespace com.keyman.text {
         LisVirtualKey: true,
         vkCode: 0,
         kName: keyName,
-        kLayer: layer
+        kLayer: layer,
+        kNextLayer: e['key'].spec['nextlayer']
       };
 
       // Set the flags for the state keys.
@@ -312,14 +330,12 @@ namespace com.keyman.text {
       let formFactor = keyman.util.device.formFactor;
 
       if(Lelem != null) {
-        var nextLayer: string = e['key'].spec['nextlayer'];
-
         keyman.domManager.initActiveElement(Lelem);
 
         // Turn off key highlighting (or preview)
         keyman['osk'].vkbd.highlightKey(e,false);
 
-        let Lkc = this.clickKey_GetKeyEventProperties(e, Lelem);
+        let Lkc = this._GetClickEventProperties(e, Lelem);
 
         // Exclude menu and OSK hide keys from normal click processing
         if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {
@@ -330,7 +346,7 @@ namespace com.keyman.text {
         // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
         // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
         if(formFactor == 'desktop') {
-          if(this.selectLayer(Lkc.kName, nextLayer)) {
+          if(this.selectLayer(Lkc.kName, Lkc.kNextLayer)) {
             return true;
           }
         }
@@ -363,8 +379,7 @@ namespace com.keyman.text {
         }
 
         // Swap layer as appropriate.
-        //this.nextLayer = nextLayer; // Is it safe to remove this?
-        this.selectLayer(Lkc.kName, nextLayer);
+        this.selectLayer(Lkc.kName, Lkc.kNextLayer);
 
         /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
       }
@@ -806,20 +821,19 @@ namespace com.keyman.text {
      *                LisVirtualKeyCode e.g. ctrl/alt key
      *                LisVirtualKey     e.g. Virtual key or non-keypress event
      */    
-    _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean) {
-      var s = new KeyEvent();
+    _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean): KeyEvent {
       let keyman = com.keyman.singleton;
+      var s = new KeyEvent();
 
       e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
+      if(e.cancelBubble === true) {
+        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
+      }    
+
       s.Ltarg = keyman.util.eventTarget(e) as HTMLElement;
       if (s.Ltarg == null) {
         return null;
-      }
-      if(e.cancelBubble === true) {
-        return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
-      }      
-
-      if (s.Ltarg.nodeType == 3) {// defeat Safari bug
+      } else if (s.Ltarg.nodeType == 3) {// defeat Safari bug
         s.Ltarg = s.Ltarg.parentNode as HTMLElement;
       }
 
@@ -1013,27 +1027,21 @@ namespace com.keyman.text {
 
       // Positional Layout
       this.swallowKeypress = false;
-      LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
-      
-      // Support backspace in simulated input DIV from physical keyboard where not matched in rule  I3363 (Build 301)
-      if(Levent.Lcode == 8 && !LeventMatched && Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
-        kbdInterface.defaultBackspace();
+      if(activeKeyboard && Levent.Lcode != 0) {
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
       }
 
-      // Translate numpad keystrokes into their non-numpad equivalents
-      // TODO:  Make part of 'defaultKeyOutput'.
-      if(!LeventMatched  &&  Levent.Lcode >= Codes.keyCodes["K_NP0"]  &&  Levent.Lcode <= Codes.keyCodes["K_NPSLASH"] && !activeKeyboard['KM']) {
-        // Number pad, numlock on
-        //      _Debug('KeyPress NumPad code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
-
-        if(Levent.Lcode < 106) {
-          var Lch = Levent.Lcode-48;
-        } else {
-          Lch = Levent.Lcode-64;
+      // To ensure consistency between touch-alias elements and normal elements,
+      // all default text output will be sourced from this method, rather than relying on browser defaults.
+      if(!LeventMatched) {
+        var ch = this.defaultKeyOutput(Levent, Levent.Lmodifiers, false);
+        if(ch) {
+          kbdInterface.output(0, outputTarget, ch);
+          LeventMatched = 1;
+        } else if(Levent.Lcode == 8) { // Backspace
+          // This is needed to prevent jumping to previous page for certain element types, like TouchAliasElements.
+          LeventMatched = 1;
         }
-        kbdInterface.output(0, outputTarget, String._kmwFromCharCode(Lch)); //I3319
-
-        LeventMatched = 1;
       }
 
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
@@ -1043,34 +1051,13 @@ namespace com.keyman.text {
           e.stopPropagation();
         }
         
-        this.swallowKeypress = (e ? this._GetEventKeyCode(e) != 0 : false);
+        this.swallowKeypress = (e && Levent.Lcode != 8 ? this._GetEventKeyCode(e) != 0 : false);
+        if(Levent.Lcode == 8) {
+          this.swallowKeypress = false;
+        }
         return false;
       } else {
         this.swallowKeypress = false;
-      }
-      
-      // Special backspace handling.
-      if(Levent.Lcode == 8) {
-        /* Backspace - delete deadkeys, also special rule if desired? */
-        // This is needed to prevent jumping to previous page, but why???  // I3363 (Build 301)
-        if(Levent.Ltarg.className != null && Levent.Ltarg.className.indexOf('keymanweb-input') >= 0) {
-          return false;
-        }
-
-        if(activeKeyboard['KM']) {
-          this.swallowKeypress = false;
-        }
-      }
-
-      // Default text output emulation (for simulated touch elements)
-      if(typeof((Levent.Ltarg as HTMLElement).base) != 'undefined') {
-        // Simulated touch elements have no default text-processing - we need to rely on a strategy similar to
-        // that of the OSK here.
-        var ch = this.defaultKeyOutput(Levent, Levent.Lmodifiers, false);
-        if(ch) {
-          kbdInterface.output(0, outputTarget, ch);
-          return false;
-        }
       }
 
       return true;

@@ -9,5 +9,6 @@ namespace com.keyman.text {
     vkCode: number;
     kName: string;
     kLayer?: string;
+    kNextLayer?: string;
   };
 }
