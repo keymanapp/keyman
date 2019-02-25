@@ -397,7 +397,11 @@ namespace com.keyman.text {
       if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) {
         // So long as the key name isn't prefixed with 'U_', we'll get a default mapping based on the Lcode value.
         // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
-        let mappingEvent: KeyEvent = Object.assign({}, Lkc);
+        let mappingEvent: KeyEvent = new KeyEvent();
+        for(var key in Lkc) {
+          mappingEvent[key] = Lkc[key];
+        }
+        
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = null;
         var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false);
