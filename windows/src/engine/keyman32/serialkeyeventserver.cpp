@@ -488,8 +488,6 @@ private:
         input.ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
         input.ki.dwFlags = lParam & 0xFFFF;
 
-        SendDebugMessageFormat(0, sdmGlobal, 0, "SerialEventKeyServer: sending key %x %x %x", input.ki.wVk, input.ki.wScan, input.ki.dwFlags);
-
         if (!SendInput(1, &input, sizeof(INPUT))) {
           DebugLastError("SendInput");
         }
