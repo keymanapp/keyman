@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2019-02-25 11.0.1313.0 beta
+* Bug Fix: AltGr causes sticky Left Control when some Windows European layouts are installed. (#1621)
+
 ## 2019-02-21 11.0.1312.0 beta
 * Bug Fix: Make sure backspace in Word (TSF) deletes both halves of surrogate pair for supplementary multilingual plane scripts (#1603)
 
