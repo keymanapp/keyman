@@ -26,7 +26,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       ruleSeq.simulateSequenceOn(inputElem);
 
       // Now for the real test!
-      var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem, ruleDef.rule);
+      var res = keyman.interface.fullContextMatch(ruleDef.n, inputElem._kmwAttachment.interface, ruleDef.rule);
 
       var msg = matchTest.msg;
       if(!msg) {
@@ -38,20 +38,6 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       window['keyman'].resetContext();
     }
   }
-}
-
-var toSupplementaryPairString = function(code){
-  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-  var L = (code - 0x10000) % 0x400 + 0xDC00;
-
-  return String.fromCharCode(H, L);
-}
-
-var toEscapedSupplementaryPairString = function(code){
-  var H = (Math.floor((code - 0x10000) / 0x400) + 0xD800).toString(16);
-  var L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
-
-  return "\\u"+H+"\\u"+L;
 }
 
 /*
@@ -843,7 +829,7 @@ describe('Engine', function() {
         ruleSeq.simulateSequenceOn(inputElem);
 
         // Now for the real test!
-        var res = keyman.interface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem);
+        var res = keyman.interface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem._kmwAttachment.interface);
 
         assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);
 

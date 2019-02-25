@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 12.0 alpha
+* Started work on Keyman Developer 12.
+
 ## 2019-02-25 11.0.1350.0 stable
 * 11.0 Stable release
 

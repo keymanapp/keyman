@@ -1,5 +1,8 @@
 # Keyman for Linux Version History
 
+## 12.0 alpha
+* Started work on Keyman for Linux 12
+
 ## 2019-02-25 11.0.120 stable
 * 11.0 Stable release
 

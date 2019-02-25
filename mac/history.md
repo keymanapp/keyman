@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 12.0 alpha
+* Started work on Keyman for macOS 12.
+
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release
 

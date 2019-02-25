@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 12.0 alpha
+* Started work on Keyman for Android 12.
+
 ## 2019-02-25 11.0.2100 stable
 * 11.0 Stable release
 
