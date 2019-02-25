@@ -1,5 +1,11 @@
 # Keyman for Android
 
+## 2019-02-25 11.0.2100 stable
+* 11.0 Stable release
+
+## 2019-02-15 11.0.2062 beta
+* No changes.
+  
 ## 2019-02-07 11.0.2061 beta
 * Bug fix:
   * Add notifications when keyboard or font fails to download from Keyman cloud (#1570)
