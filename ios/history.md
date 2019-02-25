@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2019-02-25 11.0.320 stable
+* 11.0 Stable release
+
 ## 2019-02-25 11.0.302 beta
 * Keyman now works again on iOS 9.3.5 (#1588)
 

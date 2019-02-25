@@ -1,5 +1,11 @@
 # Keyman Developer Version History
 
+## 2019-02-25 11.0.1350.0 stable
+* 11.0 Stable release
+
+## 2019-02-25 11.0.1313.0 beta
+* No changes to Keyman Developer
+
 ## 2019-02-21 11.0.1312.0 beta
 * Bug fix: Connect buttons to actions in Distribution tab in Project (#1606)
 * Bug fix: Fix crash saving new keyboard when missing files are referenced (#1605)

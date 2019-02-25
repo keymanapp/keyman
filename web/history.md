@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2019-02-25 11.0.220 stable
+* 11.0 Stable release
+
 ## 2019-02-25 11.0.208 beta
 * KeymanWeb now works again in Safari on iOS 9.3.5 (#1588)
 

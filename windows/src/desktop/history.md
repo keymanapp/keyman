@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2019-02-25 11.0.1350.0 stable
+* 11.0 Stable release
+
 ## 2019-02-25 11.0.1313.0 beta
 * Bug Fix: AltGr causes sticky Left Control when some Windows European layouts are installed. (#1621)
 

@@ -1,5 +1,8 @@
 # Keyman for Android
 
+## 2019-02-25 11.0.2100 stable
+* 11.0 Stable release
+
 ## 2019-02-15 11.0.2062 beta
 * No changes.
   
