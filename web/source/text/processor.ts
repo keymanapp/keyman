@@ -355,7 +355,7 @@ namespace com.keyman.text {
       if(Lelem != null) {
         // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
         // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-        var layer=e['key'].spec.layer || '', keyName=e['keyId'].toUpperCase(), keyShiftState=this.getModifierState(keyman['osk'].vkbd.layerId);
+        var layer=e['key'].spec.layer || e['key'].layer || '', keyName=e['keyId'].toUpperCase(), keyShiftState=this.getModifierState(keyman['osk'].vkbd.layerId);
         var nextLayer: string = e['key'].spec['nextlayer'];
 
         keyman.domManager.initActiveElement(Lelem);
