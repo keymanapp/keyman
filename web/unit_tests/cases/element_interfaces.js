@@ -1399,24 +1399,7 @@ describe('Element Input/Output Interfacing', function() {
 
   describe('The "Mock" output target', function() {
     // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
-    // TODO:  This.
-
-    // Test with Input / TextArea source
-    // - with/without pre-existing deadkeys
-    // - with/without existing selected text in the source element
-    // - text operations on the Mock are not aliased / do not affect the source element.
-    describe('Mocking', function() {
-      describe('Initialization', function() {
-        // the Mock's state matches the source element's state
-        // with/without deadkeys
-        // with/without selected text
-      });
-
-      describe('Deep-Copying', function() {
-        // is properly independent of the source element with no cross-effects
-        // with/without deadkeys
-      })
-    });
+    // As those require a very different setup, they're in the target_mocks.js test case file instead.
 
     describe('Text Retrieval', function(){
       describe('getText', function() {
