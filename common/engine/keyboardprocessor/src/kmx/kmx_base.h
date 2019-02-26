@@ -10,7 +10,7 @@
 #define strncasecmp _strnicmp 
 #endif
 
-#if __x86_64__
+#if defined(__LP64__) || defined(_LP64)
 /* 64-bit, g++ */
 #define KMX_64BIT
 #endif
