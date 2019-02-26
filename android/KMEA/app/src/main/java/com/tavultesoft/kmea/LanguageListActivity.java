@@ -640,7 +640,11 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       });
 
     alertDialog = alertDialogBuilder.create();
-    alertDialog.show();
+    if (!((AppCompatActivity)context).isFinishing()) {
+      alertDialog.show();
+    } else {
+      alertDialog.dismiss();
+    }
   }
 
 }
