@@ -258,6 +258,14 @@ namespace com.keyman.text {
         kNextLayer: e['key'].spec['nextlayer']
       };
 
+      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
+      switch(keyName) {
+        case 'K_CAPS':
+        case 'K_NUMLOCK':
+        case 'K_SCROLL':
+          this.stateKeys[keyName] = ! this.stateKeys[keyName];
+      }
+
       // Set the flags for the state keys.
       Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
       Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
@@ -317,6 +325,122 @@ namespace com.keyman.text {
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
+     * Handles default output and keyboard processing for both OSK and physical keystrokes.
+     * 
+     * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
+     */
+    processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement): boolean {
+      let keyman = com.keyman.singleton;
+      //var Lelem = keyman.domManager.getLastActiveElement();
+
+      let fromOSK = !!e; // If specified, it's from the OSK.
+
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      let kbdInterface = keyman.interface;
+      let formFactor = keyman.util.device.formFactor;
+      let keyMapManager = keyman.keyMapManager;
+
+      this.swallowKeypress = false;
+
+      if(fromOSK) {
+        keyman.domManager.initActiveElement(keyEvent.Ltarg);
+
+        // Turn off key highlighting (or preview)
+        keyman['osk'].vkbd.highlightKey(e,false);
+      }
+
+      // Exclude menu and OSK hide keys from normal click processing
+      if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
+        keyman['osk'].vkbd.optionKey(e, keyEvent.kName, true);
+        return true;
+      }
+
+      // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
+      // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
+      if(formFactor == 'desktop' && fromOSK) {
+        // If it's a desktop OSK style and this triggers a layer change,
+        // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
+        if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
+          return true;
+        }
+      }
+
+      // Will handle any non-layer change modifier & state keys, mapping them through the physical keyboard's version
+      // of state management.
+      if(this.doModifierPress(keyEvent, !fromOSK)) {
+        return true;
+      }
+
+      if(!fromOSK && !window.event) {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
+          keyEvent.Lcode=keyMapManager.browserMap.FF['k'+keyEvent.Lcode];
+        }
+      } //else 
+      //{
+      // Safari, IE, Opera?
+      //}
+
+      if(fromOSK) {
+        keyman.uiManager.setActivatingUI(true);
+        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
+        keyman.domManager.focusLastActiveElement();
+        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+      }
+
+      // // ...end I3363 (Build 301)
+      let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
+      var LeventMatched = 0;
+      this.swallowKeypress = false;
+
+      // Pass this key code and state to the keyboard program
+      if(activeKeyboard && keyEvent.Lcode != 0) {
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+      }
+
+      if(!LeventMatched) {
+        // Restore the virtual key code if a mnemonic keyboard is being used
+        keyEvent.Lcode=keyEvent.vkCode;
+
+        // Handle unmapped keys, including special keys
+        // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true);
+        if(ch) {
+          kbdInterface.output(0, outputTarget, ch);
+          LeventMatched = 1;
+        } else if(keyEvent.Lcode == 8) { // Backspace
+          LeventMatched = 1;
+        }
+      }
+
+      // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
+      if(LeventMatched) {
+        this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
+        if(keyEvent.Lcode == 8) {
+          this.swallowKeypress = false;
+        }
+        return false;
+      } else {
+        this.swallowKeypress = false;
+      }
+
+      // Swap layer as appropriate.
+      if(keyEvent.kNextLayer) {
+        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
+      }
+      /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
+      
+      if(fromOSK) {
+        keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+      }
+
+      return !LeventMatched;
+    }
+
+    /**
+     * Simulate a keystroke according to the touched keyboard button element
+     *
      * Note that the test-case oriented 'recorder' stubs this method to facilitate OSK-based input
      * recording for use in test cases.  If changing this function, please ensure the recorder is
      * not affected.
@@ -327,67 +451,12 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       var Lelem = keyman.domManager.getLastActiveElement();
 
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      let kbdInterface = keyman.interface;
-      let formFactor = keyman.util.device.formFactor;
-
       if(Lelem != null) {
-        keyman.domManager.initActiveElement(Lelem);
-
-        // Turn off key highlighting (or preview)
-        keyman['osk'].vkbd.highlightKey(e,false);
-
         let Lkc = this._GetClickEventProperties(e, Lelem);
-
-        // Exclude menu and OSK hide keys from normal click processing
-        if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {
-          keyman['osk'].vkbd.optionKey(e, Lkc.kName, true);
-          return true;
-        }
-
-        // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
-        // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-        if(formFactor == 'desktop') {
-          if(this.selectLayer(Lkc.kName, Lkc.kNextLayer)) {
-            return true;
-          }
-        }
-
-        // Will handle any non-layer change modifier & state keys, mapping them through the physical keyboard's version
-        // of state management.
-        if(this.doModifierPress(Lkc, false)) {
-          return true;
-        }
-
-        keyman.uiManager.setActivatingUI(true);
-        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        keyman.domManager.focusLastActiveElement();
-        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-
-        // // ...end I3363 (Build 301)
-        let outputTarget = Processor.getOutputTarget(Lelem);
-
-        // Pass this key code and state to the keyboard program
-        if(!activeKeyboard || (Lkc.Lcode != 0 && !kbdInterface.processKeystroke(keyman.util.device, outputTarget, Lkc))) {
-          // Restore the virtual key code if a mnemonic keyboard is being used
-          Lkc.Lcode=Lkc.vkCode;
-
-          // Handle unmapped keys, including special keys
-          // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-          var ch = this.defaultKeyOutput(Lkc, Lkc.Lmodifiers, true);
-          if(ch) {
-            kbdInterface.output(0, outputTarget, ch);
-          }
-        }
-
-        // Swap layer as appropriate.
-        this.selectLayer(Lkc.kName, Lkc.kNextLayer);
-
-        /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
+        return this.processKeyEvent(Lkc, e);
+      } else {
+        return true;
       }
-      
-      keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-      return true;
     }
 
     // FIXME:  makes some bad assumptions.
@@ -978,7 +1047,7 @@ namespace com.keyman.text {
             Ltarg: s.Ltarg,
             Lmodifiers: 0,
             LisVirtualKey: false,
-            vkCode: s.Lcode,
+            vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
             Lstates: s.Lstates,
             kName: ''
           };
@@ -998,12 +1067,6 @@ namespace com.keyman.text {
      * not affected.
      */ 
     keyDown(e: KeyboardEvent): boolean {
-      let keyman = com.keyman.singleton;
-      let activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      let util = keyman.util;
-      let kbdInterface = keyman['interface'];
-      let keyMapManager = keyman.keyMapManager;
-
       this.swallowKeypress = false;
 
       // Get event properties  
@@ -1012,61 +1075,16 @@ namespace com.keyman.text {
         return true;
       }
 
-      if(this.doModifierPress(Levent, true)) {
-        return true;
-      }
+      var LeventMatched = !this.processKeyEvent(Levent);
 
-      if(!window.event) {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(keyMapManager.browserMap.FF['k'+Levent.Lcode]) {
-          Levent.Lcode=keyMapManager.browserMap.FF['k'+Levent.Lcode];
-        }
-      } //else 
-      //{
-      // Safari, IE, Opera?
-      //}
-
-      let outputTarget = Processor.getOutputTarget(Levent.Ltarg);
-      
-      var LeventMatched=0;
-
-      // Positional Layout
-      this.swallowKeypress = false;
-      if(activeKeyboard && Levent.Lcode != 0) {
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(util.physicalDevice, outputTarget, Levent);
-      }
-
-      // To ensure consistency between touch-alias elements and normal elements,
-      // all default text output will be sourced from this method, rather than relying on browser defaults.
-      if(!LeventMatched) {
-        var ch = this.defaultKeyOutput(Levent, Levent.Lmodifiers, false);
-        if(ch) {
-          kbdInterface.output(0, outputTarget, ch);
-          LeventMatched = 1;
-        } else if(Levent.Lcode == 8) { // Backspace
-          // This is needed to prevent jumping to previous page for certain element types, like TouchAliasElements.
-          LeventMatched = 1;
-        }
-      }
-
-      // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(LeventMatched) {
         if(e  &&  e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
         }
-        
-        this.swallowKeypress = (e && Levent.Lcode != 8 ? this._GetEventKeyCode(e) != 0 : false);
-        if(Levent.Lcode == 8) {
-          this.swallowKeypress = false;
-        }
-        return false;
-      } else {
-        this.swallowKeypress = false;
       }
 
-      return true;
+      return !LeventMatched;
     }
 
     // KeyUp basically exists for two purposes:
