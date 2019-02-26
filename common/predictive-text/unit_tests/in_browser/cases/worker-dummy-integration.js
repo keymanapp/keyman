@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var LMLayer = com.keyman.text.prediction.LMLayer;
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -13,7 +14,7 @@ describe('LMLayer using dummy model', function () {
     it('will predict future suggestions', function () {
       var lmLayer = new LMLayer();
       var capabilities = {
-        maxLefContextCodeUnits: 32 + ~~Math.random() * 32
+        maxLeftContextCodeUnits: 32 + ~~Math.random() * 32
       };
 
       // We're testing many as asynchronous messages in a row.
