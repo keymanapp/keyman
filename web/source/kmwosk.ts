@@ -25,10 +25,11 @@ namespace com.keyman {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
-    layer: string; // The layer in which the key resides (not the key spec's 'act as layer' property)
+    readonly layer: string; // The layer in which the key resides (not the key spec's 'act as layer' property)
 
-    constructor(spec: OSKKeySpec) {
+    constructor(spec: OSKKeySpec, layer: string) {
       this.spec = spec;
+      this.layer = layer;
     }
 
     abstract getId(): string;
@@ -208,8 +209,8 @@ namespace com.keyman {
   }
 
   export class OSKBaseKey extends OSKKey {
-    constructor(spec: OSKKeySpec) {
-      super(spec);
+    constructor(spec: OSKKeySpec, layer: string) {
+      super(spec, layer);
     }
 
     getId(): string {
@@ -272,13 +273,11 @@ namespace com.keyman {
       btn.appendChild(skIcon);
     }
 
-    construct(layout, layerId: string, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(layout, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let util = (<KeymanBase>window['keyman']).util;
       let osk = (<KeymanBase>window['keyman']).osk;
       let spec = this.spec;
       let isDesktop = util.device.formFactor == 'desktop'
-
-      this.layer = layerId;
 
       let kDiv=util._CreateElement('div');
       kDiv['keyId']=spec['id'];
@@ -366,8 +365,8 @@ namespace com.keyman {
   }
 
   export class OSKSubKey extends OSKKey {
-    constructor(spec: OSKKeySpec) {
-      super(spec);
+    constructor(spec: OSKKeySpec, layer: string) {
+      super(spec, layer);
     }
 
     getId(): string {
@@ -1024,12 +1023,13 @@ if(!window['keyman']['initialized']) {
         osk.prependBaseKey(e);
       }
       var idx = e.id.split('-'), baseId = idx[idx.length-1];
+      var baseLayer: string = idx.length > 1 ? idx[0] : 'default'; // idx.length should always be > 1, but just in case.
 
       // If not, insert at start
       if(device.formFactor == 'phone' && e.subKeys[0].id != baseId) {
         var eCopy={'id':baseId,'layer':''};
         if(idx.length > 1) {
-          eCopy['layer'] = idx[0];
+          eCopy['layer'] = baseLayer;
         }
         for(i=0; i<e.childNodes.length; i++) {
           if(osk.hasClass(e.childNodes[i],'kmw-key-text')) {
@@ -1069,7 +1069,7 @@ if(!window['keyman']['initialized']) {
           needsTopMargin = true;
         }
 
-        let keyGenerator = new com.keyman.OSKSubKey(e.subKeys[i]);
+        let keyGenerator = new com.keyman.OSKSubKey(e.subKeys[i], baseLayer);
         let kDiv = keyGenerator.construct(e, needsTopMargin);
         
         subKeys.appendChild(kDiv);
@@ -2738,8 +2738,8 @@ if(!window['keyman']['initialized']) {
             for(j=0; j<keys.length; j++) {
               key=keys[j];
               
-              var keyGenerator = new com.keyman.OSKBaseKey(key);
-              var keyTuple = keyGenerator.construct(layout, layer['id'], rs, totalPercent);
+              var keyGenerator = new com.keyman.OSKBaseKey(key, layer['id']);
+              var keyTuple = keyGenerator.construct(layout, rs, totalPercent);
 
               rDiv.appendChild(keyTuple.element);
               totalPercent += keyTuple.percent;
