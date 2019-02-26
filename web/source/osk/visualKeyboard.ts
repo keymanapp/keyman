@@ -66,10 +66,11 @@ namespace com.keyman.osk {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
-    layer: string;
+    readonly layer: string;
 
-    constructor(spec: OSKKeySpec) {
+    constructor(spec: OSKKeySpec, layer: string) {
       this.spec = spec;
+      this.layer = layer;
     }
 
     abstract getId(osk: VisualKeyboard): string;
@@ -249,8 +250,8 @@ namespace com.keyman.osk {
   }
 
   export class OSKBaseKey extends OSKKey {
-    constructor(spec: OSKKeySpec) {
-      super(spec);
+    constructor(spec: OSKKeySpec, layer: string) {
+      super(spec, layer);
     }
 
     getId(osk: VisualKeyboard): string {
@@ -313,12 +314,10 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, layout: LayoutFormFactor, layerId: string, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(osk: VisualKeyboard, layout: LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let util = (<KeymanBase>window['keyman']).util;
       let spec = this.spec;
       let isDesktop = util.device.formFactor == 'desktop'
-
-      this.layer = layerId;
 
       let kDiv=util._CreateElement('div');
       kDiv.className='kmw-key-square';
@@ -405,8 +404,8 @@ namespace com.keyman.osk {
   }
 
   export class OSKSubKey extends OSKKey {
-    constructor(spec: OSKKeySpec) {
-      super(spec);
+    constructor(spec: OSKKeySpec, layer: string) {
+      super(spec, layer);
     }
 
     getId(osk: VisualKeyboard): string {
@@ -845,8 +844,8 @@ namespace com.keyman.osk {
           for(j=0; j<keys.length; j++) {
             key=keys[j];
             
-            var keyGenerator = new OSKBaseKey(key);
-            var keyTuple = keyGenerator.construct(this, layout, layer['id'], rs, totalPercent);
+            var keyGenerator = new OSKBaseKey(key, layer['id']);
+            var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
 
             rDiv.appendChild(keyTuple.element);
             totalPercent += keyTuple.percent;
@@ -1372,8 +1371,7 @@ namespace com.keyman.osk {
       // The holder is position:fixed, but the keys do not need to be, as no scrolling
       // is possible while the array is visible.  So it is simplest to let the keys have
       // position:static and display:inline-block
-      var subKeys=document.createElement('DIV'),i,
-        t,ts,t1,ts1,kDiv,ks,btn,bs;
+      var subKeys=document.createElement('DIV'),i;
 
       var tKey = this.getDefaultKeyObject();
 
@@ -1412,7 +1410,7 @@ namespace com.keyman.osk {
           needsTopMargin = true;
         }
 
-        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i]);
+        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer);
         let kDiv = keyGenerator.construct(this, <HTMLDivElement> e, needsTopMargin);
         
         subKeys.appendChild(kDiv);
