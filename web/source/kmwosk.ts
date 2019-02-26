@@ -25,6 +25,7 @@ namespace com.keyman {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
+    layer: string; // The layer in which the key resides (not the key spec's 'act as layer' property)
 
     constructor(spec: OSKKeySpec) {
       this.spec = spec;
@@ -139,7 +140,7 @@ namespace com.keyman {
       // Use special case lookup for modifier keys
       if(spec['sp'] == '1' || spec['sp'] == '2') {
         // Unique layer-based transformation.
-        var tId=((spec['text'] == '*Tab*' && spec.layer == 'shift') ? '*TabLeft*' : spec['text']);
+        var tId=((spec['text'] == '*Tab*' && this.layer == 'shift') ? '*TabLeft*' : spec['text']);
 
         // Transforms our *___* special key codes into their corresponding PUA character codes for keyboard display.
         keyText=this.renameSpecialKey(tId);
@@ -213,7 +214,7 @@ namespace com.keyman {
 
     getId(): string {
       // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)
-      return this.spec.layer+'-'+this.spec.id;
+      return this.layer+'-'+this.spec.id;
     }
 
     // Produces a small reference label for the corresponding physical key on a US keyboard.
@@ -277,7 +278,7 @@ namespace com.keyman {
       let spec = this.spec;
       let isDesktop = util.device.formFactor == 'desktop'
 
-      spec.layer = layerId;
+      this.layer = layerId;
 
       let kDiv=util._CreateElement('div');
       kDiv['keyId']=spec['id'];
@@ -372,8 +373,8 @@ namespace com.keyman {
     getId(): string {
       let spec = this.spec;
       // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-      if(typeof(spec['layer']) == 'string' && spec['layer'] != '') {
-        return 'popup-'+spec['layer']+'-'+spec['id'];
+      if(typeof(this.layer) == 'string' && this.layer != '') {
+        return 'popup-'+ this.layer +'-'+spec['id'];
       } else {
         // We only create subkeys when they're needed - the currently-active layer should be fine.
         return 'popup-' + (<KeymanBase> window['keyman']).osk.layerId + '-'+spec['id'];
