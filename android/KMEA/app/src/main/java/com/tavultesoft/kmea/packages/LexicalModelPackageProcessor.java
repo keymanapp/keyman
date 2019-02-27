@@ -22,8 +22,6 @@ import java.util.Map;
  * KMEA Engine. This is primarily for installing lexical model packages.
  */
 public class LexicalModelPackageProcessor extends PackageProcessor {
-  public static final String KMPPDefault_Target = "lexicalModels";
-
   private static final String TAG = "LMPackageProcessor";
 
   static File constructPath(File path, boolean temp) {

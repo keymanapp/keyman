@@ -100,7 +100,7 @@ public class PackageProcessorTest {
 
   @Test
   public void tempPackageExtraction() {
-    File infoFile = new File(tempPkg, PackageProcessor.PPDefault_Metadata);
+    File infoFile = new File(tempPkg, PackageProcessor.PP_DEFAULT_METADATA);
 
     Assert.assertTrue(infoFile.exists());
   }
@@ -235,14 +235,14 @@ public class PackageProcessorTest {
     extractUndefinedVerTestPackage();
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkgUndefinedVer);
 
-    Assert.assertEquals(PackageProcessor.PPDefault_Version, PackageProcessor.getPackageVersion(json));
+    Assert.assertEquals(PackageProcessor.PP_DEFAULT_VERSION, PackageProcessor.getPackageVersion(json));
   }
 
   @Test
   public void test_getPackageTarget() {
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
 
-    Assert.assertEquals(PackageProcessor.PPDefault_Target, PackageProcessor.getPackageTarget(json));
+    Assert.assertEquals(PackageProcessor.PP_TARGET_KEYBOARDS, PackageProcessor.getPackageTarget(json));
   }
 
   @Test

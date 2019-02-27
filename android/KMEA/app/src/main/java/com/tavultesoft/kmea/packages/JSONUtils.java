@@ -39,7 +39,7 @@ public class JSONUtils {
 
     for (File pkg: packages) {
       for (File file: pkg.listFiles()) {
-        if (file.getName().toLowerCase().endsWith(PackageProcessor.PPDefault_Metadata)) {
+        if (file.getName().toLowerCase().endsWith(PackageProcessor.PP_DEFAULT_METADATA)) {
           try {
             JSONObject kmp = parser.getJSONObjectFromFile(file);
             JSONArray kmpKeyboards = kmp.getJSONArray("keyboards");

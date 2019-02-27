@@ -871,7 +871,7 @@ public final class KMManager {
         }
       }
     } else {
-      path = getPackagesDir() + packageID + File.separator + PackageProcessor.PPDefault_Metadata;
+      path = getPackagesDir() + packageID + File.separator + PackageProcessor.PP_DEFAULT_METADATA;
 
       try {
         File kmpJSONFile = new File(path);

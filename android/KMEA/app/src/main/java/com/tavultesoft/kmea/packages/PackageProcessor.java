@@ -33,9 +33,14 @@ import org.json.JSONObject;
  */
 public class PackageProcessor {
   protected static File resourceRoot = null;
-  public static final String PPDefault_Version = "1.0";
-  public static final String PPDefault_Metadata = "kmp.json";
-  public static final String PPDefault_Target = "keyboards";
+  public static final String PP_DEFAULT_VERSION = "1.0";
+  public static final String PP_DEFAULT_METADATA = "kmp.json";
+
+  public static final String PP_TARGET_INVALID = "invalid";
+  public static final String PP_TARGET_KEYBOARDS = "keyboards";
+  public static final String PP_TARGET_LEXICAL_MODELS = "lexicalModels";
+
+  // keys in kmp.json
   public static final String PP_KEYBOARDS_KEY = "keyboards";
   public static final String PP_LEXICAL_MODELS_KEY = "lexicalModels";
 
@@ -120,13 +125,13 @@ public class PackageProcessor {
    * @return A metadata JSONObject for the package version.
    */
   public static JSONObject loadPackageInfo(File packagePath) {
-    File infoFile = new File(packagePath, PPDefault_Metadata);
+    File infoFile = new File(packagePath, PP_DEFAULT_METADATA);
 
     if(infoFile.exists()) {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
-      Log.e(TAG, infoFile.toString() + " does not exist.");
+      Log.e(TAG, "kmp.json does not exist");
       return null;
     }
   }
@@ -216,7 +221,7 @@ public class PackageProcessor {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
     } catch (Exception e) {
-      return PPDefault_Version;
+      return PP_DEFAULT_VERSION;
     }
   }
 
@@ -229,14 +234,14 @@ public class PackageProcessor {
   public static String getPackageTarget(JSONObject json) {
     try {
       if (json.has(PP_KEYBOARDS_KEY) && !json.has(PP_LEXICAL_MODELS_KEY)) {
-        return PP_KEYBOARDS_KEY;
+        return PP_TARGET_KEYBOARDS;
       } else if (json.has(PP_LEXICAL_MODELS_KEY) && !json.has(PP_KEYBOARDS_KEY)) {
-        return PP_LEXICAL_MODELS_KEY;
+        return PP_TARGET_LEXICAL_MODELS;
       } else {
-        return "invalid";
+        return PP_TARGET_INVALID;
       }
     } catch (Exception e) {
-      return "invalid";
+      return PP_TARGET_INVALID;
     }
   }
 
@@ -251,7 +256,7 @@ public class PackageProcessor {
         return target;
       }
     } catch (Exception e) {
-      return PPDefault_Target;
+      return PP_TARGET_INVALID;
     }
   }
 

@@ -44,6 +44,7 @@ public class PackageActivity extends AppCompatActivity {
   private File kmpFile;
   private File tempPackagePath;
   private List<Map<String, String>> installedPackageKeyboards;
+  private List<Map<String, String>> installedLexicalModels;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
@@ -59,30 +60,26 @@ public class PackageActivity extends AppCompatActivity {
     }
 
     final String pkgId = PackageProcessor.getPackageID(kmpFile);
-    String pkgTarget = PackageProcessor.getPackageTarget(kmpFile, false);
+    final String pkgTarget = PackageProcessor.getPackageTarget(kmpFile, false);
 
     try {
-      if (pkgTarget.equals(PackageProcessor.PPDefault_Target)) {
+      if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
-      } else if (pkgTarget.equals(LexicalModelPackageProcessor.KMPPDefault_Target)) {
+      } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         tempPackagePath = LexicalModelPackageProcessor.unzipKMP(kmpFile);
       } else {
-        Toast.makeText(context, getString(R.string.no_targets_to_install), Toast.LENGTH_SHORT).show();
-        // Setting result to 1 so calling activity will finish too
-        setResult(1);
-        ((AppCompatActivity) context).finish();
+        showErrorToast(context, getString(R.string.no_targets_to_install));
         return;
       }
     } catch (Exception e) {
-      Toast.makeText(context, getString(R.string.failed_to_extract), Toast.LENGTH_SHORT).show();
-      setResult(1);
-      ((AppCompatActivity) context).finish();
+      showErrorToast(context, getString(R.string.failed_to_extract));
       return;
     }
 
     JSONObject pkgInfo = PackageProcessor.loadPackageInfo(tempPackagePath);
     if (pkgInfo == null) {
-      showErrorDialog(context, pkgId, getString(R.string.invalid_metadata));
+      showErrorToast(context, getString(R.string.invalid_metadata));
+      return;
     }
 
     String pkgVersion = PackageProcessor.getPackageVersion(pkgInfo);
@@ -102,7 +99,9 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String titleStr = String.format("%s %s", getString(R.string.install_keyboard_package), pkgVersion);
+    String pkgTargetTitle = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ? getString(R.string.install_keyboard_package) :
+      getString(R.string.install_lexical_model_package);
+    String titleStr = String.format("%s %s", pkgTargetTitle, pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
@@ -161,11 +160,17 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No welcome.htm so display minimal package information
-      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" :
-        String.format(" %s", getString(R.string.title_keyboard));
+      String targetString = "";
+      if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+        targetString = pkgName != null && pkgName.toLowerCase().endsWith(PackageProcessor.PP_TARGET_KEYBOARDS)
+          ? "" : String.format(" %s", getString(R.string.title_keyboard));
+      } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+        targetString = pkgName != null && pkgName.toLowerCase().endsWith(PackageProcessor.PP_TARGET_LEXICAL_MODELS)
+          ? "" :String.format(" %s", "model");
+      }
       String htmlString = String.format(
         "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
-        pkgName, keyboardString);
+        pkgName, targetString);
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
@@ -173,23 +178,26 @@ public class PackageActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         try {
-          // processKMP will remove currently installed package and install
-          installedPackageKeyboards = PackageProcessor.processKMP(kmpFile, true);
-          // Do the notifications!
-          boolean success = installedPackageKeyboards.size() != 0;
-          if (success) {
-            notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
-            if (installedPackageKeyboards != null) {
+          if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+            // processKMP will remove currently installed package and install
+            installedPackageKeyboards = PackageProcessor.processKMP(kmpFile, true);
+            // Do the notifications!
+            boolean success = installedPackageKeyboards.size() != 0;
+            if (success) {
               notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+              if (installedPackageKeyboards != null) {
+                notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+              }
+              cleanup();
+            } else {
+              showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
             }
-            cleanup();
-          } else {
-            showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
+          } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+            installedLexicalModels = LexicalModelPackageProcessor.processKMP(kmpFile, true);
           }
-
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
-          showErrorDialog(context, pkgId, getString(R.string.no_valid_touch_keyboards_to_install));
+          showErrorDialog(context, pkgId, getString(R.string.no_valid_touch_keyboards_to_install)); // DDW or lexical model
         }
       }
     });
@@ -234,6 +242,13 @@ public class PackageActivity extends AppCompatActivity {
   public void onBackPressed() {
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
+  }
+
+  private void showErrorToast(Context context, String message) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    // Setting result to 1 so calling activity will finish too
+    setResult(1);
+    cleanup();
   }
 
   private void showErrorDialog(Context context, String pkgId, String message) {
