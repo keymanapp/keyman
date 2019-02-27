@@ -11,7 +11,7 @@
 @implementation KMAboutBGView
 
 - (void)drawRect:(NSRect)rect {
-    [[NSColor whiteColor] setFill];
+    [[NSColor windowBackgroundColor] setFill];
     NSRectFillUsingOperation(rect, NSCompositeSourceOver);
 }
 
