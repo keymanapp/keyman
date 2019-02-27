@@ -44,6 +44,10 @@ public class PackageProcessorTest {
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
+  private static final String TEST_EN_CUSTOM_MODEL_ID = "example.en.custom";
+  private static final File TEST_EN_CUSTOM_MODEL_KMP_FILE = new File(TEST_RESOURCE_ROOT, "packages" +
+    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_ID + ".model.kmp");
+
   private static File tempPkg;
   private static File tempPkgAlt;
   private static File tempPkgUndefinedVer;
@@ -68,6 +72,8 @@ public class PackageProcessorTest {
       System.err.println(e);
     }
   }
+
+  // Keyboard Package Tests
 
   // Some tests wish to utilize package with undefined version...
   public void extractUndefinedVerTestPackage() {
@@ -142,21 +148,6 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     Assert.assertEquals(amharic, keyboards[0]);
-
-    /*
-    Keyboard has a second language, but won't be installed
-    HashMap<String, String> geez = new HashMap<String, String>();
-    geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
-    geez.put(KMManager.KMKey_KeyboardName, "Amharic");
-    geez.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
-    geez.put(KMManager.KMKey_LanguageID, "gez");
-    geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
-    geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    geez.put(KMManager.KMKey_CustomKeyboard, "Y");
-    geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
-
-    Assert.assertEquals(geez, keyboards[1]);
-    */
   }
 
   @Test
@@ -228,6 +219,7 @@ public class PackageProcessorTest {
   public void test_getPackageID() {
     Assert.assertEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
     Assert.assertNotEquals(TEST_GFF_KBD_ID, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
+    Assert.assertEquals(TEST_EN_CUSTOM_MODEL_ID, PackageProcessor.getPackageID(TEST_EN_CUSTOM_MODEL_KMP_FILE));
   }
 
   @Test
@@ -239,11 +231,18 @@ public class PackageProcessorTest {
   }
 
   @Test
-  public void test_getPackageVersion() throws Exception {
+  public void test_getPackageVersion() {
     extractUndefinedVerTestPackage();
     JSONObject json = PackageProcessor.loadPackageInfo(tempPkgUndefinedVer);
 
     Assert.assertEquals(PackageProcessor.PPDefault_Version, PackageProcessor.getPackageVersion(json));
+  }
+
+  @Test
+  public void test_getPackageTarget() {
+    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals(PackageProcessor.PPDefault_Target, PackageProcessor.getPackageTarget(json));
   }
 
   @Test
@@ -269,11 +268,12 @@ public class PackageProcessorTest {
   }
 
   @Test
-  public void test_kmpVersionCheck() throws Exception {
-    extractAltTestPackage();
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
+  public void test_kmpVersionCheck() {
+    JSONObject json14 = PackageProcessor.loadPackageInfo(tempPkg);
+    Assert.assertEquals("1.4", PackageProcessor.getPackageVersion(json14));
 
-    Assert.assertEquals("1.5", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, true));
-    Assert.assertEquals("1.4", PackageProcessor.getPackageVersion(TEST_GFF_KMP_FILE, false));
+    extractAltTestPackage();
+    JSONObject json15 = PackageProcessor.loadPackageInfo(tempPkgAlt);
+    Assert.assertEquals("1.5", PackageProcessor.getPackageVersion(json15));
   }
 }

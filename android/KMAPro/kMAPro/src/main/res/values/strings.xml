@@ -49,5 +49,7 @@
     <string name="install_keyboard_package"  translatable="false">Install Keyboard Package</string>
     <string name="no_new_touch_keyboards_to_install" translatable="false">No new touch-optimized keyboards to install</string>
     <string name="no_valid_touch_keyboards_to_install" translatable="false">No valid touch-optimized keyboards to install</string>
+    <string name="no_targets_to_install" translatable="false">No keyboards or lexical models to install</string>
+    <string name="invalid_metadata" translatable="false">Invalid metadata in package</string>
 
 </resources>

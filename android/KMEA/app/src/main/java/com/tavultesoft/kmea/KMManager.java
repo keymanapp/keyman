@@ -134,6 +134,7 @@ public final class KMManager {
   public static final String KMDefault_LegacyAssetFonts = "fonts";
   public static final String KMDefault_UndefinedPackageID = "cloud";
   public static final String KMDefault_AssetPackages = "packages";
+  public static final String KMDefault_LexicalModelPackages = "models";
 
   // Default Keyboard Info
   public static final String KMDefault_KeyboardID = "sil_euro_latin";
@@ -158,6 +159,10 @@ public final class KMManager {
 
   protected static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
+  }
+
+  protected static String getLexicalModelsDir() {
+    return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
   protected static String getCloudDir() {
@@ -363,9 +368,16 @@ public final class KMManager {
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
+      // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
       if (!packagesDir.exists()) {
         packagesDir.mkdir();
+      }
+
+      // Lexical models directory
+      File lexicalModelsDir = new File(getLexicalModelsDir());
+      if (!lexicalModelsDir.exists()) {
+        lexicalModelsDir.mkdir();
       }
 
       // Copy default cloud keyboard

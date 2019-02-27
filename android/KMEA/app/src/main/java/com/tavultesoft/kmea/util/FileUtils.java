@@ -40,6 +40,7 @@ public final class FileUtils {
   public static final String WOFFFONT = ".woff";
 
   public static final String KEYBOARDPACKAGE = ".kmp";
+  public static final String LEXICALMODELPACKAGE = ".model.kmp";
   public static final String WELCOME_HTM = "welcome.htm";
 
   /**
@@ -386,6 +387,11 @@ public final class FileUtils {
   public static boolean hasKeyboardPackageExtension(String filename) {
     String f = filename.toLowerCase();
     return f.endsWith(KEYBOARDPACKAGE);
+  }
+
+  public static boolean hasLexicalModelPackageExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(LEXICALMODELPACKAGE) || hasKeyboardPackageExtension(filename);
   }
 
   public static boolean isTTFFont(String filename) {

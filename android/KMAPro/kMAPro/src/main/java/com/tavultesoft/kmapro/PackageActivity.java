@@ -20,11 +20,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -55,16 +59,34 @@ public class PackageActivity extends AppCompatActivity {
     }
 
     final String pkgId = PackageProcessor.getPackageID(kmpFile);
-    String pkgVersion = PackageProcessor.getPackageVersion(kmpFile, false);
-    String pkgName = PackageProcessor.getPackageName(kmpFile, false);
+    String pkgTarget = PackageProcessor.getPackageTarget(kmpFile, false);
 
     try {
-      tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
+      if (pkgTarget.equals(PackageProcessor.PPDefault_Target)) {
+        tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
+      } else if (pkgTarget.equals(LexicalModelPackageProcessor.KMPPDefault_Target)) {
+        tempPackagePath = LexicalModelPackageProcessor.unzipKMP(kmpFile);
+      } else {
+        Toast.makeText(context, getString(R.string.no_targets_to_install), Toast.LENGTH_SHORT).show();
+        // Setting result to 1 so calling activity will finish too
+        setResult(1);
+        ((AppCompatActivity) context).finish();
+        return;
+      }
     } catch (Exception e) {
-      String message = String.format("%s\n%s",
-        getString(R.string.failed_to_extract), kmpFile.getAbsolutePath());
-      showErrorDialog(context, pkgId, message);
+      Toast.makeText(context, getString(R.string.failed_to_extract), Toast.LENGTH_SHORT).show();
+      setResult(1);
+      ((AppCompatActivity) context).finish();
+      return;
     }
+
+    JSONObject pkgInfo = PackageProcessor.loadPackageInfo(tempPackagePath);
+    if (pkgInfo == null) {
+      showErrorDialog(context, pkgId, getString(R.string.invalid_metadata));
+    }
+
+    String pkgVersion = PackageProcessor.getPackageVersion(pkgInfo);
+    String pkgName = PackageProcessor.getPackageName(pkgInfo);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -190,10 +212,10 @@ public class PackageActivity extends AppCompatActivity {
 
   private void cleanup() {
     try {
-      if (kmpFile.exists()) {
+      if (kmpFile != null & kmpFile.exists()) {
         kmpFile.delete();
       }
-      if (tempPackagePath.exists()) {
+      if (tempPackagePath != null && tempPackagePath.exists()) {
         FileUtils.deleteDirectory(tempPackagePath);
       }
     } catch (Exception e) {

@@ -164,6 +164,30 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void test_hasLexicalModelPackageExtension() {
+    String filename = "test/abc.kmp";
+    Assert.assertTrue(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.KMP";
+    Assert.assertTrue(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.kmpo";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.model.kmp";
+    Assert.assertTrue(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMP";
+    Assert.assertTrue(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "test/abc.model.kmpo";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+
+    filename = "";
+    Assert.assertFalse(FileUtils.hasLexicalModelPackageExtension(filename));
+  }
+
+  @Test
   public void test_isTTFFont() {
     String filename = "test/abc.ttf";
     Assert.assertTrue(FileUtils.isTTFFont(filename));
