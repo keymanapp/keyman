@@ -3,6 +3,13 @@
 ## 12.0 alpha
 * Started work on Keyman for Android 12.
 
+## 2019-02-27 11.0.2102 stable
+* Bug fix:
+  * Fix crash from language picker trying to show error dialog (#1634)
+
+## 2019-02-26 11.0.2101 stable
+* No changes to Keyman for Android (updated Keyman Web Engine, #1629)
+
 ## 2019-02-25 11.0.2100 stable
 * 11.0 Stable release
 
