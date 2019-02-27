@@ -99,8 +99,8 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String pkgTargetTitle = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ? getString(R.string.install_keyboard_package) :
-      getString(R.string.install_lexical_model_package);
+    String pkgTargetTitle = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ? 
+      getString(R.string.install_keyboard_package) : getString(R.string.install_lexical_model_package);
     String titleStr = String.format("%s %s", pkgTargetTitle, pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
@@ -162,10 +162,10 @@ public class PackageActivity extends AppCompatActivity {
       // No welcome.htm so display minimal package information
       String targetString = "";
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
-        targetString = pkgName != null && pkgName.toLowerCase().endsWith(PackageProcessor.PP_TARGET_KEYBOARDS)
+        targetString = pkgName != null && pkgName.toLowerCase().endsWith("keyboard")
           ? "" : String.format(" %s", getString(R.string.title_keyboard));
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-        targetString = pkgName != null && pkgName.toLowerCase().endsWith(PackageProcessor.PP_TARGET_LEXICAL_MODELS)
+        targetString = pkgName != null && pkgName.toLowerCase().endsWith("model")
           ? "" :String.format(" %s", "model");
       }
       String htmlString = String.format(
