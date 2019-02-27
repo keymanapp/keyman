@@ -72,6 +72,12 @@ namespace com.keyman {
     stores: {[text: string]: text.ComplexKeyboardStore} = {};
   }
 
+  export interface KeyboardChangeData {
+    ['internalName']: string;
+    ['languageCode']: string; 
+    ['indirect']: boolean;
+  }
+
   export class KeyboardManager {
     // Language regions as defined by cloud server
     static readonly regions = ['World','Africa','Asia','Europe','South America','North America','Oceania','Central America','Middle East'];
@@ -1487,10 +1493,12 @@ namespace com.keyman {
      * @return      {boolean}   
      */       
     doKeyboardChange(_internalName: string, _languageCode: string, _indirect?:boolean): boolean {                      
-      var p={};
-      p['internalName']=_internalName;
-      p['languageCode']=_languageCode; 
-      p['indirect']=(arguments.length > 2 ? _indirect : false);
+      var p: KeyboardChangeData = {
+        'internalName': _internalName,
+        'languageCode': _languageCode,
+        'indirect': (arguments.length > 2 ? _indirect : false)
+      }
+
       return this.keymanweb.util.callEvent('kmw.keyboardchange', p);
     }
 
