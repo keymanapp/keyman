@@ -122,6 +122,9 @@ public final class KMManager {
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
+  public static final String KMKey_LexicalModelID = "lmId";
+  public static final String KMKey_LexicalModelName = "lmName";
+  public static final String KMKey_LexicalModelVersion = "lmVersion";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";

@@ -32,6 +32,7 @@ public final class FileUtils {
 
   // File extensions and file types
   public static final String JAVASCRIPT = ".js";
+  public static final String LEXICALMODEL = ".model.js";
   public static final String TRUETYPEFONT = ".ttf";
   public static final String OPENTYPEFONT = ".otf";
 
@@ -382,6 +383,11 @@ public final class FileUtils {
   public static boolean hasJavaScriptExtension(String filename) {
     String f = filename.toLowerCase();
     return f.endsWith(JAVASCRIPT);
+  }
+
+  public static boolean hasLexicalModelExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(LEXICALMODEL);
   }
 
   public static boolean hasKeyboardPackageExtension(String filename) {

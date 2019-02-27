@@ -6,12 +6,15 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.ZipUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,9 +52,89 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     return tempModelPath;
   }
 
+  static boolean lexicalModelExists(final String packageId, final String modelId) {
+    if (resourceRoot != null) {
+      FileFilter lexicalModelFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+          if (pathname.isFile() && pathname.getName().startsWith(modelId) && FileUtils.hasLexicalModelExtension(pathname.getName())) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      File kmpFile = new File(packageId + ".kmp");
+      if (!kmpFile.exists()) {
+        kmpFile = new File(packageId + ".model.kmp");
+      }
+      File packageDir = constructPath(kmpFile, false);
+      File[] files = packageDir.listFiles(lexicalModelFilter);
+      if (files.length > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  static boolean welcomeExists(final String packageId) {
+    if (resourceRoot != null) {
+      FileFilter welcomeFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+          if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
+            return true;
+          }
+          return false;
+        }
+      };
+
+      File kmpFile = new File(packageId + ".kmp");
+      if (!kmpFile.exists()) {
+        kmpFile = new File(packageId + ".model.kmp");
+      }
+      File packageDir = constructPath(kmpFile, false);
+      File[] files = packageDir.listFiles(welcomeFilter);
+      if (files.length > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static Map<String, String>[] processLexicalModelsEntry(JSONObject jsonModel, String packageId) throws JSONException {
-    HashMap<String, String>[] models = new HashMap[1];
-    return models;
+    JSONArray languages = jsonModel.getJSONArray("languages");
+
+    String modelId = jsonModel.getString("id");
+    if (lexicalModelExists(packageId, modelId)) {
+      HashMap<String, String>[] models = new HashMap[languages.length()];
+
+      for (int i = 0; i < languages.length(); i++) {
+        models[i] = new HashMap<>();
+        models[i].put(KMManager.KMKey_PackageID, packageId);
+        models[i].put(KMManager.KMKey_LexicalModelName, jsonModel.getString("name"));
+        models[i].put(KMManager.KMKey_LexicalModelID, jsonModel.getString("id"));
+        models[i].put(KMManager.KMKey_LexicalModelVersion, jsonModel.getString("version"));
+        models[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+        models[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
+
+        if (welcomeExists(packageId)) {
+          File kmpFile = new File(packageId + ".kmp");
+          if (!kmpFile.exists()) {
+            kmpFile = new File(packageId + ".model.kmp");
+          }
+          File packageDir = constructPath(kmpFile, false);
+          File welcomeFile = new File(packageDir, "welcome.htm");
+          // Only storing relative instead of absolute paths as a convenience for unit tests.
+          models[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+        }
+      }
+      return models;
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -95,9 +178,9 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
   static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
-    ArrayList<Map<String, String>> specs = new ArrayList<>();
+    ArrayList<Map<String, String>> lexicalModelSpecs = new ArrayList<>();
     if (KMManager.isReservedNamespace(getPackageID(path))) {
-      return specs;
+      return lexicalModelSpecs;
     }
     File tempPath;
     if (!preExtracted) {
@@ -125,15 +208,21 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     // isn't available at Android runtime.
     tempPath.renameTo(permPath);
 
-    boolean hasKeyboards = newInfoJSON.has("keyboards");
-    boolean hasLexicalModels = newInfoJSON.has("lexicalModels");
-    if (hasLexicalModels && !hasKeyboards) {
+    // Verify newInfoJSON has "lexicalModels" and not "keyboards"
+    if (newInfoJSON.has(PackageProcessor.PP_LEXICAL_MODELS_KEY) && !newInfoJSON.has(PackageProcessor.PP_KEYBOARDS_KEY)) {
+      JSONArray lexicalModels = newInfoJSON.getJSONArray(PP_LEXICAL_MODELS_KEY);
 
+      for (int i = 0; i < lexicalModels.length(); i++) {
+        Map<String, String>[] lms = processLexicalModelsEntry(lexicalModels.getJSONObject(i), packageId);
+        if (lms != null) {
+          lexicalModelSpecs.addAll(Arrays.asList(lms));
+        }
+      }
     } else {
       Log.e(TAG, path.getName() + " must contain \"lexicalModels\"");
     }
 
-    return specs;
+    return lexicalModelSpecs;
   }
 
 }

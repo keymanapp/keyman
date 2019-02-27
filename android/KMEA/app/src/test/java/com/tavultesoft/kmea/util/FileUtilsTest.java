@@ -149,6 +149,27 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void test_hasLexicalModelExtension() {
+    String filename = "test/abc.model.js";
+    Assert.assertTrue(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abc.MODEL.JS";
+    Assert.assertTrue(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abc.sh";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abcmodeljs";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abc.js";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+  }
+
+  @Test
   public void test_hasKeyboardPackageExtension() {
     String filename = "test/abc.kmp";
     Assert.assertTrue(FileUtils.hasKeyboardPackageExtension(filename));

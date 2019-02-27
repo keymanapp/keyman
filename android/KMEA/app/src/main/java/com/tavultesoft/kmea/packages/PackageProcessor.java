@@ -148,7 +148,6 @@ public class PackageProcessor {
   public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard, String packageId) throws JSONException {
     JSONArray languages = jsonKeyboard.getJSONArray("languages");
 
-
     String keyboardId = jsonKeyboard.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
       // Only use the first language
@@ -445,9 +444,9 @@ public class PackageProcessor {
   static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
-    ArrayList<Map<String, String>> specs = new ArrayList<>();
+    ArrayList<Map<String, String>> keyboardSpecs = new ArrayList<>();
     if (KMManager.isReservedNamespace(getPackageID(path))) {
-      return specs;
+      return keyboardSpecs;
     }
     File tempPath;
     if (!preExtracted) {
@@ -481,22 +480,20 @@ public class PackageProcessor {
 //    System.out.println("Info: " + json.getJSONObject("info").toString(2));
 //    System.out.println("Files: " + json.getJSONArray("files").toString(2));
 
-    // Verify newInfoJSON has "keyboards" or "lexicalModels", but not both
-    boolean hasKeyboards = newInfoJSON.has("keyboards");
-    boolean hasLexicalModels = newInfoJSON.has("lexicalModels");
-    if (hasKeyboards && !hasLexicalModels) {
+    // Verify newInfoJSON has "keyboards" and not "lexicalModels"
+    if (newInfoJSON.has(PP_KEYBOARDS_KEY) && !newInfoJSON.has(PP_LEXICAL_MODELS_KEY)) {
       // newInfoJSON holds all the newly downloaded/updated keyboard data.
-      JSONArray keyboards = newInfoJSON.getJSONArray("keyboards");
+      JSONArray keyboards = newInfoJSON.getJSONArray(PP_KEYBOARDS_KEY);
 
       for (int i = 0; i < keyboards.length(); i++) {
         Map<String, String>[] kbds = processKeyboardsEntry(keyboards.getJSONObject(i), packageId);
         if (kbds != null) {
-          specs.addAll(Arrays.asList(kbds));
+          keyboardSpecs.addAll(Arrays.asList(kbds));
         }
       }
     }  else {
       Log.e(TAG, path.getName() + " must contain \"keyboards\"");
     }
-    return specs;
+    return keyboardSpecs;
   }
 }

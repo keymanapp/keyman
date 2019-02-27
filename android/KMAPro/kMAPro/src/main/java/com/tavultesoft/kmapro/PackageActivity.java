@@ -194,6 +194,12 @@ public class PackageActivity extends AppCompatActivity {
             }
           } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
             installedLexicalModels = LexicalModelPackageProcessor.processKMP(kmpFile, true);
+            // Do the notifications
+            boolean success = installedLexicalModels.size() != 0;
+            if (success) {
+
+            }
+            cleanup();
           }
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
