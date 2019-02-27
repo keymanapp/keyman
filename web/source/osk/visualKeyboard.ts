@@ -47,7 +47,7 @@ namespace com.keyman.osk {
     text?: string;
     sp?: number | ButtonClass;
     width: string;
-    layer?: string; // Added during OSK construction.
+    layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
     nextlayer?: string;
     pad?: string;
     widthpc?: number; // Added during OSK construction.
@@ -66,6 +66,10 @@ namespace com.keyman.osk {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
+
+    /** 
+     * The layer of the OSK on which the key is displayed. 
+     */
     readonly layer: string;
 
     constructor(spec: OSKKeySpec, layer: string) {
