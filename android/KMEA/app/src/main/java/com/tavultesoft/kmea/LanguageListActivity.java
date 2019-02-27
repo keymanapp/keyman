@@ -156,7 +156,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         Toast.makeText(context, context.getString(R.string.font_failed_to_download), Toast.LENGTH_LONG).show();
       }
       finish();
-    } else {
+    } else if (!((AppCompatActivity)context).isFinishing()) {
       String title = String.format("%s: %s", languageName, keyboardName);
       showErrorDialog(context, title, context.getString(R.string.keyboard_failed_to_download));
     }
@@ -640,11 +640,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       });
 
     alertDialog = alertDialogBuilder.create();
-    if (!((AppCompatActivity)context).isFinishing()) {
-      alertDialog.show();
-    } else {
-      alertDialog.dismiss();
-    }
+    alertDialog.show();
   }
 
 }
