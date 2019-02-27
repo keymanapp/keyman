@@ -226,7 +226,7 @@ public class PackageActivity extends AppCompatActivity {
 
   private void cleanup() {
     try {
-      if (kmpFile != null & kmpFile.exists()) {
+      if (kmpFile != null && kmpFile.exists()) {
         kmpFile.delete();
       }
       if (tempPackagePath != null && tempPackagePath.exists()) {

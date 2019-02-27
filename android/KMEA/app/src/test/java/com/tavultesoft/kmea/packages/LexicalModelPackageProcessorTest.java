@@ -28,6 +28,8 @@ public class LexicalModelPackageProcessorTest {
   private static final File TEST_EN_CUSTOM_MODEL_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "models" +
     File.separator + TEST_EN_CUSTOM_MODEL_KMP_NAME);
 
+  private static final int TEST_EN_CUSTOM_MODEL_COUNT = 2;
+
   private static File tempPkg;
 
   // Each test gets a fresh version of the extracted package.
@@ -90,5 +92,7 @@ public class LexicalModelPackageProcessorTest {
   @Test
   public void test_kmpProcessLexicalModel() throws Exception {
     List<Map<String, String>> installedModels = LexicalModelPackageProcessor.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, true, true);
+
+    Assert.assertEquals(TEST_EN_CUSTOM_MODEL_COUNT, installedModels.size());
   }
 }
