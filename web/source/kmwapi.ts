@@ -1,4 +1,3 @@
-/// <reference path="closure.ts" />
 /// <reference path="kmwbase.ts" />
 /// <reference path="kmwutils.ts" />
 /// <reference path="text/kbdInterface.ts" />

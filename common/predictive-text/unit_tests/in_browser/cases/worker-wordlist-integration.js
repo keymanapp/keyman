@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var LMLayer = com.keyman.text.prediction.LMLayer;
 
 /*
  * How to run the worlist
@@ -9,7 +10,7 @@ describe('LMLayer using the word list model', function () {
     it('will predict an empty buffer', function () {
       var lmLayer = new LMLayer();
       var capabilities = {
-        maxLefContextCodeUnits: 32 + ~~Math.random() * 32
+        maxLeftContextCodeUnits: 32 + ~~Math.random() * 32
       };
 
       // We're testing many as asynchronous messages in a row.

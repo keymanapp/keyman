@@ -522,8 +522,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 989C9C251A7876DE00A20425 /* Build configuration list for PBXNativeTarget "Keyman" */;
 			buildPhases = (
-				9A5A4B1321F78E0100B31301 /* Assert version number same as git branch */,
 				D2FF67BB6C749BA6861F5E25 /* [CP] Check Pods Manifest.lock */,
+				9A5A4B1321F78E0100B31301 /* Assert version number same as git branch */,
 				E2588F2E1F2644850061C9C4 /* Run Script */,
 				989C9C041A7876DE00A20425 /* Sources */,
 				989C9C051A7876DE00A20425 /* Frameworks */,

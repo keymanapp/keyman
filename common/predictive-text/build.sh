@@ -24,6 +24,8 @@ build ( ) {
 # Builds the top-level JavaScript file (the second stage of compilation)
 build-main () {
   npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level JavaScript file."
+  cp ./index.d.ts build/index.d.ts
+  cp ./message.d.ts build/message.d.ts
 }
 
 # Builds the inner JavaScript worker (the first stage of compilation).

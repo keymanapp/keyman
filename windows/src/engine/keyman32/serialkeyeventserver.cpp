@@ -415,23 +415,90 @@ private:
     */
 
     if (msg == wm_keyman_keyevent && flag_ShouldSerializeInput  /*&& _td->lpActiveKeyboard*/) {
-      INPUT input;
-      input.type = INPUT_KEYBOARD;
-      input.ki.wVk = (WORD)wParam;
-      input.ki.wScan = (lParam & 0xFF0000) >> 16;
-      input.ki.time = GetMessageTime();
-      input.ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
-      input.ki.dwFlags = lParam & 0xFFFF;
 
-      if (!SendInput(1, &input, sizeof(INPUT))) {
-        DebugLastError("SendInput");
+      if (wParam == VK_RMENU && (lParam & (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP)) == (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP) && GetKeyState(VK_LCONTROL) < 0) {
+        /* 
+          When Windows has a European layout that uses AltGr installed, it can emit an additional LCtrl down via software 
+          when RAlt is pressed. However, the corresponding LCtrl up is never received, seemingly because when Keyman
+          re-emits the LCtrl+RAlt, there are subtle differences in the event flags which we cannot duplicate -- specifically
+          the flag that emits WM_SYSKEYDOWN for the VK_LCONTROL, even though it is received before the VK_RALT event. It 
+          appears that Windows figures this out by giving this VK_LCONTROL the scan code 0x21D instead of 0x1D. But we 
+          are unable to emit that scan code: Windows truncates the scan code sent through SendInput so that we can only
+          send 0x1D.
+
+          So we simulate the release of the Left Control key ourselves when the release of the Right Alt is received,
+          using VK_CONTROL and scan 0x1D, and hope for the best.
+
+          The full Windows sequence is:
+
+            WM_SYSKEYDOWN VK_CONTROL 0x21D
+            WM_SYSKEYDOWN VK_MENU 0x38 EXTENDED_BIT
+            ...
+            WM_KEYUP VK_CONTROL 0x21D
+            WM_KEYUP VK_MENU 0x38 EXTENDED_BIT
+
+          The best Keyman can do is:
+
+            WM_KEYDOWN VK_CONTROL 0x1D
+            WM_KEYDOWN VK_MENU 0x38 EXTENDED_BIT
+            ...
+            WM_KEYUP VK_CONTROL 0x1D
+            WM_KEYUP VK_MENU 0x38 EXTENDED_BIT
+
+          There is a possibility that some apps may try and sniff that 0x21D scan code and get confused because Keyman
+          doesn't emit it. Hopefully this is rare.
+        */
+        INPUT input[2];
+        input[0].type = INPUT_KEYBOARD;
+        input[0].ki.wVk = VK_CONTROL;
+        input[0].ki.wScan = 0x21D; // Yeah, Windows chops this to 0x1D. Such is life.
+        input[0].ki.time = GetMessageTime();
+        input[0].ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
+        input[0].ki.dwFlags = KEYEVENTF_KEYUP;
+
+        input[1].type = INPUT_KEYBOARD;
+        input[1].ki.wVk = (WORD)wParam;
+        input[1].ki.wScan = (lParam & 0xFFF0000) >> 16;
+        input[1].ki.time = GetMessageTime();
+        input[1].ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
+        input[1].ki.dwFlags = lParam & 0xFFFF;
+
+        if (!SendInput(2, input, sizeof(INPUT))) {
+          DebugLastError("SendInput");
+        }
+
+        UpdateLocalModifierState(
+          (BYTE)input[0].ki.wVk,
+          input[0].ki.dwFlags & KEYEVENTF_EXTENDEDKEY ? TRUE : FALSE,
+          (BYTE)input[0].ki.wScan,
+          input[0].ki.dwFlags & KEYEVENTF_KEYUP ? TRUE : FALSE);
+
+        UpdateLocalModifierState(
+          (BYTE)input[1].ki.wVk,
+          input[1].ki.dwFlags & KEYEVENTF_EXTENDEDKEY ? TRUE : FALSE,
+          (BYTE)input[1].ki.wScan,
+          input[1].ki.dwFlags & KEYEVENTF_KEYUP ? TRUE : FALSE);
+      }
+      else {
+        INPUT input;
+        input.type = INPUT_KEYBOARD;
+        input.ki.wVk = (WORD)wParam;
+        input.ki.wScan = (lParam & 0xFFF0000) >> 16;
+        input.ki.time = GetMessageTime();
+        input.ki.dwExtraInfo = EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT;
+        input.ki.dwFlags = lParam & 0xFFFF;
+
+        if (!SendInput(1, &input, sizeof(INPUT))) {
+          DebugLastError("SendInput");
+        }
+
+        UpdateLocalModifierState(
+          (BYTE)input.ki.wVk,
+          input.ki.dwFlags & KEYEVENTF_EXTENDEDKEY ? TRUE : FALSE,
+          (BYTE)input.ki.wScan,
+          input.ki.dwFlags & KEYEVENTF_KEYUP ? TRUE : FALSE);
       }
 
-      UpdateLocalModifierState(
-        (BYTE) input.ki.wVk, 
-        input.ki.dwFlags & KEYEVENTF_EXTENDEDKEY ? TRUE : FALSE,
-        (BYTE) input.ki.wScan,
-        input.ki.dwFlags & KEYEVENTF_KEYUP ? TRUE : FALSE);
     }
 
     return DefWindowProc(hwnd, msg, wParam, lParam);

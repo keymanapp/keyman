@@ -33,6 +33,7 @@
             <map value="0x4" message="$(string.Map.LALT)"/>
             <map value="0x5" message="$(string.Map.LCTRL_LALT)"/>
             <map value="0x8" message="$(string.Map.RALT)"/>
+            <map value="0x9" message="$(string.Map.LCTRL_RALT)"/> <!-- Because Windows simulates this for AltGr in European keyboards -->
             <map value="0xA" message="$(string.Map.RCTRL_RALT)"/>
 
             <map value="0x10" message="$(string.Map.SHIFT)"/>
@@ -210,6 +211,7 @@
         <string id="Map.RCTRL" value="RCTRL" />
         <string id="Map.LALT" value="LALT" />
         <string id="Map.LCTRL_LALT" value="LCTRL+LALT" />
+        <string id="Map.LCTRL_RALT" value="LCTRL+RALT" />
         <string id="Map.RALT" value="RALT" />
         <string id="Map.RCTRL_RALT" value="RCTRL+RALT" />
 

@@ -1,20 +1,9 @@
 // Establishes key-code definitions.
 /// <reference path="codes.ts" />
+// Defines our generalized "KeyEvent" class.
+/// <reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
-  export class KeyEvent {
-    Ltarg: HTMLElement;
-    Lcode: number;
-    Lstates: number;
-    LmodifierChange?: boolean;
-    Lmodifiers: number;
-    LisVirtualKey: boolean;
-    vkCode: number;
-    kName: string;
-    kLayer?: string;
-    kNextLayer?: string;
-  };
-
   export class LegacyKeyEvent {
     Ltarg: HTMLElement;
     Lcode: number;
@@ -230,7 +219,7 @@ namespace com.keyman.text {
 
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
       // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer=e['key'].spec.layer || '', keyName=e['keyId'].toUpperCase();
+      var layer=e['key'].spec.layer || e['key'].layer || '', keyName=e['keyId'].toUpperCase();
       var keyShiftState = this.getModifierState(keyman['osk'].vkbd.layerId);
 
       keyman.domManager.initActiveElement(Lelem);

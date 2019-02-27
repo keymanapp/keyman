@@ -40,119 +40,126 @@
  * 
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
-class LMLayer {
-  /**
-   * The underlying worker instance. By default, this is the LMLayerWorker. 
-   */
-  private _worker: Worker;
-  /** Call this when the LMLayer has sent us the 'ready' message! */
-  private _declareLMLayerReady: (conf: Configuration) => void;
-  private _promises: PromiseStore<Suggestion[]>;
-  private _nextToken: number;
 
-  /**
-   * Construct the top-level LMLayer interface. This also starts the underlying Worker.
-   * Make sure to call .initialize() when using the default Worker.
-   * 
-   * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
-   *            or file: URI. If uri is not provided, this will start the default Worker.
-   */
-  constructor(worker?: Worker) {
-    // Either use the given worker, or instantiate the default worker.
-    this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
-    this._worker.onmessage = this.onMessage.bind(this)
-    this._declareLMLayerReady = null;
-    this._promises = new PromiseStore;
-    this._nextToken = Number.MIN_SAFE_INTEGER;
-  }
+namespace com.keyman.text.prediction {
+  export class LMLayer {
+    /**
+     * The underlying worker instance. By default, this is the LMLayerWorker. 
+     */
+    private _worker: Worker;
+    /** Call this when the LMLayer has sent us the 'ready' message! */
+    private _declareLMLayerReady: (conf: Configuration) => void;
+    private _promises: PromiseStore<Suggestion[]>;
+    private _nextToken: number;
 
-  /**
-   * Initializes the LMLayer worker with the keyboard/platform's capabilities,
-   * as well as a description of the model required.
-   */
-  initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration> {
-    return new Promise((resolve, _reject) => {
-      this._worker.postMessage({
-        message: 'initialize',
-        capabilities,
-        model
+    /**
+     * Construct the top-level LMLayer interface. This also starts the underlying Worker.
+     * Make sure to call .initialize() when using the default Worker.
+     * 
+     * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
+     *            or file: URI. If uri is not provided, this will start the default Worker.
+     */
+    constructor(worker?: Worker) {
+      // Either use the given worker, or instantiate the default worker.
+      this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
+      this._worker.onmessage = this.onMessage.bind(this)
+      this._declareLMLayerReady = null;
+      this._promises = new PromiseStore;
+      this._nextToken = Number.MIN_SAFE_INTEGER;
+    }
+
+    /**
+     * Initializes the LMLayer worker with the keyboard/platform's capabilities,
+     * as well as a description of the model required.
+     */
+    initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration> {
+      return new Promise((resolve, _reject) => {
+        this._worker.postMessage({
+          message: 'initialize',
+          capabilities,
+          model
+        });
+
+        // Sets up so the promise is resolved in the onMessage() callback, when it receives
+        // the 'ready' message.
+        this._declareLMLayerReady = resolve;
       });
+    }
 
-      // Sets up so the promise is resolved in the onMessage() callback, when it receives
-      // the 'ready' message.
-      this._declareLMLayerReady = resolve;
-    });
-  }
-
-  predict(transform: Transform, context: Context): Promise<Suggestion[]> {
-    let token = this._nextToken++;
-    return new Promise((resolve, reject) => {
-      this._promises.make(token, resolve, reject);
-      this._worker.postMessage({
-        message: 'predict',
-        token: token,
-        transform: transform,
-        context: context,
+    predict(transform: Transform, context: Context): Promise<Suggestion[]> {
+      let token = this._nextToken++;
+      return new Promise((resolve, reject) => {
+        this._promises.make(token, resolve, reject);
+        this._worker.postMessage({
+          message: 'predict',
+          token: token,
+          transform: transform,
+          context: context,
+        });
       });
-    });
-  }
+    }
 
-  // TODO: asynchronous close() method.
-  //       Worker code must recognize message and call self.close().
+    // TODO: asynchronous close() method.
+    //       Worker code must recognize message and call self.close().
 
-  private onMessage(event: MessageEvent): void {
-    let payload: OutgoingMessage = event.data;
-    if (payload.message === 'ready') {
-      this._declareLMLayerReady(event.data.configuration);
-    } else if (payload.message === 'suggestions') {
-      this._promises.keep(payload.token, payload.suggestions);
-    } else {
-      // This branch should never execute, but just in case...
-      //@ts-ignore
-      throw new Error(`Message not implemented: ${payload.message}`);
+    private onMessage(event: MessageEvent): void {
+      let payload: OutgoingMessage = event.data;
+      if (payload.message === 'ready') {
+        this._declareLMLayerReady(event.data.configuration);
+      } else if (payload.message === 'suggestions') {
+        this._promises.keep(payload.token, payload.suggestions);
+      } else {
+        // This branch should never execute, but just in case...
+        //@ts-ignore
+        throw new Error(`Message not implemented: ${payload.message}`);
+      }
+    }
+
+    /**
+     * Given a function, this utility returns the source code within it, as a string.
+     * This is intended to unwrap the "wrapped" source code created in the LMLayerWorker
+     * build process.
+     *
+     * @param fn The function whose body will be returned.
+     */
+    static unwrap(fn: Function): string {
+        let wrapper = fn.toString();
+        let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
+        return match[1];
+    }
+
+    /**
+     * Converts the INSIDE of a function into a blob URI that can
+     * be passed as a valid URI for a Worker.
+     * @param fn Function whose body will be referenced by a URI.
+     * 
+     * This function makes the following possible:
+     * 
+     *    let worker = new Worker(LMLayer.asBlobURI(function myWorkerCode () {
+     *      postMessage('inside Web Worker')
+     *      function onmessage(event) {
+     *        // handle message inside Web Worker.
+     *      }
+     *    }));
+     */
+    static asBlobURI(fn: Function): string {
+      let code = LMLayer.unwrap(fn);
+      let blob = new Blob([code], { type: 'text/javascript' });
+      return URL.createObjectURL(blob);
     }
   }
-
-  /**
-   * Given a function, this utility returns the source code within it, as a string.
-   * This is intended to unwrap the "wrapped" source code created in the LMLayerWorker
-   * build process.
-   *
-   * @param fn The function whose body will be returned.
-   */
-  static unwrap(fn: Function): string {
-      let wrapper = fn.toString();
-      let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
-      return match[1];
-  }
-
-  /**
-   * Converts the INSIDE of a function into a blob URI that can
-   * be passed as a valid URI for a Worker.
-   * @param fn Function whose body will be referenced by a URI.
-   * 
-   * This function makes the following possible:
-   * 
-   *    let worker = new Worker(LMLayer.asBlobURI(function myWorkerCode () {
-   *      postMessage('inside Web Worker')
-   *      function onmessage(event) {
-   *        // handle message inside Web Worker.
-   *      }
-   *    }));
-   */
-  static asBlobURI(fn: Function): string {
-    let code = LMLayer.unwrap(fn);
-    let blob = new Blob([code], { type: 'text/javascript' });
-    return URL.createObjectURL(blob);
-  }
 }
 
-// Let LMLayer be available both in the browser and in Node.
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = LMLayer;
-  //@ts-ignore
-  LMLayer.PromiseStore = PromiseStore;
-} else {
-  //@ts-ignore
-  window.LMLayer = LMLayer;
-}
+(function(){
+  let ns = com.keyman.text.prediction;
+
+  // Let LMLayer be available both in the browser and in Node.
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ns.LMLayer;
+    //@ts-ignore
+    ns.LMLayer.PromiseStore = ns.PromiseStore;
+  } else {
+    //@ts-ignore
+    window.LMLayer = ns.LMLayer;
+  }
+}());
