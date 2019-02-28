@@ -28,71 +28,73 @@
  * Defines a simple word list (unigram) model.
  */
 
-/**
- * @class WordListModel
- *
- * Defines the word list model, or the unigram model.
- * Unigram models throw away all preceding words, and search
- * for the next word exclusively. As such, they can perform simple
- * prefix searches within words, however they are not very good
- * at predicting the next word.
- */
-LMLayerWorker.models.WordListModel = (function () {
-  /** Upper bound on the amount of suggestions to generate. */
-  const MAX_SUGGESTIONS = 3;
+ namespace models {
+  /**
+   * @class WordListModel
+   *
+   * Defines the word list model, or the unigram model.
+   * Unigram models throw away all preceding words, and search
+   * for the next word exclusively. As such, they can perform simple
+   * prefix searches within words, however they are not very good
+   * at predicting the next word.
+   */
+  LMLayerWorker.models.WordListModel = (function () {
+    /** Upper bound on the amount of suggestions to generate. */
+    const MAX_SUGGESTIONS = 3;
 
-  return class WordListModel implements WorkerInternalModel {
-    private _wordlist: string[];
+    return class WordListModel implements WorkerInternalModel {
+      private _wordlist: string[];
 
-    constructor(_capabilities: Capabilities, wordlist: string[]) {
-      this._wordlist = wordlist;
-    }
-
-    predict(transform: Transform, context: Context): Suggestion[] {
-      // EVERYTHING to the left of the cursor: 
-      let fullLeftContext = context.left || '';
-      // Stuff to the left of the cursor in the current word.
-      let leftContext = fullLeftContext.split(/\s+/).pop() || '';
-      // All text to the left of the cursor INCLUDING anything that has
-      // just been typed.
-      let prefix = leftContext + (transform.insert || '');
-      let suggestions: Suggestion[] = [];
-
-      // Special-case the empty buffer/transform: return the top suggestions.
-      if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
-        return this._wordlist.slice(0, MAX_SUGGESTIONS).map(word => ({
-          transform: {
-            insert: word + ' ',
-            deleteLeft: 0
-          },
-          displayAs: word
-        }));
+      constructor(_capabilities: Capabilities, wordlist: string[]) {
+        this._wordlist = wordlist;
       }
 
-      // Naïve O(n) exhaustive search through the entire word
-      // list, up to the suggestion limit.
-      for (let word of this._wordlist) {
-        let suggestionPrefix = word.substr(0, prefix.length);
-        if (prefix !== suggestionPrefix) {
-          continue;
+      predict(transform: Transform, context: Context): Suggestion[] {
+        // EVERYTHING to the left of the cursor: 
+        let fullLeftContext = context.left || '';
+        // Stuff to the left of the cursor in the current word.
+        let leftContext = fullLeftContext.split(/\s+/).pop() || '';
+        // All text to the left of the cursor INCLUDING anything that has
+        // just been typed.
+        let prefix = leftContext + (transform.insert || '');
+        let suggestions: Suggestion[] = [];
+
+        // Special-case the empty buffer/transform: return the top suggestions.
+        if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
+          return this._wordlist.slice(0, MAX_SUGGESTIONS).map(word => ({
+            transform: {
+              insert: word + ' ',
+              deleteLeft: 0
+            },
+            displayAs: word
+          }));
         }
 
-        suggestions.push({
-          transform: {
-            // The left part of the word has already been entered.
-            insert: word.substr(leftContext.length) + ' ',
-            deleteLeft: 0,
-          },
-          displayAs: word,
-        });
+        // Naïve O(n) exhaustive search through the entire word
+        // list, up to the suggestion limit.
+        for (let word of this._wordlist) {
+          let suggestionPrefix = word.substr(0, prefix.length);
+          if (prefix !== suggestionPrefix) {
+            continue;
+          }
 
-        // Do not exceed the limit on suggestions.
-        if (suggestions.length >= MAX_SUGGESTIONS) {
-          break;
+          suggestions.push({
+            transform: {
+              // The left part of the word has already been entered.
+              insert: word.substr(leftContext.length) + ' ',
+              deleteLeft: 0,
+            },
+            displayAs: word,
+          });
+
+          // Do not exceed the limit on suggestions.
+          if (suggestions.length >= MAX_SUGGESTIONS) {
+            break;
+          }
         }
+
+        return suggestions;
       }
-
-      return suggestions;
-    }
-  };
-}());
+    };
+  }());
+}

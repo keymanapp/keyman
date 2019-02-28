@@ -236,6 +236,9 @@ class LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage });
     scope.onmessage = worker.onMessage.bind(worker);
 
+    // Ensures that the worker instance is accessible for loaded model scripts.
+    scope['LMLayerWorker'] = worker;
+
     return worker;
   }
 }

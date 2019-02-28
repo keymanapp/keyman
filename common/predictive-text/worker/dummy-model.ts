@@ -22,33 +22,35 @@
 
 /// <reference path="./index.ts" />
 
-/**
- * @file dummy-model.ts
- * 
- * Defines the Dummy model, which is used for testing the
- * prediction API exclusively.
- */
+namespace models {
+  /**
+   * @file dummy-model.ts
+   * 
+   * Defines the Dummy model, which is used for testing the
+   * prediction API exclusively.
+   */
 
-/**
- * The Dummy Model that returns nonsensical, but predictable results. 
- */
-LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
-  configuration: Configuration;
-  private _futureSuggestions: Suggestion[][];
+  /**
+   * The Dummy Model that returns nonsensical, but predictable results. 
+   */
+  LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
+    configuration: Configuration;
+    private _futureSuggestions: Suggestion[][];
 
-  constructor(capabilities: Capabilities, options?: any) {
-    options = options || {};
-    this.configuration = options.configuration || {};
-    // Create a shallow copy of the suggestions;
-    // this class mutates the array.
-    this._futureSuggestions = options.futureSuggestions
-      ? options.futureSuggestions.slice() : [];
-  }
-
-  predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Suggestion[] {
-    if (injectedSuggestions) {
-      return injectedSuggestions;
+    constructor(capabilities: Capabilities, options?: any) {
+      options = options || {};
+      this.configuration = options.configuration || {};
+      // Create a shallow copy of the suggestions;
+      // this class mutates the array.
+      this._futureSuggestions = options.futureSuggestions
+        ? options.futureSuggestions.slice() : [];
     }
-    return this._futureSuggestions.shift();
-  }
-};
+
+    predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Suggestion[] {
+      if (injectedSuggestions) {
+        return injectedSuggestions;
+      }
+      return this._futureSuggestions.shift();
+    }
+  };
+}
