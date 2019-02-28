@@ -31,13 +31,14 @@ public class LexicalModelPackageProcessorTest {
   private static final int TEST_EN_CUSTOM_MODEL_COUNT = 2;
 
   private static File tempPkg;
+  private static LexicalModelPackageProcessor lmPP;
 
   // Each test gets a fresh version of the extracted package.
   @Before
   public void extractBaseTestPackage() {
-    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    lmPP = new LexicalModelPackageProcessor(TEST_EXTRACTION_ROOT);
     try {
-      tempPkg = LexicalModelPackageProcessor.unzipKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE);
+      tempPkg = lmPP.unzipKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE);
     } catch (IOException e) {
       System.err.println(e);
     }
@@ -57,20 +58,13 @@ public class LexicalModelPackageProcessorTest {
   // Lexical Model Package Tests
 
   @Test
-  public void test_getPackageTarget() {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
-
-    Assert.assertEquals(PackageProcessor.PP_LEXICAL_MODELS_KEY, PackageProcessor.getPackageTarget(json));
-  }
-
-  @Test
   public void test_load_EN_CUSTOM_models() throws Exception {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    JSONObject json = lmPP.loadPackageInfo(tempPkg);
     FileUtils.moveDirectory(tempPkg, TEST_EN_CUSTOM_MODEL_KMP_TARGET);
 
     Assert.assertNotNull(json);
 
-    Map<String, String>[] models = LexicalModelPackageProcessor.processLexicalModelsEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom");
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom");
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
     en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");
@@ -91,7 +85,7 @@ public class LexicalModelPackageProcessorTest {
 
   @Test
   public void test_kmpProcessLexicalModel() throws Exception {
-    List<Map<String, String>> installedModels = LexicalModelPackageProcessor.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, true, true);
+    List<Map<String, String>> installedModels = lmPP.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, true, true);
 
     Assert.assertEquals(TEST_EN_CUSTOM_MODEL_COUNT, installedModels.size());
   }

@@ -1,5 +1,6 @@
 package com.tavultesoft.kmea.packages;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
@@ -27,11 +28,23 @@ import java.util.Map;
 public class LexicalModelPackageProcessor extends PackageProcessor {
   private static final String TAG = "LMPackageProcessor";
 
-  static File constructPath(File path, boolean temp) {
+  public LexicalModelPackageProcessor(File resourceRoot) {
+    super(resourceRoot);
+  }
+
+  public LexicalModelPackageProcessor(Context context) {
+    super(context);
+  }
+
+  public File constructPath(File path, boolean temp) {
     String kmpBaseName = getPackageID(path);
     // Feel free to change this as desired - simply ensure it is unique enough to never be used as
     // a legitimate package name.
     String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
+
+    if (temp) {
+      return new File(resourceRoot, KMManager.KMDefault_LexicalModelPackages + File.separator + kmpFolderName + File.separator);
+    }
 
     return new File(resourceRoot, KMManager.KMDefault_LexicalModelPackages + File.separator + kmpFolderName + File.separator);
   }
@@ -42,7 +55,9 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
    * @return The mapped temporary file path for the .kmp file's contents.
    * @throws IOException
    */
+    /*
   public static File unzipKMP(File path) throws IOException {
+    return PackageProcessor.unzipKMP(path);
     File tempModelPath = constructPath(path, true);
     if (!tempModelPath.exists()) {
       tempModelPath.mkdir();
@@ -51,8 +66,9 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
 
     return tempModelPath;
   }
+    */
 
-  static boolean lexicalModelExists(final String packageId, final String modelId) {
+  private boolean lexicalModelExists(final String packageId, final String modelId) {
     if (resourceRoot != null) {
       FileFilter lexicalModelFilter = new FileFilter() {
         @Override
@@ -78,45 +94,19 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     return false;
   }
 
-  static boolean welcomeExists(final String packageId) {
-    if (resourceRoot != null) {
-      FileFilter welcomeFilter = new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-          if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
-            return true;
-          }
-          return false;
-        }
-      };
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId) throws JSONException {
+    JSONArray languages = jsonEntry.getJSONArray("languages");
 
-      File kmpFile = new File(packageId + ".kmp");
-      if (!kmpFile.exists()) {
-        kmpFile = new File(packageId + ".model.kmp");
-      }
-      File packageDir = constructPath(kmpFile, false);
-      File[] files = packageDir.listFiles(welcomeFilter);
-      if (files.length > 0) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public static Map<String, String>[] processLexicalModelsEntry(JSONObject jsonModel, String packageId) throws JSONException {
-    JSONArray languages = jsonModel.getJSONArray("languages");
-
-    String modelId = jsonModel.getString("id");
+    String modelId = jsonEntry.getString("id");
     if (lexicalModelExists(packageId, modelId)) {
       HashMap<String, String>[] models = new HashMap[languages.length()];
 
       for (int i = 0; i < languages.length(); i++) {
         models[i] = new HashMap<>();
         models[i].put(KMManager.KMKey_PackageID, packageId);
-        models[i].put(KMManager.KMKey_LexicalModelName, jsonModel.getString("name"));
-        models[i].put(KMManager.KMKey_LexicalModelID, jsonModel.getString("id"));
-        models[i].put(KMManager.KMKey_LexicalModelVersion, jsonModel.getString("version"));
+        models[i].put(KMManager.KMKey_LexicalModelName, jsonEntry.getString("name"));
+        models[i].put(KMManager.KMKey_LexicalModelID, jsonEntry.getString("id"));
+        models[i].put(KMManager.KMKey_LexicalModelVersion, jsonEntry.getString("version"));
         models[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
         models[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
 
@@ -146,7 +136,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public static List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
     return processKMP(path, false);
   }
 
@@ -160,7 +150,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public static List<Map<String, String>> processKMP(File path, boolean force) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, boolean force) throws IOException, JSONException {
     return processKMP(path, force, false);
   }
 
@@ -175,7 +165,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
     ArrayList<Map<String, String>> lexicalModelSpecs = new ArrayList<>();
@@ -210,10 +200,10 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
 
     // Verify newInfoJSON has "lexicalModels" and not "keyboards"
     if (newInfoJSON.has(PackageProcessor.PP_LEXICAL_MODELS_KEY) && !newInfoJSON.has(PackageProcessor.PP_KEYBOARDS_KEY)) {
-      JSONArray lexicalModels = newInfoJSON.getJSONArray(PP_LEXICAL_MODELS_KEY);
+       JSONArray lexicalModels = newInfoJSON.getJSONArray(PP_LEXICAL_MODELS_KEY);
 
       for (int i = 0; i < lexicalModels.length(); i++) {
-        Map<String, String>[] lms = processLexicalModelsEntry(lexicalModels.getJSONObject(i), packageId);
+        Map<String, String>[] lms = processEntry(lexicalModels.getJSONObject(i), packageId);
         if (lms != null) {
           lexicalModelSpecs.addAll(Arrays.asList(lms));
         }

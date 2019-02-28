@@ -52,6 +52,7 @@ import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -200,9 +201,6 @@ public final class KMManager {
       Log.e(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
-    // Initializes the PackageProcessor with the base resource directory, which is the parent directory
-    // for the final location corresponding to KMDefault_AssetPackages.
-    PackageProcessor.initialize(new File(getResourceRoot()));
     JSONUtils.initialize(new File(getPackagesDir()));
   }
 

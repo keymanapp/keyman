@@ -46,6 +46,7 @@ public class PackageActivity extends AppCompatActivity {
   private List<Map<String, String>> installedPackageKeyboards;
   private List<Map<String, String>> installedLexicalModels;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
+  private PackageProcessor kmpProcessor;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -59,18 +60,23 @@ public class PackageActivity extends AppCompatActivity {
       kmpFile = new File(bundle.getString("kmpFile"));
     }
 
-    final String pkgId = PackageProcessor.getPackageID(kmpFile);
-    final String pkgTarget = PackageProcessor.getPackageTarget(kmpFile, false);
+    kmpProcessor =  new PackageProcessor(context);
+    final String pkgId = kmpProcessor.getPackageID(kmpFile);
+    final String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
 
     try {
+      // Initializes the PackageProcessor with the base resource directory, which is the parent directory
+      // for the final location corresponding to KMDefault_AssetPackages.
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
-        tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
+        // No action
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-        tempPackagePath = LexicalModelPackageProcessor.unzipKMP(kmpFile);
+        kmpProcessor = new LexicalModelPackageProcessor(context);
       } else {
         showErrorToast(context, getString(R.string.no_targets_to_install));
         return;
       }
+      tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
+
     } catch (Exception e) {
       showErrorToast(context, getString(R.string.failed_to_extract));
       return;

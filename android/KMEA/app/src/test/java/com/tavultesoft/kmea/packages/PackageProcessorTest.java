@@ -52,12 +52,14 @@ public class PackageProcessorTest {
   private static File tempPkgAlt;
   private static File tempPkgUndefinedVer;
 
+  private PackageProcessor PP, PP_ALT, PP_UNDEFINED;
+
   // Each test gets a fresh version of the extracted package.
   @Before
   public void extractBaseTestPackage() {
-    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    PP = new PackageProcessor(TEST_EXTRACTION_ROOT);
     try {
-      tempPkg = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE);
+      tempPkg = PP.unzipKMP(TEST_GFF_KMP_FILE);
     } catch (IOException e) {
       System.err.println(e);
     }
@@ -65,9 +67,9 @@ public class PackageProcessorTest {
 
   // Some tests wish to utilize an alternate package..
   public void extractAltTestPackage() {
-    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    PP_ALT = new PackageProcessor(TEST_EXTRACTION_ROOT);
     try {
-      tempPkgAlt = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_ALT);
+      tempPkgAlt = PP_ALT.unzipKMP(TEST_GFF_KMP_FILE_ALT);
     } catch (IOException e) {
       System.err.println(e);
     }
@@ -77,9 +79,9 @@ public class PackageProcessorTest {
 
   // Some tests wish to utilize package with undefined version...
   public void extractUndefinedVerTestPackage() {
-    PackageProcessor.initialize(TEST_EXTRACTION_ROOT);
+    PP_UNDEFINED = new PackageProcessor(TEST_EXTRACTION_ROOT);
     try {
-      tempPkgUndefinedVer = PackageProcessor.unzipKMP(TEST_GFF_KMP_FILE_UNDEFINED_VER);
+      tempPkgUndefinedVer = PP_UNDEFINED.unzipKMP(TEST_GFF_KMP_FILE_UNDEFINED_VER);
     } catch (IOException e) {
       System.err.println(e);
     }
@@ -107,7 +109,7 @@ public class PackageProcessorTest {
 
   @Test
   public void test_loadInfoJSON() throws Exception {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    JSONObject json = PP.loadPackageInfo(tempPkg);
 
     Assert.assertNotNull(json);
 //
@@ -128,12 +130,12 @@ public class PackageProcessorTest {
 
   @Test
   public void test_load_GFF_KMP_keyboards() throws Exception {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    JSONObject json = PP.loadPackageInfo(tempPkg);
     FileUtils.moveDirectory(tempPkg, TEST_GFF_KMP_TARGET);
 
     Assert.assertNotNull(json);
 
-    Map<String, String>[] keyboards = PackageProcessor.processKeyboardsEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
     // Only the first language is installed with the keyboard
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
@@ -153,14 +155,14 @@ public class PackageProcessorTest {
   @Test
   public void test_PathConstruction() {
     String permPath = TEST_EXTRACTION_ROOT.toString() + File.separator + "packages" + File.separator + TEST_GFF_KMP_NAME;
-    Assert.assertEquals(new File(permPath), PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false));
+    Assert.assertEquals(new File(permPath), PP.constructPath(TEST_GFF_KMP_FILE, false));
 
-    Assert.assertNotEquals(new File(permPath), PackageProcessor.constructPath(TEST_GFF_KMP_FILE, true));
+    Assert.assertNotEquals(new File(permPath), PP.constructPath(TEST_GFF_KMP_FILE, true));
   }
 
   @Test
   public void test_installKMP() throws Exception {
-    List<Map<String, String>> installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
+    List<Map<String, String>> installedKbds = PP.processKMP(TEST_GFF_KMP_FILE);
 
     Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
@@ -168,112 +170,112 @@ public class PackageProcessorTest {
 
   @Test
   public void test_upgradeInstall() throws Exception {
-    File installedKMP = PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false);
+    File installedKMP = PP.constructPath(TEST_GFF_KMP_FILE, false);
     List<Map<String, String>> installedKbds;
     String version;
 
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE);
-    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE);
+    version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
 
     extractAltTestPackage();
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
-    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT);
+    version = PP_ALT.getPackageVersion(PP_ALT.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
   }
 
   @Test
   public void test_downgradeInstall() throws Exception {
-    File installedKMP = PackageProcessor.constructPath(TEST_GFF_KMP_FILE, false);
+    File installedKMP = PP.constructPath(TEST_GFF_KMP_FILE, false);
     List<Map<String, String>> installedKbds;
     String version;
 
     extractAltTestPackage();
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT, false);
-    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, false);
+    version = PP_ALT.getPackageVersion(PP_ALT.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
 
     // Blocked downgrade attempt.
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, false);
-    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, false);
+    version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(0, installedKbds.size());
     Assert.assertEquals("1.5", version);
 
-    installedKbds = PackageProcessor.processKMP(TEST_GFF_KMP_FILE, true);
-    version = PackageProcessor.getPackageVersion(PackageProcessor.loadPackageInfo(installedKMP));
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, true);
+    version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
   }
 
   @Test
   public void test_keyboardVersion() throws Exception {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    JSONObject json = PP.loadPackageInfo(tempPkg);
 
     Assert.assertEquals("1.4", PackageProcessor.getKeyboardVersion(json, TEST_GFF_KBD_ID));
   }
 
   @Test
   public void test_getPackageID() {
-    Assert.assertEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
-    Assert.assertNotEquals(TEST_GFF_KBD_ID, PackageProcessor.getPackageID(TEST_GFF_KMP_FILE));
-    Assert.assertEquals(TEST_EN_CUSTOM_MODEL_ID, PackageProcessor.getPackageID(TEST_EN_CUSTOM_MODEL_KMP_FILE));
+    Assert.assertEquals(TEST_GFF_KMP_NAME, PP.getPackageID(TEST_GFF_KMP_FILE));
+    Assert.assertNotEquals(TEST_GFF_KBD_ID, PP.getPackageID(TEST_GFF_KMP_FILE));
+    Assert.assertEquals(TEST_EN_CUSTOM_MODEL_ID, PP.getPackageID(TEST_EN_CUSTOM_MODEL_KMP_FILE));
   }
 
   @Test
   public void test_getPackageName() throws Exception {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    JSONObject json = PP.loadPackageInfo(tempPkg);
 
-    Assert.assertEquals(TEST_GFF_PACKAGE_NAME, PackageProcessor.getPackageName(json));
-    Assert.assertNotEquals(TEST_GFF_KMP_NAME, PackageProcessor.getPackageName(json));
+    Assert.assertEquals(TEST_GFF_PACKAGE_NAME, PP.getPackageName(json));
+    Assert.assertNotEquals(TEST_GFF_KMP_NAME, PP.getPackageName(json));
   }
 
   @Test
   public void test_getPackageVersion() {
     extractUndefinedVerTestPackage();
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkgUndefinedVer);
+    JSONObject json = PP_UNDEFINED.loadPackageInfo(tempPkgUndefinedVer);
 
-    Assert.assertEquals(PackageProcessor.PP_DEFAULT_VERSION, PackageProcessor.getPackageVersion(json));
+    Assert.assertEquals(PackageProcessor.PP_DEFAULT_VERSION, PP_UNDEFINED.getPackageVersion(json));
   }
 
   @Test
   public void test_getPackageTarget() {
-    JSONObject json = PackageProcessor.loadPackageInfo(tempPkg);
+    JSONObject json = PP.loadPackageInfo(tempPkg);
 
-    Assert.assertEquals(PackageProcessor.PP_TARGET_KEYBOARDS, PackageProcessor.getPackageTarget(json));
+    Assert.assertEquals(PackageProcessor.PP_TARGET_KEYBOARDS, PP.getPackageTarget(json));
   }
 
   @Test
   public void test_versionChecks() throws Exception {
-    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
-    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
+    Assert.assertFalse(PP.isDowngrade(TEST_GFF_KMP_FILE));
+    Assert.assertFalse(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     extractAltTestPackage();
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE_ALT);
+    PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT);
 
-    Assert.assertTrue(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
-    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
+    Assert.assertTrue(PP.isDowngrade(TEST_GFF_KMP_FILE));
+    Assert.assertFalse(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     // Test 2 - when it's an equal version.
-    PackageProcessor.processKMP(TEST_GFF_KMP_FILE, true);
-    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE));
-    Assert.assertTrue(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE));
+    PP.processKMP(TEST_GFF_KMP_FILE, true);
+    Assert.assertFalse(PP.isDowngrade(TEST_GFF_KMP_FILE));
+    Assert.assertTrue(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     // Test 3 - when it's an upgrade.
     extractAltTestPackage();
-    Assert.assertFalse(PackageProcessor.isDowngrade(TEST_GFF_KMP_FILE_ALT));
-    Assert.assertFalse(PackageProcessor.isSameVersion(TEST_GFF_KMP_FILE_ALT));
+    Assert.assertFalse(PP_ALT.isDowngrade(TEST_GFF_KMP_FILE_ALT));
+    Assert.assertFalse(PP_ALT.isSameVersion(TEST_GFF_KMP_FILE_ALT));
   }
 
   @Test
   public void test_kmpVersionCheck() {
-    JSONObject json14 = PackageProcessor.loadPackageInfo(tempPkg);
-    Assert.assertEquals("1.4", PackageProcessor.getPackageVersion(json14));
+    JSONObject json14 = PP.loadPackageInfo(tempPkg);
+    Assert.assertEquals("1.4", PP.getPackageVersion(json14));
 
     extractAltTestPackage();
-    JSONObject json15 = PackageProcessor.loadPackageInfo(tempPkgAlt);
-    Assert.assertEquals("1.5", PackageProcessor.getPackageVersion(json15));
+    JSONObject json15 = PP_ALT.loadPackageInfo(tempPkgAlt);
+    Assert.assertEquals("1.5", PP_ALT.getPackageVersion(json15));
   }
 }
