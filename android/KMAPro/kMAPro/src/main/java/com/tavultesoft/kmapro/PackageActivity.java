@@ -60,13 +60,14 @@ public class PackageActivity extends AppCompatActivity {
       kmpFile = new File(bundle.getString("kmpFile"));
     }
 
-    kmpProcessor =  new PackageProcessor(context);
+    File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+    kmpProcessor =  new PackageProcessor(resourceRoot);
     final String pkgId = kmpProcessor.getPackageID(kmpFile);
     final String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
 
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-        kmpProcessor = new LexicalModelPackageProcessor(context);
+        kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
       } else if (!pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         showErrorToast(context, getString(R.string.no_targets_to_install));
         return;

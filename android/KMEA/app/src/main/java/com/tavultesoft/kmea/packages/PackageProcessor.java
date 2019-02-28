@@ -31,7 +31,7 @@ import org.json.JSONObject;
  * KMEA engine.  This is primarily for installing keyboard packages.
  */
 public class PackageProcessor {
-  protected static File resourceRoot = null, cacheRoot = null;
+  protected static File resourceRoot = null;
 
   public static final String PP_DEFAULT_VERSION = "1.0";
   public static final String PP_DEFAULT_METADATA = "kmp.json";
@@ -46,14 +46,8 @@ public class PackageProcessor {
 
   private static final String TAG = "PackageProcessor";
 
-  // This constructor primarily for unit tests
   public PackageProcessor(File resourceRoot) {
     this.resourceRoot = resourceRoot;
-  }
-
-  public PackageProcessor(Context context) {
-    this.resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
-    this.cacheRoot = new File(context.getCacheDir().toString() + File.separator);
   }
 
   /**
@@ -203,7 +197,7 @@ public class PackageProcessor {
 
   /**
    * Simply extracts the package's name.
-   * @param json The metadata JSONOBject for the package.
+   * @param json The metadata JSONObject for the package.
    * @return The package name (via String)
    */
   public String getPackageName(JSONObject json) {

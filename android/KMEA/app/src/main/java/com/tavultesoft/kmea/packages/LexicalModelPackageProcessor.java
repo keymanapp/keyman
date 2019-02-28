@@ -1,11 +1,7 @@
 package com.tavultesoft.kmea.packages;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.ZipUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,8 +10,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,41 +26,14 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     super(resourceRoot);
   }
 
-  public LexicalModelPackageProcessor(Context context) {
-    super(context);
-  }
-
   public File constructPath(File path, boolean temp) {
     String kmpBaseName = getPackageID(path);
     // Feel free to change this as desired - simply ensure it is unique enough to never be used as
     // a legitimate package name.
     String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
 
-    if (temp) {
-      return new File(resourceRoot, KMManager.KMDefault_LexicalModelPackages + File.separator + kmpFolderName + File.separator);
-    }
-
     return new File(resourceRoot, KMManager.KMDefault_LexicalModelPackages + File.separator + kmpFolderName + File.separator);
   }
-
-  /**
-   * Unzips the package.kmp file to its mapped temporary directory location.
-   * @param path The file path of the .kmp file, file name included.
-   * @return The mapped temporary file path for the .kmp file's contents.
-   * @throws IOException
-   */
-    /*
-  public static File unzipKMP(File path) throws IOException {
-    return PackageProcessor.unzipKMP(path);
-    File tempModelPath = constructPath(path, true);
-    if (!tempModelPath.exists()) {
-      tempModelPath.mkdir();
-    }
-    ZipUtils.unzip(path, tempModelPath);
-
-    return tempModelPath;
-  }
-    */
 
   private boolean lexicalModelExists(final String packageId, final String modelId) {
     if (resourceRoot != null) {
@@ -86,7 +53,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
       }
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(lexicalModelFilter);
-      if (files.length > 0) {
+      if (files != null && files.length > 0) {
         return true;
       }
     }
@@ -141,5 +108,4 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
   public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
     return super.processKMP(path, tempPath, key);
   }
-
 }
