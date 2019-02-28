@@ -2,6 +2,7 @@ var assert = chai.assert;
 var LMLayer = com.keyman.text.prediction.LMLayer;
 
 describe('LMLayerWorker', function () {
+  this.timeout(5000);
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {
       assert.isFunction(LMLayerWorkerCode,
@@ -19,8 +20,8 @@ describe('LMLayerWorker', function () {
       };
       worker.postMessage({
         message: 'initialize',
-        model: { type: 'dummy' },
-        capabilities: { maxLeftContextCodeUnits: 64 }
+        // Since the worker's based in a blob, it's not on the 'same domain'.  We need to absolute-path the model file.
+        model: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
       });
     });
   });

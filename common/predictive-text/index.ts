@@ -69,14 +69,12 @@ namespace com.keyman.text.prediction {
     }
 
     /**
-     * Initializes the LMLayer worker with the keyboard/platform's capabilities,
-     * as well as a description of the model required.
+     * Initializes the LMLayer worker with a path to the desired model file.
      */
-    initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration> {
+    initialize(model: string): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
         this._worker.postMessage({
           message: 'initialize',
-          capabilities,
           model
         });
 

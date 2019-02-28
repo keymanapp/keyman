@@ -75,9 +75,11 @@ class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  private _hostURL: string;
+
   constructor(options = {
     importScripts: null,
-    postMessage: null,
+    postMessage: null
   }) {
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
@@ -223,7 +225,7 @@ class LMLayerWorker {
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
-    let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts });
+    let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
 
     // Ensures that the worker instance is accessible for loaded model scripts.

@@ -13,19 +13,13 @@ describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
       var lmLayer = new LMLayer();
-      var capabilities = {
-        maxLeftContextCodeUnits: 32 + ~~Math.random() * 32
-      };
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
       return lmLayer.initialize(
-        capabilities,
-        {
-            type: 'dummy',
-            futureSuggestions: iGotDistractedByHazel()
-        }
+        // We need to provide an absolute path since the worker is based within a blob.
+        document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {

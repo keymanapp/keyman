@@ -59,6 +59,10 @@ module.exports = {
     variableName: '__json__'
   },
 
+  proxies: {
+    "/resources/": "/base/resources/"
+  },
+
   // web server port
   port: 9876,
 
