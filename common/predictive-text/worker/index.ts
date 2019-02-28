@@ -69,10 +69,18 @@ class LMLayerWorker {
    */
   private _postMessage: PostMessage;
 
+  /**
+   * By default, it's self.importScripts(), but can be overridden
+   * so that this can be tested **outside of a Worker**.
+   */
+  private _importScripts: ImportScripts;
+
   constructor(options = {
+    importScripts: null,
     postMessage: null,
   }) {
     this._postMessage = options.postMessage || postMessage;
+    this._importScripts = options.importScripts || importScripts;
     this.setupInitialState();
   }
 
@@ -126,23 +134,12 @@ class LMLayerWorker {
    * @param desc         Type of the model to instantiate and its parameters.
    * @param capabilities Capabilities on offer from the keyboard.
    */
-  private loadModel(desc: ModelDescription, capabilities: Capabilities) {
-    let model: WorkerInternalModel;
+  public loadModel(model: WorkerInternalModel) {
+    let capabilities = model.getCapabilities();
     let configuration: Configuration = {
       leftContextCodeUnits: 0,
       rightContextCodeUnits: 0
     };
-
-    if (desc.type === 'dummy') {
-      model = new models.DummyModel(capabilities, {
-        futureSuggestions: desc.futureSuggestions
-      });
-    } else if (desc.type === 'wordlist') {
-      model = new models.WordListModel(capabilities, desc.wordlist);
-    } else {
-      throw new Error('Invalid model');
-    }
-    // TODO: when model is object with kind 'wordlist' or 'fst'
 
     // Set reasonable defaults for the configuration.
     if (!configuration.leftContextCodeUnits) {
@@ -152,7 +149,14 @@ class LMLayerWorker {
       configuration.rightContextCodeUnits = capabilities.maxRightContextCodeUnits || 0;
     }
 
-    return {model, configuration};
+    this.transitionToReadyState(model);
+    this.cast('ready', { configuration });
+  }
+
+  private loadModelFile(url: string) {
+    // The self/global WebWorker method, allowing us to directly import another script file into WebWorker scope.
+    // If built correctly, the model's script file will auto-register the model with loadModel() above.
+    this._importScripts(url);
   }
 
   /**
@@ -171,13 +175,7 @@ class LMLayerWorker {
         }
 
         // TODO: validate configuration?
-        let {model, configuration} = this.loadModel(
-          // TODO: validate configuration, and provide valid configuration in tests.
-          payload.model, payload.capabilities
-        );
-
-        this.transitionToReadyState(model);
-        this.cast('ready', { configuration });
+        this.loadModelFile(payload.model);
       }
     };
   }
@@ -225,11 +223,12 @@ class LMLayerWorker {
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
-    let worker = new LMLayerWorker({ postMessage: scope.postMessage });
+    let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts });
     scope.onmessage = worker.onMessage.bind(worker);
 
     // Ensures that the worker instance is accessible for loaded model scripts.
     scope['LMLayerWorker'] = worker;
+    scope['models'] = models;
 
     return worker;
   }

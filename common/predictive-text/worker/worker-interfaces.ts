@@ -32,6 +32,7 @@
  * The signature of self.postMessage(), so that unit tests can mock it.
  */
 type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
+type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 
 
 /**
@@ -48,13 +49,9 @@ interface InitializeMessage {
   message: 'initialize';
 
   /**
-   * The model type, and all of its parameters.
+   * The model's compiled JS file.
    */
-  model: ModelDescription;
-  /**
-   * The configuration that the keyboard can offer to the model.
-   */
-  capabilities: Capabilities;
+  model: string;
 }
 
 /**
@@ -104,6 +101,7 @@ interface LMLayerWorkerState {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
+  getCapabilities(): Capabilities;
   predict(transform: Transform, context: Context): Suggestion[];
 }
 

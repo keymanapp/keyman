@@ -97,4 +97,19 @@ if (typeof require === 'function') {
     //             └── ...
     return require('./in_browser/json/' + name);
   }
+
+  var fs = require("fs");
+  var vm = require("vm");
+
+  // This worker-global function does not exist by default in Node!
+  _.importScriptsWith = function(context) {
+      return function() { // the constructed context's importScripts method.
+      debugger
+      for(var i=0; i < arguments.length; i++) {
+        context = vm.createContext(context);
+        var script = new vm.Script(fs.readFileSync(arguments[i]));
+        script.runInContext(context);
+      }
+    }
+  }
 }

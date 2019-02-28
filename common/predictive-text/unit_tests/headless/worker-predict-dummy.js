@@ -3,8 +3,6 @@
  */
 
 var assert = require('chai').assert;
-
-debugger
 var DummyModel = require('../../build/intermediate').models.DummyModel;
 
 describe('LMLayerWorker dummy model', function() {

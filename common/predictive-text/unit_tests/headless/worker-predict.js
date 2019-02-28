@@ -5,7 +5,7 @@ let LMLayerWorker = require('../../build/intermediate');
 
 
 describe('LMLayerWorker', function () {
-  describe('#predict()', function () {
+  describe.skip('#predict()', function () {
     it('should send back suggestions', function () {
       var suggestion = {
         transform: {
