@@ -20,8 +20,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="./index.ts" />
-
 namespace models {
   /**
    * @file dummy-model.ts
@@ -33,7 +31,7 @@ namespace models {
   /**
    * The Dummy Model that returns nonsensical, but predictable results. 
    */
-  LMLayerWorker.models.DummyModel = class DummyModel implements WorkerInternalModel {
+  export class DummyModel implements WorkerInternalModel {
     configuration: Configuration;
     private _futureSuggestions: Suggestion[][];
 

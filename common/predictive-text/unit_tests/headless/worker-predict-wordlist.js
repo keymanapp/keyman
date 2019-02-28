@@ -4,6 +4,7 @@
 
 var assert = require('chai').assert;
 
+debugger
 var WordListModel = require('../../build/intermediate').models.WordListModel;
 
 describe('LMLayerWorker word list model', function() {

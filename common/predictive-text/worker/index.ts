@@ -30,6 +30,8 @@
  */
 
 /// <reference path="../message.d.ts" />
+/// <reference path="models/dummy-model.ts" />
+/// <reference path="models/wordlist-model.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -54,16 +56,6 @@
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
 class LMLayerWorker {
-  /**
-   * All of the bundled model implementations will add themselves here:
-   * Note: the models will add themselves by including this
-   * file using a triple-slash directive:
-   * /// <reference path="path/to/this/file.ts" />
-   * then adding the constructor to this static object:
-   * LMLayerWorker.models.MyModelImplementation = class {}
-   */
-  static models: {[key: string]: WorkerInternalModelConstructor} = {};
-
   /**
    * State pattern. This object handles onMessage().
    * handleMessage() can transition to a different state, if
@@ -142,11 +134,11 @@ class LMLayerWorker {
     };
 
     if (desc.type === 'dummy') {
-      model = new LMLayerWorker.models.DummyModel(capabilities, {
+      model = new models.DummyModel(capabilities, {
         futureSuggestions: desc.futureSuggestions
       });
     } else if (desc.type === 'wordlist') {
-      model = new LMLayerWorker.models.WordListModel(capabilities, desc.wordlist);
+      model = new models.WordListModel(capabilities, desc.wordlist);
     } else {
       throw new Error('Invalid model');
     }
@@ -246,6 +238,7 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+  module.exports['models'] = models;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as DedicatedWorkerGlobalScope);
