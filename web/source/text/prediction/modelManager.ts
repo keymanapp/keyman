@@ -26,6 +26,7 @@ namespace com.keyman.text.prediction {
 
   export class ModelManager {
     private lmEngine: LMLayer;
+    private currentModel: ModelSpec;
 
     // Tracks registered models by ID.
     private registeredModels: {[id: string]: ModelSpec} = {};
@@ -41,27 +42,61 @@ namespace com.keyman.text.prediction {
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));
     }
 
+    private deactivateModel() {
+      // TODO:  Call a LMLayer method for model deactivation.
+      this.currentModel = null;
+    }
+
+    private activateModel(model: ModelSpec) {
+      if(!model) {
+        throw new Error("Null reference not allowed.");
+      }
+
+      // TODO:  Activate this model within the LMLayer!
+      let file = model.path;
+
+      //this.lmEngine.initialize(file)  // Currently unsupported.
+      console.log("Model detected!");
+
+      this.currentModel = model;
+    }
+
     onKeyboardChange(kbdInfo: KeyboardChangeData) {
       let lgCode = kbdInfo['languageCode'];
 
       let model = this.languageModelMap[lgCode];
 
-      if(model) {
-        // TODO:  Activate this model within the LMLayer!
-        let file = model.path;
+      if(this.currentModel !== model) {
+        this.deactivateModel();
 
-        //this.lmEngine.initialize(file)  // Currently unsupported.
-        console.log("Model detected!");
+        if(model) {
+          this.activateModel(model);
+        }
       }
     }
 
     // Accessible publicly as keyman.modelManager.register(model: ModelSpec)
     register(model: ModelSpec): void {
+      let keyman = com.keyman.singleton;
+      let activeLanguage = keyman.keyboardManager.getActiveLanguage();
+
       this.registeredModels[model.id] = model;
 
+      // Register the model for each targeted language code variant.
+      let mm = this;
       model.languages.forEach(function(code: string) {
-        this.languageModelMap[code] = model;
-      }, this);
+        mm.languageModelMap[code] = model;
+
+        // The model's for our active language!  Activate it!
+        if(code == activeLanguage) {
+          // Manually trigger our model-update event function.
+          mm.onKeyboardChange({
+            ['internalName']: keyman.keyboardManager.getActiveKeyboardName(),
+            ['languageCode']: code,
+            ['indirect']: true
+          });
+        }
+      });
     }
 
     isRegistered(model: ModelSpec): boolean {
