@@ -1,6 +1,6 @@
 # Keyman for Linux Version History
 
-## 2019-02-25 11.0.120 stable
+## 2019-02-25 11.0.124 stable
 * 11.0 Stable release
 
 ## 2019-02-22 11.0.111 beta

@@ -1,5 +1,11 @@
 # KeymanWeb Version History
 
+## 2019-02-27 11.0.222 stable
+* Fixes bug with OSK keys set as if on a different layer from the one they are actually on (#1628)
+
+## 2019-02-26 11.0.221 stable
+* Fixes bug with the Toolbar UI (#1629)
+
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release
 
