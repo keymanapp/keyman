@@ -408,8 +408,11 @@ public class PackageProcessor {
 
   /**
    * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
+   * This will overwrite an existing package.
    * @param path Filepath of a newly downloaded .kmp file.
-   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
+   * @param tempPath Filepath of temporarily extracted .kmp file
+   * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
+   * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
    * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
@@ -417,65 +420,20 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
-    return processKMP(path, false);
-  }
-
-  /**
-   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
-   * @param path Filepath of a newly downloaded .kmp file.
-   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
-   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
-   * May be empty if the package file is actually an old version.
-   * <br/><br/>
-   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
-   * as closely as practical.
-   * @throws IOException
-   * @throws JSONException
-   */
-  public List<Map<String, String>> processKMP(File path, boolean force) throws IOException, JSONException {
-    return processKMP(path, force, false);
-  }
-
-  /**
-   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
-   * @param path Filepath of a newly downloaded .kmp file.
-   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
-   * @param preExtracted Indicates that the specified file has already been unzipped.  Only of use for testing.
-   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
-   * May be empty if the package file is actually an old version.
-   * <br/><br/>
-   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
-   * as closely as practical.
-   * @throws IOException
-   * @throws JSONException
-   */
-  public List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
-    ArrayList<Map<String, String>> keyboardSpecs = new ArrayList<>();
+    ArrayList<Map<String, String>> specs = new ArrayList<>();
     if (KMManager.isReservedNamespace(getPackageID(path))) {
-      return keyboardSpecs;
-    }
-    File tempPath;
-    if (!preExtracted) {
-      tempPath = unzipKMP(path);
-    } else {
-      tempPath = constructPath(path, true);
+      return specs;
     }
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
     String packageId = getPackageID(path);
 
     File permPath = constructPath(path, false);
     if (permPath.exists()) {
-      if (!force && comparePackageDirectories(tempPath, permPath) != 1) {
-        // Abort!  The current installation is newer or as up-to-date.
-        FileUtils.deleteDirectory(tempPath);
-        return new ArrayList<>();  // It's empty; avoids dealing directly with null ptrs.
-      } else {
-        // Out with the old.  "In with the new" is identical to a new package installation.
-        FileUtils.deleteDirectory(permPath);
-      }
+      // Out with the old.  "In with the new" is identical to a new package installation.
+      FileUtils.deleteDirectory(permPath);
     }
 
     // No version conflict!  Proceed with the install!
@@ -488,21 +446,18 @@ public class PackageProcessor {
 //    System.out.println("Options: " + json.getJSONObject("options").toString(2));
 //    System.out.println("Info: " + json.getJSONObject("info").toString(2));
 //    System.out.println("Files: " + json.getJSONArray("files").toString(2));
+    if (newInfoJSON.has(key)) {
+      JSONArray entries = newInfoJSON.getJSONArray(key);
 
-    // Verify newInfoJSON has "keyboards" and not "lexicalModels"
-    if (newInfoJSON.has(PP_KEYBOARDS_KEY) && !newInfoJSON.has(PP_LEXICAL_MODELS_KEY)) {
-      // newInfoJSON holds all the newly downloaded/updated keyboard data.
-      JSONArray keyboards = newInfoJSON.getJSONArray(PP_KEYBOARDS_KEY);
-
-      for (int i = 0; i < keyboards.length(); i++) {
-        Map<String, String>[] kbds = processEntry(keyboards.getJSONObject(i), packageId);
-        if (kbds != null) {
-          keyboardSpecs.addAll(Arrays.asList(kbds));
+      for (int i = 0; i < entries.length(); i++) {
+        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId);
+        if (maps != null) {
+          specs.addAll(Arrays.asList(maps));
         }
       }
     }  else {
-      Log.e(TAG, path.getName() + " must contain \"keyboards\"");
+      Log.e(TAG, path.getName() + " must contain \"" + key + "\"");
     }
-    return keyboardSpecs;
+    return specs;
   }
 }

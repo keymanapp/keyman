@@ -130,89 +130,16 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
   /**
    * The master KMP processing method; use after a .model.kmp download to fully install within the filesystem.
    * @param path Filepath of a newly downloaded .kmp file.
+   * @param tempPath Filepath of temporarily extracted .kmp file
+   * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
    * @return A list of data maps of the newly installed and/or newly upgraded lexical models found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
    * @throws IOException
    * @throws JSONException
    */
-  public List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
-    return processKMP(path, false);
-  }
-
-  /**
-   * The master KMP processing method; use after a .model.kmp download to fully install within the filesystem.
-   * @param path Filepath of a newly downloaded .kmp file.
-   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
-   * @return A list of data maps of the newly installed and/or newly upgraded lexical models found in the package.
-   * May be empty if the package file is actually an old version.
-   * <br/><br/>
-   * @throws IOException
-   * @throws JSONException
-   */
-  public List<Map<String, String>> processKMP(File path, boolean force) throws IOException, JSONException {
-    return processKMP(path, force, false);
-  }
-
-  /**
-   * The master KMP processing method; use after a .model.kmp download to fully install within the filesystem.
-   * @param path Filepath of a newly downloaded .kmp file.
-   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
-   * @param preExtracted Indicates that the specified file has already been unzipped.  Only of use for testing.
-   * @return A list of data maps of the newly installed and/or newly upgraded lexical models found in the package.
-   * May be empty if the package file is actually an old version.
-   * <br/><br/>
-   * @throws IOException
-   * @throws JSONException
-   */
-  public List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
-    // Block reserved namespaces, like /cloud/.
-    // TODO:  Consider throwing an exception instead?
-    ArrayList<Map<String, String>> lexicalModelSpecs = new ArrayList<>();
-    if (KMManager.isReservedNamespace(getPackageID(path))) {
-      return lexicalModelSpecs;
-    }
-    File tempPath;
-    if (!preExtracted) {
-      tempPath = unzipKMP(path);
-    } else {
-      tempPath = constructPath(path, true);
-    }
-    JSONObject newInfoJSON = loadPackageInfo(tempPath);
-    String packageId = getPackageID(path);
-
-    File permPath = constructPath(path, false);
-    if (permPath.exists()) {
-      if (!force && comparePackageDirectories(tempPath, permPath) != 1) {
-        // Abort!  The current installation is newer or as up-to-date.
-        FileUtils.deleteDirectory(tempPath);
-        return new ArrayList<>();  // It's empty; avoids dealing directly with null ptrs.
-      } else {
-        // Out with the old.  "In with the new" is identical to a new package installation.
-        FileUtils.deleteDirectory(permPath);
-      }
-    }
-
-    // No version conflict!  Proceed with the install!
-    // Unfortunately, the nice recursive method provided by Apache Commons-IO's FileUtils class
-    // isn't available at Android runtime.
-    tempPath.renameTo(permPath);
-
-    // Verify newInfoJSON has "lexicalModels" and not "keyboards"
-    if (newInfoJSON.has(PackageProcessor.PP_LEXICAL_MODELS_KEY) && !newInfoJSON.has(PackageProcessor.PP_KEYBOARDS_KEY)) {
-       JSONArray lexicalModels = newInfoJSON.getJSONArray(PP_LEXICAL_MODELS_KEY);
-
-      for (int i = 0; i < lexicalModels.length(); i++) {
-        Map<String, String>[] lms = processEntry(lexicalModels.getJSONObject(i), packageId);
-        if (lms != null) {
-          lexicalModelSpecs.addAll(Arrays.asList(lms));
-        }
-      }
-    } else {
-      Log.e(TAG, path.getName() + " must contain \"lexicalModels\"");
-    }
-
-    return lexicalModelSpecs;
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
+    return super.processKMP(path, tempPath, key);
   }
 
 }

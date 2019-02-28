@@ -162,7 +162,7 @@ public class PackageProcessorTest {
 
   @Test
   public void test_installKMP() throws Exception {
-    List<Map<String, String>> installedKbds = PP.processKMP(TEST_GFF_KMP_FILE);
+    List<Map<String, String>> installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
 
     Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
@@ -174,13 +174,13 @@ public class PackageProcessorTest {
     List<Map<String, String>> installedKbds;
     String version;
 
-    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE);
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
     version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
 
     extractAltTestPackage();
-    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT);
+    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY);
     version = PP_ALT.getPackageVersion(PP_ALT.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
@@ -193,18 +193,13 @@ public class PackageProcessorTest {
     String version;
 
     extractAltTestPackage();
-    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, false);
+    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY);
     version = PP_ALT.getPackageVersion(PP_ALT.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
 
-    // Blocked downgrade attempt.
-    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, false);
-    version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
-    Assert.assertEquals(0, installedKbds.size());
-    Assert.assertEquals("1.5", version);
-
-    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, true);
+    extractBaseTestPackage();
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
     version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
@@ -253,13 +248,14 @@ public class PackageProcessorTest {
     Assert.assertFalse(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     extractAltTestPackage();
-    PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT);
+    PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY);
 
     Assert.assertTrue(PP.isDowngrade(TEST_GFF_KMP_FILE));
     Assert.assertFalse(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     // Test 2 - when it's an equal version.
-    PP.processKMP(TEST_GFF_KMP_FILE, true);
+    extractBaseTestPackage();
+    PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
     Assert.assertFalse(PP.isDowngrade(TEST_GFF_KMP_FILE));
     Assert.assertTrue(PP.isSameVersion(TEST_GFF_KMP_FILE));
 

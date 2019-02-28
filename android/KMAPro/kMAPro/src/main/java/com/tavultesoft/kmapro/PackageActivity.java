@@ -65,13 +65,9 @@ public class PackageActivity extends AppCompatActivity {
     final String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
 
     try {
-      // Initializes the PackageProcessor with the base resource directory, which is the parent directory
-      // for the final location corresponding to KMDefault_AssetPackages.
-      if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
-        // No action
-      } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+      if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         kmpProcessor = new LexicalModelPackageProcessor(context);
-      } else {
+      } else if (!pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         showErrorToast(context, getString(R.string.no_targets_to_install));
         return;
       }
@@ -82,14 +78,14 @@ public class PackageActivity extends AppCompatActivity {
       return;
     }
 
-    JSONObject pkgInfo = PackageProcessor.loadPackageInfo(tempPackagePath);
+    JSONObject pkgInfo = kmpProcessor.loadPackageInfo(tempPackagePath);
     if (pkgInfo == null) {
       showErrorToast(context, getString(R.string.invalid_metadata));
       return;
     }
 
-    String pkgVersion = PackageProcessor.getPackageVersion(pkgInfo);
-    String pkgName = PackageProcessor.getPackageName(pkgInfo);
+    String pkgVersion = kmpProcessor.getPackageVersion(pkgInfo);
+    String pkgName = kmpProcessor.getPackageName(pkgInfo);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -186,7 +182,7 @@ public class PackageActivity extends AppCompatActivity {
         try {
           if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
             // processKMP will remove currently installed package and install
-            installedPackageKeyboards = PackageProcessor.processKMP(kmpFile, true);
+            installedPackageKeyboards = kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
             // Do the notifications!
             boolean success = installedPackageKeyboards.size() != 0;
             if (success) {
@@ -199,7 +195,7 @@ public class PackageActivity extends AppCompatActivity {
               showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
             }
           } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-            installedLexicalModels = LexicalModelPackageProcessor.processKMP(kmpFile, true);
+            installedLexicalModels = kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
             // Do the notifications
             boolean success = installedLexicalModels.size() != 0;
             if (success) {

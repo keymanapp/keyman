@@ -85,7 +85,7 @@ public class LexicalModelPackageProcessorTest {
 
   @Test
   public void test_kmpProcessLexicalModel() throws Exception {
-    List<Map<String, String>> installedModels = lmPP.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, true, true);
+    List<Map<String, String>> installedModels = lmPP.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, tempPkg, PackageProcessor.PP_LEXICAL_MODELS_KEY);
 
     Assert.assertEquals(TEST_EN_CUSTOM_MODEL_COUNT, installedModels.size());
   }
