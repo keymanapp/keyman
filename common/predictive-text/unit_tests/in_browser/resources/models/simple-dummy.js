@@ -111,5 +111,5 @@
   }());
 
   // It's a 'dummy' model, so there's no need for extra methods and such within the Model's class definition.
-  LMLayerWorker.loadModel(new models.DummyModel(Model.capabilities, Model.futureSuggestions));
+  LMLayerWorker.loadModel(new models.DummyModel(Model.capabilities, {futureSuggestions: Model.futureSuggestions}));
 })();

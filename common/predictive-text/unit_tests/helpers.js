@@ -104,7 +104,7 @@ if (typeof require === 'function') {
   // This worker-global function does not exist by default in Node!
   _.importScriptsWith = function(context) {
       return function() { // the constructed context's importScripts method.
-      debugger
+
       for(var i=0; i < arguments.length; i++) {
         context = vm.createContext(context);
         var script = new vm.Script(fs.readFileSync(arguments[i]));
