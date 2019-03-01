@@ -92,7 +92,7 @@
                             <action selector="configAction:" target="-2" id="3W6-cm-6P5"/>
                         </connections>
                     </button>
-                    <imageView autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UOr-Co-IuK">
+                    <imageView autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="251" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="UOr-Co-IuK">
                         <rect key="frame" x="15" y="252" width="400" height="58"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="58" id="AMG-Zr-ebx"/>
