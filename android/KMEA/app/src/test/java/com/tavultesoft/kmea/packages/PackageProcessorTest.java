@@ -1,7 +1,6 @@
 package com.tavultesoft.kmea.packages;
 
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.ZipUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -12,9 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
