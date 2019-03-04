@@ -103,7 +103,7 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setGravity(Gravity.CENTER);
 
     String pkgTargetTitle = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ? 
-      getString(R.string.install_keyboard_package) : getString(R.string.install_lexical_model_package);
+      getString(R.string.install_keyboard_package) : getString(R.string.install_predictive_text_package);
     String titleStr = String.format("%s %s", pkgTargetTitle, pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
@@ -206,7 +206,7 @@ public class PackageActivity extends AppCompatActivity {
           }
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
-          showErrorDialog(context, pkgId, getString(R.string.no_valid_touch_keyboards_to_install)); // DDW or lexical model
+          showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
         }
       }
     });
