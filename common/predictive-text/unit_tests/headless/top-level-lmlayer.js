@@ -17,15 +17,7 @@ describe('LMLayer', function() {
       let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(fakeWorker);
-      lmLayer.initialize(
-        {
-          maxLeftContextCodeUnits: 32,
-        },
-        {
-          kind: 'wordlist',
-          words: ['foo', 'bar', 'baz', 'quux']
-        }
-      );
+      lmLayer.initialize("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
@@ -33,23 +25,14 @@ describe('LMLayer', function() {
     it('should send the `initialize` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(fakeWorker);
-      let configuration = await lmLayer.initialize(
-        {
-          maxLeftContextCodeUnits: 32,
-        },
-        {
-          kind: 'wordlist',
-          words: ['foo', 'bar', 'baz', 'quux']
-        }
-      );
+      let configuration = await lmLayer.initialize("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
       // In the "Worker", assert the message looks right and
       // ASYNCHRONOUSLY reply with ready message.
       function fakePostMessage(data) {
-        assert.propertyVal(data, 'message', 'initialize')
-        assert.isObject(data.capabilities);
-        assert.isObject(data.model);
+        assert.propertyVal(data, 'message', 'initialize');
+        assert.isString(data.model);
       
         callAsynchronously(() => fakeWorker.onmessage({
           data: {

@@ -75,7 +75,7 @@ namespace com.keyman.text.prediction {
       return new Promise((resolve, _reject) => {
         this._worker.postMessage({
           message: 'initialize',
-          model
+          model: model
         });
 
         // Sets up so the promise is resolved in the onMessage() callback, when it receives
