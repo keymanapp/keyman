@@ -365,7 +365,7 @@ namespace com.keyman.osk {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
-      let Processor = (<KeymanBase> keymanweb).textProcessor;
+      let processor = (<KeymanBase> keymanweb).textProcessor;
 
       var origArg = keyName;
       if(!keymanweb.keyboardManager.activeKeyboard || !osk.vkbd) {
@@ -385,7 +385,7 @@ namespace com.keyman.osk {
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=Processor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=processor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -420,7 +420,7 @@ namespace com.keyman.osk {
       }
       
       // Process modifier key action
-      if(Processor.selectLayer(keyName)) {
+      if(processor.selectLayer(keyName)) {
         return true;      
       }
 
@@ -431,9 +431,9 @@ namespace com.keyman.osk {
       Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0, Lcode: Codes.keyCodes[keyName],LisVirtualKey:true};
 
       // Set the flags for the state keys.
-      Lkc.Lstates |= Processor.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= Processor.stateKeys['K_NUMLOCK'] ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= Processor.stateKeys['K_SCROLL']  ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
+      Lkc.Lstates |= processor.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= processor.stateKeys['K_NUMLOCK'] ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= processor.stateKeys['K_SCROLL']  ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
 
       // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
       if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
@@ -452,7 +452,7 @@ namespace com.keyman.osk {
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          Processor.selectLayer(keyName, nextLayer);
+          processor.selectLayer(keyName, nextLayer);
         }
         return false;
       }
@@ -472,21 +472,24 @@ namespace com.keyman.osk {
       // Pass this key code and state to the keyboard program
       if(!keymanweb.keyboardManager.activeKeyboard ||  Lkc.Lcode == 0) return false;
       
+      let Processor = com.keyman.text.Processor;
+      let outputTarget = Processor.getOutputTarget(Lelem);
+
       // If key is mapped, return true
-      if(kbdInterface.processKeystroke(util.device, Lelem, Lkc)) {
+      if(kbdInterface.processKeystroke(util.device, outputTarget, Lkc)) {
         // Make sure we don't affect the current layer until the keystroke has been processed!
         if(nextLayer) {
-          Processor.selectLayer(keyName, nextLayer);
+          processor.selectLayer(keyName, nextLayer);
         }
 
         return true;
       }
 
-      keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, Lelem, keyName);
+      keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, outputTarget, keyName);
 
       if(nextLayer) {
         // Final nextLayer check.
-        Processor.selectLayer(keyName, nextLayer);
+        processor.selectLayer(keyName, nextLayer);
       }
 
       return true;
