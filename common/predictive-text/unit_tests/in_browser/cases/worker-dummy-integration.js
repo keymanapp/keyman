@@ -35,6 +35,7 @@ describe('LMLayer using dummy model', function () {
         return lmLayer.predict(zeroTransform(), emptyContext());
       }).then(function (suggestions) {
         assert.deepEqual(suggestions, iGotDistractedByHazel()[3]);
+        lmLayer.shutdown();
         return Promise.resolve();
       });
     });

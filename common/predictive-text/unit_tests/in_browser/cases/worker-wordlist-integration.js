@@ -35,6 +35,7 @@ describe('LMLayer using the word list model', function () {
         return lmLayer.predict(type('q'), atEndOfBuffer('the '));
       }).then(function (suggestions) {
         assert.isAtLeast(suggestions.length, EXPECTED_SUGGESTIONS);
+        lmLayer.shutdown();
         return Promise.resolve();
       });
     });

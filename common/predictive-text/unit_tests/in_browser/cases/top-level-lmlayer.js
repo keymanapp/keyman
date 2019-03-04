@@ -6,6 +6,7 @@ describe('LMLayer', function () {
     it('should construct with zero arguments', function () {
       let lmLayer = new LMLayer();
       assert.instanceOf(lmLayer, LMLayer);
+      lmLayer.shutdown();
     });
   });
 
@@ -25,6 +26,7 @@ describe('LMLayer', function () {
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(event) {
         assert.propertyVal(event, 'data', 'fhqwhgads');
+        worker.terminate();
         done();
       };
     })

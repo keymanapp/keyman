@@ -72,6 +72,9 @@ class LMLayerWorker {
   /**
    * By default, it's self.importScripts(), but can be overridden
    * so that this can be tested **outside of a Worker**.
+   * 
+   * To function properly, self.importScripts() must be bound to self
+   * before being stored here, else it will fail.
    */
   private _importScripts: ImportScripts;
 
@@ -161,6 +164,13 @@ class LMLayerWorker {
     this._importScripts(url);
   }
 
+  public unloadModel() {
+    // Right now, this seems sufficient to clear out the old model.
+    // The only existing reference to a loaded model is held by 
+    // transitionToReadyState's `handleMessage` closure. (The `model` var)
+    this.setupInitialState();
+  }
+
   /**
    * Sets the initial state, i.e., `uninitialized`.
    * This state only handles `initialized` messages, and will
@@ -229,6 +239,7 @@ class LMLayerWorker {
     scope.onmessage = worker.onMessage.bind(worker);
 
     // Ensures that the worker instance is accessible for loaded model scripts.
+    // Assists unit-testing.
     scope['LMLayerWorker'] = worker;
     scope['models'] = models;
 

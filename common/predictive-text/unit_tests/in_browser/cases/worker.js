@@ -17,6 +17,7 @@ describe('LMLayerWorker', function () {
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
+        worker.terminate();
       };
       worker.postMessage({
         message: 'initialize',

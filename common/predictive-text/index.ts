@@ -114,6 +114,14 @@ namespace com.keyman.text.prediction {
     }
 
     /**
+     * Clears out any computational resources in use by the LMLayer, including shutting
+     * down any internal WebWorkers.
+     */
+    public shutdown() {
+      this._worker.terminate();
+    }
+
+    /**
      * Given a function, this utility returns the source code within it, as a string.
      * This is intended to unwrap the "wrapped" source code created in the LMLayerWorker
      * build process.
