@@ -203,15 +203,20 @@ class LMLayerWorker {
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
-        if (payload.message !== 'predict') {
-          throw new Error(`invalid message; expected 'predict' but got ${payload.message}`);
+        switch(payload.message) {
+          case 'predict':
+            let {transform, context} = payload;
+            this.cast('suggestions', {
+              token: payload.token,
+              suggestions: model.predict(transform, context)
+            });
+            break;
+          case 'unload':
+            this.unloadModel();
+            break;
+          default:
+          throw new Error(`invalid message; expected one of {'predict'} but got ${payload.message}`);
         }
-
-        let {transform, context} = payload;
-        this.cast('suggestions', {
-          token: payload.token,
-          suggestions: model.predict(transform, context)
-        });
       }
     };
   }

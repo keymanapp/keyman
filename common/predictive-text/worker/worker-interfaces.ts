@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'initialize' | 'predict';
-type IncomingMessage = InitializeMessage | PredictMessage;
+type IncomingMessageKind = 'initialize' | 'predict' | 'unload';
+type IncomingMessage = InitializeMessage | PredictMessage | UnloadMessage;
 
 /**
  * The structure of an initialization message. It should include the model (either in
@@ -83,6 +83,9 @@ interface PredictMessage {
   context: Context;
 }
 
+interface UnloadMessage {
+  message: 'unload'
+}
 
 
 /**

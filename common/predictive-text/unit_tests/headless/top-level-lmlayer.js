@@ -12,12 +12,12 @@ describe('LMLayer', function() {
     });
   });
 
-  describe('#initialize()', function () {
+  describe('#activateModel()', function () {
     it('should accept capabilities and model description', function () {
       let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(fakeWorker);
-      lmLayer.initialize("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
@@ -25,7 +25,7 @@ describe('LMLayer', function() {
     it('should send the `initialize` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(fakeWorker);
-      let configuration = await lmLayer.initialize("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      let configuration = await lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
       // In the "Worker", assert the message looks right and
@@ -59,7 +59,7 @@ describe('LMLayer', function() {
       });
 
       let lmLayer = new LMLayer(fakeWorker);
-      let actualConfiguration = await lmLayer.initialize(
+      let actualConfiguration = await lmLayer.activateModel(
         {
           maxLeftContextCodeUnits: 32,
         },
@@ -69,7 +69,7 @@ describe('LMLayer', function() {
         }
       );
 
-      // This SHOULD be called by initialize().
+      // This SHOULD be called by activateModel().
       assert.deepEqual(actualConfiguration, expectedConfiguration);
     })
   });
