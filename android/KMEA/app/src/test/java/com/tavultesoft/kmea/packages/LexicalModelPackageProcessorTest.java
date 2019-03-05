@@ -22,11 +22,11 @@ public class LexicalModelPackageProcessorTest {
   private static final File TEST_RESOURCE_ROOT = new File("test_resources");
   private static final File TEST_EXTRACTION_ROOT = new File(TEST_RESOURCE_ROOT, "temp");
 
-  private static final String TEST_EN_CUSTOM_MODEL_KMP_NAME = "example.en.custom";
+  private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom.model";
   private static final File TEST_EN_CUSTOM_MODEL_KMP_FILE = new File(TEST_RESOURCE_ROOT, "packages" +
-    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_KMP_NAME + ".model.kmp");
+    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_NAME + ".kmp");
   private static final File TEST_EN_CUSTOM_MODEL_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "models" +
-    File.separator + TEST_EN_CUSTOM_MODEL_KMP_NAME);
+    File.separator + TEST_EN_CUSTOM_MODEL_NAME);
 
   private static final int TEST_EN_CUSTOM_MODEL_COUNT = 2;
 
@@ -64,10 +64,10 @@ public class LexicalModelPackageProcessorTest {
 
     Assert.assertNotNull(json);
 
-    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom");
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom.model");
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
-    en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");
+    en_custom.put(KMManager.KMKey_PackageID, "example.en.custom.model");
     en_custom.put(KMManager.KMKey_LexicalModelName, "Example (English) Template Custom Model");
     en_custom.put(KMManager.KMKey_LexicalModelID, "example.en.custom");
     en_custom.put(KMManager.KMKey_LexicalModelVersion, "1.0.0");

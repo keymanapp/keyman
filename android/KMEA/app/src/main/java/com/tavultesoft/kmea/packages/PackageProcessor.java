@@ -52,7 +52,7 @@ public class PackageProcessor {
   /**
    * Parse the kmp path and extract the package ID.
    * This doesn't need to unzip and parse kmp.json
-   * @param path of the kmp file. Could have extension ".kmp" or ".model.kmp"
+   * @param path of the kmp file
    * @return String - package ID
    * @throws IllegalStateException
    * @throws IllegalArgumentException
@@ -66,17 +66,12 @@ public class PackageProcessor {
 
     if(filename.lastIndexOf('.') != -1) {
       // Android's temp downloads attach a suffix to the extension; .kmp isn't the end of the filename.
-      // Checking Lexical Model Package Extension because it can be either .kmp or .model.kmp
-      if(!FileUtils.hasLexicalModelPackageExtension(filename)) {
+      if(!FileUtils.hasKeymanPackageExtension(filename)) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
-      if (filename.endsWith(FileUtils.LEXICALMODELPACKAGE)) {
-        return filename.substring(0, filename.lastIndexOf(FileUtils.LEXICALMODELPACKAGE));
-      } else {
-        // Extract our best-guess name for the package and construct the temporary package name.
-        return filename.substring(0, filename.lastIndexOf(FileUtils.KEYBOARDPACKAGE));
-      }
+      // Extract our best-guess name for the package and construct the temporary package name.
+      return filename.substring(0, filename.lastIndexOf(FileUtils.KEYMANPACKAGE));
     } else {
       throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
     }
@@ -386,9 +381,6 @@ public class PackageProcessor {
       };
 
       File kmpFile = new File(packageId + ".kmp");
-      if (!kmpFile.exists()) {
-        kmpFile = new File(packageId + ".model.kmp");
-      }
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(welcomeFilter);
       if (files != null && files.length > 0) {

@@ -26,7 +26,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     super(resourceRoot);
   }
 
-  public File constructPath(File path, boolean temp) {
+  protected File constructPath(File path, boolean temp) {
     String kmpBaseName = getPackageID(path);
     // Feel free to change this as desired - simply ensure it is unique enough to never be used as
     // a legitimate package name.
@@ -48,9 +48,6 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
       };
 
       File kmpFile = new File(packageId + ".kmp");
-      if (!kmpFile.exists()) {
-        kmpFile = new File(packageId + ".model.kmp");
-      }
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(lexicalModelFilter);
       if (files != null && files.length > 0) {

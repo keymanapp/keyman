@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             }
 
             // Only handle ad-hoc kmp packages
-            if (FileUtils.hasKeyboardPackageExtension(url)) {
+            if (FileUtils.hasKeymanPackageExtension(url)) {
               try {
                 // Download the KMP to app cache
                 downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -675,7 +675,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
-          isKMP = FileUtils.hasKeyboardPackageExtension(filename);
+          isKMP = FileUtils.hasKeymanPackageExtension(filename);
           cacheKMPFilename = filename;
           inputFile = getContentResolver().openInputStream(data);
           break;
@@ -683,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         case "file":
           File kmpFile = new File(data.getPath());
           filename = kmpFile.getName();
-          isKMP = FileUtils.hasKeyboardPackageExtension(data.toString());
+          isKMP = FileUtils.hasKeymanPackageExtension(data.toString());
           cacheKMPFilename = kmpFile.getName();
           inputFile = new FileInputStream(kmpFile);
           break;
