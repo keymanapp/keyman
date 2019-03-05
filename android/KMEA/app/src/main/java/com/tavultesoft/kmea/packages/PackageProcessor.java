@@ -1,7 +1,6 @@
 package com.tavultesoft.kmea.packages;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
@@ -27,22 +26,39 @@ import org.json.JSONObject;
  */
 
 /**
- * A class of static methods for use in handling Keyman's .kmp file format, as it relates to the
- * KMEA engine.  Only `processKMP` and `initialize` should see regular use; the rest are helper
- * methods designed to facilitate unit testing for this class's functionality.
+ * A class for use in handling Keyman's .kmp package file format, as it relates to the
+ * KMEA engine.  This is primarily for installing keyboard packages.
  */
 public class PackageProcessor {
-  private static File resourceRoot = null;
-  public static final String PPDefault_Version = "1.0";
-  public static final String PPDefault_Metadata = "kmp.json";
+  protected static File resourceRoot = null;
 
-  public static void initialize(File resourceRoot) {
-    PackageProcessor.resourceRoot = resourceRoot;
+  public static final String PP_DEFAULT_VERSION = "1.0";
+  public static final String PP_DEFAULT_METADATA = "kmp.json";
+
+  public static final String PP_TARGET_INVALID = "invalid";
+  public static final String PP_TARGET_KEYBOARDS = "keyboards";
+  public static final String PP_TARGET_LEXICAL_MODELS = "lexicalModels";
+
+  // keys in kmp.json
+  public static final String PP_KEYBOARDS_KEY = "keyboards";
+  public static final String PP_LEXICAL_MODELS_KEY = "lexicalModels";
+
+  private static final String TAG = "PackageProcessor";
+
+  public PackageProcessor(File resourceRoot) {
+    this.resourceRoot = resourceRoot;
   }
 
-  public static String getPackageID(File path) {
-    String filename = path.getName();
-    String kmpBaseName;
+  /**
+   * Parse the kmp path and extract the package ID.
+   * This doesn't need to unzip and parse kmp.json
+   * @param path of the kmp file
+   * @return String - package ID
+   * @throws IllegalStateException
+   * @throws IllegalArgumentException
+   */
+  public String getPackageID(File path) {
+    String filename = path.getName().toLowerCase();
 
     if(resourceRoot == null) {
       throw new IllegalStateException("The PackageProcessor has not been initialized!");
@@ -50,36 +66,41 @@ public class PackageProcessor {
 
     if(filename.lastIndexOf('.') != -1) {
       // Android's temp downloads attach a suffix to the extension; .kmp isn't the end of the filename.
-      if(!FileUtils.hasKeyboardPackageExtension(filename)) {
+      if(!FileUtils.hasKeymanPackageExtension(filename)) {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
       // Extract our best-guess name for the package and construct the temporary package name.
-      return filename.substring(0, filename.toLowerCase().lastIndexOf(".kmp"));
+      return filename.substring(0, filename.lastIndexOf(FileUtils.KEYMANPACKAGE));
     } else {
       throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
     }
   }
 
-  // A default, managed mapping for package installation, handling both temp directory
-  // and perm directory locations.  No need to relocate the downloaded .kmp file itself.
+  /**
+   * A default, managed mapping for package installation, handling both temp directory
+   * and perm directory locations.  No need to relocate the downloaded .kmp file itself.
+   * @param path File - path to  the .kmp
+   * @param temp boolean - If true, prepends ".{package ID}.temp" to the folder
+   * @return File - path to extract the .kmp file
+   */
   @NonNull
-  static File constructPath(File path, boolean temp) {
+  protected File constructPath(File path, boolean temp) {
     String kmpBaseName = getPackageID(path);
     // Feel free to change this as desired - simply ensure it is unique enough to never be used as
     // a legitimate package name.
     String kmpFolderName = temp ? "." + kmpBaseName + ".temp" : kmpBaseName;
 
-    return new File(resourceRoot,KMManager.KMDefault_AssetPackages + File.separator + kmpFolderName + File.separator);
+    return new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + kmpFolderName + File.separator);
   }
 
   /**
    * Unzips the package.kmp file to its mapped temporary directory location.
    * @param path The file path of the .kmp file, file name included.
    * @return The mapped temporary file path for the .kmp file's contents.
-   * @throws IOException
+   * @throws IOException Exception from unzipping
    */
-  public static File unzipKMP(File path) throws IOException {
+  public File unzipKMP(File path) throws IOException {
     File tempKeyboardPath = constructPath(path, true);
     if (!tempKeyboardPath.exists()) {
       tempKeyboardPath.mkdir();
@@ -95,14 +116,14 @@ public class PackageProcessor {
    * @param packagePath The extracted location information to retrieve information for.
    * @return A metadata JSONObject for the package version.
    */
-  static JSONObject loadPackageInfo(File packagePath) {
-    File infoFile = new File(packagePath, PPDefault_Metadata);
+  public JSONObject loadPackageInfo(File packagePath) {
+    File infoFile = new File(packagePath, PP_DEFAULT_METADATA);
 
     if(infoFile.exists()) {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
-      Log.e("PackageProcessor", infoFile.toString() + " does not exist.");
+      Log.e(TAG, "kmp.json does not exist");
       return null;
     }
   }
@@ -112,31 +133,30 @@ public class PackageProcessor {
   /**
    * Generates a list of keyboard data maps designed to mirror the `download` method output of
    * KMKeyboardDownloader as closely as practical.
-   * @param jsonKeyboard  One entry of the master JSONArray of the top-level "keyboards" property.
+   * @param jsonEntry  One entry of the master JSONArray of the top-level "keyboards" property.
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public static Map<String, String>[] processKeyboardsEntry(JSONObject jsonKeyboard, String packageId) throws JSONException {
-    JSONArray languages = jsonKeyboard.getJSONArray("languages");
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId) throws JSONException {
+    JSONArray languages = jsonEntry.getJSONArray("languages");
 
-
-    String keyboardId = jsonKeyboard.getString("id");
+    String keyboardId = jsonEntry.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
       // Only use the first language
       HashMap<String, String>[] keyboards = new HashMap[1];
       int i=0;
       keyboards[i] = new HashMap<>();
       keyboards[i].put(KMManager.KMKey_PackageID, packageId);
-      keyboards[i].put(KMManager.KMKey_KeyboardName, jsonKeyboard.getString("name"));
-      keyboards[i].put(KMManager.KMKey_KeyboardID, jsonKeyboard.getString("id"));
+      keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
+      keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
       keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
       keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
-      keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonKeyboard.getString("version"));
-      if (jsonKeyboard.has("displayFont")) {
-        keyboards[i].put(KMManager.KMKey_Font, jsonKeyboard.getString("displayFont"));
+      keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
+      if (jsonEntry.has("displayFont")) {
+        keyboards[i].put(KMManager.KMKey_Font, jsonEntry.getString("displayFont"));
       }
-      if (jsonKeyboard.has("oskFont")) {
-        keyboards[i].put(KMManager.KMKey_OskFont, jsonKeyboard.getString("oskFont"));
+      if (jsonEntry.has("oskFont")) {
+        keyboards[i].put(KMManager.KMKey_OskFont, jsonEntry.getString("oskFont"));
       }
 
       // For now, all KMP distributed keyboards are custom
@@ -171,31 +191,14 @@ public class PackageProcessor {
 
   /**
    * Simply extracts the package's name.
-   * @param json The metadata JSONOBject for the package.
+   * @param json The metadata JSONObject for the package.
    * @return The package name (via String)
-   * @throws JSONException
    */
-  public static String getPackageName(JSONObject json) throws JSONException {
-    if (json == null) {
-      return null;
-    } else {
-      return json.getJSONObject("info").getJSONObject("name").getString("description");
-    }
-  }
-
-  public static String getPackageName(File kmpPath, boolean installed) {
+  public String getPackageName(JSONObject json) {
     try {
-      if (installed) {
-        return getPackageName(loadPackageInfo(constructPath(kmpPath, false)));
-      } else {
-        File tempPath = unzipKMP(kmpPath);
-        String name = getPackageName(loadPackageInfo(tempPath));
-        FileUtils.deleteDirectory(tempPath);
-        return name;
-      }
+      return json.getJSONObject("info").getJSONObject("name").getString("description");
     } catch (Exception e) {
-      // Developer will never allow package name to be undefined, but just in case, reuse package ID
-      return getPackageID(kmpPath);
+      return "";
     }
   }
 
@@ -205,26 +208,48 @@ public class PackageProcessor {
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
    */
-  public static String getPackageVersion(JSONObject json) {
+  public String getPackageVersion(JSONObject json) {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
-    } catch (JSONException e) {
-      return PPDefault_Version;
+    } catch (Exception e) {
+      return PP_DEFAULT_VERSION;
     }
   }
 
-  public static String getPackageVersion(File kmpPath, boolean installed) {
+  /**
+   * Simply extracts the package's target (keyboards vs lexical models).
+   * Only one can be valid. Otherwise, return "invalid"
+   * @param json The metadata JSONObject for the package.
+   * @return String The target ("keyboards", "lexicalModels", or "invalid")
+   */
+  public String getPackageTarget(JSONObject json) {
     try {
-      if (installed) {
-        return getPackageVersion(loadPackageInfo(constructPath(kmpPath, false)));
+      if (json.has(PP_KEYBOARDS_KEY) && !json.has(PP_LEXICAL_MODELS_KEY)) {
+        return PP_TARGET_KEYBOARDS;
+      } else if (json.has(PP_LEXICAL_MODELS_KEY) && !json.has(PP_KEYBOARDS_KEY)) {
+        return PP_TARGET_LEXICAL_MODELS;
       } else {
-        File tempPath = unzipKMP(kmpPath);
-        String version = getPackageVersion(loadPackageInfo(tempPath));
-        FileUtils.deleteDirectory(tempPath);
-        return version;
+        return PP_TARGET_INVALID;
       }
     } catch (Exception e) {
-      return PPDefault_Version;
+      return PP_TARGET_INVALID;
+    }
+  }
+
+  /**
+   * Simply extracts the package's target (keyboards vs lexical models).
+   * Only one can be valid. Otherwise, return "invalid"
+   * @param kmpPath File - The path to the kmp
+   * @return String The target ("keyboards", "lexicalModels", or "invalid")
+   */
+  public String getPackageTarget(File kmpPath) {
+    try {
+      File tempPath = unzipKMP(kmpPath);
+      String target = getPackageTarget(loadPackageInfo(tempPath));
+      FileUtils.deleteDirectory(tempPath);
+      return target;
+    } catch (Exception e) {
+      return PP_TARGET_INVALID;
     }
   }
 
@@ -237,7 +262,7 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public static int comparePackageDirectories(File newPath, File oldPath) throws IOException, JSONException {
+  public int comparePackageDirectories(File newPath, File oldPath) throws IOException, JSONException {
     JSONObject newInfoJSON = loadPackageInfo(newPath);
     String newVersion = getPackageVersion(newInfoJSON);
 
@@ -264,7 +289,7 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public static boolean isDowngrade(File kmpPath) throws IOException, JSONException {
+  public boolean isDowngrade(File kmpPath) throws IOException, JSONException {
     return internalCompareKMPVersion(kmpPath, false,-1);
   }
 
@@ -276,7 +301,7 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  static boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
+  boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
     return internalCompareKMPVersion(kmpPath, preExtracted,-1);
   }
 
@@ -287,7 +312,7 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public static boolean isSameVersion(File kmpPath) throws IOException, JSONException {
+  public boolean isSameVersion(File kmpPath) throws IOException, JSONException {
     return internalCompareKMPVersion(kmpPath, false,0);
   }
 
@@ -299,11 +324,11 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  static boolean isSameVersion(File kmpPath, boolean preExtracted) throws IOException, JSONException {
+  boolean isSameVersion(File kmpPath, boolean preExtracted) throws IOException, JSONException {
     return internalCompareKMPVersion(kmpPath, preExtracted,0);
   }
 
-  static boolean internalCompareKMPVersion(File kmpPath, boolean preExtracted, int compValue) throws IOException, JSONException {
+  boolean internalCompareKMPVersion(File kmpPath, boolean preExtracted, int compValue) throws IOException, JSONException {
     File tempPath;
     if(preExtracted) {
       tempPath = constructPath(kmpPath, true);
@@ -320,7 +345,7 @@ public class PackageProcessor {
     return compRes == compValue;
   }
 
-  static boolean touchKeyboardExists(final String packageId, final String keyboardId) {
+  boolean touchKeyboardExists(final String packageId, final String keyboardId) {
     if (resourceRoot != null) {
       FileFilter touchKeyboardFilter = new FileFilter() {
         @Override
@@ -343,7 +368,7 @@ public class PackageProcessor {
     return false;
   }
 
-  static boolean welcomeExists(final String packageId) {
+  protected boolean welcomeExists(final String packageId) {
     if (resourceRoot != null) {
       FileFilter welcomeFilter = new FileFilter() {
         @Override
@@ -358,7 +383,7 @@ public class PackageProcessor {
       File kmpFile = new File(packageId + ".kmp");
       File packageDir = constructPath(kmpFile, false);
       File[] files = packageDir.listFiles(welcomeFilter);
-      if (files.length > 0) {
+      if (files != null && files.length > 0) {
         return true;
       }
     }
@@ -368,8 +393,11 @@ public class PackageProcessor {
 
   /**
    * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
+   * This will overwrite an existing package.
    * @param path Filepath of a newly downloaded .kmp file.
-   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
+   * @param tempPath Filepath of temporarily extracted .kmp file
+   * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
+   * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
    * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
@@ -377,64 +405,20 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public static List<Map<String, String>> processKMP(File path) throws IOException, JSONException {
-    return processKMP(path, false);
-  }
-
-  /**
-   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
-   * @param path Filepath of a newly downloaded .kmp file.
-   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
-   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
-   * May be empty if the package file is actually an old version.
-   * <br/><br/>
-   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
-   * as closely as practical.
-   * @throws IOException
-   * @throws JSONException
-   */
-  public static List<Map<String, String>> processKMP(File path, boolean force) throws IOException, JSONException {
-    return processKMP(path, force, false);
-  }
-
-  /**
-   * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
-   * @param path Filepath of a newly downloaded .kmp file.
-   * @param force A <code><b>true</b></code> value indicates that attempts to downgrade should proceed/be forced.
-   * @param preExtracted Indicates that the specified file has already been unzipped.  Only of use for testing.
-   * @return A list of data maps of the newly installed and/or newly upgraded keyboards found in the package.
-   * May be empty if the package file is actually an old version.
-   * <br/><br/>
-   * The format for each map matches those of the current `download` method output of KMKeyboardDownloader
-   * as closely as practical.
-   * @throws IOException
-   * @throws JSONException
-   */
-  static List<Map<String, String>> processKMP(File path, boolean force, boolean preExtracted) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
-    if(KMManager.isReservedNamespace(getPackageID(path))) {
-      return new ArrayList<>();
-    }
-    File tempPath;
-    if(!preExtracted) {
-      tempPath = unzipKMP(path);
-    } else {
-      tempPath = constructPath(path, true);
+    ArrayList<Map<String, String>> specs = new ArrayList<>();
+    if (KMManager.isReservedNamespace(getPackageID(path))) {
+      return specs;
     }
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
     String packageId = getPackageID(path);
 
     File permPath = constructPath(path, false);
-    if(permPath.exists()) {
-      if(!force && comparePackageDirectories(tempPath, permPath) != 1) {
-        // Abort!  The current installation is newer or as up-to-date.
-        FileUtils.deleteDirectory(tempPath);
-        return new ArrayList<>();  // It's empty; avoids dealing directly with null ptrs.
-      } else {
-        // Out with the old.  "In with the new" is identical to a new package installation.
-        FileUtils.deleteDirectory(permPath);
-      }
+    if (permPath.exists()) {
+      // Out with the old.  "In with the new" is identical to a new package installation.
+      FileUtils.deleteDirectory(permPath);
     }
 
     // No version conflict!  Proceed with the install!
@@ -447,18 +431,18 @@ public class PackageProcessor {
 //    System.out.println("Options: " + json.getJSONObject("options").toString(2));
 //    System.out.println("Info: " + json.getJSONObject("info").toString(2));
 //    System.out.println("Files: " + json.getJSONArray("files").toString(2));
+    if (newInfoJSON.has(key)) {
+      JSONArray entries = newInfoJSON.getJSONArray(key);
 
-    // newInfoJSON holds all the newly downloaded/updated keyboard data.
-    JSONArray keyboards = newInfoJSON.getJSONArray("keyboards");
-    ArrayList<Map<String, String>> keyboardSpecs = new ArrayList<>();
-
-    for(int i=0; i < keyboards.length(); i++) {
-      Map<String, String>[] kbds = processKeyboardsEntry(keyboards.getJSONObject(i), packageId);
-      if (kbds != null) {
-        keyboardSpecs.addAll(Arrays.asList(kbds));
+      for (int i = 0; i < entries.length(); i++) {
+        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId);
+        if (maps != null) {
+          specs.addAll(Arrays.asList(maps));
+        }
       }
+    }  else {
+      Log.e(TAG, path.getName() + " must contain \"" + key + "\"");
     }
-
-    return keyboardSpecs;
+    return specs;
   }
 }

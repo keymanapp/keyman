@@ -149,18 +149,48 @@ public class FileUtilsTest {
   }
 
   @Test
-  public void test_hasKeyboardPackageExtension() {
-    String filename = "test/abc.kmp";
-    Assert.assertTrue(FileUtils.hasKeyboardPackageExtension(filename));
+  public void test_hasLexicalModelExtension() {
+    String filename = "test/abc.model.js";
+    Assert.assertTrue(FileUtils.hasLexicalModelExtension(filename));
 
-    filename = "test/abc.KMP";
-    Assert.assertTrue(FileUtils.hasKeyboardPackageExtension(filename));
+    filename = "test/abc.MODEL.JS";
+    Assert.assertTrue(FileUtils.hasLexicalModelExtension(filename));
 
-    filename = "test/abc.kmpo";
-    Assert.assertFalse(FileUtils.hasKeyboardPackageExtension(filename));
+    filename = "test/abc.sh";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abcmodeljs";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abc.js";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
 
     filename = "";
-    Assert.assertFalse(FileUtils.hasKeyboardPackageExtension(filename));
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+  }
+
+  @Test
+  public void test_hasKeymanPackageExtension() {
+    String filename = "test/abc.kmp";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.KMP";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.kmpo";
+    Assert.assertFalse(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.model.kmp";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMP";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMPO";
+    Assert.assertFalse(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "";
+    Assert.assertFalse(FileUtils.hasKeymanPackageExtension(filename));
   }
 
   @Test
