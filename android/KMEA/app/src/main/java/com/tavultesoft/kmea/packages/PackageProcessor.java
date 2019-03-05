@@ -1,6 +1,6 @@
 package com.tavultesoft.kmea.packages;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;

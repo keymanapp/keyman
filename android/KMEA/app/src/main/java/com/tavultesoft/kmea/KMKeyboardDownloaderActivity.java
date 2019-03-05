@@ -1,33 +1,25 @@
 package com.tavultesoft.kmea;
 
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.BuildConfig;
 
-import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
-import static com.tavultesoft.kmea.KMManager.KMKey_FontSource;
 
 public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   // Bundle Keys
