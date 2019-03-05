@@ -147,11 +147,11 @@ public class PackageActivity extends AppCompatActivity {
       }
     });
 
-    // Determine if KMP contains welcome.htm (case-insensitive) to display
+    // Determine if ad-hoc distributed KMP contains welcome.htm (case-insensitive) to display
     FileFilter welcomeFilter = new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        if (pathname.isFile() && pathname.getName().equalsIgnoreCase("welcome.htm")) {
+        if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
           return true;
         }
         return false;
