@@ -118,3 +118,7 @@ interface WorkerInternalModelConstructor {
    */
   new(capabilities: Capabilities, ...modelParameters: any[]): WorkerInternalModel;
 }
+
+interface WorkerInternalWordBreaker {
+  break(text: string): string[]; // 
+}

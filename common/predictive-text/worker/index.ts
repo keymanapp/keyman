@@ -170,6 +170,10 @@ class LMLayerWorker {
     // transitionToReadyState's `handleMessage` closure. (The `model` var)
     this.setupInitialState();
   }
+  
+  public loadWordBreaker(breaker: WorkerInternalWordBreaker) {
+    // TODO:  Actually store it somewhere for future use.  Make sure we can forget it with `unloadModel` as well.
+  }
 
   /**
    * Sets the initial state, i.e., `uninitialized`.

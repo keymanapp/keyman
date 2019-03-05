@@ -29,7 +29,7 @@ declare namespace com.keyman.text.prediction {
     /**
      * Prepares the LMLayer for reinitialization with a different model/capability set.
      */
-    deactivateModel();
+    deactivateModel(): void;
 
     predict(transform: Transform, context: Context): Promise<Suggestion[]>;
 
