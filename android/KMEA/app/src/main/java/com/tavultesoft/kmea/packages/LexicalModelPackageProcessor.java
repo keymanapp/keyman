@@ -76,9 +76,6 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
 
         if (welcomeExists(packageId)) {
           File kmpFile = new File(packageId + ".kmp");
-          if (!kmpFile.exists()) {
-            kmpFile = new File(packageId + ".model.kmp");
-          }
           File packageDir = constructPath(kmpFile, false);
           File welcomeFile = new File(packageDir, "welcome.htm");
           // Only storing relative instead of absolute paths as a convenience for unit tests.
