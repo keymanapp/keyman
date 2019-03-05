@@ -159,6 +159,7 @@ namespace com.keyman {
       this.osk.shutdown();
       this.util.shutdown();
       this.keyboardManager.shutdown();
+      this.modelManager.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();

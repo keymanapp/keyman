@@ -43,7 +43,7 @@ namespace com.keyman.text.prediction {
     }
 
     private deactivateModel() {
-      // TODO:  Call a LMLayer method for model deactivation.
+      this.lmEngine.deactivateModel();
       this.currentModel = null;
     }
 
@@ -52,12 +52,8 @@ namespace com.keyman.text.prediction {
         throw new Error("Null reference not allowed.");
       }
 
-      // TODO:  Activate this model within the LMLayer!
       let file = model.path;
-
-      //this.lmEngine.initialize(file)  // Currently unsupported.
-      console.log("Model detected!");
-
+      this.lmEngine.activateModel(file);
       this.currentModel = model;
     }
 
@@ -101,6 +97,12 @@ namespace com.keyman.text.prediction {
 
     isRegistered(model: ModelSpec): boolean {
       return !! this.registeredModels[model.id];
+    }
+
+    // TODO:  actually calling this.lmEngine.predict.  Will need its own method(s).
+
+    public shutdown() {
+      this.lmEngine.shutdown();
     }
   }
 }
