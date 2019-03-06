@@ -39,19 +39,19 @@
  * Implements the state pattern. There are three states:
  * 
  *  - `unconfigured`  (initial state before configuration)
- *  - `uninitialized` (state without model loaded)
+ *  - `modelless`     (state without model loaded)
  *  - `ready`         (state with model loaded, accepts prediction requests)
  * 
  * Transitions are initiated by valid messages. Invalid
  * messages are errors, and do not lead to transitions.
  * 
- *          +-----------------+ initialize +---------+
- *   config |                 |----------->|         |
- *  +------->  uninitialized  +            +  ready  +---+
- *          |                 |<-----------|         |   |
- *          +-----------------+   unload   +----^----+   | predict
- *                                              |        |
- *                                              +--------+
+ *          +-------------+    load    +---------+
+ *   config |             |----------->|         |
+ *  +------->  modelless  +            +  ready  +---+
+ *          |             |<-----------|         |   |
+ *          +-------------+   unload   +----^----+   | predict
+ *                                          |        |
+ *                                          +--------+
  * 
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
@@ -173,13 +173,13 @@ class LMLayerWorker {
     // Right now, this seems sufficient to clear out the old model.
     // The only existing reference to a loaded model is held by 
     // transitionToReadyState's `handleMessage` closure. (The `model` var)
-    this.setupInitialState();
+    this.transitionToLoadingState();
   }
 
   /**
    * Sets the initial state, i.e., `unconfigured`.
    * This state only handles `config` messages, and will
-   * transition to the `uninitialized` state once it receives
+   * transition to the `modelless` state once it receives
    * the config data from the host platform.
    */
   private setupConfigState() {
@@ -193,24 +193,24 @@ class LMLayerWorker {
 
         this._platformCapabilities = payload.capabilities;
 
-        this.setupInitialState();
+        this.transitionToLoadingState();
       }
     }
   }
 
   /**
-   * Sets the model-loading state, i.e., `uninitialized`.
-   * This state only handles `initialized` messages, and will
+   * Sets the model-loading state, i.e., `modelless`.
+   * This state only handles `load` messages, and will
    * transition to the `ready` state once it receives a model
    * description and capabilities.
    */
-  private setupInitialState() {
+  private transitionToLoadingState() {
     this.state = {
-      name: 'uninitialized',
+      name: 'modelless',
       handleMessage: (payload) => {
-        // ...that message must have been 'initialize'!
-        if (payload.message !== 'initialize') {
-          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
+        // ...that message must have been 'load'!
+        if (payload.message !== 'load') {
+          throw new Error(`invalid message; expected 'load' but got ${payload.message}`);
         }
 
         // TODO: validate configuration?
@@ -224,7 +224,7 @@ class LMLayerWorker {
    * fully-instantiated model. The `ready` state only responds
    * to `predict` message, and is an accepting state.
    *
-   * @param model The initialized language model.
+   * @param model The loaded language model.
    */
   private transitionToReadyState(model: WorkerInternalModel) {
     this.state = {

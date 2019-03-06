@@ -22,9 +22,9 @@ describe('LMLayerWorker', function() {
       // First the worker must receive config data...
       configWorker(worker);
 
-      // Sending it the initialize it should notify us that it's initialized!
+      // Sending it the `load` message should notify us that it's loaded!
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
       assert(fakePostMessage.calledOnce);
@@ -68,7 +68,7 @@ describe('LMLayerWorker', function() {
       
       // Send a message; we should get something back.
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
 
@@ -94,7 +94,7 @@ describe('LMLayerWorker', function() {
       }, /invalid message/i);
     });
 
-    it('accepts a capability set and transitions to the "initialize" state', function () {
+    it('accepts a capability set and transitions to the "modelless" state', function () {
       var context = {
         postMessage: sinon.fake()
       };
@@ -105,11 +105,11 @@ describe('LMLayerWorker', function() {
       // Trigger the config message
       configWorker(worker);
 
-      assert.equal(worker.state.name, 'uninitialized');
+      assert.equal(worker.state.name, 'modelless');
     });
   });
 
-  describe('Message: initialize', function () {
+  describe('Message: load', function () {
     it('should disallow any other message', function () {
       var context = {
         postMessage: sinon.fake()
@@ -139,7 +139,7 @@ describe('LMLayerWorker', function() {
       configWorker(worker);
 
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
 
@@ -161,7 +161,7 @@ describe('LMLayerWorker', function() {
       // simple-dummy.js is set with the following.
       var maxCodeUnits = 64;
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
 

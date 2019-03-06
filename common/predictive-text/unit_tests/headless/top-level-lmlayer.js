@@ -35,7 +35,7 @@ describe('LMLayer', function() {
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
 
-    it('should send the `initialize` message to the LMLayer', async function () {
+    it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
       let configuration = await lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
@@ -49,7 +49,7 @@ describe('LMLayer', function() {
           return;
         }
 
-        assert.propertyVal(data, 'message', 'initialize');
+        assert.propertyVal(data, 'message', 'load');
         assert.isString(data.model);
       
         callAsynchronously(() => fakeWorker.onmessage({

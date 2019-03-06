@@ -25,7 +25,7 @@ describe('LMLayerWorker', function () {
         capabilities: helpers.defaultCapabilities
       })
       worker.postMessage({
-        message: 'initialize',
+        message: 'load',
         // Since the worker's based in a blob, it's not on the 'same domain'.  We need to absolute-path the model file.
         model: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
       });
