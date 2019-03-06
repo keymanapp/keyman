@@ -52,6 +52,7 @@ namespace com.keyman.text.prediction {
     private _declareLMLayerReady: (conf: Configuration) => void;
     private _promises: PromiseStore<Suggestion[]>;
     private _nextToken: number;
+    private capabilities: Capabilities;
 
     /**
      * Construct the top-level LMLayer interface. This also starts the underlying Worker.
@@ -60,13 +61,28 @@ namespace com.keyman.text.prediction {
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(worker?: Worker) {
+    constructor(capabilities: Capabilities, worker?: Worker) {
       // Either use the given worker, or instantiate the default worker.
       this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
       this._worker.onmessage = this.onMessage.bind(this)
       this._declareLMLayerReady = null;
       this._promises = new PromiseStore;
       this._nextToken = Number.MIN_SAFE_INTEGER;
+
+      this.sendConfig(capabilities);
+    }
+
+    /**
+     * Initializes the LMLayer worker with the host platform's capability set.
+     * 
+     * @param capabilities The host platform's capability spec - a model cannot assume access to more context
+     *                     than specified by this parameter.
+     */
+    private sendConfig(capabilities: Capabilities) {
+      this._worker.postMessage({
+        message: 'config',
+        capabilities: capabilities
+      });
     }
 
     /**

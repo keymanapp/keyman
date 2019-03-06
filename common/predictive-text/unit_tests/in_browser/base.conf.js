@@ -33,7 +33,7 @@ module.exports = {
   files: [
     // Include the generated worker code.  Make sure it's linked before any of the test cases.
     '../../build/index.js',
-
+    'helpers.js',    // Provides utility helpers and objects for tests.
     'cases/**/*.js', // Where the tests actually reside.
     
     // We don't have anything in these locations... yet.  But they'll be useful for test resources.

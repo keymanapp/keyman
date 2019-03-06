@@ -23,6 +23,8 @@ describe('LMLayerWorker', function () {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
+      configWorker(worker);
+      
       worker.onMessage(createMessageEventWithData({
         message: 'initialize',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"

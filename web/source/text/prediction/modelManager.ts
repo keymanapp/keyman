@@ -36,7 +36,12 @@ namespace com.keyman.text.prediction {
 
     init() {
       let keyman = com.keyman.singleton;
-      this.lmEngine = new LMLayer();
+      // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
+      // model may expect.
+      let capabilities: Capabilities = {
+        maxLeftContextCodeUnits: 64
+      }
+      this.lmEngine = new LMLayer(capabilities);
       
       // Registers this module for keyboard (and thus, language) change events.
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));

@@ -36,21 +36,22 @@
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
  * 
- * Implements the state pattern. There are two states:
+ * Implements the state pattern. There are three states:
  * 
- *  - `uninitialized` (initial state)
- *  - `ready`         (accepting state)
+ *  - `unconfigured`  (initial state before configuration)
+ *  - `uninitialized` (state without model loaded)
+ *  - `ready`         (state with model loaded, accepts prediction requests)
  * 
  * Transitions are initiated by valid messages. Invalid
  * messages are errors, and do not lead to transitions.
  * 
- *         +-----------------+            +---------+
- *         |                 | initialize |         |
- *  +------>  uninitialized  +----------->+  ready  +---+
- *         |                 |            |         |   |
- *         +-----------------+            +----^----+   | predict
- *                                             |        |
- *                                             +--------+
+ *          +-----------------+ initialize +---------+
+ *   config |                 |----------->|         |
+ *  +------->  uninitialized  +            +  ready  +---+
+ *          |                 |<-----------|         |   |
+ *          +-----------------+   unload   +----^----+   | predict
+ *                                              |        |
+ *                                              +--------+
  * 
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
@@ -78,6 +79,8 @@ class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  private _platformCapabilities: Capabilities;
+
   private _hostURL: string;
 
   constructor(options = {
@@ -86,7 +89,7 @@ class LMLayerWorker {
   }) {
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
-    this.setupInitialState();
+    this.setupConfigState();
   }
 
   /**
@@ -140,6 +143,8 @@ class LMLayerWorker {
    * @param capabilities Capabilities on offer from the keyboard.
    */
   public loadModel(model: WorkerInternalModel) {
+    // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
+    // returning a Configuration.
     let capabilities = model.getCapabilities();
     let configuration: Configuration = {
       leftContextCodeUnits: 0,
@@ -172,7 +177,29 @@ class LMLayerWorker {
   }
 
   /**
-   * Sets the initial state, i.e., `uninitialized`.
+   * Sets the initial state, i.e., `unconfigured`.
+   * This state only handles `config` messages, and will
+   * transition to the `uninitialized` state once it receives
+   * the config data from the host platform.
+   */
+  private setupConfigState() {
+    this.state = {
+      name: 'unconfigured',
+      handleMessage: (payload) => {
+        // ... that message must have been 'config'!
+        if (payload.message !== 'config') {
+          throw new Error(`invalid message; expected 'config' but got ${payload.message}`);
+        }
+
+        this._platformCapabilities = payload.capabilities;
+
+        this.setupInitialState();
+      }
+    }
+  }
+
+  /**
+   * Sets the model-loading state, i.e., `uninitialized`.
    * This state only handles `initialized` messages, and will
    * transition to the `ready` state once it receives a model
    * description and capabilities.

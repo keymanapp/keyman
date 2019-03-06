@@ -12,7 +12,7 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
 describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
-      var lmLayer = new LMLayer();
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but

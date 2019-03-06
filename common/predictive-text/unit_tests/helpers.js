@@ -21,6 +21,26 @@ _.createMessageEventWithData = function createMessageEventWithData(data) {
 }
 
 /**
+ * Creates a simple, default capabilities object for standard-case LMLayer init.
+ */
+_.capabilities = function capabilities() {
+  return {
+    maxLeftContextCodeUnits: 64
+  }
+}
+
+/** 
+ * Mimics a message from the outer LMLayer shell with a simple, default config object.
+ * Used for Worker tests.
+ */
+_.configWorker = function configWorker(worker) {
+  worker.onMessage(createMessageEventWithData({
+    message: 'config',
+    capabilities: _.capabilities()
+  }));
+}
+
+/**
  * A valid model that suggests exactly what you want it to suggest.
  * 
  * @returns {ModelDescription}

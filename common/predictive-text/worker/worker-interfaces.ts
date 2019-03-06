@@ -38,8 +38,21 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'initialize' | 'predict' | 'unload';
-type IncomingMessage = InitializeMessage | PredictMessage | UnloadMessage;
+type IncomingMessageKind = 'config' | 'initialize' | 'predict' | 'unload';
+type IncomingMessage = ConfigMessage | InitializeMessage | PredictMessage | UnloadMessage;
+
+/**
+ * The structure of a config message.  It should include the platform's supported
+ * capabilities.
+ */
+interface ConfigMessage {
+  message: 'config';
+
+  /**
+   * The platform's supported capabilities.
+   */
+  capabilities: Capabilities;
+}
 
 /**
  * The structure of an initialization message. It should include the model (either in
@@ -96,7 +109,7 @@ interface LMLayerWorkerState {
    * Informative property. Name of the state. Currently, the LMLayerWorker can only
    * be the following states:
    */
-  name: 'uninitialized' | 'ready';
+  name: 'unconfigured' | 'uninitialized' | 'ready';
   handleMessage(payload: IncomingMessage): void;
 }
 
