@@ -18,7 +18,7 @@ declare namespace com.keyman.text.prediction {
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(worker?: Worker);
+    constructor(capabilities: Capabilities, worker?: Worker);
 
     /**
      * Initializes the LMLayer worker with the keyboard/platform's capabilities,
@@ -62,5 +62,11 @@ declare namespace com.keyman.text.prediction {
      *    }));
      */
     static asBlobURI(fn: Function): string;
+
+    /**
+     * Clears out any computational resources in use by the LMLayer, including shutting
+     * down any internal WebWorkers.
+     */
+    public shutdown(): void;
   }
 }
