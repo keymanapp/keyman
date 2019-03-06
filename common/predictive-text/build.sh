@@ -17,7 +17,7 @@ EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
 # Build the worker and the main script.
 build ( ) {
   # Ensure that the build-product destination for any generated include .d.ts files exists.
-  if ! [-d $INCLUDES_OUTPUT ]; then
+  if ! [ -d $INCLUDES_OUTPUT ]; then
     mkdir -p "$INCLUDES_OUTPUT"
   fi
 
@@ -44,7 +44,7 @@ build-worker () {
   npm run tsc -- -p ./worker/tsconfig.json || fail "Could not build worker."
 
   # Tweak the output index.d.ts to have an updated reference to message.d.ts
-  sed -i 's/path="\.\.\/\.\.\/message\.d\.ts"/path="message\.d\.ts"/g' $WORKER_OUTPUT/index.d.ts \
+  sed -i 's/path="\.\.\/\.\.\/message\.d\.ts"/path="message\.d\.ts"/g' "${WORKER_OUTPUT}/index.d.ts" \
     || fail "Could not update message.d.ts reference"
 
   mv $WORKER_OUTPUT/index.d.ts $INCLUDES_OUTPUT/LMLayerWorker.d.ts
