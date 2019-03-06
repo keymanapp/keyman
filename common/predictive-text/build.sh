@@ -47,7 +47,7 @@ build-worker () {
 
   # macOS has a slightly different sed, which needs an extension to use for a backup file.  Thanks, Apple.
   BACKUP_EXT=
-  if [ os_id == 'mac' ]; then
+  if [ $os_id == 'mac' ]; then
     BACKUP_EXT='.bak'
   fi
 
