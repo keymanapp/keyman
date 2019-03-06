@@ -18,7 +18,6 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
-      //var worker = new LMLayerWorker({ postMessage: fakePostMessage });
       
       // Sending it the initialize it should notify us that it's initialized!
       worker.onMessage(createMessageEventWithData({

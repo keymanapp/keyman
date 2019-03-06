@@ -215,7 +215,7 @@ class LMLayerWorker {
             this.unloadModel();
             break;
           default:
-          throw new Error(`invalid message; expected one of {'predict'} but got ${payload.message}`);
+          throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
         }
       }
     };

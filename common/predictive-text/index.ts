@@ -34,7 +34,7 @@
  * Since the Worker runs in a different thread, the public methods of this class are
  * asynchronous. Methods of note include:
  * 
- *  - #activateModel() -- initialize the LMLayer with a configuration and language model
+ *  - #activateModel() -- initialize the LMLayer by loading a specified model file
  *  - #predict() -- ask the LMLayer to offer suggestions (predictions or corrections) for
  *                  the input event
  *  - #deactivateModel() -- de-initializes the LMLayer, preparing it for re-initialization
@@ -72,11 +72,11 @@ namespace com.keyman.text.prediction {
     /**
      * Initializes the LMLayer worker with a path to the desired model file.
      */
-    activateModel(model: string): Promise<Configuration> {
+    activateModel(modelFilePath: string): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
         this._worker.postMessage({
           message: 'initialize',
-          model: model
+          model: modelFilePath
         });
 
         // Sets up so the promise is resolved in the onMessage() callback, when it receives
