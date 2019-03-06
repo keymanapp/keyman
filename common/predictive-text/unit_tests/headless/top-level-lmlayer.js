@@ -16,8 +16,7 @@ describe('LMLayer', function() {
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
-      // In the "Worker", assert the message looks right and
-      // ASYNCHRONOUSLY reply with ready message.
+      // In the "Worker", assert the message looks right
       function fakePostMessage(data) {
         assert.propertyVal(data, 'message', 'config');
         assert.isObject(data.capabilities);
