@@ -43,8 +43,16 @@ build-worker () {
 
   npm run tsc -- -p ./worker/tsconfig.json || fail "Could not build worker."
 
+  get_builder_OS
+
+  # macOS has a slightly different sed, which needs an extension to use for a backup file.  Thanks, Apple.
+  BACKUP_EXT=
+  if [ os_id == 'mac' ]; then
+    BACKUP_EXT='.bak'
+  fi
+
   # Tweak the output index.d.ts to have an updated reference to message.d.ts
-  sed -i 's/path="\.\.\/\.\.\/message\.d\.ts"/path="message\.d\.ts"/g' "${WORKER_OUTPUT}/index.d.ts" \
+  sed -i $BACKUP_EXT 's/path="\.\.\/\.\.\/message\.d\.ts"/path="message\.d\.ts"/g' "${WORKER_OUTPUT}/index.d.ts" \
     || fail "Could not update message.d.ts reference"
 
   mv $WORKER_OUTPUT/index.d.ts $INCLUDES_OUTPUT/LMLayerWorker.d.ts
