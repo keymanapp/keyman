@@ -414,3 +414,17 @@ keyboard to acknowledge late suggestions, or for the LMLayer to avoid
 sending late `suggestions` messages. In either case, a `suggestions`
 message can be identified as appropriate or "late" via its `token`
 property.
+
+
+## *Informative*: LMLayer worker as a state machine
+
+The LMLayer worker can be seen in the following states:
+
+ - `unconfigured`
+ - `model-less`
+ - `ready`
+
+The transitions of this diagram correspond to messages as described
+above.
+
+![State machine of the LMLayer](./lmlayer-states.png)
