@@ -41,16 +41,18 @@
   const MAX_SUGGESTIONS = 3;
 
   export class WordListModel implements WorkerInternalModel {
-    capabilities: Capabilities;
+    configuration: Configuration;
     private _wordlist: string[];
 
-    constructor(_capabilities: Capabilities, wordlist: string[]) {
-      this.capabilities = _capabilities;
+    constructor(wordlist: string[]) {
       this._wordlist = wordlist;
     }
 
-    getCapabilities(): Capabilities {
-      return this.capabilities;
+    configure(capabilities: Capabilities): Configuration {
+      return this.configuration = {
+        leftContextCodeUnits: capabilities.maxLeftContextCodeUnits,
+        rightContextCodeUnits: capabilities.maxRightContextCodeUnits
+      };
     }
 
     predict(transform: Transform, context: Context): Suggestion[] {

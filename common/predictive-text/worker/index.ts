@@ -145,18 +145,14 @@ class LMLayerWorker {
   public loadModel(model: WorkerInternalModel) {
     // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
     // returning a Configuration.
-    let capabilities = model.getCapabilities();
-    let configuration: Configuration = {
-      leftContextCodeUnits: 0,
-      rightContextCodeUnits: 0
-    };
+    let configuration = model.configure(this._platformCapabilities);
 
     // Set reasonable defaults for the configuration.
     if (!configuration.leftContextCodeUnits) {
-      configuration.leftContextCodeUnits = capabilities.maxLeftContextCodeUnits;
+      configuration.leftContextCodeUnits = this._platformCapabilities.maxLeftContextCodeUnits;
     }
     if (!configuration.rightContextCodeUnits) {
-      configuration.rightContextCodeUnits = capabilities.maxRightContextCodeUnits || 0;
+      configuration.rightContextCodeUnits = this._platformCapabilities.maxRightContextCodeUnits || 0;
     }
 
     this.transitionToReadyState(model);

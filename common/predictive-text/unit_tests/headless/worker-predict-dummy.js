@@ -7,25 +7,9 @@ var DummyModel = require('../../build/intermediate').models.DummyModel;
 
 describe('LMLayerWorker dummy model', function() {
   describe('instantiation', function () {
-    it('can be instantiated with capabilities', function () {
-      var model = new DummyModel(defaultCapabilities);
+    it('can be instantiated with no arguments', function () {
+      var model = new DummyModel();
       assert.isObject(model);
-    });
-
-    it('supports dependency-injected configuration', function () {
-      let configuration = {
-        leftContextCodeUnits: 64,
-        rightContextCodeUnits: 0
-      };
-
-      var model = new DummyModel({
-        maxLeftContextCodeUnits: 64,
-      },
-      {
-        configuration: configuration,
-      });
-
-      assert.deepEqual(model.configuration, configuration);
     });
   });
 
@@ -65,7 +49,7 @@ describe('LMLayerWorker dummy model', function() {
         },
       ];
 
-      var model = new DummyModel(defaultCapabilities());
+      var model = new DummyModel();
 
       // Type a 't'
       var suggestions = model.predict({
@@ -89,9 +73,7 @@ describe('LMLayerWorker dummy model', function() {
       assert.isDefined(futureSuggestions[2]);
       assert.isDefined(futureSuggestions[3]);
 
-      var model = new DummyModel(defaultCapabilities, {
-        futureSuggestions: futureSuggestions
-      });
+      var model = new DummyModel({futureSuggestions: futureSuggestions});
 
       // The dummy model should give suggestions in order,
       // regardless of the provided transform and context.

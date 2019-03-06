@@ -117,7 +117,7 @@ interface LMLayerWorkerState {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
-  getCapabilities(): Capabilities;
+  configure(capabilities: Capabilities): Configuration;
   predict(transform: Transform, context: Context): Suggestion[];
 }
 
@@ -129,5 +129,5 @@ interface WorkerInternalModelConstructor {
    * WorkerInternalModel instances are all given the keyboard's
    * capabilities, plus any parameters they require.
    */
-  new(capabilities: Capabilities, ...modelParameters: any[]): WorkerInternalModel;
+  new(...modelParameters: any[]): WorkerInternalModel;
 }
