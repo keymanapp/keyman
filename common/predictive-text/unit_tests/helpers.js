@@ -4,6 +4,9 @@
  * Globally-defined helper functions for use in in Mocha tests.
  */
 
+var fs = require("fs");
+var vm = require("vm");
+
 // Choose the appropriate global object. Either `global` in
 // Node, or `window` in browsers.
 var _ = global || window;
@@ -15,6 +18,26 @@ var _ = global || window;
  */
 _.createMessageEventWithData = function createMessageEventWithData(data) {
   return { data };
+}
+
+/**
+ * Creates a simple, default capabilities object for standard-case LMLayer init.
+ */
+_.capabilities = function capabilities() {
+  return {
+    maxLeftContextCodeUnits: 64
+  }
+}
+
+/** 
+ * Mimics a message from the outer LMLayer shell with a simple, default config object.
+ * Used for Worker tests.
+ */
+_.configWorker = function configWorker(worker) {
+  worker.onMessage(createMessageEventWithData({
+    message: 'config',
+    capabilities: _.capabilities()
+  }));
 }
 
 /**
@@ -98,13 +121,14 @@ if (typeof require === 'function') {
     return require('./in_browser/json/' + name);
   }
 
-  var fs = require("fs");
-  var vm = require("vm");
-
   // This worker-global function does not exist by default in Node!
   _.importScriptsWith = function(context) {
       return function() { // the constructed context's importScripts method.
 
+      /* Use of vm.createContext and script.runInContext allow us to avoid
+       * polluting the global scope with imports.  When we throw away the
+       * context object, imported scripts will be automatically GC'd.
+       */
       for(var i=0; i < arguments.length; i++) {
         context = vm.createContext(context);
         var script = new vm.Script(fs.readFileSync(arguments[i]));

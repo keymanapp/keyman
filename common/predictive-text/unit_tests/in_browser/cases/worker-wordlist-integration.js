@@ -8,10 +8,7 @@ describe('LMLayer using the word list model', function () {
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      var lmLayer = new LMLayer();
-      // var capabilities = {
-      //   maxLeftContextCodeUnits: 32 + ~~Math.random() * 32
-      // };
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but

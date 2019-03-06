@@ -18,11 +18,13 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
-      //var worker = new LMLayerWorker({ postMessage: fakePostMessage });
       
-      // Sending it the initialize it should notify us that it's initialized!
+      // First the worker must receive config data...
+      configWorker(worker);
+
+      // Sending it the `load` message should notify us that it's loaded!
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
       assert(fakePostMessage.calledOnce);
@@ -61,9 +63,12 @@ describe('LMLayerWorker', function() {
       // It should have installed a callback.
       assert.isFunction(fakeWorkerGlobal.onmessage);
 
+      // First the worker must receive config data...
+      configWorker(worker);
+      
       // Send a message; we should get something back.
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
 
@@ -72,7 +77,7 @@ describe('LMLayerWorker', function() {
     });
   });
 
-  describe('Message: initialize', function () {
+  describe('Message: config', function () {
     it('should disallow any other message', function () {
       var context = {
         postMessage: sinon.fake()
@@ -80,6 +85,40 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
+
+      // It should not respond to 'predict'
+      assert.throws(function () {
+        worker.onMessage(createMessageEventWithData({
+          message: 'predict',
+        }));
+      }, /invalid message/i);
+    });
+
+    it('accepts a capability set and transitions to the "modelless" state', function () {
+      var context = {
+        postMessage: sinon.fake()
+      };
+      context.importScripts = importScriptsWith(context);
+
+      var worker = LMLayerWorker.install(context);
+      
+      // Trigger the config message
+      configWorker(worker);
+
+      assert.equal(worker.state.name, 'modelless');
+    });
+  });
+
+  describe('Message: load', function () {
+    it('should disallow any other message', function () {
+      var context = {
+        postMessage: sinon.fake()
+      };
+      context.importScripts = importScriptsWith(context);
+
+      var worker = LMLayerWorker.install(context);
+
+      configWorker(worker);
 
       // It should not respond to 'predict'
       assert.throws(function () {
@@ -97,8 +136,10 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker = LMLayerWorker.install(context);
+      configWorker(worker);
+
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
 
@@ -115,10 +156,12 @@ describe('LMLayerWorker', function() {
       context.importScripts = importScriptsWith(context);
 
       var worker =  LMLayerWorker.install(context);
+      configWorker(worker);
+
       // simple-dummy.js is set with the following.
       var maxCodeUnits = 64;
       worker.onMessage(createMessageEventWithData({
-        message: 'initialize',
+        message: 'load',
         model: "./unit_tests/in_browser/resources/models/simple-dummy.js"
       }));
 

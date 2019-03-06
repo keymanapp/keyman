@@ -33,21 +33,23 @@ namespace models {
    */
   export class DummyModel implements WorkerInternalModel {
     configuration: Configuration;
-    capabilities: Capabilities;
     private _futureSuggestions: Suggestion[][];
 
-    constructor(capabilities: Capabilities, options?: any) {
-      this.capabilities = capabilities;
+    constructor(options?: any) {
       options = options || {};
-      this.configuration = options.configuration || {};
       // Create a shallow copy of the suggestions;
       // this class mutates the array.
       this._futureSuggestions = options.futureSuggestions
         ? options.futureSuggestions.slice() : [];
     }
 
-    getCapabilities(): Capabilities {
-      return this.capabilities;
+    configure(capabilities: Capabilities): Configuration {
+      this.configuration = {
+        leftContextCodeUnits: capabilities.maxLeftContextCodeUnits,
+        rightContextCodeUnits: capabilities.maxRightContextCodeUnits
+      };
+      
+      return this.configuration;
     }
 
     predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Suggestion[] {

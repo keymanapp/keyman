@@ -7,12 +7,12 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
  * **injectable** suggestions: that is, you, as the tester, have
  * to provide the predictions. The dummy model does not create any
  * suggestions on its own. The dummy model can take in a series
- * of suggestions when initialized and return them sequentially.
+ * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
-      var lmLayer = new LMLayer();
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but

@@ -19,8 +19,13 @@ describe('LMLayerWorker', function () {
         done();
         worker.terminate();
       };
+      // While the config message doesn't trigger a reply message, we have to send it a configuration message first.
       worker.postMessage({
-        message: 'initialize',
+        message: 'config',
+        capabilities: helpers.defaultCapabilities
+      })
+      worker.postMessage({
+        message: 'load',
         // Since the worker's based in a blob, it's not on the 'same domain'.  We need to absolute-path the model file.
         model: document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
       });

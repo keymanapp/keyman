@@ -8,7 +8,20 @@ let LMLayer = require('../../build');
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
     it('should accept a Worker to instantiate', function () {
-      new LMLayer(createFakeWorker());
+      new LMLayer(capabilities(), createFakeWorker());
+    });
+
+    it('should send the `config` message to the LMLayer', async function () {
+      let fakeWorker = createFakeWorker(fakePostMessage);
+      let lmLayer = new LMLayer(capabilities(), fakeWorker);
+
+      assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
+      // In the "Worker", assert the message looks right and
+      // ASYNCHRONOUSLY reply with ready message.
+      function fakePostMessage(data) {
+        assert.propertyVal(data, 'message', 'config');
+        assert.isObject(data.capabilities);
+      }
     });
   });
 
@@ -16,22 +29,27 @@ describe('LMLayer', function() {
     it('should accept capabilities and model description', function () {
       let fakeWorker = createFakeWorker();
 
-      let lmLayer = new LMLayer(fakeWorker);
+      let lmLayer = new LMLayer(capabilities(), fakeWorker);
       lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
 
-    it('should send the `initialize` message to the LMLayer', async function () {
+    it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
-      let lmLayer = new LMLayer(fakeWorker);
+      let lmLayer = new LMLayer(capabilities(), fakeWorker);
       let configuration = await lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
-      assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
+      assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
       // In the "Worker", assert the message looks right and
       // ASYNCHRONOUSLY reply with ready message.
       function fakePostMessage(data) {
-        assert.propertyVal(data, 'message', 'initialize');
+        // Expected first call:  config.  Ignore it.
+        if(data.message == 'config') {
+          return;
+        }
+
+        assert.propertyVal(data, 'message', 'load');
         assert.isString(data.model);
       
         callAsynchronously(() => fakeWorker.onmessage({
@@ -58,7 +76,7 @@ describe('LMLayer', function() {
         }));
       });
 
-      let lmLayer = new LMLayer(fakeWorker);
+      let lmLayer = new LMLayer(capabilities, fakeWorker);
       let actualConfiguration = await lmLayer.activateModel(
         {
           maxLeftContextCodeUnits: 32,

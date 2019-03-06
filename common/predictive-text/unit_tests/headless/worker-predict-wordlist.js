@@ -8,7 +8,7 @@ var WordListModel = require('../../build/intermediate').models.WordListModel;
 describe('LMLayerWorker word list model', function() {
   describe('instantiation', function () {
     it('can be instantiated with an empty word list', function () {
-      var model = new WordListModel(defaultCapabilities(), []);
+      var model = new WordListModel([]);
       assert.isObject(model);
     });
 
@@ -25,7 +25,6 @@ describe('LMLayerWorker word list model', function() {
       //   «t|                        » [Send]
       //   [   to   ] [   the   ] [   this    ]
       var model = new WordListModel(
-        defaultCapabilities(),
         jsonFixture('wordlists/english-1000')
       );
 
@@ -51,7 +50,6 @@ describe('LMLayerWorker word list model', function() {
       //   «th|                       » [Send]
       //   [  this  ] [   the   ] [   there   ]
       var model = new WordListModel(
-        defaultCapabilities(),
         jsonFixture('wordlists/english-1000')
       );
 
@@ -92,7 +90,6 @@ describe('LMLayerWorker word list model', function() {
       //   «|                         » [Send]
       //   [   I'm  ] [    I    ] [    Hey    ]
       var model = new WordListModel(
-        defaultCapabilities(),
         jsonFixture('wordlists/english-1000')
       );
 
@@ -115,7 +112,6 @@ describe('LMLayerWorker word list model', function() {
       //   «I g|                        » [Send]
       //   [  gave  ] [   got   ] [  got the  ]
       var model = new WordListModel(
-        defaultCapabilities(),
         jsonFixture('wordlists/english-1000')
       );
 

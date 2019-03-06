@@ -36,21 +36,22 @@
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
  * 
- * Implements the state pattern. There are two states:
+ * Implements the state pattern. There are three states:
  * 
- *  - `uninitialized` (initial state)
- *  - `ready`         (accepting state)
+ *  - `unconfigured`  (initial state before configuration)
+ *  - `modelless`     (state without model loaded)
+ *  - `ready`         (state with model loaded, accepts prediction requests)
  * 
  * Transitions are initiated by valid messages. Invalid
  * messages are errors, and do not lead to transitions.
  * 
- *         +-----------------+            +---------+
- *         |                 | initialize |         |
- *  +------>  uninitialized  +----------->+  ready  +---+
- *         |                 |            |         |   |
- *         +-----------------+            +----^----+   | predict
- *                                             |        |
- *                                             +--------+
+ *          +-------------+    load    +---------+
+ *   config |             |----------->|         |
+ *  +------->  modelless  +            +  ready  +---+
+ *          |             |<-----------|         |   |
+ *          +-------------+   unload   +----^----+   | predict
+ *                                          |        |
+ *                                          +--------+
  * 
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
@@ -78,6 +79,8 @@ class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  private _platformCapabilities: Capabilities;
+
   private _hostURL: string;
 
   constructor(options = {
@@ -86,7 +89,7 @@ class LMLayerWorker {
   }) {
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
-    this.setupInitialState();
+    this.setupConfigState();
   }
 
   /**
@@ -140,18 +143,16 @@ class LMLayerWorker {
    * @param capabilities Capabilities on offer from the keyboard.
    */
   public loadModel(model: WorkerInternalModel) {
-    let capabilities = model.getCapabilities();
-    let configuration: Configuration = {
-      leftContextCodeUnits: 0,
-      rightContextCodeUnits: 0
-    };
+    // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
+    // returning a Configuration.
+    let configuration = model.configure(this._platformCapabilities);
 
     // Set reasonable defaults for the configuration.
     if (!configuration.leftContextCodeUnits) {
-      configuration.leftContextCodeUnits = capabilities.maxLeftContextCodeUnits;
+      configuration.leftContextCodeUnits = this._platformCapabilities.maxLeftContextCodeUnits;
     }
     if (!configuration.rightContextCodeUnits) {
-      configuration.rightContextCodeUnits = capabilities.maxRightContextCodeUnits || 0;
+      configuration.rightContextCodeUnits = this._platformCapabilities.maxRightContextCodeUnits || 0;
     }
 
     this.transitionToReadyState(model);
@@ -168,7 +169,29 @@ class LMLayerWorker {
     // Right now, this seems sufficient to clear out the old model.
     // The only existing reference to a loaded model is held by 
     // transitionToReadyState's `handleMessage` closure. (The `model` var)
-    this.setupInitialState();
+    this.transitionToLoadingState();
+  }
+
+  /**
+   * Sets the initial state, i.e., `unconfigured`.
+   * This state only handles `config` messages, and will
+   * transition to the `modelless` state once it receives
+   * the config data from the host platform.
+   */
+  private setupConfigState() {
+    this.state = {
+      name: 'unconfigured',
+      handleMessage: (payload) => {
+        // ... that message must have been 'config'!
+        if (payload.message !== 'config') {
+          throw new Error(`invalid message; expected 'config' but got ${payload.message}`);
+        }
+
+        this._platformCapabilities = payload.capabilities;
+
+        this.transitionToLoadingState();
+      }
+    }
   }
   
   public loadWordBreaker(breaker: WorkerInternalWordBreaker) {
@@ -176,18 +199,18 @@ class LMLayerWorker {
   }
 
   /**
-   * Sets the initial state, i.e., `uninitialized`.
-   * This state only handles `initialized` messages, and will
+   * Sets the model-loading state, i.e., `modelless`.
+   * This state only handles `load` messages, and will
    * transition to the `ready` state once it receives a model
    * description and capabilities.
    */
-  private setupInitialState() {
+  private transitionToLoadingState() {
     this.state = {
-      name: 'uninitialized',
+      name: 'modelless',
       handleMessage: (payload) => {
-        // ...that message must have been 'initialize'!
-        if (payload.message !== 'initialize') {
-          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
+        // ...that message must have been 'load'!
+        if (payload.message !== 'load') {
+          throw new Error(`invalid message; expected 'load' but got ${payload.message}`);
         }
 
         // TODO: validate configuration?
@@ -201,7 +224,7 @@ class LMLayerWorker {
    * fully-instantiated model. The `ready` state only responds
    * to `predict` message, and is an accepting state.
    *
-   * @param model The initialized language model.
+   * @param model The loaded language model.
    */
   private transitionToReadyState(model: WorkerInternalModel) {
     this.state = {
@@ -219,7 +242,7 @@ class LMLayerWorker {
             this.unloadModel();
             break;
           default:
-          throw new Error(`invalid message; expected one of {'predict'} but got ${payload.message}`);
+          throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
         }
       }
     };

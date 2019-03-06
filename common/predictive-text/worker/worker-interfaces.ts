@@ -38,15 +38,28 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'initialize' | 'predict' | 'unload';
-type IncomingMessage = InitializeMessage | PredictMessage | UnloadMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage;
+
+/**
+ * The structure of a config message.  It should include the platform's supported
+ * capabilities.
+ */
+interface ConfigMessage {
+  message: 'config';
+
+  /**
+   * The platform's supported capabilities.
+   */
+  capabilities: Capabilities;
+}
 
 /**
  * The structure of an initialization message. It should include the model (either in
  * source code or parameter form), as well as the keyboard's capabilities.
  */
-interface InitializeMessage {
-  message: 'initialize';
+interface LoadMessage {
+  message: 'load';
 
   /**
    * The model's compiled JS file.
@@ -96,7 +109,7 @@ interface LMLayerWorkerState {
    * Informative property. Name of the state. Currently, the LMLayerWorker can only
    * be the following states:
    */
-  name: 'uninitialized' | 'ready';
+  name: 'unconfigured' | 'modelless' | 'ready';
   handleMessage(payload: IncomingMessage): void;
 }
 
@@ -104,7 +117,7 @@ interface LMLayerWorkerState {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
-  getCapabilities(): Capabilities;
+  configure(capabilities: Capabilities): Configuration;
   predict(transform: Transform, context: Context): Suggestion[];
 }
 
@@ -116,7 +129,7 @@ interface WorkerInternalModelConstructor {
    * WorkerInternalModel instances are all given the keyboard's
    * capabilities, plus any parameters they require.
    */
-  new(capabilities: Capabilities, ...modelParameters: any[]): WorkerInternalModel;
+  new(...modelParameters: any[]): WorkerInternalModel;
 }
 
 interface WorkerInternalWordBreaker {

@@ -34,10 +34,11 @@
  * Since the Worker runs in a different thread, the public methods of this class are
  * asynchronous. Methods of note include:
  * 
- *  - #activateModel() -- initialize the LMLayer with a configuration and language model
+ *  - #activateModel() -- loads a specified model file
  *  - #predict() -- ask the LMLayer to offer suggestions (predictions or corrections) for
  *                  the input event
- *  - #deactivateModel() -- de-initializes the LMLayer, preparing it for re-initialization
+ *  - #deactivateModel() -- unloads the LMLayer's currently loaded model, preparing it to
+ *                          receive (load) a new model
  * 
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
@@ -52,31 +53,46 @@ namespace com.keyman.text.prediction {
     private _declareLMLayerReady: (conf: Configuration) => void;
     private _promises: PromiseStore<Suggestion[]>;
     private _nextToken: number;
+    private capabilities: Capabilities;
 
     /**
      * Construct the top-level LMLayer interface. This also starts the underlying Worker.
-     * Make sure to call .initialize() when using the default Worker.
      * 
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(worker?: Worker) {
+    constructor(capabilities: Capabilities, worker?: Worker) {
       // Either use the given worker, or instantiate the default worker.
       this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
       this._worker.onmessage = this.onMessage.bind(this)
       this._declareLMLayerReady = null;
       this._promises = new PromiseStore;
       this._nextToken = Number.MIN_SAFE_INTEGER;
+
+      this.sendConfig(capabilities);
+    }
+
+    /**
+     * Initializes the LMLayer worker with the host platform's capability set.
+     * 
+     * @param capabilities The host platform's capability spec - a model cannot assume access to more context
+     *                     than specified by this parameter.
+     */
+    private sendConfig(capabilities: Capabilities) {
+      this._worker.postMessage({
+        message: 'config',
+        capabilities: capabilities
+      });
     }
 
     /**
      * Initializes the LMLayer worker with a path to the desired model file.
      */
-    activateModel(model: string): Promise<Configuration> {
+    activateModel(modelFilePath: string): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
         this._worker.postMessage({
-          message: 'initialize',
-          model: model
+          message: 'load',
+          model: modelFilePath
         });
 
         // Sets up so the promise is resolved in the onMessage() callback, when it receives

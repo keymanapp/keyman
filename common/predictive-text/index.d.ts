@@ -13,7 +13,7 @@ declare namespace com.keyman.text.prediction {
 
     /**
      * Construct the top-level LMLayer interface. This also starts the underlying Worker.
-     * Make sure to call .initialize() when using the default Worker.
+     * Make sure to call .load() when using the default Worker.
      * 
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
