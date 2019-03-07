@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,9 +29,9 @@ public final class JSONParser {
   public JSONParser() {
   }
 
-  private JSONObject getJSONObjectFromReader(BufferedReader reader) {
+  private <T extends Object> T getJSONObjectFromReader(BufferedReader reader, Class<T> type) {
     String jsonStr = "";
-    JSONObject jsonObj = null;
+    T obj = null;
     String logTag = "JSONObjectFromReader";
 
     try {
@@ -40,30 +41,38 @@ public final class JSONParser {
         strBuilder.append(line + "\n");
       }
       jsonStr = strBuilder.toString();
-      jsonObj = new JSONObject(jsonStr);
+      if (type == JSONObject.class) {
+        obj = (T) new JSONObject(jsonStr);
+      } else if (type == JSONArray.class) {
+        obj = (T) new JSONArray(jsonStr);
+      }
     } catch (UnsupportedEncodingException e) {
       Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
-      jsonObj = null;
+      obj = null;
       System.err.println(e);
     } catch (InterruptedIOException e) {
       // Disregard from cancelling action
-      Log.e(logTag, (e.getMessage() == null)  ? "InterruptedIOException" : e.getMessage());
-      jsonObj = null;
+      Log.e(logTag, (e.getMessage() == null) ? "InterruptedIOException" : e.getMessage());
+      obj = null;
     } catch (IOException e) {
       Log.e(logTag, (e.getMessage() == null) ? "IOException" : e.getMessage());
-      jsonObj = null;
+      obj = null;
       System.err.println(e);
     } catch (JSONException e) {
       Log.e(logTag, (e.getMessage() == null) ? "JSONException" : e.getMessage());
-      jsonObj = null;
+      obj = null;
       System.err.println(e);
     } catch (Exception e) {
       Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
-      jsonObj = null;
+      obj = null;
       System.err.println(e);
     }
 
-    return jsonObj;
+    return obj;
+  }
+
+  public JSONObject getJSONObjectFromReader(BufferedReader reader) {
+    return getJSONObjectFromReader(reader, JSONObject.class);
   }
 
   public JSONObject getJSONObjectFromFile(File path) {
@@ -72,7 +81,7 @@ public final class JSONParser {
 
     try {
       reader = new BufferedReader(new FileReader(path));
-      jsonObj = getJSONObjectFromReader(reader);
+      jsonObj = getJSONObjectFromReader(reader, JSONObject.class);
     } catch (FileNotFoundException e) {
       Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
       jsonObj = null;
@@ -88,10 +97,18 @@ public final class JSONParser {
     return jsonObj;
   }
 
-  // Doesn't work for directly-hosted files, hence the separate method above.
-  public JSONObject getJSONObjectFromUrl(String urlStr) {
+  //
+
+  /**
+   * Download a JSONObject or JSONArray from a URL.
+   * Doesn't work for directly-hosted files, hence the separate method above.
+   * @param urlStr String URL of the endpoint
+   * @param type Class<T> - JSONObject.class or JSONArray.class
+   * @return JSONObject or JSONArray that matches type
+   */
+  public <T extends Object> T getJSONObjectFromUrl(String urlStr, Class<T> type) {
     BufferedReader reader = null;
-    JSONObject jsonObj = null;
+    T obj = null;
     InputStream inputStream = null;
     String logTag = "JSONObjectFromUrl";
 
@@ -115,28 +132,32 @@ public final class JSONParser {
           charSet = "utf-8";
 
         reader = new BufferedReader(new InputStreamReader(inputStream, charSet), 4096);
-        jsonObj = getJSONObjectFromReader(reader);
+        obj = (T) getJSONObjectFromReader(reader, type);
       }
     } catch (UnsupportedEncodingException e) {
       Log.e(logTag, (e.getMessage() == null) ? "UnsupportedEncodingException" : e.getMessage());
-      jsonObj = null;
+      obj = null;
       System.err.println(e);
     } catch (Exception e) {
       Log.e(logTag, (e.getMessage() == null) ? "Exception" : e.getMessage());
-      jsonObj = null;
+      obj = null;
       System.err.println(e);
     } finally {
       Connection.disconnect();
 
-      if(reader != null) {
+      if (reader != null) {
         try {
           reader.close();
-        } catch(IOException e) {
+        } catch (IOException e) {
           // Ignore.
         }
       }
     }
 
-    return jsonObj;
+    return obj;
+  }
+
+  public JSONObject getJSONObjectFromUrl(String urlStr) {
+    return getJSONObjectFromUrl(urlStr, JSONObject.class);
   }
 }
