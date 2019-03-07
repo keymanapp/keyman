@@ -12,13 +12,14 @@
 (function() {
   let prototype = com.keyman.Util.prototype;
 
-  var publishAPI = function(miniName: string, longName: string) {
-    prototype[miniName] = prototype[longName];
+  var publishAPI = function(legacyName: string, name: string) {
+    prototype[legacyName] = prototype[name];
   }
 
-  publishAPI('getAbsoluteX', "_GetAbsoluteX");
-  publishAPI("getAbsoluteY", "_GetAbsoluteY");
-  publishAPI("getAbsolute", "_GetAbsolute");
+  // These four were renamed, but we need to maintain their legacy names.
+  publishAPI("_GetAbsoluteX", 'getAbsoluteX');
+  publishAPI("_GetAbsoluteY", "getAbsoluteY");
+  publishAPI("_GetAbsolute", "getAbsolute");
   publishAPI("toNzString", "nzString");
 }());
 
