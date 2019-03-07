@@ -16,8 +16,7 @@ describe('LMLayer', function() {
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
-      // In the "Worker", assert the message looks right and
-      // ASYNCHRONOUSLY reply with ready message.
+      // In the "Worker", assert the message looks right
       function fakePostMessage(data) {
         assert.propertyVal(data, 'message', 'config');
         assert.isObject(data.capabilities);
@@ -25,12 +24,12 @@ describe('LMLayer', function() {
     });
   });
 
-  describe('#activateModel()', function () {
+  describe('#loadModel()', function () {
     it('should accept capabilities and model description', function () {
       let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
@@ -38,7 +37,7 @@ describe('LMLayer', function() {
     it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      let configuration = await lmLayer.activateModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      let configuration = await lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
       // In the "Worker", assert the message looks right and
@@ -77,7 +76,7 @@ describe('LMLayer', function() {
       });
 
       let lmLayer = new LMLayer(capabilities, fakeWorker);
-      let actualConfiguration = await lmLayer.activateModel(
+      let actualConfiguration = await lmLayer.loadModel(
         {
           maxLeftContextCodeUnits: 32,
         },
@@ -87,7 +86,7 @@ describe('LMLayer', function() {
         }
       );
 
-      // This SHOULD be called by activateModel().
+      // This SHOULD be called by loadModel().
       assert.deepEqual(actualConfiguration, expectedConfiguration);
     })
   });

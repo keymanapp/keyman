@@ -118,7 +118,7 @@ Currently there are four message types:
 Message       | Direction          | Parameters          | Expected reply      | Uses token
 --------------|--------------------|---------------------|---------------------|---------------
 `config`      | LMLayer -> worker  | capabilities        | No                  | No
-`load`        | keyboard → LMLayer | capabilities, model | Yes — `ready`       | No
+`load`        | keyboard → LMLayer | model               | Yes — `ready`       | No
 `unload`      | keyboard → LMLayer | none                | No                  | No 
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
 `predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
@@ -178,7 +178,8 @@ to the LMLayer prior to sending `load`. The keyboard **SHOULD NOT** send another
 message to the keyboard until it receives `ready` message from the LMLayer
 before sending another message.
 
-The LMLayer needs to know the platform's abilities and restrictions (capabilities), as well as which concrete language model to instantiate. These properties are passed as `capabilities` and `model`, respectively.
+The LMLayer needs to know which concrete language model to instantiate. This is provided
+by the file at the path specified by the `model` string parameter.
 
 ```typescript
 interface LoadMessage {

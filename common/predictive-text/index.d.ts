@@ -24,12 +24,12 @@ declare namespace com.keyman.text.prediction {
      * Initializes the LMLayer worker with the keyboard/platform's capabilities,
      * as well as a description of the model required.
      */
-    activateModel(model: string): Promise<Configuration>;
+    loadModel(model: string): Promise<Configuration>;
 
     /**
      * Prepares the LMLayer for reinitialization with a different model/capability set.
      */
-    deactivateModel(): void;
+    unloadModel();
 
     predict(transform: Transform, context: Context): Promise<Suggestion[]>;
 
