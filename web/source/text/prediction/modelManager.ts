@@ -47,18 +47,18 @@ namespace com.keyman.text.prediction {
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));
     }
 
-    private deactivateModel() {
-      this.lmEngine.deactivateModel();
+    private unloadModel() {
+      this.lmEngine.unloadModel();
       this.currentModel = null;
     }
 
-    private activateModel(model: ModelSpec) {
+    private loadModel(model: ModelSpec) {
       if(!model) {
         throw new Error("Null reference not allowed.");
       }
 
       let file = model.path;
-      this.lmEngine.activateModel(file);
+      this.lmEngine.loadModel(file);
       this.currentModel = model;
     }
 
@@ -68,10 +68,10 @@ namespace com.keyman.text.prediction {
       let model = this.languageModelMap[lgCode];
 
       if(this.currentModel !== model) {
-        this.deactivateModel();
+        this.unloadModel();
 
         if(model) {
-          this.activateModel(model);
+          this.loadModel(model);
         }
       }
     }

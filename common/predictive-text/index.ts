@@ -34,10 +34,10 @@
  * Since the Worker runs in a different thread, the public methods of this class are
  * asynchronous. Methods of note include:
  * 
- *  - #activateModel() -- loads a specified model file
+ *  - #loadModel() -- loads a specified model file
  *  - #predict() -- ask the LMLayer to offer suggestions (predictions or corrections) for
  *                  the input event
- *  - #deactivateModel() -- unloads the LMLayer's currently loaded model, preparing it to
+ *  - #unloadModel() -- unloads the LMLayer's currently loaded model, preparing it to
  *                          receive (load) a new model
  * 
  * The top-level LMLayer will automatically starts up its own Web Worker.
@@ -88,7 +88,7 @@ namespace com.keyman.text.prediction {
     /**
      * Initializes the LMLayer worker with a path to the desired model file.
      */
-    activateModel(modelFilePath: string): Promise<Configuration> {
+    loadModel(modelFilePath: string): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
         this._worker.postMessage({
           message: 'load',
@@ -105,7 +105,7 @@ namespace com.keyman.text.prediction {
      * Unloads the previously-active model from memory, resetting the LMLayer to prep
      * for transition to use of a new model.
      */
-    public deactivateModel() {
+    public unloadModel() {
       this._worker.postMessage({
         message: 'unload'
       });

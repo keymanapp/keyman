@@ -13,7 +13,7 @@ describe('LMLayer using the word list model', function () {
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
-      return lmLayer.activateModel(
+      return lmLayer.loadModel(
         // We need to provide an absolute path since the worker is based within a blob.
         document.location.protocol + '//' + document.location.host + "/resources/models/simple-wordlist.js"
       ).then(function (_actualConfiguration) {
