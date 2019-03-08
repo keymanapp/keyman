@@ -19,20 +19,25 @@ install the packages to
 `python3 setup.py --help install` will give you more install options
 You will need `sudo apt install python3-pip` to `make uninstall`
 
-## Things to run
+## Things to run from the command line
 
 ### km-config
 
 `./km-config`
 
-This shows a list of installed kmps.
-For each one it has buttons to `show the welcome page`, `show more information` and `uninstall`.
+This displays a configuration panel that shows the currently installed Keyman keyboard packages and can download and install additional keyboards.
 
 ##### Buttons
 
+* `Uninstall` - uninstall selected keyboard
+* `About` - show information about selected keyboard
+* `Help` - display help documentation about selected keyboard
+-----------------------------------
+
 * `Refresh` - useful if you install or uninstall on the commandline while running km-config.
-* `Download keyboard...` - runs `DownloadKmpWindow` (see below)
-* `Install keyboard...` - opens a file choose dialog to choose a kmp file to install and bring up the `InstallKmpWindow` for more details and to confirm installing.
+* `Download` - runs `DownloadKmpWindow` (see below)
+* `Install` - opens a file choose dialog to choose a kmp file to install and bring up the `InstallKmpWindow` for more details and to confirm installing.
+* `Close` - close the configuration panel
 
 ##### Download window
 
@@ -51,36 +56,34 @@ Secondary-click gives you a menu including 'Back' to go back a page.
 
 ### km-package-install
 
-Command line installer for kmp
+`km-package-install -p <keyboard package id>` install Keyman keyboard package from the keyman.com server
 
-`km-package-install -k <keyboard id>`
-or
-`km-package-install -f <kmp file>`
+`km-package-install -f <kmp file>` install Keyman keyboard package from a local .kmp file
 
 ### km-package-uninstall
 
-Command line uninstaller for kmp
+`km-package-uninstall <keyboard id>` uninstall Keyman keyboard package
 
-`km-package-uninstall <keyboard id>`
+`km-package-uninstall -s <keyboard id>` uninstall from shared area `/usr/local`
 
 ### km-package-list-installed
 
 `km-package-list-installed` shows name, version, id, description of each installed keyboard
 
-`km-package-list-installed -s` shows name, version, id of each installed keyboard
+`km-package-list-installed -s` shows those installed in shared areas
+
+`km-package-list-installed -os` shows those installed by the OS
+
+`km-package-list-installed -u` shows those installed in user areas
 
 ### km-package-get
 
-Download Keyman keyboard package to ~/Downloads
-
-`km-package-get <keyboard id>`
+`km-package-get <keyboard id>` download Keyman keyboard package to `~/.cache/keyman`
 
 ### km-kvk2ldml
 
-Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print
-the details of the kvk file [-p] optionally with all keys [-k].
+`km-kvk2ldml [-p] [-k] [-o LDMLFILE] <kvk file>` Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print the details of the kvk file [-p] optionally with all keys [-k].
 
-`km-kvk2ldml [-p] [-k] [-o LDMLFILE] <kvk file>`
 
 ## Building the Debian package
 
