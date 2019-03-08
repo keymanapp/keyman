@@ -2,7 +2,7 @@
 
 ## Prerequisites
 * Android Studio 3.3.2+
-* Java
+* Java SE Development Kit 8
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
 ## Minimum Android Requirements
