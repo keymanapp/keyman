@@ -1,8 +1,8 @@
 # Keyman for Android & Keyman Engine for Android
 
 ## Prerequisites
-* Android Studio 3.0.1+
-* Java
+* Android Studio 3.3.2+
+* Java SE Development Kit 8
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
 ## Minimum Android Requirements
@@ -18,9 +18,18 @@ For MacOS/Linux users, add the following to **~/.bashrc** or **~/.bash_profile**
 export ANDROID_HOME=$HOME/Android/Sdk
 export PATH=$PATH:$ANDROID_HOME/tools
 ```
+For MacOS users, add the following (adjusted appropriately) to **~/.bashrc** or **~/.bash_profile** if your Java version is too strange for gradlew to understand (e.g., 11.0.2)
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+echo $JAVA_HOME #should output: /Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home
+```
 3. For Windows users, from a Git Bash Prompt window, cd to the **sdk/tools/bin** folder and accept all the SDK license agreements
 ```
 yes | ./sdkmanager.bat --licenses
+```
+For MacOS users, from a Terminal window, cd to the **~/Library/Android/sdk/tools/bin** folder and accept all the SDK license agreements
+```bash
+yes | ./sdkmanager --licenses
 ```
 4. If you plan to test on a physical device via USB, install the appropriate [OEM USB drivers](https://developer.android.com/studio/run/oem-usb.html)
 5. Install [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
