@@ -10,10 +10,8 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 
-import android.app.Activity;
-import android.content.ContextWrapper;
 import android.view.ContextThemeWrapper;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -26,7 +24,7 @@ import android.view.ViewGroup.OnHierarchyChangeListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.support.v7.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatEditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 

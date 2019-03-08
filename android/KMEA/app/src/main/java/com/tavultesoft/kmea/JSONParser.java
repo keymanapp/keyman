@@ -87,10 +87,12 @@ public final class JSONParser {
       jsonObj = null;
       System.err.println(e);
     } finally {
-      try {
-        reader.close();
-      } catch (IOException e) {
-        // Ignore.
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          // Ignore.
+        }
       }
     }
 
