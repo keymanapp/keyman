@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'io.fabric'
+    id 'com.github.triplet.play' version '2.1.0' apply false
 }
 
 android {
@@ -65,7 +66,7 @@ android {
 }
 
 if (project.hasProperty("keys_json_file")) {
-    apply plugin: 'com.github.triplet.play' version '2.1.0'
+    apply plugin: 'com.github.triplet.play'
 
     play {
         jsonFile = file(project.ext.keys_json_file)
