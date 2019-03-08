@@ -1,7 +1,7 @@
 # Keyman for Android & Keyman Engine for Android
 
 ## Prerequisites
-* Android Studio 3.0.1+
+* Android Studio 3.3.2+
 * Java
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 
