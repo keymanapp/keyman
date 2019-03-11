@@ -69,7 +69,7 @@ if (project.hasProperty("keys_json_file")) {
     apply plugin: 'com.github.triplet.play'
 
     play {
-        jsonFile = file(project.ext.keys_json_file)
+        serviceAccountCredentials = file(project.ext.keys_json_file)
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy = "ignore"
