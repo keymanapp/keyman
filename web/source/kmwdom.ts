@@ -1437,6 +1437,7 @@ namespace com.keyman {
         });
       }
 
+      keyman.modelManager.init();
       this.keyman._MasterDocument = window.document;
 
       /**

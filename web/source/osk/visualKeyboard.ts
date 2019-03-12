@@ -630,7 +630,7 @@ namespace com.keyman.osk {
      * @param       {string}              formFactor  layout form factor
      * @return      {Object}                          fully formatted OSK object
      */
-    deviceDependentLayout(layout, formFactor: string): HTMLDivElement {
+    deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
 
