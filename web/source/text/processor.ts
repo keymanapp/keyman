@@ -346,7 +346,7 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if(formFactor == 'desktop' && fromOSK) {
+      if((formFactor == 'desktop' || keyman.keyboardManager.layoutIsDesktopBased()) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
@@ -354,11 +354,12 @@ namespace com.keyman.text {
         }
       }
 
-      // Will handle any non-layer change modifier & state keys, mapping them through the physical keyboard's version
+      // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
-      if(this.doModifierPress(keyEvent, !fromOSK)) {
+      if(!fromOSK && this.doModifierPress(keyEvent, !fromOSK)) {
         return true;
       }
+
 
       if(!fromOSK && !window.event) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts

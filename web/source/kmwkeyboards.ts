@@ -863,6 +863,18 @@ namespace com.keyman {
       return null;
     }
 
+    layoutIsDesktopBased(k0?) {
+      let keyman = com.keyman.singleton;
+      var k = k0 || this.activeKeyboard;
+
+      if(k && k['KVKL']) {
+        // A custom mobile layout is defined... but are we using it?
+        return keyman.util.device.formFactor != 'desktop';
+      } else {
+        return true;
+      }
+    }
+
     /**
      * Function     _getKeyboardByID
      * Scope        Private
