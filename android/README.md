@@ -70,6 +70,11 @@ adb shell setprop debug.firebase.analytics.app .none.
     4. Name your run configuration kMAPro (or as desired)
 5. Run your new configuration: Select Run --> Run 'kMAPro'
 6. Select a physical device or create a new virtual device to match your target API version
+    For Ubuntu 18.04, you will need to add your user to the `kvm` group for permission accessing the emulator.
+```
+    sudo apt install qemu-kvm
+    sudo adduser <username> kvm
+```
 
 ### Running From Command Line
 1. Launch a command prompt
