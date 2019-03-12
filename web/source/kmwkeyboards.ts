@@ -869,7 +869,7 @@ namespace com.keyman {
 
       if(k && k['KVKL']) {
         // A custom mobile layout is defined... but are we using it?
-        return keyman.util.device.formFactor != 'desktop';
+        return keyman.util.device.formFactor == 'desktop';
       } else {
         return true;
       }
