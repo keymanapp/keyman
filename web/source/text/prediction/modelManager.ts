@@ -36,28 +36,29 @@ namespace com.keyman.text.prediction {
 
     init() {
       let keyman = com.keyman.singleton;
-      this.lmEngine = new LMLayer();
+      // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
+      // model may expect.
+      let capabilities: Capabilities = {
+        maxLeftContextCodeUnits: 64
+      }
+      this.lmEngine = new LMLayer(capabilities);
       
       // Registers this module for keyboard (and thus, language) change events.
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));
     }
 
-    private deactivateModel() {
-      // TODO:  Call a LMLayer method for model deactivation.
+    private unloadModel() {
+      this.lmEngine.unloadModel();
       this.currentModel = null;
     }
 
-    private activateModel(model: ModelSpec) {
+    private loadModel(model: ModelSpec) {
       if(!model) {
         throw new Error("Null reference not allowed.");
       }
 
-      // TODO:  Activate this model within the LMLayer!
       let file = model.path;
-
-      //this.lmEngine.initialize(file)  // Currently unsupported.
-      console.log("Model detected!");
-
+      this.lmEngine.loadModel(file);
       this.currentModel = model;
     }
 
@@ -67,10 +68,10 @@ namespace com.keyman.text.prediction {
       let model = this.languageModelMap[lgCode];
 
       if(this.currentModel !== model) {
-        this.deactivateModel();
+        this.unloadModel();
 
         if(model) {
-          this.activateModel(model);
+          this.loadModel(model);
         }
       }
     }
@@ -101,6 +102,12 @@ namespace com.keyman.text.prediction {
 
     isRegistered(model: ModelSpec): boolean {
       return !! this.registeredModels[model.id];
+    }
+
+    // TODO:  actually calling this.lmEngine.predict.  Will need its own method(s).
+
+    public shutdown() {
+      this.lmEngine.shutdown();
     }
   }
 }

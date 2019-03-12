@@ -8,20 +8,14 @@ describe('LMLayer using the word list model', function () {
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
-      var lmLayer = new LMLayer();
-      var capabilities = {
-        maxLeftContextCodeUnits: 32 + ~~Math.random() * 32
-      };
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
-      return lmLayer.initialize(
-        capabilities,
-        {
-            type: 'wordlist',
-            wordlist: __json__['wordlists/english-1000']
-        }
+      return lmLayer.loadModel(
+        // We need to provide an absolute path since the worker is based within a blob.
+        document.location.protocol + '//' + document.location.host + "/resources/models/simple-wordlist.js"
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -38,6 +32,7 @@ describe('LMLayer using the word list model', function () {
         return lmLayer.predict(type('q'), atEndOfBuffer('the '));
       }).then(function (suggestions) {
         assert.isAtLeast(suggestions.length, EXPECTED_SUGGESTIONS);
+        lmLayer.shutdown();
         return Promise.resolve();
       });
     });

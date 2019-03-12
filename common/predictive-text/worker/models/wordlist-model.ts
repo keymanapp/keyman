@@ -20,32 +20,39 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="./index.ts" />
-
 /**
  * @file wordlist-model.ts
  * 
  * Defines a simple word list (unigram) model.
  */
 
-/**
- * @class WordListModel
- *
- * Defines the word list model, or the unigram model.
- * Unigram models throw away all preceding words, and search
- * for the next word exclusively. As such, they can perform simple
- * prefix searches within words, however they are not very good
- * at predicting the next word.
- */
-LMLayerWorker.models.WordListModel = (function () {
+ namespace models {
+  /**
+   * @class WordListModel
+   *
+   * Defines the word list model, or the unigram model.
+   * Unigram models throw away all preceding words, and search
+   * for the next word exclusively. As such, they can perform simple
+   * prefix searches within words, however they are not very good
+   * at predicting the next word.
+   */
+
   /** Upper bound on the amount of suggestions to generate. */
   const MAX_SUGGESTIONS = 3;
 
-  return class WordListModel implements WorkerInternalModel {
+  export class WordListModel implements WorkerInternalModel {
+    configuration: Configuration;
     private _wordlist: string[];
 
-    constructor(_capabilities: Capabilities, wordlist: string[]) {
+    constructor(wordlist: string[]) {
       this._wordlist = wordlist;
+    }
+
+    configure(capabilities: Capabilities): Configuration {
+      return this.configuration = {
+        leftContextCodeUnits: capabilities.maxLeftContextCodeUnits,
+        rightContextCodeUnits: capabilities.maxRightContextCodeUnits
+      };
     }
 
     predict(transform: Transform, context: Context): Suggestion[] {
@@ -95,4 +102,4 @@ LMLayerWorker.models.WordListModel = (function () {
       return suggestions;
     }
   };
-}());
+}
