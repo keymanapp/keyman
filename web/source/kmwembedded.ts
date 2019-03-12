@@ -434,7 +434,7 @@ namespace com.keyman.osk {
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
-        keyName: keyName
+        kName: keyName
       };
 
       // Set the flags for the state keys.
