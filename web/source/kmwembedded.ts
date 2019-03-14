@@ -476,30 +476,8 @@ namespace com.keyman.osk {
 
       Lkc.vkCode=Lkc.Lcode;
 
-      // Pass this key code and state to the keyboard program
-      if(!keymanweb.keyboardManager.activeKeyboard ||  Lkc.Lcode == 0) return false;
-      
-      let Processor = com.keyman.text.Processor;
-      let outputTarget = Processor.getOutputTarget(Lelem);
-
-      // If key is mapped, return true
-      if(kbdInterface.processKeystroke(util.device, outputTarget, Lkc)) {
-        // Make sure we don't affect the current layer until the keystroke has been processed!
-        if(nextLayer) {
-          processor.selectLayer(keyName, nextLayer);
-        }
-
-        return true;
-      }
-
-      keymanweb.processDefaultMapping(Lkc, outputTarget);
-
-      if(nextLayer) {
-        // Final nextLayer check.
-        processor.selectLayer(keyName, nextLayer);
-      }
-
-      return true;
+      // Now that we have a valid key event, hand it off to the Processor for execution.
+      return processor.processKeyEvent(Lkc);
   };
 
   /**

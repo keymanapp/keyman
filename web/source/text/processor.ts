@@ -329,7 +329,7 @@ namespace com.keyman.text {
 
       this.swallowKeypress = false;
 
-      if(fromOSK) {
+      if(fromOSK && !keyman.isEmbedded) {
         keyman.domManager.initActiveElement(keyEvent.Ltarg);
 
         // Turn off key highlighting (or preview)
@@ -370,7 +370,7 @@ namespace com.keyman.text {
       // Safari, IE, Opera?
       //}
 
-      if(fromOSK) {
+      if(fromOSK && !keyman.isEmbedded) {
         keyman.uiManager.setActivatingUI(true);
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
@@ -421,7 +421,7 @@ namespace com.keyman.text {
 
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
       
-      if(fromOSK) {
+      if(fromOSK && !keyman.isEmbedded) {
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       }
 
