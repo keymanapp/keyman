@@ -13,7 +13,35 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      this.div = util._CreateElement('div');
+      let d = util._CreateElement('div');
+      d.id = "keymanweb_banner_bar";
+      d.className = "kmw-banner-bar";
+      this.div = d;
+      this.setVisibility(visible);
+    }
+
+    appendStyleSheet() {
+      let keymanweb = com.keyman.singleton;
+      let util = keymanweb.util;
+
+      // TODO: add stylesheets
+    }
+
+    disable() {
+      this._Enabled = false;
+    }
+
+    enable() {
+      this._Enabled = true;
+    }
+
+    setVisibility(visible: boolean) {
+      this._Visible = visible;
+
+      if (this.div) {
+        let ds = this.div.style;
+        ds.display=(this._Visible) ? 'block': 'none';
+      }
     }
   }
 

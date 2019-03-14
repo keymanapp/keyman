@@ -301,9 +301,13 @@ namespace com.keyman.osk {
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
         kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') {
-        innerFrame=<HTMLDivElement> innerFrame.nextSibling;
+        innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling; // skip banner bar
       }
       innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
+
+      if(this.banner) {
+        this.banner.appendStyleSheet();
+      }
 
       if(this.vkbd) {
         // Create the key preview (for phones)
@@ -322,9 +326,10 @@ namespace com.keyman.osk {
     /**
      * Function     _GenerateBanner
      * Scope        Private
-     * Description  Generates the banner element and attaches it to KMW
+     * Description  Generates the banner element
      */
     private _GenerateBanner() {
+      // TODO: This should really be BlankBanner().
       this.banner = new com.keyman.osk.SuggestionBanner();
     }
 

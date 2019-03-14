@@ -88,7 +88,7 @@ namespace com.keyman {
       'fonts':'',
       'attachType':'',
       'ui':null
-    };;
+    };
 
 
     // Stub functions (defined later in code only if required)

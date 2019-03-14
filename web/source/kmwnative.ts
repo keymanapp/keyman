@@ -390,7 +390,8 @@ namespace com.keyman.osk {
 
     var b: HTMLElement = _Box,bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.firstChild.firstChild; bs=b.style;
+    b = <HTMLElement> b.childNodes.item(1);
+    bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
 
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!

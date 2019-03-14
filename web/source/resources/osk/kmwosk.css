@@ -139,6 +139,8 @@
 .kmw-title-bar-actions{position: absolute; cursor: default; right:2px; top:0; width: 33px; height: 13px;}
 .kmw-footer-caption{color:#fff;font:0.7em Arial;margin:0 0 0 4px;}
 
+.kmw-banner-bar{height:40px; width:auto; margin:0; background-color:lightblue; border-radius:0 0 6px 6px; }
+
 .kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;
           font-family:SpecialOSK;color:white;}
 .kmw-footer-resize:hover{font-weight:bold;}

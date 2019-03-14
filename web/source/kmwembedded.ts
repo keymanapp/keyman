@@ -136,7 +136,8 @@ namespace com.keyman.osk {
 
     var b: HTMLElement = osk._Box, bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.firstChild.firstChild;
+    // sort out childNodes keymanweb_banner_bar and visualOSK
+    b = <HTMLElement> b.childNodes.item(1);
     bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     pad = Math.round(0.15*rowHeight);
