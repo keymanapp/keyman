@@ -33,11 +33,9 @@ namespace com.keyman.text {
      * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
      * Otherwise, lookup the  virtual key code (physical keyboard mapping)
      *
-     * @param   {string}  keyName Name of the key
-     * @param   {number}  n
+     * @param   {object}  Lkc  The pre-analyzed key event object
      * @param   {number}  keyShiftState
      * @param   {boolean} usingOSK
-     * @param   {Object=} Lelem
      * @return  {string}
      */
     defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
@@ -346,7 +344,7 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if(formFactor == 'desktop' && fromOSK) {
+      if((formFactor == 'desktop' || keyman.keyboardManager.layoutIsDesktopBased()) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
@@ -354,11 +352,12 @@ namespace com.keyman.text {
         }
       }
 
-      // Will handle any non-layer change modifier & state keys, mapping them through the physical keyboard's version
+      // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
-      if(this.doModifierPress(keyEvent, !fromOSK)) {
+      if(!fromOSK && this.doModifierPress(keyEvent, !fromOSK)) {
         return true;
       }
+
 
       if(!fromOSK && !window.event) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
@@ -390,7 +389,8 @@ namespace com.keyman.text {
 
       if(!LeventMatched) {
         // Restore the virtual key code if a mnemonic keyboard is being used
-        keyEvent.Lcode=keyEvent.vkCode;
+        // If no vkCode value was stored, maintain the original Lcode value.
+        keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
 
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
@@ -403,6 +403,11 @@ namespace com.keyman.text {
         }
       }
 
+      // Swap layer as appropriate.
+      if(keyEvent.kNextLayer) {
+        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
+      }
+      
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(LeventMatched) {
         this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
@@ -414,10 +419,6 @@ namespace com.keyman.text {
         this.swallowKeypress = false;
       }
 
-      // Swap layer as appropriate.
-      if(keyEvent.kNextLayer) {
-        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
-      }
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
       
       if(fromOSK) {

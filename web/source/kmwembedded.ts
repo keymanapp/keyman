@@ -428,7 +428,14 @@ namespace com.keyman.osk {
       let modifierCodes = Codes.modifierCodes;
       
       // Check the virtual key 
-      Lkc = {Ltarg:Lelem,Lmodifiers:0,Lstates:0, Lcode: Codes.keyCodes[keyName],LisVirtualKey:true};
+      Lkc = {
+        Ltarg: Lelem,
+        Lmodifiers: 0,
+        Lstates: 0,
+        Lcode: Codes.keyCodes[keyName],
+        LisVirtualKey: true,
+        kName: keyName
+      };
 
       // Set the flags for the state keys.
       Lkc.Lstates |= processor.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
@@ -485,7 +492,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      keymanweb.processDefaultMapping(Lkc.Lcode, keyShiftState, outputTarget, keyName);
+      keymanweb.processDefaultMapping(Lkc, outputTarget);
 
       if(nextLayer) {
         // Final nextLayer check.
@@ -538,7 +545,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      return keymanweb.processDefaultMapping(Lkc.Lcode, shift, outputTarget, '');
+      return keymanweb.processDefaultMapping(Lkc, outputTarget);
     } catch (err) {
       console.error(err.message, err);
       return false;
@@ -554,34 +561,35 @@ namespace com.keyman.osk {
    *  @param  {string}  keyName
    *  @return {boolean}         true if key code successfully processed
    */
-  keymanweb.processDefaultMapping = function(code, shift, Lelem, keyName) {
+  keymanweb.processDefaultMapping = function(keyEvent: com.keyman.text.KeyEvent, target: com.keyman.text.OutputTarget) {
     // Note:  this assumes Lelem is properly attached and has an element interface.
     // Currently true in the Android and iOS apps.
     let Codes = com.keyman.text.Codes;
+    let code = keyEvent.Lcode;
 
     // Default handling for external keys.
     // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
     // to the mobile apps to handle (insert characters or navigate forms).
     if (code == Codes.keyCodes.K_SPACE) {
-      kbdInterface.output(0, Lelem, ' ');
+      kbdInterface.output(0, target, ' ');
       return true;
     } else if (code == Codes.keyCodes.K_BKSP) {
       kbdInterface.defaultBackspace();
       return true;
     } else if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
-      if (shift == Codes.modifierCodes['SHIFT']) {
-        kbdInterface.output(0, Lelem, '|');
+      if (keyEvent.Lmodifiers == Codes.modifierCodes['SHIFT']) {
+        kbdInterface.output(0, target, '|');
       } else {
-        kbdInterface.output(0, Lelem, '\\');
+        kbdInterface.output(0, target, '\\');
       }
       return true;
     }
 
     // Determine the character from the OSK
-    var ch = keymanweb.textProcessor.defaultKeyOutput(keyName, code, shift, false, undefined);
+    var ch = (<com.keyman.text.Processor> keymanweb.textProcessor).defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, false);
     if(ch) {
-      kbdInterface.output(0, Lelem, ch);
+      kbdInterface.output(0, target, ch);
       return true;
     }
 
