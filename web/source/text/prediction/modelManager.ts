@@ -25,18 +25,24 @@ namespace com.keyman.text.prediction {
   }
 
   /**
-   * Corresponds to the 'invalidate' ModelManager event.
+   * Corresponds to the 'invalidatesuggestions' ModelManager event.
    */
   export type InvalidateSuggestionsHandler = () => boolean;
 
   /**
-   * Corresponds to the 'suggestions_ready' ModelManager event.
+   * Corresponds to the 'suggestionsready' ModelManager event.
    */
   export type ReadySuggestionsHandler = (suggestions: Suggestion[]) => boolean;
 
+  export type ModelChangeEnum = 'loaded'|'unloaded'|'changed';
+  /**
+   * Corresponds to the 'modelchange' ModelManager event.
+   */
+  export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
+
   export class ModelManager {
     private lmEngine: LMLayer;
-    private currentModel: ModelSpec;
+    private currentModel?: ModelSpec;
     private currentPromise: Promise<Suggestion[]>;
 
     // Tracks registered models by ID.
@@ -62,7 +68,7 @@ namespace com.keyman.text.prediction {
 
     private unloadModel() {
       this.lmEngine.unloadModel();
-      this.currentModel = null;
+      delete this.currentModel;
     }
 
     private loadModel(model: ModelSpec) {
@@ -76,16 +82,30 @@ namespace com.keyman.text.prediction {
     }
 
     onKeyboardChange(kbdInfo: KeyboardChangeData) {
+      let keyman = com.keyman.singleton;
       let lgCode = kbdInfo['languageCode'];
-
       let model = this.languageModelMap[lgCode];
 
       if(this.currentModel !== model) {
-        this.unloadModel();
+        let stateChange = 0; // Base value; will not remain the same 
+
+        if(this.currentModel) {
+          this.unloadModel();
+          stateChange += 2;
+        }
 
         if(model) {
           this.loadModel(model);
+          stateChange += 1;
         }
+
+        if(stateChange == 0) {
+          console.warn("Unexpected lack of model state change in ModelManager.onKeyboardChange!");
+          return;
+        }
+
+        let changeParam: ModelChangeEnum = stateChange == 1 ? 'loaded' : (stateChange == 2 ? 'unloaded' : 'changed');
+        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', changeParam);
       }
     }
 
@@ -141,12 +161,12 @@ namespace com.keyman.text.prediction {
 
       // We've already invalidated any suggestions resulting from any previously-existing Promise -
       // may as well officially invalidate them via event.
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidate", null);
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", null);
 
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {
         if(promise == mm.currentPromise) {
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestions_ready", suggestions);
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", suggestions);
         }
       })
     }
