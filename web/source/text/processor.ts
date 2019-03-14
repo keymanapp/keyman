@@ -319,11 +319,16 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
      */
-    processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement): boolean {
+    processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
       //var Lelem = keyman.domManager.getLastActiveElement();
 
       let fromOSK = !!e; // If specified, it's from the OSK.
+
+      // Enables embedded-path OSK sourcing detection.
+      if(typeof e == 'boolean') {
+        e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
+      }
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let kbdInterface = keyman.interface;

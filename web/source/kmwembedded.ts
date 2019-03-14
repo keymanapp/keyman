@@ -14,7 +14,7 @@
 /*****************************************/
 
 namespace com.keyman.osk {
-    // Send the subkey array to iOS, with centre,top of base key position
+  // Send the subkey array to iOS, with centre,top of base key position
   /**
    * Create a popup key array natively 
    * 
@@ -174,6 +174,42 @@ namespace com.keyman.osk {
 
     return true;
   };
+}
+
+namespace com.keyman.text {
+  let nativeDefaultKeyOutput = Processor.prototype.defaultKeyOutput;
+
+  // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
+  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+    let keyman = com.keyman.singleton;
+
+    // Note:  this assumes Lelem is properly attached and has an element interface.
+    // Currently true in the Android and iOS apps.
+    let Codes = com.keyman.text.Codes;
+    let code = Lkc.Lcode;
+
+    // Default handling for external keys.
+    // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
+    // to the mobile apps to handle (insert characters or navigate forms).
+    if(!usingOSK) { // If hardware-sourced.
+      if (code == Codes.keyCodes.K_SPACE) {
+        return ' ';
+      } else if (code == Codes.keyCodes.K_BKSP) {
+        keyman['interface'].defaultBackspace();
+        return '';
+      } else if (code == Codes.keyCodes.K_oE2) {
+        // Using defaults of English US layout for the 102nd key
+        if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
+          return '|';
+        } else {
+          return '\\';
+        }
+      }
+    }
+
+    // Use 'native'-mode defaults, determining the character from the OSK
+    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, false);
+  }
 }
 
 (function() {
@@ -454,7 +490,7 @@ namespace com.keyman.osk {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      return processor.processKeyEvent(Lkc);
+      return processor.processKeyEvent(Lkc, true);
   };
 
   /**
@@ -466,7 +502,8 @@ namespace com.keyman.osk {
    *  @param  {number}  lstates lock state (0x0200=no caps 0x0400=num 0x0800=no num 0x1000=scroll 0x2000=no scroll locks)
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
-    if(!keymanweb.keyboardManager.activeKeyboard || code == 0) {
+    let keyman = com.keyman.singleton;
+    if(!keyman.keyboardManager.activeKeyboard || code == 0) {
       return false;
     }
 
@@ -477,11 +514,11 @@ namespace com.keyman.osk {
     // Currently true in the Android and iOS apps.
     var Lelem = keymanweb.domManager.getLastActiveElement();
     
-    keymanweb.domManager.initActiveElement(Lelem);
+    keyman.domManager.initActiveElement(Lelem);
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
-      Ltarg: keymanweb.domManager.getActiveElement(),
+      Ltarg: keyman.domManager.getActiveElement(),
       Lmodifiers: shift,
       vkCode: code,
       Lcode: code,
@@ -490,64 +527,13 @@ namespace com.keyman.osk {
       kName: ''
     }; 
 
-    let Processor = com.keyman.text.Processor;
-    let outputTarget = Processor.getOutputTarget(Lelem);
-
     try {
-      // Pass this key code and state to the keyboard program
-      // If key is mapped, return true
-      if((kbdInterface as com.keyman.text.KeyboardInterface).processKeystroke(util.physicalDevice, outputTarget, Lkc)) {
-        return true;
-      }
-
-      return keymanweb.processDefaultMapping(Lkc, outputTarget);
+      // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
+      // off to the processor for its actual execution.
+      return keyman.textProcessor.processKeyEvent(Lkc); // Lack of second argument -> `usingOSK == false`
     } catch (err) {
       console.error(err.message, err);
       return false;
     }
   };
-
-  /**
-   * Process default mapping only if necessary (last resort)
-   *  @param  {number}  code   key identifier
-   *  @param  {number}  shift  shift state (0x01=left ctrl 0x02=right ctrl 0x04=left alt 0x08=right alt
-   *                                        0x10=shift 0x20=ctrl 0x40=alt)
-   *  @param  {Object}  Lelem   element to output to
-   *  @param  {string}  keyName
-   *  @return {boolean}         true if key code successfully processed
-   */
-  keymanweb.processDefaultMapping = function(keyEvent: com.keyman.text.KeyEvent, target: com.keyman.text.OutputTarget) {
-    // Note:  this assumes Lelem is properly attached and has an element interface.
-    // Currently true in the Android and iOS apps.
-    let Codes = com.keyman.text.Codes;
-    let code = keyEvent.Lcode;
-
-    // Default handling for external keys.
-    // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
-    // to the mobile apps to handle (insert characters or navigate forms).
-    if (code == Codes.keyCodes.K_SPACE) {
-      kbdInterface.output(0, target, ' ');
-      return true;
-    } else if (code == Codes.keyCodes.K_BKSP) {
-      kbdInterface.defaultBackspace();
-      return true;
-    } else if (code == Codes.keyCodes.K_oE2) {
-      // Using defaults of English US layout for the 102nd key
-      if (keyEvent.Lmodifiers == Codes.modifierCodes['SHIFT']) {
-        kbdInterface.output(0, target, '|');
-      } else {
-        kbdInterface.output(0, target, '\\');
-      }
-      return true;
-    }
-
-    // Determine the character from the OSK
-    var ch = (<com.keyman.text.Processor> keymanweb.textProcessor).defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, false);
-    if(ch) {
-      kbdInterface.output(0, target, ch);
-      return true;
-    }
-
-    return false;
-  }
 })();
