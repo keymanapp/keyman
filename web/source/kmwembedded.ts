@@ -425,34 +425,20 @@ namespace com.keyman.osk {
       }
 
       let Codes = com.keyman.text.Codes;
-      let modifierCodes = Codes.modifierCodes;
       
       // Check the virtual key 
       Lkc = {
         Ltarg: Lelem,
-        Lmodifiers: 0,
+        Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
         kName: keyName
       };
 
-      // Set the flags for the state keys.
-      Lkc.Lstates |= processor.stateKeys['K_CAPS']    ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= processor.stateKeys['K_NUMLOCK'] ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= processor.stateKeys['K_SCROLL']  ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
-
-      // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-      if(keyName.substr(0,2) == 'U_') Lkc.isVirtualKey=false;
-
-      // Get code for non-physical keys
-      if(typeof Lkc.Lcode == 'undefined') {
-          Lkc.Lcode = keymanweb.textProcessor.getVKDictionaryCode(keyName);
-          if (!Lkc.Lcode) {
-              // Special case for U_xxxx keys
-              Lkc.Lcode = 1;
-          }
-      }
+      // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
+      // we can handle many other pre-processing steps the same way with this common method.
+      processor.commonClickEventPreprocessing(Lkc);
 
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
@@ -464,19 +450,10 @@ namespace com.keyman.osk {
         return false;
       }
 
-      // Define modifiers value for sending to keyboard mapping function
-      Lkc.Lmodifiers = keyShiftState;
-      let modifierBitmasks = Codes.modifierBitmasks;
-
-      // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-      if((Lkc.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM'] && Layouts.emulatesAltGr()) {
-          Lkc.Lmodifiers &= ~modifierBitmasks['ALT_GR_SIM'];
-          Lkc.Lmodifiers |= modifierCodes['RALT'];
-      }
-
       Lkc.vkCode=Lkc.Lcode;
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
+      // This allows the Processor to also handle any predictive-text tasks necessary.
       return processor.processKeyEvent(Lkc);
   };
 

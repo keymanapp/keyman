@@ -232,10 +232,14 @@ namespace com.keyman.text {
       outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
       // Start:  mirrors _GetKeyEventProperties
+
+      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
+      keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
+
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: KeyEvent = {
         Ltarg: Lelem,
-        Lmodifiers: 0,
+        Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
@@ -253,38 +257,8 @@ namespace com.keyman.text {
           this.stateKeys[keyName] = ! this.stateKeys[keyName];
       }
 
-      // Set the flags for the state keys.
-      Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
-
-      // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
-      if(keyName.substr(0,2) == 'U_') {
-        Lkc.LisVirtualKey=false;
-      }
-
-      // Get code for non-physical keys (T_KOKAI, U_05AB etc)
-      if(typeof Lkc.Lcode == 'undefined') {
-        Lkc.Lcode = this.getVKDictionaryCode(keyName);// Updated for Build 347
-        if(!Lkc.Lcode) {
-          // Special case for U_xxxx keys. This vk code will never be used
-          // in a keyboard, so we use this to ensure that keystroke processing
-          // occurs for the key.
-          Lkc.Lcode = 1; 
-        }
-      }
-
-      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
-
-      // Define modifiers value for sending to keyboard mapping function
-      Lkc.Lmodifiers = keyShiftState;
-
-      // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-      if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && osk.Layouts.emulatesAltGr()) {
-        Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
-        Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
-      }
+      // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
+      this.commonClickEventPreprocessing(Lkc);
 
       // End - mirrors _GetKeyEventProperties
 
@@ -307,6 +281,35 @@ namespace com.keyman.text {
       }
 
       return Lkc;
+    }
+
+    commonClickEventPreprocessing(Lkc: KeyEvent) {
+      // Set the flags for the state keys.
+      Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
+      Lkc.Lstates |= this.stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
+      Lkc.Lstates |= this.stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
+
+      // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
+      if(Lkc.kName.substr(0,2) == 'U_') {
+        Lkc.LisVirtualKey=false;
+      }
+
+      // Get code for non-physical keys (T_KOKAI, U_05AB etc)
+      if(typeof Lkc.Lcode == 'undefined') {
+        Lkc.Lcode = this.getVKDictionaryCode(Lkc.kName);// Updated for Build 347
+        if(!Lkc.Lcode) {
+          // Special case for U_xxxx keys. This vk code will never be used
+          // in a keyboard, so we use this to ensure that keystroke processing
+          // occurs for the key.
+          Lkc.Lcode = 1; 
+        }
+      }
+
+      // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
+      if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && osk.Layouts.emulatesAltGr()) {
+        Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
+        Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
+      }
     }
 
     /**
