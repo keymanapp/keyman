@@ -403,6 +403,11 @@ namespace com.keyman.text {
         }
       }
 
+      // Swap layer as appropriate.
+      if(keyEvent.kNextLayer) {
+        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
+      }
+      
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(LeventMatched) {
         this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
@@ -414,10 +419,6 @@ namespace com.keyman.text {
         this.swallowKeypress = false;
       }
 
-      // Swap layer as appropriate.
-      if(keyEvent.kNextLayer) {
-        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
-      }
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
       
       if(fromOSK) {
