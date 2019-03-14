@@ -188,22 +188,19 @@ namespace com.keyman.text {
     let Codes = com.keyman.text.Codes;
     let code = Lkc.Lcode;
 
-    // Default handling for external keys.
     // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
     // to the mobile apps to handle (insert characters or navigate forms).
-    if(!usingOSK) { // If hardware-sourced.
-      if (code == Codes.keyCodes.K_SPACE) {
-        return ' ';
-      } else if (code == Codes.keyCodes.K_BKSP) {
-        keyman['interface'].defaultBackspace();
-        return '';
-      } else if (code == Codes.keyCodes.K_oE2) {
-        // Using defaults of English US layout for the 102nd key
-        if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
-          return '|';
-        } else {
-          return '\\';
-        }
+    if (code == Codes.keyCodes.K_SPACE) {
+      return ' ';
+    } else if (code == Codes.keyCodes.K_BKSP) {
+      keyman['interface'].defaultBackspace();
+      return '';
+    } else if (code == Codes.keyCodes.K_oE2) {
+      // Using defaults of English US layout for the 102nd key
+      if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
+        return '|';
+      } else {
+        return '\\';
       }
     }
 
