@@ -33,11 +33,9 @@ namespace com.keyman.text {
      * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
      * Otherwise, lookup the  virtual key code (physical keyboard mapping)
      *
-     * @param   {string}  keyName Name of the key
-     * @param   {number}  n
+     * @param   {object}  Lkc  The pre-analyzed key event object
      * @param   {number}  keyShiftState
      * @param   {boolean} usingOSK
-     * @param   {Object=} Lelem
      * @return  {string}
      */
     defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
@@ -391,7 +389,8 @@ namespace com.keyman.text {
 
       if(!LeventMatched) {
         // Restore the virtual key code if a mnemonic keyboard is being used
-        keyEvent.Lcode=keyEvent.vkCode;
+        // If no vkCode value was stored, maintain the original Lcode value.
+        keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
 
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
