@@ -41,6 +41,8 @@ namespace com.keyman.text {
       this.preInput = preInput;
       this.removedDks = removedDks;
       this.insertedDks = insertedDks;
+
+      this.transform.id = this.token;
     }
   }
 

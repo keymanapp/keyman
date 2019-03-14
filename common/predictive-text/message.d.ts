@@ -149,6 +149,15 @@ interface Configuration {
  */
 interface Transform {
   /**
+   * Facilitates use of unique identifiers for tracking the Transform and
+   * any related data from its original source, as the reference cannot be
+   * preserved across WebWorker boundaries.
+   * 
+   * This is *separate* from any LMLayer-internal identification values.
+   */
+  id?: number;
+
+  /**
    * The Unicode scalar values (i.e., characters) to be inserted at the
    * cursor position.
    *
