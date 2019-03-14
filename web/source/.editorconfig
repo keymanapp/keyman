@@ -5,6 +5,6 @@ root = true
 [*]
 indent_style = space
 
-[*.{java, js, sh, css, html, xml}]
+[*.{java, js, ts, sh, css, html, xml}]
 indent_size = 2
 

@@ -2,7 +2,7 @@
 ///<reference path="../processor.ts" />
 // Defines the LMLayer's outer shell
 ///<reference path="../../includes/lmlayer.ts" />
-// Defines the KeyboardManager and its related types.
+// Defines the ModelManager and its related types.
 ///<reference path="../../kmwkeyboards.ts" />
 
 namespace com.keyman.text.prediction {
@@ -62,7 +62,7 @@ namespace com.keyman.text.prediction {
       }
       this.lmEngine = new LMLayer(capabilities);
       
-      // Registers this module for keyboard (and thus, language) change events.
+      // Registers this module for keyboard (language) and model change events.
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));
     }
 
