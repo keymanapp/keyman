@@ -19,7 +19,7 @@
 
 /* kmw-key-square applies only to OSK key elements, kmw-key-square-ex applies only to popup key elements */
 
-.phone.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+.phone.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:184px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
 .phone .kmw-osk-inner-frame{margin:0;background:transparent;}
 .phone .kmw-key-layer-group{position:fixed;left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}

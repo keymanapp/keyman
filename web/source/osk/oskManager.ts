@@ -333,6 +333,7 @@ namespace com.keyman.osk {
      */
     private _GenerateBanner() {
       // TODO: This should really be BlankBanner().
+      // this.banner = new com.keyman.osk.BlankBanner();
       this.banner = new com.keyman.osk.SuggestionBanner();
     }
 
@@ -357,7 +358,7 @@ namespace com.keyman.osk {
         this._Box.appendChild(this.controlBar());
       }
 
-      // Add suggestion bar to OSK
+      // Add suggestion banner bar to OSK
       if (this.banner) {
         this._Box.appendChild(this.banner.div);
       }
@@ -1049,7 +1050,8 @@ namespace com.keyman.osk {
         }
       }
 
-      return height;
+      let bannerHeight = this.banner.height;
+      return height + bannerHeight;
     }
 
     /**

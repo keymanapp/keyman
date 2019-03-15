@@ -379,18 +379,18 @@ namespace com.keyman.osk {
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         oskHeight=oskManager.getHeight(),
-        rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows)),
+        bannerHeight=oskManager.banner.height,
+        rowHeight=Math.floor((oskHeight-bannerHeight)/(nRows == 0 ? 1 : nRows)),
         nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
-
     oskHeight=nRows*rowHeight;
 
     var b: HTMLElement = _Box,bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.childNodes.item(1);
+    b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
 

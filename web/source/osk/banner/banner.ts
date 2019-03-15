@@ -2,13 +2,27 @@ namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
   export abstract class Banner {
-    _Visible: boolean = false;
-    _Enabled: boolean = true;
+    private _Visible: boolean;
+    private _Enabled: boolean;
+    private _Height: number; // pixels
     div: HTMLDivElement;
+
+    public get height():number {
+      return this._Height;
+    }
+
+    public set height(height) {
+      this._Height = height;
+      let ds = this.div.style;
+      if (height > 0) {
+        ds.height= height + 'px';
+      }
+    }
 
     protected constructor(visible: boolean, enabled: boolean) {
       this._Visible = visible;
       this._Enabled = enabled;
+      this._Height = 40;
 
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
@@ -35,6 +49,8 @@ namespace com.keyman.osk {
       this._Enabled = true;
     }
 
+
+
     setVisibility(visible: boolean) {
       this._Visible = visible;
 
@@ -49,6 +65,7 @@ namespace com.keyman.osk {
 
     constructor() {
       super(false, true);
+      this.height = 0;
     }
   }
 
