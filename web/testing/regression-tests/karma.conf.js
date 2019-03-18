@@ -62,7 +62,7 @@ module.exports = function(config) {
     files: [
       // Test framework
       { pattern: path.join(keyman_basename, test_relative_path, 'test.html'), nocache: true },
-      { pattern: path.join(keyman_basename, test_relative_path, 'test.js'), nocache: true },
+      { pattern: path.join(keyman_basename, test_relative_path, 'tests-generated.js'), nocache: true },
 
       // The test-runner is shared with the Node application for generating base tests manually
       { pattern: path.join(keyman_basename, test_relative_path, 'test-runner.js'), nocache: true }, 
@@ -143,6 +143,7 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+
   })
 }

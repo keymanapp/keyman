@@ -7,6 +7,7 @@ const fs = require("fs");
 const path = require('path');
 const express = require('express');
 const config = require('./config.js');
+const util = require('./util.js');
 
 const KEYBOARDS_ROOT = path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP);
 
@@ -34,20 +35,8 @@ module.exports = {
    * @param {express.Response} response 
    */
   listKeyboards: function(request, response) {
-    let shortnames = fs.readdirSync(KEYBOARDS_ROOT);
-    let keyboards = [];
-    shortnames.forEach(function(shortname) {
-      let kbds = fs.readdirSync(path.join(KEYBOARDS_ROOT, shortname));
-      if(kbds && kbds.length) {
-        kbds.forEach(function(kbd) {
-          if(fs.existsSync(path.join(KEYBOARDS_ROOT, shortname, kbd, 'build', kbd+'.tests')) &&
-              fs.existsSync(path.join(KEYBOARDS_ROOT, shortname, kbd, 'build', kbd+'.js'))) {
-            keyboards.push({s:shortname, id: kbd});
-          }
-        });
-      }
-    });
     console.log(`/list-keyboards`);
+    let keyboards = util.getKeyboardFolders(KEYBOARDS_ROOT);
     response.setHeader('Content-Type', 'application/json');
     response.writeHead(200);
     return response.end(JSON.stringify(keyboards));
@@ -65,38 +54,52 @@ module.exports = {
 
     function finish(json) {
       //console.log(json);
-      
+
       response.setHeader('Content-Type', 'application/json');
-      if(request.method !== 'POST' || !json || typeof json != 'object' || !json.id || !json.shortname ) {
+      if(request.method !== 'POST' || !json || typeof json != 'object' || !json.id || !json.shortname || !json.compilerVersion || !json.engineVersion) {
         console.error('/save-results Invalid request');
         response.writeHead(400);
         return response.end(JSON.stringify({result: "Invalid request"}));
       }
+
+      const filename = `${json.id}-${json.compilerVersion}-${json.engineVersion}.results`;
   
-      console.log(`/save-results ${json.shortname}/${json.id}`);
+      console.log(`/save-results ${json.shortname}/${filename}`);
     
       // Do some basic sanity checks to avoid disasters
-      if(typeof(json.id) != 'string' || 
-          !json.id.match(/^[a-z0-9_]+$/) ||
-          typeof(json.shortname) != 'string' ||
-          !json.shortname.match(/^[a-z]+$/)) {
+      if(typeof(json.id) != 'string' || !json.id.match(/^[a-z0-9_]+$/) ||
+          typeof(json.shortname) != 'string' || !json.shortname.match(/^[a-z]+$/) ||
+          typeof(json.compilerVersion) != 'string' || !json.compilerVersion.match(/^(\d+)(\.\d+)*$/) ||
+          typeof(json.engineVersion) != 'string' || !json.engineVersion.match(/^(\d+)(\.\d+)*$/)) {
+        // console.log(typeof json.compilerVersion);
+        // console.log(typeof json.engineVersion);
         console.error('/save-results Invalid request');
         response.writeHead(400);
         return response.end(JSON.stringify({result: "Invalid request"}));
       }
     
       // Ensure that the 'shortname/id/build' folder exists
-      let base = path.join(KEYBOARDS_ROOT, json.shortname, json.id, 'build');
+      let base = path.join(KEYBOARDS_ROOT, json.shortname, json.id);
       if(!fs.existsSync(base)) {
         const msg = `Keyboard ${json.shortname}/${json.id} not found at ${base}`;
         console.error('/save-results 404 '+msg);
         response.writeHead(404);
         return response.end(JSON.stringify({result: msg}));
       }
+      base = path.join(base, 'tests');
+      if(!fs.existsSync(base)) {
+        fs.mkdirSync(base);
+        if(!fs.existsSync(base)) {
+          const msg = `Could not create tests folder ${base}`;
+          console.error('/save-results 500 '+msg);
+          response.writeHead(500);
+          return response.end(JSON.stringify({result: msg}));
+        }
+      }
     
       // Assuming for now that the json is valid. This is internal use so we are not too worried
       // about integrity.
-      fs.writeFileSync(path.join(base, json.id+'.results'), JSON.stringify(json.results, null, 2));
+      fs.writeFileSync(path.join(base, filename), JSON.stringify(json.results, null, 2));
       response.writeHead(200);
       return response.end(JSON.stringify({result: 'success'}));
     };

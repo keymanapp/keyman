@@ -12,8 +12,6 @@ function addKeyboardsList(keyboards) {
 }
 
 window.addEventListener('load', function() {
-  console.log('windowLoad');
-
   // Retrieve list of available tests
   let http = new XMLHttpRequest();
   http.onreadystatechange = function() {
@@ -37,32 +35,8 @@ function loadTests() {
   });
 }
 
-/**
- * Post test results to /save-result
- * @param {string} locator 
- * @param {string|object} results
- */
-function saveTestResults(locator, results) {
-  return new Promise(function(resolve, reject) {
-    let json = testRunner.parseLocator(locator);
-    if(!json.id) throw new Error('Invalid locator: '+locator);
-    json.results = typeof results == 'string' ? JSON.parse(results) : results;
-
-    // Post results to be saved to disk by index.js
-    let http = new XMLHttpRequest();
-    http.onreadystatechange = function() {
-      if(http.readyState === XMLHttpRequest.DONE) {
-        if(http.status === 200) {
-          resolve(http.responseText);
-        } else {
-          reject('Failed to save test results: '+http.responseText);
-        }
-      }
-    };
-    http.open('POST', '/save-results');
-    http.setRequestHeader('Content-Type', 'application/json');
-    http.send(JSON.stringify(json));
-  });
+function saveTestResults() {
+  return testRunner.saveTestResults(keyboards.value, masterJSON.value);
 }
 
 /**
@@ -80,7 +54,7 @@ function loadRunAndSaveTest(n) {
   keyboards.value = locator; // tracks progress visually
   testRunner.loadTests(locator)
     .then(() => testRunner.runTests(id))
-    .then(() => saveTestResults(locator, testRunner.keyboards[id].results))
+    .then(() => testRunner.saveTestResults(locator, testRunner.keyboards[id].results))
     .then(() => {
       if(++n < allKeyboards.length) {
         loadRunAndSaveTest(n);
