@@ -37,4 +37,6 @@ app.use('/keyboards/', express.static(path.join(config.KEYBOARDS_ROOT, config.KE
 app.get("/list-keyboards", testHost.listKeyboards);
 app.post("/save-results", testHost.saveResults);
 
+console.log('Listening on http://'+config.host+':'+config.port);
+
 app.listen(config.port, config.host);
