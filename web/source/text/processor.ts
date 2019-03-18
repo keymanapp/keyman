@@ -367,7 +367,7 @@ namespace com.keyman.text {
       }
 
 
-      if(!fromOSK && !window.event) {
+      if(!keyman.isEmbedded && !fromOSK && !window.event) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
