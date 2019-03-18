@@ -61,40 +61,59 @@ module.exports = {
    */
   saveResults: function(request, response) {
     // Take the posted JSON file, save to KEYBOARDS_ROOT/x/id/build/id.results
-    response.setHeader('Content-Type', 'application/json');
+    let body = [];
 
-    let json = request.body;
-    if(request.method !== 'POST' || !json || typeof json != 'object' || !json.id || !json.shortname ) {
-      console.error('/save-results Invalid request');
-      response.writeHead(400);
-      return response.end(JSON.stringify({result: "Invalid request"}));
-    }
+    function finish(json) {
+      //console.log(json);
+      
+      response.setHeader('Content-Type', 'application/json');
+      if(request.method !== 'POST' || !json || typeof json != 'object' || !json.id || !json.shortname ) {
+        console.error('/save-results Invalid request');
+        response.writeHead(400);
+        return response.end(JSON.stringify({result: "Invalid request"}));
+      }
+  
+      console.log(`/save-results ${json.shortname}/${json.id}`);
+    
+      // Do some basic sanity checks to avoid disasters
+      if(typeof(json.id) != 'string' || 
+          !json.id.match(/^[a-z0-9_]+$/) ||
+          typeof(json.shortname) != 'string' ||
+          !json.shortname.match(/^[a-z]+$/)) {
+        console.error('/save-results Invalid request');
+        response.writeHead(400);
+        return response.end(JSON.stringify({result: "Invalid request"}));
+      }
+    
+      // Ensure that the 'shortname/id/build' folder exists
+      let base = path.join(KEYBOARDS_ROOT, json.shortname, json.id, 'build');
+      if(!fs.existsSync(base)) {
+        const msg = `Keyboard ${json.shortname}/${json.id} not found at ${base}`;
+        console.error('/save-results 404 '+msg);
+        response.writeHead(404);
+        return response.end(JSON.stringify({result: msg}));
+      }
+    
+      // Assuming for now that the json is valid. This is internal use so we are not too worried
+      // about integrity.
+      fs.writeFileSync(path.join(base, json.id+'.results'), JSON.stringify(json.results, null, 2));
+      response.writeHead(200);
+      return response.end(JSON.stringify({result: 'success'}));
+    };
 
-    console.log(`/save-results ${json.shortname}/${json.id}`);
-  
-    // Do some basic sanity checks to avoid disasters
-    if(typeof(json.id) != 'string' || 
-        !json.id.match(/^[a-z0-9_]+$/) ||
-        typeof(json.shortname) != 'string' ||
-        !json.shortname.match(/^[a-z]+$/)) {
-      console.error('/save-results Invalid request');
-      response.writeHead(400);
-      return response.end(JSON.stringify({result: "Invalid request"}));
+    if(request.body) {
+      // Express hosted (interactive)
+      return finish(request.body);
+    } else {
+      // Karma-based (CI)
+      request.on('error', (err) => {
+        console.error(err);
+      }).on('data', (chunk) => {
+        body.push(chunk);
+      }).on('end', () => {
+        body = Buffer.concat(body).toString();
+        finish(JSON.parse(body));
+      });
     }
-  
-    // Ensure that the 'shortname/id/build' folder exists
-    let base = path.join(KEYBOARDS_ROOT, json.shortname, json.id, 'build');
-    if(!fs.existsSync(base)) {
-      const msg = `Keyboard ${json.shortname}/${json.id} not found at ${base}`;
-      console.error('/save-results 404 '+msg);
-      response.writeHead(404);
-      return response.end(JSON.stringify({result: msg}));
-    }
-  
-    // Assuming for now that the json is valid. This is internal use so we are not too worried
-    // about integrity.
-    fs.writeFileSync(path.join(base, json.id+'.results'), JSON.stringify(json.results, null, 2));
-    response.writeHead(200);
-    return response.end(JSON.stringify({result: 'success'}));
   }
 };
