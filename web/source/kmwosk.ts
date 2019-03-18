@@ -2461,6 +2461,9 @@ if(!window['keyman']['initialized']) {
       if(t === null || device.formFactor != 'desktop') return;
 
       if(t.nodeName == 'SPAN') t=t.parentNode;
+      if(t.className.indexOf('kmw-key-label') >= 0) {
+        t = t.parentNode;
+      }
       if(util.eventType(e) == 'mousedown')
       {
         osk.currentKey=t.id; osk._CancelMouse(e);
@@ -2483,6 +2486,9 @@ if(!window['keyman']['initialized']) {
       if(t === null || device.formFactor != 'desktop') return;
 
       if(t.nodeName == 'SPAN') t=t.parentNode;
+      if(t.className.indexOf('kmw-key-label') >= 0) {
+        t = t.parentNode;
+      }
       osk.highlightKey(t,false);
 
       // Process as click if mouse button released anywhere over key
