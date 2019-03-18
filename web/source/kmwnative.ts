@@ -386,7 +386,7 @@ namespace com.keyman.osk {
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
-    oskHeight=nRows*rowHeight;
+    oskHeight=nRows*rowHeight+bannerHeight;
 
     var b: HTMLElement = _Box,bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
@@ -405,7 +405,7 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows));
+      rowHeight=Math.floor((oskHeight-bannerHeight)/(nRows == 0 ? 1 : nRows));
 
       pad = Math.round(0.15*rowHeight);
       (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';

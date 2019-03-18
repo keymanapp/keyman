@@ -633,6 +633,8 @@ namespace com.keyman.osk {
     deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
+      let bannerHeight = oskManager.banner.height;
+      let rowsPercent = 100;
 
       var lDiv=util._CreateElement('div'), ls=lDiv.style, actualHeight=0;
 
@@ -645,6 +647,7 @@ namespace com.keyman.osk {
         case 'tablet':
           actualHeight=oskManager.getHeight();
           ls.height=actualHeight+'px';
+          rowsPercent = Math.round(100*(actualHeight - bannerHeight)/actualHeight );
           break;
       }
 
@@ -694,11 +697,11 @@ namespace com.keyman.osk {
       // Set the OSK row height, **assuming all layers have the same number of rows**
 
       // Calculate default row height
-      rowHeight=100/rows.length;
+      rowHeight=rowsPercent/rows.length;
 
       // For desktop OSK, use a percentage of the OSK height
       if(formFactor == 'desktop') {
-        rowHeight=100/rows.length;
+        rowHeight=rowsPercent/rows.length;
       }
 
       // Get the actual available document width and scale factor according to device type

@@ -118,11 +118,11 @@ namespace com.keyman.osk {
     let util = keyman.util;
     let device = util.device;
 
-    if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
+    if(!_Box || !_Box.childNodes || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
       return false;
     }
 
-    var layers=_Box.firstChild.firstChild.childNodes,
+    var layers=_Box.childNodes.item(1).firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         oskHeight=osk.getHeight(),
         rowHeight=Math.floor(oskHeight/nRows),
