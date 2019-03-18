@@ -111,43 +111,42 @@ namespace com.keyman.osk {
    * Adjust the absolute height of each keyboard element after a rotation - modified for KMEI, 13/11/14
    *    
    **/      
-  VisualKeyboard.prototype.adjustHeights=function(this: VisualKeyboard): boolean {
+  VisualKeyboard.prototype.adjustHeights = function(this: VisualKeyboard): boolean {
     let keyman = com.keyman.singleton;
-    let osk = keyman.osk;
-    let _Box = osk._Box;
+    let oskManager = keyman.osk;
+    let _Box = oskManager._Box;
     let util = keyman.util;
     let device = util.device;
 
-    if(!_Box || !_Box.childNodes || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
+    if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
       return false;
     }
 
-    var layers=_Box.childNodes.item(1).firstChild.childNodes,
+    var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
-        oskHeight=osk.getHeight(),
-        rowHeight=Math.floor(oskHeight/nRows),
+        oskHeight=oskManager.getHeight(),
+        bannerHeight=oskManager.banner.height,
+        rowHeight=Math.floor((oskHeight-bannerHeight)/(nRows == 0 ? 1 : nRows)),
         nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
+    oskHeight=nRows*rowHeight+bannerHeight;
 
-    oskHeight=nRows*rowHeight;
-
-    var b: HTMLElement = osk._Box, bs=b.style;
+    var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    // sort out childNodes keymanweb_banner_bar and visualOSK
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     pad = Math.round(0.15*rowHeight);
 
     var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
- 
+
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';
+      (<HTMLElement> layers[nLayer]).style.height=(oskHeight-bannerHeight+3)+'px';
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
@@ -158,7 +157,7 @@ namespace com.keyman.osk {
         for(nKey=0;nKey<nKeys;nKey++) {
           key=keys[nKey];
           // Must set the height of the text DIV, not the label (if any)
-          for(j=0;j<key.childNodes.length;j++) {
+          for(j=0; j<key.childNodes.length; j++) {
             if(util.hasClass(key.childNodes[j],'kmw-key')) {
               break;
             }
@@ -166,9 +165,11 @@ namespace com.keyman.osk {
           ks=key.childNodes[j].style;
           ks.bottom=rs.bottom;
           ks.height=ks.minHeight=(rowHeight-pad)+'px';
-                          
+
           // Rescale keycap labels on iPhone (iOS 7)
-          if(resizeLabels && (j > 0)) key.childNodes[0].style.fontSize='6px';
+          if(resizeLabels && (j > 0)) {
+            key.childNodes[0].style.fontSize='6px';
+          }
         }
       }
     }
