@@ -20,13 +20,13 @@ def changeblacktowhite(im):
     return im2
 
 def checkandsaveico(icofile):
-	"""
-	Convert keyman ico file to png to work in IBus
+    """
+    Convert keyman ico file to png to work in IBus
     The ico file may be ico or bmp format
 
-	Args:
-		icofile (str): path to ico file
-	"""
+    Args:
+        icofile (str): path to ico file
+    """
     im = Image.open(icofile)
     im = im.convert('RGBA')
     im2 = im
@@ -42,12 +42,12 @@ def checkandsaveico(icofile):
     os.remove(icofile + ".bmp")
 
 def extractico(kmxfile):
-	"""
-	Extract icon file from compiled kmx keyboard
+    """
+    Extract icon file from compiled kmx keyboard
 
-	Args:
-		kmxfile (str): path to kmx file
-	"""
+    Args:
+        kmxfile (str): path to kmx file
+    """
     name, ext = os.path.splitext(kmxfile)
     icofilename = name+".ico"
     with open(kmxfile, mode='rb') as file: # b is important -> binary
