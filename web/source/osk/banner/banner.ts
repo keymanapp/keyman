@@ -11,7 +11,7 @@ namespace com.keyman.osk {
       return this._Height;
     }
 
-    public set height(height) {
+    public set height(height:number) {
       this._Height = height;
       let ds = this.div.style;
       if (height > 0) {
@@ -61,6 +61,10 @@ namespace com.keyman.osk {
     }
   }
 
+  /**
+   * Function       BlankBanner
+   * Description    A banner of height 0 that should not be shown
+   */
   export class BlankBanner extends Banner {
 
     constructor() {
@@ -71,18 +75,22 @@ namespace com.keyman.osk {
 
   /**
    * Function       ImageBanner
-   * @param         string        image
+   * @param         {string}        imagePath   Path of image to display in the banner
    * Description    Display an image in the banner
    */
   export class ImageBanner extends Banner {
-    image: string;
+    imagePath: string;
 
-    constructor(image) {
+    constructor(imagePath) {
       super(true, true);
-      this.image = image;
+      this.imagePath = imagePath;
     }
   }
 
+  /**
+   * Function       SuggestionBanner
+   * Description    Display lexical model suggestions in the banner
+   */
   export class SuggestionBanner extends Banner {
     constructor() {
       super(true, true);

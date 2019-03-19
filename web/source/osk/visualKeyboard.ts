@@ -647,7 +647,7 @@ namespace com.keyman.osk {
         case 'tablet':
           actualHeight=oskManager.getHeight();
           ls.height=actualHeight+'px';
-          rowsPercent = Math.round(100*oskManager.getRowsHeight()/actualHeight );
+          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/actualHeight );
           break;
       }
 

@@ -1055,11 +1055,18 @@ namespace com.keyman.osk {
     }
 
     /**
+     * Get the wanted height of the banner (does not include the keyboard)
+     */
+    getBannerHeight(): number {
+      return this.banner.height;
+    }
+
+    /**
      * Get the wanted height of the OSK for touch devices (does not include banner height)
      *
      *  @return   {number}    height in pixels
      **/
-    getRowsHeight(): number {
+    getKeyboardHeight(): number {
       return this.getHeight() - this.banner.height;
     }
 
