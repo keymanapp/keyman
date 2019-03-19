@@ -1,6 +1,7 @@
 # Keyman for Linux Version History
 
 ## 12.0 alpha
+* extract icon from kmx instead of downloading it (#1649)
 * Started work on Keyman for Linux 12
 
 ## 2019-02-25 11.0.120 stable
