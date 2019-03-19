@@ -6,7 +6,7 @@
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
 // Includes the banner
-/// <reference path="./banner/banner.ts" />
+/// <reference path="./bannerManager.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -24,7 +24,7 @@ namespace com.keyman.osk {
   export class OSKManager {
     // Important OSK elements (and container classes)
     _Box: HTMLDivElement;
-    banner: com.keyman.osk.Banner;
+    banner: com.keyman.osk.BannerManager;
     vkbd: VisualKeyboard;
     resizeIcon: HTMLDivElement;
     closeButton: HTMLDivElement;
@@ -121,6 +121,15 @@ namespace com.keyman.osk {
         }
       }
       this.loadCookie();
+
+      this.banner = new BannerManager();
+
+      // TODO:  Remove when it's production time.  This is here for debugging purposes only.
+      this.banner.setOptions({
+        'enablePredictions': true,
+        'persistentBanner': true
+      })
+
       this.ready=true;
     }
 
@@ -270,7 +279,6 @@ namespace com.keyman.osk {
             Lviskbd={'F':'Tahoma', 'BK': Layouts.dfltText}; //DDOSK
           }
 
-          this._GenerateBanner();
           this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask());
         } else { //The following code applies only to preformatted 'help' such as European Latin
           //osk.ddOSK = false;
@@ -308,9 +316,7 @@ namespace com.keyman.osk {
       }
       innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
 
-      if(this.banner) {
-        this.banner.appendStyleSheet();
-      }
+      this.banner.appendStyles();
 
       if(this.vkbd) {
         // Create the key preview (for phones)
@@ -324,17 +330,6 @@ namespace com.keyman.osk {
       if(this._Enabled) {
         this._Show();
       }
-    }
-
-    /**
-     * Function     _GenerateBanner
-     * Scope        Private
-     * Description  Generates the banner element
-     */
-    private _GenerateBanner() {
-      // TODO: This should really be BlankBanner().
-      // this.banner = new com.keyman.osk.BlankBanner();
-      this.banner = new com.keyman.osk.SuggestionBanner();
     }
 
     /**
@@ -360,7 +355,7 @@ namespace com.keyman.osk {
 
       // Add suggestion banner bar to OSK
       if (this.banner) {
-        this._Box.appendChild(this.banner.div);
+        this._Box.appendChild(this.banner.element);
       }
 
       // Add primary keyboard element to OSK
