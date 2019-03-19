@@ -1010,7 +1010,7 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Get the wanted height of the OSK for touch devices
+     * Get the wanted height of the OSK for touch devices (banner height + rows of keys)
      *
      *  @return   {number}    height in pixels
      **/
@@ -1052,6 +1052,15 @@ namespace com.keyman.osk {
 
       let bannerHeight = this.banner.height;
       return height + bannerHeight;
+    }
+
+    /**
+     * Get the wanted height of the OSK for touch devices (does not include banner height)
+     *
+     *  @return   {number}    height in pixels
+     **/
+    getRowsHeight(): number {
+      return this.getHeight() - this.banner.height;
     }
 
     /**

@@ -380,7 +380,7 @@ namespace com.keyman.osk {
         nRows=layers[0].childNodes.length,
         oskHeight=oskManager.getHeight(),
         bannerHeight=oskManager.banner.height,
-        rowHeight=Math.floor((oskHeight-bannerHeight)/(nRows == 0 ? 1 : nRows)),
+        rowHeight=Math.floor(oskManager.getRowsHeight()/(nRows == 0 ? 1 : nRows)),
         nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
@@ -406,7 +406,7 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskHeight-bannerHeight+3)+'px';
+      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getRowsHeight()+3)+'px';
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
