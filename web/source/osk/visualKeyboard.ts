@@ -1596,13 +1596,13 @@ namespace com.keyman.osk {
         t = <HTMLElement> t.parentNode;
       }
 
-      let key = getKeyFrom(t);
+      let key = this.keyTarget(t);
 
       if(util.eventType(e) == 'mousedown') {
         this.currentKey=key.id;
         util._CancelMouse(e);
         this.highlightKey(key, true);
-      } else if(t.id == this.currentKey) {
+      } else if(key.id == this.currentKey) {
         this.highlightKey(key, true);
       }
     }.bind(this);
@@ -1625,13 +1625,13 @@ namespace com.keyman.osk {
         t = <HTMLElement> t.parentNode;
       }
 
-      let key = getKeyFrom(t);
+      let key = this.keyTarget(t);
       this.highlightKey(key, false);
 
       // Process as click if mouse button released anywhere over key
       if(util.eventType(e) == 'mouseup') {
         if(key.id == this.currentKey) {
-          keyman.textProcessor.clickKey(getKeyFrom(key));
+          keyman.textProcessor.clickKey(key);
         }
         this.currentKey='';
       }
