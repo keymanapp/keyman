@@ -97,8 +97,8 @@ namespace com.keyman.osk {
       this.img = document.createElement('img');
       this.img.setAttribute('src', imagePath);
       let ds = this.img.style;
-      ds.width='100%';
-      ds.height=this.height + 'px';
+      ds.width = '100%';
+      ds.height = this.height + 'px';
       if (this.div) {
         this.div.appendChild(this.img);
       }
@@ -118,6 +118,11 @@ namespace com.keyman.osk {
         this.height = this.DEFAULT_HEIGHT;
         this.visible = true;
         this.enable = true;
+
+        if (this.img) {
+          let ds = this.img.style;
+          ds.height = this.height + 'px';
+        }
       }
     }
   }
