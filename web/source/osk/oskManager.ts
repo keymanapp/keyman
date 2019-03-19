@@ -24,7 +24,7 @@ namespace com.keyman.osk {
   export class OSKManager {
     // Important OSK elements (and container classes)
     _Box: HTMLDivElement;
-    banner: com.keyman.osk.Banner;
+    banner: Banner;
     vkbd: VisualKeyboard;
     resizeIcon: HTMLDivElement;
     closeButton: HTMLDivElement;
@@ -332,9 +332,23 @@ namespace com.keyman.osk {
      * Description  Generates the banner element
      */
     private _GenerateBanner() {
-      // TODO: This should really be BlankBanner().
-      // this.banner = new com.keyman.osk.BlankBanner();
-      this.banner = new com.keyman.osk.SuggestionBanner();
+      let keymanweb = com.keyman.singleton;
+      let device = keymanweb.util.device;
+
+      if (device.OS == 'iOS') {
+        let banner = new ImageBanner('');
+        // TODO: embedded app will set the image path
+        banner.setImagePath('../../ios/keyman/Keyman/SWKeyboard/Keyman Banner/banner-Portrait.png');
+        this.banner = banner;
+      } else if (device.OS == 'Android') {
+        let banner = new BlankBanner();
+        this.banner = banner;
+      } else if (device.formFactor == 'desktop') {
+        // TODO: This should really be BlankBanner()
+        // let banner = new BlankBanner();
+        let banner = new SuggestionBanner();
+        this.banner = banner;
+      }
     }
 
     /**
@@ -360,7 +374,7 @@ namespace com.keyman.osk {
 
       // Add suggestion banner bar to OSK
       if (this.banner) {
-        this._Box.appendChild(this.banner.div);
+        this._Box.appendChild(this.banner.getDiv());
       }
 
       // Add primary keyboard element to OSK
