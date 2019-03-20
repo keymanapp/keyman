@@ -68,6 +68,10 @@ namespace com.keyman.text.prediction {
       keyman['addEventListener']('keyboardchange', this.onKeyboardChange.bind(this));
     }
 
+    public get activeModel(): ModelSpec {
+      return this.currentModel;
+    }
+
     private unloadModel() {
       this.lmEngine.unloadModel();
       delete this.currentModel;
