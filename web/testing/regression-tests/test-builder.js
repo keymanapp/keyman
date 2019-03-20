@@ -1,4 +1,4 @@
-// Generate a test-runner for all available keyboards
+// Generate a tests-generated for all available keyboards
 // We do this because dynamically setting up test cases using Mocha + karma is
 // fragile at best -- and does not report the total number of cases correctly.
 
@@ -6,8 +6,24 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config.js');
 const util = require('./util.js');
+const program = require('commander');
 
 const KEYBOARDS_ROOT = path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP);
+
+function list(val) {
+  return val.split(',');
+}
+
+program
+  .version('0.1')
+  .option('-c, --compiler-version [version]', 'Specify compiler version that is being tested, which is saved in the results file.')
+  .option('-e, --engine-version [version]', 'Specify KeymanWeb engine version that is being tested, which is saved in the results file.')
+  .option('-k, --keyboards [keyboards]', 'Test specific keyboard(s) in the repo, e.g. k/khmer_angkor. If -k is not specified, then test all keyboards in the keyboards repository.', list, []);
+
+program.parse(process.argv);
+
+config.compilerVersion = program.compilerVersion;
+config.engineVersion = program.engineVersion;
 
 let keyboards = util.getKeyboardFolders(KEYBOARDS_ROOT);
 
@@ -15,28 +31,24 @@ let code = `
   let assert = chai.assert;
 `;
 
-console.log(process.argv[2]);
 keyboards.forEach(function(keyboard) {
- 
-  if(process.argv.length < 2 || keyboard.id == process.argv[2])
-
-  code += `
-
-  describe('Test keyboard ${keyboard.id}', () => {
-    const s='${keyboard.s}';
-    const id='${keyboard.id}';
-    const locator = s+'/'+id;
-    it('should generate a set of results for "all" possible inputs', function() {
-      return windowLoad
-        .then(function() {
-          return testRunner.loadTests(locator)
-            .then(() => testRunner.runTests(id))
-            .then(() => testRunner.saveTestResults(locator, testRunner.keyboards[id].results));
-          });
-    }).timeout(0);
-  });
-  
-`;
+  if(program.keyboards.length == 0 || program.keyboards.indexOf(keyboard.s+'/'+keyboard.id) >= 0) {
+    code += `
+      describe('Test keyboard ${keyboard.id}', () => {
+        const s='${keyboard.s}';
+        const id='${keyboard.id}';
+        const locator = s+'/'+id;
+        it('should generate a set of results for "all" possible inputs', function() {
+          return windowLoad
+            .then(function() {
+              return testRunner.loadTests(locator)
+                .then(() => testRunner.runTests(id))
+                .then(() => testRunner.saveTestResults(locator, testRunner.keyboards[id].results));
+              });
+        }).timeout(0);
+      });
+    `;
+  }
 });
 
 fs.writeFileSync('./tests-generated.js', code);

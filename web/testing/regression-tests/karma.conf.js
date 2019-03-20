@@ -68,34 +68,26 @@ module.exports = function(config) {
       { pattern: path.join(keyman_basename, test_relative_path, 'test-runner.js'), nocache: true }, 
 
       // KeymanWeb and keyboards
-      { pattern: path.join(keyman_basename, KEYMANWEB_RELATIVE_PATH, '**'), watched: false, included: false, nocache: true },
+      //{ pattern: path.join(keyman_basename, KEYMANWEB_RELATIVE_PATH, '**'), watched: false, included: false, nocache: true },
+      { pattern: path.join(keyman_basename, test_relative_path, 'web', 'unminified', '**'), watched: false, included: false, nocache: true },
       { pattern: path.join(KEYBOARDS_REPO_BASENAME, 'release', '**'), watched: false, included: false, nocache: true },
     ],
 
     // Add our custom HTTP responders for `/save-results` and `/list-keyboards`
 
-     middleware: ['custom'],
+    middleware: ['custom'],
 
     plugins: [
       'karma-*',
        {'middleware:custom': ['factory', function(/*config*/) { return test_host.handleRequest; }]}
     ],
 
-//   /*function KeymanwebRegressionFooFactory(config) {
-//     return function (request, response, /* next */) {
-//       debugger;
-//       response.writeHead(200);
-//       return response.end('FOO!!');
-//     };
-// }*/
-  
-
-
     // proxy the convoluted relative paths into consistent targets at /web/ and /keyboards/
 
     proxies: {
-      '/web/' : { target: '/base/' + path.posix.join(keyman_basename, KEYMANWEB_RELATIVE_PATH) + '/' },
-      '/keyboards/' : { target: '/base/' + path.posix.join(KEYBOARDS_REPO_BASENAME, test_config.KEYBOARDS_GROUP) + '/' }
+      '/web/' : { target: '/base/' + path.posix.join(keyman_basename, test_relative_path, 'web', 'unminified') + '/' },
+      //'/web/' : { target: '/base/' + path.posix.join(keyman_basename, KEYMANWEB_RELATIVE_PATH) + '/' },
+      '/keyboards/' : { target: '/base/' + path.posix.join(KEYBOARDS_REPO_BASENAME, test_config.KEYBOARDS_GROUP) + '/' },
     },
 
     // list of files / patterns to exclude
@@ -129,7 +121,12 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    //TODO enable watch for interactive tests?
+    autoWatch: false,
+
+
+    // Some of our larger tests take over a minute to complete
+    browserNoActivityTimeout: 240000,
 
 
     // start these browsers
@@ -139,7 +136,8 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    //TODO disable singleRun for interactive tests? - split into separate conf file?
+    singleRun: true,
 
     // Concurrency level
     // how many browser should be started simultaneous
