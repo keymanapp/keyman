@@ -57,7 +57,7 @@ namespace com.keyman.text.prediction {
    */
   export type ReadySuggestionsHandler = (suggestions: Suggestion[]) => boolean;
 
-  export type ModelChangeEnum = 'loaded'|'unloaded'|'changed';
+  export type ModelChangeEnum = 'loaded'|'unloaded';
   /**
    * Corresponds to the 'modelchange' ModelManager event.
    */
@@ -115,51 +115,33 @@ namespace com.keyman.text.prediction {
     }
 
     onKeyboardChange(kbdInfo: KeyboardChangeData) {
+      let keyman = com.keyman.singleton;
+
       let lgCode = kbdInfo['languageCode'];
       let model = this.languageModelMap[lgCode];
-      var loadPromise: Promise<number>;
+      var loadPromise: Promise<void>;
 
       if(this.currentModel !== model) {
-        let stateChange = 0; // Base value; will not remain the same 
-
         if(this.currentModel) {
           this.unloadModel();
-          stateChange += 2;
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
         }
 
         if(model) {
-          loadPromise = this.loadModel(model).then(function() {
-            // Track the state bit flags appropriately.
-            return stateChange + 1;
-          });
-        }
-
-        if(stateChange == 0) {
-          console.warn("Unexpected lack of model state change in ModelManager.onKeyboardChange!");
-          return;
+          loadPromise = this.loadModel(model);
         }
 
         // If we're loading a model, we need to defer until its completion before we report a change of state.
         if(loadPromise) {
           let mm = this;
-          loadPromise.then(function(stateBitFlags: number) {
-            mm.doModelChange(stateBitFlags);
+          loadPromise.then(function() {
+            keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
           }).catch(function(failReason: any) {
             // Does this provide enough logging information?
             console.error("Could not load model '" + model.id + "': " + failReason);
           });
-        } else {
-          // No promises?  Just directly trigger the event, then!
-          this.doModelChange(stateChange);
         }
       }
-    }
-
-    private doModelChange(stateBitFlags: number) {
-      let keyman = com.keyman.singleton;
-
-      let changeParam: ModelChangeEnum = stateBitFlags == 1 ? 'loaded' : (stateBitFlags == 2 ? 'unloaded' : 'changed');
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', changeParam);
     }
 
     // Accessible publicly as keyman.modelManager.register(model: ModelSpec)
