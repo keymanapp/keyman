@@ -6,7 +6,7 @@
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
 // Includes the banner
-/// <reference path="./banner/banner.ts" />
+/// <reference path="./bannerManager.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -24,7 +24,7 @@ namespace com.keyman.osk {
   export class OSKManager {
     // Important OSK elements (and container classes)
     _Box: HTMLDivElement;
-    banner: Banner;
+    banner: BannerManager;
     vkbd: VisualKeyboard;
     resizeIcon: HTMLDivElement;
     closeButton: HTMLDivElement;
@@ -121,6 +121,7 @@ namespace com.keyman.osk {
         }
       }
       this.loadCookie();
+      this.banner = new BannerManager();
       this.ready=true;
     }
 
@@ -270,7 +271,6 @@ namespace com.keyman.osk {
             Lviskbd={'F':'Tahoma', 'BK': Layouts.dfltText}; //DDOSK
           }
 
-          this._GenerateBanner();
           this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask());
         } else { //The following code applies only to preformatted 'help' such as European Latin
           //osk.ddOSK = false;
@@ -308,9 +308,7 @@ namespace com.keyman.osk {
       }
       innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
 
-      if(this.banner) {
-        this.banner.appendStyleSheet();
-      }
+      this.banner.appendStyles();
 
       if(this.vkbd) {
         // Create the key preview (for phones)
@@ -323,31 +321,6 @@ namespace com.keyman.osk {
 
       if(this._Enabled) {
         this._Show();
-      }
-    }
-
-    /**
-     * Function     _GenerateBanner
-     * Scope        Private
-     * Description  Generates the banner element
-     */
-    private _GenerateBanner() {
-      let keymanweb = com.keyman.singleton;
-      let device = keymanweb.util.device;
-
-      if (device.OS == 'iOS') {
-        let banner = new ImageBanner('');
-        // TODO: embedded app will set the image path
-        banner.setImagePath('../../ios/keyman/Keyman/SWKeyboard/Keyman Banner/banner-Portrait.png');
-        this.banner = banner;
-      } else if (device.OS == 'Android') {
-        let banner = new BlankBanner();
-        this.banner = banner;
-      } else if (device.formFactor == 'desktop') {
-        // TODO: This should really be BlankBanner()
-        // let banner = new BlankBanner();
-        let banner = new SuggestionBanner();
-        this.banner = banner;
       }
     }
 
@@ -374,7 +347,7 @@ namespace com.keyman.osk {
 
       // Add suggestion banner bar to OSK
       if (this.banner) {
-        this._Box.appendChild(this.banner.getDiv());
+        this._Box.appendChild(this.banner.element);
       }
 
       // Add primary keyboard element to OSK
@@ -1328,7 +1301,9 @@ namespace com.keyman.osk {
         if(device.touchable) {
           Ls.position='fixed';
           Ls.left=Ls.bottom='0px';
-          Ls.height=Ls.maxHeight=(<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
+          Ls.height=Ls.maxHeight= (parseInt(vkbdHeight) + this.getBannerHeight()) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
