@@ -1301,7 +1301,9 @@ namespace com.keyman.osk {
         if(device.touchable) {
           Ls.position='fixed';
           Ls.left=Ls.bottom='0px';
-          Ls.height=Ls.maxHeight=(<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
+          Ls.height=Ls.maxHeight= (parseInt(vkbdHeight) + this.getBannerHeight()) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
