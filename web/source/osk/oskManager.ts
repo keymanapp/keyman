@@ -24,7 +24,7 @@ namespace com.keyman.osk {
   export class OSKManager {
     // Important OSK elements (and container classes)
     _Box: HTMLDivElement;
-    banner: com.keyman.osk.BannerManager;
+    banner: BannerManager;
     vkbd: VisualKeyboard;
     resizeIcon: HTMLDivElement;
     closeButton: HTMLDivElement;
