@@ -171,8 +171,6 @@ namespace com.keyman.osk {
         suggestionText = spec.text;
       }
 
-      t.className = 'kmw-suggestion-text';
-
       if (this.spec.languageID) {
         t.lang = this.spec.languageID;
       }
@@ -193,7 +191,10 @@ namespace com.keyman.osk {
       }
 
       // Finalize the suggestion text
-      t.innerHTML = suggestionText;
+      var d=util._CreateElement('div'), ds=d.style;
+      d.className = 'kmw-suggestion-text';
+      d.innerHTML = suggestionText;
+      t.appendChild(d);
 
       return t;
     }
