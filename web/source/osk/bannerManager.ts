@@ -5,6 +5,8 @@ namespace com.keyman.osk {
     persistentBanner?: boolean;
     enablePredictions?: boolean;
     imagePath?: string;
+    // TODO: Remove test code for production
+    setPrediction?: string;
   }
 
   export type BannerType = "blank" | "image" | "suggestion";
@@ -18,20 +20,47 @@ namespace com.keyman.osk {
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
       persistentBanner: false,
-      enablePredictions: true
+      enablePredictions: true,
+      imagePath: ""
     }
 
     constructor() {
       // Step 1 - establish the container element.  Must come before this.setOptions.
       this.constructContainer();
 
-      // Initialize with the default options - any 'manually set' options come post-construction.
-      // This will also automatically set the default banner in place.
-      this.setOptions(BannerManager.DEFAULT_OPTIONS);
-
       // Register a listener for model change events so that we can hot-swap the banner as needed.
       let keyman = com.keyman.singleton;
+      let device = keyman.util.device;
+
+      // TODO: Remove for production
+      let initialOptions: BannerOptions;
+      if (device.OS == 'iOS') {
+        initialOptions = {
+          persistentBanner: true,
+          enablePredictions: false,
+          imagePath: '../../ios/keyman/Keyman/SWKeyboard/Keyman Banner/banner-Portrait.png'
+        };
+        this.setBanner('image');
+      } else if (device.OS == 'Android') {
+        initialOptions = BannerManager.DEFAULT_OPTIONS;
+        this.setBanner('blank');
+      } else if (device.formFactor == 'desktop') {
+        initialOptions = {
+          persistentBanner: true,
+          enablePredictions: true
+        };
+        this.setBanner('suggestion');
+      } else {
+        initialOptions = BannerManager.DEFAULT_OPTIONS;
+      }
+
+      // Initialize with the default options - any 'manually set' options come post-construction.
+      // This will also automatically set the default banner in place.
+      this.setOptions(initialOptions);
+
       keyman.modelManager['addEventListener']('modelchange', this.selectBanner.bind(this));
+      keyman.modelManager['addEventListener']('invalidatesuggestions', this.invalidateSuggestions.bind(this));
+      keyman.modelManager['addEventListener']('suggestionsready', this.updateSuggestions.bind(this));
     }
 
     private constructContainer(): HTMLDivElement {
@@ -77,6 +106,16 @@ namespace com.keyman.osk {
             // Determines the image file to use for ImageBanners.
             this.imagePath = optionSpec['imagePath'];
             break;
+          case 'setPrediction':
+            let suggestions:Suggestion[] = Array();
+            for(var i=0; i<optionSpec['setPrediction'].length; i++) {
+              let s: Suggestion = SuggestionBanner.BLANK_SUGGESTION();
+              s.displayAs = optionSpec['setPrediction'][i] + (i+1) + ' ';
+              suggestions.push(s);
+            }
+            this.updateSuggestions(suggestions);
+            // Don't reselect the banner because that will reinitialize the suggestions
+            return;
           default:
             // Invalid option specified!
         }
@@ -112,7 +151,7 @@ namespace com.keyman.osk {
     private selectBanner(state?: text.prediction.ModelChangeEnum) {
       let keyman = com.keyman.singleton;
 
-      if(keyman.modelManager.activeModel) {
+      if(keyman.modelManager.enabled) {
         this.setBanner('suggestion');
       } else if(this.alwaysShows) {
         this.setBanner('image');
@@ -126,12 +165,28 @@ namespace com.keyman.osk {
         if(banner == this.activeBanner) {
           return;
         } else {
-          this.bannerContainer.removeChild(this.activeBanner.getDiv());
+          this.bannerContainer.replaceChild(banner.getDiv(), this.activeBanner.getDiv());
         }
       }
 
       this.activeBanner = banner;
       this.bannerContainer.appendChild(banner.getDiv());
+    }
+
+    private invalidateSuggestions() {
+      if(this.activeBanner) {
+        let banner = this.activeBanner as SuggestionBanner;
+        banner.invalidateSuggestions();
+        this._setBanner(banner);
+      }
+    }
+
+    private updateSuggestions(suggestions: Suggestion[]) {
+      if (this.activeBanner) {
+        let banner = this.activeBanner as SuggestionBanner;
+        banner.updateSuggestions(suggestions);
+        this._setBanner(banner);
+      }
     }
 
     public get height(): number {
