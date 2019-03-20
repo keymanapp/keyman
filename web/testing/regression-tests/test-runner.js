@@ -235,6 +235,7 @@ var testRunner = {
     if(test !== undefined) {
       //console.log('Running test '+id+':'+index);
       receiver.value = test.context || '';
+      //TODO: reset deadkey state
       var e = new com.keyman.KeyEvent();
       e.Ltarg = receiver;
       e.Lcode = test.key;

@@ -23,11 +23,14 @@ program
   .option('-c, --compiler-versions [versions]', 'Specify compiler version(s) to test. Can specify "stable", "source" or a specific version number.', list, ['stable','source'])
   .option('-e, --engine-versions [versions]', 'Specify KeymanWeb engine version(s) to test. Can specify "stable", "source" or a specific version number.', list, ['stable','source'])
   .option('-k, --keyboards [keyboards]', 'Builds and tests specific keyboard source files. If -k is not specified, then test all keyboards in the keyboards repository.', list, [])
+  .option('-f, --fail-fast', "Don't attempt to continue tests after the first keyboard test fails")
   .option('--skip-analysis', "Don't create .tests files, assume they are already present");
 
 program.parse(process.argv);
 
 const KEYBOARDS_ROOT = path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP);
+
+process.exitCode = 0;
 
 //console.log(program.compilerVersions);
 //console.log(program.engineVersions);
@@ -81,6 +84,13 @@ function forEachPromise(items, fn) {
           return fn(item);
       });
   }, Promise.resolve());
+}
+
+function fail(msg, code) {
+  // We don't abandon the test cases unless fail-fast is specified but we do have a finish failure
+  console.error(msg);
+  process.exitCode = code;
+  if(program.failFast) process.exit();
 }
 
 forEachPromise(program.compilerVersions, version => {
@@ -142,10 +152,10 @@ forEachPromise(program.compilerVersions, version => {
     testedCompilerVersions.push(compilerVersion);
 
     let buildKeyboard = function(keyboard) {
-      keyboard = keyboard ? 'release/'+keyboard : '';
+      keyboard = keyboard ? 'release/'+keyboard : 'release';
       return new Promise((resolve, reject) => {
         let spawn = require('child_process').spawn;
-        let build = spawn(`${bash.command}`, [].concat(bash.params, ['build.sh', keyboard]), { cwd: config.KEYBOARDS_ROOT });
+        let build = spawn(`${bash.command}`, [].concat(bash.params, ['build.sh', '-T', 'kmn', keyboard]), { cwd: config.KEYBOARDS_ROOT });
 
         // We pipe the stdout/stderr rather than using stdio:'inherit' option because
         // stdio:'inherit' changes the mode of the console streams and we lose colours
@@ -255,7 +265,7 @@ forEachPromise(program.compilerVersions, version => {
 
           build.on('exit', function(code) {
             if(code != 0) {
-              console.error('Keyboards test failed with code '+code);
+              fail('Keyboards test failed with code '+code, 3);
               //reject(); // We won't abort because reasons
             }
             resolve();
@@ -278,8 +288,7 @@ forEachPromise(program.compilerVersions, version => {
 
   let baseCompilerVersion = testedCompilerVersions.shift(), baseEngineVersion = testedEngineVersions.shift();
 
-  process.exitCode = 0;
-  
+
   keyboards.forEach((keyboard) => {
     if(!program.keyboards.length || program.keyboards.indexOf(keyboard.s+'/'+keyboard.id) >= 0) {
       // Validate each of the test files against the first tested compiler+engine version
@@ -292,9 +301,7 @@ forEachPromise(program.compilerVersions, version => {
           const result = fs.readFileSync(resultFilename, 'utf8');
           //console.log(resultFilename, result);
           if(result != baseResult) {
-            console.error(`MISMATCH: ${keyboard.s}/${keyboard.id}: compiler: ${baseCompilerVersion}:${cv} and engine: ${baseEngineVersion}:${ev}`);
-            // We don't abandon the test cases but we do have a finish failure.
-            process.exitCode = 4;
+            fail(`MISMATCH: ${keyboard.s}/${keyboard.id}: compiler: ${baseCompilerVersion}:${cv} and engine: ${baseEngineVersion}:${ev}`, 4);
           }
         });
       });
