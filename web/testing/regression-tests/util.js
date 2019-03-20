@@ -9,7 +9,7 @@ module.exports = {
       let kbds = fs.readdirSync(path.join(root, shortname));
       if(kbds && kbds.length) {
         kbds.forEach(function(kbd) {
-          if(fs.existsSync(path.join(root, shortname, kbd, 'build', kbd+'.tests')) &&
+          if(fs.existsSync(path.join(root, shortname, kbd, 'tests', kbd+'.tests')) &&
               fs.existsSync(path.join(root, shortname, kbd, 'build', kbd+'.js'))) {
             keyboards.push({s:shortname, id: kbd});
           }

@@ -48,26 +48,43 @@ var testRunner = {
    */
 
   loadScript: function(path) {
+    console.log(`Loading script ${path}`);
     return new Promise(function(resolve, reject) {
       let script = document.createElement('script'), hadError = false;
       let errorHandler = function(err) {
         hadError = true;
-        console.error(err);
-        window.removeEventListener('error', errorHandler);
-        reject(err);
+        console.error(path + ': ' + err.message);
+        // console.log('removeEventListener for window.onerror');
+        //window.removeEventListener('error', errorHandler);
+        reject(err.message);
+        return true;
       };
 
+      let scriptParseErrorHandler = function(err) {
+        hadError = true;
+        console.error(path + ': ' + err.message);
+        // console.log('removeEventListener for window.onerror');
+        window.onerror = null;
+        reject(err.message);
+        return true;
+      };
+
+      // console.log('addEventListener for window.onerror');
+      window.onerror = scriptParseErrorHandler; //addEventListener('error', errorHandler); // Capture compile / run errors
+      script.addEventListener('error', errorHandler); // Capture fs / network errors
+
       script.src = path;
+
       script.addEventListener('load', function() {
+        //console.log(`loadScript.load(${path})`);
+        //console.log(hadError);
         if(hadError) {
           document.head.removeChild(script);
           return;
         }
+        //console.log(`Finishing loadScript(${path})`)
         resolve();
       });
-
-      script.addEventListener('error', errorHandler); // Capture fs / network errors
-      window.addEventListener('error', errorHandler); // Capture compile / run errors
 
       document.head.appendChild(script);
     });
@@ -80,45 +97,28 @@ var testRunner = {
       if(!id) throw new Error('Invalid locator '+locator);
 
       //debugger;
-      testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/build/' + id + '.tests').then(
-        function() {
-          testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/build/' + id + '.js').then(
-            function() {
-              console.log('Starting test for '+id);
-              keyman.interface.registerStub({
-                'KN': 'Stub',
-                'KI': 'Keyboard_'+id,
-                'KL': 'en',
-                'KLC': 'en'
-              });
-              let k = testRunner.keyboards[id]; 
-              /*let keyboardLoaded = function() {
-                console.log('-- Tests and keyboard loaded');
-                keyman.util.removeEventListener('kmw.keyboardregistered', keyboardLoaded);
-                resolve();
-              }*/
-      
-              //keyman.addEventListener('keyboardregistered', keyboardLoaded);
-      
-              //keyman.addKeyboards({name: k.keyboard.name, id: id, filename: KEYBOARDS_RELATIVE_PATH + locator + '/' + k.keyboard.filename, languages: k.keyboard.languages});
-              keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
-              document.body.focus();
-              receiver.focus();
-              resolve();
-//              document.head.removeChild(scriptTests);
-  //            window.removeEventListener('error', errorHandler);
-      
-
-            },
-            function(err) {
-              reject(err);
-            }
-          )
-        },
-        function(err) {
-          reject(err);
-        }
-      );
+      return testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/tests/' + id + '.tests')
+        .then(function() {
+          return testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/build/' + id + '.js');
+        })
+        .then(function() {
+          console.log('Starting test for '+id);
+          keyman.interface.registerStub({
+            'KN': 'Stub',
+            'KI': 'Keyboard_'+id,
+            'KL': 'en',
+            'KLC': 'en'
+          });
+          let k = testRunner.keyboards[id]; 
+          keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
+          document.body.focus();
+          receiver.focus();
+          resolve();
+        })
+        .catch(function(reason) {
+          console.log('FAILED HERE for '+locator+': '+reason);
+          reject(reason);
+        });
     });
   },
 

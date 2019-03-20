@@ -62,17 +62,20 @@ module.exports = {
         return response.end(JSON.stringify({result: "Invalid request"}));
       }
 
-      const filename = `${json.id}-${json.compilerVersion}-${json.engineVersion}.results`;
+      // We can override the compiler and engine versions because for 
+      // source builds, the version numbers provided by the compiler and/or
+      // KeymanWeb are not relevant.
+      const compilerVersion = config.compilerVersion || json.compilerVersion;
+      const engineVersion = config.engineVersion || json.engineVersion;
+      const filename = `${json.id}-${compilerVersion}-${engineVersion}.results`;
   
       console.log(`/save-results ${json.shortname}/${filename}`);
     
       // Do some basic sanity checks to avoid disasters
       if(typeof(json.id) != 'string' || !json.id.match(/^[a-z0-9_]+$/) ||
           typeof(json.shortname) != 'string' || !json.shortname.match(/^[a-z]+$/) ||
-          typeof(json.compilerVersion) != 'string' || !json.compilerVersion.match(/^(\d+)(\.\d+)*$/) ||
-          typeof(json.engineVersion) != 'string' || !json.engineVersion.match(/^(\d+)(\.\d+)*$/)) {
-        // console.log(typeof json.compilerVersion);
-        // console.log(typeof json.engineVersion);
+          typeof(compilerVersion) != 'string' || !compilerVersion.match(/^((\d+)(\.\d+)*)|source$/) ||
+          typeof(engineVersion) != 'string' || !engineVersion.match(/^((\d+)(\.\d+)*)|source$/)) {
         console.error('/save-results Invalid request');
         response.writeHead(400);
         return response.end(JSON.stringify({result: "Invalid request"}));

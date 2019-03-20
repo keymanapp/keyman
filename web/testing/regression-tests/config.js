@@ -41,4 +41,11 @@ module.exports = {
   KEYMANWEB_RELATIVE_PATH: 'web/release/unminified/web',
   BASE_RELATIVE_PATH: '../../../../',
   KEYMAN_REPO_BASE_RELATIVE_PATH: '../../../',
+
+  /**
+   * These variables are usually set at runtime per the CI environment, and
+   * if not set then will be inferred from the compiler and engine.
+   */
+  engineVersion: null,
+  compilerVersion: null,
 };
