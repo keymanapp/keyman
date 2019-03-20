@@ -14,7 +14,7 @@ namespace com.keyman.osk {
     private bannerContainer: HTMLDivElement;
     private activeBanner: Banner;
     private alwaysShows: boolean;
-    private imagePath?: string;
+    private imagePath?: string = "";
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
       persistentBanner: false,
@@ -28,6 +28,10 @@ namespace com.keyman.osk {
       // Initialize with the default options - any 'manually set' options come post-construction.
       // This will also automatically set the default banner in place.
       this.setOptions(BannerManager.DEFAULT_OPTIONS);
+
+      // Register a listener for model change events so that we can hot-swap the banner as needed.
+      let keyman = com.keyman.singleton;
+      keyman.modelManager['addEventListener']('modelchange', this.selectBanner.bind(this));
     }
 
     private constructContainer(): HTMLDivElement {
@@ -105,7 +109,7 @@ namespace com.keyman.osk {
       }
     }
 
-    private selectBanner() {
+    private selectBanner(state?: text.prediction.ModelChangeEnum) {
       let keyman = com.keyman.singleton;
 
       if(keyman.modelManager.activeModel) {
@@ -122,12 +126,12 @@ namespace com.keyman.osk {
         if(banner == this.activeBanner) {
           return;
         } else {
-          this.bannerContainer.removeChild(this.activeBanner.div);
+          this.bannerContainer.removeChild(this.activeBanner.getDiv());
         }
       }
 
       this.activeBanner = banner;
-      this.bannerContainer.appendChild(banner.div);
+      this.bannerContainer.appendChild(banner.getDiv());
     }
 
     public get height(): number {

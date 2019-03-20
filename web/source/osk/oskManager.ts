@@ -121,15 +121,7 @@ namespace com.keyman.osk {
         }
       }
       this.loadCookie();
-
       this.banner = new BannerManager();
-
-      // TODO:  Remove when it's production time.  This is here for debugging purposes only.
-      this.banner.setOptions({
-        'enablePredictions': true,
-        'persistentBanner': true
-      })
-
       this.ready=true;
     }
 

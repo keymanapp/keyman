@@ -40,6 +40,9 @@ namespace com.keyman.text.prediction {
    */
   export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
 
+  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange";
+  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler;
+
   export class ModelManager {
     private lmEngine: LMLayer;
     private currentModel?: ModelSpec;
@@ -160,7 +163,7 @@ namespace com.keyman.text.prediction {
      * @return      {boolean}                     value returned by util.addEventListener
      * Description  Wrapper function to add and identify KeymanWeb-specific event handlers
      */       
-    ['addEventListener'](event: string, func: ReadySuggestionsHandler | InvalidateSuggestionsHandler): boolean {
+    ['addEventListener'](event: SupportedEventNames, func: SupportedEventHandler): boolean {
       let keyman = com.keyman.singleton;
       return keyman.util.addEventListener(ModelManager.EVENT_PREFIX + event, func);
     }
