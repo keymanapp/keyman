@@ -20,8 +20,8 @@ const fs = require("fs");
 const path = require('path');
 
 const express = require("express");
-const config = require('./config.js');
-const testHost = require('./test-host.js');
+const config = require('./node_src/config.js');
+const testHost = require('./node_src/test-host.js');
 
 const app = express();
 

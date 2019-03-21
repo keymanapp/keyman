@@ -11,8 +11,8 @@ const rimraf = require('rimraf');
 
 // Local modules
 
-const config = require('./config.js');
-const util = require('./util.js');
+const config = require('./node_src/config.js');
+const util = require('./node_src/util.js');
 
 function list(val) {
   return val.split(',');

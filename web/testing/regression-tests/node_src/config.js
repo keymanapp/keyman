@@ -25,7 +25,7 @@ module.exports = {
    * Because of how Karma serves files, for now you should avoid changing
    * this.
    */
-  KEYBOARDS_ROOT: path.join(__dirname, '..', '..', '..', '..', 'keyboards'),
+  KEYBOARDS_ROOT: path.join(path.resolve(__dirname, '..'), '..', '..', '..', '..', 'keyboards'),
   /**
    * The section of the keyboards repo we will test (you could change this
    * to `experimental` if you have your own experimental keyboards to test)
@@ -34,7 +34,7 @@ module.exports = {
   /**
    * The path to the built version of KeymanWeb that we are testing.
    */
-  KEYMANWEB_ROOT: path.join(__dirname, '..', '..', 'release', 'unminified', 'web'),
+  KEYMANWEB_ROOT: path.join(path.resolve(__dirname, '..'), '..', '..', 'release', 'unminified', 'web'),
   /**
    * Various relative paths
    */

@@ -1,8 +1,8 @@
 // Karma configuration
 // Generated on Wed Mar 13 2019 10:21:54 GMT+1100 (Australian Eastern Daylight Time)
 const path = require('path');
-const test_config = require('./config.js');
-const test_host = require('./test-host.js');
+const test_config = require('./node_src/config.js');
+const test_host = require('./node_src/test-host.js');
 
 module.exports = function(config) {
   //
@@ -65,7 +65,7 @@ module.exports = function(config) {
       { pattern: path.join(keyman_basename, test_relative_path, 'tests-generated.js'), nocache: true },
 
       // The test-runner is shared with the Node application for generating base tests manually
-      { pattern: path.join(keyman_basename, test_relative_path, 'test-runner.js'), nocache: true }, 
+      { pattern: path.join(keyman_basename, test_relative_path, 'src', 'test-runner.js'), nocache: true }, 
 
       // KeymanWeb and keyboards
       //{ pattern: path.join(keyman_basename, KEYMANWEB_RELATIVE_PATH, '**'), watched: false, included: false, nocache: true },

@@ -4,8 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const config = require('./config.js');
-const util = require('./util.js');
+const config = require('./node_src/config.js');
+const util = require('./node_src/util.js');
 const program = require('commander');
 
 const KEYBOARDS_ROOT = path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP);
@@ -57,10 +57,13 @@ fs.writeFileSync('./tests-generated.js', code);
 // Run Karma with the generated tests
 //
 
-const Server = require('karma').Server
+const Server = require('karma').Server;
 const cfg = require('karma').config;
 
-const karmaConfig = cfg.parseConfig(path.resolve('./karma.conf.js'), { port: 1337 } );
+// Note: if karma.conf.js is invalid, then this will die with exit code 1
+// without logging the error. The easiest way to see the error is to
+// run `node_modules/bin/karma start karma.conf.js`
+const karmaConfig = cfg.parseConfig(path.resolve('./karma.conf.js') );
 
 let server = new Server(karmaConfig, function(exitCode) {
   console.log('Karma has exited with ' + exitCode)
