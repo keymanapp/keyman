@@ -167,7 +167,7 @@ namespace com.keyman.osk {
 
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;
-      s.zIndex='9999'; s.display='none';
+      s.zIndex='9999'; s.display='none'; s.width='auto';
       s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
 
       // Use smaller base font size for mobile devices
