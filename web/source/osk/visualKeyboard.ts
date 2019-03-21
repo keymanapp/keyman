@@ -1,3 +1,5 @@
+///<reference path="activeLayout.ts" />
+
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
   //#region Definition of the KeyElement merger type
@@ -664,8 +666,10 @@ namespace com.keyman.osk {
       this.fontSize=ls.fontSize;       //TODO: move outside function*********
 
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-      var n,i,j,layers,layer,gDiv: HTMLDivElement;
-      var rows,row,rowHeight,rDiv,keys,key,rs,gs;
+      var n: number, i: number, j: number;
+      var layers: LayoutLayer[], layer: LayoutLayer, gDiv: HTMLDivElement;
+      var rows: LayoutRow[], row: LayoutRow, rowHeight: number, rDiv: HTMLDivElement;
+      var keys: LayoutKey[], key: LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
 
       layers=layout['layer'];
 
@@ -702,7 +706,7 @@ namespace com.keyman.osk {
       }
 
       // Get the actual available document width and scale factor according to device type
-      var objectWidth;
+      var objectWidth : number;
       if(formFactor == 'desktop') {
         objectWidth = 100;
       } else {
@@ -817,7 +821,7 @@ namespace com.keyman.osk {
           // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)
           // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
           // All key widths and paddings are rounded for uniformity
-          var keyPercent,padPercent,totalPercent=0;
+          var keyPercent: number, padPercent: number, totalPercent=0;
           for(j=0; j<keys.length-1; j++) {
             keyPercent=Math.round(parseInt(keys[j]['width'],10)*objectWidth/totalWidth);
             keys[j]['widthpc']=keyPercent;
@@ -848,7 +852,7 @@ namespace com.keyman.osk {
           for(j=0; j<keys.length; j++) {
             key=keys[j];
             
-            var keyGenerator = new OSKBaseKey(key, layer['id']);
+            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
             var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
 
             rDiv.appendChild(keyTuple.element);
