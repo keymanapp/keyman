@@ -78,11 +78,6 @@ namespace com.keyman.osk {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveRow();
       for(let key in dummy) {
-        // for(let id in data) {
-        //   if(!e.hasOwnProperty(id)) {
-        //     (<any>e)[id] = (<any>data)[id];
-        //   }
-        // }
         if(!row.hasOwnProperty(key)) {
           row[key] = dummy[key];
         }
@@ -152,11 +147,6 @@ namespace com.keyman.osk {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayer();
       for(let key in dummy) {
-        // for(let id in data) {
-        //   if(!e.hasOwnProperty(id)) {
-        //     (<any>e)[id] = (<any>data)[id];
-        //   }
-        // }
         if(!layer.hasOwnProperty(key)) {
           layer[key] = dummy[key];
         }
@@ -183,9 +173,9 @@ namespace com.keyman.osk {
       }
 
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-      var n: number, i: number, j: number;
+      var n: number, i: number;
       var layers: LayoutLayer[], layer: LayoutLayer;
-      var rows: LayoutRow[], row: LayoutRow;
+      var rows: LayoutRow[];
 
       layers=layout['layer'];
 
@@ -204,14 +194,6 @@ namespace com.keyman.osk {
       }
       // ...remove to here when compiler bug fixed ***
 
-      // // Get the actual available document width and scale factor according to device type
-      // var objectWidth : number;
-      // if(formFactor == 'desktop') {
-      //   objectWidth = 100; // As in, 100%.
-      // } else {
-      //   objectWidth = oskManager.getWidth();  // ... as in px.  Makes sense; we don't want random sub-pixel issues.
-      // }
-
       for(n=0; n<layers.length; n++) {
         ActiveLayer.polyfill(layers[n], formFactor);
       }
@@ -219,11 +201,6 @@ namespace com.keyman.osk {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayout();
       for(let key in dummy) {
-        // for(let id in data) {
-        //   if(!e.hasOwnProperty(id)) {
-        //     (<any>e)[id] = (<any>data)[id];
-        //   }
-        // }
         if(!layout.hasOwnProperty(key)) {
           layout[key] = dummy[key];
         }
