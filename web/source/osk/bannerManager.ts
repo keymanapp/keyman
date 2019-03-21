@@ -5,8 +5,6 @@ namespace com.keyman.osk {
     persistentBanner?: boolean;
     enablePredictions?: boolean;
     imagePath?: string;
-    // TODO: Remove test code for production
-    setPrediction?: string;
   }
 
   export type BannerType = "blank" | "image" | "suggestion";
@@ -30,14 +28,6 @@ namespace com.keyman.osk {
 
       // Initialize with the default options - any 'manually set' options come post-construction.
       // This will also automatically set the default banner in place.
-      //
-      // Test code to generate suggestions from the console:
-      // osk.banner.setBanner('suggestion')
-      // s = Array(new com.keyman.osk.SuggestionBanner.BLANK_SUGGESTION, new com.keyman.osk.SuggestionBanner.BLANK_SUGGESTION, new com.keyman.osk.SuggestionBanner.BLANK_SUGGESTION)
-      // s[0].displayAs = '';
-      // s[1].displayAs = '';
-      // s[2].displayAs = '';
-      // osk.banner.activeBanner.updateSuggestions(s)
       this.setOptions(BannerManager.DEFAULT_OPTIONS);
 
       // Register a listener for model change events so that we can hot-swap the banner as needed.
