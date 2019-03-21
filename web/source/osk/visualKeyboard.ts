@@ -762,9 +762,9 @@ namespace com.keyman.osk {
           // Apply defaults, setting the width and other undefined properties for each key
           keys=row['key'];
 
-          // Calculate actual key widths by summing defined widths and scaling each key to %,
-          // adjusting the width of the last key to make the total exactly 100%
-          // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)
+          // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
+          // adjusting the width of the last key to make the total exactly 100%.
+          // Overwrite the previously-computed percent.
           // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
           // All key widths and paddings are rounded for uniformity
           var keyPercent: number, padPercent: number, totalPercent=0;
