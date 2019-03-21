@@ -384,7 +384,7 @@ namespace com.keyman.osk {
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
-    let oskHeight : number =nRows*rowHeight;
+    let oskHeight : number = nRows*rowHeight;
 
     var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';

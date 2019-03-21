@@ -128,7 +128,7 @@ namespace com.keyman.osk {
     }
   }
 
-  export class OSKSuggestionSpec {
+  export class BannerSuggestionSpec {
     id: string;
     languageID: string;
     text?: string;
@@ -146,10 +146,10 @@ namespace com.keyman.osk {
     }
   }
 
-  export class OSKSuggestion {
-    spec: OSKSuggestionSpec;
+  export class BannerSuggestion {
+    spec: BannerSuggestionSpec;
 
-    constructor(spec: OSKSuggestionSpec) {
+    constructor(spec: BannerSuggestionSpec) {
       this.spec = spec;
     }
 
@@ -165,6 +165,7 @@ namespace com.keyman.osk {
       // Add OSK suggestion labels
       var suggestionText: string;
       var t=util._CreateElement('span'), ts=t.style;
+      t.className = "kmw-suggestion-span";
       if(spec.text == null || spec.text == '') {
         suggestionText = '\xa0';  // default:  nbsp.
       } else {
@@ -182,6 +183,12 @@ namespace com.keyman.osk {
 
       if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
         ts.fontSize=spec['fontsize'];
+      }
+
+      let device = util.device;
+      if (device.formFactor != 'desktop') {
+        let oskManager = com.keyman.singleton.osk;
+        ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
@@ -205,17 +212,17 @@ namespace com.keyman.osk {
    * Description    Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
-    readonly SUGGESTION_LIMIT:number = 3;
-    private suggestionList : OSKSuggestion[];
+    public static SUGGESTION_LIMIT:number = 3;
+    private suggestionList : BannerSuggestion[];
 
     constructor() {
       super(true, true);
-      let suggestionList:OSKSuggestion[] = new Array();
+      let suggestionList:BannerSuggestion[] = new Array();
       this.suggestionList = suggestionList;
       if (this.div) {
-        for (var i=0; i<this.SUGGESTION_LIMIT; i++) {
-          let s = new OSKSuggestionSpec('suggestion' + i, 'en', '', '33', ' ');
-          let d = new OSKSuggestion(s);
+        for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+          let s = new BannerSuggestionSpec('suggestion' + i, 'en', '', '33', ' ');
+          let d = new BannerSuggestion(s);
           this.suggestionList[i] = d;
           this.div.appendChild(d.generateSuggestionText());
         }
@@ -234,7 +241,7 @@ namespace com.keyman.osk {
 
     public invalidateSuggestions() {
       if (this.div) {
-        for (var i=0; i<this.SUGGESTION_LIMIT; i++) {
+        for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
           this.suggestionList[i].spec.text = '';
           this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
         }

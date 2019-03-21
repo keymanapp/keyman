@@ -1199,7 +1199,7 @@ namespace com.keyman.osk {
       var x = e.changedTouches[0].pageX;
 
       // Get key-row beneath touch point
-      while(t && t.className.indexOf('key-row') < 0) {
+      while(t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
         t = <HTMLElement> t.parentNode;
       }
       if(!t) {
@@ -1209,11 +1209,12 @@ namespace com.keyman.osk {
       // Find minimum distance from any key
       var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
       for(k = 0; k < t.childNodes.length; k++) {
-        if((<HTMLElement> t.childNodes[k].firstChild).className.indexOf('key-hidden') >= 0) {
+        let childNode = t.childNodes[k] as HTMLElement;
+        if(childNode.className !== undefined && childNode.className.indexOf('key-hidden') >= 0) {
           continue;
         }
-        x1 = (<HTMLElement> t.childNodes[k]).offsetLeft;
-        x2 = x1 + (<HTMLElement> t.childNodes[k]).offsetWidth;
+        x1 = childNode.offsetLeft;
+        x2 = x1 + childNode.offsetWidth;
         dx =x1 - x;
         if(dx >= 0 && dx < dxMin) {
           k0 = k; dxMin = dx;

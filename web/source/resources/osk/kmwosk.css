@@ -48,7 +48,11 @@
 .phone.ios .kmw-key.kmw-key-shift-on,
 .phone.ios .kmw-key.kmw-key-special-on {color:#000;background-color:#fdfdfe;}
 .phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
- 
+
+.phone.ios .kmw-banner-bar {background-color: #cfd3d9; height: 40px; width: 100%;}
+.phone.ios .kmw-banner-bar span {background-color: #cfd3d9; display:inline-block; vertical-align: middle;}
+.phone.ios .kmw-suggestion-text {color:#000;background-color:#fdfdfe; text-align: center;}
+
 .phone.android .kmw-key-layer-group {background-color: #333;}  
 .phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
 .phone.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;}
@@ -60,6 +64,10 @@
 .phone.android .kmw-key.kmw-spacebar {background-color: #555;}
 .phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #bbb;}
 .phone.android .kmw-spacebar-caption {color: #aaa;}
+
+.phone.android .kmw-banner-bar {background-color: #222; height: 40px; width: 100%;}
+.phone.android .kmw-banner-bar span {background-color: #333; display:inline-block; vertical-align: middle;}
+.phone.android .kmw-suggestion-text {color:#ffff; background-color: #222; text-align: center;}
 
 .tablet.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
@@ -139,8 +147,11 @@
 .kmw-title-bar-actions{position: absolute; cursor: default; right:2px; top:0; width: 33px; height: 13px;}
 .kmw-footer-caption{color:#fff;font:0.7em Arial;margin:0 0 0 4px;}
 
-.kmw-banner-bar{height:40px; width:100%; margin:0; background-color:lightblue; border-radius:0 0 6px 6px; }
-.kmw-suggestion-text{display: inline-block; text-align:center; width: 33%;}
+
+.kmw-banner-bar{height:40px; width:100%; margin:0; background-color:darkorange;}
+.kmw-banner-bar span {background-color: orange; display:inline-block; vertical-align: middle;}
+.kmw-suggestion-text{color:#ffff; background-color: orange; text-align: center;}
+
 
 .kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;
           font-family:SpecialOSK;color:white;}
