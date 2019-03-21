@@ -4,10 +4,10 @@
   "description": "Automated regression test suite for KeymanWeb",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Marc Durdin",
+  "license": "MIT",
   "devDependencies": {
     "adm-zip": "^0.4.13",
     "chai": "^4.2.0",
@@ -25,9 +25,7 @@
     "minimist": "^1.2.0",
     "mocha": "^6.0.2",
     "requirejs": "^2.3.6",
-    "yauzl": "^2.10.0"
-  },
-  "dependencies": {
     "rimraf": "^2.6.3"
-  }
+  },
+  "dependencies": {}
 }
