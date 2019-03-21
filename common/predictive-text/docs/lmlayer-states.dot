@@ -1,0 +1,13 @@
+digraph LMLayerFSM {
+  rankdir=LR;
+
+  node [shape = point] 0;
+  edge [fontname="Courier"];
+
+  node [shape = circle];
+  0 -> unconfigured;
+  unconfigured -> modelless [label="config"];
+  modelless -> ready [label="load"];
+  ready -> ready [label="predict"];
+  ready -> modelless [label="unload"];
+}

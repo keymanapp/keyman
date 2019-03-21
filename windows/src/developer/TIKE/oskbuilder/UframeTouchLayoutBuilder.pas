@@ -94,6 +94,7 @@ type
     procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
+    procedure UnregisterSources;
   protected
     function GetHelpTopic: string; override;
 
@@ -225,8 +226,15 @@ end;
 procedure TframeTouchLayoutBuilder.FormDestroy(Sender: TObject);
 begin
   inherited;
+  UnregisterSources;
+end;
+
+procedure TframeTouchLayoutBuilder.UnregisterSources;
+begin
   if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFilename) then
     modWebHttpServer.AppSource.UnregisterSource(FFilename);
+  if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFilename+'#state') then
+    modWebHttpServer.AppSource.UnregisterSource(FFilename+'#state');
 end;
 
 procedure TframeTouchLayoutBuilder.RegisterSource;
@@ -302,6 +310,7 @@ var
   FNewLayoutJS: string;
   FTouchLayout: TTouchLayout;
   FOldLayout: TTouchLayout;
+  FState: string;
   function GetNextFilename: string;
   begin
     Inc(FInitialFilenameIndex);
@@ -311,8 +320,13 @@ begin
   FLastErrorOffset := -1;
   FLastError := '';
 
-  if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFilename) then
-    modWebHttpServer.AppSource.UnregisterSource(FFilename);
+  if FFilename <> '' then
+  begin
+    if not modWebHttpServer.AppSource.TryGetSource(FFilename + '#state', FState) then
+      FState := '';
+  end;
+
+  UnregisterSources;
 
   if ALoadFromString then
   begin
@@ -371,6 +385,8 @@ begin
   end;
 
   RegisterSource;
+  if FState <> '' then
+    modWebHttpServer.AppSource.RegisterSource(FFilename + '#state', FState, True);
 
   try
     DoLoad;
@@ -448,9 +464,15 @@ procedure TframeTouchLayoutBuilder.Save(const AFilename: string);
 var
   s: string;
 begin
+  if (FFilename = '') and (AFilename <> '') then
+  begin
+    Load(AFilename, not FileExists(AFilename), False);
+  end;
+
   if not IsModified and FileExists(AFilename) then   // I4047   // I4147
     Exit;
   s := GetLayoutJS;
+
   if s = '' then
     Exit;
   FSavedLayoutJS := s;

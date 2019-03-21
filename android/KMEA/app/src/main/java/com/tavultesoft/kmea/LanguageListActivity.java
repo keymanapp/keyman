@@ -23,23 +23,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Build;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
   private static final String jsonCacheFilename = "jsonCache.dat";
+  private static final String TAG = "LanguageListActivity";
 
   private static JSONArray languages = null;
 
@@ -69,6 +72,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private static HashMap<String, String> keyboardModifiedDates = null;
 
   private int selectedIndex = 0;
+  private static AlertDialog alertDialog;
   //protected static int selectedIndex() { return selectedIndex; }
 
   @Override
@@ -120,29 +124,38 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   }
 
   @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (resultCode == 1) {
+      finish();
+    }
+  }
+
+  @Override
   public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
     // Do nothing
   }
 
   @Override
   public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
+    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
+    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
     if (result > 0) {
       String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
       String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-      if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
+      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
+      KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+
+      if (result == 2) {
+        Toast.makeText(context, context.getString(R.string.font_failed_to_download), Toast.LENGTH_LONG).show();
+      }
       finish();
-    } else {
-      Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
+    } else if (!((AppCompatActivity)context).isFinishing()) {
+      String title = String.format("%s: %s", languageName, keyboardName);
+      showErrorDialog(context, title, context.getString(R.string.keyboard_failed_to_download));
     }
   }
 
@@ -166,7 +179,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String kbID = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_ID);
       String kbName = keyboards.getJSONObject(keyboardIndex).getString(KMManager.KMKey_Name);
       String kbVersion = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_KeyboardVersion, "1.0");
-      String isCustom = "N";
+      String isCustom = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_CustomKeyboard, "N");
       String kbFont = keyboards.getJSONObject(keyboardIndex).optString(KMManager.KMKey_Font, "");
 
       kbInfo = new HashMap<String, String>();
@@ -180,7 +193,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       kbInfo.put(KMManager.KMKey_Font, kbFont);
     } catch (JSONException e) {
       kbInfo = null;
-      Log.e("getKeyboardInfo", "JSON Error: " + e);
+      Log.e(TAG, "getKeyboardInfo - JSON Error: " + e);
     }
 
     return kbInfo;
@@ -219,7 +232,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           int kbLength = langKeyboards.length();
           if (kbLength == 1) {
             keyboard = langKeyboards.getJSONObject(0);
-            pkgID = keyboard.getString(KMManager.KMKey_PackageID);
+            pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
             kbID = keyboard.getString(KMManager.KMKey_ID);
             kbName = keyboard.getString(KMManager.KMKey_Name);
             kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -241,6 +254,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           } else {
             for (int j = 0; j < kbLength; j++) {
               keyboard = langKeyboards.getJSONObject(j);
+              pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
               kbID = keyboard.getString(KMManager.KMKey_ID);
               kbName = keyboard.getString(KMManager.KMKey_Name);
               kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -248,6 +262,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
               kbKey = String.format("%s_%s", langID, kbID);
               HashMap<String, String> hashMap = new HashMap<String, String>();
+              hashMap.put(KMManager.KMKey_PackageID, pkgID);
               hashMap.put(KMManager.KMKey_KeyboardName, kbName);
               hashMap.put(KMManager.KMKey_LanguageName, langName);
               hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
@@ -264,6 +279,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
         return keyboardsInfo;
       } catch (Exception e) {
+        Log.e(TAG, "getKeyboardsInfo() error: " + e);
         return null;
       }
     }
@@ -339,7 +355,11 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
 
       if (hasConnection && !loadFromCache) {
-        progressDialog = new ProgressDialog(context, R.style.ProgressDialog);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+          progressDialog = new ProgressDialog(context, R.style.AppTheme_Dialog_Progress);
+        } else {
+          progressDialog = new ProgressDialog(context);
+        }
         progressDialog.setMessage(getString(R.string.getting_keyboard_catalog));
         progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.label_cancel),
           new DialogInterface.OnClickListener() {
@@ -405,7 +425,10 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         }
       }
 
-      if (jsonObj == null) {
+      // Consolidate kmp.json info from packages/
+      JSONArray kmpLanguagesArray = JSONUtils.getLanguages();
+
+      if (jsonObj == null && kmpLanguagesArray.length() == 0) {
         Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
         finish();
         return;
@@ -414,10 +437,53 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
 
       try {
-        languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
-        options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
         keyboardsInfo = new HashMap<String, HashMap<String, String>>();
         keyboardModifiedDates = new HashMap<String, String>();
+
+        if (!hasConnection) {
+          // When offline, only use keyboards available from kmp.json
+          // Use default options
+          options = JSONUtils.defaultOptions(context.getString(R.string.device_type));
+          languages = kmpLanguagesArray;
+        } else {
+          // Otherwise, merge kmpLanguagesArray with cloud languagesArray
+          options = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Options);
+          languages = jsonObj.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+          for (int i = 0; i < kmpLanguagesArray.length(); i++) {
+            JSONObject kmpLanguage = kmpLanguagesArray.getJSONObject(i);
+            String kmpLanguageID = kmpLanguage.getString("id");
+            int languageIndex = JSONUtils.findID(languages, kmpLanguageID);
+            if (languageIndex == -1) {
+              // Add new language object
+              languages.put(kmpLanguage);
+            } else {
+              // Merge language info
+              JSONObject language = languages.getJSONObject(languageIndex);
+              JSONArray keyboards = language.getJSONArray("keyboards");
+              JSONArray kmpKeyboards = kmpLanguage.getJSONArray("keyboards");
+              for (int j = 0; j < kmpKeyboards.length(); j++) {
+                JSONObject kmpKeyboard = kmpKeyboards.getJSONObject(j);
+                String kmpKeyboardID = kmpKeyboard.getString("id");
+                int keyboardIndex = JSONUtils.findID(keyboards, kmpKeyboardID);
+                if (keyboardIndex == -1) {
+                  // Add new keyboard object
+                  keyboards.put(kmpKeyboard);
+                } else {
+                  // Merge keyboard info
+                  JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
+
+                  String keyboardVersion = keyboard.getString(KMManager.KMKey_KeyboardVersion);
+                  String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
+                  int versionComparison = FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion);
+                  if ((versionComparison == FileUtils.VERSION_GREATER) || (versionComparison == FileUtils.VERSION_EQUAL)) {
+                    // Keyboard from package >= Keyboard from cloud so replace keyboard entry with local kmp info
+                    keyboards.put(keyboardIndex, kmpKeyboard);
+                  }
+                }
+              }
+            }
+          }
+        }
 
         int langLength = languages.length();
         for (int i = 0; i < langLength; i++) {
@@ -513,23 +579,36 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
               View v = listView.getChildAt(0);
               int offsetY = (v == null) ? 0 : v.getTop();
               i.putExtra("offsetY", offsetY);
-              startActivity(i);
+              startActivityForResult(i, 1);
             } else {
               HashMap<String, String> kbInfo = getKeyboardInfo(selectedIndex, 0);
               final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
               final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
               final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
+              String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
+              String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, "");
+              String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
 
-              Bundle bundle = new Bundle();
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-              bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-              bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-              Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-              i.putExtras(bundle);
-              startActivity(i);
+              if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+                // Custom keyboard already exists in packages/ so just add the language association
+                KeyboardPickerActivity.addKeyboard(context, kbInfo);
+                KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+                Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                ((AppCompatActivity) context).finish();
+              } else {
+                // Keyboard needs to be downloaded
+                Bundle bundle = new Bundle();
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+                bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
+                Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+                i.putExtras(bundle);
+                startActivity(i);
+              }
             }
           }
         });
@@ -541,4 +620,24 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       }
     }
   }
+
+  private static void showErrorDialog(Context context, String title, String message) {
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+    alertDialogBuilder.setTitle(title);
+    alertDialogBuilder
+      .setMessage(message)
+      .setCancelable(false)
+      .setPositiveButton(context.getString(R.string.label_close),new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog,int id) {
+        if (dialog != null) {
+          dialog.dismiss();
+        }
+        }
+      });
+
+    alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
+  }
+
 }

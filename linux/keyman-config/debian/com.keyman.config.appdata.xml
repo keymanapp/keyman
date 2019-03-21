@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2019 Daniel Glassey <wdg@debian.org> -->
+<component type="desktop-application">
+  <id>com.keyman.config</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>MIT</project_license>
+  <project_group>Keyman</project_group>
+  <name>Keyman Keyboards</name>
+  <summary>Configure keyboards for Keyman for Linux</summary>
+
+  <description>
+    <p>
+ Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+open source keyboarding platform which allows anyone to write a keyboard layout
+for their language. Keyman is available for many platforms, including Windows,
+macOS, iOS, Android, Linux and the web.
+</p>
+    <p>
+ Keyboard layouts are defined with a clear and easy to understand keyboard
+grammar. Keyman's contextual input model means keyboard layouts can be
+intelligent and make it simple to type even the most complex languages.
+Keyboard layouts are distributed through an open catalog to all major desktop
+and mobile platforms.
+</p>
+    <p>
+ Install, uninstall and view information about Keyman keyboard packages.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">km-config.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>The Keyman Keyboards main window with a keyboard welcome window.</caption>
+      <image type="source" width="920" height="518">https://keyman.com/go/linux/11.0/linux-configuration.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://keyman.com/linux/</url>
+  <url type="bugtracker">https://github.com/keymanapp/keyman/issues</url>
+  <url type="contact">https://community.software.sil.org/c/keyman</url>
+</component>

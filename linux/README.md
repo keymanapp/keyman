@@ -15,26 +15,18 @@
 - It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
 
 - Install packages required for building and developing KMFL and Keyman for Linux
-`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson libjson-glib-dev libgtk-3-dev help2man python3-lxml python3-magic python3-numpy python3-pil python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli`
+`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential devtools dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml python3-magic python3-numpy python3-pil python3-pip python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli`
 
 ### Compiling from Command Line
 
 #### Build script
 
-##### Tmp install
-
-Run `make tmpinstall` to build and install keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl and ibus-keyman to `/tmp/kmfl`
-
-This is only for testing the build, not for running ibus-kmfl or ibus-keyman in ibus
-
-
 ##### Installing for ibus to use ibus-kmfl or ibus-keyman
 
 - The process to build and install everything is:
 
-    * `make devreconf` (or `make reconf`) to create the build system and set the version
-    * `make configure`
-    * `make` to build
+    * `make reconf` to create the build system and set the version
+    * `make fullbuild` to configure and build
     * `sudo make install` to install to /usr/local
 
 - Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
@@ -48,7 +40,14 @@ This is only for testing the build, not for running ibus-kmfl or ibus-keyman in 
     * If you already have the ibus-kmfl package installed then it will move the file `/usr/share/ibus/component/kmfl.xml` to `/usr/share/doc/ibus-kmfl/`
     * If you already have the ibus-keyman package installed then it will move the file `/usr/share/ibus/component/keyman.xml` to `/usr/share/doc/ibus-keyman/`
 
-        * run `make uninstall` to uninstall everything and put it back again
+        * run `sudo make uninstall` to uninstall everything and put it back again
+        
+##### Tmp install
+Used by TC for validating PRs
+
+Run `make tmpinstall` to build and install keyboardprocessor, kmflcomp, libkmfl, ibus-kmfl and ibus-keyman to `/tmp/kmfl`
+
+This is only for testing the build, not for running ibus-kmfl or ibus-keyman in ibus
 
 #### Manually
 
@@ -83,6 +82,31 @@ Nightly builds upload the most recent new master build to https://downloads.keym
 
 Jenkins now continuously builds Debian packages on every commit to master
 Periodically test packages will be uploaded to https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily
+
+### Launchpad
+This section is primarily for "Keyman for Linux" team members, and not needed for general building.
+
+1. If you don't have one, create an account at https://launchpad.net
+2. Request to join the ["Keyman for Linux"](https://launchpad.net/~keymanapp) team.
+3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key and associate it to your launchpad account
+4. Set the following environment variables in your ~/.profile or ~/.bashrc (so you don't have to set them every time)  
+  `export GPGKEY=[key_id]` using the `key_id` of your GPG key  
+  `DEBEMAIL="your.email.address@example.org"`  
+  `DEBFULLNAME="Firstname Lastname"`  
+  `export DEBEMAIL DEBFULLNAME`  
+
+To upload the packages to launchpad, run the following script from the `linux/` directory:
+```
+./scripts/launchpad.sh [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
+```
+**Parameters**  
+UPLOAD="yes" do the dput for real  
+TIER="\<tier>" alpha, beta, or stable, default beta  
+PROJECT="\<project>" only upload this project  
+DIST="\<dist>" only upload for this distribution  
+PACKAGEVERSION="\<version>" normally use the default so don't specify it. But if you change packaging and run another upload you need to increment the number at the end of `PACKAGEVERSION`. e.g. next one is `1~sil2` then `1~sil3`...
+
+Refer to https://help.launchpad.net/Packaging/PPA/Uploading for troubleshooting and setting up for dput upload.
 
 ### Testing
 Tests to be created as there are no current tests

@@ -1,5 +1,16 @@
 # Keyman for macOS Version History
 
+## 12.0 alpha
+* Started work on Keyman for macOS 12.
+
+## 2019-02-25 11.0.220 stable
+* 11.0 Stable release
+
+## 2019-02-20 11.0.201 beta
+* Update version strings to 11.0.0 (#1583)
+* Workaround bug in macOS 10.13.1-10.13.3 which caused preferences dialog to fail to appear (#1447)
+* Fix broken About dialog (#1594)
+
 ## 2019-01-02 11.0.200 beta
 * Initial beta release of Keyman for macOS 11
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2018-07-01..2019-01-01+label%3Amac+-label%3Acherry-pick+-label%3Astable)

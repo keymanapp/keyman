@@ -1,5 +1,52 @@
 # Keyman Developer Version History
 
+## 12.0 alpha
+* Started work on Keyman Developer 12.
+
+## 2019-02-25 11.0.1350.0 stable
+* 11.0 Stable release
+
+## 2019-02-25 11.0.1313.0 beta
+* No changes to Keyman Developer
+
+## 2019-02-21 11.0.1312.0 beta
+* Bug fix: Connect buttons to actions in Distribution tab in Project (#1606)
+* Bug fix: Fix crash saving new keyboard when missing files are referenced (#1605)
+* Bug fix: Fix resizing of text editor windows (#1607)
+
+## 2019-02-20 11.0.1311.0 beta
+* No changes to Keyman Developer
+
+## 2019-02-19 11.0.1310.0 beta
+* Bug fix: Developer does not focus the text editor automatically after load (#1582)
+
+## 2019-02-15 11.0.1309.0 beta
+* Bug fix: Developer was not maintaining project state between page loads (#1580)
+* Bug fix: Developer now maintains the view state when switching between Design and Code views of touch layout editor (#1579)
+* Bug fix: New Project Wizard wasn't adding metadata files to project (#1578)
+* Bug Fix: Package RTL keyboard metadata was being overwritten if .kmx was after .js in package file list (#1576)
+
+## 2019-02-14 11.0.1308.0 beta
+* Change: Adds option to check filename conventions (#1549)
+
+## 2019-02-01 11.0.1307.0 beta
+* Change: Removed unused test window (#1560)
+
+## 2019-01-18 11.0.1306.0 beta
+* Change: Update included KeymanWeb to 11.0.206 (#1537)
+
+## 2019-01-17 11.0.1305.0 beta
+* Change: Allow the "display underlying" flag to be set for each platform (#1539)
+
+## 2019-01-15 11.0.1304.0 beta
+* Change: Tidy up ambiguities in user interface in touch layout editor (#1534)
+
+## 2019-01-15 11.0.1303.0 beta
+* No changes to Keyman Developer
+
+## 2019-01-10 11.0.1302.0 beta
+* Change: Update included KeymanWeb to 11.0.205
+
 ## 2019-01-07 11.0.1301.0 beta
 * Bug fix: Developer does not open a new project after it is created (#1499)
 * Bug fix: Developer does not enable Install button in Package Editor after compile (#1498)

@@ -81,13 +81,27 @@ uses
   kmxfileconsts,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
-  PackageInfo,
   Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFiles,
+  PackageInfo,
   RedistFiles,
   TouchLayout,
   utilfiletypes,
   utilstr,
   VisualKeyboard;
+
+
+const
+  SFolder_Source = 'source';
+  SFolder_Build = 'build';
+
+  SFile_ReadmeMD = 'README.md';     // in root
+  SFile_HistoryMD = 'HISTORY.md';   // in root
+  SFile_LicenseMD = 'LICENSE.md';   // in root
+  SFile_WelcomeHTM = 'welcome.htm'; // in source/
+  SFile_ReadmeHTM = 'readme.htm';   // in source/
+
+  SFileTemplate_KeyboardInfo = '%s.keyboard_info'; // in root
 
 { TKeyboardProjectTemplate }
 
@@ -107,7 +121,7 @@ end;
 
 procedure TKeyboardProjectTemplate.Generate;
 begin
-  if not ForceDirectories(FBasePath + FKeyboardID + '\source') then
+  if not ForceDirectories(FBasePath + FKeyboardID + '\' + SFolder_Source) then
     raise EKeyboardProjectTemplate.Create('Could not create destination path '+FBasePath+FKeyboardID);
 
   WriteDocumentation;
@@ -131,9 +145,9 @@ begin
   if Base = '' then
     Result := ''
   else if ExtractFileExt(Base) = Base then
-    Result := FBasePath + FKeyboardID + '\source\' + FKeyboardID + Base
+    Result := FBasePath + FKeyboardID + '\' + SFolder_Source + '\' + FKeyboardID + Base
   else
-    Result := FBasePath + FKeyboardID + '\source\' + Base;
+    Result := FBasePath + FKeyboardID + '\' + SFolder_Source + '\' + Base;
 end;
 
 function TKeyboardProjectTemplate.GetIconFilename: string;
@@ -192,14 +206,17 @@ end;
 procedure TKeyboardProjectTemplate.WriteDocumentation;
 begin
   // Write readme.htm and welcome.htm
-  Transform('source\welcome.htm');
-  Transform('source\readme.htm');
+  Transform(SFolder_Source + '\' + SFile_WelcomeHTM);
+  Transform(SFolder_Source + '\' + SFile_ReadmeHTM);
 end;
 
 procedure TKeyboardProjectTemplate.WriteKeyboardInfo;
 begin
   // Write keyboardid.keyboard_info
-  Transform('keyboard.keyboard_info', FKeyboardID+'.keyboard_info');
+  Transform(
+    Format(SFileTemplate_KeyboardInfo, ['keyboard']),
+    Format(SFileTemplate_KeyboardInfo, [FKeyboardID])
+  );
 end;
 
 procedure TKeyboardProjectTemplate.WriteKMN;
@@ -257,12 +274,20 @@ var
 begin
   kpj := TProject.Create(GetProjectFilename);
   try
-    kpj.Options.BuildPath := '$PROJECTPATH\build';
+    kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;
     kpj.Options.WarnDeprecatedCode := True;
     kpj.Options.CompilerWarningsAsErrors := True;
+    kpj.Options.CheckFilenameConventions := True;
 
+    // Add keyboard and package to project
     kpj.Files.Add(TkmnProjectFile.Create(kpj, GetKeyboardFilename, nil));
     kpj.Files.Add(TkpsProjectFile.Create(kpj, GetPackageFilename, nil));
+
+    // Add metadata files to project
+    kpj.Files.Add(TOpenableProjectFile.Create(kpj, FBasePath + FKeyboardID + '\' + SFile_HistoryMD, nil));
+    kpj.Files.Add(TOpenableProjectFile.Create(kpj, FBasePath + FKeyboardID + '\' + SFile_LicenseMD, nil));
+    kpj.Files.Add(TOpenableProjectFile.Create(kpj, FBasePath + FKeyboardID + '\' + SFile_ReadmeMD, nil));
+    kpj.Files.Add(TOpenableProjectFile.Create(kpj, FBasePath + FKeyboardID + '\' + Format(SFileTemplate_KeyboardInfo, [FKeyboardID]), nil));
 
     kpj.Save;
   finally
@@ -289,7 +314,7 @@ begin
     if HasKMX then
     begin
       f := TPackageContentFile.Create(kps);
-      f.FileName := FBasePath + FKeyboardID + '\build\' + FKeyboardID + Ext_KeymanFile;
+      f.FileName := FBasePath + FKeyboardID + '\' + SFolder_Build + '\' + FKeyboardID + Ext_KeymanFile;
       kps.Files.Add(f);
     end;
 
@@ -297,7 +322,7 @@ begin
     if HasTouchLayout then
     begin
       f := TPackageContentFile.Create(kps);
-      f.FileName := FBasePath + FKeyboardID + '\build\' + FKeyboardID + Ext_Javascript;
+      f.FileName := FBasePath + FKeyboardID + '\' + SFolder_Build + '\' + FKeyboardID + Ext_Javascript;
       kps.Files.Add(f);
     end;
 
@@ -305,18 +330,18 @@ begin
     if HasKVKS then
     begin
       f := TPackageContentFile.Create(kps);
-      f.FileName := FBasePath + FKeyboardID + '\build\' + FKeyboardID + Ext_VisualKeyboard;
+      f.FileName := FBasePath + FKeyboardID + '\' + SFolder_Build + '\' + FKeyboardID + Ext_VisualKeyboard;
       kps.Files.Add(f);
     end;
 
     // Add welcome
     f := TPackageContentFile.Create(kps);
-    f.FileName := FBasePath + FKeyboardID + '\source\welcome.htm';
+    f.FileName := FBasePath + FKeyboardID + '\' + SFolder_Source + '\' + SFile_WelcomeHTM;
     kps.Files.Add(f);
 
     // Add readme
     f := TPackageContentFile.Create(kps);
-    f.FileName := FBasePath + FKeyboardID + '\source\readme.htm';
+    f.FileName := FBasePath + FKeyboardID + '\' + SFolder_Source + '\' + SFile_ReadmeHTM;
     kps.Files.Add(f);
     kps.Options.ReadmeFile := f;
 
@@ -388,9 +413,9 @@ end;
 
 procedure TKeyboardProjectTemplate.WriteRepositoryMetadata;
 begin
-  Transform('HISTORY.md');
-  Transform('LICENSE.md');
-  Transform('README.md');
+  Transform(SFile_HistoryMD);
+  Transform(SFile_LicenseMD);
+  Transform(SFile_ReadmeMD);
 end;
 
 procedure TKeyboardProjectTemplate.WriteTouchLayout;

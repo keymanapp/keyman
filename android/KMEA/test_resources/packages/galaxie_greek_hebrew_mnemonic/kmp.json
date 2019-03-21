@@ -1,0 +1,110 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "10.0.1206.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm"
+  },
+  "info": {
+    "name": {
+      "description": "Galaxie Greek/Hebrew (Mnemonic) Keyboard Package"
+    },
+    "copyright": {
+      "description": "2004-2018 Galaxie Software and SIL International"
+    },
+    "version": {
+      "description": "3.2"
+    }
+  },
+  "files": [
+    {
+      "name": "greek-welcome.htm",
+      "description": "File greek-welcome.htm"
+    },
+    {
+      "name": "hebrew-welcome.htm",
+      "description": "File hebrew-welcome.htm"
+    },
+    {
+      "name": "style.css",
+      "description": "File style.css"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "galaxie_hebrew_mnemonic.js",
+      "description": "File galaxie_hebrew_mnemonic.js"
+    },
+    {
+      "name": "galaxie_hebrew_mnemonic.kvk",
+      "description": "File galaxie_hebrew_mnemonic.kvk"
+    },
+    {
+      "name": "galaxie_hebrew_mnemonic.kmx",
+      "description": "Keyboard Galaxie Hebrew (Mnemonic)"
+    },
+    {
+      "name": "galaxie_greek_mnemonic.js",
+      "description": "File galaxie_greek_mnemonic.js"
+    },
+    {
+      "name": "galaxie_greek_mnemonic.kvk",
+      "description": "File galaxie_greek_mnemonic.kvk"
+    },
+    {
+      "name": "galaxie_greek_mnemonic.kmx",
+      "description": "Keyboard Galaxie Greek (Mnemonic)"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "Galaxie Hebrew (Mnemonic)",
+      "id": "galaxie_hebrew_mnemonic",
+      "version": "3.2",
+      "languages": [
+        {
+          "name": "Ancient Hebrew (Hebrew)",
+          "id": "hbo-Hebr"
+        },
+        {
+          "name": "Hebrew (Hebrew)",
+          "id": "he-Hebr"
+        },
+        {
+          "name": "Afade (Latin)",
+          "id": "aal-Latn"
+        }
+      ]
+    },
+    {
+      "name": "Galaxie Greek (Mnemonic)",
+      "id": "galaxie_greek_mnemonic",
+      "version": "3.2.1",
+      "languages": [
+        {
+          "name": "Ancient Greek (to 1453) (Greek)",
+          "id": "grc-Grek"
+        },
+        {
+          "name": "Modern Greek (1453-) (Greek)",
+          "id": "el-Grek"
+        }
+      ]
+    }
+  ]
+}

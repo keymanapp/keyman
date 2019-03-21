@@ -256,11 +256,168 @@ function retrieveAndReset(Pelem) {
   var val = "";
   if(alias) {
     val = alias.textContent;
-    keyman.touchAliasing.setText(alias, "", 0);
+    alias.setText("", 0);
   } else {
     val = Pelem.value;
     Pelem.value = "";
   }
 
   return val;
+}
+
+// Useful for tests related to strings with supplementary pairs.
+var toSupplementaryPairString = function(code){
+  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+  var L = (code - 0x10000) % 0x400 + 0xDC00;
+
+  return String.fromCharCode(H, L);
+}
+
+var toEscapedSupplementaryPairString = function(code){
+  var H = (Math.floor((code - 0x10000) / 0x400) + 0xD800).toString(16);
+  var L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
+
+  return "\\u"+H+"\\u"+L;
+}
+
+// Defines an object for dynamically adding elements for testing purposes.
+// Designed for use with the robustAttachment.html fixture.
+
+var DynamicElements;
+var inputCounter = 0;
+
+if(typeof(DynamicElements) == 'undefined') {
+  DynamicElements = {};
+
+  DynamicElements.addInput = function() {
+    var masterDiv = document.getElementById('DynamicElements');
+    var newInput = document.createElement("input");
+    var i = inputCounter++;
+    
+    newInput.id = 'input' + i;
+    newInput.className = 'test';
+    newInput.placeholder = "Dynamic area #" + i + "!";
+    
+    masterDiv.appendChild(newInput);
+    return newInput.id;
+  }
+  
+  DynamicElements.addText = function () {
+    var masterDiv = document.getElementById('DynamicElements');
+    var newTextArea = document.createElement("textarea");
+    var i = inputCounter++;
+    
+    newTextArea.id = 'textarea' + i;
+    newTextArea.className = 'test';
+    newTextArea.placeholder = "Dynamic area #" + i + "!";
+    
+    masterDiv.appendChild(newTextArea);
+    return newTextArea.id;
+  }
+  
+  DynamicElements.addIFrame = function(loadCallback) {
+    var masterDiv = document.getElementById('DynamicElements');
+    var frame = document.createElement("iframe");
+    var i = inputCounter++;
+    
+    frame.height = "100";
+    frame.id = 'iframe' + i;
+    if(loadCallback) {
+      frame.addEventListener('load', function() {
+        // Give KMW's attachment events a chance to run first.
+        window.setTimeout(loadCallback, 100);
+      });
+    }
+    frame.setAttribute("src", "resources/html/iframe.html");
+      
+    masterDiv.appendChild(frame);
+    return frame.id;
+  }
+
+  DynamicElements.addDesignIFrame = function(loadCallback) {
+    var masterDiv = document.getElementById('DynamicElements');
+    var frame = document.createElement("iframe");
+    var i = inputCounter++;
+    
+    frame.height = "100";
+    frame.id = 'designIFrame' + i;
+    frame.src = "resources/html/editableFrame.html";
+    
+    if(loadCallback) {
+      frame.addEventListener('load', function() {
+        loadCallback();
+      });
+    }
+      
+    masterDiv.appendChild(frame);
+    return frame.id;
+  }
+  
+  DynamicElements.addEditable = function() {
+    var masterDiv = document.getElementById('DynamicElements');
+    var editable = document.createElement("div");
+    var i = inputCounter++;
+    
+    editable.contentEditable = true;
+    editable.textContent = "Edit me!";
+    editable.id = 'editable' + i;
+    editable.style.width="500px";
+    
+    masterDiv.appendChild(editable);
+    return editable.id;
+  }
+
+  // base: takes an optional element to use as the touch alias's ['base'] property.
+  DynamicElements.addTouchAlias = function(base) {
+    var masterDiv = document.getElementById('DynamicElements');
+    var touchAlias = com.keyman.dom.constructTouchAlias(base);
+    var i = inputCounter++;
+
+    touchAlias.id = 'touchAlias' + i;
+
+    masterDiv.appendChild(touchAlias);
+    return touchAlias.id;
+  }
+
+  DynamicElements.assertAttached = function(ele, done) {
+    var assertion = function() {
+      assert.isTrue(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not attached!");
+    }
+    if(done) {
+      window.setTimeout(function() {
+        assertion();
+        done();
+      }, kmwconfig.timeouts.eventDelay);
+    } else {
+      assertion();
+    }
+  }
+
+  DynamicElements.assertDetached = function(ele, done) {
+    var assertion = function() {
+      assert.isFalse(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not detached!");
+    }
+    if(done) {
+      window.setTimeout(function() {
+        assertion();
+        done();
+      }, kmwconfig.timeouts.eventDelay);
+    } else {
+      assertion();
+    }
+  }
+
+  // Is utilized only by the attachmentAPI test case, but it was originally defined as part of the same
+  // object as the rest of DynamicElements, which is useful for numerous test cases.
+  DynamicElements.init = function() {
+    var s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
+    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEvent(s_key_json);
+
+    DynamicElements.enabledLaoOutput = "ຫ";
+    DynamicElements.enabledKhmerOutput = "ស";
+    // Simulated JavaScript events do not produce text output.
+    DynamicElements.disabledOutput = "";
+  }
+
+  DynamicElements.init();
 }

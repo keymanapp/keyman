@@ -30,6 +30,7 @@ def install_to_ibus(bus, keyboard_id):
         preload_engines = ibus_settings.get_strv("preload-engines")
         logging.debug(preload_engines)
         if keyboard_id not in preload_engines:
+            # TODO: in the event preload_engines contains upper-case keyboards, we'll need to uninstall_from_ibus #1601
             preload_engines.append(keyboard_id)
         logging.debug(preload_engines)
         ibus_settings.set_strv("preload-engines", preload_engines)

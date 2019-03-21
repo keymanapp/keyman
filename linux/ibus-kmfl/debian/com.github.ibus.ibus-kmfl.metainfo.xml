@@ -1,0 +1,31 @@
+​<?xml version="1.0" encoding="UTF-8"?>
+​<component type="inputmethod">
+​  <id>com.github.ibus.ibus-kmfl</id>
+​  <metadata_license>FSFAP</metadata_license>
+​  <name>ibus-kmfl</name>
+​  <summary>KMFL input method for IBus</summary>
+​  <description>
+​    <p>
+      This package provides the KMFL (Keyboard Mapping for Linux) input method
+      engine for IBus. With this module, you can use keyboard layouts designed
+      for Keyman for Windows 6.0 under the IBus platform.
+    </p>
+    <p>
+      Originally created in 1993 to type Lao on Windows, Keyman is now a free and
+      open source keyboarding platform which allows anyone to write a keyboard layout
+      for their language. Keyman is available for many platforms, including Windows,
+      macOS, iOS, Android, Linux and the web.
+    </p>
+    <p>
+      Keyboard layouts are defined with a clear and easy to understand keyboard
+      grammar. Keyman's contextual input model means keyboard layouts can be
+      intelligent and make it simple to type even the most complex languages.
+      Keyboard layouts are distributed through an open catalog to all major desktop
+      and mobile platforms.
+    </p>
+    <p>
+​      Input methods are typing systems allowing users to input complex languages.
+​    </p>
+​  </description>
+​  <url type="homepage">https://www.keyman.com/linux</url>
+​</component>

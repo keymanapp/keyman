@@ -45,7 +45,8 @@ namespace com.keyman {
       this.keyman.alignInputs();
 
       var osk = this.keyman.osk;
-      osk.hideLanguageList();
+      // TODO:  Reattach later in the refactoring process!
+      //osk.hideLanguageList();
       osk._Load();
       if(this.oskVisible) {
         osk._Show();

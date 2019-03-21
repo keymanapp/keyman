@@ -180,6 +180,22 @@ function addIFrame() {
   masterDiv.appendChild(newDiv);
 }
 
+function addDesignIFrame() {
+  var masterDiv = document.getElementById('DynamicDesignFrames');
+  var frame = document.createElement("iframe");
+  var i = inputCounter++;
+  
+  frame.height = "100";
+  frame.id = 'designIFrame' + i;
+  frame.src = "editableFrame.html";
+  
+  // The iframe's document sets design-mode on with its body.onload handler.
+ 
+  var newDiv = generateDiagnosticDiv(frame);
+  masterDiv.appendChild(newDiv);
+  return frame.id;
+}
+
 function addEditable() {
   var masterDiv = document.getElementById('DynamicEditables');
   var editable = document.createElement("div");

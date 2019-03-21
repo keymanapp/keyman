@@ -2,7 +2,7 @@
 <!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
 <Locale Version="10.0.1100.0" OnlineProductID="30">
   <String Type="PlainText" Id="S_LocaleAuthors">www.ಸಿರಿಗನ್ನಡ.com (www.sirigannada.com)</String>
-  <String Type="PlainText" Id="SK_UIFontName">Tahoma</String>
+  <String Type="PlainText" Id="SK_UIFontName">Noto Sans Kannada</String>
   <String Type="PlainText" Id="SK_UIFontSize">10</String>
   <String Type="PlainText" Id="S_ShortProductName">&Name_CNV;</String>
   <String Type="PlainText" Id="S_Yes">ಹೌದು</String>
@@ -174,8 +174,8 @@
   <String Type="PlainText" Id="S_Splash_Title">&Name_CNV;</String>
   <String Type="PlainText" Id="S_Splash_Name">&Name;</String>
   <String Type="PlainText" Id="S_Splash_Version">&Version;</String>
-  <String Type="PlainText" Id="S_Splash_Start">ಕೀಮ್ಯಾನ್ ಪ್ರಾರಂಭಿಸು</String>
-  <String Type="PlainText" Id="S_Splash_Exit">ನಿರ್ಗಮನ</String>
+  <String Type="PlainText" Id="S_Splash_Start">ಪ್ರಾರಂಭಿಸು</String>
+  <String Type="PlainText" Id="S_Splash_Exit">ನಿರ್ಗಮಿಸು</String>
   <String Type="PlainText" Id="S_Splash_OtherTasks">ಇತರೆ ಕಾರ್ಯಗಳು</String>
   <String Type="PlainText" Id="S_Splash_Configuration">ಸಂರಚನೆ</String>
   <String Type="PlainText" Id="S_Splash_ShowAtStartup">ಆರಂಭದಲ್ಲಿ ಈ ಪರದೆಯನ್ನು ತೋರಿಸು</String>

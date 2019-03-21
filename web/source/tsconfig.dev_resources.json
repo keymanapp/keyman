@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"inlineSources": true,
+	"module": "none",
+	"outFile": "../release/dev_resources/dev_resources.js",
+	"sourceMap": true,
+	"target": "es5"
+	},
+  "files": [
+    "text/outputTarget.ts",
+    "dom/wrapElement.ts"
+  ]
+}

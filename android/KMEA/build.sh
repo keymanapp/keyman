@@ -85,7 +85,7 @@ fi
 PLATFORM=`uname -s`
 
 # Report JUnit test results to CI
-echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\TEST-com.tavultesoft.kmea.packages.PackageProcessorTest.xml']"
+echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"

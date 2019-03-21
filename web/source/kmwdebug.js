@@ -1,6 +1,6 @@
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2019 SIL International
 ***/
 
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 

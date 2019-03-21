@@ -47,7 +47,7 @@ begin
 
   try
     try
-      Result := DoCompilePackage(pack, SelfMessage, FSilent, TargetFilename);
+      Result := DoCompilePackage(pack, SelfMessage, FSilent, OwnerProject.Options.CheckFilenameConventions, TargetFilename);
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
         Result := False;
 

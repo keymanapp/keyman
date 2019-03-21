@@ -1,12 +1,496 @@
 // Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
+/// <reference path="text/kmwstring.ts" />
 // Contains event management for mobile device rotation events.
 /// <reference path="kmwrotation.ts" />
 
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2019 SIL International
 ***/
+
+namespace com.keyman.osk {
+  /**
+   * Touch hold key display management
+   * 
+   * @param   {Object}  key   base key object
+   */
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
+    // Clear and restart the popup timer
+    if(this.subkeyDelayTimer) {
+      window.clearTimeout(this.subkeyDelayTimer);
+      this.subkeyDelayTimer = null;
+    }
+
+    if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
+      this.subkeyDelayTimer = window.setTimeout(
+        function(this: VisualKeyboard) {
+          this.clearPopup();
+          this.showSubKeys(key);
+        }.bind(this), this.popupDelay);
+    }
+  };
+
+  VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
+    let keyman = com.keyman.singleton;
+    let oskManager = keyman.osk;
+    if(keyDown) {
+      if(keyName.indexOf('K_LOPT') >= 0) {
+        oskManager.showLanguageMenu();
+      } else if(keyName.indexOf('K_ROPT') >= 0) {
+        keyman.uiManager.setActivatingUI(false);
+        oskManager._Hide(true); 
+        let active = keyman.domManager.getActiveElement();
+        if(dom.Utils.instanceof(active, "TouchAliasElement")) {
+          (active as dom.TouchAliasElement).hideCaret();
+        }
+        keyman.domManager.clearLastActiveElement();
+      }
+    }
+  };
+
+  // Manage popup key highlighting
+  VisualKeyboard.prototype.highlightSubKeys=function(this: VisualKeyboard, k: KeyElement, x: number, y: number) {
+    let util = com.keyman.singleton.util;
+
+    // Test for subkey array, return if none
+    if(k == null || k['subKeys'] == null) {
+      return;
+    }
+
+    // Highlight key at touch position (and clear other highlighting)
+    var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
+
+    // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+    if((this.touchY-y > 5) && skBox == null) {
+      if(this.subkeyDelayTimer) {
+        window.clearTimeout(this.subkeyDelayTimer);
+      }
+      this.showSubKeys(k);
+      skBox=document.getElementById('kmw-popup-keys');
+    } 
+        
+    for(i=0; i < k['subKeys'].length; i++) {
+      try {
+        sk=<HTMLElement> skBox.childNodes[i].firstChild;
+        x0=dom.Utils.getAbsoluteX(sk); y0=dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
+        x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
+        onKey=(x > x0 && x < x1 && y > y0 && y < y1);
+        this.highlightKey(sk, onKey);
+        if(onKey) {
+          this.highlightKey(k, false);
+        }
+      } catch(ex){}           
+    }    
+  };
+
+  /**
+   * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
+   * 
+   * @param   {Object}  key   HTML key element
+   * @param   {boolean} on    show or hide
+   */              
+  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
+    let keyman = com.keyman.singleton;
+    let util = keyman.util;
+    let oskManager = keyman.osk;
+
+    var tip=this.keytip;
+
+    // Do not change the key preview unless key or state has changed
+    if(tip == null || (key == tip.key && on == tip.state)) {
+      return;
+    }
+
+    var sk=document.getElementById('kmw-popup-keys'),
+        popup = (sk && sk.style.visibility == 'visible')
+
+    // Create and display the preview
+    if(on && !popup) {                                                       
+      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
+          h0 = oskManager._Box.offsetHeight,  
+          xLeft = dom.Utils.getAbsoluteX(key),
+          xTop = dom.Utils.getAbsoluteY(key),
+          xWidth = key.offsetWidth,
+          xHeight = key.offsetHeight,
+          kc = <HTMLElement> key.firstChild,
+          kcs = kc.style, 
+          kts = tip.element.style, 
+          ktLabel = <HTMLElement> tip.element.childNodes[1],
+          ktls = ktLabel.style,
+          edge = 0,
+          canvas = <HTMLCanvasElement> tip.element.firstChild, 
+          previewFontScale = 1.8;
+          
+      // Find key text element
+      for(var i=0; i<key.childNodes.length; i++) {
+        kc = <HTMLElement> key.childNodes[i];
+        if(util.hasClass(kc,'kmw-key-text')) {
+          break;
+        }
+      }
+      
+      // Canvas dimensions must be set explicitly to prevent clipping
+      canvas.width = 1.6 * xWidth;
+      canvas.height = 2.3 * xHeight;
+
+      kts.top = 'auto';
+      kts.bottom = (y0 + h0 - xTop - xHeight)+'px';
+      kts.textAlign = 'center';   kts.overflow = 'visible';
+      kts.fontFamily = util.getStyleValue(kc,'font-family');
+      kts.width = canvas.width+'px';
+      kts.height = canvas.height+'px';
+
+      var px=util.getStyleInt(kc, 'font-size');
+      if(px != 0) {
+        let popupFS = previewFontScale * px;
+        kts.fontSize = popupFS + 'px';
+
+        let textWidth = com.keyman.osk.OSKKey.getTextWidth(this, ktLabel.textContent, kts);
+        // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
+        let proportion = canvas.width * 0.9 / (textWidth);
+
+        // Prevent the preview from overrunning its display area.
+        if(proportion < 1) {
+          kts.fontSize = (popupFS * proportion) + 'px';
+        }
+      }
+      
+      ktLabel.textContent = kc.textContent;
+      ktls.display = 'block';
+      ktls.position = 'absolute';
+      ktls.textAlign = 'center';
+      ktls.width='100%';
+      ktls.top = '2%';
+      ktls.bottom = 'auto';
+      
+      // Adjust canvas shape if at edges
+      var xOverflow = (canvas.width - xWidth) / 2;
+      if(xLeft < xOverflow) {
+        edge = -1;
+        xLeft += xOverflow;
+      } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
+        edge = 1;
+        xLeft -= xOverflow;
+      }
+
+      this.drawPreview(canvas, xWidth, xHeight, edge);
+                
+      kts.left=(xLeft - xOverflow) + 'px';
+      kts.display = 'block';
+    } else { // Hide the key preview
+      tip.element.style.display = 'none';
+    }
+    
+    // Save the key preview state
+    tip.key = key;
+    tip.state = on;
+  };
+
+  /**
+   * Draw key preview in element using CANVAS
+   *  @param  {Object}  canvas CANVAS element 
+   *  @param  {number}  w width of touched key, px
+   *  @param  {number}  h height of touched key, px      
+   *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
+   */
+  VisualKeyboard.prototype.drawPreview = function(this: VisualKeyboard, canvas: HTMLCanvasElement, w: number, h: number, edge: number) {
+    let device = com.keyman.singleton.util.device;
+
+    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height,
+        w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
+        h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
+    
+    if(device.OS == 'Android') {
+      r = 3;
+    }
+    
+    // Adjust the preview shape at the edge of the keyboard
+    switch(edge) {
+      case -1:
+        w1 -= dx;
+        w2 -= dx;
+        break;
+      case 1:
+        w1 += dx;
+        w2 += dx;
+        break;
+    }
+    
+    // Clear the canvas
+    ctx.clearRect(0,0,canvas.width,canvas.height);     
+
+    // Define appearance of preview (cannot be done directly in CSS)
+    if(device.OS == 'Android') {
+      var wx=(w1+w2)/2; 
+      w1 = w2 = wx;    
+      ctx.fillStyle = '#999';
+    } else {
+      ctx.fillStyle = '#ffffff';
+    }  
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#cccccc';
+
+    // Draw outline
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(w0+r,0);
+    ctx.arcTo(w3,0,w3,r,r);
+    if(device.OS == 'Android') {    
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w1,h2,r);
+      ctx.arcTo(w1,h2,w0,h1-r,r);
+    } else {
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w2-r,h3,r);
+      ctx.arcTo(w2,h3,w1,h3,r);
+      ctx.arcTo(w1,h3,w1,h2-r,r);
+      ctx.arcTo(w1,h2,w0,h1-r,r);
+    }
+    ctx.arcTo(w0,h1,w0,r,r);
+    ctx.arcTo(w0,0,w0+r,0,r);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();  
+  };
+
+  /** 
+   *  Create a key preview element for phone devices
+   */    
+  VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
+    let keyman = com.keyman.singleton;
+    let util = keyman.util;
+
+    if(keyman.util.device.formFactor == 'phone') {
+      if(this.keytip == null) {
+        this.keytip = {
+          key: null,
+          state: false
+        }
+        let tipElement = this.keytip.element=util._CreateElement('div');
+        tipElement.className='kmw-keytip';
+        tipElement.id = 'kmw-keytip';
+        
+        // The following style is critical, so do not rely on external CSS
+        tipElement.style.pointerEvents='none';
+        
+        // Add CANVAS element for outline and SPAN for key label
+        tipElement.appendChild(util._CreateElement('canvas'));
+        tipElement.appendChild(util._CreateElement('span')); 
+      }
+      
+      // Always append to _Box (since cleared during OSK Load) 
+      keyman.osk._Box.appendChild(this.keytip.element);
+    }
+  };
+
+  /**
+   * Add a callout for popup keys (if KeymanWeb on a phone device)
+   * 
+   * @param   {Object}  key   HTML key element
+   * @return  {Object}        callout object   
+   */              
+  VisualKeyboard.prototype.addCallout = function(this: VisualKeyboard, key: KeyElement): HTMLDivElement {   
+    let keyman = com.keyman.singleton;
+    let util = keyman.util;
+
+    if(util.device.formFactor != 'phone' || util.device.OS != 'iOS') {
+      return null;
+    }
+      
+    var cc = util._CreateElement('div'), ccs = cc.style;
+    cc.id = 'kmw-popup-callout';
+    keyman.osk._Box.appendChild(cc);
+    
+    // Create the callout
+    var xLeft = key.offsetLeft,
+        xTop = key.offsetTop,
+        xWidth = key.offsetWidth,
+        xHeight = key.offsetHeight;
+
+    // Set position and style 
+    ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
+    ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+    
+    // Return callout element, to allow removal later
+    return cc;  
+  }
+
+  /**
+   * Wait until font is loaded before applying stylesheet - test each 100 ms
+   * @param   {Object}  kfd   main font descriptor
+   * @param   {Object}  ofd   secondary font descriptor (OSK only)
+   * @return  {boolean}
+   */       
+  VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
+    let keymanweb = com.keyman.singleton;
+    let util = keymanweb.util;
+
+    if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') {
+      return true;
+    }
+    
+    if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') {
+      return true;
+    }
+
+    var kReady=util.checkFontDescriptor(kfd), oReady=util.checkFontDescriptor(ofd); 
+    if(kReady && oReady) {
+      return true;
+    }
+
+    keymanweb.fontCheckTimer=window.setInterval(function() {        
+      if(util.checkFontDescriptor(kfd) && util.checkFontDescriptor(ofd)) {
+        window.clearInterval(keymanweb.fontCheckTimer);
+        keymanweb.fontCheckTimer=null;
+        keymanweb.alignInputs();    
+      }    
+    }, 100);
+    
+    // Align anyway as best as can if font appears to remain uninstalled after 5 seconds   
+    window.setTimeout(function() {
+      if(keymanweb.fontCheckTimer)
+      {
+        window.clearInterval(keymanweb.fontCheckTimer);
+        keymanweb.fontCheckTimer=null;
+        keymanweb.alignInputs();
+        // Don't notify - this is a management issue, not anything the user needs to deal with
+        // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
+        //util.alert('Unable to download the font normally used with '+ks['KN']+'.');
+      }
+    }, 5000);
+    return false;
+  };
+
+  /**
+   * Adjust the absolute height of each keyboard element after a rotation
+   *
+   **/
+  VisualKeyboard.prototype.adjustHeights = function(this: VisualKeyboard): boolean {
+    let keyman = com.keyman.singleton;
+    let oskManager = keyman.osk;
+    let _Box = oskManager._Box;
+    let util = keyman.util;
+    let device = util.device;
+
+    if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
+      return;
+    }
+
+    var layers=this.kbdDiv.firstChild.childNodes,
+        nRows=layers[0].childNodes.length,
+        oskHeight=oskManager.getHeight(),
+        rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows)),
+        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
+
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      rowHeight = rowHeight/window.devicePixelRatio;
+    }
+
+    oskHeight=nRows*rowHeight;
+
+    var b: HTMLElement = _Box,bs=b.style;
+    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    b = <HTMLElement> b.firstChild.firstChild; bs=b.style;
+    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+
+    // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
+    if(device.OS == 'iOS') {
+      fs=fs/util.getViewportScale();
+    }
+
+    bs.fontSize=fs+'em';
+    var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
+
+    for(nLayer=0;nLayer<layers.length; nLayer++) {
+      // Check the heights of each row, in case different layers have different row counts.
+      nRows=layers[nLayer].childNodes.length;
+      rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows));
+
+      pad = Math.round(0.15*rowHeight);
+      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';
+      for(nRow=0; nRow<nRows; nRow++) {
+        rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
+        rs.bottom=(nRows-nRow-1)*rowHeight+1+'px';
+        rs.maxHeight=rs.height=rowHeight+'px';
+        keys=layers[nLayer].childNodes[nRow].childNodes;
+        nKeys=keys.length;
+        for(nKey=0;nKey<nKeys;nKey++) {
+          key=keys[nKey];
+          //key.style.marginTop = (device.formFactor == 'phone' ? pad : 4)+'px';
+          //**no longer needed if base key label and popup icon are within btn, not container**
+
+          // Must set the height of the btn DIV, not the label (if any)
+          for(j=0; j<key.childNodes.length; j++) {
+            if(util.hasClass(key.childNodes[j],'kmw-key')) {
+              break;
+            }
+          }
+          ks=key.childNodes[j].style;
+          ks.bottom=rs.bottom;
+          ks.height=ks.minHeight=(rowHeight-pad)+'px';
+
+          // Rescale keycap labels on iPhone (iOS 7)
+          if(resizeLabels && (j > 0)) {
+            key.childNodes[0].style.fontSize='6px';
+          }
+        }
+      }
+    }
+  };
+
+  // /**
+  //  *  Adjust the width of the last cell in each row for length differences
+  //  *  due to rounding percentage widths to nearest pixel.
+  //  *
+  //  *  @param  {number}  nLayer    Index of currently visible layer
+  //  */
+  // osk.adjustRowLengths = function(nLayer)
+  // {
+  //   if(nLayer >= 0) return;   //TODO: TEST ONLY - remove code if not needed
+
+  //   var maxWidth,layers=osk._DivVKbd.childNodes[0].childNodes;
+
+  //   if(nLayer < 0 || nLayer >= layers.length || layers[nLayer].aligned) return;
+
+  //   // Do not try and align if not visible!
+  //   if(layers[nLayer].style.display != 'block') return;
+
+  //   // Set max width to be 6 px less than OSK layer width (allow for inter-key spacing)
+  //   // TODO: Adjustment needs to be device and orientation specific
+  //   maxWidth=osk._DivVKbd.childNodes[0].offsetWidth-6;
+
+  //   if(device.OS == 'Windows')
+  //   {
+  //     maxWidth -= util.landscapeView() ? 4: 40;
+  //   }
+  //   var i,rows=layers[nLayer].childNodes,keys,nKeys,lastKey,xMax;
+  //   for(i=0; i<rows.length; i++)
+  //   {
+  //     keys=rows[i].childNodes;
+  //     nKeys=keys.length;
+  //     xMax=keys[nKeys-2].offsetLeft+keys[nKeys-2].offsetWidth;
+  //     lastKey=keys[nKeys-1];
+  //     lastKey.style.width=(maxWidth-xMax)+'px';
+  //   }
+  //   layers[nLayer].aligned=true;
+  // }
+
+  // /**
+  //  *  Clear the row alignment flag for each layer
+  //  *  @return   {number}    number of currently active layer
+  //  *
+  //  */
+  // osk.resetRowLengths = function()
+  // {
+  //   var j,layers=osk._DivVKbd.childNodes[0].childNodes,nLayer=-1;
+  //   for(j=0; j<layers.length; j++)
+  //   {
+  //     if(layers[j].style.display == 'block') nLayer=j;
+  //     layers[j].aligned=false;
+  //   }
+  //   return nLayer;
+  // }
+}
 
 // If KMW is already initialized, the KMW script has been loaded more than once. We wish to prevent resetting the 
 // KMW system, so we use the fact that 'initialized' is only 1 / true after all scripts are loaded for the initial
@@ -21,6 +505,7 @@ if(!window['keyman']['initialized']) {
     // Declare KeymanWeb object
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
     var dbg=keymanweb.debug;
+    var dom = com.keyman.dom;
 
     // Force full initialization
     keymanweb.isEmbedded = false;
@@ -88,63 +573,6 @@ if(!window['keyman']['initialized']) {
       var rx=RegExp('^(([\\.]/)|([\\.][\\.]/)|(/))|(:)');   
       return (rx.test(Lfilename) ? '' : keymanweb.options['keyboards']) + Lfilename;
     }
-    
-    /**
-     * Get (uncached) keyboard context for a specified range, relative to caret
-     * 
-     * @param       {number}      n       Number of characters to move back from caret
-     * @param       {number}      ln      Number of characters to return
-     * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-     * @return      {string}              Context string 
-     * 
-     * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
-     *             KC(2,1,Pelem) == "e"
-     *             KC(3,3,Pelem) == "def"
-     *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
-     */    
-    keymanweb.KC_ = function(n, ln, Pelem) {
-      var Ldv, tempContext = '';
-      if(Pelem.body) {
-        var Ldoc=Pelem; 
-      } else {
-        var Ldoc=Pelem.ownerDocument; // I1481 - use Ldoc to get the ownerDocument when no selection is found
-      }
-
-      if(device.touchable) {
-        tempContext = keymanweb.touchAliasing.getTextBeforeCaret(Pelem);
-      } else if(Ldoc  &&  (Ldv=Ldoc.defaultView)  &&  Ldv.getSelection  &&
-        (Ldoc.designMode.toLowerCase() == 'on' || Pelem.contentEditable == 'true' || Pelem.contentEditable == 'plaintext-only' || Pelem.contentEditable === '')) {
-        // I2457 - support contentEditable elements in mozilla, webkit
-        /* Mozilla midas html editor and editable elements */
-        var Lsel = Ldv.getSelection();
-        if(Lsel.focusNode.nodeType == 3) {
-          tempContext = Lsel.focusNode.substringData(0, Lsel.focusOffset);
-        }
-      } else if (Pelem.setSelectionRange) {
-        /* Mozilla other controls */
-        var LselectionStart, LselectionEnd;
-        if(Pelem._KeymanWebSelectionStart) {
-          LselectionStart = Pelem._KeymanWebSelectionStart;
-          LselectionEnd = Pelem._KeymanWebSelectionEnd;
-          //KeymanWeb._Debug('KeymanWeb.KC: _KeymanWebSelectionStart=TRUE LselectionStart='+LselectionStart+'; LselectionEnd='+LselectionEnd);
-        } else {
-          if(keymanweb._CachedSelectionStart === null || Pelem.selectionStart !== keymanweb._LastCachedSelection) { // I3319, KMW-1
-            keymanweb._LastCachedSelection = Pelem.selectionStart; // KMW-1
-            keymanweb._CachedSelectionStart = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionStart); // I3319
-            keymanweb._CachedSelectionEnd = Pelem.value._kmwCodeUnitToCodePoint(Pelem.selectionEnd);     // I3319
-          }
-          LselectionStart = keymanweb._CachedSelectionStart; // I3319
-          LselectionEnd = keymanweb._CachedSelectionEnd;     // I3319           
-        }
-        tempContext = Pelem.value._kmwSubstr(0, LselectionStart);
-      }
-
-      if(tempContext._kmwLength() < n) {
-        tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
-      }
-      
-      return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
-    }      
 
     /**
      * Align input fields (should not be needed with KMEI, KMEA), making them visible if previously hidden.
@@ -177,7 +605,9 @@ if(!window['keyman']['initialized']) {
 
         // Supported by IE 9 and all modern browsers.
         processList.forEach(function(element: HTMLElement) {
-          domManager.touchHandlers.updateInput(element);
+          if(dom.Utils.instanceof(element, "TouchAliasElement")) {
+            (element as com.keyman.dom.TouchAliasElement).updateInput();
+          }
           element.style.visibility = 'visible';
           if(element.base.textContent.length > 0) {
             element.base.style.visibility = 'hidden';
@@ -212,307 +642,6 @@ if(!window['keyman']['initialized']) {
       return device.touchable;
     }
 
-    // Manage popup key highlighting 
-    osk.highlightSubKeys=function(k,x,y)
-    {      
-      // Test for subkey array, return if none
-      if(k == null || k.subKeys == null) return;
-
-      // Highlight key at touch position (and clear other highlighting) 
-      var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
-
-      // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
-      if((osk.touchY-y > 5) && skBox == null)
-      {
-        if(osk.subkeyDelayTimer) window.clearTimeout(osk.subkeyDelayTimer);
-        osk.showSubKeys(k); skBox=document.getElementById('kmw-popup-keys');
-      } 
-          
-      for(i=0; i<k.subKeys.length; i++)
-      {
-        try 
-        {
-          sk=skBox.childNodes[i].firstChild;
-          x0=util._GetAbsoluteX(sk); y0=util._GetAbsoluteY(sk);//-document.body.scrollTop;
-          x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
-          onKey=(x > x0 && x < x1 && y > y0 && y < y1);
-          osk.highlightKey(sk,onKey);
-          if(onKey) osk.highlightKey(k,false);
-        } catch(ex){}           
-      }    
-    }
-    
-    osk.optionKey=function(e,keyName,keyDown)
-    {       
-      if(keyDown) 
-      {
-        if(keyName.indexOf('K_LOPT') >= 0) osk.showLanguageMenu();
-        else if(keyName.indexOf('K_ROPT') >= 0)
-        {
-          keymanweb.uiManager.setActivatingUI(false);
-          osk._Hide(true); 
-          keymanweb.touchAliasing.hideCaret();
-          keymanweb.domManager.clearLastActiveElement();
-        }
-      }
-    }
-
-    /** 
-     *  Create a key preview element for phone devices
-     */    
-    osk.createKeyTip=function()
-    { 
-      if(device.formFactor == 'phone')
-      {
-        if(osk.keytip == null)
-        {  
-          osk.keytip=(<Util>util)._CreateElement('div'); 
-          osk.keytip.className='kmw-keytip';
-          osk.keytip.id = 'kmw-keytip';
-          
-          // The following style is critical, so do not rely on external CSS
-          osk.keytip.style.pointerEvents='none'; 
-          
-          // Add CANVAS element for outline and SPAN for key label
-          osk.keytip.appendChild((<Util>util)._CreateElement('canvas'));
-          osk.keytip.appendChild((<Util>util)._CreateElement('span'));   
-          osk.keytip.key = null;
-          osk.keytip.state = false;     
-        }
-        
-        // Always append to _Box (since cleared during OSK Load) 
-        osk._Box.appendChild(osk.keytip);
-      }
-    }
-
-    /**
-     * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
-     * 
-     * @param   {Object}  key   HTML key element
-     * @param   {boolean} on    show or hide
-     */              
-    osk.showKeyTip=function(key,on) 
-    { 
-      var tip=osk.keytip;
-
-      // Do not change the key preview unless key or state has changed
-      if(tip == null || (key == tip.key && on == tip.state)) return;  
-
-      var sk=document.getElementById('kmw-popup-keys'),
-          popup = (sk && sk.style.visibility == 'visible')
-
-      // Create and display the preview
-      if(on && !popup)
-      {                                                       
-        var y0 = util._GetAbsoluteY(osk._Box),
-            h0 = osk._Box.offsetHeight,  
-            xLeft = util._GetAbsoluteX(key),
-            xTop = util._GetAbsoluteY(key),
-            xWidth = key.offsetWidth,
-            xHeight = key.offsetHeight,
-            kc = key.firstChild,
-            kcs = kc.style, 
-            kts = tip.style, 
-            ktLabel = tip.childNodes[1],
-            ktls = ktLabel.style,
-            edge = 0,
-            canvas = tip.firstChild, 
-            previewFontScale = 1.8;
-            
-        // Find key text element
-        for(var i=0; i<key.childNodes.length; i++)
-        {
-          kc = key.childNodes[i];
-          if(osk.hasClass(kc,'kmw-key-text')) break;    
-        }
-        
-        // Canvas dimensions must be set explicitly to prevent clipping
-        canvas.width = 1.6 * xWidth;
-        canvas.height = 2.3 * xHeight;
-  
-        kts.top = 'auto';
-        kts.bottom = (y0 + h0 - xTop - xHeight)+'px';
-        kts.textAlign = 'center';   kts.overflow = 'visible';
-        kts.fontFamily = util.getStyleValue(kc,'font-family');
-        kts.width = canvas.width+'px';
-        kts.height = canvas.height+'px';
-
-        var px=util.getStyleInt(kc,'font-size');
-        if(px != 0) {
-          let popupFS = previewFontScale * px;
-          kts.fontSize = popupFS + 'px';
-
-          let textWidth = com.keyman.OSKKey.getTextWidth(ktLabel.textContent, kts);
-          // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
-          let proportion = canvas.width * 0.9 / (textWidth);
-
-          // Prevent the preview from overrunning its display area.
-          if(proportion < 1) {
-            kts.fontSize = (popupFS * proportion) + 'px';
-          }
-        }
-        
-        ktLabel.textContent = kc.textContent;
-        ktls.display = 'block';
-        ktls.position = 'absolute';
-        ktls.textAlign = 'center';
-        ktls.width='100%';
-        ktls.top = '2%';
-        ktls.bottom = 'auto';
-        
-        // Adjust canvas shape if at edges
-        var xOverflow = (canvas.width - xWidth) / 2;
-        if(xLeft < xOverflow)
-        {
-          edge = -1; xLeft += xOverflow;
-        }
-        else if(xLeft > window.innerWidth - xWidth - xOverflow)
-        {
-          edge = 1; xLeft -= xOverflow 
-        }
-
-        osk.drawPreview(canvas, xWidth, xHeight, edge);
-                  
-        kts.left=(xLeft - xOverflow)+'px';
-        kts.display = 'block';        
-      }
-      
-      // Hide the key preview
-      else
-      {        
-        tip.style.display = 'none';
-      }
-      
-      // Save the key preview state
-      tip.key = key; tip.state = on;
-    }
-
-    /**
-     * Draw key preview in element using CANVAS
-     *  @param  {Object}  canvas CANVAS element 
-     *  @param  {number}  w width of touched key, px
-     *  @param  {number}  h height of touched key, px      
-     *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
-     */
-    osk.drawPreview = function(canvas,w,h,edge)
-    {
-      var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height,
-          w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
-          h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
-      
-      if(device.OS == 'Android') 
-      {
-        r = 3;
-      }
-      
-      // Adjust the preview shape at the edge of the keyboard
-      switch(edge)
-      {
-        case -1:
-          w1 -= dx; w2 -= dx;
-          break;
-        case 1:
-          w1 += dx; w2 += dx;
-          break;
-      }
-      
-      // Clear the canvas
-      ctx.clearRect(0,0,canvas.width,canvas.height);     
-
-      // Define appearance of preview (cannot be done directly in CSS)
-      if(device.OS == 'Android') 
-      {
-        var wx=(w1+w2)/2; 
-        w1 = w2 = wx;    
-        ctx.fillStyle = '#999';
-      }
-      else
-      {
-        ctx.fillStyle = '#ffffff';
-      }  
-      ctx.lineWidth = '1';
-      ctx.strokeStyle = '#cccccc';
-
-      // Draw outline
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(w0+r,0);
-      ctx.arcTo(w3,0,w3,r,r);
-      if(device.OS == 'Android')
-      {    
-        ctx.arcTo(w3,h1,w2,h2,r);
-        ctx.arcTo(w2,h2,w1,h2,r);
-        ctx.arcTo(w1,h2,w0,h1-r,r);
-      }
-      else
-      {
-        ctx.arcTo(w3,h1,w2,h2,r);
-        ctx.arcTo(w2,h2,w2-r,h3,r);
-        ctx.arcTo(w2,h3,w1,h3,r);
-        ctx.arcTo(w1,h3,w1,h2-r,r);
-        ctx.arcTo(w1,h2,w0,h1-r,r);
-      }
-      ctx.arcTo(w0,h1,w0,r,r);
-      ctx.arcTo(w0,0,w0+r,0,r);
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();  
-    }
-    
-    /**
-     * Add a callout for popup keys (if KeymanWeb on a phone device)
-     * 
-     * @param   {Object}  key   HTML key element
-     * @return  {Object}        callout object   
-     */              
-    osk.addCallout = function(key) 
-    {   
-      if(device.formFactor != 'phone' || device.OS != 'iOS') return null;
-        
-      var cc = (<Util>util)._CreateElement('div'),ccs = cc.style;
-      cc.id = 'kmw-popup-callout';
-      osk._Box.appendChild(cc);
-      
-      // Create the callout
-      var xLeft = key.offsetLeft,
-          xTop = key.offsetTop,
-          xWidth = key.offsetWidth,
-          xHeight = key.offsetHeight;
-
-      // Set position and style 
-      ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
-      ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
-      
-      // Return callout element, to allow removal later
-      return cc;  
-    }
-    
-    /**
-     * Touch hold key display management
-     * 
-     * @param   {Object}  key   base key object
-     */
-    osk.touchHold = function(key)
-    {
-    // Clear and restart the popup timer
-      if(osk.subkeyDelayTimer) 
-      {
-        window.clearTimeout(osk.subkeyDelayTimer);
-        osk.subkeyDelayTimer = null;
-      }    
-      if(typeof key.subKeys != 'undefined' && key.subKeys != null) 
-      {
-        osk.subkeyDelayTimer = window.setTimeout(
-          function()
-          {
-            osk.clearPopup();
-            osk.showSubKeys(key);
-          }, 
-          osk.popupDelay
-        );
-      }                                            
-    }
-
     /**
      * Use rotation events to adjust OSK and input element positions and scaling as necessary
      */     
@@ -536,50 +665,5 @@ if(!window['keyman']['initialized']) {
       }
     }
     */ 
-
-    /**
-     * Wait until font is loaded before applying stylesheet - test each 100 ms
-     * @param   {Object}  kfd   main font descriptor
-     * @param   {Object}  ofd   secondary font descriptor (OSK only)
-     * @return  {boolean}
-     */       
-    osk.waitForFonts=function(kfd,ofd)
-    {
-      if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') return true;
-      
-      if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') return true;
-
-
-      var kReady=util.checkFontDescriptor(kfd),oReady=util.checkFontDescriptor(ofd); 
-      if(kReady && oReady) return true;
-
-      keymanweb.fontCheckTimer=window.setInterval(function()
-      {        
-        if(util.checkFontDescriptor(kfd) && util.checkFontDescriptor(ofd))
-        {
-          window.clearInterval(keymanweb.fontCheckTimer);
-          keymanweb.fontCheckTimer=null;
-          keymanweb.alignInputs();    
-        }    
-      },100);
-      
-      // Align anyway as best as can if font appears to remain uninstalled after 5 seconds   
-      window.setTimeout(function()
-      {
-        if(keymanweb.fontCheckTimer)
-        {
-          window.clearInterval(keymanweb.fontCheckTimer);
-          keymanweb.fontCheckTimer=null;
-          keymanweb.alignInputs();
-          // Don't notify - this is a management issue, not anything the user needs to deal with
-          // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
-          //util.alert('Unable to download the font normally used with '+ks['KN']+'.');
-        }
-      },5000);
-      return false;
-    }
-
-
-
   })();
 }

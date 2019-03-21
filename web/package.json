@@ -1,6 +1,6 @@
 {
   "name": "keyman",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "Facilitates text input in any language.",
   "repository": {
     "type": "git",
@@ -20,7 +20,6 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "google-closure-compiler": "^20171203.0.0",
-    "google-closure-library": "^20171203.0.0",
     "html2canvas": "^1.0.0-alpha.12",
     "karma": "^3.1.4",
     "karma-browserstack-launcher": "^1.4.0",
@@ -47,6 +46,8 @@
     "modernizr": "modernizr"
   },
   "dependencies": {
-    "promise-polyfill": "^8.1.0"
+    "@types/node": "^11.9.4",
+    "promise-polyfill": "^8.1.0",
+    "ts-node": "^8.0.2"
   }
 }

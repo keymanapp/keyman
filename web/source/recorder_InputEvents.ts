@@ -195,7 +195,7 @@ namespace KMWRecorder {
       window['keyman'].resetContext();
       if(ele['base']) {
         // Gotta be extra-careful with the simulated touch fields!
-        window['keyman'].touchAliasing.setText(ele, "", 0);
+        (<any> ele /*as com.keyman.dom.TouchAliasElement*/).setText("", 0);
       } else {
         ele.textContent = "";
       }

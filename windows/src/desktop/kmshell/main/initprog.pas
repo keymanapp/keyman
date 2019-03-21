@@ -289,10 +289,6 @@ begin
     Free;
   end;
 
-  //FRunFolder := GetCurrentDir;
-
-  //raise Exception.Create('Error Message');
-
   KeyboardFileNames := TWideStringList.Create;
   try
     if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery) then

@@ -63,7 +63,7 @@ def uninstall_keyboards_from_ibus(keyboards, packageDir):
 			# install all kmx for first lang not just packageID
 			for kb in keyboards:
 				kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
-				if "languages" in kb:
+				if "languages" in kb and len(kb["languages"]) > 0:
 					logging.debug(kb["languages"][0])
 					keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
 				else:

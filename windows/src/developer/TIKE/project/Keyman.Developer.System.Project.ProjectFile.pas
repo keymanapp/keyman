@@ -294,11 +294,13 @@ type
     FBuildPath: string;
     FWarnDeprecatedCode: Boolean;   // I4866
     FCompilerWarningsAsErrors: Boolean;   // I4865
+    FCheckFilenameConventions: Boolean;
   public
     constructor Create;
     property BuildPath: string read FBuildPath write FBuildPath;
     property WarnDeprecatedCode: Boolean read FWarnDeprecatedCode write FWarnDeprecatedCode;   // I4866
     property CompilerWarningsAsErrors: Boolean read FCompilerWarningsAsErrors write FCompilerWarningsAsErrors;   // I4865
+    property CheckFilenameConventions: Boolean read FCheckFilenameConventions write FCheckFilenameConventions;
   end;
 
 const
@@ -1175,6 +1177,7 @@ constructor TProjectOptions.Create;
 begin
   WarnDeprecatedCode := True;   // I4866
   CompilerWarningsAsErrors := False;   // I4865
+  CheckFilenameConventions := True; // default to TRUE for new projects
 end;
 
 type

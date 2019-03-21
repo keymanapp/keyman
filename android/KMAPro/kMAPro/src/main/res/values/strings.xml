@@ -41,13 +41,17 @@
     <string name="hint_title" translatable="false">Title</string>
     <string name="hint_url" translatable="false">Url</string>
 
-    <!-- Keyboard Package strings -->
+    <!-- KMP Package strings -->
     <string name="title_package" translatable="false">Package</string>
     <string name="title_failed_to_install" translatable="false">failed to install</string>
     <string name="downloading_keyboard_package" translatable="false">Downloading keyboard package</string>
     <string name="failed_to_extract" translatable="false">Failed to extract</string>
     <string name="install_keyboard_package"  translatable="false">Install Keyboard Package</string>
+    <string name="install_predictive_text_package" translatable="false">Install Predictive Text Package</string>
     <string name="no_new_touch_keyboards_to_install" translatable="false">No new touch-optimized keyboards to install</string>
     <string name="no_valid_touch_keyboards_to_install" translatable="false">No valid touch-optimized keyboards to install</string>
+    <string name="no_targets_to_install" translatable="false">No keyboards or predictive text to install</string>
+    <string name="missing_metadata" translatable="false">kmp.json does not exist</string>
+    <string name="invalid_metadata" translatable="false">Invalid metadata in package</string>
 
 </resources>

@@ -1,9 +1,9 @@
 var assert = chai.assert;
 
 describe('Engine - Chirality', function() {
-  before(function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad);
+  this.timeout(kmwconfig.timeouts.scriptLoad);
 
+  before(function(done) {
     fixture.setBase('unit_tests/fixtures');
     setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });

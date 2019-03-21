@@ -1,0 +1,1245 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "11.0.1304.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "graphicFile": "splash.bmp"
+  },
+  "info": {
+    "name": {
+      "description": "Cameroon QWERTY"
+    },
+    "version": {
+      "description": "6.0.2"
+    },
+    "copyright": {
+      "description": "\u00A92018 SIL Cameroon"
+    },
+    "author": {
+      "description": "Matthew Lee",
+      "url": "mailto:keyboards_cameroon@sil.org"
+    },
+    "website": {
+      "description": "LangTechCameroon.info",
+      "url": "LangTechCameroon.info"
+    }
+  },
+  "files": [
+    {
+      "name": "Cameroon.ico",
+      "description": "File Cameroon.ico"
+    },
+    {
+      "name": "sil_cameroon_qwerty.css",
+      "description": "File sil_cameroon_qwerty.css"
+    },
+    {
+      "name": "AndikaAfr-R.ttf",
+      "description": "Font Andika Afr"
+    },
+    {
+      "name": "sil_cameroon_qwerty.kvk",
+      "description": "File sil_cameroon_qwerty.kvk"
+    },
+    {
+      "name": "sil_cameroon_qwerty.kmx",
+      "description": "Keyboard Cameroon QWERTY"
+    },
+    {
+      "name": "splash.bmp",
+      "description": "File splash.bmp"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "e_chart.png",
+      "description": "File e_chart.png"
+    },
+    {
+      "name": "e_tableau.png",
+      "description": "File e_tableau.png"
+    },
+    {
+      "name": "helpIcon.png",
+      "description": "File helpIcon.png"
+    },
+    {
+      "name": "ic_launcher.png",
+      "description": "File ic_launcher.png"
+    },
+    {
+      "name": "icon.png",
+      "description": "File icon.png"
+    },
+    {
+      "name": "QwertyColor.png",
+      "description": "File QwertyColor.png"
+    },
+    {
+      "name": "sil-logo-blue.png",
+      "description": "File sil-logo-blue.png"
+    },
+    {
+      "name": "kb.css",
+      "description": "File kb.css"
+    },
+    {
+      "name": "sil_cameroon_qwerty.js",
+      "description": "File sil_cameroon_qwerty.js"
+    },
+    {
+      "name": "globe.png",
+      "description": "File globe.png"
+    },
+    {
+      "name": "longpress-qwerty.png",
+      "description": "File longpress-qwerty.png"
+    },
+    {
+      "name": "modkeys-en-q.png",
+      "description": "File modkeys-en-q.png"
+    },
+    {
+      "name": "modkeys-fr-q.png",
+      "description": "File modkeys-fr-q.png"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "Cameroon QWERTY",
+      "id": "sil_cameroon_qwerty",
+      "version": "6.0.2",
+      "oskFont": "AndikaAfr-R.ttf",
+      "displayFont": "AndikaAfr-R.ttf",
+      "languages": [
+        {
+          "name": "Afade",
+          "id": "aal-Latn"
+        },
+        {
+          "name": "Aghem",
+          "id": "agq-Latn"
+        },
+        {
+          "name": "Ajumbu",
+          "id": "muc-Latn"
+        },
+        {
+          "name": "Akoose",
+          "id": "bss-Latn"
+        },
+        {
+          "name": "Akum",
+          "id": "aku-Latn"
+        },
+        {
+          "name": "Ambele",
+          "id": "ael-Latn"
+        },
+        {
+          "name": "Atong",
+          "id": "ato-Latn"
+        },
+        {
+          "name": "Awing",
+          "id": "azo-Latn"
+        },
+        {
+          "name": "Babanki",
+          "id": "bbk-Latn"
+        },
+        {
+          "name": "Bafanji",
+          "id": "bfj-Latn"
+        },
+        {
+          "name": "Bafaw-Balong",
+          "id": "bwt-Latn"
+        },
+        {
+          "name": "Bafia",
+          "id": "ksf-Latn"
+        },
+        {
+          "name": "Bafut",
+          "id": "bfd-Latn"
+        },
+        {
+          "name": "Baka",
+          "id": "bkc-Latn"
+        },
+        {
+          "name": "Bakaka",
+          "id": "bqz-Latn"
+        },
+        {
+          "name": "Bakoko",
+          "id": "bkh-Latn"
+        },
+        {
+          "name": "Bakole",
+          "id": "kme-Latn"
+        },
+        {
+          "name": "Baldemu",
+          "id": "bdn-Latn"
+        },
+        {
+          "name": "Balo",
+          "id": "bqo-Latn"
+        },
+        {
+          "name": "Bamali",
+          "id": "bbq-Latn"
+        },
+        {
+          "name": "Bambalang",
+          "id": "bmo-Latn"
+        },
+        {
+          "name": "Bambili-Bambui",
+          "id": "baw-Latn"
+        },
+        {
+          "name": "Bamenyam",
+          "id": "bce-Latn"
+        },
+        {
+          "name": "Bamukumbit",
+          "id": "bqt-Latn"
+        },
+        {
+          "name": "Bamun",
+          "id": "bax-Latn"
+        },
+        {
+          "name": "Bamunka",
+          "id": "bvm-Latn"
+        },
+        {
+          "name": "Bana",
+          "id": "bcw-Latn"
+        },
+        {
+          "name": "Bangandu",
+          "id": "bgf-Latn"
+        },
+        {
+          "name": "Bangolan",
+          "id": "bgj-Latn"
+        },
+        {
+          "name": "Bankon",
+          "id": "abb-Latn"
+        },
+        {
+          "name": "Barombi",
+          "id": "bbi-Latn"
+        },
+        {
+          "name": "Basaa",
+          "id": "bas-Latn"
+        },
+        {
+          "name": "Bassossi",
+          "id": "bsi-Latn"
+        },
+        {
+          "name": "Bata",
+          "id": "bta-Latn"
+        },
+        {
+          "name": "Batanga",
+          "id": "bnm-Latn"
+        },
+        {
+          "name": "Bati",
+          "id": "btc-Latn"
+        },
+        {
+          "name": "Beba",
+          "id": "bfp-Latn"
+        },
+        {
+          "name": "Bebele",
+          "id": "beb-Latn"
+        },
+        {
+          "name": "Bebil",
+          "id": "bxp-Latn"
+        },
+        {
+          "name": "Beezen",
+          "id": "bnz-Latn"
+        },
+        {
+          "name": "Befang",
+          "id": "bby-Latn"
+        },
+        {
+          "name": "Bekwel",
+          "id": "bkw-Latn"
+        },
+        {
+          "name": "Bikya",
+          "id": "byb-Latn"
+        },
+        {
+          "name": "Bishuo",
+          "id": "bwh-Latn"
+        },
+        {
+          "name": "Bitare",
+          "id": "brt-Latn"
+        },
+        {
+          "name": "Bokyi",
+          "id": "bky-Latn"
+        },
+        {
+          "name": "Bomwali",
+          "id": "bmw-Latn"
+        },
+        {
+          "name": "Bonkeng",
+          "id": "bvg-Latn"
+        },
+        {
+          "name": "Bubia",
+          "id": "bbx-Latn"
+        },
+        {
+          "name": "Buduma",
+          "id": "bdm-Latn"
+        },
+        {
+          "name": "Bulu",
+          "id": "bum-Latn"
+        },
+        {
+          "name": "Bum",
+          "id": "bmv-Latn"
+        },
+        {
+          "name": "Bung",
+          "id": "bqd-Latn"
+        },
+        {
+          "name": "Busam",
+          "id": "bxs-Latn"
+        },
+        {
+          "name": "Busuu",
+          "id": "bju-Latn"
+        },
+        {
+          "name": "Buwal",
+          "id": "bhs-Latn"
+        },
+        {
+          "name": "Byep",
+          "id": "mkk-Latn"
+        },
+        {
+          "name": "Caka",
+          "id": "ckx-Latn"
+        },
+        {
+          "name": "Chungmboko",
+          "id": "cug-Latn"
+        },
+        {
+          "name": "Cuvok",
+          "id": "cuv-Latn"
+        },
+        {
+          "name": "Daba",
+          "id": "dbq-Latn"
+        },
+        {
+          "name": "Dama",
+          "id": "dmm-Latn"
+        },
+        {
+          "name": "Dek",
+          "id": "dek-Latn"
+        },
+        {
+          "name": "Denya",
+          "id": "anv-Latn"
+        },
+        {
+          "name": "Dii",
+          "id": "dur-Latn"
+        },
+        {
+          "name": "Dimbong",
+          "id": "dii-Latn"
+        },
+        {
+          "name": "Doyayo",
+          "id": "dow-Latn"
+        },
+        {
+          "name": "Duala",
+          "id": "dua-Latn"
+        },
+        {
+          "name": "Dugun",
+          "id": "ndu-Latn"
+        },
+        {
+          "name": "Dugwor",
+          "id": "dme-Latn"
+        },
+        {
+          "name": "Duli-Gey",
+          "id": "duz-Latn"
+        },
+        {
+          "name": "Duupa",
+          "id": "dae-Latn"
+        },
+        {
+          "name": "Ejagham",
+          "id": "etu-Latn"
+        },
+        {
+          "name": "Elip",
+          "id": "ekm-Latn"
+        },
+        {
+          "name": "Eman",
+          "id": "emn-Latn"
+        },
+        {
+          "name": "Esimbi",
+          "id": "ags-Latn"
+        },
+        {
+          "name": "Eton",
+          "id": "eto-Latn"
+        },
+        {
+          "name": "Evant",
+          "id": "bzz-Latn"
+        },
+        {
+          "name": "Ewondo",
+          "id": "ewo-Latn"
+        },
+        {
+          "name": "Fali, North",
+          "id": "fll-Latn"
+        },
+        {
+          "name": "Fali, South",
+          "id": "fal-Latn"
+        },
+        {
+          "name": "Fang",
+          "id": "fak-Latn"
+        },
+        {
+          "name": "Fang",
+          "id": "fan-Latn"
+        },
+        {
+          "name": "Fe\u2019fe\u2019",
+          "id": "fmp-Latn"
+        },
+        {
+          "name": "Fulfulde, Adamawa",
+          "id": "fub-Latn"
+        },
+        {
+          "name": "Fulfulde, Mbororo",
+          "id": "fuv-Latn"
+        },
+        {
+          "name": "Gavar",
+          "id": "gou-Latn"
+        },
+        {
+          "name": "Gbaya, Northwest",
+          "id": "gya-Latn"
+        },
+        {
+          "name": "Gbaya-Mbodomo",
+          "id": "gmm-Latn"
+        },
+        {
+          "name": "Ghom\u00E1l\u00E1\u2019",
+          "id": "bbj-Latn"
+        },
+        {
+          "name": "Gidar",
+          "id": "gid-Latn"
+        },
+        {
+          "name": "Gimme",
+          "id": "kmp-Latn"
+        },
+        {
+          "name": "Gimnime",
+          "id": "gmn-Latn"
+        },
+        {
+          "name": "Giziga",
+          "id": "giz-Latn"
+        },
+        {
+          "name": "Giziga, North",
+          "id": "gis-Latn"
+        },
+        {
+          "name": "Glavda",
+          "id": "glw-Latn"
+        },
+        {
+          "name": "Gude",
+          "id": "gde-Latn"
+        },
+        {
+          "name": "Gvoko",
+          "id": "ngs-Latn"
+        },
+        {
+          "name": "Gyele",
+          "id": "gyi-Latn"
+        },
+        {
+          "name": "Hdi",
+          "id": "xed-Latn"
+        },
+        {
+          "name": "Hijuk",
+          "id": "hij-Latn"
+        },
+        {
+          "name": "Hya",
+          "id": "hya-Latn"
+        },
+        {
+          "name": "Iceve-Maci",
+          "id": "bec-Latn"
+        },
+        {
+          "name": "Ipulo",
+          "id": "ass-Latn"
+        },
+        {
+          "name": "Isu",
+          "id": "isu-Latn"
+        },
+        {
+          "name": "Isu",
+          "id": "szv-Latn"
+        },
+        {
+          "name": "Iyive",
+          "id": "uiv-Latn"
+        },
+        {
+          "name": "Jimi",
+          "id": "jim-Latn"
+        },
+        {
+          "name": "Jina",
+          "id": "jia-Latn"
+        },
+        {
+          "name": "Jukun Takum",
+          "id": "jbu-Latn"
+        },
+        {
+          "name": "Kako",
+          "id": "kkj-Latn"
+        },
+        {
+          "name": "Kamkam",
+          "id": "bgu-Latn"
+        },
+        {
+          "name": "Kanuri, Central",
+          "id": "knc-Latn"
+        },
+        {
+          "name": "Karang",
+          "id": "kzr-Latn"
+        },
+        {
+          "name": "Kare",
+          "id": "kbn-Latn"
+        },
+        {
+          "name": "Kasabe",
+          "id": "luw-Latn"
+        },
+        {
+          "name": "Kemedzung",
+          "id": "dmo-Latn"
+        },
+        {
+          "name": "Kendem",
+          "id": "kvm-Latn"
+        },
+        {
+          "name": "Kenswei Nsei",
+          "id": "ndb-Latn"
+        },
+        {
+          "name": "Kenyang",
+          "id": "ken-Latn"
+        },
+        {
+          "name": "Kera",
+          "id": "ker-Latn"
+        },
+        {
+          "name": "Kol",
+          "id": "biw-Latn"
+        },
+        {
+          "name": "Kolbila",
+          "id": "klc-Latn"
+        },
+        {
+          "name": "Kom",
+          "id": "bkm-Latn"
+        },
+        {
+          "name": "Koma",
+          "id": "kmy-Latn"
+        },
+        {
+          "name": "Koonzime",
+          "id": "ozm-Latn"
+        },
+        {
+          "name": "Korop",
+          "id": "krp-Latn"
+        },
+        {
+          "name": "Koshin",
+          "id": "kid-Latn"
+        },
+        {
+          "name": "Kuk",
+          "id": "kfn-Latn"
+        },
+        {
+          "name": "Kung",
+          "id": "kfl-Latn"
+        },
+        {
+          "name": "Kuo",
+          "id": "xuo-Latn"
+        },
+        {
+          "name": "Kutep",
+          "id": "kub-Latn"
+        },
+        {
+          "name": "Kwa\u2019",
+          "id": "bko-Latn"
+        },
+        {
+          "name": "Kwaja",
+          "id": "kdz-Latn"
+        },
+        {
+          "name": "Kwakum",
+          "id": "kwu-Latn"
+        },
+        {
+          "name": "Kwanja",
+          "id": "knp-Latn"
+        },
+        {
+          "name": "Kwasio",
+          "id": "nmg-Latn"
+        },
+        {
+          "name": "La\u2019bi",
+          "id": "lbi-Latn"
+        },
+        {
+          "name": "Lagwan",
+          "id": "kot-Latn"
+        },
+        {
+          "name": "Laimbue",
+          "id": "lmx-Latn"
+        },
+        {
+          "name": "Lamnso\u2019",
+          "id": "lns-Latn"
+        },
+        {
+          "name": "Lefa",
+          "id": "lfa-Latn"
+        },
+        {
+          "name": "Leti",
+          "id": "leo-Latn"
+        },
+        {
+          "name": "Lidzonka",
+          "id": "add-Latn"
+        },
+        {
+          "name": "Limbum",
+          "id": "lmp-Latn"
+        },
+        {
+          "name": "Longto",
+          "id": "wok-Latn"
+        },
+        {
+          "name": "Mada",
+          "id": "mxu-Latn"
+        },
+        {
+          "name": "Mafa",
+          "id": "maf-Latn"
+        },
+        {
+          "name": "Majera",
+          "id": "xmj-Latn"
+        },
+        {
+          "name": "Makaa",
+          "id": "mcp-Latn"
+        },
+        {
+          "name": "Malgbe",
+          "id": "mxf-Latn"
+        },
+        {
+          "name": "Malimba",
+          "id": "mzd-Latn"
+        },
+        {
+          "name": "Mambai",
+          "id": "mcs-Latn"
+        },
+        {
+          "name": "Mambila, Cameroon",
+          "id": "mcu-Latn"
+        },
+        {
+          "name": "Manta",
+          "id": "myg-Latn"
+        },
+        {
+          "name": "Masana",
+          "id": "mcn-Latn"
+        },
+        {
+          "name": "Maslam",
+          "id": "msv-Latn"
+        },
+        {
+          "name": "Matal",
+          "id": "mfh-Latn"
+        },
+        {
+          "name": "Mazagway",
+          "id": "dkx-Latn"
+        },
+        {
+          "name": "Mbembe, Tigon",
+          "id": "nza-Latn"
+        },
+        {
+          "name": "Mbo",
+          "id": "mbo-Latn"
+        },
+        {
+          "name": "Mbo\u2019",
+          "id": "mtk-Latn"
+        },
+        {
+          "name": "Mbonga",
+          "id": "xmb-Latn"
+        },
+        {
+          "name": "Mbudum",
+          "id": "xmd-Latn"
+        },
+        {
+          "name": "Mbuko",
+          "id": "mqb-Latn"
+        },
+        {
+          "name": "Mbule",
+          "id": "mlb-Latn"
+        },
+        {
+          "name": "Mbum",
+          "id": "mdd-Latn"
+        },
+        {
+          "name": "Medumba",
+          "id": "byv-Latn"
+        },
+        {
+          "name": "Mefele",
+          "id": "mfj-Latn"
+        },
+        {
+          "name": "Mendankwe-Nkwen",
+          "id": "mfd-Latn"
+        },
+        {
+          "name": "Mengaka",
+          "id": "xmg-Latn"
+        },
+        {
+          "name": "Mengisa",
+          "id": "mct-Latn"
+        },
+        {
+          "name": "Menka",
+          "id": "mea-Latn"
+        },
+        {
+          "name": "Merey",
+          "id": "meq-Latn"
+        },
+        {
+          "name": "Mesaka",
+          "id": "iyo-Latn"
+        },
+        {
+          "name": "Meta\u2019",
+          "id": "mgo-Latn"
+        },
+        {
+          "name": "Mfumte",
+          "id": "nfu-Latn"
+        },
+        {
+          "name": "Mina",
+          "id": "hna-Latn"
+        },
+        {
+          "name": "Mmaala",
+          "id": "mmu-Latn"
+        },
+        {
+          "name": "Mmen",
+          "id": "bfm-Latn"
+        },
+        {
+          "name": "Mofu, North",
+          "id": "mfk-Latn"
+        },
+        {
+          "name": "Mofu-Gudur",
+          "id": "mif-Latn"
+        },
+        {
+          "name": "Mokpwe",
+          "id": "bri-Latn"
+        },
+        {
+          "name": "Moloko",
+          "id": "mlw-Latn"
+        },
+        {
+          "name": "Mom Jango",
+          "id": "ver-Latn"
+        },
+        {
+          "name": "Mono",
+          "id": "mru-Latn"
+        },
+        {
+          "name": "Mpade",
+          "id": "mpi-Latn"
+        },
+        {
+          "name": "Mpiemo",
+          "id": "mcx-Latn"
+        },
+        {
+          "name": "Mpumpong",
+          "id": "mgg-Latn"
+        },
+        {
+          "name": "Mser",
+          "id": "kqx-Latn"
+        },
+        {
+          "name": "Mundabli",
+          "id": "boe-Latn"
+        },
+        {
+          "name": "Mundang",
+          "id": "mua-Latn"
+        },
+        {
+          "name": "Mundani",
+          "id": "mnf-Latn"
+        },
+        {
+          "name": "Mungaka",
+          "id": "mhk-Latn"
+        },
+        {
+          "name": "Mungbam",
+          "id": "mij-Latn"
+        },
+        {
+          "name": "Musey",
+          "id": "mse-Latn"
+        },
+        {
+          "name": "Musgu",
+          "id": "mug-Latn"
+        },
+        {
+          "name": "Muyang",
+          "id": "muy-Latn"
+        },
+        {
+          "name": "Naami",
+          "id": "bzv-Latn"
+        },
+        {
+          "name": "Nagumi",
+          "id": "ngv-Latn"
+        },
+        {
+          "name": "Naki",
+          "id": "mff-Latn"
+        },
+        {
+          "name": "Ncane",
+          "id": "ncr-Latn"
+        },
+        {
+          "name": "Ndai",
+          "id": "gke-Latn"
+        },
+        {
+          "name": "Nda\u2019nda\u2019",
+          "id": "nnz-Latn"
+        },
+        {
+          "name": "Ndemli",
+          "id": "nml-Latn"
+        },
+        {
+          "name": "Ndoola",
+          "id": "ndr-Latn"
+        },
+        {
+          "name": "Ngamambo",
+          "id": "nbv-Latn"
+        },
+        {
+          "name": "Ngambay",
+          "id": "sba-Latn"
+        },
+        {
+          "name": "Ngemba",
+          "id": "nge-Latn"
+        },
+        {
+          "name": "Ngie",
+          "id": "ngj-Latn"
+        },
+        {
+          "name": "Ngiemboon",
+          "id": "nnh-Latn"
+        },
+        {
+          "name": "Ngomba",
+          "id": "jgo-Latn"
+        },
+        {
+          "name": "Ngombale",
+          "id": "nla-Latn"
+        },
+        {
+          "name": "Ngoshie",
+          "id": "nsh-Latn"
+        },
+        {
+          "name": "Ngwe",
+          "id": "nwe-Latn"
+        },
+        {
+          "name": "Ngwo",
+          "id": "ngn-Latn"
+        },
+        {
+          "name": "Nimbari",
+          "id": "nmr-Latn"
+        },
+        {
+          "name": "Njen",
+          "id": "njj-Latn"
+        },
+        {
+          "name": "Njyem",
+          "id": "njy-Latn"
+        },
+        {
+          "name": "Nkongho",
+          "id": "nkc-Latn"
+        },
+        {
+          "name": "Nomaande",
+          "id": "lem-Latn"
+        },
+        {
+          "name": "Noone",
+          "id": "nhu-Latn"
+        },
+        {
+          "name": "Nubaca",
+          "id": "baf-Latn"
+        },
+        {
+          "name": "Nugunu",
+          "id": "yas-Latn"
+        },
+        {
+          "name": "Nyokon",
+          "id": "nvo-Latn"
+        },
+        {
+          "name": "Nyong",
+          "id": "muo-Latn"
+        },
+        {
+          "name": "Nzakambay",
+          "id": "nzy-Latn"
+        },
+        {
+          "name": "Nzanyi",
+          "id": "nja-Latn"
+        },
+        {
+          "name": "Oblo",
+          "id": "obl-Latn"
+        },
+        {
+          "name": "Oku",
+          "id": "oku-Latn"
+        },
+        {
+          "name": "Oroko",
+          "id": "bdu-Latn"
+        },
+        {
+          "name": "Osatu",
+          "id": "ost-Latn"
+        },
+        {
+          "name": "Pam",
+          "id": "pmn-Latn"
+        },
+        {
+          "name": "Pana",
+          "id": "pnz-Latn"
+        },
+        {
+          "name": "Parkwa",
+          "id": "pbi-Latn"
+        },
+        {
+          "name": "Peere",
+          "id": "pfe-Latn"
+        },
+        {
+          "name": "P\u00E9v\u00E9",
+          "id": "lme-Latn"
+        },
+        {
+          "name": "Pidgin, Cameroon",
+          "id": "wes-Latn"
+        },
+        {
+          "name": "Pinyin",
+          "id": "pny-Latn"
+        },
+        {
+          "name": "Pol",
+          "id": "pmm-Latn"
+        },
+        {
+          "name": "Psikye",
+          "id": "kvj-Latn"
+        },
+        {
+          "name": "Samba Leko",
+          "id": "ndi-Latn"
+        },
+        {
+          "name": "Sari",
+          "id": "asj-Latn"
+        },
+        {
+          "name": "Sharwa",
+          "id": "swq-Latn"
+        },
+        {
+          "name": "Suga",
+          "id": "sgi-Latn"
+        },
+        {
+          "name": "Supapya",
+          "id": "bbw-Latn"
+        },
+        {
+          "name": "Swo",
+          "id": "sox-Latn"
+        },
+        {
+          "name": "Tibea",
+          "id": "ngy-Latn"
+        },
+        {
+          "name": "Tikar",
+          "id": "tik-Latn"
+        },
+        {
+          "name": "Tiv",
+          "id": "tiv-Latn"
+        },
+        {
+          "name": "To",
+          "id": "toz-Latn"
+        },
+        {
+          "name": "Tsuvan",
+          "id": "tsh-Latn"
+        },
+        {
+          "name": "Tuki",
+          "id": "bag-Latn"
+        },
+        {
+          "name": "Tunen",
+          "id": "tvu-Latn"
+        },
+        {
+          "name": "Tuotomb",
+          "id": "ttf-Latn"
+        },
+        {
+          "name": "Tupuri",
+          "id": "tui-Latn"
+        },
+        {
+          "name": "Twendi",
+          "id": "twn-Latn"
+        },
+        {
+          "name": "Usaghade",
+          "id": "usk-Latn"
+        },
+        {
+          "name": "Vame",
+          "id": "mlr-Latn"
+        },
+        {
+          "name": "Vemgo-Mabas",
+          "id": "vem-Latn"
+        },
+        {
+          "name": "Vengo",
+          "id": "bav-Latn"
+        },
+        {
+          "name": "Vute",
+          "id": "vut-Latn"
+        },
+        {
+          "name": "Wandala",
+          "id": "mfi-Latn"
+        },
+        {
+          "name": "Wawa",
+          "id": "www-Latn"
+        },
+        {
+          "name": "Weh",
+          "id": "weh-Latn"
+        },
+        {
+          "name": "Wumboko",
+          "id": "bqm-Latn"
+        },
+        {
+          "name": "Wushi",
+          "id": "bse-Latn"
+        },
+        {
+          "name": "Wuzlam",
+          "id": "udl-Latn"
+        },
+        {
+          "name": "Yamba",
+          "id": "yam-Latn"
+        },
+        {
+          "name": "Yambeta",
+          "id": "yat-Latn"
+        },
+        {
+          "name": "Yangben",
+          "id": "yav-Latn"
+        },
+        {
+          "name": "Yasa",
+          "id": "yko-Latn"
+        },
+        {
+          "name": "Yemba",
+          "id": "ybb-Latn"
+        },
+        {
+          "name": "Yeni",
+          "id": "yei-Latn"
+        },
+        {
+          "name": "Yukuben",
+          "id": "ybl-Latn"
+        },
+        {
+          "name": "Zhoa",
+          "id": "zhw-Latn"
+        },
+        {
+          "name": "Zizilivakan",
+          "id": "ziz-Latn"
+        },
+        {
+          "name": "Zulgo-Gemzek",
+          "id": "gnd-Latn"
+        },
+        {
+          "name": "Zumaya",
+          "id": "zuy-Latn"
+        }
+      ]
+    }
+  ]
+}

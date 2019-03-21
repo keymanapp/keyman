@@ -133,9 +133,6 @@
         <DCCReference Include="..\..\global\delphi\general\compile.pas"/>
         <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="..\..\global\delphi\general\keyman32_int.pas"/>
-        <DCCReference Include="child\UfrmTestKeyboard.pas">
-            <Form>frmTestKeyboard</Form>
-        </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\int_kmdebug.pas"/>
         <DCCReference Include="debug\UfrmKeyTest.pas">
             <Form>frmKeyTest</Form>

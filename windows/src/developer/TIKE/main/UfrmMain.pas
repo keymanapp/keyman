@@ -384,7 +384,6 @@ type
     procedure RefreshOptions;
 
     function OpenEditor(FFileName: string; frmClass: TfrmTikeEditorClass): TfrmTikeEditor;
-    function OpenTestWindow(FFileName: string): TfrmTikeChild;
     function OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
 
     procedure HelpTopic(s: string); overload;
@@ -437,7 +436,7 @@ uses
   UfrmOSKEditor,
   UfrmSelectSystemKeyboard,
   UfrmStartup, UfrmOptions,
-  UfrmTestKeyboard, UfrmKeyTest, UfrmKeymanWizard,
+  UfrmKeyTest, UfrmKeymanWizard,
   UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.System.Project.ProjectFileType,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
   UfrmHelp, dmActionsTextEditor, UfrmDebugStatus,
@@ -975,7 +974,7 @@ begin
       finally
         EndDockLoading;
       end;
-    end;
+    end;
   finally
     Free;
   end;
@@ -1072,29 +1071,6 @@ begin
   HelpTopic(Sender.HelpTopic);
 end;
 
-function TfrmKeymanDeveloper.OpenTestWindow(FFileName: string): TfrmTikeChild;
-var
-  i: Integer;
-begin
-  for i := 0 to FChildWindows.Count - 1 do
-    if FChildWindows[i] is TfrmTestKeyboard then
-      with FChildWindows[i] as TfrmTestKeyboard do
-        if KeyboardName = FFileName then
-        begin
-          Result := Self.ChildWindows[i];
-          ShowChild(Result);
-          Reload;
-          Exit;
-        end;
-
-  Result := TfrmTestKeyboard.Create(Self);
-  with Result as TfrmTestKeyboard do
-  begin
-    KeyboardName := FFileName;
-    Testing := True;
-  end;
-end;
-
 procedure TfrmKeymanDeveloper.ActivateActiveChild;
 begin
   if Assigned(ActiveChild) then
@@ -1138,8 +1114,7 @@ begin
             if not ActiveEditor.Modified and ActiveEditor.Untitled then
               ActiveEditor.Free;
 
-        if ext = '.kmx' then      Result := OpenTestWindow(FFileName)
-        else if ext = '.kmn' then Result := OpenKMNEditor(FFileName)
+        if ext = '.kmn' then Result := OpenKMNEditor(FFileName)
         else if ext = '.kps' then Result := OpenKPSEditor(FFileName)
         else if ext = '.kvk' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp' then Result := OpenEditor(FFileName, TfrmBitmapEditor)

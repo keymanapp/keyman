@@ -51,6 +51,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -111,6 +113,7 @@ public final class KMManager {
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";
   public static final String KMKey_Font = "font";
+  public static final String KMKey_DisplayFont = "displayFont";
   public static final String KMKey_OskFont = "oskFont";
   public static final String KMKey_FontSource = "source";
   public static final String KMKey_FontFiles = "files";
@@ -120,6 +123,9 @@ public final class KMManager {
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
+  public static final String KMKey_LexicalModelID = "lmId";
+  public static final String KMKey_LexicalModelName = "lmName";
+  public static final String KMKey_LexicalModelVersion = "lmVersion";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -132,6 +138,7 @@ public final class KMManager {
   public static final String KMDefault_LegacyAssetFonts = "fonts";
   public static final String KMDefault_UndefinedPackageID = "cloud";
   public static final String KMDefault_AssetPackages = "packages";
+  public static final String KMDefault_LexicalModelPackages = "models";
 
   // Default Keyboard Info
   public static final String KMDefault_KeyboardID = "sil_euro_latin";
@@ -156,6 +163,10 @@ public final class KMManager {
 
   protected static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
+  }
+
+  protected static String getLexicalModelsDir() {
+    return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
   protected static String getCloudDir() {
@@ -190,9 +201,7 @@ public final class KMManager {
       Log.e(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
-    // Initializes the PackageProcessor with the base resource directory, which is the parent directory
-    // for the final location corresponding to KMDefault_AssetPackages.
-    PackageProcessor.initialize(new File(getResourceRoot()));
+    JSONUtils.initialize(new File(getPackagesDir()));
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -360,9 +369,16 @@ public final class KMManager {
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
+      // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
       if (!packagesDir.exists()) {
         packagesDir.mkdir();
+      }
+
+      // Lexical models directory
+      File lexicalModelsDir = new File(getLexicalModelsDir());
+      if (!lexicalModelsDir.exists()) {
+        lexicalModelsDir.mkdir();
       }
 
       // Copy default cloud keyboard
@@ -856,7 +872,7 @@ public final class KMManager {
         }
       }
     } else {
-      path = getPackagesDir() + packageID + File.separator + "kmp.json";
+      path = getPackagesDir() + packageID + File.separator + PackageProcessor.PP_DEFAULT_METADATA;
 
       try {
         File kmpJSONFile = new File(path);

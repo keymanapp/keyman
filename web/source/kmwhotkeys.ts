@@ -67,12 +67,12 @@ namespace com.keyman {
      * @param       {Event}       e       event
      * Description  Passes control to handlers according to the hotkey pressed
      */
-    _Process: (e: KeyboardEvent) => boolean = function(e: KeyboardEvent) {
+    _Process: (e: KeyboardEvent) => boolean = function(this: HotkeyManager, e: KeyboardEvent) {
       if(!e) {
         e = window.event as KeyboardEvent;
       }
 
-      var _Lcode = this.keyman.domManager.nonTouchHandlers._GetEventKeyCode(e);
+      var _Lcode = this.keyman.textProcessor._GetEventKeyCode(e);
       if(_Lcode == null) {
         return false;
       }
@@ -85,9 +85,11 @@ namespace com.keyman {
 
       for(var i=0; i<this.hotkeys.length; i++) {  
         if(this.hotkeys[i].matches(_Lcode, _Lmodifiers)) { 
-          this.hotkeys[i].Handler(); 
+          this.hotkeys[i].handler(); 
           e.returnValue = false; 
-          if(e && e.preventDefault) e.preventDefault(); 
+          if(e && e.preventDefault) {
+            e.preventDefault(); 
+          }
           e.cancelBubble = true; 
           return false; 
         }

@@ -69,7 +69,13 @@ namespace com.keyman {
   }
 
   export class KeyboardTag {
-    stores: {[text: string]: ComplexKeyboardStore} = {};
+    stores: {[text: string]: text.ComplexKeyboardStore} = {};
+  }
+
+  export interface KeyboardChangeData {
+    ['internalName']: string;
+    ['languageCode']: string; 
+    ['indirect']: boolean;
   }
 
   export class KeyboardManager {
@@ -111,9 +117,11 @@ namespace com.keyman {
       return this.activeKeyboard ? this.activeKeyboard['_kmw'] : null;
     }
 
-    getActiveLanguage(): string {
+    getActiveLanguage(fullName?: boolean): string {
       if(this.activeStub == null) {
         return '';
+      } else if(fullName) {
+        return this.activeStub['KL'];
       } else {
         return this.activeStub['KLC'];
       }
@@ -227,7 +235,7 @@ namespace com.keyman {
     /**
      *  Create or update a keyboard meta-data 'stub' during keyboard registration
      * 
-     *  Cross-reference with https://help.keyman.com/developer/engine/web/10.0/reference/core/addKeyboards.
+     *  Cross-reference with https://help.keyman.com/developer/engine/web/11.0/reference/core/addKeyboards.
      *  
      *  @param  {Object}  kp  (partial) keyboard meta-data object (`spec` object)
      *  @param  {Object}  lp  language object (`spec.languages` object)
@@ -444,7 +452,7 @@ namespace com.keyman {
             
             // Append a stylesheet for this keyboard for keyboard specific styles 
             // or if needed to specify an embedded font
-            osk.appendStyleSheet();
+            osk.vkbd.appendStyleSheet();
             
             // Re-initializate OSK before returning if required
             if(this.keymanweb.mustReloadKeyboard) {
@@ -493,7 +501,7 @@ namespace com.keyman {
             && ((this.keyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---'))) {
             // Force OSK display for CJK keyboards (keyboards using a pick list)
             if(this.isCJK(this.keyboardStubs[Ln]) || util.device.touchable) {
-              osk._Enabled = 1;
+              osk._Enabled = true;
             }
 
             // Create a script to load from the server - when it finishes loading, it will register itself, 
@@ -817,7 +825,7 @@ namespace com.keyman {
         k0 = this.getKeyboardByID(k0);
       }
 
-      return !!(this.getKeyboardModifierBitmask(k0) & this.keymanweb.osk.modifierBitmasks.IS_CHIRAL);
+      return !!(this.getKeyboardModifierBitmask(k0) & text.Codes.modifierBitmasks.IS_CHIRAL);
     }
 
     /**
@@ -842,7 +850,7 @@ namespace com.keyman {
         return k['KMBM'];
       }
 
-      return this.keymanweb.osk.modifierBitmasks['NON_CHIRAL'];
+      return text.Codes.modifierBitmasks['NON_CHIRAL'];
     }
 
     getFont(k0?) {
@@ -853,6 +861,18 @@ namespace com.keyman {
       }
       
       return null;
+    }
+
+    layoutIsDesktopBased(k0?) {
+      let keyman = com.keyman.singleton;
+      var k = k0 || this.activeKeyboard;
+
+      if(k && k['KVKL']) {
+        // A custom mobile layout is defined... but are we using it?
+        return keyman.util.device.formFactor == 'desktop';
+      } else {
+        return true;
+      }
     }
 
     /**
@@ -1485,10 +1505,12 @@ namespace com.keyman {
      * @return      {boolean}   
      */       
     doKeyboardChange(_internalName: string, _languageCode: string, _indirect?:boolean): boolean {                      
-      var p={};
-      p['internalName']=_internalName;
-      p['languageCode']=_languageCode; 
-      p['indirect']=(arguments.length > 2 ? _indirect : false);
+      var p: KeyboardChangeData = {
+        'internalName': _internalName,
+        'languageCode': _languageCode,
+        'indirect': (arguments.length > 2 ? _indirect : false)
+      }
+
       return this.keymanweb.util.callEvent('kmw.keyboardchange', p);
     }
 

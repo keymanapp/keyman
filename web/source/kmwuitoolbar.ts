@@ -1,6 +1,6 @@
 /***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
+   KeymanWeb 11.0
+   Copyright 2019 SIL International
 ***/
 
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
@@ -337,7 +337,7 @@ if(!window['keyman']['ui']['name']) {
           if(Keyboards[j]['RegionCode'] != i) continue;              // Not this region
 
           // Get JUST the language code for this section.  BCP-47 codes can include more!
-          var bcpSubtags: string[] = keymanweb['util'].getLanguageCodes(Keyboards[j]['LanguageCode']);
+          var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
           if(bcpSubtags[0] == languageCode) continue; // Same language as previous keyboard
           languageCode = bcpSubtags[0];
 
@@ -351,7 +351,7 @@ if(!window['keyman']['ui']['name']) {
         {           
           if(Keyboards[j]['RegionCode'] != i) continue;      // Not this region
 
-          var bcpSubtags: string[] = keymanweb['util'].getLanguageCodes(Keyboards[j]['LanguageCode']);
+          var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
           if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
             var x = ui.languages[languageCode].keyboards;
 

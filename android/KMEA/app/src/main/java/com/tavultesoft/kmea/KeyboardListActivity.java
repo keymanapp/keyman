@@ -14,19 +14,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.util.MapCompat;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.app.DialogFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -97,11 +96,25 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           HashMap<String, String> kbInfo = LanguageListActivity.getKeyboardInfo(langIndex, position);
-          final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
+          final String pkgID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
           final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
           final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
           String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
           String langName = kbInfo.get(KMManager.KMKey_LanguageName);
+          String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
+          String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, kFont);
+          String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
+
+          if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+            // keyboard already exists in packages/ so just add the language association
+            KeyboardPickerActivity.addKeyboard(context, kbInfo);
+            KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+            Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+            // Setting result to 1 so calling activity will finish too
+            setResult(1);
+            ((AppCompatActivity) context).finish();
+            return;
+          }
 
           Bundle args = new Bundle();
           args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
@@ -109,7 +122,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
           args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
           args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
           args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-          args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+          args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);
@@ -161,16 +174,11 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
       String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
       String kFont = keyboardInfo.get(KMManager.KMKey_Font);
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (KMManager.InAppKeyboard != null)
-        KMManager.InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-      if (KMManager.SystemKeyboard != null)
-        KMManager.SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
-      finish();
-    } else {
-      Toast.makeText(this, "Keyboard download failed", Toast.LENGTH_SHORT).show();
+      KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
+      KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
     }
+    finish();
   }
 
   @Override

@@ -1,5 +1,44 @@
 # Keyman Desktop Version History
 
+## 12.0 alpha
+* Started work on Keyman Desktop 12.
+
+## 2019-02-25 11.0.1350.0 stable
+* 11.0 Stable release
+
+## 2019-02-25 11.0.1313.0 beta
+* Bug Fix: AltGr causes sticky Left Control when some Windows European layouts are installed. (#1621)
+
+## 2019-02-21 11.0.1312.0 beta
+* Bug Fix: Make sure backspace in Word (TSF) deletes both halves of surrogate pair for supplementary multilingual plane scripts (#1603)
+
+## 2019-02-20 11.0.1311.0 beta
+* Minor tweaks to Kannada localization (#1598)
+
+## 2019-02-19 11.0.1310.0 beta
+* No changes to Keyman Desktop
+
+## 2019-02-15 11.0.1309.0 beta
+* Bug Fix: Upgrading from 9.0 to 11.0 did not preserve keyboards and settings (#1548)
+
+## 2019-02-14 11.0.1308.0 beta
+* No changes to Keyman Desktop
+
+## 2019-02-01 11.0.1307.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-18 11.0.1306.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-17 11.0.1305.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-15 11.0.1304.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-15 11.0.1303.0 beta
+* No changes to Keyman Desktop
+
 ## 2019-01-09 11.0.1302.0 beta
 * Bug Fix: Switching between keyboards in same language would sometimes fail (#1505)
 * Bug Fix: Caps Lock control headers are now handled correctly by Keyman (#1506)

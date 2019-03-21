@@ -523,6 +523,13 @@ procedure TframeCEFHost.Handle_CEF_LOADEND(var message: TMessage);
 begin
   if csDestroying in ComponentState then
     Exit;
+
+  // The focus needs to be set again for key events to
+  // be passed to the CEF window, even if it appears
+  // to already be focused to the expected window.
+  if IsChild(Handle, GetFocus) then
+    SetFocus;
+
   if Assigned(FOnLoadEnd) then
     FOnLoadEnd(Self);
 end;

@@ -6,9 +6,7 @@
   "files": [
 		"kmwbase.ts",
 		"keymanweb.ts",
-		"kmwosk.ts", 
 		"kmwembedded.ts",
-		"kmwlayout.ts",
 		"kmwinit.ts",
 		"kmwapi.ts"
   ]

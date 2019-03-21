@@ -7,7 +7,6 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -22,10 +21,10 @@ import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.util.MapCompat;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,7 +35,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,6 +67,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   private static boolean updateFailed = false;
   private static Calendar lastUpdateCheck = null;
   private static int selectedIndex = 0;
+  private static final String TAG = "KeyboardPickerActivity";
 
   protected static int selectedIndex() {
     return selectedIndex;
@@ -173,7 +173,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
+        // Check that available keyboard information can be obtained via:
+        // 1. connection to cloud catalog
+        // 2. cached file
+        // 3. local kmp.json files in packages/
+        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
+          KeyboardPickerActivity.hasKeyboardFromPackage()){
           dismissOnSelect = false;
           Intent i = new Intent(context, LanguageListActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -299,6 +304,17 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return pos;
   }
 
+  private static boolean hasKeyboardFromPackage() {
+    for(HashMap<String, String> kbInfo: keyboardsList) {
+      String packageID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      if (!packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private static boolean saveKeyboardsList(Context context) {
     boolean result;
     try {
@@ -309,7 +325,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e("KeyboardPickerActivity", "Failed to save keyboards list. Error: " + e);
+      Log.e(TAG, "Failed to save keyboards list. Error: " + e);
       result = false;
     }
 
@@ -342,12 +358,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    if (KMManager.InAppKeyboard != null) {
-      KMManager.InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-    }
-    if (KMManager.SystemKeyboard != null) {
-      KMManager.SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-    }
+    KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -429,7 +440,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e("KeyboardPickerActivity", "Failed to read keyboards list. Error: " + e);
+        Log.e(TAG, "Failed to read keyboards list. Error: " + e);
         list = null;
       }
     }
@@ -608,7 +619,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
               }
             }
           } catch (Exception e) {
-            Log.e("KeyboardPickerActivity", "Failed to compare keyboard version. Error: " + e);
+            Log.e(TAG, "Failed to compare keyboard version. Error: " + e);
             keyboardVersions = null;
             ret = -1;
           }
