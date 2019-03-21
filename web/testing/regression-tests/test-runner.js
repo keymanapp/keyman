@@ -46,7 +46,6 @@ var testRunner = {
    * @param {string} locator  a string in the form of shortname/id, e.g. k/kayan, sil/sil_ipa
    * @returns {Promise} A promise fulfilled when the keyboard and the tests file are ready
    */
-
   loadScript: function(path) {
     console.log(`Loading script ${path}`);
     return new Promise(function(resolve, reject) {
@@ -90,6 +89,10 @@ var testRunner = {
     });
   },
 
+  /**
+   * Load a tests file and a keyboard from the keyboards repository
+   * @param {string} locator 
+   */
   loadTests: function(locator) {
     console.log('Loading tests + keyboard for '+locator);
     return new Promise(function(resolve, reject) {
@@ -124,8 +127,8 @@ var testRunner = {
 
   /**
    * Post test results to /save-result
-   * @param {string} locator 
-   * @param {string|object} results
+   * @param {string} locator   shortname/id, e.g. k/kayan
+   * @param {string|object} results   Array or JSON-coded Array string of results
    */
   saveTestResults: function(locator, results) {
     return new Promise(function(resolve, reject) {
@@ -136,7 +139,7 @@ var testRunner = {
       json.engineVersion = keyman.build.toString();
       json.compilerVersion = eval('new Keyboard_'+json.id+'().KVER');
 
-      // Post results to be saved to disk by index.js
+      // Post results to be saved to disk by the back end (test-host.js)
       let http = new XMLHttpRequest();
       http.onreadystatechange = function() {
         if(http.readyState === XMLHttpRequest.DONE) {
@@ -155,8 +158,8 @@ var testRunner = {
 
   /**
    * Validates and parses a locator string (shortname/id, e.g. k/kayan) into an object
-   * @param {string} locator 
-   * @returns {object}
+   * @param {string} locator   "shortname/id", e.g. "k/kayan"
+   * @returns {object}  object with `shortname` and `id` properties
    */
   parseLocator: function(locator) {
     let m = locator.match(/^([a-z0-9_]+)\/([a-z0-9_]+)$/);
@@ -175,7 +178,7 @@ var testRunner = {
 
   /**
    * Removes a keyboard and associated tests from memory
-   * @param {string} locator   (shortname/id, e.g. k/kayan)
+   * @param {string} locator   shortname/id, e.g. k/kayan
    */
   unregister: function(locator) {
     let {shortname, id} = this.parseLocator(locator);
@@ -236,6 +239,7 @@ var testRunner = {
       //console.log('Running test '+id+':'+index);
       receiver.value = test.context || '';
       //TODO: reset deadkey state
+      keyman.interface.resetContext();
       var e = new com.keyman.KeyEvent();
       e.Ltarg = receiver;
       e.Lcode = test.key;
@@ -246,7 +250,7 @@ var testRunner = {
       e.LisVirtualKey = true;
       e.vkCode = test.key;
       try {
-        keyman['interface'].processKeystroke(keyman.util.physicalDevice, receiver, e);
+        keyman.interface.processKeystroke(keyman.util.physicalDevice, receiver, e);
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
         console.error(err);
