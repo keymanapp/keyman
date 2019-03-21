@@ -1,5 +1,5 @@
 namespace com.keyman.osk {
-  class ActiveRow {
+  class ActiveRow implements LayoutRow {
     // Identify key labels (e.g. *Shift*) that require the special OSK font
     static readonly SPECIAL_LABEL=/\*\w+\*/;
 
@@ -10,8 +10,16 @@ namespace com.keyman.osk {
       sp: '0',
       pad: '15'
     };
+
+    id: string;
+    key: LayoutKey[];
+    totalWidth: number;
+
+    private constructor() {
+
+    }
     
-    constructor(row: LayoutRow, totalWidth: number) {
+    static polyfill(row: LayoutRow, totalWidth: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
@@ -46,39 +54,56 @@ namespace com.keyman.osk {
       // All key widths and paddings are rounded for uniformity
       var keyPercent: number, padPercent: number, totalPercent=0;
       for(let j=0; j<keys.length-1; j++) {
-        keyPercent=Math.round(parseInt(keys[j]['width'],10)*objectWidth/totalWidth);
+        keyPercent=parseInt(keys[j]['width'],10)/totalWidth;
         keys[j]['widthpc']=keyPercent;
-        padPercent=Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
+        padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
         totalPercent += padPercent+keyPercent;
       }
 
       // Allow for right OSK margin (15 layout units)
-      totalPercent += Math.round(15*objectWidth/totalWidth);
+      totalPercent += 15/totalWidth;
 
       // If a single key, and padding is negative, add padding to right align the key
       if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
-        keyPercent=Math.round(parseInt(keys[0]['width'],10)*objectWidth/totalWidth);
+        keyPercent=parseInt(keys[0]['width'],10)/totalWidth;
         keys[0]['widthpc']=keyPercent;
         totalPercent += keyPercent;
-        keys[0]['padpc']=(objectWidth-totalPercent);
+        keys[0]['padpc']=1-totalPercent;
       } else if(keys.length > 0) {
         let j=keys.length-1;
-        padPercent=Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
+        padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
         totalPercent += padPercent;
-        keys[j]['widthpc']=(objectWidth-totalPercent);
+        keys[j]['widthpc']=1-totalPercent;
       }
+
+      // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
+      let dummy = new ActiveRow();
+      for(let key in dummy) {
+        // for(let id in data) {
+        //   if(!e.hasOwnProperty(id)) {
+        //     (<any>e)[id] = (<any>data)[id];
+        //   }
+        // }
+        if(!row.hasOwnProperty(key)) {
+          row[key] = dummy[key];
+        }
+      }
+
+      (row as ActiveRow).totalWidth = totalWidth;
     }
   }
 
-  class ActiveLayer {
-    rows: ActiveRow[] = [];
-    spec: LayoutLayer;
+  export class ActiveLayer implements LayoutLayer {
+    row: ActiveRow[];
+    id: string;
 
-    constructor(layer: LayoutLayer, formFactor: string) {
-      this.spec = layer;
+    constructor() {
 
+    }
+
+    static polyfill(layer: LayoutLayer, formFactor: string) {
       layer.aligned=false;
 
       // Create a DIV for each row of the group
@@ -123,26 +148,39 @@ namespace com.keyman.osk {
         totalWidth += 15;
       }
 
-      for(let i=0; i<rows.length; i++) {
-        this.rows.push(new ActiveRow(rows[i], totalWidth));
+      for(let i=0; i<layer.row.length; i++) {
+        ActiveRow.polyfill(layer.row[i], totalWidth);
+      }
+
+      // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
+      let dummy = new ActiveLayer();
+      for(let key in dummy) {
+        // for(let id in data) {
+        //   if(!e.hasOwnProperty(id)) {
+        //     (<any>e)[id] = (<any>data)[id];
+        //   }
+        // }
+        if(!layer.hasOwnProperty(key)) {
+          layer[key] = dummy[key];
+        }
       }
     }
   }
 
-  export class ActiveLayout {
-    layers: ActiveLayer[] = [];
-    spec: LayoutFormFactor;
+  export class ActiveLayout implements LayoutFormFactor{
+    layer: ActiveLayer[];
+    font: string;
+
+    private constructor() {
+
+    }
 
     /**
-     * Create the OSK for a particular keyboard and device
-     *
-     * @param       {Object}              layout      OSK layout definition
-     * @param       {string}              formFactor  layout form factor
-     * @return      {Object}                          fully formatted OSK object
+     * 
+     * @param layout
+     * @param formFactor 
      */
-    constructor(layout: LayoutFormFactor, formFactor: string) {
-      this.spec = layout;
-
+    static polyfill(layout: LayoutFormFactor, formFactor: string) {
       if(layout == null) {
         throw new Error("Cannot build an ActiveLayout for a null specification.");
       }
@@ -178,7 +216,20 @@ namespace com.keyman.osk {
       // }
 
       for(n=0; n<layers.length; n++) {
-        this.layers.push(new ActiveLayer(layers[n], formFactor));
+        ActiveLayer.polyfill(layers[n], formFactor);
+      }
+
+      // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
+      let dummy = new ActiveLayout();
+      for(let key in dummy) {
+        // for(let id in data) {
+        //   if(!e.hasOwnProperty(id)) {
+        //     (<any>e)[id] = (<any>data)[id];
+        //   }
+        // }
+        if(!layout.hasOwnProperty(key)) {
+          layout[key] = dummy[key];
+        }
       }
     }
   }
