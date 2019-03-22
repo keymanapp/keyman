@@ -38,7 +38,7 @@ module.exports = {
       {shortname: null, id: null};
   },
 
-  runProcess: function(command, params, options) {
+  runProcess: function(command, params, options, ignoreExitCode) {
     return new Promise((resolve, reject) => {
       let spawn = require('child_process').spawn;
       let build = spawn(command, params, options);
@@ -55,7 +55,12 @@ module.exports = {
 
       build.on('exit', function(code) {
         if(code != 0) {
-          reject(`Process ${command} failed with code ${code}`);
+          if(ignoreExitCode) {
+            console.warn(`Process ${command} finished with code ${code}`);
+          } 
+          else {
+            reject(`Process ${command} failed with code ${code}`);
+          }
         }
         resolve();
       });

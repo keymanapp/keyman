@@ -218,10 +218,13 @@ cleanKeyboards.then(() => {
           console.log('Cannot generate tests at present without a .kmx for '+keyboard);
           return true;
         }
-        fs.mkdirSync(path.join(config.KEYBOARDS_ROOT, config.KEYBOARDS_GROUP, locator, 'tests'));
+        if(!fs.existsSync(testPath)) {
+          fs.mkdirSync(testPath);
+        }
 
+        console.log(`Building test cases for ${locator}`);
         // TODO: Find kmanalyze outside the repo. This forces Windows-dependence right now
-        return util.runProcess('../../../windows/bin/developer/kmanalyze.exe', [kmx, tests]);
+        return util.runProcess('../../../windows/bin/developer/kmanalyze.exe', [kmx, tests], {}, true);
       };
     
       let keyboards = program.keyboards.length 
