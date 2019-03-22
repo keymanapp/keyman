@@ -3,44 +3,80 @@ namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
   export abstract class Banner {
-    private _Visible: boolean;
-    private _Enabled: boolean;
-    private _Height: number; // pixels
-    protected div: HTMLDivElement;
+    private _visible: boolean;
+    private _enabled: boolean;
+    private _height: number; // pixels
+    private div: HTMLDivElement;
 
     public DEFAULT_HEIGHT: number = 40; // pixels
 
-    public get height():number {
-      return this._Height;
+    /**
+     * Function     height
+     * Scope        Public
+     * @returns     {number} height in pixels
+     * Description  Returns the height of the banner in pixels
+     */
+    public get height(): number {
+      return this._height;
     }
 
-    public set height(height:number) {
-      this._Height = height;
+    /**
+     * Function     height
+     * Scope        Public
+     * @param       {number} height   the height in pixels
+     * Description  Sets the height of the banner in pixels
+     */
+    public set height(height: number) {
+      this._height = height;
       if (this.div) {
         let ds = this.div.style;
         ds.height = (height > 0) ? height + 'px' : '0px';
       }
     }
 
-    public get visible():boolean {
-      return this._Visible;
+    /**
+     * Function     visible
+     * Scope        Public
+     * @returns     {boolean} true if the banner is visible
+     * Description  Returns whether the banner is visible or not
+     */
+    public get visible(): boolean {
+      return this._visible;
     }
 
+    /**
+     * Function     visible
+     * Scope        Public
+     * @param       {boolean} visible   true if the banner is to be visible
+     * Description  Sets the visiblity of the banner
+     */
     public set visible(visible: boolean) {
-      this._Visible = visible;
+      this._visible = visible;
 
       if (this.div) {
         let ds = this.div.style;
-        ds.display=(this._Visible) ? 'block': 'none';
+        ds.display=(this._visible) ? 'block': 'none';
       }
     }
 
-    public get enable():boolean {
-      return this._Enabled;
+    /**
+     * Function     enable
+     * Scope        Public
+     * @return      {boolean} true if the banner is enabled
+     * Description  Returns whether the banner is enabled or not
+     */
+    public get enable(): boolean {
+      return this._enabled;
     }
 
+    /**
+     * Function     visible
+     * Scope        Public
+     * @param       {boolean} enable     true if the banner is to be enabled
+     * Description  Sets whether the banner is enabled or not
+     */
     public set enable(enable: boolean) {
-      this._Enabled = enable;
+      this._enabled = enable;
     }
 
     public constructor(visible: boolean, enabled: boolean, height?: number) {
@@ -64,7 +100,13 @@ namespace com.keyman.osk {
       // TODO: add stylesheets
     }
 
-    public getDiv():HTMLElement {
+    /**
+     * Function     getDiv
+     * Scope        Public
+     * @returns     {HTMLElement} Base element of the banner
+     * Description  Returns the HTMLElelemnt of the banner
+     */
+    public getDiv(): HTMLElement {
       return this.div;
     }
   }
@@ -99,10 +141,8 @@ namespace com.keyman.osk {
       this.img.setAttribute('src', imagePath);
       let ds = this.img.style;
       ds.width = '100%';
-      ds.height = this.height + 'px';
-      if (this.div) {
-        this.div.appendChild(this.img);
-      }
+      ds.height = '100%';
+      this.getDiv().appendChild(this.img);
     }
 
     /**
@@ -116,14 +156,8 @@ namespace com.keyman.osk {
         this.img.setAttribute('src', imagePath);
       }
       if (imagePath.length > 0) {
-        this.height = this.DEFAULT_HEIGHT;
         this.visible = true;
         this.enable = true;
-
-        if (this.img) {
-          let ds = this.img.style;
-          ds.height = this.height + 'px';
-        }
       }
     }
   }
@@ -141,13 +175,14 @@ namespace com.keyman.osk {
       this.id = id;
       this.languageID = languageID;
       this.text = text;
-      this.width = width ? width : "50";
+      this.width = width ? width : '50';
       this.pad = pad;
     }
   }
 
   export class BannerSuggestion {
     spec: BannerSuggestionSpec;
+    attachedElement: HTMLElement;
 
     constructor(spec: BannerSuggestionSpec) {
       this.spec = spec;
@@ -208,24 +243,23 @@ namespace com.keyman.osk {
   }
 
   /**
-   * Function       SuggestionBanner
-   * Description    Display lexical model suggestions in the banner
+   * Function     SuggestionBanner
+   * Scope        Public
+   * Description  Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
-    public static SUGGESTION_LIMIT:number = 3;
+    public static SUGGESTION_LIMIT: number = 3;
     private suggestionList : BannerSuggestion[];
 
     constructor() {
       super(true, true);
-      let suggestionList:BannerSuggestion[] = new Array();
+      let suggestionList: BannerSuggestion[] = new Array();
       this.suggestionList = suggestionList;
-      if (this.div) {
-        for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-          let s = new BannerSuggestionSpec('suggestion' + i, 'en', '', '33', ' ');
-          let d = new BannerSuggestion(s);
-          this.suggestionList[i] = d;
-          this.div.appendChild(d.generateSuggestionText());
-        }
+      for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+        let s = new BannerSuggestionSpec('suggestion' + i, 'en', '', '33', ' ');
+        let d = new BannerSuggestion(s);
+        this.suggestionList[i] = d;
+        d.attachedElement = this.getDiv().appendChild(d.generateSuggestionText());
       }
     }
 
@@ -239,21 +273,30 @@ namespace com.keyman.osk {
       return s;
     };
 
+    /**
+     * Function invalidateSuggestions
+     * Scope        Public
+     * Description  Clears the suggestions in the suggestion banner
+     */
     public invalidateSuggestions: (this: SuggestionBanner) => boolean = function(this: SuggestionBanner) {
-      if (this.div) {
-        for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-          this.suggestionList[i].spec.text = '';
-          this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
-        }
-      }
+      this.suggestionList.forEach((suggestion) => {
+        suggestion.spec.text = '';
+        this.getDiv().replaceChild(suggestion.generateSuggestionText(), suggestion.attachedElement);
+      });
     }.bind(this);
 
-    public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean = function(this: SuggestionBanner, suggestions: Suggestion[]) {
-      for(var i=0; i<suggestions.length; i++) {
+    /**
+     * Function updateSuggestions
+     * Scope       Public
+     * @param {Suggestion[]}  suggestions   Array of suggestions from the lexical model.
+     * Description    Update the displayed suggestions in the SuggestionBanner
+     */
+    public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean =
+      function(this: SuggestionBanner, suggestions: Suggestion[]) {
+      this.suggestionList.forEach((suggestion, i) => {
         this.suggestionList[i].update(suggestions[i]);
-        this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
-      }
+        this.getDiv().replaceChild(suggestion.generateSuggestionText(), suggestion.attachedElement);
+      });
     }.bind(this);
   }
-
 }
