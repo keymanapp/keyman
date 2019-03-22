@@ -24,6 +24,29 @@ namespace com.keyman.text.prediction {
     path: string;
   }
 
+  class TranscriptionContext implements Context {
+    left: string;
+    right?: string;
+
+    startOfBuffer: boolean;
+    endOfBuffer: boolean;
+
+    constructor(mock: Mock, config: Configuration) {
+      this.left = mock.getTextBeforeCaret();
+      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodeUnits;
+      if(!this.startOfBuffer) {
+        // Our custom substring version will return the last n characters if param #1 is given -n.
+        this.left = this.left._kmwSubstr(-config.leftContextCodeUnits);
+      }
+
+      this.right = mock.getTextAfterCaret();
+      this.endOfBuffer = this.right._kmwLength() > config.rightContextCodeUnits;
+      if(!this.endOfBuffer) {
+        this.right = this.right._kmwSubstr(0, config.rightContextCodeUnits);
+      }
+    }
+  }
+
   /**
    * Corresponds to the 'invalidatesuggestions' ModelManager event.
    */
@@ -34,7 +57,7 @@ namespace com.keyman.text.prediction {
    */
   export type ReadySuggestionsHandler = (suggestions: Suggestion[]) => boolean;
 
-  export type ModelChangeEnum = 'loaded'|'unloaded'|'changed';
+  export type ModelChangeEnum = 'loaded'|'unloaded';
   /**
    * Corresponds to the 'modelchange' ModelManager event.
    */
@@ -43,7 +66,10 @@ namespace com.keyman.text.prediction {
   export class ModelManager {
     private lmEngine: LMLayer;
     private currentModel?: ModelSpec;
-    private currentPromise: Promise<Suggestion[]>;
+    private configuration?: Configuration;
+    private currentPromise?: Promise<Suggestion[]>;
+
+    private recentTranscriptions: Transcription[] = [];
 
     // Tracks registered models by ID.
     private registeredModels: {[id: string]: ModelSpec} = {};
@@ -52,6 +78,7 @@ namespace com.keyman.text.prediction {
     private languageModelMap: {[language:string]: ModelSpec} = {};
 
     private static EVENT_PREFIX: string = "kmw.mm.";
+    private static readonly TRANSCRIPTION_BUFFER: 10;
 
     init() {
       let keyman = com.keyman.singleton;
@@ -69,43 +96,51 @@ namespace com.keyman.text.prediction {
     private unloadModel() {
       this.lmEngine.unloadModel();
       delete this.currentModel;
+      delete this.configuration;
     }
 
-    private loadModel(model: ModelSpec) {
+    private loadModel(model: ModelSpec): Promise<void> {
       if(!model) {
         throw new Error("Null reference not allowed.");
       }
 
       let file = model.path;
-      this.lmEngine.loadModel(file);
-      this.currentModel = model;
+      let mm = this;
+
+      // We should wait until the model is successfully loaded before setting our state values.
+      return this.lmEngine.loadModel(file).then(function(config: Configuration) { 
+        mm.currentModel = model;
+        mm.configuration = config;
+      });
     }
 
     onKeyboardChange(kbdInfo: KeyboardChangeData) {
       let keyman = com.keyman.singleton;
+
       let lgCode = kbdInfo['languageCode'];
       let model = this.languageModelMap[lgCode];
+      var loadPromise: Promise<void>;
 
       if(this.currentModel !== model) {
-        let stateChange = 0; // Base value; will not remain the same 
-
         if(this.currentModel) {
           this.unloadModel();
-          stateChange += 2;
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
         }
 
         if(model) {
-          this.loadModel(model);
-          stateChange += 1;
+          loadPromise = this.loadModel(model);
         }
 
-        if(stateChange == 0) {
-          console.warn("Unexpected lack of model state change in ModelManager.onKeyboardChange!");
-          return;
+        // If we're loading a model, we need to defer until its completion before we report a change of state.
+        if(loadPromise) {
+          let mm = this;
+          loadPromise.then(function() {
+            keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+          }).catch(function(failReason: any) {
+            // Does this provide enough logging information?
+            console.error("Could not load model '" + model.id + "': " + failReason);
+          });
         }
-
-        let changeParam: ModelChangeEnum = stateChange == 1 ? 'loaded' : (stateChange == 2 ? 'unloaded' : 'changed');
-        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', changeParam);
       }
     }
 
@@ -150,12 +185,18 @@ namespace com.keyman.text.prediction {
       return keyman.util.addEventListener(ModelManager.EVENT_PREFIX + event, func);
     }
 
-    public predict(transform: Transform, context: Context) {
+    public predict(transcription: Transcription) {
       // If there's no active model, there can be no predictions.
-      if(!this.currentModel) {
+      // We'll also be missing important data needed to even properly REQUEST the predictions.
+      if(!this.currentModel || !this.configuration) {
         return;
       }
+      let context = new TranscriptionContext(transcription.preInput, this.configuration);
+      this.recordTranscription(transcription);
+      this.predict_internal(transcription.transform, context);
+    }
 
+    private predict_internal(transform: Transform, context: Context) {
       let keyman = com.keyman.singleton;
       var promise = this.currentPromise = this.lmEngine.predict(transform, context);
 
@@ -167,8 +208,17 @@ namespace com.keyman.text.prediction {
       promise.then(function(suggestions: Suggestion[]) {
         if(promise == mm.currentPromise) {
           keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", suggestions);
+          mm.currentPromise = null;
         }
       })
+    }
+
+    private recordTranscription(transcription: Transcription) {
+      this.recentTranscriptions.push(transcription);
+
+      if(this.recentTranscriptions.length > ModelManager.TRANSCRIPTION_BUFFER) {
+        this.recentTranscriptions.splice(0, 1);
+      }
     }
 
     public shutdown() {
