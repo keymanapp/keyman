@@ -5,12 +5,11 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha', 'spec'],
+    reporters: ['mocha'],
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-//    browsers: ['Firefox', 'IE', 'Chrome', 'Edge'], // Can be specified at run-time instead!
-    browsers: ['Firefox', 'Chrome'], // Can be specified at run-time instead!
+    browsers: ['Firefox', 'IE', 'Chrome', 'Edge'], // Can be specified at run-time instead!
 	  // Future note for us:  https://www.npmjs.com/package/karma-browserstack-launcher
 
     // Concurrency level
