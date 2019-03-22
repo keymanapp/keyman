@@ -1,6 +1,9 @@
 /// <reference path="banner.ts" />
 
 namespace com.keyman.osk {
+  /**
+   * This object is used to specify options by both `BannerManager.getOptions` and `BannerManager.setOptions`.  Refer to the latter for specification of each field.
+   */
   export interface BannerOptions {
     persistentBanner?: boolean;
     enablePredictions?: boolean;
@@ -59,6 +62,9 @@ namespace com.keyman.osk {
       keyman.modelManager['addEventListener']('modelchange', this.selectBanner.bind(this));
     }
 
+    /**
+     * Constructs the <div> element used to contain hot-swapped `Banner` instances.
+     */
     private constructContainer(): HTMLDivElement {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
@@ -69,10 +75,18 @@ namespace com.keyman.osk {
       return this.bannerContainer = d;
     }
 
+    /**
+     * Returns the `Banner`-containing div element used to facilitate hot-swapping.
+     */
     public get element(): HTMLDivElement {
       return this.bannerContainer;
     }
 
+    /**
+     * This function corresponds to `keyman.osk.banner.getOptions`.
+     * 
+     * Gets the current control settings in use by `BannerManager`.
+     */
     public getOptions(): BannerOptions {
       let retObj = {};
 
@@ -83,6 +97,21 @@ namespace com.keyman.osk {
       return retObj;
     }
 
+    /**
+     * This function corresponds to `keyman.osk.banner.setOptions`.
+     * 
+     * Sets options used to tweak the automatic `Banner` control logic used by `BannerManager`.
+     * @param optionSpec An object specifying one or more of the following options:
+     * * `persistentBanner` (boolean) When `true`, ensures that a `Banner` is always displayed, even when no predictive model exists for the active language.
+     *
+     *   Default: `false`
+     * * `imagePath` (URL string) Specifies the file path to use for an `ImageBanner` when `persistentBanner` is `true` and no predictive model exists.
+     * 
+     *   Default: `''`.
+     * * `enablePredictions` (boolean) Turns KMW predictions on (when `true`) and off (when `false`).
+     * 
+     *   Default:  `true`.
+     */
     public setOptions(optionSpec: BannerOptions) {
       let keyman = com.keyman.singleton;
 
@@ -111,12 +140,20 @@ namespace com.keyman.osk {
       this.selectBanner();
     }
 
+    /**
+     * Applies any stylesheets needed by specific `Banner` instances.
+     */
     public appendStyles() {
       if(this.activeBanner) {
         this.activeBanner.appendStyleSheet();
       }
     }
 
+    /**
+     * Sets the active `Banner` to the specified type, regardless of existing management logic settings.
+     * 
+     * @param type `'blank' | 'image' | 'suggestion'` - A plain-text string representing the type of `Banner` to set active.
+     */
     public setBanner(type: BannerType) {
       switch(type) {
         case 'blank':
@@ -137,6 +174,10 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Handles `ModelManager`'s `'modelchange'` events, allowing logic to automatically hot-swap `Banner`s as needed.
+     * @param state 
+     */
     private selectBanner(state?: text.prediction.ModelChangeEnum) {
       let keyman = com.keyman.singleton;
 
@@ -151,6 +192,10 @@ namespace com.keyman.osk {
       }
     }
 
+    /**
+     * Internal method used by the public API `setBanner`.  `setBanner` translates the string parameter into a new instance consumed by this method.
+     * @param banner The `Banner` instance to set as active.
+     */
     private _setBanner(banner: Banner) {
       if(this.activeBanner) {
         if(banner == this.activeBanner) {
@@ -171,6 +216,9 @@ namespace com.keyman.osk {
       this.bannerContainer.appendChild(banner.getDiv());
     }
 
+    /**
+     * Gets the height (in pixels) of the active `Banner` instance.
+     */
     public get height(): number {
       if(this.activeBanner) {
         return this.activeBanner.height;
