@@ -239,21 +239,21 @@ namespace com.keyman.osk {
       return s;
     };
 
-    public invalidateSuggestions() {
+    public invalidateSuggestions: (this: SuggestionBanner) => boolean = function(this: SuggestionBanner) {
       if (this.div) {
         for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
           this.suggestionList[i].spec.text = '';
           this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
         }
       }
-    }
+    }.bind(this);
 
-    public updateSuggestions(suggestions: Suggestion[]) {
+    public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean = function(this: SuggestionBanner, suggestions: Suggestion[]) {
       for(var i=0; i<suggestions.length; i++) {
         this.suggestionList[i].update(suggestions[i]);
         this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
       }
-    }
+    }.bind(this);
   }
 
 }
