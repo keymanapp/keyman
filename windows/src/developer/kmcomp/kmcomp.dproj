@@ -88,8 +88,8 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-d hieroglyphic\hieroglyphic.kpj</Debugger_RunParams>
-        <Debugger_CWD>c:\projects\keyman\open\windows\src\test\unit-tests\kmw-compiler-ladders</Debugger_CWD>
+        <Debugger_RunParams>-v balochi_phonetic.keyboard_info</Debugger_RunParams>
+        <Debugger_CWD>c:\projects\keyman\keyboards\release\b\balochi_phonetic</Debugger_CWD>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
