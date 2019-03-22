@@ -218,8 +218,8 @@ cleanKeyboards.then(() => {
           console.log('Cannot generate tests at present without a .kmx for '+keyboard);
           return true;
         }
-        if(!fs.existsSync(testPath)) {
-          fs.mkdirSync(testPath);
+        if(!fs.existsSync(testsPath)) {
+          fs.mkdirSync(testsPath);
         }
 
         console.log(`Building test cases for ${locator}`);
