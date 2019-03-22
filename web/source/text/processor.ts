@@ -384,9 +384,13 @@ namespace com.keyman.text {
         keyman.domManager.focusLastActiveElement();
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
       }
-
       // // ...end I3363 (Build 301)
+
+      // Determine the current target for text output and create a "mock" backup
+      // of its current, pre-input state.
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
+      let preInputMock = Mock.from(outputTarget);
+
       var LeventMatched = 0;
       this.swallowKeypress = false;
 
@@ -418,6 +422,16 @@ namespace com.keyman.text {
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(LeventMatched) {
+        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent);
+        // Notify the ModelManager of new input
+        keyman.modelManager.predict(transcription);
+
+        // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
+        // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
+        if(outputTarget.getElement()) {
+          keyman['interface'].doInputEvent(outputTarget.getElement());
+        }
+
         this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
         if(keyEvent.Lcode == 8) {
           this.swallowKeypress = false;
