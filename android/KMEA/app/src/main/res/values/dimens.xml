@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Dimens for Default or Portrait (Phone) -->
 <resources>
-    <dimen name="keyboard_height">275dp</dimen>
+    <dimen name="keyboard_height">205dp</dimen>
     <dimen name="key_width">34.25dp</dimen>
     <dimen name="key_height">49.25dp</dimen>
     <dimen name="popup_arrow_width">21dp</dimen>

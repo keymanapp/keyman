@@ -301,9 +301,9 @@ namespace com.keyman.osk {
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
         kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') {
-        // Desktop order is title_bar, banner_bar, inner-frame
+        // Desktop order is title_bar, banner_container, inner-frame
         innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
-      } else if (innerFrame.id == 'keymanweb_banner_bar') {
+      } else if (innerFrame.id == 'keymanweb_banner_container') {
         innerFrame=<HTMLDivElement> innerFrame.nextSibling;
       }
       innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;

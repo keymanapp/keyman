@@ -42,7 +42,8 @@ namespace com.keyman.osk {
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
       persistentBanner: false,
-      enablePredictions: true
+      enablePredictions: true,
+      imagePath: ""
     }
 
     constructor() {
@@ -66,6 +67,7 @@ namespace com.keyman.osk {
 
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
+      d.className = "keymanweb-banner-container";
       return this.bannerContainer = d;
     }
 
@@ -127,6 +129,10 @@ namespace com.keyman.osk {
           break;
         case 'suggestion':
           this._setBanner(new SuggestionBanner());
+          let keyman = com.keyman.singleton;
+          let banner = this.activeBanner as SuggestionBanner;
+          keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions.bind(this));
+          keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions.bind(this));
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
@@ -136,6 +142,8 @@ namespace com.keyman.osk {
     private selectBanner(state?: text.prediction.ModelChangeEnum) {
       let keyman = com.keyman.singleton;
 
+      // Only display a SuggestionBanner when the current language has an active predictive model.
+      // ModelManager will never have an active model when predictions are disabled.
       if(keyman.modelManager.activeModel) {
         this.setBanner('suggestion');
       } else if(this.alwaysShows) {
@@ -150,7 +158,7 @@ namespace com.keyman.osk {
         if(banner == this.activeBanner) {
           return;
         } else {
-          this.bannerContainer.removeChild(this.activeBanner.getDiv());
+          this.bannerContainer.replaceChild(banner.getDiv(), this.activeBanner.getDiv());
         }
       }
 

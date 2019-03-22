@@ -1,3 +1,4 @@
+///<reference path="visualKeyboard.ts" />
 namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
@@ -127,13 +128,131 @@ namespace com.keyman.osk {
     }
   }
 
+  export class BannerSuggestionSpec {
+    id: string;
+    languageID: string;
+    text?: string;
+    width: string;
+    pad?: string;
+    widthpc?: number; // Added during OSK construction.
+    padpc?: number; // Added during OSK construction.
+
+    constructor(id: string, languageID: string, text?: string, width?: string, pad?: string) {
+      this.id = id;
+      this.languageID = languageID;
+      this.text = text;
+      this.width = width ? width : "50";
+      this.pad = pad;
+    }
+  }
+
+  export class BannerSuggestion {
+    spec: BannerSuggestionSpec;
+
+    constructor(spec: BannerSuggestionSpec) {
+      this.spec = spec;
+    }
+
+    public update(suggestion: Suggestion) {
+      this.spec.text = suggestion.displayAs;
+    }
+
+    // Produces a HTMLSpanElement with the key's actual text.
+    public generateSuggestionText(): HTMLSpanElement {
+      let util = (<KeymanBase>window['keyman']).util;
+      let spec = this.spec;
+
+      // Add OSK suggestion labels
+      var suggestionText: string;
+      var t=util._CreateElement('span'), ts=t.style;
+      t.className = "kmw-suggestion-span";
+      if(spec.text == null || spec.text == '') {
+        suggestionText = '\xa0';  // default:  nbsp.
+      } else {
+        suggestionText = spec.text;
+      }
+
+      if (this.spec.languageID) {
+        t.lang = this.spec.languageID;
+      }
+
+      //Override font spec if set for this key in the layout
+      if(typeof spec['font'] == 'string' && spec['font'] != '') {
+        ts.fontFamily=spec['font'];
+      }
+
+      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
+        ts.fontSize=spec['fontsize'];
+      }
+
+      let device = util.device;
+      if (device.formFactor != 'desktop') {
+        let oskManager = com.keyman.singleton.osk;
+        ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
+      }
+
+      let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
+      if(keyboardManager.isRTL()) {
+        // Add the RTL marker to ensure it displays correctly.
+        suggestionText = '\u200f' + suggestionText;
+      }
+
+      // Finalize the suggestion text
+      var d=util._CreateElement('div'), ds=d.style;
+      d.className = 'kmw-suggestion-text';
+      d.innerHTML = suggestionText;
+      t.appendChild(d);
+
+      return t;
+    }
+  }
+
   /**
    * Function       SuggestionBanner
    * Description    Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
+    public static SUGGESTION_LIMIT:number = 3;
+    private suggestionList : BannerSuggestion[];
+
     constructor() {
       super(true, true);
+      let suggestionList:BannerSuggestion[] = new Array();
+      this.suggestionList = suggestionList;
+      if (this.div) {
+        for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+          let s = new BannerSuggestionSpec('suggestion' + i, 'en', '', '33', ' ');
+          let d = new BannerSuggestion(s);
+          this.suggestionList[i] = d;
+          this.div.appendChild(d.generateSuggestionText());
+        }
+      }
+    }
+
+    public static BLANK_SUGGESTION(): Suggestion {
+      let s: Suggestion = {
+        displayAs: '',
+        transform: {
+          insert: '', deleteLeft: 0, deleteRight: 0
+        }
+      };
+      return s;
+    };
+
+    public invalidateSuggestions() {
+      if (this.div) {
+        for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+          this.suggestionList[i].spec.text = '';
+          this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
+        }
+      }
+    }
+
+    public updateSuggestions(suggestions: Suggestion[]) {
+      for(var i=0; i<suggestions.length; i++) {
+        this.suggestionList[i].update(suggestions[i]);
+        this.div.replaceChild(this.suggestionList[i].generateSuggestionText(), this.div.childNodes.item(i));
+      }
     }
   }
 
