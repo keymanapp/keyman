@@ -60,8 +60,6 @@ namespace com.keyman.osk {
     }
 
     private constructContainer(): HTMLDivElement {
-      let height = 40;
-
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
@@ -131,8 +129,8 @@ namespace com.keyman.osk {
           this._setBanner(new SuggestionBanner());
           let keyman = com.keyman.singleton;
           let banner = this.activeBanner as SuggestionBanner;
-          keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions.bind(this));
-          keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions.bind(this));
+          keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions);
+          keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions);
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
@@ -158,7 +156,14 @@ namespace com.keyman.osk {
         if(banner == this.activeBanner) {
           return;
         } else {
-          this.bannerContainer.replaceChild(banner.getDiv(), this.activeBanner.getDiv());
+          let prevBanner = this.activeBanner;
+          this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
+
+          if(prevBanner instanceof SuggestionBanner) {
+            let keyman = com.keyman.singleton;
+            keyman.modelManager['removeEventListener']('invalidatesuggestions', prevBanner.invalidateSuggestions);
+            keyman.modelManager['removeEventListener']('suggestionsready', prevBanner.updateSuggestions);
+          }
         }
       }
 

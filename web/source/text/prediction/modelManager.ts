@@ -195,11 +195,24 @@ namespace com.keyman.text.prediction {
      * @param       {string}            event     event to handle
      * @param       {function(Event)}   func      event handler function
      * @return      {boolean}                     value returned by util.addEventListener
-     * Description  Wrapper function to add and identify KeymanWeb-specific event handlers
+     * Description  Wrapper function to add and identify handlers for ModelManager events
      */       
     ['addEventListener'](event: SupportedEventNames, func: SupportedEventHandler): boolean {
       let keyman = com.keyman.singleton;
       return keyman.util.addEventListener(ModelManager.EVENT_PREFIX + event, func);
+    }
+
+    /**
+     * Function     removeEventListener
+     * Scope        Public
+     * @param       {string}            event     event to handle
+     * @param       {function(Event)}   func      event handler function
+     * @return      {boolean}                     value returned by util.addEventListener
+     * Description  Wrapper function to remove previously-added handlers for ModelManager events
+     */       
+    ['removeEventListener'](event: SupportedEventNames, func: SupportedEventHandler): boolean {
+      let keyman = com.keyman.singleton;
+      return keyman.util.removeEventListener(ModelManager.EVENT_PREFIX + event, func);
     }
 
     public predict(transcription: Transcription) {

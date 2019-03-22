@@ -1303,7 +1303,7 @@ namespace com.keyman.osk {
           Ls.left=Ls.bottom='0px';
           let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
           vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
-          Ls.height=Ls.maxHeight= (parseInt(vkbdHeight) + this.getBannerHeight()) + 'px';
+          Ls.height=Ls.maxHeight= (parseInt(vkbdHeight, 10) + this.getBannerHeight()) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
