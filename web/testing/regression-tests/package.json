@@ -4,7 +4,7 @@
   "description": "Automated regression test suite for KeymanWeb",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js -l"
   },
   "author": "Marc Durdin",
   "license": "MIT",
