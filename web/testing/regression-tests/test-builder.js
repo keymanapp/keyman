@@ -25,19 +25,19 @@ program.parse(process.argv);
 config.compilerVersion = program.compilerVersion;
 config.engineVersion = program.engineVersion;
 
-let keyboards = util.getKeyboardFolders(KEYBOARDS_ROOT);
+let keyboards = util.getKeyboardFolders(KEYBOARDS_ROOT, true);
 
 let code = `
   let assert = chai.assert;
 `;
 
 keyboards.forEach(function(keyboard) {
-  if(program.keyboards.length == 0 || program.keyboards.indexOf(keyboard.s+'/'+keyboard.id) >= 0) {
+  if(program.keyboards.length == 0 || program.keyboards.indexOf(keyboard.shortname+'/'+keyboard.id) >= 0) {
     code += `
       describe('Test keyboard ${keyboard.id}', () => {
-        const s='${keyboard.s}';
+        const shortname='${keyboard.shortname}';
         const id='${keyboard.id}';
-        const locator = s+'/'+id;
+        const locator = shortname+'/'+id;
         it('should generate a set of results for "all" possible inputs', function() {
           return windowLoad
             .then(function() {

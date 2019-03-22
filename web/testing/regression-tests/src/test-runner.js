@@ -99,29 +99,34 @@ var testRunner = {
       let {shortname, id} = testRunner.parseLocator(locator);
       if(!id) throw new Error('Invalid locator '+locator);
 
-      //debugger;
-      return testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/tests/' + id + '.tests')
-        .then(function() {
-          return testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/build/' + id + '.js');
-        })
-        .then(function() {
-          console.log('Starting test for '+id);
-          keyman.interface.registerStub({
-            'KN': 'Stub',
-            'KI': 'Keyboard_'+id,
-            'KL': 'en',
-            'KLC': 'en'
-          });
-          let k = testRunner.keyboards[id]; 
-          keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
-          document.body.focus();
-          receiver.focus();
-          resolve();
-        })
-        .catch(function(reason) {
-          console.log('FAILED HERE for '+locator+': '+reason);
-          reject(reason);
+      fetch(KEYBOARDS_RELATIVE_PATH + locator + '/tests/' + id + '.tests')
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        testRunner.register(data);
+      })
+      .then(function() {
+        return testRunner.loadScript(KEYBOARDS_RELATIVE_PATH + locator + '/build/' + id + '.js');
+      })
+      .then(function() {
+        console.log('Starting test for '+id);
+        keyman.interface.registerStub({
+          'KN': 'Stub',
+          'KI': 'Keyboard_'+id,
+          'KL': 'en',
+          'KLC': 'en'
         });
+        let k = testRunner.keyboards[id]; 
+        keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
+        document.body.focus();
+        receiver.focus();
+        resolve();
+      })
+      .catch(function(reason) {
+        console.log('FAILED HERE for '+locator+': '+reason);
+        reject(reason);
+      });
     });
   },
 
@@ -173,6 +178,9 @@ var testRunner = {
    * @param {object} data  
    */
   register: function(data) {
+    let keys = Object.keys(data.inputTests);
+    // We are going to refactor .inputTests from an object into an array with "id" parameters.
+    data.inputTests = keys.map((key) => Object.assign({id: key}, data.inputTests[key]));
     this.keyboards[data.keyboard.id] = data;
   },
 
