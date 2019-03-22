@@ -60,8 +60,6 @@ namespace com.keyman.osk {
     }
 
     private constructContainer(): HTMLDivElement {
-      let height = 40;
-
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
