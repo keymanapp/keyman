@@ -374,12 +374,12 @@ std::string unicode_escape(std::wstring s) {
 std::wstring GetKeyName(UINT key) {
   WCHAR buf[64];
 
-  if (key < 256) {
-    wsprintfW(buf, L"keyCodes.%s /* 0x%x */", VKeyNames[key], key);
-  }
-  else {
+//  if (key < 256) {
+//    wsprintfW(buf, L"keyCodes.%s /* 0x%x */", VKeyNames[key], key);
+//  }
+//  else {
     wsprintfW(buf, L"0x%x", key);
-  }
+//  }
 
   std::wstring str(buf);
   return str;
@@ -405,7 +405,8 @@ ModifierNames modifierNames[] = {
   { L"NO_NUM_LOCK", 0x0800 },
   { L"SCROLL_LOCK", 0x1000 },
   { L"NO_SCROLL_LOCK", 0x2000 },
-  { L"VIRTUAL_KEY", 0x4000 }
+  { L"VIRTUAL_KEY", 0x4000 },
+  { NULL, 0 }
 };
 
 std::wstring GetModifierName(UINT modifier) {
@@ -443,25 +444,25 @@ void PrintTests(TESTS *tests, char *keyboardID, wchar_t *keyboardName, char *key
   //std::wstring keyboardName_t = keyboardName;
 
   fprintf(fp,
-    "(function(){\n"
+    /*"(function(){\n"
     "\"use strict\";\n"
     "var modCodes = testRunner.modCodes;\n"
     "var keyCodes = testRunner.keyCodes;\n"
-    "testRunner.register({\n"
+    "testRunner.register(*/"{\n"
     "  \"keyboard\": {\n"
     "    \"id\": \"%s\",\n"
-    "    \"name\" : \"%s\",\n" //TODO: utf8
-    "    \"filename\" : \"%s\",\n"
+    //"    \"name\" : \"%s\",\n" //TODO: utf8
+    //"    \"filename\" : \"%s\",\n"
     "    \"languages\" : [{\n"
     "      \"id\": \"en\",\n"
     "      \"name\" : \"English\",\n"
     "      \"region\" : \"Europe\"\n"
     "    }]\n"
     "  },\n"
-    "  \"inputTests\": [\n",
-    keyboardID,
-    utf8_conv.to_bytes(keyboardName).c_str(),
-    keyboardJSFilename
+    "  \"inputTests\": {\n",
+    keyboardID
+    //utf8_conv.to_bytes(keyboardName).c_str(),
+    //keyboardJSFilename
   );
 
   for (size_t i = 0; i < tests->size(); i++) {
@@ -474,20 +475,20 @@ void PrintTests(TESTS *tests, char *keyboardID, wchar_t *keyboardName, char *key
 
     std::wstring keyName = GetKeyName(key);
     std::wstring modifierName = GetModifierName(shift);
-    fprintf(fp, "    {\"id\": %d, \"key\": %ws", i, keyName.c_str());
+    fprintf(fp, "    \"%d\": {\"key\": %d", i, key); // keyName.c_str());
 
     if (shift != ISVIRTUALKEY && shift != 0)
-      fprintf(fp, ", \"modifier\": %ws", modifierName.c_str());
+      fprintf(fp, ", \"modifier\": %d", shift & ~ISVIRTUALKEY); // %ws", modifierName.c_str());
 
     if (tests->at(i).context.size())
       fprintf(fp, ", \"context\": %s", unicode_escape(tests->at(i).context).c_str());
-    fprintf(fp, "},\n");
+    fprintf(fp, "}%s\n", (i == tests->size() - 1 ? "" : ","));
   }
 
   fprintf(fp, 
-    "  ]\n"
-    "});\n"
-    "})();\n"
+    "  }\n"
+    "}"/*);\n"
+    "})();\n"*/
   );
 
   fclose(fp);
