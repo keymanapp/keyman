@@ -182,17 +182,28 @@ namespace com.keyman.osk {
 
   export class BannerSuggestion {
     spec: BannerSuggestionSpec;
-    attachedElement: HTMLElement;
 
     constructor(spec: BannerSuggestionSpec) {
       this.spec = spec;
     }
 
-    public update(suggestion: Suggestion) {
+    /**
+     * Function update
+     * @param {string}     id           Element ID for the suggestion span
+     * @param {Suggestion} suggestion   Suggestion from the lexical model
+     * Description  Update the ID and text of the BannerSuggestionSpec
+     */
+    public update(id: string, suggestion: Suggestion) {
+      this.spec.id = id;
       this.spec.text = suggestion.displayAs;
     }
 
-    // Produces a HTMLSpanElement with the key's actual text.
+    /**
+     * Function generateSuggestionText
+     * @return {HTMLSpanElement}  Span element of the suggestion
+     * Description   Produces a HTMLSpanElement with the key's actual text.
+     */
+    //
     public generateSuggestionText(): HTMLSpanElement {
       let util = (<KeymanBase>window['keyman']).util;
       let spec = this.spec;
@@ -200,6 +211,7 @@ namespace com.keyman.osk {
       // Add OSK suggestion labels
       var suggestionText: string;
       var t=util._CreateElement('span'), ts=t.style;
+      t.id = spec.id;
       t.className = "kmw-suggestion-span";
       if(spec.text == null || spec.text == '') {
         suggestionText = '\xa0';  // default:  nbsp.
@@ -256,10 +268,10 @@ namespace com.keyman.osk {
       let suggestionList: BannerSuggestion[] = new Array();
       this.suggestionList = suggestionList;
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-        let s = new BannerSuggestionSpec('suggestion' + i, 'en', '', '33', ' ');
+        let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', '33', ' ');
         let d = new BannerSuggestion(s);
         this.suggestionList[i] = d;
-        d.attachedElement = this.getDiv().appendChild(d.generateSuggestionText());
+        this.getDiv().appendChild(d.generateSuggestionText());
       }
     }
 
@@ -279,9 +291,9 @@ namespace com.keyman.osk {
      * Description  Clears the suggestions in the suggestion banner
      */
     public invalidateSuggestions: (this: SuggestionBanner) => boolean = function(this: SuggestionBanner) {
-      this.suggestionList.forEach((suggestion) => {
-        suggestion.spec.text = '';
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), suggestion.attachedElement);
+      this.suggestionList.forEach((suggestion, i) => {
+        this.suggestionList[i].update('kmw-suggestion-'+i, SuggestionBanner.BLANK_SUGGESTION());
+        this.getDiv().replaceChild(suggestion.generateSuggestionText(), this.getDiv().childNodes.item(i));
       });
     }.bind(this);
 
@@ -294,8 +306,8 @@ namespace com.keyman.osk {
     public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean =
       function(this: SuggestionBanner, suggestions: Suggestion[]) {
       this.suggestionList.forEach((suggestion, i) => {
-        this.suggestionList[i].update(suggestions[i]);
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), suggestion.attachedElement);
+        this.suggestionList[i].update('kmw-suggestion-'+i, suggestions[i]);
+        this.getDiv().replaceChild(suggestion.generateSuggestionText(), this.getDiv().childNodes.item(i));
       });
     }.bind(this);
   }
