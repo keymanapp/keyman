@@ -66,6 +66,7 @@ module.exports = function(config) {
 
       // The test-runner is shared with the Node application for generating base tests manually
       { pattern: path.join(keyman_basename, test_relative_path, 'src', 'test-runner.js'), nocache: true }, 
+      { pattern: path.join(keyman_basename, test_relative_path, 'src', 'known-failures.js'), nocache: true }, 
 
       // KeymanWeb and keyboards
       //{ pattern: path.join(keyman_basename, KEYMANWEB_RELATIVE_PATH, '**'), watched: false, included: false, nocache: true },

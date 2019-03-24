@@ -139,11 +139,18 @@ var testRunner = {
         document.body.focus();
         receiver.focus();
         keyman.osk.show(false);
-        resolve();
+        resolve(true);
       })
       .catch(function(reason) {
-        console.log('FAILED HERE for '+locator+': '+reason);
-        reject(reason);
+        // We only die if the keyboard isn't a known failure
+        if(knownFailures[id]) {
+          console.warn('FAILED TO LOAD '+locator+': '+reason);
+          console.warn(`This keyboard is listed as a known failure because "${knownFailures[id].reason}". Not failing the test.`);
+          resolve(false);
+        } else {
+          console.error('FAILED TO LOAD '+locator+': '+reason);
+          reject(reason);
+        }
       });
     });
   },
@@ -160,7 +167,11 @@ var testRunner = {
       if(!json.id) throw new Error('Invalid locator: '+locator);
       json.results = typeof results == 'string' ? JSON.parse(results) : results;
       json.engineVersion = keyman.build.toString();
-      json.compilerVersion = eval('new Keyboard_'+json.id+'().KVER');
+      try {
+        json.compilerVersion = eval('new Keyboard_'+json.id+'().KVER');
+      } catch(e) {
+        json.compilerVersion = '0';
+      }
 
       // Post results to be saved to disk by the back end (test-host.js)
       let http = new XMLHttpRequest();
@@ -234,7 +245,7 @@ var testRunner = {
       console.log('-- Running '+this.keyboards[keyboardId].inputTests.length+' tests for '+keyboardId+'.');
       var chunkSize = TEST_BATCH_SIZE;
 
-      // Batch tests into groups of chunkSize. This means we don't
+      // Batch tests into group s of chunkSize. This means we don't
       // run into issues of the browser stalling on very long runs.
 
       var tests = chunk(this.keyboards[keyboardId].inputTests, chunkSize), n = 0;

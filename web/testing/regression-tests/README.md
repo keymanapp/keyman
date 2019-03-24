@@ -48,6 +48,12 @@ To build just the Keyman Developer tools required from the Windows source (cmd):
     cd windows\src
     make -DNOUI ext global buildtools developer
 
+### Known Failures
+
+As there are some known failures, these are listed in `src/known-failures.js`. 
+As the bugs that impact these keyboards are addressed, they should be progressively
+removed from the file. Keyboards listed in this file will still be tested and
+report errors, but they will not fail the test suite overall.
 
 ## Running Tests
 

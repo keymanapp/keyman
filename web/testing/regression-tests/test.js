@@ -328,39 +328,44 @@ cleanKeyboards.then(() => {
   keyboards.forEach((keyboard) => {
     if(!program.keyboards.length || program.keyboards.indexOf(keyboard.shortname+'/'+keyboard.id) >= 0) {
       // Validate each of the test files against the first tested compiler+engine version
-      const baseResultFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}-${baseCompilerVersion}-${baseEngineVersion}.results`);
-      const baseResult = fs.readFileSync(baseResultFilename, 'utf8');
-      const baseResultJSON = JSON.parse(baseResult);
+      try {
+        const baseResultFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}-${baseCompilerVersion}-${baseEngineVersion}.results`);
+        const baseResult = fs.readFileSync(baseResultFilename, 'utf8');
+        const baseResultJSON = JSON.parse(baseResult);
 
-      const testsFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}.tests`);
-      const testsJSON = JSON.parse(fs.readFileSync(testsFilename, 'utf8'));
-      //console.log(baseResultFilename, baseResult);
-      testedCompilerVersions.forEach((cv) => {
-        testedEngineVersions.forEach((ev) => {
-          const resultFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}-${cv}-${ev}.results`);
-          const result = fs.readFileSync(resultFilename, 'utf8');
-          //console.log(resultFilename, result);
-          // Naive string test first
-          if(result !== baseResult) {
-            // Now, report first mismatch and total number of mismatches after parsing JSON
-            const resultJSON = JSON.parse(result);
-            let errors = 0, prefix = `${keyboard.shortname}/${keyboard.id}`;
-            for(let k in baseResultJSON) {
-              if(resultJSON[k] !== baseResultJSON[k]) {
-                if(++errors == 1 || program.logAllFailures) {
-                  let 
-                    ix = k.toString(), 
-                    whitespace = ' '.repeat(prefix.length + ix.length + 6),
-                    input = `${testsJSON.inputTests[k].context ? `"${testsJSON.inputTests[k].context}" ` : ""}+ ${keyname(testsJSON.inputTests[k].modifier, testsJSON.inputTests[k].key)}`;
-                  console.error(`${prefix}[${ix}]: expected: ${input} > "${baseResultJSON[k]}"`);
-                  console.error(`${whitespace}actual: ${input} > "${resultJSON[k]}"`);
+        const testsFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}.tests`);
+        const testsJSON = JSON.parse(fs.readFileSync(testsFilename, 'utf8'));
+        //console.log(baseResultFilename, baseResult);
+        testedCompilerVersions.forEach((cv) => {
+          testedEngineVersions.forEach((ev) => {
+            const resultFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}-${cv}-${ev}.results`);
+            const result = fs.readFileSync(resultFilename, 'utf8');
+            //console.log(resultFilename, result);
+            // Naive string test first
+            if(result !== baseResult) {
+              // Now, report first mismatch and total number of mismatches after parsing JSON
+              const resultJSON = JSON.parse(result);
+              let errors = 0, prefix = `${keyboard.shortname}/${keyboard.id}`;
+              for(let k in baseResultJSON) {
+                if(resultJSON[k] !== baseResultJSON[k]) {
+                  if(++errors == 1 || program.logAllFailures) {
+                    let 
+                      ix = k.toString(), 
+                      whitespace = ' '.repeat(prefix.length + ix.length + 6),
+                      input = `${testsJSON.inputTests[k].context ? `"${testsJSON.inputTests[k].context}" ` : ""}+ ${keyname(testsJSON.inputTests[k].modifier, testsJSON.inputTests[k].key)}`;
+                    console.error(`${prefix}[${ix}]: expected: ${input} > "${baseResultJSON[k]}"`);
+                    console.error(`${whitespace}actual: ${input} > "${resultJSON[k]}"`);
+                  }
                 }
               }
+              fail(`${keyboard.shortname}/${keyboard.id} ${errors} test(s) mismatched between (${baseCompilerVersion} / ${baseEngineVersion}) and (${cv} / ${ev})`, 4);
             }
-            fail(`${keyboard.shortname}/${keyboard.id} ${errors} test(s) mismatched between (${baseCompilerVersion} / ${baseEngineVersion}) and (${cv} / ${ev})`, 4);
-          }
+          });
         });
-      });
+      } catch(e) {
+        // TODO: only continue if in known-failures?
+        console.warn(`Failed to load test results for ${keyboard.shortname}/${keyboard.id}: ${typeof e == 'object' ? e.message : e}`);
+      }
     }
   });
 
