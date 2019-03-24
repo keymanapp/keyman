@@ -19,6 +19,23 @@ var windowLoad = new Promise(function(resolve, reject) {
       // When running tests, we dynamically create the receiver
       receiver = document.createElement('input'); 
       document.body.appendChild(receiver);
+      let d0 = document.createElement('div');
+      d0.id = 'progressWindow';
+      d0.style.width = '100%';
+      d0.style.margin = '8px 0';
+      d0.style.height = '16px';
+      d0.style.border = 'solid 1px #666666';
+      d0.style.boxSizing = 'border-box';
+      d0.style.padding = '2px';
+
+      let d1 = document.createElement('div');
+      d1.id = 'progressPosition';
+      d1.style.background = '#44cc44';
+      d1.style.height = '100%';
+      d1.style.boxSizing = 'border-box';
+
+      d0.appendChild(d1);
+      document.body.insertBefore(d0, receiver);
     }
     keyman.attachToControl(receiver);
     keyman.setKeyboardForControl(receiver, '', '');
@@ -121,6 +138,7 @@ var testRunner = {
         keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
         document.body.focus();
         receiver.focus();
+        keyman.osk.show(false);
         resolve();
       })
       .catch(function(reason) {

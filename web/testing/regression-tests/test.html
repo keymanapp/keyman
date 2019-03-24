@@ -10,10 +10,27 @@
   <title>KeymanWeb - Regression Test Karma Harness</title>
   <script src="/web/keymanweb.js"></script>
   <script src="/web/kmwuitoggle.js"></script>
+  <style>
+    #progressWindow {
+      width: 100%;
+      margin: 8px 0;
+      height: 16px;
+      border: solid 1px #666666;
+      box-sizing: border-box;
+      padding: 2px;
+    }
+
+    #progressPosition {
+      background: #44cc44;
+      height: 100%;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 
 <body id="body">
   <input type='text' id='receiver'/> 
+  <div id='progressWindow'><div id='progressPosition'></div></div>
 </body>
 
 </html>
