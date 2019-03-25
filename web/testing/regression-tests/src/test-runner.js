@@ -80,7 +80,7 @@ var testRunner = {
         hadError = true;
         console.error(`Error loading ${path}: ${message} at ${source}:${lineno},${columnNumber}`);
         window.onerror = null;
-        reject(err.message);
+        reject(message);
         return true;
       };
 
