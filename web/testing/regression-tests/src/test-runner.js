@@ -67,38 +67,32 @@ var testRunner = {
     console.log(`Loading script ${path}`);
     return new Promise(function(resolve, reject) {
       let script = document.createElement('script'), hadError = false;
+
       let errorHandler = function(err) {
         hadError = true;
-        console.error(path + ': ' + err.message);
-        // console.log('removeEventListener for window.onerror');
-        //window.removeEventListener('error', errorHandler);
-        reject(err.message);
-        return true;
-      };
-
-      let scriptParseErrorHandler = function(err) {
-        hadError = true;
-        console.error(path + ': ' + err.message);
-        // console.log('removeEventListener for window.onerror');
+        console.error(`Error loading ${path}: ${err.message} at ${err.filename}:${err.lineno},${err.colno}`);
         window.onerror = null;
         reject(err.message);
         return true;
       };
 
-      // console.log('addEventListener for window.onerror');
-      window.onerror = scriptParseErrorHandler; //addEventListener('error', errorHandler); // Capture compile / run errors
+      let scriptParseErrorHandler = function(message, source, lineno, columnNumber, error) {
+        hadError = true;
+        console.error(`Error loading ${path}: ${message} at ${source}:${lineno},${columnNumber}`);
+        window.onerror = null;
+        reject(err.message);
+        return true;
+      };
+
+      window.onerror = scriptParseErrorHandler; // Capture compile / run errors
       script.addEventListener('error', errorHandler); // Capture fs / network errors
-
       script.src = path;
-
       script.addEventListener('load', function() {
-        //console.log(`loadScript.load(${path})`);
-        //console.log(hadError);
+        window.onerror = null;
         if(hadError) {
           document.head.removeChild(script);
           return;
         }
-        //console.log(`Finishing loadScript(${path})`)
         resolve();
       });
 
