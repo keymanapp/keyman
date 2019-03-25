@@ -162,16 +162,18 @@ namespace com.keyman.osk {
     id: string;
     languageID: string;
     text?: string;
-    width: string;
+    width: number;
     pad?: string;
     widthpc?: number; // Added during OSK construction.
     padpc?: number; // Added during OSK construction.
 
-    constructor(id: string, languageID: string, text?: string, width?: string, pad?: string) {
+    public DEFAULT_SUGGESTION_WIDTH: number = 50; // pixels
+
+    constructor(id: string, languageID: string, text?: string, width?: number, pad?: string) {
       this.id = id;
       this.languageID = languageID;
       this.text = text;
-      this.width = width ? width : '50';
+      this.width = width ? width : this.DEFAULT_SUGGESTION_WIDTH;
       this.pad = pad;
     }
   }
@@ -232,6 +234,8 @@ namespace com.keyman.osk {
       if (device.formFactor != 'desktop') {
         let oskManager = com.keyman.singleton.osk;
         ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
+      } else {
+        ts.width = spec.width + 'px';
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
@@ -261,10 +265,9 @@ namespace com.keyman.osk {
 
     constructor() {
       super(true);
-      let suggestionList: BannerSuggestion[] = new Array();
-      this.suggestionList = suggestionList;
+      this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-        let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', '33', ' ');
+        let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', 33, ' ');
         let d = new BannerSuggestion(s);
         this.suggestionList[i] = d;
         this.getDiv().appendChild(d.generateSuggestionText());
