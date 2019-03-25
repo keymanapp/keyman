@@ -3,7 +3,6 @@ namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
   export abstract class Banner {
-    private _visible: boolean;
     private _enabled: boolean;
     private _height: number; // pixels
     private div: HTMLDivElement;
@@ -24,39 +23,12 @@ namespace com.keyman.osk {
      * Function     height
      * Scope        Public
      * @param       {number} height   the height in pixels
-     * Description  Sets the height of the banner in pixels
+     * Description  Sets the height of the banner in pixels. If a negative height is given, use a default height.
+     *              Also updates the banner styling.
      */
     public set height(height: number) {
-      this._height = height;
-      if (this.div) {
-        let ds = this.div.style;
-        ds.height = (height > 0) ? height + 'px' : '0px';
-      }
-    }
-
-    /**
-     * Function     visible
-     * Scope        Public
-     * @returns     {boolean} true if the banner is visible
-     * Description  Returns whether the banner is visible or not
-     */
-    public get visible(): boolean {
-      return this._visible;
-    }
-
-    /**
-     * Function     visible
-     * Scope        Public
-     * @param       {boolean} visible   true if the banner is to be visible
-     * Description  Sets the visiblity of the banner
-     */
-    public set visible(visible: boolean) {
-      this._visible = visible;
-
-      if (this.div) {
-        let ds = this.div.style;
-        ds.display=(this._visible) ? 'block': 'none';
-      }
+      this._height = (height > 0) ?  height : this.DEFAULT_HEIGHT;
+      this.update();
     }
 
     /**
@@ -79,7 +51,28 @@ namespace com.keyman.osk {
       this._enabled = enable;
     }
 
-    public constructor(visible: boolean, enabled: boolean, height?: number) {
+    /**
+     * Function      update
+     * @return       {boolean}   true if the banner styling changed
+     * Description   Update the height and display styling of the banner
+     */
+    private update() : boolean {
+      let ds = this.div.style;
+      let currentHeightStyle = ds.height;
+      let currentDisplayStyle = ds.display;
+
+      if (this._height > 0) {
+        ds.height = this._height + 'px';
+        ds.display = 'block';
+      } else {
+        ds.height = '0px';
+        ds.display = 'none';
+      }
+
+      return (!(currentHeightStyle === ds.height) || !(currentDisplayStyle === ds.display));
+    }
+
+    public constructor(enabled: boolean, height?: number) {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
@@ -88,9 +81,9 @@ namespace com.keyman.osk {
       d.className = "kmw-banner-bar";
       this.div = d;
 
-      this.height = (height >= 0) ? height : this.DEFAULT_HEIGHT;
-      this.visible = visible;
       this.enable = enabled;
+      this.height = height;
+      this.update();
     }
 
     public appendStyleSheet() {
@@ -118,13 +111,14 @@ namespace com.keyman.osk {
   export class BlankBanner extends Banner {
 
     constructor() {
-      super(false, true, 0);
+      super(true, 0);
     }
   }
 
   /**
    * Function       ImageBanner
    * @param         {string}        imagePath   Path of image to display in the banner
+   * @param         {number}        height      If provided, the height of the banner in pixels
    * Description    Display an image in the banner
    */
   export class ImageBanner extends Banner {
@@ -132,9 +126,12 @@ namespace com.keyman.osk {
 
     constructor(imagePath, height?: number) {
       if (imagePath.length > 0) {
-        super(true, true);
+        super(true);
+        if (height) {
+          this.height = height;
+        }
       } else {
-        super(false, true, 0);
+        super(true, 0);
       }
 
       this.img = document.createElement('img');
@@ -156,7 +153,6 @@ namespace com.keyman.osk {
         this.img.setAttribute('src', imagePath);
       }
       if (imagePath.length > 0) {
-        this.visible = true;
         this.enable = true;
       }
     }
@@ -264,7 +260,7 @@ namespace com.keyman.osk {
     private suggestionList : BannerSuggestion[];
 
     constructor() {
-      super(true, true);
+      super(true);
       let suggestionList: BannerSuggestion[] = new Array();
       this.suggestionList = suggestionList;
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
