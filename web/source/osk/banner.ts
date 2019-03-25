@@ -7,7 +7,7 @@ namespace com.keyman.osk {
     private _height: number; // pixels
     private div: HTMLDivElement;
 
-    public DEFAULT_HEIGHT: number = 40; // pixels
+    public static DEFAULT_HEIGHT: number = 40; // pixels
 
     /**
      * Function     height
@@ -23,11 +23,11 @@ namespace com.keyman.osk {
      * Function     height
      * Scope        Public
      * @param       {number} height   the height in pixels
-     * Description  Sets the height of the banner in pixels. If a negative height is given, use a default height.
+     * Description  Sets the height of the banner in pixels. If a negative height is given, set height to 0 pixels.
      *              Also updates the banner styling.
      */
     public set height(height: number) {
-      this._height = (height > 0) ?  height : this.DEFAULT_HEIGHT;
+      this._height = (height > 0) ?  height : 0;
       this.update();
     }
 
@@ -264,7 +264,7 @@ namespace com.keyman.osk {
     private suggestionList : BannerSuggestion[];
 
     constructor() {
-      super(true);
+      super(true, SuggestionBanner.DEFAULT_HEIGHT);
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', 33, ' ');

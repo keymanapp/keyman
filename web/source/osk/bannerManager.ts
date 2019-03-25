@@ -160,7 +160,7 @@ namespace com.keyman.osk {
           this._setBanner(new BlankBanner());
           break;
         case 'image':
-          this._setBanner(new ImageBanner(this.imagePath));
+          this._setBanner(new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT));
           break;
         case 'suggestion':
           this._setBanner(new SuggestionBanner());
