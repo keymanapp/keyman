@@ -635,6 +635,8 @@ namespace com.keyman.osk {
     deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
+      let bannerHeight = oskManager.banner.height;
+      let rowsPercent = 100;
 
       var lDiv=util._CreateElement('div'), ls=lDiv.style, actualHeight=0;
 
@@ -647,6 +649,7 @@ namespace com.keyman.osk {
         case 'tablet':
           actualHeight=oskManager.getHeight();
           ls.height=actualHeight+'px';
+          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/actualHeight );
           break;
       }
 
@@ -699,11 +702,11 @@ namespace com.keyman.osk {
       // Set the OSK row height, **assuming all layers have the same number of rows**
 
       // Calculate default row height
-      rowHeight=100/layers[0].row.length;
+      rowHeight = rowsPercent/layers[0].row.length;
 
       // For desktop OSK, use a percentage of the OSK height
       if(formFactor == 'desktop') {
-        rowHeight=100/layers[0].row.length;
+        rowHeight = rowsPercent/layers[0].row.length;
       }
 
       // Get the actual available document width and scale factor according to device type
@@ -1146,7 +1149,7 @@ namespace com.keyman.osk {
       var x = e.changedTouches[0].pageX;
 
       // Get key-row beneath touch point
-      while(t && t.className.indexOf('key-row') < 0) {
+      while(t && t.className !== undefined && t.className.indexOf('key-row') < 0) {
         t = <HTMLElement> t.parentNode;
       }
       if(!t) {
@@ -1156,11 +1159,12 @@ namespace com.keyman.osk {
       // Find minimum distance from any key
       var k, k0=0, dx, dxMax=24, dxMin=100000, x1, x2;
       for(k = 0; k < t.childNodes.length; k++) {
-        if((<HTMLElement> t.childNodes[k].firstChild).className.indexOf('key-hidden') >= 0) {
+        let childNode = t.childNodes[k] as HTMLElement;
+        if(childNode.className !== undefined && childNode.className.indexOf('key-hidden') >= 0) {
           continue;
         }
-        x1 = (<HTMLElement> t.childNodes[k]).offsetLeft;
-        x2 = x1 + (<HTMLElement> t.childNodes[k]).offsetWidth;
+        x1 = childNode.offsetLeft;
+        x2 = x1 + childNode.offsetWidth;
         dx =x1 - x;
         if(dx >= 0 && dx < dxMin) {
           k0 = k; dxMin = dx;

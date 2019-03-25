@@ -373,25 +373,25 @@ namespace com.keyman.osk {
     let device = util.device;
 
     if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
-      return;
+      return false;
     }
 
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
-        oskHeight=oskManager.getHeight(),
-        rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows)),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
+        rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
+        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
+    let oskHeight : number = nRows*rowHeight;
 
-    oskHeight=nRows*rowHeight;
-
-    var b: HTMLElement = _Box,bs=b.style;
+    var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.firstChild.firstChild; bs=b.style;
+    b = <HTMLElement> b.childNodes.item(1).firstChild;
+    bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    pad = Math.round(0.15*rowHeight);
 
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
     if(device.OS == 'iOS') {
@@ -404,10 +404,8 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows));
+      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
 
-      pad = Math.round(0.15*rowHeight);
-      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
         rs.bottom=(nRows-nRow-1)*rowHeight+1+'px';
@@ -436,6 +434,8 @@ namespace com.keyman.osk {
         }
       }
     }
+
+    return true;
   };
 
   // /**
