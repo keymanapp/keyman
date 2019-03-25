@@ -35,6 +35,7 @@ namespace com.keyman.osk {
     capsKey?: LayoutKey,
     numKey?: LayoutKey,
     scrollKey?: LayoutKey
+    aligned?: boolean
   }
 
   export type LayoutFormFactor = {
