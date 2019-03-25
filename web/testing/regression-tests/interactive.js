@@ -10,11 +10,9 @@
  * (or as specified in **config.js**). Press Ctrl+C to stop the server.
  * 
  * Automated testing uses Karma (running with `karma.conf.js`), normally run
- * with **test.sh** in this folder. To start Karma manually:
+ * with **test.js** in this folder. To start Karma manually:
  *    `./node_modules/.bin/karma start karma.conf.js` or
  *    `node ./node_modules/karma/bin/karma start karma.conf.js`
- * 
- * TODO: interactive vs CI versions of Karma
  */
 const fs = require("fs");
 const path = require('path');

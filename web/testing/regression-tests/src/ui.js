@@ -4,7 +4,7 @@ function addKeyboardsList(keyboards) {
   let select = document.getElementById('keyboards');
   keyboards.forEach(element => {
     let option = document.createElement('option');
-    option.value = element.s + '/' + element.id;
+    option.value = element.shortname + '/' + element.id;
     option.innerText = option.value;
     select.appendChild(option);
     allKeyboards.push(option.value);

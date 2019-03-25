@@ -271,13 +271,13 @@ var testRunner = {
    * @param {string|number} index  Test identifier
    */
   runTest: function(keyboardId, testId) {
-    var test = this.keyboards[keyboardId].inputTests.find((v) => v.id == testId);
+    let test = this.keyboards[keyboardId].inputTests.find((v) => v.id == testId);
     if(test !== undefined) {
       //console.log('Running test '+id+':'+index);
-      receiver.value = test.context || '';
-      //TODO: reset deadkey state
       keyman.interface.resetContext();
-      var e = new com.keyman.KeyEvent();
+      receiver.value = test.context || '';
+      // Keyman 11 now uses com.keyman.text.KeyEvent
+      let e = com.keyman.KeyEvent ? new com.keyman.KeyEvent() : new com.keyman.text.KeyEvent();
       e.Ltarg = receiver;
       e.Lcode = test.key;
       e.Lstates = 0; // caps, etc TODO

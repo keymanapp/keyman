@@ -197,8 +197,7 @@ cleanKeyboards.then(() => {
   });
 
   //
-  // TODO: Analyze phase (for first compile run only)
-  // TODO: use the js-target kmx intermediate
+  // TODO: kmanalyze should use the js-target kmx intermediate
   //
 
   let runAnalyze = runCompile.then(() => {
@@ -215,7 +214,7 @@ cleanKeyboards.then(() => {
         if(!fs.existsSync(kmx)) {
           // TODO: kmanalyze should really call the compiler to build an intermediate .kmx
           // for use with web. This should not be that hard to do...
-          console.log('Cannot generate tests at present without a .kmx for '+keyboard);
+          console.log('Cannot currently generate tests without a .kmx for '+keyboard.id);
           return true;
         }
         if(!fs.existsSync(testsPath)) {
@@ -256,7 +255,6 @@ cleanKeyboards.then(() => {
         case 'source':
           getEngine = new Promise((resolve, reject) => {
             engineVersion = 'source';
-            // TODO: Assuming for now that the intermediate version is already built.
             if(fs.existsSync('web/')) {
               rimraf.sync('web/');
             }
