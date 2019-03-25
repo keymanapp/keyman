@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Dimens for Default or Portrait (Tablet 7") -->
 <resources>
-    <dimen name="keyboard_height">375dp</dimen>
+    <dimen name="keyboard_height">305dp</dimen>
     <dimen name="key_width">58.5dp</dimen>
     <dimen name="key_height">73.5dp</dimen>
     <dimen name="popup_arrow_width">32dp</dimen>
