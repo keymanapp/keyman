@@ -274,19 +274,19 @@ var testRunner = {
     let test = this.keyboards[keyboardId].inputTests.find((v) => v.id == testId);
     if(test !== undefined) {
       //console.log('Running test '+id+':'+index);
-      keyman.interface.resetContext();
-      receiver.value = test.context || '';
-      // Keyman 11 now uses com.keyman.text.KeyEvent
-      let e = com.keyman.KeyEvent ? new com.keyman.KeyEvent() : new com.keyman.text.KeyEvent();
-      e.Ltarg = receiver;
-      e.Lcode = test.key;
-      e.Lstates = 0; // caps, etc TODO
-      e.LmodifierChange = true;
-      e.Lmodifiers = test.modifier ? test.modifier : 0;
-      e.LisVirtualKeyCode = true;
-      e.LisVirtualKey = true;
-      e.vkCode = test.key;
       try {
+        keyman.interface.resetContext();
+        receiver.value = test.context || '';
+        // Keyman 12 now uses com.keyman.text.KeyEvent
+        let e = com.keyman.KeyEvent ? new com.keyman.KeyEvent() : new com.keyman.text.KeyEvent();
+        e.Ltarg = receiver;
+        e.Lcode = test.key;
+        e.Lstates = 0; // caps, etc TODO
+        e.LmodifierChange = true;
+        e.Lmodifiers = test.modifier ? test.modifier : 0;
+        e.LisVirtualKeyCode = true;
+        e.LisVirtualKey = true;
+        e.vkCode = test.key;
         keyman.interface.processKeystroke(keyman.util.physicalDevice, receiver, e);
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
