@@ -23,7 +23,8 @@ namespace com.keyman.osk {
      * Function     height
      * Scope        Public
      * @param       {number} height   the height in pixels
-     * Description  Sets the height of the banner in pixels. If a negative height is given, set height to 0 pixels.
+     * Description  Sets the height of the banner in pixels. If a negative 
+     *              height is given, set height to 0 pixels.
      *              Also updates the banner styling.
      */
     public set height(height: number) {
@@ -42,7 +43,7 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     visible
+     * Function     enable
      * Scope        Public
      * @param       {boolean} enable     true if the banner is to be enabled
      * Description  Sets whether the banner is enabled or not
@@ -69,7 +70,8 @@ namespace com.keyman.osk {
         ds.display = 'none';
       }
 
-      return (!(currentHeightStyle === ds.height) || !(currentDisplayStyle === ds.display));
+      return (!(currentHeightStyle === ds.height) || 
+        !(currentDisplayStyle === ds.display));
     }
 
     public constructor(enabled: boolean, height?: number) {
@@ -289,10 +291,13 @@ namespace com.keyman.osk {
      * Scope        Public
      * Description  Clears the suggestions in the suggestion banner
      */
-    public invalidateSuggestions: (this: SuggestionBanner) => boolean = function(this: SuggestionBanner) {
+    public invalidateSuggestions: (this: SuggestionBanner) => boolean = 
+        function(this: SuggestionBanner) {
       this.suggestionList.forEach((suggestion, i) => {
-        this.suggestionList[i].update('kmw-suggestion-'+i, SuggestionBanner.BLANK_SUGGESTION());
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), this.getDiv().childNodes.item(i));
+        this.suggestionList[i].update('kmw-suggestion-'+i, 
+          SuggestionBanner.BLANK_SUGGESTION());
+        this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
+          this.getDiv().childNodes.item(i));
       });
     }.bind(this);
 
@@ -303,10 +308,11 @@ namespace com.keyman.osk {
      * Description    Update the displayed suggestions in the SuggestionBanner
      */
     public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean =
-      function(this: SuggestionBanner, suggestions: Suggestion[]) {
+        function(this: SuggestionBanner, suggestions: Suggestion[]) {
       this.suggestionList.forEach((suggestion, i) => {
         this.suggestionList[i].update('kmw-suggestion-'+i, suggestions[i]);
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), this.getDiv().childNodes.item(i));
+        this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
+          this.getDiv().childNodes.item(i));
       });
     }.bind(this);
   }
