@@ -338,7 +338,7 @@ cleanKeyboards.then(() => {
         for(let k in baseResultJSON) {
           if(typeof baseResultJSON[k] !== 'string') {
             let input = `${testsJSON.inputTests[k].context ? `"${testsJSON.inputTests[k].context}" ` : ""}+ ${keyname(testsJSON.inputTests[k].modifier, testsJSON.inputTests[k].key)}`;
-            fail(`${keyboard.shortname}/${keyboard.id}[$k]: error in test: ${input}: ${baseResultJSON[k].error}`, 5);
+            fail(`${keyboard.shortname}/${keyboard.id}[${k}]: error in test: ${input}: ${baseResultJSON[k].error}`, 5);
           }
         }
 

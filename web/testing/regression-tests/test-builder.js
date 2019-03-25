@@ -40,13 +40,9 @@ keyboards.forEach(function(keyboard) {
         const locator = shortname+'/'+id;
         it('should generate a set of results for "all" possible inputs', function() {
           return windowLoad
-            .then(function() {
-              return testRunner.loadTests(locator)
-                .then((shouldRun) => { if(shouldRun) { testRunner.runTests(id); } return shouldRun; })
-                .then((shouldSave) => testRunner.saveTestResults(locator, (testRunner.keyboards[id] || {}).results));
-                //.then(() => testRunner.runTests(id))
-                //.then(() => testRunner.saveTestResults(locator, testRunner.keyboards[id].results));
-              });
+            .then(testRunner.loadTests(locator))
+            .then((shouldRun) => { if(shouldRun) { testRunner.runTests(id); } return shouldRun; })
+            .then(() => testRunner.saveTestResults(locator, (testRunner.keyboards[id] || {}).results));
         }).timeout(0);
       });
     `;

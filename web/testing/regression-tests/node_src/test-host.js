@@ -54,7 +54,13 @@ module.exports = {
 
     function finish(json) {
       response.setHeader('Content-Type', 'application/json');
-      if(request.method !== 'POST' || !json || typeof json != 'object' || !json.id || !json.shortname || !json.compilerVersion || !json.engineVersion) {
+      if(request.method !== 'POST' || 
+          !json || 
+          typeof json != 'object' || 
+          !json.id || 
+          !json.shortname || 
+          !json.hasOwnProperty('compilerVersion') || 
+          !json.hasOwnProperty('engineVersion')) {
         console.warn('/save-results Invalid request');
         response.writeHead(400);
         return response.end(JSON.stringify({result: "Invalid request"}));
@@ -68,7 +74,7 @@ module.exports = {
       const filename = `${json.id}-${compilerVersion}-${engineVersion}.results`;
   
       console.log(`/save-results ${json.shortname}/${filename}`);
-    
+
       // Do some basic sanity checks to avoid disasters
       if(typeof(json.id) != 'string' || !json.id.match(/^[a-z0-9_]+$/) ||
           typeof(json.shortname) != 'string' || !json.shortname.match(/^[a-z]+$/) ||
@@ -97,10 +103,11 @@ module.exports = {
           return response.end(JSON.stringify({result: msg}));
         }
       }
-    
+
       // Assuming for now that the json is valid. This is internal use so we are not too worried
       // about integrity.
       fs.writeFileSync(path.join(base, filename), JSON.stringify(json.results, null, 2));
+
       response.writeHead(200);
       return response.end(JSON.stringify({result: 'success'}));
     };

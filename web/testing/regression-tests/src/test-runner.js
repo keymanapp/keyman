@@ -156,9 +156,11 @@ var testRunner = {
    */
   saveTestResults: function(locator, results) {
     return new Promise(function(resolve, reject) {
-      console.log('saving test '+locator);
+      console.log('Saving test result '+locator);
       let json = testRunner.parseLocator(locator);
       if(!json.id) throw new Error('Invalid locator: '+locator);
+
+      if(results === null || results === undefined) results = {'0': {error: 'no results found'}};
 
       json.results = typeof results == 'string' ? JSON.parse(results) : results;
       json.engineVersion = keyman.build.toString();
