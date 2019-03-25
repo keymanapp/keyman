@@ -333,6 +333,15 @@ cleanKeyboards.then(() => {
 
         const testsFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}.tests`);
         const testsJSON = JSON.parse(fs.readFileSync(testsFilename, 'utf8'));
+
+        // First, check the base result for errors
+        for(let k in baseResultJSON) {
+          if(typeof baseResultJSON[k] !== 'string') {
+            let input = `${testsJSON.inputTests[k].context ? `"${testsJSON.inputTests[k].context}" ` : ""}+ ${keyname(testsJSON.inputTests[k].modifier, testsJSON.inputTests[k].key)}`;
+            fail(`${keyboard.shortname}/${keyboard.id}[$k]: error in test: ${input}: ${baseResultJSON[k].error}`, 5);
+          }
+        }
+
         //console.log(baseResultFilename, baseResult);
         testedCompilerVersions.forEach((cv) => {
           testedEngineVersions.forEach((ev) => {

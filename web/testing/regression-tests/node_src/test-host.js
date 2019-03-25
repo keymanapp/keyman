@@ -53,11 +53,9 @@ module.exports = {
     let body = [];
 
     function finish(json) {
-      //console.log(json);
-
       response.setHeader('Content-Type', 'application/json');
       if(request.method !== 'POST' || !json || typeof json != 'object' || !json.id || !json.shortname || !json.compilerVersion || !json.engineVersion) {
-        console.error('/save-results Invalid request');
+        console.warn('/save-results Invalid request');
         response.writeHead(400);
         return response.end(JSON.stringify({result: "Invalid request"}));
       }
@@ -76,7 +74,7 @@ module.exports = {
           typeof(json.shortname) != 'string' || !json.shortname.match(/^[a-z]+$/) ||
           typeof(compilerVersion) != 'string' || !compilerVersion.match(/^((\d+)(\.\d+)*)|source$/) ||
           typeof(engineVersion) != 'string' || !engineVersion.match(/^((\d+)(\.\d+)*)|source$/)) {
-        console.error('/save-results Invalid request');
+        console.warn('/save-results Invalid request');
         response.writeHead(400);
         return response.end(JSON.stringify({result: "Invalid request"}));
       }
@@ -85,7 +83,7 @@ module.exports = {
       let base = path.join(KEYBOARDS_ROOT, json.shortname, json.id);
       if(!fs.existsSync(base)) {
         const msg = `Keyboard ${json.shortname}/${json.id} not found at ${base}`;
-        console.error('/save-results 404 '+msg);
+        console.warn('/save-results 404 '+msg);
         response.writeHead(404);
         return response.end(JSON.stringify({result: msg}));
       }
@@ -94,7 +92,7 @@ module.exports = {
         fs.mkdirSync(base);
         if(!fs.existsSync(base)) {
           const msg = `Could not create tests folder ${base}`;
-          console.error('/save-results 500 '+msg);
+          console.warn('/save-results 500 '+msg);
           response.writeHead(500);
           return response.end(JSON.stringify({result: msg}));
         }

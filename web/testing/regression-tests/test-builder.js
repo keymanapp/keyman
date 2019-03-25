@@ -43,7 +43,7 @@ keyboards.forEach(function(keyboard) {
             .then(function() {
               return testRunner.loadTests(locator)
                 .then((shouldRun) => { if(shouldRun) { testRunner.runTests(id); } return shouldRun; })
-                .then((shouldSave) => { testRunner.saveTestResults(locator, (testRunner.keyboards[id] || {}).results); return shouldSave; });
+                .then((shouldSave) => testRunner.saveTestResults(locator, (testRunner.keyboards[id] || {}).results));
                 //.then(() => testRunner.runTests(id))
                 //.then(() => testRunner.saveTestResults(locator, testRunner.keyboards[id].results));
               });

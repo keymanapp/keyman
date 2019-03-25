@@ -159,6 +159,7 @@ var testRunner = {
       console.log('saving test '+locator);
       let json = testRunner.parseLocator(locator);
       if(!json.id) throw new Error('Invalid locator: '+locator);
+
       json.results = typeof results == 'string' ? JSON.parse(results) : results;
       json.engineVersion = keyman.build.toString();
       try {
@@ -285,9 +286,13 @@ var testRunner = {
         keyman.interface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.text.Processor.getOutputTarget(receiver) : receiver, e);
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
-        console.error(err);
+        console.warn(err.toString());
         this.keyboards[keyboardId].results[testId] = {error: err.message, filename: err.filename, lineno: err.lineno};
+        if(!knownFailures[keyboardId]) {
+          return false;
+        }
       }
+      return true;
     }
   },
 
