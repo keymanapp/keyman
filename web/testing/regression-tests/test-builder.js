@@ -40,7 +40,7 @@ keyboards.forEach(function(keyboard) {
         const locator = shortname+'/'+id;
         it('should generate a set of results for "all" possible inputs', function() {
           return windowLoad
-            .then(testRunner.loadTests(locator))
+            .then(() => testRunner.loadTests(locator))
             .then((shouldRun) => { if(shouldRun) { testRunner.runTests(id); } return shouldRun; })
             .then(() => testRunner.saveTestResults(locator, (testRunner.keyboards[id] || {}).results));
         }).timeout(0);
