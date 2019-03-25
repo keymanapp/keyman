@@ -231,11 +231,11 @@ namespace com.keyman.osk {
       }
 
       let device = util.device;
+      let oskManager = com.keyman.singleton.osk;
       if (device.formFactor != 'desktop') {
-        let oskManager = com.keyman.singleton.osk;
         ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
       } else {
-        ts.width = spec.width + 'px';
+        ts.width = Math.floor(oskManager.getWidthFromCookie() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
