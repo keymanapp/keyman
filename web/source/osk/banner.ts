@@ -3,7 +3,6 @@ namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
   export abstract class Banner {
-    private _enabled: boolean;
     private _height: number; // pixels
     private div: HTMLDivElement;
 
@@ -33,26 +32,6 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Function     enable
-     * Scope        Public
-     * @return      {boolean} true if the banner is enabled
-     * Description  Returns whether the banner is enabled or not
-     */
-    public get enable(): boolean {
-      return this._enabled;
-    }
-
-    /**
-     * Function     enable
-     * Scope        Public
-     * @param       {boolean} enable     true if the banner is to be enabled
-     * Description  Sets whether the banner is enabled or not
-     */
-    public set enable(enable: boolean) {
-      this._enabled = enable;
-    }
-
-    /**
      * Function      update
      * @return       {boolean}   true if the banner styling changed
      * Description   Update the height and display styling of the banner
@@ -74,7 +53,7 @@ namespace com.keyman.osk {
         !(currentDisplayStyle === ds.display));
     }
 
-    public constructor(enabled: boolean, height?: number) {
+    public constructor(height?: number) {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
@@ -83,7 +62,6 @@ namespace com.keyman.osk {
       d.className = "kmw-banner-bar";
       this.div = d;
 
-      this.enable = enabled;
       this.height = height;
       this.update();
     }
@@ -113,7 +91,7 @@ namespace com.keyman.osk {
   export class BlankBanner extends Banner {
 
     constructor() {
-      super(true, 0);
+      super(0);
     }
   }
 
@@ -128,12 +106,12 @@ namespace com.keyman.osk {
 
     constructor(imagePath, height?: number) {
       if (imagePath.length > 0) {
-        super(true);
+        super();
         if (height) {
           this.height = height;
         }
       } else {
-        super(true, 0);
+        super(0);
       }
 
       this.img = document.createElement('img');
@@ -153,9 +131,6 @@ namespace com.keyman.osk {
     public setImagePath(imagePath: string) {
       if (this.img) {
         this.img.setAttribute('src', imagePath);
-      }
-      if (imagePath.length > 0) {
-        this.enable = true;
       }
     }
   }
@@ -266,7 +241,7 @@ namespace com.keyman.osk {
     private suggestionList : BannerSuggestion[];
 
     constructor() {
-      super(true, SuggestionBanner.DEFAULT_HEIGHT);
+      super(SuggestionBanner.DEFAULT_HEIGHT);
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', 33, ' ');
