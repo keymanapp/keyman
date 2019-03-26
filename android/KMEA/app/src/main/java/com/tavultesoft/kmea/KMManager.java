@@ -57,6 +57,8 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class KMManager {
@@ -154,6 +156,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
+  public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
 
   private static Context appContext;
 
@@ -645,6 +648,39 @@ public final class KMManager {
 
   public static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
     return KeyboardPickerActivity.getKeyboardsList(context);
+  }
+
+  public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
+    String pkgID = lexicalModelInfo.get(KMKey_PackageID);
+    String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
+    String languageID = lexicalModelInfo.get(KMKey_LanguageID);
+    String path = "file://" + getLexicalModelsDir() + pkgID + File.separator + modelID + ".model.js";
+
+    JSONObject m = new JSONObject();
+    JSONArray languageArray = new JSONArray();
+    try {
+      m.put("id", modelID);
+      languageArray.put(languageID);
+      m.put("languages", languageArray);
+      m.put("path", path);
+    } catch (JSONException e) {
+
+    }
+
+    // Escape quotes for javascript call
+    String model = String.valueOf(m).replaceAll("\"", "\\\\\"");
+
+    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+      InAppKeyboard.loadUrl(String.format("javascript:registerModel('%s')", model));
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+      SystemKeyboard.loadUrl(String.format("javascript:registerModel('%s')", model));
+    }
+    return true;
+  }
+
+  public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+    return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {

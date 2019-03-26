@@ -20,7 +20,8 @@ public final class KeyboardEventHandler {
     KEYBOARD_DISMISSED,
     KEYBOARD_DOWNLOAD_STARTED,
     KEYBOARD_DOWNLOAD_FINISHED,
-    PACKAGE_INSTALLED;
+    PACKAGE_INSTALLED,
+    LEXICAL_MODEL_INSTALLED;
   }
 
   public static void notifyListeners(ArrayList<OnKeyboardEventListener> listeners, KeyboardType keyboardType, EventType event, String newValue) {
@@ -44,11 +45,13 @@ public final class KeyboardEventHandler {
     }
   }
 
-  public static void notifyListeners(ArrayList<OnKeyboardDownloadEventListener> listeners, EventType event, HashMap<String, String> keyboardInfo, int result) {
+  public static void notifyListeners(ArrayList<OnKeyboardDownloadEventListener> listeners,
+                                     EventType event, HashMap<String, String> keyboardInfo, int result) {
     if (listeners != null) {
       @SuppressWarnings("unchecked")
       // make a copy of the list to avoid concurrent modification while iterating
-        ArrayList<OnKeyboardDownloadEventListener> _listeners = (ArrayList<OnKeyboardDownloadEventListener>) listeners.clone();
+      ArrayList<OnKeyboardDownloadEventListener> _listeners =
+        (ArrayList<OnKeyboardDownloadEventListener>) listeners.clone();
       if (event == EventType.KEYBOARD_DOWNLOAD_STARTED) {
         for (OnKeyboardDownloadEventListener listener : _listeners)
           listener.onKeyboardDownloadStarted(keyboardInfo);
@@ -59,14 +62,22 @@ public final class KeyboardEventHandler {
     }
   }
 
-  public static void notifyListeners(ArrayList<OnKeyboardDownloadEventListener> listeners, EventType event, List<Map<String, String>> keyboardsInfo, int result) {
+  public static void notifyListeners(ArrayList<OnKeyboardDownloadEventListener> listeners,
+                                     EventType event, List<Map<String, String>> info, int result) {
     if (listeners != null) {
       @SuppressWarnings("unchecked")
       // make a copy of the list to avoid concurrent modification while iterating
-        ArrayList<OnKeyboardDownloadEventListener> _listeners = (ArrayList<OnKeyboardDownloadEventListener>) listeners.clone();
+      ArrayList<OnKeyboardDownloadEventListener> _listeners =
+        (ArrayList<OnKeyboardDownloadEventListener>) listeners.clone();
       if (event == EventType.PACKAGE_INSTALLED) {
-        for (OnKeyboardDownloadEventListener listener : _listeners)
-          listener.onPackageInstalled(keyboardsInfo);
+        for (OnKeyboardDownloadEventListener listener : _listeners) {
+          listener.onPackageInstalled(info);
+        }
+      } else if (event == EventType.LEXICAL_MODEL_INSTALLED) {
+        for (OnKeyboardDownloadEventListener listener : _listeners) {
+          listener.onLexicalModelInstalled(info);
+        }
+
       }
     }
   }
@@ -88,5 +99,7 @@ public final class KeyboardEventHandler {
     void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result); // result > 0 if successful, < 0 if failed
 
     void onPackageInstalled(List<Map<String, String>> keyboardsInstalled);
+
+    void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled);
   }
 }

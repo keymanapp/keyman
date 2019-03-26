@@ -830,6 +830,14 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    for(int i=0; i<lexicalModelsInstalled.size(); i++) {
+      HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      KMManager.addLexicalModel(this, lexicalModelInfo);
+    }
+  }
+
   private void copyFile(FileInputStream inStream, File dstFile) throws IOException {
     OutputStream outStream = new FileOutputStream(dstFile);
 

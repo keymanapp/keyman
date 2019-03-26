@@ -164,6 +164,11 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     // Do nothing.
   }
 
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    // Do nothing.
+  }
+
   protected static HashMap<String, String> getKeyboardInfo(int languageIndex, int keyboardIndex) {
     if (languages == null)
       return null;
