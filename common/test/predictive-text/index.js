@@ -1,7 +1,7 @@
 /**
  *
  */
-const LMLayer = require('../predictive-text');
+const LMLayer = require('../../predictive-text');
 
 
 asyncMain().then(_ => process.exit(0));
@@ -37,7 +37,7 @@ function getCurrentContext() {
 
 function createAsyncWorker() {
   // XXX: import the LMLayerWorker directly -- I know where it is built.
-  const LMLayerWorker = require('../predictive-text/build/intermediate');
+  const LMLayerWorker = require('../../predictive-text/build/intermediate');
   const vm = require('vm');
   const fs = require('fs');
 
