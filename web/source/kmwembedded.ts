@@ -352,11 +352,12 @@ namespace com.keyman.text {
   };
 
   /**
-   * Register and enable lexical model
+   * Register a lexical model
+   * 
+   * @param {com.keyman.text.prediction.ModelSpec} model  Spec of the lexical model
    */
   keymanweb['registerModel']=function(model: com.keyman.text.prediction.ModelSpec) {
     keymanweb.modelManager.register(model);
-    keymanweb.modelManager.enabled = true;
   }
 
   /**
