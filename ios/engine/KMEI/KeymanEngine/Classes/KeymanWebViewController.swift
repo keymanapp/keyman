@@ -169,7 +169,8 @@ extension KeymanWebViewController {
   }
 
   func setOskHeight(_ height: Int) {
-    webView?.evaluateJavaScript("setOskHeight(\(height));", completionHandler: nil)
+    let h = height - 40
+    webView?.evaluateJavaScript("setOskHeight(\(h));", completionHandler: nil)
   }
 
   func setPopupVisible(_ visible: Bool) {
@@ -455,7 +456,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
   func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
     if UIDevice.current.userInterfaceIdiom == .pad
-      || (Util.isSystemKeyboard && Manager.shared.inputViewController.activeTopBarHeight == 0)
+      || (Util.isSystemKeyboard /*&& Manager.shared.inputViewController.activeTopBarHeight == 0*/)
       || isSubKeysMenuVisible {
       return
     }

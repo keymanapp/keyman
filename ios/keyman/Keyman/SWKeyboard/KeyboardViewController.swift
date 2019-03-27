@@ -47,23 +47,23 @@ class KeyboardViewController: InputViewController {
   }
 
   func setupTopBarImage(isPortrait: Bool) {
-    if isPortrait {
-      topBarImageView?.image = #imageLiteral(resourceName: "banner-Portrait.png")
-      return
-    }
-
-    // iPad
-    if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
-      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
-      return
-    }
-
-    // iPhone
-    let screenRect = UIScreen.main.bounds
-    if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
-      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape-568h.png")
-    } else {
-      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
-    }
+//    if isPortrait {
+//      topBarImageView?.image = #imageLiteral(resourceName: "banner-Portrait.png")
+//      return
+//    }
+//
+//    // iPad
+//    if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
+//      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
+//      return
+//    }
+//
+//    // iPhone
+//    let screenRect = UIScreen.main.bounds
+//    if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
+//      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape-568h.png")
+//    } else {
+//      topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
+//    }
   }
 }

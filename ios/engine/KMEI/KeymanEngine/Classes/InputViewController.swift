@@ -27,8 +27,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
   var menuBehaviour = MenuBehaviour.showAlways
 
-  open var topBarImageView: UIImageView?
-
   var _isSystemKeyboard: Bool
   var isSystemKeyboard: Bool {
     return _isSystemKeyboard;
@@ -45,12 +43,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
   }
 
-  open class var topBarHeight: Int {
-    if InputViewController.isPortrait {
-      return 41
-    }
-    return UIDevice.current.userInterfaceIdiom == .phone ? 34 : 39
-  }
+//  open class var topBarHeight: Int {
+//    if InputViewController.isPortrait {
+//      return 41
+//    }
+//    return UIDevice.current.userInterfaceIdiom == .phone ? 34 : 39
+//  }
 
   open override var hasFullAccess: Bool {
     return Storage.shared != nil
@@ -62,7 +60,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   // TODO:  Consider deleting this.
   private var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight + activeTopBarHeight
+    return keymanWeb.keyboardHeight //+ activeTopBarHeight
   }
   
   public convenience init() {
@@ -118,13 +116,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseView.autoresizingMask = UIViewAutoresizing.flexibleHeight.union(.flexibleWidth)
 
     keymanWeb.delegate = self
-
-    // Fixes debugging issue - views added later are moved to the front.
-    topBarImageView?.removeFromSuperview()
-    topBarImageView = UIImageView()
-    topBarImageView!.translatesAutoresizingMaskIntoConstraints = false
-    topBarImageView!.backgroundColor = UIColor.gray
-    baseView.addSubview(topBarImageView!)
 
     baseView.addSubview(keymanWeb.view)
 
@@ -293,47 +284,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint.isActive = true
   }
 
-  public var activeTopBarHeight: CGFloat {
-    // If 'isSystemKeyboard' is true, always show the top bar.
-    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
-  }
+//  public var activeTopBarHeight: CGFloat {
+//    // If 'isSystemKeyboard' is true, always show the top bar.
+//    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
+//  }
   
   public var kmwHeight: CGFloat {
     return keymanWeb.keyboardHeight
   }
 
   private func setInnerConstraints() {
-    let topBar = topBarImageView!
     let container = keymanWeb.view!
-    
-    // Establish a consistent set of constraints for the top bar.
-    if #available(iOSApplicationExtension 11.0, *) {
-      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-
-      // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
-      topBarWidthConstraint.priority = .defaultHigh
-      topBarWidthConstraint.isActive = true
-    } else {
-      topBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
-      
-      // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
-      topBarWidthConstraint.priority = .defaultHigh
-      topBarWidthConstraint.isActive = true
-    }
-
-    topBar.heightAnchor.constraint(equalToConstant: activeTopBarHeight).isActive = true
-
-    // Establishes a set of constraints for the keyboard's container, supporting autoresizing of
-    // the keyboard's WebView via its constraints.
-    container.topAnchor.constraint(equalTo:topBar.bottomAnchor).isActive = true
 
     if #available(iOSApplicationExtension 11.0, *) {
+      container.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
       container.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
@@ -344,6 +308,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.isActive = true
     } else {
       // Fallback on earlier versions
+      container.topAnchor.constraint(equalTo:view.layoutMarginsGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.layoutMarginsGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo:view.layoutMarginsGuide.leftAnchor).isActive = true
       container.rightAnchor.constraint(equalTo:view.layoutMarginsGuide.rightAnchor).isActive = true
@@ -355,9 +320,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
     
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true) + 40)
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false) + 40)
     landscapeHeight.priority = .defaultHigh
 
     portraitConstraint = portraitHeight
