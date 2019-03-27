@@ -656,25 +656,27 @@ public final class KMManager {
     String languageID = lexicalModelInfo.get(KMKey_LanguageID);
     String path = "file://" + getLexicalModelsDir() + pkgID + File.separator + modelID + ".model.js";
 
-    JSONObject m = new JSONObject();
-    JSONArray languageArray = new JSONArray();
+    JSONObject modelObj = new JSONObject();
+    JSONArray languageJSONArray = new JSONArray();
     try {
-      m.put("id", modelID);
-      languageArray.put(languageID);
-      m.put("languages", languageArray);
-      m.put("path", path);
+      modelObj.put("id", modelID);
+      languageJSONArray.put(languageID);
+      modelObj.put("languages", languageJSONArray);
+      modelObj.put("path", path);
     } catch (JSONException e) {
 
     }
 
-    // Escape quotes for javascript call
-    String model = String.valueOf(m).replaceAll("\"", "\\\\\"");
+    // Use single quotes in JSONobject for javascript call
+    String model = String.valueOf(modelObj);
+    model = model.replaceAll("\"", "'");
+    //model = "{'id': 'example.en.custom', 'languages': ['en'], 'path': 'file:///data/user/0/com.tavultesoft.kmapro.debug/app_data/models/example.en.custom.model/example.en.custom.model.js'}";
 
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-      InAppKeyboard.loadUrl(String.format("javascript:registerModel('%s')", model));
+      InAppKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-      SystemKeyboard.loadUrl(String.format("javascript:registerModel('%s')", model));
+      SystemKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
     }
     return true;
   }

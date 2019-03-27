@@ -134,6 +134,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     }
 
+    lexicalModelsList = getLexicalModelsList(context);
     if (lexicalModelsList == null) {
       lexicalModelsList = new ArrayList<HashMap<String, String>>();
 
@@ -623,11 +624,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   }
 
   protected static HashMap<String, String> getAssociatedLexicalModel(String langId) {
-    int length = lexicalModelsList.size();
-    for( int i=0; i < length; i++) {
-      HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-      if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
-        return lmInfo;
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i = 0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
+          return lmInfo;
+        }
       }
     }
 
