@@ -664,7 +664,8 @@ public final class KMManager {
       modelObj.put("languages", languageJSONArray);
       modelObj.put("path", path);
     } catch (JSONException e) {
-
+      Log.e(TAG, "Invalid lexical model to register");
+      return false;
     }
 
     // Use single quotes in JSONobject for javascript call
