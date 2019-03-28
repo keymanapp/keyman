@@ -175,6 +175,24 @@ namespace com.keyman.text {
       this._dks = original._dks.clone();
     }
 
+    apply(transform: Transform) {
+      if(transform.deleteRight) {
+        this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
+      }
+
+      if(transform.deleteLeft) {
+        this.deleteCharsBeforeCaret(transform.deleteLeft);
+      }
+
+      if(transform.insert) {
+        this.insertTextBeforeCaret(transform.insert);
+      }
+
+      // We assume that all deadkeys are invalidated after applying a Transform, since
+      // prediction implies we'll be completing a word, post-deadkeys.
+      this._dks.clear();
+    }
+
     /**
      * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
      * `OutputTarget`.

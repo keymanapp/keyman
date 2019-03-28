@@ -157,6 +157,7 @@ namespace com.keyman.osk {
 
   export class BannerSuggestion {
     spec: BannerSuggestionSpec;
+    suggestion: Suggestion;
 
     constructor(spec: BannerSuggestionSpec) {
       this.spec = spec;
@@ -171,6 +172,35 @@ namespace com.keyman.osk {
     public update(id: string, suggestion: Suggestion) {
       this.spec.id = id;
       this.spec.text = suggestion.displayAs;
+      this.suggestion = suggestion;
+    }
+
+    /**
+     * Function apply
+     * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
+     * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
+     */
+    public apply(target?: text.OutputTarget) {
+      let keyman = com.keyman.singleton;
+      
+      // Find the state of the context at the time the prediction-triggering keystroke was applied.
+      let original = keyman.modelManager.getPredictionState(this.suggestion.transformId);
+      if(!original) {
+        console.warn("Could not apply the Suggestion!");
+        return;
+      } else {
+        if(!target) {
+          /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
+           * everything if/when the active `OutputTarget` changes, though we haven't gotten that 
+           * far in implementation yet.
+           */
+          target = text.Processor.getOutputTarget();
+        }
+
+        // Apply the Suggestion!
+        target.restoreTo(original.preInput);
+        target.apply(this.suggestion.transform);
+      }
     }
 
     /**
