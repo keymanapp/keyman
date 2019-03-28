@@ -41,29 +41,38 @@ function createAsyncWorker() {
   const vm = require('vm');
   const fs = require('fs');
 
+  let worker = {
+    postMessage(message) {
+      console.log('[top-level]', message);
+      workerScope.onmessage({ data: message });
+    },
+    onmessage(message) {
+      throw new Error('this should be reassigned!');
+    }
+  };
+
   let workerScope = {
+    LMLayerWorker,
     postMessage(message) {
       console.log('[worker]', message);
+      worker.onmessage({ data: message });
     },
     importScripts(uri) {
       let sourceCode = fs.readFileSync(uri, 'UTF-8');
       console.log('[worker] execing file:', uri);
-      vm.runInContext(sourceCode, workerScope);
+      vm.runInContext(sourceCode, workerScope, {
+        filename: uri,
+        displayErrors: true,
+        breakOnSigint: true,
+      });
     }
   };
   vm.createContext(workerScope);
 
-  let worker = LMLayerWorker.install(workerScope);
-  // 
-  LMLayerWorker['loadModel'] = function (uri) {
-    console.log('Yup, loading this here script...');
-    worker.loadModel(uri);
+  let internal = LMLayerWorker.install(workerScope);
+  LMLayerWorker.loadModel = function (uri) {
+    internal.loadModel(uri);
   }
 
-  return {
-    postMessage(message) {
-      console.log('[top-level]', message);
-      workerScope.onmessage({ data: message });
-    }
-  };
+  return worker;
 }

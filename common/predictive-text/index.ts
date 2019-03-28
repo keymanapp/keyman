@@ -90,14 +90,14 @@ namespace com.keyman.text.prediction {
      */
     loadModel(modelFilePath: string): Promise<Configuration> {
       return new Promise((resolve, _reject) => {
+        // Sets up so the promise is resolved in the onMessage() callback, when it receives
+        // the 'ready' message.
+        this._declareLMLayerReady = resolve;
+
         this._worker.postMessage({
           message: 'load',
           model: modelFilePath
         });
-
-        // Sets up so the promise is resolved in the onMessage() callback, when it receives
-        // the 'ready' message.
-        this._declareLMLayerReady = resolve;
       });
     }
 
