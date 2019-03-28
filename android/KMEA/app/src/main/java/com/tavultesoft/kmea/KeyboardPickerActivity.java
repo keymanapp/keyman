@@ -58,6 +58,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   private static KMKeyboardPickerAdapter listAdapter = null;
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
+  private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
+  // private static HashMap<String, String> lexicalModelsVersions = null; TODO
   private static boolean checkingUpdates = false;
   private static int updateCount = 0;
   private static int failedUpdateCount = 0;
@@ -125,9 +127,22 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       keyboardsList.add(kbInfo);
 
       // We'd prefer not to overwrite a file if it exists
-      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE),
+        KMManager.KMFilename_KeyboardsList);
       if (!file.exists()) {
-        saveKeyboardsList(context);
+        saveList(context, KMManager.KMFilename_KeyboardsList);
+      }
+    }
+
+    lexicalModelsList = getLexicalModelsList(context);
+    if (lexicalModelsList == null) {
+      lexicalModelsList = new ArrayList<HashMap<String, String>>();
+
+      // We'd prefer not to overwrite a file if it exists
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE),
+        KMManager.KMFilename_LexicalModelsList);
+      if (!file.exists()) {
+        saveList(context, KMManager.KMFilename_LexicalModelsList);
       }
     }
 
@@ -315,17 +330,21 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return false;
   }
 
-  private static boolean saveKeyboardsList(Context context) {
+  private static boolean saveList(Context context, String listName) {
     boolean result;
     try {
-      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), listName);
       ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-      outputStream.writeObject(keyboardsList);
+      if (listName.equalsIgnoreCase(KMManager.KMFilename_KeyboardsList)) {
+        outputStream.writeObject(keyboardsList);
+      } else if (listName.equalsIgnoreCase(KMManager.KMFilename_LexicalModelsList)) {
+        outputStream.writeObject(lexicalModelsList);
+      }
       outputStream.flush();
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save keyboards list. Error: " + e);
+      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
       result = false;
     }
 
@@ -335,7 +354,14 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   protected static boolean updateKeyboardsList(Context context, ArrayList<HashMap<String, String>> list) {
     boolean result;
     keyboardsList = list;
-    result = saveKeyboardsList(context);
+    result = saveList(context, KMManager.KMFilename_KeyboardsList);
+    return result;
+  }
+
+  protected static boolean updateLexicalModelsList(Context context, ArrayList<HashMap<String, String>> list) {
+    boolean result;
+    lexicalModelsList = list;
+    result = saveList(context, KMManager.KMFilename_LexicalModelsList);
     return result;
   }
 
@@ -359,6 +385,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
     KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+
+    // Register associated lexical model
+    HashMap<String, String> lmInfo = getAssociatedLexicalModel(langId);
+    if (lmInfo != null) {
+      KMManager.registerLexicalModel(lmInfo);
+    }
+
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -382,12 +415,45 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           int x = getKeyboardIndex(context, kbKey);
           if (x >= 0) {
             keyboardsList.set(x, keyboardInfo);
-            result = saveKeyboardsList(context);
+            result = saveList(context, KMManager.KMFilename_KeyboardsList);
           } else {
             keyboardsList.add(keyboardInfo);
-            result = saveKeyboardsList(context);
+            result = saveList(context, KMManager.KMFilename_KeyboardsList);
             if (!result) {
               keyboardsList.remove(keyboardsList.size() - 1);
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  protected static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+    boolean result = false;
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = new ArrayList<HashMap<String, String>>();
+    }
+
+    if (lexicalModelInfo != null) {
+      String pkgID = lexicalModelInfo.get(KMManager.KMKey_PackageID);
+      String modelID = lexicalModelInfo.get(KMManager.KMKey_LexicalModelID);
+      String langID = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
+
+      if (pkgID != null && modelID != null && langID != null) {
+        String lmKey = String.format("%s_%s_%s", langID, pkgID, modelID);
+        if (lmKey.length() >= 3) {
+          int x = getLexicalModelIndex(context, lmKey);
+          if (x >= 0) {
+            lexicalModelsList.set(x, lexicalModelInfo);
+            result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+          } else {
+            lexicalModelsList.add(lexicalModelInfo);
+            result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+            if (!result) {
+              lexicalModelsList.remove(lexicalModelsList.size() - 1);
             }
           }
         }
@@ -405,7 +471,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
     if (keyboardsList != null && position >= 0 && position < keyboardsList.size()) {
       keyboardsList.remove(position);
-      result = saveKeyboardsList(context);
+      result = saveList(context, KMManager.KMFilename_KeyboardsList);
     }
 
     return result;
@@ -430,22 +496,30 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   }
 
   @SuppressWarnings("unchecked")
-  protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
+  private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
     ArrayList<HashMap<String, String>> list = null;
 
-    File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+    File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), filename);
     if (file.exists()) {
       try {
         ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e(TAG, "Failed to read keyboards list. Error: " + e);
+        Log.e(TAG, "Failed to read " + filename + ". Error: " + e);
         list = null;
       }
     }
 
     return list;
+  }
+
+  protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
+    return getList(context, KMManager.KMFilename_KeyboardsList);
+  }
+
+  protected static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
+    return getList(context, KMManager.KMFilename_LexicalModelsList);
   }
 
   protected static boolean containsKeyboard(Context context, String keyboardKey) {
@@ -522,6 +596,45 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return index;
+  }
+
+  protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
+    int index = -1;
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i=0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        String langId = lmInfo.get(KMManager.KMKey_LanguageID);
+        String pkgId = lmInfo.get(KMManager.KMKey_PackageID);
+        String lmId = lmInfo.get(KMManager.KMKey_LexicalModelID);
+        String lmKey = String.format("%s_%s_%s", langId, pkgId, lmId);
+        if (lmKey.equals(lexicalModelKey)) {
+          index = i;
+          break;
+        }
+      }
+    }
+
+    return index;
+  }
+
+  protected static HashMap<String, String> getAssociatedLexicalModel(String langId) {
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i = 0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
+          return lmInfo;
+        }
+      }
+    }
+
+    return null;
   }
 
   protected static HashMap<String, String> getKeyboardInfo(Context context, int index) {
@@ -751,7 +864,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         index = getKeyboardIndex(this, kbKey);
       }
       keyboardsList.set(index, keyboardInfo);
-      saveKeyboardsList(this);
+      saveList(this, KMManager.KMFilename_KeyboardsList);
     } else if (result < 0) {
       failedUpdateCount++;
     }
@@ -793,6 +906,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing
+  }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     // Do nothing
   }
 }

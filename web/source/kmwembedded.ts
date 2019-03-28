@@ -352,11 +352,20 @@ namespace com.keyman.text {
   };
 
   /**
+   * Register a lexical model
+   * 
+   * @param {com.keyman.text.prediction.ModelSpec} model  Spec of the lexical model
+   */
+  keymanweb['registerModel']=function(model: com.keyman.text.prediction.ModelSpec) {
+    keymanweb.modelManager.register(model);
+  }
+
+  /**
    * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
    * 
    *  @param  {boolean}  isVisible
    *     
-   **/                
+   **/
   keymanweb['popupVisible'] = function(isVisible)
   {
     osk.vkbd.popupVisible = isVisible;
