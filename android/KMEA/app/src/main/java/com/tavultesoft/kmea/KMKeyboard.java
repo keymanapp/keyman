@@ -137,13 +137,9 @@ final class KMKeyboard extends WebView {
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
             ". Loading default keyboard", Toast.LENGTH_LONG).show();
 
-          // TODO: Revert this after integration.
-          // Commented out to avoid infinite cycle of setting a keyboard, and throwing KMW registration errors
-          /*
           setKeyboard(KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID,
             KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
             KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
-          */
         }
         return true;
       }

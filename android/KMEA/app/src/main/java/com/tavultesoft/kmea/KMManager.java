@@ -671,7 +671,6 @@ public final class KMManager {
     // Use single quotes in JSONobject for javascript call
     String model = String.valueOf(modelObj);
     model = model.replaceAll("\"", "'");
-    //model = "{'id': 'example.en.custom', 'languages': ['en'], 'path': 'file:///data/user/0/com.tavultesoft.kmapro.debug/app_data/models/example.en.custom.model/example.en.custom.model.js'}";
 
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
