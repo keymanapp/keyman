@@ -163,6 +163,37 @@ namespace com.keyman.text {
     }
 
     /**
+     * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
+     * @param original An `OutputTarget` (usually a `Mock`).
+     */
+    restoreTo(original: OutputTarget) {
+      //
+      this.setTextBeforeCaret(original.getTextBeforeCaret());
+      this.setTextAfterCaret(original.getTextAfterCaret());
+
+      // Also, restore the deadkeys!
+      this._dks = original._dks.clone();
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected setTextBeforeCaret(s: string): void {
+      // This one's easy enough to provide a default implementation for.
+      this.deleteCharsBeforeCaret(this.getTextBeforeCaret()._kmwLength());
+      this.insertTextBeforeCaret(s);
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'after' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected abstract setTextAfterCaret(s: string): void;
+
+    /**
      * Returns the underlying element / document modeled by the wrapper.
      */
     abstract getElement(): HTMLElement;
@@ -316,6 +347,10 @@ namespace com.keyman.text {
     insertTextBeforeCaret(s: string): void {
       this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
       this.caretIndex += s.kmwLength();
+    }
+
+    protected setTextAfterCaret(s: string): void {
+      this.text = this.getTextBeforeCaret() + s;
     }
   }
 }
