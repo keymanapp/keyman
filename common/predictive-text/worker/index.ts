@@ -234,11 +234,15 @@ class LMLayerWorker {
           case 'predict':
             let {transform, context} = payload;
 
-            // Let's not rely on the model to copy transform IDs.
             let suggestions = model.predict(transform, context);
-            suggestions.forEach(function(s: Suggestion) {
-              s.transformId = transform.id;
-            });
+
+            // Let's not rely on the model to copy transform IDs.
+            // Only bother is there IS an ID to copy.
+            if(transform.id !== undefined) {
+              suggestions.forEach(function(s: Suggestion) {
+                s.transformId = transform.id;
+              });
+            }
 
             // Now that the suggestions are ready, send them out!
             this.cast('suggestions', {
