@@ -4,7 +4,12 @@
 const LMLayer = require('../../predictive-text');
 
 
-asyncMain().then(_ => process.exit(0));
+asyncMain()
+  .then(_ => process.exit(0))
+  .catch(err => {
+    console.error(err);
+    process.exit(127);
+  })
 
 async function asyncMain() {
   let lm = new LMLayer({}, createAsyncWorker());
@@ -15,7 +20,7 @@ async function asyncMain() {
 /**
  * A transform that inserts a single character.
  */
-function insertText(char) {
+function insertCharacter(char) {
   return {
     insert: char,
     deleteLeft: 0
@@ -70,7 +75,14 @@ function createAsyncWorker() {
   vm.createContext(workerScope);
 
   let internal = LMLayerWorker.install(workerScope);
-  LMLayerWorker.loadModel = function (uri) {
+
+  // XXX: The current generated file expects these functions, but they do not,
+  //      and will not exist! Stub them out:
+  LMLayerWorker['loadWordBreaker'] = function () {
+    console.warn('ignoring word breaker');
+  };
+  LMLayerWorker['loadModel'] = function (uri) {
+    // delegate to the internal LMLayerWorker instance:
     internal.loadModel(uri);
   }
 
