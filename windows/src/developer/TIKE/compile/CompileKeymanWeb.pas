@@ -212,7 +212,8 @@ type
     fMnemonic: Boolean;
     FCompilerWarningsAsErrors: Boolean;
     FTouchLayoutFont: string;
-    FFix183_LadderLength: Integer;   // I4872
+    FFix183_LadderLength: Integer;
+    FCloseBrace: Boolean;   // I4872
 
     function JavaScript_String(ch: DWord): string;  // I2242
 
@@ -656,6 +657,7 @@ begin
   if xstrlen(fkp.dpContext) > 0 then
   begin
     FIndent := FTabStops+FTabStop;
+    FCloseBrace := True;
     Result := Result + Format('%s%sif(%s){%s', [
       FTabStops,
       FElse,
@@ -666,6 +668,7 @@ begin
   else if FElse <> '' then
   begin
     FIndent := FTabStops+FTabStop;
+    FCloseBrace := True;
     Result := Result + Format('%s%s{%s', [
       FTabStops,
       FElse,
@@ -675,15 +678,15 @@ begin
   else
   begin
     FIndent := FTabStops;
+    FCloseBrace := False;
   end;
 
   if(fgp.fUsingKeys)                                                                                        // I1959
     then Result := Result + Format('%sr=m=1;%s%s', [FIndent,linecomment,JavaScript_OutputString(FIndent, fkp, fkp.dpOutput, fgp)])    // I1959   // I3681
     else Result := Result + Format('%sm=1;%s%s', [FIndent,linecomment,JavaScript_OutputString(FIndent, fkp, fkp.dpOutput, fgp)]);    // I1959   // I3681
-  if FIndent = FTabStops then
-    Result := Result + nl
-  else
-    Result := Result + Format('%s%s}%s', [nl, FTabStops, nl]);   // I3681
+  if not FCloseBrace
+    then Result := Result + nl
+    else Result := Result + Format('%s%s}%s', [nl, FTabStops, nl]);   // I3681
 end;
 
 function TCompileKeymanWeb.JavaScript_Rules(fgp: PFILE_GROUP): string;
