@@ -135,32 +135,63 @@ namespace com.keyman.osk {
     }
   }
 
-  export class BannerSuggestionSpec {
-    id: string;
-    languageID: string;
-    text?: string;
-    width: number;
-    pad?: string;
-    widthpc?: number; // Added during OSK construction.
-    padpc?: number; // Added during OSK construction.
-
-    public DEFAULT_SUGGESTION_WIDTH: number = 50; // pixels
-
-    constructor(id: string, languageID: string, text?: string, width?: number, pad?: string) {
-      this.id = id;
-      this.languageID = languageID;
-      this.text = text;
-      this.width = width ? width : this.DEFAULT_SUGGESTION_WIDTH;
-      this.pad = pad;
-    }
-  }
-
   export class BannerSuggestion {
-    spec: BannerSuggestionSpec;
-    suggestion: Suggestion;
+    div: HTMLDivElement;
+    private display: HTMLSpanElement;
+    private fontFamily?: string;
 
-    constructor(spec: BannerSuggestionSpec) {
-      this.spec = spec;
+    private suggestion: Suggestion;
+
+    private index: number;
+    private width: number;
+
+    private static readonly BASE_ID = 'kmw-suggestion-';
+
+    constructor(index: number, widthpc?: number) {
+      let keyman = com.keyman.singleton;
+
+      this.index = index;
+      this.width = widthpc > 0 ? (widthpc <= 100 ? widthpc : 100) : 0;
+
+      this.constructRoot();
+
+      // Provides an empty, base SPAN for text display.  We'll swap these out regularly;
+      // `Suggestion`s will have varying length and may need different styling.
+      let display = this.display = keyman.util._CreateElement('span');
+      this.div.appendChild(display);
+    }
+
+    private constructRoot() {
+      let keyman = com.keyman.singleton;
+
+      // Add OSK suggestion labels
+      let div = this.div = keyman.util._CreateElement('div'), ds=div.style;
+      div.className = "kmw-suggest-option";
+      div.id = BannerSuggestion.BASE_ID + this.index;
+
+      let kbdDetails = keyman.keyboardManager.activeStub;
+      if (kbdDetails['KLC']) {
+        div.lang = kbdDetails['KLC'];
+      }
+
+      // Establish base font settings
+      let font = kbdDetails['KFont'];
+      if(font && font.family && font.family != '') {
+        ds.fontFamily = this.fontFamily = font.family;
+      }
+
+      // Ensures that a reasonable width % is set.
+      let oskManager = keyman.osk;
+      let widthpc = this.width;
+
+      ds.width = widthpc + '%';
+      // if (keyman.util.device.formFactor == 'desktop') {
+      //   // Desktop OSK widths are defined in %.
+      //   ds.width = widthpc + '%';
+      // } else {
+      //   // Touch-based OSK widths are defined in px.
+      //   ds.width = widthpc + '%'; //Math.floor(oskManager.getWidth() * widthpc / 100) + 'px';
+      // }
     }
 
     /**
@@ -169,10 +200,14 @@ namespace com.keyman.osk {
      * @param {Suggestion} suggestion   Suggestion from the lexical model
      * Description  Update the ID and text of the BannerSuggestionSpec
      */
-    public update(id: string, suggestion: Suggestion) {
-      this.spec.id = id;
-      this.spec.text = suggestion.displayAs;
+    public update(suggestion: Suggestion) {
       this.suggestion = suggestion;
+      this.updateText();
+    }
+
+    private updateText() {
+      let display = this.generateSuggestionText();
+      this.div.replaceChild(display, this.display);
     }
 
     /**
@@ -210,39 +245,23 @@ namespace com.keyman.osk {
      */
     //
     public generateSuggestionText(): HTMLSpanElement {
-      let util = (<KeymanBase>window['keyman']).util;
-      let spec = this.spec;
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
 
-      // Add OSK suggestion labels
+      let suggestion = this.suggestion;
       var suggestionText: string;
-      var t=util._CreateElement('span'), ts=t.style;
-      t.id = spec.id;
-      t.className = "kmw-suggestion-span";
-      if(spec.text == null || spec.text == '') {
+
+      var s=util._CreateElement('span');
+      s.className = 'kmw-suggestion-text';
+
+      if(suggestion == null) {
+        return s;
+      }
+
+      if(suggestion.displayAs == null || suggestion.displayAs == '') {
         suggestionText = '\xa0';  // default:  nbsp.
       } else {
-        suggestionText = spec.text;
-      }
-
-      if (this.spec.languageID) {
-        t.lang = this.spec.languageID;
-      }
-
-      //Override font spec if set for this key in the layout
-      if(typeof spec['font'] == 'string' && spec['font'] != '') {
-        ts.fontFamily=spec['font'];
-      }
-
-      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
-        ts.fontSize=spec['fontsize'];
-      }
-
-      let device = util.device;
-      let oskManager = com.keyman.singleton.osk;
-      if (device.formFactor != 'desktop') {
-        ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
-      } else {
-        ts.width = Math.floor(oskManager.getWidthFromCookie() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
+        suggestionText = suggestion.displayAs;
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
@@ -251,13 +270,11 @@ namespace com.keyman.osk {
         suggestionText = '\u200f' + suggestionText;
       }
 
-      // Finalize the suggestion text
-      var d=util._CreateElement('div'), ds=d.style;
-      d.className = 'kmw-suggestion-text';
-      d.innerHTML = suggestionText;
-      t.appendChild(d);
+      // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
-      return t;
+      // Finalize the suggestion text
+      s.innerHTML = suggestionText;
+      return s;
     }
   }
 
@@ -269,27 +286,17 @@ namespace com.keyman.osk {
   export class SuggestionBanner extends Banner {
     public static SUGGESTION_LIMIT: number = 3;
     private suggestionList : BannerSuggestion[];
+    private currentSuggestions: Suggestion[] = [];
 
     constructor() {
       super(SuggestionBanner.DEFAULT_HEIGHT);
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-        let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', 33, ' ');
-        let d = new BannerSuggestion(s);
+        let d = new BannerSuggestion(i, 100 / SuggestionBanner.SUGGESTION_LIMIT);
         this.suggestionList[i] = d;
-        this.getDiv().appendChild(d.generateSuggestionText());
+        this.getDiv().appendChild(d.div);
       }
     }
-
-    public static BLANK_SUGGESTION(): Suggestion {
-      let s: Suggestion = {
-        displayAs: '',
-        transform: {
-          insert: '', deleteLeft: 0, deleteRight: 0
-        }
-      };
-      return s;
-    };
 
     /**
      * Function invalidateSuggestions
@@ -298,11 +305,8 @@ namespace com.keyman.osk {
      */
     public invalidateSuggestions: (this: SuggestionBanner) => boolean = 
         function(this: SuggestionBanner) {
-      this.suggestionList.forEach((suggestion, i) => {
-        this.suggestionList[i].update('kmw-suggestion-'+i, 
-          SuggestionBanner.BLANK_SUGGESTION());
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
-          this.getDiv().childNodes.item(i));
+      this.suggestionList.forEach((option: BannerSuggestion) => {
+        option.update(null);
       });
     }.bind(this);
 
@@ -314,10 +318,14 @@ namespace com.keyman.osk {
      */
     public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean =
         function(this: SuggestionBanner, suggestions: Suggestion[]) {
-      this.suggestionList.forEach((suggestion, i) => {
-        this.suggestionList[i].update('kmw-suggestion-'+i, suggestions[i]);
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
-          this.getDiv().childNodes.item(i));
+      this.currentSuggestions = suggestions;
+      
+      this.suggestionList.forEach((option: BannerSuggestion, i: number) => {
+        if(i < suggestions.length) {
+          option.update(suggestions[i]);
+        } else {
+          option.update(null);
+        }
       });
     }.bind(this);
   }
