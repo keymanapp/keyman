@@ -111,10 +111,10 @@ namespace com.keyman.osk {
    * Adjust the absolute height of each keyboard element after a rotation - modified for KMEI, 13/11/14
    *    
    **/      
-  VisualKeyboard.prototype.adjustHeights=function(this: VisualKeyboard): boolean {
+  VisualKeyboard.prototype.adjustHeights = function(this: VisualKeyboard): boolean {
     let keyman = com.keyman.singleton;
-    let osk = keyman.osk;
-    let _Box = osk._Box;
+    let oskManager = keyman.osk;
+    let _Box = oskManager._Box;
     let util = keyman.util;
     let device = util.device;
 
@@ -122,31 +122,29 @@ namespace com.keyman.osk {
       return false;
     }
 
-    var layers=_Box.firstChild.firstChild.childNodes,
+    var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
-        oskHeight=osk.getHeight(),
-        rowHeight=Math.floor(oskHeight/nRows),
+        rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
         nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
+    let oskHeight : number = nRows*rowHeight;
 
-    oskHeight=nRows*rowHeight;
-
-    var b: HTMLElement = osk._Box, bs=b.style;
+    var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.firstChild.firstChild;
+    b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     pad = Math.round(0.15*rowHeight);
 
     var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
- 
+
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';
+      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
@@ -157,7 +155,7 @@ namespace com.keyman.osk {
         for(nKey=0;nKey<nKeys;nKey++) {
           key=keys[nKey];
           // Must set the height of the text DIV, not the label (if any)
-          for(j=0;j<key.childNodes.length;j++) {
+          for(j=0; j<key.childNodes.length; j++) {
             if(util.hasClass(key.childNodes[j],'kmw-key')) {
               break;
             }
@@ -165,9 +163,11 @@ namespace com.keyman.osk {
           ks=key.childNodes[j].style;
           ks.bottom=rs.bottom;
           ks.height=ks.minHeight=(rowHeight-pad)+'px';
-                          
+
           // Rescale keycap labels on iPhone (iOS 7)
-          if(resizeLabels && (j > 0)) key.childNodes[0].style.fontSize='6px';
+          if(resizeLabels && (j > 0)) {
+            key.childNodes[0].style.fontSize='6px';
+          }
         }
       }
     }
@@ -352,11 +352,20 @@ namespace com.keyman.text {
   };
 
   /**
+   * Register a lexical model
+   * 
+   * @param {com.keyman.text.prediction.ModelSpec} model  Spec of the lexical model
+   */
+  keymanweb['registerModel']=function(model: com.keyman.text.prediction.ModelSpec) {
+    keymanweb.modelManager.register(model);
+  }
+
+  /**
    * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
    * 
    *  @param  {boolean}  isVisible
    *     
-   **/                
+   **/
   keymanweb['popupVisible'] = function(isVisible)
   {
     osk.vkbd.popupVisible = isVisible;

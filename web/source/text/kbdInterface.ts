@@ -1092,10 +1092,6 @@ namespace com.keyman.text {
       var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
-      if(matched && outputTarget.getElement()) {
-        this.doInputEvent(outputTarget.getElement());
-      }
-
       return matched;
     }
     
