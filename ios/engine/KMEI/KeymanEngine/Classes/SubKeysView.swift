@@ -6,6 +6,8 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import  UIKit
+
 class SubKeysView: UIView {
   private let borderRadius: CGFloat = 5.0
   private let strokeWidth: CGFloat = 1.0

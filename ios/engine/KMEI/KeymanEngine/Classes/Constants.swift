@@ -6,19 +6,30 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import Foundation
+
 public enum Key {
   public static let keyboardInfo = "keyboardInfo"
+  public static let lexicalModelInfo = "lexicalModelInfo"
 
   /// Array of user keyboards info list in UserDefaults
   static let userKeyboardsList = "UserKeyboardsList"
 
+  /// Array of user keyboards info list in UserDefaults
+  static let userLexicalModelsList = "UserLexicalModelsList"
+
   /// Currently/last selected keyboard info in UserDefaults
   static let userCurrentKeyboard = "UserCurrentKeyboard"
+
+  /// Currently/last selected lexical model info in UserDefaults
+  static let userCurrentLexicalModel = "UserCurrentLexicalModel"
 
   // Internal user defaults keys
   static let engineVersion = "KeymanEngineVersion"
   static let keyboardPickerDisplayed = "KeyboardPickerDisplayed"
   static let synchronizeSWKeyboard = "KeymanSynchronizeSWKeyboard"
+  static let synchronizeSWLexicalModel = "KeymanSynchronizeSWLexicalModel"
+
   static let migrationLevel = "KeymanEngineMigrationLevel"
 
   // JSON keys for language REST calls
@@ -27,6 +38,7 @@ public enum Key {
 
   // TODO: Check if it matches with the key in Keyman Cloud API
   static let keyboardCopyright = "copyright"
+  static let lexicalModelCopyright = "lexicalmodelcopyright"
   static let languages = "languages"
 
   // Other keys

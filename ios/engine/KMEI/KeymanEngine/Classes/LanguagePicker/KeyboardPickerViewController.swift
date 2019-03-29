@@ -13,7 +13,7 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [InstallableKeyboard] = []
+  private var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
   private var updateQueue: [InstallableKeyboard]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
@@ -21,6 +21,9 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadCompletedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
+  private var lexicalModelDownloadStartedObserver: NotificationObserver?
+  private var lexicalModelDownloadCompletedObserver: NotificationObserver?
+  private var lexicalModelDownloadFailedObserver: NotificationObserver?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -183,6 +186,12 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
+    
+    private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+        view.isUserInteractionEnabled = false
+        navigationItem.leftBarButtonItem?.isEnabled = false
+        navigationItem.rightBarButtonItem?.isEnabled = false
+    }
 
   private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     if view == navigationController?.topViewController?.view {

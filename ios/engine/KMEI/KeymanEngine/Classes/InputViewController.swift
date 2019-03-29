@@ -115,7 +115,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // TODO: If the following line is enabled, the WKWebView does not respond to touch events
     // Can figure out why one day maybe
     baseView.translatesAutoresizingMaskIntoConstraints = false
-    baseView.autoresizingMask = UIViewAutoresizing.flexibleHeight.union(.flexibleWidth)
+    baseView.autoresizingMask = UIView.AutoresizingMask.flexibleHeight.union(.flexibleWidth)
 
     keymanWeb.delegate = self
 
@@ -140,8 +140,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
-    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
+    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[0]
+    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[0]
 
     let shouldSynchronize: Bool
     if let standardDate = standardDate,
@@ -402,6 +402,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func setKeyboard(_ kb: InstallableKeyboard) {
     keymanWeb.setKeyboard(kb)
+  }
+    
+  func setLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.setLexicalModel(lm)
   }
   
   func showHelpBubble() {
