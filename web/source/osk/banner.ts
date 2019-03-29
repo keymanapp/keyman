@@ -143,15 +143,13 @@ namespace com.keyman.osk {
     private suggestion: Suggestion;
 
     private index: number;
-    private width: number;
 
     private static readonly BASE_ID = 'kmw-suggestion-';
 
-    constructor(index: number, widthpc?: number) {
+    constructor(index: number) {
       let keyman = com.keyman.singleton;
 
       this.index = index;
-      this.width = widthpc > 0 ? (widthpc <= 100 ? widthpc : 100) : 0;
 
       this.constructRoot();
 
@@ -181,17 +179,11 @@ namespace com.keyman.osk {
       }
 
       // Ensures that a reasonable width % is set.
-      let oskManager = keyman.osk;
-      let widthpc = this.width;
+      let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.SUGGESTION_LIMIT + 1);
+      let widthpc = usableWidth / SuggestionBanner.SUGGESTION_LIMIT;
 
       ds.width = widthpc + '%';
-      // if (keyman.util.device.formFactor == 'desktop') {
-      //   // Desktop OSK widths are defined in %.
-      //   ds.width = widthpc + '%';
-      // } else {
-      //   // Touch-based OSK widths are defined in px.
-      //   ds.width = widthpc + '%'; //Math.floor(oskManager.getWidth() * widthpc / 100) + 'px';
-      // }
+      ds.marginLeft = SuggestionBanner.MARGIN + '%';
     }
 
     /**
@@ -284,7 +276,9 @@ namespace com.keyman.osk {
    * Description  Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
-    public static SUGGESTION_LIMIT: number = 3;
+    public static readonly SUGGESTION_LIMIT: number = 3;
+    public static readonly MARGIN = 1;
+
     private suggestionList : BannerSuggestion[];
     private currentSuggestions: Suggestion[] = [];
 
@@ -292,11 +286,13 @@ namespace com.keyman.osk {
       super(SuggestionBanner.DEFAULT_HEIGHT);
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-        let d = new BannerSuggestion(i, 100 / SuggestionBanner.SUGGESTION_LIMIT);
+        let d = new BannerSuggestion(i);
         this.suggestionList[i] = d;
         this.getDiv().appendChild(d.div);
       }
     }
+
+
 
     /**
      * Function invalidateSuggestions
