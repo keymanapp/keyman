@@ -669,7 +669,7 @@ begin
   begin
     FIndent := FTabStops+FTabStop;
     FCloseBrace := True;
-    Result := Result + Format('%s%s{%s', [
+    Result := Result + Format('%s%sif(1){%s', [
       FTabStops,
       FElse,
       nl
@@ -691,7 +691,7 @@ end;
 
 function TCompileKeymanWeb.JavaScript_Rules(fgp: PFILE_GROUP): string;
 var
-  j: Integer;
+  j, j2: Integer;
   HasRules: Boolean;
   fkp2, fkp: PFILE_KEY;
   processed_rule: array of Boolean;
@@ -714,7 +714,7 @@ begin
     if not processed_rule[j] and not RuleIsExcludedByPlatform(fkp) then
     begin
       // Break down by key code
-      // We know the rules are sorted by key code.
+      // We know the rules are sorted by context length and then key code.
       // First pass, break the grouping down by key code.
 
       if fgp.fUsingKeys then
@@ -733,10 +733,12 @@ begin
 
         LocalHasRules := False;
         fkp2 := fkp;
+        j2 := j;
         LocalCounter := 0;
-        while (j < Integer(fgp.cxKeyArray)) and (fkp2.Key = fkp.Key) and (fkp2.ShiftFlags = fkp.ShiftFlags) do
+        while (j < Integer(fgp.cxKeyArray)) do
         begin
-          if not RuleIsExcludedByPlatform(fkp) then
+          if not processed_rule[j] and not RuleIsExcludedByPlatform(fkp) and
+            (fkp2.Key = fkp.Key) and (fkp2.ShiftFlags = fkp.ShiftFlags) then
           begin
             processed_rule[j] := True;
             Result := Result + JavaScript_Rule(FTabStop + FTabStop + FTabStop, IfThen(LocalHasRules, 'else ', ''), fgp, fkp);
@@ -755,6 +757,10 @@ begin
         end;
 
         Result := Result + FTabStop + FTabStop + '}' + nl;
+        fkp := fkp2;
+        j := j2 + 1;
+        Inc(fkp);
+        // Inc(j);
       end
       else
       begin
@@ -2014,7 +2020,7 @@ begin
     fkp := fgp.dpKeyArray;
     HasRules := False;
 
-    if IsKeyboardVersion10OrLater then
+    if IsKeyboardVersion10OrLater or True then
     begin
       Result := Result + JavaScript_Rules(fgp);
     end
