@@ -25,6 +25,7 @@ program
   .option('-e, --engine-versions [versions]', 'Specify KeymanWeb engine version(s) to test. Can specify "stable", "source" or a specific version number.', list, ['stable','source'])
   .option('-k, --keyboards [keyboards]', 'Builds and tests specific keyboard source files. If -k is not specified, then test all keyboards in the keyboards repository.', list, [])
   .option('-f, --fail-fast', "Don't attempt to continue tests after the first keyboard test fails")
+  .option('-d, --debug', "Build keyboard with debug symbols")
   .option('--deep', "Compare all version combinations against base version, instead of just one; only valid when comparing 1 version of each against base")
   .option('--skip-analysis', "Don't create .tests files, assume they are already present")
   .option('-l, --log-all-failures', "Log all test failures to console, not just the first failure for each keyboard");
@@ -189,7 +190,7 @@ cleanKeyboards.then(() => {
 
       return util.runProcess(
         `${bash.command}`, 
-        [].concat(bash.params, ['build.sh', /*TODO: waiting on keyboards repo support for this param: '-T', 'kmn',*/ keyboard]), 
+        [].concat(bash.params, ['build.sh'], program.debug?['-d']:[], [/*TODO: waiting on keyboards repo support for this param: '-T', 'kmn',*/ keyboard]), 
         { cwd: config.KEYBOARDS_ROOT });
     };
   

@@ -41,7 +41,7 @@ keyboards.forEach(function(keyboard) {
         it('should generate a set of results for "all" possible inputs', function() {
           return windowLoad
             .then(() => testRunner.loadTests(locator))
-            .then((shouldRun) => { if(shouldRun) { testRunner.runTests(id); } return shouldRun; })
+            .then((shouldRun) => { if(shouldRun) { return testRunner.runTests(id); } })
             .then(() => testRunner.saveTestResults(locator, (testRunner.keyboards[id] || {}).results));
         }).timeout(0);
       });
