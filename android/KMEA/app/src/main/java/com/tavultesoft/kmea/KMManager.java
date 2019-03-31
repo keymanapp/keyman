@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -1364,7 +1365,11 @@ public final class KMManager {
 
         if (KMManager.shouldAllowSetKeyboard()) {
           if (SystemKeyboard.keyboardPickerEnabled) {
-            if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+            KeyguardManager km = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+            if(km.inKeyguardRestrictedInputMode()) {
+              // If screen is locked, override GlobeKeyAction to switch to next keyboard
+              advanceToNextInputMode();
+            } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
             } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
               switchToNextKeyboard(context);
