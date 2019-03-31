@@ -676,6 +676,13 @@ begin
 end;
 
 function TCompileKeymanWeb.JavaScript_Rules(fgp: PFILE_GROUP): string;
+  function IsEqualKey(k1, k2: PFILE_KEY): Boolean;
+  begin
+    Result :=
+      (JavaScript_Key(k1, FMnemonic) = JavaScript_Key(k2, FMnemonic)) and
+      (JavaScript_Shift(k1, FMnemonic) = JavaScript_Shift(k2, FMnemonic));
+  end;
+
 var
   j, j2: Integer;
   HasRules: Boolean;
@@ -723,8 +730,7 @@ begin
         LocalCounter := 0;
         while (j < Integer(fgp.cxKeyArray)) do
         begin
-          if not processed_rule[j] and not RuleIsExcludedByPlatform(fkp) and
-            (fkp2.Key = fkp.Key) and (fkp2.ShiftFlags = fkp.ShiftFlags) then
+          if not processed_rule[j] and not RuleIsExcludedByPlatform(fkp) and IsEqualKey(fkp, fkp2) then
           begin
             processed_rule[j] := True;
             Result := Result + JavaScript_Rule(FTabStop + FTabStop + FTabStop, IfThen(LocalHasRules, 'else ', ''), fgp, fkp);
