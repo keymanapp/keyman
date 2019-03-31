@@ -645,7 +645,7 @@ end;
 
 function TCompileKeymanWeb.JavaScript_Rule(FTabStops, FElse: string; fgp: PFILE_GROUP; fkp: PFILE_KEY): string;
 var
-  linecomment: string;
+  predicate, linecomment: string;
   FIndent: string;
 begin
   Result := '';
@@ -654,32 +654,18 @@ begin
     then linecomment := Format('   // Line %d', [fkp.Line])   // I4373
     else linecomment := '';
 
-  if xstrlen(fkp.dpContext) > 0 then
-  begin
-    FIndent := FTabStops+FTabStop;
-    FCloseBrace := True;
-    Result := Result + Format('%s%sif(%s){%s', [
-      FTabStops,
-      FElse,
-      JavaScript_ContextMatch(fkp, fkp.dpContext),
-      nl
-      ]);
-  end
-  else if FElse <> '' then
-  begin
-    FIndent := FTabStops+FTabStop;
-    FCloseBrace := True;
-    Result := Result + Format('%s%sif(1){%s', [
-      FTabStops,
-      FElse,
-      nl
-      ]);
-  end
-  else
-  begin
-    FIndent := FTabStops;
-    FCloseBrace := False;
-  end;
+  if xstrlen(fkp.dpContext) > 0
+    then predicate := JavaScript_ContextMatch(fkp, fkp.dpContext)
+    else predicate := '1'; // Always pass
+
+  FIndent := FTabStops+FTabStop;
+  FCloseBrace := True;
+  Result := Result + Format('%s%sif(%s){%s', [
+    FTabStops,
+    FElse,
+    predicate,
+    nl
+    ]);
 
   if(fgp.fUsingKeys)                                                                                        // I1959
     then Result := Result + Format('%sr=m=1;%s%s', [FIndent,linecomment,JavaScript_OutputString(FIndent, fkp, fkp.dpOutput, fgp)])    // I1959   // I3681
