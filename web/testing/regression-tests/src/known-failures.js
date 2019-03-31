@@ -12,13 +12,19 @@
  * Hint: searching for "FAILED TO LOAD" in logs finds the first reference to the
  * failure for any given keyboard.
  */
+
 const knownFailures = {
-  'fv_gwichin': { /*, knownGoodCompilerVersion: '12.0.333.0', knownGoodEngineVersion: '12.0.444'*/ reason: 'Chrome ladder bug #183?' },
-  'fv_han': { reason: 'Chrome ladder bug #183?' }, 
-  'fv_northern_tutchone': { reason: 'Chrome ladder bug #183?' },
-  'fv_southern_tutchone': { reason: 'Chrome ladder bug #183?' }, 
-  'fv_tagizi_dene': { reason: 'Chrome ladder bug #183?' }, 
+  'fv_gwichin': { /*, knownGoodCompilerVersion: '12.0.333.0', knownGoodEngineVersion: '12.0.444'*/ reason: 'Chrome ladder bug #183' },
+  'fv_han': { reason: 'Chrome ladder bug #183' }, 
+  'fv_northern_tutchone': { reason: 'Chrome ladder bug #183' },
+  'fv_southern_tutchone': { reason: 'Chrome ladder bug #183' }, 
+  'fv_tagizi_dene': { reason: 'Chrome ladder bug #183' }, 
   'hieroglyphic': { reason: 'Chrome ladder bug #183' }, 
   'nailangs': { reason: 'kmanalyze is corrupting the .tests file' },
   'sil_ipa': { reason: 'kmanalyze is corrupting the .tests file' }
 };
+
+// Node compatibility
+if(typeof module === 'object') {
+  module.exports = knownFailures;
+} 
