@@ -13,10 +13,14 @@ const CSI = '\033[';
  * See https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
  */
 const ANSI = {
-  CURSOR_NEXT_LINE: CSI + 'E', // Bring cursor to the beginning of the next line
-  ERASE_IN_LINE(n=0) { return CSI + n + 'k'; }, // Erase from the cursor to the end of the line
-  SAVE_CURSOR_POSITION: CSI + 's', // Remembers the current cursor position
+  CURSOR_NEXT_LINE: CSI + 'E', // Bring cursor to the beginning of the next line.
+  ERASE_IN_LINE(n=0) { return CSI + n + 'k'; }, // Erase from the cursor to the end of the line.
+  SAVE_CURSOR_POSITION: CSI + 's', // Remembers the current cursor position.
   RESTORE_CURSOR_POSITION: CSI + 'u', // Moves the cursor to the previously stored position.
+  BOLD: CSI + '1m', // Set bold text.
+  REVERSE_VIDEO: CSI + '7m', // Invert the text colour (swap background and foreground colours).
+  NORMAL_VIDEO: CSI + '27m', // Uninvert the text colour (swap background and foreground colours).
+  NORMAL: CSI + 'm', // Set all graphics renditions attributes off.
 };
 
 asyncMain()
@@ -45,9 +49,14 @@ async function asyncMain() {
   let suggestions = await lm.predict(insertCharacter('n'), getCurrentContext());
 
   // Format the displayed suggestions.
+  let selected = 0;
   let names = Array.from(suggestions)
-    .map(({displayAs}) => `[ ${displayAs} ]`)
-    .join(' ');
+    .map(({displayAs}, index) => {
+      if (index === selected) {
+        return `[${ANSI.REVERSE_VIDEO}${displayAs}${ANSI.NORMAL_VIDEO}]`;
+      }
+      return `[ ${displayAs} ]`
+    }).join(' ');
   process.stdout.write(names);
   process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
 }
