@@ -4,6 +4,8 @@
  */
 const LMLayer = require('../../predictive-text');
 
+const WORKER_DEBUG = false;
+
 
 asyncMain()
   .then(_ => process.exit(0))
@@ -103,5 +105,7 @@ function createAsyncWorker() {
  * For logging messages that pass between the top-level and the worker.
  */
 function logInternalWorkerMessage(role, ...args) {
-  console.log(`[${role}]`, ...args);
+  if (WORKER_DEBUG) {
+    console.log(`[${role}]`, ...args);
+  }
 }
