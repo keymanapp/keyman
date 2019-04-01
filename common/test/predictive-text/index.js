@@ -1,5 +1,6 @@
 /**
- *
+ * Implements a simple CLI for interactively testing the given predictive text
+ * model.
  */
 const LMLayer = require('../../predictive-text');
 
@@ -14,7 +15,16 @@ asyncMain()
 async function asyncMain() {
   let lm = new LMLayer({}, createAsyncWorker());
   let config = await lm.loadModel('./example.crk.wordlist_wahkohtowin.model.js');
-  let prediction = await lm.predict(insertCharacter('n'), getCurrentContext());
+
+  // TODO: a REPL of sorts here:
+  //
+  // > type some text
+  // [suggestions] [appear] [here] (press tab to accept)
+
+  let suggestions = await lm.predict(insertCharacter('n'), getCurrentContext());
+  for (let s of suggestions) {
+    console.log('>>>', s);
+  }
 }
 
 /**
@@ -48,7 +58,7 @@ function createAsyncWorker() {
 
   let worker = {
     postMessage(message) {
-      console.log('[top-level]', message);
+      logInternalWorkerMessage('top-level', message);
       workerScope.onmessage({ data: message });
     },
     onmessage(message) {
@@ -59,12 +69,12 @@ function createAsyncWorker() {
   let workerScope = {
     LMLayerWorker,
     postMessage(message) {
-      console.log('[worker]', message);
+      logInternalWorkerMessage('worker', message);
       worker.onmessage({ data: message });
     },
     importScripts(uri) {
       let sourceCode = fs.readFileSync(uri, 'UTF-8');
-      console.log('[worker] execing file:', uri);
+      logInternalWorkerMessage('worker', 'execing file:', uri);
       vm.runInContext(sourceCode, workerScope, {
         filename: uri,
         displayErrors: true,
@@ -87,4 +97,11 @@ function createAsyncWorker() {
   }
 
   return worker;
+}
+
+/**
+ * For logging messages that pass between the top-level and the worker.
+ */
+function logInternalWorkerMessage(role, ...args) {
+  console.log(`[${role}]`, ...args);
 }
