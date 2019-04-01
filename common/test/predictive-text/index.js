@@ -43,22 +43,30 @@ async function asyncMain() {
   // Initial line:
   process.stdout.write(`> ${ANSI.SAVE_CURSOR_POSITION}`);
 
-  // Proceed to next line to write suggestions.
+
+  let suggestions = Array.from(await lm.predict(insertCharacter('n'), getCurrentContext()));
+  renderSuggestions(suggestions, 1);
+}
+
+/**
+ * Render the given suggestions on the next line after the cursor.
+ */
+function renderSuggestions(suggestions, selected) {
+  // Wherever we are, save the current cursor position.
+  process.stdout.write(`${ANSI.SAVE_CURSOR_POSITION}`);
+
+  // Jump to next line and erase it to write suggestions.
   process.stdout.write(ANSI.CURSOR_NEXT_LINE + ANSI.ERASE_IN_LINE());
 
-  let suggestions = await lm.predict(insertCharacter('n'), getCurrentContext());
-
   // Format the displayed suggestions.
-  let selected = 0;
-  let names = Array.from(suggestions)
+  let line = suggestions
     .map(({displayAs}, index) => {
       if (index === selected) {
-        return `[${ANSI.REVERSE_VIDEO}${displayAs}${ANSI.NORMAL_VIDEO}]`;
+        return `${ANSI.REVERSE_VIDEO}[${displayAs}]${ANSI.NORMAL_VIDEO}`;
       }
       return `[ ${displayAs} ]`
     }).join(' ');
-  process.stdout.write(names);
-  process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
+  process.stdout.write(line + ANSI.RESTORE_CURSOR_POSITION);
 }
 
 /**
