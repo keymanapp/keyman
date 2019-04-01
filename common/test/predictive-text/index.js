@@ -6,13 +6,26 @@ const LMLayer = require('../../predictive-text');
 
 const WORKER_DEBUG = false;
 
+/** "Control sequence introducer" for ANSI escape codes: */
+const CSI = '\033[';
+/**
+ * ANSI escape codes to deal with the screen and the cursor.
+ * See https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
+ */
+const ANSI = {
+  CURSOR_NEXT_LINE: CSI + 'E', // Bring cursor to the beginning of the next line
+  ERASE_IN_LINE(n=0) { return CSI + n + 'k'; }, // Erase from the cursor to the end of the line
+  SAVE_CURSOR_POSITION: CSI + 's', // Remembers the current cursor position
+  RESTORE_CURSOR_POSITION: CSI + 'u', // Moves the cursor to the previously stored position.
+};
 
 asyncMain()
   .then(_ => process.exit(0))
   .catch(err => {
     console.error(err);
     process.exit(127);
-  })
+  });
+
 
 async function asyncMain() {
   let lm = new LMLayer({}, createAsyncWorker());
@@ -23,10 +36,20 @@ async function asyncMain() {
   // > type some text
   // [suggestions] [appear] [here] (press tab to accept)
 
+  // Initial line:
+  process.stdout.write(`> ${ANSI.SAVE_CURSOR_POSITION}`);
+
+  // Proceed to next line to write suggestions.
+  process.stdout.write(ANSI.CURSOR_NEXT_LINE + ANSI.ERASE_IN_LINE());
+
   let suggestions = await lm.predict(insertCharacter('n'), getCurrentContext());
-  for (let s of suggestions) {
-    console.log('>>>', s);
-  }
+
+  // Format the displayed suggestions.
+  let names = Array.from(suggestions)
+    .map(({displayAs}) => `[ ${displayAs} ]`)
+    .join(' ');
+  process.stdout.write(names);
+  process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
 }
 
 /**
