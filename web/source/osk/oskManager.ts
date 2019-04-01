@@ -1107,9 +1107,11 @@ namespace com.keyman.osk {
       let util = com.keyman.singleton.util;
       var p: OSKRect = {};
 
+      console.log('getRect');
       if(this.vkbd) {
         p['left'] = p.left = dom.Utils.getAbsoluteX(this.vkbd.kbdDiv);
         p['top']  = p.top  = dom.Utils.getAbsoluteY(this.vkbd.kbdDiv);
+        console.log('vkbd top: ' + p.top);
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this.vkbd.kbdHelpDiv) -
           dom.Utils.getAbsoluteX(this.vkbd.kbdDiv) + this.vkbd.kbdHelpDiv.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this.vkbd.kbdHelpDiv) -
@@ -1117,6 +1119,7 @@ namespace com.keyman.osk {
       } else {
         p['left'] = p.left = dom.Utils.getAbsoluteX(this._Box);
         p['top']  = p.top  = dom.Utils.getAbsoluteY(this._Box);
+        console.log('other top: ' + p.top);
         p['width']  = p.width  = dom.Utils.getAbsoluteX(this._Box) + this._Box.offsetWidth;
         p['height'] = p.height = dom.Utils.getAbsoluteY(this._Box) + this._Box.offsetHeight;
       }
@@ -1135,6 +1138,7 @@ namespace com.keyman.osk {
         return;
       }
 
+      console.log('setRect start');
       var b = this._Box, bs = b.style;
       if('left' in p) {
         bs.left=(p['left']-dom.Utils.getAbsoluteX(b)+b.offsetLeft)+'px';
@@ -1263,15 +1267,19 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let device = keymanweb.util.device;
 
+      console.log('_Show start');
       // Do not try to display OSK if undefined, or no active element
       if(this._Box == null || keymanweb.domManager.getActiveElement() == null) {
         return;
       }
 
+      console.log('_Show 1');
+
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
       if((!device.touchable) && (keymanweb.keyboardManager.activeKeyboard == null || !this._Enabled)) {
         return;
       }
+      console.log('_Show 2');
 
       var Ls = this._Box.style;
 
@@ -1279,6 +1287,8 @@ namespace com.keyman.osk {
       if(device.touchable && Ls.bottom == '') {
         Ls.visibility='hidden';
       }
+
+      console.log('_Show 3');
 
       if(device.touchable) {
         /* In case it's still '0' from a hide() operation.
@@ -1288,6 +1298,7 @@ namespace com.keyman.osk {
          * (Opacity is only modified when device.touchable = true, though a couple of extra
          * conditions may apply.)
          */
+        console.log('_Show 4');
         Ls.opacity='1';
       }
 
@@ -1295,6 +1306,7 @@ namespace com.keyman.osk {
       // The following code will always be executed except for externally created OSK such as EuroLatin
       if(this.vkbd && this.vkbd.ddOSK) {
         // Enable the currently active keyboard layer and update the default nextLayer member
+        console.log('_Show 5');
         this.vkbd.show();
 
         // Extra style changes and overrides for touch-mode.
@@ -1303,7 +1315,9 @@ namespace com.keyman.osk {
           Ls.left=Ls.bottom='0px';
           let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
           vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
-          Ls.height=Ls.maxHeight= (parseInt(vkbdHeight, 10) + this.getBannerHeight()) + 'px';
+          Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10)) + 'px';
+          console.log('_Show 6 maxHeight = ' + Ls.maxHeight);
+
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
@@ -1312,6 +1326,7 @@ namespace com.keyman.osk {
         }
       }
 
+      console.log('_Show 7');
       //TODO: may need to return here for touch devices??
       Ls.display='block'; //Ls.visibility='visible';
 
@@ -1319,6 +1334,7 @@ namespace com.keyman.osk {
         this.vkbd.showLanguage();
       }
 
+      console.log('_Show 8');
       if(device.formFactor == 'desktop') {
         Ls.position='absolute'; Ls.display='block'; //Ls.visibility='visible';
         Ls.left='0px';
@@ -1360,6 +1376,8 @@ namespace com.keyman.osk {
 
       // If OSK still hidden, make visible only after all calculation finished
       if(Ls.visibility == 'hidden') {
+        console.log('_Show 9');
+
         window.setTimeout(function(){
           this._Box.style.visibility='visible';
         }.bind(this), 0);
@@ -1372,6 +1390,7 @@ namespace com.keyman.osk {
         Lpos['y']=this._Box.offsetTop;
         Lpos['userLocated']=this.userPositioned;
         this.doShow(Lpos);
+        console.log('_Show 10');
       }
     }
 

@@ -173,8 +173,9 @@ namespace com.keyman.osk {
      * 
      * @param type `'blank' | 'image' | 'suggestion'` - A plain-text string 
      *        representing the type of `Banner` to set active.
+     * @param height - Optional banner height in pixels.
      */
-    public setBanner(type: BannerType) {
+    public setBanner(type: BannerType, height?: number) {
       switch(type) {
         case 'blank':
           this._setBanner(new BlankBanner());
@@ -183,15 +184,26 @@ namespace com.keyman.osk {
           this._setBanner(new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT));
           break;
         case 'suggestion':
-          this._setBanner(new SuggestionBanner());
+          this._setBanner(new SuggestionBanner(height));
           let keyman = com.keyman.singleton;
           let banner = this.activeBanner as SuggestionBanner;
           keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions);
           keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions);
+          console.log('setBanner(SuggestionBanner)');
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
       }
+    }
+
+    // TODO: test code not to keep in production
+    public setSuggestions() {
+      let s:Array<Suggestion> = Array(SuggestionBanner.BLANK_SUGGESTION(), SuggestionBanner.BLANK_SUGGESTION(), SuggestionBanner.BLANK_SUGGESTION());
+      s[0].displayAs = 'choco';
+      s[1].displayAs = 'taco';
+      s[2].displayAs = 'last';
+      let suggestionBanner = this.activeBanner as SuggestionBanner;
+      suggestionBanner.updateSuggestions(s);
     }
 
     /**
@@ -207,11 +219,13 @@ namespace com.keyman.osk {
       // ModelManager will never have an active model 
       // when predictions are disabled.
       if(keyman.modelManager.activeModel) {
+        console.log('selectBanner suggestion');
         this.setBanner('suggestion');
       } else if(this.alwaysShows) {
         this.setBanner('image');
       } else {
-        this.setBanner('blank');
+        console.log('selectBanner blank');
+        this.setBanner('blank');        
       }
     }
 

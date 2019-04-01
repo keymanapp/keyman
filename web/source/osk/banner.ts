@@ -58,7 +58,7 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
 
       let d = util._CreateElement('div');
-      d.id = "keymanweb_banner_bar";
+      d.id = "kmw-banner-bar";
       d.className = "kmw-banner-bar";
       this.div = d;
 
@@ -223,6 +223,8 @@ namespace com.keyman.osk {
 
       // Finalize the suggestion text
       var d=util._CreateElement('div'), ds=d.style;
+      let suggestionIndex: String = spec.id.substr(-1);
+      d.id = 'kmw-suggestion-text-' + suggestionIndex;
       d.className = 'kmw-suggestion-text';
       d.innerHTML = suggestionText;
       t.appendChild(d);
@@ -234,14 +236,15 @@ namespace com.keyman.osk {
   /**
    * Function     SuggestionBanner
    * Scope        Public
+   * @param {number} height - If provided, the height of the banner in pixels
    * Description  Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
     public static SUGGESTION_LIMIT: number = 3;
     private suggestionList : BannerSuggestion[];
 
-    constructor() {
-      super(SuggestionBanner.DEFAULT_HEIGHT);
+    constructor(height?: number) {
+      super(height);
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', 33, ' ');
@@ -289,6 +292,7 @@ namespace com.keyman.osk {
         this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
           this.getDiv().childNodes.item(i));
       });
+      console.log("updateSuggestions done");
     }.bind(this);
   }
 }

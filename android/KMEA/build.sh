@@ -99,12 +99,12 @@ if [ "$DO_BUILD" = true ]; then
 fi
 if [ "$DO_COPY" = true ]; then
     echo "Copying KMW artifacts"
-    cp $KMW_ROOT/release/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/release/embedded/keyman.js $KMEA_ASSETS/keyman.js
-    cp $KMW_ROOT/release/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
-    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
-    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
+    cp $KMW_ROOT/release/unminified/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
+    cp $KMW_ROOT/release/unminified/embedded/keyman.js $KMEA_ASSETS/keyman.js
+    cp $KMW_ROOT/release/unminified/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+    cp $KMW_ROOT/release/unminified/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
+    cp $KMW_ROOT/release/unminified/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+    cp $KMW_ROOT/release/unminified/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
     if [ $? -ne 0 ]; then
         die "ERROR: copying artifacts failed"
     fi

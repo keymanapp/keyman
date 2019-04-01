@@ -236,8 +236,9 @@ public final class KMManager {
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
-      int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
+      int bannerHeight = getBannerHeight(appContext);
+      int kbHeight = getKeyboardHeight(appContext);
+      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
@@ -251,8 +252,9 @@ public final class KMManager {
 
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
-      int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
+      int bannerHeight = getBannerHeight(appContext);
+      int kbHeight = getKeyboardHeight(appContext);
+      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
       params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
@@ -668,8 +670,9 @@ public final class KMManager {
       return false;
     }
 
-    // Use single quotes in JSONobject for javascript call
+    // Escape single quotes, and then convert double quotes to single quotes for javascript call
     String model = String.valueOf(modelObj);
+    model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
@@ -937,6 +940,10 @@ public final class KMManager {
   public static void removeKeyboardEventListener(OnKeyboardEventListener listener) {
     KMTextView.removeOnKeyboardEventListener(listener);
     KMKeyboard.removeOnKeyboardEventListener(listener);
+  }
+
+  public static int getBannerHeight(Context context) {
+    return (int) context.getResources().getDimension(R.dimen.banner_height);
   }
 
   public static int getKeyboardHeight(Context context) {

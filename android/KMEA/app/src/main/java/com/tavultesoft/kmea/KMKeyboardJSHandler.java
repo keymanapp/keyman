@@ -27,6 +27,14 @@ public abstract class KMKeyboardJSHandler {
 
   // This annotation is required in Jelly Bean and later:
   @JavascriptInterface
+  public int getBannerHeight() {
+    int bannerHeight = context.getResources().getDimensionPixelSize(R.dimen.banner_height);
+    //bannerHeight -= bannerHeight % 20;
+    return bannerHeight;
+  }
+
+  // This annotation is required in Jelly Bean and later:
+  @JavascriptInterface
   public int getKeyboardHeight() {
     int kbHeight = context.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
     kbHeight -= kbHeight % 20;
