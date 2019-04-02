@@ -32,8 +32,8 @@ public struct Version: Comparable {
   public static func <(lhs: Version, rhs: Version) -> Bool {
     let len = max(lhs.components.count, rhs.components.count)
     for i in 0..<len {
-      let leftComponent = lhs.components[i]
-      let rightComponent = rhs.components[Int(i)] 
+      let leftComponent = lhs.components[safe: i] ?? 0
+      let rightComponent = rhs.components[safe: i] ?? 0
       if leftComponent < rightComponent {
         return true
       }

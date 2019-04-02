@@ -15,7 +15,7 @@ public enum Key {
   /// Array of user keyboards info list in UserDefaults
   static let userKeyboardsList = "UserKeyboardsList"
 
-  /// Array of user keyboards info list in UserDefaults
+  /// Array of user lexical models info list in UserDefaults
   static let userLexicalModelsList = "UserLexicalModelsList"
 
   /// Currently/last selected keyboard info in UserDefaults

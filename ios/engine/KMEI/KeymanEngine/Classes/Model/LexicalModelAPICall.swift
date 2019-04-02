@@ -9,6 +9,6 @@
 import Foundation
 
 struct LexicalModelAPICall: Codable {
-    let options: Options
-    let lexicalModel: LexicalModel
+  let options: Options
+  let lexicalModel: LexicalModel
 }

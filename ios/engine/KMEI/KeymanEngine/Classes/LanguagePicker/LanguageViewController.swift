@@ -34,12 +34,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     keyboardRepository.delegate = self
   }
 
-    init(_ lexicalModelRepository: LexicalModelRepository) {
-        self.lexicalModelRepository = lexicalModelRepository
-        self.keyboardRepository = nil
-        super.init(nibName: nil, bundle: nil)
-        lexicalModelRepository.delegate = self
-    }
+  init(_ lexicalModelRepository: LexicalModelRepository) {
+    self.lexicalModelRepository = lexicalModelRepository
+    self.keyboardRepository = nil
+    super.init(nibName: nil, bundle: nil)
+    lexicalModelRepository.delegate = self
+  }
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -359,20 +359,19 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
 
 // MARK: - LexicalModelRepositoryDelegate
 extension LanguageViewController: LexicalModelRepositoryDelegate {
-    func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository) {
-        if let languageDict = repository.languages {
-            languages = languageList(languageDict)
-        }
-        self.dismissActivityView()
-        self.tableView.reloadData()
-        if self.numberOfSections(in: self.tableView) == 0 {
-            self.showConnectionErrorAlert()
-        }
+  func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository) {
+    if let languageDict = repository.languages {
+      languages = languageList(languageDict)
     }
-    
-    func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
-        dismissActivityView()
-        showConnectionErrorAlert()
+    self.dismissActivityView()
+    self.tableView.reloadData()
+    if self.numberOfSections(in: self.tableView) == 0 {
+      self.showConnectionErrorAlert()
     }
-    
+  }
+  
+  func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
+    dismissActivityView()
+    showConnectionErrorAlert()
+  }
 }

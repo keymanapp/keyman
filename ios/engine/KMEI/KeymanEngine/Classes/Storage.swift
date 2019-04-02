@@ -84,29 +84,29 @@ class Storage {
     }
   }
     
-    func keyboardDir(forID keyboardID: String) -> URL {
-        return keyboardDir.appendingPathComponent(keyboardID)
-    }
-    
-    func lexicalModelDir(forID lexicalModelID: String) -> URL {
-        return lexicalModelDir.appendingPathComponent(lexicalModelID)
-    }
-    
-    func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
-        return keyboardURL(forID: keyboard.id, version: keyboard.version)
-    }
-    
-    func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
-        return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
-    }
-    
-    func keyboardURL(forID keyboardID: String, version: String) -> URL {
-        return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
-    }
-    
-    func lexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
-        return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
-    }
+  func keyboardDir(forID keyboardID: String) -> URL {
+    return keyboardDir.appendingPathComponent(keyboardID)
+  }
+  
+  func lexicalModelDir(forID lexicalModelID: String) -> URL {
+    return lexicalModelDir.appendingPathComponent(lexicalModelID)
+  }
+  
+  func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
+    return keyboardURL(forID: keyboard.id, version: keyboard.version)
+  }
+  
+  func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
+    return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
+  }
+  
+  func keyboardURL(forID keyboardID: String, version: String) -> URL {
+    return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
+  }
+  
+  func lexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
+    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
+  }
 
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
     return keyboardDir(forID: keyboardID).appendingPathComponent(filename)

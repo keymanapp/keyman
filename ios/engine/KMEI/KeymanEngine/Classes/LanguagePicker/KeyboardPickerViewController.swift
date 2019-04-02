@@ -187,11 +187,11 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
     
-    private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
-        view.isUserInteractionEnabled = false
-        navigationItem.leftBarButtonItem?.isEnabled = false
-        navigationItem.rightBarButtonItem?.isEnabled = false
-    }
+  private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+    view.isUserInteractionEnabled = false
+    navigationItem.leftBarButtonItem?.isEnabled = false
+    navigationItem.rightBarButtonItem?.isEnabled = false
+  }
 
   private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     if view == navigationController?.topViewController?.view {

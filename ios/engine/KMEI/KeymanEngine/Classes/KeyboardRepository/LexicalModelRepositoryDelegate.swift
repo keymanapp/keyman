@@ -9,6 +9,6 @@
 import Foundation
 
 public protocol LexicalModelRepositoryDelegate: class {
-    func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository)
-    func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error)
+  func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository)
+  func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error)
 }

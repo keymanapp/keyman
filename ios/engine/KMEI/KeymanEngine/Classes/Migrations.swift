@@ -48,7 +48,7 @@ enum Migrations {
     let userKeyboards = oldUserKeyboards.compactMap { installableKeyboard(from: $0) }
     let currentKeyboardID = fullKeyboardID(from: oldCurrentKeyboard)
 
-    storage.userDefaults.userKeyboards = userKeyboards as [InstallableKeyboard]?
+    storage.userDefaults.userKeyboards = userKeyboards
     if userKeyboards.contains(where: { $0.fullID == currentKeyboardID }) {
       storage.userDefaults.currentKeyboardID = currentKeyboardID
     } else {

@@ -27,11 +27,11 @@ public enum KeyboardState {
 
 // Possible states that a lexical model can be in
 public enum LexicalModelState {
-    case needsDownload
-    case needsUpdate
-    case upToDate
-    case downloading
-    case none
+  case needsDownload
+  case needsUpdate
+  case upToDate
+  case downloading
+  case none
 }
 
 public enum VibrationSupport {
@@ -96,36 +96,36 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public let apiKeyboardRepository: APIKeyboardRepository
     
     
-    // TODO: Change API to not disable removing as well
-    /// Allow users to add new lexical models in the lexical model picker.
-    ///  - Default value is true.
-    ///  - Setting this to false will also disable lexical model removal. To enable lexical model removal you should set
-    ///    canRemoveLexicalModels to true.
-    public var canAddNewLexicalModels: Bool {
-        get {
-            return _canAddNewLexicalModels
-        }
-        set(canAddNewLexicalModels) {
-            _canAddNewLexicalModels = canAddNewLexicalModels
-            if !canAddNewLexicalModels {
-                canRemoveLexicalModels = false
-            }
-        }
+  // TODO: Change API to not disable removing as well
+  /// Allow users to add new lexical models in the lexical model picker.
+  ///  - Default value is true.
+  ///  - Setting this to false will also disable lexical model removal. To enable lexical model removal you should set
+  ///    canRemoveLexicalModels to true.
+  public var canAddNewLexicalModels: Bool {
+    get {
+      return _canAddNewLexicalModels
     }
-    private var _canAddNewLexicalModels = true
-    
-    /// Allow users to remove lexical models.
-    /// - Default value is true.
-    /// - The default lexical model is additionally prevented from being removed by canRemoveDefaultLexicalModel.
-    public var canRemoveLexicalModels = true
-    
-    /// Allow the default lexical model to be removed.
-    /// The last lexical model cannot be removed, so the default lexical model cannot be removed if it
-    /// is the only lexical model in the list, regardless of the value of this property.
-    /// The default value is false.
-    public var canRemoveDefaultLexicalModel = false
-    
-    public let apiLexicalModelRepository: APILexicalModelRepository
+    set(canAddNewLexicalModels) {
+      _canAddNewLexicalModels = canAddNewLexicalModels
+      if !canAddNewLexicalModels {
+        canRemoveLexicalModels = false
+      }
+    }
+  }
+  private var _canAddNewLexicalModels = true
+  
+  /// Allow users to remove lexical models.
+  /// - Default value is true.
+  /// - The default lexical model is additionally prevented from being removed by canRemoveDefaultLexicalModel.
+  public var canRemoveLexicalModels = true
+  
+  /// Allow the default lexical model to be removed.
+  /// The last lexical model cannot be removed, so the default lexical model cannot be removed if it
+  /// is the only lexical model in the list, regardless of the value of this property.
+  /// The default value is false.
+  public var canRemoveDefaultLexicalModel = false
+  
+  public let apiLexicalModelRepository: APILexicalModelRepository
 
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
@@ -296,77 +296,77 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
     
     
-    /// Sets the current lexical model, querying from the user's list of lexical models.
-    ///
-    /// - Precondition:
-    ///   - The lexical model must be added with `addLexicalModel()`.
-    ///
-    /// - SeeAlso:
-    ///   - addLexicalModel()
-    /// - Returns: Whether the lexical model was set successfully
-    //TODO: this method appears unused, should we remove it?
-    public func setLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
-        if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullID) {
-            return setLexicalModel(lexicalModel)
-        }
-        return false
+  /// Sets the current lexical model, querying from the user's list of lexical models.
+  ///
+  /// - Precondition:
+  ///   - The lexical model must be added with `addLexicalModel()`.
+  ///
+  /// - SeeAlso:
+  ///   - addLexicalModel()
+  /// - Returns: Whether the lexical model was set successfully
+  //TODO: this method appears unused, should we remove it?
+  public func setLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
+    if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullID) {
+      return setLexicalModel(lexicalModel)
+    }
+    return false
+  }
+  
+  
+  /// Set the current lexical model.
+  ///
+  /// - Throws: error if the lexical model was unchanged
+  public func setLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
+    if lm.fullID == currentLexicalModelID {
+      log.info("Lexical model unchanged: \(lm.fullID)")
+      return false
+      // throw LexicalModelError.unchanged
     }
     
+    log.info("Setting language: \(lm.fullID)")
     
-    /// Set the current lexical model.
-    ///
-    /// - Throws: error if the lexical model was unchanged
-    public func setLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
-        if lm.fullID == currentLexicalModelID {
-            log.info("Lexical model unchanged: \(lm.fullID)")
-            return false
-            // throw LexicalModelError.unchanged
-        }
-        
-        log.info("Setting language: \(lm.fullID)")
-        
-        currentLexicalModelID = lm.fullID
-        
-        inputViewController.setLexicalModel(lm)
-        
-        let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-        userData.currentLexicalModelID = lm.fullID
-        userData.synchronize()
-        
-        if isKeymanHelpOn {
-            inputViewController.showHelpBubble(afterDelay: 1.5)
-        }
-        
-        NotificationCenter.default.post(name: Notifications.lexicalModelChanged,
-                                        object: self,
-                                        value: lm)
-        
-        return true
+    currentLexicalModelID = lm.fullID
+    
+    inputViewController.setLexicalModel(lm)
+    
+    let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+    userData.currentLexicalModelID = lm.fullID
+    userData.synchronize()
+    
+    if isKeymanHelpOn {
+      inputViewController.showHelpBubble(afterDelay: 1.5)
     }
-    /// Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
-    /// The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
-    public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-        let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
-        if !FileManager.default.fileExists(atPath: lexicalModelPath) {
-            log.error("Could not add lexical model with ID: \(lexicalModel.id) because the lexical model file does not exist")
-            return
-        }
-        
-        // Get lexical models list if it exists in user defaults, otherwise create a new one
-        let userDefaults = Storage.active.userDefaults
-        var userLexicalModels = userDefaults.userLexicalModels ?? []
-        
-        // Update lexical model if it exists
-        if let index = userLexicalModels.index(where: { $0.fullID == lexicalModel.fullID }) {
-            userLexicalModels[index] = lexicalModel
-        } else {
-            userLexicalModels.append(lexicalModel)
-        }
-        
-        userDefaults.userLexicalModels = userLexicalModels
-        userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-        userDefaults.synchronize()
+    
+    NotificationCenter.default.post(name: Notifications.lexicalModelChanged,
+                                    object: self,
+                                    value: lm)
+    
+    return true
+  }
+  /// Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
+  /// The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
+  public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
+    if !FileManager.default.fileExists(atPath: lexicalModelPath) {
+      log.error("Could not add lexical model with ID: \(lexicalModel.id) because the lexical model file does not exist")
+      return
     }
+    
+    // Get lexical models list if it exists in user defaults, otherwise create a new one
+    let userDefaults = Storage.active.userDefaults
+    var userLexicalModels = userDefaults.userLexicalModels ?? []
+    
+    // Update lexical model if it exists
+    if let index = userLexicalModels.index(where: { $0.fullID == lexicalModel.fullID }) {
+      userLexicalModels[index] = lexicalModel
+    } else {
+      userLexicalModels.append(lexicalModel)
+    }
+    
+    userDefaults.userLexicalModels = userLexicalModels
+    userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
+    userDefaults.synchronize()
+  }
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
@@ -429,66 +429,66 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return Storage.active.userDefaults.userKeyboard(withFullID: fullID)
   }
     
-    /// Removes a lexical model from the list in the lexical model picker if it exists.
-    /// - Returns: The lexical model exists and was removed
-    public func removeLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
-        // Remove lexical model from the list if it exists
-        let index = Storage.active.userDefaults.userLexicalModels?.index { $0.fullID == fullID }
-        if let index = index {
-            return removeLexicalModel(at: index)
-        }
-        return false
+  /// Removes a lexical model from the list in the lexical model picker if it exists.
+  /// - Returns: The lexical model exists and was removed
+  public func removeLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
+    // Remove lexical model from the list if it exists
+    let index = Storage.active.userDefaults.userLexicalModels?.index { $0.fullID == fullID }
+    if let index = index {
+      return removeLexicalModel(at: index)
+    }
+    return false
+  }
+  
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  /// - Returns: The lexical model exists and was removed
+  public func removeLexicalModel(at index: Int) -> Bool {
+    let userData = Storage.active.userDefaults
+    
+    // If user defaults for lexical models list does not exist, do nothing.
+    guard var userLexicalModels = userData.userLexicalModels else {
+      return false
     }
     
-    /// Removes the lexical model at index from the lexical models list if it exists.
-    /// - Returns: The lexical model exists and was removed
-    public func removeLexicalModel(at index: Int) -> Bool {
-        let userData = Storage.active.userDefaults
-        
-        // If user defaults for lexical models list does not exist, do nothing.
-        guard var userLexicalModels = userData.userLexicalModels else {
-            return false
-        }
-        
-        guard index < userLexicalModels.count else {
-            return false
-        }
-        
-        let kb = userLexicalModels[index]
-        userLexicalModels.remove(at: index)
-        userData.userLexicalModels = userLexicalModels
-        userData.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-        userData.synchronize()
-        
-        log.info("Removing lexical model with ID \(kb.id) and languageID \(kb.languageID)")
-        
-        // Set a new lexical model if deleting the current one
-        if kb.fullID == currentLexicalModelID {
-            _ = setLexicalModel(userLexicalModels[0])
-        }
-        
-        if !userLexicalModels.contains(where: { $0.id == kb.id }) {
-            let lexicalModelDir = Storage.active.lexicalModelDir(forID: kb.id)
-            FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
-            log.info("Deleting directory \(lexicalModelDir)")
-            if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
-                log.error("Failed to delete \(lexicalModelDir)")
-            }
-        } else {
-            log.info("User has another language installed. Skipping delete of lexical model files.")
-        }
-        
-        NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: kb)
-        return true
+    guard index < userLexicalModels.count else {
+      return false
     }
     
-    /// - Returns: Info for the current lexical model, if a lexical model is set
-    public var currentLexicalModel: InstallableLexicalModel? {
-        guard let fullID = currentLexicalModelID else {
-            return nil
-        }
-        return Storage.active.userDefaults.userLexicalModel(withFullID: fullID)
+    let kb = userLexicalModels[index]
+    userLexicalModels.remove(at: index)
+    userData.userLexicalModels = userLexicalModels
+    userData.set([Date()], forKey: Key.synchronizeSWLexicalModel)
+    userData.synchronize()
+    
+    log.info("Removing lexical model with ID \(kb.id) and languageID \(kb.languageID)")
+    
+    // Set a new lexical model if deleting the current one
+    if kb.fullID == currentLexicalModelID {
+      _ = setLexicalModel(userLexicalModels[0])
     }
+    
+    if !userLexicalModels.contains(where: { $0.id == kb.id }) {
+      let lexicalModelDir = Storage.active.lexicalModelDir(forID: kb.id)
+      FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
+      log.info("Deleting directory \(lexicalModelDir)")
+      if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
+        log.error("Failed to delete \(lexicalModelDir)")
+      }
+    } else {
+      log.info("User has another language installed. Skipping delete of lexical model files.")
+    }
+    
+    NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: kb)
+    return true
+  }
+  
+  /// - Returns: Info for the current lexical model, if a lexical model is set
+  public var currentLexicalModel: InstallableLexicalModel? {
+    guard let fullID = currentLexicalModelID else {
+      return nil
+    }
+    return Storage.active.userDefaults.userLexicalModel(withFullID: fullID)
+  }
 
   /// Switch to the next keyboard.
   /// - Returns: Index of the newly selected keyboard.
@@ -622,75 +622,75 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
     
-    // MARK: - Adhoc lexical models
+  // MARK: - Adhoc lexical models
   public func parseLMKMP(_ folder: URL) throws -> Void {
     do {
-        var path = folder
-        path.appendPathComponent("kmp.json")
-        let data = try Data(contentsOf: path, options: .mappedIfSafe)
-        let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-        if let jsonResult = jsonResult as? [String:AnyObject] {
-            if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
-                for k in lexicalModels {
-                    let name = k["name"] as! String
-                    let lexicalModelID = k["id"] as! String
-                    let version = k["version"] as! String
-                    
-                    //TODO: handle errors if languages do not exist
-                    var languageName = ""
-                    var languageId = ""
-                    
-                    var installableLexicalModels : [InstallableLexicalModel] = []
-                    if let langs = k["languages"] as? [[String:String]] {
-                        for l in langs {
-                            languageName = l["name"]!
-                            languageId = l["id"]!
-                            
-                            installableLexicalModels.append( InstallableLexicalModel(
-                                id: lexicalModelID,
-                                name: name,
-                                languageID: languageId,
-                                languageName: languageName,
-                                version: version,
-                                isCustom: false))
-                        }
-                    }
-                    
-                    do {
-                        try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
-                                                                withIntermediateDirectories: true)
-                    } catch {
-                        log.error("Could not create dir for download: \(error)")
-                        throw KMPError.fileSystem
-                    }
-                    
-                    for lexicalModel in installableLexicalModels {
-                        let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
-                        
-                        let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
-                        do {
-                            for item in installableFiles {
-                                var filePath = folder
-                                if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-                                    try FileManager.default.removeItem(at: item[1] as! URL)
-                                }
-                                filePath.appendPathComponent(item[0] as! String)
-                                try FileManager.default.copyItem(at: filePath,
-                                                                 to: item[1] as! URL)
-                                
-                            }
-                        } catch {
-                            log.error("Error saving the lexical model download: \(error)")
-                            throw KMPError.copyFiles
-                        }
-                        Manager.shared.addLexicalModel(lexicalModel)
-                    }
-                }
+      var path = folder
+      path.appendPathComponent("kmp.json")
+      let data = try Data(contentsOf: path, options: .mappedIfSafe)
+      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+      if let jsonResult = jsonResult as? [String:AnyObject] {
+        if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+          for k in lexicalModels {
+            let name = k["name"] as! String
+            let lexicalModelID = k["id"] as! String
+            let version = k["version"] as! String
+            
+            //TODO: handle errors if languages do not exist
+            var languageName = ""
+            var languageId = ""
+            
+            var installableLexicalModels : [InstallableLexicalModel] = []
+            if let langs = k["languages"] as? [[String:String]] {
+              for l in langs {
+                languageName = l["name"]!
+                languageId = l["id"]!
+                
+                installableLexicalModels.append( InstallableLexicalModel(
+                  id: lexicalModelID,
+                  name: name,
+                  languageID: languageId,
+                  languageName: languageName,
+                  version: version,
+                  isCustom: false))
+              }
             }
+            
+            do {
+              try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
+                                                      withIntermediateDirectories: true)
+            } catch {
+              log.error("Could not create dir for download: \(error)")
+              throw KMPError.fileSystem
+            }
+            
+            for lexicalModel in installableLexicalModels {
+              let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
+              
+              let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
+              do {
+                for item in installableFiles {
+                  var filePath = folder
+                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+                    try FileManager.default.removeItem(at: item[1] as! URL)
+                  }
+                  filePath.appendPathComponent(item[0] as! String)
+                  try FileManager.default.copyItem(at: filePath,
+                                                   to: item[1] as! URL)
+                  
+                }
+              } catch {
+                log.error("Error saving the lexical model download: \(error)")
+                throw KMPError.copyFiles
+              }
+              Manager.shared.addLexicalModel(lexicalModel)
+            }
+          }
         }
+      }
     } catch {
-        log.error("error parsing lexical model kmp: \(error)")
-        throw KMPError.invalidPackage
+      log.error("error parsing lexical model kmp: \(error)")
+      throw KMPError.invalidPackage
     }
   }
   
@@ -948,224 +948,226 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return nil
   }
 
-    /// Asynchronously fetches the .js file for the lexical model with given IDs.
-    /// See `Notifications` for notification on success/failiure.
-    /// - Parameters:
-    ///   - isUpdate: Keep the lexical model files on failure
-    ///   - fetchRepositoryIfNeeded: Fetch the list of lexical models from the API if necessary.
-    public func downloadLexicalModel(withID lexicalModelID: String,
-                                 languageID: String,
-                                 isUpdate: Bool,
-                                 fetchRepositoryIfNeeded: Bool = true) {
-        guard let lexicalModels = apiLexicalModelRepository.lexicalModels,
-            let options = apiLexicalModelRepository.options
-            else {
-                if fetchRepositoryIfNeeded {
-                    log.info("Fetching repository from API for lexical model download")
-                    apiLexicalModelRepository.fetch { error in
-                        if let error = error {
-                            self.downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-                        } else {
-                            log.info("Fetched repository. Continuing with lexical model download.")
-                            self.downloadLexicalModel(withID: lexicalModelID,
-                                                  languageID: languageID,
-                                                  isUpdate: isUpdate,
-                                                  fetchRepositoryIfNeeded: false)
-                        }
-                    }
-                    return
-                }
-                let message = "Lexical model repository not yet fetched"
-                let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-                downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-                return
-        }
-        
-        guard let lexicalModel = apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID),
-            let filename = lexicalModels[lexicalModelID]?.filename
-            else {
-                let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
-                let error = NSError(domain: "Keyman", code: 0,
-                                    userInfo: [NSLocalizedDescriptionKey: message])
-                downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-                return
-        }
-        
-        guard downloadQueue == nil else {
-            let error = NSError(domain: "Keyman", code: 0,
-                                userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-            downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
-            return
-        }
-        
-        guard reachability.currentReachabilityStatus() != NotReachable else {
-            let error = NSError(domain: "Keyman", code: 0,
-                                userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-            downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
-            return
-        }
-        
-        do {
-            try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
-                                                    withIntermediateDirectories: true)
-        } catch {
-            log.error("Could not create dir for download: \(error)")
-            return
-        }
-        
-        let lexicalModelURL = options.lexicalModelBaseURL?.appendingPathComponent(filename)
-        
-        // TODO: Better typing
-        downloadQueue = HTTPDownloader(self)
-        let commonUserData: [String: Any] = [
-            Key.lexicalModelInfo: [lexicalModel],
-            Key.update: isUpdate
-        ]
-        downloadQueue!.userInfo = commonUserData
-        
-        let request = HTTPDownloadRequest(url: lexicalModelURL!, userInfo: commonUserData)
-        request.destinationFile = Storage.active.lexicalModelURL(for: lexicalModel).path
-        request.tag = 0
-        downloadQueue!.addRequest(request)
-        
-        downloadQueue!.run()
-    }
-    
-    private func lexicalModelFontURLs(forFont font: Font?, options: Options) -> [URL] {
-        guard let font = font else {
-            return []
-        }
-        return font.source.filter({ $0.hasFontExtension })
-            .map({ options.fontBaseURL.appendingPathComponent($0) })
-    }
-    
-    /// Downloads a custom lexical model from the URL
-    /// - Parameters:
-    ///   - url: URL to a JSON description of the lexical model
-    public func downloadLexicalModel(from url: URL) {
-        guard reachability.currentReachabilityStatus() != NotReachable else {
-            let error = NSError(domain: "Keyman", code: 0,
-                                userInfo: [NSLocalizedDescriptionKey: "No connection"])
-            downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-            return
-        }
-        
-        guard let data = try? Data(contentsOf: url) else {
-            let error = NSError(domain: "Keyman", code: 0,
-                                userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
-            downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-            return
-        }
-        
-        decodeLexicalModelData(data, decodingStrategy: .ios8601WithFallback)
-    }
-    
-    private func decodeLexicalModelData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = decodingStrategy
-        
-        if let lexicalModel = try? decoder.decode(LexicalModelAPICall.self, from: data) {
-            downloadLexicalModel(lexicalModel)
-        } else {
-            decoder.dateDecodingStrategy = .iso8601WithoutTimezone
-            if let lexicalModel = try? decoder.decode(LexicalModelAPICall.self, from: data) {
-                downloadLexicalModel(lexicalModel)
+  /// Asynchronously fetches the .js file for the lexical model with given IDs.
+  /// See `Notifications` for notification on success/failiure.
+  /// - Parameters:
+  ///   - isUpdate: Keep the lexical model files on failure
+  ///   - fetchRepositoryIfNeeded: Fetch the list of lexical models from the API if necessary.
+  public func downloadLexicalModel(withID lexicalModelID: String,
+                                   languageID: String,
+                                   isUpdate: Bool,
+                                   fetchRepositoryIfNeeded: Bool = true) {
+    guard let lexicalModels = apiLexicalModelRepository.lexicalModels,
+      let options = apiLexicalModelRepository.options
+      else {
+        if fetchRepositoryIfNeeded {
+          log.info("Fetching repository from API for lexical model download")
+          apiLexicalModelRepository.fetch { error in
+            if let error = error {
+              self.downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
             } else {
-                decoder.dateDecodingStrategy = .ios8601WithMilliseconds
-                do {
-                    let lexicalModel = try decoder.decode(LexicalModelAPICall.self, from: data)
-                    downloadLexicalModel(lexicalModel)
-                } catch {
-                    downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-                }
+              log.info("Fetched repository. Continuing with lexical model download.")
+              self.downloadLexicalModel(withID: lexicalModelID,
+                                        languageID: languageID,
+                                        isUpdate: isUpdate,
+                                        fetchRepositoryIfNeeded: false)
             }
+          }
+          return
         }
+        let message = "Lexical model repository not yet fetched"
+        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+        return
     }
     
-    /// Assumes that lexical model has font and oskFont set and ignores fonts contained in Language.
-    private func downloadLexicalModel(_ lexicalModelAPI: LexicalModelAPICall) {
-        let lexicalModel = lexicalModelAPI.lexicalModel
-        let installableLexicalModels = lexicalModel.languages!.map { language in
-            InstallableLexicalModel(lexicalModel: lexicalModel, language: language, isCustom: true)
-        }
-        
-        let filename = lexicalModel.filename
-        let lexicalModelURL = lexicalModelAPI.options.lexicalModelBaseURL!.appendingPathComponent(filename)
-        
-        if downloadQueue != nil {
-            // Download queue is active.
-            let error = NSError(domain: "Keyman", code: 0,
-                                userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-            downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
-            return
-        }
-        
-        if reachability.currentReachabilityStatus() == NotReachable {
-            let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-            downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
-            return
-        }
-        
+    guard let lexicalModel = apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID),
+      let filename = lexicalModels[lexicalModelID]?.filename
+      else {
+        let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
+        let error = NSError(domain: "Keyman", code: 0,
+                            userInfo: [NSLocalizedDescriptionKey: message])
+        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+        return
+    }
+    
+    guard downloadQueue == nil else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
+      return
+    }
+    
+    guard reachability.currentReachabilityStatus() != NotReachable else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
+      return
+    }
+    
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return
+    }
+    
+    let lexicalModelURL = options.lexicalModelBaseURL?.appendingPathComponent(filename)
+    
+    // TODO: Better typing
+    downloadQueue = HTTPDownloader(self)
+    let commonUserData: [String: Any] = [
+      Key.lexicalModelInfo: [lexicalModel],
+      Key.update: isUpdate
+    ]
+    downloadQueue!.userInfo = commonUserData
+    
+    let request = HTTPDownloadRequest(url: lexicalModelURL!, userInfo: commonUserData)
+    request.destinationFile = Storage.active.lexicalModelURL(for: lexicalModel).path
+    request.tag = 0
+    downloadQueue!.addRequest(request)
+    
+    downloadQueue!.run()
+  }
+  
+  private func lexicalModelFontURLs(forFont font: Font?, options: Options) -> [URL] {
+    guard let font = font else {
+      return []
+    }
+    return font.source.filter({ $0.hasFontExtension })
+      .map({ options.fontBaseURL.appendingPathComponent($0) })
+  }
+  
+  /// Downloads a custom lexical model from the URL
+  /// - Parameters:
+  ///   - url: URL to a JSON description of the lexical model
+  public func downloadLexicalModel(from url: URL) {
+    guard reachability.currentReachabilityStatus() != NotReachable else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No connection"])
+      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+      return
+    }
+    
+    guard let data = try? Data(contentsOf: url) else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
+      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+      return
+    }
+    
+    decodeLexicalModelData(data, decodingStrategy: .ios8601WithFallback)
+  }
+  
+  private func decodeLexicalModelData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = decodingStrategy
+    
+    if let lexicalModel = try? decoder.decode(LexicalModelAPICall.self, from: data) {
+      downloadLexicalModel(lexicalModel)
+    } else {
+      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
+      if let lexicalModel = try? decoder.decode(LexicalModelAPICall.self, from: data) {
+        downloadLexicalModel(lexicalModel)
+      } else {
+        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
         do {
-            try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
-                                                    withIntermediateDirectories: true)
+          let lexicalModel = try decoder.decode(LexicalModelAPICall.self, from: data)
+          downloadLexicalModel(lexicalModel)
         } catch {
-            log.error("Could not create dir for download: \(error)")
-            return
+          downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
         }
-        
-        let isUpdate = Storage.active.userDefaults.userLexicalModels?.contains { $0.id == lexicalModel.id } ?? false
-        
-        downloadQueue = HTTPDownloader(self)
-        let commonUserData: [String: Any] = [
-            Key.lexicalModelInfo: installableLexicalModels,
-            Key.update: isUpdate
-        ]
-        downloadQueue!.userInfo = commonUserData
-        
-        var request = HTTPDownloadRequest(url: lexicalModelURL, userInfo: commonUserData)
-        request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version).path
-        request.tag = 0
-        
-        downloadQueue!.addRequest(request)
-        downloadQueue!.run()
+      }
+    }
+  }
+  
+  /// Assumes that lexical model has font and oskFont set and ignores fonts contained in Language.
+  private func downloadLexicalModel(_ lexicalModelAPI: LexicalModelAPICall) {
+    let lexicalModel = lexicalModelAPI.lexicalModel
+    let installableLexicalModels = lexicalModel.languages!.map { language in
+      InstallableLexicalModel(lexicalModel: lexicalModel, language: language, isCustom: true)
     }
     
-    /// - Returns: The current state for a lexical model
-    public func stateForLexicalModel(withID lexicalModelID: String) -> LexicalModelState {
-        if lexicalModelIdForCurrentRequest() == lexicalModelID {
-            return .downloading
-        }
-        let userLexicalModels = Storage.active.userDefaults.userLexicalModels
-        guard let userLexicalModel = userLexicalModels?.first(where: { $0.id == lexicalModelID }) else {
-            return .needsDownload
-        }
-        
-        // Check version
-        if let repositoryVersionString = apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.version {
-            let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
-            let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
-            if downloadedVersion < repositoryVersion {
-                return .needsUpdate
-            }
-        }
-        return .upToDate
+    let filename = lexicalModel.filename
+    let lexicalModelURL = lexicalModelAPI.options.lexicalModelBaseURL!.appendingPathComponent(filename)
+    
+    if downloadQueue != nil {
+      // Download queue is active.
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
+      return
     }
     
-    func lexicalModelIdForCurrentRequest() -> String? {
-        if let currentRequest = currentRequest {
-            let tmpStr = currentRequest.url.lastPathComponent
-            if tmpStr.hasJavaScriptExtension {
-                return String(tmpStr.dropLast(3))
-            }
-        } else if let downloadQueue = downloadQueue {
-            let kbInfo = downloadQueue.userInfo[Key.lexicalModelInfo]
-            if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
-                return lexicalModel.id
-            }
-        }
-        return nil
+    if reachability.currentReachabilityStatus() == NotReachable {
+      let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
+      return
     }
+    
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return
+    }
+    
+    let isUpdate = Storage.active.userDefaults.userLexicalModels?.contains { $0.id == lexicalModel.id } ?? false
+    
+    downloadQueue = HTTPDownloader(self)
+    let commonUserData: [String: Any] = [
+      Key.lexicalModelInfo: installableLexicalModels,
+      Key.update: isUpdate
+    ]
+    downloadQueue!.userInfo = commonUserData
+    
+    let request = HTTPDownloadRequest(url: lexicalModelURL, userInfo: commonUserData)
+    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version).path
+    request.tag = 0
+    
+    downloadQueue!.addRequest(request)
+    downloadQueue!.run()
+  }
+  
+  /// - Returns: The current state for a lexical model
+  public func stateForLexicalModel(withID lexicalModelID: String) -> LexicalModelState {
+    if lexicalModelIdForCurrentRequest() == lexicalModelID {
+      return .downloading
+    }
+    let userLexicalModels = Storage.active.userDefaults.userLexicalModels
+    guard let userLexicalModel = userLexicalModels?.first(where: { $0.id == lexicalModelID }) else {
+      return .needsDownload
+    }
+    
+    // Check version
+    if let repositoryVersionString = apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.version {
+      let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
+      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
+      if downloadedVersion < repositoryVersion {
+        return .needsUpdate
+      }
+    }
+    return .upToDate
+  }
+  
+  func lexicalModelIdForCurrentRequest() -> String? {
+    if let currentRequest = currentRequest {
+      let tmpStr = currentRequest.url.lastPathComponent
+      if tmpStr.hasJavaScriptExtension {
+        return String(tmpStr.dropLast(3))
+      }
+    } else if let downloadQueue = downloadQueue {
+      let kbInfo = downloadQueue.userInfo[Key.lexicalModelInfo]
+      if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
+        return lexicalModel.id
+      }
+    }
+    return nil
+  }
+
+  
   @objc func reachabilityChanged(_ notification: Notification) {
     log.debug {
       let reachStr: String
@@ -1305,29 +1307,29 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     userData.synchronize()
   }
     
-    /// Updates the user's installed lexical models and current lexical model with information in newLexicalModel.
-    /// - Parameter newLexicalModel: Info for updated lexical model.
-    func updateUserLexicalModels(with newLexicalModel: InstallableLexicalModel) {
-        let userData = Storage.active.userDefaults
-        guard var userLexicalModels = userData.userLexicalModels else {
-            return
-        }
-        
-        // Set version in user lexical models list
-        for i in userLexicalModels.indices {
-            var lm = userLexicalModels[i]
-            if lm.id == newLexicalModel.id {
-                if lm.languageID == newLexicalModel.languageID {
-                    lm = newLexicalModel
-                } else {
-                    lm.version = newLexicalModel.version
-                }
-                userLexicalModels[i] = lm
-            }
-        }
-        userData.userLexicalModels = userLexicalModels
-        userData.synchronize()
+  /// Updates the user's installed lexical models and current lexical model with information in newLexicalModel.
+  /// - Parameter newLexicalModel: Info for updated lexical model.
+  func updateUserLexicalModels(with newLexicalModel: InstallableLexicalModel) {
+    let userData = Storage.active.userDefaults
+    guard var userLexicalModels = userData.userLexicalModels else {
+      return
     }
+    
+    // Set version in user lexical models list
+    for i in userLexicalModels.indices {
+      var lm = userLexicalModels[i]
+      if lm.id == newLexicalModel.id {
+        if lm.languageID == newLexicalModel.languageID {
+          lm = newLexicalModel
+        } else {
+          lm.version = newLexicalModel.version
+        }
+        userLexicalModels[i] = lm
+      }
+    }
+    userData.userLexicalModels = userLexicalModels
+    userData.synchronize()
+  }
 
   func synchronizeSWKeyboard() {
     if let shared = Storage.shared,
@@ -1384,18 +1386,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
     
-    public func dismissLexicalModelPicker(_ viewController: UIViewController) {
-        // #1045 - Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
-        // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
-        // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
-        // true source of the problems.
-        viewController.dismiss(animated: false)
-        showKeyboard()
-        if shouldReloadLexicalModel {
-            inputViewController.reload()
-        }
-        NotificationCenter.default.post(name: Notifications.lexicalModelPickerDismissed, object: self, value: ())
+  public func dismissLexicalModelPicker(_ viewController: UIViewController) {
+    // #1045 - Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
+    // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
+    // way to fix the problem. Presumably there is some kind of underlying plumbing issue that is the
+    // true source of the problems.
+    viewController.dismiss(animated: false)
+    showKeyboard()
+    if shouldReloadLexicalModel {
+      inputViewController.reload()
     }
+    NotificationCenter.default.post(name: Notifications.lexicalModelPickerDismissed, object: self, value: ())
+  }
 
   // MARK: - Text
 

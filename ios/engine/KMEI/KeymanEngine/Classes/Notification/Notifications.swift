@@ -17,8 +17,8 @@ public struct KeyboardDownloadFailedNotification {
 public typealias LexicalModelDownloadStartedNotification = [InstallableLexicalModel]
 public typealias LexicalModelDownloadCompletedNotification = [InstallableLexicalModel]
 public struct LexicalModelDownloadFailedNotification {
-    public let lexicalModels: [InstallableLexicalModel]
-    public let error: Error
+  public let lexicalModels: [InstallableLexicalModel]
+  public let error: Error
 }
 
 public typealias KeyboardLoadedNotification = InstallableKeyboard

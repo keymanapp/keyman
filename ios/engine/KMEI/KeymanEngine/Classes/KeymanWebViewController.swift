@@ -248,30 +248,30 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
     
-    func setLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-        let stub: [String: Any] = [
-            "KI": "LexicalModel_\(lexicalModel.id)",
-            "KN": lexicalModel.name,
-            "KLC": lexicalModel.languageID,
-            "KL": lexicalModel.languageName,
-            "KF": storage.lexicalModelURL(for: lexicalModel).absoluteString
-        ]
-        
-        let data: Data
-        do {
-            data = try JSONSerialization.data(withJSONObject: stub, options: [])
-        } catch {
-            log.error("Failed to serialize lexical model stub: \(error)")
-            return
-        }
-        guard let stubString = String(data: data, encoding: .utf8) else {
-            log.error("Failed to create stub string")
-            return
-        }
-        
-        log.debug("LexicalModel stub: \(stubString)")
-        webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
+  func setLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    let stub: [String: Any] = [
+      "KI": "LexicalModel_\(lexicalModel.id)",
+      "KN": lexicalModel.name,
+      "KLC": lexicalModel.languageID,
+      "KL": lexicalModel.languageName,
+      "KF": storage.lexicalModelURL(for: lexicalModel).absoluteString
+    ]
+  
+    let data: Data
+    do {
+      data = try JSONSerialization.data(withJSONObject: stub, options: [])
+    } catch {
+      log.error("Failed to serialize lexical model stub: \(error)")
+      return
     }
+    guard let stubString = String(data: data, encoding: .utf8) else {
+      log.error("Failed to create stub string")
+      return
+    }
+  
+    log.debug("LexicalModel stub: \(stubString)")
+    webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
+  }
 }
 
 // MARK: - WKScriptMessageHandler

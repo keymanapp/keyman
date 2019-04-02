@@ -19,7 +19,7 @@ public struct Options: Codable {
 
   /// Base URL for keyboard filenames.
   public let keyboardBaseURL: URL
-  /// Base URL for keyboard filenames.
+  /// Base URL for lexical model filenames.
   public let lexicalModelBaseURL: URL?
 
   /// Base URL for font filenames.

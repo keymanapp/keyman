@@ -10,20 +10,21 @@ import Foundation
 
 /// A complete identifier for an `InstallableLexicalModel`. LexicalModels must have unique `FullLexicalModelID`s.
 public struct FullLexicalModelID: Codable {
-    public var lexicalModelID: String
-    public var languageID: String
+  public var lexicalModelID: String
+  public var languageID: String
 }
 
 // MARK: - Equatable
 extension FullLexicalModelID: Equatable {
-    public static func ==(lhs: FullLexicalModelID, rhs: FullLexicalModelID) -> Bool {
-        return lhs.lexicalModelID == rhs.lexicalModelID && lhs.languageID == rhs.languageID
-    }
+  public static func ==(lhs: FullLexicalModelID, rhs: FullLexicalModelID) -> Bool {
+    return lhs.lexicalModelID == rhs.lexicalModelID && lhs.languageID == rhs.languageID
+  }
 }
 
 // MARK: - CustomStringConvertible
 extension FullLexicalModelID: CustomStringConvertible {
-    public var description: String {
-        return "<lexicalModelID: \"\(lexicalModelID)\", languageID: \"\(languageID)\">"
-    }
+  public var description: String {
+    return "<lexicalModelID: \"\(lexicalModelID)\", languageID: \"\(languageID)\">"
+  }
 }
+
