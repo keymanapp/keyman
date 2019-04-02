@@ -67,7 +67,7 @@
 
 .phone.android .kmw-banner-bar {background-color: #222; height: 100%; width: 100%;}
 .phone.android .kmw-banner-bar span {background-color: #333; display:inline-block; vertical-align: middle;}
-.phone.android .kmw-suggestion-text {color:#ffff; background-color: #222; text-align: center;}
+.phone.android .kmw-suggestion-text {color:#ffff; background-color: #222; position: relative; text-align: center;}
 
 .tablet.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
@@ -114,7 +114,7 @@
 
 .tablet.android .kmw-banner-bar {background-color: #b4b4b8; height: 40px; width: 100%;}
 .tablet.android .kmw-banner-bar span {background-color: #b4b4b8; display:inline-block; vertical-align: middle;}
-.tablet.android .kmw-suggestion-text {color:#77f; background-color: #b4b4b8; text-align: center;}
+.tablet.android .kmw-suggestion-text {color:#77f; background-color: #b4b4b8; position: relative; text-align: center;}
 
 /* Vertical centering of text labels on keys */ 
 .kmw-key {text-align:center; white-space:nowrap;}
