@@ -209,11 +209,13 @@ namespace com.keyman.osk {
 
       let device = util.device;
       let oskManager = com.keyman.singleton.osk;
+      let width: number;
       if (device.formFactor != 'desktop') {
-        ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
+        width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT);
       } else {
-        ts.width = Math.floor(oskManager.getWidthFromCookie() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
+        width = Math.floor(oskManager.getWidthFromCookie() / SuggestionBanner.SUGGESTION_LIMIT);
       }
+      ts.width = width + 'px';
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
       if(keyboardManager.isRTL()) {
@@ -223,10 +225,12 @@ namespace com.keyman.osk {
 
       // Finalize the suggestion text
       var d=util._CreateElement('div'), ds=d.style;
-      let suggestionIndex: String = spec.id.substr(-1);
+      let suggestionIndex: string = spec.id.substr(-1);
       d.id = 'kmw-suggestion-text-' + suggestionIndex;
       d.className = 'kmw-suggestion-text';
       d.innerHTML = suggestionText;
+      //ds.left = (parseInt(suggestionIndex, 10) * width) + 'px';
+      ds.top = oskManager.getBannerHeight() - 48 + 'px';
       t.appendChild(d);
 
       return t;
