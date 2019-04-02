@@ -189,7 +189,6 @@ namespace com.keyman.osk {
           let banner = this.activeBanner as SuggestionBanner;
           keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions);
           keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions);
-          console.log('setBanner(SuggestionBanner)');
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
@@ -219,13 +218,11 @@ namespace com.keyman.osk {
       // ModelManager will never have an active model 
       // when predictions are disabled.
       if(keyman.modelManager.activeModel) {
-        console.log('selectBanner suggestion');
         this.setBanner('suggestion');
       } else if(this.alwaysShows) {
         this.setBanner('image');
       } else {
-        console.log('selectBanner blank');
-        this.setBanner('blank');        
+        this.setBanner('blank');
       }
     }
 

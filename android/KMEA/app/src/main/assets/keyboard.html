@@ -141,9 +141,8 @@
       //window.console.log('insertText('+ dn +', ' + s +');');
       window.jsInterface.insertText(dn, s);
 
-      setBanner();
-
       // TODO: Remove for production: Testing
+      setBanner();
       var kmw=com.keyman.singleton;
       kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'insertAlpha'}, {displayAs: 'insertBeta'}, {displayAs: 'insertCharlie'}]);
     }

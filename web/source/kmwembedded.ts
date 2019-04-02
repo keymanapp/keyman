@@ -118,11 +118,9 @@ namespace com.keyman.osk {
     let util = keyman.util;
     let device = util.device;
 
-    console.log("adjustHeights: 0");
     if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
       return false;
     }
-    console.log("adjustHeights: 1");
 
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
@@ -134,7 +132,6 @@ namespace com.keyman.osk {
     }
     let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
-    console.log("adjustHeight: oskHeight " + oskHeight);
 
     var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(bannerHeight+oskHeight+3)+'px';
@@ -149,8 +146,6 @@ namespace com.keyman.osk {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
       (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
-
-      console.log("adjustHeights: layersp[].style.height = " + (<HTMLElement> layers[nLayer]).style.height);
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
@@ -178,7 +173,6 @@ namespace com.keyman.osk {
       }
     }
 
-    console.log("adjustHeights returns true");
     return true;
   };
 }
@@ -353,12 +347,9 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    console.log('correctOSKTextSize start');
     if(osk.vkbd.adjustHeights()) {
-      console.log('correctOSKTextSize - osk.Load');
       osk._Load();
     }
-    console.log('correctOSKTextSize done');
   };
 
   /**

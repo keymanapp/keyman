@@ -229,7 +229,7 @@ namespace com.keyman.osk {
       d.id = 'kmw-suggestion-text-' + suggestionIndex;
       d.className = 'kmw-suggestion-text';
       d.innerHTML = suggestionText;
-      //ds.left = (parseInt(suggestionIndex, 10) * width) + 'px';
+      // TODO: Investigate the factor of "48"
       ds.top = oskManager.getBannerHeight() - 48 + 'px';
       t.appendChild(d);
 
