@@ -168,14 +168,16 @@ namespace com.keyman.osk {
       div.id = BannerSuggestion.BASE_ID + this.index;
 
       let kbdDetails = keyman.keyboardManager.activeStub;
-      if (kbdDetails['KLC']) {
-        div.lang = kbdDetails['KLC'];
-      }
+      if(kbdDetails) {  
+        if (kbdDetails['KLC']) {
+          div.lang = kbdDetails['KLC'];
+        }
 
-      // Establish base font settings
-      let font = kbdDetails['KFont'];
-      if(font && font.family && font.family != '') {
-        ds.fontFamily = this.fontFamily = font.family;
+        // Establish base font settings
+        let font = kbdDetails['KFont'];
+        if(font && font.family && font.family != '') {
+          ds.fontFamily = this.fontFamily = font.family;
+        }
       }
 
       // Ensures that a reasonable width % is set.
