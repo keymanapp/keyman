@@ -19,7 +19,7 @@
       //document.body.style.backgroundColor="transparent";
       //window.console.log('Device type = '+device);
       //window.console.log('Keyboard height = '+oskHeight);
-      var kmw=com.keyman.singleton; //window['keyman'];
+      var kmw=com.keyman.singleton;
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
@@ -32,14 +32,13 @@
       var ta = document.getElementById('ta');
       kmw['setActiveElement'](ta);
 
+      // TODO: Remove for production. For testing integration of suggestion banner
       kmw.osk.banner.setOptions({
         'persistentBanner': true,
         'enablePredictions': true
       });
-
-      // TODO: Delete this. Useful for rough exploratory testing of suggestion banner
       setBanner();
-      kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'a'}, {displayAs: 'b'}, {displayAs: 'c'}]);
+      kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
 
       ta.readOnly = false;
 
@@ -144,8 +143,9 @@
 
       setBanner();
 
+      // TODO: Remove for production: Testing
       var kmw=com.keyman.singleton;
-      kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'a'}, {displayAs: 'b'}, {displayAs: 'c'}]);
+      kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'insertAlpha'}, {displayAs: 'insertBeta'}, {displayAs: 'insertCharlie'}]);
     }
 
     function registerModel(model) {
