@@ -2012,7 +2012,7 @@ begin
     fkp := fgp.dpKeyArray;
     HasRules := False;
 
-    if IsKeyboardVersion10OrLater or True then
+    if FFix183_LadderLength <> 0 then
     begin
       Result := Result + JavaScript_Rules(fgp);
     end
