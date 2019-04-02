@@ -52,6 +52,7 @@
 .phone.ios .kmw-banner-bar {background-color: #cfd3d9; height: 40px; width: 100%;}
 .phone.ios .kmw-banner-bar .kmw-suggest-option {background-color: #fdfdfe; display:inline-block; vertical-align: middle; border-radius: 5px;}
 .phone.ios .kmw-suggestion-text {color:#000; width: 100%; text-align: center;}
+.phone.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
 
 .phone.android .kmw-key-layer-group {background-color: #333;}  
 .phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
@@ -68,6 +69,7 @@
 .phone.android .kmw-banner-bar {background-color: #222; height: 40px; width: 100%;}
 .phone.android .kmw-banner-bar .kmw-suggest-option {background-color: #333; display:inline-block; vertical-align: middle; border-radius: 5px}
 .phone.android .kmw-suggestion-text {color:#ffff; background-color: #222; text-align: center;}
+.phone.android .kmw-suggest-option.kmw-suggest-touched {background-color:#bbb;}
 
 .tablet.kmw-osk-frame{position:fixed;left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
         background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
@@ -97,6 +99,7 @@
 .tablet.ios .kmw-banner-bar {background-color: #cfd3d9}
 .tablet.ios .kmw-banner-bar .kmw-suggest-option {background-color: #fdfdfe; display:inline-block; vertical-align:middle; border-radius: 5px;}
 .tablet.ios .kmw-suggestion-text {color:#000; text-align: center;}
+.tablet.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
 
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 
@@ -115,6 +118,7 @@
 .tablet.android .kmw-banner-bar {background-color: #b4b4b8; height: 40px; width: 100%;}
 .tablet.android .kmw-banner-bar .kmw-suggest-option {background-color: #b4b4b8; display:inline-block; vertical-align: middle; border-radius: 5px}
 .tablet.android .kmw-suggestion-text {color:#77f; background-color: #b4b4b8; text-align: center;}
+.tablet.android .kmw-suggest-option.kmw-suggest-touched {background-color:#777;}
 
 /* Vertical centering of text labels on keys */ 
 .kmw-key {text-align:center; white-space:nowrap;}

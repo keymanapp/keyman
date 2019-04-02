@@ -886,7 +886,6 @@ namespace com.keyman.osk {
         } else {
           // If this key has subkey, start timer to display subkeys after delay, set up release
           this.touchHold(key);
-          //if(key.subKeys != null) this.subkeyDelayTimer=window.setTimeout(function(){this.showSubKeys(key);},this.popupDelay);
         }
         this.keyPending = key;
       }
@@ -993,7 +992,7 @@ namespace com.keyman.osk {
       var t = e.changedTouches[0],
           t1 = <HTMLElement> document.elementFromPoint(x,y),
           key0 = this.keyPending,
-          key1 = this.keyTarget(t1);
+          key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
       // Find the nearest key to the touch point if not on a visible key
       if((key1 && key1.className.indexOf('key-hidden') >= 0) ||
@@ -1032,8 +1031,9 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Use the popup duplicate of the base key if a phone with a visible popup array
       var sk=document.getElementById('kmw-popup-keys');
+
+      // Use the popup duplicate of the base key if a phone with a visible popup array
       if(sk && sk.style.visibility == 'visible' && util.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
         key1 = <KeyElement> sk.childNodes[0].firstChild;
       }
@@ -1050,9 +1050,13 @@ namespace com.keyman.osk {
       this.highlightSubKeys(key1,x,y);
 
       if(sk && sk.style.visibility == 'visible') {
+        // Once a subkey array is displayed, do not allow changing the base key.
+        // Keep that array visible and accept no other options until the touch ends.
         if(key1 && key1.id.indexOf('popup') < 0 && key1 != this.popupBaseKey) {
           return;
         }
+
+        // Highlight the base key on devices that do not append it to the subkey array.
         if(key1 && key1 == this.popupBaseKey && key1.className.indexOf('kmw-key-touched') < 0) {
           this.highlightKey(key1,true);
         }
