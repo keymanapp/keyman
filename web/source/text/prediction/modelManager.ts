@@ -251,6 +251,21 @@ namespace com.keyman.text.prediction {
       }
     }
 
+    /**
+     * Retrieves the context and output state of KMW immediately before the prediction with 
+     * token `id` was generated.  Must correspond to a 'recent' one, as only so many are stored
+     * in `ModelManager`'s history buffer.
+     * @param id A unique identifier corresponding to a recent `Transcription`.
+     * @returns The matching `Transcription`, or `null` none is found.
+     */
+    public getPredictionState(id: number): Transcription {
+      let match = this.recentTranscriptions.filter(function(t: Transcription) {
+        return t.token == id;
+      })
+
+      return match.length == 0 ? null : match[0];
+    }
+
     public shutdown() {
       this.lmEngine.shutdown();
     }

@@ -84,7 +84,7 @@ namespace com.keyman.osk {
 
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
-      d.className = "keymanweb-banner-container";
+      d.className = "kmw-banner-container";
       return this.bannerContainer = d;
     }
 

@@ -217,6 +217,13 @@ interface Context {
  */
 interface Suggestion {
   /**
+   * Indicates the externally-supplied id of the Transform that prompted
+   * the Suggestion.  Automatically handled by the LMLayer; models should
+   * not handle this field.
+   */
+  transformId?: number;
+
+  /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */
