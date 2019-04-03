@@ -32,6 +32,12 @@ asyncMain()
 
 
 async function asyncMain() {
+  // Ensure we're running in the terminal
+  if (!process.stdin.isTTY) {
+    throw new Error('must be run from interactive terminal');
+  }
+
+  // Load the LMLayer and the desired model.
   let lm = new LMLayer({}, createAsyncWorker());
   let config = await lm.loadModel('./example.crk.wordlist_wahkohtowin.model.js');
 
