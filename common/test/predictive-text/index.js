@@ -2,6 +2,10 @@
  * Implements a simple CLI for interactively testing the given predictive text
  * model.
  */
+
+const readline = require('readline');
+
+// Load the most recent LMLayer code locally.
 const LMLayer = require('../../predictive-text');
 
 const WORKER_DEBUG = false;
@@ -23,19 +27,88 @@ const ANSI = {
   NORMAL: CSI + 'm', // Set all graphics renditions attributes off.
 };
 
-asyncMain()
-  .then(_ => process.exit(0))
-  .catch(err => {
-    console.error(err);
-    process.exit(127);
-  });
+// Do it!
+main();
 
-
-async function asyncMain() {
+function main() {
   // Ensure we're running in the terminal
   if (!process.stdin.isTTY) {
     throw new Error('must be run from interactive terminal');
   }
+
+  readline.emitKeypressEvents(process.stdin);
+  if (process.stdin.isTTY)
+    process.stdin.setRawMode(true);
+  process.stdin.resume();
+
+  /**
+   *
+   * [ 'n',
+   *  { sequence: 'n',
+   *    name: 'n',
+   *    ctrl: false,
+   *    meta: false,
+   *    shift: false } ]
+   *[ 'o',
+   *  { sequence: 'o',
+   *    name: 'o',
+   *    ctrl: false,
+   *    meta: false,
+   *    shift: false } ]
+   *[ 'O',
+   *  { sequence: 'O', name: 'o', ctrl: false, meta: false, shift: true } ]
+   *[ '\t',
+   *  { sequence: '\t',
+   *    name: 'tab',
+   *    ctrl: false,
+   *    meta: false,
+   *    shift: false } ]
+   *[ '\r',
+   *  { sequence: '\r',
+   *    name: 'return',
+   *    ctrl: false,
+   *    meta: false,
+   *    shift: false } ]
+   *[ undefined,
+   *  { sequence: '\u001b[C',
+   *    name: 'right',
+   *    ctrl: false,
+   *    meta: false,
+   *    shift: false,
+   *    code: '[C' } ]
+   *[ '\u0004',
+   *  { sequence: '\u0004',
+   *    name: 'd',
+   *    ctrl: true,
+   *    meta: false,
+   *    shift: false } ]
+   *[ '\u0003',
+   *  { sequence: '\u0003',
+   *    name: 'c',
+   *    ctrl: true,
+   *    meta: false,
+   *    shift: false } ]
+   *
+   */
+  process.stdin.on('keypress', function (char, keypress) {
+    console.log({char, keypress});
+    if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
+      process.exit(0);
+    }
+  });
+
+  return;
+
+  asyncMain()
+    .then(_ => process.exit(0))
+    .catch(err => {
+      console.error(err);
+      process.exit(127);
+    });
+}
+
+
+async function asyncMain() {
 
   // Load the LMLayer and the desired model.
   let lm = new LMLayer({}, createAsyncWorker());
