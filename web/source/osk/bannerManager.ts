@@ -84,7 +84,7 @@ namespace com.keyman.osk {
 
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
-      d.className = "keymanweb-banner-container";
+      d.className = "kmw-banner-container";
       return this.bannerContainer = d;
     }
 
@@ -197,7 +197,8 @@ namespace com.keyman.osk {
 
     // TODO: test code not to keep in production
     public setSuggestions() {
-      let s:Array<Suggestion> = Array(SuggestionBanner.BLANK_SUGGESTION(), SuggestionBanner.BLANK_SUGGESTION(), SuggestionBanner.BLANK_SUGGESTION());
+      let blank : Suggestion = {displayAs: 'blank'} as Suggestion;
+      let s:Array<Suggestion> = Array(blank, blank, blank);
       s[0].displayAs = 'choco';
       s[1].displayAs = 'taco';
       s[2].displayAs = 'last';
