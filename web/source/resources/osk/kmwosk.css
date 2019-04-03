@@ -158,10 +158,9 @@
 .kmw-title-bar-actions{position: absolute; cursor: default; right:2px; top:0; width: 33px; height: 13px;}
 .kmw-footer-caption{color:#fff;font:0.7em Arial;margin:0 0 0 4px;}
 
-.kmw-banner-bar{height:40px; width:100%; margin:0; background-color:darkorange;}
-.kmw-banner-bar .kmw-suggest-option {background-color: orange; display:inline-block; vertical-align: middle;}
-.kmw-suggestion-text{color:#fff; background-color: orange; display: inline; height: 100%;
-        line-height:normal; position: relative; vertical-align: middle;}
+.kmw-banner-bar{height:100%; width:100%; margin:0; background-color:darkorange; display: inline-block;}
+.kmw-banner-bar .kmw-suggest-option {background-color: orange; display:inline-block; text-align: center; height: 85%; border-radius: 5px;}
+.kmw-suggestion-text{color:#fff; background-color: orange; line-height: normal; position: relative; vertical-align: middle;}
 
 .kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;
           font-family:SpecialOSK;color:white;}
