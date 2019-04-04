@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <!-- Set the viewport width to match phone and tablet device widths -->
+  <meta name="viewport" content="width=device-width,user-scalable=no">
+  <!-- Enable IE9 Standards mode -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>KeymanWeb - Regression Test Karma Harness</title>
+  <script src="/web/keymanweb.js"></script>
+  <script src="/web/kmwuitoggle.js"></script>
+  <style>
+    #progressWindow {
+      width: 100%;
+      margin: 8px 0;
+      height: 16px;
+      border: solid 1px #666666;
+      box-sizing: border-box;
+      padding: 2px;
+    }
+
+    #progressPosition {
+      background: #44cc44;
+      height: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body id="body">
+  <input type='text' id='receiver'/> 
+  <div id='progressWindow'><div id='progressPosition'></div></div>
+</body>
+
+</html>

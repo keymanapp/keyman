@@ -1,5 +1,5 @@
 
-static PWSTR VKeyNames[256] = {
+static PCWSTR VKeyNames[256] = {
 // Key Codes
 	L"K_?00",				// &H0
 	L"K_LBUTTON",			// &H1

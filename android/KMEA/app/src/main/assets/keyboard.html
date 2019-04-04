@@ -126,6 +126,12 @@
       window.jsInterface.insertText(dn, s);
     }
 
+    function registerModel(model) {
+      var kmw=window['keyman'];
+      window.console.log('model: ' + model);
+      kmw.registerModel(model);
+    }
+
     function resetContext() {
       var kmw=window['keyman'];
       kmw.resetContext();
