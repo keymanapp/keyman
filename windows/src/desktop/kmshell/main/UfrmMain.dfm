@@ -17,8 +17,7 @@ inherited frmMain: TfrmMain
   TextHeight = 13
   inherited web: TKeymanEmbeddedWB
     Width = 617
-    Height = 494
-    Silent = True
+    Height = 330
     ExplicitWidth = 617
     ExplicitHeight = 330
     ControlData = {

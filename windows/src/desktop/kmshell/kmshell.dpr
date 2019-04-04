@@ -158,18 +158,27 @@ uses
   UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
   Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
   UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
-  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas';
+  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas',
+  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
 
 begin
   CoInitFlags := COINIT_APARTMENTTHREADED;
+
+  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
   try
-    Application.Initialize;
-    Run;
-  except
-    on E:Exception do KeymanHandleException(E);
+    if FInitializeCEF.Start then
+    try
+      Application.Initialize;
+      Run;
+    except
+      on E:Exception do KeymanHandleException(E);
+    end;
+  finally
+    FInitializeCEF.Free;
   end;
 end.
 

@@ -21,7 +21,7 @@
                     06 Oct 2006 - mcdurdin - Refactor web browser into parent class
                     06 Oct 2006 - mcdurdin - Save activate page state and reload
                     06 Oct 2006 - mcdurdin - Add download keyboard
-                    04 Dec 2006 - mcdurdin - Use TfrmWebContainer;
+                    04 Dec 2006 - mcdurdin - Use T-frmWebContainer;
                     04 Dec 2006 - mcdurdin - Add keyboard_download, package_welcome, footer_buy, select_uilanguage
                     05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
                     05 Dec 2006 - mcdurdin - Localize additional messages

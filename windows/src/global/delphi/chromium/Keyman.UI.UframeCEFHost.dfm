@@ -1,16 +1,21 @@
-inherited frameCEFHost: TframeCEFHost
+object frameCEFHost: TframeCEFHost
   Left = 193
   Top = 131
   Align = alClient
   BorderIcons = []
   BorderStyle = bsNone
-  Caption = ''
   ClientHeight = 645
   ClientWidth = 878
-  OldCreateOrder = True
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
-  ExplicitWidth = 878
-  ExplicitHeight = 645
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object cefwp: TCEFWindowParent

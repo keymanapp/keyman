@@ -25,9 +25,7 @@ uses
   uCEFWindowParent,
 
   Keyman.System.CEFManager,
-//  KeymanDeveloperUtils,
-  UserMessages, UfrmTike;
-//  UfrmTIKE;
+  UserMessages;
 
 const
   CEF_DESTROY = WM_USER + 300;
@@ -64,7 +62,7 @@ type
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
 
-  TframeCEFHost = class(TTikeForm, IKeymanCEFHost)
+  TframeCEFHost = class(TForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
     tmrCreateBrowser: TTimer;
     cefwp: TCEFWindowParent;

@@ -50,7 +50,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, UfrmKeymanBase, OleCtrls, SHDocVw, EmbeddedWB,
   XMLRenderer, keymanapi_TLB, UserMessages, IeConst, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB, TempFileManager;
+  KeymanEmbeddedWB, TempFileManager, Keyman.UI.UframeCEFHost;
 
 type
   TfrmWebContainer = class(TfrmKeymanBase)
@@ -77,17 +77,22 @@ type
       pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
       var pDispatchObjectHit: IDispatch): HRESULT;
   private
-    cweb: TframeCEFHost;
+    cef: TframeCEFHost;
     FDialogName: WideString;
     FXMLRenderers: TXMLRenderers;
     FXMLFileName: TTempFile;
     FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
-    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
+//    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     function GetIEVersionString: WideString;
     procedure DownloadUILanguages;
-    procedure ContributeUILanguages;   // I4989
+    procedure ContributeUILanguages;
+    procedure cefLoadEnd(Sender: TObject);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
+      params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
+      out Handled: Boolean);   // I4989
 
   protected
     procedure DoResizeByContent;
@@ -151,7 +156,6 @@ procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
   const AdditionalData: WideString);
 var
   FWidth, FHeight: Integer;
-  v: OleVariant;
 begin
   FreeAndNil(FXMLFileName);   // I4181
 
@@ -179,8 +183,7 @@ begin
     ClientHeight := FHeight;
   end;
 
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  web.Navigate(FXMLFileName.Name, v);   // I4181
+  cef.Navigate(FXMLFileName.Name);
 end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
@@ -233,6 +236,58 @@ procedure TfrmWebContainer.TntFormCreate(Sender: TObject);
 begin
   inherited;
   FXMLRenderers := TXMLRenderers.Create;
+
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnLoadEnd := cefLoadEnd;
+end;
+
+procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+var
+  aparams: TStringList;
+  v: Boolean;
+  command: string;
+begin
+  if ShouldProcessAllCommands then
+  begin
+    v := GetParamsFromURLEx(URL, aparams);
+    command := aparams[0];
+    aparams.Delete(0);
+    FireCommand(command, aparams);
+    aparams.Free;
+  end
+  else
+  begin
+    command := params[0];
+    params.Delete(0);
+    FireCommand(command, params);
+  end;
+//
+//    then v := GetParamsFromURLEx(URL, aparams)
+//    else v := GetParamsFromURL(URL, aparams);
+//  if v then
+//  begin
+//    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
+//  end;
+end;
+
+procedure TfrmWebContainer.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+var
+  params: TStringList;
+  v: Boolean;
+begin
+  AssertCefThread;
+  if ShouldProcessAllCommands then
+  begin
+    v := GetParamsFromURLEx(URL, params);
+    Handled := True;
+    params.Free;
+  end
+  else
+    Handled := False;
 end;
 
 procedure TfrmWebContainer.TntFormDestroy(Sender: TObject);
@@ -280,6 +335,15 @@ begin
   end
   else
     Screen.Cursor := crHourglass;
+end;
+
+procedure TfrmWebContainer.cefLoadEnd(Sender: TObject);
+begin
+  AssertVclThread;
+  DoResizeByContent;
+  Screen.Cursor := crDefault;
+  if ShouldSetCaption then Self.Caption := cef.cef.Browser.MainFrame.Name;
+  if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
 end;
 
 procedure TfrmWebContainer.webDocumentComplete(ASender: TObject;
@@ -459,7 +523,7 @@ begin
   Do_Content_Render(True);
 end;
 
-procedure TfrmWebContainer.WMUser_FireCommand(var Message: TMessage);
+{procedure TfrmWebContainer.WMUser_FireCommand(var Message: TMessage);
 var
   command: WideString;
   params: TStringList;
@@ -469,7 +533,7 @@ begin
   params.Delete(0);
   FireCommand(command, params);
   params.Free;
-end;
+end;}
 
 procedure TfrmWebContainer.WMUser_FormShown(var Message: TMessage);
 begin

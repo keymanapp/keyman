@@ -12,8 +12,8 @@ inherited frmWebContainer: TfrmWebContainer
   PixelsPerInch = 96
   TextHeight = 13
   object web: TKeymanEmbeddedWB
-    Left = 304
-    Top = 216
+    Left = 296
+    Top = 16
     Width = 122
     Height = 70
     TabOrder = 0
