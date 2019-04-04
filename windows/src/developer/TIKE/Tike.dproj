@@ -226,7 +226,7 @@
         <DCCReference Include="main\MessageIdentifiers.pas"/>
         <DCCReference Include="..\..\global\delphi\general\exceptionw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
-        <DCCReference Include="main\Keyman.Developer.UI.UframeCEFHost.pas">
+        <DCCReference Include="..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
@@ -498,7 +498,7 @@
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
-        <DCCReference Include="main\Keyman.Developer.System.CEFManager.pas"/>
+        <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.Debugger.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.App.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.Base.pas"/>
@@ -509,11 +509,9 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas">
             <Form>frmNewProjectParameters</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewProject.pas">
             <Form>frmNewProject</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.KeyboardProjectTemplate.pas"/>
         <DCCReference Include="main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas"/>

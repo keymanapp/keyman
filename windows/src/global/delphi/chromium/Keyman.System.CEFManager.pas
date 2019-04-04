@@ -1,4 +1,4 @@
-unit Keyman.Developer.System.CEFManager;
+unit Keyman.System.CEFManager;
 
 interface
 
@@ -28,7 +28,7 @@ type
     FShutdownCompletionHandler: TNotifyEvent;
     procedure CompletionHandler(Sender: IKeymanCEFHost);
   public
-    constructor Create;
+    constructor Create(const RootFolder: string);
     destructor Destroy; override;
     function Start: Boolean;
 
@@ -47,11 +47,11 @@ uses
   Winapi.ShlObj,
   Winapi.Windows,
 
-  KeymanDeveloperUtils,
+  KeymanPaths,
   KeymanVersion,
-  RedistFiles,
-  RegistryKeys,
-  UTikeDebugMode;
+//  RedistFiles,
+  RegistryKeys;
+//  UTikeDebugMode;
 
 { TInitializeCEF }
 
@@ -67,7 +67,7 @@ begin
   end;
 end;
 
-constructor TCEFManager.Create;
+constructor TCEFManager.Create(const RootFolder: string);
 begin
   FWindows := TList<IKeymanCEFHost>.Create;
   // You *MUST* call GlobalCEFApp.StartMainProcess in a if..then clause
@@ -83,13 +83,13 @@ begin
 
   // In case you want to use custom directories for the CEF3 binaries, cache, cookies and user data.
   // If you don't set a cache directory the browser will use in-memory cache.
-  GlobalCEFApp.FrameworkDirPath     := GetCEFPath;
+  GlobalCEFApp.FrameworkDirPath     := TKeymanPaths.CEFPath;
   GlobalCEFApp.ResourcesDirPath     := GlobalCEFApp.FrameworkDirPath;
   GlobalCEFApp.LocalesDirPath       := GlobalCEFApp.FrameworkDirPath + '\locales';
   GlobalCEFApp.EnableGPU            := True;      // Enable hardware acceleration
-  GlobalCEFApp.cache                := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\cache';  //TODO: refactor into KeymanPaths.pas
-  GlobalCEFApp.cookies              := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\cookies';
-  GlobalCEFApp.UserDataPath         := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\browser\userdata';
+  GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath(RootFolder, 'cache');
+  GlobalCEFApp.cookies              := TKeymanPaths.CEFDataPath(RootFolder, 'cookies');
+  GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath(RootFolder, 'userdata');
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
 end;
 

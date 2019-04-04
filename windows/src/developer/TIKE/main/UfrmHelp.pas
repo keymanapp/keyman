@@ -9,7 +9,7 @@ uses
   Xml.XMLDoc,
   Xml.XMLIntf,
 
-  Keyman.Developer.UI.UframeCEFHost,
+  Keyman.UI.UframeCEFHost,
   TempFileManager, UfrmTikeDock,
   System.Actions, JvComponentBase, JvDockControlForm, uCEFWindowParent,
   uCEFInterfaces, uCEFTypes,

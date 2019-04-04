@@ -58,7 +58,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile,
   KeymanDeveloperUtils, UserMessages,
-  Keyman.Developer.UI.UframeCEFHost;
+  Keyman.UI.UframeCEFHost;
 
 type
   TfrmProject = class(TfrmTikeChild)  // I2721

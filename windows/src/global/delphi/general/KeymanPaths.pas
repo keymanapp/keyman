@@ -9,6 +9,10 @@ type
   EKeymanPath = class(Exception);
 
   TKeymanPaths = class
+  private
+    const S_CEF_DebugPath = 'Debug_CEFPath';
+    const S_CEF_EnvVar = 'KEYMAN_CEF4DELPHI_ROOT';
+    const S_CEF_SubFolder = 'cef\';
   public
     const S_KMShell = 'kmshell.exe';
     const S_Xml_LocaleDef = 'xml\localedef.dtd';
@@ -25,7 +29,11 @@ type
     class function KeymanEngineInstallDir: string; static;
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
+    class function CEFPath: string; static; // Chromium Embedded Framework
+    class function CEFDataPath(const RootFolder, mode: string): string; static;
   end;
+
+function GetFolderPath(csidl: Integer): string;
 
 implementation
 
@@ -121,6 +129,23 @@ begin
     raise EKeymanPath.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
+end;
+
+class function TKeymanPaths.CEFPath: string;
+begin
+  Result := GetDebugPath(S_CEF_DebugPath, '');
+  if Result = '' then
+  begin
+    Result := GetEnvironmentVariable(S_CEF_EnvVar);
+    if Result = ''
+      then Result := ExtractFilePath(ParamStr(0))+S_CEF_SubFolder
+      else Result := IncludeTrailingPathDelimiter(Result);
+  end;
+end;
+
+class function TKeymanPaths.CEFDataPath(const RootFolder, mode: string): string;
+begin
+  Result := GetFolderPath(CSIDL_APPDATA) + RootFolder + '\browser\' + mode;
 end;
 
 class function TKeymanPaths.KeyboardsInstallDir: string;

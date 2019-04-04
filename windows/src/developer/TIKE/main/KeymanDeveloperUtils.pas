@@ -60,7 +60,6 @@ const
   MAXMRU = 4;
   MAX_REG_FONT_ENTRIES = 16;
 
-function GetFolderPath(csidl: Integer): string;
 function ShouldShowStartup: Boolean;
 function TikeActive: Boolean;
 function CreateLink(const ObjPath, LinkPath, Desc: string): Boolean;
@@ -92,7 +91,8 @@ implementation
 
 uses
   Winapi.ShellApi,
-  Classes, SysUtils, ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
+  Classes, SysUtils,
+  ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
      ResourceStrings, CRC32, VisualKeyboard, Controls;
 
@@ -171,28 +171,6 @@ begin
     Result := SUCCEEDED(hres);
 end;
 
-
-function GetFolderPath(csidl: Integer): string;
-var
-    buf: array[0..260] of Char;
-    idl: PItemIDList;
-    mm: IMalloc;
-begin
-    Result := '';
-    if SHGetMalloc(mm) = NOERROR then
-    begin
-        if SHGetSpecialFolderLocation(0, csidl, idl) = NOERROR then
-        begin
-            if SHGetPathFromIDList(idl, buf) then
-            begin
-                Result := Buf;
-                if Result <> '' then
-                    if Result[Length(Result)] <> '\' then Result := Result + '\';
-            end;
-            mm.Free(idl);
-        end;
-    end;
-end;
 
 function ShouldShowStartup: Boolean;
 begin

@@ -47,7 +47,7 @@ uses
   Vcl.Forms,
   Vcl.Graphics,
 
-  Keyman.Developer.UI.UframeCEFHost,
+  Keyman.UI.UframeCEFHost,
 
   KeyboardFonts,
   KMDActionInterfaces,

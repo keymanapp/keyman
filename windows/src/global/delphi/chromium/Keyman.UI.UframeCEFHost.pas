@@ -1,4 +1,4 @@
-unit Keyman.Developer.UI.UframeCEFHost;
+unit Keyman.UI.UframeCEFHost;
 
 interface
 
@@ -24,10 +24,10 @@ uses
   uCEFTypes,
   uCEFWindowParent,
 
-  Keyman.Developer.System.CEFManager,
-  KeymanDeveloperUtils,
-  UserMessages,
-  UfrmTIKE;
+  Keyman.System.CEFManager,
+//  KeymanDeveloperUtils,
+  UserMessages, UfrmTike;
+//  UfrmTIKE;
 
 const
   CEF_DESTROY = WM_USER + 300;
@@ -175,11 +175,11 @@ uses
   System.StrUtils,
   Winapi.ShellApi,
 
-  Keyman.Developer.System.HelpTopics,
+//  Keyman.Developer.System.HelpTopics,
 //  typinfo,
   ErrorControlledRegistry,
   ExternalExceptionHandler,
-  UfrmMain,
+//  UfrmMain,
   utilhttp,
   uCEFApplication,
   VersionInfo;
@@ -504,7 +504,7 @@ begin
 
   if p.event.windows_key_code = VK_F1 then
   begin
-    frmKeymanDeveloper.HelpTopic(Self)
+//    if Assigned(OnHelpTopic) then OnHelpTopic(Self); // TODO: frmKeymanDeveloper.HelpTopic(Self)
   end
   else if p.event.windows_key_code = VK_F12 then
   begin

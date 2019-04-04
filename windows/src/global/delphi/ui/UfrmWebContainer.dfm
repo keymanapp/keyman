@@ -12,13 +12,11 @@ inherited frmWebContainer: TfrmWebContainer
   PixelsPerInch = 96
   TextHeight = 13
   object web: TKeymanEmbeddedWB
-    Left = 0
-    Top = 0
-    Width = 426
-    Height = 286
-    Align = alClient
+    Left = 304
+    Top = 216
+    Width = 122
+    Height = 70
     TabOrder = 0
-    Silent = False
     OnBeforeNavigate2 = webBeforeNavigate2
     OnDocumentComplete = webDocumentComplete
     OnNewWindow3 = webNewWindow3

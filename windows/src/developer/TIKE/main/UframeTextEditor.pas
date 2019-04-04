@@ -24,7 +24,7 @@ uses
   uCEFInterfaces,
   uCEFTypes,
 
-  Keyman.Developer.UI.UframeCEFHost,
+  Keyman.UI.UframeCEFHost,
   KMDActionInterfaces,
   MenuImgList,
   TextFileFormat,

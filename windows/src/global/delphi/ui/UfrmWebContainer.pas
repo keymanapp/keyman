@@ -77,6 +77,7 @@ type
       pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
       var pDispatchObjectHit: IDispatch): HRESULT;
   private
+    cweb: TframeCEFHost;
     FDialogName: WideString;
     FXMLRenderers: TXMLRenderers;
     FXMLFileName: TTempFile;
