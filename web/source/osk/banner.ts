@@ -208,6 +208,7 @@ namespace com.keyman.osk {
     private updateText() {
       let display = this.generateSuggestionText();
       this.div.replaceChild(display, this.display);
+      this.display = display;
     }
 
     /**
