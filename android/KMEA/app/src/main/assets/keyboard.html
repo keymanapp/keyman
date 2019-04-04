@@ -32,14 +32,8 @@
       var ta = document.getElementById('ta');
       kmw['setActiveElement'](ta);
 
-      // TODO: Remove for production. For testing integration of suggestion banner
-      kmw.osk.banner.setOptions({
-        'persistentBanner': true,
-        'enablePredictions': true
-      });
-      setBanner();
-      kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
-
+      // TODO: Init as 'blank'
+      setBanner('suggestion');
       ta.readOnly = false;
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
@@ -142,9 +136,13 @@
       window.jsInterface.insertText(dn, s);
 
       // TODO: Remove for production: Testing
-      setBanner();
       var kmw=com.keyman.singleton;
-      kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'insertAlpha'}, {displayAs: 'insertBeta'}, {displayAs: 'insertCharlie'}]);
+      if (s == 'b') {
+        setBanner('blank');
+      } else if (s == 's') {
+        setBanner('suggestion');
+        kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'insertAlpha'}, {displayAs: 'insertBeta'}, {displayAs: 'insertCharlie'}]);
+      }
     }
 
     function registerModel(model) {
@@ -228,10 +226,26 @@
       window.location.hash = 'hideKeyboard' + fragmentToggle;
     }
 
-    function setBanner() {
-      var kmw = window['keyman'];
-      kmw.osk.banner.setBanner('suggestion', bannerHeight);
-      window.console.log('Embedded setBanner to ' + bannerHeight);
+    function setBanner(bannerType) {
+      var kmw = com.keyman.singleton;
+      var banner = kmw.osk.banner;
+      if (bannerType == 'blank') {
+        banner.setOptions({
+          'persistentBanner': false,
+          'enablePredictions': false
+        });
+        banner.setBanner('blank');
+      } else if (bannerType == 'suggestion') {
+        banner.setOptions({
+          'persistentBanner': true,
+          'enablePredictions': true
+        });
+        banner.setBanner('suggestion', bannerHeight);
+
+        // TODO: Remove for production. For testing integration of suggestion banner
+        window.console.log('Embedded setBanner to ' + bannerHeight);
+        kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
+      }
     }
 
     function showHelpBubble() {
