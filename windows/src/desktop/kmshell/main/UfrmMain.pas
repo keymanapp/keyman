@@ -74,10 +74,9 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
-  keymanapi_TLB, UfrmKeymanBase, OleCtrls, SHDocVw, EmbeddedWB,
+  keymanapi_TLB, UfrmKeymanBase,
   MSHTML_TLB, UfrmWebContainer,
-  XMLRenderer, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB;
+  XMLRenderer;
 
 type
   TfrmMain = class(TfrmWebContainer)
@@ -219,7 +218,6 @@ begin
   inherited;
 
   kmcom.AutoApply := False;
-  web.UserInterfaceOptions := web.UserInterfaceOptions + [EnableThemes];
 
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -870,7 +868,8 @@ procedure TfrmMain.SaveState;
 var
   elem: IHTMLElement;
 begin
-  try
+{$MESSAGE HINT 'TODO: Save state support'}
+  {try  TODO: save state
     if Assigned(web.Document) then
     begin
       elem:= (web.Document as IHTMLDocument3).getElementById('state');
@@ -880,7 +879,7 @@ begin
     end;
   except
     FState := '';
-  end;
+  end;}
 end;
 
 class function TfrmMain.ShouldRegisterWindow: Boolean; // I2720

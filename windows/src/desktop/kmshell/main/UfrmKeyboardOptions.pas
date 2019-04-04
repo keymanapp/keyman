@@ -24,8 +24,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB, keymanapi_TLB,
-  UserMessages, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB;
+  Dialogs, UfrmWebContainer, keymanapi_TLB,
+  UserMessages;
 
 type
   TfrmKeyboardOptions = class(TfrmWebContainer)
@@ -55,9 +55,9 @@ function ShowKeyboardOptions(AOwner: TWinControl; const AKeyboardName: WideStrin
 implementation
 
 uses
-  EwbTools,
   kmint,
   utilexecute,
+  utilhttp,
   WideStrings;
 
 {$R *.dfm}
@@ -143,17 +143,19 @@ begin
   for I := 0 to kbd.Options.Count - 1 do
   begin
     if I > 0 then s := s + '&';
-    s := s + EwbTools.Encode(kbd.Options[I].Name) + '=' + EwbTools.Encode(kbd.Options[I].Value);
+    s := s + URLEncode(kbd.Options[I].Name) + '=' + URLEncode(kbd.Options[I].Value);
   end;
 
   if s <> '' then s := '?' + s;
 
   s := ExtractFilePath(kbd.OwnerPackage.Filename) + 'options.htm' + s;
 
-  web.OnBeforeNavigate2 := nil;
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  web.Navigate(s, v);
-  web.OnBeforeNavigate2 := webBeforeNavigate2;
+  cef.Navigate(s);
+{$MESSAGE HINT 'TODO: Override the onbeforenavigate'}
+//  web.OnBeforeNavigate2 := nil;
+//  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
+//  web.Navigate(s, v);
+//  web.OnBeforeNavigate2 := webBeforeNavigate2;
 end;
 
 procedure TfrmKeyboardOptions.WMUser_ContentRender(var Message: TMessage);

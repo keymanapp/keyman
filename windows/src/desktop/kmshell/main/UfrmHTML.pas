@@ -33,15 +33,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, OleCtrls, SHDocVw, EmbeddedWB,
-  keymanapi_TLB, UfrmKeymanBase, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB, Vcl.AppEvnts;
+  StdCtrls, ExtCtrls, keymanapi_TLB, UfrmKeymanBase, Vcl.AppEvnts, Keyman.UI.UframeCEFHost;
 
 type
   TfrmHTML = class(TfrmKeymanBase)
     cmdOK: TButton;
     panHTML: TPanel;
-    web: TKeymanEmbeddedWB;
     cmdPrint: TButton;
     cmdBack: TButton;
     cmdForward: TButton;
@@ -54,13 +51,12 @@ type
       bstrUrl: WideString);
     procedure cmdBackClick(Sender: TObject);
     procedure cmdForwardClick(Sender: TObject);
-    procedure webCommandStateChange(ASender: TObject; Command: Integer;
-      Enable: WordBool);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
       Shift: TShiftState);
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
+    cef: TframeCEFHost;
     FFileName: string;
     procedure SetText(const Value: string);
     procedure SetURL(const Value: string);
@@ -89,18 +85,19 @@ uses
 
 procedure TfrmHTML.ShowFile(const FileName: WideString);
 begin
-  if FileExists(FileName) and Assigned(web) then
-    web.Navigate(FileName);
+  if FileExists(FileName) and Assigned(cef) then
+    cef.Navigate(FileName);
 end;
 
-procedure TfrmHTML.webCommandStateChange(ASender: TObject; Command: Integer;
+{$MESSAGE HINT 'TODO: support navigation state changes'}
+{procedure TfrmHTML.webCommandStateChange(ASender: TObject; Command: Integer;
   Enable: WordBool);
 begin
   if Command = CSC_NAVIGATEFORWARD then
     cmdForward.Enabled := Enable
   else if Command = CSC_NAVIGATEBACK then
     cmdBack.Enabled := Enable;
-end;
+end;}
 
 procedure TfrmHTML.webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
   Shift: TShiftState);
@@ -150,17 +147,20 @@ end;
 
 procedure TfrmHTML.cmdBackClick(Sender: TObject);
 begin
-  web.GoBack;
+  if Assigned(cef) and Assigned(cef.cef) then
+    cef.cef.GoBack;
 end;
 
 procedure TfrmHTML.cmdForwardClick(Sender: TObject);
 begin
-  web.GoForward;
+  if Assigned(cef) and Assigned(cef.cef) then
+    cef.cef.GoForward;
 end;
 
 procedure TfrmHTML.cmdPrintClick(Sender: TObject);
 begin
-  web.Print;  // I2641
+  if Assigned(cef) and Assigned(cef.cef) then
+    cef.cef.Print;
 end;
 
 procedure TfrmHTML.FormCreate(Sender: TObject);
@@ -172,6 +172,14 @@ begin
   if s <> '' then Font.Name := s;
   cmdOK.Caption := MsgFromId(SKButtonOK);
   cmdPrint.Caption := MsgFromId(SKButtonPrint);
+
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.ShouldOpenRemoteUrlsInBrowser := True;
+//  cef.OnBeforeBrowse := cefBeforeBrowse;
+//  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+//  cef.OnLoadEnd := cefLoadEnd;
 end;
 
 procedure TfrmHTML.FormDestroy(Sender: TObject);
@@ -189,7 +197,7 @@ end;
 
 procedure TfrmHTML.SetURL(const Value: string);
 begin
-  if Assigned(web) then web.Navigate(Value);
+  if Assigned(cef) then cef.Navigate(Value);
 end;
 
 procedure DoShowWelcome(const Title, FileName: WideString);

@@ -48,9 +48,8 @@ uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, UfrmKeymanBase, keymanapi_TLB, jpeg,
-  UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB, SHDocVw_EWB,
-  UserMessages,
-  EwbCore, KeymanEmbeddedWB, Vcl.AppEvnts;
+  UfrmWebContainer,
+  UserMessages, Vcl.AppEvnts;
 
 type
   TfrmSplash = class(TfrmWebContainer)

@@ -107,7 +107,7 @@ inherited frmTextEditor: TfrmTextEditor
       Left = 285
       Top = 0
       Width = 42
-      Height = 22
+      Height = 21
       Hint = 'Font Size|Select font size'
       TabOrder = 1
       Text = '0'
@@ -207,32 +207,6 @@ inherited frmTextEditor: TfrmTextEditor
     ParentBackground = False
     ParentColor = True
     TabOrder = 2
-    object webFonts: TKeymanEmbeddedWB
-      Left = 0
-      Top = 0
-      Width = 237
-      Height = 595
-      Align = alClient
-      TabOrder = 0
-      Silent = False
-      OnBeforeNavigate2 = webBeforeNavigate2
-      OnNewWindow3 = webNewWindow3
-      DisableCtrlShortcuts = 'N'
-      UserInterfaceOptions = [EnablesFormsAutoComplete, EnableThemes]
-      About = ' EmbeddedWB http://bsalsa.com/'
-      DisableErrors.fpExceptions = False
-      PrintOptions.HTMLHeader.Strings = (
-        '<HTML></HTML>')
-      PrintOptions.Orientation = poPortrait
-      ExplicitWidth = 156
-      ExplicitHeight = 453
-      ControlData = {
-        4C00000045520000070700000000000000000000000000000000000000000000
-        000000004C000000000000000000000001000000E0D057007335CF11AE690800
-        2B2E126208000000000000004C0000000114020000000000C000000000000046
-        8000000000000000000000000000000000000000000000000000000000000000
-        00000000000000000100000000000000000000000000000000000000}
-    end
   end
   object panEditor: TPanel
     Left = 0
@@ -317,7 +291,7 @@ inherited frmTextEditor: TfrmTextEditor
     Left = 88
     Top = 68
     Bitmap = {
-      494C01010F001400440010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010F001400480010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

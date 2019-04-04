@@ -48,42 +48,19 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmKeymanBase, OleCtrls, SHDocVw, EmbeddedWB,
-  XMLRenderer, keymanapi_TLB, UserMessages, IeConst, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB, TempFileManager, Keyman.UI.UframeCEFHost;
+  Dialogs, UfrmKeymanBase,
+  XMLRenderer, keymanapi_TLB, UserMessages, TempFileManager, Keyman.UI.UframeCEFHost;
 
 type
   TfrmWebContainer = class(TfrmKeymanBase)
-    web: TKeymanEmbeddedWB; // I2721
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      var URL: OleVariant);
     procedure TntFormCreate(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
-    procedure webScriptError2(Sender: TObject; ErrorLine, ErrorCharacter,
-      ErrorCode, ErrorMessage, ErrorUrl: string;
-      var ScriptErrorAction: TScriptErrorAction);
-    procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-      Shift: TShiftState);
-    procedure webShowContextMenu2(Sender: TCustomEmbeddedWB;
-      const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-      const Context: IDispatch; var Result: HRESULT);
-    function webShowHelpRequest1(Sender: TObject; HWND: NativeUInt;
-      pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
-      var pDispatchObjectHit: IDispatch): HRESULT;
   private
-    cef: TframeCEFHost;
     FDialogName: WideString;
     FXMLRenderers: TXMLRenderers;
     FXMLFileName: TTempFile;
     FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
-//    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     function GetIEVersionString: WideString;
     procedure DownloadUILanguages;
@@ -95,6 +72,7 @@ type
       out Handled: Boolean);   // I4989
 
   protected
+    cef: TframeCEFHost;
     procedure DoResizeByContent;
 
     procedure FireCommand(const command: WideString; params: TStringList); virtual;
@@ -130,20 +108,17 @@ implementation
 
 uses
   custinterfaces,
-  MSHTML_TLB,
   ErrorControlledRegistry,
   ExternalExceptionHandler,
   kmint,
   UILanguages,
   UfrmScriptError,
   Upload_Settings,
-  URLMon,
   utilexecute,
   utilsystem,
   utilhttp,
   utilxml,
-  VersionInfo,
-  WebSoundControl;
+  VersionInfo;
 
 {$R *.dfm}
 
@@ -214,7 +189,8 @@ end;
 
 procedure TfrmWebContainer.SetFocus;  // I2720
 begin
-  web.SetFocusToDoc;
+//  if Assigned(cef) then
+//    cef.SetFocus;
 end;
 
 function TfrmWebContainer.ShouldProcessAllCommands: Boolean;
@@ -240,6 +216,7 @@ begin
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
   cef.Visible := True;
+  cef.ShouldOpenRemoteUrlsInBrowser := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
   cef.OnLoadEnd := cefLoadEnd;
@@ -261,17 +238,14 @@ begin
   end
   else
   begin
-    command := params[0];
-    params.Delete(0);
-    FireCommand(command, params);
+    if params.Count > 0 then
+    begin
+      command := params[0];
+      params.Delete(0);
+      FireCommand(command, params);
+      params.Insert(0, command);  {$MESSAGE HINT 'TODO: Refactor the ShouldProcessAllCommands code path'} // TODO: refactor
+    end;
   end;
-//
-//    then v := GetParamsFromURLEx(URL, aparams)
-//    else v := GetParamsFromURL(URL, aparams);
-//  if v then
-//  begin
-//    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-//  end;
 end;
 
 procedure TfrmWebContainer.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
@@ -318,25 +292,6 @@ begin
   Do_Content_Render(True);
 end;
 
-procedure TfrmWebContainer.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-var
-  params: TStringList;
-  v: Boolean;
-begin
-  if ShouldProcessAllCommands
-    then v := GetParamsFromURLEx(URL, params)
-    else v := GetParamsFromURL(URL, params);
-  if v then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
-  end
-  else
-    Screen.Cursor := crHourglass;
-end;
-
 procedure TfrmWebContainer.cefLoadEnd(Sender: TObject);
 begin
   AssertVclThread;
@@ -346,39 +301,8 @@ begin
   if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
 end;
 
-procedure TfrmWebContainer.webDocumentComplete(ASender: TObject;
-  const pDisp: IDispatch; var URL: OleVariant);
-var
-  doc2: IHTMLDocument2;
-  doc3: IHTMLDocument3;
-  elem: IHTMLElement;
-begin
-  try
-    //if (pDisp as IWebBrowser2).TopLevelContainer then
-    //begin
-      DoResizeByContent;
-
-      Screen.Cursor := crDefault;
-
-      doc2 := (web.Document as IHTMLDocument2);
-      if ShouldSetCaption then Self.Caption := doc2.title;
-      if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
-
-      doc3 := (web.Document as IHTMLDocument3);
-
-      elem := doc3.documentElement;
-      if Assigned(elem) then  // MS KB 317024
-        elem.insertAdjacentHTML('afterBegin', '&#xa0;<SCRIPT For="window" Event="onerror">var noOp = null;</SCRIPT>');
-      // NOTE: The &nbsp, or some other visible HTML, is required. Internet Explorer will not
-      // parse and recognize the script block without some visual HTML to
-      // accompany it.
-    //end;
-  except
-    Exit;
-  end;
-end;
-
-procedure TfrmWebContainer.webKeyDown(Sender: TObject; var Key: Word;
+{$MESSAGE HINT 'TODO: Support VK_F5 key event'}
+{procedure TfrmWebContainer.webKeyDown(Sender: TObject; var Key: Word;
   ScanCode: Word; Shift: TShiftState);
 begin
   if (Key = VK_F5) and (ssCtrl in Shift) then
@@ -386,15 +310,12 @@ begin
     Key := 0;
     PostMessage(Handle, WM_USER_ContentRender, 0, 0);
   end;
-end;
+end;}
 
 procedure TfrmWebContainer.DoResizeByContent;
-var
-  doc3: IHTMLDocument3;
-  elem: IHTMLElement;
 begin
   try
-    if Assigned(web.Document) then
+{    if Assigned(web.Document) then
     begin
       doc3 := (web.Document as IHTMLDocument3);
 
@@ -410,6 +331,7 @@ begin
         (web.Document as IHTMLDocument2).parentWindow.scrollTo(0,0);
       end;
     end;
+    }
   except
     Exit;
   end;
@@ -418,19 +340,6 @@ end;
 function IsLocalURL(URL: WideString): Boolean;
 begin
   Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
-end;
-
-procedure TfrmWebContainer.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-var
-  params: TStringList;
-begin
-  Cancel := True;
-  if GetParamsFromURL(bstrURL, params)
-    then PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params))
-    else if IsLocalURL(bstrURL) then web.Go(bstrUrl)
-    else TUtilExecute.URL(bstrUrl);  // I3349
 end;
 
 function TfrmWebContainer.GetIEVersionString: WideString;
@@ -446,7 +355,8 @@ begin
   end;
 end;
 
-procedure TfrmWebContainer.webScriptError2(Sender: TObject; ErrorLine,
+{$MESSAGE HINT 'TODO: Log script errors'}
+{procedure TfrmWebContainer.webScriptError2(Sender: TObject; ErrorLine,
   ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string;
   var ScriptErrorAction: TScriptErrorAction);
 var
@@ -501,44 +411,34 @@ begin
     PostMessage(Handle, WM_CLOSE, 0, 0); // I1829, dead screen when uninstalling keyboard
   //Release;   // Disabled in I1792
   //PostMessage(Handle,
-end;
+end;}
 
-procedure TfrmWebContainer.webShowContextMenu2(Sender: TCustomEmbeddedWB;
+{$MESSAGE HINT 'TODO: Support context menu'}
+{procedure TfrmWebContainer.webShowContextMenu2(Sender: TCustomEmbeddedWB;
   const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
   const Context: IDispatch; var Result: HRESULT);
 begin
   Result := S_OK;
-end;
+end;}
 
-function TfrmWebContainer.webShowHelpRequest1(Sender: TObject; HWND: NativeUInt;
+{$MESSAGE HINT 'TODO: Support context help'}
+{function TfrmWebContainer.webShowHelpRequest1(Sender: TObject; HWND: NativeUInt;
   pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
   var pDispatchObjectHit: IDispatch): HRESULT;
 begin
   Application.HelpJump('context_'+lowercase(FDialogName));
   Result := S_OK;
-end;
+end;}
 
 procedure TfrmWebContainer.WMUser_ContentRender(var Message: TMessage);
 begin
   Do_Content_Render(True);
 end;
 
-{procedure TfrmWebContainer.WMUser_FireCommand(var Message: TMessage);
-var
-  command: WideString;
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  command := params[0];
-  params.Delete(0);
-  FireCommand(command, params);
-  params.Free;
-end;}
-
 procedure TfrmWebContainer.WMUser_FormShown(var Message: TMessage);
 begin
-  web.SetFocus;
-  web.SetFocusToDoc;
+  if Assigned(cef) then
+    cef.SetFocus;
 end;
 
 procedure TfrmWebContainer.WndProc(var Message: TMessage);  // I2720
@@ -549,8 +449,8 @@ begin
     case Msg of
       WM_ACTIVATE, WM_SETFOCUS, WM_KILLFOCUS:
         begin
-          Windows.SetFocus(web.Handle);
-          web.SetFocusToDoc;
+          if Assigned(cef) then
+            cef.SetFocus;
         end;
     end;
 end;

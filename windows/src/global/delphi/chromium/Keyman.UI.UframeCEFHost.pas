@@ -25,7 +25,8 @@ uses
   uCEFWindowParent,
 
   Keyman.System.CEFManager,
-  UserMessages;
+  UserMessages,
+  utilexecute;
 
 const
   CEF_DESTROY = WM_USER + 300;
@@ -116,6 +117,7 @@ type
     FShutdownCompletionHandler: TShutdownCompletionHandlerEvent;
     FIsClosing: Boolean;
     FShouldShowContextMenu: Boolean;
+    FShouldOpenRemoteUrlsInBrowser: Boolean;
 
     FCallbackWnd: THandle;
     FOnPreKeySyncEvent: TCEFHostPreKeySyncEvent;
@@ -153,6 +155,7 @@ type
     procedure Navigate(const url: string); overload;
     function HasFocus: Boolean;
     property ShouldShowContextMenu: Boolean read FShouldShowContextMenu write FShouldShowContextMenu;
+    property ShouldOpenRemoteUrlsInBrowser: Boolean read FShouldOpenRemoteUrlsInBrowser write FShouldOpenRemoteUrlsInBrowser;
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowseSync: TCEFHostBeforeBrowseSyncEvent read FOnBeforeBrowseSync write FOnBeforeBrowseSync;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
@@ -173,11 +176,8 @@ uses
   System.StrUtils,
   Winapi.ShellApi,
 
-//  Keyman.Developer.System.HelpTopics,
-//  typinfo,
   ErrorControlledRegistry,
   ExternalExceptionHandler,
-//  UfrmMain,
   utilhttp,
   uCEFApplication,
   VersionInfo;
@@ -355,6 +355,11 @@ begin
   end;
 end;
 
+function IsLocalURL(URL: WideString): Boolean;
+begin
+  Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
+end;
+
 procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
@@ -374,6 +379,11 @@ begin
   begin
     if Assigned(FOnBeforeBrowse) then
       FOnBeforeBrowse(Self, url, params, Boolean(message.WParam));
+
+    if FShouldOpenRemoteUrlsInBrowser and (params.Count = 0) and not IsLocalURL(URL) then
+      {$MESSAGE HINT 'Refactor how remote URLs are handled'}
+      // TODO: refactor links
+      TUtilExecute.URL(url);
   end
   else if shouldOpenUrlIfNotHandled then
     cef.LoadURL(url);
@@ -428,6 +438,9 @@ begin
   params := nil;
   if not Handled then
     Handled := GetParamsFromURL(Url, params);
+
+  if not Handled and FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
+    Handled := True;
 
   if not Assigned(params) then
     params := TStringList.Create;
@@ -502,6 +515,7 @@ begin
 
   if p.event.windows_key_code = VK_F1 then
   begin
+    {$MESSAGE HINT 'TODO: Add F1 support back in again'}
 //    if Assigned(OnHelpTopic) then OnHelpTopic(Self); // TODO: frmKeymanDeveloper.HelpTopic(Self)
   end
   else if p.event.windows_key_code = VK_F12 then

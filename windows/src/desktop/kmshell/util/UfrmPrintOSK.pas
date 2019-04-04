@@ -7,7 +7,7 @@
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
+  Related Files:
   Dependencies:     
 
   Bugs:             
@@ -25,13 +25,12 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtShiftState, UserMessages,
-  VisualKeyboard, Menus, OleCtrls, SHDocVw, ExtCtrls, keymanapi_TLB,
-  SHDocVw_EWB, EwbCore, EmbeddedWB, StdCtrls, UfrmKeymanBase,
-  KeymanEmbeddedWB;
+  VisualKeyboard, Menus, ExtCtrls, keymanapi_TLB,
+  StdCtrls, UfrmKeymanBase;
 
+{$MESSAGE HINT 'TODO: Support printing OSK'}
 type
   TfrmPrintOSK = class(TfrmKeymanBase)
-    web: TKeymanEmbeddedWB;
     TntLabel1: TLabel;
     procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
       var URL: OleVariant);
@@ -78,7 +77,7 @@ begin
     TempPath := IncludeTrailingPathDelimiter(buf);
     TempFileName := 'Keyman Keyboard '+kbd.ID+'.html';
     if not SaveWebPage(vv, TempPath + TempFileName) then Exit;
-    web.Navigate(TempPath + TempFileName);
+//    web.Navigate(TempPath + TempFileName);
   finally
     vv.Free;
   end;
@@ -107,7 +106,7 @@ procedure TfrmPrintOSK.WMUserPrintKeyboard(var Message: TMessage);
 begin
   SetFocus;       // I2675
   BringToFront;   // I2675
-  web.Print;
+//  web.Print;
 end;
 
 procedure TfrmPrintOSK.DeleteWebPage;

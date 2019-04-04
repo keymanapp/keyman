@@ -94,7 +94,7 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-c</Debugger_RunParams>
+        <Debugger_RunParams>-splash</Debugger_RunParams>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -204,7 +204,6 @@
         <DCCReference Include="main\UImportOlderKeyboardUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
         <DCCReference Include="install\DownloadLocale.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\WebSoundControl.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="util\UILanguages.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilmsxml.pas"/>
@@ -229,7 +228,6 @@
         <DCCReference Include="..\..\global\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeys.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\KeymanEmbeddedWB.pas"/>
         <DCCReference Include="main\UImportOlderVersionSettings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanMutex.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
@@ -395,15 +393,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

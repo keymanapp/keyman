@@ -50,12 +50,11 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, OleCtrls, SHDocVw, ActiveX,
-  EmbeddedWB, ToolWin, Menus,
-  XMLRenderer, GenericXMLRenderer, ActnList, ImgList,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, ActiveX,
+  ToolWin, Menus,
+  XMLRenderer, GenericXMLRenderer, ActnList, ImgList, Keyman.UI.UframeCEFHost,
   utilcheckfonts, AppEvnts, KeymanTextEditorRichEdit, TempFileManager,
-  UfrmKeymanBase, UserMessages, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB,
-  System.Actions, System.ImageList;
+  UfrmKeymanBase, UserMessages, System.Actions, System.ImageList;
 
 type
   TfrmTextEditor = class(TfrmKeymanBase)
@@ -99,7 +98,6 @@ type
     EditPasteCmd: TAction;
     New1: TMenuItem;
     panFonts: TPanel;
-    webFonts: TKeymanEmbeddedWB;
     panEditor: TPanel;
     splitFonts: TSplitter;
     Cut1: TMenuItem;
@@ -151,6 +149,7 @@ type
     procedure mnuViewFontHelperClick(Sender: TObject);
     procedure editorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
+    webFonts: TframeCEFHost;
     wm_keyman_control, wm_keyman_refresh: UINT;
     FUpdating: Boolean;
     FCheckFontsThread: TCheckFontsThread;
@@ -178,7 +177,7 @@ type
 
     procedure CheckKeyboardFonts(FSetFont: Boolean);
     procedure CheckFontsThreadComplete(Sender: TObject);
-    function LoadWebBox(web: TEmbeddedWB; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
+    function LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
 
     procedure HideFontsBox;
     procedure FireCommand(const command: WideString; params: TStringList);
@@ -265,6 +264,8 @@ begin
 
   StartCheckFontsThread;
   HideFontsBox;
+
+  {$MESSAGE HINT 'TODO: Support font box'}
 
   FormCreate_Editor;
 end;
@@ -364,11 +365,10 @@ begin
 end;}
 
 
-function TfrmTextEditor.LoadWebBox(web: TEmbeddedWB; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
+function TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
 var
   FXMLRenderers: TXMLRenderers;
   FXMLFileName: TTempFile;   // I4181
-  v: OleVariant;
 begin
   FXMLRenderers := TXMLRenderers.Create;
   try
@@ -379,8 +379,7 @@ begin
     FXMLRenderers.Free;
   end;
 
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  web.Navigate(FXMLFileName.Name, v);   // I4181
+  web.Navigate(FXMLFileName.Name);   // I4181
 
   Result := FXMLFileName;   // I4181
 end;
@@ -810,6 +809,7 @@ begin
   end;
 end;
 
+{$MESSAGE HINT 'TODO: Handle new window event from font frame'}
 procedure TfrmTextEditor.webNewWindow3(ASender: TObject;
   var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
   const bstrUrlContext, bstrUrl: WideString);
@@ -824,7 +824,7 @@ begin
   else
   begin
     Cancel := True;
-    (ASender as TEmbeddedWB).Go(bstrUrl);
+    (ASender as TframeCEFHost).Navigate(bstrUrl);
   end;
 end;
 
@@ -870,7 +870,6 @@ begin
   if command = 'selectfont' then
   begin
     webFonts.SetFocus;
-    webFonts.SetFocusToDoc;
     if editor.CanFocus then // I1641
       editor.SetFocus;
     CurrText.Name := params.Values['font'];

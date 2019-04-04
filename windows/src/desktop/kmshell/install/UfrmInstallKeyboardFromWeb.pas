@@ -34,9 +34,7 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB,
-  UfrmDownloadProgress, UfrmKeymanBase, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB;
+  Dialogs, UfrmWebContainer, UfrmDownloadProgress, UfrmKeymanBase;
 
 type
   TfrmInstallKeyboardFromWeb = class(TfrmWebContainer)
@@ -198,21 +196,20 @@ begin
 end;
 
 procedure TfrmInstallKeyboardFromWeb.Download(params: TStringList);
-var
-  doc: IHTMLDocument3;
-  elem: IHTMLElement;
 begin
   FURL := params.Values['url'];
   FFilename := params.Values['filename'];
   FDownloadOnly := False;
 
-  if Assigned(web.Document) then
+  // Query document>>
+{$MESSAGE HINT 'support downloadonly checkbox'}
+{TODO: support downloadonly if Assigned(web.Document) then
   begin
     doc := web.Document as IHTMLDocument3;
     elem := doc.getElementById('chkDownloadOnly');
     if Assigned(elem) then
       FDownloadOnly := (elem as IHTMLInputElement).checked;
-  end;
+  end;}
 
   with TfrmDownloadProgress.Create(Self) do
   try
