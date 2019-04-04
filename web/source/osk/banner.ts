@@ -291,9 +291,9 @@ namespace com.keyman.osk {
           if(e.parentNode && util.hasClass(<HTMLElement> e.parentNode,'kmw-suggest-option')) {
             return e.parentNode as HTMLDivElement;
           }
-          if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
-            return e.firstChild as HTMLDivElement;
-          }
+          // if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
+          //   return e.firstChild as HTMLDivElement;
+          // }
         }
       } catch(ex) {}
       return null;

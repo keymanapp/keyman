@@ -87,17 +87,20 @@ namespace com.keyman.dom {
      *
      *  @param  {Event}   e   touch event
      *  @param  {Object}  t   HTML object at touch point
+     *  @param  {boolean} omitCurrent  Omits any target directly under the touch point.
      *  @return {Object}      nearest key to touch point
      *
      **/
-    findNearestTarget(e: TouchEvent, t: HTMLElement): Target {
-      if((!e) || (typeof e.changedTouches == 'undefined')
-        || (e.changedTouches.length == 0)) {
+    private findTargetFromTouch(e: TouchEvent, t: HTMLElement, forMove: boolean): Target {
+      let touchList = forMove ? e.touches : e.changedTouches;
+
+      if((!e) || (typeof touchList == 'undefined')
+        || (touchList.length == 0)) {
         return null;
       }
 
       // Get touch point on screen
-      var x = e.changedTouches[0].pageX;
+      var x = touchList[0].pageX;
 
       // Get the UI row beneath touch point (SuggestionBanner div, 'kmw-key-row' if OSK, ...)
       while(t && t.className !== undefined && t.className.indexOf(this.rowClassMatch) < 0) {
@@ -108,24 +111,35 @@ namespace com.keyman.dom {
       }
 
       // Find minimum distance from any key
-      var k: number, bestMatch=0, dx: number, dxMax=24, dxMin=100000, x1: number, x2: number;
+      var k: number, bestMatch=0, dxMax=24, dxMin=100000, x1: number, x2: number;
       for(k = 0; k < t.childNodes.length; k++) {
         let childNode = t.childNodes[k] as HTMLElement;
-        /* // If integrating with the OSK, replace with an 'isInvalidTarget' check.
-        if(childNode.className !== undefined && childNode.className.indexOf('key-hidden') >= 0) {
+
+        if(this.isInvalidTarget(this.findTargetFrom(childNode))) {
           continue;
-        }*/
+        }
+        
         x1 = childNode.offsetLeft;
         x2 = x1 + childNode.offsetWidth;
-        dx = x1 - x;
-        if(dx >= 0 && dx < dxMin) {
+
+        // If it lies completely to the right and is the closest so far
+        let dxRight = x1 - x;
+        if(dxRight >= 0 && dxRight < dxMin) {
           bestMatch = k;
-          dxMin = dx;
+          dxMin = dxRight;
         }
-        dx = x - x2;
-        if(dx >= 0 && dx < dxMin) {
+
+        // If it lies completely to the left and is the closest so far
+        let dxLeft = x - x2;
+        if(dxLeft >= 0 && dxLeft < dxMin) {
           bestMatch = k;
-          dxMin = dx;
+          dxMin = dxLeft;
+        }
+
+        // If it is neither completely to the left nor completely to the right,
+        // it's under the cursor.  Stop the search!
+        if(dxLeft < 0 && dxRight < 0) {
+          return this.findTargetFrom(childNode);
         }
       }
 
@@ -140,17 +154,46 @@ namespace com.keyman.dom {
         }
 
         if(((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-          // If integrating with the OSK, should probably use `findTargetFrom`.
-          // The OSK would want this (key-square) element's child.
-          return <Target> t;
+          return this.findTargetFrom(t);
         }
       }
       return null;
     }
 
+    findBestTarget(e: TouchEvent, forMove?: boolean) {
+      var eventTarget: HTMLElement;
+
+      if(forMove) {
+        eventTarget = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) as HTMLElement;
+      } else {
+        eventTarget = e.changedTouches[0].target as HTMLElement;
+      }
+
+      let target = this.findTargetFrom(eventTarget);
+
+      // Should refactor this multi-check a bit for more overall reliability.
+      if(!target) {
+        // We didn't find a direct target, so we should look for the closest possible one.
+        // Filters out invalid targets.
+        target = this.findTargetFromTouch(e, eventTarget, forMove);
+      }
+
+      return target;
+    }
+
+    /**
+     * Reports whether or not a `Target` should be considered invalid.  Needed by the OSK for
+     * hidden keys.
+     * @param target A `Target` element to be validated.
+     */
+    protected isInvalidTarget(target: Target): boolean {
+      return false;
+    }
+
     touchStart(e: TouchEvent) {
       // Determine the selected Target, manage state.
-      this.currentTarget = this.findTargetFrom(e.changedTouches[0].target as HTMLElement);
+      //this.currentTarget = this.findTargetFrom(e.changedTouches[0].target as HTMLElement);
+      this.currentTarget = this.findBestTarget(e);
       this.touchX = e.changedTouches[0].pageX;
       this.touchY = e.changedTouches[0].pageY;
 
@@ -158,16 +201,6 @@ namespace com.keyman.dom {
       
       this.touchCount = e.touches.length;
 
-      // If option should not be selectable, how do we re-target?
-      // (If/when the OSK is refactored to use this, we'll need appropriate code here.)
-      // Probably a 'isInvalidTarget()' and 'nearestTarget()'.
-
-      if(!this.currentTarget) {
-        // Find nearest target.
-        this.currentTarget = this.findNearestTarget(e, <HTMLElement> e.changedTouches[0].target)
-      }
-
-      // Still no appropriate target?  Reject the touch event.
       if(!this.currentTarget) {
         return;
       }
@@ -234,12 +267,7 @@ namespace com.keyman.dom {
         this.pendingTarget = null;
         // Always clear highlighting of current target on release (multi-touch)
       } else {
-        var tt = e.changedTouches[0];
-        t = this.findTargetFrom(tt.target as HTMLElement);
-        if(!t) {
-          var t1 = document.elementFromPoint(tt.clientX,tt.clientY);
-          t = this.findNearestTarget(e, <HTMLElement> t1);
-        }
+        t = this.findBestTarget(e);
 
         if(t) {
           this.highlight(t,false);
@@ -272,22 +300,14 @@ namespace com.keyman.dom {
       }
 
       // Get touch position
-      var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
-          y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
+      var y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
 
       // Move target key and highlighting
-      var t1 = <HTMLElement> document.elementFromPoint(x,y),
-          key0 = this.pendingTarget,
-          key1 = this.findTargetFrom(t1);  // For the OSK, this ALSO gets subkeys.
+      var key0 = this.pendingTarget,
+          key1 = this.findBestTarget(e, true);  // For the OSK, this ALSO gets subkeys.
 
       // If option should not be selectable, how do we re-target?
-      // (If/when the OSK is refactored to use this, we'll need appropriate code here.)
-      // Probably a 'isInvalidTarget()' and 'nearestTarget()'.
 
-      // Find the nearest key to the touch point if not on a visible key
-      if(!key1) {
-        key1 = this.findNearestTarget(e,t1);
-      }
 
       // Do not move over keys if device popup visible
       if(this.hasModalPopup()) {
@@ -349,7 +369,11 @@ namespace com.keyman.dom {
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
         let base = this.baseElement;
-        if(key0 && e.touches[0].pageY < Math.max(5, base.offsetTop - 0.25 * base.offsetHeight)) {
+        let top = (base.offsetParent as HTMLElement).offsetTop + base.offsetTop;
+        let height = base.offsetHeight;
+        let yMin = Math.max(5, top - 0.25 * height);
+        let yMax = (top + height) + 0.25 * height;
+        if(key0 && (e.touches[0].pageY < yMin || e.touches[0].pageY > yMax)) {
           this.highlight(key0,false);
           this.clearHolds();
           this.pendingTarget = null;

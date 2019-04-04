@@ -1062,9 +1062,12 @@ namespace com.keyman.osk {
         }
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
-        let _Box = com.keyman.singleton.osk._Box;
-        var yMin = Math.max(5, _Box.offsetTop - 0.25*_Box.offsetHeight);
-        if(key0 && e.touches[0].pageY < Math.max(5,_Box.offsetTop - 0.25*_Box.offsetHeight)) {
+        // _Box has (most of) the useful client values.
+        let _Box = this.kbdDiv.offsetParent as HTMLElement; // == osk._Box
+        let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
+        // We need to adjust the offset properties by any offsets related to the active banner.
+        var yMin = Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height);
+        if(key0 && e.touches[0].pageY < yMin) {
           this.highlightKey(key0,false);
           this.showKeyTip(null,false);
           this.keyPending = null;
