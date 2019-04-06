@@ -53,7 +53,12 @@ uses
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
-  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas';
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
+  UserMessages in '..\..\global\delphi\general\UserMessages.pas',
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
+  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas';
 
 {$R *.res}
 {$R manifest.res}

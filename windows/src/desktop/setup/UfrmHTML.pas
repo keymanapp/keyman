@@ -33,17 +33,16 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, OleCtrls, SHDocVw, EmbeddedWB,
-  SHDocVw_EWB, EwbCore, KeymanEmbeddedWB;
+  StdCtrls, ExtCtrls, OleCtrls, SHDocVw;
 
 type
   TfrmHTML = class(TForm)
     cmdOK: TButton;
     panHTML: TPanel;
-    web: TKeymanEmbeddedWB;
     cmdPrint: TButton;
     cmdBack: TButton;
     cmdForward: TButton;
+    web: TWebBrowser;
     procedure cmdPrintClick(Sender: TObject);
     procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
       var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
@@ -100,7 +99,7 @@ end;
 
 procedure TfrmHTML.cmdPrintClick(Sender: TObject);
 begin
-  web.Print;
+  web.ExecWB(OLECMDID_PRINT, 0);
 end;
 
 end.

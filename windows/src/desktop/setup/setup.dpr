@@ -25,8 +25,6 @@ uses
   UfrmRunDesktop in 'UfrmRunDesktop.pas' {frmRunDesktop},
   UfrmInstallOptions in 'UfrmInstallOptions.pas' {frmInstallOptions},
   RunTools in 'RunTools.pas',
-  UfrmHTML in 'UfrmHTML.pas' {frmHTML},
-  KeymanEmbeddedWB in '..\..\global\delphi\comp\KeymanEmbeddedWB.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   ShellUserRegistry in '..\..\global\delphi\general\ShellUserRegistry.pas',
   RegistryHelpers in 'RegistryHelpers.pas',
