@@ -315,6 +315,7 @@ end;}
 procedure TfrmWebContainer.DoResizeByContent;
 begin
   try
+{$MESSAGE HINT 'TODO: Support window resizing'}
 {    if Assigned(web.Document) then
     begin
       doc3 := (web.Document as IHTMLDocument3);
