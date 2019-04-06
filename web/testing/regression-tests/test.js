@@ -14,6 +14,7 @@ const rimraf = require('rimraf');
 const config = require('./node_src/config.js');
 const util = require('./node_src/util.js');
 const keyname = require('./node_src/keyname.js');
+const knownFailures = require('./src/known-failures.js');
 
 function list(val) {
   return val.split(',');
@@ -25,6 +26,7 @@ program
   .option('-e, --engine-versions [versions]', 'Specify KeymanWeb engine version(s) to test. Can specify "stable", "source" or a specific version number.', list, ['stable','source'])
   .option('-k, --keyboards [keyboards]', 'Builds and tests specific keyboard source files. If -k is not specified, then test all keyboards in the keyboards repository.', list, [])
   .option('-f, --fail-fast', "Don't attempt to continue tests after the first keyboard test fails")
+  .option('-d, --debug', "Build keyboard with debug symbols")
   .option('--deep', "Compare all version combinations against base version, instead of just one; only valid when comparing 1 version of each against base")
   .option('--skip-analysis', "Don't create .tests files, assume they are already present")
   .option('-l, --log-all-failures', "Log all test failures to console, not just the first failure for each keyboard");
@@ -189,7 +191,7 @@ cleanKeyboards.then(() => {
 
       return util.runProcess(
         `${bash.command}`, 
-        [].concat(bash.params, ['build.sh', /*TODO: waiting on keyboards repo support for this param: '-T', 'kmn',*/ keyboard]), 
+        [].concat(bash.params, ['build.sh'], program.debug?['-d']:[], [/*TODO: waiting on keyboards repo support for this param: '-T', 'kmn',*/ keyboard]), 
         { cwd: config.KEYBOARDS_ROOT });
     };
   
@@ -326,6 +328,12 @@ cleanKeyboards.then(() => {
   keyboards.forEach((keyboard) => {
     if(!program.keyboards.length || program.keyboards.indexOf(keyboard.shortname+'/'+keyboard.id) >= 0) {
       // Validate each of the test files against the first tested compiler+engine version
+
+      let localFailCount = 0;
+      const localFail = knownFailures.hasOwnProperty([keyboard.id]) ? 
+        (msg) => { if(++localFailCount == 1) console.warn(`WARN: Not failing test because ${keyboard.id} is in known-failures.`); console.warn(`WARN: ${msg}`); } : 
+        fail;
+
       try {
         const baseResultFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}-${baseCompilerVersion}-${baseEngineVersion}.results`);
         const baseResult = fs.readFileSync(baseResultFilename, 'utf8');
@@ -333,13 +341,19 @@ cleanKeyboards.then(() => {
 
         const testsFilename = path.join(KEYBOARDS_ROOT, keyboard.shortname, keyboard.id, 'tests', `${keyboard.id}.tests`);
         const testsJSON = JSON.parse(fs.readFileSync(testsFilename, 'utf8'));
+        const numTests = Object.keys(testsJSON.inputTests).length;
 
         // First, check the base result for errors
         for(let k in baseResultJSON) {
           if(typeof baseResultJSON[k] !== 'string') {
             let input = `${testsJSON.inputTests[k].context ? `"${testsJSON.inputTests[k].context}" ` : ""}+ ${keyname(testsJSON.inputTests[k].modifier, testsJSON.inputTests[k].key)}`;
-            fail(`${keyboard.shortname}/${keyboard.id}[${k}]: error in test: ${input}: ${baseResultJSON[k].error}`, 5);
+            localFail(`${keyboard.shortname}/${keyboard.id}[${k}]: error in test: ${input}: ${baseResultJSON[k].error}`, 5);
           }
+        }
+
+        // Make sure every test is in the base result set
+        if(Object.keys(baseResultJSON).length != numTests) {
+          localFail(`${keyboard.shortname}/${keyboard.id}: base result set has fewer results (${Object.keys(baseResultJSON).length}) than expected (${numTests})`, 6);
         }
 
         //console.log(baseResultFilename, baseResult);
@@ -365,13 +379,12 @@ cleanKeyboards.then(() => {
                   }
                 }
               }
-              fail(`${keyboard.shortname}/${keyboard.id} ${errors} test(s) mismatched between (${baseCompilerVersion} / ${baseEngineVersion}) and (${cv} / ${ev})`, 4);
+              localFail(`${keyboard.shortname}/${keyboard.id} ${errors}/${numTests} test(s) mismatched between (${baseCompilerVersion} / ${baseEngineVersion}) and (${cv} / ${ev})`, 4);
             }
           });
         });
       } catch(e) {
-        // TODO: only continue if in known-failures?
-        console.warn(`Failed to load test results for ${keyboard.shortname}/${keyboard.id}: ${typeof e == 'object' ? e.message : e}`);
+        localFail(`Failed to load test results for ${keyboard.shortname}/${keyboard.id}: ${typeof e == 'object' ? e.message : e}`, 7);
       }
     }
   });
