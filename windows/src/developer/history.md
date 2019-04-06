@@ -1,5 +1,14 @@
 # Keyman Developer Version History
 
+## 2019-04-06 11.0.1353.0 stable
+* Bug fix: For large keyboards, Keyman Developer would generate a .js file that Chrome was unable to parse (#1717)
+
+## 2019-02-27 11.0.1352.0 stable
+* No changes
+
+## 11.0.1351.0 stable
+* Not released
+
 ## 2019-02-25 11.0.1350.0 stable
 * 11.0 Stable release
 
