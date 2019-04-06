@@ -132,7 +132,6 @@ var
   n: Integer;
   I: Integer;
   s: WideString;
-  v: OleVariant;
 begin
   n := kmcom.Keyboards.IndexOf(FKeyboardName);
   if n < 0 then Exit;

@@ -26,9 +26,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB,
-  keymanapi_TLB, UfrmKeymanBase, UserMessages, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB;
+  Dialogs, UfrmWebContainer,
+  keymanapi_TLB, UfrmKeymanBase, UserMessages;
 
 type
   THelpFormHelpTarget = (htNone, htProduct, htKeyboard, htTutorial);

@@ -25,8 +25,9 @@ unit WebBrowserManager;  // I3306
 interface
 
 uses
-  Windows, Messages, Types, Classes, EmbeddedWB, MSHTML_TLB,
-  XMLRenderer, keymanapi_TLB, UserMessages, EwbCore,
+  Windows, Messages, Types, Classes,
+  XMLRenderer, keymanapi_TLB, UserMessages,
+  Keyman.UI.UframeCEFHost,
   TempFileManager;
 
 type
@@ -37,9 +38,13 @@ type
 
   TWebBrowserManager_ResizeEvent = procedure(Sender: TObject; X, Y: Integer) of object;
 
+  TWebBrowserManager_ScriptErrorEvent = TNotifyEvent;
+
+  {$MESSAGE HINT 'TODO: implement TWebBrowserManager'}
+
   TWebBrowserManager = class(TComponent)
   private
-    web: TEmbeddedWB;
+    cef: TframeCEFHost;
     FSafeWndHandle: Cardinal;
     FXMLFileName: TTempFile;   // I4181
     FXMLRenderers: TXMLRenderers;
@@ -47,29 +52,10 @@ type
     FDialogName: WideString;
     FOnResize: TWebBrowserManager_ResizeEvent;
     FOnSetTitle: TWebBrowserManager_SetTitleEvent;
-    FOnScriptError: TScriptErrorEvent;
+    FOnScriptError: TWebBrowserManager_ScriptErrorEvent;
     FRenderTemplate: WideString;
 
-    procedure webShowContextMenu(Sender: TCustomEmbeddedWB;
-      const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-      const Context: IDispatch; var Result: HRESULT);
-    procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-      Shift: TShiftState);
-    procedure webScriptError(Sender: TObject; ErrorLine, ErrorCharacter,
-      ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
-    function webShowHelpRequest(Sender: TObject; HWND: NativeUInt;
-      pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
-      var pDispatchObjectHit: IDispatch): HRESULT;
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      var URL: OleVariant);
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
-
-    procedure SetWebBrowser(const Value: TEmbeddedWB);
+    procedure SetWebBrowser(const Value: TframeCEFHost);
     procedure AddWebHooks;
     procedure RemoveWebHooks;
 
@@ -92,8 +78,8 @@ type
     property OnFireCommand: TWebBrowserManager_FireCommandEvent read FOnFireCommand write FOnFireCommand;
     property OnSetTitle: TWebBrowserManager_SetTitleEvent read FOnSetTitle write FOnSetTitle;
     property OnResize: TWebBrowserManager_ResizeEvent read FOnResize write FOnResize;
-    property OnScriptError: TScriptErrorEvent read FOnScriptError write FOnScriptError;
-    property WebBrowser: TEmbeddedWB read web write SetWebBrowser;
+    property OnScriptError: TWebBrowserManager_ScriptErrorEvent read FOnScriptError write FOnScriptError;
+    property WebBrowser: TframeCEFHost read cef write SetWebBrowser;
     property RenderTemplate: WideString read FRenderTemplate write SetRenderTemplate;
   end;
 
@@ -104,8 +90,7 @@ uses
   SHDocVw,
   SysUtils,
   utilhttp,
-  utilsystem,
-  WebSoundControl;
+  utilsystem;
 
 { TWebBrowserManager }
 
@@ -121,7 +106,7 @@ end;
 destructor TWebBrowserManager.Destroy;
 begin
   Classes.DeallocateHWnd(FSafeWndHandle);
-  if web <> nil then web.RemoveFreeNotification(Self);
+  if cef <> nil then cef.RemoveFreeNotification(Self);
   DeleteXMLFiles;
   FreeAndNil(FXMLRenderers);
   inherited Destroy;
@@ -137,10 +122,10 @@ end;
 procedure TWebBrowserManager.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
-  if (AComponent = web) and (Operation = opRemove) then
+  if (AComponent = cef) and (Operation = opRemove) then
   begin
     RemoveWebHooks;
-    web := nil;
+    cef := nil;
   end;
   inherited;
 end;
@@ -174,9 +159,9 @@ begin
   FXMLRenderers.RenderTemplate := FRenderTemplate;
 end;
 
-procedure TWebBrowserManager.SetWebBrowser(const Value: TEmbeddedWB);
+procedure TWebBrowserManager.SetWebBrowser(const Value: TframeCEFHost);
 begin
-  if web <> nil then
+  {if web <> nil then
   begin
     RemoveWebHooks;
     web.RemoveFreeNotification(Self);
@@ -186,7 +171,7 @@ begin
   begin
     web.FreeNotification(Self);
     AddWebHooks;
-  end;
+  end;}
 end;
 
 function TWebBrowserManager.TemplateExists: Boolean;
@@ -196,7 +181,7 @@ end;
 
 procedure TWebBrowserManager.AddWebHooks;
 begin
-  if web <> nil then
+  {if web <> nil then
   begin
     web.OnShowContextMenu := webShowContextMenu;
     web.OnKeyDown := webKeyDown;
@@ -205,12 +190,12 @@ begin
     web.OnDocumentComplete := webDocumentComplete;
     web.OnBeforeNavigate2 := webBeforeNavigate2;
     web.OnNewWindow3 := webNewWindow3;
-  end;
+  end;}
 end;
 
 procedure TWebBrowserManager.RemoveWebHooks;
 begin
-  if web <> nil then
+  {if web <> nil then
   begin
     web.OnShowContextMenu := nil;
     web.OnKeyDown := nil;
@@ -219,10 +204,10 @@ begin
     web.OnDocumentComplete := nil;
     web.OnBeforeNavigate2 := nil;
     web.OnNewWindow3 := nil;
-  end;
+  end;}
 end;
 
-procedure TWebBrowserManager.webBeforeNavigate2(ASender: TObject;
+{procedure TWebBrowserManager.webBeforeNavigate2(ASender: TObject;
   const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
   Headers: OleVariant; var Cancel: WordBool);
 var
@@ -233,9 +218,9 @@ begin
     PostMessage(FSafeWndHandle, WM_USER_FireCommand, 0, Integer(params));
     Cancel := True;
   end;
-end;
+end;}
 
-procedure TWebBrowserManager.webDocumentComplete(ASender: TObject;
+{procedure TWebBrowserManager.webDocumentComplete(ASender: TObject;
   const pDisp: IDispatch; var URL: OleVariant);
 var
   doc2: IHTMLDocument2;
@@ -258,18 +243,6 @@ begin
           FOnResize(Self, elem.offsetWidth, elem.offsetHeight);
       end;
 
-{        if True then
-
-        ClientWidth := elem.offsetWidth;
-        ClientHeight := elem.offsetHeight;
-
-        Left := (Screen.Width - Width) div 2;
-        Top := (Screen.Height - Height) div 2;
-      end;}
-
-      elem := doc3.documentElement;
-      if Assigned(elem) then
-        elem.insertAdjacentHTML('afterBegin', '&#xa0;<SCRIPT For="window" Event="onerror">var noOp = null;</SCRIPT>');
     	// NOTE: The &nbsp, or some other visible HTML, is required. Internet Explorer will not
     	// parse and recognize the script block without some visual HTML to
     	// accompany it.
@@ -278,9 +251,9 @@ begin
     Exit;
   end;
   DeleteXMLFiles;   // I4181
-end;
+end;}
 
-procedure TWebBrowserManager.webNewWindow3(ASender: TObject;
+{procedure TWebBrowserManager.webNewWindow3(ASender: TObject;
   var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
   const bstrUrlContext, bstrUrl: WideString);
 var
@@ -290,9 +263,9 @@ begin
   if GetParamsFromURL(bstrURL, params)
     then PostMessage(FSafeWndHandle, WM_USER_FireCommand, 0, Integer(params))
     else web.Go(bstrURL);
-end;
+end;}
 
-procedure TWebBrowserManager.webKeyDown(Sender: TObject; var Key: Word;
+{procedure TWebBrowserManager.webKeyDown(Sender: TObject; var Key: Word;
   ScanCode: Word; Shift: TShiftState);
 begin
   if (Key = VK_F5) and (ssCtrl in Shift) then
@@ -300,34 +273,33 @@ begin
     Key := 0;
     PostMessage(FSafeWndHandle, WM_USER_ContentRender, 0, 0);
   end;
-end;
+end;}
 
-procedure TWebBrowserManager.webScriptError(Sender: TObject; ErrorLine,
+{procedure TWebBrowserManager.webScriptError(Sender: TObject; ErrorLine,
   ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
 begin
   if Assigned(FOnScriptError) then
     FOnScriptError(Self, ErrorLine, ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl, ScriptErrorAction);
-end;
+end;}
 
-procedure TWebBrowserManager.webShowContextMenu(Sender: TCustomEmbeddedWB;
+
+{procedure TWebBrowserManager.webShowContextMenu(Sender: TCustomEmbeddedWB;
   const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
   const Context: IDispatch; var Result: HRESULT);
 begin
   PostMessage(web.ParentWindow, WM_CONTEXTMENU, web.Handle, MAKELONG(ppt.X, ppt.Y));
   Result := S_OK;
-end;
+end;}
 
-function TWebBrowserManager.webShowHelpRequest(Sender: TObject; HWND: NativeUInt;
+{function TWebBrowserManager.webShowHelpRequest(Sender: TObject; HWND: NativeUInt;
   pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
   var pDispatchObjectHit: IDispatch): HRESULT;
 begin
   Application.HelpJump('context_'+lowercase(FDialogName));
   Result := S_OK;
-end;
+end;}
 
 procedure TWebBrowserManager.Content_Render(FRefreshKeyman: Boolean; const AdditionalData: WideString);
-var
-  v: OleVariant;
 begin
   DeleteXMLFiles;
 
@@ -335,8 +307,7 @@ begin
 
   FDialogName := ChangeFileExt(ExtractFileName(FXMLRenderers.RenderTemplate), '');
 
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  web.Navigate(FXMLFileName.Name, v);   // I4181
+  cef.Navigate(FXMLFileName.Name);   // I4181
 end;
 
 procedure TWebBrowserManager.DeleteXMLFiles;

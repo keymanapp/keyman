@@ -248,8 +248,6 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnicodeBlocks.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\SHDocVw.pas"/>
-        <DCCReference Include="..\..\ext\embeddedwb\Source\EmbeddedWB.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
         <DCCReference Include="..\..\engine\kmcomapi\util\utilolepicture.pas"/>
@@ -393,15 +391,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -91,7 +91,6 @@ procedure TfrmKeepInTouch.Content_Render(FRefreshKeyman: Boolean;
   const AdditionalData: WideString);
 var
   FPath: string;
-  v: OleVariant;
 begin
   FPath := MakeKeymanUrl(URLPath_KeepInTouch) + '?embed=1';
   cef.Navigate(FPath);   // I4181

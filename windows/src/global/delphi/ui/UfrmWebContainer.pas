@@ -62,7 +62,6 @@ type
     FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
-    function GetIEVersionString: WideString;
     procedure DownloadUILanguages;
     procedure ContributeUILanguages;
     procedure cefLoadEnd(Sender: TObject);
@@ -225,12 +224,11 @@ end;
 procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 var
   aparams: TStringList;
-  v: Boolean;
   command: string;
 begin
   if ShouldProcessAllCommands then
   begin
-    v := GetParamsFromURLEx(URL, aparams);
+    GetParamsFromURLEx(URL, aparams);
     command := aparams[0];
     aparams.Delete(0);
     FireCommand(command, aparams);
@@ -256,7 +254,7 @@ begin
   AssertCefThread;
   if ShouldProcessAllCommands then
   begin
-    v := GetParamsFromURLEx(URL, params);
+    GetParamsFromURLEx(URL, params);
     Handled := True;
     params.Free;
   end
@@ -341,19 +339,6 @@ end;
 function IsLocalURL(URL: WideString): Boolean;
 begin
   Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
-end;
-
-function TfrmWebContainer.GetIEVersionString: WideString;
-begin
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly('Software\Microsoft\Internet Explorer') and ValueExists('Version')
-      then Result := ReadString('Version')
-      else Result := 'unknown';
-  finally
-    Free;
-  end;
 end;
 
 {$MESSAGE HINT 'TODO: Log script errors'}

@@ -273,7 +273,6 @@
         <DCCReference Include="..\..\global\delphi\comp\ExtShiftState.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="main\CharMapDropTool.pas"/>
-        <DCCReference Include="main\CharMapDropTool_EmbeddedWB.pas"/>
         <DCCReference Include="dialogs\UfrmBitmapEditorText.pas">
             <Form>frmBitmapEditorText</Form>
         </DCCReference>
@@ -358,7 +357,6 @@
         <DCCReference Include="dialogs\UfrmFontHelper.pas">
             <Form>Form1</Form>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\general\WebSoundControl.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\usp10.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>

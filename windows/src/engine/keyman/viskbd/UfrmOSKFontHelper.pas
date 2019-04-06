@@ -39,9 +39,9 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmOSKPlugInBase, OleCtrls, SHDocVw, EmbeddedWB,
+  Dialogs, UfrmOSKPlugInBase,
   keymanapi_TLB, xmlrenderer, UfrmKeymanBase, utilcheckfonts,
-  UserMessages, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB,
+  UserMessages, Keyman.UI.UframeCEFHost,
   TempFileManager;
 
 type
@@ -52,29 +52,11 @@ type
     HasWelcome: Boolean;
   end;
 
-  TfrmOSKFontHelper = class(TfrmOSKPlugInBase)
-    web: TKeymanEmbeddedWB; // I2721
-    procedure webShowContextMenu(Sender: TCustomEmbeddedWB;
-      const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-      const Context: IDispatch; var Result: HRESULT);
-    procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-      Shift: TShiftState);
-    procedure webScriptError(Sender: TObject; ErrorLine, ErrorCharacter,
-      ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      var URL: OleVariant);
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
+  TfrmOSKFontHelper = class(TfrmOSKPlugInBase) // I2721
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
-    function webShowHelpRequest1(Sender: TObject; HWND: NativeUInt;
-      pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
-      var pDispatchObjectHit: IDispatch): HRESULT;
   private
+    cef: TframeCEFHost; {$MESSAGE HINT 'Create CEF'}
     FXML: string;   // I4181
     FXMLFileName: TTempFile;   // I4181
     FXMLRenderers: TXMLRenderers;
@@ -148,7 +130,8 @@ begin
   DisplayKeyboardFonts; // Displays default details
 end;
 
-procedure TfrmOSKFontHelper.webBeforeNavigate2(ASender: TObject;
+{$MESSAGE HINT 'TODO: support beforebrowse'}
+{procedure TfrmOSKFontHelper.webBeforeNavigate2(ASender: TObject;
   const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
   Headers: OleVariant; var Cancel: WordBool);
 var
@@ -159,33 +142,16 @@ begin
     PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
     Cancel := True;
   end;
-end;
+end;}
 
-procedure TfrmOSKFontHelper.webDocumentComplete(ASender: TObject;
+{$MESSAGE HINT 'TODO: support loadend'}
+{procedure TfrmOSKFontHelper.webDocumentComplete(ASender: TObject;
   const pDisp: IDispatch; var URL: OleVariant);
-var
-  doc3: IHTMLDocument3;
-  elem: IHTMLElement;
 begin
-  try
-    if Assigned(web.Document) then
-    begin
-      doc3 := (web.Document as IHTMLDocument3);
+  FreeAndNil(FXMLFileName);   // I4181
+end;}
 
-      elem := doc3.documentElement;
-      if Assigned(elem) then
-        elem.insertAdjacentHTML('afterBegin', '&#xa0;<SCRIPT For="window" Event="onerror">var noOp = null;</SCRIPT>');
-    	// NOTE: The &nbsp, or some other visible HTML, is required. Internet Explorer will not
-    	// parse and recognize the script block without some visual HTML to
-    	// accompany it.
-    end;
-    FreeAndNil(FXMLFileName);   // I4181
-  except
-    Exit;
-  end;
-end;
-
-procedure TfrmOSKFontHelper.webNewWindow3(ASender: TObject;
+{procedure TfrmOSKFontHelper.webNewWindow3(ASender: TObject;
   var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
   const bstrUrlContext, bstrUrl: WideString);
 var
@@ -195,9 +161,11 @@ begin
   if GetParamsFromURL(bstrURL, params)
     then PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params))
     else web.Go(bstrURL);
-end;
+end;}
 
-procedure TfrmOSKFontHelper.webKeyDown(Sender: TObject; var Key: Word;
+
+{$MESSAGE HINT 'TODO: support Ctrl+F5'}
+{procedure TfrmOSKFontHelper.webKeyDown(Sender: TObject; var Key: Word;
   ScanCode: Word; Shift: TShiftState);
 begin
   if (Key = VK_F5) and (ssCtrl in Shift) then
@@ -205,31 +173,34 @@ begin
     Key := 0;
     PostMessage(Handle, WM_USER_ContentRender, 0, 0);
   end;
-end;
+end;}
 
-procedure TfrmOSKFontHelper.webScriptError(Sender: TObject; ErrorLine,
+{$MESSAGE HINT 'TODO: Handle script errors'}
+{procedure TfrmOSKFontHelper.webScriptError(Sender: TObject; ErrorLine,
   ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
 begin
   ScriptErrorAction := eaCancel;
   //TODO: Log message to event log
-end;
+end;}
 
-procedure TfrmOSKFontHelper.webShowContextMenu(Sender: TCustomEmbeddedWB;
+{$MESSAGE HINT 'TODO: Support context menu'}
+{procedure TfrmOSKFontHelper.webShowContextMenu(Sender: TCustomEmbeddedWB;
   const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
   const Context: IDispatch; var Result: HRESULT);
 begin
   PostMessage(Handle, WM_CONTEXTMENU, web.Handle, MAKELONG(ppt.X, ppt.Y));
   Result := S_OK;
 //Result := S_FALSE;
-end;
+end;}
 
-function TfrmOSKFontHelper.webShowHelpRequest1(Sender: TObject;
+{$MESSAGE HINT 'TODO: Support context help'}
+{function TfrmOSKFontHelper.webShowHelpRequest1(Sender: TObject;
   HWND: NativeUInt; pszHelpFile: PWideChar; uCommand, dwData: Integer;
   ptMouse: TPoint; var pDispatchObjectHit: IDispatch): HRESULT;
 begin
   Application.HelpJump('context_'+lowercase(FDialogName));
   Result := S_OK;
-end;
+end;}
 
 procedure TfrmOSKFontHelper.WMUser_ContentRender(var Message: TMessage);
 begin
@@ -480,8 +451,6 @@ begin
 end;
 
 procedure TfrmOSKFontHelper.Do_Content_Render(const AXML: WideString);
-var
-  v: OleVariant;
 begin
   FXMLRenderers := TXMLRenderers.Create;
   FXMLRenderers.RenderTemplate := 'FontHelper.xsl';
@@ -490,9 +459,8 @@ begin
   Content_Render;
   FreeAndNil(FXMLRenderers);
 
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
   if Assigned(FXMLFileName) and FileExists(FXMLFileName.Name) then   // I4181
-    web.Navigate(FXMLFileName.Name, v);   // I4181
+    cef.Navigate(FXMLFileName.Name);   // I4181
 end;
 
 end.

@@ -89,14 +89,14 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, Menus, ActiveX, keymanapi_TLB, utilstr, custinterfaces,
-  OleCtrls, SHDocVw, ImgList, UfrmOSKPlugInBase,
+  ImgList, UfrmOSKPlugInBase,
   UfrmOSKOnScreenKeyboard, UfrmOSKCharacterMap, UfrmOSKKeyboardUsage,
   UfrmOSKEntryHelper,
   Buttons, ToolWin, PaintPanel, exImageList,
-  Menu_KeyboardItems, ComCtrls, StdCtrls, EmbeddedWB,
+  Menu_KeyboardItems, ComCtrls, StdCtrls,
   UfrmOSKFontHelper, LangSwitchManager,
-  WebBrowserManager, UserMessages, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB, System.ImageList;
+  Keyman.UI.UframeCEFHost,
+  WebBrowserManager, UserMessages, System.ImageList;
 
 type
   TOSKActivePage = (apKeyboard, apCharacterMap, apEntryHelper, apKeyboardUsage, apFontHelper, apUndefined);
@@ -141,7 +141,6 @@ type
     ilKeyboards: TexImageList;
     panKeyboardUsage: TPanel;
     panHint: TPanel;
-    webHint: TKeymanEmbeddedWB;  // I2721
     panFontHelper: TPanel;
     tbKeyboards: TToolBar;
     procedure FormCreate(Sender: TObject);
@@ -171,6 +170,7 @@ type
       Button: TToolButton; State: TCustomDrawState; Stage: TCustomDrawStage;
       var Flags: TTBCustomDrawFlags; var DefaultDraw: Boolean);   // I4849
   private
+    cefHint: TframeCEFHost;
     webHintManager: TWebBrowserManager;
     btnKeyboardHelp: TToolButton;
     cmi: IKeymanCustomisationMenuItem;
@@ -332,7 +332,7 @@ begin
   if Assigned(webHintManager) then Exit;
 
   webHintManager := TWebBrowserManager.Create(Self);  // I1256 - hint system
-  webHintManager.WebBrowser := webHint;
+  webHintManager.WebBrowser := cefHint;
   webHintManager.OnFireCommand := webHintFireCommand;
   webHintManager.OnResize := webHintResize;
   webHintManager.RenderTemplate := 'VKHints.xsl';

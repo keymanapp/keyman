@@ -1,18 +1,18 @@
 (*
   Name:             UfrmOSKKeyboardUsage
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    11 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - I1373 - Initial version
                     14 Jun 2008 - mcdurdin - I1429 - Use U+XXXX when inserting characters from keyboard usage (so we avoid Unicode URLs for compat)
                     29 Mar 2010 - mcdurdin - I2199 - Shift+click
@@ -32,10 +32,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmOSKPlugInBase, OleCtrls, SHDocVw, EmbeddedWB, ExtShiftState,
+  Dialogs, UfrmOSKPlugInBase, Keyman.UI.UframeCEFHost, ExtShiftState,
   keymanapi_TLB, xmlrenderer, UfrmKeymanBase, UserMessages,
-  SHDocVw_EWB, EwbCore, KeymanEmbeddedWB, TempFileManager;
+  TempFileManager;
 
+{$MESSAGE HINT 'Remove all refs to MSHTML_TLB, OleCtrls, SHDocVw, EmbeddedWB, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB in all units'}
 type
   TKeyboardProps = record
     KeyboardName: WideString;
@@ -44,29 +45,11 @@ type
     HasWelcome: Boolean;
   end;
 
-  TfrmOSKKeyboardUsage = class(TfrmOSKPlugInBase)
-    web: TKeymanEmbeddedWB;  // I2721
-    procedure webShowContextMenu(Sender: TCustomEmbeddedWB;
-      const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-      const Context: IDispatch; var Result: HRESULT);
-    procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-      Shift: TShiftState);
-    procedure webScriptError(Sender: TObject; ErrorLine, ErrorCharacter,
-      ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      var URL: OleVariant);
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
+  TfrmOSKKeyboardUsage = class(TfrmOSKPlugInBase)  // I2721
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
-    function webShowHelpRequest1(Sender: TObject; HWND: NativeUInt;
-      pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
-      var pDispatchObjectHit: IDispatch): HRESULT;
   private
+    cef: TframeCEFHost; {$MESSAGE HINT 'Create CEF'}
     FLastActiveKeymanID: Integer;
     FXMLFileName: TTempFile;   // I4181
     FXMLRenderers: TXMLRenderers;
@@ -79,7 +62,6 @@ type
     procedure Content_Render;
     procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
-    procedure WMUser_ResetWebFocus(var Message: TMessage); message WM_USER_ResetWebFocus;
     procedure FireCommand(const command: WideString; params: TStringList);
     procedure SendKeys(keys: WideString);  // I3214   // I3521
     function GetTag(var s: WideString): WideString;  // I3214   // I3521
@@ -100,7 +82,6 @@ implementation
 uses
   KLog,
   kmint,
-  MSHTML_TLB,
   custinterfaces,
   StockFileNames,
   UfrmKeyman7Main,
@@ -170,7 +151,6 @@ var
   kbds: IKeymanKeyboardsInstalled;
   pkg: IKeymanPackageInstalled;
   FProps: TKeyboardProps;
-  v: OleVariant;
 begin
   FXML := frmKeyman7Main.frmVisualKeyboard.GetToolbarPositionXML;
 
@@ -244,9 +224,8 @@ begin
   end;
 
   // show the "no welcome" welcome
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
   if (FFileName_ <> '') and FileExists(FFileName_) then
-    web.Navigate(FFileName_, v);
+    cef.Navigate(FFileName_);
 end;
 
 
@@ -506,13 +485,10 @@ begin
 
   if t <> '' then
     SendInputString(hwnd, t);
-
-  // Reset focus to web browser document in this process
-
-  PostMessage(Handle, WM_USER_ResetWebFocus, 0, 0);
 end;
 
-procedure TfrmOSKKeyboardUsage.webBeforeNavigate2(ASender: TObject;
+{$MESSAGE HINT 'TODO: support beforebrowse'}
+{procedure TfrmOSKKeyboardUsage.webBeforeNavigate2(ASender: TObject;
   const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
   Headers: OleVariant; var Cancel: WordBool);
 var
@@ -523,35 +499,18 @@ begin
     PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
     Cancel := True;
   end;
-end;
+end;}
 
-procedure TfrmOSKKeyboardUsage.webDocumentComplete(ASender: TObject;
+{$MESSAGE HINT 'TODO: support loadend'}
+{procedure TfrmOSKKeyboardUsage.webDocumentComplete(ASender: TObject;
   const pDisp: IDispatch; var URL: OleVariant);
-var
-  doc3: IHTMLDocument3;
-  elem: IHTMLElement;
 begin
-  try
-    if Assigned(web.Document) then
-    begin
-      doc3 := (web.Document as IHTMLDocument3);
-
-      elem := doc3.documentElement;
-      if Assigned(elem) then
-        elem.insertAdjacentHTML('afterBegin', '&#xa0;<SCRIPT For="window" Event="onerror">var noOp = null;</SCRIPT>');
-    	// NOTE: The &nbsp, or some other visible HTML, is required. Internet Explorer will not
-    	// parse and recognize the script block without some visual HTML to
-    	// accompany it.
-    end;
-  except
-    Exit;
-  end;
   FreeAndNil(FXMLFileName);   // I4181
 
   frmKeyman7Main.frmVisualKeyboard.SetTopMost(True);   // I4593
-end;
+end;}
 
-procedure TfrmOSKKeyboardUsage.webNewWindow3(ASender: TObject;
+{procedure TfrmOSKKeyboardUsage.webNewWindow3(ASender: TObject;
   var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
   const bstrUrlContext, bstrUrl: WideString);
 var
@@ -561,9 +520,10 @@ begin
   if GetParamsFromURL(bstrURL, params)
     then PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params))
     else web.Go(bstrURL);
-end;
+end;}
 
-procedure TfrmOSKKeyboardUsage.webKeyDown(Sender: TObject; var Key: Word;
+{$MESSAGE HINT 'TODO: support Ctrl+F5'}
+{procedure TfrmOSKKeyboardUsage.webKeyDown(Sender: TObject; var Key: Word;
   ScanCode: Word; Shift: TShiftState);
 begin
   if (Key = VK_F5) and (ssCtrl in Shift) then
@@ -571,15 +531,18 @@ begin
     Key := 0;
     PostMessage(Handle, WM_USER_ContentRender, 0, 0);
   end;
-end;
+end;}
 
-procedure TfrmOSKKeyboardUsage.webScriptError(Sender: TObject; ErrorLine,
+{$MESSAGE HINT 'TODO: Handle script errors'}
+{procedure TfrmOSKKeyboardUsage.webScriptError(Sender: TObject; ErrorLine,
   ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
 begin
   ScriptErrorAction := eaCancel;
   //TODO: Log message to event log
-end;
+end;}
 
+{$MESSAGE HINT 'TODO: Support context menu'}
+{
 procedure TfrmOSKKeyboardUsage.webShowContextMenu(Sender: TCustomEmbeddedWB;
   const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
   const Context: IDispatch; var Result: HRESULT);
@@ -587,23 +550,17 @@ begin
   PostMessage(Handle, WM_CONTEXTMENU, web.Handle, MAKELONG(ppt.X, ppt.Y));
   Result := S_OK;
 end;
+}
 
-function TfrmOSKKeyboardUsage.webShowHelpRequest1(Sender: TObject;
+{$MESSAGE HINT 'TODO: Support context help'}
+{function TfrmOSKKeyboardUsage.webShowHelpRequest1(Sender: TObject;
   HWND: NativeUInt; pszHelpFile: PWideChar; uCommand, dwData: Integer;
   ptMouse: TPoint; var pDispatchObjectHit: IDispatch): HRESULT;
 begin
   Application.HelpJump('context_'+lowercase(FDialogName));
   Result := S_OK;
 end;
-
-procedure TfrmOSKKeyboardUsage.WMUser_ResetWebFocus(var Message: TMessage);
-begin
-  // This is required to get the IE embedded browser to respond to the next
-  // click as if it were focused after we reset the focus to the target window
-  // with SendInputString. Otherwise, the next click on the browser control
-  // is treated as a focus click and does not trigger e.g. an insertchars event
-  web.SetFocusToDoc;
-end;
+}
 
 procedure TfrmOSKKeyboardUsage.WMUser_ContentRender(var Message: TMessage);
 begin

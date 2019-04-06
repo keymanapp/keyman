@@ -89,7 +89,6 @@ uses
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
-  WebSoundControl in '..\..\global\delphi\general\WebSoundControl.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
@@ -102,7 +101,6 @@ uses
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   LayeredFormUtils in '..\..\global\delphi\general\LayeredFormUtils.pas',
   UfrmOSKOnScreenKeyboard in 'viskbd\UfrmOSKOnScreenKeyboard.pas' {frmOSKOnScreenKeyboard},
-  KeymanEmbeddedWB in '..\..\global\delphi\comp\KeymanEmbeddedWB.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmVisualKeyboard in 'viskbd\UfrmVisualKeyboard.pas' {frmVisualKeyboard},
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
@@ -142,7 +140,9 @@ uses
   Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas',
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
-  Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas';
+  Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
+  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost};
 
 {$R ICONS.RES}
 {$R VERSION.RES}

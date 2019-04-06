@@ -233,31 +233,6 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 6
-      object webHint: TKeymanEmbeddedWB
-        Left = 0
-        Top = 0
-        Width = 547
-        Height = 21
-        Align = alClient
-        TabOrder = 0
-        DisableCtrlShortcuts = 'N'
-        UserInterfaceOptions = [DisableTextSelect, DontUse3DBorders, EnablesFormsAutoComplete, EnableThemes]
-        About = ' EmbeddedWB http://bsalsa.com/'
-        DisableErrors.fpExceptions = False
-        PrintOptions.HTMLHeader.Strings = (
-          '<HTML></HTML>')
-        PrintOptions.Orientation = poPortrait
-        ExplicitLeft = 72
-        ExplicitTop = 8
-        ExplicitWidth = 300
-        ExplicitHeight = 150
-        ControlData = {
-          4C00000032310000F70100000000000000000000000000000000000000000000
-          000000004C000000000000000000000001000000E0D057007335CF11AE690800
-          2B2E126208000000000000004C0000000114020000000000C000000000000046
-          8000000000000000000000000000000000000000000000000000000000000000
-          00000000000000000100000000000000000000000000000000000000}
-      end
     end
     object panFontHelper: TPanel
       Left = 0

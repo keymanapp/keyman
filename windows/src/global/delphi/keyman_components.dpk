@@ -39,8 +39,7 @@ requires
   dbrtl,
   dclact,
   dclstd,
-  xmlrtl,
-  EmbeddedWebBrowser_XE;
+  xmlrtl;
 
 contains
   extshiftstate in 'comp\extshiftstate.pas',
@@ -70,7 +69,6 @@ contains
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
   usp10 in 'general\usp10.pas',
-  KeymanEmbeddedWB in 'comp\KeymanEmbeddedWB.pas',
   ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
   CaptionPanel in 'comp\CaptionPanel.pas',
   OnScreenKeyboardData in 'visualkeyboard\OnScreenKeyboardData.pas',

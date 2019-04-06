@@ -75,7 +75,7 @@ uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
   keymanapi_TLB, UfrmKeymanBase,
-  MSHTML_TLB, UfrmWebContainer,
+  UfrmWebContainer,
   XMLRenderer;
 
 type
@@ -865,8 +865,6 @@ begin
 end;
 
 procedure TfrmMain.SaveState;
-var
-  elem: IHTMLElement;
 begin
 {$MESSAGE HINT 'TODO: Save state support'}
   {try  TODO: save state

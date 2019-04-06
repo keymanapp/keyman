@@ -109,8 +109,6 @@ uses
   UfrmBaseKeyboard in 'main\UfrmBaseKeyboard.pas' {frmBaseKeyboard},
   UnicodeBlocks in '..\..\global\delphi\general\UnicodeBlocks.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
-  SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
-  EmbeddedWB in '..\..\ext\embeddedwb\Source\EmbeddedWB.pas',
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
   utilolepicture in '..\..\engine\kmcomapi\util\utilolepicture.pas',
