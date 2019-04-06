@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Dimens for Default or Portrait (Tablet 10") -->
 <resources>
+    <dimen name="banner_height">90dp</dimen>
     <dimen name="keyboard_height">405dp</dimen>
     <dimen name="key_width">68.5dp</dimen>
     <dimen name="key_height">98.5dp</dimen>

@@ -58,7 +58,7 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
 
       let d = util._CreateElement('div');
-      d.id = "keymanweb_banner_bar";
+      d.id = "kmw-banner-bar";
       d.className = "kmw-banner-bar";
       this.div = d;
 
@@ -266,6 +266,11 @@ namespace com.keyman.osk {
 
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
+      // TODO: Investigate the factor of "48"
+      let ss = s.style;
+      let oskManager = keyman.osk;
+      ss.top = oskManager.getBannerHeight() - 48 + 'px';
+
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
       return s;
@@ -275,6 +280,7 @@ namespace com.keyman.osk {
   /**
    * Function     SuggestionBanner
    * Scope        Public
+   * @param {number} height - If provided, the height of the banner in pixels
    * Description  Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
@@ -284,8 +290,8 @@ namespace com.keyman.osk {
     private suggestionList : BannerSuggestion[];
     private currentSuggestions: Suggestion[] = [];
 
-    constructor() {
-      super(SuggestionBanner.DEFAULT_HEIGHT);
+    constructor(height?: number) {
+      super(height);
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let d = new BannerSuggestion(i);
@@ -325,6 +331,7 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
+      console.log("updateSuggestions done");
     }.bind(this);
   }
 }

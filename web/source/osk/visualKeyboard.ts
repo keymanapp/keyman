@@ -638,7 +638,7 @@ namespace com.keyman.osk {
       let bannerHeight = oskManager.banner.height;
       let rowsPercent = 100;
 
-      var lDiv=util._CreateElement('div'), ls=lDiv.style, actualHeight=0;
+      var lDiv=util._CreateElement('div'), ls=lDiv.style, totalHeight=0;
 
       // Set OSK box default style
       lDiv.className='kmw-key-layer-group';
@@ -647,9 +647,9 @@ namespace com.keyman.osk {
       switch(formFactor) {
         case 'phone':
         case 'tablet':
-          actualHeight=oskManager.getHeight();
-          ls.height=actualHeight+'px';
-          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/actualHeight );
+          totalHeight=oskManager.getHeight();
+          ls.height=totalHeight+'px';
+          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/totalHeight );
           break;
       }
 
