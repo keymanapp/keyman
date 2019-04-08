@@ -75,7 +75,7 @@ type
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
 
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
     procedure cefBeforeContextMenu(Sender: TObject;
       const browser: ICefBrowser; const frame: ICefFrame;
       const params: ICefContextMenuParams; const model: ICefMenuModel);
@@ -231,12 +231,11 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
 begin
   AssertVclThread;
-  if (params.Count > 0) and (params[0] = 'command') then
+  if command = 'command' then
   begin
-    params.Delete(0);
     FireCommand(params);
   end;
 end;

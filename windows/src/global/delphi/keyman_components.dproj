@@ -98,7 +98,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="comp\WebBrowserFocusMonitor.dcr"/>
         <DCCReference Include="designide.dcp"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="vcl.dcp"/>
@@ -126,10 +125,8 @@
         <DCCReference Include="comp\PanelOverlapped.pas"/>
         <DCCReference Include="comp\StringGridEditControlled.pas"/>
         <DCCReference Include="comp\BitmapEditor.pas"/>
-        <DCCReference Include="tlb\MSHTML_TLB.pas"/>
         <DCCReference Include="comp\FixedTrackbar.pas"/>
         <DCCReference Include="comp\KMDActions.pas"/>
-        <DCCReference Include="comp\WebBrowserFocusMonitor.pas"/>
         <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="comp\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\developer\TIKE\actions\KMDActionInterfaces.pas"/>

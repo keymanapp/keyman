@@ -158,6 +158,7 @@ type
     property ShouldOpenRemoteUrlsInBrowser: Boolean read FShouldOpenRemoteUrlsInBrowser write FShouldOpenRemoteUrlsInBrowser;
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowseSync: TCEFHostBeforeBrowseSyncEvent read FOnBeforeBrowseSync write FOnBeforeBrowseSync;
+    {$MESSAGE HINT 'TODO: Deunify OnBeforeBrowse for keyman: URLs as these follow a standard pattern'}
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
 

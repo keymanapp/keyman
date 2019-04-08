@@ -212,7 +212,6 @@
             <Form>frmVisualKeyboardImportKMX</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\comp\PanelOverlapped.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\SHDocVw_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ScanCodeMap.pas"/>
         <DCCReference Include="dialogs\UfrmRegressionTestFailure.pas">
             <Form>frmRegressionTestFailure</Form>
@@ -443,7 +442,6 @@
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeyboardFonts.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\SHDocVw.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="main\TikeUnicodeData.pas"/>

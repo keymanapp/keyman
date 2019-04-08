@@ -75,7 +75,7 @@ type
     cef: TframeCEFHost;
 
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
 
     procedure ProjectRefresh(Sender: TObject);
@@ -247,7 +247,7 @@ begin
   FreeAndNil(FNextCommandParams);
 end;
 
-procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
 begin
   DoNavigate(Url);
 end;

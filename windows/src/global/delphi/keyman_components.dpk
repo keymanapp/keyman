@@ -1,7 +1,6 @@
 package keyman_components;
 
 {$R *.res}
-{$R 'comp\WebBrowserFocusMonitor.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -60,7 +59,6 @@ contains
   BitmapEditor in 'comp\BitmapEditor.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',
   KMDActions in 'comp\KMDActions.pas',
-  WebBrowserFocusMonitor in 'comp\WebBrowserFocusMonitor.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
   OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
   KMDActionInterfaces in '..\..\developer\TIKE\actions\KMDActionInterfaces.pas',

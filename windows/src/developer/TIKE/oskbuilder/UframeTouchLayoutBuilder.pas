@@ -88,7 +88,7 @@ type
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
     
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
     procedure RegisterSource;
     procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -505,14 +505,13 @@ begin
   if Assigned(FOnImportFromOSKCommand) then FOnImportFromOSKCommand(Self);
 end;
 
-procedure TframeTouchLayoutBuilder.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+procedure TframeTouchLayoutBuilder.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
 begin
   if csDestroying in ComponentState then   // I3983
     Exit;
 
-  if (params.Count > 0) and (params[0] = 'command') then
+  if command = 'command' then
   begin
-    params.Delete(0);
     FireCommand(params);
   end;
 end;

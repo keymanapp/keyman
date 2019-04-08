@@ -8,7 +8,9 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas';
 
-{$R *.res}
+{R icons.res}
+{$R version.res}
+{$R manifest.res}
 
 begin
   FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);

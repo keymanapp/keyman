@@ -59,7 +59,7 @@ type
     FDialogName: WideString;
     FXMLRenderers: TXMLRenderers;
     FXMLFileName: TTempFile;
-    FNoMoreErrors: Boolean;   // I4181
+//    FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure DownloadUILanguages;
@@ -244,7 +244,6 @@ end;
 procedure TfrmWebContainer.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
 var
   params: TStringList;
-  v: Boolean;
 begin
   AssertCefThread;
   if ShouldProcessAllCommands then
