@@ -58,7 +58,7 @@ type
   PCEFConsoleMessageEventData = ^TCEFConsoleMessageEventData;
 
   TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; out Handled: Boolean) of object;
-  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean) of object;
+  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean) of object;
 
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
@@ -363,7 +363,7 @@ end;
 procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
-  url: string;
+  command, url: string;
   wasHandled,
   shouldOpenUrlIfNotHandled: Boolean;
 begin
@@ -378,7 +378,14 @@ begin
   if wasHandled then
   begin
     if Assigned(FOnBeforeBrowse) then
-      FOnBeforeBrowse(Self, url, params, Boolean(message.WParam));
+    begin
+      if params.Count > 0 then
+      begin
+        command := params[0];
+        params.Delete(0);
+        FOnBeforeBrowse(Self, url, command, params, Boolean(message.WParam));
+      end;
+    end;
 
     if FShouldOpenRemoteUrlsInBrowser and (params.Count = 0) and not IsLocalURL(URL) then
       {$MESSAGE HINT 'Refactor how remote URLs are handled'}

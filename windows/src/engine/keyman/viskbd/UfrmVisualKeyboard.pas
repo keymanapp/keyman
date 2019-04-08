@@ -342,6 +342,11 @@ procedure TfrmVisualKeyboard.FormCreate(Sender: TObject);
 begin
   inherited;
 
+  cefHint := TframeCEFHost.Create(Self);
+  cefHint.Parent := panHint;
+  cefHint.Visible := True;
+  cefHint.ShouldOpenRemoteUrlsInBrowser := True;
+
   CreateWebHintManager;
 
   FToolbarHintWindow := TOSKHintWindow.Create(Self);

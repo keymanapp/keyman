@@ -27,7 +27,7 @@
                     30 Jan 2009 - mcdurdin - I1829 - Close after a script error
                     29 Mar 2010 - mcdurdin - I2199 - Shift+click web browser
                     25 May 2010 - mcdurdin - I1694 - Select Keyman UI language rework
-                    17 Dec 2010 - mcdurdin - I2570 - Use new EmbeddedWB
+                    17 Dec 2010 - mcdurdin - I2570 - Use new E-mbeddedWB
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     28 Feb 2011 - mcdurdin - I2720 - Prevent Keyman Desktop splash from showing multiple copies (focus management for web browser)
                     18 Mar 2011 - mcdurdin - I2786 - Application title is sometimes incorrect
@@ -65,7 +65,7 @@ type
     procedure DownloadUILanguages;
     procedure ContributeUILanguages;
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string;
+    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
       params: TStringList; wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
       out Handled: Boolean);   // I4989
@@ -221,28 +221,23 @@ begin
   cef.OnLoadEnd := cefLoadEnd;
 end;
 
-procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
 var
   aparams: TStringList;
-  command: string;
+  acommand: string;
 begin
   if ShouldProcessAllCommands then
   begin
     GetParamsFromURLEx(URL, aparams);
-    command := aparams[0];
+    acommand := aparams[0];
     aparams.Delete(0);
-    FireCommand(command, aparams);
+    FireCommand(acommand, aparams);
     aparams.Free;
   end
   else
   begin
     if params.Count > 0 then
-    begin
-      command := params[0];
-      params.Delete(0);
       FireCommand(command, params);
-      params.Insert(0, command);  {$MESSAGE HINT 'TODO: Refactor the ShouldProcessAllCommands code path'} // TODO: refactor
-    end;
   end;
 end;
 

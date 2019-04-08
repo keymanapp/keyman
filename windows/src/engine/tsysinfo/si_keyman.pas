@@ -16,7 +16,7 @@
   History:          13 May 2005 - mcdurdin - Integrated into kmshell from tsysinfo
                     09 Jun 2005 - mcdurdin - Use MSXML_TLB not MSXML2_TLB
                     20 Jul 2008 - mcdurdin - I1532 - Report files in tsysinfo
-                    16 Jan 2009 - mcdurdin - Use a TEmbeddedWB so copy and paste works
+                    16 Jan 2009 - mcdurdin - Use a TE-mbeddedWB so copy and paste works
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     19 Jul 2011 - mcdurdin - I3000 - Tweak display of diagnostics using .xslt files
                     26 Jun 2012 - mcdurdin - I3379 - KM9 - Remove old Winapi references now in Delphi libraries

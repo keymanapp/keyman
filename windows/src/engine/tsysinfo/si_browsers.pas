@@ -25,7 +25,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, si_base, StdCtrls, OleCtrls, SHDocVw, msxml;
+  Dialogs, si_base, StdCtrls, msxml;
 
 type
   TSI_Browsers = class(TSI_Base)

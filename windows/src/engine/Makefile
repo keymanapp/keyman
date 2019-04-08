@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=keyman32 kmcomapi keyman tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip
+TARGETS=keyman32 kmcomapi keyman kmbrowserhost tsysinfox64 tsysinfo keyman64 keymanx64 mcompile inst kmtip
 MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 
 !include ..\Header.mak
@@ -13,6 +13,10 @@ MANIFESTS=keyman tsysinfo tsysinfox64 keymanx64 mcompile
 
 keyman:
     cd $(ROOT)\src\engine\keyman
+    $(MAKE) $(TARGET)
+
+kmbrowserhost:
+    cd $(ROOT)\src\engine\kmbrowserhost
     $(MAKE) $(TARGET)
 
 kmcomapi:

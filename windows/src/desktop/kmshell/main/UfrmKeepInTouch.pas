@@ -48,7 +48,6 @@ uses
   ErrorControlledRegistry,
   OnlineConstants,
   RegistryKeys,
-  ShDocVw,
   Upload_Settings,
   UtilCheckOnline,
   UtilExecute;

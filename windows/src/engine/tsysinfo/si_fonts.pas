@@ -23,7 +23,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, si_base, StdCtrls, OleCtrls, msxml, Contnrs;
+  Dialogs, si_base, StdCtrls, msxml, Contnrs;
 
 type
   TSI_Fonts = class(TSI_Base)

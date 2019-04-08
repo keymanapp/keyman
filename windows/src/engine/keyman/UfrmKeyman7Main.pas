@@ -294,6 +294,7 @@ type
     procedure UnregisterHotkeys;
     procedure HotkeyWndProc(var Message: TMessage);
     procedure DoLanguageHotkey(Index: Integer);
+    procedure CEFShutdownComplete(Sender: TObject);
   protected
 
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -400,6 +401,7 @@ uses
   RegistryKeys,
   klog,
   GetOsVersion,
+  Keyman.System.CEFManager,
   System.Win.ComObj, {tlhelp32,}
   VistaMessages,
   Vcl.AxCtrls,
@@ -677,9 +679,14 @@ begin
     ReleaseMutex(hProgramMutex); // We are not controlling Keyman any more - another copy of Keyman.exe may start
     if not (csDestroying in ComponentState) then
     begin
-      Close;
+      FInitializeCEF.StartShutdown(CEFShutdownComplete);
     end;
   end;
+end;
+
+procedure TfrmKeyman7Main.CEFShutdownComplete(Sender: TObject);
+begin
+  Close;
 end;
 
 { TRunningProduct }

@@ -39,6 +39,7 @@ uses
   System.SysUtils,
 
   GetOsVersion,
+  Keyman.System.CEFManager,
   Keyman.System.Security,
   Keyman.Winapi.VersionHelpers,
   KeymanVersion,
@@ -59,13 +60,31 @@ begin
   end;
 end;
 
+procedure RunProgram; forward;
+
 procedure Run;
+begin
+  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
+  try
+    if FInitializeCEF.Start then
+    begin
+      RunProgram;
+      frmKeyman7Main.Free;
+    end;
+  finally
+    FInitializeCEF.Free;
+  end;
+end;
+
+procedure RunProgram;
 var
   FCommand: Integer;
   Finished: Boolean;
   Count: Integer;
   hMutex: Cardinal;
 begin
+
+
   if not ValidateParameters(FCommand) then Exit;
 
   hProgramMutex := CreateMutex(nil, False, 'KeymanEXE70');

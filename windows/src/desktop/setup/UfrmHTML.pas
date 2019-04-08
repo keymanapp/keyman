@@ -21,7 +21,7 @@
                     23 Aug 2007 - mcdurdin - I919 - Add print button
                     27 Mar 2008 - mcdurdin - Use TfrmKeymanBase instead of TfrmKMShell
                     25 May 2010 - mcdurdin - I2393 - Forward, Back and new window functions in Keyboard Welcome
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     11 Jan 2011 - mcdurdin - I2645 - Refactor install process - move license to bootstrapper
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support

@@ -58,7 +58,6 @@ contains
   PanelOverlapped in 'comp\PanelOverlapped.pas',
   StringGridEditControlled in 'comp\StringGridEditControlled.pas',
   BitmapEditor in 'comp\BitmapEditor.pas',
-  MSHTML_TLB in 'tlb\MSHTML_TLB.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',
   KMDActions in 'comp\KMDActions.pas',
   WebBrowserFocusMonitor in 'comp\WebBrowserFocusMonitor.pas',

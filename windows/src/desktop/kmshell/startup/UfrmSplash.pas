@@ -104,7 +104,7 @@ uses
   utilfocusappwnd,
   utilkmshell,
   utilxml,
-  VersionInfo, ActiveX, MSHTML_TLB;
+  VersionInfo, ActiveX;
 
 {$R *.DFM}
 

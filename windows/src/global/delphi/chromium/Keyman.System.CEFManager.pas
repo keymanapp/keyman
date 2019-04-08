@@ -81,6 +81,8 @@ begin
   // debug the CEF interactions more easily
 //  GlobalCEFApp.SingleProcess        := TikeDebugMode;
 
+  GlobalCEFApp.BrowserSubprocessPath := TKeymanPaths.CEFSubprocessPath;
+
   // In case you want to use custom directories for the CEF3 binaries, cache, cookies and user data.
   // If you don't set a cache directory the browser will use in-memory cache.
   GlobalCEFApp.FrameworkDirPath     := TKeymanPaths.CEFPath;

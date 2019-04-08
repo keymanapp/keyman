@@ -36,7 +36,6 @@ uses
   keymanapi_TLB, xmlrenderer, UfrmKeymanBase, UserMessages,
   TempFileManager;
 
-{$MESSAGE HINT 'Remove all refs to MSHTML_TLB, OleCtrls, SHDocVw, EmbeddedWB, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB in all units'}
 type
   TKeyboardProps = record
     KeyboardName: WideString;
@@ -49,7 +48,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    cef: TframeCEFHost; {$MESSAGE HINT 'Create CEF'}
+    cef: TframeCEFHost;
     FLastActiveKeymanID: Integer;
     FXMLFileName: TTempFile;   // I4181
     FXMLRenderers: TXMLRenderers;
@@ -60,7 +59,6 @@ type
 
     function GetKeyboardProps(APackage: IKeymanPackage; AKeyboard: IKeymanKeyboardInstalled): TKeyboardProps;
     procedure Content_Render;
-    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure FireCommand(const command: WideString; params: TStringList);
     procedure SendKeys(keys: WideString);  // I3214   // I3521
@@ -70,6 +68,9 @@ type
     function GetAsyncShiftState: TExtShiftState;  // I3214   // I3521
     procedure do_keybd_event(bVk, bScan: Byte; dwFlags, dwExtraInfo: DWORD);  // I3214   // I3521
     procedure SendChars(const chars: string);
+    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
+      params: TStringList; wasHandled: Boolean);
+    procedure cefLoadEnd(Sender: TObject);
     { Private declarations }
   public
     { Public declarations }
@@ -487,40 +488,16 @@ begin
     SendInputString(hwnd, t);
 end;
 
-{$MESSAGE HINT 'TODO: support beforebrowse'}
-{procedure TfrmOSKKeyboardUsage.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-var
-  params: TStringList;
+procedure TfrmOSKKeyboardUsage.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
 begin
-  if GetParamsFromURL(URL, params) then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
-  end;
-end;}
+  FireCommand(command, params);
+end;
 
-{$MESSAGE HINT 'TODO: support loadend'}
-{procedure TfrmOSKKeyboardUsage.webDocumentComplete(ASender: TObject;
-  const pDisp: IDispatch; var URL: OleVariant);
+procedure TfrmOSKKeyboardUsage.cefLoadEnd(Sender: TObject);
 begin
   FreeAndNil(FXMLFileName);   // I4181
-
   frmKeyman7Main.frmVisualKeyboard.SetTopMost(True);   // I4593
-end;}
-
-{procedure TfrmOSKKeyboardUsage.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-var
-  params: TStringList;
-begin
-  Cancel := True;
-  if GetParamsFromURL(bstrURL, params)
-    then PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params))
-    else web.Go(bstrURL);
-end;}
+end;
 
 {$MESSAGE HINT 'TODO: support Ctrl+F5'}
 {procedure TfrmOSKKeyboardUsage.webKeyDown(Sender: TObject; var Key: Word;
@@ -567,18 +544,6 @@ begin
   Content_Render;
 end;
 
-procedure TfrmOSKKeyboardUsage.WMUser_FireCommand(var Message: TMessage);
-var
-  command: WideString;
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  command := params[0];
-  params.Delete(0);
-  FireCommand(command, params);
-  params.Free;
-end;
-
 procedure TfrmOSKKeyboardUsage.Content_Render;
 var
   AdditionalData: WideString;
@@ -620,6 +585,13 @@ procedure TfrmOSKKeyboardUsage.FormCreate(Sender: TObject);
 begin
   inherited;
   FLastActiveKeymanID := -2;
+
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.ShouldOpenRemoteUrlsInBrowser := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
 end;
 
 procedure TfrmOSKKeyboardUsage.FormDestroy(Sender: TObject);

@@ -55,7 +55,6 @@ type
 implementation
 
 uses
-  MSHTML_TLB,
   httpuploader,
   GlobalProxySettings,
   UfrmInstallKeyboard,

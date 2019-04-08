@@ -48,7 +48,7 @@
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
                     22 Oct 2010 - mcdurdin - Integrate purchase wizard into main form
                     05 Nov 2010 - mcdurdin - I2530 - Getting Started link in Configuration is broken
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     28 Feb 2011 - mcdurdin - I2720 - Prevent multiple instances of Keyman Configuration
                     28 Feb 2011 - mcdurdin - I2539 - After activation, Keyman Configuration does not refresh its buttons

@@ -26,7 +26,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, si_base, StdCtrls, OleCtrls, SHDocVw, msxml;
+  Dialogs, si_base, StdCtrls, msxml;
 
 type
   TGetLocalInfoEx = function(lpLocaleName: PWideChar; LCType: DWORD; lpLCData: PWideChar; cchData: Integer): Integer; stdcall;

@@ -47,7 +47,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, UfrmOSKPlugInBase, OnScreenKeyboard, ExtShiftState, UserMessages,
-  VisualKeyboard, VisualKeyboardInfo, Menus, OleCtrls, SHDocVw, ExtCtrls;
+  VisualKeyboard, VisualKeyboardInfo, Menus, ExtCtrls;
 
 type
   TfrmOSKOnScreenKeyboard = class(TfrmOSKPlugInBase)

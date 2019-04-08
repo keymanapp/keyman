@@ -24,7 +24,7 @@
                     28 Jun 2010 - mcdurdin - I2421 - Return additional information for font coverage
                     05 Nov 2010 - mcdurdin - I2482 - Tutorial interferes when not active (part 1 - when hidden)
                     10 Dec 2010 - mcdurdin - I2558 - LazyWrite performance
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     03 Feb 2011 - mcdurdin - I2260 - "Start Text Editor" should not start in "Tutorial" mode
                     03 Feb 2011 - mcdurdin - I2697 - Fix potential race condition on termination of check fonts thread
                     03 Feb 2011 - mcdurdin - I2698 - Font styling shortcuts for text editor
@@ -206,7 +206,6 @@ uses
   keymanapi_TLB,
   kmint,
   KMShellHints,
-  MSHTML_TLB,
   ErrorControlledRegistry,
   RegistryKeys,
   RichEdit,

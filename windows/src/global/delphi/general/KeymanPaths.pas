@@ -13,6 +13,7 @@ type
     const S_CEF_DebugPath = 'Debug_CEFPath';
     const S_CEF_EnvVar = 'KEYMAN_CEF4DELPHI_ROOT';
     const S_CEF_SubFolder = 'cef\';
+    const S_CEF_SubProcess = 'kmbrowserhost.exe';
   public
     const S_KMShell = 'kmshell.exe';
     const S_Xml_LocaleDef = 'xml\localedef.dtd';
@@ -31,6 +32,7 @@ type
     class function KeyboardsInstallDir: string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const RootFolder, mode: string): string; static;
+    class function CEFSubprocessPath: string; static;
   end;
 
 function GetFolderPath(csidl: Integer): string;
@@ -141,6 +143,25 @@ begin
       then Result := ExtractFilePath(ParamStr(0))+S_CEF_SubFolder
       else Result := IncludeTrailingPathDelimiter(Result);
   end;
+end;
+
+class function TKeymanPaths.CEFSubprocessPath: string;
+begin
+  Result := KeymanEngineInstallPath(S_CEF_SubProcess);
+  if FileExists(Result) then Exit;
+
+  Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess;
+  if FileExists(Result) then Exit;
+
+  // Source repo, bin folder
+  Result := ExtractFilePath(ParamStr(0)) + '..\engine\' + S_CEF_SubProcess;
+  if FileExists(Result) then Exit;
+
+  // Source repo, source folder
+  Result := ExtractFilePath(ParamStr(0)) + '..\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
+  if FileExists(Result) then Exit;
+
+  Result := ExtractFilePath(ParamStr(0)) + '..\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
 end;
 
 class function TKeymanPaths.CEFDataPath(const RootFolder, mode: string): string;

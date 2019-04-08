@@ -34,7 +34,7 @@
                     20 Jul 2008 - mcdurdin - I1553 - External exceptions
                     29 Mar 2010 - mcdurdin - I2199 - Shift+Click opens new window
                     26 Jul 2010 - mcdurdin - I2468 - Eliminate KeymanWeb Pack
-                    17 Dec 2010 - mcdurdin - I2570 - Use new EmbeddedWB (see also I2595)
+                    17 Dec 2010 - mcdurdin - I2570 - Use new E-mbeddedWB (see also I2595)
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support

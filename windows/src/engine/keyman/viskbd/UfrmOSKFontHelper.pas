@@ -18,7 +18,7 @@
                     29 Mar 2010 - mcdurdin - I2199 - Shift+click
                     24 Jun 2010 - mcdurdin - I2421 - Start work on font helper showing additional detail
                     26 Jul 2010 - mcdurdin - Code tidy - remove old commented-out code
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     18 Feb 2011 - mcdurdin - I2712 - SMP support for font helper
                     18 Mar 2011 - mcdurdin - I1698, I2120, I2323, I2565 - Font helper crash when searching
@@ -56,7 +56,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    cef: TframeCEFHost; {$MESSAGE HINT 'Create CEF'}
+    cef: TframeCEFHost;
     FXML: string;   // I4181
     FXMLFileName: TTempFile;   // I4181
     FXMLRenderers: TXMLRenderers;
@@ -68,7 +68,6 @@ type
     FLastSelectedKeyboardName: WideString;
 
     procedure Content_Render;
-    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure WMUser_FontChange(var Message: TMessage); message WM_USER_FontChange;  // I3390   // I3519
 
@@ -78,6 +77,9 @@ type
     procedure DisplayKeyboardFonts;
     procedure StartCheckingFonts(Keyboard: IKeymanKeyboardInstalled);
     procedure Do_Content_Render(const AXML: WideString);
+    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
+      params: TStringList; wasHandled: Boolean);
+    procedure cefLoadEnd(Sender: TObject);
     { Private declarations }
   public
     { Public declarations }
@@ -90,7 +92,6 @@ uses
   findfonts,
   KLog,
   kmint,
-  MSHTML_TLB,
   custinterfaces,
   UfrmKeyman7Main,
   UfrmVisualKeyboard,
@@ -130,38 +131,16 @@ begin
   DisplayKeyboardFonts; // Displays default details
 end;
 
-{$MESSAGE HINT 'TODO: support beforebrowse'}
-{procedure TfrmOSKFontHelper.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-var
-  params: TStringList;
+procedure TfrmOSKFontHelper.cefBeforeBrowse(Sender: TObject; const Url,
+  command: string; params: TStringList; wasHandled: Boolean);
 begin
-  if GetParamsFromURL(URL, params) then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
-  end;
-end;}
+  FireCommand(command, params);
+end;
 
-{$MESSAGE HINT 'TODO: support loadend'}
-{procedure TfrmOSKFontHelper.webDocumentComplete(ASender: TObject;
-  const pDisp: IDispatch; var URL: OleVariant);
+procedure TfrmOSKFontHelper.cefLoadEnd(Sender: TObject);
 begin
   FreeAndNil(FXMLFileName);   // I4181
-end;}
-
-{procedure TfrmOSKFontHelper.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-var
-  params: TStringList;
-begin
-  Cancel := True;
-  if GetParamsFromURL(bstrURL, params)
-    then PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params))
-    else web.Go(bstrURL);
-end;}
+end;
 
 
 {$MESSAGE HINT 'TODO: support Ctrl+F5'}
@@ -207,18 +186,6 @@ begin
   DisplayKeyboardFonts;  // I3216   // I3520
 end;
 
-procedure TfrmOSKFontHelper.WMUser_FireCommand(var Message: TMessage);
-var
-  command: WideString;
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  command := params[0];
-  params.Delete(0);
-  FireCommand(command, params);
-  params.Free;
-end;
-
 procedure TfrmOSKFontHelper.Content_Render;
 var
   AdditionalData: WideString;
@@ -252,7 +219,7 @@ begin
   else if command = 'welcome' then frmKeyman7Main.MnuOpenKeyboardHelp(nil)
   else if command = 'help' then frmKeyman7Main. MnuOpenProductHelp(frmKeyman7Main.frmVisualKeyboard)
   else if command = '' then
-       
+
   else if command = 'insertchars' then
   begin
     hwnd := kmcom.Control.LastFocusWindow;
@@ -293,6 +260,13 @@ procedure TfrmOSKFontHelper.FormCreate(Sender: TObject);
 begin
   inherited;
   FCheckFontKeyboards := TCheckFontKeyboards.Create;
+
+  cef := TframeCEFHost.Create(Self);
+  cef.Parent := Self;
+  cef.Visible := True;
+  cef.ShouldOpenRemoteUrlsInBrowser := True;
+  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnLoadEnd := cefLoadEnd;
 end;
 
 procedure TfrmOSKFontHelper.FormDestroy(Sender: TObject);
