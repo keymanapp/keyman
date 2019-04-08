@@ -62,6 +62,7 @@ type
 
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
+  TCEFHostTitleChangeEvent = procedure(Sender: TObject; const title: string) of object;
 
   TframeCEFHost = class(TForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
@@ -108,6 +109,8 @@ type
     procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
     procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
       source: TCefFocusSource; out Result: Boolean);
+    procedure cefTitleChange(Sender: TObject; const browser: ICefBrowser;
+      const title: ustring);
   private
     FApplicationHandle: THandle;
     FNextURL: string;
@@ -123,6 +126,7 @@ type
     FOnPreKeySyncEvent: TCEFHostPreKeySyncEvent;
     FOnKeyEvent: TCEFHostKeyEvent;
     FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
+    FOnTitleChange: TCEFHostTitleChangeEvent;
 
     procedure CallbackWndProc(var Message: TMessage);
 
@@ -161,7 +165,7 @@ type
     {$MESSAGE HINT 'TODO: Deunify OnBeforeBrowse for keyman: URLs as these follow a standard pattern'}
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
-
+    property OnTitleChange: TCEFHostTitleChangeEvent read FOnTitleChange write FOnTitleChange;
     property OnPreKeySyncEvent: TCEFHostPreKeySyncEvent read FOnPreKeySyncEvent write FOnPreKeySyncEvent;
     property OnKeyEvent: TCEFHostKeyEvent read FOnKeyEvent write FOnKeyEvent;
   end;
@@ -635,6 +639,14 @@ procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
   Result := source = FOCUS_SOURCE_NAVIGATION;
+end;
+
+procedure TframeCEFHost.cefTitleChange(Sender: TObject;
+  const browser: ICefBrowser; const title: ustring);
+begin
+  AssertVclThread;
+  if Assigned(FOnTitleChange) then
+    FOnTitleChange(Self, title);
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);

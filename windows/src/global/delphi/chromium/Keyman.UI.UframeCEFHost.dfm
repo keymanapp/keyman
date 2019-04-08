@@ -44,6 +44,7 @@ object frameCEFHost: TframeCEFHost
     OnSetFocus = cefSetFocus
     OnRunContextMenu = cefRunContextMenu
     OnPreKeyEvent = cefPreKeyEvent
+    OnTitleChange = cefTitleChange
     OnConsoleMessage = cefConsoleMessage
     OnBeforePopup = cefBeforePopup
     OnAfterCreated = cefAfterCreated

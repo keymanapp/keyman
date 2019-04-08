@@ -56,6 +56,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
+    {$MESSAGE HINT 'TODO: Refactor to use TWebBrowserManager'}
     cef: TframeCEFHost;
     FXML: string;   // I4181
     FXMLFileName: TTempFile;   // I4181
@@ -80,7 +81,8 @@ type
     procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
       params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
-    { Private declarations }
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
   public
     { Public declarations }
     procedure SelectKeyboard(KeymanID: Integer);
@@ -93,6 +95,8 @@ uses
   KLog,
   kmint,
   custinterfaces,
+  uCEFTypes,
+  uCEFConstants,
   UfrmKeyman7Main,
   UfrmVisualKeyboard,
   Unicode,
@@ -137,22 +141,33 @@ begin
   FireCommand(command, params);
 end;
 
+procedure TfrmOSKFontHelper.cefKeyEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+begin
+  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
+  begin
+    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
+      PostMessage(Handle, WM_USER_ContentRender, 0, 0)
+    else if e.event.windows_key_code = VK_F1 then
+      Application.HelpJump('context_'+lowercase(FDialogName));
+  end;
+end;
+
 procedure TfrmOSKFontHelper.cefLoadEnd(Sender: TObject);
 begin
   FreeAndNil(FXMLFileName);   // I4181
 end;
 
 
-{$MESSAGE HINT 'TODO: support Ctrl+F5'}
-{procedure TfrmOSKFontHelper.webKeyDown(Sender: TObject; var Key: Word;
-  ScanCode: Word; Shift: TShiftState);
+procedure TfrmOSKFontHelper.cefPreKeySyncEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
 begin
-  if (Key = VK_F5) and (ssCtrl in Shift) then
-  begin
-    Key := 0;
-    PostMessage(Handle, WM_USER_ContentRender, 0, 0);
-  end;
-end;}
+  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
+    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
+      Handled := True
+    else if e.event.windows_key_code = VK_F1 then
+      Handled := True;
+end;
 
 {$MESSAGE HINT 'TODO: Handle script errors'}
 {procedure TfrmOSKFontHelper.webScriptError(Sender: TObject; ErrorLine,
@@ -172,14 +187,6 @@ begin
 //Result := S_FALSE;
 end;}
 
-{$MESSAGE HINT 'TODO: Support context help'}
-{function TfrmOSKFontHelper.webShowHelpRequest1(Sender: TObject;
-  HWND: NativeUInt; pszHelpFile: PWideChar; uCommand, dwData: Integer;
-  ptMouse: TPoint; var pDispatchObjectHit: IDispatch): HRESULT;
-begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
-  Result := S_OK;
-end;}
 
 procedure TfrmOSKFontHelper.WMUser_ContentRender(var Message: TMessage);
 begin
@@ -267,6 +274,8 @@ begin
   cef.ShouldOpenRemoteUrlsInBrowser := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnLoadEnd := cefLoadEnd;
+  cef.OnKeyEvent := cefKeyEvent;
+  cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
 end;
 
 procedure TfrmOSKFontHelper.FormDestroy(Sender: TObject);

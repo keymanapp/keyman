@@ -40,8 +40,6 @@ type
 
   TWebBrowserManager_ScriptErrorEvent = TNotifyEvent;
 
-  {$MESSAGE HINT 'TODO: implement TWebBrowserManager'}
-
   TWebBrowserManager = class(TComponent)
   private
     cef: TframeCEFHost;
@@ -65,7 +63,9 @@ type
 
     procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
-
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+    procedure cefTitleChange(Sender: TObject; const title: string);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation);
       override;
@@ -91,6 +91,8 @@ implementation
 uses
   Forms,
   SysUtils,
+  uCEFConstants,
+  uCEFTypes,
   utilhttp,
   utilsystem;
 
@@ -186,14 +188,15 @@ begin
   begin
     cef.OnBeforeBrowse := cefBeforeBrowse;
     cef.OnLoadEnd := cefLoadEnd;
+    cef.OnKeyEvent := cefKeyEvent;
+    cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
+    cef.OnTitleChange := cefTitleChange;
   end;
-  {$MESSAGE HINT 'TODO: Support OnShowContextMenu, OnKeyDown, OnScriptError, OnShowHelpRequest'}
+  {$MESSAGE HINT 'TODO: Support OnShowContextMenu, OnScriptError'}
   {if web <> nil then
   begin
     web.OnShowContextMenu := webShowContextMenu;
-    web.OnKeyDown := webKeyDown;
     web.OnScriptError := webScriptError;
-    web.OnShowHelpRequest := webShowHelpRequest;
   end;}
 end;
 
@@ -203,28 +206,16 @@ begin
   begin
     cef.OnBeforeBrowse := nil;
     cef.OnLoadEnd := nil;
+    cef.OnKeyEvent := nil;
+    cef.OnPreKeySyncEvent := nil;
+    cef.OnTitleChange := nil;
   end;
   {if web <> nil then
   begin
     web.OnShowContextMenu := nil;
-    web.OnKeyDown := nil;
     web.OnScriptError := nil;
-    web.OnShowHelpRequest := nil;
-    web.OnDocumentComplete := nil;
-    web.OnBeforeNavigate2 := nil;
-    web.OnNewWindow3 := nil;
   end;}
 end;
-
-{procedure TWebBrowserManager.webKeyDown(Sender: TObject; var Key: Word;
-  ScanCode: Word; Shift: TShiftState);
-begin
-  if (Key = VK_F5) and (ssCtrl in Shift) then
-  begin
-    Key := 0;
-    PostMessage(FSafeWndHandle, WM_USER_ContentRender, 0, 0);
-  end;
-end;}
 
 {procedure TWebBrowserManager.webScriptError(Sender: TObject; ErrorLine,
   ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
@@ -242,14 +233,6 @@ begin
   Result := S_OK;
 end;}
 
-{function TWebBrowserManager.webShowHelpRequest(Sender: TObject; HWND: NativeUInt;
-  pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
-  var pDispatchObjectHit: IDispatch): HRESULT;
-begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
-  Result := S_OK;
-end;}
-
 procedure TWebBrowserManager.cefBeforeBrowse(Sender: TObject; const Url,
   command: string; params: TStringList; wasHandled: Boolean);
 begin
@@ -259,38 +242,43 @@ begin
   end;
 end;
 
-{procedure TWebBrowserManager.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-var
-  params: TStringList;
+procedure TWebBrowserManager.cefKeyEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
 begin
-  if GetParamsFromURL(URL, params) then
+  // VCL Thread
+  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
   begin
-    PostMessage(FSafeWndHandle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
+    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
+      PostMessage(FSafeWndHandle, WM_USER_ContentRender, 0, 0)
+    else if e.event.windows_key_code = VK_F1 then
+      Application.HelpJump('context_'+lowercase(FDialogName));
   end;
-end;}
+end;
 
-{procedure TWebBrowserManager.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-var
-  params: TStringList;
+procedure TWebBrowserManager.cefPreKeySyncEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
 begin
-  Cancel := True;
-  if GetParamsFromURL(bstrURL, params)
-    then PostMessage(FSafeWndHandle, WM_USER_FireCommand, 0, Integer(params))
-    else web.Go(bstrURL);
-end;}
+  // CEF thread
+  Handled := False;
+
+  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
+    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
+      Handled := True
+    else if e.event.windows_key_code = VK_F1 then
+      Handled := True;
+end;
+
+procedure TWebBrowserManager.cefTitleChange(Sender: TObject;
+  const title: string);
+begin
+  if Assigned(FOnSetTitle) then
+    FOnSetTitle(Self, title);
+end;
 
 procedure TWebBrowserManager.cefLoadEnd(Sender: TObject);
 begin
-{$MESSAGE HINT 'TODO: Support resizing; OnSetTitle'}
-//  if Assigned(FOnSetTitle) then
-//    FOnSetTitle(cef.Title);
+{$MESSAGE HINT 'TODO: Support resizing'}
   DeleteXMLFiles;
-
 {
       if Assigned(FOnResize) then
       begin

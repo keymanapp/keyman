@@ -48,6 +48,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
+    {$MESSAGE HINT 'TODO: Refactor to use TWebBrowserManager'}
     cef: TframeCEFHost;
     FLastActiveKeymanID: Integer;
     FXMLFileName: TTempFile;   // I4181
@@ -71,6 +72,8 @@ type
     procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
       params: TStringList; wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
     { Private declarations }
   public
     { Public declarations }
@@ -85,6 +88,8 @@ uses
   kmint,
   custinterfaces,
   StockFileNames,
+  uCEFTypes,
+  uCEFConstants,
   UfrmKeyman7Main,
   UfrmVisualKeyboard,
   Unicode,
@@ -493,22 +498,33 @@ begin
   FireCommand(command, params);
 end;
 
+procedure TfrmOSKKeyboardUsage.cefKeyEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+begin
+  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
+  begin
+    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
+      PostMessage(Handle, WM_USER_ContentRender, 0, 0)
+    else if e.event.windows_key_code = VK_F1 then
+      Application.HelpJump('context_'+lowercase(FDialogName));
+  end;
+end;
+
 procedure TfrmOSKKeyboardUsage.cefLoadEnd(Sender: TObject);
 begin
   FreeAndNil(FXMLFileName);   // I4181
   frmKeyman7Main.frmVisualKeyboard.SetTopMost(True);   // I4593
 end;
 
-{$MESSAGE HINT 'TODO: support Ctrl+F5'}
-{procedure TfrmOSKKeyboardUsage.webKeyDown(Sender: TObject; var Key: Word;
-  ScanCode: Word; Shift: TShiftState);
+procedure TfrmOSKKeyboardUsage.cefPreKeySyncEvent(Sender: TObject;
+  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
 begin
-  if (Key = VK_F5) and (ssCtrl in Shift) then
-  begin
-    Key := 0;
-    PostMessage(Handle, WM_USER_ContentRender, 0, 0);
-  end;
-end;}
+  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
+    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
+      Handled := True
+    else if e.event.windows_key_code = VK_F1 then
+      Handled := True;
+end;
 
 {$MESSAGE HINT 'TODO: Handle script errors'}
 {procedure TfrmOSKKeyboardUsage.webScriptError(Sender: TObject; ErrorLine,
@@ -529,15 +545,6 @@ begin
 end;
 }
 
-{$MESSAGE HINT 'TODO: Support context help'}
-{function TfrmOSKKeyboardUsage.webShowHelpRequest1(Sender: TObject;
-  HWND: NativeUInt; pszHelpFile: PWideChar; uCommand, dwData: Integer;
-  ptMouse: TPoint; var pDispatchObjectHit: IDispatch): HRESULT;
-begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
-  Result := S_OK;
-end;
-}
 
 procedure TfrmOSKKeyboardUsage.WMUser_ContentRender(var Message: TMessage);
 begin
@@ -592,6 +599,8 @@ begin
   cef.ShouldOpenRemoteUrlsInBrowser := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnLoadEnd := cefLoadEnd;
+  cef.OnKeyEvent := cefKeyEvent;
+  cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
 end;
 
 procedure TfrmOSKKeyboardUsage.FormDestroy(Sender: TObject);
