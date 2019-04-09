@@ -35,7 +35,7 @@ type
 //    procedure AddUnmatchedContext(FormName, ControlName: string);
 //    procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
   protected
     function GetHelpTopic: string; override;
@@ -226,7 +226,7 @@ begin
   Result := SHelpTopic_Context_Help;
 end;
 
-procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
 var
   frm: TTIKEForm;
 begin

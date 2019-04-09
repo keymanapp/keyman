@@ -75,8 +75,9 @@ type
     cef: TframeCEFHost;
 
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
+    procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
 
     procedure ProjectRefresh(Sender: TObject);
     procedure ProjectRefreshCaption(Sender: TObject);
@@ -84,7 +85,6 @@ type
     procedure WebCommand(Command: WideString; Params: TStringList);
     procedure RefreshHTML;
     procedure EditFileExternal(FileName: WideString);
-    function DoNavigate(URL: string): Boolean;
     procedure ClearMessages;
     function ShouldHandleNavigation(URL: string): Boolean;
   protected
@@ -182,6 +182,7 @@ begin
   cef.Visible := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
   RefreshHTML;
 end;
@@ -247,15 +248,33 @@ begin
   FreeAndNil(FNextCommandParams);
 end;
 
-procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmProject.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
+var
+  s: string;
 begin
-  DoNavigate(Url);
+  if Copy(URL, 1, 5) = 'help:' then
+  begin
+    s := URL;
+    Delete(s,1,5);
+    FNextCommand := LowerCase(s);
+    frmKeymanDeveloper.HelpTopic(LowerCase(s));
+  end
+  else if not URL.StartsWith(modWebHttpServer.GetLocalhostURL) and (Copy(URL, 1, 4) = 'http') then
+  begin
+    FNextCommand := URL;
+    TUtilExecute.URL(URL);
+  end;
 end;
 
 procedure TfrmProject.cefBeforeBrowseSync(Sender: TObject;
   const Url: string; out Handled: Boolean);
 begin
   Handled := ShouldHandleNavigation(Url);
+end;
+
+procedure TfrmProject.cefCommand(Sender: TObject; const command: string; params: TStringList);
+begin
+  WebCommand(LowerCase(command), params);
 end;
 
 procedure TfrmProject.ClearMessages;
@@ -266,62 +285,13 @@ end;
 function TfrmProject.ShouldHandleNavigation(URL: string): Boolean;
 begin
   Result := False;
-  if Copy(URL, 1, 7) = 'keyman:' then
-  begin
-    Result := True;
-  end
-  else if Copy(URL, 1, 5) = 'help:' then
+  if Copy(URL, 1, 5) = 'help:' then
   begin
     Result := True;
   end
   else if not URL.StartsWith(modWebHttpServer.GetLocalhostURL) and (Copy(URL, 1, 4) = 'http') then
   begin
     Result := True;
-  end
-end;
-
-function TfrmProject.DoNavigate(URL: string): Boolean;
-var
-  n: Integer;
-  s, command: WideString;
-  FCommandParams: TStringList;
-begin
-  Result := False;
-  if Copy(URL, 1, 7) = 'keyman:' then
-  begin
-    s := URL;
-
-    FCommandParams := TStringList.Create;
-    try
-      Delete(s,1,7);
-      n := Pos('?',s);
-      if n > 0 then
-      begin
-        command := Copy(s,1,n-1);
-        DecodeAndSetParams(Copy(s,n+1,Length(s)), FCommandParams);
-      end
-      else
-        command := s;
-
-      WebCommand(LowerCase(Command), FCommandParams);
-    finally
-      FCommandParams.Free;
-    end;
-    Result := True;
-  end
-  else if Copy(URL, 1, 5) = 'help:' then
-  begin
-    Result := True;
-    s := URL;
-    Delete(s,1,5);
-    FNextCommand := LowerCase(s);
-    frmKeymanDeveloper.HelpTopic(LowerCase(s));
-  end
-  else if not URL.StartsWith(modWebHttpServer.GetLocalhostURL) and (Copy(URL, 1, 4) = 'http') then
-  begin
-    Result := True;
-    FNextCommand := URL;
-    TUtilExecute.URL(URL);
   end
 end;
 

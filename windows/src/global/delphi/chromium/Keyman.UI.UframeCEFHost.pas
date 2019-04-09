@@ -39,6 +39,7 @@ const
   CEF_BEFOREBROWSE = WM_USER + 307;
   CEF_CONSOLEMESSAGE = WM_USER + 308;
   CEF_TITLECHANGE = WM_USER + 309;
+  CEF_COMMAND = WM_USER + 310;
 
 type
   TCEFHostKeyEventData = record
@@ -66,7 +67,8 @@ type
   PCEFTitleChangeEventData = ^TCEFTitleChangeEventData;
 
   TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; out Handled: Boolean) of object;
-  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean) of object;
+  TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url: string; wasHandled: Boolean) of object;
+  TCEFCommandEvent = procedure(Sender: TObject; const command: string; params: TStringList) of object;
 
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
@@ -135,6 +137,7 @@ type
     FOnKeyEvent: TCEFHostKeyEvent;
     FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
     FOnTitleChange: TCEFHostTitleChangeEvent;
+    FOnCommand: TCEFCommandEvent;
 
     procedure CallbackWndProc(var Message: TMessage);
 
@@ -151,6 +154,7 @@ type
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
     procedure Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
     procedure Handle_CEF_TITLECHANGE(var message: TMessage);
+    procedure Handle_CEF_COMMAND(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -171,7 +175,7 @@ type
     property ShouldOpenRemoteUrlsInBrowser: Boolean read FShouldOpenRemoteUrlsInBrowser write FShouldOpenRemoteUrlsInBrowser;
     property OnAfterCreated: TNotifyEvent read FOnAfterCreated write FOnAfterCreated;
     property OnBeforeBrowseSync: TCEFHostBeforeBrowseSyncEvent read FOnBeforeBrowseSync write FOnBeforeBrowseSync;
-    {$MESSAGE HINT 'TODO: Deunify OnBeforeBrowse for keyman: URLs as these follow a standard pattern'}
+    property OnCommand: TCEFCommandEvent read FOnCommand write FOnCommand;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
     property OnTitleChange: TCEFHostTitleChangeEvent read FOnTitleChange write FOnTitleChange;
@@ -352,6 +356,7 @@ begin
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
     CEF_CONSOLEMESSAGE: Handle_CEF_CONSOLEMESSAGE(Message);
     CEF_TITLECHANGE: Handle_CEF_TITLECHANGE(Message);
+    CEF_COMMAND: Handle_CEF_COMMAND(Message);
   end;
 
   if Self <> nil then
@@ -391,7 +396,7 @@ end;
 procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
-  command, url: string;
+  url: string;
   wasHandled,
   shouldOpenUrlIfNotHandled: Boolean;
 begin
@@ -407,12 +412,7 @@ begin
   begin
     if Assigned(FOnBeforeBrowse) then
     begin
-      if params.Count > 0 then
-      begin
-        command := params[0];
-        params.Delete(0);
-        FOnBeforeBrowse(Self, url, command, params, Boolean(message.WParam));
-      end;
+      FOnBeforeBrowse(Self, url, Boolean(message.WParam));
     end;
 
     if FShouldOpenRemoteUrlsInBrowser and (params.Count = 0) and not IsLocalURL(URL) then
@@ -422,6 +422,24 @@ begin
   end
   else if shouldOpenUrlIfNotHandled then
     cef.LoadURL(url);
+
+  params.Free;
+end;
+
+procedure TframeCEFHost.Handle_CEF_COMMAND(var message: TMessage);
+var
+  params: TStringList;
+  command: string;
+begin
+  AssertVclThread;
+  params := TStringList(message.LParam);
+
+  if Assigned(FOnCommand) then
+  begin
+    command := params[0];
+    params.Delete(0);
+    FOnCommand(Self, command, params);
+  end;
 
   params.Free;
 end;
@@ -465,12 +483,32 @@ begin
   AssertCefThread;
 
   Handled := False;
+
   if Assigned(FOnBeforeBrowseSync) then
   begin
     FOnBeforeBrowseSync(Self, url, Handled);
   end;
 
-  params := nil;
+  if not Handled and GetParamsFromURL(Url, params) then
+  begin
+    Handled := True;
+    // Use OnCommand for keyman: URLs
+    params.Insert(0, Url);
+    PostMessage(FCallbackWnd, CEF_COMMAND, 0, LPARAM(params));
+  end
+  else
+  begin
+    // Use OnBeforeBrowse for other URLs
+    if not Handled and FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
+      Handled := True;
+
+    params := TStringList.Create;
+    params.Insert(0, Url);
+    PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));
+  end;
+
+  {params := nil;
+
   if not Handled then
     Handled := GetParamsFromURL(Url, params);
 
@@ -482,7 +520,7 @@ begin
 
   params.Insert(0, Url);
 
-  PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));
+  PostMessage(FCallbackWnd, CEF_BEFOREBROWSE, MAKELONG(WORD(Handled), WORD(ShouldOpenUrlIfNotHandled)), LPARAM(params));}
 end;
 
 procedure TframeCEFHost.cefBeforeClose(Sender: TObject; const browser: ICefBrowser);

@@ -61,7 +61,7 @@ type
     procedure DeleteXMLFiles;
     procedure SetRenderTemplate(const Value: WideString);
 
-    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+    procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
     procedure cefLoadEnd(Sender: TObject);
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
@@ -186,7 +186,7 @@ procedure TWebBrowserManager.AddWebHooks;
 begin
   if cef <> nil then
   begin
-    cef.OnBeforeBrowse := cefBeforeBrowse;
+    cef.OnCommand := cefCommand;
     cef.OnLoadEnd := cefLoadEnd;
     cef.OnKeyEvent := cefKeyEvent;
     cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
@@ -204,7 +204,7 @@ procedure TWebBrowserManager.RemoveWebHooks;
 begin
   if cef <> nil then
   begin
-    cef.OnBeforeBrowse := nil;
+    cef.OnCommand := nil;
     cef.OnLoadEnd := nil;
     cef.OnKeyEvent := nil;
     cef.OnPreKeySyncEvent := nil;
@@ -233,13 +233,9 @@ begin
   Result := S_OK;
 end;}
 
-procedure TWebBrowserManager.cefBeforeBrowse(Sender: TObject; const Url,
-  command: string; params: TStringList; wasHandled: Boolean);
+procedure TWebBrowserManager.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
-  if command <> '' then
-  begin
-    FireCommand(command, params);
-  end;
+  FireCommand(command, params);
 end;
 
 procedure TWebBrowserManager.cefKeyEvent(Sender: TObject;

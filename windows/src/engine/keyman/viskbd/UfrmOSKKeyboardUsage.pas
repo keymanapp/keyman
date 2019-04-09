@@ -69,8 +69,7 @@ type
     function GetAsyncShiftState: TExtShiftState;  // I3214   // I3521
     procedure do_keybd_event(bVk, bScan: Byte; dwFlags, dwExtraInfo: DWORD);  // I3214   // I3521
     procedure SendChars(const chars: string);
-    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
-      params: TStringList; wasHandled: Boolean);
+    procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
     procedure cefLoadEnd(Sender: TObject);
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
@@ -493,7 +492,7 @@ begin
     SendInputString(hwnd, t);
 end;
 
-procedure TfrmOSKKeyboardUsage.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmOSKKeyboardUsage.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
   FireCommand(command, params);
 end;
@@ -597,7 +596,7 @@ begin
   cef.Parent := Self;
   cef.Visible := True;
   cef.ShouldOpenRemoteUrlsInBrowser := True;
-  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
   cef.OnKeyEvent := cefKeyEvent;
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;

@@ -65,12 +65,13 @@ type
     procedure DownloadUILanguages;
     procedure ContributeUILanguages;
     procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
-      params: TStringList; wasHandled: Boolean);
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
       out Handled: Boolean);   // I4989
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+    procedure cefCommand(Sender: TObject; const command: string;
+      params: TStringList);
 
   protected
     cef: TframeCEFHost;
@@ -222,12 +223,13 @@ begin
   cef.ShouldOpenRemoteUrlsInBrowser := True;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
   cef.OnKeyEvent := cefKeyEvent;
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
 end;
 
-procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
 var
   aparams: TStringList;
   acommand: string;
@@ -239,11 +241,12 @@ begin
     aparams.Delete(0);
     FireCommand(acommand, aparams);
     aparams.Free;
-  end
-  else
-  begin
-    FireCommand(command, params);
   end;
+end;
+
+procedure TfrmWebContainer.cefCommand(Sender: TObject; const command: string; params: TStringList);
+begin
+  FireCommand(command, params);
 end;
 
 procedure TfrmWebContainer.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);

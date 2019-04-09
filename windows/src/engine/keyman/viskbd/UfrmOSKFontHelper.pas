@@ -78,8 +78,7 @@ type
     procedure DisplayKeyboardFonts;
     procedure StartCheckingFonts(Keyboard: IKeymanKeyboardInstalled);
     procedure Do_Content_Render(const AXML: WideString);
-    procedure cefBeforeBrowse(Sender: TObject; const Url, command: string;
-      params: TStringList; wasHandled: Boolean);
+    procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
     procedure cefLoadEnd(Sender: TObject);
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
@@ -135,8 +134,7 @@ begin
   DisplayKeyboardFonts; // Displays default details
 end;
 
-procedure TfrmOSKFontHelper.cefBeforeBrowse(Sender: TObject; const Url,
-  command: string; params: TStringList; wasHandled: Boolean);
+procedure TfrmOSKFontHelper.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
   FireCommand(command, params);
 end;
@@ -272,7 +270,7 @@ begin
   cef.Parent := Self;
   cef.Visible := True;
   cef.ShouldOpenRemoteUrlsInBrowser := True;
-  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
   cef.OnKeyEvent := cefKeyEvent;
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
