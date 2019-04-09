@@ -10,7 +10,7 @@ namespace com.keyman.osk {
 
     public static readonly DEFAULT_HEIGHT: number = 40; // pixels
     public static readonly BANNER_CLASS: string = 'kmw-banner-bar';
-    public static readonly BANNER_ID: string = 'keymanweb_banner_bar';
+    public static readonly BANNER_ID: string = 'kmw-banner-bar';
 
     /**
      * Function     height
@@ -273,6 +273,11 @@ namespace com.keyman.osk {
 
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
+      // TODO: Investigate the factor of "48"
+      let ss = s.style;
+      let oskManager = keyman.osk;
+      ss.top = oskManager.getBannerHeight() - 48 + 'px';
+
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
       return s;
@@ -354,6 +359,7 @@ namespace com.keyman.osk {
   /**
    * Function     SuggestionBanner
    * Scope        Public
+   * @param {number} height - If provided, the height of the banner in pixels
    * Description  Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
@@ -367,8 +373,9 @@ namespace com.keyman.osk {
 
     static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
 
-    constructor() {
-      super(SuggestionBanner.DEFAULT_HEIGHT);
+    constructor(height?: number) {
+      super(height || SuggestionBanner.DEFAULT_HEIGHT);
+
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let d = new BannerSuggestion(i);
@@ -430,6 +437,7 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
+      console.log("updateSuggestions done");
     }.bind(this);
   }
 }

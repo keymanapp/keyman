@@ -662,6 +662,17 @@ if(!window['keyman']['initialized']) {
     }
 
     /**
+     * Test code to set suggestion banner
+     * TODO: Remove from production
+     */
+    keymanweb['setBanner']=function() {
+      let keyman = com.keyman.singleton;
+      let osk = keyman.osk;
+      osk.banner.setBanner('suggestion');
+      osk.banner.setSuggestions();
+    };
+
+    /**
      * Possible way to detect the start of a rotation and hide the OSK before it is adjusted in size
      * 
      *  @param  {Object}    e   accelerometer rotation event      
