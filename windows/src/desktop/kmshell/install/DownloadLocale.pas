@@ -49,7 +49,7 @@ uses
   GlobalProxySettings,
   VersionInfo,
   UfrmInstallKeyboard,
-  UfrmWebContainer,
+  UfrmWebContainer, // for FOnDownloadLocale
   utildir,
   RegistryKeys,
   SysUtils,

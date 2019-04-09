@@ -37,4 +37,48 @@ the root of the cloned repo in order to run Keyman Developer.
 License - MPL 1.1
 -----------------
 
+Current uses
+------------
 
+This information was compiled during the transition of Keyman Engine and 
+Keyman Desktop from TEmbeddedWB to TCEF4Delphi. It may not be up to date.
+
+cef / cefwp:
+  UframeCEFHost (TframeCEFHost)
+    
+Kmshell
+    UfrmHTML ()
+    UfrmTextEditor 
+    UfrmWebContainer [*from global]
+      UfrmBaseKeyboard
+      UfrmInstallKeyboard
+      UfrmInstallKeyboardFromWeb
+      UfrmHint [*from global]
+      UfrmKeepInTouch
+      UfrmKeyboardOptions
+      UfrmMain
+      UfrmOnlineUpdateNewVersion
+      UfrmProxyConfiguration
+      UfrmSplash
+
+Developer
+    UframeTextEditor
+    UfrmHelp
+    UframeTouchLayoutBuilder
+    UfrmProject
+
+Keyman
+    UfrmOSKFontHelper
+    UfrmOSKKeyboardUsage
+    UfrmVisualKeyboard [WebHintManager]
+    UfrmWebContainer [*from global]
+      UfrmHelp
+      UfrmHint [*from global]
+
+Tsysinfo
+    sysinfo_main
+
+Global
+    WebBrowserManager [*]
+    UfrmWebContainer [*]
+       {Keyman, KMShell}

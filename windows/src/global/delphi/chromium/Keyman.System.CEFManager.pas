@@ -31,6 +31,7 @@ type
     constructor Create(const RootFolder: string);
     destructor Destroy; override;
     function Start: Boolean;
+    function StartSubProcess: Boolean;  // Use for browser sub process only
 
     procedure RegisterWindow(cef: IKeymanCEFHost);
     procedure UnregisterWindow(cef: IKeymanCEFHost);
@@ -50,7 +51,8 @@ uses
   KeymanPaths,
   KeymanVersion,
 //  RedistFiles,
-  RegistryKeys;
+  RegistryKeys,
+  uCEFConstants;
 //  UTikeDebugMode;
 
 { TInitializeCEF }
@@ -76,6 +78,8 @@ begin
   GlobalCEFApp := TCefApplication.Create;
 
   GlobalCEFApp.CheckCEFFiles := False;
+
+  GlobalCEFApp.LogSeverity := LOGSEVERITY_VERBOSE;
 
   // We run in debug mode when TIKE debug mode flag is set, so that we can
   // debug the CEF interactions more easily
@@ -113,6 +117,11 @@ end;
 function TCEFManager.Start: Boolean;
 begin
   Result := GlobalCEFApp.StartMainProcess;
+end;
+
+function TCEFManager.StartSubProcess: Boolean;
+begin
+  Result := GlobalCEFApp.StartSubProcess;
 end;
 
 function TCEFManager.StartShutdown(CompletionHandler: TNotifyEvent): Boolean;

@@ -15,7 +15,7 @@ uses
 begin
   FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
   try
-    FInitializeCEF.Start;
+    FInitializeCEF.StartSubProcess;
   finally
     FInitializeCEF.Free;
   end;

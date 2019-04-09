@@ -38,6 +38,7 @@ const
   CEF_KEYEVENT = WM_USER + 306;
   CEF_BEFOREBROWSE = WM_USER + 307;
   CEF_CONSOLEMESSAGE = WM_USER + 308;
+  CEF_TITLECHANGE = WM_USER + 309;
 
 type
   TCEFHostKeyEventData = record
@@ -56,6 +57,13 @@ type
   end;
 
   PCEFConsoleMessageEventData = ^TCEFConsoleMessageEventData;
+
+  TCEFTitleChangeEventData = record
+    browserid: Integer;
+    title: string;
+  end;
+
+  PCEFTitleChangeEventData = ^TCEFTitleChangeEventData;
 
   TCEFHostBeforeBrowseSyncEvent = procedure(Sender: TObject; const Url: string; out Handled: Boolean) of object;
   TCEFHostBeforeBrowseEvent = procedure(Sender: TObject; const Url, command: string; params: TStringList; wasHandled: Boolean) of object;
@@ -142,6 +150,7 @@ type
     procedure Handle_CEF_KEYEVENT(var message: TMessage);
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
     procedure Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
+    procedure Handle_CEF_TITLECHANGE(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -271,6 +280,19 @@ begin
   CreateBrowser;
 end;
 
+procedure TframeCEFHost.Handle_CEF_TITLECHANGE(var message: TMessage);
+var
+  p: PCEFTitleChangeEventData;
+begin
+  AssertVclThread;
+  p := PCEFTitleChangeEventData(message.LParam);
+
+  if Assigned(FOnTitleChange) then
+    FOnTitleChange(Self, p.title);
+
+  FreeMem(p);
+end;
+
 procedure TframeCEFHost.cefWidgetCompMsg(var aMessage: TMessage;
   var aHandled: Boolean);
 begin
@@ -329,6 +351,7 @@ begin
     CEF_KEYEVENT: Handle_CEF_KEYEVENT(Message);
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
     CEF_CONSOLEMESSAGE: Handle_CEF_CONSOLEMESSAGE(Message);
+    CEF_TITLECHANGE: Handle_CEF_TITLECHANGE(Message);
   end;
 
   if Self <> nil then
@@ -643,10 +666,16 @@ end;
 
 procedure TframeCEFHost.cefTitleChange(Sender: TObject;
   const browser: ICefBrowser; const title: ustring);
+var
+  p: PCEFTitleChangeEventData;
 begin
-  AssertVclThread;
-  if Assigned(FOnTitleChange) then
-    FOnTitleChange(Self, title);
+  AssertCefThread;
+
+  p := AllocMem(SizeOf(TCEFTitleChangeEventData));
+  p.browserid := browser.Identifier;
+  p.title := title;
+
+  PostMessage(FCallbackWnd, CEF_TITLECHANGE, 0, LPARAM(p));
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);
