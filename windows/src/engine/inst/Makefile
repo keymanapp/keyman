@@ -6,6 +6,8 @@
 
 # ----------------------------------------------------------------------
 
+ENGINE_FILES=keymanengine.wixobj components.wixobj cef.wixobj
+
 setup: msm copy
 
 build:
@@ -35,7 +37,7 @@ msm:
     $(MAKE) -fdownload.mak candle
     
     # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
-    $(WIXLIGHT) -sw1072 -ext WixUtilExtension keymanengine.wixobj components.wixobj -o keymanengine.msm
+    $(WIXLIGHT) -sw1072 -ext WixUtilExtension $(ENGINE_FILES) -o keymanengine.msm
 
 copy:    
     #
@@ -62,6 +64,7 @@ clean:
     -del /Q *.msm
     -del /Q *.wixobj
     -del /Q *.wixpdb
+    -del /Q cef.wxs
 
 install:
     rem nothing
