@@ -442,8 +442,8 @@ begin
   begin
     si := FSIList[i];
     web := TframeCEFHost.Create(si.Parent);
-    // web.Parent := si.Parent as TWinControl;
-    (si.Parent as TWinControl).InsertControl(web);
+    web.Parent := si.Parent as TWinControl;
+    //(si.Parent as TWinControl).InsertControl(web);
     (si.Parent as TTabSheet).Caption := si.Caption;
     (si.Parent as TTabSheet).TabVisible := True;
     web.Align := alClient;

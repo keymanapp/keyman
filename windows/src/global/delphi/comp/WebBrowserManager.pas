@@ -134,20 +134,9 @@ begin
 end;
 
 procedure TWebBrowserManager.SafeWndProc(var Message: TMessage);
-var
-  command: WideString;
-  params: TStringList;
 begin
   with Message do
     case Msg of
-      WM_USER_FireCommand:
-        begin
-          params := TStringList(Message.LParam);
-          command := params[0];
-          params.Delete(0);
-          FireCommand(command, params);
-          params.Free;
-        end;
       WM_USER_ContentRender:
         Content_Render;
     else

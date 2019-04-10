@@ -46,14 +46,9 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure cmdPrintClick(Sender: TObject);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
     procedure cmdBackClick(Sender: TObject);
     procedure cmdForwardClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-      Shift: TShiftState);
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
     cef: TframeCEFHost;
@@ -99,21 +94,21 @@ begin
     cmdBack.Enabled := Enable;
 end;}
 
-procedure TfrmHTML.webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
+{procedure TfrmHTML.webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
   Shift: TShiftState);
 begin
   inherited;
   if Key = VK_ESCAPE then
     Close;
-end;
+end;}
 
-procedure TfrmHTML.webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
+{procedure TfrmHTML.webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
   var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
   bstrUrl: WideString);
 begin
   Cancel := True;
   TUtilExecute.URL(bstrUrl);  // I3349
-end;
+end;}
 
 procedure TfrmHTML.SetText(const Value: string);
 var
@@ -177,6 +172,7 @@ begin
   cef.Parent := Self;
   cef.Visible := True;
   cef.ShouldOpenRemoteUrlsInBrowser := True;
+
 //  cef.OnBeforeBrowse := cefBeforeBrowse;
 //  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
 //  cef.OnLoadEnd := cefLoadEnd;

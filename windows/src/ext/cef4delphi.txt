@@ -45,6 +45,7 @@ Keyman Desktop from TEmbeddedWB to TCEF4Delphi. It may not be up to date.
 
 cef / cefwp:
   UframeCEFHost (TframeCEFHost)
+    {Kmshell, Developer, Keyman, Tsysinfo}
     
 Kmshell
     UfrmHTML ()
@@ -70,7 +71,7 @@ Developer
 Keyman
     UfrmOSKFontHelper
     UfrmOSKKeyboardUsage
-    UfrmVisualKeyboard [WebHintManager]
+    UfrmVisualKeyboard [*WebHintManager from global]
     UfrmWebContainer [*from global]
       UfrmHelp
       UfrmHint [*from global]
@@ -80,5 +81,8 @@ Tsysinfo
 
 Global
     WebBrowserManager [*]
+      {Keyman}
     UfrmWebContainer [*]
-       {Keyman, KMShell}
+      {Keyman, KMShell}
+    UfrmHint [*]
+      {Keyman, KMShell}

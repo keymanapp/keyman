@@ -63,8 +63,20 @@ uses
 {$R version.res}
 
 begin
-  Application.Title := 'Keyman Desktop System Information';
-  Application.Initialize;
-  Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
-  Application.Run;
+  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
+  try
+    try
+      if FInitializeCEF.Start then
+      begin
+        Application.Title := 'Keyman Desktop System Information';
+        Application.Initialize;
+        Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
+        Application.Run;
+      end;
+    finally
+      frmDiagnostics.Free;
+    end;
+  finally
+    FInitializeCEF.Free;
+  end;
 end.
