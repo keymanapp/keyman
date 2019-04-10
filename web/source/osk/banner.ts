@@ -148,7 +148,7 @@ namespace com.keyman.osk {
 
     private index: number;
 
-    private static readonly BASE_ID = 'kmw-suggestion-';
+    static readonly BASE_ID = 'kmw-suggestion-';
 
     constructor(index: number) {
       let keyman = com.keyman.singleton;
@@ -218,6 +218,10 @@ namespace com.keyman.osk {
      */
     public apply(target?: text.OutputTarget) {
       let keyman = com.keyman.singleton;
+
+      if(this.isEmpty()) {
+        return;
+      }
       
       // Find the state of the context at the time the prediction-triggering keystroke was applied.
       let original = keyman.modelManager.getPredictionState(this.suggestion.transformId);
@@ -237,6 +241,10 @@ namespace com.keyman.osk {
         target.restoreTo(original.preInput);
         target.apply(this.suggestion.transform);
       }
+    }
+
+    public isEmpty(): boolean {
+      return !this.suggestion;
     }
 
     /**
@@ -273,10 +281,13 @@ namespace com.keyman.osk {
 
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
-      // TODO: Investigate the factor of "48"
-      let ss = s.style;
-      let oskManager = keyman.osk;
-      ss.top = oskManager.getBannerHeight() - 48 + 'px';
+      if(keyman.isEmbedded && keyman.util.device.OS == 'Android') {
+        // TODO: Investigate the factor of "48"
+
+        let ss = s.style;
+        let oskManager = keyman.osk;
+        ss.top = oskManager.getBannerHeight() - 48 + 'px';
+      }
 
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
@@ -308,6 +319,16 @@ namespace com.keyman.osk {
     protected highlight(t: HTMLDivElement, on: boolean): void {
       let classes = t.className;
       let cs = ' ' + SuggestionBanner.TOUCHED_CLASS;
+
+      if(t.id.indexOf(BannerSuggestion.BASE_ID) == -1) {
+        console.warn("Cannot find BannerSuggestion object for element to highlight!");
+      } else {
+        // Never highlight an empty suggestion button.
+        let suggestion = t['suggestion'] as BannerSuggestion;
+        if(suggestion.isEmpty()) {
+          on = false;
+        }
+      }
 
       if(on && classes.indexOf(cs) < 0) {
         t.className=classes+cs;
