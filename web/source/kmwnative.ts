@@ -400,7 +400,14 @@ namespace com.keyman.osk {
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
+    // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      b.childNodes.forEach(function(layer: HTMLElement) {
+        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+      });
+    }
+    // Sets the layers to the correct height 
     pad = Math.round(0.15*rowHeight);
 
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!

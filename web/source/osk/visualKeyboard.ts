@@ -635,7 +635,6 @@ namespace com.keyman.osk {
     deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
-      let bannerHeight = oskManager.banner.height;
       let rowsPercent = 100;
 
       var lDiv=util._CreateElement('div'), ls=lDiv.style, totalHeight=0;

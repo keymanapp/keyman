@@ -458,7 +458,6 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
-      console.log("updateSuggestions done");
     }.bind(this);
   }
 }
