@@ -7,5 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "event-iterator": "^1.2.0"
+  }
 }

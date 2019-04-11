@@ -90,14 +90,27 @@ function main() {
    *    shift: false } ]
    *
    */
-  stream.on('keypress', function (char, keypress) {
-    console.log({char, keypress});
-    if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
-      process.exit(0);
-    }
-  });
 
-  return;
+  function keypressOf(stream) {
+    return new EventIterator(
+      (push, stop, fail) => {
+        stream.on('keypress', (char, keypress) => push([char, keypress]));
+        stream.on('close', stop);
+        stream.on('error', fail);
+      }
+    );
+  }
+
+  async function derp() {
+    for await (let [char, keypress] of keypressOf(stream)) {
+      console.log({char, keypress});
+      if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
+        process.exit(0);
+      }
+    }
+  }
+
+  return derp().catch(_ => process.exit(127));
 
   asyncMain()
     .then(_ => process.exit(0))
