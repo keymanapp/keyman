@@ -5,6 +5,9 @@
 
 const readline = require('readline');
 
+const {EventIterator} = require('event-iterator');
+
+
 // Load the most recent LMLayer code locally.
 const LMLayer = require('../../predictive-text');
 
@@ -36,10 +39,7 @@ function main() {
     throw new Error('must be run from interactive terminal');
   }
 
-  readline.emitKeypressEvents(process.stdin);
-  if (process.stdin.isTTY)
-    process.stdin.setRawMode(true);
-  process.stdin.resume();
+  let stream = setupStdin();
 
   /**
    *
@@ -90,7 +90,7 @@ function main() {
    *    shift: false } ]
    *
    */
-  process.stdin.on('keypress', function (char, keypress) {
+  stream.on('keypress', function (char, keypress) {
     console.log({char, keypress});
     if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
       process.exit(0);
@@ -168,6 +168,19 @@ function getCurrentContext() {
     startOfBuffer: true,
     endOfBuffer: true,
   };
+}
+
+
+/**
+ * Setup stdin for reading keypress events.
+ */
+function setupStdin() {
+  readline.emitKeypressEvents(process.stdin);
+  if (process.stdin.isTTY)
+    process.stdin.setRawMode(true);
+  process.stdin.resume();
+
+  return process.stdin;
 }
 
 
