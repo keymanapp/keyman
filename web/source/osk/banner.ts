@@ -1,4 +1,6 @@
 ///<reference path="visualKeyboard.ts" />
+///<reference path="../dom/uiTouchHandlerBase.ts" />
+
 namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
@@ -6,7 +8,9 @@ namespace com.keyman.osk {
     private _height: number; // pixels
     private div: HTMLDivElement;
 
-    public static DEFAULT_HEIGHT: number = 40; // pixels
+    public static readonly DEFAULT_HEIGHT: number = 40; // pixels
+    public static readonly BANNER_CLASS: string = 'kmw-banner-bar';
+    public static readonly BANNER_ID: string = 'kmw-banner-bar';
 
     /**
      * Function     height
@@ -58,8 +62,8 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
 
       let d = util._CreateElement('div');
-      d.id = "kmw-banner-bar";
-      d.className = "kmw-banner-bar";
+      d.id = Banner.BANNER_ID;
+      d.className = Banner.BANNER_CLASS;
       this.div = d;
 
       this.height = height;
@@ -144,7 +148,7 @@ namespace com.keyman.osk {
 
     private index: number;
 
-    private static readonly BASE_ID = 'kmw-suggestion-';
+    static readonly BASE_ID = 'kmw-suggestion-';
 
     constructor(index: number) {
       let keyman = com.keyman.singleton;
@@ -186,6 +190,8 @@ namespace com.keyman.osk {
 
       ds.width = widthpc + '%';
       ds.marginLeft = SuggestionBanner.MARGIN + '%';
+
+      this.div['suggestion'] = this;
     }
 
     /**
@@ -202,6 +208,7 @@ namespace com.keyman.osk {
     private updateText() {
       let display = this.generateSuggestionText();
       this.div.replaceChild(display, this.display);
+      this.display = display;
     }
 
     /**
@@ -211,6 +218,10 @@ namespace com.keyman.osk {
      */
     public apply(target?: text.OutputTarget) {
       let keyman = com.keyman.singleton;
+
+      if(this.isEmpty()) {
+        return;
+      }
       
       // Find the state of the context at the time the prediction-triggering keystroke was applied.
       let original = keyman.modelManager.getPredictionState(this.suggestion.transformId);
@@ -230,6 +241,10 @@ namespace com.keyman.osk {
         target.restoreTo(original.preInput);
         target.apply(this.suggestion.transform);
       }
+    }
+
+    public isEmpty(): boolean {
+      return !this.suggestion;
     }
 
     /**
@@ -266,14 +281,99 @@ namespace com.keyman.osk {
 
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
-      // TODO: Investigate the factor of "48"
-      let ss = s.style;
-      let oskManager = keyman.osk;
-      ss.top = oskManager.getBannerHeight() - 48 + 'px';
+      if(keyman.isEmbedded && keyman.util.device.OS == 'Android') {
+        // TODO: Investigate the factor of "48"
+
+        let ss = s.style;
+        let oskManager = keyman.osk;
+        ss.top = oskManager.getBannerHeight() - 48 + 'px';
+      }
 
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
       return s;
+    }
+  }
+
+  class SuggestionTouchManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+    findTargetFrom(e: HTMLElement): HTMLDivElement {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      try {
+        if(e) {
+          if(util.hasClass(e,'kmw-suggest-option')) {
+            return e as HTMLDivElement;
+          }
+          if(e.parentNode && util.hasClass(<HTMLElement> e.parentNode,'kmw-suggest-option')) {
+            return e.parentNode as HTMLDivElement;
+          }
+          // if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
+          //   return e.firstChild as HTMLDivElement;
+          // }
+        }
+      } catch(ex) {}
+      return null;
+    }
+
+    protected highlight(t: HTMLDivElement, on: boolean): void {
+      let classes = t.className;
+      let cs = ' ' + SuggestionBanner.TOUCHED_CLASS;
+
+      if(t.id.indexOf(BannerSuggestion.BASE_ID) == -1) {
+        console.warn("Cannot find BannerSuggestion object for element to highlight!");
+      } else {
+        // Never highlight an empty suggestion button.
+        let suggestion = t['suggestion'] as BannerSuggestion;
+        if(suggestion.isEmpty()) {
+          on = false;
+        }
+      }
+
+      if(on && classes.indexOf(cs) < 0) {
+        t.className=classes+cs;
+      } else {
+        t.className=classes.replace(cs,'');
+      }
+    }
+
+    protected select(t: HTMLDivElement): void {
+      let suggestion = t['suggestion'] as BannerSuggestion;
+      suggestion.apply();
+    }
+
+    //#region Long-press support
+    protected hold(t: HTMLDivElement): void {
+      // Temp, pending implementation of suggestion longpress submenus
+      // - nothing worth doing with a hold yet -
+    }
+    protected clearHolds(): void {
+      // Temp, pending implementation of suggestion longpress submenus
+      // - nothing to clear without them -
+    }
+    protected hasModalPopup(): boolean {
+      // Temp, pending implementation of suggestion longpress submenus
+      return false;
+    }
+    protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {
+      return target;
+    }
+    protected hasSubmenu(t: HTMLDivElement): boolean {
+      // Temp, pending implementation of suggestion longpress submenus:
+      return false;
+    }
+    protected isSubmenuActive(): boolean {
+      // Temp, pending implementation of suggestion longpress submenus:
+      return false;
+    }
+    protected displaySubmenuFor(target: HTMLDivElement) {
+      throw new Error("Method not implemented.");
+    }
+    //#endregion
+
+    constructor(div: HTMLElement) {
+      // TODO:  Determine appropriate CSS styling names, etc.
+      super(div, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
     }
   }
 
@@ -290,17 +390,44 @@ namespace com.keyman.osk {
     private suggestionList : BannerSuggestion[];
     private currentSuggestions: Suggestion[] = [];
 
+    private touchHandler: SuggestionTouchManager;
+
+    static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
+
     constructor(height?: number) {
-      super(height);
+      super(height || SuggestionBanner.DEFAULT_HEIGHT);
+
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let d = new BannerSuggestion(i);
         this.suggestionList[i] = d;
         this.getDiv().appendChild(d.div);
       }
+
+      this.setupTouchHandling();
     }
 
+    private setupTouchHandling() {
+      let keyman = com.keyman.singleton;
+      let div = this.getDiv();
 
+      let th = this.touchHandler = new SuggestionTouchManager(div);
+
+      if(keyman.util.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
+        // Not to mention, it's rather redundant.
+        div.addEventListener('touchstart', function(e: TouchEvent) {
+          th.touchStart(e);
+        }, true);
+        // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
+        div.addEventListener('touchend', function(e: TouchEvent) {
+          th.touchEnd(e);
+        }, true); 
+        div.addEventListener('touchmove', function(e: TouchEvent) {
+          th.touchMove(e);
+        }, false);
+        //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
+      }
+    }
 
     /**
      * Function invalidateSuggestions
@@ -331,7 +458,6 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
-      console.log("updateSuggestions done");
     }.bind(this);
   }
 }
