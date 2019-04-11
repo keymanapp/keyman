@@ -31,7 +31,7 @@ type
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
-    class function CEFDataPath(const RootFolder, mode: string): string; static;
+    class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
   end;
 
@@ -140,16 +140,18 @@ begin
   begin
     Result := GetEnvironmentVariable(S_CEF_EnvVar);
     if Result = ''
-      then Result := ExtractFilePath(ParamStr(0))+S_CEF_SubFolder
+      then Result := KeymanEngineInstallPath+S_CEF_SubFolder
       else Result := IncludeTrailingPathDelimiter(Result);
   end;
 end;
 
 class function TKeymanPaths.CEFSubprocessPath: string;
 begin
+  // Normal install location - in Keyman Engine install folder
   Result := KeymanEngineInstallPath(S_CEF_SubProcess);
   if FileExists(Result) then Exit;
 
+  // Same folder as executable
   Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess;
   if FileExists(Result) then Exit;
 
@@ -158,15 +160,15 @@ begin
   if FileExists(Result) then Exit;
 
   // Source repo, source folder
-  Result := ExtractFilePath(ParamStr(0)) + '..\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
+  Result := ExtractFilePath(ParamStr(0)) + '..\..\engine\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
   if FileExists(Result) then Exit;
 
-  Result := ExtractFilePath(ParamStr(0)) + '..\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
+  Result := ExtractFilePath(ParamStr(0)) + '..\..\engine\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
 end;
 
-class function TKeymanPaths.CEFDataPath(const RootFolder, mode: string): string;
+class function TKeymanPaths.CEFDataPath(const mode: string): string;
 begin
-  Result := GetFolderPath(CSIDL_APPDATA) + RootFolder + '\browser\' + mode;
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderCEFBrowserData + '\' + mode;
 end;
 
 class function TKeymanPaths.KeyboardsInstallDir: string;

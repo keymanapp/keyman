@@ -64,7 +64,7 @@ procedure RunProgram; forward;
 
 procedure Run;
 begin
-  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
+  FInitializeCEF := TCEFManager.Create;
   try
     if FInitializeCEF.Start then
     begin

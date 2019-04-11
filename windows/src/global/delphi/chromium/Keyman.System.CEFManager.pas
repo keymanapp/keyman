@@ -28,7 +28,9 @@ type
     FShutdownCompletionHandler: TNotifyEvent;
     procedure CompletionHandler(Sender: IKeymanCEFHost);
   public
-    constructor Create(const RootFolder: string);
+    const ProcessMessage_GetWindowSize = 'ProcessMessage_ResizeByContent';
+  public
+    constructor Create;
     destructor Destroy; override;
     function Start: Boolean;
     function StartSubProcess: Boolean;  // Use for browser sub process only
@@ -52,8 +54,18 @@ uses
   KeymanVersion,
 //  RedistFiles,
   RegistryKeys,
-  uCEFConstants;
+  uCEFConstants,
+  uCEFDOMVisitor,
+  uCEFInterfaces,
+  uCEFMiscFunctions,
+  uCEFProcessMessage,
+  uCEFTypes;
 //  UTikeDebugMode;
+
+procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
+                                                      sourceProcess : TCefProcessId;
+                                                const message       : ICefProcessMessage;
+                                                var   aHandled      : boolean); forward;
 
 { TInitializeCEF }
 
@@ -69,7 +81,7 @@ begin
   end;
 end;
 
-constructor TCEFManager.Create(const RootFolder: string);
+constructor TCEFManager.Create;
 begin
   FWindows := TList<IKeymanCEFHost>.Create;
   // You *MUST* call GlobalCEFApp.StartMainProcess in a if..then clause
@@ -79,7 +91,7 @@ begin
 
   GlobalCEFApp.CheckCEFFiles := False;
 
-  GlobalCEFApp.LogSeverity := LOGSEVERITY_VERBOSE;
+  GlobalCEFApp.LogSeverity := LOGSEVERITY_ERROR;
 
   // We run in debug mode when TIKE debug mode flag is set, so that we can
   // debug the CEF interactions more easily
@@ -93,10 +105,13 @@ begin
   GlobalCEFApp.ResourcesDirPath     := GlobalCEFApp.FrameworkDirPath;
   GlobalCEFApp.LocalesDirPath       := GlobalCEFApp.FrameworkDirPath + '\locales';
   GlobalCEFApp.EnableGPU            := True;      // Enable hardware acceleration
-  GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath(RootFolder, 'cache');
-  GlobalCEFApp.cookies              := TKeymanPaths.CEFDataPath(RootFolder, 'cookies');
-  GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath(RootFolder, 'userdata');
+  GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath('cache');
+  GlobalCEFApp.cookies              := TKeymanPaths.CEFDataPath('cookies');
+  GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath('userdata');
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
+
+  GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
+
 end;
 
 destructor TCEFManager.Destroy;
@@ -141,6 +156,60 @@ procedure TCEFManager.UnregisterWindow(cef: IKeymanCEFHost);
 begin
 //  OutputDebugString(PChar('TCEFManager.UnregisterWindow'));
   FWindows.Remove(cef);
+end;
+
+procedure DOMVisitor_GetWindowSize(const browser: ICefBrowser; const document: ICefDomDocument);
+const
+  NODE_ID = 'size';
+var
+  msg: ICefProcessMessage;
+  node : ICefDomNode;
+begin
+  // This function is called from a CEF thread
+  // document is only valid inside this function.
+
+  if document <> nil then
+  begin
+    node := document.GetElementById(NODE_ID);
+    if node <> nil then
+    begin
+      // Send back node dimensions to the browser process
+      msg := TCefProcessMessageRef.New(TCEFManager.ProcessMessage_GetWindowSize);
+      msg.ArgumentList.SetInt(0, node.ElementBounds.width);
+      msg.ArgumentList.SetInt(1, node.ElementBounds.height);
+      CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'Sending message '+msg.Name+', '+IntToStr(node.ElementBounds.width)+', '+IntToStr(node.ElementBounds.height));
+      browser.SendProcessMessage(PID_BROWSER, msg);
+    end;
+  end;
+end;
+
+procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
+                                                    sourceProcess : TCefProcessId;
+                                              const message       : ICefProcessMessage;
+                                              var   aHandled      : boolean);
+var
+  TempFrame   : ICefFrame;
+  TempVisitor : TCefFastDomVisitor2;
+begin
+  aHandled := False;
+
+  CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'message received '+message.Name);
+
+  if browser <> nil then
+  begin
+    if message.name = TCEFManager.ProcessMessage_GetWindowSize then
+    begin
+      TempFrame := browser.MainFrame;
+
+      if (TempFrame <> nil) then
+      begin
+        TempVisitor := TCefFastDomVisitor2.Create(browser, DOMVisitor_GetWindowSize);
+        TempFrame.VisitDom(TempVisitor);
+      end;
+
+      aHandled := True;
+    end;
+  end;
 end;
 
 end.

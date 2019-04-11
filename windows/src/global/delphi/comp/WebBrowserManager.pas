@@ -66,6 +66,7 @@ type
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
     procedure cefTitleChange(Sender: TObject; const title: string);
+    procedure cefResizeFromDocument(Sender: TObject; awidth, aheight: Integer);
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation);
       override;
@@ -180,6 +181,7 @@ begin
     cef.OnKeyEvent := cefKeyEvent;
     cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
     cef.OnTitleChange := cefTitleChange;
+    cef.OnResizeFromDocument := cefResizeFromDocument;
   end;
   {$MESSAGE HINT 'TODO: Support OnShowContextMenu, OnScriptError'}
   {if web <> nil then
@@ -262,16 +264,12 @@ end;
 
 procedure TWebBrowserManager.cefLoadEnd(Sender: TObject);
 begin
-{$MESSAGE HINT 'TODO: Support resizing'}
   DeleteXMLFiles;
-{
-      if Assigned(FOnResize) then
-      begin
-        elem := doc3.getElementById('size');
-        if Assigned(elem) then
-          FOnResize(Self, elem.offsetWidth, elem.offsetHeight);
-      end;
-}
+end;
+
+procedure TWebBrowserManager.cefResizeFromDocument(Sender: TObject; awidth, aheight: Integer);
+begin
+  FOnResize(Self, awidth, aheight);
 end;
 
 procedure TWebBrowserManager.Content_Render(FRefreshKeyman: Boolean; const AdditionalData: WideString);

@@ -6,8 +6,9 @@
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
     
     <ComponentGroupRef Id="KeymanEngineComponents" />
+    <ComponentGroupRef Id="CEF" />
     
-    <Directory Id="TARGETDIR" Name="SourceDir">
+    <Directory Id="TARGETDIR" Name="SourceDir" ComponentGuidGenerationSeed="50d43807-710f-4ed9-b503-637558eb0651">
       <Directory Id="CommonFilesFolder">
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine">

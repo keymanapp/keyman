@@ -13,7 +13,7 @@ uses
 {$R manifest.res}
 
 begin
-  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
+  FInitializeCEF := TCEFManager.Create;
   try
     FInitializeCEF.StartSubProcess;
   finally

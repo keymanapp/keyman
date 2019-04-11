@@ -63,7 +63,7 @@ uses
 {$R version.res}
 
 begin
-  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
+  FInitializeCEF := TCEFManager.Create;
   try
     try
       if FInitializeCEF.Start then

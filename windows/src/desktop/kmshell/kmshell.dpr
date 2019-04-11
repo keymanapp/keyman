@@ -163,7 +163,7 @@ uses
 begin
   CoInitFlags := COINIT_APARTMENTTHREADED;
 
-  FInitializeCEF := TCEFManager.Create(SFolderKeymanEngine);
+  FInitializeCEF := TCEFManager.Create;
   try
     if FInitializeCEF.Start then
     try

@@ -284,7 +284,7 @@ uses
 begin
   CoInitFlags := COINIT_APARTMENTTHREADED;
 
-  FInitializeCEF := TCEFManager.Create(SFolderKeymanDeveloper);
+  FInitializeCEF := TCEFManager.Create;
   try
     if FInitializeCEF.Start then
     begin
@@ -297,8 +297,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  ShowStartup;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+      ShowStartup;
       Application.Run;
     end;
   finally

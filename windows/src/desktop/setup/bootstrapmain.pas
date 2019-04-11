@@ -110,8 +110,6 @@ uses
   Windows,
   SFX;
 
-function CheckDependencies(FSilent: Boolean): Boolean; forward;   // I4470
-
 var
   FNiceExitCodes: Boolean = False;
 
@@ -406,9 +404,6 @@ BEGIN
         if CheckForOldVersionScenario then   // I4460
           Exit;
 
-        if not CheckDependencies(FSilent) then   // I4470
-          Exit;
-
         with TfrmRunDesktop.Create(nil) do    // I2562
         try
           ContinueSetup := FContinueSetup;
@@ -439,28 +434,6 @@ BEGIN
     CoUninitialize;
   end;
 end;
-
-function CheckDependencies(FSilent: Boolean): Boolean;   // I4470
-begin
-  Result := False;
-
-  // Check Internet Explorer version
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_LOCAL_MACHINE;
-    if not OpenKeyReadOnly('Software\Microsoft\Internet Explorer') or not ValueExists('Version') or (ReadString('Version') < '9.0') then
-    begin
-      LogError(FInstallInfo.Text(ssQueryUpdateInternetExplorer));
-      SetExitVal(ERROR_NOT_SUPPORTED);
-      Exit;
-    end;
-  finally
-    Free;
-  end;
-
-  Result := True;
-end;
-
 
 { TInstallInfo }
 

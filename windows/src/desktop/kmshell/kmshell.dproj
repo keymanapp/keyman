@@ -215,7 +215,6 @@
         </DCCReference>
         <DCCReference Include="..\..\engine\keyman\KeymanTrayIcon.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards10.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\MSHTML_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\FixupLocaleDoctype.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
@@ -391,15 +390,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

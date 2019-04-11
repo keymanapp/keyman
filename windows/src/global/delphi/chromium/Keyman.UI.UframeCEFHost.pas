@@ -73,6 +73,7 @@ type
   TCEFHostPreKeySyncEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean) of object;
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
   TCEFHostTitleChangeEvent = procedure(Sender: TObject; const title: string) of object;
+  TCEFHostResizeFromDocumentEvent = procedure(Sender: TObject; width, height: Integer) of object;
 
   TframeCEFHost = class(TForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
@@ -121,6 +122,9 @@ type
       source: TCefFocusSource; out Result: Boolean);
     procedure cefTitleChange(Sender: TObject; const browser: ICefBrowser;
       const title: ustring);
+    procedure cefProcessMessageReceived(Sender: TObject;
+      const browser: ICefBrowser; sourceProcess: TCefProcessId;
+      const message: ICefProcessMessage; out Result: Boolean);
   private
     FApplicationHandle: THandle;
     FNextURL: string;
@@ -138,6 +142,7 @@ type
     FOnBeforeBrowse: TCEFHostBeforeBrowseEvent;
     FOnTitleChange: TCEFHostTitleChangeEvent;
     FOnCommand: TCEFCommandEvent;
+    FOnResizeFromDocument: TCEFHostResizeFromDocumentEvent;
 
     procedure CallbackWndProc(var Message: TMessage);
 
@@ -167,6 +172,7 @@ type
     procedure Navigate; overload;
     procedure DoBeforeBrowse(const url: string; out Handled: Boolean; ShouldOpenUrlIfNotHandled: Boolean);
   public
+    procedure DoResizeByContent;
     procedure SetFocus; override;
     procedure StartClose;
     procedure Navigate(const url: string); overload;
@@ -181,6 +187,7 @@ type
     property OnTitleChange: TCEFHostTitleChangeEvent read FOnTitleChange write FOnTitleChange;
     property OnPreKeySyncEvent: TCEFHostPreKeySyncEvent read FOnPreKeySyncEvent write FOnPreKeySyncEvent;
     property OnKeyEvent: TCEFHostKeyEvent read FOnKeyEvent write FOnKeyEvent;
+    property OnResizeFromDocument: TCEFHostResizeFromDocumentEvent read FOnResizeFromDocument write FOnResizeFromDocument;
   end;
 
 // Helpers to make sure we don't accidentally code
@@ -198,6 +205,8 @@ uses
   ExternalExceptionHandler,
   utilhttp,
   uCEFApplication,
+  uCEFConstants,
+  uCEFProcessMessage,
   VersionInfo;
 
 {$R *.DFM}
@@ -436,6 +445,7 @@ begin
 
   if Assigned(FOnCommand) then
   begin
+    params.Delete(0); // url; not really used currently
     command := params[0];
     params.Delete(0);
     FOnCommand(Self, command, params);
@@ -672,8 +682,8 @@ begin
 
     PostMessage(FCallbackWnd, CEF_KEYEVENT, MAKELONG(WORD(Result), WORD(isKeyboardShortcut)), LPARAM(p));
   end;
-
 end;
+
 
 procedure TframeCEFHost.cefBeforePopup(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame; const targetUrl,
@@ -742,6 +752,27 @@ begin
   AssertVclThread;
   inherited;
   if cef <> nil then cef.NotifyMoveOrResizeStarted;
+end;
+
+procedure TframeCEFHost.DoResizeByContent;
+var
+  msg : ICefProcessMessage;
+begin
+  // Use the ArgumentList property if you need to pass some parameters.
+  msg := TCefProcessMessageRef.New(TCEFManager.ProcessMessage_GetWindowSize); // Same name than TCefCustomRenderProcessHandler.MessageName
+  cef.SendProcessMessage(PID_RENDERER, msg);
+end;
+
+procedure TframeCEFHost.cefProcessMessageReceived(Sender: TObject;
+  const browser: ICefBrowser; sourceProcess: TCefProcessId;
+  const message: ICefProcessMessage; out Result: Boolean);
+begin
+  AssertVclThread;
+  if message.Name = TCEFManager.ProcessMessage_GetWindowSize then
+  begin
+    if Assigned(FOnResizeFromDocument) then
+      FOnResizeFromDocument(Self, message.ArgumentList.GetInt(0), message.ArgumentList.GetInt(1));
+  end;
 end;
 
 end.
