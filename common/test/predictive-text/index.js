@@ -39,10 +39,8 @@ function main() {
     throw new Error('must be run from interactive terminal');
   }
 
-  let stream = setupStdin();
-
   async function derp() {
-    for await (let [char, keypress] of keypressOf(stream)) {
+    for await (let [char, keypress] of keypressesFromStdin()) {
       console.log({char, keypress});
       if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
         process.exit(0);
@@ -50,9 +48,7 @@ function main() {
     }
   }
 
-  return derp().catch(_ => process.exit(127));
-
-  asyncMain()
+  return derp()
     .then(_ => process.exit(0))
     .catch(err => {
       console.error(err);
@@ -127,12 +123,6 @@ function getCurrentContext() {
  * Setup stdin for reading keypress events.
  */
 function setupStdin() {
-  readline.emitKeypressEvents(process.stdin);
-  if (process.stdin.isTTY)
-    process.stdin.setRawMode(true);
-  process.stdin.resume();
-
-  return process.stdin;
 }
 
 
@@ -195,7 +185,7 @@ function logInternalWorkerMessage(role, ...args) {
 }
 
 /**
- * Allows you to iterate over each keypress event from the given stream.
+ * Allows you to iterate over each keypress event from stdin.
  *
  * Each iteration will yield a two-valued array of [char, keypress].
  * `char` is the string emitted by the keypress. This MAY be undefined!
@@ -207,7 +197,15 @@ function logInternalWorkerMessage(role, ...args) {
  *    meta: bool;       // was meta (Command/Windows key) pressed?
  *    shift: bool;      // was shift pressed?
  */
-function keypressOf(stream) {
+function keypressesFromStdin() {
+  let stream = process.stdin;
+
+  readline.emitKeypressEvents(stream);
+  if (stream.isTTY) {
+    stream.setRawMode(true);
+  }
+  stream.resume();
+
   return new EventIterator(
     (push, stop, fail) => {
       stream.on('keypress', (char, keypress) => push([char, keypress]));
