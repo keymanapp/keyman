@@ -41,66 +41,6 @@ function main() {
 
   let stream = setupStdin();
 
-  /**
-   *
-   * [ 'n',
-   *  { sequence: 'n',
-   *    name: 'n',
-   *    ctrl: false,
-   *    meta: false,
-   *    shift: false } ]
-   *[ 'o',
-   *  { sequence: 'o',
-   *    name: 'o',
-   *    ctrl: false,
-   *    meta: false,
-   *    shift: false } ]
-   *[ 'O',
-   *  { sequence: 'O', name: 'o', ctrl: false, meta: false, shift: true } ]
-   *[ '\t',
-   *  { sequence: '\t',
-   *    name: 'tab',
-   *    ctrl: false,
-   *    meta: false,
-   *    shift: false } ]
-   *[ '\r',
-   *  { sequence: '\r',
-   *    name: 'return',
-   *    ctrl: false,
-   *    meta: false,
-   *    shift: false } ]
-   *[ undefined,
-   *  { sequence: '\u001b[C',
-   *    name: 'right',
-   *    ctrl: false,
-   *    meta: false,
-   *    shift: false,
-   *    code: '[C' } ]
-   *[ '\u0004',
-   *  { sequence: '\u0004',
-   *    name: 'd',
-   *    ctrl: true,
-   *    meta: false,
-   *    shift: false } ]
-   *[ '\u0003',
-   *  { sequence: '\u0003',
-   *    name: 'c',
-   *    ctrl: true,
-   *    meta: false,
-   *    shift: false } ]
-   *
-   */
-
-  function keypressOf(stream) {
-    return new EventIterator(
-      (push, stop, fail) => {
-        stream.on('keypress', (char, keypress) => push([char, keypress]));
-        stream.on('close', stop);
-        stream.on('error', fail);
-      }
-    );
-  }
-
   async function derp() {
     for await (let [char, keypress] of keypressOf(stream)) {
       console.log({char, keypress});
@@ -122,7 +62,6 @@ function main() {
 
 
 async function asyncMain() {
-
   // Load the LMLayer and the desired model.
   let lm = new LMLayer({}, createAsyncWorker());
   let config = await lm.loadModel('./example.crk.wordlist_wahkohtowin.model.js');
@@ -253,4 +192,27 @@ function logInternalWorkerMessage(role, ...args) {
   if (WORKER_DEBUG) {
     console.log(`[${role}]`, ...args);
   }
+}
+
+/**
+ * Allows you to iterate over each keypress event from the given stream.
+ *
+ * Each iteration will yield a two-valued array of [char, keypress].
+ * `char` is the string emitted by the keypress. This MAY be undefined!
+ * `keypress` is an object with the following properties:
+ *
+ *    sequence: string; // the raw sequence recieved by the terminal driver.
+ *    name: string;     // name of the primary key pressed
+ *    ctrl: bool;       // was ctrl pressed?
+ *    meta: bool;       // was meta (Command/Windows key) pressed?
+ *    shift: bool;      // was shift pressed?
+ */
+function keypressOf(stream) {
+  return new EventIterator(
+    (push, stop, fail) => {
+      stream.on('keypress', (char, keypress) => push([char, keypress]));
+      stream.on('close', stop);
+      stream.on('error', fail);
+    }
+  );
 }
