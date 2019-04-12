@@ -21,7 +21,7 @@ const CSI = '\033[';
  */
 const ANSI = {
   CURSOR_NEXT_LINE: CSI + 'E', // Bring cursor to the beginning of the next line.
-  ERASE_IN_LINE(n=0) { return CSI + n + 'k'; }, // Erase from the cursor to the end of the line.
+  ERASE_IN_LINE(n=2) { return CSI + n + 'K'; }, // Erase the entire line.
   SAVE_CURSOR_POSITION: CSI + 's', // Remembers the current cursor position.
   RESTORE_CURSOR_POSITION: CSI + 'u', // Moves the cursor to the previously stored position.
   BOLD: CSI + '1m', // Set bold text.
@@ -39,16 +39,7 @@ function main() {
     throw new Error('must be run from interactive terminal');
   }
 
-  async function derp() {
-    for await (let [char, keypress] of keypressesFromStdin()) {
-      console.log({char, keypress});
-      if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
-        process.exit(0);
-      }
-    }
-  }
-
-  return derp()
+  asyncMain()
     .then(_ => process.exit(0))
     .catch(err => {
       console.error(err);
@@ -62,17 +53,23 @@ async function asyncMain() {
   let lm = new LMLayer({}, createAsyncWorker());
   let config = await lm.loadModel('./example.crk.wordlist_wahkohtowin.model.js');
 
-  // TODO: a REPL of sorts here:
-  //
+  // Setup the REPL
   // > type some text
   // [suggestions] [appear] [here] (press tab to accept)
 
   // Initial line:
-  process.stdout.write(`> ${ANSI.SAVE_CURSOR_POSITION}`);
+  process.stdout.write(`> `);
 
-
-  let suggestions = Array.from(await lm.predict(insertCharacter('n'), getCurrentContext()));
-  renderSuggestions(suggestions, 1);
+  for await (let [char, keypress] of keypressesFromStdin()) {
+    if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
+      process.stdout.write('\n');
+      process.exit(0);
+    } else {
+      process.stdout.write(char);
+      let suggestions = Array.from(await lm.predict(insertCharacter(char), getCurrentContext()));
+      renderSuggestions(suggestions, 0);
+    }
+  }
 }
 
 /**
@@ -80,20 +77,26 @@ async function asyncMain() {
  */
 function renderSuggestions(suggestions, selected) {
   // Wherever we are, save the current cursor position.
-  process.stdout.write(`${ANSI.SAVE_CURSOR_POSITION}`);
+  process.stdout.write(ANSI.SAVE_CURSOR_POSITION);
 
   // Jump to next line and erase it to write suggestions.
   process.stdout.write(ANSI.CURSOR_NEXT_LINE + ANSI.ERASE_IN_LINE());
 
-  // Format the displayed suggestions.
-  let line = suggestions
-    .map(({displayAs}, index) => {
-      if (index === selected) {
-        return `${ANSI.REVERSE_VIDEO}[${displayAs}]${ANSI.NORMAL_VIDEO}`;
-      }
-      return `[ ${displayAs} ]`
-    }).join(' ');
-  process.stdout.write(line + ANSI.RESTORE_CURSOR_POSITION);
+  if (!suggestions || suggestions.length === 0) {
+    process.stdout.write(' no suggestions ');
+  } else {
+    // Format the displayed suggestions.
+    let line = suggestions
+      .map(({displayAs}, index) => {
+        if (index === selected) {
+          return `${ANSI.REVERSE_VIDEO}[${displayAs}]${ANSI.NORMAL_VIDEO}`;
+        }
+        return `[ ${displayAs} ]`
+      }).join(' ');
+    process.stdout.write(line);
+  }
+
+  process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
 }
 
 /**
