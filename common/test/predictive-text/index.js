@@ -61,7 +61,7 @@ async function asyncMain() {
   process.stdout.write(`> `);
 
   for await (let [char, keypress] of keypressesFromStdin()) {
-    if (keypress.sequence === '\u0003' || keypress.sequence === '\u0004') {
+    if (wantsQuit(keypress)) {
       process.stdout.write('\n');
       process.exit(0);
     } else {
@@ -121,11 +121,15 @@ function getCurrentContext() {
   };
 }
 
-
 /**
- * Setup stdin for reading keypress events.
+ * True if the keypress looks like something that typically quits the program.
  */
-function setupStdin() {
+function wantsQuit(keypress) {
+  const CTRL_C = '\u0003';
+  const CTRL_D = '\u0004';
+  const CTRL_BACKSLASH = '\u001C';
+  let code = keypress.sequence;
+  return code === CTRL_C || code === CTRL_D || code === CTRL_BACKSLASH;
 }
 
 
