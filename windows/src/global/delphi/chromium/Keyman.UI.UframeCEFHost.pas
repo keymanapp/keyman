@@ -37,9 +37,9 @@ const
   CEF_SETFOCUS = WM_USER + 305;
   CEF_KEYEVENT = WM_USER + 306;
   CEF_BEFOREBROWSE = WM_USER + 307;
-  CEF_CONSOLEMESSAGE = WM_USER + 308;
   CEF_TITLECHANGE = WM_USER + 309;
   CEF_COMMAND = WM_USER + 310;
+  CEF_RESIZEFROMDOCUMENT = WM_USER + 311;
 
 type
   TCEFHostKeyEventData = record
@@ -90,10 +90,7 @@ type
       out Result: Boolean);
     procedure cefPreKeyEvent(Sender: TObject; const browser: ICefBrowser;
       const event: PCefKeyEvent; osEvent: PMsg; out isKeyboardShortcut,
-      Result: Boolean);
-    procedure cefConsoleMessage(Sender: TObject; const browser: ICefBrowser;
-      level: Cardinal; const message, source: ustring; line: Integer;
-      out Result: Boolean);   // I2986
+      Result: Boolean);   // I2986
     procedure cefLoadEnd(Sender: TObject; const browser: ICefBrowser;
                          const frame: ICefFrame; httpStatusCode: Integer);
     procedure cefBeforeBrowse(Sender: TObject; const browser: ICefBrowser;
@@ -143,6 +140,7 @@ type
     FOnTitleChange: TCEFHostTitleChangeEvent;
     FOnCommand: TCEFCommandEvent;
     FOnResizeFromDocument: TCEFHostResizeFromDocumentEvent;
+    FOnHelpTopic: TNotifyEvent;
 
     procedure CallbackWndProc(var Message: TMessage);
 
@@ -157,9 +155,9 @@ type
     procedure Handle_CEF_SETFOCUS(var message: TMessage);
     procedure Handle_CEF_KEYEVENT(var message: TMessage);
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
-    procedure Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
     procedure Handle_CEF_TITLECHANGE(var message: TMessage);
     procedure Handle_CEF_COMMAND(var message: TMessage);
+    procedure Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -183,6 +181,7 @@ type
     property OnBeforeBrowseSync: TCEFHostBeforeBrowseSyncEvent read FOnBeforeBrowseSync write FOnBeforeBrowseSync;
     property OnCommand: TCEFCommandEvent read FOnCommand write FOnCommand;
     property OnBeforeBrowse: TCEFHostBeforeBrowseEvent read FOnBeforeBrowse write FOnBeforeBrowse;
+    property OnHelpTopic: TNotifyEvent read FOnHelpTopic write FOnHelpTopic;
     property OnLoadEnd: TNotifyEvent read FOnLoadEnd write FOnLoadEnd;
     property OnTitleChange: TCEFHostTitleChangeEvent read FOnTitleChange write FOnTitleChange;
     property OnPreKeySyncEvent: TCEFHostPreKeySyncEvent read FOnPreKeySyncEvent write FOnPreKeySyncEvent;
@@ -363,9 +362,9 @@ begin
     CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
     CEF_KEYEVENT: Handle_CEF_KEYEVENT(Message);
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
-    CEF_CONSOLEMESSAGE: Handle_CEF_CONSOLEMESSAGE(Message);
     CEF_TITLECHANGE: Handle_CEF_TITLECHANGE(Message);
     CEF_COMMAND: Handle_CEF_COMMAND(Message);
+    CEF_RESIZEFROMDOCUMENT: Handle_CEF_RESIZEFROMDOCUMENT(Message);
   end;
 
   if Self <> nil then
@@ -454,28 +453,6 @@ begin
   params.Free;
 end;
 
-procedure TframeCEFHost.Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
-var
-  I: Integer;
-  id: string;
-  p: PCEFConsoleMessageEventData;
-begin
-  AssertVclThread;
-  p := PCEFConsoleMessageEventData(message.LParam);
-
-  id := LowerCase(ExtractFileName(ParamStr(0)))+'_'+GetVersionString+'_script_';
-  if Assigned(Owner)
-    then id := id + Owner.ClassName
-    else id := id + 'unknown';
-
-  I := string(p.source).LastDelimiter('/');
-  id := id + '_' + string(p.source).SubString(I + 1) + '_' + IntToStr(p.line);
-
-  LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(p.line)+' of '+p.source, p.message, '');
-
-  FreeMem(p);
-end;
-
 procedure TframeCEFHost.cefBeforeBrowse(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
   const request: ICefRequest; user_gesture, isRedirect: Boolean;
@@ -547,26 +524,6 @@ begin
   Result := True;
 end;
 
-procedure TframeCEFHost.cefConsoleMessage(Sender: TObject;
-  const browser: ICefBrowser; level: Cardinal; const message, source: ustring;
-  line: Integer; out Result: Boolean);
-var
-  p: PCEFConsoleMessageEventData;
-begin
-  AssertCefThread;
-
-  p := AllocMem(SizeOf(TCEFConsoleMessageEventData));
-  p.browserid := browser.Identifier;
-  p.level := level;
-  p.message := message;
-  p.source := source;
-  p.line := line;
-
-  Result := True;
-
-  PostMessage(FCallbackWnd, CEF_CONSOLEMESSAGE, WORD(Result), LPARAM(p));
-end;
-
 procedure TframeCEFHost.Handle_CEF_DESTROY(var Message: TMessage);
 begin
   AssertVclThread;
@@ -598,8 +555,7 @@ begin
 
   if p.event.windows_key_code = VK_F1 then
   begin
-    {$MESSAGE HINT 'TODO: Add F1 support back in again'}
-//    if Assigned(OnHelpTopic) then OnHelpTopic(Self); // TODO: frmKeymanDeveloper.HelpTopic(Self)
+    if Assigned(FOnHelpTopic) then FOnHelpTopic(Self); // TODO: frmKeymanDeveloper.HelpTopic(Self)
   end
   else if p.event.windows_key_code = VK_F12 then
   begin
@@ -627,6 +583,13 @@ begin
 
   if Assigned(FOnLoadEnd) then
     FOnLoadEnd(Self);
+end;
+
+procedure TframeCEFHost.Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
+begin
+  AssertVclThread;
+  if Assigned(FOnResizeFromDocument) then
+    FOnResizeFromDocument(Self, message.WParam, message.LParam);
 end;
 
 procedure TframeCEFHost.Handle_CEF_SETFOCUS(var message: TMessage);
@@ -767,12 +730,8 @@ procedure TframeCEFHost.cefProcessMessageReceived(Sender: TObject;
   const browser: ICefBrowser; sourceProcess: TCefProcessId;
   const message: ICefProcessMessage; out Result: Boolean);
 begin
-  AssertVclThread;
   if message.Name = TCEFManager.ProcessMessage_GetWindowSize then
-  begin
-    if Assigned(FOnResizeFromDocument) then
-      FOnResizeFromDocument(Self, message.ArgumentList.GetInt(0), message.ArgumentList.GetInt(1));
-  end;
+    PostMessage(FCallbackWnd, CEF_RESIZEFROMDOCUMENT, message.ArgumentList.GetInt(0), message.ArgumentList.GetInt(1));
 end;
 
 end.

@@ -3,7 +3,6 @@
 # We use different directories so that heat generates
 # different identifiers for the various folders
 KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build\xml
-KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
 KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
@@ -16,10 +15,9 @@ copykmdev: makeinstaller
 test-releaseexists:
     if exist $(ROOT)\release\$VERSION\keymandeveloper*.msi echo. & echo Release $VERSION already exists. Delete it or update src\version.txt and try again & exit 1
 
-candle: heat-cef heat-xml heat-templates
+candle: heat-xml heat-templates
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE kmdev.wxs 
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
     
 heat-xml:
@@ -42,15 +40,6 @@ heat-templates:
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_TEMPLATES) -o templates.wxs -ag -cg Templates -dr dirProjects -var var.TemplatesSourceDir -wx -nologo
     # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
     -rmdir /s/q $(KEYMAN_WIX_TEMP_TEMPLATES)
-
-heat-cef:
-    # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
-    mkdir $(KEYMAN_WIX_TEMP_CEF)
-    xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
-    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
-    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 makeinstaller:
     cd $(ROOT)\src\developer\inst

@@ -73,6 +73,7 @@ type
     procedure cefCommand(Sender: TObject; const command: string;
       params: TStringList);
     procedure cefResizeFromDocument(Sender: TObject; awidth, aheight: Integer);
+    procedure cefHelpTopic(Sender: TObject);
   protected
     cef: TframeCEFHost;
 
@@ -229,6 +230,7 @@ begin
   cef.OnKeyEvent := cefKeyEvent;
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
   cef.OnResizeFromDocument := cefResizeFromDocument;
+  cef.OnHelpTopic := cefHelpTopic;
 end;
 
 procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
@@ -249,6 +251,11 @@ end;
 procedure TfrmWebContainer.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
   FireCommand(command, params);
+end;
+
+procedure TfrmWebContainer.cefHelpTopic(Sender: TObject);
+begin
+  Application.HelpJump('context_'+lowercase(FDialogName));
 end;
 
 procedure TfrmWebContainer.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
@@ -338,72 +345,6 @@ function IsLocalURL(URL: WideString): Boolean;
 begin
   Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
 end;
-
-{$MESSAGE HINT 'TODO: Log script errors'}
-{procedure TfrmWebContainer.webScriptError2(Sender: TObject; ErrorLine,
-  ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string;
-  var ScriptErrorAction: TScriptErrorAction);
-var
-  FLog: string;
-  FFileName: WideString;
-  FTellKeymanSupport: Boolean;
-  FAborting: Boolean;
-begin
-  FAborting := False;
-
-  if FNoMoreErrors then
-  begin
-    ScriptErrorAction := eaContinue;
-    Exit;
-  end;
-
-  case ShowScriptErrorDialog(Self, ErrorMessage, FTellKeymanSupport) of  // I2992   // I3544
-    mrYes: ScriptErrorAction := eaContinue;
-    mrCancel: begin ScriptErrorAction := eaContinue; FNoMoreErrors := True; end;
-    mrNo:   ScriptErrorAction := eaCancel;
-    mrAbort: begin ScriptErrorAction := eaCancel; FAborting := True; end;
-  end;
-
-  if FTellKeymanSupport then
-  begin
-    FLog := '';
-
-    try
-      with TStringList.Create do
-      try
-        FFileName := ConvertFileURLToPath(ErrorUrl);
-
-        if FileExists(FFileName) then  // I1792
-          LoadFromFile(FFileName);  // Use preamble encoding
-        FLog := Text;
-      finally
-        Free;
-      end;
-    except
-      on E:Exception do
-        FLog := 'Exception '+E.Message+' trying to load '+FXMLFileName.Name+' for review';   // I4181
-    end;
-
-    LogExceptionToExternalHandler(
-      ExtractFileName(ParamStr(0))+'_'+GetVersionString+'_script_'+Self.ClassName+'_'+ErrorCode,   // I3710
-      'Error '+ErrorCode+' occurred at line '+ErrorLine+', character '+ErrorCharacter+' in '+ErrorUrl+', '+
-      FXMLFileName.Name+#13#10+'Internet Explorer Version: '+GetIEVersionString+#13#10#13#10,   // I4181
-      ErrorMessage, FLog);
-  end;
-
-  if FAborting then
-    PostMessage(Handle, WM_CLOSE, 0, 0); // I1829, dead screen when uninstalling keyboard
-  //Release;   // Disabled in I1792
-  //PostMessage(Handle,
-end;}
-
-{$MESSAGE HINT 'TODO: Support context menu'}
-{procedure TfrmWebContainer.webShowContextMenu2(Sender: TCustomEmbeddedWB;
-  const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-  const Context: IDispatch; var Result: HRESULT);
-begin
-  Result := S_OK;
-end;}
 
 procedure TfrmWebContainer.WMUser_ContentRender(var Message: TMessage);
 begin

@@ -109,7 +109,7 @@
       </Component>
 
       <Component Guid="{2a4d1b78-f11a-433f-ad19-a918c7c90e6e}">
-        <File Id="kmbrowserhost.exe" Name="kmbrowserhost.exe" KeyPath="yes">
+        <File Id="kmbrowserhost.exe" Name="kmbrowserhost.exe" KeyPath="yes" />
       </Component>
 
       <Component Guid="{B8867245-9570-4B63-B631-00F1474F71D4}">

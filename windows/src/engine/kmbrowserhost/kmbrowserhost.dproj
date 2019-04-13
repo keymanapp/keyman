@@ -108,6 +108,15 @@
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ExternalExceptionHandler.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilsystem.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

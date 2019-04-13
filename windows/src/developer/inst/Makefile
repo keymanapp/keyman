@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj templates.wixobj
 
 setup:
 
@@ -59,7 +59,6 @@ clean:
     -del /Q *.exe
     -del /Q *.wixpdb
     -del /Q xml.wxs
-    -del /Q cef.wxs
     -del /Q templates.wxs
 
 test-releaseexists:

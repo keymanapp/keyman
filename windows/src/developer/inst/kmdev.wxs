@@ -323,7 +323,6 @@
       <ComponentGroupRef Id="FontsAndRedist" />
       <ComponentGroupRef Id="AppData" />
       <ComponentGroupRef Id="XML" />
-      <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Templates" />
       
       <MergeRef Id='keymanengine' />

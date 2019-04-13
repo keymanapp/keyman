@@ -183,11 +183,10 @@ begin
     cef.OnTitleChange := cefTitleChange;
     cef.OnResizeFromDocument := cefResizeFromDocument;
   end;
-  {$MESSAGE HINT 'TODO: Support OnShowContextMenu, OnScriptError'}
+  {$MESSAGE HINT 'TODO: Support OnShowContextMenu'}
   {if web <> nil then
   begin
     web.OnShowContextMenu := webShowContextMenu;
-    web.OnScriptError := webScriptError;
   end;}
 end;
 

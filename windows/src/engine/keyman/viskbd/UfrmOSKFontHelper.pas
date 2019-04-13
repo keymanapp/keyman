@@ -167,14 +167,6 @@ begin
       Handled := True;
 end;
 
-{$MESSAGE HINT 'TODO: Handle script errors'}
-{procedure TfrmOSKFontHelper.webScriptError(Sender: TObject; ErrorLine,
-  ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
-begin
-  ScriptErrorAction := eaCancel;
-  //TODO: Log message to event log
-end;}
-
 {$MESSAGE HINT 'TODO: Support context menu'}
 {procedure TfrmOSKFontHelper.webShowContextMenu(Sender: TCustomEmbeddedWB;
   const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
