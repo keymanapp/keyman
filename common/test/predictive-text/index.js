@@ -187,10 +187,13 @@ function createAsyncWorker() {
  * Figure out the path to the model file from the command line.
  */
 function determineModelFile(program) {
+  // invoked as: predictive-text -f path/to/model.js
   if (program.modelFile) {
     return program.modelFile;
   }
 
+  // invoked as: predictive-text author.bcp47.uniq
+  // will lookup the model in using LMPATH.
   if (program.args[0]) {
     // Find the model file under the LMPath.
     let modelID = program.args[0];
@@ -199,18 +202,14 @@ function determineModelFile(program) {
 
     let LMPATH = process.env['LMPATH'];
     if (!LMPATH) {
-      console.error(`${program.name()}: Environment variable LMPATH undefined!`);
-      program.outputHelp();
-      process.exit(EXIT_USAGE);
+      usageError('Environment variable LMPATH undefined!');
     }
 
     return path.join(LMPATH, author, `${bcp47}.${uniq}`, 'build', `${modelID}.model.js`);
   }
 
-  // A model is not specified in anyway on the command line. Error out!
-  console.error(`${program.name()}: You forgot to specify a model!`);
-  program.outputHelp();
-  process.exit(EXIT_USAGE);
+  // A model is not specified in any way on the command line. Error out!
+  usageError('You did not specify a model!');
 }
 
 /**
@@ -292,6 +291,15 @@ function unindent(string) {
   let numLeadingSpaces = lines[0].match(/^ */)[0].length;
 
   return lines.map(line => line.substr(numLeadingSpaces)).join('\n');
+}
+
+/**
+ * Call to quit the program with an error due to incorrect command line usage.
+ */
+function usageError(message) {
+  console.error(`${program.name()}: ${message}\n`);
+  program.outputHelp();
+  process.exit(EXIT_USAGE);
 }
 
 /**
