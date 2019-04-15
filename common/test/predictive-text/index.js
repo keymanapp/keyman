@@ -50,7 +50,7 @@ function main() {
     .parse(process.argv);
 
   let modelFile = program.modelFile;
-  if (! modelFile) {
+  if (!modelFile) {
     console.error(`${program.name()}: You forgot to specify a model!`);
     program.outputHelp();
     process.exit(EXIT_USAGE);
@@ -134,39 +134,6 @@ function renderSuggestions(suggestions, selected) {
   process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
 }
 
-/**
- * A transform that inserts a single character.
- */
-function insertCharacter(char) {
-  return {
-    insert: char,
-    deleteLeft: 0
-  };
-}
-
-/**
- * Gets the current context from the current buffer.
- */
-function getCurrentContext() {
-  // TODO: base this on an actual buffer!
-  return {
-    left: '',
-    startOfBuffer: true,
-    endOfBuffer: true,
-  };
-}
-
-/**
- * True if the keypress looks like something that typically quits the program.
- */
-function wantsQuit(keypress) {
-  const CTRL_C = '\u0003';
-  const CTRL_D = '\u0004';
-  const CTRL_BACKSLASH = '\u001C';
-  let code = keypress.sequence;
-  return code === CTRL_C || code === CTRL_D || code === CTRL_BACKSLASH;
-}
-
 
 function createAsyncWorker() {
   // XXX: import the LMLayerWorker directly -- I know where it is built.
@@ -217,13 +184,29 @@ function createAsyncWorker() {
   return worker;
 }
 
+
+///////////////////////////////// Utilities /////////////////////////////////
+
 /**
- * For logging messages that pass between the top-level and the worker.
+ * Gets the current context from the current buffer.
  */
-function logInternalWorkerMessage(role, ...args) {
-  if (WORKER_DEBUG) {
-    console.log(`[${role}]`, ...args);
-  }
+function getCurrentContext() {
+  // TODO: base this on an actual buffer!
+  return {
+    left: '',
+    startOfBuffer: true,
+    endOfBuffer: true,
+  };
+}
+
+/**
+ * A transform that inserts a single character.
+ */
+function insertCharacter(char) {
+  return {
+    insert: char,
+    deleteLeft: 0
+  };
 }
 
 /**
@@ -257,7 +240,15 @@ function keypressesFromStdin() {
   );
 }
 
-///////////////////////////////// Utilities /////////////////////////////////
+/**
+ * Loges messages that pass between the top-level and the worker, only when
+ * WORKER_DEBUG is enabled.
+ */
+function logInternalWorkerMessage(role, ...args) {
+  if (WORKER_DEBUG) {
+    console.log(`[${role}]`, ...args);
+  }
+}
 
 /**
  * Unindents a template literal.
@@ -275,4 +266,15 @@ function unindent(string) {
   let numLeadingSpaces = lines[0].match(/^ */)[0].length;
 
   return lines.map(line => line.substr(numLeadingSpaces)).join('\n');
+}
+
+/**
+ * True if the keypress looks like something that typically quits the program.
+ */
+function wantsQuit(keypress) {
+  const CTRL_C = '\u0003';
+  const CTRL_D = '\u0004';
+  const CTRL_BACKSLASH = '\u001C';
+  let code = keypress.sequence;
+  return code === CTRL_C || code === CTRL_D || code === CTRL_BACKSLASH;
 }
