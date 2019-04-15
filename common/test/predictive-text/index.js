@@ -50,28 +50,7 @@ function main() {
     .option('-f, --model-file <file>', 'path to model file')
     .parse(process.argv);
 
-  let modelFile;
-  if (program.modelFile) {
-    modelFile = program.modelFile;
-  } else if (program.args[0]) {
-    // Find the model file under the LMPath.
-    let modelID = program.args[0];
-    let lmPath = process.env['LMPATH'];
-    let [author, bcp47, uniq] = modelID.split('.');
-
-    let LMPATH = process.env['LMPATH'];
-    if (!LMPATH) {
-      console.error(`${program.name()}: Environment variable LMPATH undefined!`);
-      program.outputHelp();
-      process.exit(EXIT_USAGE);
-    }
-
-    modelFile = path.join(LMPATH, author, `${bcp47}.${uniq}`, 'build', `${modelID}.model.js`);
-  } else{
-    console.error(`${program.name()}: You forgot to specify a model!`);
-    program.outputHelp();
-    process.exit(EXIT_USAGE);
-  }
+  let modelFile = determineModelFile(program);
 
   // Ensure we're running in the terminal
   if (!process.stdin.isTTY) {
@@ -203,6 +182,36 @@ function createAsyncWorker() {
 
 
 ///////////////////////////////// Utilities /////////////////////////////////
+
+/**
+ * Figure out the path to the model file from the command line.
+ */
+function determineModelFile(program) {
+  if (program.modelFile) {
+    return program.modelFile;
+  }
+
+  if (program.args[0]) {
+    // Find the model file under the LMPath.
+    let modelID = program.args[0];
+    let lmPath = process.env['LMPATH'];
+    let [author, bcp47, uniq] = modelID.split('.');
+
+    let LMPATH = process.env['LMPATH'];
+    if (!LMPATH) {
+      console.error(`${program.name()}: Environment variable LMPATH undefined!`);
+      program.outputHelp();
+      process.exit(EXIT_USAGE);
+    }
+
+    return path.join(LMPATH, author, `${bcp47}.${uniq}`, 'build', `${modelID}.model.js`);
+  }
+
+  // A model is not specified in anyway on the command line. Error out!
+  console.error(`${program.name()}: You forgot to specify a model!`);
+  program.outputHelp();
+  process.exit(EXIT_USAGE);
+}
 
 /**
  * Gets the current context from the current buffer.
