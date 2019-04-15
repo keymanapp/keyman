@@ -3,11 +3,11 @@
  * model.
  */
 
+const path = require('path');
 const readline = require('readline');
 
 const {EventIterator} = require('event-iterator');
 const program =  require('commander');
-
 
 // Load the most recent LMLayer code locally.
 const LMLayer = require('../../predictive-text');
@@ -44,13 +44,30 @@ function main() {
   // Command line options:
   program
     .version(require('./package.json').version)
-    .usage('-f <model-file>')
+    .usage('(-f <model-file> | <model-id>)')
     .description('CLI for trying lexical models.')
+    .arguments('[model-id]')
     .option('-f, --model-file <file>', 'path to model file')
     .parse(process.argv);
 
-  let modelFile = program.modelFile;
-  if (!modelFile) {
+  let modelFile;
+  if (program.modelFile) {
+    modelFile = program.modelFile;
+  } else if (program.args[0]) {
+    // Find the model file under the LMPath.
+    let modelID = program.args[0];
+    let lmPath = process.env['LMPATH'];
+    let [author, bcp47, uniq] = modelID.split('.');
+
+    let LMPATH = process.env['LMPATH'];
+    if (!LMPATH) {
+      console.error(`${program.name()}: Environment variable LMPATH undefined!`);
+      program.outputHelp();
+      process.exit(EXIT_USAGE);
+    }
+
+    modelFile = path.join(LMPATH, author, `${bcp47}.${uniq}`, 'build', `${modelID}.model.js`);
+  } else{
     console.error(`${program.name()}: You forgot to specify a model!`);
     program.outputHelp();
     process.exit(EXIT_USAGE);
