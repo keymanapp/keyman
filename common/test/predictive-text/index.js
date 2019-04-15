@@ -70,7 +70,9 @@ function main() {
     #  * Press ${ANSI.BOLD}<Ctrl>${ANSI.NORMAL}+${ANSI.BOLD}<C>${ANSI.NORMAL} to quit.
   `))
 
-  asyncMain(modelFile)
+  // The command line proper handles asynchronous keypresses, hence the rest
+  // must also be asynchronous.
+  asyncRepl(modelFile)
     .then(_ => process.exit(0))
     .catch(err => {
       console.error(err);
@@ -79,7 +81,9 @@ function main() {
 }
 
 
-async function asyncMain(modelFile) {
+async function asyncRepl(modelFile) {
+  let buffer = '';  // the text to predict on
+
   // Load the LMLayer and the desired model.
   let lm = new LMLayer({}, createAsyncWorker());
   let config = await lm.loadModel(modelFile);
@@ -95,11 +99,44 @@ async function asyncMain(modelFile) {
     if (wantsQuit(keypress)) {
       process.stdout.write('\n');
       process.exit(0);
-    } else {
-      process.stdout.write(char);
-      let suggestions = Array.from(await lm.predict(insertCharacter(char), getCurrentContext()));
-      renderSuggestions(suggestions, 0);
     }
+
+    // TODO: handle tab
+    // TODO: handle shift-tab
+    // TODO: handle enter
+    // TODO: handle backspace
+
+    // insert the keypress
+    process.stdout.write(char);
+    let {transform, context} = insertCharacter(char);
+    let suggestions = Array.from(await lm.predict(transform, context));
+    renderSuggestions(suggestions, 0);
+  }
+
+  // Helpers
+
+  /**
+   * Inserts a character at the end of the buffer.  Returns the transform and
+   * context of the character insert.
+   *
+   * Note: this mutates the buffer!
+   */
+  function insertCharacter(char) {
+    let oldBuffer = buffer;
+    buffer += char;
+
+    let transform = {
+      insert: char,
+      deleteLeft: 0
+    };
+
+    let context = {
+      left: oldBuffer,
+      startOfBuffer: oldBuffer.length === 0 ? true : false,
+      endOfBuffer: true,
+    };
+
+    return { transform, context };
   }
 }
 
@@ -210,28 +247,6 @@ function determineModelFile(program) {
 
   // A model is not specified in any way on the command line. Error out!
   usageError('You did not specify a model!');
-}
-
-/**
- * Gets the current context from the current buffer.
- */
-function getCurrentContext() {
-  // TODO: base this on an actual buffer!
-  return {
-    left: '',
-    startOfBuffer: true,
-    endOfBuffer: true,
-  };
-}
-
-/**
- * A transform that inserts a single character.
- */
-function insertCharacter(char) {
-  return {
-    insert: char,
-    deleteLeft: 0
-  };
 }
 
 /**
