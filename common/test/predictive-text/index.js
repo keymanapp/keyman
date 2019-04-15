@@ -104,13 +104,28 @@ async function asyncRepl(modelFile) {
     // TODO: handle tab
     // TODO: handle shift-tab
     // TODO: handle enter
-    // TODO: handle backspace
 
-    // insert the keypress
-    process.stdout.write(char);
-    let {transform, context} = insertCharacter(char);
-    let suggestions = Array.from(await lm.predict(transform, context));
-    renderSuggestions(suggestions, 0);
+    if (keypress.name === 'backspace') {
+      if (buffer.length === 0) {
+        // nothing to do if the buffer is empty
+        continue;
+      }
+
+      let oldBuffer = buffer;
+      // Remove the last character.
+      // TODO: handle surrogate pairs!
+      buffer = buffer.substr(0, buffer.length - 1);
+
+      // Redraw the line
+      process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
+      process.stdout.write(`> ${buffer}`);
+    } else {
+      // insert the keypress
+      process.stdout.write(char);
+      let {transform, context} = insertCharacter(char);
+      let suggestions = Array.from(await lm.predict(transform, context));
+      renderSuggestions(suggestions, 0);
+    }
   }
 
   // Helpers
