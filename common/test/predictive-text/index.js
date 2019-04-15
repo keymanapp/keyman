@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Implements a simple CLI for interactively testing the given predictive text
  * model.
