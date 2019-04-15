@@ -102,10 +102,32 @@ async function asyncRepl(modelFile) {
       process.exit(0);
     }
 
-    // TODO: handle tab
-    // TODO: handle shift-tab
-    // TODO: handle enter
-    if (keypress.name === 'return') {
+    if (keypress.name === 'tab') {
+      let n = suggestions.length;
+      if (n === 0) {
+        // nothing to select.
+        selectedSuggestionIndex = null;
+        continue;
+      }
+
+      if (keypress.shift === false) {
+        // Select the next suggestion.
+        selectedSuggestionIndex = (selectedSuggestionIndex + 1) % n;
+      } else {
+        // Select the previous suggestion.
+
+        // Note that JavaScript's modulous operator is annoying with negative
+        // numbers, so use an if statement to handle wrapping.
+        selectedSuggestionIndex = selectedSuggestionIndex - 1;
+        // Wrap around to the end.
+        if (selectedSuggestionIndex < 0) {
+          selectedSuggestionIndex = n - 1;
+        }
+      }
+
+      renderSuggestions(suggestions, selectedSuggestionIndex);
+
+    } else if (keypress.name === 'return') {
       // Accept the currently selected
       let acceptedSuggestion = suggestions[selectedSuggestionIndex];
 
@@ -130,6 +152,7 @@ async function asyncRepl(modelFile) {
       process.stdout.write(`> ${buffer}`);
 
       // TODO: ask for suggestions again.
+
     } else if (keypress.name === 'backspace') {
       if (buffer.length === 0) {
         // nothing to do if the buffer is empty
@@ -201,7 +224,7 @@ function renderSuggestions(suggestions, selected) {
         if (index === selected) {
           return `${ANSI.REVERSE_VIDEO}[${displayAs}]${ANSI.NORMAL_VIDEO}`;
         }
-        return `[ ${displayAs} ]`
+        return `[${displayAs}]`
       }).join(' ');
     process.stdout.write(line);
   }
