@@ -6,12 +6,17 @@
 const readline = require('readline');
 
 const {EventIterator} = require('event-iterator');
+const program =  require('commander');
 
 
 // Load the most recent LMLayer code locally.
 const LMLayer = require('../../predictive-text');
 
+
+///////////////////////////////// Constants /////////////////////////////////
+
 const WORKER_DEBUG = false;
+const EXIT_USAGE = 1;
 
 /** "Control sequence introducer" for ANSI escape codes: */
 const CSI = '\033[';
@@ -30,16 +35,46 @@ const ANSI = {
   NORMAL: CSI + 'm', // Set all graphics renditions attributes off.
 };
 
-// Do it!
+
+//////////////////////////////////// main ////////////////////////////////////
+
 main();
 
 function main() {
+  // Command line options:
+  program
+    .version(require('./package.json').version)
+    .usage('-f <model-file>')
+    .description('CLI for trying lexical models.')
+    .option('-f, --model-file <file>', 'path to model file')
+    .parse(process.argv);
+
+  let modelFile = program.modelFile;
+  if (! modelFile) {
+    console.error(`${program.name()}: You forgot to specify a model!`);
+    program.outputHelp();
+    process.exit(EXIT_USAGE);
+  }
+
   // Ensure we're running in the terminal
   if (!process.stdin.isTTY) {
     throw new Error('must be run from interactive terminal');
   }
 
-  asyncMain()
+  // Show a quick "how-to" message.
+  console.log(unindent(`
+    # Testing ${modelFile}
+    #
+    # Type text in the model's language. Suggestions will appear automatically.
+    #
+    #  * Press ${ANSI.BOLD}<Tab>${ANSI.NORMAL} to select a suggestion.
+    #  * Press ${ANSI.BOLD}<Tab>${ANSI.NORMAL} again to select the next suggestion.
+    #  * Press ${ANSI.BOLD}<Shift>${ANSI.NORMAL}+${ANSI.BOLD}<Tab>${ANSI.NORMAL} to select the previous suggestion.
+    #  * Press ${ANSI.BOLD}<Enter>${ANSI.NORMAL} to accept the suggestion.
+    #  * Press ${ANSI.BOLD}<Ctrl>${ANSI.NORMAL}+${ANSI.BOLD}<C>${ANSI.NORMAL} to quit.
+  `))
+
+  asyncMain(modelFile)
     .then(_ => process.exit(0))
     .catch(err => {
       console.error(err);
@@ -48,10 +83,10 @@ function main() {
 }
 
 
-async function asyncMain() {
+async function asyncMain(modelFile) {
   // Load the LMLayer and the desired model.
   let lm = new LMLayer({}, createAsyncWorker());
-  let config = await lm.loadModel('./example.crk.wordlist_wahkohtowin.model.js');
+  let config = await lm.loadModel(modelFile);
 
   // Setup the REPL
   // > type some text
@@ -220,4 +255,24 @@ function keypressesFromStdin() {
       stream.on('error', fail);
     }
   );
+}
+
+///////////////////////////////// Utilities /////////////////////////////////
+
+/**
+ * Unindents a template literal.
+ */
+function unindent(string) {
+  let lines = string.split('\n');
+  // Remove empty lines from the top and bottom.
+  if (lines[0] === '') {
+    lines.shift();
+  }
+  if (lines[lines.length -1] === '') {
+    lines.pop();
+  }
+
+  let numLeadingSpaces = lines[0].match(/^ */)[0].length;
+
+  return lines.map(line => line.substr(numLeadingSpaces)).join('\n');
 }

@@ -1,6 +1,6 @@
 {
   "name": "lmlayer-cli",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Command line interface to the predictive text engine.",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
   "license": "MIT",
   "dependencies": {
+    "commander": "^2.20.0",
     "event-iterator": "^1.2.0"
   }
 }
