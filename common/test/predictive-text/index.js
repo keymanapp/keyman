@@ -82,8 +82,6 @@ function main() {
 
 
 async function asyncRepl(modelFile) {
-  let buffer = '';  // the text to predict on
-
   // Load the LMLayer and the desired model.
   let lm = new LMLayer({}, createAsyncWorker());
   let config = await lm.loadModel(modelFile);
@@ -91,6 +89,9 @@ async function asyncRepl(modelFile) {
   // Setup the REPL
   // > type some text
   // [suggestions] [appear] [here] (press tab to accept)
+  let buffer = '';  // the text to predict on
+  let suggestions = [];
+  let selectedSuggestionIndex = 0;  // which suggestion is currently suggested
 
   // Initial line:
   process.stdout.write(`> `);
@@ -104,8 +105,32 @@ async function asyncRepl(modelFile) {
     // TODO: handle tab
     // TODO: handle shift-tab
     // TODO: handle enter
+    if (keypress.name === 'return') {
+      // Accept the currently selected
+      let acceptedSuggestion = suggestions[selectedSuggestionIndex];
 
-    if (keypress.name === 'backspace') {
+      if (!acceptedSuggestion) {
+        // There's no suggestion to insert!
+        continue;
+      }
+
+      let oldBuffer = buffer;
+      let transform = acceptedSuggestion.transform;
+
+      // TODO: Handle deleteLeft from the buffer!
+      buffer = buffer += transform.insert;
+      let context = {
+        left: oldBuffer,
+        startOfBuffer: oldBuffer.length === 0 ? true : false,
+        endOfBuffer: true,
+      }
+
+      // Redraw the line
+      process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
+      process.stdout.write(`> ${buffer}`);
+
+      // TODO: ask for suggestions again.
+    } else if (keypress.name === 'backspace') {
       if (buffer.length === 0) {
         // nothing to do if the buffer is empty
         continue;
@@ -119,12 +144,14 @@ async function asyncRepl(modelFile) {
       // Redraw the line
       process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
       process.stdout.write(`> ${buffer}`);
+
+      // TODO: ask for suggestions again?
     } else {
       // insert the keypress
       process.stdout.write(char);
       let {transform, context} = insertCharacter(char);
-      let suggestions = Array.from(await lm.predict(transform, context));
-      renderSuggestions(suggestions, 0);
+      suggestions = Array.from(await lm.predict(transform, context));
+      renderSuggestions(suggestions, selectedSuggestionIndex);
     }
   }
 
