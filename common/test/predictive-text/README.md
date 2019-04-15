@@ -1,4 +1,4 @@
-Predictive Text testing CLI
+Predictive text testing CLI
 ---------------------------
 
 Provides a command line interface to try out predictive text models.
@@ -10,31 +10,49 @@ Install
 
 Install dependencies with `npm`:
 
-    npm install 
+    npm install
 
 Usage
 -----
 
 Start it like so:
 
-    $ node .
+    $ node . -f path/to/model.js
 
 You will be presented with a prompt. Type any phrase in the model's
-language. Press <kbd>Tab</kbd> to start choosing a prediction. Press the
-left and right arrow keys to go through suggestions. Press
-<kbd>Enter</kbd> to select the given suggestion. Press <kbd>Esc</kbd>.
+language.
 
-Press <kbd>Ctrl</kbd>+D or <kbd>Ctrl</kbd>+C to quit.
+ * Press <kbd>Tab</kbd> to start selecting a suggestion.
+ * Press <kbd>Tab</kbd> again to select the next suggestion.
+ * Press <kbd>Shift</kbd>+<kbd>Tab</kbd> to select the previous suggestion.
+ * Press <kbd>Enter</kbd> to accept the selected suggestion.
+ * Press <kbd>Ctrl</kbd>+C or <kbd>Ctrl</kbd>+D to quit.
 
     > He
     [ Hello ] [ Hey ] [ He he ]
 
+Defining the `LMPATH` environment variable
+------------------------------------------
 
-ROADMAP
--------
+You can also load models by their model ID. For example,
 
- * The command line interface!
- * \-f _filename_ to load a model from a file
- * `LMPATH` environment variable to load a named model by id: e.g,.
-   `node . example.crk.wordlist` will load the given model,
-   provided `LMPATH` is defined.
+   $ node . example.en.model
+
+For this to work, you need to define the `LMPATH` environment variable.
+The CLI will search the directory specified in `LMPATH` to find the
+particular model.
+
+For example, say you have
+[lexical-models](https://github.com/keymanapp/lexical-models) cloned in
+your home directory. To be able to access any of the `release` build
+lexical models, export the `LMPATH` variable as follows:
+
+```sh
+export LMPATH="${HOME}/lexical-models/release"
+```
+
+This line usually goes in your shell startup file, e.g., `~/.bashrc`,
+`~/.bash_profile`, or `~/.zshrc`, etc.
+
+Then, any lexical model built in `~/lexical-models/release` can be used
+in the command line interface.
