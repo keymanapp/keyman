@@ -92,7 +92,7 @@ async function asyncRepl(modelFile) {
   // > type some text
   let buffer = '';  // the text to predict on
   let suggestions = [];
-  let selectedSuggestionIndex = 0;  // which suggestion is currently suggested
+  let selectedSuggestionIndex = null;  // which suggestion is currently suggested
 
   // Draw the prompt for the first time.
   redrawPrompt();
@@ -108,6 +108,13 @@ async function asyncRepl(modelFile) {
       if (n === 0) {
         // nothing to select.
         selectedSuggestionIndex = null;
+        continue;
+      }
+
+      // Nothing selected, but there are suggestions -- then select the first
+      // one!
+      if (selectedSuggestionIndex === null) {
+        selectedSuggestionIndex = 0;
         continue;
       }
 
@@ -127,7 +134,6 @@ async function asyncRepl(modelFile) {
       }
 
       renderSuggestions(suggestions, selectedSuggestionIndex);
-
     } else if (keypress.name === 'return') {
       // Accept the currently selected
       let acceptedSuggestion = suggestions[selectedSuggestionIndex];
