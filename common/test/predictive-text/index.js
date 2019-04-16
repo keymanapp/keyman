@@ -138,11 +138,7 @@ async function asyncRepl(modelFile) {
       }
 
       applyTransformToActiveBuffer(acceptedSuggestion.transform);
-
-      // Redraw the line
-      process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
-      process.stdout.write(`> ${buffer}`);
-
+      redrawPrompt();
       // TODO: ask for suggestions again.
 
     } else if (keypress.name === 'backspace') {
@@ -170,6 +166,16 @@ async function asyncRepl(modelFile) {
   }
 
   // Helpers
+
+  /**
+   * Draws the prompt, clearing what was on the screen.
+   */
+  function redrawPrompt() {
+    // Erases the ENTIRE line, returning to the beginning of the line.
+    process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
+    // Write the buffer!
+    process.stdout.write(`> ${buffer}`);
+  }
 
   /**
    * Inserts a character at the end of the buffer.  Returns the transform and
@@ -203,7 +209,6 @@ async function asyncRepl(modelFile) {
     let lastIndex = buffer.length - 1;
     // When the last character is a low surrogate (0xDC00-0xDFFF), this means
     // we have a surrogate pair! We must delete two 16-bit code units.
-    console.log({ buffer });
     if ('\uDC00' <= buffer[lastIndex] && buffer[lastIndex] <= '\uDFFF') {
       console.assert('\uD800'  <= buffer[lastIndex - 1] && buffer[lastIndex - 1] <= '\uDBFF');
       lastIndex = lastIndex - 1;
