@@ -130,10 +130,11 @@ namespace com.keyman.osk {
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
+    let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(bannerHeight+oskHeight+3)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
@@ -352,11 +353,20 @@ namespace com.keyman.text {
   };
 
   /**
+   * Register a lexical model
+   * 
+   * @param {com.keyman.text.prediction.ModelSpec} model  Spec of the lexical model
+   */
+  keymanweb['registerModel']=function(model: com.keyman.text.prediction.ModelSpec) {
+    keymanweb.modelManager.register(model);
+  };
+
+  /**
    * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
    * 
    *  @param  {boolean}  isVisible
    *     
-   **/                
+   **/
   keymanweb['popupVisible'] = function(isVisible)
   {
     osk.vkbd.popupVisible = isVisible;

@@ -10,6 +10,7 @@
   <script src="keyman.js"></script>
   <script type="text/javascript">
     var device = window.jsInterface.getDeviceType();
+    var bannerHeight = window.jsInterface.getBannerHeight();
     var oskHeight = window.jsInterface.getKeyboardHeight();
     var oskWidth = 0;
     window.addEventListener('load', init, false);
@@ -18,18 +19,20 @@
       //document.body.style.backgroundColor="transparent";
       //window.console.log('Device type = '+device);
       //window.console.log('Keyboard height = '+oskHeight);
-      var kmw=window['keyman'];
+      var kmw=com.keyman.singleton;
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
       kmw['showKeyboardList'] = showMenu;
       kmw['hideKeyboard'] = hideKeyboard;
+      kmw['getBannerHeight'] = getBannerHeight;
       kmw['getOskHeight'] = getOskHeight;
       kmw['getOskWidth'] = getOskWidth;
       kmw['beepKeyboard'] = beepKeyboard;
       var ta = document.getElementById('ta');
       kmw['setActiveElement'](ta);
 
+      setBanner('blank');
       ta.readOnly = false;
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
@@ -42,6 +45,11 @@
       }
       var kmw=window['keyman'];
       kmw['correctOSKTextSize']();
+      window.console.log('Embedded done with correctOSKTextSize');
+    }
+
+    function getBannerHeight() {
+      return bannerHeight;
     }
 
     function setOskWidth(w) {
@@ -51,6 +59,7 @@
     }
 
     function getOskHeight() {
+      window.console.log('Embedded getOskHeight: '+oskHeight);
       return oskHeight;
     }
 
@@ -124,6 +133,21 @@
     function insertText(dn, s) {
       //window.console.log('insertText('+ dn +', ' + s +');');
       window.jsInterface.insertText(dn, s);
+
+      // TODO: Remove for production: Testing
+      var kmw=com.keyman.singleton;
+      if (s == 'b') {
+        setBanner('blank');
+      } else if (s == 's') {
+        setBanner('suggestion');
+        kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'insertAlpha'}, {displayAs: 'insertBeta'}, {displayAs: 'insertCharlie'}]);
+      }
+    }
+
+    function registerModel(model) {
+      var kmw=window['keyman'];
+      window.console.log('model: ' + model);
+      kmw.registerModel(model);
     }
 
     function resetContext() {
@@ -199,6 +223,28 @@
     function hideKeyboard() {
       fragmentToggle = (fragmentToggle + 1) % 100;
       window.location.hash = 'hideKeyboard' + fragmentToggle;
+    }
+
+    function setBanner(bannerType) {
+      var kmw = com.keyman.singleton;
+      var banner = kmw.osk.banner;
+      if (bannerType == 'blank') {
+        banner.setOptions({
+          'persistentBanner': false,
+          'enablePredictions': false
+        });
+        banner.setBanner('blank');
+      } else if (bannerType == 'suggestion') {
+        banner.setOptions({
+          'persistentBanner': true,
+          'enablePredictions': true
+        });
+        banner.setBanner('suggestion', bannerHeight);
+
+        // TODO: Remove for production. For testing integration of suggestion banner
+        window.console.log('Embedded setBanner to ' + bannerHeight);
+        kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
+      }
     }
 
     function showHelpBubble() {

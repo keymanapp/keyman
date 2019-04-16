@@ -190,7 +190,7 @@ namespace com.keyman.dom {
         var n = start.node.ownerDocument.createTextNode(s);
 
         let range = this.root.ownerDocument.createRange();
-        range.setStart(start.node, s.length);
+        range.setStart(start.node, start.offset);
         range.collapse(true);
         range.insertNode(n);
       }
@@ -206,6 +206,36 @@ namespace com.keyman.dom {
         Lsel.addRange(finalCaret);
       }
       Lsel.collapseToEnd();
+    }
+
+    protected setTextAfterCaret(s: string) {
+      if(!this.hasSelection()) {
+        return;
+      }
+
+      let caret = this.getCarets().end;
+      let delta = s._kmwLength();
+      let Lsel = this.root.ownerDocument.getSelection();
+
+      if(delta == 0) {
+        return;
+      }
+
+      // This is designed explicitly for use in direct-setting operations; deadkeys
+      // will be handled after this method.
+
+      if(caret.node.nodeType == 3) {
+        let textStart = <Text> caret.node;
+        textStart.replaceData(caret.offset, textStart.length, s);
+      } else {
+        // Create a new text node - empty control
+        var n = caret.node.ownerDocument.createTextNode(s);
+
+        let range = this.root.ownerDocument.createRange();
+        range.setStart(caret.node, caret.offset);
+        range.collapse(true);
+        range.insertNode(n);
+      }
     }
   }
 }

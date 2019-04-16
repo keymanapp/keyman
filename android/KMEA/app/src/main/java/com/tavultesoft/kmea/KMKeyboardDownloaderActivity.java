@@ -367,10 +367,16 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
           if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
             File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-            // TODO: Propogate installedLexicalModels to KMW
             List<Map<String, String>> installedLexicalModels =
               kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+
+            boolean success = installedLexicalModels.size() != 0;
+            if (success) {
+              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                installedLexicalModels, 1);
+            }
           }
+
         }
         if (result < 0) {
           if (FileUtils.hasFontExtension(url)) {
@@ -405,6 +411,19 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         if (oskFont != null)
           keyboardInfo.put(KMManager.KMKey_OskFont, oskFont);
         KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboardInfo, result);
+      }
+    }
+
+    /**
+     * Notify listeners when a lexical model is installed
+     * @param eventType
+     * @param models
+     * @param result
+     */
+    protected void notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType eventType,
+      List<Map<String, String>> models, int result) {
+      if (kbDownloadEventListeners != null) {
+        KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, models, result);
       }
     }
   }

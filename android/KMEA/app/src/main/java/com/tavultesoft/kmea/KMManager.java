@@ -57,6 +57,8 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class KMManager {
@@ -102,6 +104,7 @@ public final class KMManager {
   protected static boolean SystemKeyboardShouldIgnoreSelectionChange = false;
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
+  protected static String currentBanner = "blank";
 
   // Keyman public keys
   public static final String KMKey_ID = "id";
@@ -154,6 +157,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
+  public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
 
   private static Context appContext;
 
@@ -231,12 +235,18 @@ public final class KMManager {
     return false;
   }
 
+  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+    int bannerHeight = currentBanner.equals("suggestion") ? getBannerHeight(appContext) : 0;
+    int kbHeight = getKeyboardHeight(appContext);
+    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
+    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+   return params;
+  }
+
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
-      int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
-      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -248,10 +258,8 @@ public final class KMManager {
 
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
-      int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
-      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
@@ -647,6 +655,46 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
+  public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
+    String pkgID = lexicalModelInfo.get(KMKey_PackageID);
+    String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
+    String languageID = lexicalModelInfo.get(KMKey_LanguageID);
+    String path = "file://" + getLexicalModelsDir() + pkgID + File.separator + modelID + ".model.js";
+
+    JSONObject modelObj = new JSONObject();
+    JSONArray languageJSONArray = new JSONArray();
+    try {
+      modelObj.put("id", modelID);
+      languageJSONArray.put(languageID);
+      modelObj.put("languages", languageJSONArray);
+      modelObj.put("path", path);
+    } catch (JSONException e) {
+      Log.e(TAG, "Invalid lexical model to register");
+      return false;
+    }
+
+    // Escape single quotes, and then convert double quotes to single quotes for javascript call
+    String model = String.valueOf(modelObj);
+    model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+    model = model.replaceAll("\"", "'");
+
+    currentBanner = "suggestion";
+    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+      InAppKeyboard.setLayoutParams(params);
+      InAppKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+      SystemKeyboard.setLayoutParams(params);
+      SystemKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+    }
+    return true;
+  }
+
+  public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+    return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
+  }
+
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
     // Log Firebase analytic event.
     Bundle params = new Bundle();
@@ -899,6 +947,10 @@ public final class KMManager {
   public static void removeKeyboardEventListener(OnKeyboardEventListener listener) {
     KMTextView.removeOnKeyboardEventListener(listener);
     KMKeyboard.removeOnKeyboardEventListener(listener);
+  }
+
+  public static int getBannerHeight(Context context) {
+    return (int) context.getResources().getDimension(R.dimen.banner_height);
   }
 
   public static int getKeyboardHeight(Context context) {

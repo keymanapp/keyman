@@ -1,4 +1,6 @@
 ///<reference path="visualKeyboard.ts" />
+///<reference path="../dom/uiTouchHandlerBase.ts" />
+
 namespace com.keyman.osk {
   // Base class for a banner above the keyboard in the OSK
 
@@ -6,7 +8,9 @@ namespace com.keyman.osk {
     private _height: number; // pixels
     private div: HTMLDivElement;
 
-    public static DEFAULT_HEIGHT: number = 40; // pixels
+    public static readonly DEFAULT_HEIGHT: number = 40; // pixels
+    public static readonly BANNER_CLASS: string = 'kmw-banner-bar';
+    public static readonly BANNER_ID: string = 'kmw-banner-bar';
 
     /**
      * Function     height
@@ -58,8 +62,8 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
 
       let d = util._CreateElement('div');
-      d.id = "keymanweb_banner_bar";
-      d.className = "kmw-banner-bar";
+      d.id = Banner.BANNER_ID;
+      d.className = Banner.BANNER_CLASS;
       this.div = d;
 
       this.height = height;
@@ -135,31 +139,59 @@ namespace com.keyman.osk {
     }
   }
 
-  export class BannerSuggestionSpec {
-    id: string;
-    languageID: string;
-    text?: string;
-    width: number;
-    pad?: string;
-    widthpc?: number; // Added during OSK construction.
-    padpc?: number; // Added during OSK construction.
-
-    public DEFAULT_SUGGESTION_WIDTH: number = 50; // pixels
-
-    constructor(id: string, languageID: string, text?: string, width?: number, pad?: string) {
-      this.id = id;
-      this.languageID = languageID;
-      this.text = text;
-      this.width = width ? width : this.DEFAULT_SUGGESTION_WIDTH;
-      this.pad = pad;
-    }
-  }
-
   export class BannerSuggestion {
-    spec: BannerSuggestionSpec;
+    div: HTMLDivElement;
+    private display: HTMLSpanElement;
+    private fontFamily?: string;
 
-    constructor(spec: BannerSuggestionSpec) {
-      this.spec = spec;
+    private suggestion: Suggestion;
+
+    private index: number;
+
+    static readonly BASE_ID = 'kmw-suggestion-';
+
+    constructor(index: number) {
+      let keyman = com.keyman.singleton;
+
+      this.index = index;
+
+      this.constructRoot();
+
+      // Provides an empty, base SPAN for text display.  We'll swap these out regularly;
+      // `Suggestion`s will have varying length and may need different styling.
+      let display = this.display = keyman.util._CreateElement('span');
+      this.div.appendChild(display);
+    }
+
+    private constructRoot() {
+      let keyman = com.keyman.singleton;
+
+      // Add OSK suggestion labels
+      let div = this.div = keyman.util._CreateElement('div'), ds=div.style;
+      div.className = "kmw-suggest-option";
+      div.id = BannerSuggestion.BASE_ID + this.index;
+
+      let kbdDetails = keyman.keyboardManager.activeStub;
+      if(kbdDetails) {  
+        if (kbdDetails['KLC']) {
+          div.lang = kbdDetails['KLC'];
+        }
+
+        // Establish base font settings
+        let font = kbdDetails['KFont'];
+        if(font && font.family && font.family != '') {
+          ds.fontFamily = this.fontFamily = font.family;
+        }
+      }
+
+      // Ensures that a reasonable width % is set.
+      let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.SUGGESTION_LIMIT + 1);
+      let widthpc = usableWidth / SuggestionBanner.SUGGESTION_LIMIT;
+
+      ds.width = widthpc + '%';
+      ds.marginLeft = SuggestionBanner.MARGIN + '%';
+
+      this.div['suggestion'] = this;
     }
 
     /**
@@ -168,9 +200,51 @@ namespace com.keyman.osk {
      * @param {Suggestion} suggestion   Suggestion from the lexical model
      * Description  Update the ID and text of the BannerSuggestionSpec
      */
-    public update(id: string, suggestion: Suggestion) {
-      this.spec.id = id;
-      this.spec.text = suggestion.displayAs;
+    public update(suggestion: Suggestion) {
+      this.suggestion = suggestion;
+      this.updateText();
+    }
+
+    private updateText() {
+      let display = this.generateSuggestionText();
+      this.div.replaceChild(display, this.display);
+      this.display = display;
+    }
+
+    /**
+     * Function apply
+     * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
+     * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
+     */
+    public apply(target?: text.OutputTarget) {
+      let keyman = com.keyman.singleton;
+
+      if(this.isEmpty()) {
+        return;
+      }
+      
+      // Find the state of the context at the time the prediction-triggering keystroke was applied.
+      let original = keyman.modelManager.getPredictionState(this.suggestion.transformId);
+      if(!original) {
+        console.warn("Could not apply the Suggestion!");
+        return;
+      } else {
+        if(!target) {
+          /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
+           * everything if/when the active `OutputTarget` changes, though we haven't gotten that 
+           * far in implementation yet.
+           */
+          target = text.Processor.getOutputTarget();
+        }
+
+        // Apply the Suggestion!
+        target.restoreTo(original.preInput);
+        target.apply(this.suggestion.transform);
+      }
+    }
+
+    public isEmpty(): boolean {
+      return !this.suggestion;
     }
 
     /**
@@ -180,39 +254,23 @@ namespace com.keyman.osk {
      */
     //
     public generateSuggestionText(): HTMLSpanElement {
-      let util = (<KeymanBase>window['keyman']).util;
-      let spec = this.spec;
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
 
-      // Add OSK suggestion labels
+      let suggestion = this.suggestion;
       var suggestionText: string;
-      var t=util._CreateElement('span'), ts=t.style;
-      t.id = spec.id;
-      t.className = "kmw-suggestion-span";
-      if(spec.text == null || spec.text == '') {
+
+      var s=util._CreateElement('span');
+      s.className = 'kmw-suggestion-text';
+
+      if(suggestion == null) {
+        return s;
+      }
+
+      if(suggestion.displayAs == null || suggestion.displayAs == '') {
         suggestionText = '\xa0';  // default:  nbsp.
       } else {
-        suggestionText = spec.text;
-      }
-
-      if (this.spec.languageID) {
-        t.lang = this.spec.languageID;
-      }
-
-      //Override font spec if set for this key in the layout
-      if(typeof spec['font'] == 'string' && spec['font'] != '') {
-        ts.fontFamily=spec['font'];
-      }
-
-      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
-        ts.fontSize=spec['fontsize'];
-      }
-
-      let device = util.device;
-      let oskManager = com.keyman.singleton.osk;
-      if (device.formFactor != 'desktop') {
-        ts.width = Math.floor(oskManager.getWidth() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
-      } else {
-        ts.width = Math.floor(oskManager.getWidthFromCookie() / SuggestionBanner.SUGGESTION_LIMIT) + 'px';
+        suggestionText = suggestion.displayAs;
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
@@ -221,45 +279,155 @@ namespace com.keyman.osk {
         suggestionText = '\u200f' + suggestionText;
       }
 
-      // Finalize the suggestion text
-      var d=util._CreateElement('div'), ds=d.style;
-      d.className = 'kmw-suggestion-text';
-      d.innerHTML = suggestionText;
-      t.appendChild(d);
+      // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
-      return t;
+      if(keyman.isEmbedded && keyman.util.device.OS == 'Android') {
+        // TODO: Investigate the factor of "48"
+
+        let ss = s.style;
+        let oskManager = keyman.osk;
+        ss.top = oskManager.getBannerHeight() - 48 + 'px';
+      }
+
+      // Finalize the suggestion text
+      s.innerHTML = suggestionText;
+      return s;
+    }
+  }
+
+  class SuggestionTouchManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+    findTargetFrom(e: HTMLElement): HTMLDivElement {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      try {
+        if(e) {
+          if(util.hasClass(e,'kmw-suggest-option')) {
+            return e as HTMLDivElement;
+          }
+          if(e.parentNode && util.hasClass(<HTMLElement> e.parentNode,'kmw-suggest-option')) {
+            return e.parentNode as HTMLDivElement;
+          }
+          // if(e.firstChild && util.hasClass(<HTMLElement> e.firstChild,'kmw-suggest-option')) {
+          //   return e.firstChild as HTMLDivElement;
+          // }
+        }
+      } catch(ex) {}
+      return null;
+    }
+
+    protected highlight(t: HTMLDivElement, on: boolean): void {
+      let classes = t.className;
+      let cs = ' ' + SuggestionBanner.TOUCHED_CLASS;
+
+      if(t.id.indexOf(BannerSuggestion.BASE_ID) == -1) {
+        console.warn("Cannot find BannerSuggestion object for element to highlight!");
+      } else {
+        // Never highlight an empty suggestion button.
+        let suggestion = t['suggestion'] as BannerSuggestion;
+        if(suggestion.isEmpty()) {
+          on = false;
+        }
+      }
+
+      if(on && classes.indexOf(cs) < 0) {
+        t.className=classes+cs;
+      } else {
+        t.className=classes.replace(cs,'');
+      }
+    }
+
+    protected select(t: HTMLDivElement): void {
+      let suggestion = t['suggestion'] as BannerSuggestion;
+      suggestion.apply();
+    }
+
+    //#region Long-press support
+    protected hold(t: HTMLDivElement): void {
+      // Temp, pending implementation of suggestion longpress submenus
+      // - nothing worth doing with a hold yet -
+    }
+    protected clearHolds(): void {
+      // Temp, pending implementation of suggestion longpress submenus
+      // - nothing to clear without them -
+    }
+    protected hasModalPopup(): boolean {
+      // Temp, pending implementation of suggestion longpress submenus
+      return false;
+    }
+    protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {
+      return target;
+    }
+    protected hasSubmenu(t: HTMLDivElement): boolean {
+      // Temp, pending implementation of suggestion longpress submenus:
+      return false;
+    }
+    protected isSubmenuActive(): boolean {
+      // Temp, pending implementation of suggestion longpress submenus:
+      return false;
+    }
+    protected displaySubmenuFor(target: HTMLDivElement) {
+      throw new Error("Method not implemented.");
+    }
+    //#endregion
+
+    constructor(div: HTMLElement) {
+      // TODO:  Determine appropriate CSS styling names, etc.
+      super(div, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
     }
   }
 
   /**
    * Function     SuggestionBanner
    * Scope        Public
+   * @param {number} height - If provided, the height of the banner in pixels
    * Description  Display lexical model suggestions in the banner
    */
   export class SuggestionBanner extends Banner {
-    public static SUGGESTION_LIMIT: number = 3;
-    private suggestionList : BannerSuggestion[];
+    public static readonly SUGGESTION_LIMIT: number = 3;
+    public static readonly MARGIN = 1;
 
-    constructor() {
-      super(SuggestionBanner.DEFAULT_HEIGHT);
+    private suggestionList : BannerSuggestion[];
+    private currentSuggestions: Suggestion[] = [];
+
+    private touchHandler: SuggestionTouchManager;
+
+    static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
+
+    constructor(height?: number) {
+      super(height || SuggestionBanner.DEFAULT_HEIGHT);
+
       this.suggestionList = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-        let s = new BannerSuggestionSpec('kmw-suggestion-' + i, 'en', '', 33, ' ');
-        let d = new BannerSuggestion(s);
+        let d = new BannerSuggestion(i);
         this.suggestionList[i] = d;
-        this.getDiv().appendChild(d.generateSuggestionText());
+        this.getDiv().appendChild(d.div);
       }
+
+      this.setupTouchHandling();
     }
 
-    public static BLANK_SUGGESTION(): Suggestion {
-      let s: Suggestion = {
-        displayAs: '',
-        transform: {
-          insert: '', deleteLeft: 0, deleteRight: 0
-        }
-      };
-      return s;
-    };
+    private setupTouchHandling() {
+      let keyman = com.keyman.singleton;
+      let div = this.getDiv();
+
+      let th = this.touchHandler = new SuggestionTouchManager(div);
+
+      if(keyman.util.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
+        // Not to mention, it's rather redundant.
+        div.addEventListener('touchstart', function(e: TouchEvent) {
+          th.touchStart(e);
+        }, true);
+        // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
+        div.addEventListener('touchend', function(e: TouchEvent) {
+          th.touchEnd(e);
+        }, true); 
+        div.addEventListener('touchmove', function(e: TouchEvent) {
+          th.touchMove(e);
+        }, false);
+        //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
+      }
+    }
 
     /**
      * Function invalidateSuggestions
@@ -268,11 +436,8 @@ namespace com.keyman.osk {
      */
     public invalidateSuggestions: (this: SuggestionBanner) => boolean = 
         function(this: SuggestionBanner) {
-      this.suggestionList.forEach((suggestion, i) => {
-        this.suggestionList[i].update('kmw-suggestion-'+i, 
-          SuggestionBanner.BLANK_SUGGESTION());
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
-          this.getDiv().childNodes.item(i));
+      this.suggestionList.forEach((option: BannerSuggestion) => {
+        option.update(null);
       });
     }.bind(this);
 
@@ -284,10 +449,14 @@ namespace com.keyman.osk {
      */
     public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean =
         function(this: SuggestionBanner, suggestions: Suggestion[]) {
-      this.suggestionList.forEach((suggestion, i) => {
-        this.suggestionList[i].update('kmw-suggestion-'+i, suggestions[i]);
-        this.getDiv().replaceChild(suggestion.generateSuggestionText(), 
-          this.getDiv().childNodes.item(i));
+      this.currentSuggestions = suggestions;
+      
+      this.suggestionList.forEach((option: BannerSuggestion, i: number) => {
+        if(i < suggestions.length) {
+          option.update(suggestions[i]);
+        } else {
+          option.update(null);
+        }
       });
     }.bind(this);
   }

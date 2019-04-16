@@ -635,10 +635,9 @@ namespace com.keyman.osk {
     deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
-      let bannerHeight = oskManager.banner.height;
       let rowsPercent = 100;
 
-      var lDiv=util._CreateElement('div'), ls=lDiv.style, actualHeight=0;
+      var lDiv=util._CreateElement('div'), ls=lDiv.style, totalHeight=0;
 
       // Set OSK box default style
       lDiv.className='kmw-key-layer-group';
@@ -647,9 +646,9 @@ namespace com.keyman.osk {
       switch(formFactor) {
         case 'phone':
         case 'tablet':
-          actualHeight=oskManager.getHeight();
-          ls.height=actualHeight+'px';
-          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/actualHeight );
+          totalHeight=oskManager.getHeight();
+          ls.height=totalHeight+'px';
+          rowsPercent = Math.round(100*oskManager.getKeyboardHeight()/totalHeight );
           break;
       }
 
@@ -886,7 +885,6 @@ namespace com.keyman.osk {
         } else {
           // If this key has subkey, start timer to display subkeys after delay, set up release
           this.touchHold(key);
-          //if(key.subKeys != null) this.subkeyDelayTimer=window.setTimeout(function(){this.showSubKeys(key);},this.popupDelay);
         }
         this.keyPending = key;
       }
@@ -993,7 +991,7 @@ namespace com.keyman.osk {
       var t = e.changedTouches[0],
           t1 = <HTMLElement> document.elementFromPoint(x,y),
           key0 = this.keyPending,
-          key1 = this.keyTarget(t1);
+          key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
 
       // Find the nearest key to the touch point if not on a visible key
       if((key1 && key1.className.indexOf('key-hidden') >= 0) ||
@@ -1032,8 +1030,9 @@ namespace com.keyman.osk {
         return;
       }
 
-      // Use the popup duplicate of the base key if a phone with a visible popup array
       var sk=document.getElementById('kmw-popup-keys');
+
+      // Use the popup duplicate of the base key if a phone with a visible popup array
       if(sk && sk.style.visibility == 'visible' && util.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
         key1 = <KeyElement> sk.childNodes[0].firstChild;
       }
@@ -1050,17 +1049,24 @@ namespace com.keyman.osk {
       this.highlightSubKeys(key1,x,y);
 
       if(sk && sk.style.visibility == 'visible') {
+        // Once a subkey array is displayed, do not allow changing the base key.
+        // Keep that array visible and accept no other options until the touch ends.
         if(key1 && key1.id.indexOf('popup') < 0 && key1 != this.popupBaseKey) {
           return;
         }
+
+        // Highlight the base key on devices that do not append it to the subkey array.
         if(key1 && key1 == this.popupBaseKey && key1.className.indexOf('kmw-key-touched') < 0) {
           this.highlightKey(key1,true);
         }
         // Cancel touch if moved up and off keyboard, unless popup keys visible
       } else {
-        let _Box = com.keyman.singleton.osk._Box;
-        var yMin = Math.max(5, _Box.offsetTop - 0.25*_Box.offsetHeight);
-        if(key0 && e.touches[0].pageY < Math.max(5,_Box.offsetTop - 0.25*_Box.offsetHeight)) {
+        // _Box has (most of) the useful client values.
+        let _Box = this.kbdDiv.offsetParent as HTMLElement; // == osk._Box
+        let height = (this.kbdDiv.firstChild as HTMLElement).offsetHeight; // firstChild == layer-group, has height info.
+        // We need to adjust the offset properties by any offsets related to the active banner.
+        var yMin = Math.max(5, this.kbdDiv.offsetTop + _Box.offsetTop - 0.25*height);
+        if(key0 && e.touches[0].pageY < yMin) {
           this.highlightKey(key0,false);
           this.showKeyTip(null,false);
           this.keyPending = null;

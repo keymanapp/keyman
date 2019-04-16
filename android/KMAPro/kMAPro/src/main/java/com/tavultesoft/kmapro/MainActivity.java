@@ -420,9 +420,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   private void resizeTextView(boolean isKeyboardVisible) {
+    int bannerHeight = 0;
     int keyboardHeight = 0;
-    if (isKeyboardVisible)
+    if (isKeyboardVisible) {
+      bannerHeight = KMManager.getBannerHeight(this);
       keyboardHeight = KMManager.getKeyboardHeight(this);
+    }
 
     TypedValue outValue = new TypedValue();
     getTheme().resolveAttribute(android.R.attr.actionBarSize, outValue, true);
@@ -437,7 +440,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     Point size = new Point(0, 0);
     getWindowManager().getDefaultDisplay().getSize(size);
     int screenHeight = size.y;
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - keyboardHeight);
+    Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
+    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
   }
 
   private void showInfo() {
@@ -827,6 +831,14 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
       }
+    }
+  }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    for(int i=0; i<lexicalModelsInstalled.size(); i++) {
+      HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      KMManager.addLexicalModel(this, lexicalModelInfo);
     }
   }
 
