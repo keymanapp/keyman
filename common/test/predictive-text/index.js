@@ -94,8 +94,8 @@ async function asyncRepl(modelFile) {
   let suggestions = [];
   let selectedSuggestionIndex = 0;  // which suggestion is currently suggested
 
-  // Initial line:
-  process.stdout.write(`> `);
+  // Draw the prompt for the first time.
+  redrawPrompt();
 
   for await (let [char, keypress] of keypressesFromStdin()) {
     if (wantsQuit(keypress)) {
@@ -147,19 +147,14 @@ async function asyncRepl(modelFile) {
         continue;
       }
 
-      let oldBuffer = buffer;
       // Remove the last character.
       deleteLastCodepoint();
-
-      // Redraw the line
-      process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
-      process.stdout.write(`> ${buffer}`);
+      redrawPrompt();
 
       // TODO: ask for suggestions again?
     } else {
-      // insert the keypress
-      process.stdout.write(char);
       let {transform, context} = insertCharacter(char);
+      redrawPrompt();
       suggestions = Array.from(await lm.predict(transform, context));
       renderSuggestions(suggestions, selectedSuggestionIndex);
     }
