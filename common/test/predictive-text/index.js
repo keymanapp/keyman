@@ -153,8 +153,7 @@ async function asyncRepl(modelFile) {
 
       let oldBuffer = buffer;
       // Remove the last character.
-      // TODO: handle surrogate pairs!
-      buffer = buffer.substr(0, buffer.length - 1);
+      deleteLastCodepoint();
 
       // Redraw the line
       process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
@@ -194,6 +193,22 @@ async function asyncRepl(modelFile) {
     };
 
     return { transform, context };
+  }
+
+  /**
+   * Mutates the buffer by removing the last code point. This handles
+   * surrogate pairs.
+   */
+  function deleteLastCodepoint() {
+    let lastIndex = buffer.length - 1;
+    // When the last character is a low surrogate (0xDC00-0xDFFF), this means
+    // we have a surrogate pair! We must delete two 16-bit code units.
+    console.log({ buffer });
+    if ('\uDC00' <= buffer[lastIndex] && buffer[lastIndex] <= '\uDFFF') {
+      console.assert('\uD800'  <= buffer[lastIndex - 1] && buffer[lastIndex - 1] <= '\uDBFF');
+      lastIndex = lastIndex - 1;
+    }
+    buffer = buffer.substr(0, lastIndex);
   }
 
   /**
