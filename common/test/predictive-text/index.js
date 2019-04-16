@@ -115,6 +115,7 @@ async function asyncRepl(modelFile) {
       // one!
       if (selectedSuggestionIndex === null) {
         selectedSuggestionIndex = 0;
+        renderSuggestions();
         continue;
       }
 
@@ -134,6 +135,7 @@ async function asyncRepl(modelFile) {
       }
 
       renderSuggestions(suggestions, selectedSuggestionIndex);
+
     } else if (keypress.name === 'return') {
       // Accept the currently selected
       let acceptedSuggestion = suggestions[selectedSuggestionIndex];
@@ -148,7 +150,7 @@ async function asyncRepl(modelFile) {
 
       // Ask for suggestions.
       suggestions = await askForPredictions();
-      renderSuggestions(suggestions, selectedSuggestionIndex);
+      renderSuggestions();
 
     } else if (keypress.name === 'backspace') {
       if (buffer.length === 0) {
@@ -162,14 +164,14 @@ async function asyncRepl(modelFile) {
 
       // Ask for suggestions again
       suggestions = await askForPredictions();
-      renderSuggestions(suggestions, selectedSuggestionIndex);
+      renderSuggestions();
 
     } else {
       // Handle a keypress of a letter or symbol.
       let {transform, context} = insertCharacter(char);
       redrawPrompt();
       suggestions = await askForPredictions(transform, context);
-      renderSuggestions(suggestions, selectedSuggestionIndex);
+      renderSuggestions();
     }
   }
 
@@ -256,36 +258,36 @@ async function asyncRepl(modelFile) {
   function applyTransformToActiveBuffer(transform) {
     buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
   }
-}
 
-/**
- * Render the given suggestions on the next line after the cursor.
- * Looks like this:
- *
- *    [suggestions] [appear] [here]
- */
-function renderSuggestions(suggestions, selected) {
-  // Wherever we are, save the current cursor position.
-  process.stdout.write(ANSI.SAVE_CURSOR_POSITION);
+  /**
+   * Render the given suggestions on the next line after the cursor.
+   * Looks like this:
+   *
+   *    [suggestions] [appear] [here]
+   */
+  function renderSuggestions() {
+    // Wherever we are, save the current cursor position.
+    process.stdout.write(ANSI.SAVE_CURSOR_POSITION);
 
-  // Jump to next line and erase it to write suggestions.
-  process.stdout.write(ANSI.CURSOR_NEXT_LINE + ANSI.ERASE_IN_LINE());
+    // Jump to next line and erase it to write suggestions.
+    process.stdout.write(ANSI.CURSOR_NEXT_LINE + ANSI.ERASE_IN_LINE());
 
-  if (!suggestions || suggestions.length === 0) {
-    process.stdout.write(' no suggestions ');
-  } else {
-    // Format the displayed suggestions.
-    let line = suggestions
-      .map(({displayAs}, index) => {
-        if (index === selected) {
-          return `${ANSI.REVERSE_VIDEO}[${displayAs}]${ANSI.NORMAL_VIDEO}`;
-        }
-        return `[${displayAs}]`
-      }).join(' ');
-    process.stdout.write(line);
+    if (!suggestions || suggestions.length === 0) {
+      process.stdout.write(' no suggestions ');
+    } else {
+      // Format the displayed suggestions.
+      let line = suggestions
+        .map(({displayAs}, index) => {
+          if (index === selectedSuggestionIndex) {
+            return `${ANSI.REVERSE_VIDEO}[${displayAs}]${ANSI.NORMAL_VIDEO}`;
+          }
+          return `[${displayAs}]`
+        }).join(' ');
+      process.stdout.write(line);
+    }
+
+    process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
   }
-
-  process.stdout.write(ANSI.RESTORE_CURSOR_POSITION);
 }
 
 
