@@ -137,16 +137,7 @@ async function asyncRepl(modelFile) {
         continue;
       }
 
-      let oldBuffer = buffer;
-      let transform = acceptedSuggestion.transform;
-
-      // apply the transform to the buffer.
-      buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
-      let context = {
-        left: oldBuffer,
-        startOfBuffer: oldBuffer.length === 0 ? true : false,
-        endOfBuffer: true,
-      }
+      applyTransformToActiveBuffer(acceptedSuggestion.transform);
 
       // Redraw the line
       process.stdout.write(ANSI.ERASE_IN_LINE() + '\r');
@@ -203,6 +194,13 @@ async function asyncRepl(modelFile) {
     };
 
     return { transform, context };
+  }
+
+  /**
+   * Mutates buffer by applying the given transform.
+   */
+  function applyTransformToActiveBuffer(transform) {
+    buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
   }
 }
 
