@@ -90,7 +90,6 @@ async function asyncRepl(modelFile) {
 
   // Setup the REPL
   // > type some text
-  // [suggestions] [appear] [here] (press tab to accept)
   let buffer = '';  // the text to predict on
   let suggestions = [];
   let selectedSuggestionIndex = 0;  // which suggestion is currently suggested
@@ -141,8 +140,8 @@ async function asyncRepl(modelFile) {
       let oldBuffer = buffer;
       let transform = acceptedSuggestion.transform;
 
-      // TODO: Handle deleteLeft from the buffer!
-      buffer = buffer += transform.insert;
+      // apply the transform to the buffer.
+      buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
       let context = {
         left: oldBuffer,
         startOfBuffer: oldBuffer.length === 0 ? true : false,
@@ -209,6 +208,9 @@ async function asyncRepl(modelFile) {
 
 /**
  * Render the given suggestions on the next line after the cursor.
+ * Looks like this:
+ *
+ *    [suggestions] [appear] [here]
  */
 function renderSuggestions(suggestions, selected) {
   // Wherever we are, save the current cursor position.
