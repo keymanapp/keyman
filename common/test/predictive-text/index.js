@@ -139,7 +139,10 @@ async function asyncRepl(modelFile) {
 
       applyTransformToActiveBuffer(acceptedSuggestion.transform);
       redrawPrompt();
-      // TODO: ask for suggestions again.
+
+      // Ask for suggestions.
+      suggestions = await askForPredictions();
+      renderSuggestions(suggestions, selectedSuggestionIndex);
 
     } else if (keypress.name === 'backspace') {
       if (buffer.length === 0) {
@@ -151,16 +154,46 @@ async function asyncRepl(modelFile) {
       deleteLastCodepoint();
       redrawPrompt();
 
-      // TODO: ask for suggestions again?
+      // Ask for suggestions again
+      suggestions = await askForPredictions();
+      renderSuggestions(suggestions, selectedSuggestionIndex);
+
     } else {
+      // Handle a keypress of a letter or symbol.
       let {transform, context} = insertCharacter(char);
       redrawPrompt();
-      suggestions = Array.from(await lm.predict(transform, context));
+      suggestions = await askForPredictions(transform, context);
       renderSuggestions(suggestions, selectedSuggestionIndex);
     }
   }
 
   // Helpers
+
+  /**
+   * Asks the LMLayer for predictions with the given transform and context.
+   * Asynchronously returns the new suggestions.
+   */
+  async function askForPredictions(transform = nullTransform(), context = currentContext()) {
+    return Array.from(await lm.predict(transform, context));
+  }
+
+  /**
+   * Returns the null transform.
+   */
+  function nullTransform() {
+    return { insert: '', deleteLeft: 0 };
+  }
+
+  /**
+   * Returns the current state of the buffer.
+   */
+  function currentContext() {
+    return {
+      left: buffer,
+      startOfBuffer: buffer.length === 0,
+      endOfBuffer: true
+    };
+  }
 
   /**
    * Draws the prompt, clearing what was on the screen.
