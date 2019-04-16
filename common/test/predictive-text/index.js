@@ -32,6 +32,7 @@ const ANSI = {
   SAVE_CURSOR_POSITION: CSI + 's', // Remembers the current cursor position.
   RESTORE_CURSOR_POSITION: CSI + 'u', // Moves the cursor to the previously stored position.
   BOLD: CSI + '1m', // Set bold text.
+  FAINT: CSI + '2m', // Set "faint" text.
   REVERSE_VIDEO: CSI + '7m', // Invert the text colour (swap background and foreground colours).
   NORMAL_VIDEO: CSI + '27m', // Uninvert the text colour (swap background and foreground colours).
   NORMAL: CSI + 'm', // Set all graphics renditions attributes off.
@@ -273,7 +274,7 @@ async function asyncRepl(modelFile) {
     process.stdout.write(ANSI.CURSOR_NEXT_LINE + ANSI.ERASE_IN_LINE());
 
     if (!suggestions || suggestions.length === 0) {
-      process.stdout.write(' no suggestions ');
+      process.stdout.write(`${ANSI.FAINT}no suggestions${ANSI.NORMAL}`);
     } else {
       // Format the displayed suggestions.
       let line = suggestions
