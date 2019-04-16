@@ -1,5 +1,5 @@
 Predictive text testing CLI
----------------------------
+===========================
 
 Provides a command line interface to try out predictive text models.
 
@@ -21,7 +21,7 @@ Usage
 
 Start it like so:
 
-    $ node . -f path/to/model.js  # local
+    $ ./index.js -f path/to/model.js  # local
     $ lmlayer-cli . -f path/to/model.js  # global
 
 You will be presented with a prompt. Type any phrase in the model's
@@ -33,16 +33,18 @@ language.
  * Press <kbd>Enter</kbd> to accept the selected suggestion.
  * Press <kbd>Ctrl</kbd>+C or <kbd>Ctrl</kbd>+D to quit.
 
-    > He
-    [ Hello ] [ Hey ] [ He he ]
+```
+> He
+[Hello] [Hey] [He he]
+```
 
 Defining the `LMPATH` environment variable
 ------------------------------------------
 
 You can also load models by their model ID. For example,
 
-   $ node . example.en.model  # local
-   $ lmlayer-cli example.en.model  # global
+    $ ./index.js example.en.model  # local
+    $ lmlayer-cli example.en.model  # global
 
 For this to work, you need to define the `LMPATH` environment variable.
 The CLI will search the directory specified in `LMPATH` to find the
