@@ -92,6 +92,10 @@ async function asyncRepl(modelFile) {
   // Setup the REPL
   // > type some text
   let buffer = '';  // the text to predict on
+  // To support the prediction API, the previous buffer must be kept
+  // to apply suggested transforms correctly:
+  // See: https://github.com/keymanapp/keyman/blob/99caf52b38fddedfb0969b20c0e6b27be243c348/common/predictive-text/docs/worker-communication-protocol.md#message-predict
+  let previousBuffer = null;
   let suggestions = [];
   let selectedSuggestionIndex = null;  // which suggestion is currently suggested
 
@@ -221,7 +225,7 @@ async function asyncRepl(modelFile) {
    * Note: this mutates the buffer!
    */
   function insertCharacter(char) {
-    let oldBuffer = buffer;
+    previousBuffer = buffer;
     buffer += char;
 
     let transform = {
@@ -230,8 +234,8 @@ async function asyncRepl(modelFile) {
     };
 
     let context = {
-      left: oldBuffer,
-      startOfBuffer: oldBuffer.length === 0 ? true : false,
+      left: previousBuffer,
+      startOfBuffer: previousBuffer.length === 0 ? true : false,
       endOfBuffer: true,
     };
 
@@ -257,7 +261,10 @@ async function asyncRepl(modelFile) {
    * Mutates buffer by applying the given transform.
    */
   function applyTransformToActiveBuffer(transform) {
-    buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
+    let tmpBuffer = buffer;
+    buffer = previousBuffer
+      .substr(0, previousBuffer.length - transform.deleteLeft) + transform.insert;
+    previousBuffer = tmpBuffer;
   }
 
   /**
