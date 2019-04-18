@@ -46,14 +46,21 @@ main();
 function main() {
   // Command line options:
   program
+    .name(require('./package.json').name)
     .version(require('./package.json').version)
-    .usage('(-f <model-file> | <model-id>)')
+    .usage('[-i <test-file> | -s <string>] (-f <model-file> | <model-id>)')
     .description('CLI for trying lexical models.')
     .arguments('[model-id]')
     .option('-f, --model-file <file>', 'path to model file')
+    .option('-i, --test-file <file>', 'path to test file')
+    .option('-s, --string <string>', 'string to test against the model')
     .parse(process.argv);
 
   let modelFile = determineModelFile(program);
+
+  if (program.testFile || program.string) {
+    throw new Error('Not implemented');
+  }
 
   // Ensure we're running in the terminal
   if (!process.stdin.isTTY) {
