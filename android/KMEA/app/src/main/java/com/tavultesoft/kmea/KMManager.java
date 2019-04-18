@@ -235,10 +235,16 @@ public final class KMManager {
     return false;
   }
 
+  /**
+   * Adjust the keyboard dimensions. If the suggestion banner is active, use the
+   * combined banner height and keyboard height
+   * @return RelativeLayout.LayoutParams
+   */
   private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = currentBanner.equals("suggestion") ? getBannerHeight(appContext) : 0;
     int kbHeight = getKeyboardHeight(appContext);
-    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
+    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+      RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
    return params;
   }
@@ -655,6 +661,10 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
+  public static void setCurrentBanner(String banner) {
+    currentBanner = banner;
+  }
+
   public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
@@ -682,11 +692,11 @@ public final class KMManager {
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
     }
     return true;
   }
@@ -950,11 +960,16 @@ public final class KMManager {
   }
 
   public static int getBannerHeight(Context context) {
-    return (int) context.getResources().getDimension(R.dimen.banner_height);
+    int bannerHeight = 0;
+    if (currentBanner.equals("suggestion")) {
+      bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
+    }
+    return bannerHeight;
   }
 
   public static int getKeyboardHeight(Context context) {
-    return (int) context.getResources().getDimension(R.dimen.keyboard_height);
+    int kbHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
+    return kbHeight;
   }
 
   public static void setDebugMode(boolean value) {

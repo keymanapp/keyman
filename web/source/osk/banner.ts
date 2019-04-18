@@ -281,14 +281,6 @@ namespace com.keyman.osk {
 
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
-      if(keyman.isEmbedded && keyman.util.device.OS == 'Android') {
-        // TODO: Investigate the factor of "48"
-
-        let ss = s.style;
-        let oskManager = keyman.osk;
-        ss.top = oskManager.getBannerHeight() - 48 + 'px';
-      }
-
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
       return s;

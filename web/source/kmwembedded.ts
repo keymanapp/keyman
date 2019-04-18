@@ -134,12 +134,21 @@ namespace com.keyman.osk {
     let oskHeight : number = nRows*rowHeight;
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(bannerHeight+oskHeight+3)+'px';
+    console.log("adjustHeights: bannerHeight " + bannerHeight + ", oskHeight " + oskHeight);
+    bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
+    // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      b.childNodes.forEach(function(layer: HTMLElement) {
+        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+      });
+    }
+    // Sets the layers to the correct height 
     pad = Math.round(0.15*rowHeight);
 
+    bs.fontSize=fs+'em';
     var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
 
     for(nLayer=0;nLayer<layers.length; nLayer++) {
@@ -155,7 +164,7 @@ namespace com.keyman.osk {
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {
           key=keys[nKey];
-          // Must set the height of the text DIV, not the label (if any)
+          // Must set the height of the btn DIV, not the label (if any)
           for(j=0; j<key.childNodes.length; j++) {
             if(util.hasClass(key.childNodes[j],'kmw-key')) {
               break;

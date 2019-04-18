@@ -5,7 +5,9 @@ import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
+import android.widget.RelativeLayout;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
@@ -13,6 +15,7 @@ public abstract class KMKeyboardJSHandler {
   private Context context;
   private KMKeyboard k = null;
   private static int KM_VIBRATE_DURATION = 100; // milliseconds
+  private static String TAG = "KMKeyboardJSHandler";
 
   KMKeyboardJSHandler(Context context, KMKeyboard k) {
     this.context = context;
@@ -28,15 +31,14 @@ public abstract class KMKeyboardJSHandler {
   // This annotation is required in Jelly Bean and later:
   @JavascriptInterface
   public int getBannerHeight() {
-    int bannerHeight = context.getResources().getDimensionPixelSize(R.dimen.banner_height);
-    //bannerHeight -= bannerHeight % 20;
-    return bannerHeight;
+    return KMManager.getBannerHeight(context);
   }
 
+  // Get the keyboard height
   // This annotation is required in Jelly Bean and later:
   @JavascriptInterface
   public int getKeyboardHeight() {
-    int kbHeight = context.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
+    int kbHeight = KMManager.getKeyboardHeight(context);
     kbHeight -= kbHeight % 20;
     return kbHeight;
   }
@@ -61,6 +63,21 @@ public abstract class KMKeyboardJSHandler {
         v.vibrate(KM_VIBRATE_DURATION);
       }
     }
+  }
+
+  // This annotation is required in Jelly Bean and later:
+  @JavascriptInterface
+  public void onModelChange(boolean loaded) {
+    Log.d(TAG, "onModelChange");
+    if (loaded) {
+      KMManager.setCurrentBanner("suggestion");
+    } else {
+      KMManager.setCurrentBanner("blank");
+    }
+
+    // TODO: Implement any updates when lexical model is loaded
+    //RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+    //k.setLayoutParams(params);
   }
 
   // Store the current keyboard chirality status from KMW in the Keyboard

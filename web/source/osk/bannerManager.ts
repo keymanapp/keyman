@@ -81,10 +81,17 @@ namespace com.keyman.osk {
     private constructContainer(): HTMLDivElement {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
-
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
       d.className = "kmw-banner-container";
+
+      /*
+      let oskManager = keymanweb.osk;
+      let bannerHeight : number = oskManager.getBannerHeight();
+      console.warn("constructContainer: bannerHeight " + bannerHeight);
+      let ds = d.style;
+      ds.height = ds.maxHeight = bannerHeight + 'px';
+      */
       return this.bannerContainer = d;
     }
 
@@ -193,17 +200,6 @@ namespace com.keyman.osk {
         default:
           throw new Error("Invalid type specified for the banner!");
       }
-    }
-
-    // TODO: test code not to keep in production
-    public setSuggestions() {
-      let blank : Suggestion = {displayAs: 'blank'} as Suggestion;
-      let s:Array<Suggestion> = Array(blank, blank, blank);
-      s[0].displayAs = 'choco';
-      s[1].displayAs = 'taco';
-      s[2].displayAs = 'last';
-      let suggestionBanner = this.activeBanner as SuggestionBanner;
-      suggestionBanner.updateSuggestions(s);
     }
 
     /**

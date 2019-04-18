@@ -1,6 +1,6 @@
 <html>
 <!--
- Copyright (C) 2017-2018 SIL International. All rights reserved.
+ Copyright (C) 2017-2019 SIL International. All rights reserved.
 -->
 
 <head>
@@ -32,23 +32,32 @@
       var ta = document.getElementById('ta');
       kmw['setActiveElement'](ta);
 
-      setBanner('blank');
       ta.readOnly = false;
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
+      kmw.addEventListener('mm.modelchange', onModelChange);
     }
 
     function setOskHeight(h) {
       if(h > 0) {
         oskHeight = h;
+        bannerHeight = window.jsInterface.getBannerHeight();
+        window.console.log('Embedded setOskHeight: ' + bannerHeight + ', ' + oskHeight);
       }
       var kmw=window['keyman'];
       kmw['correctOSKTextSize']();
       window.console.log('Embedded done with correctOSKTextSize');
     }
 
+    function setBannerHeight(h) {
+      if (h > 0) {
+        bannerHeight = h;
+      }
+    }
+
     function getBannerHeight() {
+      window.console.log('Embedded getBannerHeight: '+bannerHeight);
       return bannerHeight;
     }
 
@@ -73,6 +82,12 @@
 
     function beepKeyboard() {
       window.jsInterface.beepKeyboard();
+    }
+
+    function onModelChange(change) {
+      var loaded = change == 'loaded' ? true : false;
+      window.console.log('onModelChange change: ' + change + ', loaded: ' + loaded);
+      window.jsInterface.onModelChange(loaded);
     }
 
     // Query KMW if a given keyboard uses chiral modifiers.
@@ -133,20 +148,20 @@
     function insertText(dn, s) {
       //window.console.log('insertText('+ dn +', ' + s +');');
       window.jsInterface.insertText(dn, s);
+    }
 
-      // TODO: Remove for production: Testing
-      var kmw=com.keyman.singleton;
-      if (s == 'b') {
-        setBanner('blank');
-      } else if (s == 's') {
-        setBanner('suggestion');
-        kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'insertAlpha'}, {displayAs: 'insertBeta'}, {displayAs: 'insertCharlie'}]);
-      }
+    function enableSuggestions(model) {
+      bannerHeight = window.jsInterface.getBannerHeight();
+      //setOskHeight(oskHeight);
+
+      var kmw=window['keyman'];
+
+      registerModel(model);
     }
 
     function registerModel(model) {
       var kmw=window['keyman'];
-      window.console.log('model: ' + model);
+      window.console.log('registerModel: ' + model);
       kmw.registerModel(model);
     }
 
@@ -226,25 +241,23 @@
     }
 
     function setBanner(bannerType) {
+    /*
       var kmw = com.keyman.singleton;
       var banner = kmw.osk.banner;
       if (bannerType == 'blank') {
-        banner.setOptions({
-          'persistentBanner': false,
-          'enablePredictions': false
-        });
         banner.setBanner('blank');
       } else if (bannerType == 'suggestion') {
         banner.setOptions({
-          'persistentBanner': true,
+          'persistentBanner': false,
           'enablePredictions': true
         });
         banner.setBanner('suggestion', bannerHeight);
 
         // TODO: Remove for production. For testing integration of suggestion banner
         window.console.log('Embedded setBanner to ' + bannerHeight);
-        kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
+        // kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
       }
+      */
     }
 
     function showHelpBubble() {
