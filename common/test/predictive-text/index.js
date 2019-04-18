@@ -62,10 +62,26 @@ function main() {
     throw new Error('Not implemented');
   }
 
-  // Ensure we're running in the terminal
-  if (!process.stdin.isTTY) {
-    throw new Error('must be run from interactive terminal');
+  // The command line proper handles asynchronous keypresses, hence the rest
+  // must also be asynchronous.
+  asyncRepl(modelFile)
+    .then(_ => process.exit(0))
+    .catch(err => {
+      console.error(err);
+      process.exit(127);
+    });
+}
+
+
+async function asyncRepl(modelFile) {
+  // Ensure we're running in the terminal.
+  if (!(process.stdin.isTTY && process.stdout.isTTY)) {
+    throw new Error('Must be run from interactive terminal');
   }
+
+  // Load the LMLayer and the desired model.
+  let lm = new LMLayer({}, createAsyncWorker());
+  let config = await lm.loadModel(modelFile);
 
   // Show a quick "how-to" message.
   console.log(unindent(`
@@ -79,22 +95,6 @@ function main() {
     #  * Press ${ANSI.BOLD}<Enter>${ANSI.NORMAL} to accept the suggestion.
     #  * Press ${ANSI.BOLD}<Ctrl>${ANSI.NORMAL}+${ANSI.BOLD}<C>${ANSI.NORMAL} to quit.
   `))
-
-  // The command line proper handles asynchronous keypresses, hence the rest
-  // must also be asynchronous.
-  asyncRepl(modelFile)
-    .then(_ => process.exit(0))
-    .catch(err => {
-      console.error(err);
-      process.exit(127);
-    });
-}
-
-
-async function asyncRepl(modelFile) {
-  // Load the LMLayer and the desired model.
-  let lm = new LMLayer({}, createAsyncWorker());
-  let config = await lm.loadModel(modelFile);
 
   // Setup the REPL
   // > type some text
