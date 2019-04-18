@@ -423,22 +423,15 @@ function determineMode(program) {
   if (program.string) {
     return {
       mode: 'batch',
-      // test on the single provided string.
+      // The input is a single provided string.
       data: [program.string]
     };
   }
 
   if (program.testFile) {
-    let file = fs.readFileSync(program.testFile, 'UTF-8');
-    let lines = file.split('\n');
-
-    // Remove trailing empty line, caused be last newline.
-    if (file[file.length - 1] === '\n')
-      lines.pop();
-
     return {
       mode: 'batch',
-      data: lines
+      data: slurpLinesFromFile(program.testFile)
     };
   }
 
@@ -446,18 +439,29 @@ function determineMode(program) {
     return { mode: 'interactive' };
   } else {
     // Batch mode from stdin. Slurp all of stdin synchronously; fd 0 is stdin.
-    let file = fs.readFileSync(0, 'UTF-8');
-    let lines = file.split('\n');
-
-    // Remove trailing empty line, caused be last newline.
-    if (file[file.length - 1] === '\n')
-      lines.pop();
-
+    const STDIN_FD = 0;
     return {
       mode: 'batch',
-      data: lines
+      data: slurpLinesFromFile(STDIN_FD)
     };
   }
+}
+
+/**
+ * Given a file path as a string or a file descriptor as an integer,
+ * synchronously reads the file, and returns an Array of its lines, minus the
+ * trailing newline.
+ */
+function slurpLinesFromFile(input) {
+  let file = fs.readFileSync(input, 'UTF-8');
+  let lines = file.split('\n');
+
+  // Remove trailing empty line, caused be last newline.
+  if (file[file.length - 1] === '\n') {
+    lines.pop();
+  }
+
+  return lines;
 }
 
 /**
