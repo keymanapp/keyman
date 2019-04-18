@@ -8,18 +8,29 @@ Install
 
 **NOTE**: Requires Node >= 10.0
 
-Install locally with `npm`:
+First, ensure that Keyman web and the LMLayer are built. You can run the
+build script in `/web/source` to do this for you:
+
+    cd ../../../web/source
+    ./build.sh
+
+Then, you can install locally with `npm`:
 
     npm install
 
-You can install globally like so:
+Or you can install globally like so:
 
     npm install -g .
+
+When installed globally, you can invoke the CLI using the `lmlayer-cli`
+command.
 
 Usage
 -----
 
-Start it like so:
+### Interactive mode
+
+Start it in interactive mode like so:
 
     $ ./index.js -f path/to/model.js  # local
     $ lmlayer-cli . -f path/to/model.js  # global
@@ -37,6 +48,30 @@ language.
 > He
 [Hello] [Hey] [He he]
 ```
+
+### Batch mode
+
+Instead of using `lmlayer-cli` interactively, you can give the model one
+or more phrases in batch mode. Either pass in a newline-separated file
+with `-i`, or one or more phrases with `-p`. You can also pipe input to
+`lmlayer-cli`, and it will read each line as a phrase.
+
+```sh
+$ lmlayer-cli author.bcp47.uniq -p "a test phrase" -p "another test phrase"
+$ lmlayer-cli author.bcp47.unq -i my-test-file.txt
+$ echo "anything from stdin" | lmlayer-cli author.bcp47.uniq
+```
+
+The output is tab-separated, with the first column being the input, and
+the remaining columns being the suggestions, e.g.,
+
+```sh
+$ lmlayer-cli example.en.wordlist -p "d"
+d      dinosaur        dumbo octopus
+$ echo "c" | "lmlayer-cli example.en.wordlist
+c      cat     cheetah
+```
+
 
 Defining the `LMPATH` environment variable
 ------------------------------------------
