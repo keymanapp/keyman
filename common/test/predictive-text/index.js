@@ -49,12 +49,15 @@ function main() {
   program
     .name(require('./package.json').name)
     .version(require('./package.json').version)
-    .usage('[-i <test-file> | -s <string>] (-f <model-file> | <model-id>)')
+    .usage('[-i <test-file> | -p <phrase> [-p <phrase> ...]] (-f <model-file> | <model-id>)')
     .description('CLI for trying lexical models.')
     .arguments('[model-id]')
     .option('-f, --model-file <file>', 'path to model file')
-    .option('-i, --test-file <file>', 'path to test file')
-    .option('-s, --string <string>', 'string to test against the model')
+    .option('-i, --test-file <file>', 'path to file containing newline-delimited phrases')
+    .option('-p, --phrase <phrase>',
+      'phrase to test against the model. Can be provided multiple times.',
+      createArrayOfPhrases, []  // allow for one or more phrases
+    )
     .parse(process.argv);
 
   // Find the model.
@@ -376,6 +379,15 @@ function createAsyncWorker() {
 ///////////////////////////////// Utilities /////////////////////////////////
 
 /**
+ * Callback function for Commander.js to store multiple arguments for the
+ * --phrase argument.
+ */
+function createArrayOfPhrases(val, array) {
+  array.push(val);
+  return array;
+}
+
+/**
  * Return the context when the cursor is at the end of the given string.
  */
 function contextFromString(string) {
@@ -420,11 +432,11 @@ function determineModelFile(program) {
  * Determine which mode to run in. Reads in data, if necessary.
  */
 function determineMode(program) {
-  if (program.string) {
+  if (program.phrase) {
     return {
       mode: 'batch',
-      // The input is a single provided string.
-      data: [program.string]
+      // 'phrase' is an array of phrases!
+      data: program.phrase
     };
   }
 
