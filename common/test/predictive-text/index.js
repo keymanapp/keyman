@@ -5,6 +5,7 @@
  * model.
  */
 
+const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
@@ -56,20 +57,44 @@ function main() {
     .option('-s, --string <string>', 'string to test against the model')
     .parse(process.argv);
 
+  // Find the model.
   let modelFile = determineModelFile(program);
 
-  if (program.testFile || program.string) {
-    throw new Error('Not implemented');
-  }
+  // Are we in batch mode or interactive mode?
+  let { mode, data } = determineMode(program);
 
-  // The command line proper handles asynchronous keypresses, hence the rest
-  // must also be asynchronous.
-  asyncRepl(modelFile)
-    .then(_ => process.exit(0))
-    .catch(err => {
-      console.error(err);
-      process.exit(127);
-    });
+  let handleMode;
+
+  if (mode === 'batch') {
+    asyncBatchMode(modelFile, data)
+      .then(_ => process.exit(0))
+      .catch(err => {
+        console.error(err);
+        process.exit(127);
+      });
+  } else {
+    // The command line proper handles asynchronous keypresses, hence the rest
+    // must also be asynchronous.
+    asyncRepl(modelFile)
+      .then(_ => process.exit(0))
+      .catch(err => {
+        console.error(err);
+        process.exit(127);
+      });
+  }
+}
+
+
+async function asyncBatchMode(modelFile, strings) {
+  // Load the LMLayer and the desired model.
+  let lm = new LMLayer({}, createAsyncWorker());
+  let config = await lm.loadModel(modelFile);
+
+  for (let string of strings) {
+    let suggestions = await lm.predict(nullTransform(), contextFromString(string));
+    let line = [string, ...suggestions.map(s => s.displayAs)].join('\t');
+    process.stdout.write(line + '\n');
+  }
 }
 
 
@@ -198,13 +223,6 @@ async function asyncRepl(modelFile) {
   }
 
   /**
-   * Returns the null transform.
-   */
-  function nullTransform() {
-    return { insert: '', deleteLeft: 0 };
-  }
-
-  /**
    * Returns the current state of the buffer.
    */
   function currentContext() {
@@ -310,7 +328,6 @@ function createAsyncWorker() {
   // XXX: import the LMLayerWorker directly -- I know where it is built.
   const LMLayerWorker = require('../../predictive-text/build/intermediate');
   const vm = require('vm');
-  const fs = require('fs');
 
   let worker = {
     postMessage(message) {
@@ -359,6 +376,17 @@ function createAsyncWorker() {
 ///////////////////////////////// Utilities /////////////////////////////////
 
 /**
+ * Return the context when the cursor is at the end of the given string.
+ */
+function contextFromString(string) {
+  return {
+    left: string,
+    startOfBuffer: string.length === 0,
+    endOfBuffer: true
+  };
+}
+
+/**
  * Figure out the path to the model file from the command line.
  */
 function determineModelFile(program) {
@@ -368,7 +396,7 @@ function determineModelFile(program) {
   }
 
   // invoked as: predictive-text author.bcp47.uniq
-  // will lookup the model in using LMPATH.
+  // will lookup the model using LMPATH.
   if (program.args[0]) {
     // Find the model file under the LMPath.
     let modelID = program.args[0];
@@ -385,6 +413,51 @@ function determineModelFile(program) {
 
   // A model is not specified in any way on the command line. Error out!
   usageError('You did not specify a model!');
+}
+
+
+/**
+ * Determine which mode to run in. Reads in data, if necessary.
+ */
+function determineMode(program) {
+  if (program.string) {
+    return {
+      mode: 'batch',
+      // test on the single provided string.
+      data: [program.string]
+    };
+  }
+
+  if (program.testFile) {
+    let file = fs.readFileSync(program.testFile, 'UTF-8');
+    let lines = file.split('\n');
+
+    // Remove trailing empty line, caused be last newline.
+    if (file[file.length - 1] === '\n')
+      lines.pop();
+
+    return {
+      mode: 'batch',
+      data: lines
+    };
+  }
+
+  if (process.stdin.isTTY) {
+    return { mode: 'interactive' };
+  } else {
+    // Batch mode from stdin. Slurp all of stdin synchronously; fd 0 is stdin.
+    let file = fs.readFileSync(0, 'UTF-8');
+    let lines = file.split('\n');
+
+    // Remove trailing empty line, caused be last newline.
+    if (file[file.length - 1] === '\n')
+      lines.pop();
+
+    return {
+      mode: 'batch',
+      data: lines
+    };
+  }
 }
 
 /**
@@ -426,6 +499,13 @@ function logInternalWorkerMessage(role, ...args) {
   if (WORKER_DEBUG) {
     console.log(`[${role}]`, ...args);
   }
+}
+
+/**
+ * Returns the null transform.
+ */
+function nullTransform() {
+  return { insert: '', deleteLeft: 0 };
 }
 
 /**
