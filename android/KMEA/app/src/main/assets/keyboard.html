@@ -240,26 +240,6 @@
       window.location.hash = 'hideKeyboard' + fragmentToggle;
     }
 
-    function setBanner(bannerType) {
-    /*
-      var kmw = com.keyman.singleton;
-      var banner = kmw.osk.banner;
-      if (bannerType == 'blank') {
-        banner.setBanner('blank');
-      } else if (bannerType == 'suggestion') {
-        banner.setOptions({
-          'persistentBanner': false,
-          'enablePredictions': true
-        });
-        banner.setBanner('suggestion', bannerHeight);
-
-        // TODO: Remove for production. For testing integration of suggestion banner
-        window.console.log('Embedded setBanner to ' + bannerHeight);
-        // kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'alpha'}, {displayAs: 'bravo'}, {displayAs: 'charlie'}]);
-      }
-      */
-    }
-
     function showHelpBubble() {
       fragmentToggle = (fragmentToggle + 1) % 100;
       var kmw = window['keyman'];

@@ -241,7 +241,7 @@ public final class KMManager {
    * @return RelativeLayout.LayoutParams
    */
   private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
-    int bannerHeight = currentBanner.equals("suggestion") ? getBannerHeight(appContext) : 0;
+    int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
