@@ -238,8 +238,16 @@ namespace com.keyman.osk {
         }
 
         // Apply the Suggestion!
-        target.restoreTo(original.preInput);
-        target.apply(this.suggestion.transform);
+
+        // Step 1:  determine the final output text
+        let final = text.Mock.from(original.preInput);
+        final.apply(this.suggestion.transform);
+
+        // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+        // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+        // values as needed for use with their IME interfaces.
+        let transform = final.buildTransformFrom(target);
+        target.apply(transform);
       }
     }
 

@@ -92,7 +92,7 @@ namespace com.keyman.text {
      * As such, it assumes that the caret is immediately after any inserted text.
      * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
      */
-    private buildTransformFrom(original: Mock): Transform {
+    buildTransformFrom(original: OutputTarget): Transform {
       let to = this.getText();
       let from = original.getText();
 
@@ -120,7 +120,7 @@ namespace com.keyman.text {
       return new TextTransform(delta, deletedLeft, originalRight - undeletedRight);
     }
 
-    buildTranscriptionFrom(original: Mock, keyEvent: KeyEvent): Transcription {
+    buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent): Transcription {
       let transform = this.buildTransformFrom(original);
 
       // While not presently needed, there's a chance we'll want to have Deadkey mutation tracked
