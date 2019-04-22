@@ -248,6 +248,11 @@ namespace com.keyman.osk {
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(target);
         target.apply(transform);
+
+        // Signal the necessary text changes to the embedding app, if it exists.
+        if(keyman['oninserttext'] && keyman.isEmbedded) {
+          keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
+        }
       }
     }
 

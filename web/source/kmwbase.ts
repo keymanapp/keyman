@@ -578,7 +578,7 @@ namespace com.keyman {
 
     // Functions that might be added later
     ['beepKeyboard']: () => void;
-    ['oninserttext']: (dn: number, s: string) => void;
+    ['oninserttext']: (dn: number, s: string, dr?: number) => void;
 
     /**
      * Create copy of the OSK that can be used for embedding in documentation or help

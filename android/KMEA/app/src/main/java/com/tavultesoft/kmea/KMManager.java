@@ -1575,7 +1575,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s) {
+    public void insertText(final int dn, final String s, final int dr) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1700,7 +1700,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s) {
+    public void insertText(final int dn, final String s, final int dr) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {

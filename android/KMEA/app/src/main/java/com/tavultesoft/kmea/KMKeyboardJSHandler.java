@@ -93,5 +93,5 @@ public abstract class KMKeyboardJSHandler {
 
   // Insert the selected string s
   @JavascriptInterface
-  public abstract void insertText(final int dn, final String s);
+  public abstract void insertText(final int dn, final String s, final int dr);
 }
