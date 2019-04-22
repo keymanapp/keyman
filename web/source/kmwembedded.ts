@@ -134,7 +134,7 @@ namespace com.keyman.osk {
     let oskHeight : number = nRows*rowHeight;
 
     var b: HTMLElement = _Box, bs=b.style;
-    console.log("adjustHeights: bannerHeight " + bannerHeight + ", oskHeight " + oskHeight);
+    console.warn("adjustHeights: bannerHeight " + bannerHeight + ", oskHeight " + oskHeight);
     bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;

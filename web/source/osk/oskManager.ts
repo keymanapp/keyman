@@ -1001,20 +1001,6 @@ namespace com.keyman.osk {
      *  @return   {number}    height in pixels
      */
     getBannerHeight(): number {
-      let keymanweb = com.keyman.singleton;
-      let util = keymanweb.util;
-
-      // KeymanTouch - get OSK height from device
-      if (typeof(keymanweb['getBannerHeight']) == 'function') {
-        let bannerHeight : number = keymanweb['getBannerHeight']();
-        console.log("oskManager getBannerHeight: " + bannerHeight);
-        if(util.device.OS == 'Android' && 'devicePixelRatio' in window) {
-          bannerHeight = bannerHeight / window.devicePixelRatio;
-        }
-
-        return bannerHeight;
-      }
-
       return (this.banner != null) ? this.banner.height : 0;
     }
 

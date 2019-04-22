@@ -84,14 +84,6 @@ namespace com.keyman.osk {
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
       d.className = "kmw-banner-container";
-
-      /*
-      let oskManager = keymanweb.osk;
-      let bannerHeight : number = oskManager.getBannerHeight();
-      console.warn("constructContainer: bannerHeight " + bannerHeight);
-      let ds = d.style;
-      ds.height = ds.maxHeight = bannerHeight + 'px';
-      */
       return this.bannerContainer = d;
     }
 
@@ -252,10 +244,21 @@ namespace com.keyman.osk {
      * Gets the height (in pixels) of the active `Banner` instance.
      */
     public get height(): number {
+      console.warn("bannerManager.height activeBanner: " + this.activeBanner);
       if(this.activeBanner) {
         return this.activeBanner.height;
       } else {
         return 0;
+      }
+    }
+
+    /**
+     * Sets the height (in pixels) of the active 'Banner' instance.
+     */
+    public set height(h: number) {
+      if (this.activeBanner) {
+        console.warn("bannerManager.height set to " + h);
+        this.activeBanner.height = h;
       }
     }
   }
