@@ -5,6 +5,7 @@
  * model.
  */
 
+const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
@@ -46,19 +47,69 @@ main();
 function main() {
   // Command line options:
   program
+    .name(require('./package.json').name)
     .version(require('./package.json').version)
-    .usage('(-f <model-file> | <model-id>)')
+    .usage('[-i <test-file> | -p <phrase> [-p <phrase> ...]] (-f <model-file> | <model-id>)')
     .description('CLI for trying lexical models.')
     .arguments('[model-id]')
     .option('-f, --model-file <file>', 'path to model file')
+    .option('-i, --test-file <file>', 'path to file containing newline-delimited phrases')
+    .option('-p, --phrase <phrase>',
+      'phrase to test against the model. Can be provided multiple times.',
+      createArrayOfPhrases, []  // allow for one or more phrases
+    )
     .parse(process.argv);
 
+  // Find the model.
   let modelFile = determineModelFile(program);
 
-  // Ensure we're running in the terminal
-  if (!process.stdin.isTTY) {
-    throw new Error('must be run from interactive terminal');
+  // Are we in batch mode or interactive mode?
+  let { mode, data } = determineMode(program);
+
+  let handleMode;
+
+  if (mode === 'batch') {
+    asyncBatchMode(modelFile, data)
+      .then(_ => process.exit(0))
+      .catch(err => {
+        console.error(err);
+        process.exit(127);
+      });
+  } else {
+    // The command line proper handles asynchronous keypresses, hence the rest
+    // must also be asynchronous.
+    asyncRepl(modelFile)
+      .then(_ => process.exit(0))
+      .catch(err => {
+        console.error(err);
+        process.exit(127);
+      });
   }
+}
+
+
+async function asyncBatchMode(modelFile, strings) {
+  // Load the LMLayer and the desired model.
+  let lm = new LMLayer({}, createAsyncWorker());
+  let config = await lm.loadModel(modelFile);
+
+  for (let string of strings) {
+    let suggestions = await lm.predict(nullTransform(), contextFromString(string));
+    let line = [string, ...suggestions.map(s => s.displayAs)].join('\t');
+    process.stdout.write(line + '\n');
+  }
+}
+
+
+async function asyncRepl(modelFile) {
+  // Ensure we're running in the terminal.
+  if (!(process.stdin.isTTY && process.stdout.isTTY)) {
+    throw new Error('Must be run from interactive terminal');
+  }
+
+  // Load the LMLayer and the desired model.
+  let lm = new LMLayer({}, createAsyncWorker());
+  let config = await lm.loadModel(modelFile);
 
   // Show a quick "how-to" message.
   console.log(unindent(`
@@ -72,22 +123,6 @@ function main() {
     #  * Press ${ANSI.BOLD}<Enter>${ANSI.NORMAL} to accept the suggestion.
     #  * Press ${ANSI.BOLD}<Ctrl>${ANSI.NORMAL}+${ANSI.BOLD}<C>${ANSI.NORMAL} to quit.
   `))
-
-  // The command line proper handles asynchronous keypresses, hence the rest
-  // must also be asynchronous.
-  asyncRepl(modelFile)
-    .then(_ => process.exit(0))
-    .catch(err => {
-      console.error(err);
-      process.exit(127);
-    });
-}
-
-
-async function asyncRepl(modelFile) {
-  // Load the LMLayer and the desired model.
-  let lm = new LMLayer({}, createAsyncWorker());
-  let config = await lm.loadModel(modelFile);
 
   // Setup the REPL
   // > type some text
@@ -188,13 +223,6 @@ async function asyncRepl(modelFile) {
    */
   async function askForPredictions(transform = nullTransform(), context = currentContext()) {
     return Array.from(await lm.predict(transform, context));
-  }
-
-  /**
-   * Returns the null transform.
-   */
-  function nullTransform() {
-    return { insert: '', deleteLeft: 0 };
   }
 
   /**
@@ -303,7 +331,6 @@ function createAsyncWorker() {
   // XXX: import the LMLayerWorker directly -- I know where it is built.
   const LMLayerWorker = require('../../predictive-text/build/intermediate');
   const vm = require('vm');
-  const fs = require('fs');
 
   let worker = {
     postMessage(message) {
@@ -352,6 +379,26 @@ function createAsyncWorker() {
 ///////////////////////////////// Utilities /////////////////////////////////
 
 /**
+ * Callback function for Commander.js to store multiple arguments for the
+ * --phrase argument.
+ */
+function createArrayOfPhrases(val, array) {
+  array.push(val);
+  return array;
+}
+
+/**
+ * Return the context when the cursor is at the end of the given string.
+ */
+function contextFromString(string) {
+  return {
+    left: string,
+    startOfBuffer: string.length === 0,
+    endOfBuffer: true
+  };
+}
+
+/**
  * Figure out the path to the model file from the command line.
  */
 function determineModelFile(program) {
@@ -361,7 +408,7 @@ function determineModelFile(program) {
   }
 
   // invoked as: predictive-text author.bcp47.uniq
-  // will lookup the model in using LMPATH.
+  // will lookup the model using LMPATH.
   if (program.args[0]) {
     // Find the model file under the LMPath.
     let modelID = program.args[0];
@@ -378,6 +425,55 @@ function determineModelFile(program) {
 
   // A model is not specified in any way on the command line. Error out!
   usageError('You did not specify a model!');
+}
+
+
+/**
+ * Determine which mode to run in. Reads in data, if necessary.
+ */
+function determineMode(program) {
+  if (program.phrase) {
+    return {
+      mode: 'batch',
+      // 'phrase' is an array of phrases!
+      data: program.phrase
+    };
+  }
+
+  if (program.testFile) {
+    return {
+      mode: 'batch',
+      data: slurpLinesFromFile(program.testFile)
+    };
+  }
+
+  if (process.stdin.isTTY) {
+    return { mode: 'interactive' };
+  } else {
+    // Batch mode from stdin. Slurp all of stdin synchronously; fd 0 is stdin.
+    const STDIN_FD = 0;
+    return {
+      mode: 'batch',
+      data: slurpLinesFromFile(STDIN_FD)
+    };
+  }
+}
+
+/**
+ * Given a file path as a string or a file descriptor as an integer,
+ * synchronously reads the file, and returns an Array of its lines, minus the
+ * trailing newline.
+ */
+function slurpLinesFromFile(input) {
+  let file = fs.readFileSync(input, 'UTF-8');
+  let lines = file.split('\n');
+
+  // Remove trailing empty line, caused be last newline.
+  if (file[file.length - 1] === '\n') {
+    lines.pop();
+  }
+
+  return lines;
 }
 
 /**
@@ -419,6 +515,13 @@ function logInternalWorkerMessage(role, ...args) {
   if (WORKER_DEBUG) {
     console.log(`[${role}]`, ...args);
   }
+}
+
+/**
+ * Returns the null transform.
+ */
+function nullTransform() {
+  return { insert: '', deleteLeft: 0 };
 }
 
 /**
