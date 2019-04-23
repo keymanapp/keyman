@@ -1658,40 +1658,26 @@ $(function () {
       builder.hasSavedKeyUndo = false;
     });
 
+  builder.updateSubKeyCap = function (val) {
+    var k = builder.selectedSubKey();
+    if (k.length == 0) return;
+    $('.text', k).text(builder.renameSpecialKey(val));
+    k.data('text', val);
+
+    builder.updateCharacterMap(val, true);
+    builder.generateSubKeys();
+  };
+
   $('#inpSubKeyCap').change(builder.wrapChange(function () {
-    var val = $(this).val();
-
-    var k = builder.selectedSubKey();
-    if (k.length == 0) return;
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
-
-    builder.updateCharacterMap(val, true);
-    builder.generateSubKeys();
-  }));
-
-  builder.updateSubKeyCap = builder.wrapChange(function () {
-    var val = $(this).val();
-
-    var k = builder.selectedSubKey();
-    if (k.length == 0) return;
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
-
-    builder.updateCharacterMap(val, true);
-    builder.generateSubKeys();
-  }, {saveOnce: true});
-
-  $('#inpSubKeyCap').change(function () {
     builder.updateSubKeyCap($(this).val());
-  }).autocomplete({
+  }, {saveOnce: true})).autocomplete({
     source: builder.specialKeyNames,
-    change: function () {
+    change: builder.wrapChange(function () {
       builder.updateSubKeyCap($(this).val());
-    }
-  }).keyup(function () {
+    }, {saveOnce: true})
+  }).keyup(builder.wrapChange(function () {
     builder.updateSubKeyCap($(this).val());
-  }).mouseup(function () {
+  },{saveOnce: true})).mouseup(function () {
     builder.updateCharacterMap($(this).val(), false);
   }).focus(function () {
     builder.updateCharacterMap($(this).val(), false);
