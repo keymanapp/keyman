@@ -4,6 +4,7 @@
  * keyboards in this file does not stop them being tested but it does stop the 
  * test framework from failing.
  * 
+ * TODO: this is not yet supported --> `knownGood*Version` properties
  * When the issue is resolved, add a `knownGood*Version` property to the 
  * keyboard with the first *stable* release version number. If the version 
  * being tested is >= the `knownGood*Version`, then the test suite will fail if 
@@ -15,12 +16,12 @@
 
 const knownFailures = {
   'clavbur9': { reason: 'KCCM generated but not supported #1711' },
-  'fv_gwichin': { /*, knownGoodCompilerVersion: '12.0.333.0', knownGoodEngineVersion: '12.0.444'*/ reason: 'Chrome ladder bug #183' },
-  'fv_han': { reason: 'Chrome ladder bug #183' }, 
-  'fv_northern_tutchone': { reason: 'Chrome ladder bug #183' },
-  'fv_southern_tutchone': { reason: 'Chrome ladder bug #183' }, 
-  'fv_tagizi_dene': { reason: 'Chrome ladder bug #183' }, 
-  'hieroglyphic': { reason: 'Chrome ladder bug #183' }, 
+  //'fv_gwichin': { /*, knownGoodCompilerVersion: '12.0.333.0', knownGoodEngineVersion: '12.0.444'*/ reason: 'Chrome ladder bug #183?' }, // Fixed 23 Apr 2019, knownGoodCompilerVersion: 11.0.1353.0, keyboard release 9.1.1
+  //'fv_han': { reason: 'Chrome ladder bug #183?' }, // Fixed 23 Apr 2019, knownGoodCompilerVersion: 11.0.1353.0, keyboard release 9.1.1
+  //'fv_northern_tutchone': { reason: 'Chrome ladder bug #183?' }, // Fixed 23 Apr 2019, knownGoodCompilerVersion: 11.0.1353.0, keyboard release 9.1.1
+  //'fv_southern_tutchone': { reason: 'Chrome ladder bug #183?' },  // Fixed 23 Apr 2019, knownGoodCompilerVersion: 11.0.1353.0, keyboard release 9.1.1
+  //'fv_tagizi_dene': { reason: 'Chrome ladder bug #183?' },  // Fixed 23 Apr 2019, knownGoodCompilerVersion: 11.0.1353.0, keyboard release 9.1.1
+  //'hieroglyphic': { reason: 'Chrome ladder bug #183' }, // Fixed 23 Apr 2019, knownGoodCompilerVersion: 11.0.1353.0, keyboard release 1.3.1
   'nailangs': { reason: 'kmanalyze is corrupting the .tests file' },
   'sil_ipa': { reason: 'kmanalyze is corrupting the .tests file' }
 };  
