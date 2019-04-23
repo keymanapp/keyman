@@ -244,7 +244,6 @@ namespace com.keyman.osk {
      * Gets the height (in pixels) of the active `Banner` instance.
      */
     public get height(): number {
-      console.warn("bannerManager.height activeBanner: " + this.activeBanner);
       if(this.activeBanner) {
         return this.activeBanner.height;
       } else {
@@ -257,7 +256,6 @@ namespace com.keyman.osk {
      */
     public set height(h: number) {
       if (this.activeBanner) {
-        console.warn("bannerManager.height set to " + h);
         this.activeBanner.height = h;
       }
     }

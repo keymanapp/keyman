@@ -661,10 +661,6 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
-  public static void setCurrentBanner(String banner) {
-    currentBanner = banner;
-  }
-
   public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
@@ -967,8 +963,7 @@ public final class KMManager {
   }
 
   public static int getKeyboardHeight(Context context) {
-    int kbHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
-    return kbHeight;
+    return (int) context.getResources().getDimension(R.dimen.keyboard_height);
   }
 
   public static void setDebugMode(boolean value) {
