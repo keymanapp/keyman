@@ -20,18 +20,19 @@ namespace com.keyman.osk {
    * 
    * @param {Object}  key   base key element
    */            
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) { 
-    let util = com.keyman.singleton.util;       
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
+    let util = com.keyman.singleton.util;
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv);      
+      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight;
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
       }
 
       this.popupBaseKey = key;
-      this.popupPending=true;      
+      this.popupPending=true;
       window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
     }
   };
@@ -76,8 +77,10 @@ namespace com.keyman.osk {
     }
 
     if(on && (typeof showPreview == 'function')) {
-      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv), kc;
+      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight,
+          kc;
 
       // Find key text element
       for(var i=0; i<key.childNodes.length; i++) {
@@ -88,7 +91,7 @@ namespace com.keyman.osk {
       }
         
       if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
-        showPreview(xBase,yBase,key.offsetWidth,key.offsetHeight,kc.innerHTML);
+        showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
       }
     } else if(!on && (typeof clearPreview == 'function')) {
       if(this.touchCount == 0 || key == null) {

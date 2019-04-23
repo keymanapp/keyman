@@ -8,7 +8,8 @@ namespace com.keyman.osk {
     private _height: number; // pixels
     private div: HTMLDivElement;
 
-    public static DEFAULT_HEIGHT: number = 40; // pixels
+    public static DEFAULT_HEIGHT: number = 40; // pixels; embedded apps can modify
+
     public static readonly BANNER_CLASS: string = 'kmw-banner-bar';
     public static readonly BANNER_ID: string = 'kmw-banner-bar';
 
