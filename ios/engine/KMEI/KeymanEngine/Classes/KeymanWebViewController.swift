@@ -260,9 +260,14 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     if fragment.hasPrefix("#insertText-") {
       let dnRange = fragment.range(of: "+dn=")!
       let sRange = fragment.range(of: "+s=")!
+      let drRange = fragment.range(of: "+dr=")!
 
       let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-      let s = fragment[sRange.upperBound...]
+      let s = fragment[sRange.upperBound..<drRange.lowerBound]
+      // This computes the number of requested right-deletion characters.
+      // Use it when we're ready to implement that.
+      // Our .insertText will need to be adjusted accordingly.
+      _ = Int(fragment[drRange.upperBound...])!
 
       // KMW uses dn == -1 to perform special processing of deadkeys.
       // This is handled outside of Swift so we don't delete any characters.

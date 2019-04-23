@@ -91,7 +91,12 @@ public abstract class KMKeyboardJSHandler {
   @JavascriptInterface
   public  abstract boolean dispatchKey(final int code, final int eventModifiers);
 
-  // Insert the selected string s
+  /**
+   * Inserts the selected string <i>s</i>
+   * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+   * @param s   Text to insert
+   * @param dr  Number of post-caret code points to delete.
+   */
   @JavascriptInterface
   public abstract void insertText(final int dn, final String s, final int dr);
 }

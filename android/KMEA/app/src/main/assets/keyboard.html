@@ -145,8 +145,14 @@
       kmw['osk']['show'](true);
     }
 
+    /**
+     * Inserts the selected string <i>s</i>
+     * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+     * @param s   Text to insert
+     * @param dr  Number of post-caret code points to delete.  (optional)
+     */
     function insertText(dn, s, dr) {
-      dr = dr || 0; // Sets a default value.
+      dr = dr || 0; // Sets a default value of zero when dr is undefined
       //window.console.log('insertText('+ dn +', ' + s +', ' + dr + ');');
       window.jsInterface.insertText(dn, s, dr);
     }

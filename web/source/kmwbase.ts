@@ -578,6 +578,11 @@ namespace com.keyman {
 
     // Functions that might be added later
     ['beepKeyboard']: () => void;
+    /**
+     * @param {number}  dn  Number of pre-caret characters to delete
+     * @param {string}  s   Text to insert
+     * @param {number=}  dr  Number of post-caret characters to delete
+     */
     ['oninserttext']: (dn: number, s: string, dr?: number) => void;
 
     /**
