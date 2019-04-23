@@ -70,21 +70,6 @@ public abstract class KMKeyboardJSHandler {
     }
   }
 
-  // This annotation is required in Jelly Bean and later:
-  @JavascriptInterface
-  public void onModelChange(boolean loaded) {
-    Log.d(TAG, "onModelChange");
-    if (loaded) {
-      KMManager.setCurrentBanner("suggestion");
-    } else {
-      KMManager.setCurrentBanner("blank");
-    }
-
-    // TODO: Implement any updates when lexical model is loaded
-    //RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
-    //k.setLayoutParams(params);
-  }
-
   // Store the current keyboard chirality status from KMW in the Keyboard
   @JavascriptInterface
   public void setIsChiral(boolean isChiral) {

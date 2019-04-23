@@ -73,13 +73,14 @@
     }
 
     function onModelChange(change) {
-      var loaded = change == 'loaded' ? true : false;
-      window.console.log('onModelChange change: ' + change + ', loaded: ' + loaded);
+      //window.console.log('onModelChange change: ' + change);
 
+      // Refresh KMW OSK
       var kmw=window['keyman'];
       kmw['correctOSKTextSize']();
 
-      window.jsInterface.onModelChange(loaded);
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
     }
 
     // Query KMW if a given keyboard uses chiral modifiers.

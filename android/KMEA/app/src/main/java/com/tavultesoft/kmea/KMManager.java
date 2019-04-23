@@ -688,7 +688,6 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
-    currentBanner = "suggestion";
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
@@ -1364,6 +1363,12 @@ public final class KMManager {
           hashMap.put("keyText", keyText);
           InAppKeyboard.subKeysList.add(hashMap);
         }
+      } else if (url.indexOf("refreshBannerHeight") >= 0) {
+        int start = url.indexOf("change=") + 7;
+        String change = url.substring(start);
+        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        InAppKeyboard.setLayoutParams(params);
       }
       return false;
     }
@@ -1534,8 +1539,13 @@ public final class KMManager {
           hashMap.put("keyText", keyText);
           SystemKeyboard.subKeysList.add(hashMap);
         }
+      } else if (url.indexOf("refreshBannerHeight") >= 0) {
+        int start = url.indexOf("change=") + 7;
+        String change = url.substring(start);
+        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        SystemKeyboard.setLayoutParams(params);
       }
-
       return false;
     }
   }
