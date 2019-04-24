@@ -30,11 +30,6 @@ public abstract class KMKeyboardJSHandler {
 
   // This annotation is required in Jelly Bean and later:
   @JavascriptInterface
-  public int getBannerHeight() {
-    return KMManager.getBannerHeight(context);
-  }
-
-  @JavascriptInterface
   public int getDefaultBannerHeight() {
     return (int) context.getResources().getDimension(R.dimen.banner_height);
   }

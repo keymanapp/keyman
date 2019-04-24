@@ -10,8 +10,6 @@
   <script src="keyman.js"></script>
   <script type="text/javascript">
     var device = window.jsInterface.getDeviceType();
-    var defaultBannerHeight =
-      Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
     var oskHeight = window.jsInterface.getKeyboardHeight();
     var oskWidth = 0;
     window.addEventListener('load', init, false);
@@ -35,11 +33,23 @@
       ta.readOnly = false;
 
       // Tell KMW the default banner height to use
-      com.keyman.osk.Banner.DEFAULT_HEIGHT = defaultBannerHeight;
+      com.keyman.osk.Banner.DEFAULT_HEIGHT = 
+        Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
       kmw.addEventListener('mm.modelchange', onModelChange);
+    }
+
+    // Update the KMW banner height
+    function setBannerHeight(h) {
+      if (h > 0) {
+        var kmw=com.keyman.singleton;
+        var osk = kmw.osk;
+        osk.banner.height = Math.ceil(h / window.devicePixelRatio);
+      }
+      // Refresh KMW OSK
+      kmw.correctOSKTextSize();
     }
 
     function setOskHeight(h) {
