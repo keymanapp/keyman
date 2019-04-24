@@ -1580,7 +1580,11 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s) {
+    public void insertText(final int dn, final String s, final int dr) {
+      if(dr != 0) {
+        Log.d(TAG, "Right deletions requested but are not presently supported by the in-app keyboard.");
+      }
+
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1705,7 +1709,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s) {
+    public void insertText(final int dn, final String s, final int dr) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1725,6 +1729,7 @@ public final class KMManager {
 
           ic.beginBatchEdit();
 
+          // Delete any existing selected text.
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) { // This can be null if the input connection becomes invalid.
             int start = icText.startOffset + icText.selectionStart;
@@ -1749,6 +1754,7 @@ public final class KMManager {
             return;
           }
 
+          // Perform left-deletions
           for (int i = 0; i < dn; i++) {
             CharSequence chars = ic.getTextBeforeCursor(1, 0);
             if (chars != null && chars.length() > 0) {
@@ -1758,6 +1764,20 @@ public final class KMManager {
                 ic.deleteSurroundingText(2, 0);
               } else {
                 ic.deleteSurroundingText(1, 0);
+              }
+            }
+          }
+
+          // Perform right-deletions
+          for (int i = 0; i < dr; i++) {
+            CharSequence chars = ic.getTextAfterCursor(1, 0);
+            if (chars != null && chars.length() > 0) {
+              char c = chars.charAt(0);
+              SystemKeyboardShouldIgnoreSelectionChange = true;
+              if (Character.isHighSurrogate(c)) {
+                ic.deleteSurroundingText(0, 2);
+              } else {
+                ic.deleteSurroundingText(0, 1);
               }
             }
           }

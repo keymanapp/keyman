@@ -83,10 +83,16 @@
             }
             
             var fragmentToggle = 0;
-            function insertText(dn, s) {
+            /**
+             * Inserts the selected string <i>s</i>
+             * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+             * @param s   Text to insert
+             * @param dr  Number of post-caret code points to delete.  (optional)
+             */
+            function insertText(dn, s, dr) {
+                dr = dr || 0;  // Sets a default value of zero when dr is undefined
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                var insertHash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
-                //window.location.hash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
+                var insertHash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s) + '+dr=' + dr;
                 if (typeof(window.webkit) != 'undefined')
                     window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
             }
