@@ -267,6 +267,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                     object: self,
                                     value: kb)
     
+    // If we have a lexical model for the keyboard's language, activate it.
+    if let valid_models = Storage.active.userDefaults.userLexicalModels(forLanguage: kb.languageID) {
+      if valid_models.count > 0 {
+        //let lm = Storage.active.userDefaults.userLexicalModel(withFullID: valid_models[0].fullID)!
+        _ = Manager.shared.registerLexicalModel(valid_models[0])
+      }
+    }
+    
     return true
   }
 
@@ -305,29 +313,20 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   ///   - addLexicalModel()
   /// - Returns: Whether the lexical model was set successfully
   //TODO: this method appears unused, should we remove it?
-  public func setLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
+  public func registerLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
     if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullID) {
-      return setLexicalModel(lexicalModel)
+      return registerLexicalModel(lexicalModel)
     }
     return false
   }
   
-  
-  /// Set the current lexical model.
-  ///
-  /// - Throws: error if the lexical model was unchanged
-  public func setLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
-    if lm.fullID == currentLexicalModelID {
-      log.info("Lexical model unchanged: \(lm.fullID)")
-      return false
-      // throw LexicalModelError.unchanged
-    }
-    
-    log.info("Setting language: \(lm.fullID)")
+  /// Registers a lexical model with KMW.
+  public func registerLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
+    log.info("Setting lexical model: \(lm.fullID)")
     
     currentLexicalModelID = lm.fullID
     
-    inputViewController.setLexicalModel(lm)
+    inputViewController.registerLexicalModel(lm)
     
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     userData.currentLexicalModelID = lm.fullID
@@ -337,6 +336,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
     
+    // While this does only register the model with KMW, the timing of this generally does
+    // result in a change of the actual model.
     NotificationCenter.default.post(name: Notifications.lexicalModelChanged,
                                     object: self,
                                     value: lm)
@@ -464,7 +465,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     
     // Set a new lexical model if deleting the current one
     if kb.fullID == currentLexicalModelID {
-      _ = setLexicalModel(userLexicalModels[0])
+      _ = registerLexicalModel(userLexicalModels[0])
     }
     
     if !userLexicalModels.contains(where: { $0.id == kb.id }) {

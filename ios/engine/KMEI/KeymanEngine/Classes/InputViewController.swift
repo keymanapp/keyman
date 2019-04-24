@@ -404,8 +404,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.setKeyboard(kb)
   }
     
-  func setLexicalModel(_ lm: InstallableLexicalModel) {
-    keymanWeb.setLexicalModel(lm)
+  func registerLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.registerLexicalModel(lm)
   }
   
   func showHelpBubble() {
