@@ -217,7 +217,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, false);
+    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, usingOSK);
   }
 }
 
