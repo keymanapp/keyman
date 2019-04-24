@@ -17,7 +17,8 @@ public struct LexicalModel: Codable {
   public var id: String
   
   /// Name of the lexicalModel. `.js` file which should be appended to `Options.lexicalModel.BaseURI`.
-  public var filename: String
+  /// Name of the lexicalModel KMP file.
+  public var packageFilename: String
   
   /// The lexicalModel. is the recommended default for the language.
   public var isDefault: Bool
@@ -31,13 +32,13 @@ public struct LexicalModel: Codable {
   /// Dot-decimal version number of the lexicalModel..
   public var version: String
   
-  /// Language objects linked to the lexicalModel..
-  public var languages: [Language]?
+  /// Tags of languages supported by this lexicalModel..
+  public var languages: [String]?
   
   enum CodingKeys: String, CodingKey {
     case name
     case id
-    case filename
+    case packageFilename
     case isDefault = "default"
     case lastModified
     case fileSize
@@ -47,15 +48,15 @@ public struct LexicalModel: Codable {
   
   public init(name: String,
               id: String,
-              filename: String,
+              packageFilename: String,
               isDefault: Bool?,
               lastModified: Date,
               fileSize: Int?,
               version: String,
-              languages: [Language]?) {
+              languages: [String]?) {
     self.name = name
     self.id = id
-    self.filename = filename
+    self.packageFilename = packageFilename
     self.isDefault = isDefault ?? false
     self.lastModified = lastModified
     self.fileSize = fileSize
@@ -68,17 +69,17 @@ public struct LexicalModel: Codable {
     
     let name = try container.decode(String.self, forKey: .name)
     let id = try container.decode(String.self, forKey: .id)
-    let filename = try container.decode(String.self, forKey: .filename)
+    let packageFilename = try container.decode(String.self, forKey: .packageFilename)
     let isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
     // TODO: Handle both seconds and ISO 8601
     let lastModified = try container.decode(Date.self, forKey: .lastModified)
     let fileSize = try container.decodeIfPresent(Int.self, forKey: .fileSize)
     let version = try container.decode(String.self, forKey: .version)
-    let languages = try container.decodeIfPresent([Language].self, forKey: .languages)
+    let languages = try container.decodeIfPresent([String].self, forKey: .languages)
     
     self.init(name: name,
               id: id,
-              filename: filename,
+              packageFilename: packageFilename,
               isDefault: isDefault,
               lastModified: lastModified,
               fileSize: fileSize,

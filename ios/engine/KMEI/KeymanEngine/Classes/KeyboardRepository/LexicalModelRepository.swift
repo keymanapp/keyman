@@ -26,7 +26,7 @@ public extension LexicalModelRepository {
     }
   
     // If the lexicalModel (still) supports the requested language, use that one.
-    guard let language = lexicalModel.languages?.first(where: {$0.id == languageID}) ??
+    guard let language = lexicalModel.languages?.first(where: {$0 == languageID}) ??
         // Otherwise, just use the first language listed for the lexicalModel.
         lexicalModel.languages?.first ??
         // In cases where the lexicalModel fails to specify any language, use the requested one if it's in the collection.
@@ -35,7 +35,7 @@ public extension LexicalModelRepository {
         return nil
     }
   
-    return InstallableLexicalModel(lexicalModel: lexicalModel, language: language, isCustom: false)
+    return InstallableLexicalModel(lexicalModel: lexicalModel, languageID: language as! String, isCustom: false)
   }
   
   public func fetch(completionHandler: CompletionHandler? = nil) {

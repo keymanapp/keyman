@@ -253,7 +253,7 @@ extension KeymanWebViewController {
       "KI": "LexicalModel_\(lexicalModel.id)",
       "KN": lexicalModel.name,
       "KLC": lexicalModel.languageID,
-      "KL": lexicalModel.languageName,
+//      "KL": lexicalModel.languageName,
       "KF": storage.lexicalModelURL(for: lexicalModel).absoluteString
     ]
   
