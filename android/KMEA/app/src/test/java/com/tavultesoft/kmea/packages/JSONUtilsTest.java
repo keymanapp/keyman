@@ -1,6 +1,5 @@
 package com.tavultesoft.kmea.packages;
 
-
 import android.util.Log;
 
 import com.tavultesoft.kmea.JSONParser;
@@ -13,10 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.io.File;
-import java.io.IOException;
+
 
 @RunWith(RobolectricTestRunner.class)
 public class JSONUtilsTest {

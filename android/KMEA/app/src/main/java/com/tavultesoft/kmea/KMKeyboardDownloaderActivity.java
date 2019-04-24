@@ -1,33 +1,29 @@
 package com.tavultesoft.kmea;
 
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
+import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.BuildConfig;
 
-import static com.tavultesoft.kmea.KMManager.KMDefault_AssetPackages;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
-import static com.tavultesoft.kmea.KMManager.KMKey_FontSource;
 
 public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   // Bundle Keys
@@ -46,9 +42,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
 
   public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
+  public static final String kKeymanApiModelURL = "https://api.keyman.com/model";
   public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
-  private static final String TAG = "KMKeyboardDownloaderActivity";
+  private static final String TAG = "KMKbdDownloaderActivity"; // TAG needs to be less than 28 chars
 
   // Keyman public keys
   public static final String KMKey_URL = "url";
@@ -186,15 +183,17 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           deviceType = "androidphone";
         }
 
-        String remoteUrl = "";
+        String remoteUrl = "",remoteLexicalModelUrl = "";
         if (isCustom) {
           remoteUrl = url;
         } else {
           // Keyman cloud
           remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47", kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
+          remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
+
         }
 
-        ret = downloadNonKMPKeyboard(remoteUrl);
+        ret = downloadNonKMPKeyboard(remoteUrl, remoteLexicalModelUrl);
       } catch (Exception e) {
         ret = -1;
         Log.e(TAG, "Error: " + e);
@@ -224,12 +223,14 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
 
     /**
-     * Download a non-KMP Keyman keyboard from Keyman cloud via JSON
+     * Download a non-KMP Keyman keyboard from Keyman cloud via JSON.
+     * If an associated lexical model keyboard package is available, download the first one.
      * @param remoteUrl String
+     * @param remoteLexicalModelUrl String API query for lexical model associated with the language ID
      * @return ret int -1 for fail; >0 for success; 2 for keyboard downloading but not font
      * @throws Exception
      */
-    protected int downloadNonKMPKeyboard(String remoteUrl) throws Exception {
+    protected int downloadNonKMPKeyboard(String remoteUrl, String remoteLexicalModelUrl) throws Exception {
       int ret = -1;
       JSONParser jsonParser = new JSONParser();
       JSONObject kbData = jsonParser.getJSONObjectFromUrl(remoteUrl);
@@ -316,6 +317,19 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       font = keyboard.optString(KMManager.KMKey_Font);
       oskFont = keyboard.optString(KMManager.KMKey_OskFont);
 
+      // Also download first associated lexical model if it exists
+      JSONArray lmData = jsonParser.getJSONObjectFromUrl(remoteLexicalModelUrl, JSONArray.class);
+      if (lmData != null && lmData.length() > 0) {
+        try {
+          JSONObject modelInfo = lmData.getJSONObject(0);
+          if (modelInfo.has("packageFilename")) {
+            urls.add(modelInfo.getString("packageFilename"));
+          }
+        } catch (JSONException e) {
+          Log.e(TAG, "Error parsing lexical model from api.keyman.com. " + e);
+        }
+      }
+
       notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_STARTED, 0);
 
       String destination = context.getDir("data", Context.MODE_PRIVATE).toString() +
@@ -323,6 +337,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
       ret = 1;
       int result = 0;
+      File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+      LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
       for (String url : urls) {
         String filename = "";
         if (FileUtils.hasJavaScriptExtension(url)) {
@@ -338,9 +354,30 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           } else {
             filename = kbFilename.substring(start);
           }
+        } else if (FileUtils.hasKeymanPackageExtension(url)) {
+          // Save the kmp file in the app cache
+          destination = (context.getCacheDir() + File.separator).toString();
+          filename = FileUtils.getFilename(url);
         }
 
         result = FileUtils.download(context, url, destination, filename);
+        if (result > 0 && FileUtils.hasKeymanPackageExtension(url)) {
+          // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
+          File kmpFile = new File(context.getCacheDir(), filename);
+          String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
+          if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+            File unzipPath = kmpProcessor.unzipKMP(kmpFile);
+            List<Map<String, String>> installedLexicalModels =
+              kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+
+            boolean success = installedLexicalModels.size() != 0;
+            if (success) {
+              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                installedLexicalModels, 1);
+            }
+          }
+
+        }
         if (result < 0) {
           if (FileUtils.hasFontExtension(url)) {
             // Propagate warning about font failing to download
@@ -374,6 +411,19 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         if (oskFont != null)
           keyboardInfo.put(KMManager.KMKey_OskFont, oskFont);
         KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboardInfo, result);
+      }
+    }
+
+    /**
+     * Notify listeners when a lexical model is installed
+     * @param eventType
+     * @param models
+     * @param result
+     */
+    protected void notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType eventType,
+      List<Map<String, String>> models, int result) {
+      if (kbDownloadEventListeners != null) {
+        KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, models, result);
       }
     }
   }

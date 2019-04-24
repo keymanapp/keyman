@@ -5,16 +5,28 @@ init --no-package
 
 keyman_projects="keyman-keyboardprocessor kmflcomp libkmfl ibus-kmfl keyman-config ibus-keyman"
 
-if [ "$1" == "keyman-keyboardprocessor" ]; then
+tier="stable"
+
+if [[ "$1" =~ "-alpha" ]]; then
+    tier="alpha"
+elif [[ "$1" =~ "-beta" ]]; then
+    tier="beta"
+fi
+
+proj="$1"
+proj=${proj%"-alpha"}
+proj=${proj%"-beta"}
+
+if [ "$proj" == "keyman-keyboardprocessor" ]; then
 	sourcename="keyboardprocessor"
 	sourcedir="../common/engine/keyboardprocessor"
 else
 	# check if project is known
-	if [[ $keyman_projects =~ (^|[[:space:]])$1($|[[:space:]]) ]]; then
+	if [[ $keyman_projects =~ (^|[[:space:]])$proj($|[[:space:]]) ]]; then
 		sourcename="$1"
-		sourcedir="$1"
+		sourcedir="$proj"
 	else
-		stderr "$1 not in known projects ($keyman_projects)"
+		stderr "$proj not in known projects ($keyman_projects)"
 		exit -1
 	fi
 fi
@@ -29,13 +41,14 @@ rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
 log "Make source package for $sourcename"
 log "reconfigure"
-if [ "$1" == "keyman-keyboardprocessor" ]; then
+if [ "$proj" == "keyman-keyboardprocessor" ]; then
 	mkdir -p keyboardprocessor
+	JENKINS="yes" TIER="$tier" ./scripts/reconf.sh keyboardprocessor
 else
-	JENKINS="yes" ./scripts/reconf.sh $sourcename
+	JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $proj
 fi
 log "Make origdist"
-./scripts/dist.sh origdist $sourcename
+./scripts/dist.sh origdist $proj
 log "Make deb source"
 ./scripts/deb.sh sourcepackage $1
 

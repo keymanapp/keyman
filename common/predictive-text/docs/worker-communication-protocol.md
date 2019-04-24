@@ -117,69 +117,91 @@ Currently there are four message types:
 
 Message       | Direction          | Parameters          | Expected reply      | Uses token
 --------------|--------------------|---------------------|---------------------|---------------
-`initialize`  | keyboard → LMLayer | capabilities, model | Yes — `ready`       | No
+`config`      | LMLayer -> worker  | capabilities        | No                  | No
+`load`        | keyboard → LMLayer | model               | Yes — `ready`       | No
+`unload`      | keyboard → LMLayer | none                | No                  | No 
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
 `predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
 
-
-### Message: `initialize`
+### Message: `config`
 
 Must be sent from the keyboard to the LMLayer so that the LMLayer
-initializes a model. It will send `initialization` which is a plain
-JavaScript object specify the path to the model, as well configurations
-and platform restrictions.
+may properly configure loaded models. It will send `config`, a plain
+JavaScript object specifying platform restrictions.
 
-The keyboard **MUST NOT** send any messages to the LMLayer prior to
-sending `initialize`. The keyboard **SHOULD NOT** send another message
-to the keyboard until it receives `ready` message from the LMLayer
-before sending another message.
+The keyboard **MUST NOT** send any messages to the LMLayer prior to sending `config`.
+After this, it is safe to assume the `config` was performed successfully and is ready to
+`load` a model.
 
-The LMLayer needs to know the platform's abilities and restrictions (capabilities), as well as which concrete language model to instantiate. These properties are passed as `capabilities` and `model`, respectively.
+The LMLayer needs to know the platform's abilities and restrictions (capabilities).
 
 ```typescript
-interface InitializeMessage {
-  message: 'initialize';
+interface LoadMessage {
+  message: 'load';
 
   /**
-   * A ModelDescription that describes the language model and its parameters.
-   * The concrete documentation on is a valid ModelDescription
-   * can be found elsewhere.
+   * The path to the model's compiled script file.
    */
-  model: {
-    /**
-     * What kind of model to instantiate. This is subject to availability,
-     * but common examples are 'wordlist', 'fst', and 'dummy'.
-     */
-    type: string;
-    /**
-     * Each model type defines a set of configurable parameters. Please
-     * see the corresponding model's documentation for an extensive list.
-     */
-    ...parameters: any;
-  };
-
   capabilities: {
     /**
-     * Whether the platform supports deleting to the right.
-     * The absence of this rule implies false.
-     */
-    supportsDeleteRight?: false,
-
-    /**
-     * The maximum amount of UTF-16 code units that the keyboard will
-     * provide to the left of the cursor, as an integer.
+     * The maximum amount of UTF-16 code units that the keyboard will provide to
+     * the left of the cursor, as an integer.
      */
     maxLeftContextCodeUnits: number,
 
     /**
-     * The maximum amount of code units that the keyboard will provide to
-     * the right of the cursor, as an integer. The absence of this rule
-     * implies the platform is incapable of supplying right contexts. 
-     * See also, [[supportsRightContexts]].
+     * The maximum amount of code units that the keyboard will provide to the
+     * right of the cursor, as an integer. The value 0 or the absence of this
+     * rule implies that the right contexts are not supported.
      */
     maxRightContextCodeUnits?: number,
+
+    /**
+     * Whether the platform supports deleting to the right. The absence of this
+     * rule implies false.
+     */
+    supportsDeleteRight?: false,
   }
+}
+```
+
+### Message: `load`
+
+Must be sent from the keyboard to the LMLayer so that the LMLayer
+loads a model. It will send `load` which is a plain
+JavaScript object specify the path to the model, as well configurations
+and platform restrictions.
+
+After a single `config` message, the keyboard **MUST NOT** send any messages 
+to the LMLayer prior to sending `load`. The keyboard **SHOULD NOT** send another 
+message to the keyboard until it receives `ready` message from the LMLayer
+before sending another message.
+
+The LMLayer needs to know which concrete language model to instantiate. This is provided
+by the file at the path specified by the `model` string parameter.
+
+```typescript
+interface LoadMessage {
+  message: 'load';
+
+  /**
+   * The path to the model's compiled script file.
+   */
+  model: string
+}
+```
+
+### Message: `unload`
+
+Must be sent from the keyboard to the LMLayer so that the LMLayer
+resets itself in preparation for loading a new model. It will send `unload`
+which is a plain message to trigger release of old model resources.
+
+
+```typescript
+interface UnloadMessage {
+  message: 'unload';
 }
 ```
 
@@ -187,7 +209,7 @@ interface InitializeMessage {
 ### Message: `ready`
 
 Must be sent from the LMLayer to the keyboard when the LMLayer's model
-as a response to `initialize`. It will send `configuration`, which is
+as a response to `load`. It will send `configuration`, which is
 a plain JavaScript object requesting configuration from the keyboard.
 
 There are only two options defined so far:
@@ -393,3 +415,17 @@ keyboard to acknowledge late suggestions, or for the LMLayer to avoid
 sending late `suggestions` messages. In either case, a `suggestions`
 message can be identified as appropriate or "late" via its `token`
 property.
+
+
+## *Informative*: LMLayer worker as a state machine
+
+The LMLayer worker can be seen in the following states:
+
+ - `unconfigured`
+ - `model-less`
+ - `ready`
+
+The transitions of this diagram correspond to messages as described
+above.
+
+![State machine of the LMLayer](./lmlayer-states.png)

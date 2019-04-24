@@ -1,20 +1,16 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.github.triplet.play'
-apply plugin: 'io.fabric'
+plugins {
+    id 'com.android.application'
+    id 'io.fabric'
+    id 'com.github.triplet.play' version '2.1.0' apply false
+}
 
 android {
-    compileSdkVersion 27
-    playAccountConfigs {
-        defaultAccountConfig {
-            if (project.hasProperty("keys_json_file")) {
-                jsonFile = file(project.ext.keys_json_file)
-            }
-        }
-    }
+    compileSdkVersion 28
+
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
 
         //dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration
 
@@ -36,8 +32,6 @@ android {
             versionCode 100
             versionName majorMinorVersion + '.0.0'
         }
-
-        playAccountConfig = playAccountConfigs.defaultAccountConfig
     }
 
     if (project.hasProperty("release_store_file")) {
@@ -69,10 +63,16 @@ android {
     lintOptions {
         disable 'MissingTranslation'
     }
+}
+
+if (project.hasProperty("keys_json_file")) {
+    apply plugin: 'com.github.triplet.play'
 
     play {
+        serviceAccountCredentials = file(project.ext.keys_json_file)
+
         // Deactivate lower conflicting version APKs
-        untrackOld = true
+        resolutionStrategy = "ignore"
         switch (System.env.TIER) {
             case 'beta':
                 track = 'beta'
@@ -99,18 +99,14 @@ repositories {
     }
 }
 
-ext {
-    currentFirebaseVersion = "15.0.2"
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'com.google.android.material:material:1.0.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation "com.google.firebase:firebase-core:$currentFirebaseVersion"
-    implementation "com.google.firebase:firebase-crash:$currentFirebaseVersion"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
+    implementation "com.google.firebase:firebase-core:16.0.7"
+    implementation "com.google.firebase:firebase-crash:16.2.1"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
         transitive = true
     }
 }

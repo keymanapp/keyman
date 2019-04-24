@@ -37,7 +37,7 @@ Each platform maintains multiple types of releases:
 
 # License
 
-Copyright (c) 2018 SIL International. All rights reserved.
+Copyright (c) 2018-2019 SIL International. All rights reserved.
 
 Licensed under the [MIT](./windows/src/LICENSE.md) License.
 

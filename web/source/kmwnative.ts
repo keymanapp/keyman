@@ -53,12 +53,16 @@ namespace com.keyman.osk {
     let util = com.keyman.singleton.util;
 
     // Test for subkey array, return if none
+    // (JH 2/4/19) So, if a subkey is passed in, we return immediately?
     if(k == null || k['subKeys'] == null) {
       return;
     }
 
     // Highlight key at touch position (and clear other highlighting)
     var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
+
+    //#region This section fills a different role than the method name would suggest.
+    // Might correspond better to a 'checkInstantSubkeys' or something.
 
     // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
     if((this.touchY-y > 5) && skBox == null) {
@@ -68,7 +72,13 @@ namespace com.keyman.osk {
       this.showSubKeys(k);
       skBox=document.getElementById('kmw-popup-keys');
     } 
-        
+    //#endregion
+    
+    /* (JH 2/4/19) Because of that earlier note, in KMW 12 alpha (and probably 11),
+     * the following code is effectively impotent and could be deleted with no effect.
+     * Note that this probably results from VisualKeyboard.keyTarget finding the 
+     * subkey first... which is necessary anyway to support subkey output.
+     */
     for(i=0; i < k['subKeys'].length; i++) {
       try {
         sk=<HTMLElement> skBox.childNodes[i].firstChild;
@@ -373,25 +383,32 @@ namespace com.keyman.osk {
     let device = util.device;
 
     if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
-      return;
+      return false;
     }
 
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
-        oskHeight=oskManager.getHeight(),
-        rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows)),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
+        rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
+        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
     }
+    let oskHeight : number = nRows*rowHeight;
 
-    oskHeight=nRows*rowHeight;
-
-    var b: HTMLElement = _Box,bs=b.style;
+    var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.firstChild.firstChild; bs=b.style;
+    b = <HTMLElement> b.childNodes.item(1).firstChild;
+    bs=b.style;
+    // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      b.childNodes.forEach(function(layer: HTMLElement) {
+        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+      });
+    }
+    // Sets the layers to the correct height 
+    pad = Math.round(0.15*rowHeight);
 
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
     if(device.OS == 'iOS') {
@@ -404,10 +421,8 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      rowHeight=Math.floor(oskHeight/(nRows == 0 ? 1 : nRows));
+      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
 
-      pad = Math.round(0.15*rowHeight);
-      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+3)+'px';
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
         rs.bottom=(nRows-nRow-1)*rowHeight+1+'px';
@@ -436,6 +451,8 @@ namespace com.keyman.osk {
         }
       }
     }
+
+    return true;
   };
 
   // /**
@@ -650,6 +667,17 @@ if(!window['keyman']['initialized']) {
 
       rotationManager.init();
     }
+
+    /**
+     * Test code to set suggestion banner
+     * TODO: Remove from production
+     */
+    keymanweb['setBanner']=function() {
+      let keyman = com.keyman.singleton;
+      let osk = keyman.osk;
+      osk.banner.setBanner('suggestion');
+      osk.banner.setSuggestions();
+    };
 
     /**
      * Possible way to detect the start of a rotation and hide the OSK before it is adjusted in size

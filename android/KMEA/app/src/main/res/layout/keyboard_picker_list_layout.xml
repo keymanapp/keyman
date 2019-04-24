@@ -39,7 +39,7 @@
             android:layout_weight="10"
             android:layout_gravity="center"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_button"
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"

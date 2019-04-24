@@ -52,10 +52,13 @@ import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public final class KMManager {
@@ -101,6 +104,7 @@ public final class KMManager {
   protected static boolean SystemKeyboardShouldIgnoreSelectionChange = false;
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
+  protected static String currentBanner = "blank";
 
   // Keyman public keys
   public static final String KMKey_ID = "id";
@@ -122,6 +126,9 @@ public final class KMManager {
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
+  public static final String KMKey_LexicalModelID = "lmId";
+  public static final String KMKey_LexicalModelName = "lmName";
+  public static final String KMKey_LexicalModelVersion = "lmVersion";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -134,6 +141,7 @@ public final class KMManager {
   public static final String KMDefault_LegacyAssetFonts = "fonts";
   public static final String KMDefault_UndefinedPackageID = "cloud";
   public static final String KMDefault_AssetPackages = "packages";
+  public static final String KMDefault_LexicalModelPackages = "models";
 
   // Default Keyboard Info
   public static final String KMDefault_KeyboardID = "sil_euro_latin";
@@ -149,6 +157,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
+  public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
 
   private static Context appContext;
 
@@ -158,6 +167,10 @@ public final class KMManager {
 
   protected static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
+  }
+
+  protected static String getLexicalModelsDir() {
+    return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
   protected static String getCloudDir() {
@@ -192,9 +205,6 @@ public final class KMManager {
       Log.e(TAG, "Cannot initialize: Invalid keyboard type");
     }
 
-    // Initializes the PackageProcessor with the base resource directory, which is the parent directory
-    // for the final location corresponding to KMDefault_AssetPackages.
-    PackageProcessor.initialize(new File(getResourceRoot()));
     JSONUtils.initialize(new File(getPackagesDir()));
   }
 
@@ -225,12 +235,18 @@ public final class KMManager {
     return false;
   }
 
+  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+    int bannerHeight = currentBanner.equals("suggestion") ? getBannerHeight(appContext) : 0;
+    int kbHeight = getKeyboardHeight(appContext);
+    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
+    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+   return params;
+  }
+
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
-      int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
-      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -242,10 +258,8 @@ public final class KMManager {
 
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
-      int kbHeight = appContext.getResources().getDimensionPixelSize(R.dimen.keyboard_height);
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, kbHeight);
-      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
@@ -363,9 +377,16 @@ public final class KMManager {
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
 
+      // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
       if (!packagesDir.exists()) {
         packagesDir.mkdir();
+      }
+
+      // Lexical models directory
+      File lexicalModelsDir = new File(getLexicalModelsDir());
+      if (!lexicalModelsDir.exists()) {
+        lexicalModelsDir.mkdir();
       }
 
       // Copy default cloud keyboard
@@ -634,6 +655,46 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
+  public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
+    String pkgID = lexicalModelInfo.get(KMKey_PackageID);
+    String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
+    String languageID = lexicalModelInfo.get(KMKey_LanguageID);
+    String path = "file://" + getLexicalModelsDir() + pkgID + File.separator + modelID + ".model.js";
+
+    JSONObject modelObj = new JSONObject();
+    JSONArray languageJSONArray = new JSONArray();
+    try {
+      modelObj.put("id", modelID);
+      languageJSONArray.put(languageID);
+      modelObj.put("languages", languageJSONArray);
+      modelObj.put("path", path);
+    } catch (JSONException e) {
+      Log.e(TAG, "Invalid lexical model to register");
+      return false;
+    }
+
+    // Escape single quotes, and then convert double quotes to single quotes for javascript call
+    String model = String.valueOf(modelObj);
+    model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+    model = model.replaceAll("\"", "'");
+
+    currentBanner = "suggestion";
+    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+      InAppKeyboard.setLayoutParams(params);
+      InAppKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+      SystemKeyboard.setLayoutParams(params);
+      SystemKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+    }
+    return true;
+  }
+
+  public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+    return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
+  }
+
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
     // Log Firebase analytic event.
     Bundle params = new Bundle();
@@ -859,7 +920,7 @@ public final class KMManager {
         }
       }
     } else {
-      path = getPackagesDir() + packageID + File.separator + PackageProcessor.PPDefault_Metadata;
+      path = getPackagesDir() + packageID + File.separator + PackageProcessor.PP_DEFAULT_METADATA;
 
       try {
         File kmpJSONFile = new File(path);
@@ -886,6 +947,10 @@ public final class KMManager {
   public static void removeKeyboardEventListener(OnKeyboardEventListener listener) {
     KMTextView.removeOnKeyboardEventListener(listener);
     KMKeyboard.removeOnKeyboardEventListener(listener);
+  }
+
+  public static int getBannerHeight(Context context) {
+    return (int) context.getResources().getDimension(R.dimen.banner_height);
   }
 
   public static int getKeyboardHeight(Context context) {

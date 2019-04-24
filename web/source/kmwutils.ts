@@ -281,7 +281,7 @@ namespace com.keyman {
      * @return      {Object.<string,number>}               
      * Description  Returns absolute position of Pobj element with respect to page
      */  
-    _GetAbsolute(Pobj: HTMLElement) {
+    getAbsolute(Pobj: HTMLElement) {
       var p={
         /* @ export */
         x: this.getAbsoluteX(Pobj),
@@ -292,7 +292,7 @@ namespace com.keyman {
     }
 
     //  Unofficial API used by our desktop UIs.
-    getAbsolute = this._GetAbsolute;
+    _GetAbsolute = this.getAbsolute;
     
     /**
      * Select start handler (to replace multiple inline handlers) (Build 360)  

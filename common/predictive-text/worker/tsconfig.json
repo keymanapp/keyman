@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": false,
+    "declaration": true,
     "module": "none",
     "outFile": "../build/intermediate/index.js",
     "inlineSources": true,

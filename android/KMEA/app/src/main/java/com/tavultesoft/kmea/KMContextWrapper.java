@@ -6,7 +6,7 @@ package com.tavultesoft.kmea;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class KMContextWrapper extends ContextWrapper {
 

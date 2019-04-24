@@ -30,40 +30,33 @@
  */
 
 /// <reference path="../message.d.ts" />
+/// <reference path="models/dummy-model.ts" />
+/// <reference path="models/wordlist-model.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
  * 
- * Implements the state pattern. There are two states:
+ * Implements the state pattern. There are three states:
  * 
- *  - `uninitialized` (initial state)
- *  - `ready`         (accepting state)
+ *  - `unconfigured`  (initial state before configuration)
+ *  - `modelless`     (state without model loaded)
+ *  - `ready`         (state with model loaded, accepts prediction requests)
  * 
  * Transitions are initiated by valid messages. Invalid
  * messages are errors, and do not lead to transitions.
  * 
- *         +-----------------+            +---------+
- *         |                 | initialize |         |
- *  +------>  uninitialized  +----------->+  ready  +---+
- *         |                 |            |         |   |
- *         +-----------------+            +----^----+   | predict
- *                                             |        |
- *                                             +--------+
+ *          +-------------+    load    +---------+
+ *   config |             |----------->|         |
+ *  +------->  modelless  +            +  ready  +---+
+ *          |             |<-----------|         |   |
+ *          +-------------+   unload   +----^----+   | predict
+ *                                          |        |
+ *                                          +--------+
  * 
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
 class LMLayerWorker {
-  /**
-   * All of the bundled model implementations will add themselves here:
-   * Note: the models will add themselves by including this
-   * file using a triple-slash directive:
-   * /// <reference path="path/to/this/file.ts" />
-   * then adding the constructor to this static object:
-   * LMLayerWorker.models.MyModelImplementation = class {}
-   */
-  static models: {[key: string]: WorkerInternalModelConstructor} = {};
-
   /**
    * State pattern. This object handles onMessage().
    * handleMessage() can transition to a different state, if
@@ -77,11 +70,26 @@ class LMLayerWorker {
    */
   private _postMessage: PostMessage;
 
+  /**
+   * By default, it's self.importScripts(), but can be overridden
+   * so that this can be tested **outside of a Worker**.
+   * 
+   * To function properly, self.importScripts() must be bound to self
+   * before being stored here, else it will fail.
+   */
+  private _importScripts: ImportScripts;
+
+  private _platformCapabilities: Capabilities;
+
+  private _hostURL: string;
+
   constructor(options = {
-    postMessage: null,
+    importScripts: null,
+    postMessage: null
   }) {
     this._postMessage = options.postMessage || postMessage;
-    this.setupInitialState();
+    this._importScripts = options.importScripts || importScripts;
+    this.setupConfigState();
   }
 
   /**
@@ -134,58 +142,79 @@ class LMLayerWorker {
    * @param desc         Type of the model to instantiate and its parameters.
    * @param capabilities Capabilities on offer from the keyboard.
    */
-  private loadModel(desc: ModelDescription, capabilities: Capabilities) {
-    let model: WorkerInternalModel;
-    let configuration: Configuration = {
-      leftContextCodeUnits: 0,
-      rightContextCodeUnits: 0
-    };
-
-    if (desc.type === 'dummy') {
-      model = new LMLayerWorker.models.DummyModel(capabilities, {
-        futureSuggestions: desc.futureSuggestions
-      });
-    } else if (desc.type === 'wordlist') {
-      model = new LMLayerWorker.models.WordListModel(capabilities, desc.wordlist);
-    } else {
-      throw new Error('Invalid model');
-    }
-    // TODO: when model is object with kind 'wordlist' or 'fst'
+  public loadModel(model: WorkerInternalModel) {
+    // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
+    // returning a Configuration.
+    let configuration = model.configure(this._platformCapabilities);
 
     // Set reasonable defaults for the configuration.
     if (!configuration.leftContextCodeUnits) {
-      configuration.leftContextCodeUnits = capabilities.maxLeftContextCodeUnits;
+      configuration.leftContextCodeUnits = this._platformCapabilities.maxLeftContextCodeUnits;
     }
     if (!configuration.rightContextCodeUnits) {
-      configuration.rightContextCodeUnits = capabilities.maxRightContextCodeUnits || 0;
+      configuration.rightContextCodeUnits = this._platformCapabilities.maxRightContextCodeUnits || 0;
     }
 
-    return {model, configuration};
+    this.transitionToReadyState(model);
+    this.cast('ready', { configuration });
+  }
+
+  private loadModelFile(url: string) {
+    // The self/global WebWorker method, allowing us to directly import another script file into WebWorker scope.
+    // If built correctly, the model's script file will auto-register the model with loadModel() above.
+    this._importScripts(url);
+  }
+
+  public unloadModel() {
+    // Right now, this seems sufficient to clear out the old model.
+    // The only existing reference to a loaded model is held by 
+    // transitionToReadyState's `handleMessage` closure. (The `model` var)
+    this.transitionToLoadingState();
   }
 
   /**
-   * Sets the initial state, i.e., `uninitialized`.
-   * This state only handles `initialized` messages, and will
+   * Sets the initial state, i.e., `unconfigured`.
+   * This state only handles `config` messages, and will
+   * transition to the `modelless` state once it receives
+   * the config data from the host platform.
+   */
+  private setupConfigState() {
+    this.state = {
+      name: 'unconfigured',
+      handleMessage: (payload) => {
+        // ... that message must have been 'config'!
+        if (payload.message !== 'config') {
+          throw new Error(`invalid message; expected 'config' but got ${payload.message}`);
+        }
+
+        this._platformCapabilities = payload.capabilities;
+
+        this.transitionToLoadingState();
+      }
+    }
+  }
+  
+  public loadWordBreaker(breaker: WorkerInternalWordBreaker) {
+    // TODO:  Actually store it somewhere for future use.  Make sure we can forget it with `unloadModel` as well.
+  }
+
+  /**
+   * Sets the model-loading state, i.e., `modelless`.
+   * This state only handles `load` messages, and will
    * transition to the `ready` state once it receives a model
    * description and capabilities.
    */
-  private setupInitialState() {
+  private transitionToLoadingState() {
     this.state = {
-      name: 'uninitialized',
+      name: 'modelless',
       handleMessage: (payload) => {
-        // ...that message must have been 'initialize'!
-        if (payload.message !== 'initialize') {
-          throw new Error(`invalid message; expected 'initialize' but got ${payload.message}`);
+        // ...that message must have been 'load'!
+        if (payload.message !== 'load') {
+          throw new Error(`invalid message; expected 'load' but got ${payload.message}`);
         }
 
         // TODO: validate configuration?
-        let {model, configuration} = this.loadModel(
-          // TODO: validate configuration, and provide valid configuration in tests.
-          payload.model, payload.capabilities
-        );
-
-        this.transitionToReadyState(model);
-        this.cast('ready', { configuration });
+        this.loadModelFile(payload.model);
       }
     };
   }
@@ -195,21 +224,38 @@ class LMLayerWorker {
    * fully-instantiated model. The `ready` state only responds
    * to `predict` message, and is an accepting state.
    *
-   * @param model The initialized language model.
+   * @param model The loaded language model.
    */
   private transitionToReadyState(model: WorkerInternalModel) {
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
-        if (payload.message !== 'predict') {
-          throw new Error(`invalid message; expected 'predict' but got ${payload.message}`);
-        }
+        switch(payload.message) {
+          case 'predict':
+            let {transform, context} = payload;
 
-        let {transform, context} = payload;
-        this.cast('suggestions', {
-          token: payload.token,
-          suggestions: model.predict(transform, context)
-        });
+            let suggestions = model.predict(transform, context);
+
+            // Let's not rely on the model to copy transform IDs.
+            // Only bother is there IS an ID to copy.
+            if(transform.id !== undefined) {
+              suggestions.forEach(function(s: Suggestion) {
+                s.transformId = transform.id;
+              });
+            }
+
+            // Now that the suggestions are ready, send them out!
+            this.cast('suggestions', {
+              token: payload.token,
+              suggestions: suggestions
+            });
+            break;
+          case 'unload':
+            this.unloadModel();
+            break;
+          default:
+          throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
+        }
       }
     };
   }
@@ -233,8 +279,13 @@ class LMLayerWorker {
    * @param scope A global scope to install upon.
    */
   static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
-    let worker = new LMLayerWorker({ postMessage: scope.postMessage });
+    let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
+
+    // Ensures that the worker instance is accessible for loaded model scripts.
+    // Assists unit-testing.
+    scope['LMLayerWorker'] = worker;
+    scope['models'] = models;
 
     return worker;
   }
@@ -243,6 +294,7 @@ class LMLayerWorker {
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
+  module.exports['models'] = models;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as DedicatedWorkerGlobalScope);

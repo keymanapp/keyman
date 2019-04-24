@@ -26,6 +26,8 @@
 /// <reference path="osk/oskManager.ts" />
 // Defines the language modeling layer (for use in autocorrect and text prediction)
 /// <reference path="includes/lmlayer.ts" />
+// Defines the model manager.
+/// <reference path="text/prediction/modelManager.ts" />
 
 /***
    KeymanWeb 11.0
@@ -74,6 +76,7 @@ namespace com.keyman {
     uiManager: UIManager;
     keyMapManager: KeyMapManager;
     textProcessor: text.Processor;
+    modelManager: text.prediction.ModelManager;
 
     touchAliasing: DOMEventHandlers;
 
@@ -85,7 +88,7 @@ namespace com.keyman {
       'fonts':'',
       'attachType':'',
       'ui':null
-    };;
+    };
 
 
     // Stub functions (defined later in code only if required)
@@ -112,7 +115,6 @@ namespace com.keyman {
       // Allow internal minification of the public modules.
       this.util = this['util'] = new Util(this);
       window['KeymanWeb'] = this.interface = this['interface'] = new text.KeyboardInterface();
-      this.osk = this['osk'] = new com.keyman.osk.OSKManager();
       this.ui = this['ui'] = {};
 
       this.keyboardManager = new KeyboardManager(this);
@@ -121,6 +123,8 @@ namespace com.keyman {
       this.uiManager = new UIManager(this);
       this.keyMapManager = new KeyMapManager();
       this.textProcessor = new text.Processor();
+      this.modelManager = new text.prediction.ModelManager();
+      this.osk = this['osk'] = new com.keyman.osk.OSKManager();
 
       // Load properties from their static variants.
       this['build'] = KeymanBase.__BUILD__;
@@ -155,6 +159,7 @@ namespace com.keyman {
       this.osk.shutdown();
       this.util.shutdown();
       this.keyboardManager.shutdown();
+      this.modelManager.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();

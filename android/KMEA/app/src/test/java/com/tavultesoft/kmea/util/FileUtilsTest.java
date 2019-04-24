@@ -1,17 +1,14 @@
 package com.tavultesoft.kmea.util;
 
-import android.content.Context;
-import android.os.Build;
-import android.support.v4.widget.TextViewCompat;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowLog;
 
 import java.util.List;
+
+import androidx.test.core.app.ApplicationProvider;
 
 @RunWith(RobolectricTestRunner.class)
 public class FileUtilsTest {
@@ -19,17 +16,19 @@ public class FileUtilsTest {
   @Test
   public void test_download() {
     // Test invalid download doesn't throw exception
-    int ret = FileUtils.download(RuntimeEnvironment.application, "invalidURL", "", "");
+    int ret = FileUtils.download(ApplicationProvider.getApplicationContext(), "invalidURL", "", "");
     Assert.assertEquals(-1, ret);
 
     List<ShadowLog.LogItem> logs = ShadowLog.getLogs();
-    Assert.assertEquals(2, logs.size());
 
-    Assert.assertEquals("Connection", logs.get(0).tag);
-    Assert.assertEquals("Initialization failed:java.net.MalformedURLException: no protocol: invalidURL", logs.get(0).msg);
+    // The logs contain type 4, but we only care about type 6 for connection messages
+    Assert.assertEquals(4, logs.size());
 
-    Assert.assertEquals("FileUtils", logs.get(1).tag);
-    Assert.assertEquals("Could not download filename ", logs.get(1).msg);
+    Assert.assertEquals("Connection", logs.get(2).tag);
+    Assert.assertEquals("Initialization failed:java.net.MalformedURLException: no protocol: invalidURL", logs.get(2).msg);
+
+    Assert.assertEquals("FileUtils", logs.get(3).tag);
+    Assert.assertEquals("Could not download filename ", logs.get(3).msg);
   }
 
   @Test
@@ -149,18 +148,48 @@ public class FileUtilsTest {
   }
 
   @Test
-  public void test_hasKeyboardPackageExtension() {
-    String filename = "test/abc.kmp";
-    Assert.assertTrue(FileUtils.hasKeyboardPackageExtension(filename));
+  public void test_hasLexicalModelExtension() {
+    String filename = "test/abc.model.js";
+    Assert.assertTrue(FileUtils.hasLexicalModelExtension(filename));
 
-    filename = "test/abc.KMP";
-    Assert.assertTrue(FileUtils.hasKeyboardPackageExtension(filename));
+    filename = "test/abc.MODEL.JS";
+    Assert.assertTrue(FileUtils.hasLexicalModelExtension(filename));
 
-    filename = "test/abc.kmpo";
-    Assert.assertFalse(FileUtils.hasKeyboardPackageExtension(filename));
+    filename = "test/abc.sh";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abcmodeljs";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+
+    filename = "test/abc.js";
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
 
     filename = "";
-    Assert.assertFalse(FileUtils.hasKeyboardPackageExtension(filename));
+    Assert.assertFalse(FileUtils.hasLexicalModelExtension(filename));
+  }
+
+  @Test
+  public void test_hasKeymanPackageExtension() {
+    String filename = "test/abc.kmp";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.KMP";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.kmpo";
+    Assert.assertFalse(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.model.kmp";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMP";
+    Assert.assertTrue(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "test/abc.MODEL.KMPO";
+    Assert.assertFalse(FileUtils.hasKeymanPackageExtension(filename));
+
+    filename = "";
+    Assert.assertFalse(FileUtils.hasKeymanPackageExtension(filename));
   }
 
   @Test

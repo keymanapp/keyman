@@ -7,6 +7,7 @@
     * Attachment to all supported element types has now been abstracted, splitting keystroke processing from related DOM management.
     * Centralizes code paths to improve parity between hardware and OSK-based keystrokes.
   * In both cases above, significant unit testing was facilitated and has been added as a result, further improving code maintainability into the future.
+* Began adding support for our common LMLayer interface for predictive modeling.
 
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release

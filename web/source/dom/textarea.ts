@@ -99,6 +99,13 @@ namespace com.keyman.dom {
       this.setCaret(newCaret);
     }
 
+    protected setTextAfterCaret(s: string) {
+      let c = this.getCaret();
+
+      this.root.value = this.getTextBeforeCaret() + s;
+      this.setCaret(c);
+    }
+
     getTextAfterCaret(): string {
       this.getCaret();
       return this.getText()._kmwSubstring(this.processedSelectionEnd);

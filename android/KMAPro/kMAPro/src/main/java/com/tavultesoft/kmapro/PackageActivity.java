@@ -1,9 +1,9 @@
 package com.tavultesoft.kmapro;
 
 import android.annotation.SuppressLint;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,11 +20,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import android.util.Log;
+import android.widget.Toast;
 
-import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -40,7 +43,9 @@ public class PackageActivity extends AppCompatActivity {
   private File kmpFile;
   private File tempPackagePath;
   private List<Map<String, String>> installedPackageKeyboards;
+  private List<Map<String, String>> installedLexicalModels;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
+  private PackageProcessor kmpProcessor;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -54,17 +59,33 @@ public class PackageActivity extends AppCompatActivity {
       kmpFile = new File(bundle.getString("kmpFile"));
     }
 
-    final String pkgId = PackageProcessor.getPackageID(kmpFile);
-    String pkgVersion = PackageProcessor.getPackageVersion(kmpFile, false);
-    String pkgName = PackageProcessor.getPackageName(kmpFile, false);
+    File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+    kmpProcessor =  new PackageProcessor(resourceRoot);
+    final String pkgId = kmpProcessor.getPackageID(kmpFile);
+    final String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
 
     try {
-      tempPackagePath = PackageProcessor.unzipKMP(kmpFile);
+      if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+        kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+      } else if (!pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+        showErrorToast(context, getString(R.string.no_targets_to_install));
+        return;
+      }
+      tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
+
     } catch (Exception e) {
-      String message = String.format("%s\n%s",
-        getString(R.string.failed_to_extract), kmpFile.getAbsolutePath());
-      showErrorDialog(context, pkgId, message);
+      showErrorToast(context, getString(R.string.failed_to_extract));
+      return;
     }
+
+    JSONObject pkgInfo = kmpProcessor.loadPackageInfo(tempPackagePath);
+    if (pkgInfo == null) {
+      showErrorToast(context, getString(R.string.invalid_metadata));
+      return;
+    }
+
+    String pkgVersion = kmpProcessor.getPackageVersion(pkgInfo);
+    String pkgName = kmpProcessor.getPackageName(pkgInfo);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -80,7 +101,9 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String titleStr = String.format("%s %s", getString(R.string.install_keyboard_package), pkgVersion);
+    String pkgTargetTitle = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ? 
+      getString(R.string.install_keyboard_package) : getString(R.string.install_predictive_text_package);
+    String titleStr = String.format("%s %s", pkgTargetTitle, pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
@@ -123,11 +146,11 @@ public class PackageActivity extends AppCompatActivity {
       }
     });
 
-    // Determine if KMP contains welcome.htm (case-insensitive) to display
+    // Determine if ad-hoc distributed KMP contains welcome.htm (case-insensitive) to display
     FileFilter welcomeFilter = new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        if (pathname.isFile() && pathname.getName().equalsIgnoreCase("welcome.htm")) {
+        if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
           return true;
         }
         return false;
@@ -139,11 +162,17 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
       // No welcome.htm so display minimal package information
-      String keyboardString = (pkgName != null && pkgName.toLowerCase().endsWith("keyboard")) ? "" :
-        String.format(" %s", getString(R.string.title_keyboard));
+      String targetString = "";
+      if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+        targetString = pkgName != null && pkgName.toLowerCase().endsWith("keyboard")
+          ? "" : String.format(" %s", getString(R.string.title_keyboard));
+      } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+        targetString = pkgName != null && pkgName.toLowerCase().endsWith("model")
+          ? "" :String.format(" %s", "model");
+      }
       String htmlString = String.format(
         "<body style=\"max-width:600px;\"><H1>The %s%s Package</H1></body>",
-        pkgName, keyboardString);
+        pkgName, targetString);
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
@@ -151,23 +180,43 @@ public class PackageActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         try {
-          // processKMP will remove currently installed package and install
-          installedPackageKeyboards = PackageProcessor.processKMP(kmpFile, true);
-          // Do the notifications!
-          boolean success = installedPackageKeyboards.size() != 0;
-          if (success) {
-            notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
-            if (installedPackageKeyboards != null) {
-              notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+          if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+            // processKMP will remove currently installed package and install
+            installedPackageKeyboards = kmpProcessor.processKMP(kmpFile, tempPackagePath,
+              PackageProcessor.PP_KEYBOARDS_KEY);
+            // Do the notifications!
+            boolean success = installedPackageKeyboards.size() != 0;
+            if (success) {
+              notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
+                installedPackageKeyboards, 1);
+              if (installedPackageKeyboards != null) {
+                notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
+                  installedPackageKeyboards, 1);
+              }
+              cleanup();
+            } else {
+              showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
             }
-            cleanup();
-          } else {
-            showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
+          } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+            installedLexicalModels = kmpProcessor.processKMP(kmpFile, tempPackagePath,
+              PackageProcessor.PP_LEXICAL_MODELS_KEY);
+            // Do the notifications
+            boolean success = installedLexicalModels.size() != 0;
+            if (success) {
+              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                installedLexicalModels, 1);
+              if (installedLexicalModels != null) {
+                notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                  installedLexicalModels, 1);
+              }
+              cleanup();
+            } else {
+              showErrorDialog(context, pkgId, getString(R.string.no_new_predictive_text_to_install));
+            }
           }
-
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
-          showErrorDialog(context, pkgId, getString(R.string.no_valid_touch_keyboards_to_install));
+          showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
         }
       }
     });
@@ -190,10 +239,10 @@ public class PackageActivity extends AppCompatActivity {
 
   private void cleanup() {
     try {
-      if (kmpFile.exists()) {
+      if (kmpFile != null && kmpFile.exists()) {
         kmpFile.delete();
       }
-      if (tempPackagePath.exists()) {
+      if (tempPackagePath != null && tempPackagePath.exists()) {
         FileUtils.deleteDirectory(tempPackagePath);
       }
     } catch (Exception e) {
@@ -212,6 +261,13 @@ public class PackageActivity extends AppCompatActivity {
   public void onBackPressed() {
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
+  }
+
+  private void showErrorToast(Context context, String message) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    // Setting result to 1 so calling activity will finish too
+    setResult(1);
+    cleanup();
   }
 
   private void showErrorDialog(Context context, String pkgId, String message) {
@@ -235,9 +291,17 @@ public class PackageActivity extends AppCompatActivity {
     alertDialog.show();
   }
 
-  void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType, List<Map<String, String>> keyboards, int result) {
+  void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType,
+                                     List<Map<String, String>> keyboards, int result) {
     if (kbDownloadEventListeners != null) {
       KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboards, result);
+    }
+  }
+
+  void notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType eventType,
+                                          List<Map<String, String>> models, int result) {
+    if (kbDownloadEventListeners != null) {
+      KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, models, result);
     }
   }
 
