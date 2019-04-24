@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2019-04-29 11.0.1355.0 stable
+* No changes
+
 ## 2019-04-24 11.0.1354.0 stable
 * Bug fix: Keyman Developer touch layout editor would not save key caps for subkeys (#1731)
 * Bug fix: Compiler could occasionally fail with undefined results when using Unicode store names (#1736)
