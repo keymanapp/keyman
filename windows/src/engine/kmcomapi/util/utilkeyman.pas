@@ -57,7 +57,7 @@ function GetKeyboardIconFileName(const KeyboardFileName: string): string;   // I
 function GetKeymanInstallPath: string;
 
 function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
-function GetDefaultKeyboardID: Cardinal;   // I4169
+function GetDefaultKeyboardID: HKL;   // I4169
 
 var
   FInstallingKeyman: Boolean = False;
@@ -306,7 +306,7 @@ begin
     Result := 0;
 end;
 
-function GetDefaultKeyboardID: Cardinal;   // I4169
+function GetDefaultKeyboardID: HKL;   // I4169
 const
   BaseKeyboardID_USEnglish: Integer = $00000409;
 begin
