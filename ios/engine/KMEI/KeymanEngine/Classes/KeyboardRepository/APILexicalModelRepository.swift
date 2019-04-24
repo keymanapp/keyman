@@ -16,22 +16,18 @@ public enum APILexicalModelFetchError: Error {
 }
 
 public class APILexicalModelRepository: LexicalModelRepository {
-  private let languagesAPIURL = URLComponents(string: "https://api.keyman.com/cloud/4.0/languages")!
+  private let modelsAPIURL = URLComponents(string: "https://api.keyman.com/model")! //?q=bcp47:en
   
   public weak var delegate: LexicalModelRepositoryDelegate?
   public private(set) var languages: [String: Language]?
   public private(set) var lexicalModels: [String: LexicalModel]?
-  private(set) var options: Options?
   
   public func fetch(completionHandler: CompletionHandler?) {
     let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
     let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    var urlComponents = languagesAPIURL
+    var urlComponents = modelsAPIURL
     urlComponents.queryItems = [
-      URLQueryItem(name: "dateformat", value: "seconds"),
-      URLQueryItem(name: "device", value: deviceType),
-      URLQueryItem(name: "version", value: keymanVersion),
-      URLQueryItem(name: "languageidtype", value: "bcp47")
+      URLQueryItem(name: "q", value: "bcp47:en") //+languages?[0]
     ]
     log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
     let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
@@ -74,23 +70,22 @@ public class APILexicalModelRepository: LexicalModelRepository {
       return
     }
     
-    options = result.options
     languages = Dictionary(uniqueKeysWithValues: result.languages.map { ($0.id, $0) })
     
     let lexicalModelsWithID = result.languages.flatMap { language in
-      language.lexicalModels?.map { kb in (kb.id, kb) } ?? []
+      language.lexicalModels?.map { lm in (lm.id, lm) } ?? []
     }
     lexicalModels = Dictionary(lexicalModelsWithID) { old, new in
-      var kb = old
+      var lm = old
       if old.languages == nil {
-        kb.languages = new.languages
-        return kb
+        lm.languages = new.languages
+        return lm
       }
       if let newLanguages = new.languages {
-        let oldLanguageIDs = Set(old.languages!.map { $0.id })
-        kb.languages!.append(contentsOf: newLanguages.filter { !oldLanguageIDs.contains($0.id) })
+        let oldLanguageIDs = Set(old.languages!.map { $0 })
+        lm.languages!.append(contentsOf: newLanguages.filter { !oldLanguageIDs.contains($0) })
       }
-      return kb
+      return lm
     }
     
     log.info("Request completed -- \(result.languages.count) languages.")

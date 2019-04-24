@@ -160,7 +160,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     cell.selectionStyle = .none
     let lm = userLexicalModels[indexPath.row]
     
-    cell.textLabel?.text = lm.languageName
+    cell.textLabel?.text = lm.languageID // maybe do a lookup for lm.languageName
     cell.detailTextLabel?.text = lm.name
     cell.tag = indexPath.row
     
@@ -326,7 +326,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func checkUpdates() -> Bool {
-    if Manager.shared.apiLexicalModelRepository.languages == nil {
+    if Manager.shared.apiLexicalModelRepository.lexicalModels == nil {
       return false
     }
     
@@ -389,7 +389,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   func showAddLexicalModel() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageViewController(Manager.shared.apiLexicalModelRepository)
+    let vc = LanguageViewController(Manager.shared.apiLexicalModelRepository) //may need to be different for models
     navigationController?.pushViewController(vc, animated: true)
     setIsDoneButtonEnabled(true)
   }
