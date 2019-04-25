@@ -1347,6 +1347,9 @@ namespace com.keyman {
       this.keymanweb.osk._Show(-1,-1);
     }
 
+    // Some of the old CJK keyboards rely on an uppercased variant.
+    ['ShowPinnedHelp'] = this['showPinnedHelp'];
+
     resetContext() {
       this.keymanweb.osk.layerId = 'default';
 
