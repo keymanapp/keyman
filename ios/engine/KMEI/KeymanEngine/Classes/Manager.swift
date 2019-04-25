@@ -262,7 +262,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if isKeymanHelpOn {
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
-
+    
+    //HERE getAssociatedLexicalModel(langID) and setLexicalModel
+    
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
