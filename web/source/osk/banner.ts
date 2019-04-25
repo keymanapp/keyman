@@ -484,16 +484,38 @@ namespace com.keyman.osk {
       });
     }.bind(this);
 
+    /**
+     * Receives messages from the keyboard that the 'accept' keystroke has been entered.
+     * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
+     * Otherwise, return true.
+     */
+    tryAccept() {
+      return true;  // Not yet implemented
+    }
+
+    /**
+     * Receives messages from the keyboard that the 'revert' keystroke has been entered.
+     * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
+     * Otherwise, return true.
+     */
+    tryRevert() {
+      return true;
+    }
+
     activate() {
       let keyman = com.keyman.singleton;
       keyman.modelManager['addEventListener']('invalidatesuggestions', this.invalidateSuggestions);
       keyman.modelManager['addEventListener']('suggestionsready', this.updateSuggestions);
+      keyman.modelManager['addEventListener']('tryaccept', this.tryAccept);
+      keyman.modelManager['addEventListener']('tryrevert', this.tryRevert);
     }
 
     deactivate() {
       let keyman = com.keyman.singleton;
       keyman.modelManager['removeEventListener']('invalidatesuggestions', this.invalidateSuggestions);
       keyman.modelManager['removeEventListener']('suggestionsready', this.updateSuggestions);
+      keyman.modelManager['removeEventListener']('tryaccept', this.tryAccept);
+      keyman.modelManager['removeEventListener']('tryrevert', this.tryRevert);
     }
   }
 }

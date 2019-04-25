@@ -63,7 +63,7 @@ namespace com.keyman.text.prediction {
    */
   export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
 
-  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange";
+  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange" | "tryaccept" | "tryrevert";
   type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler;
 
   export class ModelManager {
@@ -290,6 +290,20 @@ namespace com.keyman.text.prediction {
         this.unloadModel();
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
+    }
+
+    public tryAcceptSuggestion(): boolean {
+      let keyman = com.keyman.singleton;
+      
+      // Handlers of this event should return 'false' when the 'try' is successful.
+      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryaccept', null);
+    }
+
+    public tryRevertSuggestion(): boolean {
+      let keyman = com.keyman.singleton;
+      
+      // Handlers of this event should return 'false' when the 'try' is successful.
+      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryrevert', null);
     }
   }
 }
