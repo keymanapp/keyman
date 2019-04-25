@@ -1001,7 +1001,7 @@ namespace com.keyman.osk {
      *  @return   {number}    height in pixels
      */
     getBannerHeight(): number {
-      return this.banner.height;
+      return (this.banner != null) ? this.banner.height : 0;
     }
 
     /**

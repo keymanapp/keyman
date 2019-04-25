@@ -235,10 +235,16 @@ public final class KMManager {
     return false;
   }
 
+  /**
+   * Adjust the keyboard dimensions. If the suggestion banner is active, use the
+   * combined banner height and keyboard height
+   * @return RelativeLayout.LayoutParams
+   */
   private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
-    int bannerHeight = currentBanner.equals("suggestion") ? getBannerHeight(appContext) : 0;
+    int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
-    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
+    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+      RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
    return params;
   }
@@ -339,9 +345,13 @@ public final class KMManager {
   public static void onConfigurationChanged(Configuration newConfig) {
     // KMKeyboard
     if (InAppKeyboard != null) {
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
   }
@@ -678,15 +688,14 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
-    currentBanner = "suggestion";
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadUrl(String.format("javascript:registerModel(%s)", model));
+      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
     }
     return true;
   }
@@ -950,7 +959,11 @@ public final class KMManager {
   }
 
   public static int getBannerHeight(Context context) {
-    return (int) context.getResources().getDimension(R.dimen.banner_height);
+    int bannerHeight = 0;
+    if (currentBanner.equals("suggestion")) {
+      bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
+    }
+    return bannerHeight;
   }
 
   public static int getKeyboardHeight(Context context) {
@@ -1349,6 +1362,12 @@ public final class KMManager {
           hashMap.put("keyText", keyText);
           InAppKeyboard.subKeysList.add(hashMap);
         }
+      } else if (url.indexOf("refreshBannerHeight") >= 0) {
+        int start = url.indexOf("change=") + 7;
+        String change = url.substring(start);
+        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        InAppKeyboard.setLayoutParams(params);
       }
       return false;
     }
@@ -1519,8 +1538,13 @@ public final class KMManager {
           hashMap.put("keyText", keyText);
           SystemKeyboard.subKeysList.add(hashMap);
         }
+      } else if (url.indexOf("refreshBannerHeight") >= 0) {
+        int start = url.indexOf("change=") + 7;
+        String change = url.substring(start);
+        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        SystemKeyboard.setLayoutParams(params);
       }
-
       return false;
     }
   }
@@ -1560,7 +1584,11 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s) {
+    public void insertText(final int dn, final String s, final int dr) {
+      if(dr != 0) {
+        Log.d(TAG, "Right deletions requested but are not presently supported by the in-app keyboard.");
+      }
+
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1685,7 +1713,7 @@ public final class KMManager {
 
     // This annotation is required in Jelly Bean and later:
     @JavascriptInterface
-    public void insertText(final int dn, final String s) {
+    public void insertText(final int dn, final String s, final int dr) {
       Handler mainLoop = new Handler(Looper.getMainLooper());
       mainLoop.post(new Runnable() {
         public void run() {
@@ -1705,6 +1733,7 @@ public final class KMManager {
 
           ic.beginBatchEdit();
 
+          // Delete any existing selected text.
           ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
           if (icText != null) { // This can be null if the input connection becomes invalid.
             int start = icText.startOffset + icText.selectionStart;
@@ -1729,6 +1758,7 @@ public final class KMManager {
             return;
           }
 
+          // Perform left-deletions
           for (int i = 0; i < dn; i++) {
             CharSequence chars = ic.getTextBeforeCursor(1, 0);
             if (chars != null && chars.length() > 0) {
@@ -1738,6 +1768,20 @@ public final class KMManager {
                 ic.deleteSurroundingText(2, 0);
               } else {
                 ic.deleteSurroundingText(1, 0);
+              }
+            }
+          }
+
+          // Perform right-deletions
+          for (int i = 0; i < dr; i++) {
+            CharSequence chars = ic.getTextAfterCursor(1, 0);
+            if (chars != null && chars.length() > 0) {
+              char c = chars.charAt(0);
+              SystemKeyboardShouldIgnoreSelectionChange = true;
+              if (Character.isHighSurrogate(c)) {
+                ic.deleteSurroundingText(0, 2);
+              } else {
+                ic.deleteSurroundingText(0, 1);
               }
             }
           }
