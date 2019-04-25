@@ -1351,6 +1351,8 @@ namespace com.keyman {
       this.keymanweb.osk._Show(-1,-1);
     }
 
+    ['ShowPinnedHelp'] = this['showPinnedHelp'];
+
     resetContext() {
       this.keymanweb.osk.layerId = 'default';
 
