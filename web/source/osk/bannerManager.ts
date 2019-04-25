@@ -175,22 +175,25 @@ namespace com.keyman.osk {
      * @param height - Optional banner height in pixels.
      */
     public setBanner(type: BannerType, height?: number) {
+      var banner: Banner;
+
       switch(type) {
         case 'blank':
-          this._setBanner(new BlankBanner());
+          banner = new BlankBanner();
           break;
         case 'image':
-          this._setBanner(new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT));
+          banner = new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT);
           break;
         case 'suggestion':
-          this._setBanner(new SuggestionBanner(height));
-          let keyman = com.keyman.singleton;
-          let banner = this.activeBanner as SuggestionBanner;
-          keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions);
-          keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions);
+          banner = new SuggestionBanner(height);
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
+      }
+
+      if(banner) {
+        this._setBanner(banner);
+        banner.activate();
       }
     }
 
@@ -226,13 +229,8 @@ namespace com.keyman.osk {
           return;
         } else {
           let prevBanner = this.activeBanner;
+          prevBanner.deactivate();
           this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
-
-          if(prevBanner instanceof SuggestionBanner) {
-            let keyman = com.keyman.singleton;
-            keyman.modelManager['removeEventListener']('invalidatesuggestions', prevBanner.invalidateSuggestions);
-            keyman.modelManager['removeEventListener']('suggestionsready', prevBanner.updateSuggestions);
-          }
         }
       }
 

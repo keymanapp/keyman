@@ -87,6 +87,24 @@ namespace com.keyman.osk {
     public getDiv(): HTMLElement {
       return this.div;
     }
+
+    /**
+     * Function     activate
+     * Scope        Public
+     * Description  Adds any relevant event listeners needed by this banner type.
+     */
+    public activate() {
+
+    }
+
+    /**
+     * Function     activate
+     * Scope        Public
+     * Description  Removes any relevant event listeners previously added by this banner.
+     */
+    public deactivate() {
+
+    }
   }
 
   /**
@@ -465,5 +483,17 @@ namespace com.keyman.osk {
         }
       });
     }.bind(this);
+
+    activate() {
+      let keyman = com.keyman.singleton;
+      keyman.modelManager['addEventListener']('invalidatesuggestions', this.invalidateSuggestions);
+      keyman.modelManager['addEventListener']('suggestionsready', this.updateSuggestions);
+    }
+
+    deactivate() {
+      let keyman = com.keyman.singleton;
+      keyman.modelManager['removeEventListener']('invalidatesuggestions', this.invalidateSuggestions);
+      keyman.modelManager['removeEventListener']('suggestionsready', this.updateSuggestions);
+    }
   }
 }
