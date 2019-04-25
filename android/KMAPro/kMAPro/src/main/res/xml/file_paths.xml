@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<paths xmlns:android="http://schemas.android.com.apk/res/android">
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- path is relative to /data/data/com.tavultesoft.kmapro/files/ -->
     <files-path name="packages" path="../app_data/packages/" />
 </paths>

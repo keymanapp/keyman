@@ -32,6 +32,7 @@ public final class FileUtils {
 
   // File extensions and file types
   public static final String JAVASCRIPT = ".js";
+  public static final String LEXICALMODEL = ".model.js";
   public static final String TRUETYPEFONT = ".ttf";
   public static final String OPENTYPEFONT = ".otf";
 
@@ -39,7 +40,7 @@ public final class FileUtils {
   public static final String SVGVIEWBOX = ".svg#";
   public static final String WOFFFONT = ".woff";
 
-  public static final String KEYBOARDPACKAGE = ".kmp";
+  public static final String KEYMANPACKAGE = ".kmp";
   public static final String WELCOME_HTM = "welcome.htm";
 
   /**
@@ -383,9 +384,14 @@ public final class FileUtils {
     return f.endsWith(JAVASCRIPT);
   }
 
-  public static boolean hasKeyboardPackageExtension(String filename) {
+  public static boolean hasLexicalModelExtension(String filename) {
     String f = filename.toLowerCase();
-    return f.endsWith(KEYBOARDPACKAGE);
+    return f.endsWith(LEXICALMODEL);
+  }
+
+  public static boolean hasKeymanPackageExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(KEYMANPACKAGE);
   }
 
   public static boolean isTTFFont(String filename) {

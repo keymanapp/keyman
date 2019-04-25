@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
@@ -31,20 +30,18 @@ import com.tavultesoft.kmea.util.MapCompat;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -164,6 +161,11 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing.
+  }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     // Do nothing.
   }
 

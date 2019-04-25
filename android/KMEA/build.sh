@@ -45,6 +45,8 @@ die ( ) {
 DO_BUILD=true
 DO_COPY=true
 NO_DAEMON=false
+EMBED_BUILD=-embed
+KMW_PATH=
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -61,6 +63,11 @@ while [[ $# -gt 0 ]] ; do
         -no-daemon)
             NO_DAEMON=true
             ;;
+        -debug)
+            DEBUG_BUILD=true
+            EMBED_BUILD=-debug_embedded
+            KMW_PATH=unminified
+            ;;
         -h|-?)
             display_usage
             ;;
@@ -72,6 +79,9 @@ echo
 echo "DO_BUILD: $DO_BUILD"
 echo "DO_COPY: $DO_COPY"
 echo "NO_DAEMON: $NO_DAEMON"
+echo "DEBUG_BUILD: $DEBUG_BUILD"
+echo "EMBED_BUILD: $EMBED_BUILD"
+echo "KMW_PATH: $KMW_PATH"
 echo
 
 if [ "$NO_DAEMON" = true ]; then
@@ -85,13 +95,13 @@ fi
 PLATFORM=`uname -s`
 
 # Report JUnit test results to CI
-echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\TEST-com.tavultesoft.kmea.packages.PackageProcessorTest.xml']"
+echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
     cd $KMW_SOURCE
 
-    ./build.sh -embed
+    ./build.sh $EMBED_BUILD
 	
     if [ $? -ne 0 ]; then
         die "ERROR: keymanweb build failed. Exiting"
@@ -99,14 +109,18 @@ if [ "$DO_BUILD" = true ]; then
 fi
 if [ "$DO_COPY" = true ]; then
     echo "Copying KMW artifacts"
-    cp $KMW_ROOT/release/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/release/embedded/keyman.js $KMEA_ASSETS/keyman.js
-    cp $KMW_ROOT/release/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
-    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
-    cp $KMW_ROOT/release/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js $KMEA_ASSETS/keyman.js
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.eot $KMEA_ASSETS/keymanweb-osk.eot
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.woff $KMEA_ASSETS/keymanweb-osk.woff
     if [ $? -ne 0 ]; then
         die "ERROR: copying artifacts failed"
+    fi
+    if [ "$DEBUG_BUILD" = true ]; then
+      echo "Copying debug artifacts"
+      cp -R $KMW_ROOT/release/$KMW_PATH/embedded/* $KMEA_ASSETS/
     fi
 fi
 

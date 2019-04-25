@@ -60,7 +60,7 @@ implementation
 
 {$IFDEF KLOGGING}
 uses
-  Variants, Windows, SysUtils, ErrorControlledRegistry, SystemDebugPath, VersionInfo, Unicode;
+  Variants, Windows, SysUtils, ErrorControlledRegistry, ErrLogPath, VersionInfo, Unicode;
 
 {$ENDIF}
 
@@ -91,7 +91,7 @@ var
   FRootPath: string;
 begin
   inherited Create;
-  FRootPath := GetSystemDebugPath;
+  FRootPath := GetErrLogPath;
 
   FMethodStack := TStringList.Create;
   GetModuleFileName(hInstance, buf, 260); FAppName := buf;

@@ -295,7 +295,7 @@ namespace com.keyman.dom {
       this.setText(textValue, null); 
     }
 
-    private setText(t?: string, cp?: number): void {
+    setText(t?: string, cp?: number): void {
       var tLen=0;
       var t1: string, t2: string;
       

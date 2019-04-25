@@ -1,0 +1,20 @@
+{
+  "name": "lmlayer-cli",
+  "version": "0.2.0",
+  "description": "Command line interface to the predictive text engine.",
+  "main": "index.js",
+  "bin": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keymanapp/keyman.git"
+  },
+  "dependencies": {
+    "commander": "^2.20.0",
+    "event-iterator": "^1.2.0"
+  }
+}

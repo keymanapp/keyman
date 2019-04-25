@@ -1,6 +1,8 @@
 # Keyman for Android
 
 ## 12.0 alpha
+* Update compile and target Android SDK version to 28 (#1654)
+* Add feature to install lexical model packages (#1641, 1653)
 * Started work on Keyman for Android 12.
 
 ## 2019-02-27 11.0.2102 stable

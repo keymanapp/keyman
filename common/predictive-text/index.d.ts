@@ -13,18 +13,23 @@ declare namespace com.keyman.text.prediction {
 
     /**
      * Construct the top-level LMLayer interface. This also starts the underlying Worker.
-     * Make sure to call .initialize() when using the default Worker.
+     * Make sure to call .load() when using the default Worker.
      * 
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(worker?: Worker);
+    constructor(capabilities: Capabilities, worker?: Worker);
 
     /**
      * Initializes the LMLayer worker with the keyboard/platform's capabilities,
      * as well as a description of the model required.
      */
-    initialize(capabilities: Capabilities, model: ModelDescription): Promise<Configuration>;
+    loadModel(model: string): Promise<Configuration>;
+
+    /**
+     * Prepares the LMLayer for reinitialization with a different model/capability set.
+     */
+    unloadModel();
 
     predict(transform: Transform, context: Context): Promise<Suggestion[]>;
 
@@ -57,5 +62,11 @@ declare namespace com.keyman.text.prediction {
      *    }));
      */
     static asBlobURI(fn: Function): string;
+
+    /**
+     * Clears out any computational resources in use by the LMLayer, including shutting
+     * down any internal WebWorkers.
+     */
+    public shutdown(): void;
   }
 }

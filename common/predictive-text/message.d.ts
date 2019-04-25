@@ -149,6 +149,15 @@ interface Configuration {
  */
 interface Transform {
   /**
+   * Facilitates use of unique identifiers for tracking the Transform and
+   * any related data from its original source, as the reference cannot be
+   * preserved across WebWorker boundaries.
+   * 
+   * This is *separate* from any LMLayer-internal identification values.
+   */
+  id?: number;
+
+  /**
    * The Unicode scalar values (i.e., characters) to be inserted at the
    * cursor position.
    *
@@ -207,6 +216,13 @@ interface Context {
  * A concrete suggestion
  */
 interface Suggestion {
+  /**
+   * Indicates the externally-supplied id of the Transform that prompted
+   * the Suggestion.  Automatically handled by the LMLayer; models should
+   * not handle this field.
+   */
+  transformId?: number;
+
   /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.

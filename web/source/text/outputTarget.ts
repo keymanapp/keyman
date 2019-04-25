@@ -41,6 +41,8 @@ namespace com.keyman.text {
       this.preInput = preInput;
       this.removedDks = removedDks;
       this.insertedDks = insertedDks;
+
+      this.transform.id = this.token;
     }
   }
 
@@ -90,7 +92,7 @@ namespace com.keyman.text {
      * As such, it assumes that the caret is immediately after any inserted text.
      * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
      */
-    private buildTransformFrom(original: Mock): Transform {
+    buildTransformFrom(original: OutputTarget): Transform {
       let to = this.getText();
       let from = original.getText();
 
@@ -118,7 +120,7 @@ namespace com.keyman.text {
       return new TextTransform(delta, deletedLeft, originalRight - undeletedRight);
     }
 
-    buildTranscriptionFrom(original: Mock, keyEvent: KeyEvent): Transcription {
+    buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent): Transcription {
       let transform = this.buildTransformFrom(original);
 
       // While not presently needed, there's a chance we'll want to have Deadkey mutation tracked
@@ -159,6 +161,55 @@ namespace com.keyman.text {
 
       return new Transcription(keyEvent, transform, Mock.from(original), removedDks, insertedDks);
     }
+
+    /**
+     * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
+     * @param original An `OutputTarget` (usually a `Mock`).
+     */
+    restoreTo(original: OutputTarget) {
+      //
+      this.setTextBeforeCaret(original.getTextBeforeCaret());
+      this.setTextAfterCaret(original.getTextAfterCaret());
+
+      // Also, restore the deadkeys!
+      this._dks = original._dks.clone();
+    }
+
+    apply(transform: Transform) {
+      if(transform.deleteRight) {
+        this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
+      }
+
+      if(transform.deleteLeft) {
+        this.deleteCharsBeforeCaret(transform.deleteLeft);
+      }
+
+      if(transform.insert) {
+        this.insertTextBeforeCaret(transform.insert);
+      }
+
+      // We assume that all deadkeys are invalidated after applying a Transform, since
+      // prediction implies we'll be completing a word, post-deadkeys.
+      this._dks.clear();
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected setTextBeforeCaret(s: string): void {
+      // This one's easy enough to provide a default implementation for.
+      this.deleteCharsBeforeCaret(this.getTextBeforeCaret()._kmwLength());
+      this.insertTextBeforeCaret(s);
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'after' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected abstract setTextAfterCaret(s: string): void;
 
     /**
      * Returns the underlying element / document modeled by the wrapper.
@@ -314,6 +365,10 @@ namespace com.keyman.text {
     insertTextBeforeCaret(s: string): void {
       this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
       this.caretIndex += s.kmwLength();
+    }
+
+    protected setTextAfterCaret(s: string): void {
+      this.text = this.getTextBeforeCaret() + s;
     }
   }
 }

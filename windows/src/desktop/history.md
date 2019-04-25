@@ -3,6 +3,9 @@
 ## 12.0 alpha
 * Started work on Keyman Desktop 12.
 
+## 2019-04-29 11.0.1355.0 stable
+* Bug Fix: Error in initialization of Keyman Engine causes FieldWorks to crash if Keyman Developer installed but not Keyman Desktop. (#1739)
+
 ## 2019-02-25 11.0.1350.0 stable
 * 11.0 Stable release
 

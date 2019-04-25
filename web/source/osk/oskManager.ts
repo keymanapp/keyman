@@ -5,6 +5,8 @@
 /// <reference path="defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
+// Includes the banner
+/// <reference path="./bannerManager.ts" />
 // Generates the visual keyboard specific to each keyboard.  (class="kmw-osk-inner-frame")
 /// <reference path="visualKeyboard.ts" />
 
@@ -22,6 +24,7 @@ namespace com.keyman.osk {
   export class OSKManager {
     // Important OSK elements (and container classes)
     _Box: HTMLDivElement;
+    banner: BannerManager;
     vkbd: VisualKeyboard;
     resizeIcon: HTMLDivElement;
     closeButton: HTMLDivElement;
@@ -118,6 +121,7 @@ namespace com.keyman.osk {
         }
       }
       this.loadCookie();
+      this.banner = new BannerManager();
       this.ready=true;
     }
 
@@ -128,6 +132,7 @@ namespace com.keyman.osk {
      */
     _Unload() {
       this.vkbd = null;
+      this.banner = null;
       this._Box = null;
     }
 
@@ -162,7 +167,7 @@ namespace com.keyman.osk {
 
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;
-      s.zIndex='9999'; s.display='none'; s.width='auto';
+      s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
       s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
 
       // Use smaller base font size for mobile devices
@@ -296,9 +301,14 @@ namespace com.keyman.osk {
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
         kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') {
+        // Desktop order is title_bar, banner_container, inner-frame
+        innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
+      } else if (innerFrame.id == 'keymanweb_banner_container') {
         innerFrame=<HTMLDivElement> innerFrame.nextSibling;
       }
       innerFrame.className = 'kmw-osk-inner-frame' + kbdClass;
+
+      this.banner.appendStyles();
 
       if(this.vkbd) {
         // Create the key preview (for phones)
@@ -333,6 +343,11 @@ namespace com.keyman.osk {
       // Add header element to OSK only for desktop browsers
       if(util.device.formFactor == 'desktop') {
         this._Box.appendChild(this.controlBar());
+      }
+
+      // Add suggestion banner bar to OSK
+      if (this.banner) {
+        this._Box.appendChild(this.banner.element);
       }
 
       // Add primary keyboard element to OSK
@@ -982,11 +997,18 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Get the wanted height of the OSK for touch devices
-     *
+     * Get the wanted height of the banner (does not include the keyboard)
+     *  @return   {number}    height in pixels
+     */
+    getBannerHeight(): number {
+      return (this.banner != null) ? this.banner.height : 0;
+    }
+
+    /**
+     * Get the wanted height of the OSK for touch devices (does not include banner height)
      *  @return   {number}    height in pixels
      **/
-    getHeight(): number {
+    getKeyboardHeight(): number {
       let keymanweb = com.keyman.singleton;
       let device = keymanweb.util.device;
 
@@ -1023,6 +1045,14 @@ namespace com.keyman.osk {
       }
 
       return height;
+    }
+
+    /**
+     * Get the wanted height of the OSK for touch devices (banner height + rows of keys)
+     *  @return   {number}    height in pixels
+     **/
+    getHeight(): number {
+      return this.getBannerHeight() + this.getKeyboardHeight();
     }
 
     /**
@@ -1271,7 +1301,9 @@ namespace com.keyman.osk {
         if(device.touchable) {
           Ls.position='fixed';
           Ls.left=Ls.bottom='0px';
-          Ls.height=Ls.maxHeight=(<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
+          vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
+          Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10)) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
