@@ -94,7 +94,7 @@ namespace com.keyman.osk {
      * Description  Adds any relevant event listeners needed by this banner type.
      */
     public activate() {
-
+      // Default implementation - no listeners.
     }
 
     /**
@@ -103,7 +103,7 @@ namespace com.keyman.osk {
      * Description  Removes any relevant event listeners previously added by this banner.
      */
     public deactivate() {
-
+      // Default implementation - no listeners.
     }
   }
 

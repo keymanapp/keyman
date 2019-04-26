@@ -380,9 +380,9 @@ namespace com.keyman.text {
       // Safari, IE, Opera?
       //}
 
-      // TODO:  When predictive-text is active...
-      //          If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
-      //          If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
+      // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
+      // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
+      // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
       if(keyman.modelManager.enabled) {
         // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
 
