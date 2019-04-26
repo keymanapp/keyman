@@ -487,12 +487,15 @@ namespace com.keyman.osk {
     private options: BannerSuggestion[];
 
     private currentSuggestions: Suggestion[] = [];
+    private currentTranscriptionID: number;
 
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
     private preAccept: text.Transcription = null;
     private swallowPrediction: boolean = false;
+
     private previousSuggestions: Suggestion[];
+    private previousTranscriptionID: number;
 
     private recentRevert: boolean = false;
     private rejectedSuggestions: Suggestion[] = [];
@@ -512,6 +515,7 @@ namespace com.keyman.osk {
       this.recentAccepted = suggestion.suggestion;
 
       this.previousSuggestions = this.currentSuggestions;
+      this.previousTranscriptionID = this.currentTranscriptionID;
 
       // Request a 'new' prediction based on current context with a nil Transform.
       let keyman = com.keyman.singleton;
@@ -542,7 +546,12 @@ namespace com.keyman.osk {
       // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
       this.rejectedSuggestions.push(this.recentAccepted);
       this.currentSuggestions = this.previousSuggestions; // Restore to the previous state's Suggestion list.
-      this.currentSuggestions.splice(this.currentSuggestions.indexOf(this.recentAccepted), 1);
+      this.currentTranscriptionID = this.previousTranscriptionID;
+
+      let rejectIndex = this.currentSuggestions.indexOf(this.recentAccepted);
+      if(rejectIndex != -1) {
+        this.currentSuggestions.splice(rejectIndex, 1);
+      }
 
       // Other state maintenance
       this.recentAccept = false;
@@ -604,9 +613,20 @@ namespace com.keyman.osk {
     }.bind(this);
 
     private doUpdate() {
+      let keyman = com.keyman.singleton;
+
+      let suggestions = [];
       // TODO:  Insert 'current text' if/when valid as the leading option.
       //        We need the LMLayer to tell us this somehow.
-      let suggestions = [].concat(this.currentSuggestions);
+      if(!this.recentAccept && !this.recentRevert) {
+        // In the meantime, a placeholder:
+        // (generated from the 'true'/original transform)
+        let original = keyman.modelManager.getPredictionState(this.currentTranscriptionID);
+        let nil = new text.TextTransform(original.transform.insert + ' ', original.transform.deleteLeft, original.transform.deleteRight);
+
+        suggestions.push({transform: nil, displayAs: '&lt;keep&gt;', transformId: this.currentTranscriptionID});
+      }
+      suggestions = suggestions.concat(this.currentSuggestions);
 
       this.options.forEach((option: BannerSuggestion, i: number) => {
         if(i < suggestions.length) {
@@ -627,6 +647,9 @@ namespace com.keyman.osk {
         function(this: SuggestionManager, suggestions: Suggestion[]) {
       
       this.currentSuggestions = suggestions;
+      if(suggestions.length > 0) {
+        this.currentTranscriptionID = suggestions[0].transformId;
+      }
 
       // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
       if(!this.swallowPrediction) {
