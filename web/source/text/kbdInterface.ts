@@ -1151,6 +1151,10 @@ namespace com.keyman.text {
       }
       this.resetContextCache();
       this.resetVKShift();
+      
+      if(keyman.modelManager) {
+        keyman.modelManager.invalidateContext();
+      }
 
       if(!keyman.isHeadless) {
         keyman.osk._Show();
