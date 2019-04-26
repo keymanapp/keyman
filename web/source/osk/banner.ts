@@ -345,7 +345,7 @@ namespace com.keyman.osk {
     static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
 
     constructor(height?: number) {
-      super(height || SuggestionBanner.DEFAULT_HEIGHT);
+      super(height || Banner.DEFAULT_HEIGHT);
 
       this.options = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {

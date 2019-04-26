@@ -182,7 +182,7 @@ namespace com.keyman.osk {
           banner = new BlankBanner();
           break;
         case 'image':
-          banner = new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT);
+          banner = new ImageBanner(this.imagePath, Banner.DEFAULT_HEIGHT);
           break;
         case 'suggestion':
           banner = new SuggestionBanner(height);
