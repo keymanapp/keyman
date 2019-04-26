@@ -47,10 +47,12 @@ namespace com.keyman.text.prediction {
     }
   }
 
+  export type InvalidateSourceEnum = 'new'|'context';
+
   /**
    * Corresponds to the 'invalidatesuggestions' ModelManager event.
    */
-  export type InvalidateSuggestionsHandler = () => boolean;
+  export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
 
   /**
    * Corresponds to the 'suggestionsready' ModelManager event.
@@ -222,12 +224,27 @@ namespace com.keyman.text.prediction {
       return keyman.util.removeEventListener(ModelManager.EVENT_PREFIX + event, func);
     }
 
-    public predict(transcription: Transcription) {
+    public invalidateContext() {
+      let keyman = com.keyman.singleton;
+
+      // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'context');
+    }
+
+    public predict(transcription?: Transcription) {
+      let keyman = com.keyman.singleton;
+
       // If there's no active model, there can be no predictions.
       // We'll also be missing important data needed to even properly REQUEST the predictions.
       if(!this.currentModel || !this.configuration) {
         return;
       }
+
+      if(!transcription) {
+        let t = text.Processor.getOutputTarget();
+        transcription = t.buildTranscriptionFrom(t, null);
+      }
+
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
       this.predict_internal(transcription.transform, context);
@@ -239,7 +256,7 @@ namespace com.keyman.text.prediction {
 
       // We've already invalidated any suggestions resulting from any previously-existing Promise -
       // may as well officially invalidate them via event.
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", null);
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'new');
 
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {

@@ -389,6 +389,9 @@ namespace com.keyman.osk {
       keyman.modelManager['addEventListener']('suggestionsready', manager.updateSuggestions);
       keyman.modelManager['addEventListener']('tryaccept', manager.tryAccept);
       keyman.modelManager['addEventListener']('tryrevert', manager.tryRevert);
+
+      // Trigger a null-based initial prediction to kick things off.
+      keyman.modelManager.predict();
     }
 
     deactivate() {
@@ -488,6 +491,8 @@ namespace com.keyman.osk {
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
     private preAccept: text.Transcription = null;
+    private swallowPrediction: boolean = false;
+    private previousSuggestions: Suggestion[];
 
     private recentRevert: boolean = false;
     private rejectedSuggestions: Suggestion[] = [];
@@ -506,7 +511,12 @@ namespace com.keyman.osk {
       this.recentRevert = false;
       this.recentAccepted = suggestion.suggestion;
 
-      // TODO:  Request a 'new' prediction based on current context with a nil Transform.
+      this.previousSuggestions = this.currentSuggestions;
+
+      // Request a 'new' prediction based on current context with a nil Transform.
+      let keyman = com.keyman.singleton;
+      this.swallowPrediction = true;
+      keyman.modelManager.predict();
     }
 
     private doRevert() {
@@ -531,6 +541,7 @@ namespace com.keyman.osk {
 
       // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
       this.rejectedSuggestions.push(this.recentAccepted);
+      this.currentSuggestions = this.previousSuggestions; // Restore to the previous state's Suggestion list.
       this.currentSuggestions.splice(this.currentSuggestions.indexOf(this.recentAccepted), 1);
 
       // Other state maintenance
@@ -574,12 +585,18 @@ namespace com.keyman.osk {
      * Scope        Public
      * Description  Clears the suggestions in the suggestion banner
      */
-    public invalidateSuggestions: (this: SuggestionManager) => boolean = 
-        function(this: SuggestionManager) {
+    public invalidateSuggestions: (this: SuggestionManager, source: text.prediction.InvalidateSourceEnum) => boolean = 
+        function(this: SuggestionManager, source: string) {
 
-      this.recentAccept = false;
-      this.recentRevert = false;
-      this.rejectedSuggestions = [];
+      if(!this.swallowPrediction || source == 'context') {
+        this.recentAccept = false;
+        this.recentRevert = false;
+        this.rejectedSuggestions = [];
+
+        if(source == 'context') {
+          this.swallowPrediction = false;
+        }
+      }
 
       this.options.forEach((option: BannerSuggestion) => {
         option.update(null);
@@ -612,9 +629,13 @@ namespace com.keyman.osk {
       this.currentSuggestions = suggestions;
 
       // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
-      this.recentAccept = false;
-      this.recentRevert = false;
-      this.rejectedSuggestions = [];
+      if(!this.swallowPrediction) {
+        this.recentAccept = false;
+        this.recentRevert = false;
+        this.rejectedSuggestions = [];
+      } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
+        this.swallowPrediction = false;
+      }
 
       // The rest is the same, whether from input or from "self-updating" after a reversion to provide new suggestions.
       this.doUpdate();
