@@ -54,10 +54,20 @@ namespace com.keyman.text.prediction {
    */
   export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
 
+  export class ReadySuggestions {
+    suggestions: Suggestion[];
+    transcriptionID: number;
+
+    constructor(suggestions: Suggestion[], id: number) {
+      this.suggestions = suggestions;
+      this.transcriptionID = id;
+    }
+  }
+
   /**
    * Corresponds to the 'suggestionsready' ModelManager event.
    */
-  export type ReadySuggestionsHandler = (suggestions: Suggestion[]) => boolean;
+  export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
 
   export type ModelChangeEnum = 'loaded'|'unloaded';
   /**
@@ -261,7 +271,8 @@ namespace com.keyman.text.prediction {
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {
         if(promise == mm.currentPromise) {
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", suggestions);
+          let result = new ReadySuggestions(suggestions, transform.id);
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", result);
           mm.currentPromise = null;
         }
       })

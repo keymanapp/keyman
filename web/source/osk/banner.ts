@@ -486,6 +486,8 @@ namespace com.keyman.osk {
 
     private options: BannerSuggestion[];
 
+    private initNewContext: boolean = true;
+
     private currentSuggestions: Suggestion[] = [];
     private currentTranscriptionID: number;
 
@@ -604,6 +606,7 @@ namespace com.keyman.osk {
 
         if(source == 'context') {
           this.swallowPrediction = false;
+          this.initNewContext = true;
         }
       }
 
@@ -618,7 +621,7 @@ namespace com.keyman.osk {
       let suggestions = [];
       // TODO:  Insert 'current text' if/when valid as the leading option.
       //        We need the LMLayer to tell us this somehow.
-      if(!this.recentAccept && !this.recentRevert) {
+      if(!this.recentAccept && !this.recentRevert && !this.initNewContext) {
         // In the meantime, a placeholder:
         // (generated from the 'true'/original transform)
         let original = keyman.modelManager.getPredictionState(this.currentTranscriptionID);
@@ -635,6 +638,8 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
+
+      this.initNewContext = false;
     }
 
     /**
@@ -643,13 +648,13 @@ namespace com.keyman.osk {
      * @param {Suggestion[]}  suggestions   Array of suggestions from the lexical model.
      * Description    Update the displayed suggestions in the SuggestionBanner
      */
-    public updateSuggestions: (this: SuggestionManager, suggestions: Suggestion[]) => boolean =
-        function(this: SuggestionManager, suggestions: Suggestion[]) {
+    public updateSuggestions: (this: SuggestionManager, prediction: text.prediction.ReadySuggestions) => boolean =
+        function(this: SuggestionManager, prediction: text.prediction.ReadySuggestions) {
       
+      let suggestions = prediction.suggestions;
+
       this.currentSuggestions = suggestions;
-      if(suggestions.length > 0) {
-        this.currentTranscriptionID = suggestions[0].transformId;
-      }
+      this.currentTranscriptionID = prediction.transcriptionID;
 
       // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
       if(!this.swallowPrediction) {
