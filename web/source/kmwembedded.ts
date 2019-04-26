@@ -20,18 +20,19 @@ namespace com.keyman.osk {
    * 
    * @param {Object}  key   base key element
    */            
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) { 
-    let util = com.keyman.singleton.util;       
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
+    let util = com.keyman.singleton.util;
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv);      
+      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight;
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
       }
 
       this.popupBaseKey = key;
-      this.popupPending=true;      
+      this.popupPending=true;
       window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
     }
   };
@@ -76,8 +77,10 @@ namespace com.keyman.osk {
     }
 
     if(on && (typeof showPreview == 'function')) {
-      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv), kc;
+      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight,
+          kc;
 
       // Find key text element
       for(var i=0; i<key.childNodes.length; i++) {
@@ -88,7 +91,7 @@ namespace com.keyman.osk {
       }
         
       if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
-        showPreview(xBase,yBase,key.offsetWidth,key.offsetHeight,kc.innerHTML);
+        showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
       }
     } else if(!on && (typeof clearPreview == 'function')) {
       if(this.touchCount == 0 || key == null) {
@@ -134,12 +137,20 @@ namespace com.keyman.osk {
     let oskHeight : number = nRows*rowHeight;
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(bannerHeight+oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
+    // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      b.childNodes.forEach(function(layer: HTMLElement) {
+        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+      });
+    }
+    // Sets the layers to the correct height 
     pad = Math.round(0.15*rowHeight);
 
+    bs.fontSize=fs+'em';
     var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
 
     for(nLayer=0;nLayer<layers.length; nLayer++) {
@@ -155,7 +166,7 @@ namespace com.keyman.osk {
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {
           key=keys[nKey];
-          // Must set the height of the text DIV, not the label (if any)
+          // Must set the height of the btn DIV, not the label (if any)
           for(j=0; j<key.childNodes.length; j++) {
             if(util.hasClass(key.childNodes[j],'kmw-key')) {
               break;
@@ -206,7 +217,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, false);
+    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, usingOSK);
   }
 }
 

@@ -59,7 +59,7 @@ public class KMPLexicalModel
       for language in self.languages {
         let lexicalModel = InstallableLexicalModel(id: lexicalModelId!, name: name!,
                                                    languageID: language.languageId,
-                                                   languageName: language.name,
+//                                                   languageName: language.name,
                                                    version: version,
                                                    isCustom: true) //update this based on adhoc vs api
         

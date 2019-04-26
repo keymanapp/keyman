@@ -81,7 +81,6 @@ namespace com.keyman.osk {
     private constructContainer(): HTMLDivElement {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
-
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
       d.className = "kmw-banner-container";
@@ -195,17 +194,6 @@ namespace com.keyman.osk {
       }
     }
 
-    // TODO: test code not to keep in production
-    public setSuggestions() {
-      let blank : Suggestion = {displayAs: 'blank'} as Suggestion;
-      let s:Array<Suggestion> = Array(blank, blank, blank);
-      s[0].displayAs = 'choco';
-      s[1].displayAs = 'taco';
-      s[2].displayAs = 'last';
-      let suggestionBanner = this.activeBanner as SuggestionBanner;
-      suggestionBanner.updateSuggestions(s);
-    }
-
     /**
      * Handles `ModelManager`'s `'modelchange'` events, 
      * allowing logic to automatically hot-swap `Banner`s as needed.
@@ -260,6 +248,15 @@ namespace com.keyman.osk {
         return this.activeBanner.height;
       } else {
         return 0;
+      }
+    }
+
+    /**
+     * Sets the height (in pixels) of the active 'Banner' instance.
+     */
+    public set height(h: number) {
+      if (this.activeBanner) {
+        this.activeBanner.height = h;
       }
     }
   }

@@ -232,6 +232,8 @@ final class KMKeyboard extends WebView {
     super.onConfigurationChanged(newConfig);
     dismissKeyPreview(0);
     dismissSubKeysWindow();
+    int bannerHeight = KMManager.getBannerHeight(context);
+    loadUrl(String.format("javascript:setBannerHeight(%d)", bannerHeight));
     loadUrl(String.format("javascript:setOskWidth(%d)", newConfig.screenWidthDp));
     loadUrl("javascript:setOskHeight(0)");
     if (dismissHelpBubble()) {

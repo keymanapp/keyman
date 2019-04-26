@@ -9,6 +9,18 @@
 import Foundation
 
 struct LexicalModelAPICall: Codable {
-  let options: Options
-  let lexicalModel: LexicalModel
+  let lexicalModels: [LexicalModel]
+  
+  enum CodingKeys: String, CodingKey {
+    case lexicalModels
+  }
+  
+  enum LexicalModelCodingKeys: String, CodingKey {
+    case lexicalModel
+  }
+  
+  init(from decoder: Decoder) throws {
+    let lexicalModelContainer = try decoder.container(keyedBy: CodingKeys.self)
+    self.lexicalModels = try lexicalModelContainer.decode([LexicalModel].self, forKey: .lexicalModels)
+  }
 }

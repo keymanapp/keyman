@@ -88,7 +88,9 @@ namespace com.keyman.text {
             // Or move to next field from TEXT fields
             } else if(usingOSK) {
               var inputEle: HTMLInputElement;
-              if(dom.Utils.instanceof(Lelem, "HTMLInputElement")) {
+              if(keyman.isEmbedded) { // In embedded mode, the OutputTarget may not meet other conditions.
+                return '\n';
+              } else if(dom.Utils.instanceof(Lelem, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem;
               } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem.base;

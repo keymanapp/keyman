@@ -378,7 +378,7 @@ namespace com.keyman {
 
       if(this.isKMWInput(Pelem)) {
         if(!this.isKMWDisabled(Pelem)) {
-          if(touchable) {
+          if(touchable && !this.keyman.isEmbedded) {
             this.enableTouchElement(Pelem);
           } else {
             this.enableInputElement(Pelem);

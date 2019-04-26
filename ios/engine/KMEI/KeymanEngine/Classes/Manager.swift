@@ -262,7 +262,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     if isKeymanHelpOn {
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
-
+    
+    //HERE getAssociatedLexicalModel(langID) and setLexicalModel
+    
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
@@ -651,7 +653,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                   id: lexicalModelID,
                   name: name,
                   languageID: languageId,
-                  languageName: languageName,
+//                  languageName: languageName,
                   version: version,
                   isCustom: false))
               }
@@ -958,78 +960,77 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                    languageID: String,
                                    isUpdate: Bool,
                                    fetchRepositoryIfNeeded: Bool = true) {
-    guard let lexicalModels = apiLexicalModelRepository.lexicalModels,
-      let options = apiLexicalModelRepository.options
-      else {
-        if fetchRepositoryIfNeeded {
-          log.info("Fetching repository from API for lexical model download")
-          apiLexicalModelRepository.fetch { error in
-            if let error = error {
-              self.downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-            } else {
-              log.info("Fetched repository. Continuing with lexical model download.")
-              self.downloadLexicalModel(withID: lexicalModelID,
-                                        languageID: languageID,
-                                        isUpdate: isUpdate,
-                                        fetchRepositoryIfNeeded: false)
-            }
-          }
-          return
-        }
-        let message = "Lexical model repository not yet fetched"
-        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-        return
-    }
+//    guard let lexicalModels = apiLexicalModelRepository.lexicalModels,
+//      else {
+//        if fetchRepositoryIfNeeded {
+//          log.info("Fetching repository from API for lexical model download")
+//          apiLexicalModelRepository.fetch { error in
+//            if let error = error {
+//              self.downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+//            } else {
+//              log.info("Fetched repository. Continuing with lexical model download.")
+//              self.downloadLexicalModel(withID: lexicalModelID,
+//                                        languageID: languageID,
+//                                        isUpdate: isUpdate,
+//                                        fetchRepositoryIfNeeded: false)
+//            }
+//          }
+//          return
+//        }
+//        let message = "Lexical model repository not yet fetched"
+//        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+//        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+//        return
+//    }
     
-    guard let lexicalModel = apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID),
-      let filename = lexicalModels[lexicalModelID]?.filename
-      else {
-        let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
-        let error = NSError(domain: "Keyman", code: 0,
-                            userInfo: [NSLocalizedDescriptionKey: message])
-        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
-        return
-    }
-    
-    guard downloadQueue == nil else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
-      return
-    }
-    
-    guard reachability.currentReachabilityStatus() != NotReachable else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
-      return
-    }
-    
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
-      return
-    }
-    
-    let lexicalModelURL = options.lexicalModelBaseURL?.appendingPathComponent(filename)
-    
-    // TODO: Better typing
-    downloadQueue = HTTPDownloader(self)
-    let commonUserData: [String: Any] = [
-      Key.lexicalModelInfo: [lexicalModel],
-      Key.update: isUpdate
-    ]
-    downloadQueue!.userInfo = commonUserData
-    
-    let request = HTTPDownloadRequest(url: lexicalModelURL!, userInfo: commonUserData)
-    request.destinationFile = Storage.active.lexicalModelURL(for: lexicalModel).path
-    request.tag = 0
-    downloadQueue!.addRequest(request)
-    
-    downloadQueue!.run()
+//    guard let lexicalModel = apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID),
+//      let filename = lexicalModels[lexicalModelID]?.filename
+//      else {
+//        let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
+//        let error = NSError(domain: "Keyman", code: 0,
+//                            userInfo: [NSLocalizedDescriptionKey: message])
+//        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
+//        return
+//    }
+//
+//    guard downloadQueue == nil else {
+//      let error = NSError(domain: "Keyman", code: 0,
+//                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+//      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
+//      return
+//    }
+//
+//    guard reachability.currentReachabilityStatus() != NotReachable else {
+//      let error = NSError(domain: "Keyman", code: 0,
+//                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+//      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
+//      return
+//    }
+//
+//    do {
+//      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
+//                                              withIntermediateDirectories: true)
+//    } catch {
+//      log.error("Could not create dir for download: \(error)")
+//      return
+//    }
+//
+//    let lexicalModelURL = lexicalModelBaseURL?.appendingPathComponent(filename)
+//
+//    // TODO: Better typing
+//    downloadQueue = HTTPDownloader(self)
+//    let commonUserData: [String: Any] = [
+//      Key.lexicalModelInfo: [lexicalModel],
+//      Key.update: isUpdate
+//    ]
+//    downloadQueue!.userInfo = commonUserData
+//
+//    let request = HTTPDownloadRequest(url: lexicalModelURL!, userInfo: commonUserData)
+//    request.destinationFile = Storage.active.lexicalModelURL(for: lexicalModel).path
+//    request.tag = 0
+//    downloadQueue!.addRequest(request)
+//
+//    downloadQueue!.run()
   }
   
   private func lexicalModelFontURLs(forFont font: Font?, options: Options) -> [URL] {
@@ -1083,15 +1084,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
   
-  /// Assumes that lexical model has font and oskFont set and ignores fonts contained in Language.
   private func downloadLexicalModel(_ lexicalModelAPI: LexicalModelAPICall) {
-    let lexicalModel = lexicalModelAPI.lexicalModel
+    let lexicalModel = lexicalModelAPI.lexicalModels[0]
     let installableLexicalModels = lexicalModel.languages!.map { language in
-      InstallableLexicalModel(lexicalModel: lexicalModel, language: language, isCustom: true)
+      InstallableLexicalModel(lexicalModel: lexicalModel, languageID: language, isCustom: true)
     }
     
-    let filename = lexicalModel.filename
-    let lexicalModelURL = lexicalModelAPI.options.lexicalModelBaseURL!.appendingPathComponent(filename)
+    let packageFilename = lexicalModel.packageFilename
+    let lexicalModelURL = URL(string: "https://api.keyman.com/model")!.appendingPathComponent(packageFilename)
     
     if downloadQueue != nil {
       // Download queue is active.

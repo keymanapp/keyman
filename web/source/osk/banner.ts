@@ -8,7 +8,8 @@ namespace com.keyman.osk {
     private _height: number; // pixels
     private div: HTMLDivElement;
 
-    public static readonly DEFAULT_HEIGHT: number = 40; // pixels
+    public static DEFAULT_HEIGHT: number = 40; // pixels; embedded apps can modify
+
     public static readonly BANNER_CLASS: string = 'kmw-banner-bar';
     public static readonly BANNER_ID: string = 'kmw-banner-bar';
 
@@ -238,8 +239,21 @@ namespace com.keyman.osk {
         }
 
         // Apply the Suggestion!
-        target.restoreTo(original.preInput);
-        target.apply(this.suggestion.transform);
+
+        // Step 1:  determine the final output text
+        let final = text.Mock.from(original.preInput);
+        final.apply(this.suggestion.transform);
+
+        // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+        // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+        // values as needed for use with their IME interfaces.
+        let transform = final.buildTransformFrom(target);
+        target.apply(transform);
+
+        // Signal the necessary text changes to the embedding app, if it exists.
+        if(keyman['oninserttext'] && keyman.isEmbedded) {
+          keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
+        }
       }
     }
 
@@ -280,14 +294,6 @@ namespace com.keyman.osk {
       }
 
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
-
-      if(keyman.isEmbedded && keyman.util.device.OS == 'Android') {
-        // TODO: Investigate the factor of "48"
-
-        let ss = s.style;
-        let oskManager = keyman.osk;
-        ss.top = oskManager.getBannerHeight() - 48 + 'px';
-      }
 
       // Finalize the suggestion text
       s.innerHTML = suggestionText;
