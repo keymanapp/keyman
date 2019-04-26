@@ -390,7 +390,7 @@ namespace com.keyman.text {
         if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && keyman.modelManager.tryRevertSuggestion()) {
           return;
           // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
-        } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && keyman.modelManager.tryAcceptSuggestion()) {
+        } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && keyman.modelManager.tryAcceptSuggestion('space')) {
           return;
         }
       }

@@ -63,8 +63,13 @@ namespace com.keyman.text.prediction {
    */
   export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
 
+  /**
+   * Covers both 'tryaccept' and 'tryrevert' events.
+   */
+  export type TryUIHandler = (source: string) => boolean;
+
   type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange" | "tryaccept" | "tryrevert";
-  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler;
+  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler | TryUIHandler;
 
   export class ModelManager {
     private lmEngine: LMLayer;
@@ -292,11 +297,11 @@ namespace com.keyman.text.prediction {
       }
     }
 
-    public tryAcceptSuggestion(): boolean {
+    public tryAcceptSuggestion(source: string): boolean {
       let keyman = com.keyman.singleton;
       
       // Handlers of this event should return 'false' when the 'try' is successful.
-      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryaccept', null);
+      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryaccept', source);
     }
 
     public tryRevertSuggestion(): boolean {

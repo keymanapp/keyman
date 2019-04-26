@@ -163,7 +163,7 @@ namespace com.keyman.osk {
     private display: HTMLSpanElement;
     private fontFamily?: string;
 
-    private suggestion: Suggestion;
+    private _suggestion: Suggestion;
 
     private index: number;
 
@@ -213,6 +213,10 @@ namespace com.keyman.osk {
       this.div['suggestion'] = this;
     }
 
+    get suggestion(): Suggestion {
+      return this._suggestion;
+    }
+
     /**
      * Function update
      * @param {string}     id           Element ID for the suggestion span
@@ -220,7 +224,7 @@ namespace com.keyman.osk {
      * Description  Update the ID and text of the BannerSuggestionSpec
      */
     public update(suggestion: Suggestion) {
-      this.suggestion = suggestion;
+      this._suggestion = suggestion;
       this.updateText();
     }
 
@@ -235,18 +239,18 @@ namespace com.keyman.osk {
      * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
      * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
      */
-    public apply(target?: text.OutputTarget) {
+    public apply(target?: text.OutputTarget): text.Transcription {
       let keyman = com.keyman.singleton;
 
       if(this.isEmpty()) {
-        return;
+        return null;
       }
       
       // Find the state of the context at the time the prediction-triggering keystroke was applied.
-      let original = keyman.modelManager.getPredictionState(this.suggestion.transformId);
+      let original = keyman.modelManager.getPredictionState(this._suggestion.transformId);
       if(!original) {
         console.warn("Could not apply the Suggestion!");
-        return;
+        return null;
       } else {
         if(!target) {
           /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
@@ -260,7 +264,7 @@ namespace com.keyman.osk {
 
         // Step 1:  determine the final output text
         let final = text.Mock.from(original.preInput);
-        final.apply(this.suggestion.transform);
+        final.apply(this._suggestion.transform);
 
         // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
@@ -272,11 +276,16 @@ namespace com.keyman.osk {
         if(keyman['oninserttext'] && keyman.isEmbedded) {
           keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
         }
+
+        // Build a 'reversion' Transcription that can be used to undo this apply() if needed.
+        let preApply = text.Mock.from(original.preInput);
+        preApply.apply(original.transform);
+        return preApply.buildTranscriptionFrom(target, null);
       }
     }
 
     public isEmpty(): boolean {
-      return !this.suggestion;
+      return !this._suggestion;
     }
 
     /**
@@ -289,7 +298,7 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
-      let suggestion = this.suggestion;
+      let suggestion = this._suggestion;
       var suggestionText: string;
 
       var s=util._CreateElement('span');
@@ -319,7 +328,84 @@ namespace com.keyman.osk {
     }
   }
 
-  class SuggestionTouchManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+  /**
+   * Function     SuggestionBanner
+   * Scope        Public
+   * @param {number} height - If provided, the height of the banner in pixels
+   * Description  Display lexical model suggestions in the banner
+   */
+  export class SuggestionBanner extends Banner {
+    public static readonly SUGGESTION_LIMIT: number = 3;
+    public static readonly MARGIN = 1;
+
+    private options : BannerSuggestion[];
+
+    private manager: SuggestionManager;
+
+    static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
+
+    constructor(height?: number) {
+      super(height || SuggestionBanner.DEFAULT_HEIGHT);
+
+      this.options = new Array();
+      for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+        let d = new BannerSuggestion(i);
+        this.options[i] = d;
+        this.getDiv().appendChild(d.div);
+      }
+
+      this.manager = new SuggestionManager(this.getDiv(), this.options);
+
+      this.setupTouchHandling();
+    }
+
+    private setupTouchHandling() {
+      let keyman = com.keyman.singleton;
+      let div = this.getDiv();
+
+      let th = this.manager;
+
+      if(keyman.util.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
+        // Not to mention, it's rather redundant.
+        div.addEventListener('touchstart', function(e: TouchEvent) {
+          th.touchStart(e);
+        }, true);
+        // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
+        div.addEventListener('touchend', function(e: TouchEvent) {
+          th.touchEnd(e);
+        }, true); 
+        div.addEventListener('touchmove', function(e: TouchEvent) {
+          th.touchMove(e);
+        }, false);
+        //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
+      }
+    }
+
+    activate() {
+      let keyman = com.keyman.singleton;
+      let manager = this.manager;
+
+      keyman.modelManager['addEventListener']('invalidatesuggestions', manager.invalidateSuggestions);
+      keyman.modelManager['addEventListener']('suggestionsready', manager.updateSuggestions);
+      keyman.modelManager['addEventListener']('tryaccept', manager.tryAccept);
+      keyman.modelManager['addEventListener']('tryrevert', manager.tryRevert);
+    }
+
+    deactivate() {
+      let keyman = com.keyman.singleton;
+      let manager = this.manager;
+
+      keyman.modelManager['removeEventListener']('invalidatesuggestions', manager.invalidateSuggestions);
+      keyman.modelManager['removeEventListener']('suggestionsready', manager.updateSuggestions);
+      keyman.modelManager['removeEventListener']('tryaccept', manager.tryAccept);
+      keyman.modelManager['removeEventListener']('tryrevert', manager.tryRevert);
+    }
+  }
+
+  class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+    private selected: BannerSuggestion;
+
+    //#region Touch handling implementation
     findTargetFrom(e: HTMLElement): HTMLDivElement {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
@@ -348,7 +434,7 @@ namespace com.keyman.osk {
         console.warn("Cannot find BannerSuggestion object for element to highlight!");
       } else {
         // Never highlight an empty suggestion button.
-        let suggestion = t['suggestion'] as BannerSuggestion;
+        let suggestion = this.selected = t['suggestion'] as BannerSuggestion;
         if(suggestion.isEmpty()) {
           on = false;
         }
@@ -362,8 +448,7 @@ namespace com.keyman.osk {
     }
 
     protected select(t: HTMLDivElement): void {
-      let suggestion = t['suggestion'] as BannerSuggestion;
-      suggestion.apply();
+      this.doAccept(t['suggestion'] as BannerSuggestion);
     }
 
     //#region Long-press support
@@ -394,76 +479,126 @@ namespace com.keyman.osk {
       throw new Error("Method not implemented.");
     }
     //#endregion
+    //#endregion
 
-    constructor(div: HTMLElement) {
-      // TODO:  Determine appropriate CSS styling names, etc.
-      super(div, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
-    }
-  }
+    private options: BannerSuggestion[];
 
-  /**
-   * Function     SuggestionBanner
-   * Scope        Public
-   * @param {number} height - If provided, the height of the banner in pixels
-   * Description  Display lexical model suggestions in the banner
-   */
-  export class SuggestionBanner extends Banner {
-    public static readonly SUGGESTION_LIMIT: number = 3;
-    public static readonly MARGIN = 1;
-
-    private suggestionList : BannerSuggestion[];
     private currentSuggestions: Suggestion[] = [];
 
-    private touchHandler: SuggestionTouchManager;
+    private recentAccept: boolean = false;
+    private recentAccepted: Suggestion;
+    private preAccept: text.Transcription = null;
 
-    static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
+    private recentRevert: boolean = false;
+    private rejectedSuggestions: Suggestion[] = [];
 
-    constructor(height?: number) {
-      super(height || SuggestionBanner.DEFAULT_HEIGHT);
-
-      this.suggestionList = new Array();
-      for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
-        let d = new BannerSuggestion(i);
-        this.suggestionList[i] = d;
-        this.getDiv().appendChild(d.div);
-      }
-
-      this.setupTouchHandling();
+    constructor(div: HTMLElement, options: BannerSuggestion[]) {
+      // TODO:  Determine appropriate CSS styling names, etc.
+      super(div, Banner.BANNER_CLASS, SuggestionBanner.TOUCHED_CLASS);
+      this.options = options;
     }
 
-    private setupTouchHandling() {
+    private doAccept(suggestion: BannerSuggestion) {
+      this.preAccept = suggestion.apply();
+      
+      this.selected = null;
+      this.recentAccept = true;
+      this.recentRevert = false;
+      this.recentAccepted = suggestion.suggestion;
+
+      // TODO:  Request a 'new' prediction based on current context with a nil Transform.
+    }
+
+    private doRevert() {
       let keyman = com.keyman.singleton;
-      let div = this.getDiv();
+      let current = text.Processor.getOutputTarget();
+      let priorState = this.preAccept;
 
-      let th = this.touchHandler = new SuggestionTouchManager(div);
+      // Step 1:  construct the reverted state.
+      let target = text.Mock.from(priorState.preInput);
+      target.apply(priorState.transform);
 
-      if(keyman.util.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
-        // Not to mention, it's rather redundant.
-        div.addEventListener('touchstart', function(e: TouchEvent) {
-          th.touchStart(e);
-        }, true);
-        // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-        div.addEventListener('touchend', function(e: TouchEvent) {
-          th.touchEnd(e);
-        }, true); 
-        div.addEventListener('touchmove', function(e: TouchEvent) {
-          th.touchMove(e);
-        }, false);
-        //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
+      // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+      // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+      // values as needed for use with their IME interfaces.
+      let transform = target.buildTransformFrom(current);
+      current.apply(transform);
+
+      // Signal the necessary text changes to the embedding app, if it exists.
+      if(keyman['oninserttext'] && keyman.isEmbedded) {
+        keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
       }
+
+      // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
+      this.rejectedSuggestions.push(this.recentAccepted);
+      this.currentSuggestions.splice(this.currentSuggestions.indexOf(this.recentAccepted), 1);
+
+      // Other state maintenance
+      this.recentAccept = false;
+      this.recentRevert = true;
+      this.doUpdate();
     }
+
+    /**
+     * Receives messages from the keyboard that the 'accept' keystroke has been entered.
+     * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
+     * Otherwise, return true.
+     */
+    tryAccept: (source: string) => boolean = function(this: SuggestionManager, source: string): boolean {
+      if(!this.recentAccept && this.selected) {
+        this.doAccept(this.selected);
+        return false;
+      } else if(this.recentAccept && source == 'space') {
+        this.recentAccept = false;
+        return false; // Swallows a single space post-accept.
+      }
+      return true;  // Not yet implemented
+    }.bind(this);
+
+    /**
+     * Receives messages from the keyboard that the 'revert' keystroke has been entered.
+     * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
+     * Otherwise, return true.
+     */
+    tryRevert: () => boolean = function(this: SuggestionManager): boolean {
+      if(this.recentAccept) {
+        this.doRevert();
+        return false;
+      } else {
+        return true;
+      }
+    }.bind(this);
 
     /**
      * Function invalidateSuggestions
      * Scope        Public
      * Description  Clears the suggestions in the suggestion banner
      */
-    public invalidateSuggestions: (this: SuggestionBanner) => boolean = 
-        function(this: SuggestionBanner) {
-      this.suggestionList.forEach((option: BannerSuggestion) => {
+    public invalidateSuggestions: (this: SuggestionManager) => boolean = 
+        function(this: SuggestionManager) {
+
+      this.recentAccept = false;
+      this.recentRevert = false;
+      this.rejectedSuggestions = [];
+
+      this.options.forEach((option: BannerSuggestion) => {
         option.update(null);
       });
     }.bind(this);
+
+    private doUpdate() {
+      // TODO:  Insert 'current text' if/when valid as the leading option.
+      //        We need the LMLayer to tell us this somehow.
+      let suggestions = [].concat(this.currentSuggestions);
+
+      this.options.forEach((option: BannerSuggestion, i: number) => {
+        if(i < suggestions.length) {
+          option.update(suggestions[i]);
+        } else {
+          option.update(null);
+        }
+      });
+    }
 
     /**
      * Function updateSuggestions
@@ -471,51 +606,18 @@ namespace com.keyman.osk {
      * @param {Suggestion[]}  suggestions   Array of suggestions from the lexical model.
      * Description    Update the displayed suggestions in the SuggestionBanner
      */
-    public updateSuggestions: (this: SuggestionBanner, suggestions: Suggestion[]) => boolean =
-        function(this: SuggestionBanner, suggestions: Suggestion[]) {
-      this.currentSuggestions = suggestions;
+    public updateSuggestions: (this: SuggestionManager, suggestions: Suggestion[]) => boolean =
+        function(this: SuggestionManager, suggestions: Suggestion[]) {
       
-      this.suggestionList.forEach((option: BannerSuggestion, i: number) => {
-        if(i < suggestions.length) {
-          option.update(suggestions[i]);
-        } else {
-          option.update(null);
-        }
-      });
+      this.currentSuggestions = suggestions;
+
+      // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
+      this.recentAccept = false;
+      this.recentRevert = false;
+      this.rejectedSuggestions = [];
+
+      // The rest is the same, whether from input or from "self-updating" after a reversion to provide new suggestions.
+      this.doUpdate();
     }.bind(this);
-
-    /**
-     * Receives messages from the keyboard that the 'accept' keystroke has been entered.
-     * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
-     * Otherwise, return true.
-     */
-    tryAccept() {
-      return true;  // Not yet implemented
-    }
-
-    /**
-     * Receives messages from the keyboard that the 'revert' keystroke has been entered.
-     * Should return 'false' if the current state allows reverting a recently-applied suggestion and act accordingly.
-     * Otherwise, return true.
-     */
-    tryRevert() {
-      return true;
-    }
-
-    activate() {
-      let keyman = com.keyman.singleton;
-      keyman.modelManager['addEventListener']('invalidatesuggestions', this.invalidateSuggestions);
-      keyman.modelManager['addEventListener']('suggestionsready', this.updateSuggestions);
-      keyman.modelManager['addEventListener']('tryaccept', this.tryAccept);
-      keyman.modelManager['addEventListener']('tryrevert', this.tryRevert);
-    }
-
-    deactivate() {
-      let keyman = com.keyman.singleton;
-      keyman.modelManager['removeEventListener']('invalidatesuggestions', this.invalidateSuggestions);
-      keyman.modelManager['removeEventListener']('suggestionsready', this.updateSuggestions);
-      keyman.modelManager['removeEventListener']('tryaccept', this.tryAccept);
-      keyman.modelManager['removeEventListener']('tryrevert', this.tryRevert);
-    }
   }
 }
