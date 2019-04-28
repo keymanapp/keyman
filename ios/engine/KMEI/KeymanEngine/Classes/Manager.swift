@@ -803,6 +803,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       downloadQueue!.addRequest(request)
     }
     downloadQueue!.run()
+    self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
   }
 
   private func keyboardFontURLs(forFont font: Font?, options: Options) -> [URL] {
@@ -949,6 +950,36 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
     return nil
   }
+  
+  /// Starts the process of fetching the .js file for the lexical model for the given language ID
+  ///   first it fetches the list of lexical models for the given language
+  ///   then it takes the first of the list and actually fetches and stores it
+  /// - Parameters:
+  ///   - languageID: the bcp47 string of the desired language
+  public func downloadLexicalModelsForLanguageIfExists(languageID: String) {
+    //get list of lexical models for this languageID  /?q=bcp47:en
+    func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
+      if let error = error {
+        log.info("Failed to fetch lexical model list for "+languageID+". error: "+(error as! String))
+        self.downloadFailed(forLanguageID: languageID, error: error) //???forKeyboards
+      } else {
+        log.info("Fetched lexical model list for "+languageID+".")
+        if let lexicalModel = lexicalModels?[0] {
+          if let lexicalModelKMPURL = URL.init(string: lexicalModel.packageFilename) {
+              _ = self.openURL?(lexicalModelKMPURL)
+//            self.downloadLexicalModel(from: lexicalModelKMPURL)
+          } else {
+            log.info("\(lexicalModel.packageFilename) is not a URL string?")
+            // might want to download the .js file directly, then, instead
+          }
+        } else {
+          log.info("no error, but no lexical model in list, either!")
+        }
+      }
+    }
+    
+    apiLexicalModelRepository.fetchList(languageID: languageID, completionHandler: listCompletionHandler)
+  }
 
   /// Asynchronously fetches the .js file for the lexical model with given IDs.
   /// See `Notifications` for notification on success/failiure.
@@ -980,8 +1011,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 //        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
 //        downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
 //        return
-//    }
-    
+
 //    guard let lexicalModel = apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID),
 //      let filename = lexicalModels[lexicalModelID]?.filename
 //      else {
@@ -1085,7 +1115,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   
   private func downloadLexicalModel(_ lexicalModelAPI: LexicalModelAPICall) {
     let lexicalModel = lexicalModelAPI.lexicalModels[0]
-    let installableLexicalModels = lexicalModel.languages!.map { language in
+    let installableLexicalModels = lexicalModel.languages.map { language in
       InstallableLexicalModel(lexicalModel: lexicalModel, languageID: language, isCustom: true)
     }
     
@@ -1124,7 +1154,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     downloadQueue!.userInfo = commonUserData
     
     let request = HTTPDownloadRequest(url: lexicalModelURL, userInfo: commonUserData)
-    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version).path
+    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version ?? "0.1.0").path
     request.tag = 0
     
     downloadQueue!.addRequest(request)
@@ -1265,6 +1295,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
     let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
     NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  private func downloadFailed(forLanguageID languageID: String, error: Error) {
+    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
+    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
                                     object: self,
                                     value: notification)
   }

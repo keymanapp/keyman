@@ -38,7 +38,7 @@ public struct InstallableLexicalModel: Codable {
     self.name = lexicalModel.name
     self.languageID = languageID
 //    self.languageName = language.name
-    self.version = lexicalModel.version
+    self.version = lexicalModel.version ?? "0.1.0"
     self.isCustom = isCustom
   }
 }

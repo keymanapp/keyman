@@ -54,10 +54,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     loadUserKeyboards()
-    
-    lexicalModelRepository?.fetch()
-    
-    loadUserLexicalModels()
   }
 
   override func viewDidLoad() {
@@ -358,6 +354,7 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
 }
 
 // MARK: - LexicalModelRepositoryDelegate
+ //may not need  this, as we don't plan ever to fetch the whole lexical model repository (or even the list of all available)
 extension LanguageViewController: LexicalModelRepositoryDelegate {
   func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository) {
     if let languageDict = repository.languages {

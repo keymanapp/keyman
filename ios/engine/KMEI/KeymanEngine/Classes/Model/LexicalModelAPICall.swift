@@ -20,7 +20,13 @@ struct LexicalModelAPICall: Codable {
   }
   
   init(from decoder: Decoder) throws {
-    let lexicalModelContainer = try decoder.container(keyedBy: CodingKeys.self)
-    self.lexicalModels = try lexicalModelContainer.decode([LexicalModel].self, forKey: .lexicalModels)
+    var lexicalModelContainer = try decoder.unkeyedContainer()
+    let mutableLexicalModels = NSMutableArray.init()
+    while !lexicalModelContainer.isAtEnd {
+      let subdecoder = try lexicalModelContainer.superDecoder()
+      let lexicalModel = try LexicalModel.init(from: subdecoder)
+      mutableLexicalModels.add(lexicalModel)
+    }
+    lexicalModels = mutableLexicalModels as! [LexicalModel]
   }
 }

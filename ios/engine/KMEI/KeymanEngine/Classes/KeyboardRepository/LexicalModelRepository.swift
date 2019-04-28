@@ -10,7 +10,8 @@ import Foundation
 
 public protocol LexicalModelRepository: class {
   typealias CompletionHandler = (Error?) -> Void
-  
+  typealias ListCompletionHandler = ([LexicalModel]?, Error?) -> Void // one of the arguments will be nil, depending on success
+
   var delegate: LexicalModelRepositoryDelegate? { get set }
   var languages: [String: Language]? { get }
   var lexicalModels: [String: LexicalModel]? { get }
@@ -20,15 +21,15 @@ public protocol LexicalModelRepository: class {
 }
 
 public extension LexicalModelRepository {
-  public func installableLexicalModel(withID lexicalModelID: String, languageID: String) -> InstallableLexicalModel? {
-    guard let lexicalModel = lexicalModels?.first(where: { $0.key == lexicalModelID })?.value else {
+  func installableLexicalModel(withID lexicalModelID: String, languageID: String) -> InstallableLexicalModel? {
+    guard let lexicalModel = lexicalModels?[lexicalModelID] else {
       return nil
     }
   
     // If the lexicalModel (still) supports the requested language, use that one.
-    guard let language = lexicalModel.languages?.first(where: {$0 == languageID}) ??
+    guard let language = lexicalModel.languages.first(where: {$0 == languageID}) ??
         // Otherwise, just use the first language listed for the lexicalModel.
-        lexicalModel.languages?.first ??
+        lexicalModel.languages.first ??
         // In cases where the lexicalModel fails to specify any language, use the requested one if it's in the collection.
         languages?[languageID]
     else {
@@ -38,7 +39,7 @@ public extension LexicalModelRepository {
     return InstallableLexicalModel(lexicalModel: lexicalModel, languageID: language as! String, isCustom: false)
   }
   
-  public func fetch(completionHandler: CompletionHandler? = nil) {
+  func fetch(completionHandler: CompletionHandler? = nil) {
     fetch(completionHandler: completionHandler)
   }
 }

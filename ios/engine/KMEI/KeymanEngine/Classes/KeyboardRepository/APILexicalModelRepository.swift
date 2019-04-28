@@ -22,29 +22,28 @@ public class APILexicalModelRepository: LexicalModelRepository {
   public private(set) var languages: [String: Language]?
   public private(set) var lexicalModels: [String: LexicalModel]?
   
-  public func fetch(completionHandler: CompletionHandler?) {
-    let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
-    let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+  public func fetchList(languageID: String, completionHandler: @escaping ListCompletionHandler) {
     var urlComponents = modelsAPIURL
+    let bcp47Value = "bcp47:" + languageID
     urlComponents.queryItems = [
-      URLQueryItem(name: "q", value: "bcp47:en") //+languages?[0]
+      URLQueryItem(name: "q", value: bcp47Value)
     ]
     log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
     let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
-      self.apiCompletionHandler(data: data, response: response, error: error,
+      self.apiListCompletionHandler(data: data, response: response, error: error,
                                 fetchCompletionHandler: completionHandler)
     }
     task.resume()
   }
   
-  private func apiCompletionHandler(data: Data?,
+  private func apiListCompletionHandler(data: Data?,
                                     response: URLResponse?,
                                     error: Error?,
-                                    fetchCompletionHandler: CompletionHandler?) {
+                                    fetchCompletionHandler: @escaping ListCompletionHandler) {
     let errorHandler = { (error: Error) -> Void in
       DispatchQueue.main.async {
         self.delegate?.lexicalModelRepository(self, didFailFetch: error)
-        fetchCompletionHandler?(error)
+        fetchCompletionHandler(nil, error)
       }
     }
     
@@ -61,37 +60,23 @@ public class APILexicalModelRepository: LexicalModelRepository {
     
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
-    let result: LanguagesAPICall
+    let result: LexicalModelAPICall
     do {
-      result = try decoder.decode(LanguagesAPICall.self, from: data)
+      result = try decoder.decode(LexicalModelAPICall.self, from: data)
     } catch {
-      log.error("Failed parsing API languages: \(error)")
+      log.error("Failed parsing API lexical models: \(error)")
       errorHandler(APILexicalModelFetchError.parsingError(error))
       return
     }
     
-    languages = Dictionary(uniqueKeysWithValues: result.languages.map { ($0.id, $0) })
+    let lexicalModels = result.lexicalModels
+    self.lexicalModels = Dictionary(uniqueKeysWithValues: result.lexicalModels.map { ($0.id, $0) })
+
     
-    let lexicalModelsWithID = result.languages.flatMap { language in
-      language.lexicalModels?.map { lm in (lm.id, lm) } ?? []
-    }
-    lexicalModels = Dictionary(lexicalModelsWithID) { old, new in
-      var lm = old
-      if old.languages == nil {
-        lm.languages = new.languages
-        return lm
-      }
-      if let newLanguages = new.languages {
-        let oldLanguageIDs = Set(old.languages!.map { $0 })
-        lm.languages!.append(contentsOf: newLanguages.filter { !oldLanguageIDs.contains($0) })
-      }
-      return lm
-    }
-    
-    log.info("Request completed -- \(result.languages.count) languages.")
+    log.info("Request list completed -- \(result.lexicalModels.count) lexical models.")
     DispatchQueue.main.async {
       self.delegate?.lexicalModelRepositoryDidFetch(self)
-      fetchCompletionHandler?(nil)
+      fetchCompletionHandler(lexicalModels, nil)
     }
   }
 }
