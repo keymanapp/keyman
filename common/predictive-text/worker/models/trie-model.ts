@@ -261,14 +261,14 @@
           // likely suggestion is among its decsendants.
           // So we search all of its descendants!
           if (next.type === 'leaf') {
-            queue.addAll(next.entries);
+            queue.enqueueAll(next.entries);
           } else {
             // XXX: alias `next` so that TypeScript can be SURE that internal is
             // in fact an internal node. Because of the callback binding to the
             // original definition of node (i.e., a Node | Entry), this will not
             // type-check otherwise.
             let internal = next;
-            queue.addAll(next.values.map(char => {
+            queue.enqueueAll(next.values.map(char => {
               return internal.children[char];
             }));
           }
@@ -294,24 +294,23 @@
    * A priority queue that always pops the highest weighted item.
    */
   class PriorityQueue {
-    // XXX: This SHOULD use a heap implementation, but I'm just doing a
-    // O(n log n) sort of the array when an item is popped.
+    // TODO: This probable should use a max-heap implementation, but I'm just doing
+    // a O(n log n) sort of the array when an item is popped.
     private _storage: Weighted[] = [];
- 
-    /**
-     * Adds an array of weighted items to the priority queue.
-     * @param elements 
-     */
-    addAll(elements: Weighted[]) {
-      this._storage = this._storage.concat(elements);
-    }
- 
+    // TODO: this should have a limit, and ensure small values are not added.
+
     /**
      * Enqueues a single element to the priority queue.
-     * @param element 
      */
     enqueue(element: Weighted) {
       this._storage.push(element);
+    }
+
+    /**
+     * Adds an array of weighted elements to the priority queue.
+     */
+    enqueueAll(elements: Weighted[]) {
+      this._storage = this._storage.concat(elements);
     }
  
     /**
