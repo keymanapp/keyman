@@ -43,12 +43,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
   }
 
-//  open class var topBarHeight: Int {
-//    if InputViewController.isPortrait {
-//      return 41
-//    }
-//    return UIDevice.current.userInterfaceIdiom == .phone ? 34 : 39
-//  }
+  open class var topBarHeight: Int {
+    if InputViewController.isPortrait {
+      return 41
+    }
+    return UIDevice.current.userInterfaceIdiom == .phone ? 34 : 39
+  }
 
   open override var hasFullAccess: Bool {
     return Storage.shared != nil
@@ -58,9 +58,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
-  // TODO:  Consider deleting this.
   private var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight //+ activeTopBarHeight
+    return keymanWeb.keyboardHeight + activeTopBarHeight
   }
   
   public convenience init() {
@@ -100,6 +99,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       portraitConstraint?.isActive = false
       landscapeConstraint?.isActive = true
     }
+    
+    keymanWeb.setBannerHeight(to: InputViewController.topBarHeight)
 
     super.updateViewConstraints()
   }
@@ -284,10 +285,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint.isActive = true
   }
 
-//  public var activeTopBarHeight: CGFloat {
-//    // If 'isSystemKeyboard' is true, always show the top bar.
-//    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
-//  }
+  public var activeTopBarHeight: CGFloat {
+    // If 'isSystemKeyboard' is true, always show the top bar.
+    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
+  }
   
   public var kmwHeight: CGFloat {
     return keymanWeb.keyboardHeight
@@ -320,9 +321,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
     
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true) + 40)
+    let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false) + 40)
+    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
     landscapeHeight.priority = .defaultHigh
 
     portraitConstraint = portraitHeight

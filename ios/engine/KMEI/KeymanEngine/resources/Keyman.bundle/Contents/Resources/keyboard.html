@@ -62,6 +62,18 @@
               var kmw=window['keyman'];
               kmw.osk.banner.setOptions(bannerOptions);
             }
+        
+            function setBannerHeight(h) {
+              var kmw = com.keyman.singleton;
+              var osk = kmw.osk;
+
+              if(h >= 0 && osk.banner.activeType != 'blank') {
+                osk.banner.height = h;
+              }
+              
+              // Refresh KMW's OSK
+              kmw.correctOSKTextSize();
+            }
             
             function setDeviceType(deviceType) {
                 // Set device type: AppleMobile|AppleTablet
@@ -70,8 +82,8 @@
             }
             
             function setOskHeight(height) {
-                oskHeight = height;
                 var kmw=window['keyman'];
+                oskHeight = height - kmw.osk.banner.height;
                 kmw.osk.show(true);
                 kmw['correctOSKTextSize']();
             }

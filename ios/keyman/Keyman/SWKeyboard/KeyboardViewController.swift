@@ -48,24 +48,19 @@ class KeyboardViewController: InputViewController {
 
   func getTopBarImage(isPortrait: Bool) -> String? {
     if isPortrait {
-      //topBarImageView?.image = #imageLiteral(resourceName: "banner-Portrait.png")
       return Bundle.main.path(forResource: "banner-Portrait@2x", ofType: "png")
     }
 
     // iPad
     if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
-      //topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
       return Bundle.main.path(forResource: "banner-Landscape@2x", ofType: "png")
     }
 
     // iPhone
     let screenRect = UIScreen.main.bounds
     if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
-      //topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape-568h.png")
       return Bundle.main.path(forResource: "banner-Landscape-568h@2x", ofType: "png")
     } else {
-      //
-      //topBarImageView?.image = #imageLiteral(resourceName: "banner-Landscape.png")
       return Bundle.main.path(forResource: "banner-Landscape@2x", ofType: "png")
     }
   }

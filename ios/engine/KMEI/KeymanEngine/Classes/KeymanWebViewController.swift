@@ -173,8 +173,7 @@ extension KeymanWebViewController {
   }
 
   func setOskHeight(_ height: Int) {
-    let h = height - 40
-    webView?.evaluateJavaScript("setOskHeight(\(h));", completionHandler: nil)
+    webView?.evaluateJavaScript("setOskHeight(\(height));", completionHandler: nil)
   }
 
   func setPopupVisible(_ visible: Bool) {
@@ -254,9 +253,14 @@ extension KeymanWebViewController {
   }
   
   func setBannerImage(to path: String) {
-    bannerImgPath = path
+    bannerImgPath = path // Save the path in case delayed initializaiton is needed.
     log.debug("Banner image path: '\(path).'")
     webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
+  }
+  
+  func setBannerHeight(to height: Int) {
+    // TODO:
+    webView?.evaluateJavaScript("setBannerHeight(\(height);", completionHandler: nil)
   }
 }
 

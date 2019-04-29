@@ -49,6 +49,7 @@ namespace com.keyman.osk {
    *       rather than as its standalone app.
    */
   export class BannerManager {
+    private _activeType: BannerType;
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
     private activeBanner: Banner;
@@ -192,6 +193,8 @@ namespace com.keyman.osk {
         default:
           throw new Error("Invalid type specified for the banner!");
       }
+
+      this._activeType = type;
     }
 
     /**
@@ -238,6 +241,10 @@ namespace com.keyman.osk {
 
       this.activeBanner = banner;
       this.bannerContainer.appendChild(banner.getDiv());
+    }
+
+    public get activeType(): BannerType {
+      return this._activeType;
     }
 
     /**
