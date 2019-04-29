@@ -264,7 +264,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -debug_embedded)
             set_default_vars
-            BUILD_EMBED=false
+            BUILD_EMBED=true
             BUILD_UI=false
             BUILD_COREWEB=false
             BUILD_FULLWEB=false

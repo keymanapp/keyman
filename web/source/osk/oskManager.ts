@@ -167,7 +167,7 @@ namespace com.keyman.osk {
 
       this._Visible = false;  // I3363 (Build 301)
       var s = this._Box.style;
-      s.zIndex='9999'; s.display='none'; s.width='auto';
+      s.zIndex='9999'; s.display='none'; s.width= device.touchable ? '100%' : 'auto';
       s.position = (device.formFactor == 'desktop' ? 'absolute' : 'fixed');
 
       // Use smaller base font size for mobile devices
@@ -1001,7 +1001,7 @@ namespace com.keyman.osk {
      *  @return   {number}    height in pixels
      */
     getBannerHeight(): number {
-      return this.banner.height;
+      return (this.banner != null) ? this.banner.height : 0;
     }
 
     /**
@@ -1303,7 +1303,7 @@ namespace com.keyman.osk {
           Ls.left=Ls.bottom='0px';
           let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
           vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
-          Ls.height=Ls.maxHeight= (parseInt(vkbdHeight, 10) + this.getBannerHeight()) + 'px';
+          Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10)) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 

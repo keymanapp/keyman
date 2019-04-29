@@ -185,4 +185,9 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     // Do nothing.
   }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    // Do nothing.
+  }
 }

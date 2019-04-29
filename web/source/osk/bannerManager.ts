@@ -81,10 +81,9 @@ namespace com.keyman.osk {
     private constructContainer(): HTMLDivElement {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
-
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
-      d.className = "keymanweb-banner-container";
+      d.className = "kmw-banner-container";
       return this.bannerContainer = d;
     }
 
@@ -173,8 +172,9 @@ namespace com.keyman.osk {
      * 
      * @param type `'blank' | 'image' | 'suggestion'` - A plain-text string 
      *        representing the type of `Banner` to set active.
+     * @param height - Optional banner height in pixels.
      */
-    public setBanner(type: BannerType) {
+    public setBanner(type: BannerType, height?: number) {
       switch(type) {
         case 'blank':
           this._setBanner(new BlankBanner());
@@ -183,7 +183,7 @@ namespace com.keyman.osk {
           this._setBanner(new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT));
           break;
         case 'suggestion':
-          this._setBanner(new SuggestionBanner());
+          this._setBanner(new SuggestionBanner(height));
           let keyman = com.keyman.singleton;
           let banner = this.activeBanner as SuggestionBanner;
           keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions);
@@ -248,6 +248,15 @@ namespace com.keyman.osk {
         return this.activeBanner.height;
       } else {
         return 0;
+      }
+    }
+
+    /**
+     * Sets the height (in pixels) of the active 'Banner' instance.
+     */
+    public set height(h: number) {
+      if (this.activeBanner) {
+        this.activeBanner.height = h;
       }
     }
   }

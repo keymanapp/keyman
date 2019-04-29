@@ -182,26 +182,37 @@ public class PackageActivity extends AppCompatActivity {
         try {
           if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
             // processKMP will remove currently installed package and install
-            installedPackageKeyboards = kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+            installedPackageKeyboards = kmpProcessor.processKMP(kmpFile, tempPackagePath,
+              PackageProcessor.PP_KEYBOARDS_KEY);
             // Do the notifications!
             boolean success = installedPackageKeyboards.size() != 0;
             if (success) {
-              notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+              notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
+                installedPackageKeyboards, 1);
               if (installedPackageKeyboards != null) {
-                notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED, installedPackageKeyboards, 1);
+                notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
+                  installedPackageKeyboards, 1);
               }
               cleanup();
             } else {
               showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
             }
           } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-            installedLexicalModels = kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+            installedLexicalModels = kmpProcessor.processKMP(kmpFile, tempPackagePath,
+              PackageProcessor.PP_LEXICAL_MODELS_KEY);
             // Do the notifications
             boolean success = installedLexicalModels.size() != 0;
             if (success) {
-
+              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                installedLexicalModels, 1);
+              if (installedLexicalModels != null) {
+                notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                  installedLexicalModels, 1);
+              }
+              cleanup();
+            } else {
+              showErrorDialog(context, pkgId, getString(R.string.no_new_predictive_text_to_install));
             }
-            cleanup();
           }
         } catch (Exception e) {
           Log.e("PackageActivity", "Error " + e);
@@ -280,9 +291,17 @@ public class PackageActivity extends AppCompatActivity {
     alertDialog.show();
   }
 
-  void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType, List<Map<String, String>> keyboards, int result) {
+  void notifyPackageInstallListeners(KeyboardEventHandler.EventType eventType,
+                                     List<Map<String, String>> keyboards, int result) {
     if (kbDownloadEventListeners != null) {
       KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboards, result);
+    }
+  }
+
+  void notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType eventType,
+                                          List<Map<String, String>> models, int result) {
+    if (kbDownloadEventListeners != null) {
+      KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, models, result);
     }
   }
 

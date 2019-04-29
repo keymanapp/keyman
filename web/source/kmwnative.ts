@@ -53,12 +53,16 @@ namespace com.keyman.osk {
     let util = com.keyman.singleton.util;
 
     // Test for subkey array, return if none
+    // (JH 2/4/19) So, if a subkey is passed in, we return immediately?
     if(k == null || k['subKeys'] == null) {
       return;
     }
 
     // Highlight key at touch position (and clear other highlighting)
     var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
+
+    //#region This section fills a different role than the method name would suggest.
+    // Might correspond better to a 'checkInstantSubkeys' or something.
 
     // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
     if((this.touchY-y > 5) && skBox == null) {
@@ -68,7 +72,13 @@ namespace com.keyman.osk {
       this.showSubKeys(k);
       skBox=document.getElementById('kmw-popup-keys');
     } 
-        
+    //#endregion
+    
+    /* (JH 2/4/19) Because of that earlier note, in KMW 12 alpha (and probably 11),
+     * the following code is effectively impotent and could be deleted with no effect.
+     * Note that this probably results from VisualKeyboard.keyTarget finding the 
+     * subkey first... which is necessary anyway to support subkey output.
+     */
     for(i=0; i < k['subKeys'].length; i++) {
       try {
         sk=<HTMLElement> skBox.childNodes[i].firstChild;
@@ -390,7 +400,14 @@ namespace com.keyman.osk {
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
+    // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      b.childNodes.forEach(function(layer: HTMLElement) {
+        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+      });
+    }
+    // Sets the layers to the correct height 
     pad = Math.round(0.15*rowHeight);
 
     // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!

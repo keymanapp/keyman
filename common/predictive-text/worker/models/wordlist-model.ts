@@ -45,7 +45,18 @@
     private _wordlist: string[];
 
     constructor(wordlist: string[]) {
-      this._wordlist = wordlist;
+      // XXX: This may be given an Array of pairs, where the first element is
+      //      the word and the second is the count. e.g.,
+      //        [["elephant", 2], ["zebra", 3], ["octopuses", 13]]
+      //
+      //      Ignore the count when constructing our wordlist. e.g.,
+      //        ["elephant", "zebra", "octopuses"]
+      if (wordlist.length && Array.isArray(wordlist[0])) {
+        // @ts-ignore
+        this._wordlist = wordlist.map(([word, _count]) => word);
+      } else {
+        this._wordlist = wordlist;
+      }
     }
 
     configure(capabilities: Capabilities): Configuration {

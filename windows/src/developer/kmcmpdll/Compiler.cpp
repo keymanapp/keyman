@@ -1388,15 +1388,15 @@ BOOL IsValidKeyboardVersion(WCHAR *dpString) {   // I4140
   /* version format \d+(\.\d+)*  e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, blank is not allowed */
 
   do {
-    if(!isdigit(*dpString)) {
+    if(!iswdigit(*dpString)) {
       return FALSE;
     }
-    while(isdigit(*dpString)) {
+    while(iswdigit(*dpString)) {
       dpString++;
     }
     if(*dpString == '.') { 
       dpString++; 
-      if(!isdigit(*dpString)) {
+      if(!iswdigit(*dpString)) {
         return FALSE;
       }
     }
@@ -1808,7 +1808,7 @@ int LineTokenType(PWSTR *str)
 
 	while(iswspace(*p)) p++;
 
-	if(wcschr(LineTokens[0], toupper(*p)))
+	if(wcschr(LineTokens[0], towupper(*p)))
 		for(i = 0; i <= T_W_END - T_W_START; i++)
         {
 			l = wcslen(LineTokens[i+1]);
@@ -1819,7 +1819,7 @@ int LineTokenType(PWSTR *str)
 			}
 		}
 
-	switch(toupper(*p))
+	switch(towupper(*p))
     {
 	case 'C':
 		if(iswspace(*(p+1))) return T_COMMENT;
@@ -1884,7 +1884,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 	  "[", "]" };
   */
 
-		  switch(toupper(*p))
+		  switch(towupper(*p))
       {
 		    case 'X':
         case 'D':  type = 0; break;		// xFF, d130: chars, deadkey(n)
@@ -1907,7 +1907,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
         case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
 		    default:
-  			  if(isdigit(*p)) type = 0;	// octal number
+  			  if(iswdigit(*p)) type = 0;	// octal number
 	  		  else type = 99;				// error!
       }
 		  if(wcschr(token, *p)) tokenFound = TRUE;
@@ -2220,9 +2220,9 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 
 			  do
         {
-				  while(isspace(*p)) p++;
+				  while(iswspace(*p)) p++;
 
-				  switch(toupper(*p))
+				  switch(towupper(*p))
                   {
 				  case 'N':
 					  if(_wcsnicmp(p, L"NCAPS", 5) == 0)
@@ -2406,7 +2406,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 16:
         VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
 			  q = p+1;
-			  while(isalnum(*q) || *q == '-' || *q == '_') q++;
+			  while(iswalnum(*q) || *q == '-' || *q == '_') q++;
 			  c = *q; *q = 0;
 			  codename = wstrtostr(p+1);
 			  *q = c;
@@ -2726,7 +2726,7 @@ int xatoi(PWSTR *p)
 	PWSTR endptr;
 	int n;
 
-	switch(toupper(**p))
+	switch(towupper(**p))
     {
     case 'U':
         (*p)++;
@@ -2782,7 +2782,7 @@ DWORD ProcessEthnologueStore(PWSTR p) // I2646
     {
       for(int i = 0; i < 3; i++)
       {
-        if(!isalpha(*p)) return CERR_InvalidEthnologueCode;
+        if(!iswalpha(*p)) return CERR_InvalidEthnologueCode;
         p++;
       }
     }
@@ -2812,8 +2812,8 @@ DWORD ProcessHotKey(PWSTR p, DWORD *hk)
 			if(_wcsnicmp(q, L"ALT", 3) == 0) sFlag |= HK_ALT, q += 3; 
 			else if(_wcsnicmp(q, L"CTRL", 4) == 0) sFlag |= HK_CTRL, q += 4; 
 			else if(_wcsnicmp(q, L"SHIFT", 5) == 0) sFlag |= HK_SHIFT, q += 5;
-			else if(toupper(*q) != 'K') return CERR_InvalidToken;
-		} while(toupper(*q) != 'K');
+			else if(towupper(*q) != 'K') return CERR_InvalidToken;
+		} while(towupper(*q) != 'K');
 
 		r = wcschr(q, ']');
 		if(r)
