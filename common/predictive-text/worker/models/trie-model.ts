@@ -145,14 +145,12 @@
      * in sorted order in the .values array.
      */
     children: { [codeunit: string]: Node };
-    unsorted?: true;
   }
   /** Only leaf nodes actually contain entries (i.e., the words proper). */
   interface Leaf {
     type: 'leaf';
     weight: number;
     entries: Entry[];
-    unsorted?: true;
   }
   
   /**
@@ -242,11 +240,7 @@
     let results: string[] = [];
 
     if (node.type === 'leaf') {
-      if (node.unsorted) {
-        throw new Error('The trie must be sorted before lookup!');
-      }
-
-      // Since the values are sorted, we can just add all of the values in the
+      // Assuming the values are sorted, we can just add all of the values in the
       // leaf, until we reach the limit.
       for (let item of node.entries) {
         if (item.key.startsWith(prefix)) {
@@ -266,10 +260,6 @@
           // When a node is next up in the queue, that means that next least
           // likely suggestion is among its decsendants.
           // So we search all of its descendants!
-          if (next.unsorted) {
-            throw new Error('This trie must already be sorted.')
-          }
-
           if (next.type === 'leaf') {
             queue.addAll(next.entries);
           } else {
