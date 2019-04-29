@@ -34,7 +34,38 @@ describe('LMLayerWorker trie model for word lists', function() {
       }
     });
 
-    it.skip('should predict prefixes within an word and a single letter transform', function () {
+    it('should predict prefixes within an word and a single letter transform', function () {
+      // Predicting when the user JUST typed 'h', with the buffer having a 't' in it:
+      //
+      //   «th|                       » [Send]
+      //   [  this  ] [   the   ] [   there   ]
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
+      );
+
+      var initialPrefix = 't';
+      var insertedLetter = 'h';
+      var truePrefix = initialPrefix + insertedLetter;
+      var context = {
+        left: initialPrefix,
+        startOfBuffer: false,
+        endOfBuffer: true
+      };
+      var suggestions = model.predict({
+        insert: insertedLetter,
+        deleteLeft: 0,
+      }, context);
+      assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
+
+      // Ensure all of the suggestions actually start with 'th'
+      var suggestion;
+      var firstTwoChars;
+
+      for (var i = 0; i < MIN_SUGGESTIONS; i++) {
+        suggestion = suggestions[i];
+        firstTwoChars = applyTransform(context, suggestion.transform).substr(0, 2);
+        assert.equal(firstTwoChars, truePrefix);
+      }
     });
 
     it.skip('should produce suggestions with an empty buffer and a zero transform', function () {
@@ -42,5 +73,13 @@ describe('LMLayerWorker trie model for word lists', function() {
 
     it.skip('should produce after typing at least one word', function () {
     });
+
   });
+
+  function applyTransform(context, transform) {
+    assert.isTrue(context.endOfBuffer, "cannot only apply transform to end of buffer");
+    var buffer = context.left;
+    buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
+    return buffer;
+  }
 });
