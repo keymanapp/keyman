@@ -90,9 +90,35 @@ describe('LMLayerWorker trie model for word lists', function() {
       }
     });
 
-    it.skip('should produce after typing at least one word', function () {
-    });
+    it('should produce after typing at least one word', function () {
+      // Predicting after typing at least one word.
+      //
+      //   «I g|                        » [Send]
+      //   [  gave  ] [   got   ] [  got the  ]
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
+      );
 
+      var truePrefix = 'g';
+      var suggestions = model.predict({
+        insert: truePrefix,
+        deleteLeft: 0
+      }, {
+        left: 'I ',
+        startOfBuffer: false,
+        endOfBuffer: true,
+      });
+      assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
+
+      // Ensure all of the suggestions seem valid.
+      var suggestion;
+      for (var i = 0; i < MIN_SUGGESTIONS; i++) {
+        suggestion = suggestions[i];
+        assert.strictEqual(suggestion.transform.insert.substr(0, truePrefix.length), truePrefix);
+        assert.strictEqual(suggestion.transform.deleteLeft, 0);
+        assert.isNotEmpty(suggestion.displayAs.substr(0, truePrefix.length), truePrefix);
+      }
+    });
   });
 
   function applyTransform(context, transform) {
