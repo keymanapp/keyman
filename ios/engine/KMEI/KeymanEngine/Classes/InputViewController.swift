@@ -408,4 +408,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func dismissKeyboardMenu() {
     keymanWeb.dismissKeyboardMenu()
   }
+  
+  open func setBannerImage(to path: String) {
+    keymanWeb.setBannerImage(to: path)
+  }
 }

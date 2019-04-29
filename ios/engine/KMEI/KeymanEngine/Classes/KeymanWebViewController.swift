@@ -49,6 +49,10 @@ class KeymanWebViewController: UIViewController {
   
   /// Stores the keyboard view's current size.
   private var kbSize: CGSize = CGSize.zero
+  
+  /// Stores the current image for use by the Banner
+  /// when predictive text is not active
+  private var bannerImgPath: String = ""
 
   init(storage: Storage) {
     self.storage = storage
@@ -248,6 +252,12 @@ extension KeymanWebViewController {
     log.debug("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
+  
+  func setBannerImage(to path: String) {
+    bannerImgPath = path
+    log.debug("Banner image path: '\(path).'")
+    webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
+  }
 }
 
 // MARK: - WKScriptMessageHandler
@@ -421,6 +431,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
+    
+    // Now that we've loaded the keyboard page fully, perform any in-page needed init.
+    setBannerImage(to: bannerImgPath)
+    
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
 

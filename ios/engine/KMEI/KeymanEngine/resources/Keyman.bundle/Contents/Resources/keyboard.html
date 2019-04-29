@@ -27,6 +27,12 @@
             var device = 'AppleMobile';
             var oskHeight = 0;
             var oskWidth = 0;
+            
+            var bannerOptions = {
+                'persistentBanner': true,
+                'imagePath': '' // Need to route the actual banner image here.
+            };
+            
             window.addEventListener('load', init, false);
             
             function init() {
@@ -43,15 +49,18 @@
                     kmw['beepKeyboard'] = beepKeyboard;
                     kmw['setActiveElement']('ta');
                     
-                    kmw.osk.banner.setOptions({
-                        'persistentBanner': true,
-                        'imagePath': 'keyboard_icon.png' // Need to route the actual banner image here.  This is very temp.
-                    });
+                    kmw.osk.banner.setOptions(bannerOptions);
                     
                     // // TODO:  Delete this.  Useful for rough exploratory testing - can show suggestion bar here with this.
                     // kmw.osk.banner.setBanner('suggestion')
                     // kmw.osk.banner.activeBanner.updateSuggestions([{displayAs: 'a'}, {displayAs: 'b'}, {displayAs: 'c'}])
                 //});
+            }
+        
+            function setBannerImage(path) {
+              bannerOptions['imagePath'] = path;
+              var kmw=window['keyman'];
+              kmw.osk.banner.setOptions(bannerOptions);
             }
             
             function setDeviceType(deviceType) {
@@ -98,6 +107,7 @@
             function insertText(dn, s) {
                 fragmentToggle = (fragmentToggle + 1) % 100;
                 var insertHash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
+                console.log("Hi mom.");
                 //window.location.hash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
                 if (typeof(window.webkit) != 'undefined')
                     window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
