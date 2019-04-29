@@ -74,11 +74,10 @@ describe('LMLayerWorker trie model for word lists', function() {
       //   «|                         » [Send]
       //   [   I'm  ] [    I    ] [    Hey    ]
       var model = new TrieModel(
-        jsonFixture('wordlists/english-1000')
+        jsonFixture('tries/english-1000')
       );
 
       var suggestions = model.predict(zeroTransform(), emptyContext());
-      console.log({ suggestions });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions seem okay.

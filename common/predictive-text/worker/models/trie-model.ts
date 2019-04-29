@@ -60,7 +60,7 @@
     predict(transform: Transform, context: Context): Suggestion[] {
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
-        return this._trie.lookup('').map(word => ({
+        return this._trie.firstN(MAX_SUGGESTIONS).map(word => ({
           transform: {
             insert: word + ' ',
             deleteLeft: 0
@@ -196,6 +196,14 @@
       }
 
       return getSortedResults(lowestCommonNode, searchKey);
+    }
+
+    /**
+     * Returns the top N suggestions from the trie.
+     * @param n How many suggestions, maximum, to return.
+     */
+    firstN(n: number): string[] {
+      return getSortedResults(this.root, '' as SearchKey, n);
     }
   }
 
