@@ -31,6 +31,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     String keyboardCount = (kbList.size() > 1) ? String.format(" (%d)", kbList.size()) : "";
     languagesPreference.setKey(KeymanSettingsActivity.installedLanguagesKey);
     languagesPreference.setTitle(getString(R.string.installed_languages) + keyboardCount);
+    languagesPreference.setWidgetLayoutResource(R.layout.preference_icon_layout);
     Intent languagesIntent = new Intent();
     languagesIntent.setClassName(context.getPackageName(), "com.tavultesoft.kmea.KeyboardPickerActivity");
     languagesIntent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
