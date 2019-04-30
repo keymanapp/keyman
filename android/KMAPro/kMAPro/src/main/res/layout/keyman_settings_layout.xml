@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <com.google.android.material.appbar.AppBarLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:elevation="0dp">
+
+    <androidx.appcompat.widget.Toolbar
+      android:id="@+id/keyman_settings_toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="?attr/actionBarSize"
+      android:background="@color/keyman_blue">
+
+      <!-- android:theme="@style/AppTheme.Toolbar" /-->
+
+      <!--TextView
+        android:id="@+id/menu_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/keyman_settings"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" /-->
+
+    </androidx.appcompat.widget.Toolbar>
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <fragment
+    android:layout_marginTop="?attr/actionBarSize"
+    android:id="@+id/keyman_settings_fragment"
+    android:name="com.tavultesoft.kmapro.KeymanSettingsFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+
+</RelativeLayout>

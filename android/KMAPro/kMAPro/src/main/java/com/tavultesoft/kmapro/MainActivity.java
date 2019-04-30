@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private int textSize = minTextSize;
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
-  protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
@@ -383,6 +382,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       case R.id.action_get_started:
         showGetStarted();
         return true;
+      case R.id.action_settings:
+        showSettings();
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
@@ -593,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   private void checkGetStarted() {
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean dontShowGetStarted = prefs.getBoolean(MainActivity.dontShowGetStartedKey, false);
+    boolean dontShowGetStarted = prefs.getBoolean(GetStartedActivity.dontShowGetStartedKey, false);
     if (!dontShowGetStarted) {
       boolean shouldShowGetStarted = false;
       ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
@@ -724,6 +726,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void showGetStarted() {
     Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
     startActivity(getStartedIntent);
+  }
+
+  private void showSettings() {
+    Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
+    startActivity(settingsIntent);
   }
 
   public static Drawable getActionBarDrawable(Context context) {

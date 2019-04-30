@@ -32,6 +32,7 @@ public class GetStartedActivity extends AppCompatActivity {
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> list = null;
   private static KMListAdapter listAdapter = null;
+  protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   private final String iconKey = "icon";
   private final String textKey = "text";
   private final String isEnabledKey = "isEnabled";
@@ -53,7 +54,7 @@ public class GetStartedActivity extends AppCompatActivity {
     });
 
     final SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean dontShowGetStarted = prefs.getBoolean(MainActivity.dontShowGetStartedKey, false);
+    boolean dontShowGetStarted = prefs.getBoolean(dontShowGetStartedKey, false);
 
     final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
     checkBox.setChecked(dontShowGetStarted);
@@ -61,7 +62,7 @@ public class GetStartedActivity extends AppCompatActivity {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.dontShowGetStartedKey, isChecked);
+        editor.putBoolean(dontShowGetStartedKey, isChecked);
         editor.commit();
       }
     });
