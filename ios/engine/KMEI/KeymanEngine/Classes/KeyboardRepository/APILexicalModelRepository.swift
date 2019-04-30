@@ -16,7 +16,7 @@ public enum APILexicalModelFetchError: Error {
 }
 
 public class APILexicalModelRepository: LexicalModelRepository {
-  private let modelsAPIURL = URLComponents(string: "https://api.keyman.com/model")! //?q=bcp47:en
+  private let modelsAPIURL = URLComponents(string: "https://api.keyman.com/model")!
   
   public weak var delegate: LexicalModelRepositoryDelegate?
   public private(set) var languages: [String: Language]?
