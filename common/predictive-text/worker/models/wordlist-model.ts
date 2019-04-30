@@ -44,19 +44,11 @@
     configuration: Configuration;
     private _wordlist: string[];
 
-    constructor(wordlist: string[]) {
-      // XXX: This may be given an Array of pairs, where the first element is
-      //      the word and the second is the count. e.g.,
-      //        [["elephant", 2], ["zebra", 3], ["octopuses", 13]]
-      //
-      //      Ignore the count when constructing our wordlist. e.g.,
-      //        ["elephant", "zebra", "octopuses"]
-      if (wordlist.length && Array.isArray(wordlist[0])) {
-        // @ts-ignore
-        this._wordlist = wordlist.map(([word, _count]) => word);
-      } else {
-        this._wordlist = wordlist;
-      }
+    constructor(wordlist: [string, number][]) {
+      // The wordlist is always given as an array of
+      // [wordform, count] pairs. Since this model does not
+      // support weighting, discard the count.
+      this._wordlist = wordlist.map(([word, _count]) => word);
     }
 
     configure(capabilities: Capabilities): Configuration {
