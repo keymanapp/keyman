@@ -432,7 +432,7 @@ function determineModelFile(program) {
  * Determine which mode to run in. Reads in data, if necessary.
  */
 function determineMode(program) {
-  if (program.phrase) {
+  if (program.phrase && program.phrase.length > 0) {
     return {
       mode: 'batch',
       // 'phrase' is an array of phrases!
