@@ -16,16 +16,6 @@
       android:layout_height="?attr/actionBarSize"
       android:background="@color/keyman_blue">
 
-      <!-- android:theme="@style/AppTheme.Toolbar" /-->
-
-      <!--TextView
-        android:id="@+id/menu_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/keyman_settings"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" /-->
-
     </androidx.appcompat.widget.Toolbar>
   </com.google.android.material.appbar.AppBarLayout>
 
