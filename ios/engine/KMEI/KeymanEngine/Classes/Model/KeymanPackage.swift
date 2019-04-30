@@ -60,7 +60,8 @@ public class KeymanPackage
         if let jsonResult = jsonResult as? [String:AnyObject] {
           if let packagedKeyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
             if let packagedModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
-                //TODO: rrb signal error
+                //TODO: rrb show error to user, for now, just log
+              log.error("error parsing keyman package: packages  MUST NOT have both keyboards and lexical models")
               return nil
             }
             let kmp = KeyboardKeymanPackage.init(folder: folder)
@@ -68,10 +69,6 @@ public class KeymanPackage
             return kmp
           }
           else if let packagedModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
-            if let packagedKeyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
-                //TODO: rrb signal error
-              return nil
-            }
             let kmm = LexicalModelKeymanPackage.init(folder: folder)
             kmm.parse(json: jsonResult)
             return kmm
