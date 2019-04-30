@@ -13,6 +13,11 @@ describe('LMLayerWorker word list model', function() {
     });
 
     it('can be instantiated with an word list', function () {
+      var model = new WordListModel([
+        ['foo', 0],
+        ['bar', 1],
+        ['baz', Math.MAX_SAFE_INTEGER]
+      ]);
     });
   });
 
