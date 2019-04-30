@@ -951,9 +951,55 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return nil
   }
   
-  /// Starts the process of fetching the .js file for the lexical model for the given language ID
+  func  installLexicalModelPackage(downloadedPackageFile: URL) {
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    var destination =  documentsDirectory
+    destination.appendPathComponent("temp/\(downloadedPackageFile.lastPathComponent)")
+    
+    KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
+      if let kmp = kmp {
+        do {
+          try Manager.shared.parseLMKMP(kmp.sourceFolder)
+          //this can fail gracefully and not show errors to users
+          try FileManager.default.removeItem(at: downloadedPackageFile)
+        } catch {
+          log.error("Error installing the lexical model: \(error)")
+        }
+      } else {
+        log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
+      }
+    })
+  }
+  
+  func downloadLexicalModelPackage(string lexicalModelPackageURLString: String) -> Void {
+    if let lexicalModelKMPURL = URL.init(string: lexicalModelPackageURLString) {
+      //data from URL
+      guard let data = try? Data(contentsOf: lexicalModelKMPURL) else {
+        let error = NSError(domain: "Keyman", code: 0,
+                            userInfo: [NSLocalizedDescriptionKey: "Failed to fetch lexical model KMP file"])
+        downloadFailed(forKeyboards: [], error: error)
+        return
+      }
+      //put the data at a local  file  URL
+      var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      destinationUrl.appendPathComponent("\(lexicalModelKMPURL.lastPathComponent).zip")
+      do {
+        //write the URL contents to a local file URL
+        try data.write(to: destinationUrl)
+        installLexicalModelPackage(downloadedPackageFile: destinationUrl)
+        log.info("lexical model download complete")
+      } catch {
+        log.error("writing or opening downloaded lexical model KMP failed")
+      }
+    } else {
+      log.info("\(lexicalModelPackageURLString) is not a URL string?")
+      // might want to download the .js file directly, then, instead
+    }
+  }
+  
+  /// Starts the process of fetching the package file of the lexical model for the given language ID
   ///   first it fetches the list of lexical models for the given language
-  ///   then it takes the first of the list and actually fetches and stores it
+  ///   then it takes the first of the list and download the KMP package file and asks the app to open it (like adhoc download)
   /// - Parameters:
   ///   - languageID: the bcp47 string of the desired language
   public func downloadLexicalModelsForLanguageIfExists(languageID: String) {
@@ -964,14 +1010,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         self.downloadFailed(forLanguageID: languageID, error: error) //???forKeyboards
       } else {
         log.info("Fetched lexical model list for "+languageID+".")
-        if let lexicalModel = lexicalModels?[0] {
-          if let lexicalModelKMPURL = URL.init(string: lexicalModel.packageFilename) {
-              _ = self.openURL?(lexicalModelKMPURL)
-//            self.downloadLexicalModel(from: lexicalModelKMPURL)
-          } else {
-            log.info("\(lexicalModel.packageFilename) is not a URL string?")
-            // might want to download the .js file directly, then, instead
-          }
+        // choose which of the lexical models to download
+        //  for now, this just downloads the first one
+        let chosenIndex = 0
+        if let lexicalModel = lexicalModels?[chosenIndex] {
+          downloadLexicalModelPackage(string: lexicalModel.packageFilename)
         } else {
           log.info("no error, but no lexical model in list, either!")
         }
