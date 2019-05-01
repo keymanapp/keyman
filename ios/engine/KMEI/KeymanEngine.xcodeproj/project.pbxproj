@@ -80,8 +80,8 @@
 		9A079E47223DBF0100581263 /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
 		9A079E48223DBF0A00581263 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
 		9A079E49223F176100581263 /* String+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C075EB051F8EFF870041F4BD /* String+Helpers.swift */; };
-		9A082559227589360051EBB0 /* Date+ISOExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Date+ISOExtension.swift */; };
-		9A08255A227589360051EBB0 /* Date+ISOExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Date+ISOExtension.swift */; };
+		9A082559227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */; };
+		9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */; };
 		9A31E2C1224AAD8300D9A491 /* FontManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B09EAD1FCFD10F002F39AF /* FontManager.swift */; };
 		9A31E2C2224AAD9A00D9A491 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CB633B1FA6F61500617CDB /* Notifications.swift */; };
 		9A31E2C3224AADBB00D9A491 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9931FA6EB470060583B /* NotificationName.swift */; };
@@ -286,7 +286,7 @@
 		9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallableLexicalModel.swift; sourceTree = "<group>"; };
 		9A079E3F223B602B00581263 /* LexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModel.swift; sourceTree = "<group>"; };
 		9A079E42223B61AE00581263 /* FullLexicalModelID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullLexicalModelID.swift; sourceTree = "<group>"; };
-		9A082558227589360051EBB0 /* Date+ISOExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+ISOExtension.swift"; sourceTree = "<group>"; };
+		9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Formatter+ISODateExtension.swift"; sourceTree = "<group>"; };
 		9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelInfoViewController.swift; sourceTree = "<group>"; };
 		9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelAPICall.swift; sourceTree = "<group>"; };
 		9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelPickerViewController.swift; sourceTree = "<group>"; };
@@ -609,7 +609,7 @@
 				C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */,
 				C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */,
 				C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */,
-				9A082558227589360051EBB0 /* Date+ISOExtension.swift */,
+				9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */,
 				CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */,
 			);
 			path = Extension;
@@ -1072,7 +1072,7 @@
 				9A079DDE2231A13100581263 /* FullKeyboardID.swift in Sources */,
 				9A31E2CA224AE88E00D9A491 /* LexicalModelAPICall.swift in Sources */,
 				9A079E3222361C3B00581263 /* Migrations.swift in Sources */,
-				9A08255A227589360051EBB0 /* Date+ISOExtension.swift in Sources */,
+				9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */,
 				9A079E2A223619FC00581263 /* KeymanWebDelegate.swift in Sources */,
 				9A31E2C3224AADBB00D9A491 /* NotificationName.swift in Sources */,
 				9A079DDA2231A0B900581263 /* KeymanPackage.swift in Sources */,
@@ -1139,7 +1139,7 @@
 				C08E69911FDA6F6F0026056B /* FullKeyboardID.swift in Sources */,
 				9A9CB0822241704800231FB9 /* APILexicalModelRepository.swift in Sources */,
 				C040E5101F8606E300901EE4 /* TextField.swift in Sources */,
-				9A082559227589360051EBB0 /* Date+ISOExtension.swift in Sources */,
+				9A082559227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */,
 				C0324B8D1F87480700AF3785 /* TextFieldDelegateProxy.swift in Sources */,
 				C075EB061F8EFF870041F4BD /* String+Helpers.swift in Sources */,
 				1645D5952036C6FF0076C51B /* KeymanPackage.swift in Sources */,
