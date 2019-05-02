@@ -960,6 +960,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       if let kmp = kmp {
         do {
           try Manager.shared.parseLMKMP(kmp.sourceFolder)
+          log.info("successfully installed the lexical model from: \(kmp.sourceFolder)")
           //this can fail gracefully and not show errors to users
           try FileManager.default.removeItem(at: downloadedPackageFile)
         } catch {
@@ -973,24 +974,33 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   
   func downloadLexicalModelPackage(string lexicalModelPackageURLString: String) -> Void {
     if let lexicalModelKMPURL = URL.init(string: lexicalModelPackageURLString) {
-      //data from URL
-      guard let data = try? Data(contentsOf: lexicalModelKMPURL) else {
-        let error = NSError(domain: "Keyman", code: 0,
-                            userInfo: [NSLocalizedDescriptionKey: "Failed to fetch lexical model KMP file"])
-        downloadFailed(forKeyboards: [], error: error)
-        return
-      }
-      //put the data at a local  file  URL
+      //determine where to put the data (local  file  URL)
       var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
       destinationUrl.appendPathComponent("\(lexicalModelKMPURL.lastPathComponent).zip")
-      do {
-        //write the URL contents to a local file URL
-        try data.write(to: destinationUrl)
-        installLexicalModelPackage(downloadedPackageFile: destinationUrl)
-        log.info("lexical model download complete")
-      } catch {
-        log.error("writing or opening downloaded lexical model KMP failed")
+      //callback to handle the data downloaded
+      func lexicalModelDownloaded(data: Data?,
+                                  response: URLResponse?,
+                                  dest: URL,
+                                  error: Error?) {
+        if let error = error {
+          log.error("Failed to fetch lexical model KMP file")
+          downloadFailed(forKeyboards: [], error: error)
+        } else {
+          do {
+            try data!.write(to: dest)
+          } catch {
+            log.error("Error writing the lexical model download data: \(error)")
+          }
+          installLexicalModelPackage(downloadedPackageFile: dest)
+        }
       }
+
+      log.info("downloading lexical model from Keyman cloud: \(lexicalModelKMPURL).")
+      let task = URLSession.shared.dataTask(with: lexicalModelKMPURL) { (data, response, error) in
+        lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
+      }
+      task.resume()
+
     } else {
       log.info("\(lexicalModelPackageURLString) is not a URL string?")
       // might want to download the .js file directly, then, instead
