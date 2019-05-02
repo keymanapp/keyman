@@ -296,6 +296,11 @@ namespace com.keyman {
       } else if(!blockGlobalChange) {
         this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
       }
+
+      // Now that we've fully entered the new context, we can generate initial predictions from it.
+      if(this.keyman.modelManager) {
+        this.keyman.modelManager.predict();
+      }
     }
 
     /**
