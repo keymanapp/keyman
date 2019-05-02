@@ -32,6 +32,7 @@
 /// <reference path="../message.d.ts" />
 /// <reference path="models/dummy-model.ts" />
 /// <reference path="models/wordlist-model.ts" />
+/// <reference path="word_breaking/ascii-word-breaker.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -282,6 +283,7 @@ class LMLayerWorker {
     // Assists unit-testing.
     scope['LMLayerWorker'] = worker;
     scope['models'] = models;
+    scope['wordBreakers'] = wordBreakers;
 
     return worker;
   }
@@ -291,6 +293,7 @@ class LMLayerWorker {
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
   module.exports['models'] = models;
+  module.exports['wordBreakers'] = wordBreakers;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as DedicatedWorkerGlobalScope);

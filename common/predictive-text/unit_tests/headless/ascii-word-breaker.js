@@ -8,6 +8,6 @@ describe('The ASCIIWordBreaker', function() {
     it('breaks simple English sentences', function () {
         let breaks = breakASCIIWords('Look! -- The quick brown fox jumps... over the lazy dog!');
         let words = breaks.map(span => span.text);
-        assert.deepEqual(words, ['Look', 'the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']);
+        assert.deepEqual(words, ['Look', 'The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']);
     });
 });

@@ -160,13 +160,13 @@ interface WordBreakingFunction {
  */
 interface Span {
   // invariant: start < end (empty spans not allowed)
-  start: number;
+  readonly start: number;
   // invariant: end > end (empty spans not allowed)
-  end: number;
+  readonly end: number;
   // invariant: length === end - start
-  length: number;
+  readonly length: number;
   // invariant: text.length === length
   // invariant: each character is BMP UTF-16 code unit, or is a high surrogate
   // UTF-16 code unit followed by a low surrogate UTF-16 code unit.
-  text: number;
+  readonly text: string;
 }
