@@ -40,15 +40,28 @@
   /** Upper bound on the amount of suggestions to generate. */
   const MAX_SUGGESTIONS = 3;
 
+  /**
+   * Additional arguments to pass into the model, in addition to the model
+   * parameters themselves.
+   */
+  interface WordListModelOptions {
+    /**
+     * How to break words in a phrase.
+     */
+    wordBreaker?: WordBreakingFunction;
+  }
+
   export class WordListModel implements WorkerInternalModel {
     configuration: Configuration;
     private _wordlist: string[];
+    readonly breakWords: WordBreakingFunction;
 
-    constructor(wordlist: [string, number][]) {
+    constructor(wordlist: [string, number][], options: WordListModelOptions = {}) {
       // The wordlist is always given as an array of
       // [wordform, count] pairs. Since this model does not
       // support weighting, discard the count.
       this._wordlist = wordlist.map(([word, _count]) => word);
+      this.breakWords = options.wordBreaker || wordBreakers.placeholderWordBreaker;
     }
 
     configure(capabilities: Capabilities): Configuration {
@@ -62,7 +75,8 @@
       // EVERYTHING to the left of the cursor: 
       let fullLeftContext = context.left || '';
       // Stuff to the left of the cursor in the current word.
-      let leftContext = fullLeftContext.split(/\s+/).pop() || '';
+      let words = this.breakWords(fullLeftContext);
+      let leftContext = words.length > 0 ? words.pop().text : '';
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
       let prefix = leftContext + (transform.insert || '');

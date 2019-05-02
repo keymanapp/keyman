@@ -109,8 +109,13 @@
      * Get the last word of the phrase, or nothing.
      * @param fullLeftContext the entire left context of the string.
      */
-    private getLastWord(fullLeftContext: string) {
-      return this.breakWords(fullLeftContext).pop().text || '';
+    private getLastWord(fullLeftContext: string): string {
+      let words = this.breakWords(fullLeftContext)
+      if (words.length > 0) {
+        return words.pop().text;
+      }
+
+      return '';
     }
   };
 
