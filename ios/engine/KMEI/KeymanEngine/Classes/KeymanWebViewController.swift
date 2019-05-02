@@ -143,7 +143,7 @@ extension KeymanWebViewController {
       }
       let components = result.components(separatedBy: ",")
       let x = CGFloat(Float(components[0])!)
-      let y = CGFloat(Float(components[1])!) + Manager.shared._inputViewController!.activeTopBarHeight // KMW doesn't adjust for this!
+      let y = CGFloat(Float(components[1])!)
       let w = CGFloat(Float(components[2])!)
       let h = CGFloat(Float(components[3])!)
       completion(KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h))
