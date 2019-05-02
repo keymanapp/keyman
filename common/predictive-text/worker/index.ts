@@ -194,10 +194,6 @@ class LMLayerWorker {
     }
   }
   
-  public loadWordBreaker(breaker: WorkerInternalWordBreaker) {
-    // TODO:  Actually store it somewhere for future use.  Make sure we can forget it with `unloadModel` as well.
-  }
-
   /**
    * Sets the model-loading state, i.e., `modelless`.
    * This state only handles `load` messages, and will

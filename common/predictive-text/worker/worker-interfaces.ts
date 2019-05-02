@@ -131,7 +131,3 @@ interface WorkerInternalModelConstructor {
    */
   new(...modelParameters: any[]): WorkerInternalModel;
 }
-
-interface WorkerInternalWordBreaker {
-  break(text: string): string[]; // 
-}
