@@ -58,6 +58,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     listView = (ListView) findViewById(R.id.listView);
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
+    textView.setText(getString(R.string.title_add_keyboard));
 
     try {
       langIndex = getIntent().getIntExtra("selectedIndex", 0);

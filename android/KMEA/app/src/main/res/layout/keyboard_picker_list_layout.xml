@@ -7,13 +7,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include layout="@layout/keyboard_picker_toolbar" />
+    <include layout="@layout/list_toolbar" />
 
     <include layout="@layout/list_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/keyboard_list_layout"
-        android:layout_below="@id/keyboard_picker_appbar"/>
+        android:layout_below="@id/list_appbar"/>
 
     <LinearLayout
         android:layout_width="match_parent"
