@@ -22,6 +22,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/// <reference path="../word_breaking/placeholder-word-breaker.ts" />
+
 /**
  * @file trie-model.ts
  * 
@@ -60,7 +62,7 @@
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(trieData as Node);
-      this.breakWords = options.wordBreaker || defaultWordBreaker;
+      this.breakWords = options.wordBreaker || wordBreakers.placeholderWordBreaker;
     }
 
     configure(capabilities: Capabilities): Configuration {
@@ -344,28 +346,6 @@
       this._storage.sort((a, b) => b.weight - a.weight);
       return this._storage.shift();
     }
-  }
-
-  /**
-   * A **VERY** dumb word breaker that simply splits at words. Do not use this
-   * word breaker!
-   *
-   * @param phrase The phrase in which to break words.
-   * @deprecated Please use a word breaker tailored to your language instead.
-   */
-  function defaultWordBreaker(phrase: string): Span[] {
-    let nextStart = 0;
-    return phrase.split(/\s+/).map(utterance => {
-      // XXX: The indices are NOT accurate to the original phrase!
-      let span = {
-        start: nextStart,
-        end: nextStart + utterance.length,
-        text: utterance,
-        length: utterance.length
-      };
-      nextStart = span.end;
-      return span;
-    });
   }
 
   /**
