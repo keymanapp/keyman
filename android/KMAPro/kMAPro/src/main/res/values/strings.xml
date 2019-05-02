@@ -32,14 +32,14 @@
   <string name="enable_system_keyboard" translatable="false">Enable Keyman as system-wide keyboard</string>
   <string name="set_keyman_as_default" translatable="false">Set Keyman as default keyboard</string>
   <string name="more_info" translatable="false">More info</string>
-  <string name="dont_show_again" translatable="false">Don\'t show again</string>
+  <string name="show_get_started" translatable="false">Show \"Get Started\" on startup</string>
 
   <!-- Keyman Settings menu strings -->
   <string name="keyman_settings" translatable="false">Settings</string>
   <string name="installed_languages" translatable="false">Installed Languages</string>
   <string name="show_banner" translatable="false">Show banner</string>
   <string name="show_banner_on" translatable="false">Cannot be switched off when predictive text is enabled</string>
-  <string name="dont_show_get_started" translatable="false">Don\'t show \"Get Started\" on startup</string>
+  <!-- reuse show_get_started -->
 
   <!-- Language Settings menu strings -->
   <string name="enable_corrections" translatable="false">Enable corrections</string>

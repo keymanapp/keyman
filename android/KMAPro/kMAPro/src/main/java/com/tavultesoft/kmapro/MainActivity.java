@@ -595,8 +595,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   private void checkGetStarted() {
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean dontShowGetStarted = prefs.getBoolean(GetStartedActivity.dontShowGetStartedKey, false);
-    if (!dontShowGetStarted) {
+    boolean showGetStarted = prefs.getBoolean(GetStartedActivity.showGetStartedKey, true);
+    if (showGetStarted) {
       boolean shouldShowGetStarted = false;
       ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() < 2)

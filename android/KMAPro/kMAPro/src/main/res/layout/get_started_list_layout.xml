@@ -45,7 +45,7 @@
               android:layout_marginLeft="@dimen/checkbox_margin_left"
               android:layout_marginStart="@dimen/checkbox_margin_left"
               android:layout_gravity="center_vertical"
-              android:text="@string/dont_show_again" />
+              android:text="@string/show_get_started" />
 
         </LinearLayout>
 
