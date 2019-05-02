@@ -108,7 +108,7 @@
      * @param fullLeftContext the entire left context of the string.
      */
     private getLastWord(fullLeftContext: string) {
-      return fullLeftContext.split(/\s+/).pop() || '';
+      return this.breakWords(fullLeftContext).pop().text || '';
     }
   };
 
@@ -346,8 +346,26 @@
     }
   }
 
+  /**
+   * A **VERY** dumb word breaker that simply splits at words. Do not use this
+   * word breaker!
+   *
+   * @param phrase The phrase in which to break words.
+   * @deprecated Please use a word breaker tailored to your language instead.
+   */
   function defaultWordBreaker(phrase: string): Span[] {
-    throw new Error;
+    let nextStart = 0;
+    return phrase.split(/\s+/).map(utterance => {
+      // XXX: The indices are NOT accurate to the original phrase!
+      let span = {
+        start: nextStart,
+        end: nextStart + utterance.length,
+        text: utterance,
+        length: utterance.length
+      };
+      nextStart = span.end;
+      return span;
+    });
   }
 
   /**
