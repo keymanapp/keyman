@@ -28,7 +28,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     Preference languagesPreference = new Preference(context);
     ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(context);
-    String keyboardCount = (kbList.size() > 1) ? String.format(" (%d)", kbList.size()) : "";
+    String keyboardCount = (kbList != null && kbList.size() > 1) ?
+      String.format(" (%d)", kbList.size()) : "";
     languagesPreference.setKey(KeymanSettingsActivity.installedLanguagesKey);
     languagesPreference.setTitle(getString(R.string.installed_languages) + keyboardCount);
     languagesPreference.setWidgetLayoutResource(R.layout.preference_icon_layout);
