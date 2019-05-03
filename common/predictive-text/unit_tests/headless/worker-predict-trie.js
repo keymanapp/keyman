@@ -1,26 +1,11 @@
 /*
- * Unit tests for the Dummy prediction model.
+ * Unit tests for the Trie prediction model.
  */
 
 var assert = require('chai').assert;
-var WordListModel = require('../../build/intermediate').models.WordListModel;
+var TrieModel = require('../../build/intermediate').models.TrieModel;
 
-describe('LMLayerWorker word list model', function() {
-  describe('instantiation', function () {
-    it('can be instantiated with an empty word list', function () {
-      var model = new WordListModel([]);
-      assert.isObject(model);
-    });
-
-    it('can be instantiated with an word list', function () {
-      var model = new WordListModel([
-        ['foo', 0],
-        ['bar', 1],
-        ['baz', Math.MAX_SAFE_INTEGER]
-      ]);
-    });
-  });
-
+describe('LMLayerWorker trie model for word lists', function() {
   describe('prediction', function () {
     var MIN_SUGGESTIONS = 3;
 
@@ -29,8 +14,8 @@ describe('LMLayerWorker word list model', function() {
       //
       //   «t|                        » [Send]
       //   [   to   ] [   the   ] [   this    ]
-      var model = new WordListModel(
-        jsonFixture('wordlists/english-1000')
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
       );
 
       var suggestions = model.predict({
@@ -54,38 +39,32 @@ describe('LMLayerWorker word list model', function() {
       //
       //   «th|                       » [Send]
       //   [  this  ] [   the   ] [   there   ]
-      var model = new WordListModel(
-        jsonFixture('wordlists/english-1000')
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
       );
 
       var initialPrefix = 't';
       var insertedLetter = 'h';
       var truePrefix = initialPrefix + insertedLetter;
-      var suggestions = model.predict({
-        insert: insertedLetter,
-        deleteLeft: 0,
-      }, {
+      var context = {
         left: initialPrefix,
         startOfBuffer: false,
         endOfBuffer: true
-      });
+      };
+      var suggestions = model.predict({
+        insert: insertedLetter,
+        deleteLeft: 0,
+      }, context);
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 'th'
       var suggestion;
-      var suggestedWord;
+      var firstTwoChars;
 
-      // XXX: this tests knows TOO MUCH about the implementation of the function.
-      // Need a test that asserts behavior; not how it got there.
       for (var i = 0; i < MIN_SUGGESTIONS; i++) {
         suggestion = suggestions[i];
-        suggestedWord = suggestion.displayAs;
-        // Assuming the transform where nothing is deleted, but
-        // the rest of the suggested word is inserted.
-        assert.strictEqual(suggestion.transform.deleteLeft, 0);
-        // The first two characters should match the prefix WITH the transform.
-        assert.strictEqual(suggestedWord.substr(0, truePrefix.length), truePrefix);
-        assert.strictEqual(suggestion.transform.insert[0], insertedLetter);
+        firstTwoChars = applyTransform(context, suggestion.transform).substr(0, 2);
+        assert.equal(firstTwoChars, truePrefix);
       }
     });
 
@@ -94,14 +73,14 @@ describe('LMLayerWorker word list model', function() {
       //
       //   «|                         » [Send]
       //   [   I'm  ] [    I    ] [    Hey    ]
-      var model = new WordListModel(
-        jsonFixture('wordlists/english-1000')
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
       );
 
       var suggestions = model.predict(zeroTransform(), emptyContext());
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
-      // Ensure all of the suggestions seem valid.
+      // Ensure all of the suggestions seem okay.
       var suggestion;
       for (var i = 0; i < MIN_SUGGESTIONS; i++) {
         suggestion = suggestions[i];
@@ -116,8 +95,8 @@ describe('LMLayerWorker word list model', function() {
       //
       //   «I g|                        » [Send]
       //   [  gave  ] [   got   ] [  got the  ]
-      var model = new WordListModel(
-        jsonFixture('wordlists/english-1000')
+      var model = new TrieModel(
+        jsonFixture('tries/english-1000')
       );
 
       var truePrefix = 'g';
@@ -141,4 +120,11 @@ describe('LMLayerWorker word list model', function() {
       }
     });
   });
+
+  function applyTransform(context, transform) {
+    assert.isTrue(context.endOfBuffer, "cannot only apply transform to end of buffer");
+    var buffer = context.left;
+    buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
+    return buffer;
+  }
 });
