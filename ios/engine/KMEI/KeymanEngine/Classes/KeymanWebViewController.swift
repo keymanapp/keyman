@@ -184,6 +184,12 @@ extension KeymanWebViewController {
 
   func setText(_ text: String?) {
     var text = text ?? ""
+    // Remove any system-added LTR/RTL marks.
+    text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
+    text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
+    text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
+
+    // JavaScript escape-sequence encodings.
     text = text.replacingOccurrences(of: "\\", with: "\\\\")
     text = text.replacingOccurrences(of: "'", with: "\\'")
     text = text.replacingOccurrences(of: "\n", with: "\\n")
