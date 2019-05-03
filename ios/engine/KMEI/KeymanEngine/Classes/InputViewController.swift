@@ -201,8 +201,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       newRange = context.startIndex..<context.startIndex
     }
 
-    setText(context)
-    setSelectionRange(NSRange(newRange, in: context), manually: false)
+    setContextState(text: context, range: NSRange(newRange, in: context))
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -411,24 +410,35 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
   }
-  
-//  func setCursorRange(_ range: NSRange) {
-//    keymanWeb.setCursorRange(range)
-//  }
-  
-  func setText(_ text: String?) {
-    keymanWeb.setText(text)
-  }
-  
+
   func clearText() {
-    setText(nil)
-    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
+    setContextState(text: nil, range: NSRange(location: 0, length: 0))
     log.info("Cleared text.")
   }
-  
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
+ 
+  func setContextState(text: String?, range: NSRange) {
+    // Check for any LTR or RTL marks at the context's start; if they exist, we should
+    // offset the selection range.
+    let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
+    var offsetPrefix = false;
+    
+    let context = text ?? ""
+    
+    for codepoint in characterOrderingChecks {
+      if(context.hasPrefix(codepoint)) {
+        offsetPrefix = true;
+        break;
+      }
+    }
+    
+    var selRange = range;
+    if(offsetPrefix) { // If we have a character ordering mark, offset range location to hide it.
+      selRange = NSRange(location: selRange.location - 1, length: selRange.length)
+    }
+    
+    keymanWeb.setText(context)
     if range.location != NSNotFound {
-      keymanWeb.setCursorRange(range)
+      keymanWeb.setCursorRange(selRange)
     }
   }
   
