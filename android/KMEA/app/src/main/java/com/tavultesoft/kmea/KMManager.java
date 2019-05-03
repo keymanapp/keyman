@@ -112,6 +112,7 @@ public final class KMManager {
   public static final String KMKey_PackageID = "packageId";
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
+  public static final String KMKey_KeyboardCount = "kbCount";
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";

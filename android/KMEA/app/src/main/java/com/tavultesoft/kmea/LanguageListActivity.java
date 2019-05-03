@@ -44,8 +44,16 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * "Add new keyboard"
+ * Gets the list of installable languages from Keyman cloud and allows user to download a keyboard.
+ * After downloading, the new keyboard is selected.
+ *
+ * The language list is saved to a cache file "jsonCache.dat".
+ */
 public final class LanguageListActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
   private Context context;
@@ -87,6 +95,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+    TextView textView = (TextView) findViewById(R.id.bar_title);
+    textView.setText(getString(R.string.title_add_keyboard));
 
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
