@@ -19,7 +19,6 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   private let fontSize: CGFloat
   private let xLength: CGFloat
   private var adjX: CGFloat = 0
-  //private let topBarHeight: CGFloat
   private var tableView: UITableView?
   private let closeButtonTitle: String?
 
@@ -65,7 +64,6 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     _inputViewController = inputViewController
     self.closeButtonTitle = closeButtonTitle
-    //topBarHeight = inputViewController.activeTopBarHeight
     keyFrame = frame
     rowHeight = UIDevice.current.userInterfaceIdiom == .phone ? 30 : 60
     fontSize = UIDevice.current.userInterfaceIdiom == .phone ? 14 : 21
@@ -79,7 +77,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     let containerWidth = maxWidth - strokeWidth * 2
     var containerHeight = CGFloat(tableList.count) * rowHeight
 
-    let vHeight = Manager.shared.inputViewController.kmwHeight //+ topBarHeight
+    let vHeight = Manager.shared.inputViewController.kmwHeight
     let bY = Manager.shared.inputViewController.kmwHeight - (keyFrame.origin.y + baseHeight)
 
     if containerHeight + baseHeight > vHeight - bY {
@@ -91,7 +89,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     let viewWidth = maxWidth
     let viewHeight = baseHeight + containerHeight + strokeWidth
     var viewPosX = keyFrame.origin.x - (viewWidth - keyFrame.size.width) / 2.0
-    let viewPosY = (keyFrame.origin.y /*+ topBarHeight*/) - (viewHeight - keyFrame.size.height)
+    let viewPosY = (keyFrame.origin.y) - (viewHeight - keyFrame.size.height)
 
     if viewPosX < 0 {
       if (keyFrame.origin.x - borderRadius * 1.0) < 0 {

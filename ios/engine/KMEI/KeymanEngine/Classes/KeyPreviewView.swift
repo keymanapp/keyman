@@ -36,13 +36,8 @@ class KeyPreviewView: UIView {
     var viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.height)
 
     let tbHeight = Manager.shared.inputViewController.activeTopBarHeight
-//    if Manager.shared.isSystemKeyboard && (viewPosY < -tbHeight) {
-//      adjY = viewPosY + tbHeight
-//      viewPosY = CGFloat(-tbHeight)
-//      viewHeight += adjY
-//    } else {
-      adjY = 0
-//    }
+
+    adjY = 0
 
     if viewPosX < 0 {
       adjX = keyFrame.origin.x - viewPosX
