@@ -8,7 +8,7 @@
 ///<reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
-  class TextTransform implements Transform {
+  export class TextTransform implements Transform {
     readonly insert: string;
     readonly deleteLeft: number;
     readonly deleteRight?: number;
@@ -18,6 +18,8 @@ namespace com.keyman.text {
       this.deleteLeft = deleteLeft;
       this.deleteRight = deleteRight || 0;
     }
+
+    public static readonly nil = new TextTransform('', 0, 0);
   }
 
   export class Transcription {

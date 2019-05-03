@@ -380,6 +380,21 @@ namespace com.keyman.text {
       // Safari, IE, Opera?
       //}
 
+      // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
+      // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
+      // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
+      if(keyman.modelManager.enabled) {
+        // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
+
+        // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
+        if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && keyman.modelManager.tryRevertSuggestion()) {
+          return;
+          // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
+        } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && keyman.modelManager.tryAcceptSuggestion('space')) {
+          return;
+        }
+      }
+
       if(fromOSK && !keyman.isEmbedded) {
         keyman.uiManager.setActivatingUI(true);
         com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
