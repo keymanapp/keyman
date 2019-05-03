@@ -62,7 +62,7 @@
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(trieData as Node);
-      this.breakWords = options.wordBreaker || wordBreakers.placeholderWordBreaker;
+      this.breakWords = options.wordBreaker || wordBreakers.placeholder;
     }
 
     configure(capabilities: Capabilities): Configuration {
