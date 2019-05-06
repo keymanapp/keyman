@@ -5,16 +5,19 @@
 package com.tavultesoft.kmea;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -30,10 +33,12 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
-  private static KMListAdapter listAdapter = null;
+  private static ImageButton addButton = null;
   private static ArrayList<HashMap<String, String>> languagesList = null;
   private boolean didExecuteParser = false;
 
+  private boolean dismissOnSelect = true;
+  protected static boolean canAddNewKeyboard = true;
   protected static Typeface listFont = null;
 
   @Override
@@ -41,7 +46,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
-    setContentView(R.layout.activity_list_layout);
+    setContentView(R.layout.languages_settings_list_layout);
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
@@ -56,17 +61,42 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
 
     languagesList = getLanguagesList(context);
 
-    String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardCount};
-    int[] to = new int[]{R.id.text1, R.id.text2};
-    listAdapter = new KMListAdapter(context, languagesList, R.layout.list_row_layout2, from, to);
-    //listAdapter.listFont = listFont;
+    String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardCount, KMManager.KMKey_Icon};
+    int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
+    ListAdapter listAdapter = new KMListAdapter(context, languagesList, R.layout.list_row_layout2, from, to);
     listView.setAdapter(listAdapter);
-    listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       }
     });
+
+    addButton = (ImageButton) findViewById(R.id.add_button);
+    addButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Check that available keyboard information can be obtained via:
+        // 1. connection to cloud catalog
+        // 2. cached file
+        // 3. local kmp.json files in packages/
+        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
+          KeyboardPickerActivity.hasKeyboardFromPackage()){
+          dismissOnSelect = false;
+          Intent i = new Intent(context, LanguageListActivity.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+          context.startActivity(i);
+        } else {
+          AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+          dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
+          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
+          dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
+          AlertDialog dialog = dialogBuilder.create();
+          dialog.show();
+        }
+      }
+    });
+    if (!canAddNewKeyboard) {
+      addButton.setVisibility(View.GONE);
+    }
   }
 
   @Override
@@ -133,7 +163,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
         lgInfo.put(KMManager.KMKey_LanguageID, languageID);
         lgInfo.put(KMManager.KMKey_LanguageName, languageName);
         lgInfo.put(KMManager.KMKey_KeyboardCount, oneKeyboard);
-        lgInfo.put("icon", String.valueOf(R.drawable.ic_arrow_forward));
+        lgInfo.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
         lgInfo.put("isEnabled", "true");
         list.add(lgInfo);
       }
