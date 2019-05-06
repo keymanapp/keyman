@@ -40,6 +40,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var landscapeConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
+  
+  private var swallowBackspaceTextChange: Bool = false
 
   open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
@@ -190,6 +192,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
+    // Swallows self-triggered calls from emptying the context due to keyboard rules
+    if self.swallowBackspaceTextChange {
+      self.swallowBackspaceTextChange = false
+      return
+    }
+    
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(contextAfterInput)"
@@ -202,6 +210,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
 
     setContextState(text: context, range: NSRange(newRange, in: context))
+  }
+  
+  @objc func clearSwallowFlag() {
+    self.swallowBackspaceTextChange = false
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
@@ -236,6 +248,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
         }
       }
     }
+    
+    self.swallowBackspaceTextChange = true
+    // afterDelay 0.01 is not sufficient!  0.02 seems to be enough for an actual delay to register.
+    perform(#selector(self.clearSwallowFlag), with: nil, afterDelay: 0.02)
 
     if !newText.isEmpty {
       textDocumentProxy.insertText(newText)
