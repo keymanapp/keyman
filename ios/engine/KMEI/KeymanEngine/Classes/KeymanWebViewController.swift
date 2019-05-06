@@ -49,6 +49,10 @@ class KeymanWebViewController: UIViewController {
   
   /// Stores the keyboard view's current size.
   private var kbSize: CGSize = CGSize.zero
+  
+  /// Stores the current image for use by the Banner
+  /// when predictive text is not active
+  private var bannerImgPath: String = ""
 
   init(storage: Storage) {
     self.storage = storage
@@ -247,6 +251,17 @@ extension KeymanWebViewController {
     log.debug("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
+  
+  func setBannerImage(to path: String) {
+    bannerImgPath = path // Save the path in case delayed initializaiton is needed.
+    log.debug("Banner image path: '\(path).'")
+    webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
+  }
+  
+  func setBannerHeight(to height: Int) {
+    // TODO:
+    webView?.evaluateJavaScript("setBannerHeight(\(height);", completionHandler: nil)
+  }
 }
 
 // MARK: - WKScriptMessageHandler
@@ -425,6 +440,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
+    
+    // Now that we've loaded the keyboard page fully, perform any in-page needed init.
+    setBannerImage(to: bannerImgPath)
+    
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
 
@@ -459,9 +478,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
   }
 
   func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    if UIDevice.current.userInterfaceIdiom == .pad
-      || (Util.isSystemKeyboard && Manager.shared.inputViewController.activeTopBarHeight == 0)
-      || isSubKeysMenuVisible {
+    if UIDevice.current.userInterfaceIdiom == .pad || isSubKeysMenuVisible {
       return
     }
 

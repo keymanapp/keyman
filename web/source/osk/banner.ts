@@ -137,12 +137,14 @@ namespace com.keyman.osk {
         super(0);
       }
 
+      console.log("Loading img with src '" + imagePath + "'");
       this.img = document.createElement('img');
       this.img.setAttribute('src', imagePath);
       let ds = this.img.style;
       ds.width = '100%';
       ds.height = '100%';
       this.getDiv().appendChild(this.img);
+      console.log("Image loaded.");
     }
 
     /**
