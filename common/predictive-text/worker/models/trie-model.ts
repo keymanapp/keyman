@@ -22,6 +22,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/// <reference path="../word_breaking/placeholder-word-breaker.ts" />
+
 /**
  * @file trie-model.ts
  * 
@@ -31,6 +33,18 @@
  namespace models {
   /** Upper bound on the amount of suggestions to generate. */
   const MAX_SUGGESTIONS = 3;
+
+  /**
+   * Additional arguments to pass into the model, in addition to the model
+   * parameters themselves.
+   */
+  interface TrieModelOptions {
+    /**
+     * How to break words in a phrase.
+     */
+    wordBreaker?: WordBreakingFunction;
+    // TODO: add support for custom Wordform2Key function.
+  }
 
   /**
    * @class TrieModel
@@ -44,10 +58,11 @@
   export class TrieModel implements WorkerInternalModel {
     configuration: Configuration;
     private _trie: Trie;
+    readonly breakWords: WordBreakingFunction;
 
-    // TODO: add support for custom Wordform2Key function.
-    constructor(trieData: object) {
+    constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(trieData as Node);
+      this.breakWords = options.wordBreaker || wordBreakers.placeholder;
     }
 
     configure(capabilities: Capabilities): Configuration {
@@ -72,7 +87,7 @@
       // EVERYTHING to the left of the cursor: 
       let fullLeftContext = context.left || '';
       // Stuff to the left of the cursor in the current word.
-      let leftContext = fullLeftContext.split(/\s+/).pop() || '';
+      let leftContext = this.getLastWord(fullLeftContext);
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
       let prefix = leftContext + (transform.insert || '');
@@ -88,6 +103,19 @@
           displayAs: word,
         }
       });
+    }
+
+    /**
+     * Get the last word of the phrase, or nothing.
+     * @param fullLeftContext the entire left context of the string.
+     */
+    private getLastWord(fullLeftContext: string): string {
+      let words = this.breakWords(fullLeftContext)
+      if (words.length > 0) {
+        return words.pop().text;
+      }
+
+      return '';
     }
   };
 
