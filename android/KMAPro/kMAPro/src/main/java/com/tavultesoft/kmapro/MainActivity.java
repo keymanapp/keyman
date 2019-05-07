@@ -724,7 +724,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   private void showGetStarted() {
-    Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
+    // TODO: Restore GetStartedActivity for production
+    //Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
+    Intent getStartedIntent = new Intent(this, com.tavultesoft.kmea.ModelsPickerActivity.class );
     startActivity(getStartedIntent);
   }
 
