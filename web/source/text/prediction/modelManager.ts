@@ -47,15 +47,27 @@ namespace com.keyman.text.prediction {
     }
   }
 
+  export type InvalidateSourceEnum = 'new'|'context';
+
   /**
    * Corresponds to the 'invalidatesuggestions' ModelManager event.
    */
-  export type InvalidateSuggestionsHandler = () => boolean;
+  export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
+
+  export class ReadySuggestions {
+    suggestions: Suggestion[];
+    transcriptionID: number;
+
+    constructor(suggestions: Suggestion[], id: number) {
+      this.suggestions = suggestions;
+      this.transcriptionID = id;
+    }
+  }
 
   /**
    * Corresponds to the 'suggestionsready' ModelManager event.
    */
-  export type ReadySuggestionsHandler = (suggestions: Suggestion[]) => boolean;
+  export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
 
   export type ModelChangeEnum = 'loaded'|'unloaded';
   /**
@@ -63,8 +75,13 @@ namespace com.keyman.text.prediction {
    */
   export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
 
-  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange";
-  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler;
+  /**
+   * Covers both 'tryaccept' and 'tryrevert' events.
+   */
+  export type TryUIHandler = (source: string) => boolean;
+
+  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange" | "tryaccept" | "tryrevert";
+  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler | TryUIHandler;
 
   export class ModelManager {
     private lmEngine: LMLayer;
@@ -217,12 +234,27 @@ namespace com.keyman.text.prediction {
       return keyman.util.removeEventListener(ModelManager.EVENT_PREFIX + event, func);
     }
 
-    public predict(transcription: Transcription) {
+    public invalidateContext() {
+      let keyman = com.keyman.singleton;
+
+      // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'context');
+    }
+
+    public predict(transcription?: Transcription) {
+      let keyman = com.keyman.singleton;
+
       // If there's no active model, there can be no predictions.
       // We'll also be missing important data needed to even properly REQUEST the predictions.
       if(!this.currentModel || !this.configuration) {
         return;
       }
+
+      if(!transcription) {
+        let t = text.Processor.getOutputTarget();
+        transcription = t.buildTranscriptionFrom(t, null);
+      }
+
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
       this.predict_internal(transcription.transform, context);
@@ -234,12 +266,13 @@ namespace com.keyman.text.prediction {
 
       // We've already invalidated any suggestions resulting from any previously-existing Promise -
       // may as well officially invalidate them via event.
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", null);
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'new');
 
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {
         if(promise == mm.currentPromise) {
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", suggestions);
+          let result = new ReadySuggestions(suggestions, transform.id);
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", result);
           mm.currentPromise = null;
         }
       })
@@ -290,6 +323,20 @@ namespace com.keyman.text.prediction {
         this.unloadModel();
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
+    }
+
+    public tryAcceptSuggestion(source: string): boolean {
+      let keyman = com.keyman.singleton;
+      
+      // Handlers of this event should return 'false' when the 'try' is successful.
+      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryaccept', source);
+    }
+
+    public tryRevertSuggestion(): boolean {
+      let keyman = com.keyman.singleton;
+      
+      // Handlers of this event should return 'false' when the 'try' is successful.
+      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryrevert', null);
     }
   }
 }

@@ -1138,6 +1138,9 @@ namespace com.keyman.text {
       }
     }
 
+    // Needed for some legacy CJK keyboards.
+    ['ShowPinnedHelp'] = this['showPinnedHelp'];
+
     resetContext() {
       let keyman = com.keyman.singleton;
       if(!keyman.isHeadless && keyman.osk.vkbd) {
@@ -1151,6 +1154,10 @@ namespace com.keyman.text {
       }
       this.resetContextCache();
       this.resetVKShift();
+      
+      if(keyman.modelManager) {
+        keyman.modelManager.invalidateContext();
+      }
 
       if(!keyman.isHeadless) {
         keyman.osk._Show();

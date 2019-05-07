@@ -333,11 +333,11 @@ div.android #keytip {background-color:#f00;}
     height: 100% !important;
 }
 
-.kmw-embedded .ios.kmw-osk-frame {top:0 !important;bottom:initial !important; width:100% !important;}
+.kmw-embedded .ios.kmw-osk-frame {bottom:0 !important; width:100% !important;}
 
 .kmw-embedded .ios.kmw-osk-frame {position: absolute !important;}
 
-.kmw-embedded .ios.kmw-osk-frame .kmw-key-layer-group {position: absolute !important; top: 0 !important; bottom: initial !important;}
+.kmw-embedded .ios.kmw-osk-frame .kmw-key-layer-group {position: absolute !important; /*top: 0 !important;*/ bottom: 0 !important;}
 
 .kmw-embedded .ios.kmw-osk-frame .kmw-key-layer {position: absolute !important; top: 0 !important; bottom: initial !important;}
 

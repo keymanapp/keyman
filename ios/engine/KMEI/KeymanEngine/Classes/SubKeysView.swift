@@ -60,11 +60,7 @@ class SubKeysView: UIView {
     }
 
     let kbHeight = Manager.shared.inputViewController.kmwHeight
-    let tbHeight = Manager.shared.inputViewController.activeTopBarHeight
-    var maxContainerHeight = (screenHeight - kbHeight) + keyFrame.origin.y - strokeWidth
-    if isSystemKeyboard {
-      maxContainerHeight = keyFrame.origin.y + tbHeight - strokeWidth
-    }
+    let maxContainerHeight = (screenHeight - kbHeight) + keyFrame.origin.y - strokeWidth
 
     var columns = Int((screenWidth - marginX) / (maxButtonSize.width + marginX))
     rows = subKeys.count / columns
@@ -95,11 +91,6 @@ class SubKeysView: UIView {
     var viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.size.height)
     adjX = 0
     adjY = 0
-    if isSystemKeyboard && (viewPosY < -tbHeight) {
-      adjY = viewPosY + tbHeight
-      viewPosY = -tbHeight
-      viewHeight += adjY
-    }
 
     if viewPosX < 0 {
       if (keyFrame.origin.x - borderRadius * 1.25) < 0 {
