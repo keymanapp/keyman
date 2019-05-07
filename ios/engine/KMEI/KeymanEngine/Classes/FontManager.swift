@@ -8,6 +8,7 @@
 
 import CoreText
 import Foundation
+import UIKit // for UIFont
 
 public class FontManager {
   public static let shared = FontManager()

@@ -6,6 +6,8 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import Foundation
+
 extension String {
   var hasFontExtension: Bool {
     return hasExtension(FileExtensions.trueTypeFont) || hasSuffix(FileExtensions.openTypeFont)

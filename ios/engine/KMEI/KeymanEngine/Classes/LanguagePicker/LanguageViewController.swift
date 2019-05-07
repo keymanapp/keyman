@@ -15,20 +15,30 @@ private let toolbarActivityIndicatorTag = 102
 
 class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var userKeyboards: [String: InstallableKeyboard] = [:]
+  private var userLexicalModels: [String: InstallableLexicalModel] = [:]
   private var sectionIndexTitles: [String] = []
   private var indices: [Int] = []
   private var selectedSection = 0
   private var isUpdate = false
   private var languages: [Language] = []
-  private let keyboardRepository: KeyboardRepository
+  private let keyboardRepository: KeyboardRepository?
+  private let lexicalModelRepository: LexicalModelRepository?
 
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
 
   init(_ keyboardRepository: KeyboardRepository) {
     self.keyboardRepository = keyboardRepository
+    self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
     keyboardRepository.delegate = self
+  }
+
+  init(_ lexicalModelRepository: LexicalModelRepository) {
+    self.lexicalModelRepository = lexicalModelRepository
+    self.keyboardRepository = nil
+    super.init(nibName: nil, bundle: nil)
+    lexicalModelRepository.delegate = self
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -37,10 +47,10 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 
   override func loadView() {
     super.loadView()
-    if let languageDict = keyboardRepository.languages {
+    if let languageDict = keyboardRepository?.languages {
       languages = languageList(languageDict)
     } else {
-      keyboardRepository.fetch()
+      keyboardRepository?.fetch()
     }
 
     loadUserKeyboards()
@@ -277,7 +287,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   func loadUserKeyboards() {
     userKeyboards = [:]
     guard let userKbList = Storage.active.userDefaults.userKeyboards else {
-      userKeyboards = [:]
       return
     }
 
@@ -286,6 +295,18 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       userKeyboards[dictKey] = kb
     }
   }
+    
+    func loadUserLexicalModels() {
+        userLexicalModels = [:]
+        guard let userLmList = Storage.active.userDefaults.userLexicalModels else {
+            return
+        }
+        
+        for lm in userLmList {
+            let dictKey = "\(lm.languageID)_\(lm.id)"
+            userLexicalModels[dictKey] = lm
+        }
+    }
 
   private func isAdded(languageID: String?, keyboardID: String?) -> Bool {
     guard let languageID = languageID, let keyboardID = keyboardID else {
@@ -329,5 +350,25 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
     return languageDict.values.sorted { a, b -> Bool in
       a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
     }
+  }
+}
+
+// MARK: - LexicalModelRepositoryDelegate
+ //may not need  this, as we don't plan ever to fetch the whole lexical model repository (or even the list of all available)
+extension LanguageViewController: LexicalModelRepositoryDelegate {
+  func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository) {
+    if let languageDict = repository.languages {
+      languages = languageList(languageDict)
+    }
+    self.dismissActivityView()
+    self.tableView.reloadData()
+    if self.numberOfSections(in: self.tableView) == 0 {
+      self.showConnectionErrorAlert()
+    }
+  }
+  
+  func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
+    dismissActivityView()
+    showConnectionErrorAlert()
   }
 }
