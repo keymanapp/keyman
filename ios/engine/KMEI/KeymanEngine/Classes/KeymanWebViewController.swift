@@ -248,13 +248,11 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
     
-  func setLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+  func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     let stub: [String: Any] = [
-      "KI": "LexicalModel_\(lexicalModel.id)",
-      "KN": lexicalModel.name,
-      "KLC": lexicalModel.languageID,
-//      "KL": lexicalModel.languageName,
-      "KF": storage.lexicalModelURL(for: lexicalModel).absoluteString
+      "id": "LexicalModel_\(lexicalModel.id)",
+      "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
+      "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
     ]
   
     let data: Data
@@ -270,7 +268,7 @@ extension KeymanWebViewController {
     }
   
     log.debug("LexicalModel stub: \(stubString)")
-    webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
+    webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
   }
 }
 

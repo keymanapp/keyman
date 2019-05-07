@@ -232,7 +232,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       // Add lexicalModel.
       for lexicalModel in lexicalModels {
         Manager.shared.addLexicalModel(lexicalModel)
-        _ = Manager.shared.setLexicalModel(lexicalModel)
+        _ = Manager.shared.registerLexicalModel(lexicalModel)
       }
       
       navigationController?.popToRootViewController(animated: true)
@@ -266,7 +266,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   private func switchLexicalModel(_ index: Int) {
     // Switch lexicalModel and register to user defaults.
-    if Manager.shared.setLexicalModel(userLexicalModels[index]) {
+    if Manager.shared.registerLexicalModel(userLexicalModels[index]) {
       tableView.reloadData()
     }
     

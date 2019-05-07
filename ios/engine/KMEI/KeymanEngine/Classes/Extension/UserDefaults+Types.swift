@@ -132,6 +132,14 @@ public extension UserDefaults {
       set(lexicalModels, forKey: Key.userLexicalModelsList)
     }
   }
+  
+  public func userLexicalModels(forLanguage lgCode: String) -> [InstallableLexicalModel]? {
+    if let models = userLexicalModels {
+      return models.compactMap { ($0.languageID == lgCode) ? $0 : nil }
+    } else {
+      return nil
+    }
+  }
 
   public var currentKeyboardID: FullKeyboardID? {
     get {
