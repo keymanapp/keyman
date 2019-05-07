@@ -47,6 +47,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public final class KeyboardPickerActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
@@ -88,11 +89,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     final Context context = this;
     setContentView(R.layout.keyboard_picker_list_layout);
 
-    toolbar = (Toolbar) findViewById(R.id.keyboard_picker_toolbar);
+    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+    TextView textView = (TextView) findViewById(R.id.bar_title);
+    textView.setText(getString(R.string.title_keyboards));
 
     closeButton = (Button) findViewById(R.id.close_keyman_button);
     Bundle bundle = getIntent().getExtras();
@@ -319,7 +322,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return pos;
   }
 
-  private static boolean hasKeyboardFromPackage() {
+  protected static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
       String packageID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       if (!packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
@@ -596,6 +599,25 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return index;
+  }
+
+  /**
+   * Get the list of associated keyboard names for a given language ID
+   * @param langId
+   * @return ArrayList of keyboard names
+   */
+  protected static ArrayList<String> getAssociatedKeyboards(String langId) {
+    if (keyboardsList != null) {
+      ArrayList<String> associatedKeyboards = new ArrayList<String>();
+      for (HashMap<String, String> keyboardInfo: keyboardsList) {
+        if (keyboardInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(langId)) {
+          associatedKeyboards.add(keyboardInfo.get(KMManager.KMKey_KeyboardName));
+        }
+      }
+      return associatedKeyboards;
+    }
+
+    return null;
   }
 
   protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
