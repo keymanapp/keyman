@@ -35,11 +35,10 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   private static ListView listView = null;
   private static ImageButton addButton = null;
   private static ArrayList<HashMap<String, String>> languagesList = null;
-  private boolean didExecuteParser = false;
+  private static ArrayList<String> associatedKeyboardsList = null;
 
   private boolean dismissOnSelect = true;
   protected static boolean canAddNewKeyboard = true;
-  protected static Typeface listFont = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +67,23 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        listView.setItemChecked(position, true);
+        listView.setSelection(position);
+
+        HashMap<String, String> languageInfo = languagesList.get(position);
+        String langId = languageInfo.get(KMManager.KMKey_LanguageID);
+        String langName = languageInfo.get(KMManager.KMKey_LanguageName);
+        associatedKeyboardsList = KeyboardPickerActivity.getAssociatedKeyboards(langId);
+        Bundle args = new Bundle();
+        args.putString(KMManager.KMKey_LanguageID, langId);
+        args.putString(KMManager.KMKey_LanguageName, langName);
+        args.putSerializable("associatedKeyboards", associatedKeyboardsList);
+        // TODO: Start intent for "Language Settings" activity with the selected languageID
+        //Intent intent = new Intent(context, LanguageSettingsActivity.class);
+        // intent.putExtra(args);
+
+        if (dismissOnSelect)
+          finish();
       }
     });
 

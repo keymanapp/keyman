@@ -601,6 +601,25 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return index;
   }
 
+  /**
+   * Get the list of associated keyboard names for a given language ID
+   * @param langId
+   * @return ArrayList of keyboard names
+   */
+  protected static ArrayList<String> getAssociatedKeyboards(String langId) {
+    if (keyboardsList != null) {
+      ArrayList<String> associatedKeyboards = new ArrayList<String>();
+      for (HashMap<String, String> keyboardInfo: keyboardsList) {
+        if (keyboardInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(langId)) {
+          associatedKeyboards.add(keyboardInfo.get(KMManager.KMKey_KeyboardName));
+        }
+      }
+      return associatedKeyboards;
+    }
+
+    return null;
+  }
+
   protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
     int index = -1;
 
