@@ -442,6 +442,7 @@ namespace com.keyman.osk {
         let suggestion = this.selected = t['suggestion'] as BannerSuggestion;
         if(suggestion.isEmpty()) {
           on = false;
+          this.selected = null;
         }
       }
 
@@ -511,7 +512,14 @@ namespace com.keyman.osk {
     }
 
     private doAccept(suggestion: BannerSuggestion) {
-      this.preAccept = suggestion.apply();
+      let revert = suggestion.apply();
+      
+      if(revert) {
+        this.preAccept = revert;
+      } else {
+        // If null, it's a blank option; we should effectively never 'accept' it.
+        return;
+      }
       
       this.selected = null;
       this.recentAccept = true;
