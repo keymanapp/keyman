@@ -407,8 +407,10 @@ namespace com.keyman.text {
 
     var w=key.offsetWidth, 
         h=key.offsetHeight,
-        x=dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(osk.vkbd.kbdDiv) + w/2,
-        y=dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(osk.vkbd.kbdDiv);
+        // Since the full OSKManager '_Box' is displayed within the keyboards' WebViews,
+        // these calculations should be performed with respect to that, rather than osk.vkbd.kbdDiv.
+        x=dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(osk._Box) + w/2,
+        y=dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(osk._Box);
 
     return x+','+y+','+w+','+h;
   };

@@ -27,8 +27,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
   var menuBehaviour = MenuBehaviour.showAlways
 
-  open var topBarImageView: UIImageView?
-
   var _isSystemKeyboard: Bool
   var isSystemKeyboard: Bool {
     return _isSystemKeyboard;
@@ -62,7 +60,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
-  // TODO:  Consider deleting this.
   private var expandedHeight: CGFloat {
     return keymanWeb.keyboardHeight + activeTopBarHeight
   }
@@ -104,6 +101,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       portraitConstraint?.isActive = false
       landscapeConstraint?.isActive = true
     }
+    
+    keymanWeb.setBannerHeight(to: InputViewController.topBarHeight)
 
     super.updateViewConstraints()
   }
@@ -117,16 +116,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // TODO: If the following line is enabled, the WKWebView does not respond to touch events
     // Can figure out why one day maybe
     baseView.translatesAutoresizingMaskIntoConstraints = false
-    baseView.autoresizingMask = UIViewAutoresizing.flexibleHeight.union(.flexibleWidth)
+    baseView.autoresizingMask = UIView.AutoresizingMask.flexibleHeight.union(.flexibleWidth)
 
     keymanWeb.delegate = self
-
-    // Fixes debugging issue - views added later are moved to the front.
-    topBarImageView?.removeFromSuperview()
-    topBarImageView = UIImageView()
-    topBarImageView!.translatesAutoresizingMaskIntoConstraints = false
-    topBarImageView!.backgroundColor = UIColor.gray
-    baseView.addSubview(topBarImageView!)
 
     baseView.addSubview(keymanWeb.view)
 
@@ -142,8 +134,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
-    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
+    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[0]
+    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[0]
 
     let shouldSynchronize: Bool
     if let standardDate = standardDate,
@@ -320,37 +312,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private func setInnerConstraints() {
-    let topBar = topBarImageView!
     let container = keymanWeb.view!
-    
-    // Establish a consistent set of constraints for the top bar.
-    if #available(iOSApplicationExtension 11.0, *) {
-      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-
-      // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
-      topBarWidthConstraint.priority = .defaultHigh
-      topBarWidthConstraint.isActive = true
-    } else {
-      topBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
-      
-      // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
-      topBarWidthConstraint.priority = .defaultHigh
-      topBarWidthConstraint.isActive = true
-    }
-
-    topBar.heightAnchor.constraint(equalToConstant: activeTopBarHeight).isActive = true
-
-    // Establishes a set of constraints for the keyboard's container, supporting autoresizing of
-    // the keyboard's WebView via its constraints.
-    container.topAnchor.constraint(equalTo:topBar.bottomAnchor).isActive = true
 
     if #available(iOSApplicationExtension 11.0, *) {
+      container.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
       container.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
@@ -361,6 +326,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.isActive = true
     } else {
       // Fallback on earlier versions
+      container.topAnchor.constraint(equalTo:view.layoutMarginsGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.layoutMarginsGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo:view.layoutMarginsGuide.leftAnchor).isActive = true
       container.rightAnchor.constraint(equalTo:view.layoutMarginsGuide.rightAnchor).isActive = true
@@ -420,6 +386,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func setKeyboard(_ kb: InstallableKeyboard) {
     keymanWeb.setKeyboard(kb)
   }
+    
+  func registerLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.registerLexicalModel(lm)
+  }
   
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
@@ -475,5 +445,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func dismissKeyboardMenu() {
     keymanWeb.dismissKeyboardMenu()
+  }
+  
+  open func setBannerImage(to path: String) {
+    keymanWeb.setBannerImage(to: path)
   }
 }

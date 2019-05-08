@@ -6,6 +6,8 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import Foundation
+
 protocol HTTPDownloadDelegate: class {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
