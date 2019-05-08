@@ -195,6 +195,10 @@ extension KeymanWebViewController {
     text = text.replacingOccurrences(of: "\n", with: "\\n")
     webView!.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
   }
+  
+  func resetContext() {
+    webView!.evaluateJavaScript("keyman.interface.resetContext();", completionHandler: nil)
+  }
 
   func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
     let type: String

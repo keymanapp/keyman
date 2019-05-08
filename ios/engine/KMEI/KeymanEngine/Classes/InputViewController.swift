@@ -210,6 +210,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
 
     setContextState(text: context, range: NSRange(newRange, in: context))
+    // Within the app, this is triggered after every keyboard input.
+    // We should NOT call .resetContext() here for this reason.
   }
   
   @objc func clearSwallowFlag() {
@@ -429,7 +431,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   func clearText() {
     setContextState(text: nil, range: NSRange(location: 0, length: 0))
+    keymanWeb.resetContext()
     log.info("Cleared text.")
+  }
+  
+  func resetContext() {
+    keymanWeb.resetContext()
   }
  
   func setContextState(text: String?, range: NSRange) {
