@@ -27,19 +27,48 @@
             var device = 'AppleMobile';
             var oskHeight = 0;
             var oskWidth = 0;
+            
+            var bannerOptions = {
+                'persistentBanner': true,
+                'imagePath': '' // Need to route the actual banner image here.
+            };
+            
             window.addEventListener('load', init, false);
             
             function init() {
                 var kmw=window['keyman'];
-                kmw.init({'app':device,'fonts':'fonts/'});
-                kmw['util']['setOption']('attachType','manual');
-                kmw['oninserttext'] = insertText;
-                kmw['showKeyboardList'] = menuKeyDown;
-                kmw['hideKeyboard'] = hideKeyboard;
-                kmw['getOskHeight'] = getOskHeight;
-                kmw['getOskWidth'] = getOskWidth;
-                kmw['beepKeyboard'] = beepKeyboard;
-                kmw['setActiveElement']('ta');
+                // We could convert to relying on the promise, but the underlying input element
+                // tends to show a bit due to the delay when we do so.
+                kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
+                    kmw['util']['setOption']('attachType','manual');
+                    kmw['oninserttext'] = insertText;
+                    kmw['showKeyboardList'] = menuKeyDown;
+                    kmw['hideKeyboard'] = hideKeyboard;
+                    kmw['getOskHeight'] = getOskHeight;
+                    kmw['getOskWidth'] = getOskWidth;
+                    kmw['beepKeyboard'] = beepKeyboard;
+                    kmw['setActiveElement']('ta');
+                    
+                    kmw.osk.banner.setOptions(bannerOptions);
+                //});
+            }
+        
+            function setBannerImage(path) {
+              bannerOptions['imagePath'] = path;
+              var kmw=window['keyman'];
+              kmw.osk.banner.setOptions(bannerOptions);
+            }
+        
+            function setBannerHeight(h) {
+              var kmw = com.keyman.singleton;
+              var osk = kmw.osk;
+
+              if(h >= 0 && osk.banner.activeType != 'blank') {
+                osk.banner.height = h;
+              }
+              
+              // Refresh KMW's OSK
+              kmw.correctOSKTextSize();
             }
             
             function setDeviceType(deviceType) {
@@ -49,8 +78,8 @@
             }
             
             function setOskHeight(height) {
-                oskHeight = height;
                 var kmw=window['keyman'];
+                oskHeight = height - kmw.osk.banner.height;
                 kmw.osk.show(true);
                 kmw['correctOSKTextSize']();
             }

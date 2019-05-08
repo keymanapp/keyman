@@ -15,7 +15,7 @@ public struct KMPLanguage {
 
 public class KMPKeyboard
 {
-  public var kmp: KeymanPackage
+  public var kmp: KeyboardKeymanPackage
   
   public var name: String?
   public var keyboardId: String?
@@ -25,7 +25,7 @@ public class KMPKeyboard
   public var languages: [KMPLanguage]! = []
   public var installableKeyboards: [InstallableKeyboard]! = []
   
-  init(kmp: KeymanPackage) {
+  init(kmp: KeyboardKeymanPackage) {
     self.kmp = kmp
   }
 

@@ -49,6 +49,10 @@ class KeymanWebViewController: UIViewController {
   
   /// Stores the keyboard view's current size.
   private var kbSize: CGSize = CGSize.zero
+  
+  /// Stores the current image for use by the Banner
+  /// when predictive text is not active
+  private var bannerImgPath: String = ""
 
   init(storage: Storage) {
     self.storage = storage
@@ -253,6 +257,40 @@ extension KeymanWebViewController {
     log.debug("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
+
+  func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    let stub: [String: Any] = [
+      "id": "LexicalModel_\(lexicalModel.id)",
+      "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
+      "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
+    ]
+  
+    let data: Data
+    do {
+      data = try JSONSerialization.data(withJSONObject: stub, options: [])
+    } catch {
+      log.error("Failed to serialize lexical model stub: \(error)")
+      return
+    }
+    guard let stubString = String(data: data, encoding: .utf8) else {
+      log.error("Failed to create stub string")
+      return
+    }
+  
+    log.debug("LexicalModel stub: \(stubString)")
+    webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+  }
+  
+  func setBannerImage(to path: String) {
+    bannerImgPath = path // Save the path in case delayed initializaiton is needed.
+    log.debug("Banner image path: '\(path).'")
+    webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
+  }
+  
+  func setBannerHeight(to height: Int) {
+    // TODO:
+    webView?.evaluateJavaScript("setBannerHeight(\(height);", completionHandler: nil)
+  }
 }
 
 // MARK: - WKScriptMessageHandler
@@ -401,7 +439,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
         // We use this style b/c it's short, and in essence it is a minor UI element collision -
         // a single key with blocked (erroneous) output.
         // Oddly, is a closer match to SystemSoundID 1520 than 1521.
-        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackStyle.heavy)
+        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.heavy)
         vibrator.impactOccurred()
       } else {
         // Fallback on earlier feedback style
@@ -431,6 +469,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
+    
+    // Now that we've loaded the keyboard page fully, perform any in-page needed init.
+    setBannerImage(to: bannerImgPath)
+    
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
 
@@ -465,9 +507,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
   }
 
   func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    if UIDevice.current.userInterfaceIdiom == .pad
-      || (Util.isSystemKeyboard && Manager.shared.inputViewController.activeTopBarHeight == 0)
-      || isSubKeysMenuVisible {
+    if UIDevice.current.userInterfaceIdiom == .pad || isSubKeysMenuVisible {
       return
     }
 
