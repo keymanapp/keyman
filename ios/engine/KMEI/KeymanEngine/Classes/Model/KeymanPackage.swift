@@ -18,33 +18,24 @@ public class KeymanPackage
 {
   static private let kmpFile = "kmp.json"
   public var sourceFolder: URL
-  private var keyboards: [KMPKeyboard]!
 
   init(folder: URL) {
     sourceFolder = folder
   }
-  
-  public func parse(json: [String:AnyObject]) {
-    self.keyboards = []
     
-    if let packagedKeyboards = json["keyboards"] as? [[String:AnyObject]] {
-      for keyboardJson in packagedKeyboards {
-        let keyboard = KMPKeyboard.init(kmp: self)
-        keyboard.parse(json: keyboardJson)
-        
-        if(keyboard.isValid) {
-          keyboards.append(keyboard)
-        }
-      }
-    }
+  // to be overridden by subclasses
+  public func isKeyboard() -> Bool {
+    return false
+  }
+
+  // to be overridden by subclasses
+  public func parse(json: [String:AnyObject]) {
+    return
   }
   
+  // to be overridden by subclasses
   public func defaultInfoHtml() -> String {
-    var str = "Found Packages:<br/>"
-    for keyboard in keyboards {
-      str += keyboard.keyboardId! + "<br/>"
-    }
-    return str
+    return "base class!"
   }
   
   public func infoHtml() -> String {
@@ -67,9 +58,21 @@ public class KeymanPackage
         let data = try Data(contentsOf: path, options: .mappedIfSafe)
         let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
         if let jsonResult = jsonResult as? [String:AnyObject] {
-          let kmp = KeymanPackage.init(folder: folder)
-          kmp.parse(json: jsonResult)
-          return kmp
+          if let packagedKeyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
+            if let packagedModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+                //TODO: rrb show error to user, for now, just log
+              log.error("error parsing keyman package: packages  MUST NOT have both keyboards and lexical models")
+              return nil
+            }
+            let kmp = KeyboardKeymanPackage.init(folder: folder)
+            kmp.parse(json: jsonResult)
+            return kmp
+          }
+          else if let packagedModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+            let kmm = LexicalModelKeymanPackage.init(folder: folder)
+            kmm.parse(json: jsonResult)
+            return kmm
+          }
         }
       }
     } catch {

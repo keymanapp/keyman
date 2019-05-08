@@ -1,77 +1,75 @@
 //
-//  KeyboardPickerViewController.swift
+//  LexicalModelPickerViewController.swift
 //  KeymanEngine
 //
-//  Created by Gabriel Wong on 2017-09-12.
-//  Copyright © 2017 SIL International. All rights reserved.
+//  Created by Randy Boring on 3/19/19.
+//  Copyright © 2019 SIL International. All rights reserved.
 //
 
+import Foundation
 import UIKit
 
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
-class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
-  private var updateQueue: [InstallableKeyboard]?
+class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelegate {
+  private var userLexicalModels: [InstallableLexicalModel] = [InstallableLexicalModel]()
+  private var updateQueue: [InstallableLexicalModel]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
-
-  private var keyboardDownloadStartedObserver: NotificationObserver?
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
-  private var keyboardDownloadFailedObserver: NotificationObserver?
+  
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-
-    title = "Keyboards"
+    
+    title = "LexicalModels"
     setIsDoneButtonEnabled(false)
     isDidUpdateCheck = false
     updateQueue = nil
-    if Manager.shared.canAddNewKeyboards {
+    if Manager.shared.canAddNewLexicalModels {
       let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
                                       action: #selector(self.addClicked))
       navigationItem.rightBarButtonItem = addButton
     }
-
+    
     navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
                                                           blue: 0.25, alpha: 0.9)
-
-    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
+    
+    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadStarted,
       observer: self,
-      function: KeyboardPickerViewController.keyboardDownloadStarted)
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
+      function: LexicalModelPickerViewController.lexicalModelDownloadStarted)
+    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadCompleted,
       observer: self,
-      function: KeyboardPickerViewController.keyboardDownloadCompleted)
-    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
+      function: LexicalModelPickerViewController.lexicalModelDownloadCompleted)
+    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadFailed,
       observer: self,
-      function: KeyboardPickerViewController.keyboardDownloadFailed)
+      function: LexicalModelPickerViewController.lexicalModelDownloadFailed)
   }
-
+  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
-    loadUserKeyboards()
-    scroll(toSelectedKeyboard: false)
+    
+    loadUserLexicalModels()
+    scroll(toSelectedLexicalModel: false)
   }
-
+  
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     if isDidUpdateCheck || !checkUpdates() {
       return
     }
-
+    
     let toolbarFrame = navigationController!.toolbar!.frame
     let button = UIButton(type: .roundedRect)
     button.addTarget(self, action: #selector(self.updateClicked), for: .touchUpInside)
-
+    
     button.frame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
                           width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7)
     button.center = CGPoint(x: toolbarFrame.width / 2, y: toolbarFrame.height / 2)
@@ -82,91 +80,91 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
                                .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
     button.tag = toolbarButtonTag
     navigationController?.toolbar?.addSubview(button)
-
+    
     navigationController?.setToolbarHidden(false, animated: true)
-    scroll(toSelectedKeyboard: false)
+    scroll(toSelectedLexicalModel: false)
   }
-
+  
   override func numberOfSections(in tableView: UITableView) -> Int {
     return 1
   }
-
+  
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return userKeyboards.count
+    return userLexicalModels.count
   }
-
+  
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "Cell"
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       return cell
     }
-
+    
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
     selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
     cell.selectedBackgroundView = selectionColor
     return cell
   }
-
-  // TODO: Refactor. Duplicated in KeyboardInfoViewController
+  
+  // TODO: Refactor. Duplicated in LexicalModelInfoViewController
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    if !Manager.shared.canRemoveKeyboards {
+    if !Manager.shared.canRemoveLexicalModels {
       return false
     }
-
-    if !Manager.shared.canRemoveDefaultKeyboard {
+    
+    if !Manager.shared.canRemoveDefaultLexicalModel {
       return indexPath.row != 0
     }
     if indexPath.row > 0 {
       return true
     }
-    return userKeyboards.count > 1
+    return userLexicalModels.count > 1
   }
-
+  
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
                           forRowAt indexPath: IndexPath) {
     if editingStyle != .delete {
       return
     }
-
-    if Manager.shared.removeKeyboard(at: indexPath.row) {
-      loadUserKeyboards()
+    
+    if Manager.shared.removeLexicalModel(at: indexPath.row) {
+      loadUserLexicalModels()
     }
     setIsDoneButtonEnabled(true)
   }
-
+  
   override func tableView(_ tableView: UITableView,
                           accessoryButtonTappedForRowWith indexPath: IndexPath) {
-    showKeyboardInfoView(with: indexPath.row)
+    showLexicalModelInfoView(with: indexPath.row)
   }
-
-  func showKeyboardInfoView(with index: Int) {
+  
+  func showLexicalModelInfoView(with index: Int) {
     setIsDoneButtonEnabled(true)
-    let kb = userKeyboards[index]
-    let version = kb.version
-
-    let infoView = KeyboardInfoViewController()
-    infoView.title = kb.name
-    infoView.keyboardCount = userKeyboards.count
-    infoView.keyboardIndex = index
-    infoView.keyboardID = kb.id
-    infoView.languageID = kb.languageID
-    infoView.keyboardVersion = version
-    infoView.isCustomKeyboard = kb.isCustom
+    let lm = userLexicalModels[index]
+    let version = lm.version
+    
+    let infoView = LexicalModelInfoViewController()
+    infoView.title = lm.name
+    infoView.lexicalModelCount = userLexicalModels.count
+    infoView.lexicalModelIndex = index
+    infoView.lexicalModelID = lm.id
+    infoView.languageID = lm.languageID
+    infoView.lexicalModelVersion = version
+    infoView.isCustomLexicalModel = lm.isCustom
     navigationController?.pushViewController(infoView, animated: true)
   }
-
+  
   override func tableView(_ tableView: UITableView,
                           willDisplay cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
-    let kb = userKeyboards[indexPath.row]
-
-    cell.textLabel?.text = kb.languageName
-    cell.detailTextLabel?.text = kb.name
+    let lm = userLexicalModels[indexPath.row]
+    
+    cell.textLabel?.text = lm.languageID // maybe do a lookup for lm.languageName
+    cell.detailTextLabel?.text = lm.name
     cell.tag = indexPath.row
-
-    if Manager.shared.currentKeyboardID == kb.fullID {
+    
+    if Manager.shared.currentLexicalModelID == lm.fullID {
       cell.selectionStyle = .blue
       cell.isSelected = true
       cell.accessoryType = .detailDisclosureButton
@@ -176,42 +174,36 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       cell.accessoryType = .detailDisclosureButton
     }
   }
-
+  
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    switchKeyboard(indexPath.row)
+    switchLexicalModel(indexPath.row)
   }
-
-  private func keyboardDownloadStarted(_ keyboards: [InstallableKeyboard]) {
-    view.isUserInteractionEnabled = false
-    navigationItem.leftBarButtonItem?.isEnabled = false
-    navigationItem.rightBarButtonItem?.isEnabled = false
-  }
-    
+  
   private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
-
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
+  
+  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
     if view == navigationController?.topViewController?.view {
       if updateQueue == nil {
         return
       }
-      Manager.shared.shouldReloadKeyboard = true
-
-      // Update keyboard version
-      for keyboard in keyboards {
-        Manager.shared.updateUserKeyboards(with: keyboard)
+      Manager.shared.shouldReloadLexicalModel = true
+      
+      // Update lexicalModel version
+      for lexicalModel in lexicalModels {
+        Manager.shared.updateUserLexicalModels(with: lexicalModel)
       }
-
+      
       updateQueue!.remove(at: 0)
       if !updateQueue!.isEmpty {
         let langID = updateQueue![0].languageID
-        let kbID = updateQueue![0].id
-        Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
+        let lmID = updateQueue![0].id
+        Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
       } else {
-        loadUserKeyboards()
+        loadUserLexicalModels()
         view.isUserInteractionEnabled = true
         navigationItem.leftBarButtonItem?.isEnabled = true
         if navigationItem.rightBarButtonItem != nil {
@@ -219,47 +211,47 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
         }
         updateQueue = nil
         let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-        label?.text = "Keyboards successfully updated!"
+        label?.text = "Lexical models successfully updated!"
         navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
         Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
                              userInfo: nil, repeats: false)
       }
     } else {
       let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-      label?.text = "Keyboard successfully downloaded!"
+      label?.text = "Lexical model successfully downloaded!"
       navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
       Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
                            userInfo: nil, repeats: false)
-
+      
       view.isUserInteractionEnabled = true
       navigationItem.leftBarButtonItem?.isEnabled = true
       if navigationItem.rightBarButtonItem != nil {
         navigationItem.rightBarButtonItem?.isEnabled = true
       }
-
-      // Add keyboard.
-      for keyboard in keyboards {
-        Manager.shared.addKeyboard(keyboard)
-        _ = Manager.shared.setKeyboard(keyboard)
+      
+      // Add lexicalModel.
+      for lexicalModel in lexicalModels {
+        Manager.shared.addLexicalModel(lexicalModel)
+        _ = Manager.shared.registerLexicalModel(lexicalModel)
       }
-
+      
       navigationController?.popToRootViewController(animated: true)
     }
   }
-
-  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
+  
+  private func lexicalModelDownloadFailed(_ notification: LexicalModelDownloadFailedNotification) {
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
     if let item = navigationItem.rightBarButtonItem {
       item.isEnabled = true
     }
-
+    
     let title: String
     if view == navigationController?.topViewController?.view {
       updateQueue = nil
-      title = "Keyboard Update Error"
+      title = "Lexical model Update Error"
     } else {
-      title = "Keyboard Download Error"
+      title = "Lexical model Download Error"
     }
     navigationController?.setToolbarHidden(true, animated: true)
     
@@ -271,39 +263,39 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     
     self.present(alertController, animated: true, completion: nil)
   }
-
-  private func switchKeyboard(_ index: Int) {
-    // Switch keyboard and register to user defaults.
-    if Manager.shared.setKeyboard(userKeyboards[index]) {
+  
+  private func switchLexicalModel(_ index: Int) {
+    // Switch lexicalModel and register to user defaults.
+    if Manager.shared.registerLexicalModel(userLexicalModels[index]) {
       tableView.reloadData()
     }
-
+    
     if !_isDoneButtonEnabled {
-      Manager.shared.dismissKeyboardPicker(self)
+      Manager.shared.dismissLexicalModelPicker(self)
     }
   }
-
-  private func loadUserKeyboards() {
-    userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
+  
+  private func loadUserLexicalModels() {
+    userLexicalModels = Storage.active.userDefaults.userLexicalModels ?? []
     tableView.reloadData()
   }
-
-  private func isAdded(languageID langID: String, keyboardID kbID: String) -> Bool {
-    return userKeyboards.contains { kb in kb.languageID == langID && kb.id == kbID }
+  
+  private func isAdded(languageID langID: String, lexicalModelID lmID: String) -> Bool {
+    return userLexicalModels.contains { lm in lm.languageID == langID && lm.id == lmID }
   }
-
+  
   @objc func doneClicked(_ sender: Any) {
-    Manager.shared.dismissKeyboardPicker(self)
+    Manager.shared.dismissLexicalModelPicker(self)
   }
-
+  
   @objc func cancelClicked(_ sender: Any) {
-    Manager.shared.dismissKeyboardPicker(self)
+    Manager.shared.dismissLexicalModelPicker(self)
   }
-
+  
   @objc func addClicked(_ sender: Any) {
-    showAddKeyboard()
+    showAddLexicalModel()
   }
-
+  
   @objc func updateClicked(_ sender: Any) {
     navigationController?.toolbar?.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
     let toolbarFrame = navigationController!.toolbar!.frame
@@ -311,7 +303,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     let height = toolbarFrame.height * 0.7
     let labelFrame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
                             width: width, height: height)
-
+    
     let label = UILabel(frame: labelFrame)
     label.backgroundColor = UIColor.clear
     label.textColor = UIColor.white
@@ -321,7 +313,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
                               .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
     label.tag = toolbarLabelTag
-
+    
     let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     indicatorView.center = CGPoint(x: width - indicatorView.frame.width, y: height * 0.5)
     indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
@@ -330,53 +322,53 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.toolbar?.addSubview(label)
     navigationController?.toolbar?.addSubview(indicatorView)
     setIsDoneButtonEnabled(true)
-    updateKeyboards()
+    updateLexicalModels()
   }
-
+  
   private func checkUpdates() -> Bool {
-    if Manager.shared.apiKeyboardRepository.languages == nil {
+    if Manager.shared.apiLexicalModelRepository.lexicalModels == nil {
       return false
     }
-
+    
     isDidUpdateCheck = true
-    return userKeyboards.contains { keyboard in
-      let kbID = keyboard.id
-      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
+    return userLexicalModels.contains { lexicalModel in
+      let lmID = lexicalModel.id
+      return Manager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
     }
   }
-
-  private func updateKeyboards() {
+  
+  private func updateLexicalModels() {
     updateQueue = []
-    var kbIDs = Set<String>()
-    for kb in userKeyboards {
-      let kbState = Manager.shared.stateForKeyboard(withID: kb.id)
-      if kbState == .needsUpdate {
-        if !kbIDs.contains(kb.id) {
-          kbIDs.insert(kb.id)
-          updateQueue!.append(kb)
+    var lmIDs = Set<String>()
+    for lm in userLexicalModels {
+      let lmState = Manager.shared.stateForLexicalModel(withID: lm.id)
+      if lmState == .needsUpdate {
+        if !lmIDs.contains(lm.id) {
+          lmIDs.insert(lm.id)
+          updateQueue!.append(lm)
         }
       }
     }
-
+    
     if !updateQueue!.isEmpty {
       let langID = updateQueue![0].languageID
-      let kbID = updateQueue![0].id
-      Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
+      let lmID = updateQueue![0].id
+      Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
     }
   }
-
-  private func scroll(toSelectedKeyboard animated: Bool) {
-    let index = userKeyboards.index { kb in
-      return Manager.shared.currentKeyboardID == kb.fullID
+  
+  private func scroll(toSelectedLexicalModel animated: Bool) {
+    let index = userLexicalModels.index { kb in
+      return Manager.shared.currentLexicalModelID == kb.fullID
     }
-
+    
     if let index = index {
       let indexPath = IndexPath(row: index, section: 0)
       tableView.scrollToRow(at: indexPath, at: .middle, animated: animated)
-
+      
     }
   }
-
+  
   private func setIsDoneButtonEnabled(_ value: Bool) {
     _isDoneButtonEnabled = value
     if _isDoneButtonEnabled {
@@ -389,16 +381,17 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       navigationItem.leftBarButtonItem = cancelButton
     }
   }
-
+  
   @objc func hideToolbarDelayed(_ timer: Timer) {
     navigationController?.setToolbarHidden(true, animated: true)
   }
-
-  func showAddKeyboard() {
+  
+  func showAddLexicalModel() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
+    let vc = LanguageViewController(Manager.shared.apiLexicalModelRepository) //may need to be different for models
     navigationController?.pushViewController(vc, animated: true)
     setIsDoneButtonEnabled(true)
   }
 }
+

@@ -58,6 +58,14 @@ To build in Xcode,
 
 The framework will be built to **engine/KMEI/build/(Debug|Release)-universal/KeymanEngine.framework**.
 
+If it doesn't build, and you have upgraded from Xcode 10.0 (or earlier) to 10.1 (or later), it may not
+build due to "Could not find any available simulators for iOS" error from Carthage, probably while 
+building DeviceKit. Xcode 10.1 changed the output format which confuses Carthage. Upgrade Carthage:
+```
+brew upgrade carthage
+brew link --overwrite carthage
+```
+
 ### Linking with KeymanEngine
 1. Add KeymanEngine.framework to 'Linked Frameworks and Libraries' and 'Embedded Binaries' in your project targets.
 
