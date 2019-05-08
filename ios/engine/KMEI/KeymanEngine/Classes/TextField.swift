@@ -167,7 +167,7 @@ public class TextField: UITextField, KeymanResponder {
                              length: offset(from: textRange.start, to: textRange.end))
 
       Manager.shared.setContextState(text: text, range: newRange)
-      Manager.shared.resetContext()
+      // This is called when editing in-app; do not reset context here.
       shouldUpdateKMText = false
     }
   }

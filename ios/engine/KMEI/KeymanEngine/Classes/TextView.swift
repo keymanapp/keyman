@@ -274,7 +274,7 @@ extension TextView: UITextViewDelegate {
     if shouldUpdateKMText {
       // Catches copy/paste operations
       Manager.shared.setContextState(text: textView.text, range: textView.selectedRange)
-      Manager.shared.resetContext()
+      // This is called when editing in-app; do not reset context here.
       shouldUpdateKMText = false
     }
   }
