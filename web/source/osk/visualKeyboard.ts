@@ -817,6 +817,16 @@ namespace com.keyman.osk {
     //#endregion
 
     //#region OSK touch handlers
+    getTouchCoordinatesOnKeyboard(touch: Touch) {
+      let keyman = com.keyman.singleton;
+      
+      // We need to compute the 'local', keyboard-based coordinates for the touch.
+      let kbdCoords = keyman.util.getAbsolute(this.kbdDiv);
+      let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
+
+      return offsetCoords;
+    }
+
     /**
      * The main OSK touch start event handler
      *
@@ -830,6 +840,8 @@ namespace com.keyman.osk {
 
       // Save the touch point
       this.touchX = e.changedTouches[0].pageX;
+
+      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(e.changedTouches[0]);
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
@@ -935,6 +947,8 @@ namespace com.keyman.osk {
       // Process and clear highlighting of pending target
       if(this.keyPending) {
         this.highlightKey(this.keyPending,false);
+
+        let touchKbdPos = this.getTouchCoordinatesOnKeyboard(e.changedTouches[0]);
 
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
