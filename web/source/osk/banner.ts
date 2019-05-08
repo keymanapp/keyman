@@ -442,6 +442,7 @@ namespace com.keyman.osk {
         let suggestion = this.selected = t['suggestion'] as BannerSuggestion;
         if(suggestion.isEmpty()) {
           on = false;
+          this.selected = null;
         }
       }
 
