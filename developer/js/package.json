@@ -1,11 +1,11 @@
 {
-  "name": "keyman-lexical-model-compiler",
+  "name": "@keymanapp/developer-lexical-model-compiler",
   "version": "1.0.0",
-  "description": "Lexical model compiler",
+  "description": "Keyman Developer lexical model compiler",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "install": "npx tsc -p .",
+    "build": "npx tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Marc Durdin (SIL)",
