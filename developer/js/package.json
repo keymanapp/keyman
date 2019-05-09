@@ -1,0 +1,27 @@
+{
+  "name": "@keymanapp/developer-lexical-model-compiler",
+  "version": "1.0.0",
+  "description": "Keyman Developer lexical model compiler",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npx tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marc Durdin (SIL)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "dependencies": {
+    "node": "^11.7.0",
+    "node-zip": "^1.1.1",
+    "typescript": "^3.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^10.14.6",
+    "chalk": "^2.4.2",
+    "xml2js": "^0.4.19"
+  }
+}

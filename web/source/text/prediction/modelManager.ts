@@ -239,6 +239,7 @@ namespace com.keyman.text.prediction {
 
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'context');
+      this.predict();
     }
 
     public predict(transcription?: Transcription) {
