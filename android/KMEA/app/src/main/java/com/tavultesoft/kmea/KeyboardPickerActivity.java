@@ -389,7 +389,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
 
     // Register associated lexical model
-    HashMap<String, String> lmInfo = getAssociatedLexicalModel(langId);
+    HashMap<String, String> lmInfo = getAssociatedLexicalModel(this, langId);
     if (lmInfo != null) {
       KMManager.registerLexicalModel(lmInfo);
     }
@@ -601,16 +601,18 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   }
 
   /**
-   * Get the list of associated keyboard names for a given language ID
+   * Get the list of associated keyboards for a given language ID
    * @param langId
-   * @return ArrayList of keyboard names
+   * @return ArrayList of keyboard
    */
-  protected static ArrayList<String> getAssociatedKeyboards(String langId) {
+  public static ArrayList<HashMap<String, String>> getAssociatedKeyboards(String langId) {
     if (keyboardsList != null) {
-      ArrayList<String> associatedKeyboards = new ArrayList<String>();
+      ArrayList<HashMap<String, String>> associatedKeyboards = new ArrayList<HashMap<String, String>>();
       for (HashMap<String, String> keyboardInfo: keyboardsList) {
         if (keyboardInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(langId)) {
-          associatedKeyboards.add(keyboardInfo.get(KMManager.KMKey_KeyboardName));
+          keyboardInfo.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
+          keyboardInfo.put("isEnabled", "true");
+          associatedKeyboards.add(keyboardInfo);
         }
       }
       return associatedKeyboards;
@@ -644,7 +646,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return index;
   }
 
-  protected static HashMap<String, String> getAssociatedLexicalModel(String langId) {
+  public static HashMap<String, String> getAssociatedLexicalModel(Context context, String langId) {
+    if (lexicalModelsList == null) {
+     lexicalModelsList = getLexicalModelsList(context);
+    }
     if (lexicalModelsList != null) {
       int length = lexicalModelsList.size();
       for (int i = 0; i < length; i++) {

@@ -48,6 +48,12 @@
     <string name="model_version" translatable="false">Model version</string>
     <string name="uninstall_model" translatable="false">Uninstall model</string>
 
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections" translatable="false">Enable corrections</string>
+    <string name="enable_predictions" translatable="false">Enable predictions</string>
+    <string name="model" translatable="false">Model</string>
+    <string name="manage_dictionary" translatable="false">Manage dictionary</string>
+
     <!-- Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>
     <string name="image_view" translatable="false">Image View</string>

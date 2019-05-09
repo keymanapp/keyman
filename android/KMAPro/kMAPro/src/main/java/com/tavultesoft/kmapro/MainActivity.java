@@ -23,6 +23,8 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.LanguagesSettingsActivity;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
@@ -725,6 +727,20 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   private void showGetStarted() {
     Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
+
+    String langId = "en";
+    ArrayList<HashMap<String, String>> associatedKeyboardsList = KeyboardPickerActivity.getAssociatedKeyboards(langId);
+    HashMap<String, String> associatedLexicalModel = KeyboardPickerActivity.getAssociatedLexicalModel(this, langId);
+    Bundle args = new Bundle();
+    args.putString(KMManager.KMKey_LanguageID, langId);
+    args.putString(KMManager.KMKey_LanguageName, "English");
+    args.putSerializable("associatedKeyboards", associatedKeyboardsList);
+    if (associatedLexicalModel != null) {
+      args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
+    }
+    getStartedIntent = new Intent(this, com.tavultesoft.kmea.LanguageSettingsActivity.class);
+    getStartedIntent.putExtras(args);
+
     startActivity(getStartedIntent);
   }
 

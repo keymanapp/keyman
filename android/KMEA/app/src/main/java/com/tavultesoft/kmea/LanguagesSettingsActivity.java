@@ -35,7 +35,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   private static ListView listView = null;
   private static ImageButton addButton = null;
   private static ArrayList<HashMap<String, String>> languagesList = null;
-  private static ArrayList<String> associatedKeyboardsList = null;
+  private static ArrayList<HashMap<String, String>> associatedKeyboardsList = null;
 
   private boolean dismissOnSelect = true;
   protected static boolean canAddNewKeyboard = true;
@@ -74,9 +74,15 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
         String langId = languageInfo.get(KMManager.KMKey_LanguageID);
         String langName = languageInfo.get(KMManager.KMKey_LanguageName);
         associatedKeyboardsList = KeyboardPickerActivity.getAssociatedKeyboards(langId);
+
+        HashMap<String, String> associatedLexicalModel = KeyboardPickerActivity.getAssociatedLexicalModel(context, langId);
+
         Bundle args = new Bundle();
         args.putString(KMManager.KMKey_LanguageID, langId);
         args.putString(KMManager.KMKey_LanguageName, langName);
+        if (associatedLexicalModel != null) {
+          args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
+        }
         args.putSerializable("associatedKeyboards", associatedKeyboardsList);
         // TODO: Start intent for "Language Settings" activity with the selected languageID
         //Intent intent = new Intent(context, LanguageSettingsActivity.class);
