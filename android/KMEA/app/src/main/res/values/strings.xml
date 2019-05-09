@@ -44,6 +44,10 @@
     <string name="keyboard_version" translatable="false">Keyboard version</string>
     <string name="help_link" translatable="false">Help link</string>
 
+    <!-- Model Info -->
+    <string name="model_version" translatable="false">Model version</string>
+    <string name="uninstall_model" translatable="false">Uninstall model</string>
+
     <!-- Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>
     <string name="image_view" translatable="false">Image View</string>

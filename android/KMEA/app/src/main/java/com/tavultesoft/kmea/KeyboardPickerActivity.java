@@ -60,7 +60,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
-  // private static HashMap<String, String> lexicalModelsVersions = null; TODO
   private static boolean checkingUpdates = false;
   private static int updateCount = 0;
   private static int failedUpdateCount = 0;
