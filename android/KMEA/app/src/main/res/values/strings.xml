@@ -19,6 +19,7 @@
     <string name="label_cancel" translatable="false">Cancel</string>
     <string name="label_close" translatable="false">Close</string>
     <string name="label_close_keyman" translatable="false">Close Keyman</string>
+
     <string name="label_download" translatable="false">Download</string>
     <string name="label_install" translatable="false">Install</string>
     <string name="label_later" translatable="false">Later</string>
@@ -30,6 +31,7 @@
     <!-- Keyboard Updates -->
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
+    <string name="confirm_delete" translatable="false">Would you like to delete this keyboard?</string>
     <string name="confirm_download" translatable="false">Would you like to download this keyboard?</string>
     <string name="confirm_update" translatable="false">Would you like to update keyboards now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
@@ -40,9 +42,10 @@
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
     <string name="updating_keyboards" translatable="false">Updating keyboards&#8230;</string>
 
-    <!-- Keyboard Info -->
+    <!-- Keyboard Info and Keyboard Settings -->
     <string name="keyboard_version" translatable="false">Keyboard version</string>
     <string name="help_link" translatable="false">Help link</string>
+    <string name="uninstall_keyboard" translatable="false">Uninstall keyboard</string>
 
     <!-- Model Info -->
     <string name="model_version" translatable="false">Model version</string>

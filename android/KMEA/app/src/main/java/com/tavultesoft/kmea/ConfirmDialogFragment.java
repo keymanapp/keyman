@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 /**
- * Confirmation dialog for downloading a Keyman keyboard
+ * Confirmation dialog for downloading or deleting a Keyman keyboard/model
  */
 public class ConfirmDialogFragment extends DialogFragment {
   public static final String ARG_TITLE = "ConfirmDialogFragment.title";
   public static final String ARG_MESSAGE = "ConfirmDialogFragment.message";
+  public static final String ARG_KEYBOARD_KEY = "confirmDialogFragment.keyboardKey";
 
   public static ConfirmDialogFragment newInstance(String title, String message) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
@@ -24,24 +25,45 @@ public class ConfirmDialogFragment extends DialogFragment {
     return frag;
   }
 
+  public static ConfirmDialogFragment newInstance(String title, String message, String keyboardKey) {
+    ConfirmDialogFragment frag = new ConfirmDialogFragment();
+    Bundle args = new Bundle();
+    args.putString(ARG_TITLE, title);
+    args.putString(ARG_MESSAGE, message);
+    args.putString(ARG_KEYBOARD_KEY, keyboardKey);
+    frag.setArguments(args);
+    return frag;
+  }
+
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     Dialog dialog = super.onCreateDialog(savedInstanceState);
 
     final String title = getArguments().getString(ARG_TITLE);
     final String message = getArguments().getString(ARG_MESSAGE);
+    final String keyboardKey = getArguments().getString(ARG_KEYBOARD_KEY);
+    String positiveLabel = (keyboardKey == null) ? getString(R.string.label_download) : getString(R.string.label_delete);
 
     return new AlertDialog.Builder(getActivity())
       .setTitle(title)
       .setMessage(message)
-      .setPositiveButton(getString(R.string.label_download), new DialogInterface.OnClickListener() {
+      .setPositiveButton(positiveLabel, new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          // Download keyboard
-          if (KMManager.hasConnection(getActivity())) {
-            KMKeyboardDownloaderActivity.download(getActivity(), true);
-          } else {
+          if (keyboardKey == null) {
+            // Confirmation to download keyboard
+            if (KMManager.hasConnection(getActivity())) {
+              KMKeyboardDownloaderActivity.download(getActivity(), true);
+            } else {
             Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+          }
+          } else {
+            // Confirmation to delete item
+            int keyboardIndex = KeyboardPickerActivity.getKeyboardIndex(getActivity(), keyboardKey);
+            boolean result = KeyboardPickerActivity.removeKeyboard(getActivity(), keyboardIndex);
+            if (result) {
+              Toast.makeText(getActivity(), "Keyboard deleted", Toast.LENGTH_SHORT).show();
+            }
           }
           if (dialog != null) {
             dialog.dismiss();

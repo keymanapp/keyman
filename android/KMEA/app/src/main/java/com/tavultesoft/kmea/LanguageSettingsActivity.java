@@ -103,6 +103,26 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         listView.setItemChecked(position, true);
         listView.setSelection(position);
+        HashMap<String, String> kbInfo = associatedKeyboardList.get(position);
+        String packageID = kbInfo.get(KMManager.KMKey_PackageID);
+        String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
+        if (packageID == null || packageID.isEmpty()) {
+          packageID = KMManager.KMDefault_UndefinedPackageID;
+        }
+        Intent intent = new Intent(context, KeyboardSettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.putExtra(KMManager.KMKey_PackageID, packageID);
+        intent.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
+        intent.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
+        intent.putExtra(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
+        intent.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
+        intent.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID));
+        boolean isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+        intent.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
+        String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
+        if (customHelpLink != null)
+          intent.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+        startActivity(intent);
       }
     });
   }
