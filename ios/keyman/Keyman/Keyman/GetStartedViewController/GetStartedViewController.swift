@@ -179,15 +179,15 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   @objc func switchValueChanged(_ sender: Any) {
     let userData = AppDelegate.activeUserDefaults()
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: shouldShowGetStartedKey)
+      userData.set(toggle.isOn, forKey: dontShowGetStartedKey)
       userData.synchronize()
     }
   }
-  
+
   private var dontShowGetStarted: Bool {
     return !shouldShowGetStarted
   }
-  
+
   private var shouldShowGetStarted: Bool {
     let userData = AppDelegate.activeUserDefaults()
     var value: Any? = userData.object(forKey: shouldShowGetStartedKey)
@@ -195,11 +195,13 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       value = userData.object(forKey: dontShowGetStartedKey)
       if nil == value {
         userData.set(true, forKey: shouldShowGetStartedKey)
+        userData.synchronize()
         return true // default to showing when no preference has been set
         // so it shows at startup
       } else {
         userData.removeObject(forKey: dontShowGetStartedKey)
         userData.set(false, forKey: shouldShowGetStartedKey)
+        userData.synchronize()
         // remove the old, confusing value and set the new value
         return false
       }
