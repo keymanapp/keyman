@@ -37,7 +37,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   private static ArrayList<HashMap<String, String>> languagesList = null;
   private static ArrayList<HashMap<String, String>> associatedKeyboardsList = null;
 
-  private boolean dismissOnSelect = true;
+  private boolean dismissOnSelect = false;
   protected static boolean canAddNewKeyboard = true;
 
   @Override
@@ -84,9 +84,9 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
           args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
         }
         args.putSerializable("associatedKeyboards", associatedKeyboardsList);
-        // TODO: Start intent for "Language Settings" activity with the selected languageID
-        //Intent intent = new Intent(context, LanguageSettingsActivity.class);
-        // intent.putExtra(args);
+        Intent intent = new Intent(context, LanguageSettingsActivity.class);
+        intent.putExtras(args);
+        startActivity(intent);
 
         if (dismissOnSelect)
           finish();
