@@ -68,6 +68,7 @@ public class ConfirmDialogFragment extends DialogFragment {
           if (dialog != null) {
             dialog.dismiss();
           }
+          getActivity().finish();
         }
       })
       .setNegativeButton(getString(R.string.label_cancel),  new DialogInterface.OnClickListener() {
