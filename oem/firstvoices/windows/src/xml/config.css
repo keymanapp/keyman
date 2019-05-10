@@ -1,0 +1,249 @@
+  * { font-family: Tahoma; }
+  #state { display: none }
+  #titleframe {
+    background: #562110 url('config-banner-bg.png') no-repeat top left;
+    width:100%; 
+    height:42px;
+    position: absolute;
+    left: 0; 
+    top: 0;
+    }
+  #displaylanguage { 
+    right: 8px;
+    font-size: 11px;
+    position: absolute;
+    top: 14px;
+    color: white;
+  }
+  #displaylanguage a {
+    color: white;
+    }
+  #menuframe {
+    position: absolute;
+    left: 0px; 
+    top: 79px;
+    width: 116px;
+    overflow: hidden;
+    z-index: 10;
+  }
+  #contentframe {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid #ad4a28;
+  }
+  #footerframe {
+    position: absolute;
+    left: 0px;
+    bottom: 0; 
+    width: 100%;
+    overflow: hidden;
+    background: url('transBlue.png');
+    padding: 10px 8px 8px 8px;
+  }
+
+  .contentpage { display: none; }
+
+  .header {
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    font-size: 24px;
+    padding: 4px;
+    background: url('transBlue.png');
+  }
+  #header-pad { background: url('transBlue.png'); width: 116px; height: 37px; position: absolute; top: 42px; left: 0; }
+  
+  .content {
+    background: none;
+    overflow-x: hidden;
+    overflow-y: auto; 
+    font-size: 12px;
+    border-right: 1px solid #ad4a28;
+    border-top: 1px solid #ad4a28;
+  }
+  
+  .contentBox
+  {
+    
+    xborder-bottom: 1px solid #ad4a28;
+    padding: 4px;
+  }
+  
+  #menuframe_footer
+  {
+    height: 100%;
+    background: url('tab-unselected.png') top left repeat-y;
+  }
+  
+  a.hotkey:link, a.hotkey:visited { color: blue; text-decoration: underline; cursor: pointer; }
+  a.hotkey:active, a.hotkey:hover { color: blue; text-decoration: underline; cursor: pointer; }
+  
+  body { padding: 0px; margin: 0px; overflow: hidden; background: white; height: 100%; }
+  html { padding: 0px; margin: 0px; overflow: hidden; height: 100%; }
+
+  .helplinks { padding: 4px 4px 0 0; float: right; font: 12px Tahoma; }
+  .helplinks a { color: blue; text-decoration: none; }
+  .helplinks a:hover { cursor: pointer; text-decoration: underline; }
+        
+  /* List Styles */
+  .list { }
+  .list_packageitem { display: block; background: none; margin: 4px 4px 4px 4px; padding: 2px; font-weight: bold; font-size: 16px; }
+  .list_item { display: block; background: none; margin: 4px; padding: 0px; clear: left; cursor: default; }
+  .list_item_hover 
+  {
+    background: url("transBlue.png") repeat !important;
+  }
+  .list_item_focus
+  {
+    background: url("transLightBlue.png") repeat !important;
+  }
+    
+  .list_title { height: 23px; padding: 0 0 2px 4px; }
+  .keyboard_unloaded, .keyboard_unloaded td { color: #777 }
+  .keyboard_loaded, .keyboard_loaded td { color: black }
+  .list_header { font-size: 11px; font-weight: bold; white-space: nowrap; }
+  .list_icon { display: inline; margin: 2px 6px 0px 2px; vertical-align: middle; }
+  .list_detail { background: #f0f0ff; clear: both; font-size: 11px; margin: 1px; display: none; }
+  .list_detail * { background: #f0f0ff }
+  .list_expand { float: left; cursor: default; background: url('list-expand.png') -22px 0 no-repeat;
+    width: 22px; height: 12px; margin: 5px 8px 0 0; }
+  table tr { text-align: left; font-size: 11px; padding: 0px; margin: 0px; }
+  .table_header { font-weight: bold; font-size: 11px; white-space: nowrap; }
+
+  .menuframe { margin: 0; width: 116px; display: block; text-align: center; font-size: 12px; padding: 8px 0; background: url(tab-unselected.png) top left no-repeat; }
+  .menuframe_active { margin: 0; width: 116px; display: block; text-align: center; font-size: 12px; padding: 8px 0;
+       background: url(tab-selected.png) top left no-repeat; }
+
+  .packagetitle { float: left; font-weight: bold; font-size: 13.3px; margin: 2px 0 0 1px; }
+  .packageversion { font-size: 11px; font-weight: normal; color: #808080 }
+  #keyboards 
+  {
+    overflow-x: hidden;
+    overflow-y: auto; 
+  }
+  #keyboards_none, #keyboards_light {
+    position: relative; left: 0; top: 0; width: 100%; font-size: 13.3px; margin: 0 12px; border: solid 1px gray; padding: 8px;
+  }
+  #keyboards_none img, #keyboards_light img {
+    float: left; margin: 0 8px 0 0;
+  }
+  #keyboards_light {
+    margin: 12px;
+  }
+  #keyboards_control {left: 0; bottom: 0; padding: 4px 4px 6px 4px; overflow: hidden; width: 100%; }
+
+  /* Keyboard Styles */
+  .keyboard_header { font-size: 14.7px; }
+  .keyboard_hotkey { color: #888; font-size: 11px; }
+  .keyboard_options { float: left; font-size: 13.3px; margin: 5px 0 0 14px; }
+  .keyboard_options a { text-decoration: none; }
+  .keyboard_options a:hover { text-decoration: underline; }
+  .keyboard_options_link { margin: 6px 0; }
+  
+  .keyboard_table { float: right; margin: 8px 12px 0 16px; }
+  .keyboard_table td, .keyboard_table th { vertical-align: top; }
+  .input_radio { vertical-align: middle; }
+  .label_enable { font-size: 13.3px; padding: 2px 3px; vertical-align: middle; color: black; }
+  .label_disable { font-size: 13.3px; padding: 2px 3px; vertical-align: middle; color: #888; }
+  .optiontitle { font-size: 16px; }
+  #options {
+    left: 0; 
+    top: 0; 
+    padding: 6px 4px 4px 4px;
+  }
+  .options_list { }
+  .options_list a { text-decoration: none; }
+  .options_list a:hover { text-decoration: underline; }
+  .options_list_footer {
+    border-bottom: 1px solid silver;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+  }
+  .options_list_header {
+    font-size: 13.3px; font-weight: bold;
+  }
+  .options_list_help {
+    display: none;
+  }
+  #options_control {left: 0; bottom: 0; padding: 4px 4px 6px 4px; overflow: hidden; }
+
+  /* Hotkey Styles */
+  
+  #subcontent_hotkeys .list_item 
+  {
+    margin: 4px !important;
+    padding: 4px 2px; 
+  }
+  
+  #hotkeys {
+    left: 0; 
+    top: 0; 
+    font-size: 13.3px;
+    padding: 6px 4px 4px 4px;
+    border-bottom: 2px solid white;
+  }
+  
+  .hotkey_title {
+    background: #e0e5ef;
+    font-size: 13.3px;
+    font-weight: bold;
+    color: #001020;
+    padding: 4px 8px;
+  }
+
+  /* Addin Styles */
+  #addins {
+    left: 0; 
+    top: 0; 
+    padding: 6px 4px 4px 4px;
+  }
+  #addins .list_item { clear: both; }
+  #addins .listitem_title { padding: 2px; }
+  #addins .addin_disabled { color: #777 }
+  #addins_control {left: 0; bottom: 0;  padding: 4px 4px 6px 4px; overflow: hidden; width: 100% }
+  .addin_menu { padding: 8px }
+  .addin_menu img { vertical-align: middle; }
+  .addin_menu { font-size: 13.3px; margin: 5px 0 0 14px; }
+  .addin_menu a { text-decoration: none; }
+  .addin_menu a:hover { text-decoration: underline; }
+  .addin_menu { margin: 6px 0; }
+  .addin_menu div { margin: 6px 0; }
+
+
+  /* Language Styles */
+  #languages {
+    left: 0; 
+    top: 0; 
+    padding: 6px 4px 4px 4px;
+    margin-left: 4px;
+  } 
+  th {
+    padding: 0 10 0 0;
+  }
+
+  #support_details { margin-left: 80px; }
+  #support_content { padding: 5px 10px 5px 10px; }
+  .support_title { font: bold 48px Tahoma; margin: 12px 0; }
+  
+  .support_copyright { font-size: 11px; color: #888; position: absolute; bottom: 10px; left: 110px; }
+  
+  .support_details { float: left; margin-left: 100px; }
+  .support_line_header { clear: left; float: left; font: bold 11px Tahoma; color: #333 }
+  .support_line_content { float: left; margin-left: 20px; font: 11px Tahoma; color: black }
+  .support_line_content .beta { color: #fd4a28; margin-left: 5px; font-weight: bold }
+  
+  .support_registration_status { clear: left; width: 250px; margin: 10px 0 0 0; }
+  .support_content_header { font: 16px Tahoma; margin: 10px 0; color: #333 }
+  .support_unregistered { font-size: 11px; clear: left; text-align: justify; color: #333 }
+  .support_links { clear: both; font-size: 14.7px; line-height: 1.5em; margin: 24px 0 0 100px }
+  .support_links a { text-decoration: none; }
+  .support_links a:visited { color: blue; }
+  .support_links a:hover { text-decoration: underline; }
+
+  .support_logo { position: absolute; left: 18px; top: 132px; width: 100px; height: 300px;  }
+  
+  .clear { clear:both; height: 1px; }

@@ -1,0 +1,12 @@
+  <!ENTITY Company "Tavultesoft">
+  <!ENTITY ProductName "Keyman for FirstVoices">
+  <!ENTITY Edition "">
+  <!ENTITY Version "9.0">
+  
+  <!ENTITY EvaluationPeriod "">
+
+  
+  <!ENTITY Name "&ProductName;">
+  <!ENTITY Name_CNV "&Company;&#160;&ProductName;&#160;&Version;">
+  <!ENTITY Name_CN "&Company;&#160;&ProductName;">
+  <!ENTITY Name_NV "&ProductName;&#160;&Version;">

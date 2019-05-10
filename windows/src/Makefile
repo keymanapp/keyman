@@ -95,11 +95,9 @@ unit-tests:
 release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean
     cd $(ROOT)\src
     $(MAKE) global-versions
-    $(MAKE) disable-search
     $(MAKE) build-release-wrapper
-    $(MAKE) clean    
+    # $(MAKE) clean  <-- this makes it harder to do OEM builds
     cd $(ROOT)\src
-    $(MAKE) enable-search 
 
 clean-pathdefines: test-releasebuildcheck
     # test-releasebuildcheck builds devtools for us
@@ -231,16 +229,6 @@ web-install:
 
     cd $(ROOT)\src\developer\help
     $(MAKE) html install
-
-# ----------------------------------------------------------------------
-
-disable-search:
-    -net stop wsearch
-    -net stop MsMpSvc
-
-enable-search:
-    -net start wsearch
-    -net start MsMpSvc
 
 # ----------------------------------------------------------------------
 

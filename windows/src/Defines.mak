@@ -2,11 +2,11 @@
 
 KEYMAN_VERSION=12.0
 
-!IFDEF KEYMAN_ROOT
-ROOT=$(KEYMAN_ROOT)\windows
-!ELSE
-ROOT=c:\keyman\windows
+!IFNDEF KEYMAN_ROOT
+KEYMAN_ROOT=c:\keyman
 !ENDIF
+
+ROOT=$(KEYMAN_ROOT)\windows
 
 EXT=$(ROOT)\src\ext
 
