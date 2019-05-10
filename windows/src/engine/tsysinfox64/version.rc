@@ -1,6 +1,6 @@
 1 VERSIONINFO
-  FILEVERSION		11,0,1500,0
-  PRODUCTVERSION	11,0,1500,0
+  FILEVERSION		12,0,2000,0
+  PRODUCTVERSION	12,0,2000,0
   FILEFLAGSMASK		0x3fL
   FILEFLAGS		0x0L
   FILEOS		0x4L
@@ -13,13 +13,13 @@
       BEGIN
         VALUE "CompanyName", "SIL International\0"
         VALUE "FileDescription", "x64 diagnostics\0"
-        VALUE "FileVersion", "11.0.1500.0\0"
+        VALUE "FileVersion", "12.0.2000.0\0"
         VALUE "InternalName", "TSYSINFOX64\0"
         VALUE "LegalCopyright", "© SIL International\0"
         VALUE "LegalTrademarks", "\0"
         VALUE "OriginalFilename", "TSYSINFOX64.EXE\0"
         VALUE "ProductName", "Keyman Engine\0"
-        VALUE "ProductVersion", "11.0.1500.0\0"
+        VALUE "ProductVersion", "12.0.2000.0\0"
         VALUE "Comments", "\0"
       END
     END
