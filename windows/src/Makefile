@@ -20,6 +20,7 @@ default:
     @echo           BUILDHELP       Build the helpfiles (implicit when 'make release')
     @echo           LINT            Turns on $MESSAGE hints and warnings and all extra string warnings
     @echo           QUIET           Ignore hints and warnings
+    @echo           RELEASE_OEM     Build executables for third party products in oem folder (e.g. FirstVoices)
     @echo.
     @echo     To view help on the build process, in /src/inst, run:
     @echo           make help
@@ -186,11 +187,22 @@ build-release-wrapper: clean-output update-version
     cd $(ROOT)\src\desktop\inst
     $(MAKE) setup
 
+    cd $(ROOT)\src
+    $(MAKE) build-release-wrapper-oem
+
     cd $(ROOT)\src\developer\inst
     $(MAKE)
 
     cd $(ROOT)\src\buildtools\inst
     $(MAKE)
+
+build-release-wrapper-oem:
+!ifdef RELEASE_OEM
+    cd $(ROOT)\..\oem\firstvoices\windows\src\inst
+    $(MAKE) setup
+!else
+    echo Not building OEM releases
+!endif    
 
 #
 # Tools needed to complete a build
