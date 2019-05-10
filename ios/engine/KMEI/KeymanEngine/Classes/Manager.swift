@@ -215,6 +215,33 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - Keyboard management
 
+  public func manageLanguages(inVC: UIViewController) -> Void {
+//    let languagesVC = LanguageViewController(Manager.shared.apiKeyboardRepository) //later Languages
+//    let rep = Manager.shared.apiKeyboardRepository
+//    let languagesVC = UIAlertController.init(title: "Languages Settings", message: "Languages with Keyboards should be shown here", preferredStyle: .actionSheet)
+//    navigationController?.pushViewController(languagesVC, animated: true)
+
+//    textView.isUserInteractionEnabled = false
+//    if UIDevice.current.userInterfaceIdiom == .phone {
+//      present(languagesVC, animated: true, completion: nil)
+//    } else {
+    let alertController = UIAlertController(title: "Languages Settings", message: "Languages installed",
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "Cancel",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: nil))
+    
+    inVC.present(alertController, animated: true, completion: nil)
+
+//      let popover = UIPopoverController(contentViewController: languagesVC)
+//      popover!.present(from CGRect(inView.frame), in inView, permittedArrowDirections arrowDirections: UIPopoverArrowDirectionAny, animated: true)
+//    (from: (navigationItem.rightBarButtonItems?[8])!, permittedArrowDirections: .any, animated: true)
+//    }
+  }
+
   /// Sets the current keyboard, querying from the user's list of keyboards.
   ///
   /// - Precondition:
