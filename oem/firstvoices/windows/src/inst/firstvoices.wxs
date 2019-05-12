@@ -88,6 +88,12 @@
                 <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="release" Type="string" Value="$(var.RELEASE)" />
                 <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" />
               </Component>
+
+              <Component Id="Reg_OemProductPath" Guid="*">
+                <RegistryKey Root="HKLM" Key="Software\Keyman\Keyman Engine">
+                  <RegistryValue KeyPath="yes" Name="oem product path" Type="multiString" Value="[INSTALLDIR]" Action="append" />
+                </RegistryKey>
+              </Component>
               
               <Component Id="removeCU" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="Install" Type="string" Value="1" />
@@ -154,6 +160,7 @@
       <ComponentRef Id="cfgicon.ico" />
       
       <ComponentRef Id="Reg_RootPath" />
+      <ComponentRef Id="Reg_OemProductPath" />
       <ComponentRef Id="removeCU" />
       <ComponentGroupRef Id="DesktopUI" />
 
