@@ -1,9 +1,9 @@
-  <!ENTITY Company "Tavultesoft">
-  <!ENTITY ProductName "Keyman for FirstVoices">
+  <!ENTITY Company "">
+  <!ENTITY ProductName "Keyman Desktop for FirstVoices">
   <!ENTITY Edition "">
-  <!ENTITY Version "9.0">
+  <!ENTITY Version "12.0">
   
-  <!ENTITY EvaluationPeriod "">
+  <!ENTITY EvaluationPeriod "30">
 
   
   <!ENTITY Name "&ProductName;">

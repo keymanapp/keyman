@@ -14,9 +14,7 @@
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
         <meta http-equiv="x-ua-compatible" content="ie=edge" />
-				<title>
-					<xsl:value-of select="$locale/String[@Id=$HintTitle]" />
-				</title>
+				<title><xsl:value-of select="$locale/String[@Id=$HintTitle]" /></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>hint.css</xsl:attribute></link>
 				<style type="text/css">
@@ -27,7 +25,8 @@
   					width: <xsl:value-of select="$locale_hint/@Width" />px;
 	  				height: <xsl:value-of select="$locale_hint/@Height" />px;
           }
-        </style>        
+
+        </style>
 				<script type="text/javascript">
 					document.onkeydown = function()
 					{
@@ -49,12 +48,13 @@
 			</head>
 
 			<body>
-      
 				<div id="container">
+          <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
+
 					<div id="header">
 						<img id="icon" src="hints.png" alt="Hint">
 							<xsl:attribute name="src">
-								<xsl:value-of select="/Keyman/templatepath"/>hint.png
+								<xsl:value-of select="/Keyman/templatepath"/>48.png
 							</xsl:attribute>
 						</img>
 
@@ -70,19 +70,22 @@
 					<div id="footer">
 						<div id="checkbox">
 							<input type="checkbox" onclick='javascript:if(this.checked) location.href="keyman:dontshowhint"; else location.href="keyman:showhint";' 
-										 style="vertical-align: middle;" id="chkWelcome" />&#160;<label for="chkWelcome">Don't show this hint again</label>
+										 style="vertical-align: middle;" id="chkWelcome" />&#160;<label for="chkWelcome"><xsl:value-of select="$locale/String[@Id='S_HintDialog_DontShowHintAgain']"/></label>
 						</div>
 
 						<div id="buttons">
 							<xsl:if test="/Keyman/Buttons/Button[@ID='OK']">
-								<input type="submit" onclick="javascript:location.href='keyman:ok'">
-									<xsl:attribute name="value"><xsl:value-of select="$locale/String[@Id='S_Button_OK']"/></xsl:attribute>
-								</input>
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_OK']"/></xsl:with-param>
+                  <xsl:with-param name="default" select="1" />
+                  <xsl:with-param name="command" select="'keyman:ok'" />
+                </xsl:call-template>
 							</xsl:if>
 							<xsl:if test="/Keyman/Buttons/Button[@ID='Cancel']">
-								<input type="button" onclick="javascript:location.href='keyman:cancel'">
-									<xsl:attribute name="value"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:attribute>
-								</input>
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
+                  <xsl:with-param name="command" select="'keyman:cancel'" />
+                </xsl:call-template>
 							</xsl:if>
 						</div>
 					</div>

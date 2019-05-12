@@ -42,12 +42,12 @@ div {
 }
 
 #border { 
-  border: 1px solid #AD4A29; 
+  border: none;
   width: <xsl:value-of select="$locale_onlineupdate/@Width - 2" />px; 
   height: <xsl:value-of select="$locale_onlineupdate/@Height - 2" />px;
   }
   
-#header { background: #AD4A28; text-align: right }
+#header { background: white;  }
 
 #content {
  padding: 10px;
@@ -62,7 +62,7 @@ div {
 }  
 
 #UpdateContainer {
-	height: 116px;
+	height: 76px;
 	overflow-y: auto;
 	border: solid 1px gray;
 	margin: 12px 8px;
@@ -131,8 +131,8 @@ div {
 <body onload="javascript:enableControls()">
 <div id="border">
   <div id="header">
-    <img alt='Tavultesoft'>
-      <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath' />activate_logo.gif</xsl:attribute>
+    <img alt='Keyman'>
+      <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath' />keyman-desktop.png</xsl:attribute>
     </img>  
   </div>
   <div id='content'>

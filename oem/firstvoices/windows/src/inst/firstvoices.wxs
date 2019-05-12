@@ -59,15 +59,15 @@
               </Component>
               
               <Component>
-                <File Name="menu.txt" Source="branding\menu.txt" KeyPath="yes" />
+                <File Name="menu.txt" Source="..\branding\menu.txt" KeyPath="yes" />
               </Component>
               
               <Component>
-                <File Name="messages.txt" Source="branding\messages.txt" KeyPath="yes" />
+                <File Name="messages.txt" Source="$(var.ROOT)\src\desktop\branding\messages.txt" KeyPath="yes" />
               </Component>
               
               <Component>
-                <File Id="trayicon.ico" Name="trayicon.ico" Source="branding\trayicon.ico" KeyPath="yes" />
+                <File Id="trayicon.ico" Name="trayicon.ico" Source="..\branding\trayicon.ico" KeyPath="yes" />
               </Component>
                             
               <Component>
@@ -75,11 +75,11 @@
               </Component>
               
               <Component>
-                <File Id="appicon.ico" Name="appicon.ico" Source="branding\appicon.ico" KeyPath="yes" />
+                <File Id="appicon.ico" Name="appicon.ico" Source="..\branding\appicon.ico" KeyPath="yes" />
               </Component>
               
               <Component>
-                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="branding\cfgicon.ico" KeyPath="yes" />
+                <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\branding\cfgicon.ico" KeyPath="yes" />
               </Component>
               
               <Component Id="Reg_RootPath" Guid="*">
@@ -208,8 +208,8 @@
 
     <UIRef Id="WixUI_FeatureTree"/>
 
-    <Icon Id="appicon.ico" SourceFile="branding\appicon.ico" />
-    <Icon Id="KMSHELL.ico" SourceFile="branding\cfgicon.ico" />
+    <Icon Id="appicon.ico" SourceFile="..\branding\appicon.ico" />
+    <Icon Id="KMSHELL.ico" SourceFile="..\branding\cfgicon.ico" />
 
     <Binary Id="insthelp.exe" SourceFile="$(var.ROOT)\bin\desktop\insthelp.exe" />
 

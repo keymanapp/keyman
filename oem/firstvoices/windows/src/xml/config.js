@@ -7,7 +7,7 @@ function doAttachEvent(obj, e, f)
   return obj.addEventListener(e, f, false);
 }
 
-function $(e)
+function _$(e)
 {
   return document.getElementById(e);
 }
@@ -15,39 +15,33 @@ function $(e)
 function windowResize()
 {
   var 
-    eContent = $('contentframe'), 
-    eFooter = $('footerframe'), 
-    eMenu = $('menuframe'),
-    eTitle = $('titleframe');
+    eContent = _$('contentframe'), 
+    eFooter = _$('footerframe'), 
+    eMenu = _$('menuframe');
     
   if(eContent && eFooter && eMenu)
   {
-    eContent.style.height = (document.body.offsetHeight - eFooter.offsetHeight - eTitle.offsetHeight) + 'px';
+    eContent.style.height = (document.body.offsetHeight - eFooter.offsetHeight - 1) + 'px';
     eContent.style.width = (document.body.offsetWidth - eMenu.offsetWidth) + 'px';
     eContent.style.left = eMenu.offsetWidth + 'px';
-    eContent.style.top = eTitle.offsetHeight + 'px';
+    eContent.style.top = 0 + 'px';
     eMenu.style.height = (document.body.offsetHeight - eFooter.offsetHeight - eMenu.offsetTop) + 'px';
     
     var h = (eContent.offsetHeight - 37 - 2) + 'px'; // header height and border height
-    $('subcontent_keyboards').style.height = h;
-    $('subcontent_options').style.height = h;
-    $('subcontent_hotkeys').style.height = h;
-    $('subcontent_support').style.height = h;
+    _$('subcontent_keyboards').style.height = h;
+    _$('subcontent_options').style.height = h;
+    var e = _$('subcontent_hotkeys');
+    if(e) e.style.height = h;
+    e = _$('subcontent_pro');
+    if(e) e.style.height = h;
+    _$('subcontent_support').style.height = h;
+    _$('subcontent_keepintouch').style.height = h;
   }
 }
 
 doAttachEvent(window, 'resize', windowResize);
 doAttachEvent(window, 'load', windowResize);
-
-  /*function pagesetup()
-  {
-    for(var i = 0; i<document.all.length; i++) {
-      document.all[i].unselectable = 'on';
-      document.all[i].style.cursor = 'default';
-    }
-  }
-  
-  window.attachEvent('onload', pagesetup);*/
+document.addEventListener("DOMContentLoaded", windowResize);
   
   function list_mousedown(event,n)
   {
@@ -62,28 +56,9 @@ doAttachEvent(window, 'load', windowResize);
   
   function list_blur(event,n)
   {
-    return list_unhover(event,n);
+    return true;
   }
-  
-  function list_hover(event,n)
-  {
-    if( menudiv.style.visibility != 'visible' ) {
-      // document.getElementById('list_'+n).style.background = (globalfocus==document.getElementById('list_'+n)?'#CEEDFB':'#ECF8FE');
-      document.getElementById('list_'+n).className = 'list_item '+(globalfocus_item==document.getElementById('list_'+n)?'list_item_focus':'list_item_hover');
-      //document.getElementById('list_'+n).style.cursor = "default";
-    }
-    event.cancelBubble=true; return true;
-  }
-  function list_unhover(event,n)
-  {
-    if( //(globalfocus == null || globalfocus.id != 'list_'+n) &&
-        (menudiv.style.visibility != 'visible' || global_menu_elem_name != 'options_'+n) ) {
-      document.getElementById('list_'+n).className = 
-        globalfocus_item==document.getElementById('list_'+n) ? 'list_item list_item_focus' : 'list_item';
-    }
-    event.cancelBubble=true; return true;
-  }
-  
+    
   function list_keydown(event,n)
   {
     switch(event.keyCode)
@@ -185,11 +160,15 @@ doAttachEvent(window, 'load', windowResize);
   }
 
   document.onfocusin = function() {
-    var itemtype, blah;
+    var itemtype, blah, elemid;
     
     globalfocus = event.srcElement;
     if(!event.srcElement) { return true; }
     elemid = event.srcElement.id;
+    if(typeof elemid != 'string') { 
+      // e.g. if document has received focus, id may be undefined
+      return true;
+    }
     itemtype = elemid.substr(0, 5);
     
     if(event.srcElement.className.substr(0,8) != 'menuitem' && event.srcElement != menudiv
@@ -199,6 +178,7 @@ doAttachEvent(window, 'load', windowResize);
       if(globalfocus_item != event.srcElement && !globalfocus_item.contains(event.srcElement)) {
         /* globalfocus_item.style.background = '';
         globalfocus_item.style.filter = ''; */
+        $(globalfocus_item).removeClass('list_item_focus');
         globalfocus_item = null;
       }        
     }
@@ -206,26 +186,102 @@ doAttachEvent(window, 'load', windowResize);
       globalfocus_item = event.srcElement;
       lastfocus_item = globalfocus_item;
       // event.srcElement.style.background = '#CEEDFB';
-      event.srcElement.className = 'list_item list_item_focus';
+      $(event.srcElement).addClass('list_item_focus');
       return true;
     }
     return true;
   }        
   
-  function list_detail(event,n)
-  {
-    var k = document.getElementById('list_detail_'+n), p = document.getElementById('list_expand_'+n);
-    if(k.style.display == 'block')
-    {
-      k.style.display = 'none';
-      p.style.backgroundPosition = "-22px 0";
-      // p.style.backgroundImage = 'url(""xml\\btn_expand.gif")';
-    }
-    else
-    {
-      k.style.display = 'block';
-      p.style.backgroundPosition = "0 0";
-      // p.style.backgroundImage = 'url("xml\\btn_contract.gif")';
-    }
-    document.getElementById('list_'+n).focus();
+  function list_detail(event,n) {
+    var k = document.getElementById('list_'+n);
+    $(k).toggleClass('expanded');
+    k.focus();
+    save_state();
+    return false;
   }
+  
+  var loading_state = false;
+
+  function save_state() {
+    if(loading_state) return;
+    var state = {
+      activeIndex: menuframe_activeindex,
+      keyboards: [],
+      keyboardsScrollTop: $('#subcontent_keyboards').scrollTop()
+    };
+    var keyboards = $('div.list_item');
+    keyboards.each(function(index) {
+      state.keyboards.push({name: $(this).data('name'), expanded: $(this).hasClass('expanded')});
+    });
+    $('#state').text(JSON.stringify(state));
+  }
+  
+  function load_state() {
+    loading_state = true;
+    var s = $('#state').text();
+    if(/^[0-9]+$/.exec(s)) {
+      menuframe_activeindex = s;
+      menuframe_activate(menuframe_activeindex);
+    } else if(s != "") {
+      var state = JSON.parse(s);
+      if(!state) return;
+      if(typeof state.activeIndex != 'undefined') {
+        menuframe_activeindex = state.activeIndex;
+        menuframe_activate(menuframe_activeindex);
+      }
+      if(state.keyboards) {
+        for(var i = 0; i < state.keyboards.length; i++) {
+          if(state.keyboards[i].expanded)
+            $('div.list_item[data-name="'+state.keyboards[i].name+'"]').addClass('expanded');
+        }
+      }
+      if(state.keyboardsScrollTop) {
+      //alert(state.keyboardsScrollTop);
+        window.setTimeout(function() { $('#subcontent_keyboards').scrollTop(state.keyboardsScrollTop); }, 1);
+      //alert($('#subcontent_keyboards').scrollTop());
+      }
+    }
+    loading_state = false;
+  }
+  
+  $( document ).ready(function() {
+    load_state();
+    $('#subcontent_keyboards').scroll(function() { save_state(); });
+  });
+  
+  
+function submitSupportRequest() {
+  location.href = 'keyman:contact_support?message='+encodeURIComponent($('#contact_support').val());
+}
+
+/* Options tab */
+
+function options_list_mouseover(n) {
+  return true;
+}
+function options_list_mouseout(n) {
+  return true;
+}
+
+function options_updatecheck(n) {
+  var k = document.getElementById('optionscheck_'+n);
+  k.checked = !k.checked;
+  location.href='keyman:options_clickcheck?id='+n+'&value='+k.checked;
+  document.getElementById('list_option_'+n).focus();
+}
+
+function options_basekeyboard() {
+  location.href='keyman:options_basekeyboard';
+}
+
+/* Keyboards tab */
+
+function keyboard_checkclick(n,toggle) {
+  var k = document.getElementById('keyboardcheck_'+n), li = document.getElementById('list_keyboard_'+n);
+  if(toggle) k.checked = !k.checked;
+  location.href='keyman:keyboard_clickcheck?id='+n+'&value='+k.checked;
+  var liTitle = document.getElementById('listtitle_keyboard_'+n);
+  liTitle.className = k.checked ? 'list_title keyboard_loaded' : 'list_title keyboard_unloaded';
+  li.focus();
+  return true;
+}

@@ -54,7 +54,7 @@ div {
 
 #footer {
   position: absolute;
-  top: expression(<xsl:value-of select="$locale_proxyconfiguration/@Height" /> - 36);
+  bottom: 0px;
   height: 36px;
   text-align: center;
   width: 100%;

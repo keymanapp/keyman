@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Locale SYSTEM 'localedef.dtd'>
 
 <Locale>
@@ -9,7 +9,7 @@ locale.dtd: Contains all localizable strings from Keyman Configuration XML files
 Create a user interface translation for Keyman Desktop at http://www.tavultesoft.com/keyman/support/locale/
 -->
 
-<String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">Tavultesoft</String>
+<String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">Keyman</String>
   
 <String Group='_Font' Type="PlainText" Id="SK_UIFontName" Version="7.0.230.0" Description="The standard font">Tahoma</String>
 <String Group='_Font' Type="PlainText" Id="SK_UIFontSize" Version="7.0.230.0" Description="The standard font size">8</String>
@@ -50,13 +50,12 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="Configuration Dialog" Type="PlainText" Id="S_ConfigurationTitle" Version="7.0.230.0" Description="Configuration dialog title, which includes the product name">&Name; Configuration</String>
 
-<Dialog Id="Keyman" Version="7.0.230.0" Width="790" Height="476">
+<Dialog Id="Keyman" Version="7.0.230.0" Width="740" Height="476">
   <footerheight>40</footerheight>
   <menuwidth>118</menuwidth>
   <headerheight>40</headerheight>
 </Dialog>
 
-<String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_GettingStarted" Version="7.0.239.0" Description="Configuration dialog link to Getting Started">Getting Started</String>
 <String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_Help" Version="7.0.239.0" Description="Configuration dialog link to Help">Help</String>
 
 <!-- Tab names and shortcut keys -->  
@@ -64,15 +63,15 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Keyboards" Version="7.0.230.0" Description="Keyboard Layouts tab name">Keyboard Layouts</String>  <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Keyboards_AccessChar" Version="7.0.230.0" Description="Direct access to the Keyboard Layouts tab using alt+">K</String>
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Options" Version="7.0.230.0" Description="Options tab name">Options</String>      <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Options_AccessChar" Version="7.0.230.0" Description="Direct access to the Options tab using alt+">O</String>
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Hotkeys" Version="7.0.230.0" Description="Hotkeys tab name">Hotkeys</String>      <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Hotkeys_AccessChar" Version="7.0.230.0" Description="Direct access to the Hotkeys tab using alt+">H</String>
-<String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Addins" Version="7.0.230.0" Description="Addins tab name">Addins</String>        <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Addins_AccessChar" Version="7.0.230.0" Description="Direct access to the Addins tab using alt+">A</String>
-<String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Languages" Version="7.0.230.0" Description="Languages tab name">Languages</String>  <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Languages_AccessChar" Version="7.0.230.0" Description="Direct access to the Languages tab using alt+">L</String>
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Support" Version="7.0.230.0" Description="Support tab name">Support</String>      <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_Support_AccessChar" Version="7.0.230.0" Description="Direct access to the Support tab using alt+">S</String>
+<String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_KeepInTouch" Version="9.0.493.0" Description="Keep in touch tab name">Keep in Touch</String>      <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_KeepInTouch_AccessChar" Version="9.0.492.0" Description="Direct access to the Keep in Touch tab using alt+">T</String>
 
 <!-- Configuration detail captions -->
 
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Filename" Version="7.0.230.0" Description="Keyboard download window, etc. - term for filename">Filename:</String>
 
-<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Version" Version="7.0.230.0" Description="Keyboard download window, etc. - term for version">Version:</String>
+<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Version" Version="7.0.230.0" Description="Keyboard download window, etc. - term for package version">Package version:</String>
+<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_KeyboardVersion" Version="9.0.442.0" Description="Keyboard download window, etc. - term for keyboard version">Keyboard version:</String>
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Author" Version="7.0.230.0" Description="Keyboard download window, etc. - term for author">Author:</String>
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Website" Version="7.0.230.0" Description="Keyboard download window, etc. - term for website">Website:</String>
 
@@ -92,6 +91,10 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_InstalledFor_AllUsers" Version="7.0.230.0" Description="Install choice - install for all users">All users</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_InstalledFor_CurrentUser" Version="7.0.230.0" Description="Install choice - install for current user">Current user</String>
 
+<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Languages" Version="9.0.420.0" Description="Text preceding linked language profiles">Languages:</String>
+  <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Languages_Uninstall" Version="9.0.420.0" Description="Remove language profile">&#x2715;</String>
+  <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Languages_Install" Version="9.0.420.0" Description="Add language profile">Add language</String>
+  
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_OnScreenKeyboard" Version="7.0.230.0" Description="Term for the On Screen Keyboard">On Screen Keyboard:</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_OnScreenKeyboard_Custom" Version="8.0.306.0" Description="(OSK) Custom term">Custom</String>
   <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_OnScreenKeyboard_Installed" Version="7.0.230.0" Description="(OSK) Installed term">Installed</String>
@@ -103,11 +106,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Message" Version="7.0.230.0" Description="Keyboard download window, etc. - term for additional messages">Message:</String>
 <String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Caption_Copyright" Version="7.0.230.0" Description="Keyboard download window, etc. - term for copyright">Copyright:</String>
-
-<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Button_BuyKeymanDesktop" Version="7.0.230.0" Description="Pre-activation Buy Product button in Keyman Configuration">Buy &Name;...</String>
-<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Button_ActivateKeymanDesktop" Version="7.0.230.0" Description="Pre-activation Enter Licence Code button in Keyman Configuration">Enter Licence Key...</String>
-<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Button_UpgradeKeymanDesktop" Version="8.0.289.0" Description="Upgrade from Light to Pro button in Keyman Configuration">Upgrade to Professional...</String>
-<String Group="Configuration Dialog - Captions" Type="PlainText" Id="S_Button_EnterUpgradeCode" Version="8.0.294.0" Description="Enter upgrade code button in Keyman Configuration">Enter Upgrade Code...</String>
 
 <!-- Keyboards tab -->
 
@@ -125,9 +123,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_UninstallOnScreenKeyboard" Version="7.0.230.0" Description="KL option button submenu - uninstall OSK">Uninstall On Screen Keyboard</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_InstallOnScreenKeyboard" Version="7.0.230.0" Description="KL option button submenu - install OSK">Install On Screen Keyboard...</String>
 
-<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboards_NoKeyboardsInstalled" Version="7.0.230.0" Description="Keyboard Layouts - notice of no keyboard layouts installed">You do not have any keyboards installed.  Click the Install Keyboard button to install a keyboard layout.</String>
-<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboards_Light" Verison="8.0.289.0" Description="Keyboard Layouts - notice that only 2 keyboards may be loaded for light">&Name; Light allows a maximum of 2 keyboards to be loaded at any time.</String>
-<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboards_LightLink" Verison="8.0.289.0" Description="Keyboard Layouts - notice that only 2 keyboards may be loaded for light - link text">Upgrade to Pro to load more keyboards</String>
+<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboards_NoKeyboardsInstalled" Version="7.0.230.0" Description="Keyboard Layouts - notice of no keyboard layouts installed">You do not have any keyboards installed.  Click the Download Keyboard button to install a keyboard layout from the Keyman website.</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="SKUninstallRequireAdmin" Version="7.1.251.0" Parameters="%0:s = keyboard layout name" Description="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">You can only uninstall the keyboard '%0:s' if you are an Administrator</String>
 
 <!-- Options tab -->
@@ -139,12 +135,13 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koKeyboardHotkeysAreToggle" Version="7.0.230.0" Description="General options - hotkeys toggle on AND off a keyboard layout">Keyboard hotkeys toggle keyboard activation</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koAltGrCtrlAlt" Version="7.0.230.0" Description="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simulate AltGr with Ctrl+Alt</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowHints" Version="7.0.244.0" Description="General options - show/hide hint messages (resets hint messages individually disabled)">Show hint messages</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koDeadkeyConversion" Version="9.0.480.0" Description="Advanced options - Base keyboard deadkeys are treated as normal keys">Treat hardware deadkeys as plain keys</String>
+<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowHints" Version="7.0.244.0" Description="General options - show/hide hint messages (resets hint messages individually disabled)">Show hint messages</String>
+
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koStartWithWindows" Version="7.0.230.0" Description="Startup options - Start Keyman with Windows start">Start when Windows starts</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowStartup" Version="7.0.230.0" Description="Startup options - show/hide splash screen">Show splash screen</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowWelcome" Version="7.0.230.0" Description="Startup options - show/hide welcome screen">Show welcome screen</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koCheckForUpdates" Version="7.0.230.0" Description="Startup options - check Tavultesoft online weekly for updates">Automatically check www.tavultesoft.com weekly for updates</String>
+<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koCheckForUpdates" Version="7.0.230.0" Description="Startup options - check online weekly for updates">Automatically check keyman.com weekly for updates</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koTestKeymanFunctioning" Version="7.0.236.0" Description="Startup options - test for conflicting apps when Product starts">Test for conflicting applications when &Name; starts</String>
 
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koReleaseShiftKeysAfterKeyPress" Version="7.0.236.0" Description="OSK options - Releases shift/ctrl/alt on OSK after key press">Release Shift/Ctrl/Alt on On Screen Keyboard after clicking a key</String>
@@ -155,12 +152,13 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koUnknownLanguage" Version="7.0.230.0" Description="Advanced options - installs Unknown Language in Windows Control Panel (should only be used for legacy layouts).">Turn on 'Unknown' language</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koDebugging" Version="7.0.230.0" Description="Advanced options - turn on debugging (which creates a very large file)">Debugging</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koSwitchLanguageWithKeyboard" Version="7.0.244.0" Description="Advanced options - switch Windows language when keyboard selected">Switch Windows language when a Keyman keyboard is selected</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koKeymanUniscribeManager" Version="7.1.255.0" Description="Advanced options - enable/disable the Keyman Uniscribe Manager">Enable Keyman Uniscribe Manager</String>
   <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koSwitchLanguageForAllApplications" Version="7.1.274.0" Description="Advanced options - selected language applies to all applications">Select keyboard layout for all applications</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koRunElevatedInVista" Version="7.0.230.0" Description="Advanced options - elevate user permission to highest permisable level">Always elevate user permissions when running in Windows Vista</String>
 
 <String Group="Configuration Dialog - Options tab" Type="PlainText" Id="S_Button_UILanguage" Version="7.0.230.0" Description="Options button - changes user interface language/localization">User interface language...</String>
 
+<String Group="Configuration Dialog - Options tab" Type="PlainText" Id="S_Button_BaseKeyboard" Version="9.0.445.0" Description="Options tab - base keyboard button">Base Keyboard...</String>
+  
 <!-- Hotkeys tab -->
 
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Keyboard_Prefix" Version="7.0.230.0" Description="Hotkey - activation term preceding Keyman keyboard layout name. Note: include a space following."></String> <!-- e.g. "Activate [Korean KORDA] Keyboard" -->
@@ -183,14 +181,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_SwitchLanguage" Version="8.0.294.0" Description="Hotkey - switch language window">Open Language Switcher</String>
   
 <String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Control_Title" Version="7.1.274.0" Description="Hotkey - Control Title">General Hotkeys</String>
-<String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Keyboard_Title" Version="7.1.274.0" Description="Hotkey - Keyboard Title">Keyboards</String>
-<String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Language_Title" Version="7.1.274.0" Description="Hotkey - Languages Title">Windows Languages</String>
-
-<!-- Addins tab -->
-
-<String Group="Configuration Dialog - Addins tab" Type="PlainText" Id="S_Addins_Configure" Version="7.0.241.0" Description="Addin - configure button">Configure...</String>
-<String Group="Configuration Dialog - Addins tab" Type="PlainText" Id="S_Addins_Enable" Version="8.0.314.0" Description="Addin - enable button">Enable</String>
-<String Group="Configuration Dialog - Addins tab" Type="PlainText" Id="S_Addins_Disable" Version="8.0.314.0" Description="Addin - disable button">Disable</String>
+<String Group="Configuration Dialog - Hotkeys tab" Type="PlainText" Id="S_Hotkey_Keyboard_Title" Version="7.1.274.0" Description="Hotkey - Keyboard Title">Keyboard Layouts</String>
   
 <!-- Languages tab -->
 
@@ -202,26 +193,25 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <!-- Support tab -->
 
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Copyright" Version="7.0.230.0" Description="Support - Product Copyright">Copyright 1992-2010 Tavultesoft Pty Ltd. All Rights Reserved.</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Edition" Version="7.0.230.0" Description="Support - edition (e.g. Professional, Light)">Edition</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_UpgradeNow" Version="9.0.465.0" Description="">Upgrade now!</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_SendSupportRequest" Version="9.0.465.0" Description="">Send Support Request</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_ContactHeading" Version="9.0.465.0" Description="">Contact Keyman Support</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_ContactInstructions_Free" Version="9.0.465.0" Description="">If you have any issues using Keyman, just ask us for help.</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_CommunitySupport" Version="9.0.465.0" Description="">Open FirstVoices Help Center</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_CreatedBySIL" Version="11.0.1500.0" Description="Support - SIL statement">Created by SIL International</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Copyright" Version="7.0.230.0" Description="Support - Product Copyright">Copyright &#xa9; SIL International. All Rights Reserved.</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Version" Version="7.0.230.0" Description="Support - version">Version</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_EngineVersion" Version="7.0.230.0" Description="Support - engine version">Engine Version</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_RegistrationStatus" Version="7.0.230.0" Description="Support - registration status">Registration Status</String>
 
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Caption_Activated" Version="7.0.230.0" Description="Support - activation status">Activated</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Caption_DaysUsed" Version="7.0.230.0" Description="Support - trial days already passed">Days Used</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Caption_ActivationServer" Version="8.0.314.0" Description="Support - activation server">Activation Server Name</String>
-
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_Unregistered" Version="7.0.230.0" Description="Support - trial (pre-activation) message explaining the need to activate the product">&Name; is a shareware product. You may try &Name; for &EvaluationPeriod; days, after which you must purchase a licence or uninstall it. </String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Support_UsefulLinks" Version="8.0.294.0" Description="Support - Useful Links heading">Useful Links</String>
 
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_OnlineSupport" Version="7.0.230.0" Description="Support button - links to online support">Online Support...</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_OnlineSupport" Version="7.0.230.0" Description="Support button - links to online support">Online Help</String>
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_Diagnostics" Version="7.0.230.0" Description="Support button - offers a submenu with two diagnostic tools">Diagnostics</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_CheckForUpdates" Version="7.0.230.0" Description="Support button - manually checks for product updates">Check for Updates...</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_ProxyConfig" Version="7.0.230.0" Description="Support button - allows manual adjustment of proxy settings">Proxy Settings...</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_CheckForUpdates" Version="7.0.230.0" Description="Support button - manually checks for product updates">Check for Updates</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Button_ProxyConfig" Version="7.0.230.0" Description="Options button - allows manual adjustment of proxy settings">Proxy Settings...</String>
 
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Menu_Diagnostics_Diagnostics" Version="7.0.230.0" Description="Support button submenu - performs a diagnostic report">Diagnostics...</String>
-<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Menu_Diagnostics_CheckLanguages" Version="7.0.230.0" Description="Support button submenu - evaluates if Windows language settings are correct for current Keyman keyboard layouts">Check Windows Language Settings</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Menu_Diagnostics_Diagnostics" Version="7.0.230.0" Description="Support button submenu - performs a diagnostic report">Diagnostics</String>
+<String Group="Configuration Dialog - Support tab" Type="PlainText" Id="S_Menu_Diagnostics_CheckLanguages" Version="7.0.230.0" Description="Support button submenu - evaluates if Windows language settings are correct for current Keyman keyboard layouts">Check Language Settings</String>
 
 <String Group="Configuration Dialog - Support tab" Type="PlainText" Id="SKAllLanguageSettingsTestedOK" Version="7.1.250.0" Description="Support - result of positive evaluation: Windows language settings are correct for current Keyman keyboard layouts">Microsoft Windows appears to be correctly configured for your language(s).</String>
 
@@ -233,7 +223,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <footerheight>40</footerheight>
 </Dialog>
 
-<String Group="Download Keyboard Dialog" Type="PlainText" Id="S_DownloadKeyboard_Title" Version="7.0.230.0" Description="Download keyboard layout from Tavultesoft dialog title">Download Keyboard from Tavultesoft</String>
+<String Group="Download Keyboard Dialog" Type="PlainText" Id="S_DownloadKeyboard_Title" Version="7.0.230.0" Description="Download keyboard layout from keyman.com dialog title">Download Keyboard From keyman.com</String>
 <String Group="Download Keyboard Dialog" Type="PlainText" Id="S_DownloadKeyboard_DownloadOnlyCheckbox" Version="7.0.230.0" Description="Download only option checkbox">Don't install, just download</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -253,47 +243,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Install Keyboard Dialog" Type="PlainText" Id="S_InstallKeyboard_Button_InstallAllUsers" Version="7.0.241.0" Description="Install keyboard/package - install for all users button">Install for all users</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
-<!-- Activation Dialog                 -->
-<!-- - - - - - - - - - - - - - - - - - -->
-
-<Dialog Id="Activate" Width="309" Height="308" />
-  
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_Title" Version="7.0.230.0" Description="Activate Product dialog title">Activate &Name_CN;</String>
-
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_Description" Version="7.0.230.0" Description="Activate dialog - licence description">When you purchase a licence of &Name;, you will receive an email from &Company; that includes an activation code that looks like:</String>
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_Enter" Version="7.0.230.0" Description="Activate dialog - fillable-field instructions">Please enter the licence number that you received:</String>
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_ActivateOnline" Version="7.0.230.0" Description="Activate dialog - instructions for online activation">Click the Activate button to activate &Name; on this computer over the Internet.</String> 
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_ActivateOffline" Version="7.0.230.0" Description="Activate dialog - instructions for manual activation">If you do not have Internet access, click the Manual Activation link to activate via other methods.</String>
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_ManualActivation" Version="7.0.230.0" Description="Activate dialog - manual activation link">Manual Activation</String>
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_AllUsers" Version="7.0.230.0" Description="Activate dialog - activate for all users link">Activate for all users</String>
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_ThisUser" Version="8.0.294.0" Description="Activate dialog - activate for this user only link">Activate for this user only</String>
-
-<String Group="Activation Dialog" Type="PlainText" Id="S_Activate_Button_Activate" Version="7.0.230.0" Description="Activate dialog - activate button">Activate</String>
-
-<!-- - - - - - - - - - - - - - - - - - -->
-<!-- Manual Activation Dialog          -->
-<!-- - - - - - - - - - - - - - - - - - -->
-
-<Dialog Id="ManualActivate" Width="480" Height="301" />
-
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_Title" Version="7.0.230.0" Description="Manual activation dialog title">Manual Activation</String>
-
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_Save" Version="7.0.230.0" Description="Manual activation dialog - save activation step">Save Activation Request</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_Send" Version="7.0.230.0" Description="Manual activation dialog - send activation step">Send the request to Tavultesoft or an agent</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_SendHelp" Version="7.0.230.0" Description="Manual activation dialog - howto link">How to send the request to Tavultesoft</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_Load" Version="7.0.230.0" Description="Manual activation dialog - load activation step">Load Activation Response</String>
-
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_SaveToClipboard" Version="7.0.230.0" Description="Manual activation dialog - save activation to clipboard button">To Clipboard</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_SaveToDisk" Version="7.0.230.0" Description="Manual activation dialog - save activation to removable disk button">To Removable Disk...</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_SaveToFile" Version="7.0.230.0" Description="Manual activation dialog - save activation to .ker file button">To File...</String>
-
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_LoadFromClipboard" Version="7.0.230.0" Description="Manual activation dialog - retrieve activation from clipboard button">From Clipboard</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_LoadFromDisk" Version="7.0.230.0" Description="Manual activation dialog - retrieve activation from removable disk button">From Removable Disk...</String>
-<String Group="Manual Activation Dialog" Type="PlainText" Id="S_ManualActivate_LoadFromFile" Version="7.0.230.0" Description="Manual activation dialog - retrieve activation from .kes file button">From File...</String>
-
-<String Group="Manual Activation Dialog" Type="FormatString" Id="SKSelectDrive_Title" Version="7.0.230.0" Description="Manual activation dialog - title for subdialog that displays when selecting a drive to save to/load from">Select Drive</String>
-
-<!-- - - - - - - - - - - - - - - - - - -->
 <!-- Proxy Configuration Dialog        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
@@ -305,6 +254,16 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Proxy Configuration Dialog" Type="PlainText" Id="S_ProxyConfiguration_Port" Version="7.0.230.0" Description="Proxy dialog - fillable-field port">Port: </String>
 <String Group="Proxy Configuration Dialog" Type="PlainText" Id="S_ProxyConfiguration_Username" Version="7.0.230.0" Description="Proxy dialog - fillable-field username">Username: </String>
 <String Group="Proxy Configuration Dialog" Type="PlainText" Id="S_ProxyConfiguration_Password" Version="7.0.230.0" Description="Proxy dialog - fillable-field password">Password: </String>
+
+<!-- - - - - - - - - - - - - - - - - - -->
+<!-- Base Keyboard Dialog        -->
+<!-- - - - - - - - - - - - - - - - - - -->
+
+<Dialog Id="BaseKeyboard" Width="512" Height="160" />
+
+<String Group="Base Keyboard Dialog" Type="PlainText" Id="S_BaseKeyboard_Title" Version="9.0.445.0" Description="Base keyboard dialog title">Set Base Keyboard</String>
+<String Group="Base Keyboard Dialog" Type="PlainText" Id="S_BaseKeyboard_Text" Version="9.0.445.0" Description="Base keyboard dialog description">Select the base Latin script
+keyboard that you use in Windows.  Keyman keyboards will adapt automatically to your preferred layout.</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Hotkey Dialog                     -->
@@ -319,7 +278,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="Hotkey Dialog" Type="FormatString" Id="SKUnsafeHotkey" Version="7.0.230.0" Parameters="%0:s = Hotkey" Description="Hotkey dialog - warning of hotkey conflict with standard keyboard use">The hotkey %0:s will conflict with normal keyboard use.  You should use at least Ctrl or Alt.  Do you want to change this now?</String>
 <String Group="Hotkey Dialog" Type="FormatString" Id="SKHotkeyConflicts_Keyboard" Version="7.0.230.0" Parameters="%0:s = Hotkey, %1:s = Conflicting keyboard" Description="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">The hotkey %0:s conflicts with the hotkey selected for keyboard %1:s.  If you continue, the hotkey for keyboard %1:s will be cleared.  Continue?</String>
-<String Group="Hotkey Dialog" Type="FormatString" Id="SKHotkeyConflicts_Product" Version="7.0.230.0" Parameters="%0:s = Hotkey, %1:s = Conflicting product" Description="Hotkey dialog - warning of hotkey conflict with hotkey for another feature">The hotkey %0:s conflicts with a hotkey for the product %1:s.  If you continue, the conflicting hotkey will be cleared.  Continue?</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Keyboard for Install Dialog       -->
@@ -341,7 +299,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_InstallQuery" Version="7.0.230.0" Description="Update dialog - install query">Do you want to download and install this patch now?</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_DownloadFrom" Version="7.0.230.0" Description="Update dialog - download information">You can download the new version from:</String>
-<String Group="Online Update Dialog" Type="PlainText" Id="S_Update_DownloadQuery" Version="7.0.230.0" Description="Update dialog - Tavultesoft website visiting query">Do you want to visit the website now?</String>
+<String Group="Online Update Dialog" Type="PlainText" Id="S_Update_DownloadQuery" Version="7.0.230.0" Description="Update dialog - keyman.com website visiting query">Do you want to visit the website now?</String>
   
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Button_InstallNow" Version="7.0.230.0" Description="Update dialog - install now button">Install Now</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Button_InstallLater" Version="7.0.230.0" Description="Update dialog - cancel button">Cancel</String>
@@ -353,8 +311,8 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_KeymanText" Version="7.0.230.0" Parameters="%0:s = Current version number" Description="Update dialog - name and version of updatable product">&Name; %0:s</String>
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_PackageText" Version="7.0.230.0" Parameters="%0:s = Package description, %1:s = Current package version number" Description="Update dialog - name and version of updatable keyboard layout package">Keyboard %0:s %1:s</String>
 
-<String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_UnableToContact" Version="7.0.230.0" Description="Update dialog - unable to access Tavultesoft warning">Unable to contact Tavultesoft website - please make sure you have an active Internet connection and try again.</String>
-<String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_UnableToContact_Error" Version="7.0.230.0" Parameters="%0:s = Error message" Description="Update dialog - unable to access Tavultesoft error message">Unable to contact Tavultesoft website - please make sure you have an active Internet connection and try again.  The error received was: %0:s</String>
+<String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_UnableToContact" Version="7.0.230.0" Description="Update dialog - unable to access keyman.com warning">Unable to contact keyman.com - please make sure you have an active Internet connection and try again.</String>
+<String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_UnableToContact_Error" Version="7.0.230.0" Parameters="%0:s = Error message" Description="Update dialog - unable to access keyman.com error message">Unable to contact keyman.com - please make sure you have an active Internet connection and try again.  The error received was: %0:s</String>
 
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconTitle" Version="8.0.288.0" Description="Update icon - title">&Name; updates are available</String>
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconText" Version="8.0.288.0" Description="Update icon - text">Click this icon to download and install updates</String>
@@ -365,37 +323,27 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <!-- Splash Dialog                     -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="Splash" Width="700" Height="420" />
+<Dialog Id="Splash" Width="630" Height="450" />
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Title" Version="7.0.230.0" Description="Splash dialog title, with company, product and version name">&Name_CNV;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version">&Version;</String>
 
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_LearnHow" Version="8.0.294.0" Description="Learn How button">Learn how to use &Name;</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Buy" Version="8.0.294.0" Description="Buy a licence button">Buy a licence</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_UpgradeToPro" Version="8.0.294.0" Description="Upgrade to Pro button">Upgrade to Pro</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">Start &Name;</String>
+<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">Start Keyman</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">Exit</String>
   
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_OtherTasks" Version="8.0.294.0" Description="Other tasks heading">Other tasks</String>
-  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_EnterLicenseKey" Version="8.0.294.0" Description="Enter License Key link">Enter licence key</String>
-  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_EnterUpgradeKey" Version="8.0.294.0" Description="Enter Upgrade Key link">Enter upgrade key</String>
-  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Configuration" Version="8.0.294.0" Description="Keyman Configuration link">Open &Name; Configuration</String>
-  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_ShowAtStartupCheckbox" Version="8.0.294.0" Description="Show at Startup checkbox">Show this screen every time &Name; starts</String>
-  
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_EvaluationExpired" Version="8.0.294.0" Description="Message shown when evaluation period is over">Your 30 day trial period is over.  You must buy a licence to continue using &Name;.</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_ActivationServer" Version="8.0.314.0" Description="Activation server message in splash">Product activation is managed by your system administrator</String>
-  
+  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Configuration" Version="8.0.294.0" Description="Keyman Configuration link">Configuration</String>
+  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_ShowAtStartup" Version="9.0.341.0" Description="Show at Startup toggle">Show this screen at startup</String>
+  <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_HideAtStartup" Version="9.0.431.0" Description="Hide at Startup toggle">Hide this screen at startup</String>
+      
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- UI Languages & Localization       -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="DownloadLocale" Width="320" Height="360">
-  <footerheight>40</footerheight>
-</Dialog>
-
 <String Group="_LanguageInfo" Type="PlainText" Id="S_DisplayIn" Version="8.0.278.0" Description="'Display In' text label for UI language menu">Display in</String>
 <String Group="_LanguageInfo" Type="PlainText" Id="S_MoreUILanguagesMenu" Version="8.0.278.0" Description="More UI languages online menu item">Find other display languages online...</String>
+<String Group="_LanguageInfo" Type="PlainText" Id="S_ContributeUILanguagesMenu" Version="9.0.525.0" Description="Link to contribute to language UI">Help translate the user interface...</String>
 <String Group="_LanguageInfo" Type="FormatString" Id="SKUILanguageName" Version="7.0.230.0" Description="User interface language name in the UI language">English</String>
 <String Group="_LanguageInfo" Type="FormatString" Id="SKUILanguageNameWithEnglish" Version="7.0.230.0" Description="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">English</String>
 <String Group="_LanguageInfo" Type="FormatString" Id="SKLanguageCode" Version="7.0.230.0" Description="The language code for the current translation">en</String>
@@ -407,8 +355,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="UI Language Dialog" Type="FormatString" Id="SKUILanguageHelp" Version="7.0.244.0" Description="UI dialog - instructions">Choose the language that you want displayed in the &Name; interface.</String>
 <String Group="UI Language Dialog" Type="FormatString" Id="SKButtonUILanguageDownload" Version="7.0.244.0" Description="UI dialog - 'More languages online' button">&amp;More languages online...</String>
-
-<String Group="Download UI Language Dialog" Type="PlainText" Id="S_DownloadLocale_Title" Version="7.0.230.0" Description="Download UI language dialog title">Download User Interface Language</String>
 
 <String Group="UI Language Dialog" Type="FormatString" Id="SKDialogUILanguageCreateTranslation" Version="7.1.266.0" Description="Create a new UI translation online link">Create a new translation online</String>
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -425,13 +371,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_BlurbPrefix" Version="7.0.230.0" Description="LCT dialog - standard explanitory text preceding language name(s)">&Name; has detected that the following configuration tasks need to be completed in order for</String>
 <String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_BlurbSuffix" Version="7.0.230.0" Description="LCT dialog - standard explanitory text following language name(s)">script(s) to work correctly on your computer:</String>
 
-<String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtComplexScript" Version="7.0.230.0" Description="LCT dialog - enable complex script support checkbox">Enable complex script support in Windows (requires restart)</String>
-<String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtRTL" Version="7.0.230.0" Description="LCT dialog - enable right-to-left script support checkbox">Enable right-to-left script support in Windows (requires restart)</String>
-<String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtFarEast" Version="7.0.230.0" Description="LCT dialog - enable far east script support checkbox">Enable Far East script support in Windows (requires restart)</String>
-<String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtSupplementary" Version="7.0.230.0" Description="LCT dialog - enable Unicode supplementary plane script support checkbox">Enable supplementary plane script support in Windows (requires restart)</String>
-
-<String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtWindowsLanguage" Version="7.0.230.0" Description="LCT dialog - configure Windows languages to work with Keyman keyboard layouts">Configure Windows language</String>
-<String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtUniscribe" Version="7.0.230.0" Description="LCT dialog - enable Keyman Uniscribe Manager, needed for current Keyman keyboard layouts">Enable Keyman Uniscribe Manager</String>
 <String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_psrtMSOfficeLanguage" Version="7.0.230.0" Description="LCT dialog - language support for Microsoft Office">Microsoft Office Language Support</String>
 
 <String Group="Language Setup Dialog" Type="PlainText" Id="S_LangSetup_MoreInfo" Version="7.0.230.0" Description="LCT dialog - link to help information about the proposed LCT">More&#160;Information...</String>
@@ -454,13 +393,12 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="HInts" Type="PlainText" Id="SKHintsReset" Version="7.0.244.0" Description="Hint - options tab dialog confirming reset of hints">All hint messages have been reset and will be displayed again.</String>
 
 <String Group="Hints" Type="HintTitle" Id="HintTitle_KH_EXITPRODUCT" Version="7.0.244.0" Description="Hint - dialog title upon attempting to exit product">Exit &Name;?</String>
-<String Group="Hints" Type="Hint" Id="Hint_KH_EXITPRODUCT" Version="7.0.244.0" Description="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Are you sure you want to exit &Name;?  If you want to use your standard keyboard, you don't need to exit.  You can use your standard keyboard by selecting "Switch &Name; Off" in the &Name; Icon Menu.</String>
-
-<String Group="Hints" Type="HintTitle" Id="HintTitle_KH_TUTORIALFINISHED" Version="7.0.244.0" Description="Hint - dialog title upon closing the Getting Started text editor">Text Editor Closed</String>
-<String Group="Hints" Type="Hint" Id="Hint_KH_TUTORIALFINISHED" Version="7.0.244.0" Description="Hint - informs that Product is still running">You have closed the &Name; Text Editor.  &Name; is still running and you can use your keyboard in any application.  Look for the &Name; Icon near the clock.</String>
+<String Group="Hints" Type="Hint" Id="Hint_KH_EXITPRODUCT" Version="7.0.244.0" Description="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">Are you sure you want to exit &Name;?  Your Keyman keyboards will still be listed in the Windows languages, but will not be functional until you restart &Name;.</String>
 
 <String Group="Hints" Type="HintTitle" Id="HintTitle_KH_CLOSEOSK" Version="7.0.244.0" Description="Hint - dialog title upon closing the OSK">On Screen Keyboard Closed</String>
 <String Group="Hints" Type="Hint" Id="Hint_KH_CLOSEOSK" Version="7.0.244.0" Description="Hint - explains that Product is still running and iforms how to reopen OSK">You have closed the On Screen Keyboard.  &Name; is still running.  You can open the On Screen Keyboard at any time by clicking on the &Name; Icon and selecting "On Screen Keyboard"</String>
+
+<String Group="Hints" Type="PlainText" Id="S_HintDialog_DontShowHintAgain" Version="10.0.836.0" Description="Hint dialog - caption of checkbox at bottom of dialog">Don't show this hint again</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Help                              -->
@@ -468,7 +406,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <Dialog Id="Help" Width="450" Height="300"></Dialog>
 <String Group="Help Dialog" Type="PlainText" Id="S_HelpTitle" Version="7.0.230.0" Description="Help - product name help">&Name; Help</String>
-<String Group="Help Dialog" Type="PlainText" Id="S_Help_Tutorial" Version="7.0.230.0" Description="Help - getting started tutorial name">Get Started</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Product" Version="7.0.230.0" Description="Help - help contents link title">Help Contents</String>
 
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Prefix" Version="7.0.230.0" Description="Help - text preceding keyboard name">Help on "</String>
@@ -489,6 +426,12 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="System Tray Menu Items" Type="Caption" Caption="Switch Keyman Desktop Off" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">Switch &Name; &amp;Off</String> 
 <String Group="System Tray Menu Items" Type="Caption" Caption="On Screen Keyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">On Screen &amp;Keyboard</String>
+<String Group="System Tray Menu Items" Type="Caption" Caption="Keyboard Usage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">Keyboard &amp;Usage</String>
+<String Group="System Tray Menu Items" Type="Caption" Caption="Font Helper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">&amp;Font Helper</String>
+<String Group="System Tray Menu Items" Type="Caption" Caption="Character Map" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">Character &amp;Map</String>
+<String Group="System Tray Menu Items" Type="Caption" Caption="Text Editor..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">&amp;Text Editor...</String>
+<String Group="System Tray Menu Items" Type="Caption" Caption="Configuration..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">&amp;Configuration...</String>
+
 <String Group="System Tray Menu Items" Type="Caption" Caption="Help..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">&amp;Help...</String>
 <String Group="System Tray Menu Items" Type="Caption" Caption="Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">E&amp;xit</String>
 
@@ -507,7 +450,6 @@ keyboard layout for your language.</String>
 
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Welcome" Version="7.0.244.0" Description="Usage page - keyboard help button">Keyboard Help</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_OSK" Version="7.0.244.0" Description="Usage page - On Screen Keyboard button">On Screen Keyboard</String>
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_Tutorial" Version="7.0.244.0" Description="Usage page - Getting Started button">Get Started</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Help" Version="7.0.244.0" Description="Usage page - Product Help button">&Name; Help</String>
 <String Group="Usage Page" Type="PlainText" Id="S_Usage_Config" Version="7.0.244.0" Description="Usage page - Product Configuration button">&Name; Configuration</String>
 <String Group="Usage Page" Type="HTML" Id="S_Usage_KeyboardNoDocumentation" Version="7.1.261.0" Description="Usage page - Text shown when keyboard has no documentation">This keyboard layout has no Getting Started or Usage documentation. Please check the Start Menu or contact the keyboard developer for more information on how to use this keyboard layout.</String>
@@ -530,8 +472,6 @@ keyboard layout for your language.</String>
 		Description="Company and product name used for the title of message boxes and message dialogs">&Name_CN;</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKSplashVersion" Version="7.0.230.0" Parameters="%0:s = Version number string" Description="Version number">Version %0:s</String>
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKEvaluationDaysLeft" Version="7.0.230.0" Parameters="%0:d = Days Used, %1:d = Number of days in trial" Description="Displays the number of days that the product has been evaluated for in the product evaluation dialog">You are on day %0:d of your %1:d-day &Name; trial.</String>
-
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonHelp"  Version="7.0.230.0" Description="Help button in message boxes">Help</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonPrint" Version="7.0.239.0" Description="Print button in Welcome dialog for keyboards">&amp;Print...</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonDownload" Version="7.0.240.0" Description="Download button in Locale Selection dialog">&amp;Download...</String>
@@ -549,8 +489,7 @@ keyboard layout for your language.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKInstallOnlyAsAdmin" Version="7.0.230.0" Description="Notice of user ineligibility to install/uninstall keyboards">You can only install or uninstall keyboards as Administrator.  Use Control Panel to select languages for use as a normal user.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKSurrogatesRequiresRestart" Version="7.0.230.0" Description="Notice of surrogate setting change requiring Windows restart">Changing the setting of Surrogates requires Windows to be restarted.  Do you want to restart Windows now?</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKPackageDoesNotIncludeWelcome" Version="7.0.230.0" Parameters="%0:s = Package Name" Description="Notice of lack of introductory help">The package or keyboard '%0:s' does not include any introductory help.</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKAddinDoesNotHaveConfiguration" Version="7.0.241.0" Description="Notice of lack of configuration settings for an addin">The selected addin does not include any configurable settings.</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKOSNotSupported" Version="7.0.230.0" Description="Notice of unsupported operating system">This operating system is not supported.  Please contact Tavultesoft for more details.</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKOSNotSupported" Version="7.0.230.0" Description="Notice of unsupported operating system">This operating system is not supported.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKActivation_Success" Version="7.0.230.0" Description="Notice of succesful licence activation">Your licence has been successfully activated.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKOnlineHelpFile" Version="7.0.230.0" Description="File name of the help file - must be .chm format.  The locale folder will be checked first for the file">KeymanDesktop.chm</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKCouldNotFindHelp" Version="7.0.230.0" Description="Notice of help file not found">The help file $(SKOnlineHelpFile) could not be found.</String>
@@ -558,12 +497,6 @@ keyboard layout for your language.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKANSIEncoding" Version="7.0.230.0" Description="Keyboard with an ANSI or Codepage encoding">Codepage</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKUnicodeEncoding" Version="7.0.230.0" Description="Keyboard with a Unicode encoding">Unicode</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKDownloadProgress_Title" Version="7.0.230.0" Description="Notice of file downloading">Downloading File</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKLangCheck_Uniscribe_Install" Version="7.1.259.0" Description="Notice of Uniscribe lacking">Uniscribe is not currently installed on your computer</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKLangCheck_Uniscribe_Update" Version="7.1.259.0" Description="Notice of Uniscribe needed">Keyman Uniscribe Manager is required to enable display of your language</String>
-
-<String Group="Formatted Messages" Type="FormatString" Id="SKKeymanDesktopLight2KeyboardsOnly" Version="8.0.289.0" Description="Notice - Keyman Desktop Light keyboard limit">You can only load 2 keyboards at a time with &Name; Light.  Untick the boxes at the right hand side of the list to unload the keyboards you don't currently need, or upgrade to &Name; Professional to remove this restriction.</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKCharMapDesktopLightMessage" Version="8.0.289.0" Description="Notice - Keyman Desktop Light character map limit">The Character Map Tool is available only in &Name; Professional.</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKCharMapDesktopLightLink" Version="8.0.289.0" Description="Notice - Keyman Desktop Light character map upgrade link">Upgrade to Professional</String>
     
   
 <!-- Confirmation Requests -->
@@ -582,9 +515,8 @@ keyboard layout for your language.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKUnicodeData_DatabaseCouldNotBeDeleted" Version="7.0.230.0" Parameters="%0:s = Error detail string" Description="Error deleting Unicode Character Map database">The Unicode Character database could not be deleted for a rebuild.  Error details are: %0:s</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKUnicodeData_CouldNotCreateDatabase" Version="7.0.230.0" Parameters="%0:s = Error details" Description="Error creating Unicode Character Map database">The Unicode Character database could not be created and has been disabled.  Error details are: %0:s</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKUnicodeData_DatabaseLoadFailedRebuild" Version="7.0.230.0" Parameters="%0:s = Error message" Description="Error loading Unicode Character Map database. Request to rebuild.">The Unicode character database did not load successfully (%0:s).  Rebuild it now?</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKActivation_InvalidLicenceNumber" Version="7.0.230.0" Parameters="%0:s = Error Message" Description="Displayed during activation process if the licence number is invalid">The licence number you entered is not valid (the error message received was: %0:s)</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKActivation_ErrorConnectingToTavultesoft" Version="7.0.230.0" Parameters="%0:s = Error message" Description="Error connecting during activation">Unable to connect to tavultesoft.com to request activation code (the error message received was: %0:s)</String>
-<String Group="Formatted Messages" Type="FormatString" Id="SKActivation_ErrorActivating" Version="7.0.230.0" Parameters="%0:s = Error message" Description="Error in validation of licence key">Your licence was not successfully validated: %0:s</String>
+
+
 <String Group="Formatted Messages" Type="FormatString" Id="SKErrorActivatingBrowser" Version="7.0.230.0" Description="General URL error">Cannot activate browser or email program for this URL.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKCouldNotPrintKeyboard" Version="7.0.230.0" Description="Keyboard printing error">The keyboard could not be printed successfully.  Please save to a web page and print manually.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKCannotStartProduct" Version="7.0.241.0" Parameters="%0:s: error message" Description="Error from Keyman Desktop failing to start keyman.exe due to an access denied or file not found">&Name; failed to start.  Please check your security settings to make sure that the program keyman.exe is allowed to start before continuing.  The error returned was:
@@ -595,11 +527,11 @@ Do you want to try and start &Name; again now?</String>
 
 <!-- Warnings -->
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKDebuggingWarning" Version="7.0.230.0" Description="Warning upon starting debugging in the Options tab">&Name; debug information will be stored in a text file called keymanlog\system.log on your desktop.  You should exit &Name; before reading or deleting this file.
+<String Group="Formatted Messages" Type="FormatString" Id="SKDebuggingWarning" Version="7.0.230.0" Description="Warning upon starting debugging in the Options tab">&Name; debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit &Name; before attempting to delete this file.
 
-WARNING: This file can grow large very quickly.  Enabling debugging will slow down your system and should only be done if advised by Tavultesoft support.
+WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.
 
-PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session, and delete the [desktop]\keymanlog\system.log file as soon as possible.</String>
+PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</String>
 
 <!-- Microsoft Office -->
 
@@ -613,36 +545,6 @@ PRIVACY WARNING: Please note that the debug logfile records all keystrokes that 
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKLangCheck_WindowsLanguage_Link" Version="7.1.259.0" Parameters="%0:s = language name, %1:s = keyboard name" Description="Shown when Keyman wants to link a Windows language to a Keyman keyboard so that when one is selected by the user, the other automatically switches in">Link language %0:s to Keyman keyboard %1:s</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKLangCheck_WindowsLanguage_Install" Version="7.1.259.0" Parameters="%0:s = language name, %1:s = keyboard name" Description="Shown when Keyman wants to install  a Windows language and link it to a Keyman keyboard so that when one is selected by the user, the other automatically switches in">Install language %0:s and link to Keyman keyboard %1:s</String>
-
-<!-- Tutorial -->
-
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar1_p1a" Version="8.0.294.0" Description="Tutorial Hintbar 1 paragraph 1a">Click on the &Name; icon</String>
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar1_p1b" Version="8.0.294.0" Description="Tutorial Hintbar 1 paragraph 1b">at the bottom right of your screen to begin typing in your language</String>
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar1_hint" Version="8.0.294.0" Description="Tutorial Hintbar 1 icon click hint">Don't click on this icon.  Look for a smaller version of the icon near the clock, usually at the bottom right hand corner of your screen.</String>
-
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar2_p1" Version="8.0.294.0" Description="Tutorial Hintbar 2 paragraph 1">Now choose a keyboard layout from the menu that is displayed</String>
-
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar3_p1" Version="8.0.294.0" Description="Tutorial Hintbar 3 paragraph 1">The On Screen Keyboard has now appeared.  You can type by clicking on the On Screen Keyboard or by using your hardware keyboard.</String>
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar3_p2" Version="8.0.294.0" Description="Tutorial Hintbar 3 paragraph 2">Getting Started has chosen a good font for your language automatically.  You can choose other fonts at the right hand side of the screen.</String>
-  
-  
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar4_p1a" Version="8.0.294.0" Description="Tutorial Hintbar 4 paragraph 1a">Sorry, you didn't choose a keyboard layout.  To start typing in your language, click on the &Name; icon</String>
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar4_p1b" Version="8.0.294.0" Description="Tutorial Hintbar 4 paragraph 1b">at the bottom right of your screen.</String>
-  
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar5_p1" Version="8.0.294.0" Description="Tutorial Hintbar 5 paragraph 1">Good job!  Did you know that you can also type in Word, OpenOffice, Internet Explorer, or any other program, in exactly the same way?  Just click the &Name; icon to choose your keyboard, and start typing.</String>
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar5_p2" Version="8.0.294.0" Description="Tutorial Hintbar 5 paragraph 2">When you have finished typing here, click the Close button at the top right of the screen to exit the Getting Started Screen</String>
-
-<String Group="Tutorial" Type="HTML" Id="S_Hintbar_NoKeyboards" Version="8.0.294.0" Description="Tutorial message when no keyboards installed">You have not yet installed a keyboard for your language.  <a href="keyman:config">Click here</a> to install a keyboard now.</String>
-<!-- Tutorial Font Helper -->
-
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_WindowsKeyboard" Description="Font helper message shown when selected keyboard is Windows keyboard">The selected keyboard is a Windows keyboard.  Fonts cannot be automatically determined from a Windows keyboard.</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_NonUnicodeKeyboard" Description="Font helper message shown when selected keyboard is not Unicode">The selected keyboard is not a Unicode keyboard.  Please review the documentation for the keyboard to determine appropriate fonts.</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_MatchedFonts" Description="Font helper message for matched fonts">&Name; has detected that the following fonts should work with your language:</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_PossibleFonts" Description="Font helper message for additional possible fonts">The following fonts may also work:</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_PossibleFontsOnly" Description="Font helper message for possible matching fonts">&Name; has detected that the following fonts may work with your language:</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_NoFonts" Description="Font helper message when no fonts match">No fonts were found on your system that work with your language. Please <a href="keyman:welcome">check the documentation</a> or contact Tavultesoft Support to find fonts for this keyboard.</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_Hint1" Description="Font helper hint message part 1"><b>Hint:</b> You can view this list of fonts at any time through the On Screen Keyboard, by clicking the Font Helper button</String>
-<String Group="Tutorial Font Helper" Type="HTML" Version="8.0.294.0" Id="S_FontHelper_Hint2" Description="Font helper hint message part 2">in the toolbar.</String>
 
 <!-- OSK Font Helper -->
   
@@ -661,22 +563,27 @@ PRIVACY WARNING: Please note that the debug logfile records all keystrokes that 
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PossibleFontsOnly2" Description="OSK Font helper possible fonts part 2">keyboard:</String>
 
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1a" Description="OSK Font helper no fonts part 1">No fonts were found on your system that work with </String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1b" Description="OSK Font helper no fonts part 2">.  Please <a href="keyman:welcome">check the documentation</a> or contact Tavultesoft Support to find fonts for this keyboard.</String>
+<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1b" Description="OSK Font helper no fonts part 2">.  Please <a href="keyman:welcome">check the documentation</a> to find fonts for this keyboard.</String>
   
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoKeyboards" Description="OSK Font helper no keyboards">No keyboard layouts are currently installed or loaded.  Use &Name; Configuration to install a keyboard layout.</String>
 <String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_ChooseKeyboard" Description="OSK Font helper choose keyboard">Please choose a &Name; keyboard to find the fonts that will work with it.</String>
   
 <!-- OSK Hints -->
 
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint_Title" Description="On Screen Keyboard Hintbar title">Hint:</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint1" Description="On Screen Keyboard Hintbar hint">Resize the On Screen Keyboard by clicking and dragging on the window border</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint2" Description="On Screen Keyboard Hintbar hint">Move the On Screen Keyboard by clicking and dragging on the "&Name;" title</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint3a" Description="On Screen Keyboard Hintbar hint">Insert any Unicode character into your document with the</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint3b" Description="On Screen Keyboard Hintbar hint">Character Map Tool</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint4a" Description="On Screen Keyboard Hintbar hint">Find out which fonts will work with your language with the</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint4b" Description="On Screen Keyboard Hintbar hint">Font Helper Tool</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint5a" Description="On Screen Keyboard Hintbar hint">Get more help on the keyboard by clicking the</String>
-  <String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint5b" Description="On Screen Keyboard Hintbar hint">Keyboard Usage button</String>
-  
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint_Title" Description="On Screen Keyboard Hintbar title">Hint:</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint1" Description="On Screen Keyboard Hintbar hint">Resize the On Screen Keyboard by clicking and dragging on the window border</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint2" Description="On Screen Keyboard Hintbar hint">Move the On Screen Keyboard by clicking and dragging on the "&Name;" title</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint3a" Description="On Screen Keyboard Hintbar hint">Insert any Unicode character into your document with the</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint3b" Description="On Screen Keyboard Hintbar hint">Character Map Tool</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint4a" Description="On Screen Keyboard Hintbar hint">Find out which fonts will work with your language with the</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint4b" Description="On Screen Keyboard Hintbar hint">Font Helper Tool</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint5a" Description="On Screen Keyboard Hintbar hint">Get more help on the keyboard by clicking the</String>
+<String Group="OSK Hints" Type="Plain Text" Version="8.0.294.0" Id="S_OSK_Hint5b" Description="On Screen Keyboard Hintbar hint">Keyboard Usage button</String>
 
+<!-- - - - - - - - - - - - - - - - - - -->
+<!-- Text Editor                       -->
+<!-- - - - - - - - - - - - - - - - - - -->
+
+<String Group="Text Editor" Type="FormatString" Version="10.0.836.0" Id="SKTextEditorCaption" Description="Caption of Text Editor">Text Editor - &Name;</String>
+  
 </Locale>

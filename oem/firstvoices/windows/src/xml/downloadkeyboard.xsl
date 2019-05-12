@@ -5,49 +5,29 @@
   <xsl:include href="elements.xsl"/>
 
   <xsl:variable name="locale_downloadkeyboard" select="$locale/Dialog[@Id='DownloadKeyboard'][1]" />
-  <xsl:variable name="locale_downloadlocale" select="$locale/Dialog[@Id='DownloadLocale'][1]" />
   
   <xsl:template match="/">
-    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:k="http://www.tavultesoft.com/xml/70">
+    <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
-        <xsl:choose>
-          <xsl:when test="/Keyman/DownloadLocale">
-            <title><xsl:value-of select="$locale/String[@Id='S_DownloadLocale_Title']"/></title>
-          </xsl:when>
-          <xsl:otherwise>
-            <title><xsl:value-of select="$locale/String[@Id='S_DownloadKeyboard_Title']"/></title>
-           </xsl:otherwise>
-        </xsl:choose>
+        <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <title><xsl:value-of select="$locale/String[@Id='S_DownloadKeyboard_Title']"/></title>
         
+        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <style type="text/css">
             * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; }
             
-            body { padding: 0px; margin: 0px; overflow: hidden; 
-              <xsl:choose>
-                <xsl:when test="/Keyman/DownloadLocale">
-                  width: <xsl:value-of select="$locale_downloadlocale/@Width" />px; 
-                  height: <xsl:value-of select="$locale_downloadlocale/@Height" />px;
-                </xsl:when>
-                <xsl:otherwise>
-                  width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px; 
-                  height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
-                </xsl:otherwise>
-              </xsl:choose>
-               }
+            body { 
+              padding: 0px; margin: 0px; overflow: hidden; 
+              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px; 
+              height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
+            }
             html { width: 100%; padding: 0px; margin: 0px; overflow: hidden }
             
             #size {
               position: absolute;
-              <xsl:choose>
-                <xsl:when test="/Keyman/DownloadLocale">
-                  width: <xsl:value-of select="$locale_downloadlocale/@Width" />px; 
-                  height: <xsl:value-of select="$locale_downloadlocale/@Height" />px;
-                </xsl:when>
-                <xsl:otherwise>
-                  width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px; 
-                  height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
-                </xsl:otherwise>
-              </xsl:choose>
+              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px; 
+              height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
             }
 
             #contentframe {
@@ -55,16 +35,15 @@
               left: 0;
               top: 0;
               width: 100%;
-              height: expression(document.body.clientHeight-<xsl:value-of select="$locale_downloadkeyboard/footerheight"/>);
-              overflow: hidden;
-              x-background: #FFFFFF;
-              border-bottom: 2px solid #888888; 
+              height: <xsl:value-of select="$locale_downloadkeyboard/@Height - $locale_downloadkeyboard/footerheight" />px;
+              border-bottom: 2px solid #888888;
+              overflow: scroll;
               }
             #footerframe {
               position: absolute;
               left: 0px;
-              top: expression(document.body.clientHeight-<xsl:value-of select="$locale_downloadkeyboard/footerheight"/>);
-              height: <xsl:value-of select="$locale_downloadkeyboard/footerheight"/>px;
+              top: <xsl:value-of select="$locale_downloadkeyboard/@Height - $locale_downloadkeyboard/footerheight" />px;
+              height: <xsl:value-of select="$locale_downloadkeyboard/footerheight" />px;
               width: 100%;
               overflow: hidden;
               background: #dcdcdc;
@@ -83,24 +62,14 @@
       </head>
       <body>
         <div id="size"></div>
-        <xsl:choose>
-          <xsl:when test="/Keyman/DownloadLocale">
-            <iframe id="contentframe" frameborder="0">
-              <xsl:attribute name="src">http://www.tavultesoft.com/prog/70/downloadlocales/?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
-            </iframe>
-          </xsl:when>
-          <xsl:otherwise>
-            <iframe id="contentframe" frameborder="0">
-              <xsl:attribute name="src">http://www.tavultesoft.com/prog/80/downloadkeyboards/?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
-						</iframe>
-          </xsl:otherwise>
-        </xsl:choose>
-				<p>ha!</p>
+        <iframe id="contentframe" frameborder="0">
+          <xsl:attribute name="src">https://keyman.com/go/desktop/10.0/download-keyboards?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
+        </iframe>
         <div id="footerframe">
-          <div style="float:left; font-size: 13.3px;">
+          <!--<div style="float:left; font-size: 13.3px;">
             <input type="checkbox" id="chkDownloadOnly" /> <label for="chkDownloadOnly"><xsl:value-of select="$locale/String[@Id='S_DownloadKeyboard_DownloadOnlyCheckbox']"/></label>
-          </div>
-          <div style="float:right">
+          </div>-->
+          <div style="float:right; padding-right: 8px">
             <xsl:call-template name="button">
               <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
               <xsl:with-param name="command">keyman:footer_cancel</xsl:with-param>

@@ -10,9 +10,10 @@
 
 		<html>
 			<head>
-				<title>
-					<xsl:value-of select="$locale/String[@Id='S_HelpTitle']" />
-				</title>
+        <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <title><xsl:value-of select="$locale/String[@Id='S_HelpTitle']" /></title>
+        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
 				<style type="text/css">
 					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; font-size: 13.3px; }
 
@@ -30,71 +31,107 @@
 					#size { position: absolute; left: 0; top: 0;
 						width: <xsl:value-of select="$locale_help/@Width" />px;
 						height: <xsl:value-of select="$locale_help/@Height" />px;
-					}
-					#container {
-										border: 1px solid grey;
-                    top: 0;
-                    position: absolute;
-					}
+          }
 
-					#header {
-					background: #AD4A28;
-					top: 0; left: 0;
-					height: 70px;
-					}
+          #captionBox {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 8px;
+          }
 
-					#footer {
-					left: 1px;
-					position: absolute;
-					bottom: 1px;
-					height: 40px;
-					width: 100%;
-					background: #AD4A28;
-					}
+          #captionBox div {
+          float: left;
+          height: 6px;
+          }
 
-					#icon {
-					vertical-align: middle;
-					margin: 0 15px;
-					}
-					
-					#exiticon { float: left }
+          #captionBox #c1 {
+          width: 60%;
+          background: #FC7200;
+          }
 
-					#title {
-					display: inline;
-					font-size: 21.3px;
-					color: white;
-					vertical-align: middle;
-					}
+          #captionBox #c2 {
+          width: 22%;
+          background: #B92034;
+          }
 
-					#help {
-					font-size: 14.7px;
-					padding: 0px;
-					text-align: center;
-					border: none;
-					}
+          #captionBox #c3 {
+          width: 18%;
+          background: #69B7D2;
+          }
 
-					#checkbox {
-					float: left;
-					font-size: 13.3px;
-					color: white;
-					padding: 12px 10px;
-					}
+          #container {
+          }
 
-					#buttons {
-					float: right;
-					padding: 10px;
-					}
-					
-					#help div {
-						margin: 24px;
-						}
-						
-					#help a { font-size: 18.7px }
-					
-					#buttons input {
-						width: 80px; margin: 0 4px;
-						}
-				</style>
+          #header {
+          background: white;
+          border-bottom: solid 1px #929396;
+          top: 8px; left: 0;
+          position: absolute;
+          width: 100%;
+          height: 56px;
+          }
+
+          #footer {
+          left: 0px;
+          position: absolute;
+          bottom: 0px;
+          height: 40px;
+          width: 100%;
+          background: #79C3DA;
+          }
+
+          #icon {
+          vertical-align: middle;
+          margin: 10px 15px;
+          }
+
+          #exiticon { float: left }
+
+          #title {
+          display: inline;
+          font-size: 21.3px;
+          color: black;
+          vertical-align: middle;
+          }
+
+          #help {
+          font-size: 14.7px;
+          padding: 0px;
+          position: absolute;
+          left: 0; top: 0px;
+          width: 100%;
+          text-align: center;
+          border: none;
+          }
+
+          #checkbox {
+          float: left;
+          font-size: 13.3px;
+          color: white;
+          padding: 12px 10px;
+          }
+
+          #buttons {
+          float: right;
+          padding: 10px;
+          }
+          
+          #help {
+            margin: 60px 0 0 0;
+          }
+
+          #help div {
+          margin: 24px;
+          }
+
+          #help a { font-size: 18.7px }
+
+          #buttons input {
+          width: 80px; margin: 0 4px;
+          }
+        </style>
 				<script type="text/javascript">
 					document.onkeydown = function()
 					{
@@ -106,13 +143,13 @@
 					}
 				</script>
 			</head>
-
 			<body>
 				<div id="size"></div>
-				<div id="container" cellpadding="0">
+				<div id="container">
+          <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
 					<div id="header">
 						<img id="icon" alt="Help">
-							<xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>help.gif</xsl:attribute>
+							<xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>48.png</xsl:attribute>
 						</img>
 
 						<div id="title">
@@ -121,11 +158,6 @@
 					</div>
 
 					<div id="help">
-						<div>
-							<a href="javascript:location.href='keyman:opentutorial'">
-								<xsl:value-of select="$locale/String[@Id='S_Help_Tutorial']" />
-							</a>
-						</div>
 						<xsl:if test="/Keyman/Keyboard">
 							<div>
 								<a href="javascript:location.href='keyman:openkeyboardhelp'">
@@ -144,11 +176,10 @@
 					
 					<div id="footer">
 						<div id="buttons">
-							<input type="button"  onclick="javascript:location.href='keyman:cancel'">
-								<xsl:attribute name="value">
-									<xsl:value-of select="$locale/String[@Id='S_Button_Cancel']" />
-								</xsl:attribute>
-							</input>
+                <xsl:call-template name="button">
+                  <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
+                  <xsl:with-param name="command" select="'keyman:cancel'" />
+                </xsl:call-template>
 						</div>
 					</div>
 				</div>							 

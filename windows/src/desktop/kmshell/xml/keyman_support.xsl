@@ -46,7 +46,6 @@
           <ul>
             <li><a href="https://www.keyman.com/">www.keyman.com</a></li>
             <li><a href="keyman:support_diagnostics"><xsl:value-of select="$locale/String[@Id='S_Menu_Diagnostics_Diagnostics']"/></a></li>
-            <li><a href="keyman:support_checklanguages"><xsl:value-of select="$locale/String[@Id='S_Menu_Diagnostics_CheckLanguages']"/></a></li>
             <li><a href="keyman:support_updatecheck"><xsl:value-of select="$locale/String[@Id='S_Button_CheckForUpdates']"/></a></li>
             <li><a href="keyman:link?url=https://keyman.com/go/desktop/10.0/support"><xsl:value-of select="$locale/String[@Id='S_Button_OnlineSupport']"/></a></li>
           </ul>

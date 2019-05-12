@@ -16,6 +16,7 @@ type
     const S_KeymanExe = 'keyman.exe';
     const S_CfgIcon = 'cfgicon.ico';
     const S_AppIcon = 'appicon.ico';
+    const S_KeymanMenuTitleImage = 'menutitle.png';
     const S_FallbackKeyboardPath = 'Keyboards\';
     const S__Package = '_Package\';
     const S_MCompileExe = 'mcompile.exe';

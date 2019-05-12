@@ -19,8 +19,7 @@ var menudiv = null, global_menu_elem_name = null;
     return pt;
   }
         
-  function ShowMenu(name,align,xpos,ypos)
-  {
+  function ShowMenu(name,align,xpos,ypos) {
     global_menu_elem_name = name;
     var q;
     var menu = document.getElementById('menu_'+name), button = document.getElementById('button_'+name);
@@ -29,29 +28,32 @@ var menudiv = null, global_menu_elem_name = null;
     menudiv.innerHTML = menu.innerHTML;
     menudiv.style.width = menu.offsetWidth + 'px';
     
-    for(var i = 0; i < menudiv.all.length; i++)
-      if(menudiv.all[i].id != '') menudiv.all[i].id = 'Popup_'+menudiv.all[i].id;
+    (function(m) {
+      for(var i = 0; i < m.children.length; i++) {
+        if(m.children[i].id != '') { m.children[i].id = 'Popup_'+m.children[i].id; }
+      }
+    })(menudiv);
     
     var pb = PageOffset(button);
     var pm = PageOffset(menu.offsetParent);
 
-    menudiv.style.zIndex=10;
+    menudiv.style.zIndex=100;
     menudiv.style.visibility='visible';
     
     if( xpos && ypos ) {
       if(align=='right')
-        menudiv.style.left = xpos-179;
+        menudiv.style.left = (xpos-menudiv.offsetWidth) + 'px';
       else
-        menudiv.style.left = xpos;
-      menudiv.style.top = ypos;
+        menudiv.style.left = xpos + 'px';
+      menudiv.style.top = ypos + 'px';
     } else {
-      if(align=='right') menudiv.style.left = pb.x+button.offsetWidth-menudiv.offsetWidth;
-        else menudiv.style.left = pb.x; 
-      menudiv.style.top = pb.y+button.offsetHeight;
+      if(align=='right') menudiv.style.left = (pb.x+button.offsetWidth-menudiv.offsetWidth) + 'px';
+        else menudiv.style.left = pb.x + 'px'; 
+      menudiv.style.top = (pb.y+button.offsetHeight) + 'px';
     }
     
     
-    q = menudiv.all[0];
+    q = menudiv.children[0];
     q.focus();
 //menudiv.setCapture(false);  // I1828
   }
@@ -172,10 +174,10 @@ var menudiv = null, global_menu_elem_name = null;
   }
   function menuitemdown(b)
   {
-    if(b || event.button == 1) {
-      var e = event.srcElement;          
-      if(e) { 
-        location.href=e.command;
+    if(b) {
+      var e = event.srcElement;
+      if (e) {
+        location.href = e.attributes['command'].value;
         e.className="menuitem";
       }
     } else {

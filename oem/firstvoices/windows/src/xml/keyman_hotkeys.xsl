@@ -39,70 +39,55 @@
         <div class="hotkey_title"><xsl:value-of select="$locale/String[@Id='S_Hotkey_Control_Title']"/></div>
         <xsl:for-each select="/Keyman/Hotkeys/Hotkey">
           <xsl:sort select="translate(Target,'012345678','013845672')"/><!--I2302-->
-          <xsl:if test="not(/Keyman/support/islight) or (Target != 8 and Target != 6)"><!--I2342-->
-            <xsl:call-template name="hotkey_control" />
-          </xsl:if>
+          <xsl:call-template name="hotkey_control" />
         </xsl:for-each>
+        
         <div class="hotkey_title"><xsl:value-of select="$locale/String[@Id='S_Hotkey_Keyboard_Title']"/></div>
-        <xsl:for-each select="//KeymanKeyboardInstalled[loaded]">
-          <xsl:call-template name="hotkey_keyboard" />
-        </xsl:for-each>
-        <xsl:if test="not(/Keyman/support/islight)">
-          <div class="hotkey_title"><xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Title']"/></div>
-          <xsl:for-each select="//KeymanLanguage">
-						<xsl:call-template name="hotkey_language" />
-					</xsl:for-each>
-				</xsl:if>
+        <xsl:for-each select="//KeymanLanguage">
+					<xsl:call-template name="hotkey_language" />
+				</xsl:for-each>
     </div>
     
   </xsl:template>
   
-  <xsl:template name="hotkey_keyboard">
-    <div class="list_item" tabindex="1" tagType="listitem">
-      <xsl:attribute name="id">list_kbd_<xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="index"><xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="onkeydown">return list_keydown(event,'kbd_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmousedown">document.getElementById('list_kbd_<xsl:value-of select="index"/>').focus(); return true;</xsl:attribute>
-      <xsl:attribute name="onmouseover">return list_hover(event,'kbd_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmouseout">return list_unhover(event,'kbd_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onblur">return list_unhover(event,'kbd_<xsl:value-of select="index"/>');</xsl:attribute>
-      
-      <div style="float:left; padding: 1px 0px 1px 3px;">
-		  <xsl:value-of select="$locale/String[@Id='S_Hotkey_Keyboard_Prefix']"/> <xsl:value-of select="keyboardname"/> <xsl:value-of select="$locale/String[@Id='S_Hotkey_Keyboard_Suffix']"/>
-      </div>
-      <div style="float:right">
-        <div style="float: left; padding: 1px 3px 1px 0px;">
-          <a class="hotkey" tabindex="-1">
-            <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_kbd_<xsl:value-of select="index"/></xsl:attribute>
-            <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
-            <xsl:choose>
-              <xsl:when test="hotkey"><xsl:value-of select="hotkey"/></xsl:when>
-              <xsl:otherwise><xsl:value-of select="$locale/String[@Id='S_Hotkey_None']"/></xsl:otherwise>
-            </xsl:choose>
-          </a> 
-        </div>
-      </div>
-      <br class="clear" />
-    </div>
-  </xsl:template>
-
   <xsl:template name="hotkey_language">
     <div class="list_item" tabindex="1" tagType="listitem">
-      <xsl:attribute name="id">list_lang_<xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="index"><xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="onkeydown">return list_keydown(event,'lang_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmousedown">document.getElementById('list_lang_<xsl:value-of select="index"/>').focus(); return true;</xsl:attribute>
-      <xsl:attribute name="onmouseover">return list_hover(event,'lang_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmouseout">return list_unhover(event,'lang_<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onblur">return list_unhover(event,'lang_<xsl:value-of select="index"/>');</xsl:attribute>
+      <xsl:attribute name="id">list_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
+      <xsl:attribute name="onkeydown">return list_keydown(event,'lang_<xsl:value-of select="position()-1"/>');</xsl:attribute>
+      <xsl:attribute name="onmousedown">document.getElementById('list_lang_<xsl:value-of select="position()-1"/>').focus(); return true;</xsl:attribute>
       
       <div style="float:left; padding: 1px 0px 1px 3px;">
-		  <xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Prefix']"/> <xsl:value-of select="localename"/> (<xsl:value-of select="layoutname"/>) <xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Suffix']"/>
+      
+      <div class="list_icon">
+        <img style="width: 16px; height:16px;">
+          <xsl:choose>
+            <xsl:when test="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]/bitmap">          
+              <xsl:attribute name="src">
+                <xsl:value-of select="/Keyman/ImagePath"/>
+                <xsl:value-of select="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]/bitmap"/>
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:when test="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]">          
+              <xsl:attribute name="src">
+                <xsl:value-of select="/Keyman/templatepath"/>no_icon.png
+              </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="src">
+                <xsl:value-of select="/Keyman/templatepath"/>windows_keyboard.png
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </img>
+      </div>
+      
+		  <xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Prefix']"/> <xsl:value-of select="localename"/> &#x2014; <xsl:value-of select="layoutname"/>
+      <xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Suffix']"/>
       </div>
       <div style="float:right">
         <div style="float: left; padding: 1px 3px 1px 0px;">
           <a class="hotkey" tabindex="-1">
-            <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="index"/></xsl:attribute>
+            <xsl:attribute name="href">keyman:hotkey_set?index=hotkey_lang_<xsl:value-of select="position()-1"/></xsl:attribute>
             <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
             <xsl:choose>
               <xsl:when test="hotkey"><xsl:value-of select="hotkey"/></xsl:when>
@@ -117,13 +102,9 @@
 
   <xsl:template name="hotkey_control">
     <div class="list_item" tabindex="1" tagType="listitem">
-      <xsl:attribute name="id">list_<xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="index"><xsl:value-of select="index"/></xsl:attribute>
-      <xsl:attribute name="onkeydown">return list_keydown(event,'<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmousedown">document.getElementById('list_<xsl:value-of select="index"/>').focus(); return true;</xsl:attribute>
-      <xsl:attribute name="onmouseover">return list_hover(event,'<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onmouseout">return list_unhover(event,'<xsl:value-of select="index"/>');</xsl:attribute>
-      <xsl:attribute name="onblur">return list_unhover(event,'<xsl:value-of select="index"/>');</xsl:attribute>
+      <xsl:attribute name="id">list_hotkey_<xsl:value-of select="index"/></xsl:attribute>
+      <xsl:attribute name="onkeydown">return list_keydown(event,'hotkey_<xsl:value-of select="index"/>');</xsl:attribute>
+      <xsl:attribute name="onmousedown">document.getElementById('list_hotkey_<xsl:value-of select="index"/>').focus(); return true;</xsl:attribute>
 
       <div style="float:left; padding: 1px 0px 1px 3px;">
         <xsl:choose>

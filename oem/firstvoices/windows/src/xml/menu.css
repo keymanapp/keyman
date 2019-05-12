@@ -4,8 +4,8 @@
   white-space: nowrap;
   position: absolute;
   display: block;
-  background: white;
   visibility: hidden;
+  background: white;
   border: solid 1px #ACA899;
   font-size: 11px;
   padding: 4px;
@@ -13,6 +13,7 @@
   background-repeat: repeat-y; 
   background-position: 0 0;
   width: 220px;
+  z-index: 100;
 }
 
 .menuitem

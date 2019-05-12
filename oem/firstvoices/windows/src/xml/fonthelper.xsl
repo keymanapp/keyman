@@ -10,8 +10,8 @@
 
 		<html>
 			<head>
-				<!-- META http-equiv="Page-Enter" CONTENT="progid:DXImageTransform.Microsoft.Pixelate(Duration=1)" / -->
-        
+        <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
 				<title>fonts</title>
 				<style type="text/css">
@@ -31,7 +31,7 @@
 					#middle { position: absolute; top: 50%; width: 100% }
 					#inner { position: relative; top: -50%; }
 					
-					#inner-nokeyboards { position: relative; top: -50%; margin: 0 5%; width: 100%; padding: 8px; background: #F5F6BE; border: solid 1px gray; text-align: left }
+					#inner-nokeyboards { position: relative; top: -50%; margin: -24px 5% 0 5%; min-height: 32px; width: 84%; padding: 8px 3%; background: #F5F6BE; border: solid 1px gray; text-align: left }
 					#inner-nokeyboards img { float: left; padding: 0 16px 0 0 }
           
           col.index { width: auto !important; }

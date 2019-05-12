@@ -8,31 +8,30 @@
 
 		<html>
 			<head>
-        <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+				<!--<META http-equiv="Page-Enter" CONTENT="progid:DXImageTransform.Microsoft.Pixelate(Duration=1)" />-->
 
 				<title>hintbar</title>
 				<style type="text/css">
-					* { font-family: Tahoma; font-size: 11px; }
+          * { font-family: Tahoma; font-size: 11px; }
 
-					body { padding: 0px 0px 0px 0px; margin: 0px; overflow: hidden;  width: 100%; height: 100%; background: #75899C; }
-					html { padding: 0px; margin: 0px; overflow: hidden; }
+          body { padding: 0px 0px 0px 0px; margin: 0px; overflow: hidden;  width: 100%; height: 100%; background: #5E97A8 ; }
+          html { padding: 0px; margin: 0px; overflow: hidden; }
 
-					#size { width: 100%; height: 20px; position: absolute; left: 0; top: 0 }
+          #size { width: 100%; height: 20px; position: absolute; top: -30px }
 
-					#outer { height: 100%; width: 100%; position: absolute; overflow: hidden; left: 0; top: 0 }
-					#center { position: relative; left: 0; top: 50%; width: 100%; height: 100% }
-					#inner { position: relative; top: -50%; width: 100%; height: 100%; overflow: hidden; white-space: nowrap; padding: 2px 0px 0px 0px; }
-					#control { padding-right: 2px; padding-left: 2px; position: absolute; top: -50%; right: -1px; padding-top: 2px; z-index: 1; background: #75899C; }
+          #outer { height: 100%; width: 100%; position: absolute; left: 0; top: 0; overflow: hidden; }
+          #center { position: relative; left: 0; top: 50%; width: 100%; height: 100% }
+          #inner { position: relative; top: -50%; width: 100%; height: 100%; overflow: hidden; white-space: nowrap; padding: 2px 0px 0px 0px; }
+          #control { padding-right: 2px; padding-left: 2px; position: absolute; top: -50%; right: -1px; padding-top: 2px; z-index: 1; background: #5E97A8; }
 
-					a.button, a.button:visited { padding: 2px; display: block; float: left; }
-					a.button:hover { background: #A1BDD7; }
-					a.button img { border: none }
-					
-					.hint { display: none; white-space: nowrap; position: relative; left: 0; top: 1px; height: 16px; vertical-align: middle; float: left; }
+          a.button, a.button:visited { padding: 2px; display: block; float: left; }
+          a.button:hover { background: #A1BDD7; }
+          a.button img { border: none }
+
+          .hint { color: #222222; display: none; white-space: nowrap; position: relative; left: 0; top: 2px; height: 16px; vertical-align: middle; float: left; }
           .hint img { vertical-align: bottom; width:16px; height:16px; }
-          #hinttitle { display: block; height: 16px; vertical-align: middle; padding: 0 4px 0 4px; background: #75899C; z-index: 2; position: relative; left: 0; top: 1px; float: left; }
-				</style><script type="text/javascript"><![CDATA[
+          #hinttitle { color: #222222; display: block; height: 16px; vertical-align: middle; padding: 0 4px 0 4px; background: #5E97A8; z-index: 2; position: relative; left: 0; top: 2px; float: left; }
+        </style><script type="text/javascript"><![CDATA[
 					var hints = new Array(), currhint = 0, activehint = null, scrollInterval = 0, startScrollTimeout = null, autohintInterval = null;
 					function finishload()
 					{
@@ -146,30 +145,30 @@
 									</xsl:attribute>
 								</img>
 							</a>
-							<a class="button" href="javascript:location.href='keyman:closehintbar'">
-								<img style="height:13px; width:13px"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>hint_close.gif</xsl:attribute></img>
-							</a>
+              <a class="button" href="javascript:location.href='keyman:closehintbar'">
+                <img style="height:13px; width:13px"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>hint_close.gif</xsl:attribute></img>
+              </a>
 						</div>
 
 						<div id="inner" onfilterchange="filterchange()">
 							<div id="hinttitle"><b><xsl:value-of select="$locale/String[@Id='S_OSK_Hint_Title']"/></b></div>
-							<div class="hint"><xsl:value-of select="$locale/String[@Id='S_OSK_Hint1']" /></div>
+              <div class="hint"><xsl:value-of select="$locale/String[@Id='S_OSK_Hint1']" /></div>
               <div class="hint"><xsl:value-of select="$locale/String[@Id='S_OSK_Hint2']" /></div>
-							<div class="hint">
+              <div class="hint">
                 <xsl:value-of select="$locale/String[@Id='S_OSK_Hint3a']" />
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <img alt="icon"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>charmapicon.gif</xsl:attribute></img>
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <xsl:value-of select="$locale/String[@Id='S_OSK_Hint3b']" />
               </div>
-							<div class="hint">
+              <div class="hint">
                 <xsl:value-of select="$locale/String[@Id='S_OSK_Hint4a']" />
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <img alt="icon"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>fonthinticon.gif</xsl:attribute></img>
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <xsl:value-of select="$locale/String[@Id='S_OSK_Hint4b']" />
               </div>
-							<div class="hint">
+              <div class="hint">
                 <xsl:value-of select="$locale/String[@Id='S_OSK_Hint5a']" />
                 <xsl:text xml:space="preserve"> </xsl:text>
                 <img alt="icon"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>keyboardhelpicon.gif</xsl:attribute></img>

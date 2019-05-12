@@ -73,16 +73,19 @@
               <xsl:otherwise>button</xsl:otherwise>
             </xsl:choose>
           </xsl:attribute>
-          <xsl:attribute name="ID">button_<xsl:value-of select="$id"/></xsl:attribute>
+          <xsl:attribute name="id">button_<xsl:value-of select="$id"/></xsl:attribute>
           <xsl:attribute name="onclick"><xsl:choose><xsl:when test="$onclick != ''"><xsl:value-of select="$onclick"/></xsl:when><xsl:otherwise>location.href="<xsl:value-of select="$command"/>";</xsl:otherwise></xsl:choose></xsl:attribute>
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
             font-size: 11px;
-            height: 23px; 
+            height: 25px; 
+            display: inline-block;
+            text-align: center;
             width: <xsl:value-of select="$width"/>;
             margin-right: 8px;
+            vertical-align: top;
           </xsl:attribute>
-          <img alt="" style="vertical-align:middle; width: 16px; margin: 0 4px 0 2px">
+          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;">
             <xsl:attribute name="src"><xsl:value-of select='/Keyman/templatepath' />shield.png</xsl:attribute>
           </img> 
           <xsl:value-of select="$caption" />
@@ -103,7 +106,8 @@
           <xsl:attribute name="style">
             width: <xsl:value-of select="$width"/>;
             font-size: 11px;
-            height: 23px;
+            height: 25px;
+            display: inline-block;
             margin-right: 8px;
           </xsl:attribute>
         </input>
@@ -129,9 +133,8 @@
       <xsl:attribute name="onfocus">javascript:menuitemover();</xsl:attribute>
       <xsl:attribute name="onblur">javascript:menuitemout();</xsl:attribute>
       <xsl:attribute name="onkeydown">javascript:return menuitem_keydown(0);</xsl:attribute>
-      <xsl:attribute name="command">
-        <xsl:value-of select="$command" />
-      </xsl:attribute>
+      <xsl:attribute name="command"><xsl:value-of select="$command" /></xsl:attribute>
+      <xsl:attribute name="onclick">javascript:HideMenu();return menuitemdown(true);</xsl:attribute>
       <xsl:copy-of select="$caption"/>
     </span>
   </xsl:template>
@@ -157,4 +160,27 @@
     
   </xsl:template>
 
+  <!-- Replaces a string, e.g. ' with \' https://stackoverflow.com/a/7712434/1836776 -->
+  
+  <xsl:template name="replace-string">
+    <xsl:param name="text"/>
+    <xsl:param name="replace"/>
+    <xsl:param name="with"/>
+    <xsl:choose>
+      <xsl:when test="contains($text,$replace)">
+        <xsl:value-of select="substring-before($text,$replace)"/>
+        <xsl:value-of select="$with"/>
+        <xsl:call-template name="replace-string">
+          <xsl:with-param name="text"
+                          select="substring-after($text,$replace)"/>
+          <xsl:with-param name="replace" select="$replace"/>
+          <xsl:with-param name="with" select="$with"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
 </xsl:stylesheet>

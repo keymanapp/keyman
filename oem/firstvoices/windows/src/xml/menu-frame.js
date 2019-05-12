@@ -3,9 +3,9 @@
   function menuframe_add(path, name, description, hotkey)
   {
     var n = menuframe_items.length;
-    document.write('<span unselectable="on" class="menuframe" id="menuframe'+n+'">' +
+    document.write('<span unselectable="on" class="menuframe" id="menuframe'+n+'"><span class="menuframe_'+name+'">' +
       '<img unselectable="on" alt="'+description+'"'+'src="'+path+
-      'menuframe_'+name+'.gif" width="114" height="32" /><br />'+description+'</span>');
+      'menuframe_'+name+'.png" width="114" height="32" /><br />'+description+'</span></span>');
     menuframe_items.push(document.getElementById('menuframe'+n));
     document.getElementById('menuframe'+n).onclick = function(event) { menuframe_activate(n); }
     //menuframe_items[n].onclick = function() { menuframe_activate(n); }
@@ -24,18 +24,24 @@
     menuframe_activeindex=n;
     document.getElementById('content_'+p.menu_name).style.display = 'none';
     document.getElementById('content_'+c.menu_name).style.display = 'block';
-    document.getElementById('state').innerText = menuframe_activeindex;
     
-    var q = document.getElementById('content_'+c.menu_name).getElementsByTagName('span');
-    for(var i = 0; i < q.length; i++) {
-      blah = q[i].id;
-      itemtype = blah.substr(0, 5);
-      
-      if( itemtype == "list_" )
-      {
-        q[i].focus();
-        break;
+    save_state();
+
+    if(!loading_state) {
+      var q = document.getElementById('content_'+c.menu_name).getElementsByTagName('span');
+      for(var i = 0; i < q.length; i++) {
+        blah = q[i].id;
+        itemtype = blah.substr(0, 5);
+        
+        if( itemtype == "list_" ) {
+          q[i].focus();
+          break;
+        }
       }
+    }
+    
+    if(typeof window['menuframe_activate_'+c.menu_name] != 'undefined') {
+      window['menuframe_activate_'+c.menu_name]();
     }
   }
   
@@ -74,7 +80,7 @@
         }
         break;
       case 13:    // enter
-        if( event.srcElement.id.substring(0,6) != 'button' ) {
+        if( event.target.id.substring(0,6) != 'button' && event.target.tagName != 'TEXTAREA' ) {
           event.cancelBubble = true; event.returnValue = false;
           location.href='keyman:footer_ok';
           break;
@@ -102,13 +108,13 @@
             if(event.srcElement.parentElement) {
               switch(event.srcElement.parentElement.id) {
                 case 'keyboards':
-                  keyboard_updatecheck(event.srcElement.index);
+                  keyboard_checkclick(event.srcElement.id.substring(5),true);
                   break;
                 case 'options':
-                  options_updatecheck(event.srcElement.index);
+                  options_updatecheck(event.srcElement.id.substring(5),true);
                   break;
                 case 'hotkeys':
-                  location.href='keyman:hotkey_set?index=hotkey_' + event.srcElement.index;
+                  location.href='keyman:hotkey_set?index=hotkey_' + event.srcElement.id.substring(5);
                   break;
                 default:
                   break;
@@ -116,7 +122,7 @@
             }
             break;
         }
-        event.cancelBubble = true; event.returnValue = false; break;
+        event.cancelBubble = true; event.returnValue = false; event.preventDefault(); break;
         break;
       default: 
         for(var i = 0; i < menuframe_items.length; i++)
@@ -128,12 +134,8 @@
     }
   }
 
-  function menuframe_setup()
-  {
-    var menuframe = document.getElementById('menuframe');
+  function menuframe_setup() {
     document.onkeydown = menuframe_keydown;
-    //menuframe.tabIndex = '-1';
-    menuframe_activate(menuframe_activeindex);
   }
   doAttachEvent(window, 'load', menuframe_setup);
   
