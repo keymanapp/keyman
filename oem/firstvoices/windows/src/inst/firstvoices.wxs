@@ -67,6 +67,10 @@
               </Component>
               
               <Component>
+                <File Name="menutitle.png" Source="..\branding\menutitle.png" KeyPath="yes" />
+              </Component>
+
+              <Component>
                 <File Id="trayicon.ico" Name="trayicon.ico" Source="..\branding\trayicon.ico" KeyPath="yes" />
               </Component>
                             
@@ -158,6 +162,7 @@
       <ComponentRef Id="KeymanDesktop.chm" />
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />
+      <ComponentRef Id="menutitle.png" />
       
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="Reg_OemProductPath" />
