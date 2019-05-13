@@ -27,6 +27,19 @@ private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
 private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
 private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
 
+struct Transform: Codable {
+  var id: Int?
+  var insert: String
+  var deleteLeft: Int?
+  var deleteRight: Int?
+}
+
+struct Suggestion: Codable {
+  var transformId: Int
+  var displayAs: String
+  var transform: Transform
+}
+
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
   let storage: Storage
@@ -399,6 +412,31 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     } else if fragment.hasPrefix("#beep-") {
       beep(self)
       delegate?.beep(self)
+    } else if fragment.hasPrefix("#suggestPopup"){
+      let baseFrameKey = fragment.range(of: "+baseFrame=")!
+      let suggestKey = fragment.range(of: "+suggestion=")!
+      let customKey = fragment.range(of: "+custom=")!
+      let baseFrame = fragment[baseFrameKey.upperBound..<suggestKey.lowerBound]
+      let suggestionJSON = String(fragment[suggestKey.upperBound..<customKey.lowerBound])
+      let customStr = fragment[customKey.upperBound..<fragment.endIndex]
+
+      let frameComponents = baseFrame.components(separatedBy: ",")
+      let x = CGFloat(Float(frameComponents[0])!)
+      let y = CGFloat(Float(frameComponents[1])!)
+      let w = CGFloat(Float(frameComponents[2])!)
+      let h = CGFloat(Float(frameComponents[3])!)
+      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
+      
+      let suggestionData = suggestionJSON.data(using: .utf16)
+      let decoder = JSONDecoder()
+      
+      do {
+        let suggestion = try decoder.decode(Suggestion.self, from: suggestionData!)
+        log.verbose("Longpress detected on suggestion: \"\(suggestion.displayAs)\".")
+      } catch {
+        log.error("Unexpected JSON parse error: \(error).")
+      }
+      
     } else {
       log.error("Unexpected KMW event: \(fragment)")
     }
