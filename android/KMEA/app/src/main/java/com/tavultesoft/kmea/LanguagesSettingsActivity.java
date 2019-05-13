@@ -75,7 +75,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
         String langName = languageInfo.get(KMManager.KMKey_LanguageName);
         associatedKeyboardsList = KeyboardPickerActivity.getAssociatedKeyboards(langId);
 
-        HashMap<String, String> associatedLexicalModel = KeyboardPickerActivity.getAssociatedLexicalModel(context, langId);
+        HashMap<String, String> associatedLexicalModel = KMManager.getAssociatedLexicalModel(langId);
 
         Bundle args = new Bundle();
         args.putString(KMManager.KMKey_LanguageID, langId);

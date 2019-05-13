@@ -104,6 +104,7 @@ public final class KMManager {
   protected static boolean SystemKeyboardShouldIgnoreSelectionChange = false;
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
+  protected static HashMap<String, String> currentLexicalModel = null;
   protected static String currentBanner = "blank";
 
   // Keyman public keys
@@ -668,6 +669,10 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
+  public static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
+    return KeyboardPickerActivity.getLexicalModelsList(context);
+  }
+
   public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
@@ -705,6 +710,45 @@ public final class KMManager {
 
   public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
+  }
+
+  /**
+   * registerAssociatedLexicalModel - Registers a lexical model with the associated language ID.
+   *         If a new model gets loaded, returns true.
+   * @param langId - String of the language ID
+   * @return boolean - True if a new model is loaded
+   */
+  public static boolean registerAssociatedLexicalModel(String langId) {
+    boolean status = false;
+    HashMap<String, String> lmInfo = getAssociatedLexicalModel(langId);
+    if (lmInfo != null && lmInfo != currentLexicalModel) {
+      registerLexicalModel(lmInfo);
+      status = true;
+    }
+    currentLexicalModel = lmInfo;
+
+    return status;
+  }
+
+  /**
+   * Search the installed lexical models list and see if there's an
+   * associated model for a given language ID
+   * @param langId - String of the language ID
+   * @return HashMap<String, String> Keyboard information if it exists. Otherwise null
+   */
+  public static HashMap<String, String> getAssociatedLexicalModel(String langId) {
+    ArrayList<HashMap<String, String>> lexicalModelsList = getLexicalModelsList(appContext);
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i = 0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
+          return lmInfo;
+        }
+      }
+    }
+
+    return null;
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -746,11 +790,13 @@ public final class KMManager {
     if (SystemKeyboard != null && SystemKeyboardLoaded)
       result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
+    registerAssociatedLexicalModel(languageID);
+
     return (result1 || result2);
   }
 
   public static boolean setKeyboard(Context context, int position) {
-    HashMap<String, String> keyboardInfo = KeyboardPickerActivity.getKeyboardInfo(context, position);
+    HashMap<String, String> keyboardInfo = getKeyboardInfo(context, position);
     if (keyboardInfo == null)
       return false;
 
@@ -1211,6 +1257,7 @@ public final class KMManager {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      String langId = KMManager.KMKey_LanguageID;
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
 
@@ -1224,7 +1271,7 @@ public final class KMManager {
           if (keyboardInfo != null) {
             String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
             String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-            String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
+            langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
             String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
@@ -1234,6 +1281,8 @@ public final class KMManager {
             InAppKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
               KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
+
+         registerAssociatedLexicalModel(langId);
         }
 
         Handler handler = new Handler();
@@ -1392,6 +1441,7 @@ public final class KMManager {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      String langId = KMManager.KMKey_LanguageID;
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         SystemKeyboardLoaded = true;
         if (!SystemKeyboard.keyboardSet) {
@@ -1404,7 +1454,7 @@ public final class KMManager {
           if (keyboardInfo != null) {
             String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
             String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-            String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
+            langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
             String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
@@ -1415,6 +1465,8 @@ public final class KMManager {
               KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
+
+        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
