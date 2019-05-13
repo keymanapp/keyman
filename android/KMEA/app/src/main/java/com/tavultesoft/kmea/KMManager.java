@@ -1606,8 +1606,9 @@ public final class KMManager {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
-
-        return false;
+      }
+      
+      return false;
     }
   }
 
