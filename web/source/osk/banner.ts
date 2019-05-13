@@ -461,27 +461,44 @@ namespace com.keyman.osk {
     protected hold(t: HTMLDivElement): void {
       // Temp, pending implementation of suggestion longpress submenus
       // - nothing worth doing with a hold yet -
+
+      // Should have separate native + embedded mode branches.
+      // Embedded mode should pass any info needed to show a submenu IMMEDIATELY.
     }
     protected clearHolds(): void {
       // Temp, pending implementation of suggestion longpress submenus
       // - nothing to clear without them -
+
+      // only really used in native-KMW
     }
     protected hasModalPopup(): boolean {
       // Temp, pending implementation of suggestion longpress submenus
+
+      // Utilized by the mobile apps; allows them to 'take over' touch handling,
+      // blocking it within KMW when the apps are already managing an ongoing touch-hold.
       return false;
     }
+
     protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {
       return target;
     }
+
     protected hasSubmenu(t: HTMLDivElement): boolean {
-      // Temp, pending implementation of suggestion longpress submenus:
+      // Temp, pending implementation of suggestion longpress submenus
+
+      // Only really used by native-KMW - see kmwnative's highlightSubKeys func.
       return false;
     }
+
     protected isSubmenuActive(): boolean {
-      // Temp, pending implementation of suggestion longpress submenus:
+      // Temp, pending implementation of suggestion longpress submenus
+
+      // Utilized only by native-KMW - it parallels hasModalPopup() in purpose.
       return false;
     }
+
     protected displaySubmenuFor(target: HTMLDivElement) {
+      // Utilized only by native-KMW to show submenus.
       throw new Error("Method not implemented.");
     }
     //#endregion

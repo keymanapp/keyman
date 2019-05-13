@@ -373,7 +373,7 @@ namespace com.keyman.text {
   };
 
   /**
-   * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
+   * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
    * 
    *  @param  {boolean}  isVisible
    *     
