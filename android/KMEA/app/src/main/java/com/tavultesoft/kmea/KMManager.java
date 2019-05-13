@@ -1371,6 +1371,36 @@ public final class KMManager {
         currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
+      } else if (url.indexOf("suggestPopup") >= 0) {
+        int start = url.indexOf("pos=") + 4;
+        int end = url.indexOf("size=");
+
+        String posData[] = url.substring(start, end).split("\\,");
+
+        start = end + 5;
+        end = url.indexOf("suggestion=");
+
+        String sizeData[] = url.substring(start, end).split("\\,");
+
+        start = end + 11;
+        end = url.indexOf("custom=");
+
+        String suggestionJSON = url.substring(start, end);
+
+        start = end + 7;
+
+        String isCustomStr = url.substring(start);
+
+        JSONParser parser = new JSONParser();
+        JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
+
+        try {
+          Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
+        } catch (JSONException e) {
+          //e.printStackTrace();
+          Log.v("KMEA", "JSON parsing error: " + e.getMessage());
+        }
+
       }
       return false;
     }
@@ -1547,8 +1577,37 @@ public final class KMManager {
         currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
-      }
-      return false;
+      } else if (url.indexOf("suggestPopup") >= 0) {
+        int start = url.indexOf("pos=") + 4;
+        int end = url.indexOf("size=");
+
+        String posData[] = url.substring(start, end).split("\\,");
+
+        start = end + 5;
+        end = url.indexOf("suggestion=");
+
+        String sizeData[] = url.substring(start, end).split("\\,");
+
+        start = end + 11;
+        end = url.indexOf("custom=");
+
+        String suggestionJSON = url.substring(start, end);
+
+        start = end + 7;
+
+        String isCustomStr = url.substring(start);
+
+        JSONParser parser = new JSONParser();
+        JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
+
+        try {
+          Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
+        } catch (JSONException e) {
+          //e.printStackTrace();
+          Log.v("KMEA", "JSON parsing error: " + e.getMessage());
+        }
+
+        return false;
     }
   }
 

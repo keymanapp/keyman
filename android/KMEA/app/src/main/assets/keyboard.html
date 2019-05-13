@@ -235,6 +235,23 @@
       }
     }
 
+    function suggestionPopup(obj,custom,x,y,w,h) {
+      if(obj != null) {
+        var i;
+        var s = JSON.stringify(obj);
+        var shift = false;
+        var pos = x.toString() + ',' + y.toString();
+        var size = w.toString() + ',' + h.toString();
+
+
+        fragmentToggle=(fragmentToggle+1) % 100;
+        var hash = 'suggestPopup-' + fragmentToggle + '+pos=' + pos + '+size=' + size + '+suggestion=' + s;
+        hash = hash + '+custom=' + custom;
+
+        window.location.hash = hash;
+      }
+    }
+
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
       window.location.hash = 'globeKeyAction' + fragmentToggle;
