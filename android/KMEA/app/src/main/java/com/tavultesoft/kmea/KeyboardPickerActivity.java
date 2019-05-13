@@ -387,13 +387,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
     KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-
-    // Register associated lexical model
-    HashMap<String, String> lmInfo = getAssociatedLexicalModel(langId);
-    if (lmInfo != null) {
-      KMManager.registerLexicalModel(lmInfo);
-    }
-
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -642,20 +635,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return index;
-  }
-
-  protected static HashMap<String, String> getAssociatedLexicalModel(String langId) {
-    if (lexicalModelsList != null) {
-      int length = lexicalModelsList.size();
-      for (int i = 0; i < length; i++) {
-        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
-          return lmInfo;
-        }
-      }
-    }
-
-    return null;
   }
 
   protected static HashMap<String, String> getKeyboardInfo(Context context, int index) {
