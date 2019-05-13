@@ -15,6 +15,7 @@ public class ConfirmDialogFragment extends DialogFragment {
   public static final String ARG_TITLE = "ConfirmDialogFragment.title";
   public static final String ARG_MESSAGE = "ConfirmDialogFragment.message";
   public static final String ARG_KEYBOARD_KEY = "confirmDialogFragment.keyboardKey";
+  private boolean dismissOnSelect = false;
 
   public static ConfirmDialogFragment newInstance(String title, String message) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
@@ -56,7 +57,7 @@ public class ConfirmDialogFragment extends DialogFragment {
               KMKeyboardDownloaderActivity.download(getActivity(), true);
             } else {
             Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
-          }
+            }
           } else {
             // Confirmation to delete item
             int keyboardIndex = KeyboardPickerActivity.getKeyboardIndex(getActivity(), keyboardKey);
@@ -64,11 +65,15 @@ public class ConfirmDialogFragment extends DialogFragment {
             if (result) {
               Toast.makeText(getActivity(), "Keyboard deleted", Toast.LENGTH_SHORT).show();
             }
+            dismissOnSelect = true;
           }
           if (dialog != null) {
             dialog.dismiss();
           }
-          getActivity().finish();
+
+          if (dismissOnSelect && !getActivity().isFinishing()) {
+            getActivity().finish();
+          }
         }
       })
       .setNegativeButton(getString(R.string.label_cancel),  new DialogInterface.OnClickListener() {

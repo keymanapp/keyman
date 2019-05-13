@@ -323,6 +323,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         try {
           JSONObject modelInfo = lmData.getJSONObject(0);
           if (modelInfo.has("packageFilename")) {
+            // TODO: Confirm if user wants to overwrite exisiting model version
             urls.add(modelInfo.getString("packageFilename"));
           }
         } catch (JSONException e) {
