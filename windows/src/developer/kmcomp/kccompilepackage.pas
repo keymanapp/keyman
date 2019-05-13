@@ -88,7 +88,7 @@ begin
       if AInstaller and Result then
       begin
         Result := DoCompilePackageInstaller(pack, tcp.SelfMessage, ASilent, AInstallerMSI,   // I4694
-          ChangeFileExt(pack.FileName, '.exe'), AUpdateInstaller);
+          ChangeFileExt(pack.FileName, '.exe'), AUpdateInstaller, True, '', '', '');
         if AWarnAsError and tcp.FHasWarning then Result := False;
       end;
     finally

@@ -41,8 +41,8 @@ uses Windows, kpsfile, kmpinffile, PackageInfo, CompilePackage,
   Keyman.Developer.System.Project.Projectlog,
   jwaMsi, jwaMsiQuery, SysUtils;
 
-function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean = True; ALicense: string = ''): Boolean;   // I4598   // I4688
-function DoCompileMSIInstaller(FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename, ARedistSetupPath, ALicense: string): Boolean;  // I2562
+function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean; ALicense, ATitleImage, AAppName: string): Boolean;   // I4598   // I4688
+function DoCompileMSIInstaller(FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename, ARedistSetupPath, ALicense, ATitleImage, AAppName: string): Boolean;  // I2562
 
 implementation
 
@@ -71,18 +71,20 @@ type
     FBuildPackage: Boolean;
     FOutputFilename: string;
     FLicense: string;  // I2562
+    FTitleImage: string;
+    FAppName: string;
     procedure FatalMessage(msg: string);
     procedure WriteMessage(msg: string);
     function GetMSIOnlineProductID: Boolean;
   public
-    constructor Create(APack: TKPSFile; ASilent: Boolean; AInstallerMSI: string; AUpdateInstaller, ABuildPackage: Boolean; AOutputFilename, ARedistSetupPath, ALicense: string);  // I2562
+    constructor Create(APack: TKPSFile; ASilent: Boolean; AInstallerMSI: string; AUpdateInstaller, ABuildPackage: Boolean; AOutputFilename, ARedistSetupPath, ALicense, ATitleImage, AAppName: string);  // I2562
     procedure Run;
     property OnMessage: TCompilePackageMessageEvent read FOnMessage write FOnMessage;
   end;
 
-function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean = True; ALicense: string = ''): Boolean;   // I4598   // I4688
+function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean; ALicense, ATitleImage, AAppName: string): Boolean;   // I4598   // I4688
 begin
-  with TCompilePackageInstaller.Create(pack, FSilent, AInstallerMSI, AUpdateInstaller, ABuildPackage, AOutputFilename, '', ALicense) do  // I2562   // I4598   // I4688
+  with TCompilePackageInstaller.Create(pack, FSilent, AInstallerMSI, AUpdateInstaller, ABuildPackage, AOutputFilename, '', ALicense, ATitleImage, AAppName) do  // I2562   // I4598   // I4688
   try
     OnMessage := FMessageEvent;
     Run;
@@ -92,9 +94,9 @@ begin
   end;
 end;
 
-function DoCompileMSIInstaller(FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI: string; AOutputFilename, ARedistSetupPath, ALicense: string): Boolean;  // I2562
+function DoCompileMSIInstaller(FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI: string; AOutputFilename, ARedistSetupPath, ALicense, ATitleImage, AAppName: string): Boolean;  // I2562
 begin
-  with TCompilePackageInstaller.Create(nil, FSilent, AInstallerMSI, False, False, AOutputFileName, ARedistSetupPath, ALicense) do  // I2562
+  with TCompilePackageInstaller.Create(nil, FSilent, AInstallerMSI, False, False, AOutputFileName, ARedistSetupPath, ALicense, ATitleImage, AAppName) do  // I2562
   try
     OnMessage := FMessageEvent;
     Run;
@@ -106,7 +108,7 @@ end;
 
 { TCompilePackageInstaller }
 
-constructor TCompilePackageInstaller.Create(APack: TKPSFile; ASilent: Boolean; AInstallerMSI: string; AUpdateInstaller, ABuildPackage: Boolean; AOutputFileName, ARedistSetupPath, ALicense: string);  // I2562
+constructor TCompilePackageInstaller.Create(APack: TKPSFile; ASilent: Boolean; AInstallerMSI: string; AUpdateInstaller, ABuildPackage: Boolean; AOutputFileName, ARedistSetupPath, ALicense, ATitleImage, AAppName: string);  // I2562
 begin
   inherited Create;
   FPack := APack;
@@ -117,6 +119,14 @@ begin
   FOutputFilename := AOutputFilename;
   FRedistSetupPath := ARedistSetupPath;
   FLicense := ALicense;  // I2562
+  FTitleImage := ATitleImage;
+  FAppName := AAppName;
+
+  if (FLicense <> '') and not FileExists(FLicense) then
+    raise ECompilePackageInstaller.CreateFmt('License file %s could not be found.', [FLicense]);
+
+  if (FTitleImage <> '') and not FileExists(FTitleImage) then
+    raise ECompilePackageInstaller.CreateFmt('Title iamge file %s could not be found.', [FTitleImage]);
 
   if not Assigned(FPack) then
   begin
@@ -302,11 +312,17 @@ begin
         s :=    '[Setup]'#13#10 +
                 'Version=' + FVersion + #13#10 +
                 'MSIFileName='+ExtractFileName(FInstallerMSI) + #13#10 +
-                'MSIOptions='+FMSIOptions + #13#10 +  // I3126
-                'Title='+FProductName + #13#10;
+                'MSIOptions='+FMSIOptions + #13#10;  // I3126
+
+        if FAppName <> '' then
+          s := s + 'AppName='+FAppName + #13#10;
 
         if FLicense <> '' then  // I2562
           s := s + 'License='+ExtractFileName(FLicense) + #13#10;
+
+        if FTitleImage <> '' then
+          s := s + 'TitleImage='+ExtractFileName(FTitleImage) + #13#10;
+
 
         if Assigned(FPack) and (FPack.KPSOptions.GraphicFile <> nil) and
           SameText(ExtractFileExt(FPack.KPSOptions.GraphicFile.FileName), '.bmp') then
@@ -345,6 +361,7 @@ begin
           Add(FTempPath + '\setup.inf');
           Add(FInstallerMSI);
           if FLicense <> '' then Add(FLicense);  // I2562
+          if FTitleImage <> '' then Add(FTitleImage);
           if Assigned(FPack) and (FPack.KPSOptions.GraphicFile <> nil) and
               SameText(ExtractFileExt(FPack.KPSOptions.GraphicFile.FileName), '.bmp') then
             Add(FPack.KPSOptions.GraphicFile.FileName);

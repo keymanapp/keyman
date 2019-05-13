@@ -45,7 +45,7 @@ type
   private
     TooManyParams: Boolean;
   public
-    OutputPath, RedistPath, MSIFileName, KMPFileName, KMPName, LicenseFileName: WideString;  // I2562   // I4763
+    OutputPath, RedistPath, MSIFileName, KMPFileName, KMPName, AppName, LicenseFileName, TitleImageFileName: WideString;  // I2562   // I4763
     constructor Create;
     function Validate: Boolean;
     function Completed: Boolean;
@@ -63,7 +63,7 @@ begin
   if not Params.Completed then
   begin                                                                        
     writeln('buildpkg.exe 1.0');
-    writeln('Usage: '+ExtractFileName(ParamStr(0))+' -m <msi filename> (-s <setup.exe folder location>)|(-n <kmp description> <kmp filename>) [-l LicenseFileName]');   // I2562   // I4763
+    writeln('Usage: '+ExtractFileName(ParamStr(0))+' -m <msi filename> [-l <License filename>] [-i <TitleImage filename>] [-a <app name>] (-s <setup.exe folder location>)|(-n <kmp description> <kmp filename>)');   // I2562   // I4763
     ExitCode := 3;
     Exit;
   end;
@@ -85,7 +85,7 @@ begin
     try
       if not DoCompilePackageInstaller(pack, Params.CompilerMessage, False, Params.MSIFileName,
           ChangeFileExt(Params.MSIFileName,'')+'-'+ChangeFileExt(ExtractFileName(Params.KMPFileName),'')+'.exe',
-          False, False, Params.LicenseFileName) then   // I4598   // I4694   // I4764
+          False, False, Params.LicenseFileName, Params.TitleImageFileName, Params.AppName) then   // I4598   // I4694   // I4764
         ExitCode := 1
       else
         ExitCode := 0;
@@ -104,7 +104,8 @@ begin
       if Params.OutputPath = '' then
         Params.OutputPath := ChangeFileExt(Params.MSIFileName, '.exe');
 
-      if not DoCompileMSIInstaller(Params.CompilerMessage, False, Params.MSIFileName, Params.OutputPath, Params.RedistPath, Params.LicenseFileName) then  // I2562
+      if not DoCompileMSIInstaller(Params.CompilerMessage, False, Params.MSIFileName, Params.OutputPath, Params.RedistPath,
+        Params.LicenseFileName, Params.TitleImageFileName, Params.AppName) then  // I2562
         ExitCode := 1
       else
         ExitCode := 0;
@@ -159,6 +160,10 @@ begin
       OutputPath := ParamStr(i)
     else if Flag = '-l' then  // I2562
       LicenseFileName := ParamStr(i)
+    else if Flag = '-i' then
+      TitleImageFileName := ParamStr(i)
+    else if Flag = '-a' then
+      AppName := ParamStr(i)
     else
     begin
       KMPFileName := Flag;

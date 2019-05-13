@@ -10,6 +10,7 @@ DESKTOP_FILES=firstvoices.wixobj desktopui.wixobj
 MSI=firstvoices.msi
 EXE=firstvoices.exe
 APPTITLE="Keyman for FirstVoices"
+TITLEIMAGE=setuptitle.png
 
 # If doing manual build of the project, manual-setup is the default target
 manual-setup: check setup
@@ -29,7 +30,7 @@ desktop: prereq
     $(MAKE) -fdownload.mak candle-desktop
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out $(MSI) -ext WixUIExtension $(DESKTOP_FILES) 
     $(SIGNCODE) /d $(APPTITLE) $(MSI)
-    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html
+    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE)
     $(SIGNCODE) /d $(APPTITLE) $(EXE)
     $(MAKE) -fdownload.mak copyredist-desktop
 
