@@ -389,8 +389,7 @@ namespace com.keyman.text {
 
     if(keyman['osk'].banner['activeBanner'] instanceof com.keyman.osk.SuggestionBanner) {
       let banner = keyman['osk'].banner['activeBanner'];
-
-      //
+      banner.rotateSuggestions();
     }
   }
 
