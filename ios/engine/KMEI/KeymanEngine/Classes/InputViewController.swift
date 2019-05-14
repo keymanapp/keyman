@@ -40,6 +40,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var landscapeConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
+  
+  private var swallowBackspaceTextChange: Bool = false
 
   open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
@@ -190,6 +192,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
+    // Swallows self-triggered calls from emptying the context due to keyboard rules
+    if self.swallowBackspaceTextChange && textDocumentProxy.documentContextBeforeInput == nil {
+      self.swallowBackspaceTextChange = false
+      return
+    }
+    
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(contextAfterInput)"
@@ -234,6 +242,18 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
           textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
         }
+      }
+
+      if textDocumentProxy.documentContextBeforeInput == nil {
+        if(self.swallowBackspaceTextChange) {
+          // A single keyboard processing command should never trigger two of these in a row;
+          // only one output function will perform deletions.
+
+          log.verbose("Failed to swallow a recent textDidChange call!")
+        }
+        
+        self.swallowBackspaceTextChange = true
+        break
       }
     }
 
