@@ -182,16 +182,18 @@
         
             function suggestionPopup(obj,custom,x,y,w,h) {
               if(obj != null) {
-                var i;
-                var s = JSON.stringify(obj);
-                var shift = false;
-                var pos = x.toString() + ',' + y.toString();
-                var size = w.toString() + ',' + h.toString();
-                var frame = pos + ',' + size;
-
                 fragmentToggle=(fragmentToggle+1) % 100;
-                var hash = 'suggestPopup-' + fragmentToggle + '+baseFrame=' + frame + '+suggestion=' + s;
-                hash = hash + '+custom=' + custom;
+                
+                var cmd = {
+                  'suggestion': obj,
+                  'isCustom': custom,
+                  'x': x,
+                  'y': y,
+                  'width': w,
+                  'height': h
+                };
+                
+                var hash = 'suggestPopup-' + fragmentToggle + '+cmd=' + JSON.stringify(cmd);
 
                 if (typeof(window.webkit) != 'undefined') {
                   window.webkit.messageHandlers.keyman.postMessage('#' + hash);
