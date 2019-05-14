@@ -299,7 +299,7 @@ namespace com.keyman {
 
       // Now that we've fully entered the new context, we can generate initial predictions from it.
       if(this.keyman.modelManager) {
-        this.keyman.modelManager.predict();
+        this.keyman.modelManager.invalidateContext();
       }
     }
 

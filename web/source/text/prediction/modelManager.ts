@@ -239,7 +239,7 @@ namespace com.keyman.text.prediction {
 
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'context');
-      this.predict();
+      this.predict_internal();
     }
 
     public predict(transcription?: Transcription) {
@@ -250,6 +250,21 @@ namespace com.keyman.text.prediction {
       if(!this.currentModel || !this.configuration) {
         return;
       }
+            
+      // We've already invalidated any suggestions resulting from any previously-existing Promise -
+      // may as well officially invalidate them via event.
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'new');
+
+      this.predict_internal(transcription);
+    }
+
+    /**
+     * Called internally to do actual predictions after any relevant "invalidatesuggestions" events
+     * have been raised.
+     * @param transcription The triggering transcription (if it exists)
+     */
+    private predict_internal(transcription?: Transcription) {
+      let keyman = com.keyman.singleton;
 
       if(!transcription) {
         let t = text.Processor.getOutputTarget();
@@ -258,16 +273,9 @@ namespace com.keyman.text.prediction {
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
       this.recordTranscription(transcription);
-      this.predict_internal(transcription.transform, context);
-    }
 
-    private predict_internal(transform: Transform, context: Context) {
-      let keyman = com.keyman.singleton;
+      let transform = transcription.transform;
       var promise = this.currentPromise = this.lmEngine.predict(transform, context);
-
-      // We've already invalidated any suggestions resulting from any previously-existing Promise -
-      // may as well officially invalidate them via event.
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'new');
 
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {

@@ -405,6 +405,10 @@ namespace com.keyman.osk {
       keyman.modelManager['removeEventListener']('tryaccept', manager.tryAccept);
       keyman.modelManager['removeEventListener']('tryrevert', manager.tryRevert);
     }
+
+    rotateSuggestions() {
+      this.manager.rotateSuggestions();
+    }
   }
 
   export class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
@@ -579,14 +583,14 @@ namespace com.keyman.osk {
         keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
       }
 
-      // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
-      this.rejectedSuggestions.push(this.recentAccepted);
       this.currentSuggestions = this.previousSuggestions; // Restore to the previous state's Suggestion list.
       this.currentTranscriptionID = this.previousTranscriptionID;
 
       let rejectIndex = this.currentSuggestions.indexOf(this.recentAccepted);
       if(rejectIndex != -1) {
-        this.currentSuggestions.splice(rejectIndex, 1);
+        // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
+        this.rejectedSuggestions.push(this.recentAccepted);
+        this.currentSuggestions.splice(rejectIndex, 1); // removes this.recentAccepted from this.currentSuggestions.
       }
 
       // Other state maintenance
@@ -632,6 +636,9 @@ namespace com.keyman.osk {
      */
     public invalidateSuggestions: (this: SuggestionManager, source: text.prediction.InvalidateSourceEnum) => boolean = 
         function(this: SuggestionManager, source: string) {
+      
+      // By default, we assume that the context is the same until we notice otherwise.
+      this.initNewContext = false;
 
       if(!this.swallowPrediction || source == 'context') {
         this.recentAccept = false;
@@ -649,13 +656,17 @@ namespace com.keyman.osk {
       });
     }.bind(this);
 
+    public activateKeep(): boolean {
+      return !this.recentAccept && !this.recentRevert && !this.initNewContext;
+    }
+
     private doUpdate() {
       let keyman = com.keyman.singleton;
 
       let suggestions = [];
       // TODO:  Insert 'current text' if/when valid as the leading option.
       //        We need the LMLayer to tell us this somehow.
-      if(!this.recentAccept && !this.recentRevert && !this.initNewContext) {
+      if(this.activateKeep()) {
         // In the meantime, a placeholder:
         // (generated from the 'true'/original transform)
         let original = keyman.modelManager.getPredictionState(this.currentTranscriptionID);
@@ -672,8 +683,23 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
+    }
 
-      this.initNewContext = false;
+    public rotateSuggestions() {
+      if(this.currentSuggestions.length > 0) {
+        let replaceCount = SuggestionBanner.SUGGESTION_LIMIT - (this.activateKeep() ? 1 : 0);
+        let rotating = this.currentSuggestions.splice(0, replaceCount);
+
+        this.rejectedSuggestions = this.rejectedSuggestions.concat(rotating);
+      } 
+      
+      // If we just removed the last available suggestions, it's time to refresh the list.
+      if(this.currentSuggestions.length == 0) {
+        this.currentSuggestions = this.rejectedSuggestions;
+        this.rejectedSuggestions = [];
+      }
+
+      this.doUpdate();
     }
 
     /**

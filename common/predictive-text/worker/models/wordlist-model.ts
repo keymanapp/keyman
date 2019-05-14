@@ -38,7 +38,7 @@
    */
 
   /** Upper bound on the amount of suggestions to generate. */
-  const MAX_SUGGESTIONS = 3;
+  const MAX_SUGGESTIONS = 12;
 
   /**
    * Additional arguments to pass into the model, in addition to the model
