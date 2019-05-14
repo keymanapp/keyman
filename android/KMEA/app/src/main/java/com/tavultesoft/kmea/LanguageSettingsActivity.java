@@ -87,11 +87,15 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     imageView.setImageResource(R.drawable.ic_arrow_forward);
     layout.setEnabled(true);
 
-    layout = (RelativeLayout)findViewById(R.id.manage_dictionary);
-    textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.manage_dictionary));
-    imageView = (ImageView) layout.findViewById(R.id.image1);
-    imageView.setImageResource(R.drawable.ic_arrow_forward);
+    /**
+     * This is a placeholder for "Manage dictionary" settings
+     *
+     * layout = (RelativeLayout)findViewById(R.id.manage_dictionary);
+     * textView = (TextView) layout.findViewById(R.id.text1);
+     * textView.setText(getString(R.string.manage_dictionary));
+     * imageView = (ImageView) layout.findViewById(R.id.image1);
+     * imageView.setImageResource(R.drawable.ic_arrow_forward);
+     */
 
     String[] from = new String[]{KMManager.KMKey_KeyboardName, KMManager.KMKey_Icon};
     int[] to = new int[]{R.id.text1, R.id.image1};

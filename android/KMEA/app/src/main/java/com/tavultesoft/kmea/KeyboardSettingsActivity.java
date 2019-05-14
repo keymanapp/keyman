@@ -28,6 +28,8 @@ import android.widget.TextView;
 
 import com.tavultesoft.kmea.util.FileUtils;
 
+import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
+
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
 
@@ -133,7 +135,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
           // Uninstall selected keyboard
           String title = String.format("%s: %s", languageName, kbName);
           String keyboardKey = String.format("%s_%s", languageID, kbID);
-          DialogFragment dialog = ConfirmDialogFragment.newInstance(title, getString(R.string.confirm_delete), keyboardKey);
+          DialogFragment dialog = ConfirmDialogFragment.newInstance(
+            DIALOG_TYPE_DELETE_KEYBOARD, title, getString(R.string.confirm_delete), keyboardKey);
           dialog.show(getFragmentManager(), "dialog");
         }
       }

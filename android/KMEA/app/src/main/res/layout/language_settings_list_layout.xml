@@ -75,10 +75,11 @@
         android:layout_below="@id/predictions_toggle"/>
 
     <!-- Model dictionary -->
+    <!-- Currently a placeholder
     <include layout="@layout/list_row_layout1"
         android:id="@+id/manage_dictionary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/model_picker"/>
+        android:layout_below="@id/model_picker"/> -->
 
 </RelativeLayout>

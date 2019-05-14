@@ -172,7 +172,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
               if (item.getItemId() == R.id.popup_delete) {
-                deleteKeyboard(position);
+                deleteKeyboard(context, position);
                 return true;
               } else {
                 return false;
@@ -367,13 +367,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
-  private void setSelection(int position) {
+  private static void setSelection(int position) {
     listView.setItemChecked(position, true);
     listView.setSelection(position);
     selectedIndex = position;
   }
 
-  private void switchKeyboard(int position) {
+  private static void switchKeyboard(int position) {
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
@@ -472,13 +472,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
-  protected void deleteKeyboard(int position) {
+  protected static void deleteKeyboard(Context context, int position) {
     int curKbPos = getCurrentKeyboardIndex();
-    boolean result = removeKeyboard(this, position);
+    boolean result = removeKeyboard(context, position);
     ;
 
     if (result) {
-      Toast.makeText(this, "Keyboard deleted", Toast.LENGTH_SHORT).show();
+      Toast.makeText(context, "Keyboard deleted", Toast.LENGTH_SHORT).show();
       BaseAdapter adapter = (BaseAdapter) listAdapter;
       adapter.notifyDataSetChanged();
       if (position == curKbPos) {
