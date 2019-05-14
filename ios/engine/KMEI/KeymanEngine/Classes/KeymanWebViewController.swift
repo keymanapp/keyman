@@ -655,6 +655,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
   }
 
   private func touchHoldBegan() {
+    // Is also called for banner longpresses.  Will need a way to properly differentiate.
     let isPad = UIDevice.current.userInterfaceIdiom == .pad
     let fontSize = isPad ? UIFont.buttonFontSize * 2 : UIFont.buttonFontSize
 
