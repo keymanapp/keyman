@@ -117,6 +117,7 @@ public class TextField: UITextField, KeymanResponder {
                              length: offset(from: textRange.start, to: textRange.end))
 
       Manager.shared.setContextState(text: self.text, range: newRange)
+      Manager.shared.resetContext()
     }
   }
 
@@ -129,6 +130,7 @@ public class TextField: UITextField, KeymanResponder {
                              length: offset(from: range.start, to: range.end))
 
       Manager.shared.setContextState(text: self.text, range: newRange)
+      Manager.shared.resetContext()
     }
   }
 
@@ -165,6 +167,7 @@ public class TextField: UITextField, KeymanResponder {
                              length: offset(from: textRange.start, to: textRange.end))
 
       Manager.shared.setContextState(text: text, range: newRange)
+      // This is called when editing in-app; do not reset context here.
       shouldUpdateKMText = false
     }
   }

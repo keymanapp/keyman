@@ -1504,6 +1504,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   func clearText() {
     inputViewController.clearText()
   }
+  
+  func resetContext() {
+    inputViewController.resetContext()
+  }
 
   func setContextState(text: String?, range: NSRange) {
     inputViewController.setContextState(text: text, range: range)

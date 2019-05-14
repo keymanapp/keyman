@@ -110,12 +110,14 @@ public class TextView: UITextView, KeymanResponder {
       }
 
      Manager.shared.inputViewController.setContextState(text: self.text, range: selectedRange)
+     Manager.shared.resetContext()
     }
   }
 
   public override var selectedTextRange: UITextRange? {
     didSet {
       Manager.shared.setContextState(text: self.text, range: selectedRange)
+      Manager.shared.resetContext()
     }
   }
 
@@ -272,6 +274,7 @@ extension TextView: UITextViewDelegate {
     if shouldUpdateKMText {
       // Catches copy/paste operations
       Manager.shared.setContextState(text: textView.text, range: textView.selectedRange)
+      // This is called when editing in-app; do not reset context here.
       shouldUpdateKMText = false
     }
   }
