@@ -1399,7 +1399,6 @@ public final class KMManager {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
-
       }
       return false;
     }
@@ -1577,37 +1576,28 @@ public final class KMManager {
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
-        int start = url.indexOf("pos=") + 4;
-        int end = url.indexOf("size=");
+        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+        // just the first intended '#' to get URI-based query param processing.
 
-        String posData[] = url.substring(start, end).split("\\,");
+        // At some point, other parts of the function should be redone to allow use of ? instead
+        // of # in our WebView command "queries" entirely.
+        String cmd = url.replace("keyboard.html#", "keyboard.html?");
+        Uri urlCommand = Uri.parse(cmd);
 
-        start = end + 5;
-        end = url.indexOf("suggestion=");
-
-        String sizeData[] = url.substring(start, end).split("\\,");
-
-        start = end + 11;
-        end = url.indexOf("custom=");
-
-        String suggestionJSON = url.substring(start, end);
-
-        start = end + 7;
-
-        String isCustomStr = url.substring(start);
+        double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
+        double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
+        double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
+        double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
+        String suggestionJSON = urlCommand.getQueryParameter("suggestion");
+        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
 
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
 
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
-
-          Uri.Builder builder = new Uri.Builder();
-          builder.fragment(url);
-
-          Uri uri = builder.build();
-
-          Log.v("KMEA", "Using Uri object: " + uri.getQueryParameter("custom"));
+          Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());

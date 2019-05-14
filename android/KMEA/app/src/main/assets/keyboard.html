@@ -237,16 +237,11 @@
 
     function suggestionPopup(obj,custom,x,y,w,h) {
       if(obj != null) {
-        var i;
-        var s = JSON.stringify(obj);
-        var shift = false;
-        var pos = x.toString() + ',' + y.toString();
-        var size = w.toString() + ',' + h.toString();
-        var frame = pos + ',' + size;
-
+        let s = JSON.stringify(obj);
 
         fragmentToggle=(fragmentToggle+1) % 100;
-        var hash = 'suggestPopup-' + fragmentToggle;
+        let hash = 'suggestPopup-' + fragmentToggle;
+
         hash = hash + '&x=' + encodeURIComponent(x) + '&y=' + encodeURIComponent(y);
         hash = hash + '&w=' + encodeURIComponent(w) + '&h=' + encodeURIComponent(h);
         hash = hash + '&suggestion=' + encodeURIComponent(s) + '&custom=' + encodeURIComponent(custom);
