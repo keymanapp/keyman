@@ -185,7 +185,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   open override func textDidChange(_ textInput: UITextInput?) {
     // Swallows self-triggered calls from emptying the context due to keyboard rules
-    if self.swallowBackspaceTextChange {
+    if self.swallowBackspaceTextChange && textDocumentProxy.documentContextBeforeInput == nil {
       self.swallowBackspaceTextChange = false
       return
     }
@@ -204,10 +204,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     setContextState(text: context, range: NSRange(newRange, in: context))
   }
   
-  @objc func clearSwallowFlag() {
-    self.swallowBackspaceTextChange = false
-  }
-
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if keymanWeb.isSubKeysMenuVisible {
       return
@@ -239,11 +235,21 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
         }
       }
+      
+      if textDocumentProxy.documentContextBeforeInput == nil {
+        if(self.swallowBackspaceTextChange) {
+          // A single keyboard processing command should never trigger two of these in a row;
+          // only one output function will perform deletions.
+          
+          // This should allow us to debug any failures of this assumption.
+          // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
+          // so all seems good.
+          log.verbose("Failed to swallow a recent textDidChange call!")
+        }
+        self.swallowBackspaceTextChange = true
+        break
+      }
     }
-    
-    self.swallowBackspaceTextChange = true
-    // afterDelay 0.01 is not sufficient!  0.02 seems to be enough for an actual delay to register.
-    perform(#selector(self.clearSwallowFlag), with: nil, afterDelay: 0.02)
 
     if !newText.isEmpty {
       textDocumentProxy.insertText(newText)
