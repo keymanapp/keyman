@@ -235,6 +235,21 @@
       }
     }
 
+    function suggestionPopup(obj,custom,x,y,w,h) {
+      if(obj != null) {
+        let s = JSON.stringify(obj);
+
+        fragmentToggle=(fragmentToggle+1) % 100;
+        let hash = 'suggestPopup-' + fragmentToggle;
+
+        hash = hash + '&x=' + encodeURIComponent(x) + '&y=' + encodeURIComponent(y);
+        hash = hash + '&w=' + encodeURIComponent(w) + '&h=' + encodeURIComponent(h);
+        hash = hash + '&suggestion=' + encodeURIComponent(s) + '&custom=' + encodeURIComponent(custom);
+
+        window.location.hash = hash;
+      }
+    }
+
     function showMenu() {
       fragmentToggle = (fragmentToggle + 1) % 100;
       window.location.hash = 'globeKeyAction' + fragmentToggle;

@@ -407,8 +407,10 @@ namespace com.keyman.osk {
     }
   }
 
-  class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+  export class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
     private selected: BannerSuggestion;
+
+    platformHold: (suggestion: BannerSuggestion, isCustom: boolean) => void;
 
     //#region Touch handling implementation
     findTargetFrom(e: HTMLElement): HTMLDivElement {
@@ -459,29 +461,51 @@ namespace com.keyman.osk {
 
     //#region Long-press support
     protected hold(t: HTMLDivElement): void {
-      // Temp, pending implementation of suggestion longpress submenus
-      // - nothing worth doing with a hold yet -
+      let suggestionObj = t['suggestion'] as BannerSuggestion;
+
+      // Is this the <keep> suggestion?  It's never in this.currentSuggestions, so check against that.
+      let isCustom = this.currentSuggestions.indexOf(suggestionObj.suggestion) == -1;
+
+      if(this.platformHold) {
+        // Implemented separately for native + embedded mode branches.
+        // Embedded mode should pass any info needed to show a submenu IMMEDIATELY.
+        this.platformHold(suggestionObj, isCustom); // No implementation yet for native.
+      }
     }
     protected clearHolds(): void {
       // Temp, pending implementation of suggestion longpress submenus
       // - nothing to clear without them -
+
+      // only really used in native-KMW
     }
+    
     protected hasModalPopup(): boolean {
-      // Temp, pending implementation of suggestion longpress submenus
-      return false;
+      // Utilized by the mobile apps; allows them to 'take over' touch handling,
+      // blocking it within KMW when the apps are already managing an ongoing touch-hold.
+      let keyman = com.keyman.singleton;
+      return keyman['osk'].vkbd.popupVisible;
     }
+
     protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {
       return target;
     }
+
     protected hasSubmenu(t: HTMLDivElement): boolean {
-      // Temp, pending implementation of suggestion longpress submenus:
+      // Temp, pending implementation of suggestion longpress submenus
+
+      // Only really used by native-KMW - see kmwnative's highlightSubKeys func.
       return false;
     }
+
     protected isSubmenuActive(): boolean {
-      // Temp, pending implementation of suggestion longpress submenus:
+      // Temp, pending implementation of suggestion longpress submenus
+
+      // Utilized only by native-KMW - it parallels hasModalPopup() in purpose.
       return false;
     }
+
     protected displaySubmenuFor(target: HTMLDivElement) {
+      // Utilized only by native-KMW to show submenus.
       throw new Error("Method not implemented.");
     }
     //#endregion

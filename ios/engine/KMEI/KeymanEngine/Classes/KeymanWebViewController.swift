@@ -399,6 +399,28 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     } else if fragment.hasPrefix("#beep-") {
       beep(self)
       delegate?.beep(self)
+    } else if fragment.hasPrefix("#suggestPopup"){
+      let cmdKey = fragment.range(of: "+cmd=")!
+      let cmdStr = fragment[cmdKey.upperBound..<fragment.endIndex]
+      
+      let cmdData = cmdStr.data(using: .utf16)
+      let decoder = JSONDecoder()
+      
+      do {
+        let cmd = try decoder.decode(SuggestionPopup.self, from: cmdData!)
+        log.verbose("Longpress detected on suggestion: \"\(cmd.suggestion.displayAs)\".")
+      } catch {
+        log.error("Unexpected JSON parse error: \(error).")
+      }
+      
+      // Will need processing upon extraction from the resulting object.
+//      let frameComponents = baseFrame.components(separatedBy: ",")
+//      let x = CGFloat(Float(frameComponents[0])!)
+//      let y = CGFloat(Float(frameComponents[1])!)
+//      let w = CGFloat(Float(frameComponents[2])!)
+//      let h = CGFloat(Float(frameComponents[3])!)
+//      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
+      
     } else {
       log.error("Unexpected KMW event: \(fragment)")
     }

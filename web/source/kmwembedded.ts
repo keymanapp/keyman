@@ -186,6 +186,18 @@ namespace com.keyman.osk {
 
     return true;
   };
+
+  SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
+    // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
+    let suggestionEle = suggestionObj.div;
+
+    // Need to know if it's a <keep> option or not!
+
+    var xBase = dom.Utils.getAbsoluteX(suggestionEle) - dom.Utils.getAbsoluteX(suggestionEle.parentElement) + suggestionEle.offsetWidth/2,
+        yBase = dom.Utils.getAbsoluteY(suggestionEle) - dom.Utils.getAbsoluteY(suggestionEle.parentElement);
+
+    window['suggestionPopup'](suggestionObj.suggestion, isCustom, xBase, yBase, suggestionEle.offsetWidth, suggestionEle.offsetHeight);
+  }
 }
 
 namespace com.keyman.text {
@@ -373,7 +385,7 @@ namespace com.keyman.text {
   };
 
   /**
-   * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
+   * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
    * 
    *  @param  {boolean}  isVisible
    *     
