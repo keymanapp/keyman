@@ -239,6 +239,13 @@ namespace com.keyman.text.prediction {
 
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'context');
+
+      // If there's no active model, there can be no predictions.
+      // We'll also be missing important data needed to even properly REQUEST the predictions.
+      if(!this.currentModel || !this.configuration) {
+        return;
+      }
+      
       this.predict_internal();
     }
 
@@ -268,7 +275,11 @@ namespace com.keyman.text.prediction {
 
       if(!transcription) {
         let t = text.Processor.getOutputTarget();
-        transcription = t.buildTranscriptionFrom(t, null);
+        if(t) {
+          transcription = t.buildTranscriptionFrom(t, null);
+        } else {
+          return;
+        }
       }
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
