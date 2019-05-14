@@ -35,11 +35,13 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private ImageButton addButton = null;
   private static ArrayList<HashMap<String, String>> associatedKeyboardList = null;
   private final String titleKey = "title";
   private final String subtitleKey = "subtitle";
   private final String iconKey = "icon";
   private String associatedLexicalModel = "";
+  private boolean dismissOnSelect = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -127,6 +129,30 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         if (customHelpLink != null)
           intent.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
         startActivity(intent);
+      }
+    });
+
+    addButton = (ImageButton) findViewById(R.id.add_button);
+    addButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Check that available keyboard information can be obtained via:
+        // 1. connection to cloud catalog
+        // 2. cached file
+        // 3. local kmp.json files in packages/
+        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
+          KeyboardPickerActivity.hasKeyboardFromPackage()){
+          dismissOnSelect = false;
+          Intent i = new Intent(context, LanguageListActivity.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+          context.startActivity(i);
+        } else {
+          AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+          dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
+          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
+          dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
+          AlertDialog dialog = dialogBuilder.create();
+          dialog.show();
+        }
       }
     });
   }
