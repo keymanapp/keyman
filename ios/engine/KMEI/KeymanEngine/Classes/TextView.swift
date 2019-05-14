@@ -109,14 +109,15 @@ public class TextView: UITextView, KeymanResponder {
         super.text = ""
       }
 
-      Manager.shared.inputViewController.setText(self.text)
-      Manager.shared.inputViewController.setSelectionRange(selectedRange, manually: false)
+     Manager.shared.inputViewController.setContextState(text: self.text, range: selectedRange)
+     Manager.shared.resetContext()
     }
   }
 
   public override var selectedTextRange: UITextRange? {
     didSet {
-      Manager.shared.setSelectionRange(selectedRange, manually: false)
+      Manager.shared.setContextState(text: self.text, range: selectedRange)
+      Manager.shared.resetContext()
     }
   }
 
@@ -259,9 +260,6 @@ extension TextView: UITextViewDelegate {
 
     log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
-    // copy this textView's text to the webview
-    Manager.shared.setText(text)
-    Manager.shared.setSelectionRange(selectedRange, manually: false)
     log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
@@ -275,8 +273,8 @@ extension TextView: UITextViewDelegate {
   public func textViewDidChange(_ textView: UITextView) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
-      Manager.shared.setText(textView.text)
-      Manager.shared.setSelectionRange(textView.selectedRange, manually: false)
+      Manager.shared.setContextState(text: textView.text, range: textView.selectedRange)
+      // This is called when editing in-app; do not reset context here.
       shouldUpdateKMText = false
     }
   }

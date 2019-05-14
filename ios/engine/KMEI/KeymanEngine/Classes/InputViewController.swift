@@ -38,6 +38,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var landscapeConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
+  
+  private var swallowBackspaceTextChange: Bool = false
 
   open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
@@ -182,6 +184,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
+    // Swallows self-triggered calls from emptying the context due to keyboard rules
+    if self.swallowBackspaceTextChange && textDocumentProxy.documentContextBeforeInput == nil {
+      self.swallowBackspaceTextChange = false
+      return
+    }
+    
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(contextAfterInput)"
@@ -193,10 +201,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       newRange = context.startIndex..<context.startIndex
     }
 
-    setText(context)
-    setSelectionRange(NSRange(newRange, in: context), manually: false)
+    setContextState(text: context, range: NSRange(newRange, in: context))
+    // Within the app, this is triggered after every keyboard input.
+    // We should NOT call .resetContext() here for this reason.
   }
-
+  
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if keymanWeb.isSubKeysMenuVisible {
       return
@@ -227,6 +236,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
           textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
         }
+      }
+      
+      if textDocumentProxy.documentContextBeforeInput == nil {
+        if(self.swallowBackspaceTextChange) {
+          // A single keyboard processing command should never trigger two of these in a row;
+          // only one output function will perform deletions.
+          
+          // This should allow us to debug any failures of this assumption.
+          // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
+          // so all seems good.
+          log.verbose("Failed to swallow a recent textDidChange call!")
+        }
+        self.swallowBackspaceTextChange = true
+        break
       }
     }
 
@@ -381,24 +404,40 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
   }
-  
-//  func setCursorRange(_ range: NSRange) {
-//    keymanWeb.setCursorRange(range)
-//  }
-  
-  func setText(_ text: String?) {
-    keymanWeb.setText(text)
-  }
-  
+
   func clearText() {
-    setText(nil)
-    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
+    setContextState(text: nil, range: NSRange(location: 0, length: 0))
+    keymanWeb.resetContext()
     log.info("Cleared text.")
   }
   
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
+  func resetContext() {
+    keymanWeb.resetContext()
+  }
+ 
+  func setContextState(text: String?, range: NSRange) {
+    // Check for any LTR or RTL marks at the context's start; if they exist, we should
+    // offset the selection range.
+    let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
+    var offsetPrefix = false;
+    
+    let context = text ?? ""
+    
+    for codepoint in characterOrderingChecks {
+      if(context.hasPrefix(codepoint)) {
+        offsetPrefix = true;
+        break;
+      }
+    }
+    
+    var selRange = range;
+    if(offsetPrefix) { // If we have a character ordering mark, offset range location to hide it.
+      selRange = NSRange(location: selRange.location - 1, length: selRange.length)
+    }
+    
+    keymanWeb.setText(context)
     if range.location != NSNotFound {
-      keymanWeb.setCursorRange(range)
+      keymanWeb.setCursorRange(selRange)
     }
   }
   
