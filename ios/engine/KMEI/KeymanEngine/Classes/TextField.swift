@@ -112,11 +112,11 @@ public class TextField: UITextField, KeymanResponder {
         super.text = ""
       }
 
-      Manager.shared.setText(self.text)
       let textRange = selectedTextRange ?? UITextRange()
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
-      Manager.shared.setSelectionRange(newRange, manually: false)
+
+      Manager.shared.setContextState(text: self.text, range: newRange)
     }
   }
 
@@ -127,7 +127,8 @@ public class TextField: UITextField, KeymanResponder {
       }
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: range.start),
                              length: offset(from: range.start, to: range.end))
-      Manager.shared.setSelectionRange(newRange, manually: false)
+
+      Manager.shared.setContextState(text: self.text, range: newRange)
     }
   }
 
@@ -159,11 +160,11 @@ public class TextField: UITextField, KeymanResponder {
   @objc func textFieldTextDidChange(_ notification: Notification) {
     if shouldUpdateKMText {
       // Catches copy/paste operations
-      Manager.shared.setText(text)
       let textRange = selectedTextRange!
       let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
                              length: offset(from: textRange.start, to: textRange.end))
-      Manager.shared.setSelectionRange(newRange, manually: false)
+
+      Manager.shared.setContextState(text: text, range: newRange)
       shouldUpdateKMText = false
     }
   }
@@ -262,12 +263,6 @@ extension TextField: UITextFieldDelegate {
 
     log.debug("TextField: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
 
-    // copy this textField's text to the webview
-    Manager.shared.setText(text)
-    let textRange = selectedTextRange!
-    let newRange = NSRange(location: offset(from: beginningOfDocument, to: textRange.start),
-                           length: offset(from: textRange.start, to: textRange.end))
-    Manager.shared.setSelectionRange(newRange, manually: false)
     log.debug("TextField: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
   }
 
