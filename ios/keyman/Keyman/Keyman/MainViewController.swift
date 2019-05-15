@@ -547,7 +547,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     _ = dismissDropDownMenu()
     popover?.dismiss(animated: false)
 
-    Manager.shared.manageLanguages(inVC: self)
+    Manager.shared.manageKeymanEngine(inVC: self)
   }
 
   @objc func actionButtonClick(_ sender: Any) {

@@ -100,6 +100,8 @@
 		9A31E2D0224AE8BF00D9A491 /* APILexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */; };
 		9A4609972241B39B00B0BFD1 /* LexicalModelInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */; };
 		9A4609992242047400B0BFD1 /* LexicalModelAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */; };
+		9A60763D22892485003BCFBA /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A60763C22892485003BCFBA /* Settings.storyboard */; };
+		9A60764422893A4E003BCFBA /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A60764322893A4E003BCFBA /* SettingsViewController.swift */; };
 		9A9CB08022416E5400231FB9 /* LexicalModelPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */; };
 		9A9CB0822241704800231FB9 /* APILexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */; };
 		9A9CB084224170F700231FB9 /* LexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB083224170F700231FB9 /* LexicalModelRepository.swift */; };
@@ -289,6 +291,8 @@
 		9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Formatter+ISODateExtension.swift"; sourceTree = "<group>"; };
 		9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelInfoViewController.swift; sourceTree = "<group>"; };
 		9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelAPICall.swift; sourceTree = "<group>"; };
+		9A60763C22892485003BCFBA /* Settings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Settings.storyboard; path = Settings/Settings.storyboard; sourceTree = "<group>"; };
+		9A60764322893A4E003BCFBA /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsViewController.swift; path = Settings/SettingsViewController.swift; sourceTree = "<group>"; };
 		9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelPickerViewController.swift; sourceTree = "<group>"; };
 		9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILexicalModelRepository.swift; sourceTree = "<group>"; };
 		9A9CB083224170F700231FB9 /* LexicalModelRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelRepository.swift; sourceTree = "<group>"; };
@@ -564,6 +568,15 @@
 			path = KeymanEngineTests;
 			sourceTree = "<group>";
 		};
+		9A60763E22892495003BCFBA /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				9A60763C22892485003BCFBA /* Settings.storyboard */,
+				9A60764322893A4E003BCFBA /* SettingsViewController.swift */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
 		C024C9921FA6EB340060583B /* Notification */ = {
 			isa = PBXGroup;
 			children = (
@@ -739,6 +752,7 @@
 				C024C9921FA6EB340060583B /* Notification */,
 				C07A9D881FD1760800828ADD /* KeyboardRepository */,
 				C0A93A531F8B21240079948B /* Manager.swift */,
+				9A60763E22892495003BCFBA /* Settings */,
 				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
 				987F00041AB8FCB700998116 /* KeyboardMenuView */,
 				980CC8E119D51EF00089BB57 /* URLProtocol */,
@@ -955,6 +969,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */,
+				9A60763D22892485003BCFBA /* Settings.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1153,6 +1168,7 @@
 				C024C9941FA6EB470060583B /* NotificationName.swift in Sources */,
 				C0C16A891FA8146300F090BA /* KeymanWebViewController.swift in Sources */,
 				9A079DCA222E050E00581263 /* LexicalModelKeymanPackage.swift in Sources */,
+				9A60764422893A4E003BCFBA /* SettingsViewController.swift in Sources */,
 				C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */,
 				C07A9D8E1FD1798900828ADD /* APIKeyboardRepository.swift in Sources */,
 				C0959CD41F99C44E00B616BC /* Constants.swift in Sources */,
