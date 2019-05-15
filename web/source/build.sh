@@ -420,7 +420,11 @@ if [ $BUILD_UI = true ]; then
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
+    # We currently have an issue with sourcemaps for minified versions.
+    # We should use the unminified one instead for now.
+    cp $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js
     # Copy the sourcemap.
-    cp $INTERMEDIATE/keyman.js.map $EMBED_OUTPUT/keyman.js.map
+    cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
     echo Uncompiled embedded application saved as keyman.js
 fi
+

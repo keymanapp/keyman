@@ -599,6 +599,7 @@ final class KMKeyboard extends WebView {
 
   @SuppressLint("InflateParams")
   private void showSubKeys(Context context) {
+    // This is also called for banner longpresses!  Need a way to differentiate the sources.
     if (subKeysList == null || subKeysWindow != null) {
       return;
     }
