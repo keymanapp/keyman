@@ -47,14 +47,10 @@ public final class ModelsPickerActivity extends AppCompatActivity {
     TextView textView = (TextView) findViewById(R.id.bar_title);
 
     Bundle bundle = getIntent().getExtras();
-    String languageID, languageName;
+    String languageID = "", languageName = "";
     if (bundle != null) {
       languageID = bundle.getString(KMManager.KMKey_LanguageID);
       languageName = bundle.getString(KMManager.KMKey_LanguageName);
-    } else {
-      // TODO: remove test code from production
-      languageID = "km";
-      languageName = "Khmer";
     }
     textView.setText(String.format("%s model", languageName));
 

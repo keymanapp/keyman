@@ -88,6 +88,21 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     ImageView imageView = (ImageView) layout.findViewById(R.id.image1);
     imageView.setImageResource(R.drawable.ic_arrow_forward);
     layout.setEnabled(true);
+    layout.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        // Start Model Picker Activity.
+        // Use the language ID and nmae from the first associated keyboard (they should all be the same)
+        HashMap<String, String> kbInfo = associatedKeyboardList.get(0);
+        Bundle bundle = new Bundle();
+        bundle.putString(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
+        bundle.putString(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
+        Intent i = new Intent(context, ModelsPickerActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        i.putExtras(bundle);
+        startActivity(i);
+      }
+    });
 
     /**
      * This is a placeholder for "Manage dictionary" settings
