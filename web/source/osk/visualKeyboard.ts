@@ -510,7 +510,12 @@ namespace com.keyman.osk {
       '*RCtrlShift*':     0x70
     };
 
-    private layout: ActiveLayout;
+    /**
+     * Contains layout properties corresponding to the OSK's layout.  Needs to be public
+     * so that its geometry may be updated on rotations and keyboard resize events, as 
+     * said geometry needs to be accurate for fat-finger probability calculations.
+     */
+    layout: ActiveLayout;
     layers: LayoutLayer[];
     layerId: string = "default";
     layerIndex: number;

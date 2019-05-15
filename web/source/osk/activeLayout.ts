@@ -13,13 +13,17 @@ namespace com.keyman.osk {
 
     id: string;
     key: LayoutKey[];
-    //totalWidth: number;
+
+    /**
+     * Used for calculating fat-fingering offsets.
+     */
+    proportionalY: number;
 
     private constructor() {
 
     }
     
-    static polyfill(row: LayoutRow, totalWidth: number) {
+    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
@@ -82,6 +86,9 @@ namespace com.keyman.osk {
           row[key] = dummy[key];
         }
       }
+
+      let aRow = row as ActiveRow;
+      aRow.proportionalY = proportionalY;
     }
   }
 
@@ -140,20 +147,23 @@ namespace com.keyman.osk {
         totalWidth += 15;
       }
 
-      for(let i=0; i<layer.row.length; i++) {
-        ActiveRow.polyfill(layer.row[i], totalWidth);
+      let rowCount = layer.row.length;
+      for(let i=0; i<rowCount; i++) {
+        // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
+        let rowProportionalY = (rowCount - i - 0.5) / rowCount;
+        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY);
       }
 
-      // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
+      // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayer();
-      dummy.totalWidth = totalWidth; // so that it gets copied as a new property of `this`.
       for(let key in dummy) {
         if(!layer.hasOwnProperty(key)) {
           layer[key] = dummy[key];
         }
       }
 
-      
+      let aLayer = layer as ActiveLayer;
+      aLayer.totalWidth = totalWidth;
     }
   }
 
