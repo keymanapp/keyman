@@ -18,6 +18,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.util.MapCompat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -69,7 +71,17 @@ public final class ModelsPickerActivity extends AppCompatActivity {
         listView.setItemChecked(position, true);
         listView.setSelection(position);
 
-        // TODO: Start intent for selected Predictive Text Model screen
+        // Start intent for selected Predictive Text Model screen
+        HashMap<String, String> modelInfo = lexicalModelsList.get(position);
+        Bundle bundle = new Bundle();
+        bundle.putString(KMManager.KMKey_LexicalModelID, modelInfo.get(KMManager.KMKey_LexicalModelID));
+        bundle.putString(KMManager.KMKey_LexicalModelName, modelInfo.get(KMManager.KMKey_LexicalModelName));
+        bundle.putString(KMManager.KMKey_LexicalModelVersion, modelInfo.get(KMManager.KMKey_LexicalModelVersion));
+        String isCustom = MapCompat.getOrDefault(modelInfo, KMManager.KMKey_CustomModel, "N");
+        bundle.putBoolean(KMManager.KMKey_CustomModel, isCustom.toUpperCase().equals("Y"));
+        Intent i = new Intent(context, ModelInfoActivity.class);
+        i.putExtras(bundle);
+        startActivity(i);
       }
     });
 
