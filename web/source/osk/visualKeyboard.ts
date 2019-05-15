@@ -44,7 +44,7 @@ namespace com.keyman.osk {
   //#endregion
 
   //#region OSK key objects and construction
-  export class OSKKeySpec {
+  export class OSKKeySpec implements LayoutKey {
     id: string;
     text?: string;
     sp?: number | ButtonClass;
@@ -779,11 +779,16 @@ namespace com.keyman.osk {
             keys[j]['widthpc']=keyPercent;
             padPercent = Math.round(keys[j]['padpc'] * objectWidth); // Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
             keys[j]['padpc']=padPercent;
+
+            // recompute center's x-coord
+            (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
+
             totalPercent += padPercent+keyPercent;
           }
 
           // Allow for right OSK margin (15 layout units)
-          totalPercent += Math.round(15*objectWidth/layer.totalWidth);
+          let rightMargin = Math.round(15*objectWidth/layer.totalWidth);
+          totalPercent += rightMargin;
 
           // If a single key, and padding is negative, add padding to right align the key
           if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
@@ -791,12 +796,18 @@ namespace com.keyman.osk {
             keys[0]['widthpc']=keyPercent;
             totalPercent += keyPercent;
             keys[0]['padpc']=(objectWidth-totalPercent);
+
+            // recompute center's x-coord
+            (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2) - rightMargin)/objectWidth;
           } else if(keys.length > 0) {
             j=keys.length-1;
             padPercent = Math.round(keys[j]['padpc'] * objectWidth); //Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
             keys[j]['padpc']=padPercent;
             totalPercent += padPercent;
             keys[j]['widthpc']=(objectWidth-totalPercent);
+
+            // recompute center's x-coord
+            (<ActiveKey> keys[j]).proportionalX = (objectWidth - (objectWidth - totalPercent)/2 - rightMargin)/objectWidth;
           }
 
           //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)

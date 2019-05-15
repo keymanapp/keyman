@@ -1,4 +1,21 @@
 namespace com.keyman.osk {
+  export class ActiveKey implements LayoutKey {
+    width?: string;
+    pad?: string;
+    
+    proportionalX: number;
+
+    static polyfill(key: LayoutKey) {
+      // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
+      let dummy = new ActiveKey();
+      for(let prop in dummy) {
+        if(!key.hasOwnProperty(prop)) {
+          key[prop] = dummy[prop];
+        }
+      }
+    }
+  }
+
   class ActiveRow implements LayoutRow {
     // Identify key labels (e.g. *Shift*) that require the special OSK font
     static readonly SPECIAL_LABEL=/\*\w+\*/;
@@ -49,6 +66,8 @@ namespace com.keyman.osk {
             }
             break;
         }
+
+        ActiveKey.polyfill(key);
       }
 
       // Calculate percentage-based scalings by summing defined widths and scaling each key to %.
