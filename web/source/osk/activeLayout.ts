@@ -13,7 +13,7 @@ namespace com.keyman.osk {
 
     id: string;
     key: LayoutKey[];
-    totalWidth: number;
+    //totalWidth: number;
 
     private constructor() {
 
@@ -82,14 +82,14 @@ namespace com.keyman.osk {
           row[key] = dummy[key];
         }
       }
-
-      (row as ActiveRow).totalWidth = totalWidth;
     }
   }
 
   export class ActiveLayer implements LayoutLayer {
     row: ActiveRow[];
     id: string;
+
+    totalWidth: number;
 
     constructor() {
 
@@ -146,11 +146,14 @@ namespace com.keyman.osk {
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayer();
+      dummy.totalWidth = totalWidth; // so that it gets copied as a new property of `this`.
       for(let key in dummy) {
         if(!layer.hasOwnProperty(key)) {
           layer[key] = dummy[key];
         }
       }
+
+      
     }
   }
 
@@ -167,7 +170,7 @@ namespace com.keyman.osk {
      * @param layout
      * @param formFactor 
      */
-    static polyfill(layout: LayoutFormFactor, formFactor: string) {
+    static polyfill(layout: LayoutFormFactor, formFactor: string): ActiveLayout {
       if(layout == null) {
         throw new Error("Cannot build an ActiveLayout for a null specification.");
       }
@@ -205,6 +208,8 @@ namespace com.keyman.osk {
           layout[key] = dummy[key];
         }
       }
+
+      return layout as ActiveLayout;
     }
   }
 }
