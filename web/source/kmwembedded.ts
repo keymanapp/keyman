@@ -165,7 +165,7 @@ namespace com.keyman.osk {
         rs.bottom=bottom+'px';
         rs.maxHeight=rs.height=rowHeight+'px';
         // Calculate the exact vertical coordinate of the row's center.
-        this.layout.layer[nLayer].row[nRow].proportionalY = (bottom + rowHeight/2) / (kbdHeight + 3);
+        this.layout.layer[nLayer].row[nRow].proportionalY = ((kbdHeight + 3 - bottom) - rowHeight/2) / (kbdHeight + 3);
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {

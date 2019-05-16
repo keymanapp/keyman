@@ -37,13 +37,12 @@ namespace com.keyman.osk {
      * Used for calculating fat-fingering offsets.
      */
     proportionalY: number;
-    proportionalHeight: number;
 
     private constructor() {
 
     }
     
-    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number, proportionalHeight: number) {
+    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
@@ -133,7 +132,6 @@ namespace com.keyman.osk {
 
       let aRow = row as ActiveRow;
       aRow.proportionalY = proportionalY;
-      aRow.proportionalHeight = proportionalHeight;
     }
   }
 
@@ -144,6 +142,7 @@ namespace com.keyman.osk {
     totalWidth: number;
 
     defaultKeyProportionalWidth: number;
+    rowProportionalHeight: number;
 
     constructor() {
 
@@ -197,8 +196,8 @@ namespace com.keyman.osk {
       let rowCount = layer.row.length;
       for(let i=0; i<rowCount; i++) {
         // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
-        let rowProportionalY = (rowCount - i - 0.5) / rowCount;
-        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY, 1.0 / rowCount);
+        let rowProportionalY = (i + 0.5) / rowCount;
+        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY);
       }
 
       // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -212,6 +211,67 @@ namespace com.keyman.osk {
       let aLayer = layer as ActiveLayer;
       aLayer.totalWidth = totalWidth;
       aLayer.defaultKeyProportionalWidth = parseInt(ActiveKey.DEFAULT_KEY.width, 10) / totalWidth;
+      aLayer.rowProportionalHeight = 1.0 / rowCount;
+    }
+
+    /**
+     * Computes a probability distribution regarding the likelihood of a touch command being intended
+     * for each of the layout's keys.
+     * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
+     *                           Should be within [0, 0] to [1, 1].
+     * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
+     *                           For a 400 x 200 keyboard, should be 2.
+     */
+    keyTouchDistribution(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
+      let layer = this;
+
+      // This double-nested loop computes a pseudo-distance for the touch from each key.  Quite useful for
+      // generating a probability distribution.
+      this.row.forEach(function(row: ActiveRow): void {
+        row.key.forEach(function(key: ActiveKey): void {
+          // These represent the within-key distance of the touch from the key's center.
+          // Both should be on the interval [0, 0.5].
+          let dx = Math.abs(touchCoords.x - key.proportionalX);
+          let dy = Math.abs(touchCoords.y - row.proportionalY);
+
+          // If the touch isn't within the key, these store the out-of-key distance
+          // from the closest point on the key being checked.
+          let distX: number, distY: number;
+
+          if(dx > 0.5 * key.proportionalWidth) {
+            distX = (dx - 0.5 * key.proportionalWidth);
+            dx = 0.5;
+          } else {
+            distX = 0;
+            dx /= key.proportionalWidth;
+          }
+
+          if(dy > 0.5 * layer.rowProportionalHeight) {
+            distY = (dy - 0.5 * layer.rowProportionalHeight);
+            dy = 0.5;
+          } else {
+            distY = 0;
+            dy /= layer.rowProportionalHeight;
+          }
+
+          // Now that the differentials are computed, it's time to do distance scaling.
+          //
+          // For out-of-key distance, we scale the X component by the keyboard's aspect ratio
+          // to get the actual out-of-key distance rather than proportional.
+          distX *= kbdScaleRatio;
+
+          // While the keys are rarely perfect squares, we map all within-key distance
+          // to a square shape.  (ALT/CMD should seem as close to SPACE as a 'B'.)
+          //
+          // For that square, we take the rowHeight as its edge lengths.
+          distX += dx * layer.rowProportionalHeight;
+          distY += dy * layer.rowProportionalHeight;
+
+          let distance = Math.sqrt(distX * distX + distY * distY);
+          console.log("Distance of " + (key as LayoutKey).id + " from touch: " + distance);
+        });
+      });
+      return null;
     }
   }
 
@@ -268,11 +328,6 @@ namespace com.keyman.osk {
       }
 
       return layout as ActiveLayout;
-    }
-
-    keyTouchDistribution(proportionalCoords: {x: number, y: number}, kbdDims?: {w: number, h: number}): {[keyId: string]: number} {
-      // TODO:  This function.
-      return null;
     }
   }
 }

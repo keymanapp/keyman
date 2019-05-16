@@ -859,7 +859,13 @@ namespace com.keyman.osk {
       // Save the touch point
       this.touchX = e.changedTouches[0].pageX;
 
+      // FIXME:  Temporary section demonstrating how to compute the fat-finger distribution from the OSK.
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(e.changedTouches[0]);
+      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
+      touchKbdPos.x /= layerGroup.offsetWidth;
+      touchKbdPos.y /= layerGroup.offsetHeight;
+      let kbdScale = layerGroup.offsetWidth / layerGroup.offsetHeight;
+      this.layout.layer[this.layerIndex].keyTouchDistribution(touchKbdPos, kbdScale);
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
