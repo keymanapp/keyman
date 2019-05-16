@@ -32,7 +32,7 @@ namespace com.keyman.osk {
     static readonly SPECIAL_LABEL=/\*\w+\*/;
 
     id: string;
-    key: LayoutKey[];
+    key: ActiveKey[];
 
     /**
      * Used for calculating fat-fingering offsets.
@@ -134,6 +134,14 @@ namespace com.keyman.osk {
       let aRow = row as ActiveRow;
       aRow.proportionalY = proportionalY;
     }
+
+    populateKeyMap(map: {[keyId: string]: ActiveKey}) {
+      this.key.forEach(function(key: ActiveKey) {
+        if(key.id) {
+          map[key.id] = key;
+        }
+      });
+    }
   }
 
   export class ActiveLayer implements LayoutLayer {
@@ -144,6 +152,11 @@ namespace com.keyman.osk {
 
     defaultKeyProportionalWidth: number;
     rowProportionalHeight: number;
+
+    /**
+     * Facilitates mapping key id strings to their specification objects.
+     */
+    keyMap: {[keyId: string]: ActiveKey};
 
     constructor() {
 
@@ -213,6 +226,16 @@ namespace com.keyman.osk {
       aLayer.totalWidth = totalWidth;
       aLayer.defaultKeyProportionalWidth = parseInt(ActiveKey.DEFAULT_KEY.width, 10) / totalWidth;
       aLayer.rowProportionalHeight = 1.0 / rowCount;
+      aLayer.keyMap = aLayer.constructKeyMap();
+    }
+
+    private constructKeyMap(): {[keyId: string]: ActiveKey} {
+      let map: {[keyId: string]: ActiveKey} = {};
+      this.row.forEach(function(row: ActiveRow) {
+        row.populateKeyMap(map);
+      });
+
+      return map;
     }
 
     /**
@@ -325,12 +348,12 @@ namespace com.keyman.osk {
       return keyDists;
     }
 
-    getKey(keyName: string) {
+    getKey(keyId: string) {
       // Keys usually are specified in a "long form" prefixed with their layer's ID.
-      if(keyName.indexOf(this.id + '-') == 0) {
-        keyName = keyName.replace(this.id + '-', '');
+      if(keyId.indexOf(this.id + '-') == 0) {
+        keyId = keyId.replace(this.id + '-', '');
 
-        // TODO:  Have prebuilt a 'id' -> key hash for key lookups, use that here.
+        return this.keyMap[keyId];
       }
     }
   }
