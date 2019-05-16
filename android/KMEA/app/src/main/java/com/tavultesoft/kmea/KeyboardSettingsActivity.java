@@ -136,7 +136,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
           String title = String.format("%s: %s", languageName, kbName);
           String keyboardKey = String.format("%s_%s", languageID, kbID);
           DialogFragment dialog = ConfirmDialogFragment.newInstance(
-            DIALOG_TYPE_DELETE_KEYBOARD, title, getString(R.string.confirm_delete), keyboardKey);
+            DIALOG_TYPE_DELETE_KEYBOARD, title, getString(R.string.confirm_delete_keyboard), keyboardKey);
           dialog.show(getFragmentManager(), "dialog");
         }
       }

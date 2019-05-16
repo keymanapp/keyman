@@ -160,6 +160,12 @@
       window.jsInterface.insertText(dn, s, dr);
     }
 
+    function unloadModel() {
+      var kmw=window['keyman'];
+      window.console.log('unloadModel');
+      kmw.modelManager.unloadModel();
+    }
+
     function enableSuggestions(model) {
       registerModel(model);
     }

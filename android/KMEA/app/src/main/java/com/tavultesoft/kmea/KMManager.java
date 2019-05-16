@@ -708,6 +708,17 @@ public final class KMManager {
     return true;
   }
 
+  public static boolean unloadLexicalModel() {
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      InAppKeyboard.loadUrl("javascript:unloadModel()");
+    }
+
+    if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      SystemKeyboard.loadUrl("javascript:unloadModel()");
+    }
+    return true;
+  }
+
   public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
   }

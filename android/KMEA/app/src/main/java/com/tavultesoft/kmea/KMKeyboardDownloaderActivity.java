@@ -125,7 +125,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
 
     DialogFragment dialog = ConfirmDialogFragment.newInstance(
-      DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download));
+      DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard));
     dialog.show(getFragmentManager(), "dialog");
   }
 

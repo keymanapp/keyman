@@ -439,7 +439,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
       if (pkgID != null && modelID != null && langID != null) {
         String lmKey = String.format("%s_%s_%s", langID, pkgID, modelID);
-        if (lmKey.length() >= 3) {
+        if (lmKey.length() >= 5) {
           int x = getLexicalModelIndex(context, lmKey);
           if (x >= 0) {
             lexicalModelsList.set(x, lexicalModelInfo);
@@ -487,6 +487,29 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         curKbPos = getCurrentKeyboardIndex();
         setSelection(curKbPos);
       }
+    }
+  }
+
+  protected static boolean removeLexicalModel(Context context, int position) {
+    boolean result = false;
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null && position >= 0 && position < lexicalModelsList.size()) {
+      lexicalModelsList.remove(position);
+      result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+    }
+
+    return result;
+  }
+
+  protected static void deleteLexicalModel(Context context, int position) {
+    boolean result = removeLexicalModel(context, position);
+
+    if (result) {
+      Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show();
+      KMManager.unloadLexicalModel();
     }
   }
 

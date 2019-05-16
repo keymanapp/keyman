@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -30,6 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
+
+import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class ModelInfoActivity extends AppCompatActivity {
@@ -57,10 +60,12 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     listView = (ListView) findViewById(R.id.listView);
 
+    final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
+    final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
     final String modelID = getIntent().getStringExtra(KMManager.KMKey_LexicalModelID);
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
-    String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
+    final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
     textView.setText(String.format("%s model", modelName));
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
@@ -101,6 +106,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 1) {
+          // Help link to model
           Intent i = new Intent(Intent.ACTION_VIEW);
 
           if (customHelpLink != null) {
@@ -122,25 +128,17 @@ public final class ModelInfoActivity extends AppCompatActivity {
             startActivity(i);
           } else {
             // TODO: open browser to Keyman site on lexical models
-            //String helpUrlStr = String.format("http://help.keyman.com/keyboard/%s/%s/", modelID, modelVersion);
+            //String helpUrlStr = String.format("http://help.keyman.com/models/%s/%s/", modelID, modelVersion);
             //i.setData(Uri.parse(helpUrlStr));
             //startActivity(i);
           }
         } else if (position == 2) {
-          PopupMenu popup = new PopupMenu(context, view);
-          popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
-          popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-              if (item.getItemId() == R.id.popup_delete) {
-                deleteModel(modelID);
-                return true;
-              } else {
-                return false;
-              }
-            }
-          });
-          popup.show();
-          return;
+          // Confirmation to delete model
+          String lexicalModelKey = String.format("%s_%s_%s", languageID, packageID, modelID);
+          DialogFragment dialog = ConfirmDialogFragment.newInstance(
+            DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);
+          dialog.show(getFragmentManager(), "dialog");
+
         } else {
           return;
         }
@@ -157,15 +155,5 @@ public final class ModelInfoActivity extends AppCompatActivity {
   public boolean onSupportNavigateUp() {
     super.onBackPressed();
     return true;
-  }
-
-  // TODO: Uninstall model
-  protected void deleteModel(String modelID) {
-    boolean result = true;
-
-    if (result) {
-      Toast.makeText(this, "Model deleted", Toast.LENGTH_SHORT).show();
-    }
-    finish();
   }
 }

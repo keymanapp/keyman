@@ -31,8 +31,8 @@
     <!-- Keyboard Updates -->
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
-    <string name="confirm_delete" translatable="false">Would you like to delete this keyboard?</string>
-    <string name="confirm_download" translatable="false">Would you like to download this keyboard?</string>
+    <string name="confirm_delete_keyboard" translatable="false">Would you like to delete this keyboard?</string>
+    <string name="confirm_download_keyboard" translatable="false">Would you like to download this keyboard?</string>
     <string name="confirm_update" translatable="false">Would you like to update keyboards now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
@@ -50,6 +50,7 @@
     <!-- Model Info -->
     <string name="model_version" translatable="false">Model version</string>
     <string name="uninstall_model" translatable="false">Uninstall model</string>
+    <string name="confirm_delete_model" translatable="false">Would you like to delete this model?</string>
 
     <!-- Language Settings menu strings -->
     <string name="enable_corrections" translatable="false">Enable corrections</string>

@@ -15,12 +15,14 @@ public class ConfirmDialogFragment extends DialogFragment {
   public static final String ARG_DIALOG_TYPE = "ConfirmDialogFragment.dialogType";
   public static final String ARG_TITLE = "ConfirmDialogFragment.title";
   public static final String ARG_MESSAGE = "ConfirmDialogFragment.message";
-  public static final String ARG_KEYBOARD_KEY = "confirmDialogFragment.keyboardKey";
+  public static final String ARG_ITEM_KEY = "confirmDialogFragment.itemKey";
   private boolean dismissOnSelect = false;
 
   public enum DialogType {
     DIALOG_TYPE_DOWNLOAD_KEYBOARD,
-    DIALOG_TYPE_DELETE_KEYBOARD
+    DIALOG_TYPE_DELETE_KEYBOARD,
+    DIALOG_TYPE_DOWNLOAD_MODEL,
+    DIALOG_TYPE_DELETE_MODEL
   }
 
   public static ConfirmDialogFragment newInstance(DialogType dialogType, String title, String message) {
@@ -33,13 +35,13 @@ public class ConfirmDialogFragment extends DialogFragment {
     return frag;
   }
 
-  public static ConfirmDialogFragment newInstance(DialogType dialogType, String title, String message, String keyboardKey) {
+  public static ConfirmDialogFragment newInstance(DialogType dialogType, String title, String message, String itemKey) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
     Bundle args = new Bundle();
     args.putSerializable(ARG_DIALOG_TYPE, dialogType);
     args.putString(ARG_TITLE, title);
     args.putString(ARG_MESSAGE, message);
-    args.putString(ARG_KEYBOARD_KEY, keyboardKey);
+    args.putString(ARG_ITEM_KEY, itemKey);
     frag.setArguments(args);
     return frag;
   }
@@ -51,8 +53,10 @@ public class ConfirmDialogFragment extends DialogFragment {
     final DialogType dialogType = (DialogType)getArguments().getSerializable(ARG_DIALOG_TYPE);
     final String title = getArguments().getString(ARG_TITLE);
     final String message = getArguments().getString(ARG_MESSAGE);
-    final String keyboardKey = getArguments().getString(ARG_KEYBOARD_KEY);
-    String positiveLabel = (keyboardKey == null) ? getString(R.string.label_download) : getString(R.string.label_delete);
+    final String itemKey = getArguments().getString(ARG_ITEM_KEY);
+    String positiveLabel = (dialogType == DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD ||
+      dialogType == DialogType.DIALOG_TYPE_DOWNLOAD_MODEL) ?
+      getString(R.string.label_download) : getString(R.string.label_delete);
 
     return new AlertDialog.Builder(getActivity())
       .setTitle(title)
@@ -70,9 +74,15 @@ public class ConfirmDialogFragment extends DialogFragment {
               }
               break;
             case DIALOG_TYPE_DELETE_KEYBOARD :
-              // Confirmation to delete item
-              int keyboardIndex = KeyboardPickerActivity.getKeyboardIndex(getActivity(), keyboardKey);
+              // Confirmation to delete keyboard
+              int keyboardIndex = KeyboardPickerActivity.getKeyboardIndex(getActivity(), itemKey);
               KeyboardPickerActivity.deleteKeyboard(getContext(), keyboardIndex);
+              dismissOnSelect = true;
+              break;
+            case DIALOG_TYPE_DELETE_MODEL :
+              // Confirmation to delete model
+              int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(getActivity(), itemKey);
+              KeyboardPickerActivity.deleteLexicalModel(getContext(), modelIndex);
               dismissOnSelect = true;
               break;
             default :

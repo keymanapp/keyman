@@ -121,7 +121,7 @@ namespace com.keyman.text.prediction {
       return this.currentModel;
     }
 
-    private unloadModel() {
+    public unloadModel() {
       this.lmEngine.unloadModel();
       delete this.currentModel;
       delete this.configuration;

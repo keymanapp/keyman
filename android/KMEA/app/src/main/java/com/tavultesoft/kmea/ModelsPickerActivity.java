@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -33,6 +34,7 @@ public final class ModelsPickerActivity extends AppCompatActivity {
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
+  private final static String TAG = "ModelsPickerActivity";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -49,11 +51,8 @@ public final class ModelsPickerActivity extends AppCompatActivity {
     TextView textView = (TextView) findViewById(R.id.bar_title);
 
     Bundle bundle = getIntent().getExtras();
-    String languageID = "", languageName = "";
-    if (bundle != null) {
-      languageID = bundle.getString(KMManager.KMKey_LanguageID);
-      languageName = bundle.getString(KMManager.KMKey_LanguageName);
-    }
+    final String languageID = bundle.getString(KMManager.KMKey_LanguageID);
+    final String languageName = bundle.getString(KMManager.KMKey_LanguageName);
     textView.setText(String.format("%s model", languageName));
 
     listView = (ListView) findViewById(R.id.listView);
@@ -73,7 +72,14 @@ public final class ModelsPickerActivity extends AppCompatActivity {
 
         // Start intent for selected Predictive Text Model screen
         HashMap<String, String> modelInfo = lexicalModelsList.get(position);
+        if (!languageID.equalsIgnoreCase(modelInfo.get(KMManager.KMKey_LanguageID))) {
+          Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " + modelInfo.get(KMManager.KMKey_LanguageID));
+        }
         Bundle bundle = new Bundle();
+        // Note: package ID of a model is different from package ID for a keyboard.
+        // Language ID can be re-used
+        bundle.putString(KMManager.KMKey_PackageID, modelInfo.get(KMManager.KMKey_PackageID));
+        bundle.putString(KMManager.KMKey_LanguageID, languageID);
         bundle.putString(KMManager.KMKey_LexicalModelID, modelInfo.get(KMManager.KMKey_LexicalModelID));
         bundle.putString(KMManager.KMKey_LexicalModelName, modelInfo.get(KMManager.KMKey_LexicalModelName));
         bundle.putString(KMManager.KMKey_LexicalModelVersion, modelInfo.get(KMManager.KMKey_LexicalModelVersion));
