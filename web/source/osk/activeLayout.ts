@@ -118,7 +118,7 @@ namespace com.keyman.osk {
         totalPercent += padPercent;
         keys[j]['widthpc'] = keyPercent = 1-totalPercent;
 
-        // compute center's default x-coord // FIXME
+        // compute center's default x-coord
         (<ActiveKey> keys[j]).proportionalX = (1 - rightMargin) - keyPercent/2;
         (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
       }
