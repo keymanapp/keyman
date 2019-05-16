@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/list_toolbar" />
+
+    <!-- ListView of installed keyboards. TODO: calculate height -->
+    <include layout="@layout/list_layout"
+        android:id="@+id/keyboard_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/list_appbar"
+        android:layout_alignParentBottom="false" />
+
+    <LinearLayout
+        android:id="@+id/keyboard_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/keyboard_list_layout">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:layout_gravity="center"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_button"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:contentDescription="@string/image_button"
+            android:src="@drawable/ic_add_white"
+            app:fabSize="normal" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="?attr/colorAccent"
+        android:layout_below="@+id/keyboard_linear_layout"/>
+
+  <!-- Enable corrections toggle -->
+  <include
+    android:id="@+id/corrections_toggle"
+    layout="@layout/list_row_layout4"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/separator" />
+
+    <!-- Enable predictions toggle -->
+    <include layout="@layout/list_row_layout4"
+        android:id="@+id/predictions_toggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/corrections_toggle"/>
+
+    <!-- Model picker -->
+    <include layout="@layout/list_row_layout2"
+        android:id="@+id/model_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/predictions_toggle"/>
+
+    <!-- Model dictionary -->
+    <!-- Currently a placeholder
+    <include layout="@layout/list_row_layout1"
+        android:id="@+id/manage_dictionary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/model_picker"/> -->
+
+</RelativeLayout>

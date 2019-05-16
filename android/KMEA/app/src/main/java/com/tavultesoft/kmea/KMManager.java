@@ -709,6 +709,18 @@ public final class KMManager {
     return true;
   }
 
+  public static boolean deregisterLexicalModel(String modelID) {
+    String url = String.format("javascript:deregisterModel('%s')", modelID);
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      InAppKeyboard.loadUrl(url);
+    }
+
+    if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      SystemKeyboard.loadUrl(url);
+    }
+    return true;
+  }
+
   public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
   }
