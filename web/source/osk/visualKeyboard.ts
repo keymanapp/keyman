@@ -865,7 +865,7 @@ namespace com.keyman.osk {
       touchKbdPos.x /= layerGroup.offsetWidth;
       touchKbdPos.y /= layerGroup.offsetHeight;
       let kbdScale = layerGroup.offsetWidth / layerGroup.offsetHeight;
-      this.layout.layer[this.layerIndex].keyTouchDistribution(touchKbdPos, kbdScale);
+      console.log(this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, kbdScale));
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;

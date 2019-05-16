@@ -9,6 +9,7 @@ namespace com.keyman.osk {
       pad: '15'
     };
 
+    id?: string;
     width?: string;
     pad?: string;
     
@@ -215,6 +216,26 @@ namespace com.keyman.osk {
     }
 
     /**
+     * Builds a sorted-order array of most likely keys to be intended for a given touch.
+     * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
+     *                           Should be within [0, 0] to [1, 1].
+     * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
+     *                           For a 400 x 200 keyboard, should be 2.
+     */
+    getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {keyId: string, p: number}[] {
+      let distribution = this.simpleTouchDistribution(touchCoords, kbdScaleRatio);
+      let list: {keyId: string, p: number}[] = [];
+
+      for(let key in distribution) {
+        list.push({keyId: key, p: distribution[key]});
+      }
+
+      return list.sort(function(a, b) {
+        return b.p - a.p; // Largest probability keys should be listed first.
+      })
+    }
+
+    /**
      * Computes a probability distribution regarding the likelihood of a touch command being intended
      * for each of the layout's keys.
      * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
@@ -222,8 +243,37 @@ namespace com.keyman.osk {
      * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
      *                           For a 400 x 200 keyboard, should be 2.
      */
-    keyTouchDistribution(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
+    simpleTouchDistribution(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
+      let keyDists = this.keyTouchDistances(touchCoords, kbdScaleRatio);
+      let keyProbs: {[keyId: string]: number} = {};
+
+      let totalMass = 0;
+
+      // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place 
+      // of the formula in the loop below.
+      for(let key in keyDists) {
+        totalMass += keyProbs[key] = 1 / (keyDists[key] * keyDists[key] + 1e-6); // Prevent div-by-0 errors.
+      }
+
+      for(let key in keyProbs) {
+        keyProbs[key] /= totalMass;
+      }
+
+      return keyProbs;
+    }
+
+    /**
+     * Computes a squared 'pseudo-distance' for the touch from each key.  (Not a proper metric.)
+     * Intended for use in generating a probability distribution over the keys based on the touch input.
+     * @param touchCoords A proportional (x, y) coordinate of the touch within the keyboard's geometry.
+     *                           Should be within [0, 0] to [1, 1].
+     * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
+     *                           For a 400 x 200 keyboard, should be 2.
+     */
+    private keyTouchDistances(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {[keyId: string]: number} {
       let layer = this;
+
+      let keyDists: {[keyId: string]: number} = {};
 
       // This double-nested loop computes a pseudo-distance for the touch from each key.  Quite useful for
       // generating a probability distribution.
@@ -268,10 +318,20 @@ namespace com.keyman.osk {
           distY += dy * layer.rowProportionalHeight;
 
           let distance = Math.sqrt(distX * distX + distY * distY);
-          console.log("Distance of " + (key as LayoutKey).id + " from touch: " + distance);
+          keyDists[layer.id + '-' + key.id] = distance;
         });
       });
-      return null;
+
+      return keyDists;
+    }
+
+    getKey(keyName: string) {
+      // Keys usually are specified in a "long form" prefixed with their layer's ID.
+      if(keyName.indexOf(this.id + '-') == 0) {
+        keyName = keyName.replace(this.id + '-', '');
+
+        // TODO:  Have prebuilt a 'id' -> key hash for key lookups, use that here.
+      }
     }
   }
 
