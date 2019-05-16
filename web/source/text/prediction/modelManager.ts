@@ -204,6 +204,33 @@ namespace com.keyman.text.prediction {
       });
     }
 
+    deregister(modelId: string): void {
+      let keyman = com.keyman.singleton;
+      let model: ModelSpec;
+
+      // Remove the model from the id-lookup associative array.
+      if(this.registeredModels[modelId]) {
+        model = this.registeredModels[modelId];
+        delete this.registeredModels[modelId];
+      } else {
+        return;
+      }
+
+      // Is it the active model?
+      if(this.currentModel.id == modelId) {
+        this.unloadModel();
+        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
+      }
+
+      // Ensure the model is deregistered for each targeted language code variant.
+      let mm = this;
+      model.languages.forEach(function(code: string) {
+        if(mm.languageModelMap[code].id == modelId) {
+          delete mm.languageModelMap[code];
+        }
+      });
+    }
+
     isRegistered(model: ModelSpec): boolean {
       return !! this.registeredModels[model.id];
     }
