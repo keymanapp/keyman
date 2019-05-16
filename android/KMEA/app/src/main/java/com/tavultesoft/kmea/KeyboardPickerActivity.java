@@ -504,12 +504,17 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
-  protected static void deleteLexicalModel(Context context, int position) {
+  protected static void deleteLexicalModel(Context context, int position, String modelKey) {
     boolean result = removeLexicalModel(context, position);
 
     if (result) {
       Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show();
-      KMManager.unloadLexicalModel();
+
+      // Extract [language ID, package ID, model ID] and deregister Lexical model
+      String idArray[] = modelKey.split("_");
+      if (idArray.length == 3) {
+        KMManager.deregisterLexicalModel(idArray[2]);
+      }
     }
   }
 

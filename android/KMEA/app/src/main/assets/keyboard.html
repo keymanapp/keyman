@@ -160,10 +160,9 @@
       window.jsInterface.insertText(dn, s, dr);
     }
 
-    function unloadModel() {
+    function deregisterModel(modelID) {
       var kmw=window['keyman'];
-      window.console.log('unloadModel');
-      kmw.modelManager.unloadModel();
+      kmw.modelManager.deregister(modelID);
     }
 
     function enableSuggestions(model) {
@@ -172,7 +171,7 @@
 
     function registerModel(model) {
       var kmw=window['keyman'];
-      window.console.log('registerModel: ' + model);
+      //window.console.log('registerModel: ' + model);
       kmw.registerModel(model);
     }
 
