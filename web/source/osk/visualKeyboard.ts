@@ -628,7 +628,7 @@ namespace com.keyman.osk {
      * @return    {Object}    An object that contains default key properties
      */
     getDefaultKeyObject(): OSKKeySpec {
-      return new OSKKeySpec(undefined, '', '100', '0', null, '15');
+      return new OSKKeySpec(undefined, '', ActiveKey.DEFAULT_KEY.width, ActiveKey.DEFAULT_KEY.sp as ButtonClass, null, ActiveKey.DEFAULT_KEY.pad);
     };
 
     /**
@@ -782,6 +782,7 @@ namespace com.keyman.osk {
 
             // recompute center's x-coord
             (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
+            (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
 
             totalPercent += padPercent+keyPercent;
           }
@@ -798,16 +799,18 @@ namespace com.keyman.osk {
             keys[0]['padpc']=(objectWidth-totalPercent);
 
             // recompute center's x-coord
-            (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2) - rightMargin)/objectWidth;
+            (<ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
+            (<ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
           } else if(keys.length > 0) {
             j=keys.length-1;
             padPercent = Math.round(keys[j]['padpc'] * objectWidth); //Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
             keys[j]['padpc']=padPercent;
             totalPercent += padPercent;
-            keys[j]['widthpc']=(objectWidth-totalPercent);
+            keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
 
             // recompute center's x-coord
-            (<ActiveKey> keys[j]).proportionalX = (objectWidth - (objectWidth - totalPercent)/2 - rightMargin)/objectWidth;
+            (<ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
+            (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
           }
 
           //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)

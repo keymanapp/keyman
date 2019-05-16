@@ -1,9 +1,19 @@
 namespace com.keyman.osk {
   export class ActiveKey implements LayoutKey {
+
+    // Defines key defaults
+    static readonly DEFAULT_KEY = {
+      text: '',
+      width: '100',
+      sp: '0',
+      pad: '15'
+    };
+
     width?: string;
     pad?: string;
     
     proportionalX: number;
+    proportionalWidth: number;
 
     static polyfill(key: LayoutKey) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
@@ -20,14 +30,6 @@ namespace com.keyman.osk {
     // Identify key labels (e.g. *Shift*) that require the special OSK font
     static readonly SPECIAL_LABEL=/\*\w+\*/;
 
-    // Defines key defaults
-    static readonly DEFAULT_KEY = {
-      text: '',
-      width: '100',
-      sp: '0',
-      pad: '15'
-    };
-
     id: string;
     key: LayoutKey[];
 
@@ -35,19 +37,20 @@ namespace com.keyman.osk {
      * Used for calculating fat-fingering offsets.
      */
     proportionalY: number;
+    proportionalHeight: number;
 
     private constructor() {
 
     }
     
-    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number) {
+    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number, proportionalHeight: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
         let key=keys[j];
-        for(var tp in ActiveRow.DEFAULT_KEY) {
+        for(var tp in ActiveKey.DEFAULT_KEY) {
           if(typeof key[tp] != 'string') {
-            key[tp]=ActiveRow.DEFAULT_KEY[tp];
+            key[tp]=ActiveKey.DEFAULT_KEY[tp];
           }
         }
 
@@ -70,6 +73,13 @@ namespace com.keyman.osk {
         ActiveKey.polyfill(key);
       }
 
+      /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
+       * will overwrite these values with their true runtime geometry.
+       *
+       * These calculations approximate those of the actual OSK (without fitting to a specific resolution)
+       * and are intended for use with layout testing (while headless) in the future.
+       */
+
       // Calculate percentage-based scalings by summing defined widths and scaling each key to %.
       // Save each percentage key width as a separate member (do *not* overwrite layout specified width!)
       var keyPercent: number, padPercent: number, totalPercent=0;
@@ -78,11 +88,17 @@ namespace com.keyman.osk {
         keys[j]['widthpc']=keyPercent;
         padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
+
+        // compute center's default x-coord
+        (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2));
+        (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
+
         totalPercent += padPercent+keyPercent;
       }
 
       // Allow for right OSK margin (15 layout units)
-      totalPercent += 15/totalWidth;
+      let rightMargin = 15/totalWidth;
+      totalPercent += rightMargin;
 
       // If a single key, and padding is negative, add padding to right align the key
       if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
@@ -90,12 +106,21 @@ namespace com.keyman.osk {
         keys[0]['widthpc']=keyPercent;
         totalPercent += keyPercent;
         keys[0]['padpc']=1-totalPercent;
+
+        // compute center's default x-coord
+        (<ActiveKey> keys[0]).proportionalX = ((totalPercent - rightMargin) -  keyPercent/2);
+        (<ActiveKey> keys[0]).proportionalWidth = keyPercent;
+
       } else if(keys.length > 0) {
         let j=keys.length-1;
         padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
         totalPercent += padPercent;
-        keys[j]['widthpc']=1-totalPercent;
+        keys[j]['widthpc'] = keyPercent = 1-totalPercent;
+
+        // compute center's default x-coord // FIXME
+        (<ActiveKey> keys[j]).proportionalX = (1 - rightMargin) - keyPercent/2;
+        (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
       }
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
@@ -108,6 +133,7 @@ namespace com.keyman.osk {
 
       let aRow = row as ActiveRow;
       aRow.proportionalY = proportionalY;
+      aRow.proportionalHeight = proportionalHeight;
     }
   }
 
@@ -116,6 +142,8 @@ namespace com.keyman.osk {
     id: string;
 
     totalWidth: number;
+
+    defaultKeyProportionalWidth: number;
 
     constructor() {
 
@@ -170,7 +198,7 @@ namespace com.keyman.osk {
       for(let i=0; i<rowCount; i++) {
         // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
         let rowProportionalY = (rowCount - i - 0.5) / rowCount;
-        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY);
+        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY, 1.0 / rowCount);
       }
 
       // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -183,6 +211,7 @@ namespace com.keyman.osk {
 
       let aLayer = layer as ActiveLayer;
       aLayer.totalWidth = totalWidth;
+      aLayer.defaultKeyProportionalWidth = parseInt(ActiveKey.DEFAULT_KEY.width, 10) / totalWidth;
     }
   }
 
@@ -239,6 +268,11 @@ namespace com.keyman.osk {
       }
 
       return layout as ActiveLayout;
+    }
+
+    keyTouchDistribution(proportionalCoords: {x: number, y: number}, kbdDims?: {w: number, h: number}): {[keyId: string]: number} {
+      // TODO:  This function.
+      return null;
     }
   }
 }
