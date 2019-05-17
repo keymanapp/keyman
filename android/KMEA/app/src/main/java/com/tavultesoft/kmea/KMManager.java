@@ -1444,6 +1444,9 @@ public final class KMManager {
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
 
+        InAppKeyboard.suggestionWindowPos = new double[]{x, y};
+        InAppKeyboard.suggestionJSON = suggestionJSON;
+
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
