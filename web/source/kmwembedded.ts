@@ -131,11 +131,15 @@ namespace com.keyman.osk {
         borderPad=oskManager.getKeyboardHeight() - rowHeight * (nRows == 0 ? 1 : nRows),
         nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
-    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-      rowHeight = rowHeight/window.devicePixelRatio;
-    }
     let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
+
+    let kbdHeight = oskManager.getKeyboardHeight()
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      rowHeight /= window.devicePixelRatio;
+      kbdHeight /= window.devicePixelRatio;
+      oskHeight /= window.devicePixelRatio;
+    }
 
     var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
@@ -143,11 +147,13 @@ namespace com.keyman.osk {
     bs=b.style;
     // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    let kbdHeight = oskManager.getKeyboardHeight()
+
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-      rowHeight = rowHeight/window.devicePixelRatio;
-      kbdHeight /= window.devicePixelRatio;
+      b.childNodes.forEach(function(layer: HTMLElement) {
+        layer.style.height = layer.style.maxHeight = (oskHeight + 3) + 'px';
+      });
     }
+
     // Sets the layers to the correct height 
     pad = Math.round(0.15*rowHeight);
 
