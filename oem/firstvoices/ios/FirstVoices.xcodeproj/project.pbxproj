@@ -21,6 +21,18 @@
 		37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F2E228B7458003E710C /* CheckBox.swift */; };
 		37EA1F31228B7661003E710C /* FVShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F30228B7661003E710C /* FVShared.swift */; };
 		37EA1F32228BCDA7003E710C /* FVShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F30228B7661003E710C /* FVShared.swift */; };
+		37EA1F35228CA3BE003E710C /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F34228CA3BD003E710C /* ObjcExceptionBridging.framework */; };
+		37EA1F37228CA3D2003E710C /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F36228CA3D2003E710C /* XCGLogger.framework */; };
+		37EA1F39228CA3E4003E710C /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F38228CA3E4003E710C /* Zip.framework */; };
+		37EA1F3A228CA40C003E710C /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F38228CA3E4003E710C /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		37EA1F3B228CA40C003E710C /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F36228CA3D2003E710C /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		37EA1F3C228CA40C003E710C /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F34228CA3BD003E710C /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		37EA1F3D228CA43D003E710C /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F34228CA3BD003E710C /* ObjcExceptionBridging.framework */; };
+		37EA1F3E228CA455003E710C /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F36228CA3D2003E710C /* XCGLogger.framework */; };
+		37EA1F3F228CA464003E710C /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F38228CA3E4003E710C /* Zip.framework */; };
+		37EA1F41228CA4CC003E710C /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F40228CA4CB003E710C /* DeviceKit.framework */; };
+		37EA1F42228CA4D7003E710C /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F40228CA4CB003E710C /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		37EA1F43228CA4EC003E710C /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F40228CA4CB003E710C /* DeviceKit.framework */; };
 		9800EC5C1C029F2200BF0FB5 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9800EC5B1C029F2200BF0FB5 /* Settings.bundle */; };
 		98395E331C1E61AF007CD675 /* 739-question-selected.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2D1C1E61AF007CD675 /* 739-question-selected.png */; };
 		98395E341C1E61AF007CD675 /* 739-question-selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */; };
@@ -189,6 +201,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				37EA1F42228CA4D7003E710C /* DeviceKit.framework in Embed Frameworks */,
+				37EA1F3A228CA40C003E710C /* Zip.framework in Embed Frameworks */,
+				37EA1F3B228CA40C003E710C /* XCGLogger.framework in Embed Frameworks */,
+				37EA1F3C228CA40C003E710C /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -221,6 +237,10 @@
 		37EA1F2E228B7458003E710C /* CheckBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CheckBox.swift; path = Checkbox/CheckBox.swift; sourceTree = "<group>"; };
 		37EA1F30228B7661003E710C /* FVShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FVShared.swift; path = FVShared/FVShared.swift; sourceTree = "<group>"; };
 		37EA1F33228BCDF8003E710C /* FirstVoices-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FirstVoices-Bridging-Header.h"; sourceTree = "<group>"; };
+		37EA1F34228CA3BD003E710C /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../../ios/Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
+		37EA1F36228CA3D2003E710C /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../../ios/Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
+		37EA1F38228CA3E4003E710C /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../../ios/Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
+		37EA1F40228CA4CB003E710C /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../../ios/Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		9800EC5B1C029F2200BF0FB5 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		98395E2D1C1E61AF007CD675 /* 739-question-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected.png"; sourceTree = "<group>"; };
 		98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected@2x.png"; sourceTree = "<group>"; };
@@ -373,6 +393,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37EA1F41228CA4CC003E710C /* DeviceKit.framework in Frameworks */,
+				37EA1F39228CA3E4003E710C /* Zip.framework in Frameworks */,
+				37EA1F37228CA3D2003E710C /* XCGLogger.framework in Frameworks */,
+				37EA1F35228CA3BE003E710C /* ObjcExceptionBridging.framework in Frameworks */,
 				37EA1F1E228A180A003E710C /* KeymanEngine.framework in Frameworks */,
 				98C7F7F51BFD4649007F17B7 /* AudioToolbox.framework in Frameworks */,
 				98C7F7F81BFD465A007F17B7 /* CFNetwork.framework in Frameworks */,
@@ -390,6 +414,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37EA1F43228CA4EC003E710C /* DeviceKit.framework in Frameworks */,
+				37EA1F3F228CA464003E710C /* Zip.framework in Frameworks */,
+				37EA1F3E228CA455003E710C /* XCGLogger.framework in Frameworks */,
+				37EA1F3D228CA43D003E710C /* ObjcExceptionBridging.framework in Frameworks */,
 				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
 				98C9A9E81BFC0974009E9A4F /* AudioToolbox.framework in Frameworks */,
 				98C9A9EA1BFC097B009E9A4F /* CFNetwork.framework in Frameworks */,
@@ -627,6 +655,10 @@
 		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				37EA1F40228CA4CB003E710C /* DeviceKit.framework */,
+				37EA1F38228CA3E4003E710C /* Zip.framework */,
+				37EA1F36228CA3D2003E710C /* XCGLogger.framework */,
+				37EA1F34228CA3BD003E710C /* ObjcExceptionBridging.framework */,
 				37EA1F1D228A1809003E710C /* KeymanEngine.framework */,
 				98C9A9E71BFC0974009E9A4F /* AudioToolbox.framework */,
 				98C9A9E91BFC097B009E9A4F /* CFNetwork.framework */,

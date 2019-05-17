@@ -10,11 +10,7 @@
 import Foundation
 
 let FVGroupID: String = "group.FVKeyboards"
-let kFVKeyboardList: String = "FVKeyboardList"
-let kFVKeyboardNameKey: String = "FVKeyboardName"
-let kFVKeyboardLanguageCodeKey: String = "FVKeyboardLanguageCode"
-let kFVKeyboardFilenameKey: String = "FVKeyboardFilename"
-let kFVKeyboardCheckStateKey: String = "FVKeyboardCheckState"
+let kFVLoadedKeyboardList: String = "FVLoadedKeyboardList"
 
 class FVShared {
 

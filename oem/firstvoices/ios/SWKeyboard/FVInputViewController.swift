@@ -6,7 +6,7 @@
 //  Copyright © 2019 FirstVoices. All rights reserved.
 //
 
-import Foundation
+//import Foundation
 import KeymanEngine
 import UIKit
 
@@ -17,12 +17,15 @@ class FVInputViewController: InputViewController {
     KeymanEngine.log.logAppDetails()
 
     Manager.applicationGroupIdentifier = "group.FVKeyboard"
-
     //[self setGlobeKeyTapBehaviour:GKTapSwitchToNextKeyboard];
     //[self setMenuBehaviour:MenuShowAlways];
     //[self setMenuCloseButtonTitle:@"Switch to other keyboard"];
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+
+    self.globeKeyTapBehaviour = .switchToNextKeyboard
+    self.menuBehaviour = .showAlways
+    self.menuCloseButtonTitle = "Switch to other keyboard"
   }
 
   required init?(coder aDecoder: NSCoder) {

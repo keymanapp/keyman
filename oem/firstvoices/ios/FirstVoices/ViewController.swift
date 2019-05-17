@@ -11,8 +11,8 @@ import KeymanEngine
 
 class ViewController: UIViewController, UIWebViewDelegate {
 
-  @IBOutlet weak var webView: UIWebView?
-  @IBOutlet weak var statusBarBackground: UIView?
+  @IBOutlet var webView: UIWebView!
+  @IBOutlet var statusBarBackground: UIView!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -56,7 +56,7 @@ class ViewController: UIViewController, UIWebViewDelegate {
 
   func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
     let fragment: String? = request.url!.fragment
-    if fragment!.range(of: "showKeyboards") != nil {
+    if fragment?.range(of: "showKeyboards") != nil {
       self.performSegue(withIdentifier: "Keyboards", sender: nil)
       return false
     }

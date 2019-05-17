@@ -15,22 +15,31 @@ let kKeyboardsFileLastModDateKey: String = "KeyboardsFileLastModDate"
 let tHelpButtonTag: NSInteger = 1000
 let tCheckBoxTag: NSInteger = 2000
 
-typealias KeyboardDict = [String:String]
-typealias KeyboardList = [KeyboardDict]
-struct Region {
-  var code: String
-  var keyboards: KeyboardList
+class FVKeyboard {
+  let name, languageCode, filename: String
+  init(name: String, languageCode: String, filename: String) {
+    self.name = name
+    self.languageCode = languageCode
+    self.filename = filename
+  }
 }
-typealias RegionList = [Region]
+typealias FVKeyboardList = [FVKeyboard]
+class FVRegion {
+  var name: String = ""
+  var keyboards: FVKeyboardList = []
+}
+typealias FVRegionList = [FVRegion]
 
-class KeyboardsViewController: UIViewController, UITableViewDelegate {
+class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-  @IBOutlet weak var tableView: UITableView?
+  @IBOutlet var tableView: UITableView!
   // TODO: Turn this into an array of structured objects rather than an array of array of dictionaries
   // current structure: region: array of 'keyboard info'
-  var _keyboardList: RegionList?
+  var _keyboardList: FVRegionList = []
+  var _loadedKeyboards: [String] = []
 
   override func viewDidLoad() {
+    loadKeyboardListFromUserDefaults()
     super.viewDidLoad()
     // Do any additional setup after loading the view, typically from a nib.
   }
@@ -46,7 +55,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate {
   }
 
   // MARK: - Table view data source
-  func numberOfSectionsInTableView(_ tableView: UITableView) -> Int {
+  func numberOfSections(in tableView: UITableView) -> Int {
     return self.keyboardList().count
   }
 
@@ -59,7 +68,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier: String = "Cell"
     var cell: UITableViewCell? = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
-    if cell != nil {
+    if cell == nil {
       cell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: cellIdentifier)
       let selectionColor: UIView = UIView()
       selectionColor.backgroundColor = UIColor(red: 204.0/255.0, green: 136.0/255.0, blue: 34.0/255.0, alpha: 1.0)
@@ -71,7 +80,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate {
       let margin: CGFloat = 0.0
       let helpButton: UIButton = UIButton(type: .custom)
       helpButton.tag = tHelpButtonTag
-      helpButton.addTarget(self, action: "helpButtonTapped:forEvent:", for: UIControl.Event.touchUpInside)
+      helpButton.addTarget(self, action: #selector(helpButtonTapped(_:forEvent:)), for: UIControl.Event.touchUpInside)
       helpButton.setImage(UIImage(named: "739-question"), for: UIControl.State.normal)
       helpButton.setImage(UIImage(named: "739-question-selected"), for: UIControl.State.highlighted)
       let w1: CGFloat = cellH
@@ -82,7 +91,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate {
       // TODO: consider using a table cell accessory checkbox
       let checkBox = CheckBox(frame: CGRect(x:margin+w1, y:0, width:w2, height:h2))
       checkBox.tag = tCheckBoxTag
-      checkBox.addTarget(self, action: "checkBoxTapped:forEvent:", for: UIControl.Event.valueChanged)
+      checkBox.addTarget(self, action: #selector(checkBoxTapped(_:forEvent:)), for: UIControl.Event.valueChanged)
       checkBox.isOpaque = false
       checkBox.tintColor = UIColor.lightGray
       cell!.accessoryView = UIView(frame: CGRect(x:0, y:0, width:margin+w1+w2+margin, height:cellH))
@@ -94,164 +103,124 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate {
 
   func tableView(_ tableView: UITableView,
                  titleForHeaderInSection section: Int) -> String? {
-    return self.keyboardList()[section].code
+    return self.keyboardList()[section].name
   }
 
   // MARK: - Table view delegate
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
     cell.accessoryType = .none
-    let kbArray: KeyboardList = self.keyboardList()[indexPath.section].keyboards
-    let kbDict: KeyboardDict = kbArray[indexPath.row]
-    cell.textLabel!.text = kbDict[kFVKeyboardNameKey]
-    let checkState: String = kbDict[kFVKeyboardCheckStateKey]!
+    let keyboards = (self.keyboardList()[indexPath.section]).keyboards
+    let kb = keyboards[indexPath.row]
+    cell.textLabel!.text = kb.name
     let checkbox: CheckBox = (cell.accessoryView!.viewWithTag(tCheckBoxTag) as! CheckBox)
-    checkbox.isChecked = checkState.isEqual("YES")
+    checkbox.isChecked = _loadedKeyboards.contains(kb.filename)
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     //
   }
 
-  func keyboardList() -> RegionList {
-    if _keyboardList == nil {
-      let sharedData: UserDefaults = FVShared.userDefaults()
-      _keyboardList = sharedData.array(forKey: kFVKeyboardList) as? RegionList
-      var oldKeyboardList: RegionList? = nil
-      if _keyboardList == nil || self.shouldLoadFromKeyboardsFile() {
-        do {
-          if _keyboardList != nil {
-            oldKeyboardList = _keyboardList
-            _keyboardList = nil
+  func keyboardList() -> FVRegionList {
+    if _keyboardList.count == 0 {
+      do {
+        let keyboardsFile: String = Bundle.main.path(forResource: "keyboards", ofType: "csv")!
+
+        let fileContents: String = try String(contentsOfFile: keyboardsFile, encoding: .utf8).replacingOccurrences(of: "\r", with: "")
+        let lines: [String] = fileContents.components(separatedBy: "\n")
+        for i in 1..<lines.count { // skip first line; it is a header row
+          let line: String = lines[i]
+          if line.count == 0 {
+            continue
           }
-          let keyboardsFile: String = Bundle.main.path(forResource: "keyboards", ofType: "csv")!
-
-          let fileContents: String = try String(contentsOfFile: keyboardsFile, encoding: .utf8).replacingOccurrences(of: "\r", with: "")
-          let lines: [String] = fileContents.components(separatedBy: "\n")
-          for i in 1..<lines.count {
-            let line: String = lines[i]
-            if line.count == 0 {
-              continue
+          let values: [String] = line.components(separatedBy: ",")
+          if values.count > 0 {
+            let kbName: String = values[0]
+            let regionName: String = values[3]
+            let langCode: String = values[9]
+            let kbFilename: String = values[7].replacingOccurrences(of: ".kmn", with: "-9.0.js")
+            #warning("TODO: this rename of keyboard filename is no longer correct")
+            var region = _keyboardList.first(where: { $0.name == regionName })
+            if region == nil {
+              region = FVRegion.init()
+              region!.name = regionName
+              _keyboardList.append(region!)
             }
-            let values: [String] = line.components(separatedBy: ",")
-            if values.count > 0 {
-              if _keyboardList == nil {
-                _keyboardList = RegionList.init()
-              }
-              let kbName: String = values[0]
-              let regionName: String = values[3]
-              let langCode: String = values[9]
-              let kbFilename: String = values[7].replacingOccurrences(of: ".kmn", with: "-9.0.js") // TODO: this rename is no longer correct
-              var region = _keyboardList!.first(where: { $0.code == regionName })
-              if region == nil {
-                region = Region.init(code: regionName, keyboards: [])
-                _keyboardList!.append(region!)
-              }
 
-              let kbDict: KeyboardDict = [
-                kFVKeyboardNameKey: kbName,
-                kFVKeyboardLanguageCodeKey: langCode,
-                kFVKeyboardFilenameKey: kbFilename,
-                kFVKeyboardCheckStateKey: "NO"
-              ]
-
-              region!.keyboards.append(kbDict)
-            }
+            let kb = FVKeyboard(name: kbName, languageCode: langCode, filename: kbFilename)
+            region!.keyboards.append(kb)
           }
-          let sharedData: UserDefaults = FVShared.userDefaults()
-          sharedData.set(_keyboardList, forKey: kFVKeyboardList)
-          sharedData.set(NSArray(object: self.keyboardsFileModDate()), forKey: kKeyboardsFileLastModDateKey)
-          sharedData.synchronize()
-        } catch {
-          NSLog("Unexpected error: \(error).")
         }
+      } catch {
+        NSLog("Unexpected error: \(error).")
       }
-      if oldKeyboardList != nil {
-        self.restoreActiveKeyboardsFromArray(oldKeyboardList!)
-      }
     }
-    return _keyboardList!
+    return _keyboardList
   }
 
-  func shouldLoadFromKeyboardsFile() -> Bool {
-    var sharedData: UserDefaults = FVShared.userDefaults()
-    var lastModDate: NSDate? = (sharedData.object(forKey: kKeyboardsFileLastModDateKey) as? Array<NSDate>)![0]
-    if lastModDate == nil {
-      return true
-    }
-    var fileModDate: NSDate? = self.keyboardsFileModDate()
-    if fileModDate == nil {
-      return true
-    }
-    if fileModDate!.timeIntervalSince(lastModDate! as Date) > 0 {
-      return true
-    }
-    return false
-  }
-
-  func keyboardsFileModDate() -> NSDate? {
-    var filePath: String = Bundle.main.path(forResource: "keyboards", ofType: "csv")!
-    do {
-      var attrs: [FileAttributeKey : Any] = try FileManager.default.attributesOfItem(atPath: filePath)
-      return attrs[FileAttributeKey.modificationDate] as? NSDate // NSFileModi] .object(forKey: NSFileModificationDate)
-    } catch {
-      print(error)
-    }
-    return nil
-  }
-
-  func helpButtonTapped(_ sender: Any, forEvent event: UIEvent) {
+  @objc func helpButtonTapped(_ sender: Any, forEvent event: UIEvent) {
     let touches: Set<UITouch>? = event.allTouches
     let touch: UITouch = touches!.first!
     let currentTouchPosition: CGPoint = touch.location(in: self.tableView)
     let indexPath: IndexPath? = self.tableView!.indexPathForRow(at: currentTouchPosition)
     if indexPath != nil {
-      let kbArray: KeyboardList = self.keyboardList()[indexPath!.section].keyboards
-      let kbDict: KeyboardDict = kbArray[indexPath!.row]
-      let kbFilename: String = kbDict[kFVKeyboardFilenameKey]!
+      let kbArray: FVKeyboardList = self.keyboardList()[indexPath!.section].keyboards
+      let kbDict: FVKeyboard = kbArray[indexPath!.row]
+      let kbFilename: String = kbDict.filename
       let kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
       let helpUrl: URL = URL.init(string: "\(helpLink)\(kbID)")!
       UIApplication.shared.openURL(helpUrl)
     }
   }
 
-  func checkBoxTapped(_ sender: Any, forEvent event: UIEvent) {
+  @objc func checkBoxTapped(_ sender: Any, forEvent event: UIEvent) {
     let touches: Set<UITouch>? = event.allTouches
     let touch: UITouch = touches!.first!
     let currentTouchPosition: CGPoint = touch.location(in: self.tableView)
     let indexPath: IndexPath? = self.tableView!.indexPathForRow(at: currentTouchPosition)
     if indexPath != nil {
       // Update the checkState with the new checked state
-      var kbArray: KeyboardList = self.keyboardList()[indexPath!.section].keyboards
-      var kbDict: KeyboardDict = kbArray[indexPath!.row]
-      kbDict[kFVKeyboardCheckStateKey] = (sender as! CheckBox).isChecked ? "YES" : "NO"
-      kbArray[indexPath!.row] = kbDict
-      _keyboardList![indexPath!.section].keyboards = kbArray
+      let keyboards = self.keyboardList()[indexPath!.section].keyboards
+      let kb = keyboards[indexPath!.row]
 
-      let sharedData: UserDefaults = FVShared.userDefaults()
-      sharedData.set(_keyboardList, forKey: kFVKeyboardList)
-      sharedData.synchronize()
+      _loadedKeyboards = _loadedKeyboards.filter { $0 != kb.filename }
+      if (sender as! CheckBox).isChecked {
+        _loadedKeyboards += [kb.filename]
+      }
+      self.saveKeyboardListToUserDefaults()
       self.updateActiveKeyboardsList()
     }
   }
 
+  func loadKeyboardListFromUserDefaults() {
+    let sharedData: UserDefaults = FVShared.userDefaults()
+    let keyboards = sharedData.array(forKey: kFVLoadedKeyboardList)
+    if keyboards != nil {
+      _loadedKeyboards = keyboards as! [String]
+    } else {
+      _loadedKeyboards = []
+    }
+  }
+
+  func saveKeyboardListToUserDefaults() {
+    let sharedData: UserDefaults = FVShared.userDefaults()
+    sharedData.set(_loadedKeyboards, forKey: kFVLoadedKeyboardList)
+    sharedData.synchronize()
+  }
+
   func updateActiveKeyboardsList() {
-    //Manager.shared.currentKeyboard
-    //Manager.shared.removeKeyboard(0)
-    //var sharedData: UserDefaults = FVShared.userDefaults()
-    //sharedData.remove(forKey: kKeymanUserKeyboardsListKey)
-    var kbList: RegionList = self.keyboardList()
+    let kbList = self.keyboardList()
     for i in 0...kbList.count-1 {
-      var kbArray: KeyboardList? = kbList[i].keyboards
-      for kbDict in kbArray! {
-        if kbDict[kFVKeyboardCheckStateKey]!.isEqual("YES") {
-          var kbFilename: String = kbDict[kFVKeyboardFilenameKey]!
-          var kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
-          var langCode: String = kbDict[kFVKeyboardLanguageCodeKey]!
-          var langID: String = langCode.substring(to: langCode.index(langCode.startIndex, offsetBy: langCode.count < 3 ? langCode.count : 3)).lowercased()
-          var kbName: String = kbDict[kFVKeyboardNameKey]!
-          var langName: String = kbName
-          var keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kbID,
+      let keyboards = kbList[i].keyboards
+      for kb in keyboards {
+        if _loadedKeyboards.contains(kb.filename) {
+          let kbFilename: String = kb.filename
+          let kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
+          let langCode: String = kb.languageCode
+          let langID: String = langCode.substring(to: langCode.index(langCode.startIndex, offsetBy: langCode.count < 3 ? langCode.count : 3)).lowercased()
+          let kbName: String = kb.name
+          let langName: String = kbName
+          let keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kbID,
                                                                        name: kbName,
                                                                        languageID: langID,
                                                                        languageName: langName,
@@ -264,45 +233,6 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate {
         }
       }
     }
-/*
-    if !sharedData.object(forKey: kKeymanUserKeyboardsListKey) {
-      var keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kKeymanDefaultKeyboardID,
-                                                                   name: kKeymanDefaultKeyboardName,
-                                                                   languageID: kKeymanDefaultLanguageID,
-                                                                   languageName: kKeymanDefaultLanguageName,
-                                                                   version: "1.0", //TODO fix versions
-                                                                   isRTL: kKeymanDefaultKeyboardRTL.isEqual(to: "Y") ? true : false,
-                                                                   font: kKeymanDefaultKeyboardFont,
-                                                                   oskFont: nil,
-                                                                   isCustom: false)
-      Manager.shared.addKeyboard(keyboard)
-    }
- */
-
   }
-
-  func restoreActiveKeyboardsFromArray(_ oldKeyboardList: RegionList) {
-    var oldActiveKeyboards: [String] = []
-    for region in oldKeyboardList {
-      for kbDict in region.keyboards {
-        if kbDict[kFVKeyboardCheckStateKey]!.isEqual("YES") {
-          let kbFilename: String = kbDict[kFVKeyboardFilenameKey]!
-          let kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
-          oldActiveKeyboards.append(kbID)
-        }
-      }
-    }
-    for region in self.keyboardList() {
-      for var kbDict in region.keyboards {
-        let kbFilename: String = kbDict[kFVKeyboardFilenameKey]!
-        let kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
-        if oldActiveKeyboards.contains(kbID) {
-          kbDict[kFVKeyboardCheckStateKey] = "YES"
-        }
-      }
-    }
-    self.updateActiveKeyboardsList()
-  }
-
 }
 
