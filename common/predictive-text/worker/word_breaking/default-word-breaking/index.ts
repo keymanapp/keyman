@@ -27,7 +27,6 @@ namespace wordBreakers {
 
     // All non-empty strings have at least TWO boundaries at the start and end of
     // the string.
-    console.assert(boundaries.length >= 2);
 
     for (let i = 0; i < boundaries.length - 1; i++) {
       let start = boundaries[i];
@@ -112,7 +111,7 @@ namespace wordBreakers {
       // Shift all properties, one scalar value to the right.
       [lookbehind, left, right, lookahead] =
         [left, right, lookahead, wordbreakPropertyAt(lookaheadPos)];
-      debugger;
+
       // Break at the start and end of text, unless the text is empty.
       // WB1: Break at start of text...
       if (left === 'sot') {
@@ -121,7 +120,6 @@ namespace wordBreakers {
       }
       // WB2: Break at the end of text...
       if (right === 'eot') {
-        console.assert(rightPos === text.length);
         yield rightPos;
         break; // Reached the end of the string. We're done!
       }
@@ -157,7 +155,6 @@ namespace wordBreakers {
       // In ignoring the characters in the previous loop, we could have fallen of
       // the end of the string, so end the loop prematurely if that happens!
       if (right === 'eot') {
-        console.assert(rightPos === text.length);
         yield rightPos;
         break;
       }
@@ -309,7 +306,6 @@ namespace wordBreakers {
    */
   function property(character: string): WordBreakProperty {
     // This MUST be a scalar value.
-    console.assert(character.length === 1 || character.length === 2);
     // TODO: remove dependence on character.codepointAt()?
     let codepoint = character.codePointAt(0) as number;
     return searchForProperty(codepoint, 0, WORD_BREAK_PROPERTY.length);
@@ -330,8 +326,6 @@ namespace wordBreakers {
     }
     else {
       // We found it!
-      console.assert(candidate.start <= codepoint);
-      console.assert(codepoint <= candidate.end);
       return candidate.value;
     }
   }
