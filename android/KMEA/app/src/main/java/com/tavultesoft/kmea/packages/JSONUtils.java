@@ -193,4 +193,94 @@ public class JSONUtils {
     }
     return options;
   }
+
+  /**
+   * Iterate through each model folder and parse kmp.json
+   * Will need to swap kmp.json (keyboards : languages) to cloud order (languages : keyboards)
+   */
+  public static JSONArray getLexicalModels() {
+    File[] packages = KMManager.getLexicalModelsDir().listFiles();
+    JSONArray lexicalModelsArray = new JSONArray();
+    JSONParser parser = new JSONParser();
+
+    for (File pkg: packages) {
+      for (File file: pkg.listFiles()) {
+        if (file.getName().toLowerCase().endsWith(PackageProcessor.PP_DEFAULT_METADATA)) {
+          try {
+            JSONObject kmp = parser.getJSONObjectFromFile(file);
+            JSONArray kmpModels = kmp.getJSONArray("lexicalModels");
+
+            // Determine if kmp contains welcome.htm help file
+            JSONArray kmpFiles = kmp.getJSONArray("files");
+            boolean containsHelp = JSONUtils.findHelp(kmpFiles);
+
+            for (int i=0; i<kmpModels.length(); i++) {
+              JSONObject kmpModelObj = kmpModels.getJSONObject(i);
+              String modelName = kmpModelObj.getString(KMManager.KMKey_Name);
+              String modelID = kmpModelObj.getString(KMManager.KMKey_ID);
+              String modelVersion = kmpModelObj.getString("version");
+              String modelFilename = pkg.getName() + "/" + modelID + FileUtils.LEXICALMODEL;
+
+              // Merge languages
+              JSONArray kmpLanguageArray = kmpModelObj.getJSONArray("languages");
+              for (int j=0; j<kmpLanguageArray.length(); j++) {
+                JSONObject languageObj = kmpLanguageArray.getJSONObject(j);
+                String packageID = pkg.getName();
+                String languageName = languageObj.getString(KMManager.KMKey_Name);
+                String languageID = languageObj.getString(KMManager.KMKey_ID);
+
+                JSONObject modelObj = new JSONObject();
+                modelObj.put(KMManager.KMKey_PackageID, packageID);
+                modelObj.put(KMManager.KMKey_ID, modelID);
+                modelObj.put(KMManager.KMKey_Name, modelName);
+                modelObj.put("filename", modelFilename);
+                modelObj.put(KMManager.KMKey_KeyboardVersion, modelVersion);
+                modelObj.put(KMManager.KMKey_CustomKeyboard, "Y");
+                if (containsHelp) {
+                  File welcomeFile = new File(pkg, "welcome.htm");
+                  modelObj.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+                }
+
+                File jsFile = new File(pkg, modelID + FileUtils.LEXICALMODEL);
+                if (jsFile.exists()) {
+                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD");
+                  modelObj.put("lastModified", sdf.format(jsFile.lastModified()));
+                } else {
+                  Log.d(TAG, "getLexicalModels() can't generate modified date for " + jsFile);
+                }
+                // TODO: source, filesize
+
+                lexicalModelsArray.put(modelObj);
+
+                /*
+                int index = findID(lexicalModelsArray, languageID);
+                if (lexicalModelsArray.length() == 0 || index == -1) {
+                  // Populate new entry entry into languagesArray
+                  JSONArray tempKbdArray = new JSONArray();
+                  tempKbdArray.put(kbdObj);
+
+                  JSONObject tempLanguageObj = new JSONObject();
+                  tempLanguageObj.put(KMManager.KMKey_ID, languageID);
+                  tempLanguageObj.put(KMManager.KMKey_Name, languageName);
+                  tempLanguageObj.put("keyboards", tempKbdArray);
+
+                  lexicalModelsArray.put(tempLanguageObj);
+                } else {
+                  JSONObject tempLanguageObj = lexicalModelsArray.getJSONObject(index);
+                  JSONArray tempKbdArray = tempLanguageObj.getJSONArray("keyboards");
+                  tempKbdArray.put(kbdObj);
+                }
+                */
+              }
+            }
+          } catch (JSONException e) {
+            Log.e(TAG, "getLanguages() Error parsing " + file.getName());
+          }
+        }
+      }
+    }
+
+    return lexicalModelsArray;
+  }
+
 }

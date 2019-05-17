@@ -166,19 +166,19 @@ public final class KMManager {
 
   private static Context appContext;
 
-  protected static String getResourceRoot() {
+  public static String getResourceRoot() {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
   }
 
-  protected static String getPackagesDir() {
+  public static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
   }
 
-  protected static String getLexicalModelsDir() {
+  public static String getLexicalModelsDir() {
     return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
-  protected static String getCloudDir() {
+  public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 

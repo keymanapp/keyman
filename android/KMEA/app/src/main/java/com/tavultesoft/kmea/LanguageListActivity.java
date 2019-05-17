@@ -312,7 +312,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       jsonObj = new JSONObject(objInput.readObject().toString());
       objInput.close();
     } catch (Exception e) {
-      Log.e("LanguageListActivity", "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "Failed to read from cache file. Error: " + e);
       jsonObj = null;
     }
 
@@ -327,7 +327,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       objOutput.writeObject(jsonObj.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e("LanguageListActivity", "Failed to save to cache file. Error: " + e);
+      Log.e(TAG, "Failed to save to cache file. Error: " + e);
     }
   }
 

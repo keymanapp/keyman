@@ -47,6 +47,9 @@
     <string name="help_link" translatable="false">Help link</string>
     <string name="uninstall_keyboard" translatable="false">Uninstall keyboard</string>
 
+    <!-- Model Updates -->
+    <string name="getting_model_catalog" translatable="false">Getting lexical model catalog.\nThis may take a while&#8230;</string>
+
     <!-- Model Info -->
     <string name="model_version" translatable="false">Model version</string>
     <string name="uninstall_model" translatable="false">Uninstall model</string>
