@@ -26,6 +26,7 @@ import java.util.HashMap;
 
 /**
  * Keyman Settings --> Languages Settings --> Language Settings --> Models Picker
+ * Gets the list of installable lexical models from Keyman cloud and allows user to download a model.
  * Displays a list of available models for a language ID.
  */
 public final class ModelsPickerActivity extends AppCompatActivity {

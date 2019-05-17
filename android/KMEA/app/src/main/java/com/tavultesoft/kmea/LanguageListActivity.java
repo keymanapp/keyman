@@ -52,7 +52,7 @@ import android.widget.Toast;
  * Gets the list of installable languages from Keyman cloud and allows user to download a keyboard.
  * After downloading, the new keyboard is selected.
  *
- * The language list is saved to a cache file "jsonCache.dat".
+ * The language list is saved to a cache file "jsonKeyboardsCache.dat".
  */
 public final class LanguageListActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
@@ -61,7 +61,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
-  private static final String jsonCacheFilename = "jsonCache.dat";
+  private static final String jsonCacheFilename = "jsonKeyboardsCache.dat";
   private static final String TAG = "LanguageListActivity";
 
   private static JSONArray languages = null;

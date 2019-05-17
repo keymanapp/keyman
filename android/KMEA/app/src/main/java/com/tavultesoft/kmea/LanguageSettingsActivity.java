@@ -91,13 +91,13 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     layout.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        // Start Model Picker Activity.
+        // Start ModelListActivity.
         // Use the language ID and nmae from the first associated keyboard (they should all be the same)
         HashMap<String, String> kbInfo = associatedKeyboardList.get(0);
         Bundle bundle = new Bundle();
         bundle.putString(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
         bundle.putString(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
-        Intent i = new Intent(context, ModelsPickerActivity.class);
+        Intent i = new Intent(context, ModelListActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);
         startActivity(i);

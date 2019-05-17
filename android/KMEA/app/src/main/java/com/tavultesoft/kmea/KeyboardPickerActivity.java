@@ -57,9 +57,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   private static ImageButton addButton = null;
   private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
-  private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
+
+  // Lists of installed keyboards and installed lexical models
+  private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
+
   private static boolean checkingUpdates = false;
   private static int updateCount = 0;
   private static int failedUpdateCount = 0;
