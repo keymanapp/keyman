@@ -85,6 +85,7 @@ final class KMKeyboard extends WebView {
   public String[] subKeysWindowPos = {"0", "0"};
 
   // public something-something for the suggestion.
+  public PopupWindow suggestionMenuWindow = null;
   public double[] suggestionWindowPos = {0, 0};
   public String suggestionJSON = null;
 
@@ -200,7 +201,7 @@ final class KMKeyboard extends WebView {
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (subKeysWindow != null) {
+    if (subKeysWindow != null && suggestionMenuWindow != null) {
       //popupWindow.getContentView().dispatchTouchEvent(event);
       subKeysWindow.getContentView().findViewById(R.id.grid).dispatchTouchEvent(event);
     } else {
@@ -267,6 +268,15 @@ final class KMKeyboard extends WebView {
     try {
       if (subKeysWindow != null && subKeysWindow.isShowing())
         subKeysWindow.dismiss();
+    } catch (Exception e) {
+    }
+  }
+
+  public void dismissSuggestionMenuWindow() {
+    try {
+      if (suggestionMenuWindow != null && suggestionMenuWindow.isShowing()) {
+        suggestionMenuWindow.dismiss();
+      }
     } catch (Exception e) {
     }
   }
@@ -615,7 +625,7 @@ final class KMKeyboard extends WebView {
 
   @SuppressLint("InflateParams")
   private void showSuggestionLongpress(Context context) {
-    if(suggestionJSON == null) {
+    if(suggestionJSON == null || suggestionMenuWindow != null) {
       return;
     }
 
@@ -623,13 +633,12 @@ final class KMKeyboard extends WebView {
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     View contentView = inflater.inflate(R.layout.predictive_submenu, null, false);
 
-    PopupWindow popup = new PopupWindow(contentView, 300, 120, false);
-    popup.setFocusable(false);
-    popup.setContentView(contentView);
+    suggestionMenuWindow = new PopupWindow(contentView, 300, 120, false);
+    suggestionMenuWindow.setFocusable(false);
+    suggestionMenuWindow.setContentView(contentView);
 
-//    Button button = (Button) contentView.findViewById(R.id.button); //inflater.inflate(R.layout.subkey_layout, null);
-//    button.setId(0);
-//    button.setClickable(false);
+    Button rotateSuggestions = contentView.findViewById(R.id.rotateSuggestionBtn);
+    rotateSuggestions.setClickable(false);
 
     // Compute the actual display position (offset coordinate by actual screen pos of kbd)
     WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -650,9 +659,61 @@ final class KMKeyboard extends WebView {
       posY = kbPos[1] + (int) (this.suggestionWindowPos[1] * density);
     }
 
-    popup.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX , posY);
+    suggestionMenuWindow.setTouchable(true);
+    suggestionMenuWindow.setTouchInterceptor(new View.OnTouchListener() {
+      @SuppressLint("ClickableViewAccessibility")
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getAction();
+        int tx = (int) event.getRawX();
+        int ty = (int) event.getRawY();
 
-    // Do magic.
+        if (action == MotionEvent.ACTION_UP) {
+//          int count = ((ViewGroup) v).getChildCount();
+//          for (int i = 0; i < count; i++) {
+//            FrameLayout frame = (FrameLayout) ((ViewGroup) v).getChildAt(i);
+//            Button button = (Button) frame.getChildAt(0);
+//            if (button.isPressed()) {
+//              button.performClick();
+//              break;
+//            }
+//          }
+          dismissSuggestionMenuWindow();
+        } else if (action == MotionEvent.ACTION_MOVE) {
+//          int count = ((ViewGroup) v).getChildCount();
+//          for (int i = 0; i < count; i++) {
+//            FrameLayout frame = (FrameLayout) ((ViewGroup) v).getChildAt(i);
+//            Button button = (Button) frame.getChildAt(0);
+//            int[] pos = new int[2];
+//            button.getLocationOnScreen(pos);
+//            Rect rect = new Rect();
+//            button.getDrawingRect(rect);
+//            rect.offset(pos[0], pos[1]);
+//            if (rect.contains(tx, ty)) {
+//              button.setPressed(true);
+//            } else {
+//              button.setPressed(false);
+//            }
+//          }
+        }
+        return false;
+      }
+    });
+
+    suggestionMenuWindow.setOnDismissListener(new OnDismissListener() {
+      @Override
+      public void onDismiss() {
+        suggestionJSON = null;
+        suggestionMenuWindow = null;
+        String jsString = "javascript:popupVisible(0)";
+        loadUrl(jsString);
+      }
+    });
+
+    suggestionMenuWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX , posY);
+    String jsString = "javascript:popupVisible(1)";
+    loadUrl(jsString);
+
     return;
   }
 
