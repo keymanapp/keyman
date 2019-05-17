@@ -43,8 +43,8 @@
 
     // Update the KMW banner height
     function setBannerHeight(h) {
+      var kmw=com.keyman.singleton;
       if (h > 0) {
-        var kmw=com.keyman.singleton;
         var osk = kmw.osk;
         osk.banner.height = Math.ceil(h / window.devicePixelRatio);
       }
