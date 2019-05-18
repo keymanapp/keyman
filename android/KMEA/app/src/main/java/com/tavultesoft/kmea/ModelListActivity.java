@@ -305,6 +305,10 @@ public final class ModelListActivity extends AppCompatActivity {
         return null;
       }
 
+      // TODO: do not leave for production
+      if(android.os.Debug.isDebuggerConnected())
+        android.os.Debug.waitForDebugger();
+
       JSONParser jsonParser = new JSONParser();
       JSONArray lmData = null;
       if (loadFromCache) {

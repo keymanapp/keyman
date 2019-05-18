@@ -120,7 +120,7 @@ public class JSONUtils {
   }
 
   /**
-   * Iterate through a JSONArray to determine if a language/keyboard ID exists.
+   * Iterate through a JSONArray to determine if a language/keyboard/model ID exists.
    * @param {a} JSONArray to search
    * @param {id} String of the language/keyboard ID
    * @return int - Index if the ID is found (starting with 0). -1 if the ID doesn't exist
@@ -199,7 +199,7 @@ public class JSONUtils {
    * Will need to swap kmp.json (keyboards : languages) to cloud order (languages : keyboards)
    */
   public static JSONArray getLexicalModels() {
-    File[] packages = KMManager.getLexicalModelsDir().listFiles();
+    File[] packages = new File(KMManager.getLexicalModelsDir()).listFiles();
     JSONArray lexicalModelsArray = new JSONArray();
     JSONParser parser = new JSONParser();
 
