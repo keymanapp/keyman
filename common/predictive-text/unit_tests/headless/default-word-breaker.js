@@ -9,13 +9,13 @@ const SHY = '\u00AD';
 describe('The default word breaker', function () {
   it('should break multilingual text', function () {
     let breaks = breakWords(
-      `ᑖᓂᓯ᙮ рабочий — after working on ka${SHY}wen${SHY}non:${SHY}nis
-         let's eat phở! 🥣`
+      `Добрый день! ᑕᐻ᙮ — after working on ka${SHY}wen${SHY}non:${SHY}nis,
+       let's eat phở! 🥣`
     );
     let words = breaks.map(span => span.text);
     assert.deepEqual(words, [
-      'ᑖᓂᓯ', '᙮', 'рабочий', '—', 'after', 'working', 'on',
-      `ka${SHY}wen${SHY}non:${SHY}nis`,
+      'Добрый', 'день', '!', 'ᑕᐻ', '᙮', '—', 'after',
+      'working', 'on', `ka${SHY}wen${SHY}non:${SHY}nis`, ',',
       "let's", 'eat', 'phở', '!', '🥣'
     ]);
   });
