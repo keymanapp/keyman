@@ -20,14 +20,12 @@ namespace wordBreakers {
   function* findSpans(text: string): Iterable<Span> {
     // TODO: don't throw the boundaries into an array.
     let boundaries = Array.from(findBoundaries(text));
-    
     if (boundaries.length == 0) {
       return;
     }
 
     // All non-empty strings have at least TWO boundaries at the start and end of
     // the string.
-
     for (let i = 0; i < boundaries.length - 1; i++) {
       let start = boundaries[i];
       let end = boundaries[i + 1];
@@ -69,42 +67,48 @@ namespace wordBreakers {
   }
 
   /**
-   * Return an array of string indicies where a word break should occur. That is,
-   * there should be a break BEFORE each index returned.
+   * Yields a series of string indices where a word break should
+   * occur. That is, there should be a break BEFORE each string
+   * index yielded by this generator.
+   *
+   * @param text Text to find word boundaries in.
    */
   function* findBoundaries(text: string): Iterable<number> {
     // WB1 and WB2: no boundaries if given an empty string.
     if (text.length === 0) {
-      // There are no boundaries in an empty string.
+      // There are no boundaries in an empty string!
       return;
     }
-    // TODO: rewrite this code where property(char[pos]) == property(right)
-    // use a simple while loop, AND advance CODE UNIT BY CODE UNIT (account for
-    // surrogate pairs here directly).
-    // TODO: Explicitly keep track of the parity of regional flag indicators in order
-    // to implement WB15 at all (requires even number of regional flag indicators).
-    // TODO: Rewrite this to handle WB4 properly...
-    // Maintain a sliding window of four SCALAR VALUES.
+
+    // This algorithm works by maintaining a sliding window of four SCALAR VALUES.
     //
-    //  - Scalar values? JavaScript strings are not actually a string of 
-    //    Unicode code points; some characters are made up of TWO JavaScript indices.
-    //    e.g., "💩".length === 2, "💩"[0] === '\uXXXX',   "💩"[1] === '\uXXXX'
-    //    Since we don't want to be in the "middle" of a character, make sure
-    //    we're always advancing by scalar values, and not indices.
-    //  - Four values? Some rules look at what's left of left, and some look at
-    //    what's right of right. So keep track of this!
-    //let lookbehind_pos = -2; // lookbehind, one scalar value left of left
-    //let left_pos = -1;
+    //  - Scalar values? JavaScript strings are NOT actually a string of
+    //    Unicode code points; some characters are made up of TWO
+    //    JavaScript indices. e.g.,
+    //        "💩".length === 2;
+    //        "💩"[0] === '\uD83D';
+    //        "💩"[1] === '\uDCA9';
+    //
+    //    These characters that are represented by TWO indices are
+    //    called "surrogate pairs". Since we don't want to be in the
+    //    "middle" of a character, make sure we're always advancing
+    //    by scalar values, and NOT indices. That means, we sometimes
+    //    need to advance by TWO indices, not just one.
+    //  - Four values? Some rules look at what's to the left of
+    //    left, and some look at what's to the right of right. So
+    //    keep track of this!
+
     let rightPos: number;
-    let lookaheadPos = 0; // lookahead, one scalar value right of right.
-    // Before the start of the string is also the start of the string. This doesn't matter much!
+    let lookaheadPos = 0; // lookahead, one scalar value to the right of right.
+    // Before the start of the string is also the start of the string.
     let lookbehind: WordBreakProperty;
     let left: WordBreakProperty = 'sot';
     let right: WordBreakProperty = 'sot';
     let lookahead: WordBreakProperty = wordbreakPropertyAt(0);
-    // To make sure we're not splitting emoji flags:
-    let consecutiveRegionalIndicators = 0;
-    while ( /* N.B., breaks at rule WB2. */true) {
+    // Count RIs to make sure we're not splitting emoji flags:
+    let nConsecutiveRegionalIndicators = 0;
+
+    do  {
       // Shift all positions, one scalar value to the right.
       rightPos = lookaheadPos;
       lookaheadPos = positionAfter(lookaheadPos);
@@ -136,44 +140,68 @@ namespace wordBreakers {
         yield rightPos;
         continue;
       }
-      // TODO: WB3c: Do not break within emoji ZWJ sequences.
-      // Not implemented, because it is SUPER annoying, and of limited utility.
+
+      // HACK: advance by TWO positions to handle tricky emoji
+      // combining sequences, that SHOULD be kept together by
+      // WB3c, but are prematurely split by WB4:
+      if (left === 'Other' &&
+          (right === 'Extend' || right === 'Format') &&
+          lookahead === 'ZWJ') {
+        // To ensure this is not split, advance TWO positions forward.
+        for (let i = 0; i < 2; i++) {
+          [rightPos, lookaheadPos] = [lookaheadPos, positionAfter(lookaheadPos)];
+        }
+        [left, right, lookahead] =
+          [lookahead, wordbreakPropertyAt(rightPos), wordbreakPropertyAt(lookaheadPos)];
+        // N.B. `left` now MUST be ZWJ, setting it up for WB3c proper.
+      }
+
+      // WB3c: Do not break within emoji ZWJ sequences.
+      if (left === 'ZWJ' && isExtendedPictographicAt(rightPos))
+        continue;
 
       // WB3d: Keep horizontal whitespace together
       if (left === 'WSegSpace' && right == 'WSegSpace')
         continue;
-      // WB4: Ignore format and extend characters, except after sot, CR, LF, and Newline.
-      // See: Section 6.2: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
+
+      // WB4: Ignore format and extend characters
       // This is to keep grapheme clusters together!
-      // N.B.: The exception has already been handled above!
+      // See: Section 6.2: https://unicode.org/reports/tr29/#Grapheme_Cluster_and_Format_Rules
+      // N.B.: The rule about "except after sot, CR, LF, and
+      // Newline" already been by WB1, WB2, WB3a, and WB3b above.
       while (right === 'Format' || right === 'Extend' || right === 'ZWJ') {
-        // Continue advancing in the string, as if these characters do not exist.
-        // DO NOT update left and right, however!
+        // Continue advancing in the string, as if these
+        // characters do not exist. DO NOT update left and
+        // lookbehind however!
         [rightPos, lookaheadPos] = [lookaheadPos, positionAfter(lookaheadPos)];
         [right, lookahead] = [lookahead, wordbreakPropertyAt(lookaheadPos)];
       }
-      // In ignoring the characters in the previous loop, we could have fallen of
-      // the end of the string, so end the loop prematurely if that happens!
+      // In ignoring the characters in the previous loop, we could
+      // have fallen off the end of the string, so end the loop
+      // prematurely if that happens!
       if (right === 'eot') {
         yield rightPos;
         break;
       }
-      // WB4 (continued): Lookahead must ALSO ignore these format, extend, zwj characters!
+      // WB4 (continued): Lookahead must ALSO ignore these format,
+      // extend, ZWJ characters!
       while (lookahead === 'Format' || lookahead === 'Extend' || lookahead === 'ZWJ') {
-        // Continue advancing in the string, as if these characters do not exist.
-        // DO NOT update left and right, however!
+        // Continue advancing in the string, as if these
+        // characters do not exist. DO NOT update left and right,
+        // however!
         lookaheadPos = positionAfter(lookaheadPos);
         lookahead = wordbreakPropertyAt(lookaheadPos);
       }
+
       // WB5: Do not break between most letters.
       if (isAHLetter(left) && isAHLetter(right))
         continue;
       // Do not break across certain punctuation
-      // WB6: (Don't break before appostrophies in contractions)
+      // WB6: (Don't break before apostrophes in contractions)
       if (isAHLetter(left) && isAHLetter(lookahead) &&
         (right === 'MidLetter' || isMidNumLetQ(right)))
         continue;
-      // WB7: (Don't break after appostrophies in contractions)
+      // WB7: (Don't break after apostrophes in contractions)
       if (isAHLetter(lookbehind) && isAHLetter(right) &&
         (left === 'MidLetter' || isMidNumLetQ(left)))
         continue;
@@ -223,28 +251,28 @@ namespace wordBreakers {
         right === 'Numeric' ||
         right === 'Katakana') && left === 'ExtendNumLet')
         continue;
+
       // WB15 & WB16:
       // Do not break within emoji flag sequences. That is, do not break between
       // regional indicator (RI) symbols if there is an odd number of RI
       // characters before the break point.
       if (right === 'Regional_Indicator') {
-        // Emoji flags are actually composed of two code points, each being a
-        // "regional indicator". These indicators coorespond to Latin letters. Put
+        // Emoji flags are actually composed of TWO scalar values, each being a
+        // "regional indicator". These indicators correspond to Latin letters. Put
         // two of them together, and they spell out an ISO 3166-1-alpha-2 country
         // code. Since these always come in pairs, NEVER split the pairs! So, if
         // we happen to be inside the middle of an odd numbered of
-        // Regional_Indicators, DON'T SPLIT!
-        consecutiveRegionalIndicators += 1;
-        if ((consecutiveRegionalIndicators % 2) == 1)
+        // Regional_Indicators, DON'T SPLIT IT!
+        nConsecutiveRegionalIndicators += 1;
+        if ((nConsecutiveRegionalIndicators % 2) == 1) {
           continue;
-      }
-      else {
-        consecutiveRegionalIndicators = 0;
+        }
+      } else {
+        nConsecutiveRegionalIndicators = 0;
       }
       // WB999: Otherwise, break EVERYWHERE (including around ideographs)
       yield rightPos;
-    }
-    return;
+    } while (rightPos < text.length);
 
     ///// Internal utility functions /////
 
@@ -258,8 +286,7 @@ namespace wordBreakers {
     function positionAfter(pos: number): number {
       if (pos >= text.length) {
         return text.length;
-      }
-      else if (isStartOfSurrogatePair(text[pos])) {
+      } else if (isStartOfSurrogatePair(text[pos])) {
         return pos + 2;
       }
       return pos + 1;
@@ -272,15 +299,17 @@ namespace wordBreakers {
     function wordbreakPropertyAt(pos: number) {
       if (pos < 0) {
         return 'sot'; // Always "start of string" before the string starts!
-      }
-      else if (pos >= text.length) {
+      } else if (pos >= text.length) {
         return 'eot'; // Always "end of string" after the string ends!
-      }
-      else if (isStartOfSurrogatePair(text[pos])) {
+      } else if (isStartOfSurrogatePair(text[pos])) {
         // Surrogate pairs the next TWO items from the string!
         return property(text[pos] + text[pos + 1]);
       }
       return property(text[pos]);
+    }
+
+    function isExtendedPictographicAt(pos: number) {
+      return extendedPictographic.test(text.substring(pos, pos + 2));
     }
 
     // Word_Break rule macros
@@ -295,8 +324,8 @@ namespace wordBreakers {
   }
 
   function isStartOfSurrogatePair(character: string) {
-    let code_unit = character.charCodeAt(0);
-    return code_unit >= 0xD800 && code_unit <= 0xDBFF;
+    let codeUnit = character.charCodeAt(0);
+    return codeUnit >= 0xD800 && codeUnit <= 0xDBFF;
   }
 
   /**
@@ -320,11 +349,9 @@ namespace wordBreakers {
     let candidate = WORD_BREAK_PROPERTY[midpoint];
     if (codepoint < candidate.start) {
       return searchForProperty(codepoint, left, midpoint - 1);
-    }
-    else if (codepoint > candidate.end) {
+    } else if (codepoint > candidate.end) {
       return searchForProperty(codepoint, midpoint + 1, right);
-    }
-    else {
+    } else {
       // We found it!
       return candidate.value;
     }
