@@ -3,7 +3,7 @@
 //  FirstVoices
 //
 //  Created by Serkan Kurt on 17/11/2015.
-//  Converted by Marc Durdin on 15/5/19.
+//  Rewritten by Marc Durdin on 15/5/2019.
 //  Copyright © 2015-2019 FirstVoices. All rights reserved.
 //
 
@@ -11,7 +11,6 @@ import UIKit
 import KeymanEngine
 
 let helpLink: String = "https://help.keyman.com/keyboard/"
-let kKeyboardsFileLastModDateKey: String = "KeyboardsFileLastModDate"
 let tHelpButtonTag: NSInteger = 1000
 let tCheckBoxTag: NSInteger = 2000
 
@@ -32,8 +31,6 @@ typealias FVRegionList = [FVRegion]
 class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
   @IBOutlet var tableView: UITableView!
-  // TODO: Turn this into an array of structured objects rather than an array of array of dictionaries
-  // current structure: region: array of 'keyboard info'
   var _keyboardList: FVRegionList = []
   var _loadedKeyboards: [String] = []
 
@@ -206,23 +203,57 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     sharedData.synchronize()
   }
 
+  func reportFatalError(message: String) {
+    let alertController = UIAlertController(title: title, message: message,
+      preferredStyle: UIAlertController.Style.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertAction.Style.cancel,
+                                            handler: nil))
+
+    self.present(alertController, animated: true, completion: nil)
+    print(message)
+    // TODO: send the error message + call stack through to us
+    // some reporting mechanism
+  }
+
   func updateActiveKeyboardsList() {
+
+    // Remove all installed keyboards first -- we'll re-add them below
+
+    while Manager.shared.removeKeyboard(at: 0) {
+    }
+
+    // Iterate through the available keyboards
+
     let kbList = self.keyboardList()
     for i in 0...kbList.count-1 {
       let keyboards = kbList[i].keyboards
       for kb in keyboards {
         if _loadedKeyboards.contains(kb.id) {
-          let kbinfoFilename: String = Bundle.main.path(forResource: kb.id, ofType: "keyboard_info", inDirectory: "Keyboards/files")!
 
-          // Load the .keyboard_info file and parse its first language code
+          // Load the .keyboard_info file and find its first language code
 
           var keyboardInfo: KeyboardInfo
           do {
+            let kbinfoFilename: String = Bundle.main.path(forResource: kb.id, ofType: "keyboard_info", inDirectory: "Keyboards/files")!
             keyboardInfo = try KeyboardInfoParser.decode(file: kbinfoFilename)
           } catch {
-            print("Failed to load keyboard info for " + kbinfoFilename)
+            reportFatalError(message: "Failed to load keyboard info for " + kb.id+": " + error.localizedDescription)
             continue
           }
+
+          // Preload the keyboard
+
+          do {
+            let kbPath: String = Bundle.main.path(forResource: kb.id, ofType: "js", inDirectory: "Keyboards/files")!
+            let pathUrl = URL(fileURLWithPath: kbPath)
+            try Manager.shared.preloadFiles(forKeyboardID: kb.id, at: [pathUrl], shouldOverwrite: true)
+          } catch {
+            reportFatalError(message: "Failed to load preload "+kb.id+": " + error.localizedDescription)
+            continue
+          }
+
+          // Install the keyboard into Keyman Engine
 
           let keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kb.id,
                                                                        name: kb.name,
