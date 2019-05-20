@@ -16,9 +16,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    // Set desired level before release
-    KeymanEngine.log.outputLevel = .debug
-    KeymanEngine.log.logAppDetails()
+
+#warning("TODO: we need to upgrade existing installations, which involves mapping the horrific old data structure plus keyboard file renames")
+
+    #if DEBUG
+      KeymanEngine.log.outputLevel = .debug
+      KeymanEngine.log.logAppDetails()
+    #else
+      KeymanEngine.log.outputLevel = .warning
+    #endif
 
     // Replace with your application group id
     Manager.applicationGroupIdentifier = "group.FVKeyboards"

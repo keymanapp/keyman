@@ -28,11 +28,11 @@ class KeyboardViewController: InputViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    topBarImageView?.backgroundColor = UIColor(red: 1.0, green: 96.0 / 255.0, blue: 0.0, alpha: 1.0)
+    /*topBarImageView?.backgroundColor = UIColor(red: 1.0, green: 96.0 / 255.0, blue: 0.0, alpha: 1.0)
     let label = UILabel(frame: CGRect.zero)
     label.text = " \(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName")!)"
     label.sizeToFit()
     label.textColor = UIColor.white
-    topBarImageView?.addSubview(label)
+    topBarImageView?.addSubview(label)*/
   }
 }

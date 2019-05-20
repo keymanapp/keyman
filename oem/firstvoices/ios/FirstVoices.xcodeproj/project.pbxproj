@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		37E691381C279793003B2E29 /* fv_lakota_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 37E691341C279793003B2E29 /* fv_lakota_kmw-9.0.js */; };
-		37E691391C279793003B2E29 /* inuktitut_latin-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 37E691351C279793003B2E29 /* inuktitut_latin-1.1.js */; };
-		37E6913A1C279793003B2E29 /* inuktitut_naqittaut-1.3.js in Resources */ = {isa = PBXBuildFile; fileRef = 37E691361C279793003B2E29 /* inuktitut_naqittaut-1.3.js */; };
-		37E6913B1C279793003B2E29 /* inuktitut_pirurvik-1.1.js in Resources */ = {isa = PBXBuildFile; fileRef = 37E691371C279793003B2E29 /* inuktitut_pirurvik-1.1.js */; };
 		37EA1F1E228A180A003E710C /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; };
 		37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; };
@@ -33,6 +29,8 @@
 		37EA1F41228CA4CC003E710C /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F40228CA4CB003E710C /* DeviceKit.framework */; };
 		37EA1F42228CA4D7003E710C /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F40228CA4CB003E710C /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		37EA1F43228CA4EC003E710C /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F40228CA4CB003E710C /* DeviceKit.framework */; };
+		37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F4522921BAD003E710C /* KeyboardInfo.swift */; };
+		37EA1F482292238F003E710C /* Keyboards in Resources */ = {isa = PBXBuildFile; fileRef = 37EA1F472292238E003E710C /* Keyboards */; };
 		9800EC5C1C029F2200BF0FB5 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9800EC5B1C029F2200BF0FB5 /* Settings.bundle */; };
 		98395E331C1E61AF007CD675 /* 739-question-selected.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2D1C1E61AF007CD675 /* 739-question-selected.png */; };
 		98395E341C1E61AF007CD675 /* 739-question-selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */; };
@@ -40,12 +38,10 @@
 		98395E361C1E61AF007CD675 /* 739-question.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E301C1E61AF007CD675 /* 739-question.png */; };
 		98395E371C1E61AF007CD675 /* 739-question@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E311C1E61AF007CD675 /* 739-question@2x.png */; };
 		98395E381C1E61AF007CD675 /* 739-question@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E321C1E61AF007CD675 /* 739-question@3x.png */; };
-		98395E3A1C1E772D007CD675 /* canadian_french-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98395E391C1E772D007CD675 /* canadian_french-1.0.js */; };
 		984471A61C1F796D00D3C9DA /* languagegeek.png in Resources */ = {isa = PBXBuildFile; fileRef = 984471A51C1F796D00D3C9DA /* languagegeek.png */; };
 		9889E8C41BFA9CEC00019560 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C21BFA9CEC00019560 /* Main.storyboard */; };
 		9889E8C61BFA9CEC00019560 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C51BFA9CEC00019560 /* Assets.xcassets */; };
 		9889E8C91BFA9CEC00019560 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */; };
-		9889E8D21BFAAECD00019560 /* keyboards.csv in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8D11BFAAECD00019560 /* keyboards.csv */; };
 		989618CA1C194AD90012E3EB /* fpcc.svg in Resources */ = {isa = PBXBuildFile; fileRef = 989618C81C194AD90012E3EB /* fpcc.svg */; };
 		989618CB1C194AD90012E3EB /* nrt.svg in Resources */ = {isa = PBXBuildFile; fileRef = 989618C91C194AD90012E3EB /* nrt.svg */; };
 		98C7F7F51BFD4649007F17B7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9E71BFC0974009E9A4F /* AudioToolbox.framework */; };
@@ -69,95 +65,6 @@
 		98C9A8F01BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */; };
 		98C9A8F11BFBF6C1009E9A4F /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */; };
 		98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */; };
-		98C9A96E1BFC069A009E9A4F /* fv_anicinapemi8in_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8F41BFC069A009E9A4F /* fv_anicinapemi8in_kmw-9.0.js */; };
-		98C9A96F1BFC069A009E9A4F /* fv_anishinaabemowin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8F51BFC069A009E9A4F /* fv_anishinaabemowin_kmw-9.0.js */; };
-		98C9A9701BFC069A009E9A4F /* fv_atikamekw_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8F61BFC069A009E9A4F /* fv_atikamekw_kmw-9.0.js */; };
-		98C9A9711BFC069A009E9A4F /* fv_australian_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8F71BFC069A009E9A4F /* fv_australian_kmw-9.0.js */; };
-		98C9A9721BFC069A009E9A4F /* fv_blackfoot_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8F81BFC069A009E9A4F /* fv_blackfoot_kmw-9.0.js */; };
-		98C9A9731BFC069A009E9A4F /* fv_bodewadminwen_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8F91BFC069A009E9A4F /* fv_bodewadminwen_kmw-9.0.js */; };
-		98C9A9741BFC069A009E9A4F /* fv_cree_latin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8FA1BFC069A009E9A4F /* fv_cree_latin_kmw-9.0.js */; };
-		98C9A9751BFC069A009E9A4F /* fv_dakelh_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8FB1BFC069A009E9A4F /* fv_dakelh_kmw-9.0.js */; };
-		98C9A9761BFC069A009E9A4F /* fv_dakota_mb_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8FC1BFC069A009E9A4F /* fv_dakota_mb_kmw-9.0.js */; };
-		98C9A9771BFC069A009E9A4F /* fv_dakota_sk_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8FD1BFC069A009E9A4F /* fv_dakota_sk_kmw-9.0.js */; };
-		98C9A9781BFC069A009E9A4F /* fv_dane_zaa_zaage_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8FE1BFC069A009E9A4F /* fv_dane_zaa_zaage_kmw-9.0.js */; };
-		98C9A9791BFC069A009E9A4F /* fv_dene_dzage_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8FF1BFC069A009E9A4F /* fv_dene_dzage_kmw-9.0.js */; };
-		98C9A97A1BFC069A009E9A4F /* fv_dene_mb_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9001BFC069A009E9A4F /* fv_dene_mb_kmw-9.0.js */; };
-		98C9A97B1BFC069A009E9A4F /* fv_dene_nt_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9011BFC069A009E9A4F /* fv_dene_nt_kmw-9.0.js */; };
-		98C9A97C1BFC069A009E9A4F /* fv_dene_zhatie_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9021BFC069A009E9A4F /* fv_dene_zhatie_kmw-9.0.js */; };
-		98C9A97D1BFC069A009E9A4F /* fv_denesuline_epsilon_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9031BFC069A009E9A4F /* fv_denesuline_epsilon_kmw-9.0.js */; };
-		98C9A97E1BFC069A009E9A4F /* fv_denesuline_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9041BFC069A009E9A4F /* fv_denesuline_kmw-9.0.js */; };
-		98C9A97F1BFC069A009E9A4F /* fv_dexwlesucid_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9051BFC069A009E9A4F /* fv_dexwlesucid_kmw-9.0.js */; };
-		98C9A9801BFC069A009E9A4F /* fv_diitiidatx_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9061BFC069A009E9A4F /* fv_diitiidatx_kmw-9.0.js */; };
-		98C9A9811BFC069A009E9A4F /* fv_dine_bizaad_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9071BFC069A009E9A4F /* fv_dine_bizaad_kmw-9.0.js */; };
-		98C9A9821BFC069A009E9A4F /* fv_eastern_canadian_inuktitut_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9081BFC069A009E9A4F /* fv_eastern_canadian_inuktitut_kmw-9.0.js */; };
-		98C9A9831BFC069A009E9A4F /* fv_gitsenimx_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9091BFC069A009E9A4F /* fv_gitsenimx_kmw-9.0.js */; };
-		98C9A9841BFC069A009E9A4F /* fv_goyogohono_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A90A1BFC069A009E9A4F /* fv_goyogohono_kmw-9.0.js */; };
-		98C9A9851BFC069A009E9A4F /* fv_gwichin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A90B1BFC069A009E9A4F /* fv_gwichin_kmw-9.0.js */; };
-		98C9A9861BFC069A009E9A4F /* fv_hailzaqvla_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A90C1BFC069A009E9A4F /* fv_hailzaqvla_kmw-9.0.js */; };
-		98C9A9871BFC069A009E9A4F /* fv_halqemeylem_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A90D1BFC069A009E9A4F /* fv_halqemeylem_kmw-9.0.js */; };
-		98C9A9881BFC069A009E9A4F /* fv_han_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A90E1BFC069A009E9A4F /* fv_han_kmw-9.0.js */; };
-		98C9A9891BFC069A009E9A4F /* fv_henqeminem_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A90F1BFC069A009E9A4F /* fv_henqeminem_kmw-9.0.js */; };
-		98C9A98A1BFC069A009E9A4F /* fv_hlgaagilda_xaayda_kil_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9101BFC069A009E9A4F /* fv_hlgaagilda_xaayda_kil_kmw-9.0.js */; };
-		98C9A98B1BFC069A009E9A4F /* fv_hulquminum_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9111BFC069A009E9A4F /* fv_hulquminum_kmw-9.0.js */; };
-		98C9A98C1BFC069A009E9A4F /* fv_ilnu_innu_aimun_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9121BFC069A009E9A4F /* fv_ilnu_innu_aimun_kmw-9.0.js */; };
-		98C9A98D1BFC069A009E9A4F /* fv_inuvialuktun_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9131BFC069A009E9A4F /* fv_inuvialuktun_kmw-9.0.js */; };
-		98C9A98E1BFC069A009E9A4F /* fv_isga_iabi_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9141BFC069A009E9A4F /* fv_isga_iabi_kmw-9.0.js */; };
-		98C9A98F1BFC069A009E9A4F /* fv_kanienkeha_e_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9151BFC069A009E9A4F /* fv_kanienkeha_e_kmw-9.0.js */; };
-		98C9A9901BFC069A009E9A4F /* fv_kashogotine_yati_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9161BFC069A009E9A4F /* fv_kashogotine_yati_kmw-9.0.js */; };
-		98C9A9911BFC069A009E9A4F /* fv_klahoose_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9171BFC069A009E9A4F /* fv_klahoose_kmw-9.0.js */; };
-		98C9A9921BFC069A009E9A4F /* fv_ktunaxa_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9181BFC069A009E9A4F /* fv_ktunaxa_kmw-9.0.js */; };
-		98C9A9931BFC069A009E9A4F /* fv_kwakwala_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9191BFC069A009E9A4F /* fv_kwakwala_kmw-9.0.js */; };
-		98C9A9941BFC069A009E9A4F /* fv_kwakwala_liqwala_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A91A1BFC069A009E9A4F /* fv_kwakwala_liqwala_kmw-9.0.js */; };
-		98C9A9951BFC069A009E9A4F /* fv_lunaapeewi_huluniixsuwaakan_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A91B1BFC069A009E9A4F /* fv_lunaapeewi_huluniixsuwaakan_kmw-9.0.js */; };
-		98C9A9961BFC069A009E9A4F /* fv_maori_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A91C1BFC069A009E9A4F /* fv_maori_kmw-9.0.js */; };
-		98C9A9971BFC069A009E9A4F /* fv_migmaq_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A91D1BFC069A009E9A4F /* fv_migmaq_kmw-9.0.js */; };
-		98C9A9981BFC069A009E9A4F /* fv_moose_cree_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A91E1BFC069A009E9A4F /* fv_moose_cree_kmw-9.0.js */; };
-		98C9A9991BFC069A009E9A4F /* fv_nakoda_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A91F1BFC069A009E9A4F /* fv_nakoda_kmw-9.0.js */; };
-		98C9A99A1BFC069A009E9A4F /* fv_naskapi_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9201BFC069A009E9A4F /* fv_naskapi_kmw-9.0.js */; };
-		98C9A99B1BFC069A009E9A4F /* fv_natwits_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9211BFC069A009E9A4F /* fv_natwits_kmw-9.0.js */; };
-		98C9A99C1BFC069A009E9A4F /* fv_neeaandeg_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9221BFC069A009E9A4F /* fv_neeaandeg_kmw-9.0.js */; };
-		98C9A99D1BFC069A009E9A4F /* fv_neeaaneegn_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9231BFC069A009E9A4F /* fv_neeaaneegn_kmw-9.0.js */; };
-		98C9A99E1BFC069A009E9A4F /* fv_nexwslayemucen_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9241BFC069A009E9A4F /* fv_nexwslayemucen_kmw-9.0.js */; };
-		98C9A99F1BFC069A009E9A4F /* fv_nisgaa_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9251BFC069A009E9A4F /* fv_nisgaa_kmw-9.0.js */; };
-		98C9A9A01BFC069A009E9A4F /* fv_nlekepmxcin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9261BFC069A009E9A4F /* fv_nlekepmxcin_kmw-9.0.js */; };
-		98C9A9A11BFC069A009E9A4F /* fv_nlha7kapmxtsin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9271BFC069A009E9A4F /* fv_nlha7kapmxtsin_kmw-9.0.js */; };
-		98C9A9A21BFC069A009E9A4F /* fv_northern_east_cree_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9281BFC069A009E9A4F /* fv_northern_east_cree_kmw-9.0.js */; };
-		98C9A9A31BFC069A009E9A4F /* fv_northern_tutchone_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9291BFC069A009E9A4F /* fv_northern_tutchone_kmw-9.0.js */; };
-		98C9A9A41BFC069A009E9A4F /* fv_nsilxcen_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A92A1BFC069A009E9A4F /* fv_nsilxcen_kmw-9.0.js */; };
-		98C9A9A51BFC069A009E9A4F /* fv_nuucaanul_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A92B1BFC069A009E9A4F /* fv_nuucaanul_kmw-9.0.js */; };
-		98C9A9A61BFC069A009E9A4F /* fv_nuxalk_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A92C1BFC069A009E9A4F /* fv_nuxalk_kmw-9.0.js */; };
-		98C9A9A71BFC069A009E9A4F /* fv_ojibwa_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A92D1BFC069A009E9A4F /* fv_ojibwa_kmw-9.0.js */; };
-		98C9A9A81BFC069A009E9A4F /* fv_onayotaaka_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A92E1BFC069A009E9A4F /* fv_onayotaaka_kmw-9.0.js */; };
-		98C9A9A91BFC069A009E9A4F /* fv_onodagega_onondagega_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A92F1BFC069A009E9A4F /* fv_onodagega_onondagega_kmw-9.0.js */; };
-		98C9A9AA1BFC069A009E9A4F /* fv_onodowaga_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9301BFC069A009E9A4F /* fv_onodowaga_kmw-9.0.js */; };
-		98C9A9AB1BFC069A009E9A4F /* fv_plains_cree_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9311BFC069A009E9A4F /* fv_plains_cree_kmw-9.0.js */; };
-		98C9A9AC1BFC069A009E9A4F /* fv_sahugotine_yati_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9321BFC069A009E9A4F /* fv_sahugotine_yati_kmw-9.0.js */; };
-		98C9A9AD1BFC069A009E9A4F /* fv_secwepemctsin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9331BFC069A009E9A4F /* fv_secwepemctsin_kmw-9.0.js */; };
-		98C9A9AE1BFC069A009E9A4F /* fv_sencoten_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9341BFC069A009E9A4F /* fv_sencoten_kmw-9.0.js */; };
-		98C9A9AF1BFC069A009E9A4F /* fv_severn_ojibwa_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9351BFC069A009E9A4F /* fv_severn_ojibwa_kmw-9.0.js */; };
-		98C9A9B01BFC069A009E9A4F /* fv_shashishalhem_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9361BFC069A009E9A4F /* fv_shashishalhem_kmw-9.0.js */; };
-		98C9A9B11BFC069A009E9A4F /* fv_shihgotine_yati_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9371BFC069A009E9A4F /* fv_shihgotine_yati_kmw-9.0.js */; };
-		98C9A9B21BFC069A009E9A4F /* fv_skaru_re_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9381BFC069A009E9A4F /* fv_skaru_re_kmw-9.0.js */; };
-		98C9A9B31BFC069A009E9A4F /* fv_skicinuwatuwewakon_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9391BFC069A009E9A4F /* fv_skicinuwatuwewakon_kmw-9.0.js */; };
-		98C9A9B41BFC069A009E9A4F /* fv_skwxwumesh_snichim_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A93A1BFC069A009E9A4F /* fv_skwxwumesh_snichim_kmw-9.0.js */; };
-		98C9A9B51BFC069A009E9A4F /* fv_smalgyax_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A93B1BFC069A009E9A4F /* fv_smalgyax_kmw-9.0.js */; };
-		98C9A9B61BFC069A009E9A4F /* fv_southern_carrier_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A93C1BFC069A009E9A4F /* fv_southern_carrier_kmw-9.0.js */; };
-		98C9A9B71BFC069A009E9A4F /* fv_southern_tutchone_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A93D1BFC069A009E9A4F /* fv_southern_tutchone_kmw-9.0.js */; };
-		98C9A9B81BFC069A009E9A4F /* fv_statimcets_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A93E1BFC069A009E9A4F /* fv_statimcets_kmw-9.0.js */; };
-		98C9A9B91BFC069A009E9A4F /* fv_stlatlimxec_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A93F1BFC069A009E9A4F /* fv_stlatlimxec_kmw-9.0.js */; };
-		98C9A9BA1BFC069A009E9A4F /* fv_swampy_cree_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9401BFC069A009E9A4F /* fv_swampy_cree_kmw-9.0.js */; };
-		98C9A9BB1BFC069A009E9A4F /* fv_tagizi_dene_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9411BFC069A009E9A4F /* fv_tagizi_dene_kmw-9.0.js */; };
-		98C9A9BC1BFC069A009E9A4F /* fv_taltan_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9421BFC069A009E9A4F /* fv_taltan_kmw-9.0.js */; };
-		98C9A9BD1BFC069A009E9A4F /* fv_tlicho_yatii_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9431BFC069A009E9A4F /* fv_tlicho_yatii_kmw-9.0.js */; };
-		98C9A9BE1BFC069A009E9A4F /* fv_tlingit_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9441BFC069A009E9A4F /* fv_tlingit_kmw-9.0.js */; };
-		98C9A9BF1BFC069A009E9A4F /* fv_tsekehne_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9451BFC069A009E9A4F /* fv_tsekehne_kmw-9.0.js */; };
-		98C9A9C01BFC069A009E9A4F /* fv_tsilhqotin_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9461BFC069A009E9A4F /* fv_tsilhqotin_kmw-9.0.js */; };
-		98C9A9C11BFC069A009E9A4F /* fv_tsuutina_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9471BFC069A009E9A4F /* fv_tsuutina_kmw-9.0.js */; };
-		98C9A9C21BFC069A009E9A4F /* fv_uummarmiutun_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9481BFC069A009E9A4F /* fv_uummarmiutun_kmw-9.0.js */; };
-		98C9A9C31BFC069A009E9A4F /* fv_uwikala_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A9491BFC069A009E9A4F /* fv_uwikala_kmw-9.0.js */; };
-		98C9A9C41BFC069A009E9A4F /* fv_wendat_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A94A1BFC069A009E9A4F /* fv_wendat_kmw-9.0.js */; };
-		98C9A9C51BFC069A009E9A4F /* fv_wobanakiodwawogan_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A94B1BFC069A009E9A4F /* fv_wobanakiodwawogan_kmw-9.0.js */; };
-		98C9A9C61BFC069A009E9A4F /* fv_xaislakala_kmw-9.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A94C1BFC069A009E9A4F /* fv_xaislakala_kmw-9.0.js */; };
 		98C9A9E81BFC0974009E9A4F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9E71BFC0974009E9A4F /* AudioToolbox.framework */; };
 		98C9A9EA1BFC097B009E9A4F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9E91BFC097B009E9A4F /* CFNetwork.framework */; };
 		98C9A9EC1BFC0983009E9A4F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9EB1BFC0983009E9A4F /* WebKit.framework */; };
@@ -224,10 +131,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		37E691341C279793003B2E29 /* fv_lakota_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_lakota_kmw-9.0.js"; sourceTree = "<group>"; };
-		37E691351C279793003B2E29 /* inuktitut_latin-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "inuktitut_latin-1.1.js"; sourceTree = "<group>"; };
-		37E691361C279793003B2E29 /* inuktitut_naqittaut-1.3.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "inuktitut_naqittaut-1.3.js"; sourceTree = "<group>"; };
-		37E691371C279793003B2E29 /* inuktitut_pirurvik-1.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "inuktitut_pirurvik-1.1.js"; sourceTree = "<group>"; };
 		37EA1F1D228A1809003E710C /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
 		37EA1F21228A1F57003E710C /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
@@ -241,6 +144,8 @@
 		37EA1F36228CA3D2003E710C /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../../ios/Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		37EA1F38228CA3E4003E710C /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../../ios/Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
 		37EA1F40228CA4CB003E710C /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../../ios/Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		37EA1F4522921BAD003E710C /* KeyboardInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardInfo.swift; sourceTree = "<group>"; };
+		37EA1F472292238E003E710C /* Keyboards */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Keyboards; path = FirstVoices/Keyboards; sourceTree = "<group>"; };
 		9800EC5B1C029F2200BF0FB5 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		98395E2D1C1E61AF007CD675 /* 739-question-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected.png"; sourceTree = "<group>"; };
 		98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected@2x.png"; sourceTree = "<group>"; };
@@ -248,14 +153,12 @@
 		98395E301C1E61AF007CD675 /* 739-question.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question.png"; sourceTree = "<group>"; };
 		98395E311C1E61AF007CD675 /* 739-question@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question@2x.png"; sourceTree = "<group>"; };
 		98395E321C1E61AF007CD675 /* 739-question@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question@3x.png"; sourceTree = "<group>"; };
-		98395E391C1E772D007CD675 /* canadian_french-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "canadian_french-1.0.js"; sourceTree = "<group>"; };
 		984471A51C1F796D00D3C9DA /* languagegeek.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = languagegeek.png; sourceTree = "<group>"; };
 		9889E8B61BFA9CEC00019560 /* FirstVoices.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FirstVoices.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9889E8C31BFA9CEC00019560 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9889E8C51BFA9CEC00019560 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9889E8C81BFA9CEC00019560 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9889E8CA1BFA9CEC00019560 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9889E8D11BFAAECD00019560 /* keyboards.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = keyboards.csv; sourceTree = "<group>"; };
 		989618C81C194AD90012E3EB /* fpcc.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = fpcc.svg; sourceTree = "<group>"; };
 		989618C91C194AD90012E3EB /* nrt.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = nrt.svg; sourceTree = "<group>"; };
 		98C9A8BC1BFBF23C009E9A4F /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -271,95 +174,6 @@
 		98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
 		98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait@3x.png"; sourceTree = "<group>"; };
 		98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait~ipad.png"; sourceTree = "<group>"; };
-		98C9A8F41BFC069A009E9A4F /* fv_anicinapemi8in_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_anicinapemi8in_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8F51BFC069A009E9A4F /* fv_anishinaabemowin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_anishinaabemowin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8F61BFC069A009E9A4F /* fv_atikamekw_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_atikamekw_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8F71BFC069A009E9A4F /* fv_australian_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_australian_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8F81BFC069A009E9A4F /* fv_blackfoot_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_blackfoot_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8F91BFC069A009E9A4F /* fv_bodewadminwen_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_bodewadminwen_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8FA1BFC069A009E9A4F /* fv_cree_latin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_cree_latin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8FB1BFC069A009E9A4F /* fv_dakelh_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dakelh_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8FC1BFC069A009E9A4F /* fv_dakota_mb_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dakota_mb_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8FD1BFC069A009E9A4F /* fv_dakota_sk_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dakota_sk_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8FE1BFC069A009E9A4F /* fv_dane_zaa_zaage_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dane_zaa_zaage_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A8FF1BFC069A009E9A4F /* fv_dene_dzage_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dene_dzage_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9001BFC069A009E9A4F /* fv_dene_mb_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dene_mb_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9011BFC069A009E9A4F /* fv_dene_nt_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dene_nt_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9021BFC069A009E9A4F /* fv_dene_zhatie_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dene_zhatie_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9031BFC069A009E9A4F /* fv_denesuline_epsilon_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_denesuline_epsilon_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9041BFC069A009E9A4F /* fv_denesuline_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_denesuline_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9051BFC069A009E9A4F /* fv_dexwlesucid_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dexwlesucid_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9061BFC069A009E9A4F /* fv_diitiidatx_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_diitiidatx_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9071BFC069A009E9A4F /* fv_dine_bizaad_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_dine_bizaad_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9081BFC069A009E9A4F /* fv_eastern_canadian_inuktitut_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_eastern_canadian_inuktitut_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9091BFC069A009E9A4F /* fv_gitsenimx_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_gitsenimx_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A90A1BFC069A009E9A4F /* fv_goyogohono_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_goyogohono_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A90B1BFC069A009E9A4F /* fv_gwichin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_gwichin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A90C1BFC069A009E9A4F /* fv_hailzaqvla_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_hailzaqvla_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A90D1BFC069A009E9A4F /* fv_halqemeylem_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_halqemeylem_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A90E1BFC069A009E9A4F /* fv_han_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_han_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A90F1BFC069A009E9A4F /* fv_henqeminem_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_henqeminem_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9101BFC069A009E9A4F /* fv_hlgaagilda_xaayda_kil_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_hlgaagilda_xaayda_kil_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9111BFC069A009E9A4F /* fv_hulquminum_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_hulquminum_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9121BFC069A009E9A4F /* fv_ilnu_innu_aimun_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_ilnu_innu_aimun_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9131BFC069A009E9A4F /* fv_inuvialuktun_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_inuvialuktun_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9141BFC069A009E9A4F /* fv_isga_iabi_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_isga_iabi_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9151BFC069A009E9A4F /* fv_kanienkeha_e_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_kanienkeha_e_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9161BFC069A009E9A4F /* fv_kashogotine_yati_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_kashogotine_yati_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9171BFC069A009E9A4F /* fv_klahoose_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_klahoose_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9181BFC069A009E9A4F /* fv_ktunaxa_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_ktunaxa_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9191BFC069A009E9A4F /* fv_kwakwala_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_kwakwala_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A91A1BFC069A009E9A4F /* fv_kwakwala_liqwala_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_kwakwala_liqwala_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A91B1BFC069A009E9A4F /* fv_lunaapeewi_huluniixsuwaakan_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_lunaapeewi_huluniixsuwaakan_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A91C1BFC069A009E9A4F /* fv_maori_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_maori_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A91D1BFC069A009E9A4F /* fv_migmaq_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_migmaq_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A91E1BFC069A009E9A4F /* fv_moose_cree_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_moose_cree_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A91F1BFC069A009E9A4F /* fv_nakoda_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nakoda_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9201BFC069A009E9A4F /* fv_naskapi_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_naskapi_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9211BFC069A009E9A4F /* fv_natwits_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_natwits_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9221BFC069A009E9A4F /* fv_neeaandeg_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_neeaandeg_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9231BFC069A009E9A4F /* fv_neeaaneegn_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_neeaaneegn_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9241BFC069A009E9A4F /* fv_nexwslayemucen_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nexwslayemucen_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9251BFC069A009E9A4F /* fv_nisgaa_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nisgaa_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9261BFC069A009E9A4F /* fv_nlekepmxcin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nlekepmxcin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9271BFC069A009E9A4F /* fv_nlha7kapmxtsin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nlha7kapmxtsin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9281BFC069A009E9A4F /* fv_northern_east_cree_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_northern_east_cree_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9291BFC069A009E9A4F /* fv_northern_tutchone_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_northern_tutchone_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A92A1BFC069A009E9A4F /* fv_nsilxcen_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nsilxcen_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A92B1BFC069A009E9A4F /* fv_nuucaanul_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nuucaanul_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A92C1BFC069A009E9A4F /* fv_nuxalk_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_nuxalk_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A92D1BFC069A009E9A4F /* fv_ojibwa_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_ojibwa_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A92E1BFC069A009E9A4F /* fv_onayotaaka_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_onayotaaka_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A92F1BFC069A009E9A4F /* fv_onodagega_onondagega_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_onodagega_onondagega_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9301BFC069A009E9A4F /* fv_onodowaga_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_onodowaga_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9311BFC069A009E9A4F /* fv_plains_cree_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_plains_cree_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9321BFC069A009E9A4F /* fv_sahugotine_yati_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_sahugotine_yati_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9331BFC069A009E9A4F /* fv_secwepemctsin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_secwepemctsin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9341BFC069A009E9A4F /* fv_sencoten_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_sencoten_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9351BFC069A009E9A4F /* fv_severn_ojibwa_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_severn_ojibwa_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9361BFC069A009E9A4F /* fv_shashishalhem_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_shashishalhem_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9371BFC069A009E9A4F /* fv_shihgotine_yati_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_shihgotine_yati_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9381BFC069A009E9A4F /* fv_skaru_re_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_skaru_re_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9391BFC069A009E9A4F /* fv_skicinuwatuwewakon_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_skicinuwatuwewakon_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A93A1BFC069A009E9A4F /* fv_skwxwumesh_snichim_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_skwxwumesh_snichim_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A93B1BFC069A009E9A4F /* fv_smalgyax_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_smalgyax_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A93C1BFC069A009E9A4F /* fv_southern_carrier_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_southern_carrier_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A93D1BFC069A009E9A4F /* fv_southern_tutchone_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_southern_tutchone_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A93E1BFC069A009E9A4F /* fv_statimcets_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_statimcets_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A93F1BFC069A009E9A4F /* fv_stlatlimxec_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_stlatlimxec_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9401BFC069A009E9A4F /* fv_swampy_cree_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_swampy_cree_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9411BFC069A009E9A4F /* fv_tagizi_dene_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_tagizi_dene_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9421BFC069A009E9A4F /* fv_taltan_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_taltan_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9431BFC069A009E9A4F /* fv_tlicho_yatii_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_tlicho_yatii_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9441BFC069A009E9A4F /* fv_tlingit_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_tlingit_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9451BFC069A009E9A4F /* fv_tsekehne_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_tsekehne_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9461BFC069A009E9A4F /* fv_tsilhqotin_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_tsilhqotin_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9471BFC069A009E9A4F /* fv_tsuutina_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_tsuutina_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9481BFC069A009E9A4F /* fv_uummarmiutun_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_uummarmiutun_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A9491BFC069A009E9A4F /* fv_uwikala_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_uwikala_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A94A1BFC069A009E9A4F /* fv_wendat_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_wendat_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A94B1BFC069A009E9A4F /* fv_wobanakiodwawogan_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_wobanakiodwawogan_kmw-9.0.js"; sourceTree = "<group>"; };
-		98C9A94C1BFC069A009E9A4F /* fv_xaislakala_kmw-9.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fv_xaislakala_kmw-9.0.js"; sourceTree = "<group>"; };
 		98C9A9E71BFC0974009E9A4F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		98C9A9E91BFC097B009E9A4F /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		98C9A9EB1BFC0983009E9A4F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -450,6 +264,7 @@
 		9889E8AD1BFA9CEC00019560 = {
 			isa = PBXGroup;
 			children = (
+				37EA1F472292238E003E710C /* Keyboards */,
 				9889E8B81BFA9CEC00019560 /* FirstVoices */,
 				98C9A9FB1BFC19ED009E9A4F /* Frameworks */,
 				98C7F7EE1BFD422E007F17B7 /* FVShared */,
@@ -471,20 +286,20 @@
 		9889E8B81BFA9CEC00019560 /* FirstVoices */ = {
 			isa = PBXGroup;
 			children = (
-				37EA1F33228BCDF8003E710C /* FirstVoices-Bridging-Header.h */,
-				37EA1F2E228B7458003E710C /* CheckBox.swift */,
-				37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */,
-				98395E2C1C1E61AF007CD675 /* Icons */,
-				9889E8C51BFA9CEC00019560 /* Assets.xcassets */,
 				98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */,
+				37EA1F33228BCDF8003E710C /* FirstVoices-Bridging-Header.h */,
 				9889E8CA1BFA9CEC00019560 /* Info.plist */,
+				37EA1F25228B5D6E003E710C /* AppDelegate.swift */,
+				37EA1F2E228B7458003E710C /* CheckBox.swift */,
+				37EA1F4522921BAD003E710C /* KeyboardInfo.swift */,
+				37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */,
+				37EA1F27228B5E2B003E710C /* ViewController.swift */,
+				9889E8C51BFA9CEC00019560 /* Assets.xcassets */,
+				98395E2C1C1E61AF007CD675 /* Icons */,
 				98FAB7E51C0E775500C31263 /* Instructions */,
-				9889E8D01BFAAECD00019560 /* Keyboards */,
 				9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */,
 				9889E8C21BFA9CEC00019560 /* Main.storyboard */,
 				9889E8B91BFA9CEC00019560 /* Supporting Files */,
-				37EA1F27228B5E2B003E710C /* ViewController.swift */,
-				37EA1F25228B5D6E003E710C /* AppDelegate.swift */,
 			);
 			path = FirstVoices;
 			sourceTree = "<group>";
@@ -494,16 +309,6 @@
 			children = (
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		9889E8D01BFAAECD00019560 /* Keyboards */ = {
-			isa = PBXGroup;
-			children = (
-				98C9A8F31BFC069A009E9A4F /* files */,
-				98C9A94D1BFC069A009E9A4F /* fonts */,
-				9889E8D11BFAAECD00019560 /* keyboards.csv */,
-			);
-			path = Keyboards;
 			sourceTree = "<group>";
 		};
 		98C7F7EE1BFD422E007F17B7 /* FVShared */ = {
@@ -542,114 +347,6 @@
 				98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */,
 			);
 			path = Images;
-			sourceTree = "<group>";
-		};
-		98C9A8F31BFC069A009E9A4F /* files */ = {
-			isa = PBXGroup;
-			children = (
-				37E691341C279793003B2E29 /* fv_lakota_kmw-9.0.js */,
-				37E691351C279793003B2E29 /* inuktitut_latin-1.1.js */,
-				37E691361C279793003B2E29 /* inuktitut_naqittaut-1.3.js */,
-				37E691371C279793003B2E29 /* inuktitut_pirurvik-1.1.js */,
-				98395E391C1E772D007CD675 /* canadian_french-1.0.js */,
-				98C9A8F41BFC069A009E9A4F /* fv_anicinapemi8in_kmw-9.0.js */,
-				98C9A8F51BFC069A009E9A4F /* fv_anishinaabemowin_kmw-9.0.js */,
-				98C9A8F61BFC069A009E9A4F /* fv_atikamekw_kmw-9.0.js */,
-				98C9A8F71BFC069A009E9A4F /* fv_australian_kmw-9.0.js */,
-				98C9A8F81BFC069A009E9A4F /* fv_blackfoot_kmw-9.0.js */,
-				98C9A8F91BFC069A009E9A4F /* fv_bodewadminwen_kmw-9.0.js */,
-				98C9A8FA1BFC069A009E9A4F /* fv_cree_latin_kmw-9.0.js */,
-				98C9A8FB1BFC069A009E9A4F /* fv_dakelh_kmw-9.0.js */,
-				98C9A8FC1BFC069A009E9A4F /* fv_dakota_mb_kmw-9.0.js */,
-				98C9A8FD1BFC069A009E9A4F /* fv_dakota_sk_kmw-9.0.js */,
-				98C9A8FE1BFC069A009E9A4F /* fv_dane_zaa_zaage_kmw-9.0.js */,
-				98C9A8FF1BFC069A009E9A4F /* fv_dene_dzage_kmw-9.0.js */,
-				98C9A9001BFC069A009E9A4F /* fv_dene_mb_kmw-9.0.js */,
-				98C9A9011BFC069A009E9A4F /* fv_dene_nt_kmw-9.0.js */,
-				98C9A9021BFC069A009E9A4F /* fv_dene_zhatie_kmw-9.0.js */,
-				98C9A9031BFC069A009E9A4F /* fv_denesuline_epsilon_kmw-9.0.js */,
-				98C9A9041BFC069A009E9A4F /* fv_denesuline_kmw-9.0.js */,
-				98C9A9051BFC069A009E9A4F /* fv_dexwlesucid_kmw-9.0.js */,
-				98C9A9061BFC069A009E9A4F /* fv_diitiidatx_kmw-9.0.js */,
-				98C9A9071BFC069A009E9A4F /* fv_dine_bizaad_kmw-9.0.js */,
-				98C9A9081BFC069A009E9A4F /* fv_eastern_canadian_inuktitut_kmw-9.0.js */,
-				98C9A9091BFC069A009E9A4F /* fv_gitsenimx_kmw-9.0.js */,
-				98C9A90A1BFC069A009E9A4F /* fv_goyogohono_kmw-9.0.js */,
-				98C9A90B1BFC069A009E9A4F /* fv_gwichin_kmw-9.0.js */,
-				98C9A90C1BFC069A009E9A4F /* fv_hailzaqvla_kmw-9.0.js */,
-				98C9A90D1BFC069A009E9A4F /* fv_halqemeylem_kmw-9.0.js */,
-				98C9A90E1BFC069A009E9A4F /* fv_han_kmw-9.0.js */,
-				98C9A90F1BFC069A009E9A4F /* fv_henqeminem_kmw-9.0.js */,
-				98C9A9101BFC069A009E9A4F /* fv_hlgaagilda_xaayda_kil_kmw-9.0.js */,
-				98C9A9111BFC069A009E9A4F /* fv_hulquminum_kmw-9.0.js */,
-				98C9A9121BFC069A009E9A4F /* fv_ilnu_innu_aimun_kmw-9.0.js */,
-				98C9A9131BFC069A009E9A4F /* fv_inuvialuktun_kmw-9.0.js */,
-				98C9A9141BFC069A009E9A4F /* fv_isga_iabi_kmw-9.0.js */,
-				98C9A9151BFC069A009E9A4F /* fv_kanienkeha_e_kmw-9.0.js */,
-				98C9A9161BFC069A009E9A4F /* fv_kashogotine_yati_kmw-9.0.js */,
-				98C9A9171BFC069A009E9A4F /* fv_klahoose_kmw-9.0.js */,
-				98C9A9181BFC069A009E9A4F /* fv_ktunaxa_kmw-9.0.js */,
-				98C9A9191BFC069A009E9A4F /* fv_kwakwala_kmw-9.0.js */,
-				98C9A91A1BFC069A009E9A4F /* fv_kwakwala_liqwala_kmw-9.0.js */,
-				98C9A91B1BFC069A009E9A4F /* fv_lunaapeewi_huluniixsuwaakan_kmw-9.0.js */,
-				98C9A91C1BFC069A009E9A4F /* fv_maori_kmw-9.0.js */,
-				98C9A91D1BFC069A009E9A4F /* fv_migmaq_kmw-9.0.js */,
-				98C9A91E1BFC069A009E9A4F /* fv_moose_cree_kmw-9.0.js */,
-				98C9A91F1BFC069A009E9A4F /* fv_nakoda_kmw-9.0.js */,
-				98C9A9201BFC069A009E9A4F /* fv_naskapi_kmw-9.0.js */,
-				98C9A9211BFC069A009E9A4F /* fv_natwits_kmw-9.0.js */,
-				98C9A9221BFC069A009E9A4F /* fv_neeaandeg_kmw-9.0.js */,
-				98C9A9231BFC069A009E9A4F /* fv_neeaaneegn_kmw-9.0.js */,
-				98C9A9241BFC069A009E9A4F /* fv_nexwslayemucen_kmw-9.0.js */,
-				98C9A9251BFC069A009E9A4F /* fv_nisgaa_kmw-9.0.js */,
-				98C9A9261BFC069A009E9A4F /* fv_nlekepmxcin_kmw-9.0.js */,
-				98C9A9271BFC069A009E9A4F /* fv_nlha7kapmxtsin_kmw-9.0.js */,
-				98C9A9281BFC069A009E9A4F /* fv_northern_east_cree_kmw-9.0.js */,
-				98C9A9291BFC069A009E9A4F /* fv_northern_tutchone_kmw-9.0.js */,
-				98C9A92A1BFC069A009E9A4F /* fv_nsilxcen_kmw-9.0.js */,
-				98C9A92B1BFC069A009E9A4F /* fv_nuucaanul_kmw-9.0.js */,
-				98C9A92C1BFC069A009E9A4F /* fv_nuxalk_kmw-9.0.js */,
-				98C9A92D1BFC069A009E9A4F /* fv_ojibwa_kmw-9.0.js */,
-				98C9A92E1BFC069A009E9A4F /* fv_onayotaaka_kmw-9.0.js */,
-				98C9A92F1BFC069A009E9A4F /* fv_onodagega_onondagega_kmw-9.0.js */,
-				98C9A9301BFC069A009E9A4F /* fv_onodowaga_kmw-9.0.js */,
-				98C9A9311BFC069A009E9A4F /* fv_plains_cree_kmw-9.0.js */,
-				98C9A9321BFC069A009E9A4F /* fv_sahugotine_yati_kmw-9.0.js */,
-				98C9A9331BFC069A009E9A4F /* fv_secwepemctsin_kmw-9.0.js */,
-				98C9A9341BFC069A009E9A4F /* fv_sencoten_kmw-9.0.js */,
-				98C9A9351BFC069A009E9A4F /* fv_severn_ojibwa_kmw-9.0.js */,
-				98C9A9361BFC069A009E9A4F /* fv_shashishalhem_kmw-9.0.js */,
-				98C9A9371BFC069A009E9A4F /* fv_shihgotine_yati_kmw-9.0.js */,
-				98C9A9381BFC069A009E9A4F /* fv_skaru_re_kmw-9.0.js */,
-				98C9A9391BFC069A009E9A4F /* fv_skicinuwatuwewakon_kmw-9.0.js */,
-				98C9A93A1BFC069A009E9A4F /* fv_skwxwumesh_snichim_kmw-9.0.js */,
-				98C9A93B1BFC069A009E9A4F /* fv_smalgyax_kmw-9.0.js */,
-				98C9A93C1BFC069A009E9A4F /* fv_southern_carrier_kmw-9.0.js */,
-				98C9A93D1BFC069A009E9A4F /* fv_southern_tutchone_kmw-9.0.js */,
-				98C9A93E1BFC069A009E9A4F /* fv_statimcets_kmw-9.0.js */,
-				98C9A93F1BFC069A009E9A4F /* fv_stlatlimxec_kmw-9.0.js */,
-				98C9A9401BFC069A009E9A4F /* fv_swampy_cree_kmw-9.0.js */,
-				98C9A9411BFC069A009E9A4F /* fv_tagizi_dene_kmw-9.0.js */,
-				98C9A9421BFC069A009E9A4F /* fv_taltan_kmw-9.0.js */,
-				98C9A9431BFC069A009E9A4F /* fv_tlicho_yatii_kmw-9.0.js */,
-				98C9A9441BFC069A009E9A4F /* fv_tlingit_kmw-9.0.js */,
-				98C9A9451BFC069A009E9A4F /* fv_tsekehne_kmw-9.0.js */,
-				98C9A9461BFC069A009E9A4F /* fv_tsilhqotin_kmw-9.0.js */,
-				98C9A9471BFC069A009E9A4F /* fv_tsuutina_kmw-9.0.js */,
-				98C9A9481BFC069A009E9A4F /* fv_uummarmiutun_kmw-9.0.js */,
-				98C9A9491BFC069A009E9A4F /* fv_uwikala_kmw-9.0.js */,
-				98C9A94A1BFC069A009E9A4F /* fv_wendat_kmw-9.0.js */,
-				98C9A94B1BFC069A009E9A4F /* fv_wobanakiodwawogan_kmw-9.0.js */,
-				98C9A94C1BFC069A009E9A4F /* fv_xaislakala_kmw-9.0.js */,
-			);
-			path = files;
-			sourceTree = "<group>";
-		};
-		98C9A94D1BFC069A009E9A4F /* fonts */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = fonts;
 			sourceTree = "<group>";
 		};
 		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
@@ -798,127 +495,33 @@
 			files = (
 				98FAB7FD1C0E775500C31263 /* globe.svg in Resources */,
 				9889E8C91BFA9CEC00019560 /* LaunchScreen.storyboard in Resources */,
-				98C9A98D1BFC069A009E9A4F /* fv_inuvialuktun_kmw-9.0.js in Resources */,
-				98C9A9B81BFC069A009E9A4F /* fv_statimcets_kmw-9.0.js in Resources */,
 				9800EC5C1C029F2200BF0FB5 /* Settings.bundle in Resources */,
-				98C9A9751BFC069A009E9A4F /* fv_dakelh_kmw-9.0.js in Resources */,
 				98FAB8021C0E775500C31263 /* nunito-regular-webfont.svg in Resources */,
-				98C9A9851BFC069A009E9A4F /* fv_gwichin_kmw-9.0.js in Resources */,
-				37E6913B1C279793003B2E29 /* inuktitut_pirurvik-1.1.js in Resources */,
-				98C9A9A31BFC069A009E9A4F /* fv_northern_tutchone_kmw-9.0.js in Resources */,
-				98C9A9911BFC069A009E9A4F /* fv_klahoose_kmw-9.0.js in Resources */,
-				98C9A98A1BFC069A009E9A4F /* fv_hlgaagilda_xaayda_kil_kmw-9.0.js in Resources */,
 				989618CA1C194AD90012E3EB /* fpcc.svg in Resources */,
 				98FAB8061C0E775500C31263 /* opensans-regular-webfont.eot in Resources */,
-				98C9A9BE1BFC069A009E9A4F /* fv_tlingit_kmw-9.0.js in Resources */,
-				98C9A9741BFC069A009E9A4F /* fv_cree_latin_kmw-9.0.js in Resources */,
-				98C9A99B1BFC069A009E9A4F /* fv_natwits_kmw-9.0.js in Resources */,
-				98C9A9AD1BFC069A009E9A4F /* fv_secwepemctsin_kmw-9.0.js in Resources */,
-				98C9A9811BFC069A009E9A4F /* fv_dine_bizaad_kmw-9.0.js in Resources */,
 				98FAB80B1C0E775500C31263 /* setup.html in Resources */,
-				98C9A9A71BFC069A009E9A4F /* fv_ojibwa_kmw-9.0.js in Resources */,
-				98C9A9951BFC069A009E9A4F /* fv_lunaapeewi_huluniixsuwaakan_kmw-9.0.js in Resources */,
-				98C9A9BB1BFC069A009E9A4F /* fv_tagizi_dene_kmw-9.0.js in Resources */,
-				98C9A9981BFC069A009E9A4F /* fv_moose_cree_kmw-9.0.js in Resources */,
-				98C9A9A81BFC069A009E9A4F /* fv_onayotaaka_kmw-9.0.js in Resources */,
-				98C9A99A1BFC069A009E9A4F /* fv_naskapi_kmw-9.0.js in Resources */,
-				98C9A9991BFC069A009E9A4F /* fv_nakoda_kmw-9.0.js in Resources */,
-				98C9A97C1BFC069A009E9A4F /* fv_dene_zhatie_kmw-9.0.js in Resources */,
-				98C9A9831BFC069A009E9A4F /* fv_gitsenimx_kmw-9.0.js in Resources */,
-				98C9A9C51BFC069A009E9A4F /* fv_wobanakiodwawogan_kmw-9.0.js in Resources */,
-				98C9A9821BFC069A009E9A4F /* fv_eastern_canadian_inuktitut_kmw-9.0.js in Resources */,
 				98FAB8071C0E775500C31263 /* opensans-regular-webfont.svg in Resources */,
-				98C9A9A41BFC069A009E9A4F /* fv_nsilxcen_kmw-9.0.js in Resources */,
-				98C9A97F1BFC069A009E9A4F /* fv_dexwlesucid_kmw-9.0.js in Resources */,
-				98C9A9C41BFC069A009E9A4F /* fv_wendat_kmw-9.0.js in Resources */,
 				9889E8C61BFA9CEC00019560 /* Assets.xcassets in Resources */,
 				98FAB7FF1C0E775500C31263 /* keyman.svg in Resources */,
-				98C9A98E1BFC069A009E9A4F /* fv_isga_iabi_kmw-9.0.js in Resources */,
-				98C9A9AC1BFC069A009E9A4F /* fv_sahugotine_yati_kmw-9.0.js in Resources */,
 				98395E331C1E61AF007CD675 /* 739-question-selected.png in Resources */,
-				98C9A98F1BFC069A009E9A4F /* fv_kanienkeha_e_kmw-9.0.js in Resources */,
-				98C9A9B91BFC069A009E9A4F /* fv_stlatlimxec_kmw-9.0.js in Resources */,
-				98C9A9801BFC069A009E9A4F /* fv_diitiidatx_kmw-9.0.js in Resources */,
+				37EA1F482292238F003E710C /* Keyboards in Resources */,
 				98FAB8041C0E775500C31263 /* nunito-regular-webfont.woff in Resources */,
-				98C9A9771BFC069A009E9A4F /* fv_dakota_sk_kmw-9.0.js in Resources */,
-				98C9A9AA1BFC069A009E9A4F /* fv_onodowaga_kmw-9.0.js in Resources */,
 				98FAB8091C0E775500C31263 /* opensans-regular-webfont.woff in Resources */,
-				98C9A9881BFC069A009E9A4F /* fv_han_kmw-9.0.js in Resources */,
 				989618CB1C194AD90012E3EB /* nrt.svg in Resources */,
-				98C9A99D1BFC069A009E9A4F /* fv_neeaaneegn_kmw-9.0.js in Resources */,
-				98395E3A1C1E772D007CD675 /* canadian_french-1.0.js in Resources */,
-				98C9A9A61BFC069A009E9A4F /* fv_nuxalk_kmw-9.0.js in Resources */,
-				98C9A9B31BFC069A009E9A4F /* fv_skicinuwatuwewakon_kmw-9.0.js in Resources */,
-				98C9A99C1BFC069A009E9A4F /* fv_neeaandeg_kmw-9.0.js in Resources */,
-				98C9A9781BFC069A009E9A4F /* fv_dane_zaa_zaage_kmw-9.0.js in Resources */,
 				984471A61C1F796D00D3C9DA /* languagegeek.png in Resources */,
 				98395E371C1E61AF007CD675 /* 739-question@2x.png in Resources */,
-				98C9A9B01BFC069A009E9A4F /* fv_shashishalhem_kmw-9.0.js in Resources */,
-				98C9A9791BFC069A009E9A4F /* fv_dene_dzage_kmw-9.0.js in Resources */,
 				9889E8C41BFA9CEC00019560 /* Main.storyboard in Resources */,
-				98C9A9A01BFC069A009E9A4F /* fv_nlekepmxcin_kmw-9.0.js in Resources */,
-				98C9A9731BFC069A009E9A4F /* fv_bodewadminwen_kmw-9.0.js in Resources */,
-				98C9A96F1BFC069A009E9A4F /* fv_anishinaabemowin_kmw-9.0.js in Resources */,
-				98C9A9761BFC069A009E9A4F /* fv_dakota_mb_kmw-9.0.js in Resources */,
 				98FAB7FE1C0E775500C31263 /* ios-instructions.css in Resources */,
-				98C9A9C21BFC069A009E9A4F /* fv_uummarmiutun_kmw-9.0.js in Resources */,
-				98C9A9AB1BFC069A009E9A4F /* fv_plains_cree_kmw-9.0.js in Resources */,
 				98395E341C1E61AF007CD675 /* 739-question-selected@2x.png in Resources */,
 				98FAB8051C0E775500C31263 /* nunito-regular-webfont.woff2 in Resources */,
-				98C9A9711BFC069A009E9A4F /* fv_australian_kmw-9.0.js in Resources */,
-				98C9A9C31BFC069A009E9A4F /* fv_uwikala_kmw-9.0.js in Resources */,
-				98C9A9B41BFC069A009E9A4F /* fv_skwxwumesh_snichim_kmw-9.0.js in Resources */,
-				98C9A9BF1BFC069A009E9A4F /* fv_tsekehne_kmw-9.0.js in Resources */,
-				98C9A97B1BFC069A009E9A4F /* fv_dene_nt_kmw-9.0.js in Resources */,
 				98FAB8081C0E775500C31263 /* opensans-regular-webfont.ttf in Resources */,
-				98C9A9BA1BFC069A009E9A4F /* fv_swampy_cree_kmw-9.0.js in Resources */,
 				98FAB80A1C0E775500C31263 /* opensans-regular-webfont.woff2 in Resources */,
-				98C9A9AE1BFC069A009E9A4F /* fv_sencoten_kmw-9.0.js in Resources */,
-				98C9A97D1BFC069A009E9A4F /* fv_denesuline_epsilon_kmw-9.0.js in Resources */,
-				98C9A9B21BFC069A009E9A4F /* fv_skaru_re_kmw-9.0.js in Resources */,
 				98FAB8011C0E775500C31263 /* nunito-regular-webfont.eot in Resources */,
-				98C9A9971BFC069A009E9A4F /* fv_migmaq_kmw-9.0.js in Resources */,
 				98395E361C1E61AF007CD675 /* 739-question.png in Resources */,
 				98FAB80D1C0E799100C31263 /* firstvoices-logo.gif in Resources */,
-				98C9A9C61BFC069A009E9A4F /* fv_xaislakala_kmw-9.0.js in Resources */,
-				98C9A98B1BFC069A009E9A4F /* fv_hulquminum_kmw-9.0.js in Resources */,
-				98C9A9861BFC069A009E9A4F /* fv_hailzaqvla_kmw-9.0.js in Resources */,
-				98C9A99F1BFC069A009E9A4F /* fv_nisgaa_kmw-9.0.js in Resources */,
-				98C9A9C11BFC069A009E9A4F /* fv_tsuutina_kmw-9.0.js in Resources */,
-				98C9A9891BFC069A009E9A4F /* fv_henqeminem_kmw-9.0.js in Resources */,
-				98C9A9B71BFC069A009E9A4F /* fv_southern_tutchone_kmw-9.0.js in Resources */,
-				98C9A97A1BFC069A009E9A4F /* fv_dene_mb_kmw-9.0.js in Resources */,
-				98C9A9AF1BFC069A009E9A4F /* fv_severn_ojibwa_kmw-9.0.js in Resources */,
-				98C9A9961BFC069A009E9A4F /* fv_maori_kmw-9.0.js in Resources */,
-				98C9A98C1BFC069A009E9A4F /* fv_ilnu_innu_aimun_kmw-9.0.js in Resources */,
 				98395E381C1E61AF007CD675 /* 739-question@3x.png in Resources */,
-				98C9A9A21BFC069A009E9A4F /* fv_northern_east_cree_kmw-9.0.js in Resources */,
-				98C9A9871BFC069A009E9A4F /* fv_halqemeylem_kmw-9.0.js in Resources */,
-				98C9A9921BFC069A009E9A4F /* fv_ktunaxa_kmw-9.0.js in Resources */,
-				98C9A97E1BFC069A009E9A4F /* fv_denesuline_kmw-9.0.js in Resources */,
-				37E6913A1C279793003B2E29 /* inuktitut_naqittaut-1.3.js in Resources */,
-				98C9A9841BFC069A009E9A4F /* fv_goyogohono_kmw-9.0.js in Resources */,
-				98C9A9A91BFC069A009E9A4F /* fv_onodagega_onondagega_kmw-9.0.js in Resources */,
-				37E691381C279793003B2E29 /* fv_lakota_kmw-9.0.js in Resources */,
-				98C9A9B11BFC069A009E9A4F /* fv_shihgotine_yati_kmw-9.0.js in Resources */,
-				98C9A9701BFC069A009E9A4F /* fv_atikamekw_kmw-9.0.js in Resources */,
-				98C9A9901BFC069A009E9A4F /* fv_kashogotine_yati_kmw-9.0.js in Resources */,
-				98C9A9B61BFC069A009E9A4F /* fv_southern_carrier_kmw-9.0.js in Resources */,
-				98C9A9C01BFC069A009E9A4F /* fv_tsilhqotin_kmw-9.0.js in Resources */,
-				98C9A9941BFC069A009E9A4F /* fv_kwakwala_liqwala_kmw-9.0.js in Resources */,
-				98C9A9BC1BFC069A009E9A4F /* fv_taltan_kmw-9.0.js in Resources */,
 				98395E351C1E61AF007CD675 /* 739-question-selected@3x.png in Resources */,
-				98C9A9721BFC069A009E9A4F /* fv_blackfoot_kmw-9.0.js in Resources */,
-				37E691391C279793003B2E29 /* inuktitut_latin-1.1.js in Resources */,
 				98FAB8031C0E775500C31263 /* nunito-regular-webfont.ttf in Resources */,
-				98C9A9BD1BFC069A009E9A4F /* fv_tlicho_yatii_kmw-9.0.js in Resources */,
-				98C9A96E1BFC069A009E9A4F /* fv_anicinapemi8in_kmw-9.0.js in Resources */,
-				98C9A9A51BFC069A009E9A4F /* fv_nuucaanul_kmw-9.0.js in Resources */,
-				9889E8D21BFAAECD00019560 /* keyboards.csv in Resources */,
-				98C9A9B51BFC069A009E9A4F /* fv_smalgyax_kmw-9.0.js in Resources */,
-				98C9A9A11BFC069A009E9A4F /* fv_nlha7kapmxtsin_kmw-9.0.js in Resources */,
-				98C9A9931BFC069A009E9A4F /* fv_kwakwala_kmw-9.0.js in Resources */,
-				98C9A99E1BFC069A009E9A4F /* fv_nexwslayemucen_kmw-9.0.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -954,7 +557,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/FirstVoices/Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/FirstVoices/Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"";
+			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/FirstVoices/Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/FirstVoices/Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -965,6 +568,7 @@
 			files = (
 				37EA1F26228B5D6E003E710C /* AppDelegate.swift in Sources */,
 				37EA1F2A228B69AF003E710C /* KeyboardsViewController.swift in Sources */,
+				37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */,
 				37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */,
 				37EA1F31228B7661003E710C /* FVShared.swift in Sources */,
 				37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */,

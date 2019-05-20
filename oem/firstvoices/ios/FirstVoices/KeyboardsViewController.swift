@@ -16,11 +16,10 @@ let tHelpButtonTag: NSInteger = 1000
 let tCheckBoxTag: NSInteger = 2000
 
 class FVKeyboard {
-  let name, languageCode, filename: String
-  init(name: String, languageCode: String, filename: String) {
+  let id, name: String
+  init(id: String, name: String) {
+    self.id = id
     self.name = name
-    self.languageCode = languageCode
-    self.filename = filename
   }
 }
 typealias FVKeyboardList = [FVKeyboard]
@@ -60,7 +59,6 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    //let index: Int = (section*2)+1
     let kbArray = self.keyboardList()[section].keyboards
     return kbArray.count
   }
@@ -114,7 +112,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     let kb = keyboards[indexPath.row]
     cell.textLabel!.text = kb.name
     let checkbox: CheckBox = (cell.accessoryView!.viewWithTag(tCheckBoxTag) as! CheckBox)
-    checkbox.isChecked = _loadedKeyboards.contains(kb.filename)
+    checkbox.isChecked = _loadedKeyboards.contains(kb.id)
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -124,7 +122,8 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
   func keyboardList() -> FVRegionList {
     if _keyboardList.count == 0 {
       do {
-        let keyboardsFile: String = Bundle.main.path(forResource: "keyboards", ofType: "csv")!
+        #warning("TODO: refactor the .csv load + related struct/class types into a separate module")
+        let keyboardsFile: String = Bundle.main.path(forResource: "keyboards", ofType: "csv", inDirectory: "Keyboards")!
 
         let fileContents: String = try String(contentsOfFile: keyboardsFile, encoding: .utf8).replacingOccurrences(of: "\r", with: "")
         let lines: [String] = fileContents.components(separatedBy: "\n")
@@ -135,11 +134,12 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
           }
           let values: [String] = line.components(separatedBy: ",")
           if values.count > 0 {
-            let kbName: String = values[0]
+            // Columns: shortname,id,name,region,legacyid
+            let kbId: String = values[1]
+            let kbName: String = values[2]
             let regionName: String = values[3]
-            let langCode: String = values[9]
-            let kbFilename: String = values[7].replacingOccurrences(of: ".kmn", with: "-9.0.js")
-            #warning("TODO: this rename of keyboard filename is no longer correct")
+            // TODO: let legacyId: String = values[3]
+            #warning("TODO: deal with legacy ids")
             var region = _keyboardList.first(where: { $0.name == regionName })
             if region == nil {
               region = FVRegion.init()
@@ -147,7 +147,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
               _keyboardList.append(region!)
             }
 
-            let kb = FVKeyboard(name: kbName, languageCode: langCode, filename: kbFilename)
+            let kb = FVKeyboard(id: kbId, name: kbName)
             region!.keyboards.append(kb)
           }
         }
@@ -166,9 +166,7 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     if indexPath != nil {
       let kbArray: FVKeyboardList = self.keyboardList()[indexPath!.section].keyboards
       let kbDict: FVKeyboard = kbArray[indexPath!.row]
-      let kbFilename: String = kbDict.filename
-      let kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
-      let helpUrl: URL = URL.init(string: "\(helpLink)\(kbID)")!
+      let helpUrl: URL = URL.init(string: "\(helpLink)\(kbDict.id)")!
       UIApplication.shared.openURL(helpUrl)
     }
   }
@@ -183,9 +181,9 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
       let keyboards = self.keyboardList()[indexPath!.section].keyboards
       let kb = keyboards[indexPath!.row]
 
-      _loadedKeyboards = _loadedKeyboards.filter { $0 != kb.filename }
+      _loadedKeyboards = _loadedKeyboards.filter { $0 != kb.id }
       if (sender as! CheckBox).isChecked {
-        _loadedKeyboards += [kb.filename]
+        _loadedKeyboards += [kb.id]
       }
       self.saveKeyboardListToUserDefaults()
       self.updateActiveKeyboardsList()
@@ -213,18 +211,24 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     for i in 0...kbList.count-1 {
       let keyboards = kbList[i].keyboards
       for kb in keyboards {
-        if _loadedKeyboards.contains(kb.filename) {
-          let kbFilename: String = kb.filename
-          let kbID: String = kbFilename.substring(to: kbFilename.range(of: "-")!.lowerBound)
-          let langCode: String = kb.languageCode
-          let langID: String = langCode.substring(to: langCode.index(langCode.startIndex, offsetBy: langCode.count < 3 ? langCode.count : 3)).lowercased()
-          let kbName: String = kb.name
-          let langName: String = kbName
-          let keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kbID,
-                                                                       name: kbName,
-                                                                       languageID: langID,
-                                                                       languageName: langName,
-                                                                       version: "1.0", //TODO fix versions
+        if _loadedKeyboards.contains(kb.id) {
+          let kbinfoFilename: String = Bundle.main.path(forResource: kb.id, ofType: "keyboard_info", inDirectory: "Keyboards/files")!
+
+          // Load the .keyboard_info file and parse its first language code
+
+          var keyboardInfo: KeyboardInfo
+          do {
+            keyboardInfo = try KeyboardInfoParser.decode(file: kbinfoFilename)
+          } catch {
+            print("Failed to load keyboard info for " + kbinfoFilename)
+            continue
+          }
+
+          let keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kb.id,
+                                                                       name: kb.name,
+                                                                       languageID: keyboardInfo.languages.keys[keyboardInfo.languages.startIndex],
+                                                                       languageName: kb.name,
+                                                                       version: keyboardInfo.version,
                                                                        isRTL: false,
                                                                        font: nil,
                                                                        oskFont: nil,

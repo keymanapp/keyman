@@ -10,11 +10,15 @@
 import KeymanEngine
 import UIKit
 
+@objc(FVInputViewController)
 class FVInputViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    //TODO
-    KeymanEngine.log.outputLevel = .debug
-    KeymanEngine.log.logAppDetails()
+    #if DEBUG
+      KeymanEngine.log.outputLevel = .debug
+      KeymanEngine.log.logAppDetails()
+    #else
+      KeymanEngine.log.outputLevel = .warning
+    #endif
 
     Manager.applicationGroupIdentifier = "group.FVKeyboard"
     //[self setGlobeKeyTapBehaviour:GKTapSwitchToNextKeyboard];

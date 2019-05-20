@@ -16,11 +16,20 @@ class ViewController: UIViewController, UIWebViewDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
 
-    let kbPaths: [String] = Bundle.main.paths(forResourcesOfType:"js", inDirectory: nil)
+    //
+    // Preload all the .js files, including their file versions
+    //
+
+    let kbPaths: [String] = Bundle.main.paths(forResourcesOfType:"js", inDirectory: "Keyboards/files")
     for kbPath in kbPaths {
-      //TODO: Manager.shared.preloadFiles(forKeyboardID: "", at: kbPaths, shouldOverwrite: true)
+      let pathUrl = URL(fileURLWithPath: kbPath)
+      let id = pathUrl.deletingPathExtension().lastPathComponent
+      do {
+        try Manager.shared.preloadFiles(forKeyboardID: id, at: [pathUrl], shouldOverwrite: true)
+      } catch {
+        print("Failed to preload "+id+": "+error.localizedDescription)
+      }
     }
     self.webView!.delegate = self
     let filePath: String? = Bundle.main.path(forResource: "setup", ofType: "html", inDirectory: nil)
