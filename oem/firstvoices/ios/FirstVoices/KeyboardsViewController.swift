@@ -14,28 +14,26 @@ let helpLink: String = "https://help.keyman.com/keyboard/"
 let tHelpButtonTag: NSInteger = 1000
 let tCheckBoxTag: NSInteger = 2000
 
-class FVKeyboard {
-  let id, name: String
-  init(id: String, name: String) {
-    self.id = id
-    self.name = name
-  }
-}
-typealias FVKeyboardList = [FVKeyboard]
-class FVRegion {
-  var name: String = ""
-  var keyboards: FVKeyboardList = []
-}
-typealias FVRegionList = [FVRegion]
-
 class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
   @IBOutlet var tableView: UITableView!
-  var _keyboardList: FVRegionList = []
-  var _loadedKeyboards: [String] = []
+
+  private var _keyboardList: FVRegionList!
+
+  private var keyboardList: FVRegionList {
+    get {
+      if _keyboardList == nil {
+        _keyboardList = FVRegionStorage.load()
+      }
+      return _keyboardList!
+    }
+  }
+
+  private var _loadedKeyboards: [String] = []
+
 
   override func viewDidLoad() {
-    loadKeyboardListFromUserDefaults()
+    _loadedKeyboards = FVRegionStorage.loadKeyboardListFromUserDefaults()
     super.viewDidLoad()
     // Do any additional setup after loading the view, typically from a nib.
   }
@@ -52,11 +50,11 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
 
   // MARK: - Table view data source
   func numberOfSections(in tableView: UITableView) -> Int {
-    return self.keyboardList().count
+    return self.keyboardList.count
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    let kbArray = self.keyboardList()[section].keyboards
+    let kbArray = self.keyboardList[section].keyboards
     return kbArray.count
   }
 
@@ -98,14 +96,14 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
 
   func tableView(_ tableView: UITableView,
                  titleForHeaderInSection section: Int) -> String? {
-    return self.keyboardList()[section].name
+    return self.keyboardList[section].name
   }
 
   // MARK: - Table view delegate
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
     cell.accessoryType = .none
-    let keyboards = (self.keyboardList()[indexPath.section]).keyboards
+    let keyboards = (self.keyboardList[indexPath.section]).keyboards
     let kb = keyboards[indexPath.row]
     cell.textLabel!.text = kb.name
     let checkbox: CheckBox = (cell.accessoryView!.viewWithTag(tCheckBoxTag) as! CheckBox)
@@ -116,52 +114,13 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     //
   }
 
-  func keyboardList() -> FVRegionList {
-    if _keyboardList.count == 0 {
-      do {
-        #warning("TODO: refactor the .csv load + related struct/class types into a separate module")
-        let keyboardsFile: String = Bundle.main.path(forResource: "keyboards", ofType: "csv", inDirectory: "Keyboards")!
-
-        let fileContents: String = try String(contentsOfFile: keyboardsFile, encoding: .utf8).replacingOccurrences(of: "\r", with: "")
-        let lines: [String] = fileContents.components(separatedBy: "\n")
-        for i in 1..<lines.count { // skip first line; it is a header row
-          let line: String = lines[i]
-          if line.count == 0 {
-            continue
-          }
-          let values: [String] = line.components(separatedBy: ",")
-          if values.count > 0 {
-            // Columns: shortname,id,name,region,legacyid
-            let kbId: String = values[1]
-            let kbName: String = values[2]
-            let regionName: String = values[3]
-            // TODO: let legacyId: String = values[3]
-            #warning("TODO: deal with legacy ids")
-            var region = _keyboardList.first(where: { $0.name == regionName })
-            if region == nil {
-              region = FVRegion.init()
-              region!.name = regionName
-              _keyboardList.append(region!)
-            }
-
-            let kb = FVKeyboard(id: kbId, name: kbName)
-            region!.keyboards.append(kb)
-          }
-        }
-      } catch {
-        NSLog("Unexpected error: \(error).")
-      }
-    }
-    return _keyboardList
-  }
-
   @objc func helpButtonTapped(_ sender: Any, forEvent event: UIEvent) {
     let touches: Set<UITouch>? = event.allTouches
     let touch: UITouch = touches!.first!
     let currentTouchPosition: CGPoint = touch.location(in: self.tableView)
     let indexPath: IndexPath? = self.tableView!.indexPathForRow(at: currentTouchPosition)
     if indexPath != nil {
-      let kbArray: FVKeyboardList = self.keyboardList()[indexPath!.section].keyboards
+      let kbArray: FVKeyboardList = self.keyboardList[indexPath!.section].keyboards
       let kbDict: FVKeyboard = kbArray[indexPath!.row]
       let helpUrl: URL = URL.init(string: "\(helpLink)\(kbDict.id)")!
       UIApplication.shared.openURL(helpUrl)
@@ -175,33 +134,19 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     let indexPath: IndexPath? = self.tableView!.indexPathForRow(at: currentTouchPosition)
     if indexPath != nil {
       // Update the checkState with the new checked state
-      let keyboards = self.keyboardList()[indexPath!.section].keyboards
+      let keyboards = self.keyboardList[indexPath!.section].keyboards
       let kb = keyboards[indexPath!.row]
 
       _loadedKeyboards = _loadedKeyboards.filter { $0 != kb.id }
       if (sender as! CheckBox).isChecked {
         _loadedKeyboards += [kb.id]
       }
-      self.saveKeyboardListToUserDefaults()
-      self.updateActiveKeyboardsList()
+      FVRegionStorage.saveKeyboardListToUserDefaults(loadedKeyboards: self._loadedKeyboards)
+      FVRegionStorage.updateActiveKeyboardsList(keyboardList: self.keyboardList,
+                                                loadedKeyboards: self._loadedKeyboards)
     }
   }
 
-  func loadKeyboardListFromUserDefaults() {
-    let sharedData: UserDefaults = FVShared.userDefaults()
-    let keyboards = sharedData.array(forKey: kFVLoadedKeyboardList)
-    if keyboards != nil {
-      _loadedKeyboards = keyboards as! [String]
-    } else {
-      _loadedKeyboards = []
-    }
-  }
-
-  func saveKeyboardListToUserDefaults() {
-    let sharedData: UserDefaults = FVShared.userDefaults()
-    sharedData.set(_loadedKeyboards, forKey: kFVLoadedKeyboardList)
-    sharedData.synchronize()
-  }
 
   func reportFatalError(message: String) {
     let alertController = UIAlertController(title: title, message: message,
@@ -216,58 +161,5 @@ class KeyboardsViewController: UIViewController, UITableViewDelegate, UITableVie
     // some reporting mechanism
   }
 
-  func updateActiveKeyboardsList() {
-
-    // Remove all installed keyboards first -- we'll re-add them below
-
-    while Manager.shared.removeKeyboard(at: 0) {
-    }
-
-    // Iterate through the available keyboards
-
-    let kbList = self.keyboardList()
-    for i in 0...kbList.count-1 {
-      let keyboards = kbList[i].keyboards
-      for kb in keyboards {
-        if _loadedKeyboards.contains(kb.id) {
-
-          // Load the .keyboard_info file and find its first language code
-
-          var keyboardInfo: KeyboardInfo
-          do {
-            let kbinfoFilename: String = Bundle.main.path(forResource: kb.id, ofType: "keyboard_info", inDirectory: "Keyboards/files")!
-            keyboardInfo = try KeyboardInfoParser.decode(file: kbinfoFilename)
-          } catch {
-            reportFatalError(message: "Failed to load keyboard info for " + kb.id+": " + error.localizedDescription)
-            continue
-          }
-
-          // Preload the keyboard
-
-          do {
-            let kbPath: String = Bundle.main.path(forResource: kb.id, ofType: "js", inDirectory: "Keyboards/files")!
-            let pathUrl = URL(fileURLWithPath: kbPath)
-            try Manager.shared.preloadFiles(forKeyboardID: kb.id, at: [pathUrl], shouldOverwrite: true)
-          } catch {
-            reportFatalError(message: "Failed to load preload "+kb.id+": " + error.localizedDescription)
-            continue
-          }
-
-          // Install the keyboard into Keyman Engine
-
-          let keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kb.id,
-                                                                       name: kb.name,
-                                                                       languageID: keyboardInfo.languages.keys[keyboardInfo.languages.startIndex],
-                                                                       languageName: kb.name,
-                                                                       version: keyboardInfo.version,
-                                                                       isRTL: false,
-                                                                       font: nil,
-                                                                       oskFont: nil,
-                                                                       isCustom: true)
-          Manager.shared.addKeyboard(keyboard)
-        }
-      }
-    }
-  }
 }
 

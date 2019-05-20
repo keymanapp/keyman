@@ -20,14 +20,9 @@ class FVInputViewController: InputViewController {
     //  KeymanEngine.log.outputLevel = .warning
     //#endif
 
-    print("FVIVC: Starting app")
-    Manager.applicationGroupIdentifier = "group.FVKeyboards"
-    //[self setGlobeKeyTapBehaviour:GKTapSwitchToNextKeyboard];
-    //[self setMenuBehaviour:MenuShowAlways];
-    //[self setMenuCloseButtonTitle:@"Switch to other keyboard"];
+    Manager.applicationGroupIdentifier = FVConstants.groupID
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    print("FVIVC: After super.init")
 
     self.globeKeyTapBehaviour = .switchToNextKeyboard
     self.menuBehaviour = .showAlways

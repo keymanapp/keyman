@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
+		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
 		37EA1F1E228A180A003E710C /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; };
 		37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; };
@@ -38,12 +40,9 @@
 		98395E361C1E61AF007CD675 /* 739-question.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E301C1E61AF007CD675 /* 739-question.png */; };
 		98395E371C1E61AF007CD675 /* 739-question@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E311C1E61AF007CD675 /* 739-question@2x.png */; };
 		98395E381C1E61AF007CD675 /* 739-question@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E321C1E61AF007CD675 /* 739-question@3x.png */; };
-		984471A61C1F796D00D3C9DA /* languagegeek.png in Resources */ = {isa = PBXBuildFile; fileRef = 984471A51C1F796D00D3C9DA /* languagegeek.png */; };
 		9889E8C41BFA9CEC00019560 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C21BFA9CEC00019560 /* Main.storyboard */; };
 		9889E8C61BFA9CEC00019560 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C51BFA9CEC00019560 /* Assets.xcassets */; };
 		9889E8C91BFA9CEC00019560 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */; };
-		989618CA1C194AD90012E3EB /* fpcc.svg in Resources */ = {isa = PBXBuildFile; fileRef = 989618C81C194AD90012E3EB /* fpcc.svg */; };
-		989618CB1C194AD90012E3EB /* nrt.svg in Resources */ = {isa = PBXBuildFile; fileRef = 989618C91C194AD90012E3EB /* nrt.svg */; };
 		98C7F7F51BFD4649007F17B7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9E71BFC0974009E9A4F /* AudioToolbox.framework */; };
 		98C7F7F61BFD464F007F17B7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9ED1BFC098F009E9A4F /* CoreText.framework */; };
 		98C7F7F71BFD4655007F17B7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9F71BFC09ED009E9A4F /* CoreGraphics.framework */; };
@@ -74,21 +73,6 @@
 		98C9A9F41BFC09C5009E9A4F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9F31BFC09C5009E9A4F /* MobileCoreServices.framework */; };
 		98C9A9F61BFC09DE009E9A4F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9F51BFC09DE009E9A4F /* UIKit.framework */; };
 		98C9A9F81BFC09ED009E9A4F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C9A9F71BFC09ED009E9A4F /* CoreGraphics.framework */; };
-		98FAB7FD1C0E775500C31263 /* globe.svg in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7EA1C0E775500C31263 /* globe.svg */; };
-		98FAB7FE1C0E775500C31263 /* ios-instructions.css in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7EB1C0E775500C31263 /* ios-instructions.css */; };
-		98FAB7FF1C0E775500C31263 /* keyman.svg in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7EC1C0E775500C31263 /* keyman.svg */; };
-		98FAB8011C0E775500C31263 /* nunito-regular-webfont.eot in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7EE1C0E775500C31263 /* nunito-regular-webfont.eot */; };
-		98FAB8021C0E775500C31263 /* nunito-regular-webfont.svg in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7EF1C0E775500C31263 /* nunito-regular-webfont.svg */; };
-		98FAB8031C0E775500C31263 /* nunito-regular-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F01C0E775500C31263 /* nunito-regular-webfont.ttf */; };
-		98FAB8041C0E775500C31263 /* nunito-regular-webfont.woff in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F11C0E775500C31263 /* nunito-regular-webfont.woff */; };
-		98FAB8051C0E775500C31263 /* nunito-regular-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F21C0E775500C31263 /* nunito-regular-webfont.woff2 */; };
-		98FAB8061C0E775500C31263 /* opensans-regular-webfont.eot in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F31C0E775500C31263 /* opensans-regular-webfont.eot */; };
-		98FAB8071C0E775500C31263 /* opensans-regular-webfont.svg in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F41C0E775500C31263 /* opensans-regular-webfont.svg */; };
-		98FAB8081C0E775500C31263 /* opensans-regular-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F51C0E775500C31263 /* opensans-regular-webfont.ttf */; };
-		98FAB8091C0E775500C31263 /* opensans-regular-webfont.woff in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F61C0E775500C31263 /* opensans-regular-webfont.woff */; };
-		98FAB80A1C0E775500C31263 /* opensans-regular-webfont.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F71C0E775500C31263 /* opensans-regular-webfont.woff2 */; };
-		98FAB80B1C0E775500C31263 /* setup.html in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB7F81C0E775500C31263 /* setup.html */; };
-		98FAB80D1C0E799100C31263 /* firstvoices-logo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 98FAB80C1C0E799100C31263 /* firstvoices-logo.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,15 +115,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		37C183B822932AD2009F9EFD /* FVKeyboardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardList.swift; sourceTree = "<group>"; };
+		37C183BC2293321C009F9EFD /* Instructions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Instructions; path = FirstVoices/Instructions; sourceTree = "<group>"; };
 		37EA1F1D228A1809003E710C /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
-		37EA1F21228A1F57003E710C /* SWKeyboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWKeyboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
 		37EA1F25228B5D6E003E710C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		37EA1F27228B5E2B003E710C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardsViewController.swift; sourceTree = "<group>"; };
 		37EA1F2E228B7458003E710C /* CheckBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CheckBox.swift; path = Checkbox/CheckBox.swift; sourceTree = "<group>"; };
 		37EA1F30228B7661003E710C /* FVShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FVShared.swift; path = FVShared/FVShared.swift; sourceTree = "<group>"; };
-		37EA1F33228BCDF8003E710C /* FirstVoices-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FirstVoices-Bridging-Header.h"; sourceTree = "<group>"; };
 		37EA1F34228CA3BD003E710C /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../../ios/Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		37EA1F36228CA3D2003E710C /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../../ios/Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		37EA1F38228CA3E4003E710C /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../../ios/Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
@@ -153,14 +137,11 @@
 		98395E301C1E61AF007CD675 /* 739-question.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question.png"; sourceTree = "<group>"; };
 		98395E311C1E61AF007CD675 /* 739-question@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question@2x.png"; sourceTree = "<group>"; };
 		98395E321C1E61AF007CD675 /* 739-question@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question@3x.png"; sourceTree = "<group>"; };
-		984471A51C1F796D00D3C9DA /* languagegeek.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = languagegeek.png; sourceTree = "<group>"; };
 		9889E8B61BFA9CEC00019560 /* FirstVoices.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FirstVoices.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9889E8C31BFA9CEC00019560 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9889E8C51BFA9CEC00019560 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9889E8C81BFA9CEC00019560 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9889E8CA1BFA9CEC00019560 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		989618C81C194AD90012E3EB /* fpcc.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = fpcc.svg; sourceTree = "<group>"; };
-		989618C91C194AD90012E3EB /* nrt.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = nrt.svg; sourceTree = "<group>"; };
 		98C9A8BC1BFBF23C009E9A4F /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98C9A8C11BFBF23C009E9A4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98C9A8DD1BFBF6C1009E9A4F /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
@@ -185,21 +166,6 @@
 		98C9A9F71BFC09ED009E9A4F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FirstVoices.entitlements; sourceTree = "<group>"; };
 		98C9A9FA1BFC1111009E9A4F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
-		98FAB7EA1C0E775500C31263 /* globe.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = globe.svg; sourceTree = "<group>"; };
-		98FAB7EB1C0E775500C31263 /* ios-instructions.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "ios-instructions.css"; sourceTree = "<group>"; };
-		98FAB7EC1C0E775500C31263 /* keyman.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = keyman.svg; sourceTree = "<group>"; };
-		98FAB7EE1C0E775500C31263 /* nunito-regular-webfont.eot */ = {isa = PBXFileReference; lastKnownFileType = file; path = "nunito-regular-webfont.eot"; sourceTree = "<group>"; };
-		98FAB7EF1C0E775500C31263 /* nunito-regular-webfont.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "nunito-regular-webfont.svg"; sourceTree = "<group>"; };
-		98FAB7F01C0E775500C31263 /* nunito-regular-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "nunito-regular-webfont.ttf"; sourceTree = "<group>"; };
-		98FAB7F11C0E775500C31263 /* nunito-regular-webfont.woff */ = {isa = PBXFileReference; lastKnownFileType = file; path = "nunito-regular-webfont.woff"; sourceTree = "<group>"; };
-		98FAB7F21C0E775500C31263 /* nunito-regular-webfont.woff2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "nunito-regular-webfont.woff2"; sourceTree = "<group>"; };
-		98FAB7F31C0E775500C31263 /* opensans-regular-webfont.eot */ = {isa = PBXFileReference; lastKnownFileType = file; path = "opensans-regular-webfont.eot"; sourceTree = "<group>"; };
-		98FAB7F41C0E775500C31263 /* opensans-regular-webfont.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "opensans-regular-webfont.svg"; sourceTree = "<group>"; };
-		98FAB7F51C0E775500C31263 /* opensans-regular-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "opensans-regular-webfont.ttf"; sourceTree = "<group>"; };
-		98FAB7F61C0E775500C31263 /* opensans-regular-webfont.woff */ = {isa = PBXFileReference; lastKnownFileType = file; path = "opensans-regular-webfont.woff"; sourceTree = "<group>"; };
-		98FAB7F71C0E775500C31263 /* opensans-regular-webfont.woff2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "opensans-regular-webfont.woff2"; sourceTree = "<group>"; };
-		98FAB7F81C0E775500C31263 /* setup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = setup.html; sourceTree = "<group>"; };
-		98FAB80C1C0E799100C31263 /* firstvoices-logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "firstvoices-logo.gif"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,6 +230,7 @@
 		9889E8AD1BFA9CEC00019560 = {
 			isa = PBXGroup;
 			children = (
+				37C183BC2293321C009F9EFD /* Instructions */,
 				37EA1F472292238E003E710C /* Keyboards */,
 				9889E8B81BFA9CEC00019560 /* FirstVoices */,
 				98C9A9FB1BFC19ED009E9A4F /* Frameworks */,
@@ -287,16 +254,15 @@
 			isa = PBXGroup;
 			children = (
 				98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */,
-				37EA1F33228BCDF8003E710C /* FirstVoices-Bridging-Header.h */,
 				9889E8CA1BFA9CEC00019560 /* Info.plist */,
 				37EA1F25228B5D6E003E710C /* AppDelegate.swift */,
 				37EA1F2E228B7458003E710C /* CheckBox.swift */,
+				37C183B822932AD2009F9EFD /* FVKeyboardList.swift */,
 				37EA1F4522921BAD003E710C /* KeyboardInfo.swift */,
 				37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */,
 				37EA1F27228B5E2B003E710C /* ViewController.swift */,
 				9889E8C51BFA9CEC00019560 /* Assets.xcassets */,
 				98395E2C1C1E61AF007CD675 /* Icons */,
-				98FAB7E51C0E775500C31263 /* Instructions */,
 				9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */,
 				9889E8C21BFA9CEC00019560 /* Main.storyboard */,
 				9889E8B91BFA9CEC00019560 /* Supporting Files */,
@@ -326,7 +292,6 @@
 				98C9A8DC1BFBF6C1009E9A4F /* Images */,
 				37EA1F22228A1F57003E710C /* FVInputViewController.swift */,
 				98C9A8C11BFBF23C009E9A4F /* Info.plist */,
-				37EA1F21228A1F57003E710C /* SWKeyboard-Bridging-Header.h */,
 			);
 			path = SWKeyboard;
 			sourceTree = "<group>";
@@ -368,31 +333,6 @@
 				98C9A9EB1BFC0983009E9A4F /* WebKit.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		98FAB7E51C0E775500C31263 /* Instructions */ = {
-			isa = PBXGroup;
-			children = (
-				98FAB80C1C0E799100C31263 /* firstvoices-logo.gif */,
-				989618C81C194AD90012E3EB /* fpcc.svg */,
-				98FAB7EA1C0E775500C31263 /* globe.svg */,
-				98FAB7EB1C0E775500C31263 /* ios-instructions.css */,
-				98FAB7EC1C0E775500C31263 /* keyman.svg */,
-				984471A51C1F796D00D3C9DA /* languagegeek.png */,
-				989618C91C194AD90012E3EB /* nrt.svg */,
-				98FAB7EE1C0E775500C31263 /* nunito-regular-webfont.eot */,
-				98FAB7EF1C0E775500C31263 /* nunito-regular-webfont.svg */,
-				98FAB7F01C0E775500C31263 /* nunito-regular-webfont.ttf */,
-				98FAB7F11C0E775500C31263 /* nunito-regular-webfont.woff */,
-				98FAB7F21C0E775500C31263 /* nunito-regular-webfont.woff2 */,
-				98FAB7F31C0E775500C31263 /* opensans-regular-webfont.eot */,
-				98FAB7F41C0E775500C31263 /* opensans-regular-webfont.svg */,
-				98FAB7F51C0E775500C31263 /* opensans-regular-webfont.ttf */,
-				98FAB7F61C0E775500C31263 /* opensans-regular-webfont.woff */,
-				98FAB7F71C0E775500C31263 /* opensans-regular-webfont.woff2 */,
-				98FAB7F81C0E775500C31263 /* setup.html */,
-			);
-			path = Instructions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -493,35 +433,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98FAB7FD1C0E775500C31263 /* globe.svg in Resources */,
 				9889E8C91BFA9CEC00019560 /* LaunchScreen.storyboard in Resources */,
+				37C183BD2293321C009F9EFD /* Instructions in Resources */,
 				9800EC5C1C029F2200BF0FB5 /* Settings.bundle in Resources */,
-				98FAB8021C0E775500C31263 /* nunito-regular-webfont.svg in Resources */,
-				989618CA1C194AD90012E3EB /* fpcc.svg in Resources */,
-				98FAB8061C0E775500C31263 /* opensans-regular-webfont.eot in Resources */,
-				98FAB80B1C0E775500C31263 /* setup.html in Resources */,
-				98FAB8071C0E775500C31263 /* opensans-regular-webfont.svg in Resources */,
 				9889E8C61BFA9CEC00019560 /* Assets.xcassets in Resources */,
-				98FAB7FF1C0E775500C31263 /* keyman.svg in Resources */,
 				98395E331C1E61AF007CD675 /* 739-question-selected.png in Resources */,
 				37EA1F482292238F003E710C /* Keyboards in Resources */,
-				98FAB8041C0E775500C31263 /* nunito-regular-webfont.woff in Resources */,
-				98FAB8091C0E775500C31263 /* opensans-regular-webfont.woff in Resources */,
-				989618CB1C194AD90012E3EB /* nrt.svg in Resources */,
-				984471A61C1F796D00D3C9DA /* languagegeek.png in Resources */,
 				98395E371C1E61AF007CD675 /* 739-question@2x.png in Resources */,
 				9889E8C41BFA9CEC00019560 /* Main.storyboard in Resources */,
-				98FAB7FE1C0E775500C31263 /* ios-instructions.css in Resources */,
 				98395E341C1E61AF007CD675 /* 739-question-selected@2x.png in Resources */,
-				98FAB8051C0E775500C31263 /* nunito-regular-webfont.woff2 in Resources */,
-				98FAB8081C0E775500C31263 /* opensans-regular-webfont.ttf in Resources */,
-				98FAB80A1C0E775500C31263 /* opensans-regular-webfont.woff2 in Resources */,
-				98FAB8011C0E775500C31263 /* nunito-regular-webfont.eot in Resources */,
 				98395E361C1E61AF007CD675 /* 739-question.png in Resources */,
-				98FAB80D1C0E799100C31263 /* firstvoices-logo.gif in Resources */,
 				98395E381C1E61AF007CD675 /* 739-question@3x.png in Resources */,
 				98395E351C1E61AF007CD675 /* 739-question-selected@3x.png in Resources */,
-				98FAB8031C0E775500C31263 /* nunito-regular-webfont.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -572,6 +495,7 @@
 				37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */,
 				37EA1F31228B7661003E710C /* FVShared.swift in Sources */,
 				37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */,
+				37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
-#warning("TODO: we need to upgrade existing installations, which involves mapping the horrific old data structure plus keyboard file renames")
+    FVRegionStorage.upgrade()
 
     //#if DEBUG
       KeymanEngine.log.outputLevel = .debug
@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //#endif
 
     // Replace with your application group id
-    Manager.applicationGroupIdentifier = "group.FVKeyboards"
+    Manager.applicationGroupIdentifier = FVConstants.groupID
     return true
   }
 }

@@ -18,10 +18,11 @@ class ViewController: UIViewController, UIWebViewDelegate {
     super.viewDidLoad()
 
     //
-    // Preload all the .js files, including their file versions
+    // Install all the .js files into Keyman Engine (doesn't show them in the keyboard list)
     //
 
-    let kbPaths: [String] = Bundle.main.paths(forResourcesOfType:"js", inDirectory: "Keyboards/files")
+    let kbPaths: [String] = Bundle.main.paths(forResourcesOfType: FVConstants.keyboardType,
+                                              inDirectory: FVConstants.keyboardsPath)
     for kbPath in kbPaths {
       let pathUrl = URL(fileURLWithPath: kbPath)
       let id = pathUrl.deletingPathExtension().lastPathComponent
@@ -31,8 +32,15 @@ class ViewController: UIViewController, UIWebViewDelegate {
         print("Failed to preload "+id+": "+error.localizedDescription)
       }
     }
+
+    //
+    // Show Instructions page
+    //
+
     self.webView!.delegate = self
-    let filePath: String? = Bundle.main.path(forResource: "setup", ofType: "html", inDirectory: nil)
+    let filePath: String? = Bundle.main.path(forResource: FVConstants.instructionsName,
+                                             ofType: FVConstants.instructionsType,
+                                             inDirectory: FVConstants.instructionsPath)
     self.webView!.loadRequest(URLRequest.init(url: URL.init(fileURLWithPath: filePath!)))
   }
 
