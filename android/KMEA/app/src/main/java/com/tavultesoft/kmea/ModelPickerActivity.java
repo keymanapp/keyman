@@ -56,6 +56,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+
+  // Merged array list of lexical models to display in ListView
   private static ArrayList<HashMap<String, String>> lexicalModelsArrayList = null;
   private boolean didExecuteParser = false;
 
@@ -362,7 +364,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
         if (!hasConnection) {
           // When offline, only use keyboards available from kmp.json
-          // Use default options
           models = kmpLexicalModelsArray;
         } else {
           // Otherwise, merge kmpLexicalModelsArray with cloud jsonArray
@@ -376,12 +377,12 @@ public final class ModelPickerActivity extends AppCompatActivity {
               // Add new language object
               models.put(kmpLexicalModel);
             } else {
-              // Skip to next?
-              /*
               // Merge language info
-              JSONObject model = lexicalModels.getJSONObject(languageIndex);
+
+              /*
+              JSONObject model = lexicalModels.getJSONObject(modelIndex);
               JSONArray models = lexicalModels.getJSONArray("keyboards");
-              JSONArray kmpKeyboards = kmpLanguage.getJSONArray("keyboards");
+              JSONArray kmpKeyboards = kmpLexicalModel.getJSONArray("keyboards");
               for (int j = 0; j < kmpKeyboards.length(); j++) {
                 JSONObject kmpKeyboard = kmpKeyboards.getJSONObject(j);
                 String kmpKeyboardID = kmpKeyboard.getString("id");
@@ -393,12 +394,12 @@ public final class ModelPickerActivity extends AppCompatActivity {
                   // Merge keyboard info
                   JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
 
-                  String keyboardVersion = keyboard.getString(KMManager.KMKey_KeyboardVersion);
+                  String modelVersion = model.getString(KMManager.KMKey_KeyboardVersion);
                   String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
                   int versionComparison = FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion);
                   if ((versionComparison == FileUtils.VERSION_GREATER) || (versionComparison == FileUtils.VERSION_EQUAL)) {
                     // Keyboard from package >= Keyboard from cloud so replace keyboard entry with local kmp info
-                    keyboards.put(keyboardIndex, kmpKeyboard);
+                    models.put(keyboardIndex, kmpKeyboard);
                   }
                 }
               }
@@ -407,80 +408,35 @@ public final class ModelPickerActivity extends AppCompatActivity {
           }
         }
 
-        /*
-        int langLength = languages.length();
-        for (int i = 0; i < langLength; i++) {
-          JSONObject language = languages.getJSONObject(i);
+        // Parse the model JSON Object from the api.keyman.com query
+        // We know the package ID is from "cloud" and the language ID is only 1 language from the query
+        int modelsLength = models.length();
+        for (int i = 0; i < modelsLength; i++) {
+          JSONObject model = models.getJSONObject(i);
 
-          String kbKey = "";
-          String kbID = "";
-          String langID = language.getString(KMManager.KMKey_ID);
-          String kbName = "";
-          String langName = language.getString(KMManager.KMKey_Name);
-          String kbVersion = "1.0";
+          String packageID = "cloud";
+          String languageID = model.getJSONArray("languages").getString(0);
+          String modelID = model.getString("id");
+          String langName = languageID; // TODO: get this?
+          String modelName = model.getString("name");
+          String modelVersion = model.getString("version");
           String isCustom = "N";
-          String kbFont = "";
           String icon = "0";
           String isEnabled = "true";
-          JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-          JSONObject keyboard = null;
-
-          int kbLength = langKeyboards.length();
-          if (kbLength == 1) {
-            keyboard = langKeyboards.getJSONObject(0);
-            kbID = keyboard.getString(KMManager.KMKey_ID);
-            kbName = keyboard.getString(KMManager.KMKey_Name);
-            kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-            kbFont = keyboard.optString(KMManager.KMKey_Font, "");
-
-            kbKey = String.format("%s_%s", langID, kbID);
-            if (KeyboardPickerActivity.containsKeyboard(context, kbKey)) {
-              isEnabled = "false";
-              icon = String.valueOf(R.drawable.ic_check);
-            }
-
-            HashMap<String, String> hashMap = new HashMap<String, String>();
-            hashMap.put(KMManager.KMKey_KeyboardName, kbName);
-            hashMap.put(KMManager.KMKey_LanguageName, langName);
-            hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-            hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
-            hashMap.put(KMManager.KMKey_Font, kbFont);
-            keyboardsInfo.put(kbKey, hashMap);
-
-            if (keyboardModifiedDates.get(kbID) == null)
-              keyboardModifiedDates.put(kbID, keyboard.getString(KMManager.KMKey_KeyboardModified));
-          } else {
-            icon = String.valueOf(R.drawable.ic_arrow_forward);
-            for (int j = 0; j < kbLength; j++) {
-              keyboard = langKeyboards.getJSONObject(j);
-              kbID = keyboard.getString(KMManager.KMKey_ID);
-              kbName = keyboard.getString(KMManager.KMKey_Name);
-              kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-              kbFont = keyboard.optString(KMManager.KMKey_Font, "");
-
-              kbKey = String.format("%s_%s", langID, kbID);
-              HashMap<String, String> hashMap = new HashMap<String, String>();
-              hashMap.put(KMManager.KMKey_KeyboardName, kbName);
-              hashMap.put(KMManager.KMKey_LanguageName, langName);
-              hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-              hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
-              hashMap.put(KMManager.KMKey_Font, kbFont);
-              keyboardsInfo.put(kbKey, hashMap);
-
-              if (keyboardModifiedDates.get(kbID) == null)
-                keyboardModifiedDates.put(kbID, keyboard.getString(KMManager.KMKey_KeyboardModified));
-            }
-            kbName = "";
-          }
+          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
+
+          hashMap.put(KMManager.KMKey_PackageID, packageID);
+          hashMap.put(KMManager.KMKey_LanguageID, languageID);
+          hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
+          hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
           hashMap.put(KMManager.KMKey_LanguageName, langName);
-          hashMap.put(KMManager.KMKey_KeyboardName, kbName);
-          hashMap.put(iconKey, icon);
-          hashMap.put("isEnabled", isEnabled);
-          languagesArrayList.add(hashMap);
+          hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
+          hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
+          lexicalModelsInfo.put(modelKey, hashMap);
         }
-        */
+
         String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_LexicalModelName, iconKey};
         int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
         ListAdapter adapter = new KMListAdapter(context, lexicalModelsArrayList, R.layout.list_row_layout2, from, to);
@@ -509,11 +465,14 @@ public final class ModelPickerActivity extends AppCompatActivity {
               // Language ID can be re-used
               bundle.putString(KMManager.KMKey_PackageID, modelInfo.get(KMManager.KMKey_PackageID));
               bundle.putString(KMManager.KMKey_LanguageID, languageID);
-              bundle.putString(KMManager.KMKey_LexicalModelID, modelInfo.get(KMManager.KMKey_LexicalModelID));
-              bundle.putString(KMManager.KMKey_LexicalModelName, modelInfo.get(KMManager.KMKey_LexicalModelName));
-              bundle.putString(KMManager.KMKey_LexicalModelVersion, modelInfo.get(KMManager.KMKey_LexicalModelVersion));
-              String isCustom = MapCompat.getOrDefault(modelInfo, KMManager.KMKey_CustomModel, "N");
-              bundle.putBoolean(KMManager.KMKey_CustomModel, isCustom.toUpperCase().equals("Y"));
+              bundle.putString(KMManager.KMKey_LexicalModelID,
+                modelInfo.get(KMManager.KMKey_LexicalModelID));
+              bundle.putString(KMManager.KMKey_LexicalModelName,
+                modelInfo.get(KMManager.KMKey_LexicalModelName));
+              bundle.putString(KMManager.KMKey_LexicalModelVersion,
+                modelInfo.get(KMManager.KMKey_LexicalModelVersion));
+              bundle.putString(KMManager.KMKey_CustomModel,
+                MapCompat.getOrDefault(modelInfo, KMManager.KMKey_CustomModel, "N"));
               Intent i = new Intent(context, ModelInfoActivity.class);
               i.putExtras(bundle);
               startActivityForResult(i, 1);
@@ -533,10 +492,10 @@ public final class ModelPickerActivity extends AppCompatActivity {
               // Model file already exists locally so add association
 
               /*
-              HashMap<String, String> kbInfo = getKeyboardInfo(selectedIndex, 0);
-              final String pkgID = kbInfo.get(KMManager.KMKey_PackageID);
-              final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
-              final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
+              HashMap<String, String> modelInfo = getKeyboardInfo(selectedIndex, 0);
+              final String pkgID = modelInfo.get(KMManager.KMKey_PackageID);
+              final String kbID = modelInfo.get(KMManager.KMKey_KeyboardID);
+              final String langID = modelInfo.get(KMManager.KMKey_LanguageID);
 
               if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
                 // Custom keyboard already exists in models/ so just add the language association

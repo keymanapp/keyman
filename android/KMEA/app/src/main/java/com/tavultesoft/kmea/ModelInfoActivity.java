@@ -71,7 +71,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
       textView.setTypeface(titleFont, Typeface.BOLD);
 
     final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
-    boolean isCustomModel = getIntent().getBooleanExtra(KMManager.KMKey_CustomModel, false);
+    final String customModel = getIntent().getStringExtra(KMManager.KMKey_CustomModel);
 
     infoList = new ArrayList<HashMap<String, String>>();
     final String noIcon = "0";
@@ -82,7 +82,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     infoList.add(hashMap);
 
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-    if (!isCustomModel || customHelpLink != null) {
+    if (!customModel.equalsIgnoreCase("Y") || customHelpLink != null) {
       String icon = String.valueOf(R.drawable.ic_arrow_forward);
       hashMap = new HashMap<String, String>();
       hashMap.put(titleKey, getString(R.string.help_link));

@@ -252,29 +252,27 @@ public class JSONUtils {
 
                 lexicalModelsArray.put(modelObj);
 
-                /*
-                int index = findID(lexicalModelsArray, languageID);
+                int index = findID(lexicalModelsArray, modelID);
                 if (lexicalModelsArray.length() == 0 || index == -1) {
                   // Populate new entry entry into languagesArray
-                  JSONArray tempKbdArray = new JSONArray();
-                  tempKbdArray.put(kbdObj);
+                  JSONArray tempModelArray = new JSONArray();
+                  tempModelArray.put(modelObj);
 
-                  JSONObject tempLanguageObj = new JSONObject();
-                  tempLanguageObj.put(KMManager.KMKey_ID, languageID);
-                  tempLanguageObj.put(KMManager.KMKey_Name, languageName);
-                  tempLanguageObj.put("keyboards", tempKbdArray);
+                  JSONObject tempModelObj = new JSONObject();
+                  tempModelObj.put(KMManager.KMKey_ID, languageID);
+                  tempModelObj.put(KMManager.KMKey_Name, languageName);
+                  tempModelObj.put("models", tempModelArray);
 
-                  lexicalModelsArray.put(tempLanguageObj);
+                  lexicalModelsArray.put(tempModelObj);
                 } else {
                   JSONObject tempLanguageObj = lexicalModelsArray.getJSONObject(index);
-                  JSONArray tempKbdArray = tempLanguageObj.getJSONArray("keyboards");
-                  tempKbdArray.put(kbdObj);
+                  JSONArray tempModelArray = tempLanguageObj.getJSONArray("models");
+                  tempModelArray.put(modelObj);
                 }
-                */
               }
             }
           } catch (JSONException e) {
-            Log.e(TAG, "getLanguages() Error parsing " + file.getName());
+            Log.e(TAG, "getLexicalModels() Error parsing " + file.getName());
           }
         }
       }

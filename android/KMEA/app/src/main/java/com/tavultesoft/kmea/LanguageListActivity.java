@@ -59,6 +59,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+
+  // Merged array list of languages to display in ListView
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
   private static final String TAG = "LanguageListActivity";
