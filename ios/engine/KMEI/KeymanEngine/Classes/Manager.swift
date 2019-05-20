@@ -216,7 +216,21 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // MARK: - Keyboard management
 
   public func manageKeymanEngine(inVC: UIViewController) -> Void {
-    let settingsVC = SettingsViewController(style: UITableViewStyle.grouped)
+    
+//    for b in Bundle.allBundles {
+//      do {
+//        let sb = try UIStoryboard(name: "Settings", bundle: nil)
+//        if let vc = sb.instantiateInitialViewController() {
+//          inVC.present(vc, animated: true, completion: {
+//            log.info("presented settings")
+//          })
+//        }
+//      } catch {
+//        log.info("bundle \(b) does not contain Settings.storyboard")
+//      }
+//    }
+
+    let settingsVC = SettingsViewController()
 //    let languagesVC = UIAlertController.init(title: "Languages Settings", message: "Languages with Keyboards should be shown here", preferredStyle: .actionSheet)
 //    navigationController?.pushViewController(languagesVC, animated: true)
 
@@ -224,15 +238,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 //    if UIDevice.current.userInterfaceIdiom == .phone {
 //      present(languagesVC, animated: true, completion: nil)
 //    } else {
-    let alertController = UIAlertController(title: "Settings", message: "Keyman Engine settings",
-                                            preferredStyle: UIAlertControllerStyle.alert)
-    alertController.addAction(UIAlertAction(title: "Cancel",
-                                            style: UIAlertActionStyle.cancel,
-                                            handler: nil))
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.default,
-                                            handler: nil))
     
+//    let alertController = UIAlertController(title: "Settings", message: "Keyman Engine settings",
+//                                            preferredStyle: UIAlertControllerStyle.alert)
+//    alertController.addAction(UIAlertAction(title: "Cancel",
+//                                            style: UIAlertActionStyle.cancel,
+//                                            handler: nil))
+//    alertController.addAction(UIAlertAction(title: "OK",
+//                                            style: UIAlertActionStyle.default,
+//                                            handler: nil))
+//    
     inVC.present(settingsVC, animated: true, completion: nil)
 
 //      let popover = UIPopoverController(contentViewController: languagesVC)
