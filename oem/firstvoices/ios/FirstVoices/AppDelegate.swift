@@ -19,12 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 #warning("TODO: we need to upgrade existing installations, which involves mapping the horrific old data structure plus keyboard file renames")
 
-    #if DEBUG
+    //#if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-    #endif
+    //#else
+    //  KeymanEngine.log.outputLevel = .warning
+    //#endif
 
     // Replace with your application group id
     Manager.applicationGroupIdentifier = "group.FVKeyboards"

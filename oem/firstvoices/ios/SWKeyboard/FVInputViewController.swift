@@ -13,19 +13,21 @@ import UIKit
 @objc(FVInputViewController)
 class FVInputViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    #if DEBUG
+    //#if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-    #endif
+    //#else
+    //  KeymanEngine.log.outputLevel = .warning
+    //#endif
 
-    Manager.applicationGroupIdentifier = "group.FVKeyboard"
+    print("FVIVC: Starting app")
+    Manager.applicationGroupIdentifier = "group.FVKeyboards"
     //[self setGlobeKeyTapBehaviour:GKTapSwitchToNextKeyboard];
     //[self setMenuBehaviour:MenuShowAlways];
     //[self setMenuCloseButtonTitle:@"Switch to other keyboard"];
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    print("FVIVC: After super.init")
 
     self.globeKeyTapBehaviour = .switchToNextKeyboard
     self.menuBehaviour = .showAlways
