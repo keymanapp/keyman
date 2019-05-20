@@ -51,7 +51,7 @@ import java.util.HashMap;
  * Gets the list of installable lexical models from Keyman cloud and allows user to download a model.
  * Displays a list of available models for a language ID.
  */
-public final class ModelListActivity extends AppCompatActivity {
+public final class ModelPickerActivity extends AppCompatActivity {
 
   private Context context;
   private static Toolbar toolbar = null;
@@ -59,7 +59,7 @@ public final class ModelListActivity extends AppCompatActivity {
   private static ArrayList<HashMap<String, String>> lexicalModelsArrayList = null;
   private boolean didExecuteParser = false;
 
-  private final static String TAG = "ModelListActivity";
+  private final static String TAG = "ModelPickerActivity";
 
   private static JSONArray models = null;
 
@@ -218,6 +218,13 @@ public final class ModelListActivity extends AppCompatActivity {
     return lmData;
   }
 
+  /**
+   * Save the lexical model catalog that's available from the cloud.
+   * The catalog is saved to a unique file based on the language ID
+   * @param context
+   * @param jsonArray - Array of JSON objects containing lexical model info
+   * @param languageID - String of the language ID
+   */
   private static void saveToCache(Context context, JSONArray jsonArray, String languageID) {
     ObjectOutput objOutput;
     try {
@@ -248,7 +255,7 @@ public final class ModelListActivity extends AppCompatActivity {
   }
 
   // This is copied from LanguageListActivity to download a catalog from the cloud.
-  // TODO: Refactor to use background WorkManager in 13.0
+  // TODO: Keyman roadmap is to refactor to use background WorkManager in Keyman 13.0
   private class JSONParse extends AsyncTask<Void, Integer, JSONArray> {
 
     private final boolean hasConnection = KMManager.hasConnection(context);

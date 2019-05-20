@@ -134,7 +134,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
           }
         } else if (position == 2) {
           // Confirmation to delete model
-          String lexicalModelKey = String.format("%s_%s_%s", languageID, packageID, modelID);
+          String lexicalModelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
           DialogFragment dialog = ConfirmDialogFragment.newInstance(
             DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);
           dialog.show(getFragmentManager(), "dialog");

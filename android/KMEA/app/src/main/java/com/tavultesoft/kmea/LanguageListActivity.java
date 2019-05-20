@@ -61,7 +61,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
-  private static final String jsonCacheFilename = "jsonKeyboardsCache.dat";
   private static final String TAG = "LanguageListActivity";
 
   private static JSONArray languages = null;
@@ -301,6 +300,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   }
 
   protected static File getCacheFile(Context context) {
+    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
     return new File(context.getCacheDir(), jsonCacheFilename);
   }
 
