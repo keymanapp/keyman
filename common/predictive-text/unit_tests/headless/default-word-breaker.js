@@ -3,7 +3,7 @@
  */
 var assert = require('chai').assert;
 
-var breakWords = require('../../build/intermediate').wordBreakers['uax29'];
+var breakWords = require('../../build/intermediate').wordBreakers['default'];
 const SHY = '\u00AD';
 
 describe('The default word breaker', function () {

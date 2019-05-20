@@ -2,11 +2,13 @@
 /// <reference path="./data.ts" />
 namespace wordBreakers {
   /**
-   * This code is copied from:
-   * https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0-alpha
+   * Word breaker based on Unicode Standard Annex #29, Section 4.1:
+   * Default Word Boundary Specification.   
+   * 
+   * @see http://unicode.org/reports/tr29/#Word_Boundaries
+   * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
    */
-
-  export function uax29(text: string): Span[] {
+  export function default_(text: string): Span[] {
     let spans = Array.from(findSpans(text));
     return spans.filter(span => isNonSpace(span.text));
   }
@@ -56,7 +58,7 @@ namespace wordBreakers {
   }
 
   /**
-   * Returns true when the chunk does not solely consiste of whitespace.
+   * Returns true when the chunk does not solely consist of whitespace.
    *
    * @param chunk a chunk of text. Starts and ends at word boundaries.
    */
@@ -356,4 +358,12 @@ namespace wordBreakers {
       return candidate.value;
     }
   }
+}
+
+// We cannot export a member whose name is a reserved word when
+// implementing a namespace, BUT we can manually make the
+// assignment and **declare** it as part of the namespace.
+wordBreakers['default'] = wordBreakers.default_;
+declare namespace wordBreakers {
+  export { default_ as default };
 }
