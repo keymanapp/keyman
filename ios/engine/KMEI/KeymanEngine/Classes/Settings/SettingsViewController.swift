@@ -9,16 +9,64 @@
 import UIKit
 
 open class SettingsViewController: UITableViewController {
+  private var itemsArray = [[String: String]]()
+  private var userLanguages: [String] = [String]()
 
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    loadUserLanguages()
+  }
+  
   override open func viewDidLoad() {
-        super.viewDidLoad()
+    super.viewDidLoad()
+    
+    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
+                                                          blue: 0.25, alpha: 0.9)
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+  }
+  
+  open func launchSettings(launchingVC: UIViewController, sender: Any?) -> Void {
+    let sb : UIStoryboard = UIStoryboard(name: "Settings", bundle: nil)
+    if let vc = sb.instantiateInitialViewController() {
+      launchingVC.present(vc, animated: true, completion: {
+        log.info("presented settings")
+      })
     }
+  }
+//
+//  convenience init() {
+//    self.init(style: UITableViewStyle.grouped)
+//  }
+  
+  init(/*storage: Storage*/) {
+//    self.storage = storage
+    super.init(nibName: nil, bundle: nil)
+    
+    itemsArray = [[String: String]]()
+    itemsArray.append([
+      "title": "Installed Languages...",
+      "subtitle": "0", //count of installed languages as string
+      "reuseid" : "language"
+      ])
+    
+    itemsArray.append([
+      "title": "Show Banner",
+      "subtitle": "",
+      "reuseid" : "showbanner"
+      ])
+    
+    itemsArray.append([
+      "title": "Show 'Get Started' at startup",
+      "subtitle": "",
+      "reuseid" : "showgetstarted"
+      ])
+    _ = view
+  }
+
+  required public init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
     // MARK: - Table view data source
 
@@ -33,43 +81,80 @@ open class SettingsViewController: UITableViewController {
     }
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    var reuseID: String = "foo"
-    let lastIndex = indexPath.index(before: indexPath.endIndex)
-    let rowType = indexPath[lastIndex]
-    switch(rowType) {
-      case 0:
-        reuseID = "languages"
-      case 1:
-        reuseID = "showbanner"
-      case 2:
-        reuseID = "showgetstarted"
-      default:
-        log.error("undefined indexPath(\rowType")
-        reuseID = "foo"
-    }
-    if let cell = tableView.dequeueReusableCell(withIdentifier: reuseID) {
+    let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
+    if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier!) {
       return cell
     }
+    let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+    cell.selectionStyle = .none
     
-    let cell = UITableViewCell(style: .default, reuseIdentifier: reuseID)
-    
-    // Configure the cell...
-    let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 74.0 / 255.0, green: 186.0 / 255.0, blue: 208.0 / 255.0, alpha: 1.0)
-    cell.selectedBackgroundView = selectionColor
-    switch(rowType) {
-      case 0:
-        cell.textLabel?.text = "Installed Languages"
+    switch(cellIdentifier) {
+      case "languages":
         cell.accessoryType = .disclosureIndicator
-      case 1:
-        cell.textLabel?.text = "Show Banner"
-      case 2:
-        cell.textLabel?.text = "Show 'Get Started' at startup'"
+      case "showbanner":
+        cell.accessoryType = .none
+      case "showgetstarted":
+        cell.accessoryType = .none
       default:
-        log.error("undefined indexPath(\rowType")
+        log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
+        cell.accessoryType = .none
+    }
+    
+    return cell
+  }
+
+  override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    cell.selectionStyle = .none
+    cell.accessoryType = .none
+    cell.textLabel?.text = itemsArray[indexPath.row]["title"]
+    cell.detailTextLabel?.text = itemsArray[indexPath.row]["subtitle"]
+    cell.tag = indexPath.row
+    
+    if indexPath.row == 0 {
+      cell.accessoryType = .disclosureIndicator
+    } else {
+      cell.isUserInteractionEnabled = false
+      cell.textLabel?.isEnabled = true
+      cell.detailTextLabel?.isEnabled = false
     }
 
-    return cell
+//    var reuseID: String = "foo"
+//    let lastIndex = indexPath.index(before: indexPath.endIndex)
+//    let rowType = indexPath[lastIndex]
+//    switch(rowType) {
+//      case 0:
+//        reuseID = "languages"
+//      case 1:
+//        reuseID = "showbanner"
+//      case 2:
+//        reuseID = "showgetstarted"
+//      default:
+//        log.error("undefined indexPath(\rowType")
+//        reuseID = "foo"
+//    }
+//    if let cell = tableView.dequeueReusableCell(withIdentifier: reuseID) {
+//      return cell
+//    }
+//
+//    let cell = UITableViewCell(style: .default, reuseIdentifier: reuseID)
+//
+//    // Configure the cell...
+//    let selectionColor = UIView()
+//    selectionColor.backgroundColor = UIColor(red: 74.0 / 255.0, green: 186.0 / 255.0, blue: 208.0 / 255.0, alpha: 1.0)
+//    cell.selectedBackgroundView = selectionColor
+//    switch(rowType) {
+//      case 0:
+//        cell.textLabel?.text = "Installed Languages2"
+//        cell.accessoryType = .disclosureIndicator
+//      case 1:
+//        cell.textLabel?.text = "Show Banner"
+//      case 2:
+//        cell.textLabel?.text = "Show 'Get Started' at startup'"
+//      default:
+//        log.error("undefined indexPath(\rowType")
+//    }
+//
+//    return cell
   }
 
     /*
@@ -116,4 +201,12 @@ open class SettingsViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
 
+  // MARK: - language access -
+  private func loadUserLanguages() {
+    //iterate the list of installed languages and save their names
+    userLanguages = ["en"]
+    
+    itemsArray[0]["subtitle"] = String(userLanguages.count)
+  }
+  
 }

@@ -5,7 +5,7 @@
 //  Created by Randy Boring on 3/19/19.
 //  Copyright © 2019 SIL International. All rights reserved.
 //
-
+import UIKit
 import Foundation
 
 class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate {
