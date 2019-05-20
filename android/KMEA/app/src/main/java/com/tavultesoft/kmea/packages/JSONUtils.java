@@ -83,7 +83,7 @@ public class JSONUtils {
 
                 File jsFile = new File(pkg, kbdID + ".js");
                 if (jsFile.exists()) {
-                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD");
+                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                   kbdObj.put("lastModified", sdf.format(jsFile.lastModified()));
                 } else {
                   Log.d(TAG, "getLanguages() can't generate modified date for " + jsFile);
@@ -207,6 +207,7 @@ public class JSONUtils {
       for (File file: pkg.listFiles()) {
         if (file.getName().toLowerCase().endsWith(PackageProcessor.PP_DEFAULT_METADATA)) {
           try {
+            String packageID = pkg.getName();
             JSONObject kmp = parser.getJSONObjectFromFile(file);
             JSONArray kmpModels = kmp.getJSONArray("lexicalModels");
 
@@ -225,13 +226,12 @@ public class JSONUtils {
               JSONArray kmpLanguageArray = kmpModelObj.getJSONArray("languages");
               for (int j=0; j<kmpLanguageArray.length(); j++) {
                 JSONObject languageObj = kmpLanguageArray.getJSONObject(j);
-                String packageID = pkg.getName();
-                String languageName = languageObj.getString(KMManager.KMKey_Name);
-                String languageID = languageObj.getString(KMManager.KMKey_ID);
+                String languageID = languageObj.getString("id");
+                String languageName = languageObj.getString("name");
 
                 JSONObject modelObj = new JSONObject();
                 modelObj.put(KMManager.KMKey_PackageID, packageID);
-                modelObj.put(KMManager.KMKey_ID, modelID);
+                modelObj.put("id", modelID);
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
                 modelObj.put(KMManager.KMKey_KeyboardVersion, modelVersion);
@@ -243,12 +243,18 @@ public class JSONUtils {
 
                 File jsFile = new File(pkg, modelID + FileUtils.LEXICALMODEL);
                 if (jsFile.exists()) {
-                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-DD");
+                  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                   modelObj.put("lastModified", sdf.format(jsFile.lastModified()));
                 } else {
                   Log.d(TAG, "getLexicalModels() can't generate modified date for " + jsFile);
                 }
+
+                JSONArray languageArray = new JSONArray();
+                languageArray.put(languageObj);
+                modelObj.put("languages", languageArray);
+
                 // TODO: source, filesize
+
 
                 lexicalModelsArray.put(modelObj);
 
@@ -265,9 +271,11 @@ public class JSONUtils {
 
                   lexicalModelsArray.put(tempModelObj);
                 } else {
+                  /* Do nothing?
                   JSONObject tempLanguageObj = lexicalModelsArray.getJSONObject(index);
                   JSONArray tempModelArray = tempLanguageObj.getJSONArray("models");
                   tempModelArray.put(modelObj);
+                  */
                 }
               }
             }

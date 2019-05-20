@@ -100,7 +100,9 @@ public final class ModelPickerActivity extends AppCompatActivity {
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
 
-    lexicalModelsArrayList = new ArrayList<HashMap<String, String>>();
+    if (lexicalModelsArrayList == null) {
+      lexicalModelsArrayList = new ArrayList<HashMap<String, String>>();
+    }
     //lexicalModelsArrayList = getModelsList(context, languageID);
 
     // TODO: comment out the rest of this?
@@ -374,36 +376,11 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
             int modelIndex = JSONUtils.findID(models, kmpModelID);
             if (modelIndex == -1) {
-              // Add new language object
+              // Lexical model from KMP didn't exist in cloud so add new entry
               models.put(kmpLexicalModel);
             } else {
-              // Merge language info
-
-              /*
-              JSONObject model = lexicalModels.getJSONObject(modelIndex);
-              JSONArray models = lexicalModels.getJSONArray("keyboards");
-              JSONArray kmpKeyboards = kmpLexicalModel.getJSONArray("keyboards");
-              for (int j = 0; j < kmpKeyboards.length(); j++) {
-                JSONObject kmpKeyboard = kmpKeyboards.getJSONObject(j);
-                String kmpKeyboardID = kmpKeyboard.getString("id");
-                int keyboardIndex = JSONUtils.findID(keyboards, kmpKeyboardID);
-                if (keyboardIndex == -1) {
-                  // Add new keyboard object
-                  models.put(kmpKeyboard);
-                } else {
-                  // Merge keyboard info
-                  JSONObject keyboard = keyboards.getJSONObject(keyboardIndex);
-
-                  String modelVersion = model.getString(KMManager.KMKey_KeyboardVersion);
-                  String kmpKeyboardVersion = kmpKeyboard.getString(KMManager.KMKey_KeyboardVersion);
-                  int versionComparison = FileUtils.compareVersions(kmpKeyboardVersion, keyboardVersion);
-                  if ((versionComparison == FileUtils.VERSION_GREATER) || (versionComparison == FileUtils.VERSION_EQUAL)) {
-                    // Keyboard from package >= Keyboard from cloud so replace keyboard entry with local kmp info
-                    models.put(keyboardIndex, kmpKeyboard);
-                  }
-                }
-              }
-              */
+              // Lexical model already installed from local kmp so replace models entry
+              models.put(modelIndex, kmpLexicalModel);
             }
           }
         }
@@ -434,12 +411,16 @@ public final class ModelPickerActivity extends AppCompatActivity {
           hashMap.put(KMManager.KMKey_LanguageName, langName);
           hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
           hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
-          lexicalModelsInfo.put(modelKey, hashMap);
+          hashMap.put("isEnabled", "true");
+          lexicalModelsArrayList.add(hashMap);
         }
 
-        String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_LexicalModelName, iconKey};
-        int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
-        ListAdapter adapter = new KMListAdapter(context, lexicalModelsArrayList, R.layout.list_row_layout2, from, to);
+        String[] from = new String[]{"leftIcon", KMManager.KMKey_LexicalModelName, KMManager.KMKey_Icon};
+        int[] to = new int[]{R.id.image1, R.id.text1, R.id.image2};
+
+        //String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_LexicalModelName, iconKey};
+        //int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
+        ListAdapter adapter = new KMListAdapter(context, lexicalModelsArrayList, R.layout.models_list_row_layout, from, to);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
