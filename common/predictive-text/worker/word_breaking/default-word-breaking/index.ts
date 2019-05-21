@@ -9,33 +9,28 @@ namespace wordBreakers {
    * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
    */
   export function default_(text: string): Span[] {
-    let spans = Array.from(findSpans(text));
-    return spans.filter(span => isNonSpace(span.text));
+    let boundaries = findBoundaries(text);
+    if (boundaries.length == 0) {
+      return [];
+    }
+
+    // All non-empty strings have at least TWO boundaries at the start and end of
+    // the string.
+    let spans = [];
+    for (let i = 0; i < boundaries.length - 1; i++) {
+      let start = boundaries[i];
+      let end = boundaries[i + 1];
+      let span = new LazySpan(text, start, end);
+      if (isNonSpace(span.text)) {
+        spans.push(span);
+      }
+    }
+    return spans;
   }
 
   // Utilities //
   import WordBreakProperty = wordBreakers.data.WordBreakProperty;
   import WORD_BREAK_PROPERTY = wordBreakers.data.WORD_BREAK_PROPERTY;
-
-  /**
-   * Generator that yields every successive span from the the text.
-   * @param text Any valid USVString to segment.
-   */
-  function* findSpans(text: string): Iterable<Span> {
-    // TODO: don't throw the boundaries into an array.
-    let boundaries = Array.from(findBoundaries(text));
-    if (boundaries.length == 0) {
-      return;
-    }
-
-    // All non-empty strings have at least TWO boundaries at the start and end of
-    // the string.
-    for (let i = 0; i < boundaries.length - 1; i++) {
-      let start = boundaries[i];
-      let end = boundaries[i + 1];
-      yield new LazySpan(text, start, end);
-    }
-  }
 
   /**
    * A span that does not cut out the substring until it absolutely has to!
