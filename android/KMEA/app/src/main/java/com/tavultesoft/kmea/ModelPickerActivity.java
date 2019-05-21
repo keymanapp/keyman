@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
@@ -46,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
 
@@ -80,6 +83,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
   private int selectedIndex = 0;
 
   private static AlertDialog alertDialog;
+
+  private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> lmDownloadEventListeners = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -358,9 +363,9 @@ public final class ModelPickerActivity extends AppCompatActivity {
           String modelID = model.getString("id");
           String modelName = model.getString("name");
           String modelVersion = model.getString("version");
+          String modelURL = model.getString("packageFilename");
           String isCustom = "N";
           String icon = "0";
-          String isEnabled = "true";
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
           hashMap.put(KMManager.KMKey_PackageID, packageID);
@@ -370,14 +375,18 @@ public final class ModelPickerActivity extends AppCompatActivity {
           hashMap.put(KMManager.KMKey_LanguageName, langName);
           hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
           hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
+          hashMap.put("isEnabled", "true");
+          hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
 
+          // Display check for installed models
           String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
           if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
             hashMap.put("leftIcon", String.valueOf(R.drawable.ic_check));
-            hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
+          } else {
+            // Otherwise, include link to .kmp file
+            hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
           }
 
-          hashMap.put("isEnabled", "true");
           lexicalModelsArrayList.add(hashMap);
         }
 
@@ -425,11 +434,26 @@ public final class ModelPickerActivity extends AppCompatActivity {
               startActivityForResult(i, 1);
             } else {
               // Model isn't installed so prompt to download it
+              /*
               String model_key = String.format("%s_%s_%s", packageID, languageID, modelID);
               String title = String.format("%s: %s", langName, modelName);
               DialogFragment dialog = ConfirmDialogFragment.newInstance(
                 DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model), model_key);
               dialog.show(getFragmentManager(), "dialog");
+              */
+
+              Bundle args = new Bundle();
+              args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+              args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
+              args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, modelID);
+              args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, modelName);
+              args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+              args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+              args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL,
+                modelInfo.get(KMManager.KMKey_LexicalModelPackageFilename));
+              Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+              i.putExtras(args);
+              startActivity(i);
             }
           }
         });

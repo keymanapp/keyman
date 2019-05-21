@@ -24,6 +24,7 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
+import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
 public class KMKeyboardDownloaderActivity extends AppCompatActivity {
@@ -35,6 +36,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_KB_NAME = "KMKeyboardActivity.kbName";
   public static final String ARG_LANG_NAME = "KMKeyboardActivity.langName";
   public static final String ARG_IS_CUSTOM = "KMKeyboardActivity.isCustom";
+  public static final String ARG_MODEL_ID = "KMKeyboardActivity.modelID";
+  public static final String ARG_MODEL_NAME = "KMKeyboardActivity.modelName";
+  public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
 
   // custom keyboard
   public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";
@@ -64,9 +68,12 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   private static String pkgID;
   private static String kbID;
   private static String langID;
+  private static String modelID;
+  private static String modelName;
   private static String kbName;
   private static String langName;
   private static Boolean isCustom;
+  private static Boolean downloadOnlyLexicalModel;
 
   private static String customKeyboard;
   private static String customLanguage;
@@ -86,19 +93,31 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       if (pkgID == null || pkgID.isEmpty()) {
         pkgID = KMManager.KMDefault_UndefinedPackageID;
       }
-      kbID = bundle.getString(ARG_KB_ID);
       langID = bundle.getString(ARG_LANG_ID);
-      kbName = bundle.getString(ARG_KB_NAME);
       langName = bundle.getString(ARG_LANG_NAME);
-      isCustom = bundle.getBoolean(ARG_IS_CUSTOM);
 
-      // URL parameters for custom keyboard (if they exist)
-      customKeyboard = bundle.getString(ARG_KEYBOARD);
-      customLanguage = bundle.getString(ARG_LANGUAGE);
-      url = bundle.getString(ARG_URL);
-      filename = bundle.getString(ARG_FILENAME);
-      if (filename == null || filename.isEmpty()) {
-        filename = "unknown";
+      downloadOnlyLexicalModel = bundle.containsKey(KMManager.KMKey_LexicalModelPackageFilename) &&
+        bundle.getString(KMManager.KMKey_LexicalModelPackageFilename) != null &&
+        !bundle.getString(KMManager.KMKey_LexicalModelPackageFilename).isEmpty();
+
+      if (downloadOnlyLexicalModel) {
+        modelID = bundle.getString(ARG_MODEL_ID);
+        modelName = bundle.getString(ARG_MODEL_NAME);
+        url = bundle.getString(ARG_MODEL_URL);
+      } else {
+
+        kbID = bundle.getString(ARG_KB_ID);
+        kbName = bundle.getString(ARG_KB_NAME);
+        isCustom = bundle.getBoolean(ARG_IS_CUSTOM);
+
+        // URL parameters for custom keyboard (if they exist)
+        customKeyboard = bundle.getString(ARG_KEYBOARD);
+        customLanguage = bundle.getString(ARG_LANGUAGE);
+        url = bundle.getString(ARG_URL);
+        filename = bundle.getString(ARG_FILENAME);
+        if (filename == null || filename.isEmpty()) {
+          filename = "unknown";
+        }
       }
     } else {
       return;
@@ -124,8 +143,16 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       title = String.format("%s: %s", langName, kbName);
     }
 
-    DialogFragment dialog = ConfirmDialogFragment.newInstance(
-      DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard));
+    DialogFragment dialog;
+    if (downloadOnlyLexicalModel) {
+      title = String.format("%s: %s", langName, modelName);
+      dialog = ConfirmDialogFragment.newInstance(
+        DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model));
+    } else {
+      dialog = ConfirmDialogFragment.newInstance(
+        DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard));
+    }
+
     dialog.show(getFragmentManager(), "dialog");
   }
 
@@ -142,10 +169,18 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
     private Context context;
     private boolean showProgressDialog;
+    private boolean downloadOnlyLexicalModel;
 
     public DownloadTask(Context context, boolean showProgressDialog) {
       this.context = context;
       this.showProgressDialog = showProgressDialog;
+      this.downloadOnlyLexicalModel = false;
+    }
+
+    public DownloadTask(Context context, boolean showProgressDialog, boolean downloadOnlyLexicalModel) {
+      this.context = context;
+      this.showProgressDialog = showProgressDialog;
+      this.downloadOnlyLexicalModel = downloadOnlyLexicalModel;
     }
 
     @Override
@@ -172,6 +207,12 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         return ret;
 
       try {
+
+        if (downloadOnlyLexicalModel) {
+          ret = downloadKMPLexicalModel();
+          return ret;
+        }
+
         String exceptionStr = "Invalid keyboard";
         if (pkgID == null || pkgID.trim().isEmpty() ||
           (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
@@ -222,6 +263,43 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
       ((AppCompatActivity) context).finish();
       notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+    }
+
+    /**
+     * Download a KMP Keyman lexical model from Keyman cloud
+     * @param remoteLexicalModelUrl String URL of the KMP to download
+     * @return ret int -1 for fail; >0 for success
+     * @throws Exception
+     */
+    protected int downloadKMPLexicalModel() throws Exception {
+      int result = -1;
+      File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+      LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+
+      if (downloadOnlyLexicalModel) {
+        String destination = (context.getCacheDir() + File.separator).toString();
+        filename = FileUtils.getFilename(url);
+
+        result = FileUtils.download(context, url, destination, filename);
+        if (result > 0 && FileUtils.hasKeymanPackageExtension(url)) {
+          // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
+          File kmpFile = new File(context.getCacheDir(), filename);
+          String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
+          if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+            File unzipPath = kmpProcessor.unzipKMP(kmpFile);
+            List<Map<String, String>> installedLexicalModels =
+              kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+
+            boolean success = installedLexicalModels.size() != 0;
+            if (success) {
+              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+                installedLexicalModels, 1);
+            }
+          }
+        }
+      }
+
+      return result;
     }
 
     /**
@@ -438,6 +516,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    */
   public static void download(final Context context, final boolean showProgressDialog) {
     new DownloadTask(context, showProgressDialog).execute();
+  }
+
+  public static void download(final Context context, final boolean showProgressDialog, final boolean donwloadOnlyLexicalModel) {
+    new DownloadTask(context, showProgressDialog, downloadOnlyLexicalModel).execute();
   }
 
   public static boolean isCustom(String u) {

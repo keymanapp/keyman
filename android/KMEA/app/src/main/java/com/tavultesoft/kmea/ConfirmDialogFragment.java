@@ -82,7 +82,7 @@ public class ConfirmDialogFragment extends DialogFragment {
             case DIALOG_TYPE_DOWNLOAD_MODEL :
               // Confirmation to download lexical model
               if (KMManager.hasConnection(getActivity())) {
-                // TODO: download
+                KMKeyboardDownloaderActivity.download(getActivity(), true, true);
               } else {
                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
               }

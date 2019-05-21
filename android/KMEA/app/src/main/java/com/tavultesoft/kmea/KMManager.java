@@ -135,6 +135,7 @@ public final class KMManager {
   public static final String KMKey_LexicalModelID = "lmId";
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
+  public static final String KMKey_LexicalModelPackageFilename = "kmPackageFilename";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
