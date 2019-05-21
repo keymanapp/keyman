@@ -16,7 +16,6 @@ namespace wordBreakers {
   // Utilities //
   import WordBreakProperty = wordBreakers.data.WordBreakProperty;
   import WORD_BREAK_PROPERTY = wordBreakers.data.WORD_BREAK_PROPERTY;
-  import extendedPictographic = wordBreakers.data.extendedPictographic;
 
   /**
    * Generator that yields every successive span from the the text.
@@ -146,24 +145,11 @@ namespace wordBreakers {
         continue;
       }
 
-      // HACK: advance by TWO positions to handle tricky emoji
-      // combining sequences, that SHOULD be kept together by
-      // WB3c, but are prematurely split by WB4:
-      if (left === 'Other' &&
-          (right === 'Extend' || right === 'Format') &&
-          lookahead === 'ZWJ') {
-        // To ensure this is not split, advance TWO positions forward.
-        for (let i = 0; i < 2; i++) {
-          [rightPos, lookaheadPos] = [lookaheadPos, positionAfter(lookaheadPos)];
-        }
-        [left, right, lookahead] =
-          [lookahead, wordbreakPropertyAt(rightPos), wordbreakPropertyAt(lookaheadPos)];
-        // N.B. `left` now MUST be ZWJ, setting it up for WB3c proper.
-      }
-
-      // WB3c: Do not break within emoji ZWJ sequences.
-      if (left === 'ZWJ' && isExtendedPictographicAt(rightPos))
-        continue;
+      // TODO: WB3c is not implemented, due to its complex, error-prone
+      // implementation, requiring a ginormous regexp, and the fact that
+      // the only thing it does is prevent big emoji sequences from being
+      // split up, like 🧚🏼‍♂️
+      // https://www.unicode.org/Public/emoji/12.0/emoji-zwj-sequences.txt
 
       // WB3d: Keep horizontal whitespace together
       if (left === 'WSegSpace' && right == 'WSegSpace')
@@ -311,10 +297,6 @@ namespace wordBreakers {
         return property(text[pos] + text[pos + 1]);
       }
       return property(text[pos]);
-    }
-
-    function isExtendedPictographicAt(pos: number) {
-      return extendedPictographic.test(text.substring(pos, pos + 2));
     }
 
     // Word_Break rule macros
