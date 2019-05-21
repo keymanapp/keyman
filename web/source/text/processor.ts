@@ -403,6 +403,10 @@ namespace com.keyman.text {
       }
       // // ...end I3363 (Build 301)
 
+      /// Now that we've filtered out special cases, it's time to do serious keystroke processing.
+      // For fat-finger adjustments, we should iterate across the most likely members of the key distribution.
+      // Create `Processor.processKeystroke` for this section.
+
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
@@ -431,6 +435,9 @@ namespace com.keyman.text {
           LeventMatched = 1;
         }
       }
+
+      /// End serious keystroke processing.
+      // End of fat-finger loop section; the rest is post-processing maintenance.
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
