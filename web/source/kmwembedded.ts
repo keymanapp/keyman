@@ -128,13 +128,18 @@ namespace com.keyman.osk {
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+        borderPad=oskManager.getKeyboardHeight() - rowHeight * (nRows == 0 ? 1 : nRows),
+        nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
-    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-      rowHeight = rowHeight/window.devicePixelRatio;
-    }
     let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
+
+    let kbdHeight = oskManager.getKeyboardHeight()
+    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
+      rowHeight /= window.devicePixelRatio;
+      kbdHeight /= window.devicePixelRatio;
+      oskHeight /= window.devicePixelRatio;
+    }
 
     var b: HTMLElement = _Box, bs=b.style;
     bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
@@ -142,11 +147,13 @@ namespace com.keyman.osk {
     bs=b.style;
     // Sets the layer group to the correct height.
     bs.height=bs.maxHeight=(oskHeight+3)+'px';
+
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       b.childNodes.forEach(function(layer: HTMLElement) {
-        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+        layer.style.height = layer.style.maxHeight = (oskHeight + 3) + 'px';
       });
     }
+
     // Sets the layers to the correct height 
     pad = Math.round(0.15*rowHeight);
 
@@ -160,8 +167,11 @@ namespace com.keyman.osk {
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
-        rs.bottom=(nRows-nRow-1)*rowHeight+'px';
+        let bottom = (nRows-nRow-1)*rowHeight;
+        rs.bottom=bottom+'px';
         rs.maxHeight=rs.height=rowHeight+'px';
+        // Calculate the exact vertical coordinate of the row's center.
+        this.layout.layer[nLayer].row[nRow].proportionalY = ((kbdHeight + 3 - bottom) - rowHeight/2) / (kbdHeight + 3);
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {

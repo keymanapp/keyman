@@ -95,9 +95,12 @@ namespace com.keyman {
         this.formFactor='tablet';
       }
 
+      // Test for potential Chrome emulation on Windows or macOS X (used only in next if-check)
+      let possibleChromeEmulation = navigator.platform == 'Win32' || navigator.platform == 'MacIntel'
+
       //                           alert(sxx+'->'+device.formFactor);
-      // Check for phony iOS devices (Win32 test excludes Chrome touch emulation on Windows)!
-      if(this.OS == 'iOS' && !('ongesturestart' in window) && navigator.platform != 'Win32') {
+      // Check for phony iOS devices (but don't undo for Chrome emulation used during development)
+      if(this.OS == 'iOS' && !('ongesturestart' in window) && !possibleChromeEmulation) {
         this.OS='Android';
       }
     
