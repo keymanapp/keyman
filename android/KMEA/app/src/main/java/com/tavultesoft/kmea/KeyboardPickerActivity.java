@@ -602,6 +602,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       lexicalModelsList = getLexicalModelsList(context);
     }
 
+    if (lexicalModelsList == null) {
+      return false;
+    }
+
     for(HashMap<String, String> lmInfo : lexicalModelsList) {
       String key = String.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
         lmInfo.get(KMManager.KMKey_LanguageID), lmInfo.get(KMManager.KMKey_LexicalModelID));

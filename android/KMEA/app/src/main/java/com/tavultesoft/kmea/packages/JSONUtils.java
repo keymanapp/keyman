@@ -253,7 +253,7 @@ public class JSONUtils {
                 languageArray.put(languageObj);
                 modelObj.put("languages", languageArray);
 
-                // TODO: source, filesize
+                // TODO: maybe add source, filesize
 
 
                 lexicalModelsArray.put(modelObj);

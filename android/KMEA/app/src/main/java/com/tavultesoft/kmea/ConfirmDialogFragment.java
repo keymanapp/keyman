@@ -79,6 +79,14 @@ public class ConfirmDialogFragment extends DialogFragment {
               KeyboardPickerActivity.deleteKeyboard(getContext(), keyboardIndex);
               dismissOnSelect = true;
               break;
+            case DIALOG_TYPE_DOWNLOAD_MODEL :
+              // Confirmation to download lexical model
+              if (KMManager.hasConnection(getActivity())) {
+                // TODO: download
+              } else {
+                Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
+              }
+              break;
             case DIALOG_TYPE_DELETE_MODEL :
               // Confirmation to delete model
               int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(getActivity(), itemKey);

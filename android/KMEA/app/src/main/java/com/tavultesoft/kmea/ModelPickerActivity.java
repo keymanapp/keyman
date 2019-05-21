@@ -2,6 +2,7 @@
 package com.tavultesoft.kmea;
 
 import android.annotation.SuppressLint;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+
+import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
 
 /**
  * Keyman Settings --> Languages Settings --> Language Settings --> Model List
@@ -93,7 +96,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
     TextView textView = (TextView) findViewById(R.id.bar_title);
 
     Bundle bundle = getIntent().getExtras();
-    languageID = bundle.getString(KMManager.KMKey_LanguageID);
+    this.languageID = bundle.getString(KMManager.KMKey_LanguageID);
     final String languageName = bundle.getString(KMManager.KMKey_LanguageName);
     textView.setText(String.format("%s model", languageName));
 
@@ -103,42 +106,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
     if (lexicalModelsArrayList == null) {
       lexicalModelsArrayList = new ArrayList<HashMap<String, String>>();
     }
-    //lexicalModelsArrayList = getModelsList(context, languageID);
-
-    // TODO: comment out the rest of this?
-    /*
-    String[] from = new String[]{"leftIcon", KMManager.KMKey_LexicalModelName, KMManager.KMKey_Icon};
-    int[] to = new int[]{R.id.image1, R.id.text1, R.id.image2};
-    ListAdapter listAdapter = new KMListAdapter(context, lexicalModelsArrayList, R.layout.models_list_row_layout, from, to);
-    listView.setAdapter(listAdapter);
-    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        listView.setItemChecked(position, true);
-        listView.setSelection(position);
-
-        // Start intent for selected Predictive Text Model screen
-        HashMap<String, String> modelInfo = lexicalModelsArrayList.get(position);
-        if (!languageID.equalsIgnoreCase(modelInfo.get(KMManager.KMKey_LanguageID))) {
-          Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " + modelInfo.get(KMManager.KMKey_LanguageID));
-        }
-        Bundle bundle = new Bundle();
-        // Note: package ID of a model is different from package ID for a keyboard.
-        // Language ID can be re-used
-        bundle.putString(KMManager.KMKey_PackageID, modelInfo.get(KMManager.KMKey_PackageID));
-        bundle.putString(KMManager.KMKey_LanguageID, languageID);
-        bundle.putString(KMManager.KMKey_LexicalModelID, modelInfo.get(KMManager.KMKey_LexicalModelID));
-        bundle.putString(KMManager.KMKey_LexicalModelName, modelInfo.get(KMManager.KMKey_LexicalModelName));
-        bundle.putString(KMManager.KMKey_LexicalModelVersion, modelInfo.get(KMManager.KMKey_LexicalModelVersion));
-        String isCustom = MapCompat.getOrDefault(modelInfo, KMManager.KMKey_CustomModel, "N");
-        bundle.putBoolean(KMManager.KMKey_CustomModel, isCustom.toUpperCase().equals("Y"));
-        Intent i = new Intent(context, ModelInfoActivity.class);
-        i.putExtras(bundle);
-        startActivity(i);
-      }
-    });
-    */
-
   }
 
   @Override
@@ -174,29 +141,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
     }
   }
 
-  public static ArrayList<HashMap<String, String>> getModelsList(Context context, String languageID) {
-    ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-
-    // Start with the list of currently installed models
-    ArrayList<HashMap<String, String>> availableLexicalModels = KeyboardPickerActivity.getLexicalModelsList(context);
-
-    for(HashMap<String, String> modelInfo : availableLexicalModels) {
-      if (modelInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(languageID)) {
-        // Add icons showing model is installed (check)
-        modelInfo.put("leftIcon", String.valueOf(R.drawable.ic_check));
-        modelInfo.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
-        modelInfo.put("isEnabled", "true");
-        list.add(modelInfo);
-      }
-    }
-
-    // TODO: Check the list with models available in cloud. api.keyman.com needs to be done in a background network task
-
-    return list;
-  }
-
-
-
   // Each language ID will save to a separate cache
   private static final String cacheFilename(String languageID) {
     final String jsonCacheFilename = "jsonLexicalModelsCache";
@@ -207,13 +151,16 @@ public final class ModelPickerActivity extends AppCompatActivity {
     return new File(context.getCacheDir(), cacheFilename(languageID));
   }
 
-  protected static JSONArray getCachedJSONObject(Context context, String languageID) {
-    JSONArray lmData;
+  protected static JSONArray getCachedJSONArray(Context context, String languageID) {
+    JSONArray lmData = null;
     try {
       // Read from cache file
-      ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(getCacheFile(context, languageID)));
-      lmData = new JSONArray(objInput.readObject().toString());
-      objInput.close();
+      File file = getCacheFile(context, languageID);
+      if (file.exists()) {
+        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
+        lmData = new JSONArray(objInput.readObject().toString());
+        objInput.close();
+      }
     } catch (Exception e) {
       Log.e(TAG, "Failed to read from cache file. Error: " + e);
       lmData = null;
@@ -316,14 +263,10 @@ public final class ModelPickerActivity extends AppCompatActivity {
         return null;
       }
 
-      // TODO: do not leave for production
-      if(android.os.Debug.isDebuggerConnected())
-        android.os.Debug.waitForDebugger();
-
       JSONParser jsonParser = new JSONParser();
       JSONArray lmData = null;
       if (loadFromCache) {
-        lmData = getCachedJSONObject(context, languageID);
+        lmData = getCachedJSONArray(context, languageID);
       } else if (hasConnection) {
         try {
           String remoteUrl = String.format("%s?q=bcp47:%s", KMKeyboardDownloaderActivity.kKeymanApiModelURL, languageID);
@@ -349,7 +292,11 @@ public final class ModelPickerActivity extends AppCompatActivity {
         }
       }
 
+      // Clear pre-existing list
+      lexicalModelsArrayList =  new ArrayList<HashMap<String, String>>();
+
       // Consolidate kmp.json info from models/
+      // TODO: Filter by language ID?
       JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
 
       if (jsonArray == null && kmpLexicalModelsArray.length() == 0) {
@@ -369,10 +316,16 @@ public final class ModelPickerActivity extends AppCompatActivity {
           models = kmpLexicalModelsArray;
         } else {
           // Otherwise, merge kmpLexicalModelsArray with cloud jsonArray
-          models = jsonArray;
+          models = (jsonArray != null) ? jsonArray : new JSONArray();
           for (int i = 0; i < kmpLexicalModelsArray.length(); i++) {
             JSONObject kmpLexicalModel = kmpLexicalModelsArray.getJSONObject(i);
             String kmpModelID = kmpLexicalModel.getString("id");
+
+            // Filter by language ID
+            JSONObject languageObj = kmpLexicalModel.getJSONArray("languages").getJSONObject(0);
+            if (!languageID.equalsIgnoreCase(languageObj.getString("id"))) {
+              continue;
+            }
 
             int modelIndex = JSONUtils.findID(models, kmpModelID);
             if (modelIndex == -1) {
@@ -385,25 +338,31 @@ public final class ModelPickerActivity extends AppCompatActivity {
           }
         }
 
+        if (models == null) {
+          return;
+        }
+
         // Parse the model JSON Object from the api.keyman.com query
         // We know the package ID is from "cloud" and the language ID is only 1 language from the query
         int modelsLength = models.length();
         for (int i = 0; i < modelsLength; i++) {
           JSONObject model = models.getJSONObject(i);
 
-          String packageID = "cloud";
-          String languageID = model.getJSONArray("languages").getString(0);
+          String packageID = model.optString(KMManager.KMKey_PackageID, "cloud");
+
+          // Do we assume the first ID in the languages array?
+          JSONObject langObj = model.getJSONArray("languages").getJSONObject(0);
+          String languageID =langObj.getString("id");
+          String langName = langObj.getString("name");
+
           String modelID = model.getString("id");
-          String langName = languageID; // TODO: get this?
           String modelName = model.getString("name");
           String modelVersion = model.getString("version");
           String isCustom = "N";
           String icon = "0";
           String isEnabled = "true";
-          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
-
           hashMap.put(KMManager.KMKey_PackageID, packageID);
           hashMap.put(KMManager.KMKey_LanguageID, languageID);
           hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
@@ -411,6 +370,13 @@ public final class ModelPickerActivity extends AppCompatActivity {
           hashMap.put(KMManager.KMKey_LanguageName, langName);
           hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
           hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
+
+          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+          if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
+            hashMap.put("leftIcon", String.valueOf(R.drawable.ic_check));
+            hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
+          }
+
           hashMap.put("isEnabled", "true");
           lexicalModelsArrayList.add(hashMap);
         }
@@ -418,8 +384,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
         String[] from = new String[]{"leftIcon", KMManager.KMKey_LexicalModelName, KMManager.KMKey_Icon};
         int[] to = new int[]{R.id.image1, R.id.text1, R.id.image2};
 
-        //String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_LexicalModelName, iconKey};
-        //int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
         ListAdapter adapter = new KMListAdapter(context, lexicalModelsArrayList, R.layout.models_list_row_layout, from, to);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -427,29 +391,31 @@ public final class ModelPickerActivity extends AppCompatActivity {
           @Override
           public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
             selectedIndex = position;
-            String modelName = lexicalModelsArrayList.get(+position).get(KMManager.KMKey_LexicalModelName);
-            String langName = lexicalModelsArrayList.get(+position).get(KMManager.KMKey_LanguageName);
+            HashMap<String, String> modelInfo = lexicalModelsArrayList.get(position);
+            String packageID = modelInfo.get(KMManager.KMKey_PackageID);
+            String languageID = modelInfo.get(KMManager.KMKey_LanguageID);
+            String modelID = modelInfo.get(KMManager.KMKey_LexicalModelID);
+            String modelName = modelInfo.get(KMManager.KMKey_LexicalModelName);
+            String langName = modelInfo.get(KMManager.KMKey_LanguageName);
 
-            boolean modelInstalled = true; // TODO: compute this
+            // Using the presence of the left icon "check" to determine if the model is installed
+            boolean modelInstalled = modelInfo.containsKey("leftIcon");
             if (modelInstalled) {
               // Show Model Info
               listView.setItemChecked(position, true);
               listView.setSelection(position);
 
               // Start intent for selected Predictive Text Model screen
-              HashMap<String, String> modelInfo = lexicalModelsArrayList.get(position);
               if (!languageID.equalsIgnoreCase(modelInfo.get(KMManager.KMKey_LanguageID))) {
                 Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " + modelInfo.get(KMManager.KMKey_LanguageID));
               }
               Bundle bundle = new Bundle();
               // Note: package ID of a model is different from package ID for a keyboard.
               // Language ID can be re-used
-              bundle.putString(KMManager.KMKey_PackageID, modelInfo.get(KMManager.KMKey_PackageID));
+              bundle.putString(KMManager.KMKey_PackageID, packageID);
               bundle.putString(KMManager.KMKey_LanguageID, languageID);
-              bundle.putString(KMManager.KMKey_LexicalModelID,
-                modelInfo.get(KMManager.KMKey_LexicalModelID));
-              bundle.putString(KMManager.KMKey_LexicalModelName,
-                modelInfo.get(KMManager.KMKey_LexicalModelName));
+              bundle.putString(KMManager.KMKey_LexicalModelID, modelID);
+              bundle.putString(KMManager.KMKey_LexicalModelName, modelName);
               bundle.putString(KMManager.KMKey_LexicalModelVersion,
                 modelInfo.get(KMManager.KMKey_LexicalModelVersion));
               bundle.putString(KMManager.KMKey_CustomModel,
@@ -457,48 +423,13 @@ public final class ModelPickerActivity extends AppCompatActivity {
               Intent i = new Intent(context, ModelInfoActivity.class);
               i.putExtras(bundle);
               startActivityForResult(i, 1);
-
-              /*
-              Intent i = new Intent(context, KeyboardListActivity.class);
-              i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-              i.putExtra("selectedIndex", selectedIndex);
-              int listPosition = listView.getFirstVisiblePosition();
-              i.putExtra("listPosition", listPosition);
-              View v = listView.getChildAt(0);
-              int offsetY = (v == null) ? 0 : v.getTop();
-              i.putExtra("offsetY", offsetY);
-              startActivityForResult(i, 1);
-              */
             } else {
-              // Model file already exists locally so add association
-
-              /*
-              HashMap<String, String> modelInfo = getKeyboardInfo(selectedIndex, 0);
-              final String pkgID = modelInfo.get(KMManager.KMKey_PackageID);
-              final String kbID = modelInfo.get(KMManager.KMKey_KeyboardID);
-              final String langID = modelInfo.get(KMManager.KMKey_LanguageID);
-
-              if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-                // Custom keyboard already exists in models/ so just add the language association
-                KeyboardPickerActivity.addKeyboard(context, kbInfo);
-                KMManager.setKeyboard(pkgID, kbID, langID, modelName, langName, kFont, kOskFont);
-                Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
-                ((AppCompatActivity) context).finish();
-              } else {
-                // Keyboard needs to be downloaded
-                Bundle bundle = new Bundle();
-                bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-                bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
-                Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-                i.putExtras(bundle);
-                startActivity(i);
-              }
-              */
+              // Model isn't installed so prompt to download it
+              String model_key = String.format("%s_%s_%s", packageID, languageID, modelID);
+              String title = String.format("%s: %s", langName, modelName);
+              DialogFragment dialog = ConfirmDialogFragment.newInstance(
+                DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model), model_key);
+              dialog.show(getFragmentManager(), "dialog");
             }
           }
         });

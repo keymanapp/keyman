@@ -307,12 +307,15 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   }
 
   protected static JSONObject getCachedJSONObject(Context context) {
-    JSONObject jsonObj;
+    JSONObject jsonObj = null;
     try {
       // Read from cache file
-      ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(getCacheFile(context)));
-      jsonObj = new JSONObject(objInput.readObject().toString());
-      objInput.close();
+      File file = getCacheFile(context);
+      if (file.exists()) {
+        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
+        jsonObj = new JSONObject(objInput.readObject().toString());
+        objInput.close();
+      }
     } catch (Exception e) {
       Log.e(TAG, "Failed to read from cache file. Error: " + e);
       jsonObj = null;

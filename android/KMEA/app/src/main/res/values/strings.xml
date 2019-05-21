@@ -49,6 +49,7 @@
 
     <!-- Model Updates -->
     <string name="getting_model_catalog" translatable="false">Getting lexical model catalog.\nThis may take a while&#8230;</string>
+    <string name="confirm_download_model" translatable="false">Would you like to download this model?</string>
 
     <!-- Model Info -->
     <string name="model_version" translatable="false">Model version</string>
