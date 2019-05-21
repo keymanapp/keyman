@@ -780,7 +780,7 @@ namespace com.keyman.osk {
             padPercent = Math.round(keys[j]['padpc'] * objectWidth); // Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
             keys[j]['padpc']=padPercent;
 
-            // recompute center's x-coord
+            // Recompute center's x-coord with exact, in-browser values.
             (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
             (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
 
@@ -798,7 +798,7 @@ namespace com.keyman.osk {
             totalPercent += keyPercent;
             keys[0]['padpc']=(objectWidth-totalPercent);
 
-            // recompute center's x-coord
+            // Recompute center's x-coord with exact, in-browser values.
             (<ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
             (<ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
           } else if(keys.length > 0) {
@@ -808,7 +808,7 @@ namespace com.keyman.osk {
             totalPercent += padPercent;
             keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
 
-            // recompute center's x-coord
+            // Recompute center's x-coord with exact, in-browser values.
             (<ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
             (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
           }
@@ -842,7 +842,17 @@ namespace com.keyman.osk {
       let kbdCoords = keyman.util.getAbsolute(this.kbdDiv);
       let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
 
+      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
+      offsetCoords.x /= layerGroup.offsetWidth;
+      offsetCoords.y /= layerGroup.offsetHeight;
+
       return offsetCoords;
+    }
+
+    getTouchProbabilities(touch: Touch): {keyId: string, p: number}[] {
+      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
+      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
+      return this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
     }
 
     /**
@@ -858,14 +868,6 @@ namespace com.keyman.osk {
 
       // Save the touch point
       this.touchX = e.changedTouches[0].pageX;
-
-      // FIXME:  Temporary section demonstrating how to compute the fat-finger distribution from the OSK.
-      let touchKbdPos = this.getTouchCoordinatesOnKeyboard(e.changedTouches[0]);
-      let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
-      touchKbdPos.x /= layerGroup.offsetWidth;
-      touchKbdPos.y /= layerGroup.offsetHeight;
-      let kbdScale = layerGroup.offsetWidth / layerGroup.offsetHeight;
-      console.log(this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, kbdScale));
 
       // Set the key for the new touch point to be current target, if defined
       this.currentTarget = key;
@@ -904,6 +906,7 @@ namespace com.keyman.osk {
 
         // Also backspace, to allow delete to repeat while key held
       } else if(keyName == 'K_BKSP') {
+        let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]); // TODO: Send fat-finger info
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
         Processor.clickKey(key);
@@ -913,6 +916,9 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
+
+          // e.touches[0] because it's the pending touch, rather than the new one.
+          let touchProbabilities = this.getTouchProbabilities(e.touches[0]); // TODO: Send fat-finger info
           Processor.clickKey(this.keyPending);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
@@ -972,10 +978,9 @@ namespace com.keyman.osk {
       if(this.keyPending) {
         this.highlightKey(this.keyPending,false);
 
-        let touchKbdPos = this.getTouchCoordinatesOnKeyboard(e.changedTouches[0]);
-
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
+          let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]); // TODO: Send fat-finger info
           Processor.clickKey(this.keyPending);
         }
         this.clearPopup();

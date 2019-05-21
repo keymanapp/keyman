@@ -89,7 +89,7 @@ namespace com.keyman.osk {
         padPercent=parseInt(keys[j]['pad'],10)/totalWidth;
         keys[j]['padpc']=padPercent;
 
-        // compute center's default x-coord
+        // compute center's default x-coord (used in headless modes)
         (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2));
         (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
 
@@ -107,7 +107,7 @@ namespace com.keyman.osk {
         totalPercent += keyPercent;
         keys[0]['padpc']=1-totalPercent;
 
-        // compute center's default x-coord
+        // compute center's default x-coord (used in headless modes)
         (<ActiveKey> keys[0]).proportionalX = ((totalPercent - rightMargin) -  keyPercent/2);
         (<ActiveKey> keys[0]).proportionalWidth = keyPercent;
 
@@ -118,7 +118,7 @@ namespace com.keyman.osk {
         totalPercent += padPercent;
         keys[j]['widthpc'] = keyPercent = 1-totalPercent;
 
-        // compute center's default x-coord
+        // compute center's default x-coord (used in headless modes)
         (<ActiveKey> keys[j]).proportionalX = (1 - rightMargin) - keyPercent/2;
         (<ActiveKey> keys[j]).proportionalWidth = keyPercent;
       }
@@ -275,7 +275,7 @@ namespace com.keyman.osk {
       // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place 
       // of the formula in the loop below.
       for(let key in keyDists) {
-        totalMass += keyProbs[key] = 1 / (keyDists[key] * keyDists[key] + 1e-6); // Prevent div-by-0 errors.
+        totalMass += keyProbs[key] = 1 / (keyDists[key] + 1e-6); // Prevent div-by-0 errors.
       }
 
       for(let key in keyProbs) {
@@ -340,7 +340,7 @@ namespace com.keyman.osk {
           distX += dx * layer.rowProportionalHeight;
           distY += dy * layer.rowProportionalHeight;
 
-          let distance = Math.sqrt(distX * distX + distY * distY);
+          let distance = distX * distX + distY * distY;
           keyDists[layer.id + '-' + key.id] = distance;
         });
       });
