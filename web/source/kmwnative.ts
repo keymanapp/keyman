@@ -389,10 +389,13 @@ namespace com.keyman.osk {
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+        borderPad=oskManager.getKeyboardHeight() - rowHeight * (nRows == 0 ? 1 : nRows),
+        nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
 
+    let kbdHeight = oskManager.getKeyboardHeight()
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
+      kbdHeight /= window.devicePixelRatio;
     }
     let oskHeight : number = nRows*rowHeight;
 
@@ -425,8 +428,11 @@ namespace com.keyman.osk {
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
-        rs.bottom=(nRows-nRow-1)*rowHeight+1+'px';
+        let bottom = (nRows-nRow-1)*rowHeight+1;
+        rs.bottom=bottom+'px';
         rs.maxHeight=rs.height=rowHeight+'px';
+        // Calculate the exact vertical coordinate of the row's center.
+        this.layout.layer[nLayer].row[nRow].proportionalY = ((kbdHeight + 3 - bottom) - rowHeight/2) / (kbdHeight + 3);
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {
