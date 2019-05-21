@@ -14,6 +14,9 @@ namespace wordBreakers {
   }
 
   // Utilities //
+  import WordBreakProperty = wordBreakers.data.WordBreakProperty;
+  import WORD_BREAK_PROPERTY = wordBreakers.data.WORD_BREAK_PROPERTY;
+  import extendedPictographic = wordBreakers.data.extendedPictographic;
 
   /**
    * Generator that yields every successive span from the the text.
