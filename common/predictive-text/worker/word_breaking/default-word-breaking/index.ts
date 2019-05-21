@@ -77,11 +77,11 @@ namespace wordBreakers {
    *
    * @param text Text to find word boundaries in.
    */
-  function* findBoundaries(text: string): Iterable<number> {
+  function findBoundaries(text: string): number[] {
     // WB1 and WB2: no boundaries if given an empty string.
     if (text.length === 0) {
       // There are no boundaries in an empty string!
-      return;
+      return [];
     }
 
     // This algorithm works by maintaining a sliding window of four SCALAR VALUES.
@@ -101,6 +101,8 @@ namespace wordBreakers {
     //  - Four values? Some rules look at what's to the left of
     //    left, and some look at what's to the right of right. So
     //    keep track of this!
+
+    let boundaries = [];
 
     let rightPos: number;
     let lookaheadPos = 0; // lookahead, one scalar value to the right of right.
@@ -123,12 +125,12 @@ namespace wordBreakers {
       // Break at the start and end of text, unless the text is empty.
       // WB1: Break at start of text...
       if (left === 'sot') {
-        yield rightPos;
+        boundaries.push(rightPos);
         continue;
       }
       // WB2: Break at the end of text...
       if (right === 'eot') {
-        yield rightPos;
+        boundaries.push(rightPos);
         break; // Reached the end of the string. We're done!
       }
       // WB3: Do not break within CRLF:
@@ -136,12 +138,12 @@ namespace wordBreakers {
         continue;
       // WB3b: Otherwise, break after...
       if (left === 'Newline' || left == 'CR' || left === 'LF') {
-        yield rightPos;
+        boundaries.push(rightPos);
         continue;
       }
       // WB3a: ...and before newlines
       if (right === 'Newline' || right === 'CR' || right === 'LF') {
-        yield rightPos;
+        boundaries.push(rightPos);
         continue;
       }
 
@@ -171,7 +173,7 @@ namespace wordBreakers {
       // have fallen off the end of the string, so end the loop
       // prematurely if that happens!
       if (right === 'eot') {
-        yield rightPos;
+        boundaries.push(rightPos);
         break;
       }
       // WB4 (continued): Lookahead must ALSO ignore these format,
@@ -262,8 +264,10 @@ namespace wordBreakers {
         nConsecutiveRegionalIndicators = 0;
       }
       // WB999: Otherwise, break EVERYWHERE (including around ideographs)
-      yield rightPos;
+      boundaries.push(rightPos);
     } while (rightPos < text.length);
+
+    return boundaries;
 
     ///// Internal utility functions /////
 
