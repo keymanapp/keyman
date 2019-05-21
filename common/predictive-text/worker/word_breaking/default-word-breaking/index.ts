@@ -323,7 +323,7 @@ namespace wordBreakers {
     // This MUST be a scalar value.
     // TODO: remove dependence on character.codepointAt()?
     let codepoint = character.codePointAt(0) as number;
-    return searchForProperty(codepoint, 0, WORD_BREAK_PROPERTY.length);
+    return searchForProperty(codepoint, 0, WORD_BREAK_PROPERTY.length - 1);
   }
 
   function searchForProperty(codepoint: number, left: number, right: number): WordBreakProperty {
