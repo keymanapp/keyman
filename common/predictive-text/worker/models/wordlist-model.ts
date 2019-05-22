@@ -61,7 +61,7 @@
       // [wordform, count] pairs. Since this model does not
       // support weighting, discard the count.
       this._wordlist = wordlist.map(([word, _count]) => word);
-      this.breakWords = options.wordBreaker || wordBreakers.placeholder;
+      this.breakWords = options.wordBreaker || wordBreakers.default;
     }
 
     configure(capabilities: Capabilities): Configuration {
