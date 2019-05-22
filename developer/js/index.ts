@@ -223,13 +223,13 @@ export default class LexicalModelCompiler {
         break;
       case 'trie-2.0':
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(sources)
-        }, }`;
+          createTrieDataStructure(sources, modelSource.searchTermToKey)
+        }, {\n`;
         if (wordBreakingSource) {
-          func += `  wordBreaking: ${wordBreakingSource},`;
+          func += `  wordBreaking: ${wordBreakingSource},\n`;
         }
         if (modelSource.searchTermToKey) {
-          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},`;
+          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
         }
         func += `}));\n`;
         break;

@@ -28,9 +28,9 @@ export function createWordListDataStructure(sourceFiles: string[]): string {
  *
  * @param sourceFiles an array of source files that will be read to generate the trie.
  */
-export function createTrieDataStructure(sourceFiles: string[]): string {
+export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?: (wf: string) => string): string {
   let wordlist =  parseWordList(sourceFiles.join('\n'));
-  let trie = Trie.buildTrie(wordlist);
+  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.Wordform2Key);
   return JSON.stringify(trie);
 }
 
@@ -96,7 +96,7 @@ namespace Trie {
    * A function that converts a string (word form or query) into a search key
    * (secretly, this is also a string).
    */
-  interface Wordform2Key {
+  export interface Wordform2Key {
     (wordform: string): SearchKey;
   }
 
