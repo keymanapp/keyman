@@ -31,6 +31,7 @@ namespace wordBreakers {
   // Utilities //
   import WordBreakProperty = wordBreakers.data.WordBreakProperty;
   import WORD_BREAK_PROPERTY = wordBreakers.data.WORD_BREAK_PROPERTY;
+  import I = wordBreakers.data.I;
 
   /**
    * A span that does not cut out the substring until it absolutely has to!
@@ -326,20 +327,26 @@ namespace wordBreakers {
     return searchForProperty(codepoint, 0, WORD_BREAK_PROPERTY.length - 1);
   }
 
-  function searchForProperty(codepoint: number, left: number, right: number): WordBreakProperty {
+  /**
+   * Binary search for the word break property of a given CODE POINT.
+   */
+  function searchForProperty(codePoint: number, left: number, right: number): WordBreakProperty {
     // All items that are not found in the array are assigned the 'Other' property.
     if (right < left) {
       return 'Other';
     }
+
     let midpoint = left + ~~((right - left) / 2);
     let candidate = WORD_BREAK_PROPERTY[midpoint];
-    if (codepoint < candidate.start) {
-      return searchForProperty(codepoint, left, midpoint - 1);
-    } else if (codepoint > candidate.end) {
-      return searchForProperty(codepoint, midpoint + 1, right);
+    if (codePoint < candidate[I.Start]) {
+      return searchForProperty(codePoint, left, midpoint - 1);
+    } else if (codePoint > candidate[I.End]) {
+      return searchForProperty(codePoint, midpoint + 1, right);
     } else {
       // We found it!
-      return candidate.value;
+      console.assert(candidate[I.Start] <= codePoint);
+      console.assert(codePoint <= candidate[I.End]);
+      return candidate[I.Value];
     }
   }
 }
