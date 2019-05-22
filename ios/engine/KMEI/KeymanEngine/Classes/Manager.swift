@@ -196,13 +196,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     updateUserKeyboards(with: Defaults.keyboard)
 
-
-      let userKeyboards = Storage.active.userDefaults.userKeyboards!
-      for userKeyboard in userKeyboards {
-        log.debug("userKeyboard: \(userKeyboard)")
-      }
-
-
     reachability = Reachability(hostName: keymanHostName)
 
     if(!Util.isSystemKeyboard) {

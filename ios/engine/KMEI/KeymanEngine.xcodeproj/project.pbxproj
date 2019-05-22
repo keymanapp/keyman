@@ -28,7 +28,6 @@
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
 		1687ACCE1FD8DE5300926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
 		1687ACCF1FD8DE5300926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; };
-		37EA1F44229218DC003E710C /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A93A531F8B21240079948B /* Manager.swift */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
 		988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */; };
@@ -47,6 +46,7 @@
 		9A079DDF2231A13A00581263 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAC1F9F21270064431A /* Keyboard.swift */; };
 		9A079DE02231A14200581263 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAA1F9F1FE10064431A /* Language.swift */; };
 		9A079DE12231A14D00581263 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E30C8B1FC40D0400C80416 /* Storage.swift */; };
+		9A079DE22231A15900581263 /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A93A531F8B21240079948B /* Manager.swift */; };
 		9A079DE32231A16600581263 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0959CD31F99C44E00B616BC /* Constants.swift */; };
 		9A079DE42231A1ED00581263 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B14321FD914870082A316 /* Log.swift */; };
 		9A079DE62231A69D00581263 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A079DE52231A69D00581263 /* Foundation.framework */; };
@@ -733,29 +733,29 @@
 		F273AB9615641D9300A47CEE /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				C0959CD31F99C44E00B616BC /* Constants.swift */,
-				C0B09EAD1FCFD10F002F39AF /* FontManager.swift */,
-				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
-				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
-				C05B14321FD914870082A316 /* Log.swift */,
-				C0A93A531F8B21240079948B /* Manager.swift */,
-				C08E698C1FDA392D0026056B /* Migrations.swift */,
-				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
 				165EB39F2098992D00040A69 /* Errors */,
 				C055E6E81F99EA320035C2DD /* Extension */,
-				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
-				98F9D6ED19545A620087AA43 /* InputViewController */,
-				987F00041AB8FCB700998116 /* KeyboardMenuView */,
-				F2607212158FBCB500F37184 /* KeyboardPicker */,
-				C07A9D881FD1760800828ADD /* KeyboardRepository */,
-				989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */,
 				C0452BA91F9F1CAF0064431A /* Model */,
 				C024C9921FA6EB340060583B /* Notification */,
-				98A880EF177BF82600601A9E /* PopoverView */,
+				C07A9D881FD1760800828ADD /* KeyboardRepository */,
+				C0A93A531F8B21240079948B /* Manager.swift */,
+				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
+				987F00041AB8FCB700998116 /* KeyboardMenuView */,
+				980CC8E119D51EF00089BB57 /* URLProtocol */,
 				98411308199D9ACD005BD609 /* SubKeysView */,
+				98F9D6ED19545A620087AA43 /* InputViewController */,
+				989FDF8C193C1B0C00EECAF9 /* KeyPreviewView */,
+				F2607212158FBCB500F37184 /* KeyboardPicker */,
+				98A880EF177BF82600601A9E /* PopoverView */,
 				F273AB9E156440CD00A47CEE /* UITextField */,
 				F273AB9D156440BA00A47CEE /* UITextView */,
-				980CC8E119D51EF00089BB57 /* URLProtocol */,
+				C0959CD31F99C44E00B616BC /* Constants.swift */,
+				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
+				C0B09EAD1FCFD10F002F39AF /* FontManager.swift */,
+				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
+				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
+				C05B14321FD914870082A316 /* Log.swift */,
+				C08E698C1FDA392D0026056B /* Migrations.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1072,11 +1072,11 @@
 				9A079DDE2231A13100581263 /* FullKeyboardID.swift in Sources */,
 				9A31E2CA224AE88E00D9A491 /* LexicalModelAPICall.swift in Sources */,
 				9A079E3222361C3B00581263 /* Migrations.swift in Sources */,
-				37EA1F44229218DC003E710C /* Manager.swift in Sources */,
 				9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */,
 				9A079E2A223619FC00581263 /* KeymanWebDelegate.swift in Sources */,
 				9A31E2C3224AADBB00D9A491 /* NotificationName.swift in Sources */,
 				9A079DDA2231A0B900581263 /* KeymanPackage.swift in Sources */,
+				9A079DE22231A15900581263 /* Manager.swift in Sources */,
 				9A079E47223DBF0100581263 /* SubKeysView.swift in Sources */,
 				9A31E2D0224AE8BF00D9A491 /* APILexicalModelRepository.swift in Sources */,
 				9A079DE9223613E400581263 /* APIKeyboardRepository.swift in Sources */,
