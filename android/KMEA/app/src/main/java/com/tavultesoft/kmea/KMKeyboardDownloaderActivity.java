@@ -96,13 +96,14 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       langID = bundle.getString(ARG_LANG_ID);
       langName = bundle.getString(ARG_LANG_NAME);
 
-      downloadOnlyLexicalModel = bundle.containsKey(KMManager.KMKey_LexicalModelPackageFilename) &&
-        bundle.getString(KMManager.KMKey_LexicalModelPackageFilename) != null &&
-        !bundle.getString(KMManager.KMKey_LexicalModelPackageFilename).isEmpty();
+      downloadOnlyLexicalModel = bundle.containsKey(ARG_MODEL_URL) &&
+        bundle.getString(ARG_MODEL_URL) != null &&
+        !bundle.getString(ARG_MODEL_URL).isEmpty();
 
       if (downloadOnlyLexicalModel) {
         modelID = bundle.getString(ARG_MODEL_ID);
         modelName = bundle.getString(ARG_MODEL_NAME);
+        isCustom = false;
         url = bundle.getString(ARG_MODEL_URL);
       } else {
 
@@ -188,7 +189,11 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       super.onPreExecute();
       if (showProgressDialog) {
         progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage(context.getString(R.string.downloading_keyboard));
+        if (!downloadOnlyLexicalModel) {
+          progressDialog.setMessage(context.getString(R.string.downloading_keyboard));
+        } else {
+          progressDialog.setMessage(context.getString(R.string.downloading_model));
+        }
         progressDialog.setCancelable(false);
         if (!((AppCompatActivity) context).isFinishing()) {
           progressDialog.show();
@@ -231,7 +236,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           remoteUrl = url;
         } else {
           // Keyman cloud
-          remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47", kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
+          remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
+            kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
           remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
 
         }
@@ -518,7 +524,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     new DownloadTask(context, showProgressDialog).execute();
   }
 
-  public static void download(final Context context, final boolean showProgressDialog, final boolean donwloadOnlyLexicalModel) {
+  public static void download(final Context context, final boolean showProgressDialog,
+                              final boolean donwloadOnlyLexicalModel) {
     new DownloadTask(context, showProgressDialog, downloadOnlyLexicalModel).execute();
   }
 

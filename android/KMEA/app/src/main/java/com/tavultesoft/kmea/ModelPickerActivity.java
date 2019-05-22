@@ -356,14 +356,24 @@ public final class ModelPickerActivity extends AppCompatActivity {
           String packageID = model.optString(KMManager.KMKey_PackageID, "cloud");
 
           // Do we assume the first ID in the languages array?
-          JSONObject langObj = model.getJSONArray("languages").getJSONObject(0);
-          String languageID =langObj.getString("id");
-          String langName = langObj.getString("name");
+          // api.keyman.com query returns an array of language IDs Strings while
+          // kmp.json "languages" is an array of JSONObject
+          String languageID = "", langName = "";
+          Object obj = model.getJSONArray("languages");
+          if (((JSONArray) obj).get(0) instanceof String) {
+            // language name not provided, so re-use language ID
+            languageID = model.getJSONArray("languages").getString(0);
+            langName = languageID;
+          } else if (((JSONArray) obj).get(0) instanceof JSONObject) {
+            JSONObject languageObj = model.getJSONArray("languages").getJSONObject(0);
+            languageID = languageObj.getString("id");
+            langName = languageObj.getString("name");
+          }
 
           String modelID = model.getString("id");
           String modelName = model.getString("name");
           String modelVersion = model.getString("version");
-          String modelURL = model.getString("packageFilename");
+          String modelURL = model.optString("packageFilename", "");
           String isCustom = "N";
           String icon = "0";
 
@@ -393,7 +403,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
         String[] from = new String[]{"leftIcon", KMManager.KMKey_LexicalModelName, KMManager.KMKey_Icon};
         int[] to = new int[]{R.id.image1, R.id.text1, R.id.image2};
 
-        ListAdapter adapter = new KMListAdapter(context, lexicalModelsArrayList, R.layout.models_list_row_layout, from, to);
+        ListAdapter adapter = new KMListAdapter(context, lexicalModelsArrayList,
+          R.layout.models_list_row_layout, from, to);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -416,7 +427,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
               // Start intent for selected Predictive Text Model screen
               if (!languageID.equalsIgnoreCase(modelInfo.get(KMManager.KMKey_LanguageID))) {
-                Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " + modelInfo.get(KMManager.KMKey_LanguageID));
+                Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " +
+                  modelInfo.get(KMManager.KMKey_LanguageID));
               }
               Bundle bundle = new Bundle();
               // Note: package ID of a model is different from package ID for a keyboard.
@@ -434,14 +446,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
               startActivityForResult(i, 1);
             } else {
               // Model isn't installed so prompt to download it
-              /*
-              String model_key = String.format("%s_%s_%s", packageID, languageID, modelID);
-              String title = String.format("%s: %s", langName, modelName);
-              DialogFragment dialog = ConfirmDialogFragment.newInstance(
-                DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model), model_key);
-              dialog.show(getFragmentManager(), "dialog");
-              */
-
               Bundle args = new Bundle();
               args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
               args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
@@ -459,7 +463,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
         });
 
         Intent i = getIntent();
-        listView.setSelectionFromTop(i.getIntExtra("listPosition", 0), i.getIntExtra("offsetY", 0));
+        listView.setSelectionFromTop(i.getIntExtra("listPosition", 0),
+          i.getIntExtra("offsetY", 0));
       } catch (JSONException e) {
         Log.e("JSONParse", "Error: " + e);
       }

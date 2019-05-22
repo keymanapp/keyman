@@ -51,6 +51,7 @@
     <string name="getting_model_catalog" translatable="false">Getting lexical model catalog.\nThis may take a while&#8230;</string>
     <string name="confirm_download_model" translatable="false">Would you like to download this model?</string>
     <string name="checking_model_download" translatable="false">Checking to download model&#8230;</string>
+    <string name="downloading_model" translatable="false">Downloading model&#8230;</string>
 
     <!-- Model Info -->
     <string name="model_version" translatable="false">Model version</string>
