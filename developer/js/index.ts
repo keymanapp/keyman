@@ -106,6 +106,7 @@ export default class LexicalModelCompiler {
 
     let wordBreakingSource: string = null;
 
+    // Figure out what word breaker the model is using, if any.
     if (modelSource.wordBreaking) {
       if (typeof modelSource.wordBreaking === "string") {
         // It must be a builtin word breaker, so just instantiate it.
@@ -126,7 +127,6 @@ export default class LexicalModelCompiler {
     switch(modelSource.format) {
       case "custom-1.0":
         func += this.transpileSources(sources).join('\n');
-        // JSON.stringify(oc) gives the base metadata
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
         break;
       case "fst-foma-1.0":
@@ -143,14 +143,16 @@ export default class LexicalModelCompiler {
         func += `));\n`;
         break;
       case 'trie-2.0':
-        // TODO: allow specification of key function.
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(sources)
-        }`;
+        }, }`;
         if (wordBreakingSource) {
-          func += `, {wordBreaking: ${wordBreakingSource}}`;
+          func += `  wordBreaking: ${wordBreakingSource},`;
         }
-        func += `));\n`;
+        if (modelSource.searchTermToKey) {
+          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},`;
+        }
+        func += `}));\n`;
         break;
       default:
         this.logError('Unknown model format '+modelSource.format);

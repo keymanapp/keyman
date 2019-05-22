@@ -25,7 +25,15 @@ interface LexicalModelSource extends LexicalModel {
    * The name of the type to instantiate (without parameters) as the base object for a custom predictive model.
    */
   readonly rootClass?: string
+  /**
+   * What kind of word breaking to use, if any.
+   */
   readonly wordBreaking?: 'ascii' | 'placeholder' | ClassBasedWordBreaker;
+  /**
+   * How to simplify words, to convert them into simplifired search keys
+   * This often involves removing accents, lowercasing, etc.
+   */
+  readonly searchTermToKey?: (term: string) => string;
 }
 
 interface LexicalModelCompiled extends LexicalModel {
