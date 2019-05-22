@@ -374,7 +374,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
           String modelName = model.getString("name");
           String modelVersion = model.getString("version");
           String modelURL = model.optString("packageFilename", "");
-          String isCustom = "N";
+          String isCustom = model.optString("CustomModel", "N");
           String icon = "0";
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -384,7 +384,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
           hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
           hashMap.put(KMManager.KMKey_LanguageName, langName);
           hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
-          hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
+          hashMap.put(KMManager.KMKey_CustomModel, isCustom);
           hashMap.put("isEnabled", "true");
           hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
 

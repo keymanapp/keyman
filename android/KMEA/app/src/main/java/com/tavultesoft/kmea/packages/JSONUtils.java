@@ -234,7 +234,7 @@ public class JSONUtils {
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
                 modelObj.put(KMManager.KMKey_KeyboardVersion, modelVersion);
-                modelObj.put(KMManager.KMKey_CustomKeyboard, "Y");
+                modelObj.put(KMManager.KMKey_CustomModel, "Y");
                 if (containsHelp) {
                   File welcomeFile = new File(pkg, "welcome.htm");
                   modelObj.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
