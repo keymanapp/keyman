@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Include our resource functions; they're pretty useful!
+. ../../../resources/shellHelperFunctions.sh
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" == *"darwin" ]]; then
   echo "This build script will only run in a Mac environment."
@@ -11,7 +14,7 @@ if [ -z "$TARGET" ]; then
 fi
 
 display_usage ( ) {
-    echo "build.sh [-no-update] | [-lib-build] | [-lib-ignore] | [-clean]"
+    echo "build.sh [-no-update] | [-no-archive] | [-lib-build] | [-lib-ignore] | [-clean]"
     echo
     echo "  -clean          Removes all previously-existing build products for this project before building."
     echo "  -no-update      If an in-place copy of KeymanEngine.framework exists, does not seek out an updated copy."
@@ -48,6 +51,7 @@ do_clean ( ) {
 ### START OF THE BUILD ###
 
 DO_UPDATE=true
+DO_ARCHIVE=true
 FORCE_KMEI_BUILD=false
 ALLOW_KMEI_BUILD=true
 CODE_SIGN=true
@@ -71,6 +75,9 @@ while [[ $# -gt 0 ]] ; do
             CODE_SIGN=false
             KMEI_FLAGS="$KMEI_FLAGS -no-codesign"
             ;;
+        -no-archive)
+            DO_ARCHIVE=false
+            ;;
         -h|-?)
             display_usage
             ;;
@@ -86,6 +93,10 @@ while [[ $# -gt 0 ]] ; do
     esac
     shift
 done
+
+#
+# Build Keyman Engine
+#
 
 KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-universal/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
@@ -119,8 +130,43 @@ if [ $DO_UPDATE = true ]; then
     cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 fi
 
+#
+# Build Target Application
+#
+
+DERIVED_DATA=build
+BUILD_PATH=$DERIVED_DATA/Build/Products
+XCODEFLAGS="-quiet -configuration $CONFIG"
+XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath $DERIVED_DATA" # -workspace $TARGET.xcworkspace"
+ARCHIVE_PATH=$BUILD_PATH/${CONFIG}-iphoneos/$TARGET.xcarchive
+
 if [ $CODE_SIGN = true ]; then
-  xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
+
+  if [ $DO_ARCHIVE = true ]; then
+    # Time to prepare the deployment archive data.
+    echo ""
+    echo "Preparing .ipa file for deployment."
+    xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
+
+    assertDirExists "$ARCHIVE_PATH"
+
+    # Pass the build number information along to the Plist file of the app.
+    if [ $BUILD_NUMBER ]; then
+      echo "Setting version numbers to $BUILD_NUMBER."
+      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
+      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
+
+      ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/$TARGET.app"
+      ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"
+
+      set_version "$ARCHIVE_APP" "$TARGET"
+      set_version "$ARCHIVE_KBD"
+    fi
+
+    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+  else
+    xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
+  fi
 else
   xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -target "$TARGET" -config "$CONFIG"
 fi

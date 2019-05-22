@@ -29,8 +29,8 @@ function display_usage {
   echo "Usage: build_keyboards.sh [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"
   echo "Builds all keyboards used by the app and copies them into the"
   echo "target path."
-  echo "  -copy: Only copy the keyboards; don't rebuild them"
-  echo "  -clean: Clean the keyboards from this repo"
+  echo "  -copy-keyboards: Only copy the keyboards; don't rebuild them"
+  echo "  -clean-keyboards: Clean the keyboards from this repo"
   echo "  -debug: Build debug versions of the keyboards"
   exit 1
 }
