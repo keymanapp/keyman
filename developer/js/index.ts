@@ -92,79 +92,7 @@ export default class LexicalModelCompiler {
     //
     // Build the compiled lexical model
     //
-
-    let sources: string[] = modelSource.sources.map(function(source) {
-      return fs.readFileSync(path.join(sourcePath, source), 'utf8');
-    });
-
-    let oc: LexicalModelCompiled = {id: model_id, format: modelSource.format};
-
-    // TODO: add metadata in comment
-    const filePrefix: string = `(function() {\n'use strict';\n`;
-    const fileSuffix: string = `})();`;
-    let func = filePrefix;
-
-    let wordBreakingSource: string = null;
-
-    // Figure out what word breaker the model is using, if any.
-    if (modelSource.wordBreaking) {
-      if (typeof modelSource.wordBreaking === "string") {
-        // It must be a builtin word breaker, so just instantiate it.
-        wordBreakingSource = `wordBreakers['${modelSource.wordBreaking}']`;
-      } else if (modelSource.wordBreaking.sources) {
-        let wordBreakingSources: string[] = modelSource.wordBreaking.sources.map(function(source) {
-          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
-        });
-
-        wordBreakingSource = this.transpileSources(wordBreakingSources).join('\n');
-      }
-    }
-
-    //
-    // Emit the model as code and data
-    //
-
-    switch(modelSource.format) {
-      case "custom-1.0":
-        func += this.transpileSources(sources).join('\n');
-        func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
-        break;
-      case "fst-foma-1.0":
-        (oc as LexicalModelCompiledFst).fst = Buffer.from(sources.join('')).toString('base64');
-        this.logError('Unimplemented model format '+modelSource.format);
-        return false;
-      case "trie-1.0":
-        func += `var model = {};\n`;
-        func += `model.backingData = ${createWordListDataStructure(sources)};\n`;
-        func += `LMLayerWorker.loadModel(new models.WordListModel(model.backingData`;
-        if (wordBreakingSource) {
-          func += `, {wordBreaking: ${wordBreakingSource}}`;
-        }
-        func += `));\n`;
-        break;
-      case 'trie-2.0':
-        func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(sources)
-        }, }`;
-        if (wordBreakingSource) {
-          func += `  wordBreaking: ${wordBreakingSource},`;
-        }
-        if (modelSource.searchTermToKey) {
-          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},`;
-        }
-        func += `}));\n`;
-        break;
-      default:
-        this.logError('Unknown model format '+modelSource.format);
-        return false;
-    }
-
-    //
-    // Load custom wordbreak source files
-    //
-
-
-    func += fileSuffix;
+    let func = this.generateLexicalModelCode(model_id, modelSource, sourcePath);
 
     // Save full model to build folder as Javascript for use in KeymanWeb
 
@@ -233,6 +161,91 @@ export default class LexicalModelCompiler {
 
     fs.writeFileSync(modelInfoFileName, JSON.stringify(model_info, null, 2));
   };
+
+  /**
+   * Returns the generated code for the model that will ultimately be loaded by
+   * the LMLayer worker. This code contains all model parameters, and specifies
+   * word breakers and auxilary functions that may be required.
+   * 
+   * @param model_id      The model ID. TODO: not sure if this is actually required!
+   * @param modelSource   A specification of the model to compile
+   * @param sourcePath    Where to find auxilary sources files
+   */
+  generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string) {
+    let oc: LexicalModelCompiled = {id: model_id, format: modelSource.format};
+
+    let sources: string[] = modelSource.sources.map(function(source) {
+      return fs.readFileSync(path.join(sourcePath, source), 'utf8');
+    });
+
+    // TODO: add metadata in comment
+    const filePrefix: string = `(function() {\n'use strict';\n`;
+    const fileSuffix: string = `})();`;
+    let func = filePrefix;
+
+    let wordBreakingSource: string = null;
+
+    // Figure out what word breaker the model is using, if any.
+    if (modelSource.wordBreaking) {
+      if (typeof modelSource.wordBreaking === "string") {
+        // It must be a builtin word breaker, so just instantiate it.
+        wordBreakingSource = `wordBreakers['${modelSource.wordBreaking}']`;
+      } else if (modelSource.wordBreaking.sources) {
+        let wordBreakingSources: string[] = modelSource.wordBreaking.sources.map(function(source) {
+          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
+        });
+
+        wordBreakingSource = this.transpileSources(wordBreakingSources).join('\n');
+      }
+    }
+
+    //
+    // Emit the model as code and data
+    //
+
+    switch(modelSource.format) {
+      case "custom-1.0":
+        func += this.transpileSources(sources).join('\n');
+        func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
+        break;
+      case "fst-foma-1.0":
+        (oc as LexicalModelCompiledFst).fst = Buffer.from(sources.join('')).toString('base64');
+        this.logError('Unimplemented model format '+modelSource.format);
+        return false;
+      case "trie-1.0":
+        func += `var model = {};\n`;
+        func += `model.backingData = ${createWordListDataStructure(sources)};\n`;
+        func += `LMLayerWorker.loadModel(new models.WordListModel(model.backingData`;
+        if (wordBreakingSource) {
+          func += `, {wordBreaking: ${wordBreakingSource}}`;
+        }
+        func += `));\n`;
+        break;
+      case 'trie-2.0':
+        func += `LMLayerWorker.loadModel(new models.TrieModel(${
+          createTrieDataStructure(sources)
+        }, }`;
+        if (wordBreakingSource) {
+          func += `  wordBreaking: ${wordBreakingSource},`;
+        }
+        if (modelSource.searchTermToKey) {
+          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},`;
+        }
+        func += `}));\n`;
+        break;
+      default:
+        this.logError('Unknown model format '+modelSource.format);
+        return false;
+    }
+
+    //
+    // TODO: Load custom wordbreak source files
+    //
+
+    func += fileSuffix;
+
+    return func;
+  }
 
   transpileSources(sources: Array<string>): Array<string> {
     return sources.map((source) => ts.transpileModule(source, {
