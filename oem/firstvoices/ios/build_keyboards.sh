@@ -67,6 +67,8 @@ if [ $DO_CLEAN = true ]; then
   rm -f $TARGET/keyboards.csv
 fi
 
+mkdir -p $TARGET/files
+
 # Build keyboards and copy into ios/FirstVoices/Keyboards/files
 
 if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
