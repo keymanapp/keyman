@@ -470,5 +470,4 @@ public final class ModelPickerActivity extends AppCompatActivity {
       }
     }
   }
-
 }

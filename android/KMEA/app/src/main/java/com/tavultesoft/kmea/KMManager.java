@@ -1171,16 +1171,6 @@ public final class KMManager {
     return KeyboardPickerActivity.getCurrentKeyboardInfo(context);
   }
 
-  /*
-  public static int getCurrentLexicalModelIndex(Context context) {
-    return KeyboardPickerActivity.getCurrentLexicalModelIndex(context);
-  }
-
-  public static HashMap<String, String> getCurrentLexicalModelInfo(Context context) {
-    return KeyboardPickerActivity.getCurrentLexicalModelInfo(context);
-  }
-  */
-
   public static int getKeyboardIndex(Context context, String keyboardID, String languageID) {
     int index = -1;
 

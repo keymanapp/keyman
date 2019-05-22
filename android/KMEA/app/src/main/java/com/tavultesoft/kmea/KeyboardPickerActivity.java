@@ -324,24 +324,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return pos;
   }
 
-  /* delete?
-  private static int getCurrentLexicalModelIndex() {
-    int pos = 0;
-
-    if (lexicalModelsList != null) {
-      int length = lexicalModelsList.size();
-      for(int i=0; i < length; i++) {
-        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-        String pkgID = lmInfo.get(KMManager.KMKey_PackageID);
-        String langID = lmInfo.get(KMManager.KMKey_LanguageID);
-        String modelID = lmInfo.get(KMManager.KMKey_LexicalModelID);
-        String lmKey = String.format("%s_%s_%s", pkgID, langID, modelID);
-        if (lmKey.equalsIgnoreCase(KMManager.current))
-      }
-    }
-  }
-  */
-
   protected static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
       String customKeyboard = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");

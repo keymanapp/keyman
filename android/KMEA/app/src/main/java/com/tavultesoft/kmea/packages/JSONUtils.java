@@ -196,7 +196,6 @@ public class JSONUtils {
 
   /**
    * Iterate through each model folder and parse kmp.json
-   * Will need to swap kmp.json (keyboards : languages) to cloud order (languages : keyboards)
    */
   public static JSONArray getLexicalModels() {
     File[] packages = new File(KMManager.getLexicalModelsDir()).listFiles();
@@ -255,7 +254,6 @@ public class JSONUtils {
 
                 // TODO: maybe add source, filesize
 
-
                 lexicalModelsArray.put(modelObj);
 
                 int index = findID(lexicalModelsArray, modelID);
@@ -270,12 +268,6 @@ public class JSONUtils {
                   tempModelObj.put("models", tempModelArray);
 
                   lexicalModelsArray.put(tempModelObj);
-                } else {
-                  /* Do nothing?
-                  JSONObject tempLanguageObj = lexicalModelsArray.getJSONObject(index);
-                  JSONArray tempModelArray = tempLanguageObj.getJSONArray("models");
-                  tempModelArray.put(modelObj);
-                  */
                 }
               }
             }
