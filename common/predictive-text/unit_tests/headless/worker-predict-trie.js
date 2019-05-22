@@ -122,7 +122,7 @@ describe('LMLayerWorker trie model for word lists', function() {
   });
 
   describe('Using an alternate key function', function () {
-    it.only('can use an alternate key function', function () {
+    it('can use an alternate key function', function () {
       var model = new TrieModel(jsonFixture('tries/english-1000'), {
         // This test is a bit silly. We can only search strings that
         // begin with a sequence of "a"s.
