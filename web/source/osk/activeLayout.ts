@@ -1,4 +1,7 @@
 namespace com.keyman.osk {
+  // make type for key distribution
+  export type KeyDistribution = {keyId: string, p: number}[];
+
   export class ActiveKey implements LayoutKey {
 
     // Defines key defaults
@@ -245,7 +248,7 @@ namespace com.keyman.osk {
      * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
      *                           For a 400 x 200 keyboard, should be 2.
      */
-    getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {keyId: string, p: number}[] {
+    getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): KeyDistribution {
       let distribution = this.simpleTouchDistribution(touchCoords, kbdScaleRatio);
       let list: {keyId: string, p: number}[] = [];
 

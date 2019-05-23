@@ -534,6 +534,7 @@ namespace com.keyman.osk {
     ddOSK: boolean = false;
     popupVisible: boolean;
     keyPending: KeyElement;
+    touchPending: Touch;
     deleteKey: KeyElement;
     deleting: number; // Tracks a timer id for repeated deletions.
     nextLayer: string;
@@ -849,7 +850,7 @@ namespace com.keyman.osk {
       return offsetCoords;
     }
 
-    getTouchProbabilities(touch: Touch): {keyId: string, p: number}[] {
+    getTouchProbabilities(touch: Touch): KeyDistribution {
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
       return this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
@@ -903,6 +904,7 @@ namespace com.keyman.osk {
           Processor.clickKey(key);
         }.bind(this),0);
         this.keyPending = null;
+        this.touchPending = null;
 
         // Also backspace, to allow delete to repeat while key held
       } else if(keyName == 'K_BKSP') {
@@ -913,12 +915,13 @@ namespace com.keyman.osk {
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
+        this.touchPending = null;
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
 
           // e.touches[0] because it's the pending touch, rather than the new one.
-          let touchProbabilities = this.getTouchProbabilities(e.touches[0]); // TODO: Send fat-finger info
+          let touchProbabilities = this.getTouchProbabilities(this.touchPending); // TODO: Send fat-finger info
           Processor.clickKey(this.keyPending);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
@@ -929,6 +932,7 @@ namespace com.keyman.osk {
           this.touchHold(key);
         }
         this.keyPending = key;
+        this.touchPending = e.changedTouches[0];
       }
     }.bind(this);
 
@@ -955,6 +959,7 @@ namespace com.keyman.osk {
           this.highlightKey(this.keyPending,false);
           this.clearPopup();
           this.keyPending = null;
+          this.touchPending = null;
         }
       }
 
@@ -985,6 +990,7 @@ namespace com.keyman.osk {
         }
         this.clearPopup();
         this.keyPending = null;
+        this.touchPending = null;
         // Always clear highlighting of current target on release (multi-touch)
       } else {
         var tt = e.changedTouches[0];
@@ -1031,7 +1037,7 @@ namespace com.keyman.osk {
           y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
 
       // Move target key and highlighting
-      var t = e.changedTouches[0],
+      var t = this.touchPending = e.changedTouches[0],
           t1 = <HTMLElement> document.elementFromPoint(x,y),
           key0 = this.keyPending,
           key1 = this.keyTarget(t1); // Not only gets base keys, but also gets popup keys!
@@ -1057,17 +1063,20 @@ namespace com.keyman.osk {
             this.highlightKey(key0,false);
           }
           this.keyPending=null;
+          this.touchPending=null;
         } else {
           if(key1 == this.popupBaseKey) {
             if(!util.hasClass(key1,'kmw-key-touched')) {
               this.highlightKey(key1,true);
             }
             this.keyPending = key1;
+            this.touchPending = e.touches[0];
           } else {
             if(key0) {
               this.highlightKey(key0,false);
             }
             this.keyPending = null;
+            this.touchPending = null;
           }
         }
         return;
@@ -1113,6 +1122,7 @@ namespace com.keyman.osk {
           this.highlightKey(key0,false);
           this.showKeyTip(null,false);
           this.keyPending = null;
+          this.touchPending = null;
         }
       }
 
@@ -1120,6 +1130,7 @@ namespace com.keyman.osk {
       // Do not replace a null target, as that indicates the key has already been released
       if(key1 && this.keyPending) {
         this.keyPending = key1;
+        this.touchPending = e.touches[0];
       }
 
       if(this.keyPending) {
