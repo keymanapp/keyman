@@ -84,7 +84,7 @@ while [[ $# -gt 0 ]] ; do
         -clean)
             do_clean
             KMEI_FLAGS="$KMEI_FLAGS -clean"
-            FORCE_KMEI_BUILD=true
+            # FORCE_KMEI_BUILD=true
             ;;
         -debug)
             CONFIG=Debug

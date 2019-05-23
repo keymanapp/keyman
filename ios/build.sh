@@ -8,6 +8,6 @@ set -e
 
 if [ ! -z "$RELEASE_OEM" ]; then
   pushd ../oem/firstvoices/ios > /dev/null
-  ./build.sh $*
+  ./build.sh -lib-nobuild $*
   popd > /dev/null
 fi
