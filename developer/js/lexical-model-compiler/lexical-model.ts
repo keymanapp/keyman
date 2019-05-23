@@ -25,7 +25,7 @@ interface LexicalModelSource extends LexicalModel {
    * The name of the type to instantiate (without parameters) as the base object for a custom predictive model.
    */
   readonly rootClass?: string
-  readonly wordBreaking?: 'ascii' | 'placeholder' | ClassBasedWordBreaker;
+  readonly wordBreaking?: 'default' | 'ascii' | 'placeholder' | ClassBasedWordBreaker;
 }
 
 interface LexicalModelCompiled extends LexicalModel {
