@@ -160,6 +160,7 @@ public final class KMManager {
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keyman.js";
+  protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
@@ -390,6 +391,9 @@ public final class KMManager {
       // Copy main files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
+      if(KMManager.isDebugMode()) {
+        copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
+      }
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
@@ -1473,6 +1477,9 @@ public final class KMManager {
 
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
+
+        InAppKeyboard.suggestionWindowPos = new double[]{x, y};
+        InAppKeyboard.suggestionJSON = suggestionJSON;
 
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));

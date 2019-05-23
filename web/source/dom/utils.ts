@@ -24,6 +24,12 @@ namespace com.keyman.dom {
           Lobj = Lobj.offsetParent as HTMLElement;
           Lcurleft += Lobj.offsetLeft;
         }
+
+        // On mobile devices, the OSK uses 'fixed' - this requires some extra offset work to handle.
+        if(Lobj.style.position == 'fixed') {
+          let Ldoc = Lobj.ownerDocument;
+          Lcurleft += Ldoc.scrollingElement.scrollLeft;
+        }
       }
       // Correct position if element is within a frame (but not if the controller is in document within that frame)
       // We used to reference a KMW state variable `this.keyman._MasterDocument`, but it was only ever set to `window.document`.
@@ -57,6 +63,12 @@ namespace com.keyman.dom {
         while (Lobj.offsetParent) {
           Lobj = Lobj.offsetParent as HTMLElement;
           Lcurtop += Lobj.offsetTop;
+        }
+
+        // On mobile devices, the OSK uses 'fixed' - this requires some extra offset work to handle.
+        if(Lobj.style.position == 'fixed') {
+          let Ldoc = Lobj.ownerDocument;
+          Lcurtop += Ldoc.scrollingElement.scrollTop;
         }
       }
 

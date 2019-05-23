@@ -43,7 +43,10 @@
      * How to break words in a phrase.
      */
     wordBreaker?: WordBreakingFunction;
-    // TODO: add support for custom Wordform2Key function.
+    /**
+     *  This should simplify a search term into a key.
+     */
+    searchTermToKey?: (searchTerm: string) => string;
   }
 
   /**
@@ -61,7 +64,9 @@
     readonly breakWords: WordBreakingFunction;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
-      this._trie = new Trie(trieData as Node);
+      this._trie = new Trie(trieData as Node,
+        options.searchTermToKey as Wordform2Key || defaultSearchKey
+      );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
     }
 
@@ -203,7 +208,7 @@
      */
     toKey: Wordform2Key;
 
-    constructor(root: Node, wordform2key: Wordform2Key = defaultSearchKey) {
+    constructor(root: Node, wordform2key: Wordform2Key) {
       this.root = root;
       this.toKey = wordform2key;
     }
