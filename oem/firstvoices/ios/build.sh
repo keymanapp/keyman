@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 ./build_keyboards.sh -copy-keyboards
 
 TARGET=FirstVoices
