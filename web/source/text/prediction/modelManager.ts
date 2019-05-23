@@ -111,6 +111,12 @@ namespace com.keyman.text.prediction {
         // Since the apps don't yet support right-deletions.
         maxRightContextCodeUnits: keyman.isEmbedded ? 0 : 64
       }
+
+      this.enabled = true; // Use the property's set method to filter out cases that are perma-disabled.
+      if(!this.enabled) {
+        return;
+      }
+
       this.lmEngine = new LMLayer(capabilities);
       
       // Registers this module for keyboard (language) and model change events.
@@ -358,6 +364,17 @@ namespace com.keyman.text.prediction {
 
     public set enabled(flag: boolean) {
       let keyman = com.keyman.singleton;
+
+      if(keyman.util.getIEVersion() == 10) {
+        this._enabled = false;
+        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.")
+        return;
+      } else if(keyman.util.getIEVersion() < 10) {
+        this._enabled = false;
+        console.warn("WebWorkers are not supported in this version of IE.");
+        return;
+      }
+
       this._enabled = flag;
 
       if(flag) {
