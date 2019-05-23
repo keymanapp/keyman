@@ -21,9 +21,17 @@ open class SettingsViewController: UITableViewController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     
+    title = "Keyman Settings"
+    let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+                                     action: #selector(self.doneClicked))
+    navigationItem.leftBarButtonItem = doneButton
+
     navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
                                                           blue: 0.25, alpha: 0.9)
-
+  }
+  
+  @objc func doneClicked(_ sender: Any) {
+    Manager.shared.dismissKeyboardPicker(self)
   }
   
   open func launchSettings(launchingVC: UIViewController, sender: Any?) -> Void {
@@ -207,6 +215,29 @@ open class SettingsViewController: UITableViewController {
     userLanguages = ["en"]
     
     itemsArray[0]["subtitle"] = String(userLanguages.count)
+  }
+  
+  public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {
+    let doneOrCancel = value
+    if doneOrCancel {
+      let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+                                       action: nil /* #selector(self.doneClicked) */ )
+      nc.navigationItem.leftBarButtonItem = doneButton
+    } else {
+      let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self,
+                                         action: nil /* #selector(self.cancelClicked) */ )
+      nc.navigationItem.leftBarButtonItem = cancelButton
+    }
+  }
+
+  func showLanguages() {
+    let vc = InstalledLanguagesViewController(Manager.shared.apiKeyboardRepository)
+    if let nc = navigationController {
+      nc.pushViewController(vc, animated: true)
+      setIsDoneButtonEnabled(nc, true)
+    } else {
+      log.error("no navigation controller for showing languages???")
+    }
   }
   
 }

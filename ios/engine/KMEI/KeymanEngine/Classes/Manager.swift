@@ -214,46 +214,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - Keyboard management
-
-  public func manageKeymanEngine(inVC: UIViewController) -> Void {
-    
-//    for b in Bundle.allBundles {
-//      do {
-//        let sb = try UIStoryboard(name: "Settings", bundle: nil)
-//        if let vc = sb.instantiateInitialViewController() {
-//          inVC.present(vc, animated: true, completion: {
-//            log.info("presented settings")
-//          })
-//        }
-//      } catch {
-//        log.info("bundle \(b) does not contain Settings.storyboard")
-//      }
-//    }
-
+  
+  public func showKeymanEngineSettings(inVC: UIViewController) -> Void {
+    hideKeyboard()
     let settingsVC = SettingsViewController()
-//    let languagesVC = UIAlertController.init(title: "Languages Settings", message: "Languages with Keyboards should be shown here", preferredStyle: .actionSheet)
-//    navigationController?.pushViewController(languagesVC, animated: true)
-
-//    textView.isUserInteractionEnabled = false
-//    if UIDevice.current.userInterfaceIdiom == .phone {
-//      present(languagesVC, animated: true, completion: nil)
-//    } else {
-    
-//    let alertController = UIAlertController(title: "Settings", message: "Keyman Engine settings",
-//                                            preferredStyle: UIAlertControllerStyle.alert)
-//    alertController.addAction(UIAlertAction(title: "Cancel",
-//                                            style: UIAlertActionStyle.cancel,
-//                                            handler: nil))
-//    alertController.addAction(UIAlertAction(title: "OK",
-//                                            style: UIAlertActionStyle.default,
-//                                            handler: nil))
-//    
-    inVC.present(settingsVC, animated: true, completion: nil)
-
-//      let popover = UIPopoverController(contentViewController: languagesVC)
-//      popover!.present(from CGRect(inView.frame), in inView, permittedArrowDirections arrowDirections: UIPopoverArrowDirectionAny, animated: true)
-//    (from: (navigationItem.rightBarButtonItems?[8])!, permittedArrowDirections: .any, animated: true)
-//    }
+    let nc = UINavigationController(rootViewController: settingsVC)
+    nc.modalTransitionStyle = .coverVertical
+    nc.modalPresentationStyle = .pageSheet
+    inVC.present(nc, animated: true)
   }
 
   /// Sets the current keyboard, querying from the user's list of keyboards.
