@@ -101,9 +101,12 @@
       return this._trie.lookup(prefix).map(word => {
         return {
           transform: {
-            // The left part of the word has already been entered.
-            insert: word.substr(leftContext.length) + ' ',
-            deleteLeft: 0,
+            // Insert the suggestion from the Trie, verbatim
+            insert: word + ' ',
+            // Delete whatever the prefix that the user wrote.
+            // Note: a separate capitalization/orthography engine can take this
+            // result and transform it as needed.
+            deleteLeft: leftContext.length,
           },
           displayAs: word,
         }
