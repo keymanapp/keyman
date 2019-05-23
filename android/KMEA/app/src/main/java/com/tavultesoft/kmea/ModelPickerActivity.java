@@ -75,7 +75,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
     return models;
   }
 
-  private String languageID = null;
+  private String languageID = "";
 
   private static HashMap<String, HashMap<String, String>> lexicalModelsInfo = null;
   private static HashMap<String, String> lexicalModelModifiedDates = null;
@@ -101,16 +101,20 @@ public final class ModelPickerActivity extends AppCompatActivity {
     TextView textView = (TextView) findViewById(R.id.bar_title);
 
     Bundle bundle = getIntent().getExtras();
-    this.languageID = bundle.getString(KMManager.KMKey_LanguageID);
+    String newLanguageID = bundle.getString(KMManager.KMKey_LanguageID);
+
+    // Sometimes we need to re-initialize the list of models that are displayed in the ListView
+    if (!languageID.equalsIgnoreCase(newLanguageID) ||
+        lexicalModelsArrayList == null) {
+      lexicalModelsArrayList = new ArrayList<HashMap<String, String>>();
+    }
+    languageID = newLanguageID;
+
     final String languageName = bundle.getString(KMManager.KMKey_LanguageName);
     textView.setText(String.format("%s model", languageName));
 
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
-
-    if (lexicalModelsArrayList == null) {
-      lexicalModelsArrayList = new ArrayList<HashMap<String, String>>();
-    }
   }
 
   @Override
@@ -347,15 +351,22 @@ public final class ModelPickerActivity extends AppCompatActivity {
           return;
         }
 
-        // Parse the model JSON Object from the api.keyman.com query
-        // We know the package ID is from "cloud" and the language ID is only 1 language from the query
+        // Parse the model JSON Object from the merged list of api.keyman.com query and available kmp's.
+        // Known assumption:
+        // 2. query is built on a single language ID so the "languages" array will only have one language
         int modelsLength = models.length();
         for (int i = 0; i < modelsLength; i++) {
           JSONObject model = models.getJSONObject(i);
+          String packageID = "", modelURL = "";
+          if (model.has(KMManager.KMKey_PackageID)) {
+            packageID = model.getString(KMManager.KMKey_PackageID);
+          } else {
+            // Determine package ID from packageFilename
+            modelURL = model.optString("packageFilename", "");
+            packageID = FileUtils.getFilename(modelURL);
+            packageID = packageID.replace(".model.kmp", "");
+          }
 
-          String packageID = model.optString(KMManager.KMKey_PackageID, "cloud");
-
-          // Do we assume the first ID in the languages array?
           // api.keyman.com query returns an array of language IDs Strings while
           // kmp.json "languages" is an array of JSONObject
           String languageID = "", langName = "";
@@ -373,7 +384,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
           String modelID = model.getString("id");
           String modelName = model.getString("name");
           String modelVersion = model.getString("version");
-          String modelURL = model.optString("packageFilename", "");
+
           String isCustom = model.optString("CustomModel", "N");
           String icon = "0";
 
@@ -418,6 +429,9 @@ public final class ModelPickerActivity extends AppCompatActivity {
             String modelName = modelInfo.get(KMManager.KMKey_LexicalModelName);
             String langName = modelInfo.get(KMManager.KMKey_LanguageName);
 
+            // File check to see if lexical model already exists locally
+            File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
+
             // Using the presence of the left icon "check" to determine if the model is installed
             boolean modelInstalled = modelInfo.containsKey("leftIcon");
             if (modelInstalled) {
@@ -444,6 +458,12 @@ public final class ModelPickerActivity extends AppCompatActivity {
               Intent i = new Intent(context, ModelInfoActivity.class);
               i.putExtras(bundle);
               startActivityForResult(i, 1);
+            } else if (modelCheck.exists()) {
+              // Handle scenario where previously installed kmp already exists so
+              // we only need to add the model to the list of installed models
+              // Add help link
+              modelInfo.put(KMManager.KMKey_CustomHelpLink, "");
+              KMManager.addLexicalModel(context, modelInfo);
             } else {
               // Model isn't installed so prompt to download it
               Bundle args = new Bundle();

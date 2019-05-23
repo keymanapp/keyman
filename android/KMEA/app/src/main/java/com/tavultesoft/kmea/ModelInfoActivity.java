@@ -44,6 +44,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
   private final String titleKey = "title";
   private final String subtitleKey = "subtitle";
   private final String iconKey = "icon";
+  private final String isEnabledKey = "isEnabled";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String customModel = getIntent().getStringExtra(KMManager.KMKey_CustomModel);
 
     infoList = new ArrayList<HashMap<String, String>>();
+    // Display model title
     final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.model_version));
@@ -81,16 +83,17 @@ public final class ModelInfoActivity extends AppCompatActivity {
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
+    // Display model help link (currently disabled)
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-    if (!customModel.equalsIgnoreCase("Y") || customHelpLink != null) {
-      String icon = String.valueOf(R.drawable.ic_arrow_forward);
-      hashMap = new HashMap<String, String>();
-      hashMap.put(titleKey, getString(R.string.help_link));
-      hashMap.put(subtitleKey, "");
-      hashMap.put(iconKey, icon);
-      infoList.add(hashMap);
-    }
+    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    hashMap = new HashMap<String, String>();
+    hashMap.put(titleKey, getString(R.string.help_link));
+    hashMap.put(subtitleKey, "");
+    hashMap.put(iconKey, icon);
+    hashMap.put(isEnabledKey, "false");
+    infoList.add(hashMap);
 
+    // Display link to uninstall model
     hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.uninstall_model));
     hashMap.put(subtitleKey, "");
