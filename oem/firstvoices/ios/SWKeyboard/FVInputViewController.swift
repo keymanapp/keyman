@@ -1,24 +1,26 @@
 //
 //  FVInputViewController.swift
-//  SWKeyboard
+//  FirstVoices app
 //
-//  Created by Marc Durdin on 14/5/19.
-//  Copyright © 2019 FirstVoices. All rights reserved.
+//  License: MIT
+//
+//  Copyright © 2019 FirstVoices.
+//
+//  Created by Marc Durdin on 14/05/2019.
 //
 
-//import Foundation
 import KeymanEngine
 import UIKit
 
 @objc(FVInputViewController)
 class FVInputViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    //#if DEBUG
+    #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()
-    //#else
-    //  KeymanEngine.log.outputLevel = .warning
-    //#endif
+    #else
+      KeymanEngine.log.outputLevel = .warning
+    #endif
 
     Manager.applicationGroupIdentifier = FVConstants.groupID
 

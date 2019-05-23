@@ -1,13 +1,15 @@
 //
 //  Checkbox.swift
-//  FirstVoices
+//  FirstVoices app
+//
+//  License: MIT
+//
+//  Copyright © 2019 FirstVoices.
 //
 //  Reimplementation of checkbox.m, created by Apple.
 //
-//  Created by Marc Durdin on 15/5/19.
-//  Copyright © 2019 FirstVoices. All rights reserved.
+//  Created by Marc Durdin on 15/05/2019.
 //
-
 
 import Foundation
 import UIKit

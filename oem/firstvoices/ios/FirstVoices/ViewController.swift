@@ -1,11 +1,15 @@
 //
 //  ViewController.swift
-//  FirstVoices
+//  FirstVoices app
+//
+//  License: MIT
+//
+//  Copyright © 2019 FirstVoices.
 //
 //  Created by Serkan Kurt on 17/11/2015.
-//  Converted by Marc Durdin on 15/5/19.
-//  Copyright © 2015-2019 FirstVoices. All rights reserved.
+//  Converted and rewritten by Marc Durdin on 15/05/2019.
 //
+
 import UIKit
 import KeymanEngine
 

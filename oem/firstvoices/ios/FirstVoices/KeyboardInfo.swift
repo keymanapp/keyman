@@ -1,13 +1,22 @@
 //
 //  KeyboardInfo.swift
-//  FirstVoices
+//  FirstVoices app
 //
-//  Created by Marc Durdin on 20/5/19.
-//  Copyright © 2019 FirstVoices. All rights reserved.
+//  License: MIT
+//
+//  Copyright © 2019 FirstVoices.
+//
+//  Created by Marc Durdin on 21/05/2019.
 //
 
 import Foundation
 
+//
+// The KeyboardInfoParser pulls out specific pieces of information from
+// the .keyboard_info file for each keyboard that we need in order to
+// display and install the keyboard into Keyman Engine. Most of the data
+// in the files is ignored.
+//
 struct KeyboardInfoLanguage: Decodable {
   let displayName: String
   let languageName: String

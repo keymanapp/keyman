@@ -1,13 +1,16 @@
 //
 //  AppDelegate.swift
-//  FirstVoices
+//  FirstVoices app
+//
+//  License: MIT
+//
+//  Copyright © 2019 FirstVoices.
 //
 //  Created by Serkan Kurt on 17/11/2015.
-//  Converted by Marc Durdin on 15/5/19.
-//  Copyright © 2019 FirstVoices. All rights reserved.
+//  Converted by Marc Durdin on 15/05/2019.
 //
+
 import KeymanEngine
-//import FVShared
 import UIKit
 
 @UIApplicationMain
@@ -19,12 +22,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     FVRegionStorage.upgrade()
 
-    //#if DEBUG
+    #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()
-    //#else
-    //  KeymanEngine.log.outputLevel = .warning
-    //#endif
+    #else
+      KeymanEngine.log.outputLevel = .warning
+    #endif
 
     // Replace with your application group id
     Manager.applicationGroupIdentifier = FVConstants.groupID
