@@ -135,7 +135,8 @@ export default class LexicalModelCompiler {
     // arrays for each of the lexical models in the kmp.json file,
     // and merge into a single array of identifiers in the 
     // .model_info file.
-    model_info.languages = model_info.languages || [].concat(kmpJsonData.lexicalModels.map((e) => e.languages.map((f) => f.id)));
+
+    model_info.languages = model_info.languages || kmpJsonData.lexicalModels.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
 
     set_model_metadata('lastModifiedDate', (new Date).toISOString());
     set_model_metadata('packageFilename', kmpFileName);
