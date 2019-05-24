@@ -1,6 +1,5 @@
 namespace com.keyman.osk {
-  // make type for key distribution
-  export type KeyDistribution = {keyId: string, p: number}[];
+  type KeyDistribution = text.KeyDistribution;
 
   export class ActiveKey implements LayoutKey {
 

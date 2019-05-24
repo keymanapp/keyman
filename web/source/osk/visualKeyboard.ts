@@ -1,4 +1,4 @@
-///<reference path="activeLayout.ts" />
+/// <reference path="activeLayout.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -850,7 +850,7 @@ namespace com.keyman.osk {
       return offsetCoords;
     }
 
-    getTouchProbabilities(touch: Touch): KeyDistribution {
+    getTouchProbabilities(touch: Touch): text.KeyDistribution {
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
       return this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
@@ -911,7 +911,7 @@ namespace com.keyman.osk {
         let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]); // TODO: Send fat-finger info
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        Processor.clickKey(key);
+        Processor.clickKey(key, e.changedTouches[0], touchProbabilities);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -919,10 +919,8 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-
-          // e.touches[0] because it's the pending touch, rather than the new one.
           let touchProbabilities = this.getTouchProbabilities(this.touchPending); // TODO: Send fat-finger info
-          Processor.clickKey(this.keyPending);
+          Processor.clickKey(this.keyPending, this.touchPending, touchProbabilities);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -986,7 +984,7 @@ namespace com.keyman.osk {
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
           let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]); // TODO: Send fat-finger info
-          Processor.clickKey(this.keyPending);
+          Processor.clickKey(this.keyPending, e.changedTouches[0], touchProbabilities);
         }
         this.clearPopup();
         this.keyPending = null;

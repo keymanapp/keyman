@@ -220,7 +220,6 @@ namespace com.keyman.text {
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
       // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
       var layer=e['key'].spec.layer || e['key'].layer || '', keyName=e['keyId'].toUpperCase();
-      var keyShiftState = this.getModifierState(keyman['osk'].vkbd.layerId);
 
       keyman.domManager.initActiveElement(Lelem);
 
@@ -236,7 +235,7 @@ namespace com.keyman.text {
       // Start:  mirrors _GetKeyEventProperties
 
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
+      var keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: KeyEvent = {
@@ -483,12 +482,16 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    clickKey(e: osk.KeyElement) {
+    clickKey(e: osk.KeyElement, touch?: Touch, keyDistribution?: KeyDistribution) {
       let keyman = com.keyman.singleton;
       var Lelem = keyman.domManager.getLastActiveElement();
 
       if(Lelem != null) {
         let Lkc = this._GetClickEventProperties(e, Lelem);
+        if(keyman.modelManager.enabled) {
+          Lkc.source = touch;
+          Lkc.keyDistribution = keyDistribution;
+        }
         return this.processKeyEvent(Lkc, e);
       } else {
         return true;
