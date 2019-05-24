@@ -10,7 +10,7 @@ import UIKit
 
 open class SettingsViewController: UITableViewController {
   private var itemsArray = [[String: String]]()
-  private var userLanguages: [String] = [String]()
+  private var userLanguages: [String: Language] = [:]
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
@@ -164,6 +164,25 @@ open class SettingsViewController: UITableViewController {
 //
 //    return cell
   }
+  
+  // In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
+  override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.cellForRow(at: indexPath)?.isSelected = false
+    performAction(for: indexPath)
+  }
+  
+  override open func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+    performAction(for: indexPath)
+  }
+  
+  private func performAction(for indexPath: IndexPath) {
+    switch indexPath.section {
+    case 0:
+      showLanguages()
+    default:
+      break
+    }
+  }
 
     /*
     // Override to support conditional editing of the table view.
@@ -212,8 +231,28 @@ open class SettingsViewController: UITableViewController {
   // MARK: - language access -
   private func loadUserLanguages() {
     //iterate the list of installed languages and save their names
-    userLanguages = ["en"]
-    
+    // Get keyboards list if it exists in user defaults, otherwise create a new one
+    let userDefaults = Storage.active.userDefaults
+    let userKeyboards = userDefaults.userKeyboards ?? []
+
+    var keyboardLanguages = [String: Language]()
+    for k in userKeyboards {
+      let l = k.languageID
+      keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: [Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil)], lexicalModels: nil, font: nil, oskFont: nil)
+    }
+    // there shouldn't be any lexical models for languages that don't have a keyboard installed
+    //  but check
+    let userLexicalModels = userDefaults.userLexicalModels ?? []
+    for lm in userLexicalModels {
+      let l = lm.languageID
+      if let langName = keyboardLanguages[l]?.name {
+        log.info("keyboard language \(l) \(langName) has lexical model")
+      } else {
+        log.error("lexical model language \(l) has no keyboard installed!")
+      }
+    }
+
+    userLanguages = keyboardLanguages
     itemsArray[0]["subtitle"] = String(userLanguages.count)
   }
   
@@ -231,7 +270,7 @@ open class SettingsViewController: UITableViewController {
   }
 
   func showLanguages() {
-    let vc = InstalledLanguagesViewController(Manager.shared.apiKeyboardRepository)
+    let vc = InstalledLanguagesViewController(userLanguages)
     if let nc = navigationController {
       nc.pushViewController(vc, animated: true)
       setIsDoneButtonEnabled(nc, true)

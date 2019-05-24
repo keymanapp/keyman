@@ -22,24 +22,19 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private var selectedSection = 0
   private var isUpdate = false
   private var languages: [Language] = []
+  private var installedLanguages: [String: Language]
   private let keyboardRepository: KeyboardRepository?
   private let lexicalModelRepository: LexicalModelRepository?
   
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
   
-  init(_ keyboardRepository: KeyboardRepository) {
-    self.keyboardRepository = keyboardRepository
+  init(_ givenLanguages: [String: Language]) {
+    self.installedLanguages = givenLanguages
+    self.keyboardRepository = nil
     self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
-    keyboardRepository.delegate = self
-  }
-  
-  init(_ lexicalModelRepository: LexicalModelRepository) {
-    self.lexicalModelRepository = lexicalModelRepository
-    self.keyboardRepository = nil
-    super.init(nibName: nil, bundle: nil)
-    lexicalModelRepository.delegate = self
+//    keyboardRepository.delegate = self
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -48,18 +43,13 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   
   override func loadView() {
     super.loadView()
-    if let languageDict = keyboardRepository?.languages {
-      languages = languageList(languageDict)
-    } else {
-      keyboardRepository?.fetch()
-    }
-    
+    languages = languageList(installedLanguages)
     loadUserKeyboards()
   }
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    title = "Add New Keyboard"
+    title = "Installed Languages"
     selectedSection = NSNotFound
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
