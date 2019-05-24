@@ -58,6 +58,7 @@ export default class LexicalModelCompiler {
     //
     // Filename expectations
     //
+
     const kpsFileName = `../source/${model_id}.model.kps`;
     const kmpFileName = `${model_id}.model.kmp`;
     const modelFileName = `${model_id}.model.js`;
@@ -65,10 +66,6 @@ export default class LexicalModelCompiler {
     const sourcePath = '../source';
 
     const minKeymanVersion = '12.0';
-
-    //
-    // Validate the model ID.
-    //
 
     //
     // This script is run from folder group/author/bcp47.uniq/build/ folder. We want to
@@ -92,19 +89,40 @@ export default class LexicalModelCompiler {
     //
     // Build the compiled lexical model
     //
+
     let func = this.generateLexicalModelCode(model_id, modelSource, sourcePath);
 
+    //
     // Save full model to build folder as Javascript for use in KeymanWeb
+    //
 
     fs.writeFileSync(modelFileName, func);
 
     //
-    // Create KMP file
+    // Load .kps file and validate; prepare to create KMP package file
     //
 
     let kpsString: string = fs.readFileSync(kpsFileName, 'utf8');
     let kmpCompiler = new KmpCompiler();
     let kmpJsonData = kmpCompiler.transformKpsToKmpObject(model_id, kpsString);
+
+    // Validate the model id from the folder name against the metadata
+    // in the .kps file. A package source file must contain at least one
+    // model, being the current model being compiled. Currently, the compiler
+    // supports only a single model in the .kmp, but conceptually in the future
+    // we could support multiple models. Given this, the code checks every
+    // listed model rather than just the first.
+
+    if(kmpJsonData.lexicalModels.find((e) => e.id === model_id) === undefined) {
+      let ids = kmpJsonData.lexicalModels.map((e) => e.id).join(', ');
+      this.logError(`Unable to find matching model ${model_id} in the file ${kpsFileName}; model id(s) found in the package are: ${ids}`);
+      return false;
+    }
+
+    //
+    // Build the KMP package file
+    //
+
     kmpCompiler.buildKmpFile(kmpJsonData, kmpFileName);
 
     //
@@ -122,9 +140,12 @@ export default class LexicalModelCompiler {
       model_info[field] = model_info[field] || expected;
     }
 
+    //
     // Merge model info file -- some fields have "special" behaviours -- see below
+    //
 
     set_model_metadata('id', model_id);
+
     set_model_metadata('name', kmpJsonData.info.name.description);
     set_model_metadata('authorName', kmpJsonData.info.author.description);
 
