@@ -41,10 +41,6 @@
   <string name="show_banner_on" translatable="false">Cannot be switched off when predictive text is enabled</string>
   <!-- reuse show_get_started -->
 
-  <!-- Language Settings menu strings -->
-  <string name="enable_corrections" translatable="false">Enable corrections</string>
-  <string name="enable_predictions" translatable="false">Enable predictions</string>
-  <string name="model" translatable="false">Model</string>
   <!-- Web Browser strings -->
   <string name="hint_text" translatable="false">Search or type URL</string>
   <string name="title_bookmarks" translatable="false">Bookmarks</string>

@@ -25,6 +25,7 @@ import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -104,6 +105,7 @@ public final class KMManager {
   protected static boolean SystemKeyboardShouldIgnoreSelectionChange = false;
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
+  protected static HashMap<String, String> currentLexicalModel = null;
   protected static String currentBanner = "blank";
 
   // Keyman public keys
@@ -156,6 +158,7 @@ public final class KMManager {
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keyman.js";
+  protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
@@ -386,6 +389,9 @@ public final class KMManager {
       // Copy main files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
+      if(KMManager.isDebugMode()) {
+        copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
+      }
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
@@ -668,6 +674,10 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
+  public static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
+    return KeyboardPickerActivity.getLexicalModelsList(context);
+  }
+
   public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
@@ -703,8 +713,59 @@ public final class KMManager {
     return true;
   }
 
+  public static boolean deregisterLexicalModel(String modelID) {
+    String url = String.format("javascript:deregisterModel('%s')", modelID);
+    if (InAppKeyboard != null && InAppKeyboardLoaded) {
+      InAppKeyboard.loadUrl(url);
+    }
+
+    if (SystemKeyboard != null && SystemKeyboardLoaded) {
+      SystemKeyboard.loadUrl(url);
+    }
+    return true;
+  }
+
   public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
+  }
+
+  /**
+   * registerAssociatedLexicalModel - Registers a lexical model with the associated language ID.
+   *         If a new model gets loaded, returns true.
+   * @param langId - String of the language ID
+   * @return boolean - True if a new model is loaded
+   */
+  public static boolean registerAssociatedLexicalModel(String langId) {
+    boolean status = false;
+    HashMap<String, String> lmInfo = getAssociatedLexicalModel(langId);
+    if (lmInfo != null && lmInfo != currentLexicalModel) {
+      registerLexicalModel(lmInfo);
+      status = true;
+    }
+    currentLexicalModel = lmInfo;
+
+    return status;
+  }
+
+  /**
+   * Search the installed lexical models list and see if there's an
+   * associated model for a given language ID
+   * @param langId - String of the language ID
+   * @return HashMap<String, String> Keyboard information if it exists. Otherwise null
+   */
+  public static HashMap<String, String> getAssociatedLexicalModel(String langId) {
+    ArrayList<HashMap<String, String>> lexicalModelsList = getLexicalModelsList(appContext);
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i = 0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
+          return lmInfo;
+        }
+      }
+    }
+
+    return null;
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -746,11 +807,13 @@ public final class KMManager {
     if (SystemKeyboard != null && SystemKeyboardLoaded)
       result2 = SystemKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
+    registerAssociatedLexicalModel(languageID);
+
     return (result1 || result2);
   }
 
   public static boolean setKeyboard(Context context, int position) {
-    HashMap<String, String> keyboardInfo = KeyboardPickerActivity.getKeyboardInfo(context, position);
+    HashMap<String, String> keyboardInfo = getKeyboardInfo(context, position);
     if (keyboardInfo == null)
       return false;
 
@@ -1211,6 +1274,7 @@ public final class KMManager {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      String langId = KMManager.KMKey_LanguageID;
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
 
@@ -1224,7 +1288,7 @@ public final class KMManager {
           if (keyboardInfo != null) {
             String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
             String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-            String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
+            langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
             String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
@@ -1234,6 +1298,8 @@ public final class KMManager {
             InAppKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
               KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
+
+         registerAssociatedLexicalModel(langId);
         }
 
         Handler handler = new Handler();
@@ -1371,6 +1437,36 @@ public final class KMManager {
         currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
+      } else if (url.indexOf("suggestPopup") >= 0) {
+        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+        // just the first intended '#' to get URI-based query param processing.
+
+        // At some point, other parts of the function should be redone to allow use of ? instead
+        // of # in our WebView command "queries" entirely.
+        String cmd = url.replace("keyboard.html#", "keyboard.html?");
+        Uri urlCommand = Uri.parse(cmd);
+
+        double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
+        double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
+        double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
+        double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
+        String suggestionJSON = urlCommand.getQueryParameter("suggestion");
+        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
+
+        JSONParser parser = new JSONParser();
+        JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
+
+        InAppKeyboard.suggestionWindowPos = new double[]{x, y};
+        InAppKeyboard.suggestionJSON = suggestionJSON;
+
+        try {
+          Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
+          Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
+        } catch (JSONException e) {
+          //e.printStackTrace();
+          Log.v("KMEA", "JSON parsing error: " + e.getMessage());
+        }
       }
       return false;
     }
@@ -1392,6 +1488,7 @@ public final class KMManager {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      String langId = KMManager.KMKey_LanguageID;
       if (url.endsWith(KMFilename_KeyboardHtml)) {
         SystemKeyboardLoaded = true;
         if (!SystemKeyboard.keyboardSet) {
@@ -1404,7 +1501,7 @@ public final class KMManager {
           if (keyboardInfo != null) {
             String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
             String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-            String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
+            langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
             String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
             String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
             String kFont = keyboardInfo.get(KMManager.KMKey_Font);
@@ -1415,6 +1512,8 @@ public final class KMManager {
               KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
         }
+
+        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -1547,7 +1646,35 @@ public final class KMManager {
         currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
+      } else if (url.indexOf("suggestPopup") >= 0) {
+        // URL has actual path to the keyboard.html file as a prefix!  We need to replace
+        // just the first intended '#' to get URI-based query param processing.
+
+        // At some point, other parts of the function should be redone to allow use of ? instead
+        // of # in our WebView command "queries" entirely.
+        String cmd = url.replace("keyboard.html#", "keyboard.html?");
+        Uri urlCommand = Uri.parse(cmd);
+
+        double x = Float.parseFloat(urlCommand.getQueryParameter("x"));
+        double y = Float.parseFloat(urlCommand.getQueryParameter("y"));
+        double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
+        double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
+        String suggestionJSON = urlCommand.getQueryParameter("suggestion");
+        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
+
+        JSONParser parser = new JSONParser();
+        JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
+
+        try {
+          Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
+          Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
+        } catch (JSONException e) {
+          //e.printStackTrace();
+          Log.v("KMEA", "JSON parsing error: " + e.getMessage());
+        }
       }
+
       return false;
     }
   }

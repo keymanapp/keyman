@@ -239,6 +239,10 @@ namespace com.keyman.osk {
 
       this.activeBanner = banner;
       this.bannerContainer.appendChild(banner.getDiv());
+
+      // Don't forget to adjust the OSK in case we're now using a blank Banner!
+      let keyman = com.keyman.singleton;
+      keyman['osk']._Show();
     }
 
     public get activeType(): BannerType {

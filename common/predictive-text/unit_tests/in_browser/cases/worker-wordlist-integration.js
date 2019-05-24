@@ -10,6 +10,11 @@ describe('LMLayer using the word list model', function () {
     it('will predict an empty buffer', function () {
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
+      // N.B.: This test can OCCASIONALLY Mocha's default 2
+      // seconds expected execution time, causing sporadic build
+      // failures. So just double the default timeout value! 🙃
+      this.timeout(4000);
+
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.

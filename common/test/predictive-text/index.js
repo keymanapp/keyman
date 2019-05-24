@@ -190,6 +190,8 @@ async function asyncRepl(modelFile) {
 
       // Ask for suggestions.
       suggestions = await askForPredictions();
+      // Since we chose a selection, it's best to UNSELECT the new suggestions
+      selectedSuggestionIndex = null;
       renderSuggestions();
 
     } else if (keypress.name === 'backspace') {

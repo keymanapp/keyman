@@ -43,8 +43,8 @@
 
     // Update the KMW banner height
     function setBannerHeight(h) {
+      var kmw=com.keyman.singleton;
       if (h > 0) {
-        var kmw=com.keyman.singleton;
         var osk = kmw.osk;
         osk.banner.height = Math.ceil(h / window.devicePixelRatio);
       }
@@ -160,13 +160,18 @@
       window.jsInterface.insertText(dn, s, dr);
     }
 
+    function deregisterModel(modelID) {
+      var kmw=window['keyman'];
+      kmw.modelManager.deregister(modelID);
+    }
+
     function enableSuggestions(model) {
       registerModel(model);
     }
 
     function registerModel(model) {
       var kmw=window['keyman'];
-      window.console.log('registerModel: ' + model);
+      //window.console.log('registerModel: ' + model);
       kmw.registerModel(model);
     }
 
@@ -231,6 +236,21 @@
         if(shift) {
           hash = hash + '+font=' + 'SpecialOSK';
         }
+        window.location.hash = hash;
+      }
+    }
+
+    function suggestionPopup(obj,custom,x,y,w,h) {
+      if(obj != null) {
+        let s = JSON.stringify(obj);
+
+        fragmentToggle=(fragmentToggle+1) % 100;
+        let hash = 'suggestPopup-' + fragmentToggle;
+
+        hash = hash + '&x=' + encodeURIComponent(x) + '&y=' + encodeURIComponent(y);
+        hash = hash + '&w=' + encodeURIComponent(w) + '&h=' + encodeURIComponent(h);
+        hash = hash + '&suggestion=' + encodeURIComponent(s) + '&custom=' + encodeURIComponent(custom);
+
         window.location.hash = hash;
       }
     }

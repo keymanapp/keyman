@@ -23,6 +23,7 @@ import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 
+import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
 public class KMKeyboardDownloaderActivity extends AppCompatActivity {
@@ -123,7 +124,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       title = String.format("%s: %s", langName, kbName);
     }
 
-    DialogFragment dialog = ConfirmDialogFragment.newInstance(title, getString(R.string.confirm_download));
+    DialogFragment dialog = ConfirmDialogFragment.newInstance(
+      DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard));
     dialog.show(getFragmentManager(), "dialog");
   }
 
@@ -323,6 +325,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         try {
           JSONObject modelInfo = lmData.getJSONObject(0);
           if (modelInfo.has("packageFilename")) {
+            // TODO: Confirm if user wants to overwrite exisiting model version
             urls.add(modelInfo.getString("packageFilename"));
           }
         } catch (JSONException e) {

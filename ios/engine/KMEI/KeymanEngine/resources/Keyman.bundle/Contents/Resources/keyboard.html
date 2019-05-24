@@ -180,6 +180,27 @@
                 }
             }
         
+            function suggestionPopup(obj,custom,x,y,w,h) {
+              if(obj != null) {
+                fragmentToggle=(fragmentToggle+1) % 100;
+                
+                var cmd = {
+                  'suggestion': obj,
+                  'isCustom': custom,
+                  'x': x,
+                  'y': y,
+                  'width': w,
+                  'height': h
+                };
+                
+                var hash = 'suggestPopup-' + fragmentToggle + '+cmd=' + JSON.stringify(cmd);
+
+                if (typeof(window.webkit) != 'undefined') {
+                  window.webkit.messageHandlers.keyman.postMessage('#' + hash);
+                }
+              }
+            }
+        
             function menuKeyDown() {
                 fragmentToggle = (fragmentToggle + 1) % 100;
                 var keyDownHash = 'menuKeyDown-' + fragmentToggle;

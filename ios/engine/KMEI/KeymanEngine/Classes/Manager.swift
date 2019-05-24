@@ -1501,16 +1501,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     Manager.shared.inputViewController.resetKeyboardState()
   }
 
-  func setText(_ text: String?) {
-    inputViewController.setText(text)
-  }
-
   func clearText() {
     inputViewController.clearText()
   }
+  
+  func resetContext() {
+    inputViewController.resetContext()
+  }
 
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
-    inputViewController.setSelectionRange(range, manually: manually)
+  func setContextState(text: String?, range: NSRange) {
+    inputViewController.setContextState(text: text, range: range)
   }
   
   var vibrationSupportLevel: VibrationSupport {

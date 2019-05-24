@@ -121,6 +121,41 @@ describe('LMLayerWorker trie model for word lists', function() {
     });
   });
 
+  describe('Using an alternate key function', function () {
+    it('can use an alternate key function', function () {
+      var model = new TrieModel(jsonFixture('tries/english-1000'), {
+        // This test is a bit silly. We can only search strings that
+        // begin with a sequence of "a"s.
+        searchTermToKey: function (searchTerm) {
+          let result = searchTerm.replace(/[^a]/g, '');
+          return result;
+        }
+      });
+
+      // This search should yield results for "a"
+      var firstResults = model.predict({
+        insert: "a", deleteLeft: 0
+      }, {
+        left: '', startOfBuffer: false, endOfBuffer: true
+      });
+      assert.isAbove(firstResults.length, 0);
+
+      // This should yield the SAME results, because it used the same internal
+      // query.
+      var otherResults = model.predict({
+        insert: "a", deleteLeft: 0
+      }, {
+        left: 't', startOfBuffer: false, endOfBuffer: true
+      });
+
+      // the SAME results should be suggested (made the same query)
+      assert.deepEqual(
+        otherResults.map(s => s.displayAs),
+        firstResults.map(s => s.displayAs)
+      );
+    });
+  })
+
   function applyTransform(context, transform) {
     assert.isTrue(context.endOfBuffer, "cannot only apply transform to end of buffer");
     var buffer = context.left;
