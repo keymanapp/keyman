@@ -14,11 +14,14 @@ namespace com.keyman.osk {
     id?: string;
     width?: string;
     pad?: string;
+    layer: string;
+    displayLayer: string;
+    nextlayer: "string";
     
     proportionalX: number;
     proportionalWidth: number;
 
-    static polyfill(key: LayoutKey) {
+    static polyfill(key: LayoutKey, displayLayer: string) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveKey();
       for(let prop in dummy) {
@@ -26,6 +29,10 @@ namespace com.keyman.osk {
           key[prop] = dummy[prop];
         }
       }
+
+      let aKey = key as ActiveKey;
+      aKey.displayLayer = displayLayer;
+      aKey.layer = aKey.layer || displayLayer;
     }
   }
 
@@ -45,7 +52,7 @@ namespace com.keyman.osk {
 
     }
     
-    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number) {
+    static polyfill(row: LayoutRow, displayLayer: string, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
@@ -72,7 +79,7 @@ namespace com.keyman.osk {
             break;
         }
 
-        ActiveKey.polyfill(key);
+        ActiveKey.polyfill(key, displayLayer);
       }
 
       /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -213,7 +220,7 @@ namespace com.keyman.osk {
       for(let i=0; i<rowCount; i++) {
         // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
         let rowProportionalY = (i + 0.5) / rowCount;
-        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY);
+        ActiveRow.polyfill(layer.row[i], layer.id, totalWidth, rowProportionalY);
       }
 
       // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -343,7 +350,7 @@ namespace com.keyman.osk {
           distY += dy * layer.rowProportionalHeight;
 
           let distance = distX * distX + distY * distY;
-          keyDists[layer.id + '-' + key.id] = distance;
+          keyDists[key.id] = distance;
         });
       });
 

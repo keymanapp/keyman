@@ -210,32 +210,20 @@ namespace com.keyman.text {
       }
     }
 
-    _GetClickEventProperties(e: osk.KeyElement, Lelem: HTMLElement): KeyEvent {
+    _GetClickEventProperties(e: osk.ActiveKey, Lelem: HTMLElement): KeyEvent {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let formFactor = keyman.util.device.formFactor;
-      let outputTarget = Processor.getOutputTarget(Lelem);
 
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
       // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer=e['key'].spec.layer || e['key'].layer || '', keyName=e['keyId'].toUpperCase();
-
-      keyman.domManager.initActiveElement(Lelem);
-
-      // Turn off key highlighting (or preview)
-      keyman['osk'].vkbd.highlightKey(e,false);
-      
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
-      outputTarget.invalidateSelection();
-      // Deadkey matching continues to be troublesome.
-      // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-      outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+      var layer = e.layer || e.displayLayer || '', keyName=e.id.toUpperCase();
 
       // Start:  mirrors _GetKeyEventProperties
 
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      var keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
+      var keyShiftState = this.getModifierState(layer);
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: KeyEvent = {
@@ -247,7 +235,8 @@ namespace com.keyman.text {
         vkCode: 0,
         kName: keyName,
         kLayer: layer,
-        kNextLayer: e['key'].spec['nextlayer']
+        kbdLayer: e.displayLayer,
+        kNextLayer: e.nextlayer
       };
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
@@ -482,12 +471,25 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    clickKey(e: osk.KeyElement, touch?: Touch, keyDistribution?: KeyDistribution) {
+    clickKey(e: osk.KeyElement, touch?: Touch, layerId?: string, keyDistribution?: KeyDistribution) {
       let keyman = com.keyman.singleton;
       var Lelem = keyman.domManager.getLastActiveElement();
 
       if(Lelem != null) {
-        let Lkc = this._GetClickEventProperties(e, Lelem);
+        // Handle any DOM state management related to click inputs.
+        let outputTarget = Processor.getOutputTarget(Lelem);
+        keyman.domManager.initActiveElement(Lelem);
+  
+        // Turn off key highlighting (or preview)
+        keyman['osk'].vkbd.highlightKey(e,false);
+        
+        // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+        outputTarget.invalidateSelection();
+        // Deadkey matching continues to be troublesome.
+        // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
+        outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+  
+        let Lkc = this._GetClickEventProperties(e['key'].spec as osk.ActiveKey, Lelem);
         if(keyman.modelManager.enabled) {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;

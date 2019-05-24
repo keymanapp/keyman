@@ -16,7 +16,8 @@ namespace com.keyman.text {
     LisVirtualKey: boolean;
     vkCode: number;
     kName: string;
-    kLayer?: string;
+    kLayer?: string;   // The key's layer property
+    kbdLayer?: string; // The virtual keyboard's active layer
     kNextLayer?: string;
     // Holds relevant event properties leading to construction of this KeyEvent.
     source?: KeyEvent|MouseEvent|Touch;
