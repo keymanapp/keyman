@@ -302,6 +302,50 @@ namespace com.keyman.text {
       }
     }
 
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): boolean {
+      // Create `Processor.processKeystroke` for this section.
+      let keyman = com.keyman.singleton;
+
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      let kbdInterface = keyman.interface;
+      let keyMapManager = keyman.keyMapManager;
+
+      if(!keyman.isEmbedded && !fromOSK && !window.event) {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
+          keyEvent.Lcode=keyMapManager.browserMap.FF['k'+keyEvent.Lcode];
+        }
+      }
+
+      var LeventMatched = 0;
+      this.swallowKeypress = false;
+
+      // Pass this key code and state to the keyboard program
+      if(activeKeyboard && keyEvent.Lcode != 0) {
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+      }
+
+      if(!LeventMatched) {
+        // Restore the virtual key code if a mnemonic keyboard is being used
+        // If no vkCode value was stored, maintain the original Lcode value.
+        keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
+
+        // Handle unmapped keys, including special keys
+        // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true);
+        if(ch) {
+          kbdInterface.output(0, outputTarget, ch);
+          LeventMatched = 1;
+        } else if(keyEvent.Lcode == 8) { // Backspace
+          LeventMatched = 1;
+        }
+      }
+
+      /// End serious keystroke processing.
+      return LeventMatched == 1;
+    }
+
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
@@ -392,39 +436,16 @@ namespace com.keyman.text {
       // // ...end I3363 (Build 301)
 
       /// Now that we've filtered out special cases, it's time to do serious keystroke processing.
-      // For fat-finger adjustments, we should iterate across the most likely members of the key distribution.
-      // Create `Processor.processKeystroke` for this section.
 
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
-      var LeventMatched = 0;
-      this.swallowKeypress = false;
+      // For fat-finger adjustments, we should iterate across the most likely members of the key distribution,
+      // not just the selected key.
+      let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK);
 
-      // Pass this key code and state to the keyboard program
-      if(activeKeyboard && keyEvent.Lcode != 0) {
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
-      }
-
-      if(!LeventMatched) {
-        // Restore the virtual key code if a mnemonic keyboard is being used
-        // If no vkCode value was stored, maintain the original Lcode value.
-        keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
-
-        // Handle unmapped keys, including special keys
-        // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true);
-        if(ch) {
-          kbdInterface.output(0, outputTarget, ch);
-          LeventMatched = 1;
-        } else if(keyEvent.Lcode == 8) { // Backspace
-          LeventMatched = 1;
-        }
-      }
-
-      /// End serious keystroke processing.
       // End of fat-finger loop section; the rest is post-processing maintenance.
 
       // Swap layer as appropriate.
