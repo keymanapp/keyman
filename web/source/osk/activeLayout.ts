@@ -311,6 +311,10 @@ namespace com.keyman.osk {
       // generating a probability distribution.
       this.row.forEach(function(row: ActiveRow): void {
         row.key.forEach(function(key: ActiveKey): void {
+          // If the key lacks an ID, just skip it.  Sometimes used for padding.
+          if(!key.id) {
+            return;
+          }
           // These represent the within-key distance of the touch from the key's center.
           // Both should be on the interval [0, 0.5].
           let dx = Math.abs(touchCoords.x - key.proportionalX);
@@ -361,9 +365,9 @@ namespace com.keyman.osk {
       // Keys usually are specified in a "long form" prefixed with their layer's ID.
       if(keyId.indexOf(this.id + '-') == 0) {
         keyId = keyId.replace(this.id + '-', '');
-
-        return this.keyMap[keyId];
       }
+
+      return this.keyMap[keyId];
     }
   }
 
@@ -371,8 +375,17 @@ namespace com.keyman.osk {
     layer: ActiveLayer[];
     font: string;
 
+    /**
+     * Facilitates mapping layer id strings to their specification objects.
+     */
+    layerMap: {[layerId: string]: ActiveLayer};
+
     private constructor() {
 
+    }
+
+    getLayer(layerId: string): ActiveLayer {
+      return this.layerMap[layerId];
     }
 
     /**
@@ -388,6 +401,7 @@ namespace com.keyman.osk {
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number, i: number;
       var layers: LayoutLayer[], layer: LayoutLayer;
+      let layerMap: {[layerId: string]: ActiveLayer} = {};
       var rows: LayoutRow[];
 
       layers=layout['layer'];
@@ -409,6 +423,7 @@ namespace com.keyman.osk {
 
       for(n=0; n<layers.length; n++) {
         ActiveLayer.polyfill(layers[n], formFactor);
+        layerMap[layers[n].id] = layers[n] as ActiveLayer;
       }
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
@@ -419,7 +434,10 @@ namespace com.keyman.osk {
         }
       }
 
-      return layout as ActiveLayout;
+      let aLayout = layout as ActiveLayout;
+      aLayout.layerMap = layerMap;
+
+      return aLayout;
     }
   }
 }

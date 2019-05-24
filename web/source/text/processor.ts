@@ -38,7 +38,7 @@ namespace com.keyman.text {
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
       var Lkc: KeyEvent;
 
       let keyName = Lkc.kName;
@@ -73,13 +73,19 @@ namespace com.keyman.text {
             keyman.interface.defaultBackspace();
             return '';
           case Codes.keyCodes['K_TAB']:
-            domManager.moveToNext(keyShiftState);
+            if(!disableDOM) {
+              domManager.moveToNext(keyShiftState);
+            }
             break;
           case Codes.keyCodes['K_TABBACK']:
-            domManager.moveToNext(true);
+            if(!disableDOM) {
+              domManager.moveToNext(true);
+            }
             break;
           case Codes.keyCodes['K_TABFWD']:
-            domManager.moveToNext(false);
+            if(!disableDOM) {
+              domManager.moveToNext(false);
+            }
             break;
           case Codes.keyCodes['K_ENTER']:
             // Insert new line in text area fields
@@ -95,12 +101,13 @@ namespace com.keyman.text {
               } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem.base;
               }
-
-              if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
-                inputEle.disabled=false;
-                inputEle.form.submit();
-              } else {
-                domManager.moveToNext(false);
+              if(!disableDOM) {
+                if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
+                  inputEle.disabled=false;
+                  inputEle.form.submit();
+                } else {
+                  domManager.moveToNext(false);
+                }
               }
             }
             break;
@@ -302,8 +309,7 @@ namespace com.keyman.text {
       }
     }
 
-    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): boolean {
-      // Create `Processor.processKeystroke` for this section.
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): boolean {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
@@ -333,7 +339,7 @@ namespace com.keyman.text {
 
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true);
+        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
         if(ch) {
           kbdInterface.output(0, outputTarget, ch);
           LeventMatched = 1;
@@ -342,7 +348,6 @@ namespace com.keyman.text {
         }
       }
 
-      /// End serious keystroke processing.
       return LeventMatched == 1;
     }
 
@@ -355,7 +360,6 @@ namespace com.keyman.text {
      */
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
-      //var Lelem = keyman.domManager.getLastActiveElement();
 
       let fromOSK = !!e; // If specified, it's from the OSK.
 
@@ -364,8 +368,6 @@ namespace com.keyman.text {
         e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
       }
 
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      let kbdInterface = keyman.interface;
       let formFactor = keyman.util.device.formFactor;
       let keyMapManager = keyman.keyMapManager;
 
@@ -442,9 +444,7 @@ namespace com.keyman.text {
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
-      // For fat-finger adjustments, we should iterate across the most likely members of the key distribution,
-      // not just the selected key.
-      let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK);
+      let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
 
       // End of fat-finger loop section; the rest is post-processing maintenance.
 
@@ -455,7 +455,28 @@ namespace com.keyman.text {
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(LeventMatched) {
-        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent);
+        let alternates: Alternate[];
+
+        if(keyEvent.keyDistribution) {
+          let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
+          alternates = [];
+  
+          for(let pair of keyEvent.keyDistribution) {
+            let mock = Mock.from(preInputMock);
+            
+            let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
+            if(!altKey) {
+              console.warn("Potential fat-finger key could not be found in layer!");
+              continue;
+            }
+            let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
+            if(this.processKeystroke(altEvent, mock, fromOSK, true)) {
+              alternates.push({t: mock.buildTransformFrom(preInputMock), 'p': pair.p});
+            }
+          }
+        }
+
+        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent, alternates);
         // Notify the ModelManager of new input
         keyman.modelManager.predict(transcription);
 
@@ -535,7 +556,7 @@ namespace com.keyman.text {
         
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = null;
-        var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false);
+        var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false, true);
         if(mappedChar) {
           // FIXME;  Warning - will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
           Lkc.Lcode = mappedChar.charCodeAt(0);

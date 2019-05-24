@@ -313,6 +313,8 @@ namespace com.keyman.text.prediction {
       this.recordTranscription(transcription);
 
       let transform = transcription.transform;
+      // TODO:  Use this instead of the single Transform; requires LMLayer work.
+      let alternates = transcription.alternates;
       var promise = this.currentPromise = this.lmEngine.predict(transform, context);
 
       let mm = this;

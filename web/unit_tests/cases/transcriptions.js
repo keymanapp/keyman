@@ -150,7 +150,7 @@ describe("Transcriptions and Transforms", function() {
     });
   });
 
-  describe("Operations with deadkeys", function() {
+  /*describe("Operations with deadkeys", function() {
     // Just one, less nuanced/subdivided; it's not a present priority for our work, but it should provide a decent basis if/when it's needed.
     it("Correctly recognizes deadkey set mutations", function() {
       var Mock = com.keyman.text.Mock;
@@ -193,4 +193,5 @@ describe("Transcriptions and Transforms", function() {
       assert.deepEqual({d: ins[0].d, p: ins[0].p}, {d: 3, p:2}, "Selected wrong deadkey as inserted");
     });
   });
+  */
 });
