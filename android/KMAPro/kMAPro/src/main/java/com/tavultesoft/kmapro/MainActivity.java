@@ -848,10 +848,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       KMManager.addLexicalModel(this, lexicalModelInfo);
     }
 
-    // Register associated lexical model
-    HashMap<String, String> currentKeyboardInfo = KMManager.getCurrentKeyboardInfo(getApplicationContext());
-    String currentLanguageID = currentKeyboardInfo.get(KMManager.KMKey_LanguageID);
-    KMManager.registerAssociatedLexicalModel(currentLanguageID);
+    // It would be nice to register associated lexical model
+    // But the Keyboard Downloader async task in the background can't modify the WebView
+    // (banner heights get adjusted during model registration)
   }
 
   private void copyFile(FileInputStream inStream, File dstFile) throws IOException {

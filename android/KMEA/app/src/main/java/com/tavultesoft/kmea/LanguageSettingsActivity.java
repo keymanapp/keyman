@@ -24,6 +24,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.util.MapCompat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -139,7 +141,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         intent.putExtra(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
         intent.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
         intent.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID));
-        boolean isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+        boolean isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N").equals("Y") ? true : false;
         intent.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
         String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
         if (customHelpLink != null)

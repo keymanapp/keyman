@@ -268,7 +268,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       }
 
       ((AppCompatActivity) context).finish();
-      notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+
+      if (!downloadOnlyLexicalModel) {
+        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+      }
     }
 
     /**
