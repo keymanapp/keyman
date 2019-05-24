@@ -90,7 +90,7 @@ public class ConfirmDialogFragment extends DialogFragment {
             case DIALOG_TYPE_DELETE_MODEL :
               // Confirmation to delete model
               int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(getActivity(), itemKey);
-              KeyboardPickerActivity.deleteLexicalModel(getContext(), modelIndex, itemKey);
+              KeyboardPickerActivity.deleteLexicalModel(getContext(), modelIndex);
               dismissOnSelect = true;
               break;
             default :

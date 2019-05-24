@@ -505,8 +505,35 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
   }
 
+  /**
+   * getModelIDFromPosition - Get the lexical model ID at a given position
+   * @param context
+   * @param position - int position of the lexical model
+   * @return String - model ID. Blank if invalid position
+   */
+  protected static String getModelIDFromPosition(Context context, int position) {
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    String modelID = "";
+    if (lexicalModelsList != null && position >= 0 && position < lexicalModelsList.size()) {
+      HashMap<String, String> lexicalModelInfo = lexicalModelsList.get(position);
+      modelID = lexicalModelInfo.get(KMManager.KMKey_LexicalModelID);
+    }
+
+    return modelID;
+  }
+
+  /**
+   * removeLexicalModel - Remove lexical model at a given position from the installed lexical models list
+   * @param context
+   * @param position - int position of the lexical model to remove
+   * @return boolean - result of the model could be removed and list saved
+   */
   protected static boolean removeLexicalModel(Context context, int position) {
     boolean result = false;
+
     if (lexicalModelsList == null) {
       lexicalModelsList = getLexicalModelsList(context);
     }
@@ -519,17 +546,20 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
-  protected static void deleteLexicalModel(Context context, int position, String modelKey) {
+
+  /**
+   * deleteLexicalModel - Remove lexical model from the installed list
+   * and deregister the model with KMW
+   * @param context
+   * @param position - int position in the models list
+   */
+  protected static void deleteLexicalModel(Context context, int position) {
+    String modelID = getModelIDFromPosition(context, position);
     boolean result = removeLexicalModel(context, position);
 
     if (result) {
       Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show();
-
-      // Extract [language ID, package ID, model ID] and deregister Lexical model
-      String idArray[] = modelKey.split("_");
-      if (idArray.length == 3) {
-        KMManager.deregisterLexicalModel(idArray[2]);
-      }
+      KMManager.deregisterLexicalModel(modelID);
     }
   }
 

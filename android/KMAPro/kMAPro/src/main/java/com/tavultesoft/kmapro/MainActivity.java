@@ -847,6 +847,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
       KMManager.addLexicalModel(this, lexicalModelInfo);
     }
+
+    // Register associated lexical model
+    HashMap<String, String> currentKeyboardInfo = KMManager.getCurrentKeyboardInfo(getApplicationContext());
+    String currentLanguageID = currentKeyboardInfo.get(KMManager.KMKey_LanguageID);
+    KMManager.registerAssociatedLexicalModel(currentLanguageID);
   }
 
   private void copyFile(FileInputStream inStream, File dstFile) throws IOException {
