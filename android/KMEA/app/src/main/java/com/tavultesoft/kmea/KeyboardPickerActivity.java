@@ -327,7 +327,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   protected static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
       String customKeyboard = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
-      if (!customKeyboard.equalsIgnoreCase("Y")) {
+      if (customKeyboard.equalsIgnoreCase("Y")) {
         return true;
       }
     }

@@ -463,7 +463,10 @@ public final class ModelPickerActivity extends AppCompatActivity {
               // we only need to add the model to the list of installed models
               // Add help link
               modelInfo.put(KMManager.KMKey_CustomHelpLink, "");
-              KMManager.addLexicalModel(context, modelInfo);
+              boolean result = KMManager.addLexicalModel(context, modelInfo);
+              if (result) {
+                Toast.makeText(context, "Model installed", Toast.LENGTH_SHORT).show();
+              }
             } else {
               // Model isn't installed so prompt to download it
               Bundle args = new Bundle();
