@@ -468,10 +468,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
                 Toast.makeText(context, "Model installed", Toast.LENGTH_SHORT).show();
               }
 
-              // Register associated lexical model
-              HashMap<String, String> currentKeyboardInfo = KMManager.getCurrentKeyboardInfo(context);
-              String currentLanguageID = currentKeyboardInfo.get(KMManager.KMKey_LanguageID);
-              KMManager.registerAssociatedLexicalModel(currentLanguageID);
+              // Don't register associated lexical model because this is not a UI view
             } else {
               // Model isn't installed so prompt to download it
               Bundle args = new Bundle();
