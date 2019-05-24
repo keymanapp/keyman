@@ -84,6 +84,8 @@ class LMLayerWorker {
 
   private _hostURL: string;
 
+  private _currentModelSource: string;
+
   constructor(options = {
     importScripts: null,
     postMessage: null
@@ -115,8 +117,23 @@ class LMLayerWorker {
       throw new Error(`Missing required 'message' property: ${event.data}`)
     }
 
+    // If last load was for this exact model file, squash the message.
+    // (Though not if we've had an unload since.)
+    let im = event.data as IncomingMessage;
+    if(im.message == 'load') {
+      let data = im as LoadMessage;
+      if(data.model == this._currentModelSource) {
+        console.warn("Duplicate model load message detected - squashing!");
+        return;
+      } else {
+        this._currentModelSource = data.model;
+      }
+    } else if(im.message == 'unload') {
+      this._currentModelSource = null;
+    }
+
     // We got a message! Delegate to the current state.
-    this.state.handleMessage(event.data as IncomingMessage);
+    this.state.handleMessage(im);
   }
 
   /**
