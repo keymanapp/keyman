@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ import java.util.List;
 public class SetupActivity extends Activity {
 
 	private static ListView listView = null;
-	private static FVListAdapter listAdapter = null;
+	private static SimpleAdapter listAdapter = null;
 	private static ArrayList<HashMap<String, String>> list = null;
 	private final String iconKey = "icon";
 	private final String textKey = "text";
@@ -62,7 +63,7 @@ public class SetupActivity extends Activity {
 		
 		String[] from = new String[]{ iconKey, textKey };
 		int[] to = new int[] { R.id.left_icon, R.id.text };
-		listAdapter = new FVListAdapter(context, list, R.layout.setup_row_layout, from, to);
+		listAdapter = new SimpleAdapter(context, list, R.layout.setup_row_layout, from, to);
 		listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -111,7 +112,7 @@ public class SetupActivity extends Activity {
 
 			String[] from = new String[]{ iconKey, textKey };
 			int[] to = new int[] { R.id.left_icon, R.id.text };
-			listAdapter = new FVListAdapter(this, list, R.layout.setup_row_layout, from, to);
+			listAdapter = new SimpleAdapter(this, list, R.layout.setup_row_layout, from, to);
 			listView.setAdapter(listAdapter);
 		}
 	}

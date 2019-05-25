@@ -1,10 +1,14 @@
 #!/bin/sh
 
 set -e
+set -x
+
+export TARGET=FirstVoices
+export KEYBOARDS_TARGET=app/src/main/assets/packages
+export KEYBOARDS_CSV_TARGET=app/src/main/assets/keyboards.csv
 
 # TODO: support passing -copy-keyboards, -debug, -clean etc in to build_keyboards
-KEYBOARDS_TARGET=app/src/main/assets/keyboards ./build_keyboards.sh
+./build_keyboards.sh
 
-TARGET=FirstVoices
 # TODO: in the future build_common.sh should probably be shared with all oem products?
-source build_common.sh
+./build_common.sh $*

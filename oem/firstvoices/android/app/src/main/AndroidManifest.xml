@@ -46,6 +46,10 @@
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Holo.Light.Dialog" >
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="4efced22a226f98e05442a7e472b377d89fcc294"
+            />
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

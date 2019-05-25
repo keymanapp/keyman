@@ -60,19 +60,20 @@ done
 
 if [ $DO_CLEAN = true ]; then
   echo "Cleaning target path $KEYBOARDS_TARGET"
-  rm -f $KEYBOARDS_TARGET/files/*
-  rm -f $KEYBOARDS_TARGET/keyboards.csv
+  rm -rf $KEYBOARDS_TARGET/*
+  echo "Removing file $KEYBOARDS_CSV_TARGET"
+  rm -f $KEYBOARDS_CSV_TARGET
 fi
 
-mkdir -p $KEYBOARDS_TARGET/files
+mkdir -p $KEYBOARDS_TARGET
 
-# Build keyboards and copy into ios/FirstVoices/Keyboards/files
+# Build keyboards and copy into KEYBOARDS_TARGET
 
 if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
   echo "Building and/or copying keyboards"
 
   if [ $DO_COPY = true ]; then
-    cp ../keyboards.csv "$KEYBOARDS_TARGET/keyboards.csv"
+    cp ../keyboards.csv "$KEYBOARDS_CSV_TARGET"
   fi
 
   SCRIPT_ROOT=`pwd`
@@ -90,8 +91,9 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
       fi
       if [ $DO_COPY = true ]; then
         echo "Copying $id ($name) to $KEYBOARDS_TARGET"
-        cp release/$shortname/$id/build/$id.js "$SCRIPT_ROOT/$KEYBOARDS_TARGET/files/$id.js"
-        cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/files/$id.keyboard_info"
+        mkdir -p "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id"
+        unzip release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
+        # cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
       fi
 #        die "done"
     done

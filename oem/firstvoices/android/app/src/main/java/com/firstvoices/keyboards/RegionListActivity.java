@@ -16,45 +16,35 @@ import java.util.HashMap;
 
 public final class RegionListActivity extends Activity {
 
-	private static ListView listView = null;
-    private static FVListAdapter listAdapter = null;
-    private static ArrayList<HashMap<String, String>> regionList = null;
-
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		final Context context = this;
+        final FVShared.FVRegionList regionList = FVShared.getKeyboardList(context);
+
+		// Setup layout
+
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.list_layout);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.region_title_layout);
         View titleDivider = getWindow().getDecorView().findViewById(getResources().getIdentifier("titleDivider", "id", "android"));
         titleDivider.setBackgroundColor(Color.rgb(170, 18, 37));
-		listView = (ListView)findViewById(R.id.listView);
 
-        ArrayList<ArrayList<HashMap<String, String>>> keyboardList = FVShared.getKeyboardList(context);
-        regionList = new ArrayList<HashMap<String, String>>();
-        if (keyboardList != null) {
-            int len = keyboardList.size();
-            for (int i = 0; i < len; i+=2) {
-                HashMap<String, String> regionDict = (HashMap<String, String>)keyboardList.get(i).get(0).clone();
-                regionDict.put("isEnabled", "true");
-                regionList.add(regionDict);
-            }
-        }
-
-        String[] from = new String[]{ FVShared.FVRegionNameKey };
-        int[] to = new int[] { R.id.text1 };
-        listAdapter = new FVListAdapter(context, regionList, R.layout.region_row_layout, from, to);
+        FVRegionListAdapter listAdapter = new FVRegionListAdapter(context, regionList);
         listAdapter.listFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf");
+        final ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
+
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(context, KeyboardListActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                i.putExtra("regionName", regionList.get(position).get(FVShared.FVRegionNameKey));
+                i.putExtra("regionName", regionList.get(position).name);
                 i.putExtra("regionIndex", position);
+
+                // State to allow return to previous position
                 int listPosition = listView.getFirstVisiblePosition();
                 i.putExtra("listPosition", listPosition);
                 View v = listView.getChildAt(0);
