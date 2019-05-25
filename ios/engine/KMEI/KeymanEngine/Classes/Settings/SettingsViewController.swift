@@ -53,7 +53,7 @@ open class SettingsViewController: UITableViewController {
     
     itemsArray = [[String: String]]()
     itemsArray.append([
-      "title": "Installed Languages...",
+      "title": "Languages Settings",
       "subtitle": "0", //count of installed languages as string
       "reuseid" : "language"
       ])
