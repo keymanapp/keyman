@@ -36,7 +36,7 @@
 		android:layout_alignParentRight="true"
 		android:layout_centerVertical="true"
 		android:layout_marginRight="10dp"
-		android:src="@drawable/ic_action_setup"
+		android:src="@drawable/ic_action_next"
 		android:contentDescription="@string/image_view" />
     
 </RelativeLayout>

@@ -11,7 +11,7 @@
        	android:layout_alignParentLeft="true"
        	android:layout_centerVertical="true"
        	android:contentDescription="@string/image_button"
-       	android:src="@drawable/ic_action_setup" />
+       	android:src="@drawable/ic_action_back" />
     
     <TextView
 		android:id="@+id/bar_title"
