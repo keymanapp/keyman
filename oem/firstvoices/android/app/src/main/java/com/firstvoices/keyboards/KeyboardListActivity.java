@@ -13,9 +13,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public final class KeyboardListActivity extends Activity {
 
 	@Override
@@ -29,15 +26,15 @@ public final class KeyboardListActivity extends Activity {
         View titleDivider = getWindow().getDecorView().findViewById(getResources().getIdentifier("titleDivider", "id", "android"));
         titleDivider.setBackgroundColor(Color.rgb(170, 18, 37));
 
-        TextView title = (TextView)findViewById(R.id.bar_title);
+        TextView title = findViewById(R.id.bar_title);
         title.setText(getIntent().getStringExtra("regionName"));
 
-		ListView listView = (ListView)findViewById(R.id.listView);
+		ListView listView = findViewById(R.id.listView);
 
         int regionIndex = getIntent().getIntExtra("regionIndex", 0);
 
-        FVShared.FVRegionList keyboardList = FVShared.getKeyboardList(context);
-        FVShared.FVRegion region = keyboardList.get(regionIndex);
+        FVShared.FVRegionList regionList = FVShared.getInstance().getRegionList();
+        FVShared.FVRegion region = regionList.get(regionIndex);
 
         FVKeyboardListAdapter listAdapter = new FVKeyboardListAdapter(context, region);
         listAdapter.listFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf");
@@ -50,7 +47,7 @@ public final class KeyboardListActivity extends Activity {
             }
         });
 
-		final ImageButton backButton = (ImageButton)findViewById(R.id.left_button);
+		final ImageButton backButton = findViewById(R.id.left_button);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
                 showRegionList();

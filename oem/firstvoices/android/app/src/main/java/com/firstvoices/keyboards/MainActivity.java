@@ -18,13 +18,17 @@ import com.tavultesoft.kmea.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    @SuppressWarnings("SetJavascriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
-        FVShared.preloadPackages(getApplicationContext());
+        new FVShared(this);
+
+        FVShared.getInstance().upgradeTo12();
+        FVShared.getInstance().preloadPackages();
 
         if (BuildConfig.DEBUG) {
             KMManager.setDebugMode(true);
@@ -33,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Context context = this;
         final String htmlPath = "file:///android_asset/setup/main.html";
-        WebView webView = (WebView) findViewById(R.id.webView);
+        WebView webView = findViewById(R.id.webView);
         webView.addJavascriptInterface(new JSHandler(context), "jsInterface");
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        WebView webView = (WebView) findViewById(R.id.webView);
+        WebView webView = findViewById(R.id.webView);
         if (webView != null) {
             if (didCompleteSelectKeyboard())
                 webView.loadUrl("javascript:setCheckBox1On();");
@@ -125,17 +129,18 @@ public class MainActivity extends AppCompatActivity {
     */
 
     private static final class JSHandler {
-        private Context context;
+        final private Context context;
 
         JSHandler(Context context) { this.context = context; }
 
-        // This annotation is required in Jelly Bean and later:
+        @SuppressWarnings("unused")
         @JavascriptInterface
         public void showSetup() {
             Intent setupIntent = new Intent(context, SetupActivity.class);
             context.startActivity(setupIntent);
         }
 
+        @SuppressWarnings("unused")
         @JavascriptInterface
         public void showRegionList() {
             Intent i = new Intent(context, RegionListActivity.class);
@@ -145,19 +150,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean didCompleteSelectKeyboard() {
-        if (FVShared.activeKeyboardCount(this) > 0)
-            return true;
-
-        return false;
+        return FVShared.getInstance().activeKeyboardCount() > 0;
     }
 
     private boolean didCompleteSetup() {
         if (!SetupActivity.isEnabledSystemWide(this))
             return false;
 
-        if (!SetupActivity.isDefaultKB(this))
-            return false;
-
-        return true;
+        return SetupActivity.isDefaultKB(this);
     }
 }

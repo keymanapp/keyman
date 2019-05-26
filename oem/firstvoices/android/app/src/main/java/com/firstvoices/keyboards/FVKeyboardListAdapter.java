@@ -11,9 +11,12 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-    protected Typeface listFont;
+class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
+
+    Typeface listFont;
 
     private static class ViewHolder {
         TextView text1;
@@ -21,12 +24,13 @@ public class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
         CheckBox checkBox;
     }
 
-    public FVKeyboardListAdapter(Context context, FVShared.FVRegion regionData) {
+    FVKeyboardListAdapter(Context context, FVShared.FVRegion regionData) {
         super(context, 0, regionData.keyboards);
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         ViewHolder holder;
 
         FVShared.FVKeyboard keyboard = getItem(position);
@@ -34,9 +38,9 @@ public class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
         if(convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.keyboard_row_layout, parent, false);
             holder = new ViewHolder();
-            holder.text1 = (TextView) convertView.findViewById(R.id.text1);
-            holder.checkBox = (CheckBox) convertView.findViewById(R.id.checkBox1);
-            holder.helpButton = (ImageButton) convertView.findViewById(R.id.buttonHelp);
+            holder.text1 = convertView.findViewById(R.id.text1);
+            holder.checkBox = convertView.findViewById(R.id.checkBox1);
+            holder.helpButton = convertView.findViewById(R.id.buttonHelp);
             holder.helpButton.setOnClickListener(new FVKeyboardListAdapter.FVOnClickHelpListener());
             holder.checkBox.setOnCheckedChangeListener(new FVKeyboardListAdapter.FVOnCheckedChangeListener());
             convertView.setTag(holder);
@@ -44,16 +48,16 @@ public class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
             if (listFont != null) {
                 holder.text1.setTypeface(listFont, Typeface.BOLD);
             }
-
-            //convertView.setAlpha(1.0f);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.text1.setText(keyboard.name);
-        holder.helpButton.setTag(keyboard.id);
-        holder.checkBox.setTag(keyboard.id);
-        holder.checkBox.setChecked(FVShared.checkState(getContext(), keyboard.id));
+        if(keyboard != null) {
+            holder.text1.setText(keyboard.name);
+            holder.helpButton.setTag(keyboard.id);
+            holder.checkBox.setTag(keyboard.id);
+            holder.checkBox.setChecked(FVShared.getInstance().checkState(keyboard.id));
+        }
 
         return convertView;
     }
@@ -71,14 +75,14 @@ public class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
     private class FVOnClickHelpListener implements ImageButton.OnClickListener {
         @Override
         public void onClick(View v) {
-            FVShared.helpAction(getContext(), (String)v.getTag());
+            FVShared.getInstance().helpAction((String)v.getTag());
         }
     }
 
     private class FVOnCheckedChangeListener implements CheckBox.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            FVShared.setCheckState(getContext(), (String)buttonView.getTag(), isChecked);
+            FVShared.getInstance().setCheckState((String)buttonView.getTag(), isChecked);
         }
     }
 }

@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.firstvoices.keyboards" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor">
 
         <service
             android:name="com.firstvoices.keyboards.SystemKeyboard"
@@ -51,5 +54,4 @@
             android:value="4efced22a226f98e05442a7e472b377d89fcc294"
             />
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

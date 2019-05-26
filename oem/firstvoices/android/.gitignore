@@ -10,6 +10,7 @@
 **/.idea/libraries/
 **/.idea/dictionaries
 **/.idea/**/*.xml
+**/.idea/caches/
 **/*.iml
 
 **/.DS_Store

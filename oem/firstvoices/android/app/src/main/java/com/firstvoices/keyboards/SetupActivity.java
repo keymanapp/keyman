@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodInfo;
@@ -21,9 +22,10 @@ import java.util.List;
 
 public class SetupActivity extends Activity {
 
-	private static ListView listView = null;
-	private static SimpleAdapter listAdapter = null;
-	private static ArrayList<HashMap<String, String>> list = null;
+	private ListView listView = null;
+	private SimpleAdapter listAdapter = null;
+	private ArrayList<HashMap<String, String>> list = null;
+
 	private final String iconKey = "icon";
 	private final String textKey = "text";
 	private final String isEnabledKey = "isEnabled";
@@ -37,25 +39,25 @@ public class SetupActivity extends Activity {
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.setup_title_layout);
 		View titleDivider = getWindow().getDecorView().findViewById(getResources().getIdentifier("titleDivider", "id", "android"));
 		titleDivider.setBackgroundColor(Color.rgb(170, 18, 37));
-		listView = (ListView) findViewById(R.id.listView);
+		listView = findViewById(R.id.listView);
 		
-		final ImageButton closeButton = (ImageButton)findViewById(R.id.close_button);
+		final ImageButton closeButton = findViewById(R.id.close_button);
 		closeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
             }
         });
 		
-		list = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> hashMap = new HashMap<String, String>();
+		list = new ArrayList<>();
+		HashMap<String, String> hashMap;
 
-		hashMap = new HashMap<String, String>();
+		hashMap = new HashMap<>();
 		hashMap.put(iconKey, "0");
 		hashMap.put(textKey, "Enable 'FirstVoices'");
 		hashMap.put(isEnabledKey, "true");
 		list.add(hashMap);
 
-		hashMap = new HashMap<String, String>();
+		hashMap = new HashMap<>();
 		hashMap.put(iconKey, "0");
 		hashMap.put(textKey, "Choose 'FirstVoices' as current input method");
 		hashMap.put(isEnabledKey, "false");
@@ -73,7 +75,11 @@ public class SetupActivity extends Activity {
 				}
 				else if (position == 1) {
 					InputMethodManager imManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imManager.showInputMethodPicker();
+					if(imManager != null) {
+						imManager.showInputMethodPicker();
+					} else {
+						Log.e("setupActivity.onCreate", "Failed to get system service INPUT_METHOD_SERVICE");
+					}
 				}
             }
         });
@@ -117,22 +123,29 @@ public class SetupActivity extends Activity {
 		}
 	}
 
-	protected static boolean isEnabledSystemWide(Context context) {
+	static boolean isEnabledSystemWide(Context context) {
 		InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imManager == null) {
+			Log.e("isEnabledSystemWide", "Failed to get system service INPUT_METHOD_SERVICE");
+			return false;
+		}
 		List<InputMethodInfo> imList = imManager.getEnabledInputMethodList();
-		boolean isEnabled = false;
-		int size = imList.size();
+		if(imList == null) {
+			Log.e("isEnabledSystemWide", "Failed to get enabled input method list");
+			return false;
+		}
+
+		final int size = imList.size();
 		for(int i = 0; i < size; i++) {
 			if (imList.get(i).getServiceName().equals("com.firstvoices.keyboards.SystemKeyboard")) {
-				isEnabled = true;
-				break;
+				return true;
 			}
 		}
 
-		return isEnabled;
+		return false;
 	}
 
-	protected static boolean isDefaultKB(Context context) {
+	static boolean isDefaultKB(Context context) {
 		String inputMethod = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
 		return inputMethod.equals("com.firstvoices.keyboards/.SystemKeyboard");
 	}

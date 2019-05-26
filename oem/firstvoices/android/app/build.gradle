@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 28
 
         if (project.hasProperty("services_json_file")) {
@@ -27,7 +27,7 @@ android {
             versionName "${project.ext['build.number']}"
         } else {
             String majorMinorVersion = file('$projectDir/../../../../../resources/VERSION.md').text.trim()
-            versionCode 100
+            versionCode 999
             versionName majorMinorVersion + '.0.0'
         }
     }
@@ -107,7 +107,7 @@ dependencies {
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
         transitive = true
     }
-    implementation 'androidx.preference:preference:1.1.0-alpha04'
+    implementation 'androidx.preference:preference:1.1.0-alpha05'
 }
 
 apply plugin: 'com.google.gms.google-services'

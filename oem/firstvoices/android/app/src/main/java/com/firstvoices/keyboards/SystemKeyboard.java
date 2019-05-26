@@ -5,7 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
-import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -19,7 +19,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler;
 
 public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
 
-    private static View inputView = null;
+    private View inputView = null;
 
     /** Main initialization of the input method component. Be sure to call
      * to super class. */
@@ -126,8 +126,12 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
 
         // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
         WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
+        if(wm == null) return;
         Point size = new Point(0, 0);
-        wm.getDefaultDisplay().getSize(size);
+        Display display = wm.getDefaultDisplay();
+        if(display == null) return;
+
+        display.getSize(size);
 
         int inputViewHeight = 0;
         if (inputView != null)

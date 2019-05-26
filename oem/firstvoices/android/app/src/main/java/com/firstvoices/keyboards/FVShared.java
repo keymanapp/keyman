@@ -17,53 +17,57 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class FVShared {
-    private static FVRegionList keyboardList = null;
-    private static FVLoadedKeyboardList loadedKeyboards;
+final class FVShared {
+    private static FVShared instance = null;
 
     private static final String FVLoadedKeyboardList = "loaded_keyboards.dat";
-    private static final String FVPreferences = "FVPreferences";
-    public static final String FVRegionNameKey = "FVRegionName";
-    public static final String FVKeyboardNameKey = "FVKeyboardName";
-    public static final String FVKeyboardLanguageCodeKey = "FVKeyboardLanguageCode";
-    public static final String FVKeyboardFilenameKey = "FVKeyboardFilename";
-    public static final String FVKeyboardCheckStateKey = "FVKeyboardCheckState";
-    public static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
 
-    public static class FVKeyboard {
-        public final String id, name, legacyId;
-        public FVKeyboard(String id, String name, String legacyId) {
+    // Keys from earlier versions of app, used only in the upgrade process
+    private static final String FVUpgrade_KeyboardList = "keyboard_list.dat";
+    private static final String FVUpgrade_KeyboardListHashKey = "FVKeyboardListHash";
+    private static final String FVUpgrade_Preferences = "FVPreferences";
+    private static final String FVUpgrade_KeyboardFilenameKey = "FVKeyboardFilename";
+    private static final String FVUpgrade_KeyboardCheckStateKey = "FVKeyboardCheckState";
+
+    private static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
+
+    /// Describes a keyboard used in FirstVoices Keyboards
+    static class FVKeyboard {
+        final String id, name, legacyId;
+        FVKeyboard(String id, String name, String legacyId) {
             this.id = id;
             this.name = name;
             this.legacyId = legacyId;
         }
     }
 
-    public static class FVKeyboardList extends ArrayList<FVKeyboard> {
-        public FVKeyboardList() {
+    static class FVKeyboardList extends ArrayList<FVKeyboard> {
+        FVKeyboardList() {
             super();
         }
     }
 
-    public static class FVRegion {
-        public final String name;
-        public FVKeyboardList keyboards;
-        public FVRegion(String name) {
+    /// Keyboards are grouped by region in the keyboards.csv data
+    /// The order of the keyboards in the csv is the final order
+    /// shown everywhere in the app
+    static class FVRegion {
+        final String name;
+        final FVKeyboardList keyboards;
+        FVRegion(String name) {
             this.name = name;
             this.keyboards = new FVKeyboardList();
         }
     }
 
-    public static class FVRegionList extends ArrayList<FVRegion> {
-        public FVRegionList() {
+    static class FVRegionList extends ArrayList<FVRegion> {
+        FVRegionList() {
             super();
         }
 
-        public FVRegion findRegion(String name) {
+        FVRegion findRegion(String name) {
             for(FVRegion r : this) {
                 if(r.name.equals(name)) {
                     return r;
@@ -73,119 +77,34 @@ public class FVShared {
         }
     }
 
-    public static class FVLoadedKeyboardList extends ArrayList<String> {
-        public FVLoadedKeyboardList() {
+    static class FVLoadedKeyboardList extends ArrayList<String> {
+        FVLoadedKeyboardList() {
             super();
         }
     }
 
-    public static void verifyLoaded(Context context) {
-        if (keyboardList == null) {
-            keyboardList = createKeyboardList(context);
-        }
+    FVShared(Context context) {
+        // We only want a single instance
+        assert(instance == null);
+        instance = this;
 
-        if (loadedKeyboards == null) {
-            File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), FVLoadedKeyboardList);
-            if (file.exists()) {
-                try {
-                    ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
-                    loadedKeyboards = (FVLoadedKeyboardList) inputStream.readObject();
-                    inputStream.close();
-                }
-                catch (Exception e) {
-                    Log.e("getKeyboardList", "Error: " + e);
-                    loadedKeyboards = new FVLoadedKeyboardList();
-                }
-            }
-            else {
-                loadedKeyboards = new FVLoadedKeyboardList();
-            }
-        }
+        this.context = context.getApplicationContext();
+        this.regionList = loadRegionList();
+        this.loadedKeyboards = loadLoadedKeyboardList();
     }
 
-    public static FVRegionList getKeyboardList(Context context) {
-        verifyLoaded(context);
-        return keyboardList;
+    private final Context context;
+    private final FVRegionList regionList;
+    private final FVLoadedKeyboardList loadedKeyboards;
+
+    static FVShared getInstance() {
+        // This 'singleton' requires initialization, so
+        // we cannot lazily instanatiate.
+        assert(instance != null);
+        return instance;
     }
 
-    public static FVLoadedKeyboardList getLoadedKeyboardList(Context context) {
-        verifyLoaded(context);
-        return loadedKeyboards;
-    }
-
-    public static boolean saveLoadedKeyboardList(Context context) {
-        boolean result;
-        try {
-            File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), FVLoadedKeyboardList);
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-            outputStream.writeObject(loadedKeyboards);
-            outputStream.flush();
-            outputStream.close();
-            result = true;
-        }
-        catch (Exception e) {
-            Log.e("saveLoadedKeyboardList", "Error: " + e);
-            result = false;
-        }
-
-        updateActiveKeyboardsList(context);
-
-        return result;
-    }
-
-    public static int keyboardCount(Context context, int regionIndex) {
-        FVRegionList regions = getKeyboardList(context);
-        return regions.get(regionIndex).keyboards.size();
-    }
-
-    public static int activeKeyboardCount(Context context) {
-        FVLoadedKeyboardList k = getLoadedKeyboardList(context);
-        return k.size();
-    }
-
-    public static int activeKeyboardCount(Context context, FVRegion region) {
-        if (keyboardList == null)
-            keyboardList = getKeyboardList(context);
-
-        int count = 0;
-        for (FVKeyboard keyboard : region.keyboards) {
-            if (loadedKeyboards.contains(keyboard.id)) count++;
-        }
-
-        return count;
-    }
-
-    public static boolean checkState(Context context, String id) {
-        verifyLoaded(context);
-
-        //String id = keyboardList.get(regionIndex).keyboards.get(keyboardIndex).id;
-        return loadedKeyboards.contains(id);
-    }
-
-    public static boolean setCheckState(Context context, String id, boolean isChecked) {
-        verifyLoaded(context);
-
-        // Remove any duplicated entries, yes this may be overkill
-        while(loadedKeyboards.remove(id)) {}
-
-        if(isChecked) {
-            loadedKeyboards.add(id);
-        }
-
-        saveLoadedKeyboardList(context);
-        return true;
-    }
-
-    public static void helpAction(Context context, String id) {
-        verifyLoaded(context);
-
-        String helpUrl = String.format("%s%s", FVKeyboardHelpLink, id);
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(helpUrl));
-        context.startActivity(i);
-    }
-
-    private static FVRegionList createKeyboardList(Context context) {
+    private FVRegionList loadRegionList() {
         FVRegionList list = new FVRegionList();
         try {
             InputStream inputStream = context.getAssets().open("keyboards.csv");
@@ -195,7 +114,7 @@ public class FVShared {
             String line = reader.readLine();
 
             while (line != null) {
-                while (line != null && line.contains(",,"))
+                while (line.contains(",,"))
                     line = line.replace(",,", ", ,");
 
                 String[] values = line.split(",");
@@ -230,9 +149,77 @@ public class FVShared {
         return list;
     }
 
-    private static void updateActiveKeyboardsList(Context context) {
-        verifyLoaded(context);
+    private FVLoadedKeyboardList loadLoadedKeyboardList() {
+        FVLoadedKeyboardList data = new FVLoadedKeyboardList();
+        File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), FVLoadedKeyboardList);
+        if (file.exists()) {
+            try {
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+                data = (FVLoadedKeyboardList) inputStream.readObject();
+                inputStream.close();
+            }
+            catch (Exception e) {
+                Log.e("loadData", "Error: " + e);
+            }
+        }
+        return data;
+    }
 
+    private void saveLoadedKeyboardList() {
+        try {
+            File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), FVLoadedKeyboardList);
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+            outputStream.writeObject(loadedKeyboards);
+            outputStream.flush();
+            outputStream.close();
+        }
+        catch (Exception e) {
+            Log.e("saveLoadedKeyboardList", "Error: " + e);
+        }
+
+        updateActiveKeyboardsList();
+    }
+
+    FVRegionList getRegionList() {
+        return regionList;
+    }
+
+    int activeKeyboardCount() {
+        return loadedKeyboards.size();
+    }
+
+    int activeKeyboardCount(FVRegion region) {
+        int count = 0;
+        for (FVKeyboard keyboard : region.keyboards) {
+            if (loadedKeyboards.contains(keyboard.id)) count++;
+        }
+
+        return count;
+    }
+
+    boolean checkState(String id) {
+        return loadedKeyboards.contains(id);
+    }
+
+    void setCheckState(String id, boolean isChecked) {
+        // Remove the keyboard from the list first
+        loadedKeyboards.remove(id);
+
+        if(isChecked) {
+            loadedKeyboards.add(id);
+        }
+
+        saveLoadedKeyboardList();
+    }
+
+    void helpAction(String id) {
+        String helpUrl = String.format("%s%s", FVKeyboardHelpLink, id);
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(helpUrl));
+        context.startActivity(i);
+    }
+
+    private void updateActiveKeyboardsList() {
         // Clear existing active keyboards list
 
         ArrayList<HashMap<String, String>> activeKbList = KMManager.getKeyboardsList(context);
@@ -243,15 +230,11 @@ public class FVShared {
         }
 
         // Recreate active keyboards list
-        for(FVRegion region : keyboardList) {
+        for(FVRegion region : regionList) {
             for(FVKeyboard keyboard : region.keyboards) {
                 if(loadedKeyboards.contains(keyboard.id)) {
                     // Load the .keyboard_info file and find its first language code
-
-                    //KeyboardInfo keyboardInfo;
-                    //DO LOAD THE FILE
-
-                    HashMap<String, String> kbInfo = new HashMap<String, String>();
+                    HashMap<String, String> kbInfo = new HashMap<>();
                     kbInfo.put(KMManager.KMKey_PackageID, keyboard.id); //TODO: we want to share keyboard build scripts between ios and android; can we do this?
                     kbInfo.put(KMManager.KMKey_KeyboardID, keyboard.id);
                     kbInfo.put(KMManager.KMKey_LanguageID, "en"); //TODO: use language code from kmp.json
@@ -274,7 +257,7 @@ public class FVShared {
             }
             else {
                 // Add a default keyboard in if none are available
-                HashMap<String, String> kbInfo = new HashMap<String, String>();
+                HashMap<String, String> kbInfo = new HashMap<>();
                 kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
                 kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
                 kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
@@ -286,34 +269,33 @@ public class FVShared {
         }
     }
 
-    protected static String getResourceRoot(Context context) {
+    private String getResourceRoot() {
         return context.getDir("data", 0).toString() + File.separator;
     }
 
-    protected static String getPackagesDir(Context context) {
-        return getResourceRoot(context) + "packages" + File.separator;
+    private String getPackagesDir() {
+        return getResourceRoot() + "packages" + File.separator;
     }
 
-    private static void createDir(File dir) throws IOException
-    {
-        if (dir.exists())
-        {
-            if (!dir.isDirectory())
-            {
-                throw new IOException("Can't create directory, a file is in the way");
+    private void createDir(File dir) throws IOException {
+        if (dir.exists()) {
+            if (!dir.isDirectory()) {
+                throw new IOException("Cannot create directory, a file is in the way");
             }
-        } else
-        {
-            dir.mkdirs();
-            if (!dir.isDirectory())
-            {
+        } else {
+            if(!dir.mkdirs() || !dir.isDirectory()) {
                 throw new IOException("Unable to create directory");
             }
         }
     }
-    private static void copyAssets(Context context, String assetSource, String dest) throws IOException {
+
+    private void copyAssets(String assetSource, String dest) throws IOException {
         AssetManager assetManager = context.getAssets();
         String[] items = assetManager.list(assetSource);
+        if(items == null) {
+            // Nothing found to copy
+            return;
+        }
 
         File dest_dir = new File(dest);
         createDir(dest_dir);
@@ -321,7 +303,8 @@ public class FVShared {
         for(String item : items) {
             String assetItem = assetSource + File.separator + item;
             String destItem = dest + File.separator + item;
-            if(assetManager.list(assetItem).length == 0) {
+            String[] subItems = assetManager.list(assetItem);
+            if(subItems == null || subItems.length == 0) {
                 // Is a file or empty folder, try and copy it
                 InputStream in = assetManager.open(assetItem);
                 OutputStream out = new FileOutputStream(destItem);
@@ -334,18 +317,90 @@ public class FVShared {
                 out.close();
             } else {
                 // Is a folder,
-                copyAssets(context, assetItem, dest + "/" + item);
+                copyAssets(assetItem, dest + "/" + item);
             }
         }
     }
 
-    public static void preloadPackages(Context context) {
+    void preloadPackages() {
         try {
-            copyAssets(context, "packages", getPackagesDir(context));
+            copyAssets("packages", getPackagesDir());
         }
         catch (Exception e) {
             Log.e("preloadPackages", "Error: " + e);
             // We'll squawk in this situation
         }
+    }
+
+    /// Upgrades from an earlier vesion, converting data structures
+    /// The data structures in earlier versions were a bit messy
+    @SuppressWarnings("unchecked")
+    void upgradeTo12() {
+        File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), FVUpgrade_KeyboardList);
+        if(!file.exists()) {
+            // New install, or already upgraded to 12.0
+            return;
+        }
+
+        // Remove legacy preferences that are no longer required.
+        SharedPreferences prefs = context.getSharedPreferences(FVUpgrade_Preferences, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(FVUpgrade_KeyboardListHashKey);
+        editor.apply();
+
+        ArrayList<ArrayList<HashMap<String, String>>> keyboardList;
+
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+            keyboardList = (ArrayList<ArrayList<HashMap<String, String>>>) inputStream.readObject();
+            inputStream.close();
+        }
+        catch (Exception e) {
+            // Unable to load the data from earlier version. Log the issue, then we will
+            // just delete the file and give up on it. The user will have to reconfigure
+            // their keyboards but that's not the end of the world.
+            Log.e("upgradeTo12", "Error: " + e);
+            if(!file.delete()) {
+                Log.w("upgradeTo12", "Could not remove legacy data file "+FVUpgrade_KeyboardList);
+            }
+            return;
+        }
+
+        // We've loaded the data, so delete the legacy file.
+        if(!file.delete()) {
+            Log.w("upgradeTo12", "Could not remove legacy data file "+FVUpgrade_KeyboardList);
+        }
+
+        // Iterate through the keyboards and prepare the new active keyboard list
+        loadedKeyboards.clear();
+
+        int len1 = keyboardList.size();
+        for (int i = 0; i < len1; i+=2) {
+            ArrayList<HashMap<String, String>>  kbSubList = keyboardList.get(i+1);
+            int len2 = kbSubList.size();
+            for (int j = 0; j < len2; j++) {
+                HashMap<String, String> kbDict = kbSubList.get(j);
+                String checkState = kbDict.get(FVUpgrade_KeyboardCheckStateKey);
+                String kbFilename = kbDict.get(FVUpgrade_KeyboardFilenameKey);
+
+                if (checkState != null && kbFilename != null && checkState.equals("Y")) {
+                    // The keyboard is loaded, so find the equivalent entry in the
+                    // legacyId column
+                    boolean found = false;
+                    for (FVRegion region : regionList) {
+                        for (FVKeyboard keyboard : region.keyboards) {
+                            if (keyboard.legacyId.equalsIgnoreCase(kbFilename)) {
+                                loadedKeyboards.add(keyboard.id);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                }
+            }
+        }
+
+        saveLoadedKeyboardList();
     }
 }

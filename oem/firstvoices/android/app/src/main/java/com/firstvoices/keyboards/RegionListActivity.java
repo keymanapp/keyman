@@ -11,8 +11,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public final class RegionListActivity extends Activity {
 
@@ -20,7 +18,7 @@ public final class RegionListActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		final Context context = this;
-        final FVShared.FVRegionList regionList = FVShared.getKeyboardList(context);
+        final FVShared.FVRegionList regionList = FVShared.getInstance().getRegionList();
 
 		// Setup layout
 
@@ -32,7 +30,7 @@ public final class RegionListActivity extends Activity {
 
         FVRegionListAdapter listAdapter = new FVRegionListAdapter(context, regionList);
         listAdapter.listFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf");
-        final ListView listView = (ListView)findViewById(R.id.listView);
+        final ListView listView = findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
 
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -55,7 +53,7 @@ public final class RegionListActivity extends Activity {
         });
         listView.setSelectionFromTop(getIntent().getIntExtra("listPosition", 0), getIntent().getIntExtra("offsetY", 0));
 
-		final ImageButton backButton = (ImageButton)findViewById(R.id.left_button);
+		final ImageButton backButton = findViewById(R.id.left_button);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				finish();

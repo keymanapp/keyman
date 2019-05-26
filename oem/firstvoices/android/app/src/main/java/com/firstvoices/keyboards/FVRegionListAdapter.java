@@ -1,47 +1,41 @@
 package com.firstvoices.keyboards;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardInfoActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 final class FVRegionListAdapter extends ArrayAdapter<FVShared.FVRegion> {
 
-	protected Typeface listFont;
+	Typeface listFont;
 
 	private static class ViewHolder {
 		TextView text1, text2;
 	}
 
-	public FVRegionListAdapter(Context context, FVShared.FVRegionList regions) {
+	FVRegionListAdapter(Context context, FVShared.FVRegionList regions) {
 		super(context, 0, regions);
 	}
 
+	@NonNull
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 		ViewHolder holder;
 		FVShared.FVRegion region = getItem(position);
 
 		if(convertView == null) {
 			convertView = LayoutInflater.from(getContext()).inflate(R.layout.region_row_layout, parent, false);
 			holder = new ViewHolder();
-			holder.text1 = (TextView) convertView.findViewById(R.id.text1);
-			holder.text2 = (TextView) convertView.findViewById(R.id.text2);
+			holder.text1 = convertView.findViewById(R.id.text1);
+			holder.text2 = convertView.findViewById(R.id.text2);
 
 			if (listFont != null) {
 				holder.text1.setTypeface(listFont, Typeface.BOLD);
@@ -52,12 +46,15 @@ final class FVRegionListAdapter extends ArrayAdapter<FVShared.FVRegion> {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.text1.setText(region.name);
+		if(region != null) {
 
-		int kbCount = region.keyboards.size();
-		int activeKbCount = FVShared.activeKeyboardCount(getContext(), region);
+			holder.text1.setText(region.name);
 
-		holder.text2.setText(String.format("%d/%d", activeKbCount, kbCount));
+			int kbCount = region.keyboards.size();
+			int activeKbCount = FVShared.getInstance().activeKeyboardCount(region);
+
+			holder.text2.setText(String.format(Locale.US, "%d/%d", activeKbCount, kbCount));
+		}
 
 		return convertView;
 	}
