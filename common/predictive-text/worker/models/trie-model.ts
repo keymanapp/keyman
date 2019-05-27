@@ -73,12 +73,13 @@
     }
 
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
+      // TODO:  Get a better distribution!  Our words do have frequency weighting, right?
       let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
         let distribution: Distribution<Suggestion> = [];
         let n = suggestions.length;
 
         for(let s of suggestions) {
-          distribution.push({sample: s, p: 1.0/n});
+          distribution.push({sample: s, p: 1});
         }
 
         return distribution;

@@ -72,12 +72,13 @@
     }
 
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
+      let wordCount = this._wordlist.length;
       let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
         let distribution: Distribution<Suggestion> = [];
         let n = suggestions.length;
 
         for(let s of suggestions) {
-          distribution.push({sample: s, p: 1.0/n});
+          distribution.push({sample: s, p: 1.0 / wordCount});
         }
 
         return distribution;

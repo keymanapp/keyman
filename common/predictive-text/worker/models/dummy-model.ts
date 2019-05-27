@@ -58,7 +58,7 @@ namespace models {
         let n = suggestions.length;
 
         for(let s of suggestions) {
-          distribution.push({sample: s, p: 1.0/n});
+          distribution.push({sample: s, p: 1});  // For a dummy model, this is sufficient.  The uniformness is all that matters.
         }
 
         return distribution;
