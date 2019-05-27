@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -13,6 +14,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+
+import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler;
@@ -20,6 +23,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler;
 public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
 
     private View inputView = null;
+    private KMHardwareKeyboardInterpreter interpreter = null;
 
     /** Main initialization of the input method component. Be sure to call
      * to super class. */
@@ -33,12 +37,16 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
         KMManager.setShouldCheckKeyboardUpdates(false);
         KMManager.setKeyboardPickerFont(Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf"));
         KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+
+        interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        KMManager.setInputMethodService(this); // for HW interface
     }
 
     @Override
     public void onDestroy() {
         inputView = null;
         KMManager.removeKeyboardEventListener(this);
+        interpreter = null; // Throw it away, since we're losing our application's context.
         KMManager.onDestroy();
         super.onDestroy();
     }
@@ -161,5 +169,25 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
     @Override
     public void onKeyboardDismissed() {
         // Handle Keyman keyboard dismissed event here if needed
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return interpreter.onKeyDown(keyCode, event);  // if false, will revert to default handling.
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return interpreter.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyMultiple(int keyCode, int count, KeyEvent event) {
+        return interpreter.onKeyMultiple(keyCode, count, event);
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        return interpreter.onKeyLongPress(keyCode, event);
     }
 }
