@@ -156,6 +156,31 @@ describe('LMLayerWorker trie model for word lists', function() {
     });
   })
 
+  it('replaces the entire typed word when a suggestion is accepted', function () {
+      // Ensure that all input is lower-cased when we try to look it up.
+      var model = new TrieModel(jsonFixture('tries/english-1000'), {
+        searchTermToKey: function (searchTerm) {
+          let result = searchTerm.toLowerCase();
+          return result;
+        }
+      });
+
+      // Note: the input is **UPPERCASE**
+      var context = { left: 'T', startOfBuffer: false, endOfBuffer: true };
+      var transform = { insert: "H", deleteLeft: 0 };
+
+      // Predict upon typing
+      //   «TH|                        » [Send]
+      //   [  there ] [   the   ] [   they    ]
+      var [suggestion] = model.predict(transform, context);
+      // I'm assuming the top word in English is "the".
+      assert.strictEqual(suggestion.displayAs, 'the');
+
+      var newBuffer = applyTransform(context, suggestion.transform);
+      // The suggestion should change it to lowercase.
+      assert.strictEqual(newBuffer, 'the ');
+  });
+
   function applyTransform(context, transform) {
     assert.isTrue(context.endOfBuffer, "cannot only apply transform to end of buffer");
     var buffer = context.left;
