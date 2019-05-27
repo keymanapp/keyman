@@ -52,11 +52,29 @@ namespace models {
       return this.configuration;
     }
 
-    predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Suggestion[] {
-      if (injectedSuggestions) {
-        return injectedSuggestions;
+    predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Distribution<Suggestion> {
+      let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
+        let distribution: Distribution<Suggestion> = [];
+        let n = suggestions.length;
+
+        for(let s of suggestions) {
+          distribution.push({sample: s, p: 1.0/n});
+        }
+
+        return distribution;
       }
-      return this._futureSuggestions.shift();
+
+      if (injectedSuggestions) {
+        return makeUniformDistribution(injectedSuggestions);
+      }
+
+      let currentSet = this._futureSuggestions.shift();
+      
+      if(!currentSet) {
+        return null;
+      } else {
+        return makeUniformDistribution(currentSet);
+      }
     }
   };
 }

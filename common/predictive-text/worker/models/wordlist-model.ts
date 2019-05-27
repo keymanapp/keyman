@@ -71,7 +71,18 @@
       };
     }
 
-    predict(transform: Transform, context: Context): Suggestion[] {
+    predict(transform: Transform, context: Context): Distribution<Suggestion> {
+      let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
+        let distribution: Distribution<Suggestion> = [];
+        let n = suggestions.length;
+
+        for(let s of suggestions) {
+          distribution.push({sample: s, p: 1.0/n});
+        }
+
+        return distribution;
+      }
+
       // EVERYTHING to the left of the cursor: 
       let fullLeftContext = context.left || '';
       // Stuff to the left of the cursor in the current word.
@@ -84,13 +95,13 @@
 
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
-        return this._wordlist.slice(0, MAX_SUGGESTIONS).map(word => ({
+        return makeUniformDistribution(this._wordlist.slice(0, MAX_SUGGESTIONS).map(word => ({
           transform: {
             insert: word + ' ',
             deleteLeft: 0
           },
           displayAs: word
-        }));
+        })));
       }
 
       // Naïve O(n) exhaustive search through the entire word
@@ -116,7 +127,7 @@
         }
       }
 
-      return suggestions;
+      return makeUniformDistribution(suggestions);
     }
   };
 }

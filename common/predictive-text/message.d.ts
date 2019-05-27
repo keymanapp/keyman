@@ -180,6 +180,26 @@ interface Transform {
 }
 
 /**
+ * Represents members of a probability distribution over potential outputs
+ * from ambiguous text sequences.  Designed for use with fat-finger correction
+ * and similar typing ambiguities.
+ */
+interface ProbabilityMass<T> {
+  /**
+   * A potentially-valid Transform usable to produce the next state of input.
+   */
+  sample: T;
+
+  /**
+   * The probability mass for this member of the distribution,
+   * calculated devoid of any language-modeling influences.
+   */
+  p: number;
+}
+
+type Distribution<T> = ProbabilityMass<T>[];
+
+/**
  * The text and environment surrounding the insertion point (text cursor).
  */
 interface Context {
