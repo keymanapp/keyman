@@ -35,7 +35,7 @@ class ModelCompositor {
     // TODO:  What if the model emits duplicate samples, each with their own mass?
 
     suggestionDistribution = suggestionDistribution.sort(function(a, b) {
-      return a.p - b.p;
+      return b.p - a.p; // Use descending order - we want the largest probabilty suggestions first!
     });
 
     let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {

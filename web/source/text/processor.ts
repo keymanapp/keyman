@@ -481,7 +481,7 @@ namespace com.keyman.text {
 
             let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
             if(this.processKeystroke(altEvent, mock, fromOSK, true)) {
-              alternates.push({t: mock.buildTransformFrom(preInputMock), 'p': pair.p});
+              alternates.push({sample: mock.buildTransformFrom(preInputMock), 'p': pair.p});
             }
           }
         }
