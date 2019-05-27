@@ -70,7 +70,11 @@ namespace com.keyman.text {
 
         switch(code) {
           case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            keyman.interface.defaultBackspace();
+            if(disableDOM) {
+              return '\b'; // the escape sequence for backspace.
+            } else {
+              keyman.interface.defaultBackspace();
+            }
             return '';
           case Codes.keyCodes['K_TAB']:
             if(!disableDOM) {
@@ -341,7 +345,12 @@ namespace com.keyman.text {
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
         var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
         if(ch) {
-          kbdInterface.output(0, outputTarget, ch);
+          if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
+            // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
+            kbdInterface.defaultBackspace(outputTarget);
+          } else {
+            kbdInterface.output(0, outputTarget, ch);
+          }
           LeventMatched = 1;
         } else if(keyEvent.Lcode == 8) { // Backspace
           LeventMatched = 1;
@@ -469,6 +478,7 @@ namespace com.keyman.text {
               console.warn("Potential fat-finger key could not be found in layer!");
               continue;
             }
+
             let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
             if(this.processKeystroke(altEvent, mock, fromOSK, true)) {
               alternates.push({t: mock.buildTransformFrom(preInputMock), 'p': pair.p});
