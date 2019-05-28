@@ -67,13 +67,16 @@ public class KMPKeyboard
         if let languageName = languageJson["name"],
            let languageId = languageJson["id"] {
               self.languages.append(KMPLanguage(name: languageName, languageId: languageId))
+              break
         }
       }
     }
     
     self.osk = json["oskFont"] as? String
     self.font = json["displayFont"] as? String
-    
+    //true if the keyboard targets a right-to-left script. false if absent.
+    let isrtl: Bool =  json["rtl"] as? Bool ?? false
+
     if(self.keyboardId != nil && self.name != nil)
     {
       var installableKeyboards : [InstallableKeyboard] = []
@@ -83,7 +86,7 @@ public class KMPKeyboard
                                            languageID: language.languageId,
                                            languageName: language.name,
                                            version: version,
-                                           isRTL: false,
+                                           isRTL: isrtl,
                                            font: displayFont,
                                            oskFont: oskFont,
                                            isCustom: true) //update this based on adhoc vs api
