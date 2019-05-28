@@ -31,7 +31,6 @@
 
 /// <reference path="../message.d.ts" />
 /// <reference path="models/dummy-model.ts" />
-/// <reference path="models/wordlist-model.ts" />
 /// <reference path="word_breaking/ascii-word-breaker.ts" />
 
 /**
