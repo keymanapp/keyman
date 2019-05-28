@@ -362,7 +362,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             let name = k["name"] as! String
             let keyboardID = k["id"] as! String
             let version = k["version"] as! String
-            
+            //true if the keyboard targets a right-to-left script. false if absent.
+            let isrtl: Bool =  k["rtl"] as? Bool ?? false
+
             var oskFont: Font?
             let osk = k["oskFont"] as? String
             if let _ = osk {
@@ -390,7 +392,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                   languageID: languageId,
                   languageName: languageName,
                   version: version,
-                  isRTL: false, // rrb: how do we know this? possible source of losing RTL flag?
+                  isRTL: isrtl,
                   font: displayFont,
                   oskFont: oskFont,
                   isCustom: false))
