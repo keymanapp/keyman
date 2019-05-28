@@ -446,16 +446,12 @@ namespace com.keyman.text {
       }
       // // ...end I3363 (Build 301)
 
-      /// Now that we've filtered out special cases, it's time to do serious keystroke processing.
-
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
       let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
-
-      // End of fat-finger loop section; the rest is post-processing maintenance.
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
@@ -485,9 +481,9 @@ namespace com.keyman.text {
             }
           }
         }
-
-        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent, alternates);
+        
         // Notify the ModelManager of new input
+        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent, alternates);
         keyman.modelManager.predict(transcription);
 
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation

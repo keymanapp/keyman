@@ -908,7 +908,7 @@ namespace com.keyman.osk {
 
         // Also backspace, to allow delete to repeat while key held
       } else if(keyName == 'K_BKSP') {
-        let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]); // TODO: Send fat-finger info
+        let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
         Processor.clickKey(key, e.changedTouches[0], this.layerId, touchProbabilities);
@@ -919,7 +919,7 @@ namespace com.keyman.osk {
       } else {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
-          let touchProbabilities = this.getTouchProbabilities(this.touchPending); // TODO: Send fat-finger info
+          let touchProbabilities = this.getTouchProbabilities(this.touchPending);
           Processor.clickKey(this.keyPending, this.touchPending, this.layerId, touchProbabilities);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
@@ -983,7 +983,7 @@ namespace com.keyman.osk {
 
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
-          let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]); // TODO: Send fat-finger info
+          let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
           Processor.clickKey(this.keyPending, e.changedTouches[0], this.layerId, touchProbabilities);
         }
         this.clearPopup();
