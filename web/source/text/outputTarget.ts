@@ -29,11 +29,6 @@ namespace com.keyman.text {
     readonly alternates: Alternate[];
     readonly preInput: Mock;
 
-    // // While not presently needed, there's a chance we'll want to have this information tracked
-    // // for developments later down the line.  May as well resolve the logic now.
-    // readonly removedDks: Deadkey[];
-    // readonly insertedDks: Deadkey[];
-
     private static tokenSeed: number = 0;
 
     constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
@@ -43,8 +38,6 @@ namespace com.keyman.text {
       this.transform = transform;
       this.alternates = alternates;
       this.preInput = preInput;
-      // this.removedDks = removedDks;
-      // this.insertedDks = insertedDks;
 
       this.transform.id = this.token;
     }
@@ -132,43 +125,9 @@ namespace com.keyman.text {
     buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, alternates?: Alternate[]): Transcription {
       let transform = this.buildTransformFrom(original);
 
-      // // While not presently needed, there's a chance we'll want to have Deadkey mutation tracked
-      // // for developments later down the line.  May as well resolve the logic now.
+      // If we ever decide to re-add deadkey tracking, this is the place for it.
 
-      // // Determine what deadkeys were removed and added.
-      // let fromDks = original.deadkeys().toSortedArray();
-      // let toDks = this.deadkeys().toSortedArray();
-      
-      // let commonDks: Deadkey[] = [];
-      // let removedDks: Deadkey[] = [];
-      // let insertedDks: Deadkey[] = [];
-      
-      // // Since the ordinals of any original deadkey are preserved, we can check for the (id, ordinal).
-      // fromDks.forEach(function(dk: Deadkey){
-      //   for(var i=0; i < toDks.length; i++) {
-      //     if(toDks[i].d == dk.d && toDks[i].o == dk.o) {
-      //       commonDks.push(dk);
-      //       return;
-      //     }
-      //   }
-
-      //   // Wasn't found to be in common?  Must have been removed.
-      //   removedDks.push(dk);
-      // });
-
-      // toDks.forEach(function(dk: Deadkey) {
-      //   for(var i=0; i < commonDks.length; i++) {
-      //     if(commonDks[i].d == dk.d && commonDks[i].o == dk.o) {
-      //       // It's a common one.
-      //       return;
-      //     }
-      //   }
-
-      //   // Wasn't found to be in common?  Must have been inserted.
-      //   insertedDks.push(dk);
-      // });
-
-      return new Transcription(keyEvent, transform, Mock.from(original), alternates/*, removedDks, insertedDks*/);
+      return new Transcription(keyEvent, transform, Mock.from(original), alternates);
     }
 
     /**
