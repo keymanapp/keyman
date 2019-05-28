@@ -5,22 +5,6 @@
 type WordList = [string, number][];
 
 /**
- * Returns a data structure suitable for use by the wordlist model.
- *
- * @param sourceFiles an array of the CONTENTS of source files
- *
- * @return a data structure that will be used internally by the wordlist
- *         implemention. Currently this is an array of [wordlist, count] pairs.
- */
-export function createWordListDataStructure(sourceFiles: string[]): string {
-  // NOTE: this generates a simple array of word forms --- not a trie!
-  // In the future, this function may construct a true trie data structure,
-  // but this is not yet implemented.
-  let contents = sourceFiles.join('\n');
-  return JSON.stringify(parseWordList(contents));
-}
-
-/**
  * Returns a data structure that can be loaded by the TrieModel.
  *
  * It implements a **weighted** trie, whose indices (paths down the trie) are
