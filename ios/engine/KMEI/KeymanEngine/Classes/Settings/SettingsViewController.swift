@@ -87,6 +87,21 @@ open class SettingsViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return 3
     }
+  
+  public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
+    let rightOffset = cellFrame.size.width
+    let switchWidth: CGFloat = 20
+    let switchX = rightOffset - switchWidth
+    let switchHeight = controlSize.height
+    let cellSwitchHeightDiff = cellFrame.size.height - switchHeight
+    let switchY = cellFrame.origin.y + 0.5 * cellSwitchHeightDiff
+    
+    let switchFrame = CGRect(x: switchX,
+                             y: switchY,
+                             width: switchWidth,
+                             height: cellFrame.size.height)
+    return switchFrame
+  }
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
@@ -101,14 +116,62 @@ open class SettingsViewController: UITableViewController {
         cell.accessoryType = .disclosureIndicator
       case "showbanner":
         cell.accessoryType = .none
+        let showBannerSwitch = UISwitch()
+        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
+        showBannerSwitch.frame = switchFrame
+        showBannerSwitch.isOn = false //TODO: find the setting this is to show!
+        showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
+                                      for: .valueChanged)
+        cell.addSubview(showBannerSwitch)
       case "showgetstarted":
         cell.accessoryType = .none
+        let dontShowAgainSwitch = UISwitch()
+//        let rightOffset = cell.frame.size.width
+//        let switchWidth: CGFloat = 20
+//        let switchX = rightOffset - switchWidth
+//        let dontShowAgainSwitch = UISwitch()
+//        let switchHeight = dontShowAgainSwitch.frame.size.height
+//        let cellSwitchHeightDiff = cell.frame.size.height - switchHeight
+//        let switchY = cell.frame.origin.y + 0.5 * cellSwitchHeightDiff
+
+//        let switchFrame = CGRect(x: switchX,
+//                                 y: switchY,
+//                                 width: switchWidth,
+//                                 height: cell.frame.size.height)
+        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: dontShowAgainSwitch.frame.size)
+        dontShowAgainSwitch.frame = switchFrame
+        dontShowAgainSwitch.isOn = dontShowGetStarted
+        dontShowAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
+                                      for: .valueChanged)
+        cell.addSubview(dontShowAgainSwitch)
+
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
     }
     
     return cell
+  }
+  
+  @objc func bannerSwitchValueChanged(_ sender: Any) {
+    let userData = Storage.active.userDefaults
+    if let toggle = sender as? UISwitch {
+      userData.set(toggle.isOn, forKey: "ShouldShowBanner") //???
+      userData.synchronize()
+    }
+  }
+  
+  @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
+    let userData = Storage.active.userDefaults
+    if let toggle = sender as? UISwitch {
+      userData.set(toggle.isOn, forKey: "ShouldShowGetStarted")
+      userData.synchronize()
+    }
+  }
+  
+  private var dontShowGetStarted: Bool {
+    let userData = Storage.active.userDefaults
+    return !userData.bool(forKey: "ShouldShowGetStarted")
   }
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -117,52 +180,15 @@ open class SettingsViewController: UITableViewController {
     cell.textLabel?.text = itemsArray[indexPath.row]["title"]
     cell.detailTextLabel?.text = itemsArray[indexPath.row]["subtitle"]
     cell.tag = indexPath.row
-    
+    cell.isUserInteractionEnabled = true
+
     if indexPath.row == 0 {
       cell.accessoryType = .disclosureIndicator
     } else {
-      cell.isUserInteractionEnabled = false
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = false
     }
 
-//    var reuseID: String = "foo"
-//    let lastIndex = indexPath.index(before: indexPath.endIndex)
-//    let rowType = indexPath[lastIndex]
-//    switch(rowType) {
-//      case 0:
-//        reuseID = "languages"
-//      case 1:
-//        reuseID = "showbanner"
-//      case 2:
-//        reuseID = "showgetstarted"
-//      default:
-//        log.error("undefined indexPath(\rowType")
-//        reuseID = "foo"
-//    }
-//    if let cell = tableView.dequeueReusableCell(withIdentifier: reuseID) {
-//      return cell
-//    }
-//
-//    let cell = UITableViewCell(style: .default, reuseIdentifier: reuseID)
-//
-//    // Configure the cell...
-//    let selectionColor = UIView()
-//    selectionColor.backgroundColor = UIColor(red: 74.0 / 255.0, green: 186.0 / 255.0, blue: 208.0 / 255.0, alpha: 1.0)
-//    cell.selectedBackgroundView = selectionColor
-//    switch(rowType) {
-//      case 0:
-//        cell.textLabel?.text = "Installed Languages2"
-//        cell.accessoryType = .disclosureIndicator
-//      case 1:
-//        cell.textLabel?.text = "Show Banner"
-//      case 2:
-//        cell.textLabel?.text = "Show 'Get Started' at startup'"
-//      default:
-//        log.error("undefined indexPath(\rowType")
-//    }
-//
-//    return cell
   }
   
   // In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
