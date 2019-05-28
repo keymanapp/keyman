@@ -186,7 +186,7 @@ interface Transform {
  */
 interface ProbabilityMass<T> {
   /**
-   * A potentially-valid Transform usable to produce the next state of input.
+   * An individual sample from a Distribution over the same type.
    */
   sample: T;
 
