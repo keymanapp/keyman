@@ -153,7 +153,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
     String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardName};
     int[] to = new int[]{R.id.text1, R.id.text2};
-    listAdapter = new KMKeyboardPickerAdapter(context, keyboardsList, R.layout.list_row_layout3, from, to);
+    listAdapter = new KMKeyboardPickerAdapter(context, keyboardsList);
     listAdapter.listFont = listFont;
     listView.setAdapter(listAdapter);
     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);

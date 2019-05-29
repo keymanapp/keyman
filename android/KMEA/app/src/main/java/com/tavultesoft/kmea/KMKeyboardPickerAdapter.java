@@ -5,60 +5,59 @@
 package com.tavultesoft.kmea;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-final class KMKeyboardPickerAdapter extends SimpleAdapter implements OnClickListener {
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.adapters.KeyboardsAdapter;
+
+final class KMKeyboardPickerAdapter extends KeyboardsAdapter implements OnClickListener {
+  private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
 
   private Context context;
-  private List<? extends Map<String, ?>> data;
-  private ArrayList<HashMap<String, String>> keyboardsList = null;
   protected Typeface listFont;
 
-  public KMKeyboardPickerAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
-    super(context, data, resource, from, to);
+  static List<Keyboard> mapCast(List<? extends Map<String, String>> data) {
+    List<Keyboard> kbdData = new ArrayList<>();
+    for(Map<String, String> kbd: data) {
+      kbdData.add(new Keyboard(kbd));
+    }
+
+    return kbdData;
+  }
+
+  public KMKeyboardPickerAdapter(Context context, List<? extends Map<String, String>> data) {
+    super(context, KEYBOARD_LAYOUT_RESOURCE, mapCast(data));
     this.context = context;
-    this.data = data;
   }
 
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
-    View view = super.getView(position, convertView, parent);
+    Keyboard kbd = getItem(position);
 
-    if (keyboardsList == null || keyboardsList.size() != data.size()) {
-      keyboardsList = new ArrayList<HashMap<String, String>>();
-      int length = data.size();
-      for (int i = 0; i < length; i++) {
-        HashMap<String, String> kbInfo = new HashMap<String, String>();
-        kbInfo.put(KMManager.KMKey_PackageID, data.get(i).get(KMManager.KMKey_PackageID).toString());
-        kbInfo.put(KMManager.KMKey_KeyboardID, data.get(i).get(KMManager.KMKey_KeyboardID).toString());
-        kbInfo.put(KMManager.KMKey_LanguageID, data.get(i).get(KMManager.KMKey_LanguageID).toString());
-        kbInfo.put(KMManager.KMKey_KeyboardName, data.get(i).get(KMManager.KMKey_KeyboardName).toString());
-        kbInfo.put(KMManager.KMKey_KeyboardVersion, data.get(i).get(KMManager.KMKey_KeyboardVersion).toString());
-        String isCustom = "N";
-        if (data.get(i).get(KMManager.KMKey_CustomKeyboard) != null)
-          isCustom = data.get(i).get(KMManager.KMKey_CustomKeyboard).toString();
-        kbInfo.put(KMManager.KMKey_CustomKeyboard, isCustom);
-        if (data.get(i).get(KMManager.KMKey_CustomHelpLink) != null)
-          kbInfo.put(KMManager.KMKey_CustomHelpLink, data.get(i).get(KMManager.KMKey_CustomHelpLink).toString());
-        keyboardsList.add(kbInfo);
-      }
+    // If we're being told to reuse an existing view, do that.  It's automatic optimization.
+    if(convertView == null) {
+      convertView = LayoutInflater.from(getContext()).inflate(KEYBOARD_LAYOUT_RESOURCE, parent, false);
     }
 
-    TextView text1 = (TextView) view.findViewById(R.id.text1);
-    TextView text2 = (TextView) view.findViewById(R.id.text2);
+    View view = convertView;
+
+    TextView text1 = view.findViewById(R.id.text1);
+    TextView text2 = view.findViewById(R.id.text2);
+
+    text1.setText(kbd.map.get(KMManager.KMKey_LanguageName));
+    text2.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+
     if (listFont != null) {
       text1.setTypeface(listFont, Typeface.BOLD);
       text2.setTypeface(listFont, Typeface.NORMAL);
@@ -68,7 +67,7 @@ final class KMKeyboardPickerAdapter extends SimpleAdapter implements OnClickList
       text2.setVisibility(View.INVISIBLE);
 
     ImageButton imgButton = (ImageButton) view.findViewById(R.id.imageButton1);
-    imgButton.setTag(keyboardsList.get(position));
+    imgButton.setTag(kbd);
     imgButton.setOnClickListener(this);
     return view;
   }
@@ -81,7 +80,7 @@ final class KMKeyboardPickerAdapter extends SimpleAdapter implements OnClickList
   @Override
   public void onClick(View v) {
     @SuppressWarnings("unchecked")
-    HashMap<String, String> kbInfo = (HashMap<String, String>) v.getTag();
+    Map<String, String> kbInfo = ((Keyboard) v.getTag()).map;
     Intent i = new Intent(context, KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
     String packageID = kbInfo.get(KMManager.KMKey_PackageID);
