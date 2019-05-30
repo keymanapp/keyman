@@ -5,15 +5,15 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 
 import java.util.Collections;
 import java.util.List;
 
-public class KeyboardsAdapter extends ArrayAdapter<Keyboard> implements ListBacked<Keyboard> {
-  private final List<Keyboard> data;
+public class LexicalModelAdapter extends ArrayAdapter<LexicalModel> implements ListBacked<LexicalModel> {
+  private final List<LexicalModel> data;
 
-  public KeyboardsAdapter(@NonNull Context context, int resource, @NonNull List<Keyboard> data) {
+  public LexicalModelAdapter(@NonNull Context context, int resource, @NonNull List<LexicalModel> data) {
     super(context, resource, data);
 
     // We only want to allow mutations through the adapter, but it's useful to maintain
@@ -21,7 +21,7 @@ public class KeyboardsAdapter extends ArrayAdapter<Keyboard> implements ListBack
     this.data = Collections.unmodifiableList(data);
   }
 
-  public List<Keyboard> asList() {
+  public List<LexicalModel> asList() {
     return this.data;
   }
 

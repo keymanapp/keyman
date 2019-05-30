@@ -7,11 +7,11 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-public class RepositoryDataset extends ArrayAdapter<LanguageDataset> {
+public class Dataset extends ArrayAdapter<LanguageDataset> {
   // Stores internal adapters for keyboard, lexical model listings
   // 'Items' are language-specific datasets holding their own language-specific adapters.
 
-  public RepositoryDataset(@NonNull Context context, int resource, @NonNull List<LanguageDataset> objects) {
+  private Dataset(@NonNull Context context, int resource, @NonNull List<LanguageDataset> objects) {
     super(context, resource, objects);
   }
 }

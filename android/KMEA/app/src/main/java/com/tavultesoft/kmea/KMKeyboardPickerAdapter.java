@@ -15,13 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.adapters.KeyboardsAdapter;
 
-final class KMKeyboardPickerAdapter extends KeyboardsAdapter implements OnClickListener {
+final class KMKeyboardPickerAdapter extends ArrayAdapter<Keyboard> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
 
   private Context context;
@@ -36,9 +36,9 @@ final class KMKeyboardPickerAdapter extends KeyboardsAdapter implements OnClickL
     return kbdData;
   }
 
+  // TODO:  End goal:  take in a KeyboardAdapter instead of this list; reference that as needed.
   public KMKeyboardPickerAdapter(Context context, List<? extends Map<String, String>> data) {
     super(context, KEYBOARD_LAYOUT_RESOURCE, mapCast(data));
-    this.context = context;
   }
 
   @Override
