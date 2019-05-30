@@ -49,7 +49,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>Keyman $(PRODUCT_VERSION) for macOS</string>
+	<string>$(PRODUCT_VERSION)</string>
 	<key>CFBundleGetInfoString</key>
 	<string>$(GET_INFO_STRING)</string>
 	<key>Fabric</key>
