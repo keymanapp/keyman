@@ -1019,6 +1019,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       if let error = error {
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+(error as! String))
         self.downloadFailed(forLanguageID: languageID, error: error) //???forKeyboards
+      } else if nil == lexicalModels {
+        log.info("No lexical models available for language \(languageID) (nil)")
+      } else if 0 == lexicalModels?.count {
+        log.info("No lexical models available for language \(languageID) (empty)")
       } else {
         log.info("Fetched lexical model list for "+languageID+".")
         // choose which of the lexical models to download
