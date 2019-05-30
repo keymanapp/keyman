@@ -15,30 +15,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+import com.tavultesoft.kmea.data.adapters.KeyboardsAdapter;
 
-final class KMKeyboardPickerAdapter extends ArrayAdapter<Keyboard> implements OnClickListener {
+final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, KeyboardsAdapter> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
 
   private Context context;
   protected Typeface listFont;
 
-  static List<Keyboard> mapCast(List<? extends Map<String, String>> data) {
-    List<Keyboard> kbdData = new ArrayList<>();
-    for(Map<String, String> kbd: data) {
-      kbdData.add(new Keyboard(kbd));
-    }
-
-    return kbdData;
-  }
+//  static List<Keyboard> mapCast(List<? extends Map<String, String>> data) {
+//    List<Keyboard> kbdData = new ArrayList<>();
+//    for(Map<String, String> kbd: data) {
+//      kbdData.add(new Keyboard(kbd));
+//    }
+//
+//    return kbdData;
+//  }
 
   // TODO:  End goal:  take in a KeyboardAdapter instead of this list; reference that as needed.
-  public KMKeyboardPickerAdapter(Context context, List<? extends Map<String, String>> data) {
-    super(context, KEYBOARD_LAYOUT_RESOURCE, mapCast(data));
+  public KMKeyboardPickerAdapter(Context context, KeyboardsAdapter adapter) {
+    super(context, KEYBOARD_LAYOUT_RESOURCE, adapter);
   }
 
   @Override

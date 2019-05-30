@@ -20,8 +20,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.data.adapters.KeyboardsAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
@@ -151,9 +153,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     }
 
-    String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardName};
-    int[] to = new int[]{R.id.text1, R.id.text2};
-    listAdapter = new KMKeyboardPickerAdapter(context, keyboardsList);
+    listAdapter = new KMKeyboardPickerAdapter(context, getKeyboardsAdapter(context)); ;//keyboardsList);
     listAdapter.listFont = listFont;
     listView.setAdapter(listAdapter);
     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -580,6 +580,17 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return list;
+  }
+
+  protected static KeyboardsAdapter getKeyboardsAdapter(Context context) {
+    List<? extends Map<String, String>> mapList = getKeyboardsList(context);
+    List<Keyboard> kbdsList = new ArrayList<>(mapList.size());
+
+    for(Map<String, String> map: mapList) {
+      kbdsList.add(new Keyboard(map));
+    }
+
+    return new KeyboardsAdapter(context, 0, kbdsList);
   }
 
   protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
