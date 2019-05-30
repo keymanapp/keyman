@@ -87,22 +87,18 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       cell = reusedCell
     } else {
+      let selectionColor = UIView()
+      selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0,
+                                               blue: 34.0 / 255.0, alpha: 1.0)
       if keyboards.count < 2 {
         cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
-        let selectionColor = UIView()
-        selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0,
-                                                 blue: 34.0 / 255.0, alpha: 1.0)
-        cell.selectedBackgroundView = selectionColor
       } else {
-        cell = UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
-        cell.accessoryType = .disclosureIndicator
-        let selectionColor = UIView()
-        selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0,
-                                                 blue: 34.0 / 255.0, alpha: 1.0)
-        cell.selectedBackgroundView = selectionColor
+        cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
       }
+      cell.selectedBackgroundView = selectionColor
+      cell.accessoryType = .disclosureIndicator
     }
-    cell.detailTextLabel?.text = keyboards.count < 2 ? (keyboards.first?.name ?? "") : ""
+    cell.detailTextLabel?.text = keyboards.count < 2 ? (keyboards.first?.name ?? "") : "\(keyboards.count) installed"
     return cell
   }
   
@@ -142,20 +138,13 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       return
     }
     
-    let languageID = language.id
     let keyboardID = language.keyboards![0].id
     
-    if isAdded(languageID: languageID, keyboardID: keyboardID) {
-      cell.accessoryType = .checkmark
-      cell.isUserInteractionEnabled = false
-      cell.textLabel?.isEnabled = false
-      cell.detailTextLabel?.isEnabled = false
-    } else {
-      cell.accessoryType = .none
-      cell.isUserInteractionEnabled = true
-      cell.textLabel?.isEnabled = true
-      cell.detailTextLabel?.isEnabled = true
-    }
+    cell.accessoryType = .none
+    cell.isUserInteractionEnabled = true
+    cell.textLabel?.isEnabled = true
+    cell.detailTextLabel?.isEnabled = true
+    
     let kbState = Manager.shared.stateForKeyboard(withID: keyboardID)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
@@ -165,7 +154,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     tableView.cellForRow(at: indexPath)?.isSelected = false
     if tableView.cellForRow(at: indexPath)?.accessoryType == .disclosureIndicator {
       let title = tableView.cellForRow(at: indexPath)?.textLabel?.text ?? ""
-      showLanguageDetailView(title: title, languageIndex: indexPath.section)
+      showLanguageSettingsView(title: title, languageIndex: indexPath.section)
       return
     }
     
@@ -173,31 +162,28 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     let keyboardIndex = 0;
     let keyboard = language.keyboards![keyboardIndex]
     
-    let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
-    if state != .downloading {
-      isUpdate = state != .needsDownload
-      let alertController = UIAlertController(title: "\(language.name): \(keyboard.name)",
-        message: "Would you like to download this keyboard?",
-        preferredStyle: UIAlertControllerStyle.alert)
-      alertController.addAction(UIAlertAction(title: "Cancel",
-                                              style: UIAlertActionStyle.cancel,
-                                              handler: nil))
-      alertController.addAction(UIAlertAction(title: "Download",
-                                              style: UIAlertActionStyle.default,
-                                              handler: {_ in self.downloadHandler(keyboardIndex)} ))
-      self.present(alertController, animated: true, completion: nil)
-    }
+    //TODO: launch real Language Settings controller here
+    let languageSettingsController = UIAlertController(title: "\(language.name): \(keyboard.name)",
+      message: "This  should be Language Settings",
+      preferredStyle: UIAlertControllerStyle.alert)
+    languageSettingsController.addAction(UIAlertAction(title: "Cancel",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+//    languageSettingsController.addAction(UIAlertAction(title: "Download",
+//                                            style: UIAlertActionStyle.default,
+//                                            handler: {_ in self.downloadHandler(keyboardIndex)} ))
+    self.present(languageSettingsController, animated: true, completion: nil)
   }
   
   override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
     let title = tableView.cellForRow(at: indexPath)?.textLabel?.text ?? ""
-    showLanguageDetailView(title: title, languageIndex: indexPath.section)
+    showLanguageSettingsView(title: title, languageIndex: indexPath.section)
   }
   
-  private func showLanguageDetailView(title: String, languageIndex: Int) {
-    let langDetailView = LanguageDetailViewController(language: languages[languageIndex])
-    langDetailView.title = title
-    navigationController?.pushViewController(langDetailView, animated: true)
+  private func showLanguageSettingsView(title: String, languageIndex: Int) {
+    let langSettingsView = LanguageSettingsViewController(languages[languageIndex])
+    langSettingsView.title = title
+    navigationController?.pushViewController(langSettingsView, animated: true)
   }
   
   func errorAcknowledgmentHandler(withAction action: UIAlertAction) {

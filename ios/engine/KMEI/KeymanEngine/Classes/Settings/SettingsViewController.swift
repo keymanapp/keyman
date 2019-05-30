@@ -156,6 +156,7 @@ open class SettingsViewController: UITableViewController {
   @objc func bannerSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
+      // actually this should call into KMW, which controls the banner
       userData.set(toggle.isOn, forKey: "ShouldShowBanner") //???
       userData.synchronize()
     }
@@ -264,7 +265,14 @@ open class SettingsViewController: UITableViewController {
     var keyboardLanguages = [String: Language]()
     for k in userKeyboards {
       let l = k.languageID
-      keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: [Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil)], lexicalModels: nil, font: nil, oskFont: nil)
+      var kbds: [Keyboard]
+      if let existingLanguage = keyboardLanguages[l] {
+        kbds = existingLanguage.keyboards ?? []
+        kbds.append(Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil))
+      } else {
+        kbds = [Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil)]
+      }
+      keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: nil, font: nil, oskFont: nil)
     }
     // there shouldn't be any lexical models for languages that don't have a keyboard installed
     //  but check
@@ -279,7 +287,7 @@ open class SettingsViewController: UITableViewController {
     }
 
     userLanguages = keyboardLanguages
-    itemsArray[0]["subtitle"] = String(userLanguages.count)
+    itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {
