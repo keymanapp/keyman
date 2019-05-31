@@ -71,7 +71,7 @@ namespace models {
       let currentSet = this._futureSuggestions.shift();
       
       if(!currentSet) {
-        return null;
+        return [];
       } else {
         return makeUniformDistribution(currentSet);
       }
