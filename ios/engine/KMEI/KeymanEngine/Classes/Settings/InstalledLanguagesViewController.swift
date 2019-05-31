@@ -21,8 +21,8 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private var indices: [Int] = []
   private var selectedSection = 0
   private var isUpdate = false
-  private var languages: [Language] = []
   private var installedLanguages: [String: Language]
+  private var languages: [Language] = []
   private let keyboardRepository: KeyboardRepository?
   private let lexicalModelRepository: LexicalModelRepository?
   

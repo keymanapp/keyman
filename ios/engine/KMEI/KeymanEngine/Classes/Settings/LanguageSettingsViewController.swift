@@ -10,7 +10,9 @@ import UIKit
 
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
-  
+  private var userKeyboards: [String: Language] = [:]
+  private var settingsArray = [[String: String]]()
+
   public init(_ inLanguage: Language) {
     language = inLanguage
     super.init(nibName: nil, bundle: nil)
@@ -21,14 +23,15 @@ class LanguageSettingsViewController: UITableViewController {
   }
 
   override func viewDidLoad() {
-        super.viewDidLoad()
+    super.viewDidLoad()
+    title = "\(language.name) Settings"
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-    }
+  }
 
     // MARK: - Table view data source
 
@@ -46,51 +49,86 @@ class LanguageSettingsViewController: UITableViewController {
       }
     }
 
-    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+      let cellIdentifier = "LanguageSettingsCell"
+      
+      let reusableCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
+      if let cell = reusableCell {
         return cell
+      }
+      
+      let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+      cell.selectionStyle = .none
+      let selectionColor = UIView()
+      selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
+      cell.selectedBackgroundView = selectionColor
+      cell.textLabel?.font = cell.textLabel?.font?.withSize(12.0)
+      return cell
     }
-    */
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+  override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    
+    cell.isUserInteractionEnabled = true
+    cell.textLabel?.isEnabled = true
+    cell.detailTextLabel?.isEnabled = true
+    if 0 == indexPath.section { // keyboard list
+      guard let keyboard = language.keyboards?[safe: indexPath.row] else {
+        return
+      }
+      cell.textLabel?.text = keyboard.name
+      cell.detailTextLabel?.text = keyboard.version + " " + keyboard.id
+
+      cell.accessoryType = .disclosureIndicator
+    } else { // language settings
+      cell.accessoryType = .none
+    switch indexPath.row {
+        case 0:
+          cell.textLabel?.text = "Enable corrections"
+        case 1:
+          cell.textLabel?.text = "Enable predictions"
+        case 2:
+          cell.textLabel?.text = "Model"
+          cell.accessoryType = .disclosureIndicator
+          cell.detailTextLabel?.text = language.lexicalModels?[safe: 0]?.name
+
+        default:
+          cell.textLabel?.text = "error"
+      }
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+  }
+  
+  override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.cellForRow(at: indexPath)?.isSelected = false
+    performAction(for: indexPath)
+  }
+  
+  override open func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+    performAction(for: indexPath)
+  }
+  
+  private func performAction(for indexPath: IndexPath) {
+    switch indexPath.section {
+    case 0:
+      showKeyboardInfoView(kb: (language.keyboards?[safe: indexPath.row])!)
+    default:
+      break
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
+  }
+  
+  func showKeyboardInfoView(kb: Keyboard) {
+    let version = kb.version
+    
+    let infoView = KeyboardInfoViewController()
+    infoView.title = kb.name
+    infoView.keyboardCount = userKeyboards.count
+//    infoView.keyboardIndex = index
+    infoView.keyboardID = kb.id
+//    infoView.languageID = kb.languageID
+    infoView.keyboardVersion = version
+//    infoView.isCustomKeyboard = kb.isCustom
+    navigationController?.pushViewController(infoView, animated: true)
+  }
+  
     /*
     // MARK: - Navigation
 

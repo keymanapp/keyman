@@ -176,7 +176,6 @@ open class SettingsViewController: UITableViewController {
   }
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    cell.selectionStyle = .none
     cell.accessoryType = .none
     cell.textLabel?.text = itemsArray[indexPath.row]["title"]
     cell.detailTextLabel?.text = itemsArray[indexPath.row]["subtitle"]
