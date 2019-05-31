@@ -10,10 +10,10 @@ import com.tavultesoft.kmea.data.LexicalModel;
 import java.util.Collections;
 import java.util.List;
 
-public class LexicalModelAdapter extends ArrayAdapter<LexicalModel> implements ListBacked<LexicalModel> {
+public class LexicalModelsAdapter extends ArrayAdapter<LexicalModel> implements ListBacked<LexicalModel> {
   private final List<LexicalModel> data;
 
-  public LexicalModelAdapter(@NonNull Context context, int resource, @NonNull List<LexicalModel> data) {
+  public LexicalModelsAdapter(@NonNull Context context, int resource, @NonNull List<LexicalModel> data) {
     super(context, resource, data);
 
     // We only want to allow mutations through the adapter, but it's useful to maintain

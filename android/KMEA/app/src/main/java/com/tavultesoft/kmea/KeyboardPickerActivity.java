@@ -21,6 +21,8 @@ import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.data.adapters.LexicalModelsAdapter;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.data.adapters.KeyboardsAdapter;
@@ -595,6 +597,17 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
   protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
     return getList(context, KMManager.KMFilename_KeyboardsList);
+  }
+
+  protected static LexicalModelsAdapter getLexicalModelsAdapter(Context context) {
+    List<? extends Map<String, String>> mapList = getLexicalModelsList(context);
+    List<LexicalModel> lexList = new ArrayList<>(mapList.size());
+
+    for(Map<String, String> map: mapList) {
+      lexList.add(new LexicalModel(map));
+    }
+
+    return new LexicalModelsAdapter(context, 0, lexList);
   }
 
   protected static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
