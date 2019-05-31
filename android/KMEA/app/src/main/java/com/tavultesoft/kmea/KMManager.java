@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
+import android.inputmethodservice.Keyboard;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -134,6 +135,7 @@ public final class KMManager {
   public static final String KMKey_LexicalModelID = "lmId";
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
+  public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -167,19 +169,19 @@ public final class KMManager {
 
   private static Context appContext;
 
-  protected static String getResourceRoot() {
+  public static String getResourceRoot() {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
   }
 
-  protected static String getPackagesDir() {
+  public static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
   }
 
-  protected static String getLexicalModelsDir() {
+  public static String getLexicalModelsDir() {
     return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
-  protected static String getCloudDir() {
+  public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
@@ -714,6 +716,11 @@ public final class KMManager {
   }
 
   public static boolean deregisterLexicalModel(String modelID) {
+    // Check if current lexical model needs to be cleared
+    if (currentLexicalModel != null && currentLexicalModel.get(KMManager.KMKey_LexicalModelID).equalsIgnoreCase(modelID)) {
+      currentLexicalModel = null;
+    }
+
     String url = String.format("javascript:deregisterModel('%s')", modelID);
     if (InAppKeyboard != null && InAppKeyboardLoaded) {
       InAppKeyboard.loadUrl(url);
@@ -1183,12 +1190,27 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardInfo(context, index);
   }
 
+  public static HashMap<String, String> getLexicalModelInfo(Context context, int index) {
+    return KeyboardPickerActivity.getLexicalModelInfo(context, index);
+  }
+
   public static boolean keyboardExists(Context context, String packageID, String keyboardID, String languageID) {
     boolean result = false;
 
     if (packageID != null && keyboardID != null && languageID != null) {
       String kbKey = String.format("%s_%s", languageID, keyboardID);
       result = KeyboardPickerActivity.containsKeyboard(context, kbKey);
+    }
+
+    return result;
+  }
+
+  public static boolean lexicalModelExists(Context context, String packageID, String languageID, String modelID) {
+    boolean result = false;
+
+    if (packageID != null && languageID != null &&  modelID != null) {
+      String lmKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      result = KeyboardPickerActivity.containsLexicalModel(context, lmKey);
     }
 
     return result;

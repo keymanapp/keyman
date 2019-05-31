@@ -24,6 +24,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.util.MapCompat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -91,13 +93,14 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     layout.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        // Start Model Picker Activity.
-        // Use the language ID and nmae from the first associated keyboard (they should all be the same)
+        // Start ModelPickerActivity
+        // Use the language ID and name from the first associated keyboard (they should all be the same)
+        // Do not pass keyboard package ID because it will be different from model package ID
         HashMap<String, String> kbInfo = associatedKeyboardList.get(0);
         Bundle bundle = new Bundle();
         bundle.putString(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
         bundle.putString(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
-        Intent i = new Intent(context, ModelsPickerActivity.class);
+        Intent i = new Intent(context, ModelPickerActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);
         startActivity(i);
@@ -138,7 +141,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         intent.putExtra(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
         intent.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
         intent.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID));
-        boolean isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+        boolean isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N").equals("Y") ? true : false;
         intent.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
         String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
         if (customHelpLink != null)
