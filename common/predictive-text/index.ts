@@ -111,7 +111,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    predict(transform: Transform, context: Context): Promise<Suggestion[]> {
+    predict(transform: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
       let token = this._nextToken++;
       return new Promise((resolve, reject) => {
         this._promises.make(token, resolve, reject);

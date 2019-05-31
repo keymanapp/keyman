@@ -77,16 +77,28 @@
       };
     }
 
-    predict(transform: Transform, context: Context): Suggestion[] {
+    predict(transform: Transform, context: Context): Distribution<Suggestion> {
+      // TODO:  Get a better distribution!  Our words do have frequency weighting, right?
+      let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
+        let distribution: Distribution<Suggestion> = [];
+        let n = suggestions.length;
+
+        for(let s of suggestions) {
+          distribution.push({sample: s, p: 1});
+        }
+
+        return distribution;
+      }
+
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
-        return this._trie.firstN(MAX_SUGGESTIONS).map(word => ({
+        return makeUniformDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(word => ({
           transform: {
             insert: word + ' ',
             deleteLeft: 0
           },
           displayAs: word
-        }));
+        })));
       }
 
       // EVERYTHING to the left of the cursor: 
@@ -98,7 +110,7 @@
       let prefix = leftContext + (transform.insert || '');
 
       // return a word from the trie.
-      return this._trie.lookup(prefix).map(word => {
+      return makeUniformDistribution(this._trie.lookup(prefix).map(word => {
         return {
           transform: {
             // Insert the suggestion from the Trie, verbatim
@@ -110,7 +122,7 @@
           },
           displayAs: word,
         }
-      });
+      }));
     }
 
     /**

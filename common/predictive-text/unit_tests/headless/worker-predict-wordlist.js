@@ -36,7 +36,7 @@ describe('LMLayerWorker word list model', function() {
       var suggestions = model.predict({
         insert: 't',
         deleteLeft: 0,
-      }, emptyContext());
+      }, emptyContext()).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 't'
@@ -68,7 +68,7 @@ describe('LMLayerWorker word list model', function() {
         left: initialPrefix,
         startOfBuffer: false,
         endOfBuffer: true
-      });
+      }).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 'th'
@@ -98,7 +98,7 @@ describe('LMLayerWorker word list model', function() {
         jsonFixture('wordlists/english-1000')
       );
 
-      var suggestions = model.predict(zeroTransform(), emptyContext());
+      var suggestions = model.predict(zeroTransform(), emptyContext()).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions seem valid.
@@ -128,7 +128,7 @@ describe('LMLayerWorker word list model', function() {
         left: 'I ',
         startOfBuffer: false,
         endOfBuffer: true,
-      });
+      }).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions seem valid.
