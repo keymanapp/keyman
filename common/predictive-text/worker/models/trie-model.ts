@@ -26,7 +26,7 @@
 
 /**
  * @file trie-model.ts
- * 
+ *
  * Defines a simple word list (unigram) model.
  */
 
@@ -99,7 +99,7 @@
         })));
       }
 
-      // EVERYTHING to the left of the cursor: 
+      // EVERYTHING to the left of the cursor:
       let fullLeftContext = context.left || '';
       // Stuff to the left of the cursor in the current word.
       let leftContext = this.getLastWord(fullLeftContext);
@@ -159,7 +159,7 @@
    * the trie. There should be a function that converts arbitrary strings
    * (queries) and converts them into a standard search key for a given language
    * model.
-   * 
+   *
    * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
    */
   type SearchKey = string & { _: 'SearchKey'};
@@ -186,7 +186,7 @@
   // https://github.com/ConradIrwin/trie-ing/blob/df55d7af7068d357829db9e0a7faa8a38add1d1d/LICENSE
 
   type Node = InternalNode | Leaf;
-  /** 
+  /**
    * An internal node in the trie. Internal nodes NEVER contain entries; if an
    * internal node should contain an entry, then it has a dummy leaf node (see
    * below), that can be accessed by node.children["\uFDD0"].
@@ -196,7 +196,7 @@
     weight: number;
     /** Maintains the keys of children in descending order of weight. */
     values: string[]; // TODO: As an optimization, "values" can be a single string!
-    /** 
+    /**
      * Maps a single UTF-16 code unit to a child node in the trie. This child
      * node may be a leaf or an internal node. The keys of this object are kept
      * in sorted order in the .values array.
@@ -209,7 +209,7 @@
     weight: number;
     entries: Entry[];
   }
-  
+
   /**
    * An entry in the prefix trie (stored in leaf nodes exclusively!)
    */
@@ -226,6 +226,8 @@
    */
   class Trie {
     private root: Node;
+    /** The total weight of the entire trie. */
+    private totalWeight: number;
     /**
      * Converts arbitrary strings to a search key. The trie is built up of
      * search keys; not each entry's word form!
@@ -235,13 +237,14 @@
     constructor(root: Node, wordform2key: Wordform2Key) {
       this.root = root;
       this.toKey = wordform2key;
+      this.totalWeight = countNodes(root);
     }
 
     /**
      * Lookups an arbitrary prefix (a query) in the trie. Returns the top 3
      * results in sorted order.
-     * 
-     * @param prefix 
+     *
+     * @param prefix
      */
     lookup(prefix: string): TextWithProbability[] {
       let searchKey = this.toKey(prefix);
@@ -250,7 +253,7 @@
         return [];
       }
 
-      return getSortedResults(lowestCommonNode, searchKey);
+      return getSortedResults(lowestCommonNode, searchKey, this.totalWeight);
     }
 
     /**
@@ -258,16 +261,16 @@
      * @param n How many suggestions, maximum, to return.
      */
     firstN(n: number): TextWithProbability[] {
-      return getSortedResults(this.root, '' as SearchKey, n);
+      return getSortedResults(this.root, '' as SearchKey, this.totalWeight, n);
     }
   }
 
   /**
    * Finds the deepest descendent in the trie with the given prefix key.
-   * 
+   *
    * This means that a search in the trie for a given prefix has a best-case
    * complexity of O(m) where m is the length of the prefix.
-   * 
+   *
    * @param key The prefix to search for.
    * @param index The index in the prefix. Initially 0.
    */
@@ -287,17 +290,14 @@
   /**
    * Returns all entries matching the given prefix, in descending order of
    * weight.
-   * 
+   *
    * @param prefix  the prefix to match.
    * @param results the current results
-   * @param queue 
+   * @param queue
    */
-  function getSortedResults(node: Node, prefix: SearchKey, limit = MAX_SUGGESTIONS): TextWithProbability[] {
-    let queue = new PriorityQueue(); 
+  function getSortedResults(node: Node, prefix: SearchKey, N: number, limit = MAX_SUGGESTIONS): TextWithProbability[] {
+    let queue = new PriorityQueue();
     let results: TextWithProbability[] = [];
-
-    // TODO: this is bad and should be part of the compiled data structure.
-    let N = countNodes(node);
 
     if (node.type === 'leaf') {
       // Assuming the values are sorted, we can just add all of the values in the
@@ -351,25 +351,26 @@
     }
     return results;
 
-    /**
-     * O(n) lookup to determine the total amount of nodes in the trie, starting
-     * at the provided node. Don't use this if you want lookups to be fast.
-     * @param node 
-     */
-    function countNodes(node: Node) {
-      if (node.type === 'internal') {
-        let count = 0;
-        for (let key in node.children) {
-          let child = node.children[key];
-          count += countNodes(child);
-        }
-        return count;
-      } else {
-        return node.entries.length;
-      }
+  }
+
+  /**
+   * O(n) lookup to determine the total amount of nodes in the trie, starting
+   * at the provided node. Don't use this if you want lookups to be fast.
+   * @param node
+   */
+  function countNodes(node: Node): number {
+    if (node.type === 'leaf') {
+      return node.entries
+        .map(entry => entry.weight)
+        .reduce((acc, count) => acc + count, 0);
+    } else {
+      // @ts-ignore
+      return Object.values(node.children)
+        .map(child => countNodes(child))
+        .reduce((acc, count) => acc + count, 0);
     }
   }
-  
+
   /** TypeScript type guard that returns whether the thing is a Node. */
   function isNode(x: Entry | Node): x is Node {
     return 'type' in x;
@@ -397,7 +398,7 @@
     enqueueAll(elements: Weighted[]) {
       this._storage = this._storage.concat(elements);
     }
- 
+
     /**
      * Pops the highest weighted item in the queue.
      */
