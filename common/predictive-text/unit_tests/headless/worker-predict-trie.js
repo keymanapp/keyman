@@ -21,7 +21,7 @@ describe('LMLayerWorker trie model for word lists', function() {
       var suggestions = model.predict({
         insert: 't',
         deleteLeft: 0,
-      }, emptyContext());
+      }, emptyContext()).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 't'
@@ -54,7 +54,7 @@ describe('LMLayerWorker trie model for word lists', function() {
       var suggestions = model.predict({
         insert: insertedLetter,
         deleteLeft: 0,
-      }, context);
+      }, context).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 'th'
@@ -77,7 +77,7 @@ describe('LMLayerWorker trie model for word lists', function() {
         jsonFixture('tries/english-1000')
       );
 
-      var suggestions = model.predict(zeroTransform(), emptyContext());
+      var suggestions = model.predict(zeroTransform(), emptyContext()).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions seem okay.
@@ -107,7 +107,7 @@ describe('LMLayerWorker trie model for word lists', function() {
         left: 'I ',
         startOfBuffer: false,
         endOfBuffer: true,
-      });
+      }).map(function(value) { return value.sample });
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions seem valid.

@@ -32,7 +32,7 @@ namespace com.keyman.text {
     private static tokenSeed: number = 0;
 
     constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
-      this.token = Transcription.tokenSeed++;
+      let token = this.token = Transcription.tokenSeed++;
 
       this.keystroke = keystroke;
       this.transform = transform;
@@ -40,13 +40,17 @@ namespace com.keyman.text {
       this.preInput = preInput;
 
       this.transform.id = this.token;
+
+      // Assign the ID to each alternate, as well.
+      if(alternates) {
+        alternates.forEach(function(alt) {
+          alt.sample.id = token;
+        });
+      }
     }
   }
 
-  export interface Alternate {
-    t: Transform;
-    p: number;
-  }
+  export type Alternate = ProbabilityMass<Transform>;
 
   export abstract class OutputTarget {
     private _dks: text.DeadkeyTracker;
