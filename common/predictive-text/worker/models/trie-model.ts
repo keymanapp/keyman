@@ -50,6 +50,15 @@
   }
 
   /**
+   * Used to determine the probability of an entry from the trie.
+   */
+  type TextWithProbability = {
+    text: string;
+    // TODO: use negative-log scaling instead?
+    p: number; // real-number weight, from 0 to 1
+  }
+
+  /**
    * @class TrieModel
    *
    * Defines a trie-backed word list model, or the unigram model.
@@ -80,12 +89,13 @@
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
-        return makeUniformDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(word => ({
+        return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
           transform: {
-            insert: word + ' ', // TODO: do NOT add the space here!
+            insert: text + ' ', // TODO: do NOT add the space here!
             deleteLeft: 0
           },
-          displayAs: word
+          displayAs: text,
+          p: p
         })));
       }
 
@@ -98,29 +108,26 @@
       let prefix = leftContext + (transform.insert || '');
 
       // Return suggestions from the trie.
-      return makeUniformDistribution(this._trie.lookup(prefix).map(word => {
-        return {
-          transform: {
-            // Insert the suggestion from the Trie, verbatim
-            insert: word + ' ',  // TODO: append space at a higher-level
-            // Delete whatever the prefix that the user wrote.
-            // Note: a separate capitalization/orthography engine can take this
-            // result and transform it as needed.
-            deleteLeft: leftContext.length,
-          },
-          displayAs: word,
-        }
-      }));
+      return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
+        transform: {
+          // Insert the suggestion from the Trie, verbatim
+          insert: text + ' ',  // TODO: append space at a higher-level
+          // Delete whatever the prefix that the user wrote.
+          // Note: a separate capitalization/orthography engine can take this
+          // result and transform it as needed.
+          deleteLeft: leftContext.length,
+        },
+        displayAs: text,
+        p: p
+      })));
 
       /* Helper */
 
-      // TODO:  Get a better distribution!  Our words do have frequency weighting, right?
-      function makeUniformDistribution (suggestions: Suggestion[]): Distribution<Suggestion> {
+      function makeDistribution(suggestions: (Suggestion & {p: number})[]): Distribution<Suggestion> {
         let distribution: Distribution<Suggestion> = [];
-        let n = suggestions.length;
 
         for(let s of suggestions) {
-          distribution.push({sample: s, p: 1});
+          distribution.push({sample: s, p: s.p});
         }
 
         return distribution;
@@ -236,7 +243,7 @@
      * 
      * @param prefix 
      */
-    lookup(prefix: string): string[] {
+    lookup(prefix: string): TextWithProbability[] {
       let searchKey = this.toKey(prefix);
       let lowestCommonNode = findPrefix(this.root, searchKey);
       if (lowestCommonNode === null) {
@@ -250,7 +257,7 @@
      * Returns the top N suggestions from the trie.
      * @param n How many suggestions, maximum, to return.
      */
-    firstN(n: number): string[] {
+    firstN(n: number): TextWithProbability[] {
       return getSortedResults(this.root, '' as SearchKey, n);
     }
   }
@@ -285,16 +292,23 @@
    * @param results the current results
    * @param queue 
    */
-  function getSortedResults(node: Node, prefix: SearchKey, limit = MAX_SUGGESTIONS): string[] {
+  function getSortedResults(node: Node, prefix: SearchKey, limit = MAX_SUGGESTIONS): TextWithProbability[] {
     let queue = new PriorityQueue(); 
-    let results: string[] = [];
+    let results: TextWithProbability[] = [];
+
+    // TODO: this is bad and should be part of the compiled data structure.
+    let N = countNodes(node);
 
     if (node.type === 'leaf') {
       // Assuming the values are sorted, we can just add all of the values in the
       // leaf, until we reach the limit.
       for (let item of node.entries) {
         if (item.key.startsWith(prefix)) {
-          results.push(item.content);
+          let { content, weight } = item;
+          results.push({
+            text: content,
+            p: weight / N
+          });
 
           if (results.length >= limit) {
             return results;
@@ -325,7 +339,10 @@
         } else {
           // When an entry is up next in the queue, we just add its contents to
           // the results!
-          results.push(next.content);
+          results.push({
+            text: next.content,
+            p: next.weight / N
+          });
           if (results.length >= limit) {
             return results;
           }
@@ -333,6 +350,24 @@
       }
     }
     return results;
+
+    /**
+     * O(n) lookup to determine the total amount of nodes in the trie, starting
+     * at the provided node. Don't use this if you want lookups to be fast.
+     * @param node 
+     */
+    function countNodes(node: Node) {
+      if (node.type === 'internal') {
+        let count = 0;
+        for (let key in node.children) {
+          let child = node.children[key];
+          count += countNodes(child);
+        }
+        return count;
+      } else {
+        return node.entries.length;
+      }
+    }
   }
   
   /** TypeScript type guard that returns whether the thing is a Node. */
