@@ -78,23 +78,11 @@
     }
 
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
-      // TODO:  Get a better distribution!  Our words do have frequency weighting, right?
-      let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
-        let distribution: Distribution<Suggestion> = [];
-        let n = suggestions.length;
-
-        for(let s of suggestions) {
-          distribution.push({sample: s, p: 1});
-        }
-
-        return distribution;
-      }
-
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
         return makeUniformDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(word => ({
           transform: {
-            insert: word + ' ',
+            insert: word + ' ', // TODO: do NOT add the space here!
             deleteLeft: 0
           },
           displayAs: word
@@ -109,12 +97,12 @@
       // just been typed.
       let prefix = leftContext + (transform.insert || '');
 
-      // return a word from the trie.
+      // Return suggestions from the trie.
       return makeUniformDistribution(this._trie.lookup(prefix).map(word => {
         return {
           transform: {
             // Insert the suggestion from the Trie, verbatim
-            insert: word + ' ',
+            insert: word + ' ',  // TODO: append space at a higher-level
             // Delete whatever the prefix that the user wrote.
             // Note: a separate capitalization/orthography engine can take this
             // result and transform it as needed.
@@ -123,6 +111,20 @@
           displayAs: word,
         }
       }));
+
+      /* Helper */
+
+      // TODO:  Get a better distribution!  Our words do have frequency weighting, right?
+      function makeUniformDistribution (suggestions: Suggestion[]): Distribution<Suggestion> {
+        let distribution: Distribution<Suggestion> = [];
+        let n = suggestions.length;
+
+        for(let s of suggestions) {
+          distribution.push({sample: s, p: 1});
+        }
+
+        return distribution;
+      }
     }
 
     /**
