@@ -24,7 +24,7 @@
 /// <reference path="promise-store.ts" />
 
 /**
- * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
+ * Top-level interface to the Language Modelling layer, or “LMLayer” for short.
  * 
  * The Language Modelling layer provides a way for keyboards to offer prediction and
  * correction functionalities. The LMLayer proper runs within a Web Worker, however,
