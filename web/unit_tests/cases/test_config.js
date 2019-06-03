@@ -23,6 +23,7 @@ describe('Test configuration', function () {
     // Now, were they processed correctly?
     assert.isNotNull(window['kmwconfig'], "Test global 'config' is missing!");
     let timeouts = kmwconfig.timeouts;
-    assert.equal(timeouts.standard, timeoutConfig.standard, "Timeouts were not parsed properly for test configuration.");
+    // May be longer if an extra factor (such as a mobile device multiplier) is added.
+    assert.isAtLeast(timeouts.standard, timeoutConfig.standard, "Timeouts were not parsed properly for test configuration.");
   })
 });
