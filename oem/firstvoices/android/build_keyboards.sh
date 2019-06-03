@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Build the keyboards referred to in ../keyboards.csv and copy them + metadata 
 # to the FirstVoices/Keyboards folder
