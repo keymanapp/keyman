@@ -21,7 +21,7 @@ describe('LMLayerWorker trie model for word lists', function() {
       var suggestions = model.predict({
         insert: 't',
         deleteLeft: 0,
-      }, emptyContext()).map(function(value) { return value.sample });
+      }, emptyContext()).map(getSample);
       assert.isAtLeast(suggestions.length, MIN_SUGGESTIONS);
 
       // Ensure all of the suggestions actually start with 't'
@@ -172,7 +172,7 @@ describe('LMLayerWorker trie model for word lists', function() {
       // Predict upon typing
       //   «TH|                        » [Send]
       //   [  there ] [   the   ] [   they    ]
-      var [suggestion] = model.predict(transform, context);
+      var [suggestion] = model.predict(transform, context).map(getSample);
       // I'm assuming the top word in English is "the".
       assert.strictEqual(suggestion.displayAs, 'the');
 
@@ -186,5 +186,13 @@ describe('LMLayerWorker trie model for word lists', function() {
     var buffer = context.left;
     buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
     return buffer;
+  }
+
+  /**
+   * For use in predict().map(FUNC) to get the underlying suggestion.
+   * @param {ProbabilityMass<T>} pm
+   */
+  function getSample(pm) {
+    return pm.sample
   }
 });
