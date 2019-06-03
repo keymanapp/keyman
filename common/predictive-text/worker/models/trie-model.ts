@@ -26,7 +26,7 @@
 
 /**
  * @file trie-model.ts
- * 
+ *
  * Defines a simple word list (unigram) model.
  */
 
@@ -65,7 +65,7 @@
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(trieData as Node,
-        options.searchTermToKey as Wordform2Key || defaultSearchKey
+        options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
     }
@@ -101,7 +101,7 @@
         })));
       }
 
-      // EVERYTHING to the left of the cursor: 
+      // EVERYTHING to the left of the cursor:
       let fullLeftContext = context.left || '';
       // Stuff to the left of the cursor in the current word.
       let leftContext = this.getLastWord(fullLeftContext);
@@ -150,7 +150,7 @@
    * the trie. There should be a function that converts arbitrary strings
    * (queries) and converts them into a standard search key for a given language
    * model.
-   * 
+   *
    * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
    */
   type SearchKey = string & { _: 'SearchKey'};
@@ -177,7 +177,7 @@
   // https://github.com/ConradIrwin/trie-ing/blob/df55d7af7068d357829db9e0a7faa8a38add1d1d/LICENSE
 
   type Node = InternalNode | Leaf;
-  /** 
+  /**
    * An internal node in the trie. Internal nodes NEVER contain entries; if an
    * internal node should contain an entry, then it has a dummy leaf node (see
    * below), that can be accessed by node.children["\uFDD0"].
@@ -187,7 +187,7 @@
     weight: number;
     /** Maintains the keys of children in descending order of weight. */
     values: string[]; // TODO: As an optimization, "values" can be a single string!
-    /** 
+    /**
      * Maps a single UTF-16 code unit to a child node in the trie. This child
      * node may be a leaf or an internal node. The keys of this object are kept
      * in sorted order in the .values array.
@@ -200,7 +200,7 @@
     weight: number;
     entries: Entry[];
   }
-  
+
   /**
    * An entry in the prefix trie (stored in leaf nodes exclusively!)
    */
@@ -231,8 +231,8 @@
     /**
      * Lookups an arbitrary prefix (a query) in the trie. Returns the top 3
      * results in sorted order.
-     * 
-     * @param prefix 
+     *
+     * @param prefix
      */
     lookup(prefix: string): string[] {
       let searchKey = this.toKey(prefix);
@@ -255,10 +255,10 @@
 
   /**
    * Finds the deepest descendent in the trie with the given prefix key.
-   * 
+   *
    * This means that a search in the trie for a given prefix has a best-case
    * complexity of O(m) where m is the length of the prefix.
-   * 
+   *
    * @param key The prefix to search for.
    * @param index The index in the prefix. Initially 0.
    */
@@ -278,13 +278,13 @@
   /**
    * Returns all entries matching the given prefix, in descending order of
    * weight.
-   * 
+   *
    * @param prefix  the prefix to match.
    * @param results the current results
-   * @param queue 
+   * @param queue
    */
   function getSortedResults(node: Node, prefix: SearchKey, limit = MAX_SUGGESTIONS): string[] {
-    let queue = new PriorityQueue(); 
+    let queue = new PriorityQueue();
     let results: string[] = [];
 
     if (node.type === 'leaf') {
@@ -332,7 +332,7 @@
     }
     return results;
   }
-  
+
   /** TypeScript type guard that returns whether the thing is a Node. */
   function isNode(x: Entry | Node): x is Node {
     return 'type' in x;
@@ -360,7 +360,7 @@
     enqueueAll(elements: Weighted[]) {
       this._storage = this._storage.concat(elements);
     }
- 
+
     /**
      * Pops the highest weighted item in the queue.
      */
@@ -374,9 +374,27 @@
   }
 
   /**
-   * Lowercases word forms. This works for a very limited set of languages.
+   * Converts word forms in into an indexable form. It does this by converting
+   * the string to uppercase and trying to remove diacritical marks.
+   *
+   * This is a very naïve implementation, that I've only though to work on
+   * languages that use the Latin script. Even then, some Latin-based
+   * orthographies use code points that, under NFD normalization, do NOT
+   * decompose into an ASCII letter and a combining diacritical mark (e.g.,
+   * SENĆOŦEN).
+   *
+   * Use this only in early iterations of the model. For a production lexical
+   * model, you SHOULD write/generate your own key function, tailored to your
+   * language.
    */
-  function defaultSearchKey(wordform: string) {
-    return wordform.toLowerCase() as SearchKey;
+  function defaultWordform2Key(wordform: string): SearchKey {
+    // Use this pattern to remove common diacritical marks.
+    // See: https://www.compart.com/en/unicode/block/U+0300
+    const COMBINING_DIACRITICAL_MARKS = /[\u0300-\u036f]/g;
+    return wordform
+      .normalize('NFD')
+      .toLowerCase()
+      // remove diacritical marks.
+      .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
   }
 }
