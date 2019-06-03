@@ -10,8 +10,12 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
  * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
+  this.timeout(config.timeouts.standard);
+
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
+      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                  // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.

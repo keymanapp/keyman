@@ -5,9 +5,13 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
  * How to run the worlist
  */
 describe('LMLayer using the word list model', function () {
+  this.timeout(config.timeouts.standard);
+
   describe('Prediction', function () {
     var EXPECTED_SUGGESTIONS = 3;
     it('will predict an empty buffer', function () {
+      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                  // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // N.B.: This test can OCCASIONALLY Mocha's default 2
