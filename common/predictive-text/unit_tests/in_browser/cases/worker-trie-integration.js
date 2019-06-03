@@ -14,11 +14,6 @@ describe('LMLayer using the trie model', function () {
                                                   // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
-      // N.B.: This test can OCCASIONALLY Mocha's default 2
-      // seconds expected execution time, causing sporadic build
-      // failures. So just increase the default timeout value! 🙃
-      this.timeout(10000);
-
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
