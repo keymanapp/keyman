@@ -48,9 +48,24 @@ class LanguageSettingsViewController: UITableViewController {
         return 3
       }
     }
+  
+  public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
+    let rightOffset = cellFrame.size.width
+    let switchWidth: CGFloat = 20
+    let switchX = rightOffset - switchWidth
+    let switchHeight = controlSize.height
+    let cellSwitchHeightDiff = cellFrame.size.height - switchHeight
+    let switchY = cellFrame.origin.y + 0.5 * cellSwitchHeightDiff
+    
+    let switchFrame = CGRect(x: switchX,
+                             y: switchY,
+                             width: switchWidth,
+                             height: cellFrame.size.height)
+    return switchFrame
+  }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cellIdentifier = "LanguageSettingsCell"
+      let cellIdentifier = 0 == indexPath.section ?  "KeyboardInLanguageSettingsCell" : "LanguageSettingsCell"
       
       let reusableCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
       if let cell = reusableCell {
@@ -58,7 +73,28 @@ class LanguageSettingsViewController: UITableViewController {
       }
       
       let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
-      cell.selectionStyle = .none
+      if 1 == indexPath.section {
+          //TODO: find the settings these are to show
+          if 0 == indexPath.row {
+            cell.accessoryType = .none
+            let doPredictionsSwitch = UISwitch()
+            let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
+            doPredictionsSwitch.frame = switchFrame
+            doPredictionsSwitch.isOn = false
+            //            showBannerSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
+            cell.addSubview(doPredictionsSwitch)
+          } else if 1 == indexPath.row {
+            cell.accessoryType = .none
+            let doCorrectionsSwitch = UISwitch()
+            let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
+            doCorrectionsSwitch.frame = switchFrame
+            doCorrectionsSwitch.isOn = false
+            //            showBannerSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
+            cell.addSubview(doCorrectionsSwitch)
+          } else { // row 3
+            cell.accessoryType = .disclosureIndicator
+        }
+      }
       let selectionColor = UIView()
       selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
       cell.selectedBackgroundView = selectionColor
