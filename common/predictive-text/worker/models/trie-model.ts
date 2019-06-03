@@ -237,7 +237,7 @@
     constructor(root: Node, wordform2key: Wordform2Key) {
       this.root = root;
       this.toKey = wordform2key;
-      this.totalWeight = countNodes(root);
+      this.totalWeight = sumWeights(root);
     }
 
     /**
@@ -354,11 +354,13 @@
   }
 
   /**
-   * O(n) lookup to determine the total amount of nodes in the trie, starting
-   * at the provided node. Don't use this if you want lookups to be fast.
-   * @param node
+   * O(n) traversal to sum the total weight of all leaves in the trie, starting
+   * at the provided node. Don't use this if you want lookups to be fast!
+   *
+   * TODO: Move this functionality to the trie compiler!
+   * @param node The node to start summing weights.
    */
-  function countNodes(node: Node): number {
+  function sumWeights(node: Node): number {
     if (node.type === 'leaf') {
       return node.entries
         .map(entry => entry.weight)
@@ -366,8 +368,8 @@
     } else {
       // @ts-ignore
       return Object.values(node.children)
-        .map(child => countNodes(child))
-        .reduce((acc, count) => acc + count, 0);
+        .map((child: Node) => sumWeights(child))
+        .reduce((acc: number, count: number) => acc + count, 0);
     }
   }
 
