@@ -212,11 +212,11 @@ final class FVShared {
         saveLoadedKeyboardList();
     }
 
-    void helpAction(String id) {
+    void helpAction(Context localContext, String id) {
         String helpUrl = String.format("%s%s", FVKeyboardHelpLink, id);
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(helpUrl));
-        context.startActivity(i);
+        localContext.startActivity(i);
     }
 
     private void updateActiveKeyboardsList() {

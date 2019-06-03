@@ -75,7 +75,7 @@ class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
     private class FVOnClickHelpListener implements ImageButton.OnClickListener {
         @Override
         public void onClick(View v) {
-            FVShared.getInstance().helpAction((String)v.getTag());
+            FVShared.getInstance().helpAction(getContext(), (String)v.getTag());
         }
     }
 
