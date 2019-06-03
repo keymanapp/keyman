@@ -74,7 +74,7 @@
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(trieData as Node,
-        options.searchTermToKey as Wordform2Key || defaultSearchKey
+        options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
     }
@@ -414,9 +414,27 @@
   }
 
   /**
-   * Lowercases word forms. This works for a very limited set of languages.
+   * Converts word forms in into an indexable form. It does this by converting
+   * the string to uppercase and trying to remove diacritical marks.
+   *
+   * This is a very naïve implementation, that I've only though to work on
+   * languages that use the Latin script. Even then, some Latin-based
+   * orthographies use code points that, under NFD normalization, do NOT
+   * decompose into an ASCII letter and a combining diacritical mark (e.g.,
+   * SENĆOŦEN).
+   *
+   * Use this only in early iterations of the model. For a production lexical
+   * model, you SHOULD write/generate your own key function, tailored to your
+   * language.
    */
-  function defaultSearchKey(wordform: string) {
-    return wordform.toLowerCase() as SearchKey;
+  function defaultWordform2Key(wordform: string): SearchKey {
+    // Use this pattern to remove common diacritical marks.
+    // See: https://www.compart.com/en/unicode/block/U+0300
+    const COMBINING_DIACRITICAL_MARKS = /[\u0300-\u036f]/g;
+    return wordform
+      .normalize('NFD')
+      .toLowerCase()
+      // remove diacritical marks.
+      .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
   }
 }
