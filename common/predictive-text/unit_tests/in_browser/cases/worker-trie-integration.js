@@ -4,7 +4,7 @@ var LMLayer = com.keyman.text.prediction.LMLayer;
 /*
  * How to run the worlist
  */
-describe('LMLayer using the word list model', function () {
+describe('LMLayer using the trie model', function () {
   this.timeout(config.timeouts.standard);
 
   describe('Prediction', function () {
@@ -14,17 +14,12 @@ describe('LMLayer using the word list model', function () {
                                                   // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
-      // N.B.: This test can OCCASIONALLY Mocha's default 2
-      // seconds expected execution time, causing sporadic build
-      // failures. So just double the default timeout value! 🙃
-      this.timeout(4000);
-
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
       return lmLayer.loadModel(
         // We need to provide an absolute path since the worker is based within a blob.
-        document.location.protocol + '//' + document.location.host + "/resources/models/simple-wordlist.js"
+        document.location.protocol + '//' + document.location.host + "/resources/models/simple-trie.js"
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
