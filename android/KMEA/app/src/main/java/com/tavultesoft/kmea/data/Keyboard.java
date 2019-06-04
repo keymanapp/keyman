@@ -1,8 +1,11 @@
 package com.tavultesoft.kmea.data;
 
+import com.tavultesoft.kmea.KMManager;
+
+import java.io.Serializable;
 import java.util.Map;
 
-public class Keyboard {
+public class Keyboard implements Serializable, LanguageCoded {
   public final Map<String, String> map;
 
   /* TODO:  (v13 refactor)
@@ -18,5 +21,14 @@ public class Keyboard {
 
   public Keyboard(Map<String, String> kbdData) {
     this.map = kbdData;
+  }
+
+  @Override
+  public String getLanguageCode() {
+    return this.map.get(KMManager.KMKey_LanguageID);
+  }
+
+  public String getLanguageName() {
+    return this.map.get(KMManager.KMKey_LanguageName);
   }
 }

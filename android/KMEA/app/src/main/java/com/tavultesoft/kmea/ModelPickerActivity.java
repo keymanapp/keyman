@@ -2,13 +2,10 @@
 package com.tavultesoft.kmea;
 
 import android.annotation.SuppressLint;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.inputmethodservice.Keyboard;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,10 +22,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.data.adapters.LexicalModelAdapter;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.adapters.LexicalModelsAdapter;
 import com.tavultesoft.kmea.packages.JSONUtils;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
-import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
 
@@ -48,10 +43,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_MODEL;
 
 /**
  * Keyman Settings --> Languages Settings --> Language Settings --> Model List
@@ -66,6 +57,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
   // Merged array list of lexical models to display in ListView
   private static ArrayList<HashMap<String, String>> lexicalModelsArrayList = null;
+  private static Dataset.LexicalModels lexicalModelsAdapter = null;
   private boolean didExecuteParser = false;
 
   private final static String TAG = "ModelPickerActivity";
@@ -326,8 +318,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
           models = kmpLexicalModelsArray;
         } else {
           // Otherwise, merge kmpLexicalModelsArray with cloud jsonArray
-          models = (jsonArray != null) ? jsonArray : new JSONArray();
-          for (int i = 0; i < kmpLexicalModelsArray.length(); i++) {
+          models = (jsonArray != null) ? jsonArray : new JSONArray(); // Start with cloud model list.
+          for (int i = 0; i < kmpLexicalModelsArray.length(); i++) {  // Iterate over local KMPs.
             JSONObject kmpLexicalModel = kmpLexicalModelsArray.getJSONObject(i);
             String kmpModelID = kmpLexicalModel.getString("id");
 

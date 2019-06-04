@@ -20,12 +20,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.data.adapters.LexicalModelsAdapter;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
-import com.tavultesoft.kmea.data.adapters.KeyboardsAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
@@ -155,7 +155,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     }
 
-    listAdapter = new KMKeyboardPickerAdapter(context, getKeyboardsAdapter(context)); ;//keyboardsList);
+    // TODO:  Use a persistently-loaded version of the installed dataset.
+    listAdapter = new KMKeyboardPickerAdapter(context, getInstalledDataset(context).keyboards);
     listAdapter.listFont = listFont;
     listView.setAdapter(listAdapter);
     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -584,30 +585,30 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return list;
   }
 
-  protected static KeyboardsAdapter getKeyboardsAdapter(Context context) {
-    List<? extends Map<String, String>> mapList = getKeyboardsList(context);
-    List<Keyboard> kbdsList = new ArrayList<>(mapList.size());
+  protected static Dataset getInstalledDataset(Context context) {
+    List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
+    List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
 
-    for(Map<String, String> map: mapList) {
+    for(Map<String, String> map: kbdMapList) {
       kbdsList.add(new Keyboard(map));
     }
 
-    return new KeyboardsAdapter(context, 0, kbdsList);
+    List<? extends Map<String, String>> lexMapList = getLexicalModelsList(context);
+    List<LexicalModel> lexList = new ArrayList<>(lexMapList.size());
+
+    for(Map<String, String> map: lexMapList) {
+      lexList.add(new LexicalModel(map));
+    }
+
+    Dataset data = new Dataset(context);
+    data.keyboards.addAll(kbdsList);
+    data.lexicalModels.addAll(lexList);
+
+    return data;
   }
 
   protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
     return getList(context, KMManager.KMFilename_KeyboardsList);
-  }
-
-  protected static LexicalModelsAdapter getLexicalModelsAdapter(Context context) {
-    List<? extends Map<String, String>> mapList = getLexicalModelsList(context);
-    List<LexicalModel> lexList = new ArrayList<>(mapList.size());
-
-    for(Map<String, String> map: mapList) {
-      lexList.add(new LexicalModel(map));
-    }
-
-    return new LexicalModelsAdapter(context, 0, lexList);
   }
 
   protected static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
@@ -633,7 +634,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return kbKeys.contains(keyboardKey);
   }
 
-  protected static boolean containsLexicalModel(Context context, String lexicalModelKey) {
+  public static boolean containsLexicalModel(Context context, String lexicalModelKey) {
     if (lexicalModelsList == null) {
       lexicalModelsList = getLexicalModelsList(context);
     }

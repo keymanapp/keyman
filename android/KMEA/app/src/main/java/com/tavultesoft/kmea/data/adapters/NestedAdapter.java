@@ -20,6 +20,9 @@ import java.util.List;
 public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>> extends ArrayAdapter<Element>  {
   final A wrappedAdapter;
   final AdapterFilter<Element> filter;
+  final List<Element> filteredList;
+
+  boolean isMutating = false;
 
   /**
    * Links a NestedAdapter 'listener' with a pre-existing ArrayAdapter 'source' by listening to its
@@ -46,6 +49,9 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
       if(listener == null) {
         // Our listener has been GC'd.  Time to disconnect and allow this instance to be GC'd, too.
         source.unregisterDataSetObserver(this);
+        return;
+      } else if(listener.isMutating){
+        // This event was triggered by a reaction to what our owning listener did.  No need to update.
         return;
       }
       listener.setNotifyOnChange(false); // Disable event notifications temporarily.
@@ -78,6 +84,10 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
   }
 
   public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element> filter) {
+    this(context, resource, adapter, filter, getFilteredElements(adapter, filter));
+  }
+
+  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element> filter, List<Element> filteredList) {
     super(context, resource, getFilteredElements(adapter, filter));
 
     this.wrappedAdapter = adapter;
@@ -85,6 +95,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     this.wrappedAdapter.registerDataSetObserver(observer);
 
     this.filter = filter;
+    this.filteredList = filteredList;
   }
 
   protected static <Element, A extends ArrayAdapter<Element> & ListBacked<Element>> List<Element> getFilteredElements(A adapter, AdapterFilter<Element> filter) {
@@ -104,10 +115,51 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     this.wrappedAdapter.unregisterDataSetObserver(this.observer);
   }
 
+  @Override
+  public void add(Element elem) {
+    super.add(elem); // Modifies our internal element list, which is separate from the wrapped adapter's.
+
+    this.isMutating = true;
+    wrappedAdapter.add(elem); // Reflect the changes to our wrapped adapter.
+    this.isMutating = false;
+  }
+
+  @Override
+  public void addAll(Element... elements) {
+    super.addAll(elements);
+
+    this.isMutating = true;
+    wrappedAdapter.addAll(elements);
+    this.isMutating = false;
+  }
+
+  @Override
+  public void remove(Element element) {
+    super.remove(element);
+
+    this.isMutating = true;
+    wrappedAdapter.remove(element);
+    this.isMutating = false;
+  }
+
+  @Override
+  public void clear() {
+    List<Element> cleared = new ArrayList<>(filteredList); // Duplicate list before it's cleared.
+    super.clear();
+
+    this.isMutating = true;
+    wrappedAdapter.setNotifyOnChange(false);
+
+    for(Element element: cleared) {
+      wrappedAdapter.remove(element);
+    }
+
+    wrappedAdapter.notifyDataSetChanged();
+    this.isMutating = false;
+  }
+
+
   // TODO:  As needed, override mutation functions so that we can reflect the changes onto
   //        the wrappedAdapter instance.  We should handle these cases directly rather than
   //        through self-triggered events, as we may only hold a subset due to use of filters.
-  //
-  //        Management of setNotifyOnChange() on the wrappedAdapter is recommended to bypass event
-  //        notification during such edits.
 }
