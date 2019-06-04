@@ -305,6 +305,8 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
   module.exports['models'] = models;
   module.exports['wordBreakers'] = wordBreakers;
+  /// XXX: export the ModelCompositor for testing.
+  module.exports['ModelCompositor'] = ModelCompositor;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as DedicatedWorkerGlobalScope);

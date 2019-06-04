@@ -50,6 +50,15 @@
   }
 
   /**
+   * Used to determine the probability of an entry from the trie.
+   */
+  type TextWithProbability = {
+    text: string;
+    // TODO: use negative-log scaling instead?
+    p: number; // real-number weight, from 0 to 1
+  }
+
+  /**
    * @class TrieModel
    *
    * Defines a trie-backed word list model, or the unigram model.
@@ -78,26 +87,15 @@
     }
 
     predict(transform: Transform, context: Context): Distribution<Suggestion> {
-      // TODO:  Get a better distribution!  Our words do have frequency weighting, right?
-      let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
-        let distribution: Distribution<Suggestion> = [];
-        let n = suggestions.length;
-
-        for(let s of suggestions) {
-          distribution.push({sample: s, p: 1});
-        }
-
-        return distribution;
-      }
-
       // Special-case the empty buffer/transform: return the top suggestions.
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
-        return makeUniformDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(word => ({
+        return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
           transform: {
-            insert: word + ' ',
+            insert: text + ' ', // TODO: do NOT add the space here!
             deleteLeft: 0
           },
-          displayAs: word
+          displayAs: text,
+          p: p
         })));
       }
 
@@ -109,20 +107,31 @@
       // just been typed.
       let prefix = leftContext + (transform.insert || '');
 
-      // return a word from the trie.
-      return makeUniformDistribution(this._trie.lookup(prefix).map(word => {
-        return {
-          transform: {
-            // Insert the suggestion from the Trie, verbatim
-            insert: word + ' ',
-            // Delete whatever the prefix that the user wrote.
-            // Note: a separate capitalization/orthography engine can take this
-            // result and transform it as needed.
-            deleteLeft: leftContext.length,
-          },
-          displayAs: word,
+      // Return suggestions from the trie.
+      return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
+        transform: {
+          // Insert the suggestion from the Trie, verbatim
+          insert: text + ' ',  // TODO: append space at a higher-level
+          // Delete whatever the prefix that the user wrote.
+          // Note: a separate capitalization/orthography engine can take this
+          // result and transform it as needed.
+          deleteLeft: leftContext.length,
+        },
+        displayAs: text,
+        p: p
+      })));
+
+      /* Helper */
+
+      function makeDistribution(suggestions: (Suggestion & {p: number})[]): Distribution<Suggestion> {
+        let distribution: Distribution<Suggestion> = [];
+
+        for(let s of suggestions) {
+          distribution.push({sample: s, p: s.p});
         }
-      }));
+
+        return distribution;
+      }
     }
 
     /**
@@ -217,6 +226,8 @@
    */
   class Trie {
     private root: Node;
+    /** The total weight of the entire trie. */
+    private totalWeight: number;
     /**
      * Converts arbitrary strings to a search key. The trie is built up of
      * search keys; not each entry's word form!
@@ -226,6 +237,7 @@
     constructor(root: Node, wordform2key: Wordform2Key) {
       this.root = root;
       this.toKey = wordform2key;
+      this.totalWeight = sumWeights(root);
     }
 
     /**
@@ -234,22 +246,22 @@
      *
      * @param prefix
      */
-    lookup(prefix: string): string[] {
+    lookup(prefix: string): TextWithProbability[] {
       let searchKey = this.toKey(prefix);
       let lowestCommonNode = findPrefix(this.root, searchKey);
       if (lowestCommonNode === null) {
         return [];
       }
 
-      return getSortedResults(lowestCommonNode, searchKey);
+      return getSortedResults(lowestCommonNode, searchKey, this.totalWeight);
     }
 
     /**
      * Returns the top N suggestions from the trie.
      * @param n How many suggestions, maximum, to return.
      */
-    firstN(n: number): string[] {
-      return getSortedResults(this.root, '' as SearchKey, n);
+    firstN(n: number): TextWithProbability[] {
+      return getSortedResults(this.root, '' as SearchKey, this.totalWeight, n);
     }
   }
 
@@ -283,16 +295,20 @@
    * @param results the current results
    * @param queue
    */
-  function getSortedResults(node: Node, prefix: SearchKey, limit = MAX_SUGGESTIONS): string[] {
+  function getSortedResults(node: Node, prefix: SearchKey, N: number, limit = MAX_SUGGESTIONS): TextWithProbability[] {
     let queue = new PriorityQueue();
-    let results: string[] = [];
+    let results: TextWithProbability[] = [];
 
     if (node.type === 'leaf') {
       // Assuming the values are sorted, we can just add all of the values in the
       // leaf, until we reach the limit.
       for (let item of node.entries) {
         if (item.key.startsWith(prefix)) {
-          results.push(item.content);
+          let { content, weight } = item;
+          results.push({
+            text: content,
+            p: weight / N
+          });
 
           if (results.length >= limit) {
             return results;
@@ -323,7 +339,10 @@
         } else {
           // When an entry is up next in the queue, we just add its contents to
           // the results!
-          results.push(next.content);
+          results.push({
+            text: next.content,
+            p: next.weight / N
+          });
           if (results.length >= limit) {
             return results;
           }
@@ -331,6 +350,27 @@
       }
     }
     return results;
+
+  }
+
+  /**
+   * O(n) traversal to sum the total weight of all leaves in the trie, starting
+   * at the provided node. Don't use this if you want lookups to be fast!
+   *
+   * TODO: Move this functionality to the trie compiler!
+   * @param node The node to start summing weights.
+   */
+  function sumWeights(node: Node): number {
+    if (node.type === 'leaf') {
+      return node.entries
+        .map(entry => entry.weight)
+        .reduce((acc, count) => acc + count, 0);
+    } else {
+      // @ts-ignore
+      return Object.values(node.children)
+        .map((child: Node) => sumWeights(child))
+        .reduce((acc: number, count: number) => acc + count, 0);
+    }
   }
 
   /** TypeScript type guard that returns whether the thing is a Node. */
