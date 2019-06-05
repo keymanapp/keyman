@@ -28,12 +28,11 @@ android {
             }
         }
 
-        String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity?
+        String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity, so all caps
         String env_build_counter = System.getenv("build_counter")
         if (env_build_number != null) {
             println "Using build number $env_build_number and counter $env_build_counter from environment"
             versionCode env_build_counter as Integer
-            // Because TeamCity does not bubble build.counter into system properties...
             versionName env_build_number
         } else {
             String majorMinorVersion = file('$projectDir/../../../../resources/VERSION.md').text.trim()
@@ -66,7 +65,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            if (project.hasProperty("release_store_file")) {
+            if (env_release_store_file != null) {
                 signingConfig signingConfigs.release
             }
         }
@@ -79,11 +78,12 @@ android {
     }
 }
 
-if (project.hasProperty("keys_json_file")) {
+String env_keys_json_file = System.getenv("keys_json_file")
+if (env_keys_json_file != null) {
     apply plugin: 'com.github.triplet.play'
 
     play {
-        serviceAccountCredentials = file(project.ext.keys_json_file)
+        serviceAccountCredentials = file(String.valueOf(env_keys_json_file))
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy = "ignore"
@@ -126,7 +126,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0-alpha04'
 }
 
-def void dumpProperties(it){
+/*def void dumpProperties(it){
     //println "Examining $it.name:"
     //println "Meta:"
     //println it.metaClass.metaMethods*.name.sort().unique()
@@ -137,6 +137,6 @@ def void dumpProperties(it){
     println "Properties:"
     println it.properties.entrySet()*.toString()
             .sort().toString().replaceAll(", ","\n")
-}
+}*/
 
 apply plugin: 'com.google.gms.google-services'
