@@ -31,6 +31,7 @@ android {
         String env_build_number = System.getenv("build_number")
         String env_build_counter = System.getenv("build_counter")
         if (env_build_number != null) {
+            println "Using build number $env_build_number and counter $env_build_counter from environment"
             versionCode env_build_counter as Integer
             // Because TeamCity does not bubble build.counter into system properties...
             versionName env_build_number
@@ -38,6 +39,7 @@ android {
             String majorMinorVersion = file('$projectDir/../../../../resources/VERSION.md').text.trim()
             versionCode 100
             versionName majorMinorVersion + '.0.0'
+            println "Using build $majorMinorVersion from project VERSION.md"
         }
     }
 
@@ -48,6 +50,7 @@ android {
     if (env_release_store_file != null) {
         signingConfigs {
             release {
+                println "Using signing from environment"
                 storeFile file(String.valueOf(env_release_store_file))
                 storePassword env_release_store_password
                 keyAlias env_release_key_alias
