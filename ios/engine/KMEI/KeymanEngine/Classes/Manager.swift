@@ -1221,7 +1221,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     downloadQueue!.userInfo = commonUserData
     
     let request = HTTPDownloadRequest(url: lexicalModelURL, userInfo: commonUserData)
-    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version ?? "0.1.0").path
+    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version ?? InstallableConstants.defaultVersion).path
     request.tag = 0
     
     downloadQueue!.addRequest(request)
