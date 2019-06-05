@@ -214,7 +214,7 @@ namespace com.keyman.text {
   let nativeDefaultKeyOutput = Processor.prototype.defaultKeyOutput;
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
     let keyman = com.keyman.singleton;
 
     // Note:  this assumes Lelem is properly attached and has an element interface.
@@ -227,8 +227,12 @@ namespace com.keyman.text {
     if (code == Codes.keyCodes.K_SPACE) {
       return ' ';
     } else if (code == Codes.keyCodes.K_BKSP) {
-      keyman['interface'].defaultBackspace();
-      return '';
+      if(!disableDOM) {
+        keyman['interface'].defaultBackspace();
+        return '';
+      } else {
+        return '\b';
+      }
     } else if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
       if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
