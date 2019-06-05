@@ -28,7 +28,7 @@ android {
             }
         }
 
-        String env_build_number = System.getenv("build_number")
+        String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity?
         String env_build_counter = System.getenv("build_counter")
         if (env_build_number != null) {
             println "Using build number $env_build_number and counter $env_build_counter from environment"
