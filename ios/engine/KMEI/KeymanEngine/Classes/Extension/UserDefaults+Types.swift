@@ -161,11 +161,11 @@ public extension UserDefaults {
     }
   }
 
-  public func userKeyboard(withFullID fullID: FullKeyboardID) -> InstallableKeyboard? {
+  func userKeyboard(withFullID fullID: FullKeyboardID) -> InstallableKeyboard? {
     return userKeyboards?.first { $0.fullID == fullID }
   }
     
-  public func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
+  func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
     return userLexicalModels?.first { $0.fullID == fullID }
   }
 
