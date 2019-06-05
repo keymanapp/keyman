@@ -1,6 +1,6 @@
 # Keyman Desktop Version History
 
-## 2019-04-30 11.0.1357.0 stable
+## 2019-06-05 11.0.1357.0 stable
 * Bug Fix: Error in shutdown of Keyman Engine can cause other applications to crash (#1820)
 
 ## 2019-04-29 11.0.1355.0 stable
