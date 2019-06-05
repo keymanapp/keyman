@@ -92,7 +92,7 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
       if [ $DO_COPY = true ]; then
         echo "Copying $id ($name) to $KEYBOARDS_TARGET"
         mkdir -p "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id"
-        unzip release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
+        unzip -o release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
         # cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
       fi
 #        die "done"
