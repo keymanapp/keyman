@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2019-04-30 11.0.1357.0 stable
+* Bug Fix: Error in shutdown of Keyman Engine can cause other applications to crash (#1820)
+
 ## 2019-04-29 11.0.1355.0 stable
 * Bug Fix: Error in initialization of Keyman Engine causes FieldWorks to crash if Keyman Developer installed but not Keyman Desktop. (#1739)
 
