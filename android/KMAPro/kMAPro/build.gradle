@@ -12,23 +12,28 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
 
-        println "===DUMPING PROPERTIES==="
-        dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
-        println "===END DUMP==="
+        //println "===DUMPING PROPERTIES==="
+        //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
+        //println "===END DUMP==="
 
-        if (project.hasProperty("services_json_file")) {
+        String env_services_json_file = System.getenv('services_json_file')
+
+        if (env_services_json_file != null) {
+            env_services_json_file = String.valueOf(env_services_json_file)
             println "Copying production google-services.json and using at kMAPro/"
             copy {
-                from project.ext.services_json_file
+                from env_services_json_file
                 include '*.json'
                 into './'
             }
         }
 
-        if (project.hasProperty("build.number")) {
-            versionCode project.ext['build_counter'] as Integer
+        String env_build_number = System.getenv("build_number")
+        String env_build_counter = System.getenv("build_counter")
+        if (env_build_number != null) {
+            versionCode env_build_counter as Integer
             // Because TeamCity does not bubble build.counter into system properties...
-            versionName "${project.ext['build.number']}"
+            versionName env_build_number
         } else {
             String majorMinorVersion = file('$projectDir/../../../../resources/VERSION.md').text.trim()
             versionCode 100
@@ -36,13 +41,17 @@ android {
         }
     }
 
-    if (project.hasProperty("release_store_file")) {
+    String env_release_store_file = System.getenv("release_store_file")
+    String env_release_store_password = System.getenv("release_store_password")
+    String env_release_key_alias = System.getenv("release_key_alias")
+    String env_release_key_password = System.getenv("release_key_password")
+    if (env_release_store_file != null) {
         signingConfigs {
             release {
-                storeFile file(project.ext.release_store_file)
-                storePassword project.ext.release_store_password
-                keyAlias project.ext.release_key_alias
-                keyPassword project.ext.release_key_password
+                storeFile file(String.valueof(env_release_store_file))
+                storePassword env_release_store_password
+                keyAlias env_release_key_alias
+                keyPassword env_release_key_password
             }
         }
     }
