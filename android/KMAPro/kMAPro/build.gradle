@@ -114,7 +114,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0-alpha04'
 }
 
-/*
 def void dumpProperties(it){
     //println "Examining $it.name:"
     //println "Meta:"
@@ -127,6 +126,5 @@ def void dumpProperties(it){
     println it.properties.entrySet()*.toString()
             .sort().toString().replaceAll(", ","\n")
 }
-*/
 
 apply plugin: 'com.google.gms.google-services'
