@@ -48,7 +48,7 @@ android {
     if (env_release_store_file != null) {
         signingConfigs {
             release {
-                storeFile file(String.valueof(env_release_store_file))
+                storeFile file(String.valueOf(env_release_store_file))
                 storePassword env_release_store_password
                 keyAlias env_release_key_alias
                 keyPassword env_release_key_password
