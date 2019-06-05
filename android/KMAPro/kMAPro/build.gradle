@@ -12,7 +12,9 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
 
-        //dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration
+        println "===DUMPING PROPERTIES==="
+        dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration
+        println "===END DUMP==="
 
         if (project.hasProperty("services_json_file")) {
             println "Copying production google-services.json and using at kMAPro/"
