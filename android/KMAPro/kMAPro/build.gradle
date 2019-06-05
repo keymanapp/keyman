@@ -13,7 +13,7 @@ android {
         targetSdkVersion 28
 
         println "===DUMPING PROPERTIES==="
-        dumpProperties(project.ext) // Use this to dump all external properties for debugging TeamCity integration
+        dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
         println "===END DUMP==="
 
         if (project.hasProperty("services_json_file")) {
