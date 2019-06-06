@@ -128,8 +128,14 @@ public final class ModelPickerActivity extends AppCompatActivity {
       //new JSONParse().execute();
       repo = CloudRepository.shared.fetchDataset(context, new Runnable() {
         public void run() {
-
           List<Map<String, String>> mapList = new ArrayList<>();
+
+          if(repo == null) {
+            // TEMP:  since the about-to-be-returned `repo` value that's missing is already cached,
+            //        we'll just get it directly here.
+            repo = CloudRepository.shared.fetchDataset(context, null, null);
+          }
+
           for(LexicalModel model: repo.lexicalModels.asList()) {
             mapList.add(model.map);
           }

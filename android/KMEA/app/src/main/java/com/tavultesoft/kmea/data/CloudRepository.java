@@ -25,7 +25,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,12 +39,27 @@ public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
   static private final String TAG = "CloudRepository";
 
-  private Calendar lastLoad;
+  private Dataset memCachedDataset;
+  private Calendar lastLoad; // To be used for Dataset caching.
 
   private CloudRepository() {
     // Tracks the time of the most recent cache.  We start at null to indicate that we haven't
     // tried to read the cache yet, as we don't yet have a Context instance to reference.
     lastLoad = null;
+  }
+
+  private boolean shouldUseCache(Context context) {
+    boolean hasConnection = KMManager.hasConnection(context);
+
+    if (memCachedDataset != null) {
+      Calendar lastModified = Calendar.getInstance();
+      lastModified.setTime(lastLoad.getTime());
+      lastModified.add(Calendar.HOUR_OF_DAY, 1);
+      Calendar now = Calendar.getInstance();
+      return (!hasConnection || lastModified.compareTo(now) > 0);
+    } else {
+      return false;
+    }
   }
 
   private boolean shouldUseCache(Context context, File cacheFile) {
@@ -67,7 +85,14 @@ public class CloudRepository {
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   public Dataset fetchDataset(@NonNull Context context, Runnable onSuccess, Runnable onFailure) {
-    Dataset dataset = new Dataset(context);
+    // TODO:  Do a similar check to `shouldUseCache` for our mem-cached dataset,
+    //        replacing it when outdated.
+    if(shouldUseCache(context)) {
+      return memCachedDataset; // isn't null - checked by `shouldUseCache`.
+    }
+
+    memCachedDataset = new Dataset(context);
+    lastLoad = Calendar.getInstance(); // Mark a cache timing.
 
     // Get kmp.json info from installed models.
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
@@ -75,24 +100,29 @@ public class CloudRepository {
     if (kmpLexicalModelsArray.length() == 0) {
       // May need to note this for handling a 'failure' check.
     } else {
-      dataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray, context));
+      memCachedDataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray, context));
     }
 
     boolean loadFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
+    CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, onSuccess, onFailure);
 
     if(!loadFromCache) {
-      CloudDownloadTask downloadTask = new CloudDownloadTask(context, dataset, onSuccess, onFailure);
-
       String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
       /* do what's possible here, rather than in the Task */
 
       downloadTask.execute(new CloudApiParam(ApiTarget.LexicalModels, lexicalURL));
     } else {
-      // just load from the cache.
+      // Load important parts from the cache.
+      JSONArray lexData = getCachedJSONArray(context, getLexicalModelCacheFile(context));
+
+      CloudDownloadReturns jsonData = new CloudDownloadReturns(null, lexData);
+
+      // Call the processor method directly with the cached API data.
+      downloadTask.processCloudReturns(jsonData);
     }
 
-    return dataset;
+    return memCachedDataset;
   }
 
   protected File getLexicalModelCacheFile(Context context) {
@@ -115,6 +145,24 @@ public class CloudRepository {
     }
 
     return lmData;
+  }
+
+  /**
+   * Save the JSON catalog data that's available from the cloud.
+   * The catalog is saved to a unique file.  Separate files should
+   * be used for each API call, such as for keyboards vs lexical models.
+   * @param jsonArray - Array of JSON objects containing API return info
+   */
+  private static void saveJSONArrayToCache(File file, JSONArray jsonArray) {
+    ObjectOutput objOutput;
+    try {
+      // Save to cache file
+      objOutput = new ObjectOutputStream(new FileOutputStream(file));
+      objOutput.writeObject(jsonArray.toString());
+      objOutput.close();
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to save to cache file. Error: " + e);
+    }
   }
 
   protected List<LexicalModel> processLexicalModelJSON(JSONArray models, Context context) {
@@ -171,7 +219,7 @@ public class CloudRepository {
 
         // TODO:  (Move to PickerActivity) Display check for installed models
         String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
-        if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) { // FIXME:
+        if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
           hashMap.put("leftIcon", String.valueOf(R.drawable.ic_check));
         } else {
           // Otherwise, include link to .kmp file
@@ -218,7 +266,7 @@ public class CloudRepository {
     public final JSONArray keyboardJSON;
     public final JSONArray lexicalModelJSON;
 
-    // TODO:  Process a CloudApiReturns array instead!
+    // Used by the CloudDownloadTask, as it fits well with doInBackground's param structure.
     public CloudDownloadReturns(List<CloudApiReturns> returns) {
       JSONArray kbd = null;
       JSONArray lex = null;
@@ -237,6 +285,11 @@ public class CloudRepository {
       this.keyboardJSON = kbd;
       this.lexicalModelJSON = lex;
     }
+
+    public CloudDownloadReturns(JSONArray keyboardJSON, JSONArray lexicalModelJSON) {
+      this.keyboardJSON = keyboardJSON;
+      this.lexicalModelJSON = lexicalModelJSON;
+    }
   }
 
   // This is copied from LanguageListActivity to download a catalog from the cloud.
@@ -244,7 +297,6 @@ public class CloudRepository {
   private class CloudDownloadTask extends AsyncTask<CloudApiParam, Integer, CloudDownloadReturns> {
     private final boolean hasConnection;
     private ProgressDialog progressDialog;
-    private boolean loadFromCache; // FIXME:  Needs to be assigned/removed!;
 
     private final Context context;
     private final Runnable success;
@@ -303,7 +355,7 @@ public class CloudRepository {
     protected void onPreExecute() {
       super.onPreExecute();
 
-      if (hasConnection && !loadFromCache) {
+      if (hasConnection) {
         showProgressDialog(new Runnable() {
           @Override
           public void run() { // runs on 'cancel' selection.
@@ -319,20 +371,13 @@ public class CloudRepository {
         return null;
       }
 
-      // Facilitates debugging the AsyncTask.
-      if(android.os.Debug.isDebuggerConnected()) {
-        android.os.Debug.waitForDebugger();
-      }
-
       List<CloudApiReturns> retrievedJSON = new ArrayList<>(params.length);
 
       for(CloudApiParam param:params) {
         JSONParser jsonParser = new JSONParser();
         JSONArray data = null;
-        if (loadFromCache) {
-          // Do this based on param.target if needed.
-          data = getCachedJSONArray(context, getLexicalModelCacheFile(context));
-        } else if (hasConnection) {
+
+        if (hasConnection) {
           try {
             String remoteUrl = param.url;
             data = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONArray.class);
@@ -351,9 +396,6 @@ public class CloudRepository {
     }
 
     protected List<LexicalModel> processLexicalModels(JSONArray lexicalJSON) {
-      // Clear pre-existing list
-      List<LexicalModel> lexicalModelsArrayList =  new ArrayList<>();
-
       if (lexicalJSON == null && dataset.isEmpty()) {
         Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
         failure.run();
@@ -376,7 +418,15 @@ public class CloudRepository {
     }
 
     @Override
-    protected void onPostExecute(CloudDownloadReturns jsonArray) {
+    protected void onPostExecute(CloudDownloadReturns jsonTuple) {
+      // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
+      if(jsonTuple.keyboardJSON != null) {
+        // TODO:  Handle keyboard caching, too.
+      }
+      if(jsonTuple.lexicalModelJSON != null) {
+        saveJSONArrayToCache(getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
+      }
+
       if (progressDialog != null && progressDialog.isShowing()) {
         try {
           progressDialog.dismiss();
@@ -386,7 +436,11 @@ public class CloudRepository {
         }
       }
 
-      List<LexicalModel> lexicalModelsArrayList = processLexicalModels(jsonArray.lexicalModelJSON);
+      processCloudReturns(jsonTuple);
+    }
+
+    public void processCloudReturns(CloudDownloadReturns jsonTuple) {
+      List<LexicalModel> lexicalModelsArrayList = processLexicalModels(jsonTuple.lexicalModelJSON);
       // TODO:  Filter out any duplicates from already-installed models!
       for(LexicalModel model: lexicalModelsArrayList) {
         // TODO: Check for duplicates / possible updates!
@@ -394,6 +448,7 @@ public class CloudRepository {
       }
 
       // TODO: Set the CloudRepository's LexicalModelsAdapter to have the same members.
+      dataset.lexicalModels.addAll(lexicalModelsArrayList);
 
       // And finish.
       success.run();
