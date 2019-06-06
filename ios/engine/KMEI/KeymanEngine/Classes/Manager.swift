@@ -120,10 +120,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public var canRemoveLexicalModels = true
   
   /// Allow the default lexical model to be removed.
-  /// The last lexical model cannot be removed, so the default lexical model cannot be removed if it
-  /// is the only lexical model in the list, regardless of the value of this property.
-  /// The default value is false.
-  public var canRemoveDefaultLexicalModel = false
+  /// The last lexical model CAN be removed, as this is an optional feature
+  /// The default value is true.
+  public var canRemoveDefaultLexicalModel = true
   
   public let apiLexicalModelRepository: APILexicalModelRepository
 

@@ -125,7 +125,11 @@ class LanguageSettingsViewController: UITableViewController {
         case 2:
           cell.textLabel?.text = "Model"
           cell.accessoryType = .disclosureIndicator
-          cell.detailTextLabel?.text = language.lexicalModels?[safe: 0]?.name
+          if let currentModel = language.lexicalModels?[safe: 0] {
+            cell.detailTextLabel?.text = currentModel.name
+          } else {
+            cell.detailTextLabel?.text = "<no current model>"
+          }
 
         default:
           cell.textLabel?.text = "error"
@@ -146,6 +150,13 @@ class LanguageSettingsViewController: UITableViewController {
     switch indexPath.section {
     case 0:
       showKeyboardInfoView(kb: (language.keyboards?[safe: indexPath.row])!)
+    case 1:
+      switch indexPath.row  {
+        case 2:
+          showLexicalModelInfoView()
+      default:
+        break
+      }
     default:
       break
     }
@@ -153,16 +164,67 @@ class LanguageSettingsViewController: UITableViewController {
   
   func showKeyboardInfoView(kb: Keyboard) {
     let version = kb.version
-    
-    let infoView = KeyboardInfoViewController()
-    infoView.title = kb.name
-    infoView.keyboardCount = userKeyboards.count
-//    infoView.keyboardIndex = index
-    infoView.keyboardID = kb.id
-//    infoView.languageID = kb.languageID
-    infoView.keyboardVersion = version
-//    infoView.isCustomKeyboard = kb.isCustom
-    navigationController?.pushViewController(infoView, animated: true)
+    let matchingFullID = FullKeyboardID(keyboardID: kb.id, languageID: language.id)
+
+    let userData = Storage.active.userDefaults
+
+    // If user defaults for keyboards list does not exist, do nothing.
+    guard var globalUserKeyboards = userData.userKeyboards else {
+      log.error("no keyboards in the global keyboards list!")
+      return
+    }
+
+    if let index = globalUserKeyboards.index(where: { $0.fullID == matchingFullID }) {
+      guard index < globalUserKeyboards.count else {
+        return
+      }
+      let kbIndex:Int = index
+      let thisKb = globalUserKeyboards[kbIndex]
+      let infoView = KeyboardInfoViewController()
+      infoView.title = thisKb.name
+      infoView.keyboardCount = userKeyboards.count
+      infoView.keyboardIndex = index
+      infoView.keyboardID = thisKb.id
+      infoView.languageID = language.id
+      infoView.keyboardVersion = version
+      infoView.isCustomKeyboard = thisKb.isCustom
+      navigationController?.pushViewController(infoView, animated: true)
+    } else {
+      log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
+      return
+    }
+  }
+  
+  func showLexicalModelInfoView() {
+    if let lm = language.lexicalModels?[safe: 0] {
+      let version = lm.version
+      let matchingFullID = FullLexicalModelID(lexicalModelID: lm.id, languageID: language.id)
+      
+      let userData = Storage.active.userDefaults
+      
+      if let globalUserLexicalModels = userData.userLexicalModels {
+        if let index = globalUserLexicalModels.index(where: { $0.fullID == matchingFullID }) {
+          guard index < globalUserLexicalModels.count else {
+            return
+          }
+          let lmIndex:Int = index
+          let thisLm = globalUserLexicalModels[lmIndex]
+          let infoView = LexicalModelInfoViewController()
+          infoView.title = thisLm.name
+          infoView.lexicalModelCount = globalUserLexicalModels.count
+          infoView.lexicalModelIndex = index
+          infoView.lexicalModelID = thisLm.id
+          infoView.languageID = language.id
+          infoView.lexicalModelVersion = version ?? InstallableConstants.defaultVersion
+          infoView.isCustomLexicalModel = thisLm.isCustom
+          navigationController?.pushViewController(infoView, animated: true)
+        } else {
+          log.error("this lexical model \(matchingFullID) not found among language's installed lexical model!")
+        }
+      } else {
+        log.error("no lexical models in the global models list!")
+      }
+    }
   }
   
     /*

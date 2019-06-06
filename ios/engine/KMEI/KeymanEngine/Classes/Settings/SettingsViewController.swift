@@ -252,8 +252,17 @@ open class SettingsViewController: UITableViewController {
       log.info("prepare for segue")
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+  }
+  
+  // MARK: - language access -
+  private func installed2API(_ installedList: [InstallableLexicalModel]) -> [LexicalModel] {
+    var returnList = [LexicalModel]()
+    for ilm in installedList {
+      returnList.append(LexicalModel(id: ilm.id, name: ilm.name, license: "", version: ilm.version, languages: [], authorName: "", fileSize: 0, filename: "no filename", sourcePath: nil, authorEmail: nil, description: nil, packageFileSize: 0, packageFilename: "", packageIncludes: nil, isDefault: false, lastModified: nil, minKeymanVersion: nil))
     }
-
+    return returnList
+  }
+  
   // MARK: - language access -
   private func loadUserLanguages() {
     //iterate the list of installed languages and save their names
@@ -271,7 +280,10 @@ open class SettingsViewController: UITableViewController {
       } else {
         kbds = [Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil)]
       }
-      keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: nil, font: nil, oskFont: nil)
+      let userDefaults = Storage.active.userDefaults
+      let lmListInstalled: [InstallableLexicalModel] = userDefaults.userLexicalModels(forLanguage: k.languageID) ?? []
+      let lmList = installed2API(lmListInstalled)
+      keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: lmList, font: nil, oskFont: nil)
     }
     // there shouldn't be any lexical models for languages that don't have a keyboard installed
     //  but check
