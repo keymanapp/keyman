@@ -35,7 +35,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
         ])
     }
     infoArray.append([
-      "title": "Delete",
+      "title": "Uninstall keyboard",
       "subtitle": ""
       ])
   }

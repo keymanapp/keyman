@@ -24,7 +24,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   
     infoArray = [[String: String]]()
     infoArray.append([
-        "title": "Lexical model version",
+        "title": "Model version",
         "subtitle": lexicalModelVersion
         ])
   
@@ -35,7 +35,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
           ])
     }
     infoArray.append([
-        "title": "Delete",
+        "title": "Uninstall model",
         "subtitle": ""
         ])
   }
