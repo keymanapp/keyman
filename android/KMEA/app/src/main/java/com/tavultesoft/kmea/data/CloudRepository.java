@@ -62,7 +62,8 @@ public class CloudRepository {
    * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
    * services.  Unless recently cached, this object will be populated asynchronously.
    * @param context   The current Activity requesting the Dataset.
-   * @param onFinish  A callback to run immediately upon successful completion of the download.
+   * @param onSuccess  A callback to run immediately upon successful completion of the download.
+   * @param onFailure  A callback to run immediately upon download failure.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   public Dataset fetchDataset(@NonNull Context context, Runnable onSuccess, Runnable onFailure) {
@@ -86,7 +87,7 @@ public class CloudRepository {
 
       /* do what's possible here, rather than in the Task */
 
-      downloadTask.execute(lexicalURL);
+      downloadTask.execute(new CloudApiParam(ApiTarget.LexicalModels, lexicalURL));
     } else {
       // just load from the cache.
     }
@@ -188,23 +189,62 @@ public class CloudRepository {
     return modelList;
   }
 
-  private class CloudApiReturns {
+  private enum ApiTarget {
+    Keyboards,
+    LexicalModels
+  }
+
+  private static class CloudApiParam {
+    public final ApiTarget target;
+    public final String url;
+
+    CloudApiParam(ApiTarget target, String url) {
+      this.target = target;
+      this.url = url;
+    }
+  }
+
+  private static class CloudApiReturns {
+    public final ApiTarget target;
+    public final JSONArray jsonArray;
+
+    public CloudApiReturns(ApiTarget target, JSONArray jsonArray) {
+      this.target = target;
+      this.jsonArray = jsonArray;
+    }
+  }
+
+  private static class CloudDownloadReturns {
     public final JSONArray keyboardJSON;
     public final JSONArray lexicalModelJSON;
 
-    public CloudApiReturns (JSONArray kbdJSON, JSONArray lexJSON) {
-      this.keyboardJSON = kbdJSON;
-      this.lexicalModelJSON = lexJSON;
+    // TODO:  Process a CloudApiReturns array instead!
+    public CloudDownloadReturns(List<CloudApiReturns> returns) {
+      JSONArray kbd = null;
+      JSONArray lex = null;
+
+      for(CloudApiReturns ret: returns) {
+        switch(ret.target) {
+          case Keyboards:
+            kbd = ret.jsonArray;
+            break;
+          case LexicalModels:
+            lex = ret.jsonArray;
+        }
+      }
+
+      // Errors are thrown if we try to do this assignment within the loop.
+      this.keyboardJSON = kbd;
+      this.lexicalModelJSON = lex;
     }
   }
 
   // This is copied from LanguageListActivity to download a catalog from the cloud.
   // TODO: Keyman roadmap is to refactor to use background WorkManager in Keyman 13.0
-  private class CloudDownloadTask extends AsyncTask<String, Integer, CloudApiReturns> {
+  private class CloudDownloadTask extends AsyncTask<CloudApiParam, Integer, CloudDownloadReturns> {
     private final boolean hasConnection;
     private ProgressDialog progressDialog;
-    private boolean loadFromCache;
-    private final String iconKey = "icon";
+    private boolean loadFromCache; // FIXME:  Needs to be assigned/removed!;
 
     private final Context context;
     private final Runnable success;
@@ -274,7 +314,7 @@ public class CloudRepository {
     }
 
     @Override
-    protected CloudApiReturns doInBackground(String... urls) {
+    protected CloudDownloadReturns doInBackground(CloudApiParam... params) {
       if (isCancelled()) {
         return null;
       }
@@ -284,27 +324,30 @@ public class CloudRepository {
         android.os.Debug.waitForDebugger();
       }
 
-      int count = urls.length;
+      List<CloudApiReturns> retrievedJSON = new ArrayList<>(params.length);
 
-      JSONParser jsonParser = new JSONParser();
-      JSONArray lmData = null;
-      if (loadFromCache) {
-        lmData = getCachedJSONArray(context, getLexicalModelCacheFile(context));
-      } else if (hasConnection) {
-        try {
-          String remoteUrl = urls[0];
-          lmData = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONArray.class);
-          Log.d(TAG, "JSON retrieved!");
-          Log.d(TAG, lmData.toString());
-        } catch (Exception e) {
-          Log.d(TAG, e.getMessage());
-          lmData = null;
+      for(CloudApiParam param:params) {
+        JSONParser jsonParser = new JSONParser();
+        JSONArray data = null;
+        if (loadFromCache) {
+          // Do this based on param.target if needed.
+          data = getCachedJSONArray(context, getLexicalModelCacheFile(context));
+        } else if (hasConnection) {
+          try {
+            String remoteUrl = param.url;
+            data = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONArray.class);
+          } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+            data = null;
+          }
+        } else {
+          data = null;
         }
-      } else {
-        lmData = null;
+
+        retrievedJSON.add(new CloudApiReturns(param.target, data));
       }
 
-      return new CloudApiReturns(null, lmData);
+      return new CloudDownloadReturns(retrievedJSON);
     }
 
     protected List<LexicalModel> processLexicalModels(JSONArray lexicalJSON) {
@@ -333,7 +376,7 @@ public class CloudRepository {
     }
 
     @Override
-    protected void onPostExecute(CloudApiReturns jsonArray) {
+    protected void onPostExecute(CloudDownloadReturns jsonArray) {
       if (progressDialog != null && progressDialog.isShowing()) {
         try {
           progressDialog.dismiss();
