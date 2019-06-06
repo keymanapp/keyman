@@ -22,7 +22,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.data.adapters.LexicalModelsAdapter;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -43,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Keyman Settings --> Languages Settings --> Language Settings --> Model List
@@ -57,6 +61,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
   // Merged array list of lexical models to display in ListView
   private static ArrayList<HashMap<String, String>> lexicalModelsArrayList = null;
+  private static Dataset repo;
   private static Dataset.LexicalModels lexicalModelsAdapter = null;
   private boolean didExecuteParser = false;
 
@@ -111,11 +116,109 @@ public final class ModelPickerActivity extends AppCompatActivity {
   }
 
   @Override
+  public void finish() {
+    Log.d(TAG, "Exiting ModelPickerActivity");
+  }
+
+  @Override
   protected void onResume() {
     super.onResume();
     if (!didExecuteParser) {
       didExecuteParser = true;
-      new JSONParse().execute();
+      //new JSONParse().execute();
+      repo = CloudRepository.shared.fetchDataset(context, new Runnable() {
+        public void run() {
+
+          List<Map<String, String>> mapList = new ArrayList<>();
+          for(LexicalModel model: repo.lexicalModels.asList()) {
+            mapList.add(model.map);
+          }
+
+          String[] from = new String[]{"leftIcon", KMManager.KMKey_LexicalModelName, KMManager.KMKey_Icon};
+          int[] to = new int[]{R.id.image1, R.id.text1, R.id.image2};
+
+          ListAdapter adapter = new KMListAdapter(context, mapList,
+              R.layout.models_list_row_layout, from, to);
+          listView.setAdapter(adapter);
+          listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+              selectedIndex = position;
+              HashMap<String, String> modelInfo = lexicalModelsArrayList.get(position);
+              String packageID = modelInfo.get(KMManager.KMKey_PackageID);
+              String languageID = modelInfo.get(KMManager.KMKey_LanguageID);
+              String modelID = modelInfo.get(KMManager.KMKey_LexicalModelID);
+              String modelName = modelInfo.get(KMManager.KMKey_LexicalModelName);
+              String langName = modelInfo.get(KMManager.KMKey_LanguageName);
+
+              // File check to see if lexical model already exists locally
+              File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
+
+              // Using the presence of the left icon "check" to determine if the model is installed
+              boolean modelInstalled = modelInfo.containsKey("leftIcon");
+              if (modelInstalled) {
+                // Show Model Info
+                listView.setItemChecked(position, true);
+                listView.setSelection(position);
+
+                // Start intent for selected Predictive Text Model screen
+                if (!languageID.equalsIgnoreCase(modelInfo.get(KMManager.KMKey_LanguageID))) {
+                  Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " +
+                      modelInfo.get(KMManager.KMKey_LanguageID));
+                }
+                Bundle bundle = new Bundle();
+                // Note: package ID of a model is different from package ID for a keyboard.
+                // Language ID can be re-used
+                bundle.putString(KMManager.KMKey_PackageID, packageID);
+                bundle.putString(KMManager.KMKey_LanguageID, languageID);
+                bundle.putString(KMManager.KMKey_LexicalModelID, modelID);
+                bundle.putString(KMManager.KMKey_LexicalModelName, modelName);
+                bundle.putString(KMManager.KMKey_LexicalModelVersion,
+                    modelInfo.get(KMManager.KMKey_LexicalModelVersion));
+                bundle.putString(KMManager.KMKey_CustomModel,
+                    MapCompat.getOrDefault(modelInfo, KMManager.KMKey_CustomModel, "N"));
+                Intent i = new Intent(context, ModelInfoActivity.class);
+                i.putExtras(bundle);
+                startActivityForResult(i, 1);
+              } else if (modelCheck.exists()) {
+                // Handle scenario where previously installed kmp already exists so
+                // we only need to add the model to the list of installed models
+                // Add help link
+                modelInfo.put(KMManager.KMKey_CustomHelpLink, "");
+                boolean result = KMManager.addLexicalModel(context, modelInfo);
+                if (result) {
+                  Toast.makeText(context, "Model installed", Toast.LENGTH_SHORT).show();
+                }
+
+                // Don't register associated lexical model because this is not a UI view
+              } else {
+                // Model isn't installed so prompt to download it
+                Bundle args = new Bundle();
+                args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
+                args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
+                args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, modelID);
+                args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, modelName);
+                args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+                args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+                args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL,
+                    modelInfo.get(KMManager.KMKey_LexicalModelPackageFilename));
+                Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+                i.putExtras(args);
+                startActivity(i);
+              }
+            }
+          });
+
+          Intent i = getIntent();
+          listView.setSelectionFromTop(i.getIntExtra("listPosition", 0),
+              i.getIntExtra("offsetY", 0));
+        }
+      }, new Runnable() {
+        public void run() {
+          finish();
+        }
+      });
     }
   }
 

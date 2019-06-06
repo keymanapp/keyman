@@ -137,6 +137,7 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
   public Dataset(@NonNull Context context) {
     super(context, 0, new ArrayList<LanguageDataset>());
 
+    this.context = context.getApplicationContext();
     keyboards = new Keyboards(context);
     lexicalModels = new LexicalModels(context);
   }

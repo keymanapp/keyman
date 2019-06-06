@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data.adapters;
+package com.tavultesoft.kmea.data;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,8 +16,6 @@ import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.util.FileUtils;
 
@@ -67,20 +65,33 @@ public class CloudRepository {
    * @param onFinish  A callback to run immediately upon successful completion of the download.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
-  public Dataset fetchDataset(@NonNull Context context, Runnable onFinish) {
+  public Dataset fetchDataset(@NonNull Context context, Runnable onSuccess, Runnable onFailure) {
+    Dataset dataset = new Dataset(context);
+
+    // Get kmp.json info from installed models.
+    JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
+
+    if (kmpLexicalModelsArray.length() == 0) {
+      // May need to note this for handling a 'failure' check.
+    } else {
+      dataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray, context));
+    }
+
     boolean loadFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
 
     if(!loadFromCache) {
-      CloudDownloadTask downloadTask = new CloudDownloadTask(context, onFinish);
+      CloudDownloadTask downloadTask = new CloudDownloadTask(context, dataset, onSuccess, onFailure);
+
+      String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
       /* do what's possible here, rather than in the Task */
 
-      downloadTask.execute("" /* use actual URLs here */);
+      downloadTask.execute(lexicalURL);
     } else {
       // just load from the cache.
     }
 
-    throw new UnsupportedOperationException();
+    return dataset;
   }
 
   protected File getLexicalModelCacheFile(Context context) {
@@ -105,6 +116,78 @@ public class CloudRepository {
     return lmData;
   }
 
+  protected List<LexicalModel> processLexicalModelJSON(JSONArray models, Context context) {
+    List<LexicalModel> modelList = new ArrayList<>(models.length());
+
+    try {
+      // Parse the model JSON Object from the merged list of api.keyman.com query and available kmp's.
+      // Known assumption:
+      // 2. query is built on a single language ID so the "languages" array will only have one language
+      int modelsLength = models.length();
+      for (int i = 0; i < modelsLength; i++) {
+        JSONObject model = models.getJSONObject(i);
+        String packageID = "", modelURL = "";
+        if (model.has(KMManager.KMKey_PackageID)) {
+          packageID = model.getString(KMManager.KMKey_PackageID);
+        } else {
+          // Determine package ID from packageFilename
+          modelURL = model.optString("packageFilename", "");
+          packageID = FileUtils.getFilename(modelURL);
+          packageID = packageID.replace(".model.kmp", "");
+        }
+
+        // api.keyman.com query returns an array of language IDs Strings while
+        // kmp.json "languages" is an array of JSONObject
+        String languageID = "", langName = "";
+        Object obj = model.getJSONArray("languages");
+        if (((JSONArray) obj).get(0) instanceof String) {
+          // language name not provided, so re-use language ID
+          languageID = model.getJSONArray("languages").getString(0);
+          langName = languageID;
+        } else if (((JSONArray) obj).get(0) instanceof JSONObject) {
+          JSONObject languageObj = model.getJSONArray("languages").getJSONObject(0);
+          languageID = languageObj.getString("id");
+          langName = languageObj.getString("name");
+        }
+
+        String modelID = model.getString("id");
+        String modelName = model.getString("name");
+        String modelVersion = model.getString("version");
+
+        String isCustom = model.optString("CustomModel", "N");
+        String icon = "0";
+
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+        hashMap.put(KMManager.KMKey_PackageID, packageID);
+        hashMap.put(KMManager.KMKey_LanguageID, languageID);
+        hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
+        hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
+        hashMap.put(KMManager.KMKey_LanguageName, langName);
+        hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
+        hashMap.put(KMManager.KMKey_CustomModel, isCustom);
+        hashMap.put("isEnabled", "true");
+        hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
+
+        // TODO:  (Move to PickerActivity) Display check for installed models
+        String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+        if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) { // FIXME:
+          hashMap.put("leftIcon", String.valueOf(R.drawable.ic_check));
+        } else {
+          // Otherwise, include link to .kmp file
+          hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
+        }
+        // TODO: (Move section) END.
+
+        modelList.add(new LexicalModel(hashMap));
+      }
+    } catch (JSONException e) {
+      Log.e("JSONParse", "Error: " + e);
+      return new ArrayList<>();  // Is this ideal?
+    }
+
+    return modelList;
+  }
+
   private class CloudApiReturns {
     public final JSONArray keyboardJSON;
     public final JSONArray lexicalModelJSON;
@@ -124,21 +207,26 @@ public class CloudRepository {
     private final String iconKey = "icon";
 
     private final Context context;
-    private final Runnable finish;
+    private final Runnable success;
+    private final Runnable failure;
 
-    public CloudDownloadTask(Context context, Runnable finish) {
+    private final Dataset dataset;
+
+    public CloudDownloadTask(Context context, Dataset dataset, Runnable success, Runnable failure) {
       this.context = context;
+      this.dataset = dataset;
       this.hasConnection = KMManager.hasConnection(context);
 
-      if(finish == null) {
-        finish = new Runnable() {
+      if(failure == null) {
+        failure = new Runnable() {
           @Override
           public void run() {
             // Do nothing.
           }
         };
       }
-      this.finish = finish;
+      this.success = success;
+      this.failure = failure;
     }
 
     protected void showProgressDialog(final Runnable finishCallback) {
@@ -179,7 +267,7 @@ public class CloudRepository {
         showProgressDialog(new Runnable() {
           @Override
           public void run() { // runs on 'cancel' selection.
-            finish.run();
+            failure.run();
           }
         });
       }
@@ -191,6 +279,11 @@ public class CloudRepository {
         return null;
       }
 
+      // Facilitates debugging the AsyncTask.
+      if(android.os.Debug.isDebuggerConnected()) {
+        android.os.Debug.waitForDebugger();
+      }
+
       int count = urls.length;
 
       JSONParser jsonParser = new JSONParser();
@@ -199,9 +292,12 @@ public class CloudRepository {
         lmData = getCachedJSONArray(context, getLexicalModelCacheFile(context));
       } else if (hasConnection) {
         try {
-          String remoteUrl = String.format("%s?q=bcp47:%s", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
+          String remoteUrl = urls[0];
           lmData = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONArray.class);
+          Log.d(TAG, "JSON retrieved!");
+          Log.d(TAG, lmData.toString());
         } catch (Exception e) {
+          Log.d(TAG, e.getMessage());
           lmData = null;
         }
       } else {
@@ -215,112 +311,25 @@ public class CloudRepository {
       // Clear pre-existing list
       List<LexicalModel> lexicalModelsArrayList =  new ArrayList<>();
 
-      // TODO:  This part should be utilized to init the lexical model array before the Cloud returns.
-      // Consolidate kmp.json info from models.
-      JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
-
-      // TODO: Should this be handled here?  Probably split instead - the lexicalJSON check is valid,
-      //       but the kmpLexicalModelsArray check goes with pre-init.
-      if (lexicalJSON == null && kmpLexicalModelsArray.length() == 0) {
+      if (lexicalJSON == null && dataset.isEmpty()) {
         Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
-        finish.run();
+        failure.run();
         return null;
       }
-      // TODO: End "should this be handled?" section.
 
-      try {
-        JSONArray models;
-        if (!hasConnection) {
-          // When offline, only use keyboards available from kmp.json
-          models = kmpLexicalModelsArray;
-        } else {
-          // Otherwise, merge kmpLexicalModelsArray with cloud jsonArray
-          models = (lexicalJSON != null) ? lexicalJSON : new JSONArray(); // Start with cloud model list.
-          for (int i = 0; i < kmpLexicalModelsArray.length(); i++) {  // Iterate over local KMPs.
-            JSONObject kmpLexicalModel = kmpLexicalModelsArray.getJSONObject(i);
-            String kmpModelID = kmpLexicalModel.getString("id");
-
-            int modelIndex = JSONUtils.findID(models, kmpModelID);
-            if (modelIndex == -1) {
-              // Lexical model from KMP didn't exist in cloud so add new entry
-              models.put(kmpLexicalModel);
-            } else {
-              // Lexical model already installed from local kmp so replace models entry
-              models.put(modelIndex, kmpLexicalModel);
-            }
-          }
-        }
-
-        if (models == null) {
-          return null;
-        }
-
-        // Parse the model JSON Object from the merged list of api.keyman.com query and available kmp's.
-        // Known assumption:
-        // 2. query is built on a single language ID so the "languages" array will only have one language
-        int modelsLength = models.length();
-        for (int i = 0; i < modelsLength; i++) {
-          JSONObject model = models.getJSONObject(i);
-          String packageID = "", modelURL = "";
-          if (model.has(KMManager.KMKey_PackageID)) {
-            packageID = model.getString(KMManager.KMKey_PackageID);
-          } else {
-            // Determine package ID from packageFilename
-            modelURL = model.optString("packageFilename", "");
-            packageID = FileUtils.getFilename(modelURL);
-            packageID = packageID.replace(".model.kmp", "");
-          }
-
-          // api.keyman.com query returns an array of language IDs Strings while
-          // kmp.json "languages" is an array of JSONObject
-          String languageID = "", langName = "";
-          Object obj = model.getJSONArray("languages");
-          if (((JSONArray) obj).get(0) instanceof String) {
-            // language name not provided, so re-use language ID
-            languageID = model.getJSONArray("languages").getString(0);
-            langName = languageID;
-          } else if (((JSONArray) obj).get(0) instanceof JSONObject) {
-            JSONObject languageObj = model.getJSONArray("languages").getJSONObject(0);
-            languageID = languageObj.getString("id");
-            langName = languageObj.getString("name");
-          }
-
-          String modelID = model.getString("id");
-          String modelName = model.getString("name");
-          String modelVersion = model.getString("version");
-
-          String isCustom = model.optString("CustomModel", "N");
-          String icon = "0";
-
-          HashMap<String, String> hashMap = new HashMap<String, String>();
-          hashMap.put(KMManager.KMKey_PackageID, packageID);
-          hashMap.put(KMManager.KMKey_LanguageID, languageID);
-          hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
-          hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
-          hashMap.put(KMManager.KMKey_LanguageName, langName);
-          hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
-          hashMap.put(KMManager.KMKey_CustomModel, isCustom);
-          hashMap.put("isEnabled", "true");
-          hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
-
-          // TODO:  (Move to PickerActivity) Display check for installed models
-          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
-          if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) { // FIXME:
-            hashMap.put("leftIcon", String.valueOf(R.drawable.ic_check));
-          } else {
-            // Otherwise, include link to .kmp file
-            hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
-          }
-          // TODO: (Move section) END.
-
-          lexicalModelsArrayList.add(new LexicalModel(hashMap));
-        }
-
-        return lexicalModelsArrayList;
-      } catch (JSONException e) {
-        Log.e("JSONParse", "Error: " + e);
-        return null;  // Is this ideal?
+      if (!hasConnection) {
+        // When offline, only use keyboards available from kmp.json
+        return new ArrayList<>();
       }
+
+      // Otherwise, merge kmpLexicalModelsArray with cloud jsonArray
+      JSONArray models = (lexicalJSON != null) ? lexicalJSON : new JSONArray(); // Start with cloud model list.
+
+      if (models == null) {
+        return new ArrayList<>();
+      }
+
+      return processLexicalModelJSON(models, context);
     }
 
     @Override
@@ -335,8 +344,16 @@ public class CloudRepository {
       }
 
       List<LexicalModel> lexicalModelsArrayList = processLexicalModels(jsonArray.lexicalModelJSON);
+      // TODO:  Filter out any duplicates from already-installed models!
+      for(LexicalModel model: lexicalModelsArrayList) {
+        // TODO: Check for duplicates / possible updates!
+        //if(dataset.lexicalModels.____) // if the model's already in the list, do a thing.
+      }
 
       // TODO: Set the CloudRepository's LexicalModelsAdapter to have the same members.
+
+      // And finish.
+      success.run();
     }
   }
 }
