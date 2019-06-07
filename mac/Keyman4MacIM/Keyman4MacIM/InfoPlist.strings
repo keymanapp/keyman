@@ -14,8 +14,14 @@ CFBundleDisplayName = "Keyman";
     go out of date easily.
  */
 
+// NOTE: Do not put version-related strings in here. The following are now computed based
+//  on User-Defined Build Setting variables such as PRODUCT_VERSION and COPYRIGHT_STRING_RIGHTS
+//
 //NSHumanReadableCopyright = "Copyright © 2018 SIL International. All rights reserved.";
 //CFBundleShortVersionString = "10.0";
 //CFBundleVersion = "10.0";
 //CFBundleGetInfoString = "Keyman 10.0 for macOS, Copyright 2018, SIL International";
 
+// The PRODUCT_VERSION only needs to be changed once per version.  It should be in sync with
+//  ../resources/VERSION.md
+//  There is a Run Script that checks to be sure
