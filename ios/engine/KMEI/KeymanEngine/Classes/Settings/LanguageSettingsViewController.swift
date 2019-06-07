@@ -125,8 +125,15 @@ class LanguageSettingsViewController: UITableViewController {
         case 2:
           cell.textLabel?.text = "Model"
           cell.accessoryType = .disclosureIndicator
-          if let currentModel = language.lexicalModels?[safe: 0] {
-            cell.detailTextLabel?.text = currentModel.name
+          if let currentModel = Manager.shared.currentLexicalModel {
+//            if language.id == currentModel.id {
+            if language.lexicalModels?.contains(where: {
+              $0.id == currentModel.id
+            }) ?? false {
+              cell.detailTextLabel?.text = currentModel.name
+            } else {
+              cell.detailTextLabel?.text = "<current model is not for this language>"
+            }
           } else {
             cell.detailTextLabel?.text = "<no current model>"
           }
@@ -153,7 +160,7 @@ class LanguageSettingsViewController: UITableViewController {
     case 1:
       switch indexPath.row  {
         case 2:
-          showLexicalModelInfoView()
+          showLexicalModelsView()
       default:
         break
       }
@@ -194,6 +201,13 @@ class LanguageSettingsViewController: UITableViewController {
       return
     }
   }
+  
+  func showLexicalModelsView() {
+    //LanguageLexicalModelPickerViewController? (should show just the models for this language)
+    let lmListView = LexicalModelPickerViewController()
+    lmListView.language = self.language
+    navigationController?.pushViewController(lmListView, animated: true)
+ }
   
   func showLexicalModelInfoView() {
     if let lm = language.lexicalModels?[safe: 0] {

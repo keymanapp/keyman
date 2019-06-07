@@ -134,7 +134,24 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public var openURL: ((URL) -> Bool)?
 
   var currentKeyboardID: FullKeyboardID?
-  var currentLexicalModelID: FullLexicalModelID?
+  private var _currentLexicalModelID: FullLexicalModelID?
+  var currentLexicalModelID: FullLexicalModelID? {
+    get {
+      if _currentLexicalModelID == nil {
+        let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+        _currentLexicalModelID = userData.currentLexicalModelID
+      }
+      return _currentLexicalModelID
+    }
+    
+    set(value) {
+      _currentLexicalModelID = value
+      let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+      userData.currentLexicalModelID = _currentLexicalModelID
+      userData.synchronize()
+    }
+  }
+
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
   var shouldReloadLexicalModel = false
@@ -280,8 +297,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // If we have a lexical model for the keyboard's language, activate it.
     if let valid_models = Storage.active.userDefaults.userLexicalModels(forLanguage: kb.languageID) {
       if valid_models.count > 0 {
-        //let lm = Storage.active.userDefaults.userLexicalModel(withFullID: valid_models[0].fullID)!
-        _ = Manager.shared.registerLexicalModel(valid_models[0])
+        if let lm = self.currentLexicalModel {
+          _ = Manager.shared.registerLexicalModel(lm)
+        } else {
+          _ = Manager.shared.registerLexicalModel(valid_models[0])
+        }
       }
     }
     
@@ -337,10 +357,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     currentLexicalModelID = lm.fullID
     
     inputViewController.registerLexicalModel(lm)
-    
-    let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-    userData.currentLexicalModelID = lm.fullID
-    userData.synchronize()
     
     if isKeymanHelpOn {
       inputViewController.showHelpBubble(afterDelay: 1.5)
