@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -55,8 +56,8 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
         return;
       }
       listener.setNotifyOnChange(false); // Disable event notifications temporarily.
-      listener.clear();
-      listener.addAll(NestedAdapter.getFilteredElements(listener.wrappedAdapter, listener.filter));
+      listener._internalClear();;
+      listener._internalAddAll(NestedAdapter.getFilteredElements(listener.wrappedAdapter, listener.filter));
       listener.notifyDataSetChanged();  // Re-enables events and signals that we did change.
     }
 
@@ -134,6 +135,15 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
   }
 
   @Override
+  public void addAll(@NonNull Collection<? extends Element> collection) {
+    super.addAll(collection);
+
+    this.isMutating = true;
+    wrappedAdapter.addAll(collection);
+    this.isMutating = false;
+  }
+
+  @Override
   public void remove(Element element) {
     super.remove(element);
 
@@ -147,6 +157,10 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     List<Element> cleared = new ArrayList<>(filteredList); // Duplicate list before it's cleared.
     super.clear();
 
+    // Since we use a filtered view for clear() and we want the clear() operation to seem atomic,
+    // we need to manage the setNotify flags.  This same method is also used to manage this class,
+    // though, so `doNotify` signals if this is a reactive clear() triggered by our wrapped adapter
+    // and prevents accidental looping.
     this.isMutating = true;
     wrappedAdapter.setNotifyOnChange(false);
 
@@ -154,10 +168,20 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
       wrappedAdapter.remove(element);
     }
 
+
     wrappedAdapter.notifyDataSetChanged();
     this.isMutating = false;
   }
 
+  // These methods allow bypassing of our externally-visible 'linking' versions for operations
+  // triggered by the other end of the link.
+  protected void _internalAddAll(@NonNull Collection<? extends Element> collection) {
+    super.addAll(collection);
+  }
+
+  protected void _internalClear() {
+    super.clear();
+  }
 
   // TODO:  As needed, override mutation functions so that we can reflect the changes onto
   //        the wrappedAdapter instance.  We should handle these cases directly rather than

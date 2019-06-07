@@ -12,6 +12,7 @@ import com.tavultesoft.kmea.data.adapters.ListBacked;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,8 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
   // Implements common language-tracking functionality for each internally-managed master list.
   private class LanguageCodedAdapter<Type extends LanguageCoded> extends ArrayAdapter<Type> implements ListBacked<Type> {
     private final List<Type> data;
+    private boolean doNotify = true;
+    private boolean recursiveBlock = false;
 
     public LanguageCodedAdapter(@NonNull Context context) {
       this(context, new ArrayList<Type>());
@@ -45,6 +48,11 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
       // We only want to allow mutations through the adapter, but it's useful to maintain
       // a List<> version of the data to assist with other adapters.
       this.data = Collections.unmodifiableList(data);
+
+      // Make sure our language dataset map is properly initialized!
+      for(Type obj: data) {
+        ensureLanguageDatasetExists(obj);
+      }
     }
 
     public List<Type> asList() {
@@ -54,32 +62,33 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
     public Type findMatch(Type target) {
       for(Type obj: data) {
         if(obj.getId().equals(target.getId()) && obj.getLanguageCode().equals(target.getLanguageCode())) {
-          Log.d("KMEA", "Match found for " + target.getId());
           return obj;
         }
       }
 
-      Log.d("KMEA", "Could not find match for " + target.getId());
       return null;
     }
 
     @Override
     public void add(@Nullable Type object) {
-      Dataset.this.setNotifyOnChange(false);
-      this.setNotifyOnChange(false);
+      if(doNotify) {
+        Dataset.this.setNotifyOnChange(false);
+      }
 
       super.add(object);
 
       ensureLanguageDatasetExists(object);
 
-      this.notifyDataSetChanged();
-      Dataset.this.notifyDataSetChanged();
+      if(doNotify) {
+        Dataset.this.notifyDataSetChanged();
+      }
     }
 
     @Override
     public void addAll(Type... items) {
-      Dataset.this.setNotifyOnChange(false);
-      this.setNotifyOnChange(false);
+      if(doNotify) {
+        Dataset.this.setNotifyOnChange(false);
+      }
 
       super.addAll(items);
 
@@ -87,31 +96,52 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
         ensureLanguageDatasetExists(kbd);
       }
 
-      // TODO: may want to perform a sort on them.
+      Dataset.this.notifyDataSetChanged();
+
+      if(doNotify) {
+        Dataset.this.notifyDataSetChanged();
+      }
+    }
+
+    @Override
+    public void addAll(@NonNull Collection<? extends Type> collection) {
+      if(doNotify) {
+        Dataset.this.setNotifyOnChange(false);
+      }
+
+      super.addAll(collection);
+
+      for(Type kbd: collection) {
+        ensureLanguageDatasetExists(kbd);
+      }
 
       Dataset.this.notifyDataSetChanged();
 
-      this.notifyDataSetChanged();
-      Dataset.this.notifyDataSetChanged();
+      if(doNotify) {
+        Dataset.this.notifyDataSetChanged();
+      }
     }
 
     @Override
     public void remove(Type object) {
-      Dataset.this.setNotifyOnChange(false);
-      this.setNotifyOnChange(false);
+      if(doNotify) {
+        Dataset.this.setNotifyOnChange(false);
+      }
 
       super.remove(object);
 
       handleLanguageItemRemoval(object);
 
-      this.notifyDataSetChanged();
-      Dataset.this.notifyDataSetChanged();
+      if(doNotify) {
+        Dataset.this.notifyDataSetChanged();
+      }
     }
 
     @Override
     public void clear() {
-      Dataset.this.setNotifyOnChange(false);
-      this.setNotifyOnChange(false);
+      if(doNotify) {
+        Dataset.this.setNotifyOnChange(false);
+      }
 
       List<Type> clearedKbds = this.asList();
 
@@ -121,8 +151,27 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
         handleLanguageItemRemoval(kbd);
       }
 
-      this.notifyDataSetChanged();
-      Dataset.this.notifyDataSetChanged();
+      if(doNotify) {
+        Dataset.this.notifyDataSetChanged();
+      }
+    }
+
+    @Override
+    public void setNotifyOnChange(boolean notify) {
+      super.setNotifyOnChange(notify);
+      doNotify = notify;
+
+      if(!recursiveBlock) {
+        recursiveBlock = true;
+        Dataset.this.setNotifyOnChange(notify);
+        recursiveBlock = false;
+      }
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+      doNotify = true;
+      super.notifyDataSetChanged();
     }
 
     // Override other class methods (following 'Decorator' pattern) to facilitate data tracking as needed.

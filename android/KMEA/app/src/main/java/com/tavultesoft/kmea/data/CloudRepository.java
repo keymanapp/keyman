@@ -85,8 +85,6 @@ public class CloudRepository {
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   public Dataset fetchDataset(@NonNull Context context, Runnable onSuccess, Runnable onFailure) {
-    // TODO:  Do a similar check to `shouldUseCache` for our mem-cached dataset,
-    //        replacing it when outdated.
     if(shouldUseCache(context)) {
       return memCachedDataset; // isn't null - checked by `shouldUseCache`.
     }
