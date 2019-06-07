@@ -23,6 +23,10 @@ public class Keyboard implements Serializable, LanguageCoded {
     this.map = kbdData;
   }
 
+  public String getId() {
+    return this.map.get(KMManager.KMKey_KeyboardID);
+  }
+
   @Override
   public String getLanguageCode() {
     return this.map.get(KMManager.KMKey_LanguageID);

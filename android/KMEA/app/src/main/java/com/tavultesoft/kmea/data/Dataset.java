@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.data;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
@@ -50,6 +51,18 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
       return this.data;
     }
 
+    public Type findMatch(Type target) {
+      for(Type obj: data) {
+        if(obj.getId().equals(target.getId()) && obj.getLanguageCode().equals(target.getLanguageCode())) {
+          Log.d("KMEA", "Match found for " + target.getId());
+          return obj;
+        }
+      }
+
+      Log.d("KMEA", "Could not find match for " + target.getId());
+      return null;
+    }
+
     @Override
     public void add(@Nullable Type object) {
       Dataset.this.setNotifyOnChange(false);
@@ -73,6 +86,8 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
       for(Type kbd: items) {
         ensureLanguageDatasetExists(kbd);
       }
+
+      // TODO: may want to perform a sort on them.
 
       Dataset.this.notifyDataSetChanged();
 
@@ -174,6 +189,25 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
     return new LanguageDataset(nestedKbds, nestedLexicals, languageName, languageCode);
   }
 
+  public void clear() {
+    keyboards.clear();
+    lexicalModels.clear();
+  }
+
   // TODO:  Do we need to override any of this class's menbers in case someone SOMEHOW constructs
   //        a LanguageDataset from outside the Dataset class?
+
+  @Override
+  public void setNotifyOnChange(boolean notify) {
+    super.setNotifyOnChange(notify);
+    keyboards.setNotifyOnChange(notify);
+    lexicalModels.setNotifyOnChange(notify);
+  }
+
+  @Override
+  public void notifyDataSetChanged() {
+    super.notifyDataSetChanged();
+    keyboards.notifyDataSetChanged();
+    lexicalModels.notifyDataSetChanged();
+  }
 }

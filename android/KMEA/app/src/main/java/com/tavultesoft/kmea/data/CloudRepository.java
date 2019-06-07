@@ -91,7 +91,12 @@ public class CloudRepository {
       return memCachedDataset; // isn't null - checked by `shouldUseCache`.
     }
 
-    memCachedDataset = new Dataset(context);
+    if(memCachedDataset == null) {
+      memCachedDataset = new Dataset(context);
+    } else {
+      // Clear the cached data and rebuild it from scratch.
+      memCachedDataset.clear();
+    }
     lastLoad = Calendar.getInstance(); // Mark a cache timing.
 
     // Get kmp.json info from installed models.
@@ -309,16 +314,13 @@ public class CloudRepository {
       this.dataset = dataset;
       this.hasConnection = KMManager.hasConnection(context);
 
-      if(failure == null) {
-        failure = new Runnable() {
-          @Override
-          public void run() {
-            // Do nothing.
-          }
-        };
-      }
-      this.success = success;
-      this.failure = failure;
+      Runnable dummy = new Runnable() {
+        public void run() {
+          // Do nothing.
+        }
+      };
+      this.success = success != null ? success : dummy;
+      this.failure = failure != null ? failure : dummy;
     }
 
     protected void showProgressDialog(final Runnable finishCallback) {
@@ -441,16 +443,31 @@ public class CloudRepository {
 
     public void processCloudReturns(CloudDownloadReturns jsonTuple) {
       List<LexicalModel> lexicalModelsArrayList = processLexicalModels(jsonTuple.lexicalModelJSON);
-      // TODO:  Filter out any duplicates from already-installed models!
-      for(LexicalModel model: lexicalModelsArrayList) {
-        // TODO: Check for duplicates / possible updates!
-        //if(dataset.lexicalModels.____) // if the model's already in the list, do a thing.
+
+      // We're about to do a big batch of edits.
+      this.dataset.setNotifyOnChange(false);
+
+      // Filter out any duplicates from already-installed models!
+      for(int i = 0; i < lexicalModelsArrayList.size(); i++) {
+        LexicalModel model = lexicalModelsArrayList.get(i);
+
+        // Check for duplicates / possible updates.
+        LexicalModel match = dataset.lexicalModels.findMatch(model);
+
+        if(match != null) {
+          // TODO:  Automatic update check!
+
+          // After update stuff is reasonably handled...
+          lexicalModelsArrayList.remove(model);
+          i--; // Decrement our index to reflect the removal.
+        } // else no match == no special handling.
       }
 
-      // TODO: Set the CloudRepository's LexicalModelsAdapter to have the same members.
+      // Add the cloud-returned lexical model info to the CloudRepository's LexicalModelsAdapter.
       dataset.lexicalModels.addAll(lexicalModelsArrayList);
 
       // And finish.
+      this.dataset.notifyDataSetChanged(); // Edits are done - signal that.
       success.run();
     }
   }

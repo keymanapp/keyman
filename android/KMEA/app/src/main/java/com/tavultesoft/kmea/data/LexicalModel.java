@@ -24,6 +24,10 @@ public class LexicalModel implements Serializable, LanguageCoded{
     this.map = modelData;
   }
 
+  public String getId() {
+    return this.map.get(KMManager.KMKey_LexicalModelID);
+  }
+
   @Override
   public String getLanguageCode() {
     return this.map.get(KMManager.KMKey_LanguageID);
