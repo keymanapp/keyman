@@ -154,7 +154,36 @@ describe('LMLayerWorker trie model for word lists', function() {
         firstResults.map(s => s.displayAs)
       );
     });
-  })
+  });
+  
+  describe('The default key function', function () {
+    it('uses the default key function', function () {
+      var model = new TrieModel(jsonFixture('tries/accented'));
+
+      //   «nai|                » [Send]
+      //   [  ???  ] [  naïve  ] [  ???  ]
+      var [suggestion] = model.predict({
+        insert: 'i', deleteLeft: 0
+      }, {
+        left: 'na',
+        startOfBuffer: false,
+        endOfBuffer: true
+      }).map(getSample);
+      assert.strictEqual(suggestion.displayAs, 'naïve');
+
+      //   «Let‘s get some pho|       » [Send]
+      //   [  ???  ] [  phở  ] [  ???  ]
+      var [suggestion] = model.predict({
+        insert: 'o', deleteLeft: 0
+      }, {
+        left: 'Let‘s get some ph',
+        startOfBuffer: false,
+        endOfBuffer: true
+      }).map(getSample);
+      assert.strictEqual(suggestion.displayAs, 'phở');
+
+    });
+  });
 
   it('replaces the entire typed word when a suggestion is accepted', function () {
       // Ensure that all input is lower-cased when we try to look it up.
