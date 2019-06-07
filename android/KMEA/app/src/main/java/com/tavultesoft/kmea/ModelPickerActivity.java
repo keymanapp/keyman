@@ -108,8 +108,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
           // File check to see if lexical model already exists locally
           File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
 
-          // Using the presence of the left icon "check" to determine if the model is installed
-          boolean modelInstalled = modelInfo.containsKey("leftIcon");
+          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+          boolean modelInstalled = KeyboardPickerActivity.containsLexicalModel(context, modelKey);
           if (modelInstalled) {
             // Show Model Info
             listView.setItemChecked(position, true);
@@ -197,6 +197,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
   // As this one is specific to this class, we can implement Activity-specific functionality within it.
   static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels> {
     static final int RESOURCE = R.layout.models_list_row_layout;
+    private final Context context;
 
     public FilteredLexicalModelAdapter(@NonNull Context context, Dataset.LexicalModels lexicalModels, final String languageCode) {
       super(context, RESOURCE, lexicalModels, new AdapterFilter<LexicalModel>() {
@@ -205,6 +206,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
           return elem.getLanguageCode().equals(languageCode);
         }
       });
+
+      this.context = context;
     }
 
     @Override
@@ -222,19 +225,24 @@ public final class ModelPickerActivity extends AppCompatActivity {
       TextView text1 = view.findViewById(R.id.text1);
       ImageView img2 = view.findViewById(R.id.image2);
 
-      int leftIcon = 0; // default:  hide the icon.
-      if (model.map.get("leftIcon") != null) { // Set by CloudRepository if the model is locally installed.
-        leftIcon = Integer.parseInt(model.map.get("leftIcon"));
+      // Needed for the check below.
+      String packageID = model.map.get(KMManager.KMKey_PackageID);
+      String languageID = model.map.get(KMManager.KMKey_LanguageID);
+      String modelID = model.map.get(KMManager.KMKey_LexicalModelID);
+      String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+
+      // TODO:  Refactor this check - we should instead test against the installed models listing
+      //        once it has its own backing Dataset instance.
+      // Is this an installed model or not?
+
+      if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
+        img1.setImageResource(R.drawable.ic_check);
+      } else {
+        img1.setImageResource(0);
       }
-      img1.setImageResource(leftIcon);
 
       text1.setText(model.map.get(KMManager.KMKey_LexicalModelName));
-
-      int icon = 0;
-      if (model.map.get(KMManager.KMKey_Icon) != null) {
-        icon = Integer.parseInt(model.map.get(KMManager.KMKey_Icon));
-      }
-      img2.setImageResource(icon);
+      img2.setImageResource(R.drawable.ic_arrow_forward);
 
       return view;
     }

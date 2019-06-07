@@ -217,18 +217,9 @@ public class CloudRepository {
         hashMap.put(KMManager.KMKey_LanguageName, langName);
         hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
         hashMap.put(KMManager.KMKey_CustomModel, isCustom);
+        hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
         hashMap.put("isEnabled", "true");
         hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
-
-        // TODO:  (Move to PickerActivity) Display check for installed models
-        String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
-        if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
-          hashMap.put("leftIcon", String.valueOf(R.drawable.ic_check));
-        } else {
-          // Otherwise, include link to .kmp file
-          hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
-        }
-        // TODO: (Move section) END.
 
         modelList.add(new LexicalModel(hashMap));
       }
