@@ -160,12 +160,18 @@ public final class ModelPickerActivity extends AppCompatActivity {
             i.putExtras(args);
             startActivity(i);
           }
+
+          // Force a display refresh.
+          ((FilteredLexicalModelAdapter) listView.getAdapter()).notifyDataSetChanged();
         }
       });
 
       Intent i = getIntent();
       listView.setSelectionFromTop(i.getIntExtra("listPosition", 0),
           i.getIntExtra("offsetY", 0));
+    } else {
+      // Forces a display refresh.
+      ((FilteredLexicalModelAdapter) listView.getAdapter()).notifyDataSetChanged();
     }
   }
 
