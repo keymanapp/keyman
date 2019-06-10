@@ -71,7 +71,8 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
     @Override
     public void add(@Nullable Type object) {
-      if(doNotify) {
+      boolean notify = doNotify; // Save initial value.
+      if(notify) {
         Dataset.this.setNotifyOnChange(false);
       }
 
@@ -79,14 +80,15 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
       ensureLanguageDatasetExists(object);
 
-      if(doNotify) {
+      if(notify) {
         Dataset.this.notifyDataSetChanged();
       }
     }
 
     @Override
     public void addAll(Type... items) {
-      if(doNotify) {
+      boolean notify = doNotify; // Save initial value.
+      if(notify) {
         Dataset.this.setNotifyOnChange(false);
       }
 
@@ -96,16 +98,15 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
         ensureLanguageDatasetExists(kbd);
       }
 
-      Dataset.this.notifyDataSetChanged();
-
-      if(doNotify) {
+      if(notify) {
         Dataset.this.notifyDataSetChanged();
       }
     }
 
     @Override
     public void addAll(@NonNull Collection<? extends Type> collection) {
-      if(doNotify) {
+      boolean notify = doNotify; // Save initial value.
+      if(notify) {
         Dataset.this.setNotifyOnChange(false);
       }
 
@@ -115,16 +116,15 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
         ensureLanguageDatasetExists(kbd);
       }
 
-      Dataset.this.notifyDataSetChanged();
-
-      if(doNotify) {
+      if(notify) {
         Dataset.this.notifyDataSetChanged();
       }
     }
 
     @Override
     public void remove(Type object) {
-      if(doNotify) {
+      boolean notify = doNotify; // Save initial value.
+      if(notify) {
         Dataset.this.setNotifyOnChange(false);
       }
 
@@ -132,14 +132,15 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
       handleLanguageItemRemoval(object);
 
-      if(doNotify) {
+      if(notify) {
         Dataset.this.notifyDataSetChanged();
       }
     }
 
     @Override
     public void clear() {
-      if(doNotify) {
+      boolean notify = doNotify; // Save initial value.
+      if(notify) {
         Dataset.this.setNotifyOnChange(false);
       }
 
@@ -151,7 +152,7 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
         handleLanguageItemRemoval(kbd);
       }
 
-      if(doNotify) {
+      if(notify) {
         Dataset.this.notifyDataSetChanged();
       }
     }

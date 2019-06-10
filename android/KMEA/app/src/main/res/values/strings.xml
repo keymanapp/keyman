@@ -28,6 +28,9 @@
 
     <!-- For the following, &#8230; is the ellipsis character "..." -->
 
+    <!-- Cloud API related strings -->
+    <string name="getting_cloud_catalog" translatable="false">Getting keyboard and model catalog.\nThis may take a while&#8230;</string>
+
     <!-- Keyboard Updates -->
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>

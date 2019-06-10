@@ -89,7 +89,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
   }
 
   public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element> filter, List<Element> filteredList) {
-    super(context, resource, getFilteredElements(adapter, filter));
+    super(context, resource, filteredList);
 
     this.wrappedAdapter = adapter;
     observer = new WrapperObserver<>(this, adapter);

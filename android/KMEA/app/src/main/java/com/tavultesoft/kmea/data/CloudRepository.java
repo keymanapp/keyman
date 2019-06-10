@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tavultesoft.kmea.BuildConfig;
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
@@ -98,28 +99,46 @@ public class CloudRepository {
     lastLoad = Calendar.getInstance(); // Mark a cache timing.
 
     // Get kmp.json info from installed models.
+    // Consolidate kmp.json info from packages/
+    JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
 
-    if (kmpLexicalModelsArray.length() == 0) {
+    if (kmpLanguagesArray.length() == 0 && kmpLexicalModelsArray.length() == 0) {
       // May need to note this for handling a 'failure' check.
     } else {
-      memCachedDataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray, context));
+      memCachedDataset.keyboards.addAll(processKeyboardJSON(kmpLanguagesArray, true));
+      memCachedDataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray));
     }
 
     boolean loadFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
+    loadFromCache = loadFromCache && this.shouldUseCache(context, getKeyboardCacheFile(context));
     CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, onSuccess, onFailure);
 
     if(!loadFromCache) {
+      String deviceType = context.getString(R.string.device_type);
+      if (deviceType.equals("AndroidTablet")) {
+        deviceType = "androidtablet";
+      } else {
+        deviceType = "androidphone";
+      }
+
+      // Retrieves the cloud-based keyboard catalog in Android's preferred format.
+      String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
+          KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
+      // This allows us to directly get the full lexical model catalog.
       String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
       /* do what's possible here, rather than in the Task */
 
-      downloadTask.execute(new CloudApiParam(ApiTarget.LexicalModels, lexicalURL));
+      // We can pass in multiple URLs; this format is extensible if we need extra catalogs in the future.
+      downloadTask.execute(new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object),
+          new CloudApiParam(ApiTarget.LexicalModels, lexicalURL, JSONType.Array));
     } else {
       // Load important parts from the cache.
-      JSONArray lexData = getCachedJSONArray(context, getLexicalModelCacheFile(context));
+      JSONObject kbdData = getCachedJSONObject(getKeyboardCacheFile(context));
+      JSONArray lexData = getCachedJSONArray(getLexicalModelCacheFile(context));
 
-      CloudDownloadReturns jsonData = new CloudDownloadReturns(null, lexData);
+      CloudDownloadReturns jsonData = new CloudDownloadReturns(kbdData, lexData);
 
       // Call the processor method directly with the cached API data.
       downloadTask.processCloudReturns(jsonData);
@@ -128,12 +147,17 @@ public class CloudRepository {
     return memCachedDataset;
   }
 
+  protected File getKeyboardCacheFile(Context context) {
+    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
+    return new File(context.getCacheDir(), jsonCacheFilename);
+  }
+
   protected File getLexicalModelCacheFile(Context context) {
     final String jsonLexicalCacheFilename = "jsonLexicalModelsCache.dat";
     return new File(context.getCacheDir(), jsonLexicalCacheFilename);
   }
 
-  protected JSONArray getCachedJSONArray(Context context, File file) {
+  protected JSONArray getCachedJSONArray(File file) {
     JSONArray lmData = null;
     try {
       // Read from cache file
@@ -150,31 +174,123 @@ public class CloudRepository {
     return lmData;
   }
 
+  protected JSONObject getCachedJSONObject(File file) {
+    JSONObject kbData = null;
+    try {
+      // Read from cache file
+      if (file.exists()) {
+        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
+        kbData = new JSONObject(objInput.readObject().toString());
+        objInput.close();
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      kbData = null;
+    }
+
+    return kbData;
+  }
+
   /**
    * Save the JSON catalog data that's available from the cloud.
    * The catalog is saved to a unique file.  Separate files should
    * be used for each API call, such as for keyboards vs lexical models.
-   * @param jsonArray - Array of JSON objects containing API return info
+   * @param json - Array of JSON objects containing API return info
    */
-  private static void saveJSONArrayToCache(File file, JSONArray jsonArray) {
+  private static void saveJSONArrayToCache(File file, JSONArray json) {
     ObjectOutput objOutput;
     try {
       // Save to cache file
       objOutput = new ObjectOutputStream(new FileOutputStream(file));
-      objOutput.writeObject(jsonArray.toString());
+      objOutput.writeObject(json.toString());
       objOutput.close();
     } catch (Exception e) {
       Log.e(TAG, "Failed to save to cache file. Error: " + e);
     }
   }
 
-  protected List<LexicalModel> processLexicalModelJSON(JSONArray models, Context context) {
+  /**
+   * Save the JSON catalog data that's available from the cloud.
+   * The catalog is saved to a unique file.  Separate files should
+   * be used for each API call, such as for keyboards vs lexical models.
+   * @param json - JSON object containing API return info
+   */
+  private static void saveJSONObjectToCache(File file, JSONObject json) {
+    ObjectOutput objOutput;
+    try {
+      // Save to cache file
+      objOutput = new ObjectOutputStream(new FileOutputStream(file));
+      objOutput.writeObject(json.toString());
+      objOutput.close();
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to save to cache file. Error: " + e);
+    }
+  }
+
+  protected JSONObject wrapKmpKeyboardJSON(JSONArray languagesArray) {
+    try {
+      JSONObject json = new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, languagesArray);
+      return new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, json);
+    } catch (JSONException e) {
+      Log.e(TAG, "Failed to properly handle KMP JSON.  Error: " + e);
+      return null;
+    }
+  }
+
+  protected List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
+    List<Keyboard> keyboardsList = new ArrayList<>();
+    //keyboardModifiedDates = new HashMap<String, String>();
+
+    String isCustom = fromKMP ? "Y" : "N";
+
+    try {
+      // Thank you, Cloud API format.
+      JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+      for (int i = 0; i < languages.length(); i++) {
+        JSONObject language = languages.getJSONObject(i);
+
+        String langID = language.getString(KMManager.KMKey_ID);
+        String langName = language.getString(KMManager.KMKey_Name);
+
+        JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
+
+        int kbLength = langKeyboards.length();
+        for (int j = 0; j < kbLength; j++) {
+          JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
+          String kbID = keyboardJSON.getString(KMManager.KMKey_ID);
+          String kbName = keyboardJSON.getString(KMManager.KMKey_Name);
+          String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+          String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
+
+          String kbKey = String.format("%s_%s", langID, kbID);
+          HashMap<String, String> hashMap = new HashMap<String, String>();
+          hashMap.put(KMManager.KMKey_KeyboardName, kbName);
+          hashMap.put(KMManager.KMKey_LanguageName, langName);
+          hashMap.put(KMManager.KMKey_LanguageID, langID);
+          hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
+          hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
+          hashMap.put(KMManager.KMKey_Font, kbFont);
+
+//          if (keyboardModifiedDates.get(kbID) == null) {
+//            keyboardModifiedDates.put(kbID, keyboardJSON.getString(KMManager.KMKey_KeyboardModified));
+//          }
+
+          keyboardsList.add(new Keyboard(hashMap));
+        }
+      }
+    } catch (JSONException e) {
+      Log.e("JSONParse", "Error: " + e);
+      return new ArrayList<>();  // Is this ideal?
+    }
+
+    return keyboardsList;
+  }
+
+  protected List<LexicalModel> processLexicalModelJSON(JSONArray models) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
-      // Parse the model JSON Object from the merged list of api.keyman.com query and available kmp's.
-      // Known assumption:
-      // 2. query is built on a single language ID so the "languages" array will only have one language
+      // Parse each model JSON Object.
       int modelsLength = models.length();
       for (int i = 0; i < modelsLength; i++) {
         JSONObject model = models.getJSONObject(i);
@@ -236,39 +352,54 @@ public class CloudRepository {
     LexicalModels
   }
 
+  private enum JSONType {
+    Array,
+    Object
+  }
+
   private static class CloudApiParam {
     public final ApiTarget target;
     public final String url;
+    public final JSONType type;
 
-    CloudApiParam(ApiTarget target, String url) {
+    CloudApiParam(ApiTarget target, String url, JSONType type) {
       this.target = target;
       this.url = url;
+      this.type = type;
     }
   }
 
   private static class CloudApiReturns {
     public final ApiTarget target;
     public final JSONArray jsonArray;
+    public final JSONObject jsonObject;
 
     public CloudApiReturns(ApiTarget target, JSONArray jsonArray) {
       this.target = target;
       this.jsonArray = jsonArray;
+      this.jsonObject = null;
+    }
+
+    public CloudApiReturns(ApiTarget target, JSONObject jsonObject) {
+      this.target = target;
+      this.jsonArray = null;
+      this.jsonObject = jsonObject;
     }
   }
 
   private static class CloudDownloadReturns {
-    public final JSONArray keyboardJSON;
-    public final JSONArray lexicalModelJSON;
+    public JSONObject keyboardJSON;
+    public JSONArray lexicalModelJSON;
 
     // Used by the CloudDownloadTask, as it fits well with doInBackground's param structure.
     public CloudDownloadReturns(List<CloudApiReturns> returns) {
-      JSONArray kbd = null;
+      JSONObject kbd = null;
       JSONArray lex = null;
 
       for(CloudApiReturns ret: returns) {
         switch(ret.target) {
           case Keyboards:
-            kbd = ret.jsonArray;
+            kbd = ret.jsonObject;
             break;
           case LexicalModels:
             lex = ret.jsonArray;
@@ -280,7 +411,7 @@ public class CloudRepository {
       this.lexicalModelJSON = lex;
     }
 
-    public CloudDownloadReturns(JSONArray keyboardJSON, JSONArray lexicalModelJSON) {
+    public CloudDownloadReturns(JSONObject keyboardJSON, JSONArray lexicalModelJSON) {
       this.keyboardJSON = keyboardJSON;
       this.lexicalModelJSON = lexicalModelJSON;
     }
@@ -318,7 +449,7 @@ public class CloudRepository {
       } else {
         progressDialog = new ProgressDialog(context);
       }
-      progressDialog.setMessage(context.getString(R.string.getting_model_catalog));
+      progressDialog.setMessage(context.getString(R.string.getting_cloud_catalog));
       progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.label_cancel),
           new DialogInterface.OnClickListener() {
 
@@ -363,56 +494,64 @@ public class CloudRepository {
       }
 
       List<CloudApiReturns> retrievedJSON = new ArrayList<>(params.length);
+      progressDialog.setMax(params.length);
 
       for(CloudApiParam param:params) {
         JSONParser jsonParser = new JSONParser();
-        JSONArray data = null;
+        JSONArray dataArray = null;
+        JSONObject dataObject = null;
 
         if (hasConnection) {
           try {
             String remoteUrl = param.url;
-            data = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONArray.class);
+
+            if(param.type == JSONType.Array) {
+              dataArray = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONArray.class);
+            } else {
+              dataObject = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONObject.class);
+            }
           } catch (Exception e) {
             Log.d(TAG, e.getMessage());
-            data = null;
           }
         } else {
-          data = null;
         }
 
-        retrievedJSON.add(new CloudApiReturns(param.target, data));
+        if(param.type == JSONType.Array) {
+          retrievedJSON.add(new CloudApiReturns(param.target, dataArray));
+        } else {
+          retrievedJSON.add(new CloudApiReturns(param.target, dataObject));
+        }
+        progressDialog.setProgress(progressDialog.getProgress());
       }
 
       return new CloudDownloadReturns(retrievedJSON);
     }
 
-    protected List<LexicalModel> processLexicalModels(JSONArray lexicalJSON) {
-      if (lexicalJSON == null && dataset.isEmpty()) {
+    protected JSONArray ensureInit(JSONArray json) {
+      if(json == null && dataset.isEmpty()) {
         Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
         failure.run();
         return null;
       }
 
-      if (!hasConnection) {
-        // When offline, only use keyboards available from kmp.json
-        return new ArrayList<>();
+      return (json != null) ? json : new JSONArray();
+    }
+
+    protected JSONObject ensureInit(JSONObject json) {
+      if(json == null && dataset.isEmpty()) {
+        Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
+        failure.run();
+        return null;
       }
 
-      // Otherwise, merge kmpLexicalModelsArray with cloud jsonArray
-      JSONArray models = (lexicalJSON != null) ? lexicalJSON : new JSONArray(); // Start with cloud model list.
-
-      if (models == null) {
-        return new ArrayList<>();
-      }
-
-      return processLexicalModelJSON(models, context);
+      return (json != null) ? json : new JSONObject();
     }
 
     @Override
     protected void onPostExecute(CloudDownloadReturns jsonTuple) {
       // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
       if(jsonTuple.keyboardJSON != null) {
-        // TODO:  Handle keyboard caching, too.
+        saveJSONObjectToCache(getKeyboardCacheFile(context), jsonTuple.keyboardJSON);
       }
       if(jsonTuple.lexicalModelJSON != null) {
         saveJSONArrayToCache(getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
@@ -427,16 +566,41 @@ public class CloudRepository {
         }
       }
 
+      jsonTuple.keyboardJSON = ensureInit(jsonTuple.keyboardJSON);
+      jsonTuple.lexicalModelJSON = ensureInit(jsonTuple.lexicalModelJSON);
+
       processCloudReturns(jsonTuple);
     }
 
     public void processCloudReturns(CloudDownloadReturns jsonTuple) {
-      List<LexicalModel> lexicalModelsArrayList = processLexicalModels(jsonTuple.lexicalModelJSON);
+      List<Keyboard> keyboardsArrayList = processKeyboardJSON(jsonTuple.keyboardJSON, false);
+      List<LexicalModel> lexicalModelsArrayList = processLexicalModelJSON(jsonTuple.lexicalModelJSON);
 
       // We're about to do a big batch of edits.
       this.dataset.setNotifyOnChange(false);
 
-      // Filter out any duplicates from already-installed models!
+      // Filter out any duplicates from already-installed / KMP keyboards, properly merging the lists.
+      for(int i = 0; i < keyboardsArrayList.size(); i++) {
+        Keyboard keyboard = keyboardsArrayList.get(i);
+
+        // Check for duplicates / possible updates.
+        Keyboard match = dataset.keyboards.findMatch(keyboard);
+
+        if(match != null) {
+          // TODO:  Automatic update check!
+
+          // After update stuff is reasonably handled...
+          keyboardsArrayList.remove(keyboard);
+          i--; // Decrement our index to reflect the removal.
+        } // else no match == no special handling.
+      }
+
+      Log.d(TAG, keyboardsArrayList.toString());
+
+      // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
+      dataset.keyboards.addAll(keyboardsArrayList);
+
+      // Filter out any duplicates from already-installed models, properly merging the lists.
       for(int i = 0; i < lexicalModelsArrayList.size(); i++) {
         LexicalModel model = lexicalModelsArrayList.get(i);
 
