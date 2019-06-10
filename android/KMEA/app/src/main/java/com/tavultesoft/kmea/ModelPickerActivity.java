@@ -37,6 +37,7 @@ import org.json.JSONArray;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -206,10 +207,20 @@ public final class ModelPickerActivity extends AppCompatActivity {
     private final Context context;
 
     public FilteredLexicalModelAdapter(@NonNull Context context, Dataset.LexicalModels lexicalModels, final String languageCode) {
-      super(context, RESOURCE, lexicalModels, new AdapterFilter<LexicalModel>() {
+      // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
+      super(context, RESOURCE, lexicalModels, new AdapterFilter<LexicalModel, Dataset.LexicalModels>() {
         @Override
-        public boolean matches(LexicalModel elem) {
-          return elem.getLanguageCode().equals(languageCode);
+        public List<LexicalModel> selectFrom(Dataset.LexicalModels adapter) {
+          List<LexicalModel> list = new ArrayList<>();
+
+          // Highly unoptimized version:  O(n^2).
+          for(LexicalModel elem: adapter.asList()) {
+            if(elem.getLanguageCode().equals(languageCode)) {
+              list.add(elem);
+            }
+          }
+
+          return list;
         }
       });
 

@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>> extends ArrayAdapter<Element>  {
   final A wrappedAdapter;
-  final AdapterFilter<Element> filter;
+  final AdapterFilter<Element, A> filter;
   final List<Element> filteredList;
 
   boolean isMutating = false;
@@ -57,7 +57,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
       }
       listener.setNotifyOnChange(false); // Disable event notifications temporarily.
       listener._internalClear();;
-      listener._internalAddAll(NestedAdapter.getFilteredElements(listener.wrappedAdapter, listener.filter));
+      listener._internalAddAll(listener.filter.selectFrom(listener.wrappedAdapter));
       listener.notifyDataSetChanged();  // Re-enables events and signals that we did change.
     }
 
@@ -76,19 +76,19 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
   private final WrapperObserver<Element, A, NestedAdapter<Element, A>> observer;
 
   public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter) {
-    this(context, resource, adapter, new AdapterFilter<Element>() {
+    this(context, resource, adapter, new AdapterFilter<Element, A>() {
         @Override
-        public boolean matches(Element elem) {
-            return true;
+        public List<Element> selectFrom(A adapter) {
+            return adapter.asList();
         }
     });
   }
 
-  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element> filter) {
-    this(context, resource, adapter, filter, getFilteredElements(adapter, filter));
+  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A> filter) {
+    this(context, resource, adapter, filter, filter.selectFrom(adapter));
   }
 
-  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element> filter, List<Element> filteredList) {
+  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A> filter, List<Element> filteredList) {
     super(context, resource, filteredList);
 
     this.wrappedAdapter = adapter;
@@ -97,18 +97,6 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
 
     this.filter = filter;
     this.filteredList = filteredList;
-  }
-
-  protected static <Element, A extends ArrayAdapter<Element> & ListBacked<Element>> List<Element> getFilteredElements(A adapter, AdapterFilter<Element> filter) {
-    ArrayList<Element> list = new ArrayList<>();
-
-    for(Element elem: adapter.asList()) {
-      if(filter.matches(elem)) {
-        list.add(elem);
-      }
-    }
-
-    return list;
   }
 
   @Override

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Dataset extends ArrayAdapter<LanguageDataset> {
-  class LanguageFilter<Type extends LanguageCoded> implements AdapterFilter<Type> {
+  public class LanguageFilter<Type extends LanguageCoded, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter> {
     private final String lgCode;
 
     LanguageFilter(String lgCode) {
@@ -27,8 +27,20 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
     }
 
     @Override
-    public boolean matches(LanguageCoded elem) {
-      return elem.getLanguageCode().equals(lgCode);
+    public List<Type> selectFrom(Adapter adapter) {
+      // Since we know that the adapter is connected to the master Dataset, we can pre-filter and optimize
+      // performance of our linked adapters.
+
+      List<Type> list = new ArrayList<>();
+
+      // Highly unoptimized version:  O(n^2).
+      for(Type elem: adapter.asList()) {
+        if(elem.getLanguageCode().equals(lgCode)) {
+          list.add(elem);
+        }
+      }
+
+      return list;
     }
   }
 
@@ -232,9 +244,9 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
   protected LanguageDataset constructLanguageDataset(String languageName, String languageCode) {
     // Construct nested adapters for the individual language datasets.
     NestedAdapter<Keyboard, Keyboards> nestedKbds =
-        new NestedAdapter<>(context, 0, keyboards, new LanguageFilter<Keyboard>(languageCode));
+        new NestedAdapter<>(context, 0, keyboards, new LanguageFilter<Keyboard, Keyboards>(languageCode));
     NestedAdapter<LexicalModel, LexicalModels> nestedLexicals =
-        new NestedAdapter<>(context, 0, lexicalModels, new LanguageFilter<LexicalModel>(languageCode));
+        new NestedAdapter<>(context, 0, lexicalModels, new LanguageFilter<LexicalModel, LexicalModels>(languageCode));
 
     return new LanguageDataset(nestedKbds, nestedLexicals, languageName, languageCode);
   }
