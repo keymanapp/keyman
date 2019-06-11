@@ -18,9 +18,9 @@ import java.util.List;
  * @param <Element> The shared item type of the two Adapters.
  * @param <A> The type specification of the Adapter to be nested/linked.
  */
-public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>> extends ArrayAdapter<Element>  {
+public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>, FilterArg> extends ArrayAdapter<Element>  {
   final A wrappedAdapter;
-  final AdapterFilter<Element, A> filter;
+  final AdapterFilter<Element, A, FilterArg> filter;
   final List<Element> filteredList;
 
   boolean isMutating = false;
@@ -33,15 +33,17 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
    * @param <S> The type of the 'wrapped' source ArrayAdapter (possibly a subclass).
    * @param <A> The type of the 'listener' NestedAdapter, complete with its generic type parameters.
    */
-  static class WrapperObserver<E, S extends ArrayAdapter<E> & ListBacked<E>, A extends NestedAdapter<E, S>> extends DataSetObserver {
+  static class WrapperObserver<E, S extends ArrayAdapter<E> & ListBacked<E>, A extends NestedAdapter<E, S, F>, F> extends DataSetObserver {
     // By being static and using a WeakReference here, we avoid memory leaks that would otherwise
     // prevent our owner from being GC'd.
     private WeakReference<A> listenerRef;
     private S source;
+    private final F filterArg;
 
-    WrapperObserver(A listener, S source) {
+    WrapperObserver(A listener, S source, F filterArg) {
       this.listenerRef = new WeakReference<>(listener);
       this.source = source;
+      this.filterArg = filterArg;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
       }
       listener.setNotifyOnChange(false); // Disable event notifications temporarily.
       listener._internalClear();;
-      listener._internalAddAll(listener.filter.selectFrom(listener.wrappedAdapter));
+      listener._internalAddAll(listener.filter.selectFrom(listener.wrappedAdapter, this.filterArg));
       listener.notifyDataSetChanged();  // Re-enables events and signals that we did change.
     }
 
@@ -73,26 +75,26 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     }
   }
 
-  private final WrapperObserver<Element, A, NestedAdapter<Element, A>> observer;
+  private final WrapperObserver<Element, A, NestedAdapter<Element, A, FilterArg>, FilterArg> observer;
 
   public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter) {
-    this(context, resource, adapter, new AdapterFilter<Element, A>() {
+    this(context, resource, adapter, new AdapterFilter<Element, A, FilterArg>() {
         @Override
-        public List<Element> selectFrom(A adapter) {
+        public List<Element> selectFrom(A adapter, FilterArg dummy) {
             return adapter.asList();
         }
-    });
+    }, null);
   }
 
-  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A> filter) {
-    this(context, resource, adapter, filter, filter.selectFrom(adapter));
+  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A, FilterArg> filter, FilterArg filterArg) {
+    this(context, resource, adapter, filter, filterArg, filter.selectFrom(adapter, filterArg));
   }
 
-  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A> filter, List<Element> filteredList) {
+  public NestedAdapter(@NonNull Context context, int resource, @NonNull A adapter, AdapterFilter<Element, A, FilterArg> filter, FilterArg filterArg, List<Element> filteredList) {
     super(context, resource, filteredList);
 
     this.wrappedAdapter = adapter;
-    observer = new WrapperObserver<>(this, adapter);
+    observer = new WrapperObserver<>(this, adapter, filterArg);
     this.wrappedAdapter.registerDataSetObserver(observer);
 
     this.filter = filter;

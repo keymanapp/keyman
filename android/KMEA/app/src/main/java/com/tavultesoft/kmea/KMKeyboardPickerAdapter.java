@@ -22,7 +22,7 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 
-final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards> implements OnClickListener {
+final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, Void> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
 
   private Context context;

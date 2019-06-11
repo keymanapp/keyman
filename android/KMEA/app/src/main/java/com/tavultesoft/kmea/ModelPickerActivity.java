@@ -202,15 +202,15 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
   // Uses the repo dataset's master lexical model list to create a filtered adapter for use here.
   // As this one is specific to this class, we can implement Activity-specific functionality within it.
-  static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels> {
+  static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels, Void> {
     static final int RESOURCE = R.layout.models_list_row_layout;
     private final Context context;
 
     public FilteredLexicalModelAdapter(@NonNull Context context, Dataset.LexicalModels lexicalModels, final String languageCode) {
       // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
-      super(context, RESOURCE, lexicalModels, new AdapterFilter<LexicalModel, Dataset.LexicalModels>() {
+      super(context, RESOURCE, lexicalModels, new AdapterFilter<LexicalModel, Dataset.LexicalModels, Void>() {
         @Override
-        public List<LexicalModel> selectFrom(Dataset.LexicalModels adapter) {
+        public List<LexicalModel> selectFrom(Dataset.LexicalModels adapter, Void dummy) {
           List<LexicalModel> list = new ArrayList<>();
 
           // Highly unoptimized version:  O(n^2).
@@ -222,7 +222,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
           return list;
         }
-      });
+      }, null);
 
       this.context = context;
     }

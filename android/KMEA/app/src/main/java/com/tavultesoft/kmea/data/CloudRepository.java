@@ -262,9 +262,10 @@ public class CloudRepository {
           String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
           String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
 
-          String kbKey = String.format("%s_%s", langID, kbID);
+          //String kbKey = String.format("%s_%s", langID, kbID);
           HashMap<String, String> hashMap = new HashMap<String, String>();
           hashMap.put(KMManager.KMKey_KeyboardName, kbName);
+          hashMap.put(KMManager.KMKey_KeyboardID, kbID);
           hashMap.put(KMManager.KMKey_LanguageName, langName);
           hashMap.put(KMManager.KMKey_LanguageID, langID);
           hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
