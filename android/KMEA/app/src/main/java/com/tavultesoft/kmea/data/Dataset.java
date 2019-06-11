@@ -1,7 +1,6 @@
 package com.tavultesoft.kmea.data;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
@@ -9,7 +8,6 @@ import androidx.annotation.Nullable;
 
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.ListBacked;
-import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,28 +19,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Dataset extends ArrayAdapter<LanguageDataset> {
+public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
   public abstract class LanguageFilter<Type extends LanguageCoded, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter, String> {
-    abstract Set<Type> getSetFrom(LanguageMetadata metadata);
+    abstract Set<Type> getSetFrom(LanguageDataset metadata);
 
     @Override
     public List<Type> selectFrom(Adapter adapter, String lgCode) {
       // Since we know that the adapter is connected to the master Dataset, we can pre-filter and optimize
       // performance of our linked adapters.
-      LanguageMetadata metadata = Dataset.this.languageMetadata.get(lgCode);
+      LanguageDataset metadata = Dataset.this.languageMetadata.get(lgCode);
 
       return new ArrayList<>(getSetFrom(metadata));
     }
   }
 
   private final LanguageFilter<Keyboard, Keyboards> keyboardFilter = new LanguageFilter<Keyboard, Keyboards>() {
-    Set<Keyboard> getSetFrom(LanguageMetadata metadata) {
+    Set<Keyboard> getSetFrom(LanguageDataset metadata) {
       return metadata.keyboards;
     }
   };
 
   private final LanguageFilter<LexicalModel, LexicalModels> lexicalModelFilter = new LanguageFilter<LexicalModel, LexicalModels>() {
-    Set<LexicalModel> getSetFrom(LanguageMetadata metadata) {
+    Set<LexicalModel> getSetFrom(LanguageDataset metadata) {
       return metadata.lexicalModels;
     }
   };
@@ -66,7 +64,7 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
       // Make sure our language dataset map is properly initialized!
       for(Type obj: data) {
-        ensureLanguageDatasetExists(obj);
+        getMetadataFor(obj); // We can ignore the return; this makes sure the needed object is constructed.
       }
     }
 
@@ -93,7 +91,7 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
       super.add(object);
 
-      ensureLanguageDatasetExists(object);
+      getMetadataFor(object); // We can ignore the return; this makes sure the needed object is constructed.
 
       if(notify) {
         Dataset.this.notifyDataSetChanged();
@@ -117,7 +115,7 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
       HashSet<String> mutatedLanguages = new HashSet<>();
 
       for(Type item: collection) {
-        LanguageMetadata data = getMetadataFor(item);
+        LanguageDataset data = getMetadataFor(item);
 
         if(item instanceof Keyboard) {
           if(!data.keyboards.contains(item)) {
@@ -132,12 +130,6 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
         }
 
         mutatedLanguages.add(data.code);
-      }
-
-      // Ensures that the LanguageDataset is only constructed after we've already analyzed the keyboards
-      // and determined the language sets.
-      for(String lgCode: mutatedLanguages) {
-        ensureLanguageDatasetExists(Dataset.this.languageMetadata.get(lgCode).name, lgCode);
       }
 
       if(notify) {
@@ -218,13 +210,13 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
     }
   }
 
-  class LanguageMetadata {
+  class LanguageDataset {
     public final String name;
     public final String code;
     public Set<Keyboard> keyboards = new HashSet<>();
     public Set<LexicalModel> lexicalModels = new HashSet<>();
 
-    public LanguageMetadata(String name, String code) {
+    public LanguageDataset(String name, String code) {
       this.name = name;
       this.code = code;
     }
@@ -236,12 +228,9 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
   private Context context;
 
-  // Maps the relevant adapters for UI usage.
-  private final Map<String, LanguageDataset> languageIndexMap = new HashMap<>();
-
   // Tracks keyboards and model by language tag separately from the adapters; useful for
   // optimizing Adapter functionality.
-  private final Map<String, LanguageMetadata> languageMetadata = new HashMap<>();
+  private final Map<String, LanguageDataset> languageMetadata = new HashMap<>();
 
   // 'Items' are language-specific datasets holding their own language-specific adapters.
 
@@ -255,53 +244,32 @@ public class Dataset extends ArrayAdapter<LanguageDataset> {
 
   protected void handleLanguageItemRemoval(LanguageCoded coded) {
     String lgCode = coded.getLanguageCode();
-    LanguageDataset lgData = languageIndexMap.get(lgCode);
+    LanguageDataset lgData = languageMetadata.get(lgCode);
 
-//    if(lgData.keyboards.getCount() == 0 && lgData.lexicalModels.getCount() == 0) {
-//      // We're no longer storing anything for this language - remove lgData from tracking.
-//      this.remove(lgData);
-//      languageIndexMap.remove(lgCode);
-//    }
+    if(lgData.keyboards.size() == 0 && lgData.lexicalModels.size() == 0) {
+      // We're no longer storing anything for this language - remove lgData from tracking.
+      this.remove(lgData);
+      languageMetadata.remove(lgCode);
+    }
   }
 
-  protected LanguageMetadata getMetadataFor(LanguageCoded coded) {
+  protected LanguageDataset getMetadataFor(LanguageCoded coded) {
     final String lgCode = coded.getLanguageCode();
-    LanguageMetadata data = Dataset.this.languageMetadata.get(lgCode);
+    LanguageDataset data = Dataset.this.languageMetadata.get(lgCode);
 
     if(data == null) {
-      data = new LanguageMetadata(coded.getLanguageName(), coded.getLanguageCode());
+      data = new LanguageDataset(coded.getLanguageName(), coded.getLanguageCode());
       Dataset.this.languageMetadata.put(lgCode, data);
     }
 
     return data;
   }
 
-  protected void ensureLanguageDatasetExists(String lgName, String lgCode) {
-    LanguageDataset lgData = languageIndexMap.get(lgCode);
-
-    if(lgData == null) {
-      lgData = constructLanguageDataset(lgName, lgCode);
-      languageIndexMap.put(lgCode, lgData);
-      Dataset.this.add(lgData);
-    }
-  }
-
-  protected void ensureLanguageDatasetExists(LanguageCoded coded) {
-    this.ensureLanguageDatasetExists(coded.getLanguageName(), coded.getLanguageCode());
-  }
-
-  protected LanguageDataset constructLanguageDataset(String languageName, String languageCode) {
-    // Building a large set of nested adapters seriously drains performance.
-    // FIXME:  replace LanguageDatasets with the current LanguageMetadata - we want to work from that.
-
-    return new LanguageDataset(/*nestedKbds, nestedLexicals,*/ languageName, languageCode);
-  }
 
   public void clear() {
     keyboards.clear();
     lexicalModels.clear();
 
-    this.languageIndexMap.clear();
     this.languageMetadata.clear();
   }
 
