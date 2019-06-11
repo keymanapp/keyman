@@ -19,6 +19,7 @@
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
