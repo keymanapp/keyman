@@ -617,7 +617,7 @@ public class CloudRepository {
         } // else no match == no special handling.
       }
 
-      // Add the cloud-returned lexical model info to the CloudRepository's LexicalModelsAdapter.
+      // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
       dataset.lexicalModels.addAll(lexicalModelsArrayList);
 
       // And finish.

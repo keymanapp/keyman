@@ -226,8 +226,6 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
   public final Keyboards keyboards;
   public final LexicalModels lexicalModels;
 
-  private Context context;
-
   // Tracks keyboards and model by language tag separately from the adapters; useful for
   // optimizing Adapter functionality.
   private final Map<String, LanguageDataset> languageMetadata = new HashMap<>();
@@ -235,9 +233,8 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
   // 'Items' are language-specific datasets holding their own language-specific adapters.
 
   public Dataset(@NonNull Context context) {
-    super(context, 0, new ArrayList<LanguageDataset>());
+    super(context.getApplicationContext(), 0, new ArrayList<LanguageDataset>());
 
-    this.context = context.getApplicationContext();
     keyboards = new Keyboards(context);
     lexicalModels = new LexicalModels(context);
   }
