@@ -93,7 +93,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
       //new JSONParse().execute();
       repo = CloudRepository.shared.fetchDataset(context, null, null);
 
-      listView.setAdapter(new FilteredLexicalModelAdapter(context, repo.lexicalModels, languageID));
+      listView.setAdapter(new FilteredLexicalModelAdapter(context, repo, languageID));
       listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
         @Override
@@ -202,27 +202,13 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
   // Uses the repo dataset's master lexical model list to create a filtered adapter for use here.
   // As this one is specific to this class, we can implement Activity-specific functionality within it.
-  static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels, Void> {
+  static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels, String> {
     static final int RESOURCE = R.layout.models_list_row_layout;
     private final Context context;
 
-    public FilteredLexicalModelAdapter(@NonNull Context context, Dataset.LexicalModels lexicalModels, final String languageCode) {
+    public FilteredLexicalModelAdapter(@NonNull Context context, final Dataset repo, final String languageCode) {
       // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
-      super(context, RESOURCE, lexicalModels, new AdapterFilter<LexicalModel, Dataset.LexicalModels, Void>() {
-        @Override
-        public List<LexicalModel> selectFrom(Dataset.LexicalModels adapter, Void dummy) {
-          List<LexicalModel> list = new ArrayList<>();
-
-          // Highly unoptimized version:  O(n^2).
-          for(LexicalModel elem: adapter.asList()) {
-            if(elem.getLanguageCode().equals(languageCode)) {
-              list.add(elem);
-            }
-          }
-
-          return list;
-        }
-      }, null);
+      super(context, RESOURCE, repo.lexicalModels, repo.lexicalModelFilter, languageCode);
 
       this.context = context;
     }
