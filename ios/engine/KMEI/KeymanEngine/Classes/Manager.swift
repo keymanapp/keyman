@@ -481,21 +481,21 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return false
     }
     
-    let kb = userLexicalModels[index]
+    let lm = userLexicalModels[index]
     userLexicalModels.remove(at: index)
     userData.userLexicalModels = userLexicalModels
     userData.set([Date()], forKey: Key.synchronizeSWLexicalModel)
     userData.synchronize()
     
-    log.info("Removing lexical model with ID \(kb.id) and languageID \(kb.languageID)")
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID)")
     
     // Set a new lexical model if deleting the current one
-    if kb.fullID == currentLexicalModelID {
+    if lm.fullID == currentLexicalModelID {
       _ = registerLexicalModel(userLexicalModels[0])
     }
     
-    if !userLexicalModels.contains(where: { $0.id == kb.id }) {
-      let lexicalModelDir = Storage.active.lexicalModelDir(forID: kb.id)
+    if !userLexicalModels.contains(where: { $0.id == lm.id }) {
+      let lexicalModelDir = Storage.active.lexicalModelDir(forID: lm.id)
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
       log.info("Deleting directory \(lexicalModelDir)")
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
@@ -505,7 +505,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       log.info("User has another language installed. Skipping delete of lexical model files.")
     }
     
-    NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: kb)
+    NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: lm)
     return true
   }
   
