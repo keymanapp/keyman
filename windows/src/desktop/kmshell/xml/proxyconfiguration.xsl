@@ -10,6 +10,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <title><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Title']"/></title>
 <style type="text/css">
   * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; }
