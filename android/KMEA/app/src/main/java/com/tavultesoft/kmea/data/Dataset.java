@@ -160,11 +160,11 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
         Dataset.this.setNotifyOnChange(false);
       }
 
-      List<Type> clearedKbds = this.asList();
+      List<Type> clearedItems = this.asList();
 
       super.clear();
 
-      for(Type kbd: clearedKbds) {
+      for(Type kbd: clearedItems) {
         handleLanguageItemRemoval(kbd);
       }
 
@@ -257,6 +257,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     if(data == null) {
       data = new LanguageDataset(coded.getLanguageName(), coded.getLanguageCode());
       Dataset.this.languageMetadata.put(lgCode, data);
+      Dataset.this.add(data);
     }
 
     return data;

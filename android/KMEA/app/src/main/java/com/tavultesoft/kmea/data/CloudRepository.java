@@ -42,6 +42,7 @@ public class CloudRepository {
 
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
+  private boolean invalidateLexicalCache = false;
 
   private CloudRepository() {
     // Tracks the time of the most recent cache.  We start at null to indicate that we haven't
@@ -66,6 +67,12 @@ public class CloudRepository {
   private boolean shouldUseCache(Context context, File cacheFile) {
     boolean hasConnection = KMManager.hasConnection(context);
 
+    // Forced cache bypass - we need to load more lexical models (signaled by invalidation).
+    if(this.invalidateLexicalCache && cacheFile.equals(this.getLexicalModelCacheFile(context))) {
+      this.invalidateLexicalCache = false;
+      return false;
+    }
+
     if (cacheFile.exists()) {
       Calendar lastModified = Calendar.getInstance();
       lastModified.setTime(new Date(cacheFile.lastModified()));
@@ -75,6 +82,12 @@ public class CloudRepository {
     } else {
       return false;
     }
+  }
+
+  // Should be called whenever a new language code starts being managed in order to help signal
+  // retrieval of the language code's lexical models.
+  public void invalidateLexicalModelCache() {
+    this.invalidateLexicalCache = true;
   }
 
   /**
@@ -96,7 +109,15 @@ public class CloudRepository {
       // Clear the cached data and rebuild it from scratch.
       memCachedDataset.clear();
     }
+
+    // Since we're not using a mem-cached version, let's start constructing one for later use.
     lastLoad = Calendar.getInstance(); // Mark a cache timing.
+
+    Dataset installedSet = KeyboardPickerActivity.getInstalledDataset(context);
+    List<String> languageCodes = new ArrayList<>(installedSet.getCount());
+    for(int i=0; i < installedSet.getCount(); i++) {
+      languageCodes.add(installedSet.getItem(i).code);
+    }
 
     // Get kmp.json info from installed models.
     // Consolidate kmp.json info from packages/
@@ -125,8 +146,20 @@ public class CloudRepository {
       // Retrieves the cloud-based keyboard catalog in Android's preferred format.
       String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
           KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
+
       // This allows us to directly get the full lexical model catalog.
+      // TODO:  Remove and replace with commented-out code below once the proper multi-language
+      //        query is ready!
       String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
+
+      // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)
+//      String lexicalURL = String.format("%s?q=bcp47:", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
+//
+//      for(String lgCode: languageCodes) {
+//        lexicalURL = String.format("%s%s,", lexicalURL, lgCode);
+//      }
+//
+//      lexicalURL = lexicalURL.substring(0, lexicalURL.lastIndexOf(','));
 
       /* do what's possible here, rather than in the Task */
 

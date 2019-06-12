@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
@@ -421,6 +422,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       String pkgID = keyboardInfo.get(KMManager.KMKey_PackageID);
       String kbID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String langID = keyboardInfo.get(KMManager.KMKey_LanguageID);
+
+      // TODO:  Possible optimization - do we have anything with this language code already?
+      //        Only invalidate the lexical cache if not.
+      CloudRepository.shared.invalidateLexicalModelCache();
+
       if (pkgID != null && kbID != null && langID != null) {
         String kbKey = String.format("%s_%s", langID, kbID);
         if (kbKey.length() >= 3) {
@@ -584,7 +590,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return list;
   }
 
-  protected static Dataset getInstalledDataset(Context context) {
+  public static Dataset getInstalledDataset(Context context) {
     List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
     List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
 
