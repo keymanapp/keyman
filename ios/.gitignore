@@ -11,5 +11,6 @@ samples/KMSample2/build
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanios.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-osk.ttf
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/kmwosk.css
+engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman.js.map
 Keyman 2*
 Carthage

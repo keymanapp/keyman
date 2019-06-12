@@ -1,0 +1,23 @@
+.gradle
+
+# Built application files
+**/build/
+
+# Local configuration file (sdk path, etc)
+**/local.properties
+
+# User-specific stuff:
+**/.idea/libraries/
+**/.idea/dictionaries
+**/.idea/**/*.xml
+**/.idea/caches/
+**/*.iml
+
+**/.DS_Store
+
+# This is the file output from KMEA; it's part of our build process.
+**/keyman-engine.aar
+
+# Files generated as part of the build
+app/src/main/assets/packages
+app/src/main/assets/keyboards.csv

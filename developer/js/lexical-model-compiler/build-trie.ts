@@ -5,22 +5,6 @@
 type WordList = [string, number][];
 
 /**
- * Returns a data structure suitable for use by the wordlist model.
- *
- * @param sourceFiles an array of the CONTENTS of source files
- *
- * @return a data structure that will be used internally by the wordlist
- *         implemention. Currently this is an array of [wordlist, count] pairs.
- */
-export function createWordListDataStructure(sourceFiles: string[]): string {
-  // NOTE: this generates a simple array of word forms --- not a trie!
-  // In the future, this function may construct a true trie data structure,
-  // but this is not yet implemented.
-  let contents = sourceFiles.join('\n');
-  return JSON.stringify(parseWordList(contents));
-}
-
-/**
  * Returns a data structure that can be loaded by the TrieModel.
  *
  * It implements a **weighted** trie, whose indices (paths down the trie) are
@@ -28,9 +12,9 @@ export function createWordListDataStructure(sourceFiles: string[]): string {
  *
  * @param sourceFiles an array of source files that will be read to generate the trie.
  */
-export function createTrieDataStructure(sourceFiles: string[]): string {
+export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?: (wf: string) => string): string {
   let wordlist =  parseWordList(sourceFiles.join('\n'));
-  let trie = Trie.buildTrie(wordlist);
+  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.Wordform2Key);
   return JSON.stringify(trie);
 }
 
@@ -96,7 +80,7 @@ namespace Trie {
    * A function that converts a string (word form or query) into a search key
    * (secretly, this is also a string).
    */
-  interface Wordform2Key {
+  export interface Wordform2Key {
     (wordform: string): SearchKey;
   }
 
@@ -108,17 +92,17 @@ namespace Trie {
   //   The MIT License
   //   Copyright (c) 2015-2017 Conrad Irwin <conrad.irwin@gmail.com>
   //   Copyright (c) 2011 Marc Campbell <marc.e.campbell@gmail.com>
-  // 
+  //
   //   Permission is hereby granted, free of charge, to any person obtaining a copy
   //   of this software and associated documentation files (the "Software"), to deal
   //   in the Software without restriction, including without limitation the rights
   //   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   //   copies of the Software, and to permit persons to whom the Software is
   //   furnished to do so, subject to the following conditions:
-  // 
+  //
   //   The above copyright notice and this permission notice shall be included in
   //   all copies or substantial portions of the Software.
-  // 
+  //
   //   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   //   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   //   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -364,7 +348,7 @@ namespace Trie {
     const COMBINING_DIACRITICAL_MARKS = /[\u0300-\u036f]/g;
     return wordform
       .normalize('NFD')
-      .toUpperCase()
+      .toLowerCase()
       // remove diacritical marks.
       .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
   }

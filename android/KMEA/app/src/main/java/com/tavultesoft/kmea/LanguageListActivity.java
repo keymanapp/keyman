@@ -52,16 +52,17 @@ import android.widget.Toast;
  * Gets the list of installable languages from Keyman cloud and allows user to download a keyboard.
  * After downloading, the new keyboard is selected.
  *
- * The language list is saved to a cache file "jsonCache.dat".
+ * The language list is saved to a cache file "jsonKeyboardsCache.dat".
  */
 public final class LanguageListActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
 
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+
+  // Merged array list of languages to display in ListView
   private static ArrayList<HashMap<String, String>> languagesArrayList = null;
   private boolean didExecuteParser = false;
-  private static final String jsonCacheFilename = "jsonCache.dat";
   private static final String TAG = "LanguageListActivity";
 
   private static JSONArray languages = null;
@@ -301,18 +302,22 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   }
 
   protected static File getCacheFile(Context context) {
+    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
     return new File(context.getCacheDir(), jsonCacheFilename);
   }
 
   protected static JSONObject getCachedJSONObject(Context context) {
-    JSONObject jsonObj;
+    JSONObject jsonObj = null;
     try {
       // Read from cache file
-      ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(getCacheFile(context)));
-      jsonObj = new JSONObject(objInput.readObject().toString());
-      objInput.close();
+      File file = getCacheFile(context);
+      if (file.exists()) {
+        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
+        jsonObj = new JSONObject(objInput.readObject().toString());
+        objInput.close();
+      }
     } catch (Exception e) {
-      Log.e("LanguageListActivity", "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "Failed to read from cache file. Error: " + e);
       jsonObj = null;
     }
 
@@ -327,7 +332,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       objOutput.writeObject(jsonObj.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e("LanguageListActivity", "Failed to save to cache file. Error: " + e);
+      Log.e(TAG, "Failed to save to cache file. Error: " + e);
     }
   }
 

@@ -57,9 +57,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   private static ImageButton addButton = null;
   private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
-  private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static HashMap<String, String> keyboardVersions = null;
+
+  // Lists of installed keyboards and installed lexical models
+  private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
+
   private static boolean checkingUpdates = false;
   private static int updateCount = 0;
   private static int failedUpdateCount = 0;
@@ -172,7 +175,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
               if (item.getItemId() == R.id.popup_delete) {
-                deleteKeyboard(position);
+                deleteKeyboard(context, position);
                 return true;
               } else {
                 return false;
@@ -323,8 +326,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
   protected static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
-      String packageID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-      if (!packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      String customKeyboard = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
+      if (customKeyboard.equalsIgnoreCase("Y")) {
         return true;
       }
     }
@@ -353,6 +356,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
+  /**
+   * Save the list of installed keyboards
+   * @param context
+   * @param list
+   * @return boolean - Status if the keyboard list was successfully saved
+   */
   protected static boolean updateKeyboardsList(Context context, ArrayList<HashMap<String, String>> list) {
     boolean result;
     keyboardsList = list;
@@ -360,6 +369,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
+  /**
+   * Save the list of installed lexical models
+   * @param context
+   * @param list
+   * @return boolean - Status if the lexical models list was successfully saved
+   */
   protected static boolean updateLexicalModelsList(Context context, ArrayList<HashMap<String, String>> list) {
     boolean result;
     lexicalModelsList = list;
@@ -367,13 +382,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
-  private void setSelection(int position) {
+  private static void setSelection(int position) {
     listView.setItemChecked(position, true);
     listView.setSelection(position);
     selectedIndex = position;
   }
 
-  private void switchKeyboard(int position) {
+  private static void switchKeyboard(int position) {
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
@@ -387,13 +402,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
     KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-
-    // Register associated lexical model
-    HashMap<String, String> lmInfo = getAssociatedLexicalModel(langId);
-    if (lmInfo != null) {
-      KMManager.registerLexicalModel(lmInfo);
-    }
-
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -445,8 +453,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       String langID = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
 
       if (pkgID != null && modelID != null && langID != null) {
-        String lmKey = String.format("%s_%s_%s", langID, pkgID, modelID);
-        if (lmKey.length() >= 3) {
+        String lmKey = String.format("%s_%s_%s", pkgID, langID, modelID);
+        if (lmKey.length() >= 5) {
           int x = getLexicalModelIndex(context, lmKey);
           if (x >= 0) {
             lexicalModelsList.set(x, lexicalModelInfo);
@@ -479,13 +487,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return result;
   }
 
-  protected void deleteKeyboard(int position) {
+  protected static void deleteKeyboard(Context context, int position) {
     int curKbPos = getCurrentKeyboardIndex();
-    boolean result = removeKeyboard(this, position);
+    boolean result = removeKeyboard(context, position);
     ;
 
     if (result) {
-      Toast.makeText(this, "Keyboard deleted", Toast.LENGTH_SHORT).show();
+      Toast.makeText(context, "Keyboard deleted", Toast.LENGTH_SHORT).show();
       BaseAdapter adapter = (BaseAdapter) listAdapter;
       adapter.notifyDataSetChanged();
       if (position == curKbPos) {
@@ -494,6 +502,64 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         curKbPos = getCurrentKeyboardIndex();
         setSelection(curKbPos);
       }
+    }
+  }
+
+  /**
+   * getModelIDFromPosition - Get the lexical model ID at a given position
+   * @param context
+   * @param position - int position of the lexical model
+   * @return String - model ID. Blank if invalid position
+   */
+  protected static String getModelIDFromPosition(Context context, int position) {
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    String modelID = "";
+    if (lexicalModelsList != null && position >= 0 && position < lexicalModelsList.size()) {
+      HashMap<String, String> lexicalModelInfo = lexicalModelsList.get(position);
+      modelID = lexicalModelInfo.get(KMManager.KMKey_LexicalModelID);
+    }
+
+    return modelID;
+  }
+
+  /**
+   * removeLexicalModel - Remove lexical model at a given position from the installed lexical models list
+   * @param context
+   * @param position - int position of the lexical model to remove
+   * @return boolean - result of the model could be removed and list saved
+   */
+  protected static boolean removeLexicalModel(Context context, int position) {
+    boolean result = false;
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null && position >= 0 && position < lexicalModelsList.size()) {
+      lexicalModelsList.remove(position);
+      result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+    }
+
+    return result;
+  }
+
+
+  /**
+   * deleteLexicalModel - Remove lexical model from the installed list
+   * and deregister the model with KMW
+   * @param context
+   * @param position - int position in the models list
+   */
+  protected static void deleteLexicalModel(Context context, int position) {
+    String modelID = getModelIDFromPosition(context, position);
+    boolean result = removeLexicalModel(context, position);
+
+    if (result) {
+      Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show();
+      KMManager.deregisterLexicalModel(modelID);
     }
   }
 
@@ -541,6 +607,26 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return kbKeys.contains(keyboardKey);
+  }
+
+  protected static boolean containsLexicalModel(Context context, String lexicalModelKey) {
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList == null) {
+      return false;
+    }
+
+    for(HashMap<String, String> lmInfo : lexicalModelsList) {
+      String key = String.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
+        lmInfo.get(KMManager.KMKey_LanguageID), lmInfo.get(KMManager.KMKey_LexicalModelID));
+      if (lexicalModelKey.equalsIgnoreCase(key)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   protected static int getCurrentKeyboardIndex(Context context) {
@@ -601,16 +687,18 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   }
 
   /**
-   * Get the list of associated keyboard names for a given language ID
+   * Get the list of associated keyboards for a given language ID
    * @param langId
-   * @return ArrayList of keyboard names
+   * @return ArrayList of keyboard
    */
-  protected static ArrayList<String> getAssociatedKeyboards(String langId) {
+  public static ArrayList<HashMap<String, String>> getAssociatedKeyboards(String langId) {
     if (keyboardsList != null) {
-      ArrayList<String> associatedKeyboards = new ArrayList<String>();
+      ArrayList<HashMap<String, String>> associatedKeyboards = new ArrayList<HashMap<String, String>>();
       for (HashMap<String, String> keyboardInfo: keyboardsList) {
         if (keyboardInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(langId)) {
-          associatedKeyboards.add(keyboardInfo.get(KMManager.KMKey_KeyboardName));
+          keyboardInfo.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
+          keyboardInfo.put("isEnabled", "true");
+          associatedKeyboards.add(keyboardInfo);
         }
       }
       return associatedKeyboards;
@@ -619,6 +707,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return null;
   }
 
+  /**
+   * Get the index of a lexical model key in the list of installed lexical models.
+   * @param context
+   * @param lexicalModelKey - key of "{package ID}_{language ID}_{lexical model ID}"
+   * @return Index >= 0 if the lexical model key exists. Otherwise -1
+   */
   protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
     int index = -1;
 
@@ -630,10 +724,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       int length = lexicalModelsList.size();
       for (int i=0; i < length; i++) {
         HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-        String langId = lmInfo.get(KMManager.KMKey_LanguageID);
         String pkgId = lmInfo.get(KMManager.KMKey_PackageID);
+        String langId = lmInfo.get(KMManager.KMKey_LanguageID);
         String lmId = lmInfo.get(KMManager.KMKey_LexicalModelID);
-        String lmKey = String.format("%s_%s_%s", langId, pkgId, lmId);
+        String lmKey = String.format("%s_%s_%s", pkgId, langId, lmId);
         if (lmKey.equals(lexicalModelKey)) {
           index = i;
           break;
@@ -642,20 +736,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return index;
-  }
-
-  protected static HashMap<String, String> getAssociatedLexicalModel(String langId) {
-    if (lexicalModelsList != null) {
-      int length = lexicalModelsList.size();
-      for (int i = 0; i < length; i++) {
-        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
-          return lmInfo;
-        }
-      }
-    }
-
-    return null;
   }
 
   protected static HashMap<String, String> getKeyboardInfo(Context context, int index) {
@@ -674,6 +754,23 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       }
       return kbInfo;
+    }
+
+    return null;
+  }
+
+  protected static HashMap<String, String> getLexicalModelInfo(Context context,int index) {
+    if (index < 0) {
+      return null;
+    }
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null && index < lexicalModelsList.size()) {
+      HashMap<String, String> lmInfo = lexicalModelsList.get(index);
+      return lmInfo;
     }
 
     return null;

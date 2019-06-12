@@ -847,6 +847,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
       KMManager.addLexicalModel(this, lexicalModelInfo);
     }
+
+    // It would be nice to register associated lexical model
+    // But the Keyboard Downloader async task in the background can't modify the WebView
+    // (banner heights get adjusted during model registration)
   }
 
   private void copyFile(FileInputStream inStream, File dstFile) throws IOException {

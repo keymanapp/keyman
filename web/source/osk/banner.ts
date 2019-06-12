@@ -405,10 +405,16 @@ namespace com.keyman.osk {
       keyman.modelManager['removeEventListener']('tryaccept', manager.tryAccept);
       keyman.modelManager['removeEventListener']('tryrevert', manager.tryRevert);
     }
+
+    rotateSuggestions() {
+      this.manager.rotateSuggestions();
+    }
   }
 
-  class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
+  export class SuggestionManager extends dom.UITouchHandlerBase<HTMLDivElement> {
     private selected: BannerSuggestion;
+
+    platformHold: (suggestion: BannerSuggestion, isCustom: boolean) => void;
 
     //#region Touch handling implementation
     findTargetFrom(e: HTMLElement): HTMLDivElement {
@@ -459,29 +465,51 @@ namespace com.keyman.osk {
 
     //#region Long-press support
     protected hold(t: HTMLDivElement): void {
-      // Temp, pending implementation of suggestion longpress submenus
-      // - nothing worth doing with a hold yet -
+      let suggestionObj = t['suggestion'] as BannerSuggestion;
+
+      // Is this the <keep> suggestion?  It's never in this.currentSuggestions, so check against that.
+      let isCustom = this.currentSuggestions.indexOf(suggestionObj.suggestion) == -1;
+
+      if(this.platformHold) {
+        // Implemented separately for native + embedded mode branches.
+        // Embedded mode should pass any info needed to show a submenu IMMEDIATELY.
+        this.platformHold(suggestionObj, isCustom); // No implementation yet for native.
+      }
     }
     protected clearHolds(): void {
       // Temp, pending implementation of suggestion longpress submenus
       // - nothing to clear without them -
+
+      // only really used in native-KMW
     }
+    
     protected hasModalPopup(): boolean {
-      // Temp, pending implementation of suggestion longpress submenus
-      return false;
+      // Utilized by the mobile apps; allows them to 'take over' touch handling,
+      // blocking it within KMW when the apps are already managing an ongoing touch-hold.
+      let keyman = com.keyman.singleton;
+      return keyman['osk'].vkbd.popupVisible;
     }
+
     protected dealiasSubTarget(target: HTMLDivElement): HTMLDivElement {
       return target;
     }
+
     protected hasSubmenu(t: HTMLDivElement): boolean {
-      // Temp, pending implementation of suggestion longpress submenus:
+      // Temp, pending implementation of suggestion longpress submenus
+
+      // Only really used by native-KMW - see kmwnative's highlightSubKeys func.
       return false;
     }
+
     protected isSubmenuActive(): boolean {
-      // Temp, pending implementation of suggestion longpress submenus:
+      // Temp, pending implementation of suggestion longpress submenus
+
+      // Utilized only by native-KMW - it parallels hasModalPopup() in purpose.
       return false;
     }
+
     protected displaySubmenuFor(target: HTMLDivElement) {
+      // Utilized only by native-KMW to show submenus.
       throw new Error("Method not implemented.");
     }
     //#endregion
@@ -555,14 +583,14 @@ namespace com.keyman.osk {
         keyman['oninserttext'](transform.deleteLeft, transform.insert, transform.deleteRight);
       }
 
-      // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
-      this.rejectedSuggestions.push(this.recentAccepted);
       this.currentSuggestions = this.previousSuggestions; // Restore to the previous state's Suggestion list.
       this.currentTranscriptionID = this.previousTranscriptionID;
 
       let rejectIndex = this.currentSuggestions.indexOf(this.recentAccepted);
       if(rejectIndex != -1) {
-        this.currentSuggestions.splice(rejectIndex, 1);
+        // Denote the previous suggestion as rejected and update the 'valid' suggestion list accordingly.
+        this.rejectedSuggestions.push(this.recentAccepted);
+        this.currentSuggestions.splice(rejectIndex, 1); // removes this.recentAccepted from this.currentSuggestions.
       }
 
       // Other state maintenance
@@ -608,6 +636,9 @@ namespace com.keyman.osk {
      */
     public invalidateSuggestions: (this: SuggestionManager, source: text.prediction.InvalidateSourceEnum) => boolean = 
         function(this: SuggestionManager, source: string) {
+      
+      // By default, we assume that the context is the same until we notice otherwise.
+      this.initNewContext = false;
 
       if(!this.swallowPrediction || source == 'context') {
         this.recentAccept = false;
@@ -625,13 +656,17 @@ namespace com.keyman.osk {
       });
     }.bind(this);
 
+    public activateKeep(): boolean {
+      return !this.recentAccept && !this.recentRevert && !this.initNewContext;
+    }
+
     private doUpdate() {
       let keyman = com.keyman.singleton;
 
       let suggestions = [];
       // TODO:  Insert 'current text' if/when valid as the leading option.
       //        We need the LMLayer to tell us this somehow.
-      if(!this.recentAccept && !this.recentRevert && !this.initNewContext) {
+      if(this.activateKeep()) {
         // In the meantime, a placeholder:
         // (generated from the 'true'/original transform)
         let original = keyman.modelManager.getPredictionState(this.currentTranscriptionID);
@@ -648,8 +683,23 @@ namespace com.keyman.osk {
           option.update(null);
         }
       });
+    }
 
-      this.initNewContext = false;
+    public rotateSuggestions() {
+      if(this.currentSuggestions.length > 0) {
+        let replaceCount = SuggestionBanner.SUGGESTION_LIMIT - (this.activateKeep() ? 1 : 0);
+        let rotating = this.currentSuggestions.splice(0, replaceCount);
+
+        this.rejectedSuggestions = this.rejectedSuggestions.concat(rotating);
+      } 
+      
+      // If we just removed the last available suggestions, it's time to refresh the list.
+      if(this.currentSuggestions.length == 0) {
+        this.currentSuggestions = this.rejectedSuggestions;
+        this.rejectedSuggestions = [];
+      }
+
+      this.doUpdate();
     }
 
     /**

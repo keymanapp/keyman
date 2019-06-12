@@ -9,6 +9,7 @@ interface ClassBasedWordBreaker {
 }
 
 interface LexicalModel {
+  // TODO: remove trie-2.0 when https://github.com/keymanapp/lexical-models/pull/39 is merged.
   readonly format: 'trie-1.0'|'trie-2.0'|'fst-foma-1.0'|'custom-1.0',
   //... metadata ...
 }
@@ -25,7 +26,15 @@ interface LexicalModelSource extends LexicalModel {
    * The name of the type to instantiate (without parameters) as the base object for a custom predictive model.
    */
   readonly rootClass?: string
-  readonly wordBreaking?: 'ascii' | 'placeholder' | ClassBasedWordBreaker;
+  /**
+   * What kind of word breaking to use, if any.
+   */
+  readonly wordBreaking?: 'default' | 'ascii' | 'placeholder' | ClassBasedWordBreaker;
+  /**
+   * How to simplify words, to convert them into simplifired search keys
+   * This often involves removing accents, lowercasing, etc.
+   */
+  readonly searchTermToKey?: (term: string) => string;
 }
 
 interface LexicalModelCompiled extends LexicalModel {

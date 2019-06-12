@@ -9,7 +9,7 @@ import * as ts from "typescript";
 import KmpCompiler from "./package-compiler/kmp-compiler";
 import * as fs from "fs";
 import * as path from "path";
-import { createWordListDataStructure, createTrieDataStructure } from "./lexical-model-compiler/build-trie";
+import { createTrieDataStructure } from "./lexical-model-compiler/build-trie";
 
 // The model ID MUST adhere to this pattern:
 //                         author           .bcp47            .uniq
@@ -58,6 +58,7 @@ export default class LexicalModelCompiler {
     //
     // Filename expectations
     //
+
     const kpsFileName = `../source/${model_id}.model.kps`;
     const kmpFileName = `${model_id}.model.kmp`;
     const modelFileName = `${model_id}.model.js`;
@@ -65,10 +66,6 @@ export default class LexicalModelCompiler {
     const sourcePath = '../source';
 
     const minKeymanVersion = '12.0';
-
-    //
-    // Validate the model ID.
-    //
 
     //
     // This script is run from folder group/author/bcp47.uniq/build/ folder. We want to
@@ -93,88 +90,39 @@ export default class LexicalModelCompiler {
     // Build the compiled lexical model
     //
 
-    let sources: string[] = modelSource.sources.map(function(source) {
-      return fs.readFileSync(path.join(sourcePath, source), 'utf8');
-    });
-
-    let oc: LexicalModelCompiled = {id: model_id, format: modelSource.format};
-
-    // TODO: add metadata in comment
-    const filePrefix: string = `(function() {\n'use strict';\n`;
-    const fileSuffix: string = `})();`;
-    let func = filePrefix;
-
-    let wordBreakingSource: string = null;
-
-    if (modelSource.wordBreaking) {
-      if (typeof modelSource.wordBreaking === "string") {
-        // It must be a builtin word breaker, so just instantiate it.
-        wordBreakingSource = `wordBreakers['${modelSource.wordBreaking}']`;
-      } else if (modelSource.wordBreaking.sources) {
-        let wordBreakingSources: string[] = modelSource.wordBreaking.sources.map(function(source) {
-          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
-        });
-
-        wordBreakingSource = this.transpileSources(wordBreakingSources).join('\n');
-      }
-    }
+    let func = this.generateLexicalModelCode(model_id, modelSource, sourcePath);
 
     //
-    // Emit the model as code and data
-    //
-
-    switch(modelSource.format) {
-      case "custom-1.0":
-        func += this.transpileSources(sources).join('\n');
-        // JSON.stringify(oc) gives the base metadata
-        func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
-        break;
-      case "fst-foma-1.0":
-        (oc as LexicalModelCompiledFst).fst = Buffer.from(sources.join('')).toString('base64');
-        this.logError('Unimplemented model format '+modelSource.format);
-        return false;
-      case "trie-1.0":
-        func += `var model = {};\n`;
-        func += `model.backingData = ${createWordListDataStructure(sources)};\n`;
-        func += `LMLayerWorker.loadModel(new models.WordListModel(model.backingData`;
-        if (wordBreakingSource) {
-          func += `, {wordBreaking: ${wordBreakingSource}}`;
-        }
-        func += `));\n`;
-        break;
-      case 'trie-2.0':
-        // TODO: allow specification of key function.
-        func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(sources)
-        }`;
-        if (wordBreakingSource) {
-          func += `, {wordBreaking: ${wordBreakingSource}}`;
-        }
-        func += `));\n`;
-        break;
-      default:
-        this.logError('Unknown model format '+modelSource.format);
-        return false;
-    }
-
-    //
-    // Load custom wordbreak source files
-    //
-
-
-    func += fileSuffix;
-
     // Save full model to build folder as Javascript for use in KeymanWeb
+    //
 
     fs.writeFileSync(modelFileName, func);
 
     //
-    // Create KMP file
+    // Load .kps file and validate; prepare to create KMP package file
     //
 
     let kpsString: string = fs.readFileSync(kpsFileName, 'utf8');
     let kmpCompiler = new KmpCompiler();
     let kmpJsonData = kmpCompiler.transformKpsToKmpObject(model_id, kpsString);
+
+    // Validate the model id from the folder name against the metadata
+    // in the .kps file. A package source file must contain at least one
+    // model, being the current model being compiled. Currently, the compiler
+    // supports only a single model in the .kmp, but conceptually in the future
+    // we could support multiple models. Given this, the code checks every
+    // listed model rather than just the first.
+
+    if(kmpJsonData.lexicalModels.find((e) => e.id === model_id) === undefined) {
+      let ids = kmpJsonData.lexicalModels.map((e) => e.id).join(', ');
+      this.logError(`Unable to find matching model ${model_id} in the file ${kpsFileName}; model id(s) found in the package are: ${ids}`);
+      return false;
+    }
+
+    //
+    // Build the KMP package file
+    //
+
     kmpCompiler.buildKmpFile(kmpJsonData, kmpFileName);
 
     //
@@ -192,9 +140,12 @@ export default class LexicalModelCompiler {
       model_info[field] = model_info[field] || expected;
     }
 
+    //
     // Merge model info file -- some fields have "special" behaviours -- see below
+    //
 
     set_model_metadata('id', model_id);
+
     set_model_metadata('name', kmpJsonData.info.name.description);
     set_model_metadata('authorName', kmpJsonData.info.author.description);
 
@@ -205,7 +156,8 @@ export default class LexicalModelCompiler {
     // arrays for each of the lexical models in the kmp.json file,
     // and merge into a single array of identifiers in the 
     // .model_info file.
-    model_info.languages = model_info.languages || [].concat(kmpJsonData.lexicalModels.map((e) => e.languages.map((f) => f.id)));
+
+    model_info.languages = model_info.languages || kmpJsonData.lexicalModels.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
 
     set_model_metadata('lastModifiedDate', (new Date).toISOString());
     set_model_metadata('packageFilename', kmpFileName);
@@ -231,6 +183,83 @@ export default class LexicalModelCompiler {
 
     fs.writeFileSync(modelInfoFileName, JSON.stringify(model_info, null, 2));
   };
+
+  /**
+   * Returns the generated code for the model that will ultimately be loaded by
+   * the LMLayer worker. This code contains all model parameters, and specifies
+   * word breakers and auxilary functions that may be required.
+   * 
+   * @param model_id      The model ID. TODO: not sure if this is actually required!
+   * @param modelSource   A specification of the model to compile
+   * @param sourcePath    Where to find auxilary sources files
+   */
+  generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string) {
+    let oc: LexicalModelCompiled = {id: model_id, format: modelSource.format};
+
+    let sources: string[] = modelSource.sources.map(function(source) {
+      return fs.readFileSync(path.join(sourcePath, source), 'utf8');
+    });
+
+    // TODO: add metadata in comment
+    const filePrefix: string = `(function() {\n'use strict';\n`;
+    const fileSuffix: string = `})();`;
+    let func = filePrefix;
+
+    let wordBreakingSource: string = null;
+
+    // Figure out what word breaker the model is using, if any.
+    if (modelSource.wordBreaking) {
+      if (typeof modelSource.wordBreaking === "string") {
+        // It must be a builtin word breaker, so just instantiate it.
+        wordBreakingSource = `wordBreakers['${modelSource.wordBreaking}']`;
+      } else if (modelSource.wordBreaking.sources) {
+        let wordBreakingSources: string[] = modelSource.wordBreaking.sources.map(function(source) {
+          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
+        });
+
+        wordBreakingSource = this.transpileSources(wordBreakingSources).join('\n');
+      }
+    }
+
+    //
+    // Emit the model as code and data
+    //
+
+    switch(modelSource.format) {
+      case "custom-1.0":
+        func += this.transpileSources(sources).join('\n');
+        func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
+        break;
+      case "fst-foma-1.0":
+        (oc as LexicalModelCompiledFst).fst = Buffer.from(sources.join('')).toString('base64');
+        this.logError('Unimplemented model format '+modelSource.format);
+        return false;
+      case "trie-1.0": // TODO: in lexical-models, rollback all trie-2.0 models to use trie-1.0!
+      case 'trie-2.0':
+        func += `LMLayerWorker.loadModel(new models.TrieModel(${
+          createTrieDataStructure(sources, modelSource.searchTermToKey)
+        }, {\n`;
+        if (wordBreakingSource) {
+          func += `  wordBreaking: ${wordBreakingSource},\n`;
+        }
+        if (modelSource.searchTermToKey) {
+          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
+        }
+        func += `}));\n`;
+        break;
+      default:
+        this.logError('Unknown model format '+modelSource.format);
+        return false;
+    }
+
+    //
+    // TODO: Load custom wordbreak source files
+    //
+
+    func += fileSuffix;
+
+    return func;
+  }
 
   transpileSources(sources: Array<string>): Array<string> {
     return sources.map((source) => ts.transpileModule(source, {
