@@ -15,7 +15,8 @@ set -u
 
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'
-KEYBOARDS_ROOT=../../../../keyboards
+
+
 
 function die {
   echo "FATAL: $1"
@@ -101,3 +102,5 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
 
   popd
 fi
+
+echo "Keyboards built successfully."
