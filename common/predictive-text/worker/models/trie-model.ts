@@ -73,7 +73,9 @@
     readonly breakWords: WordBreakingFunction;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
-      this._trie = new Trie(trieData as Node,
+      this._trie = new Trie(
+        trieData['root'],
+        trieData['totalWeight'],
         options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
@@ -234,10 +236,10 @@
      */
     toKey: Wordform2Key;
 
-    constructor(root: Node, wordform2key: Wordform2Key) {
+    constructor(root: Node, totalWeight: number, wordform2key: Wordform2Key) {
       this.root = root;
       this.toKey = wordform2key;
-      this.totalWeight = sumWeights(root);
+      this.totalWeight = totalWeight;
     }
 
     /**
@@ -351,26 +353,6 @@
     }
     return results;
 
-  }
-
-  /**
-   * O(n) traversal to sum the total weight of all leaves in the trie, starting
-   * at the provided node. Don't use this if you want lookups to be fast!
-   *
-   * TODO: Move this functionality to the trie compiler!
-   * @param node The node to start summing weights.
-   */
-  function sumWeights(node: Node): number {
-    if (node.type === 'leaf') {
-      return node.entries
-        .map(entry => entry.weight)
-        .reduce((acc, count) => acc + count, 0);
-    } else {
-      // @ts-ignore
-      return Object.values(node.children)
-        .map((child: Node) => sumWeights(child))
-        .reduce((acc: number, count: number) => acc + count, 0);
-    }
   }
 
   /** TypeScript type guard that returns whether the thing is a Node. */
