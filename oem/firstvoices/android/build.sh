@@ -65,7 +65,6 @@ while [[ $# -gt 0 ]] ; do
   shift
 done
 
-# TODO: support passing -copy-keyboards, -debug, -clean etc in to build_keyboards
 ../common/build_keyboards.sh $PARAM_COPY_KEYBOARDS $PARAM_CLEAN_KEYBOARDS $PARAM_DEBUG
 
 # TODO: in the future build_common.sh should probably be shared with all oem products?
