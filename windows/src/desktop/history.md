@@ -1,5 +1,8 @@
 # Keyman Desktop Version History
 
+## 2019-06-12 11.0.1360.0 stable
+* Bug Fix: Crash "Object doesn't support property or method..." starting Keyman Configuration on some systems (#1827)
+
 ## 2019-06-05 11.0.1357.0 stable
 * Bug Fix: Error in shutdown of Keyman Engine can cause other applications to crash (#1820)
 
