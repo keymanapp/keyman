@@ -35,13 +35,21 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
   public final LanguageFilter<Keyboard, Keyboards> keyboardFilter = new LanguageFilter<Keyboard, Keyboards>() {
     Set<Keyboard> getSetFrom(LanguageDataset metadata) {
-      return metadata.keyboards;
+      if(metadata == null) {
+        return new HashSet<>();
+      } else {
+        return metadata.keyboards;
+      }
     }
   };
 
   public final LanguageFilter<LexicalModel, LexicalModels> lexicalModelFilter = new LanguageFilter<LexicalModel, LexicalModels>() {
     Set<LexicalModel> getSetFrom(LanguageDataset metadata) {
-      return metadata.lexicalModels;
+      if(metadata == null) {
+        return new HashSet<>();
+      } else {
+        return metadata.lexicalModels;
+      }
     }
   };
 

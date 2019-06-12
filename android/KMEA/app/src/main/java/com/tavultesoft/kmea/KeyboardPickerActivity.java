@@ -229,7 +229,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     super.onResume();
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     BaseAdapter adapter = (BaseAdapter) listAdapter;
-    adapter.notifyDataSetChanged();
+    if(listAdapter != null) {
+      adapter.notifyDataSetChanged();
+    }
+
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
     if (!shouldCheckKeyboardUpdates)
@@ -425,7 +428,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
       // TODO:  Possible optimization - do we have anything with this language code already?
       //        Only invalidate the lexical cache if not.
-      CloudRepository.shared.invalidateLexicalModelCache();
+      CloudRepository.shared.invalidateLexicalModelCache(context);
 
       if (pkgID != null && kbID != null && langID != null) {
         String kbKey = String.format("%s_%s", langID, kbID);
@@ -503,8 +506,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     if (result) {
       Toast.makeText(context, "Keyboard deleted", Toast.LENGTH_SHORT).show();
       BaseAdapter adapter = (BaseAdapter) listAdapter;
-      adapter.notifyDataSetChanged();
-      if (position == curKbPos) {
+      if(adapter != null) {
+        adapter.notifyDataSetChanged();
+      }
+      if (position == curKbPos && listView != null) {
         switchKeyboard(0);
       } else {
         curKbPos = getCurrentKeyboardIndex();

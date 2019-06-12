@@ -58,7 +58,7 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
         return;
       }
       listener.setNotifyOnChange(false); // Disable event notifications temporarily.
-      listener._internalClear();;
+      listener._internalClear();
       listener._internalAddAll(listener.filter.selectFrom(listener.wrappedAdapter, this.filterArg));
       listener.notifyDataSetChanged();  // Re-enables events and signals that we did change.
     }
