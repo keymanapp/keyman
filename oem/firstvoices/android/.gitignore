@@ -21,3 +21,9 @@
 # Files generated as part of the build
 app/src/main/assets/packages
 app/src/main/assets/keyboards.csv
+
+# Legacy Eclipse IDE files
+.classpath
+.project
+.cproject
+.settings/
