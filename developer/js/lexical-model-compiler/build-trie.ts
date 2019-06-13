@@ -342,11 +342,11 @@ namespace Trie {
     if (node.type === 'leaf') {
       return node.entries
         .map(entry => entry.weight)
-        .reduce((acc, count) => acc + count);
+        .reduce((acc, count) => acc + count, 0);
     } else {
       return Object.values(node.children)
         .map((child) => sumWeights(child))
-        .reduce((acc, count) => acc + count);
+        .reduce((acc, count) => acc + count, 0);
     }
   }
 
