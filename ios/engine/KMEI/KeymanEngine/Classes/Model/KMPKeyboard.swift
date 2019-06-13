@@ -67,6 +67,7 @@ public class KMPKeyboard
         if let languageName = languageJson["name"],
            let languageId = languageJson["id"] {
               self.languages.append(KMPLanguage(name: languageName, languageId: languageId))
+              break
         }
       }
     }
