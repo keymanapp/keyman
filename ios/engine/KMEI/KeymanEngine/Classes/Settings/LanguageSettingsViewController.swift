@@ -33,6 +33,15 @@ class LanguageSettingsViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
   }
 
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+//    navigationController?.setToolbarHidden(true, animated: true)
+    // if no rows to show yet, show a loading indicator
+    log.info("didAppear: LanguageSettingsViewController")
+  }
+  
+  
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -45,7 +54,7 @@ class LanguageSettingsViewController: UITableViewController {
         let kbct = language.keyboards!.count
         return kbct
       } else {
-        return 3
+        return 4
       }
     }
   
@@ -91,7 +100,7 @@ class LanguageSettingsViewController: UITableViewController {
             doCorrectionsSwitch.isOn = false
             //            showBannerSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
             cell.addSubview(doCorrectionsSwitch)
-          } else { // row 3
+          } else { // rows 3 and 4
             cell.accessoryType = .disclosureIndicator
         }
       }
@@ -125,18 +134,22 @@ class LanguageSettingsViewController: UITableViewController {
         case 2:
           cell.textLabel?.text = "Model"
           cell.accessoryType = .disclosureIndicator
-          if let currentModel = Manager.shared.currentLexicalModel {
-//            if language.id == currentModel.id {
-            if language.lexicalModels?.contains(where: {
-              $0.id == currentModel.id
-            }) ?? false {
-              cell.detailTextLabel?.text = currentModel.name
-            } else {
-              cell.detailTextLabel?.text = "<current model is not for this language>"
+          if let modelCt = language.lexicalModels?.count {
+            switch modelCt {
+            case 0:
+              cell.detailTextLabel?.text = "no models installed"
+            case 1:
+              cell.detailTextLabel?.text = "one model installed"
+            default:
+              cell.detailTextLabel?.text = "\(modelCt) models installed"
             }
           } else {
-            cell.detailTextLabel?.text = "<no current model>"
+            cell.detailTextLabel?.text = "no models installed"
           }
+        case 3:
+          cell.textLabel?.text = "Manage dictionary"
+          cell.accessoryType = .disclosureIndicator
+          cell.isUserInteractionEnabled = false
 
         default:
           cell.textLabel?.text = "error"
