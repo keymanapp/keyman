@@ -4,18 +4,18 @@
 
 package com.tavultesoft.kmea;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.MapCompat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -23,10 +23,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,11 +38,6 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
-  private static JSONArray languages = LanguageListActivity.languages();
-  private static JSONArray keyboards = null;
-  private static ArrayList<HashMap<String, String>> keyboardsArrayList = null;
-  private static int langIndex = 0;
-  private final String iconKey = "icon";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -60,79 +57,53 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     final TextView textView = (TextView) findViewById(R.id.bar_title);
     textView.setText(getString(R.string.title_add_keyboard));
 
-    try {
-      langIndex = getIntent().getIntExtra("selectedIndex", 0);
-      JSONObject language = languages.getJSONObject(langIndex);
-      final String langID = language.getString(KMManager.KMKey_ID);
-      final String langName = language.getString(KMManager.KMKey_Name);
-      textView.setText(langName);
+    String langID = getIntent().getStringExtra("languageCode");
+    String langName = getIntent().getStringExtra("languageName");
 
-      keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-      keyboardsArrayList = new ArrayList<HashMap<String, String>>();
+    Dataset repo = CloudRepository.shared.fetchDataset(this, null, null);
+    FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(this, repo, langID);
 
-      int length = keyboards.length();
-      for (int i = 0; i < length; i++) {
-        String kbID = keyboards.getJSONObject(i).getString(KMManager.KMKey_ID);
-        String kbName = keyboards.getJSONObject(i).getString(KMManager.KMKey_Name);
-        String isEnabled = "true";
-        String icon = "0";
-        String kbKey = String.format("%s_%s", langID, kbID);
-        if (KeyboardPickerActivity.containsKeyboard(context, kbKey)) {
-          isEnabled = "false";
-          icon = String.valueOf(R.drawable.ic_check);
+    textView.setText(langName);
+
+    listView.setAdapter(adapter);
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        FilteredKeyboardsAdapter adapter = (FilteredKeyboardsAdapter) listView.getAdapter();
+
+        HashMap<String, String> kbInfo = new HashMap<>(adapter.getItem(position).map);
+        final String pkgID = MapCompat.getOrDefault(new HashMap<>(kbInfo), KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+        final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
+        final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
+        String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
+        String langName = kbInfo.get(KMManager.KMKey_LanguageName);
+        String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
+        String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, kFont);
+        String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
+
+        if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+          // keyboard already exists in packages/ so just add the language association
+          KeyboardPickerActivity.addKeyboard(context, kbInfo);
+          KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+          Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
+          // Setting result to 1 so calling activity will finish too
+          setResult(1);
+          ((AppCompatActivity) context).finish();
+          return;
         }
 
-        HashMap<String, String> hashMap = new HashMap<String, String>();
-        hashMap.put(KMManager.KMKey_KeyboardName, kbName);
-        hashMap.put(iconKey, icon);
-        hashMap.put("isEnabled", isEnabled);
-        keyboardsArrayList.add(hashMap);
+        Bundle args = new Bundle();
+        args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+        args.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
+        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+        args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+        args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
+        Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+        i.putExtras(args);
+        startActivity(i);
       }
-
-      String[] from = new String[]{KMManager.KMKey_KeyboardName, iconKey};
-      int[] to = new int[]{R.id.text1, R.id.image1};
-      ListAdapter adapter = new KMListAdapter(context, keyboardsArrayList, R.layout.list_row_layout1, from, to);
-      listView.setAdapter(adapter);
-      listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-          HashMap<String, String> kbInfo = LanguageListActivity.getKeyboardInfo(langIndex, position);
-          final String pkgID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-          final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
-          final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
-          String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
-          String langName = kbInfo.get(KMManager.KMKey_LanguageName);
-          String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
-          String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, kFont);
-          String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
-
-          if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-            // keyboard already exists in packages/ so just add the language association
-            KeyboardPickerActivity.addKeyboard(context, kbInfo);
-            KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
-            Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
-            // Setting result to 1 so calling activity will finish too
-            setResult(1);
-            ((AppCompatActivity) context).finish();
-            return;
-          }
-
-          Bundle args = new Bundle();
-          args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-          args.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-          args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-          args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-          args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-          args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
-          Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
-          i.putExtras(args);
-          startActivity(i);
-
-        }
-      });
-    } catch (JSONException e) {
-      Log.e("JSON Error", (e.getMessage() == null) ? "JSONException" : e.getMessage());
-    }
+    });
   }
 
   @Override
@@ -190,5 +161,55 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     // Do nothing.
+  }
+
+  // Fully details the building of this Activity's list view items.
+  static private class FilteredKeyboardsAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, String> {
+    static final int RESOURCE = R.layout.list_row_layout1;
+    private final Context context;
+
+    public FilteredKeyboardsAdapter(@NonNull Context context, final Dataset repo, final String languageCode) {
+      // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
+      super(context, RESOURCE, repo.keyboards, repo.keyboardFilter, languageCode);
+
+      this.context = context;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      Keyboard kbd = this.getItem(position);
+
+      // If we're being told to reuse an existing view, do that.  It's automatic optimization.
+      if (convertView == null) {
+        convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+      }
+
+      View view = convertView;
+
+      ImageView img1 = view.findViewById(R.id.image1);
+      TextView text1 = view.findViewById(R.id.text1);
+      text1.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+
+      if (!this.isEnabled(position)) {
+        view.setAlpha(0.25f);
+        img1.setImageResource(R.drawable.ic_check);
+      } else {
+        view.setAlpha(1.0f);
+        img1.setImageResource(0);
+      }
+
+      return view;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+      Keyboard kbd = this.getItem(position);
+
+      final String langID = kbd.map.get(KMManager.KMKey_LanguageID); // Has the selected language code.
+      String kbID = kbd.map.get(KMManager.KMKey_KeyboardID);
+
+      String kbKey = String.format("%s_%s", langID, kbID);
+      return !KeyboardPickerActivity.containsKeyboard(context, kbKey);
+    }
   }
 }

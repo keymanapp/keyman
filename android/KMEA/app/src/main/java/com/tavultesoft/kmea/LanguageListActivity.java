@@ -572,6 +572,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
           HashMap<String, String> hashMap = new HashMap<String, String>();
           hashMap.put(KMManager.KMKey_LanguageName, langName);
+          hashMap.put(KMManager.KMKey_LanguageID, langID);
           hashMap.put(KMManager.KMKey_KeyboardName, kbName);
           hashMap.put(iconKey, icon);
           hashMap.put("isEnabled", isEnabled);
@@ -593,6 +594,9 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             if (kbName == "") {
               Intent i = new Intent(context, KeyboardListActivity.class);
               i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+              Map<String, String> map = languagesArrayList.get(selectedIndex);
+              i.putExtra("languageCode", map.get(KMManager.KMKey_LanguageID));
+              i.putExtra("languageName", map.get(KMManager.KMKey_LanguageName));
               i.putExtra("selectedIndex", selectedIndex);
               int listPosition = listView.getFirstVisiblePosition();
               i.putExtra("listPosition", listPosition);

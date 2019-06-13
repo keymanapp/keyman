@@ -95,10 +95,6 @@ public class CloudRepository {
     file.delete();
   }
 
-  public void fetchLexicalModels(@NonNull Context context, Dataset dataset, Runnable onSuccess, Runnable onFailure) {
-
-  }
-
   /**
    * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
    * services.  Unless recently cached, this object will be populated asynchronously.
