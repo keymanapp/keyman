@@ -27,8 +27,14 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = "LexicalModels"
-    setIsDoneButtonEnabled(false)
+    if let langName = language?.name {
+      title = "\(langName) Lexical Models"
+    } else {
+      title = "Lexical Models"
+    }
+    if language == nil {
+      setIsDoneButtonEnabled(false)
+    }
     isDidUpdateCheck = false
     updateQueue = nil
     if Manager.shared.canAddNewLexicalModels {
@@ -63,6 +69,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+    log.info("didAppear: LexicalModelPickerViewController")
     if isDidUpdateCheck || !checkUpdates() {
       return
     }
@@ -84,7 +91,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     
     navigationController?.setToolbarHidden(false, animated: true)
     scroll(toSelectedLexicalModel: false)
-  }
+}
   
   override func numberOfSections(in tableView: UITableView) -> Int {
     return 1
@@ -135,7 +142,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   func showLexicalModelInfoView(with index: Int) {
-    setIsDoneButtonEnabled(true)
+    if language == nil {
+      setIsDoneButtonEnabled(true)
+    }
     let lm = userLexicalModels[index]
     let version = lm.version
     
@@ -407,7 +416,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     button?.isEnabled = false
     let vc = LanguageViewController(Manager.shared.apiLexicalModelRepository) //may need to be different for models
     navigationController?.pushViewController(vc, animated: true)
-    setIsDoneButtonEnabled(true)
+    if language == nil {
+      setIsDoneButtonEnabled(true)
+    }
   }
 }
 
