@@ -345,8 +345,8 @@ namespace Trie {
         .reduce((acc, count) => acc + count, 0);
     } else {
       return Object.values(node.children)
-        .map((child: Node) => sumWeights(child))
-        .reduce((acc: number, count: number) => acc + count, 0);
+        .map((child) => sumWeights(child))
+        .reduce((acc, count) => acc + count, 0);
     }
   }
 
