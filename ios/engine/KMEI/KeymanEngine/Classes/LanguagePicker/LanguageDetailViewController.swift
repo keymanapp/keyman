@@ -45,6 +45,12 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       observer: self,
       function: LanguageDetailViewController.keyboardDownloadFailed)
   }
+  
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    log.info("didAppear: LanguageDetailViewController (actually willAppear)")
+  }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return language.keyboards!.count

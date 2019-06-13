@@ -16,7 +16,8 @@ open class SettingsViewController: UITableViewController {
     super.viewWillAppear(animated)
     
     loadUserLanguages()
-  }
+    log.info("didAppear: SettingsViewController (actually willAppear)")
+ }
   
   override open func viewDidLoad() {
     super.viewDidLoad()

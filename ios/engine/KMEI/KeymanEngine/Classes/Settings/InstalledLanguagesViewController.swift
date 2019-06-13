@@ -59,6 +59,13 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       forName: Notifications.keyboardDownloadFailed,
       observer: self,
       function: InstalledLanguagesViewController.keyboardDownloadFailed)
+    
+    if Manager.shared.canAddNewKeyboards {
+      let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
+                                      action: #selector(self.addClicked))
+      navigationItem.rightBarButtonItem = addButton
+    }
+
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -67,6 +74,8 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     // if no rows to show yet, show a loading indicator
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
+    } else {
+      log.info("didAppear: InstalledLanguagesViewController")
     }
   }
   
@@ -347,6 +356,17 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
   func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
     dismissActivityView()
     showConnectionErrorAlert()
+  }
+  
+  @objc func addClicked(_ sender: Any) {
+    showAddKeyboard()
+  }
+  
+  func showAddKeyboard() {
+    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
+    button?.isEnabled = false
+    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
+    navigationController?.pushViewController(vc, animated: true)
   }
 }
 

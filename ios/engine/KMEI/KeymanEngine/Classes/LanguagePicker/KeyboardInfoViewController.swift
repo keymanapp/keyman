@@ -43,7 +43,8 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     navigationController?.setToolbarHidden(true, animated: true)
-  }
+    log.info("didAppear: KeyboardInfoViewController")
+}
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return 1

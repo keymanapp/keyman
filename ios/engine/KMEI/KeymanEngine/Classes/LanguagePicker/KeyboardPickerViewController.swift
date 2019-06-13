@@ -85,6 +85,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
     navigationController?.setToolbarHidden(false, animated: true)
     scroll(toSelectedKeyboard: false)
+    log.info("didAppear: KeyboardPickerViewController")
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {

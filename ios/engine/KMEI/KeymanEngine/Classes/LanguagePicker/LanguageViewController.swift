@@ -54,6 +54,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     }
 
     loadUserKeyboards()
+    loadUserLexicalModels()
   }
 
   override func viewDidLoad() {
@@ -76,8 +77,10 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     // if no rows to show yet, show a loading indicator
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
+    } else {
+      log.info("didAppear: LanguageViewController")
     }
-  }
+ }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return languages.count
