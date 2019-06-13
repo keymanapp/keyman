@@ -44,7 +44,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   override func loadView() {
     super.loadView()
     languages = languageList(installedLanguages)
-    loadUserKeyboards()
   }
   
   override func viewDidLoad() {
@@ -65,7 +64,11 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
                                       action: #selector(self.addClicked))
       navigationItem.rightBarButtonItem = addButton
     }
-
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    loadUserKeyboards()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -74,9 +77,8 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     // if no rows to show yet, show a loading indicator
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
-    } else {
-      log.info("didAppear: InstalledLanguagesViewController")
     }
+    log.info("didAppear: InstalledLanguagesViewController")
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {
