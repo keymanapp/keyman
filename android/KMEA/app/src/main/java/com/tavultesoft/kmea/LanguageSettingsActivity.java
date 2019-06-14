@@ -7,9 +7,11 @@ package com.tavultesoft.kmea;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -20,11 +22,15 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import java.util.ArrayList;
@@ -39,14 +45,11 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private ImageButton addButton = null;
-  private static ArrayList<HashMap<String, String>> associatedKeyboardList = null;
-  private final String titleKey = "title";
-  private final String subtitleKey = "subtitle";
-  private final String iconKey = "icon";
   private String associatedLexicalModel = "";
-  private boolean dismissOnSelect = false;
   private String lgCode;
   private String lgName;
+
+  private final static String TAG = "LanguageSettingsAct";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -67,13 +70,17 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     listView.setFastScrollEnabled(true);
 
     Bundle bundle = getIntent().getExtras();
+    FilteredKeyboardsAdapter adapter = null;
     if (bundle != null) {
-      associatedKeyboardList = (ArrayList<HashMap<String, String>>) bundle.getSerializable("associatedKeyboards");
       associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
       lgCode = bundle.getString(KMManager.KMKey_LanguageID);
       lgName = bundle.getString(KMManager.KMKey_LanguageName);
+
+      adapter = new FilteredKeyboardsAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), lgCode);
     } else {
-      associatedKeyboardList = new ArrayList<HashMap<String, String>>();
+      // Should never actually happen.
+      Log.v(TAG, "Language data not specified for LanguageSettingsActivity!");
+      finish();
     }
 
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
@@ -99,12 +106,9 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         // Start ModelPickerActivity
-        // Use the language ID and name from the first associated keyboard (they should all be the same)
-        // Do not pass keyboard package ID because it will be different from model package ID
-        HashMap<String, String> kbInfo = associatedKeyboardList.get(0);
         Bundle bundle = new Bundle();
-        bundle.putString(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
-        bundle.putString(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
+        bundle.putString(KMManager.KMKey_LanguageID, lgCode);
+        bundle.putString(KMManager.KMKey_LanguageName, lgName);
         Intent i = new Intent(context, ModelPickerActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);
@@ -122,17 +126,18 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
      * imageView.setImageResource(R.drawable.ic_arrow_forward);
      */
 
-    String[] from = new String[]{KMManager.KMKey_KeyboardName, KMManager.KMKey_Icon};
-    int[] to = new int[]{R.id.text1, R.id.image1};
-    ListAdapter listAdapter = new KMListAdapter(context, associatedKeyboardList, R.layout.list_row_layout1, from, to);
+//    String[] from = new String[]{KMManager.KMKey_KeyboardName, KMManager.KMKey_Icon};
+//    int[] to = new int[]{R.id.text1, R.id.image1};
+//    ListAdapter listAdapter = new KMListAdapter(context, associatedKeyboardList, R.layout.list_row_layout1, from, to);
 
-    listView.setAdapter(listAdapter);
+    listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         listView.setItemChecked(position, true);
         listView.setSelection(position);
-        HashMap<String, String> kbInfo = associatedKeyboardList.get(position);
+        Keyboard kbd = ((FilteredKeyboardsAdapter) listView.getAdapter()).getItem(position);
+        HashMap<String, String> kbInfo = new HashMap<>(kbd.map);
         String packageID = kbInfo.get(KMManager.KMKey_PackageID);
         String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
         if (packageID == null || packageID.isEmpty()) {
@@ -164,7 +169,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         // 3. local kmp.json files in packages/
         if (KMManager.hasConnection(context) || CloudRepository.shared.hasCache(context) ||
           KeyboardPickerActivity.hasKeyboardFromPackage()){
-          dismissOnSelect = false;
           // Rework to use languuage-specific (KeyboardList) picker!
           Intent i = new Intent(context, KeyboardListActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -204,4 +208,35 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     finish();
   }
 
+  // Fully details the building of this Activity's list view items.
+  static private class FilteredKeyboardsAdapter extends NestedAdapter<com.tavultesoft.kmea.data.Keyboard, Dataset.Keyboards, String> {
+    static final int RESOURCE = R.layout.list_row_layout1;
+    private final Context context;
+
+    public FilteredKeyboardsAdapter(@NonNull Context context, final Dataset storage, final String languageCode) {
+      // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
+      super(context, RESOURCE, storage.keyboards, storage.keyboardFilter, languageCode);
+
+      this.context = context;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      com.tavultesoft.kmea.data.Keyboard kbd = this.getItem(position);
+
+      // If we're being told to reuse an existing view, do that.  It's automatic optimization.
+      if (convertView == null) {
+        convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+      }
+
+      View view = convertView;
+
+      ImageView img1 = view.findViewById(R.id.image1);
+      TextView text1 = view.findViewById(R.id.text1);
+      text1.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+      img1.setImageResource(R.drawable.ic_arrow_forward);
+
+      return view;
+    }
+  }
 }
