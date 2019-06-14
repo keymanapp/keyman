@@ -67,7 +67,6 @@ public class KMPKeyboard
         if let languageName = languageJson["name"],
            let languageId = languageJson["id"] {
               self.languages.append(KMPLanguage(name: languageName, languageId: languageId))
-              break
         }
       }
     }
@@ -112,7 +111,6 @@ public class KMPKeyboard
       throw KMPError.fileSystem
     }
     
-    var haveInstalledOne = false
     for keyboard in installableKeyboards {
       var installableFiles: [[Any]] = []
       
@@ -143,10 +141,7 @@ public class KMPKeyboard
           throw KMPError.copyFiles
         }
       }
-      if !haveInstalledOne {
-        Manager.shared.addKeyboard(keyboard)
-        haveInstalledOne = true
-      }
+      Manager.shared.addKeyboard(keyboard)
     }
   }
 }
