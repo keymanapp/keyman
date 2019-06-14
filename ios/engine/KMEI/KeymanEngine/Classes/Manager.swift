@@ -269,12 +269,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                     object: self,
                                     value: kb)
     
+    let userDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
-    if let valid_models = Storage.active.userDefaults.userLexicalModels(forLanguage: kb.languageID) {
-      if valid_models.count > 0 {
-        //let lm = Storage.active.userDefaults.userLexicalModel(withFullID: valid_models[0].fullID)!
-        _ = Manager.shared.registerLexicalModel(valid_models[0])
-      }
+    //let lm = Storage.active.userDefaults.userLexicalModel(withFullID: valid_models[0].fullID)!
+    if let preferred_model = userDefaults.preferredLexicalModel(forLanguage: kb.languageID) {
+      _ = Manager.shared.registerLexicalModel(preferred_model)
     }
     
     return true

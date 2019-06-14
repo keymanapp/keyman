@@ -133,12 +133,42 @@ public extension UserDefaults {
     }
   }
   
-  public func userLexicalModels(forLanguage lgCode: String) -> [InstallableLexicalModel]? {
-    if let models = userLexicalModels {
-      return models.compactMap { ($0.languageID == lgCode) ? $0 : nil }
+  // stores a dictionary of lexical model ids keyed to language ids, i.e., [langID: modelID]
+  var languageModelSelections: [String: String]? {
+    get {
+      return dictionary(forKey: Key.userPreferredLexicalModels) as? [String : String]
+    }
+    
+    set(lexicalModelPrefs) {
+      set(lexicalModelPrefs, forKey: Key.userPreferredLexicalModels)
+    }
+  }
+  
+  // returns lexical model id, given language id
+  func preferredLexicalModelID(forLanguage lgCode: String) -> String? {
+    if let modelPrefs = languageModelSelections {
+      return modelPrefs[lgCode]
     } else {
       return nil
     }
+  }
+  
+  func set(preferredLexicalModelID: String?, forKey key: String) {
+    var modelPrefs: [String: String]?
+    modelPrefs = languageModelSelections
+    if modelPrefs == nil {
+      modelPrefs = [String: String]()
+    }
+    modelPrefs?[key] = preferredLexicalModelID
+    languageModelSelections = modelPrefs
+  }
+  
+  // returns lexical model id, given language id
+  func preferredLexicalModel(forLanguage lgCode: String) -> InstallableLexicalModel? {
+    if let preferredID = preferredLexicalModelID(forLanguage: lgCode) {
+      return userLexicalModels?.first { $0.id == preferredID }
+    }
+    return nil
   }
 
   public var currentKeyboardID: FullKeyboardID? {
