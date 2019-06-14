@@ -50,6 +50,15 @@ public class CloudRepository {
     lastLoad = null;
   }
 
+  public boolean hasCache(Context context) {
+    if(shouldUseMemCache(context)) {
+      return true;
+    } else {
+      return shouldUseCache(context, getKeyboardCacheFile(context)) &&
+          shouldUseCache(context, getLexicalModelCacheFile(context));
+    }
+  }
+
   private boolean shouldUseMemCache(Context context) {
     boolean hasConnection = KMManager.hasConnection(context);
 

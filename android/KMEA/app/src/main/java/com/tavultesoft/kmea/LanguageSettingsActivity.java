@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import java.util.ArrayList;
@@ -44,6 +45,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private final String iconKey = "icon";
   private String associatedLexicalModel = "";
   private boolean dismissOnSelect = false;
+  private String lgCode;
+  private String lgName;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     if (bundle != null) {
       associatedKeyboardList = (ArrayList<HashMap<String, String>>) bundle.getSerializable("associatedKeyboards");
       associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
+      lgCode = bundle.getString(KMManager.KMKey_LanguageID);
+      lgName = bundle.getString(KMManager.KMKey_LanguageName);
     } else {
       associatedKeyboardList = new ArrayList<HashMap<String, String>>();
     }
@@ -157,11 +162,14 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         // 1. connection to cloud catalog
         // 2. cached file
         // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
+        if (KMManager.hasConnection(context) || CloudRepository.shared.hasCache(context) ||
           KeyboardPickerActivity.hasKeyboardFromPackage()){
           dismissOnSelect = false;
-          Intent i = new Intent(context, LanguageListActivity.class);
+          // Rework to use languuage-specific (KeyboardList) picker!
+          Intent i = new Intent(context, KeyboardListActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+          i.putExtra("languageCode", lgCode);
+          i.putExtra("languageName", lgName);
           context.startActivity(i);
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
