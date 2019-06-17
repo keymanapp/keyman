@@ -245,7 +245,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         ret = downloadNonKMPKeyboard(remoteUrl, remoteLexicalModelUrl);
       } catch (Exception e) {
         ret = -1;
-        Log.e(TAG, "Error: " + e);
+        Log.e(TAG, "Error: " + e, e);
       }
 
       return ret;

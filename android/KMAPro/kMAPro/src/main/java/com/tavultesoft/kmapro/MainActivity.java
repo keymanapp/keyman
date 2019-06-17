@@ -845,7 +845,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     for(int i=0; i<lexicalModelsInstalled.size(); i++) {
       HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-      KMManager.addLexicalModel(this, lexicalModelInfo);
+      try {
+        KMManager.addLexicalModel(this, lexicalModelInfo);
+      } catch (RuntimeException e) {
+        // We error-catch this in case it's called from an AsyncTask;
+        // this may happen when installing a new keyboard given that we attempt
+        // to auto-download an appropriate lexical model to match it.
+      }
     }
 
     // It would be nice to register associated lexical model

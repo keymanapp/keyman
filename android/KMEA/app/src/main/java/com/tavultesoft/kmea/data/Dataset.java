@@ -99,7 +99,17 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
       super.add(object);
 
-      getMetadataFor(object); // We can ignore the return; this makes sure the needed object is constructed.
+      LanguageDataset data = getMetadataFor(object); // We can ignore the return; this makes sure the needed object is constructed.
+
+      if(object instanceof Keyboard) {
+        if(!data.keyboards.contains(object)) {
+          data.keyboards.add((Keyboard) object);
+        }
+      } else if(object instanceof LexicalModel) {
+        if(!data.lexicalModels.contains(object)) {
+          data.lexicalModels.add((LexicalModel) object);
+        }
+      }
 
       if(notify) {
         Dataset.this.notifyDataSetChanged();
@@ -154,6 +164,14 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
       super.remove(object);
 
+      LanguageDataset data = getMetadataFor(object);
+
+      if(object instanceof Keyboard) {
+        data.keyboards.remove(object);
+      } else if(object instanceof LexicalModel) {
+        data.lexicalModels.remove(object);
+      }
+
       handleLanguageItemRemoval(object);
 
       if(notify) {
@@ -168,12 +186,21 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
         Dataset.this.setNotifyOnChange(false);
       }
 
-      List<Type> clearedItems = this.asList();
+      // this.asList returns an unmodifiable reference to the internal list -
+      // but that list itself may be modified by this adapter's functions!
+      List<Type> clearedItems = new ArrayList<>(this.asList());
 
       super.clear();
 
-      for(Type kbd: clearedItems) {
-        handleLanguageItemRemoval(kbd);
+      for(Type object: clearedItems) {
+        LanguageDataset data = getMetadataFor(object);
+        if(object instanceof Keyboard) {
+          data.keyboards.remove(object);
+        } else if(object instanceof LexicalModel) {
+          data.lexicalModels.remove(object);
+        }
+
+        handleLanguageItemRemoval(object);
       }
 
       if(notify) {
@@ -195,11 +222,11 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
     @Override
     public void notifyDataSetChanged() {
-      doNotify = true;
-      super.notifyDataSetChanged();
+      Dataset.this.notifyDataSetChanged();
     }
 
     void _notifyDataSetChanged() {
+      doNotify = true;
       super.notifyDataSetChanged();
     }
 
@@ -292,8 +319,8 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
   @Override
   public void notifyDataSetChanged() {
     super.notifyDataSetChanged();
-    keyboards.notifyDataSetChanged();
-    lexicalModels.notifyDataSetChanged();
+    keyboards._notifyDataSetChanged();
+    lexicalModels._notifyDataSetChanged();
   }
 
   void _notifyDataSetChanged() {

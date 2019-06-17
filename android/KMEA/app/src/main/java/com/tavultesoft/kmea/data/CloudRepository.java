@@ -160,6 +160,16 @@ public class CloudRepository {
     JSONObject kbdData = new JSONObject();
     JSONArray lexData = new JSONArray();
 
+    if(loadKeyboardsFromCache) {
+      kbdData = getCachedJSONObject(getKeyboardCacheFile(context));
+
+      // In case something went wrong with the last cache attempt, which can cause a null return.
+      if(kbdData == null) {
+        kbdData = new JSONObject();
+        loadKeyboardsFromCache = false;
+      }
+    }
+
     if(!loadKeyboardsFromCache) {
       String deviceType = context.getString(R.string.device_type);
       if (deviceType.equals("AndroidTablet")) {
@@ -174,8 +184,15 @@ public class CloudRepository {
 
       //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object);
       cloudQueries.add(new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object));
-    } else {
-      kbdData = getCachedJSONObject(getKeyboardCacheFile(context));
+    }
+
+    if(loadLexicalModelsFromCache) {
+      lexData = getCachedJSONArray(getLexicalModelCacheFile(context));
+
+      if(lexData == null) {
+        lexData = new JSONArray();
+        loadLexicalModelsFromCache = false;
+      }
     }
 
     if(!loadLexicalModelsFromCache) {
@@ -184,7 +201,6 @@ public class CloudRepository {
       //        query is ready!
       String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
-      //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.LexicalModels, lexicalURL, JSONType.Array);
       cloudQueries.add(new CloudApiParam(ApiTarget.LexicalModels, lexicalURL, JSONType.Array));
 
 
@@ -198,8 +214,6 @@ public class CloudRepository {
 //      lexicalURL = lexicalURL.substring(0, lexicalURL.lastIndexOf(','));
 
       /* do what's possible here, rather than in the Task */
-    } else {
-      lexData = getCachedJSONArray(getLexicalModelCacheFile(context));
     }
 
     boolean executeCallbacks = true;
@@ -214,7 +228,7 @@ public class CloudRepository {
     }
 
     // Reuse any valid parts of the cache.
-    if(kbdData != null || lexData != null) {
+    if(loadKeyboardsFromCache || loadLexicalModelsFromCache) {
       CloudDownloadReturns jsonData = new CloudDownloadReturns(kbdData, lexData);
 
       // Call the processor method directly with the cached API data.
@@ -651,6 +665,7 @@ public class CloudRepository {
     }
 
     public void processCloudReturns(CloudDownloadReturns jsonTuple, boolean executeCallbacks) {
+      // TODO:  Need proper offline check again.
       List<Keyboard> keyboardsArrayList = processKeyboardJSON(jsonTuple.keyboardJSON, false);
       List<LexicalModel> lexicalModelsArrayList = processLexicalModelJSON(jsonTuple.lexicalModelJSON);
 

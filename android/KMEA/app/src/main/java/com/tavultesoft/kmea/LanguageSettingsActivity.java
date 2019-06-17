@@ -6,7 +6,6 @@ package com.tavultesoft.kmea;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,8 +15,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,7 +30,6 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.MapCompat;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -126,10 +122,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
      * imageView.setImageResource(R.drawable.ic_arrow_forward);
      */
 
-//    String[] from = new String[]{KMManager.KMKey_KeyboardName, KMManager.KMKey_Icon};
-//    int[] to = new int[]{R.id.text1, R.id.image1};
-//    ListAdapter listAdapter = new KMListAdapter(context, associatedKeyboardList, R.layout.list_row_layout1, from, to);
-
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
@@ -190,6 +182,14 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   @Override
   public void onResume() {
     super.onResume();
+
+    FilteredKeyboardsAdapter adapter = ((FilteredKeyboardsAdapter) listView.getAdapter());
+
+    if(adapter != null) {
+      // Despite the fact that updates should have been auto-triggered anyway, it seems that we
+      // need a manual call here for things to happen in a timely fashion.
+      adapter.notifyDataSetChanged();
+    }
   }
 
   @Override
@@ -211,13 +211,10 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   // Fully details the building of this Activity's list view items.
   static private class FilteredKeyboardsAdapter extends NestedAdapter<com.tavultesoft.kmea.data.Keyboard, Dataset.Keyboards, String> {
     static final int RESOURCE = R.layout.list_row_layout1;
-    private final Context context;
 
     public FilteredKeyboardsAdapter(@NonNull Context context, final Dataset storage, final String languageCode) {
       // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
       super(context, RESOURCE, storage.keyboards, storage.keyboardFilter, languageCode);
-
-      this.context = context;
     }
 
     @Override

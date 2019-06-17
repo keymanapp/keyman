@@ -66,6 +66,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   // Lists of installed keyboards and installed lexical models
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
+  private static Dataset storageDataset = null;
 
   private static boolean checkingUpdates = false;
   private static int updateCount = 0;
@@ -372,6 +373,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     boolean result;
     keyboardsList = list;
     result = saveList(context, KMManager.KMFilename_KeyboardsList);
+    notifyKeyboardsUpdate(context);
     return result;
   }
 
@@ -385,6 +387,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     boolean result;
     lexicalModelsList = list;
     result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+    notifyLexicalModelsUpdate(context);
     return result;
   }
 
@@ -448,6 +451,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     }
 
+    notifyKeyboardsUpdate(context);
+
     return result;
   }
 
@@ -481,6 +486,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     }
 
+    notifyLexicalModelsUpdate(context);
+
     return result;
   }
 
@@ -495,13 +502,14 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       result = saveList(context, KMManager.KMFilename_KeyboardsList);
     }
 
+    notifyKeyboardsUpdate(context);
+
     return result;
   }
 
   protected static void deleteKeyboard(Context context, int position) {
     int curKbPos = getCurrentKeyboardIndex();
     boolean result = removeKeyboard(context, position);
-    ;
 
     if (result) {
       Toast.makeText(context, "Keyboard deleted", Toast.LENGTH_SHORT).show();
@@ -511,11 +519,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
       if (position == curKbPos && listView != null) {
         switchKeyboard(0);
-      } else {
+      } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = getCurrentKeyboardIndex();
         setSelection(curKbPos);
       }
     }
+
+    notifyKeyboardsUpdate(context);
   }
 
   /**
@@ -556,6 +566,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       result = saveList(context, KMManager.KMFilename_LexicalModelsList);
     }
 
+    notifyLexicalModelsUpdate(context);
+
     return result;
   }
 
@@ -574,6 +586,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show();
       KMManager.deregisterLexicalModel(modelID);
     }
+
+    notifyLexicalModelsUpdate(context);
   }
 
   @SuppressWarnings("unchecked")
@@ -596,6 +610,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   }
 
   public static Dataset getInstalledDataset(Context context) {
+    if(storageDataset != null) {
+      return storageDataset;
+    }
+
     List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
     List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
 
@@ -604,17 +622,51 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     List<? extends Map<String, String>> lexMapList = getLexicalModelsList(context);
+    if(lexMapList == null) {
+      lexMapList = new ArrayList<>(0);
+    }
     List<LexicalModel> lexList = new ArrayList<>(lexMapList.size());
 
     for(Map<String, String> map: lexMapList) {
       lexList.add(new LexicalModel(map));
     }
 
-    Dataset data = new Dataset(context);
-    data.keyboards.addAll(kbdsList);
-    data.lexicalModels.addAll(lexList);
+    storageDataset = new Dataset(context);
+    storageDataset.keyboards.addAll(kbdsList);
+    storageDataset.lexicalModels.addAll(lexList);
 
-    return data;
+    return storageDataset;
+  }
+
+  // While the two following methods aren't exactly ideal, they should be enough to get the job done
+  // for 12.0 before a more complete refactor of this class is done.
+  protected static void notifyKeyboardsUpdate(Context context) {
+    Dataset storage = getInstalledDataset(context);
+    storage.keyboards.setNotifyOnChange(false);
+    storage.keyboards.clear();
+
+    List<? extends Map<String, String>> mapList = getKeyboardsList(context);
+    List<Keyboard> kbdList = new ArrayList<>(mapList.size());
+    for(Map<String, String> map: mapList) {
+      kbdList.add(new Keyboard(map));
+    }
+    storage.keyboards.addAll(kbdList);
+    storage.keyboards.notifyDataSetChanged();
+  }
+
+  protected static void notifyLexicalModelsUpdate(Context context) {
+    Dataset storage = getInstalledDataset(context);
+    storage.lexicalModels.setNotifyOnChange(false);
+    storage.lexicalModels.clear();
+
+    List<? extends Map<String, String>> mapList = getLexicalModelsList(context);
+    List<LexicalModel> lexList = new ArrayList<>(mapList.size());
+    for(Map<String, String> map: mapList) {
+      lexList.add(new LexicalModel(map));
+    }
+    storage.lexicalModels.addAll(lexList);
+
+    storage.lexicalModels.notifyDataSetChanged();
   }
 
   protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
@@ -826,6 +878,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
   }
 
+  // TODO:  Handle within the new CloudRepository class!
   private static void checkKeyboardUpdates(final Context context) {
     new AsyncTask<Void, Integer, Integer>() {
       private final boolean hasConnection = KMManager.hasConnection(context);

@@ -81,7 +81,9 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     this(context, resource, adapter, new AdapterFilter<Element, A, FilterArg>() {
         @Override
         public List<Element> selectFrom(A adapter, FilterArg dummy) {
-            return adapter.asList();
+          // Make sure to duplicate the list so that we don't accidentally try to modify our
+          // wrapped adapter's (unmodifiable) contents.
+          return new ArrayList<>(adapter.asList());
         }
     }, null);
   }
