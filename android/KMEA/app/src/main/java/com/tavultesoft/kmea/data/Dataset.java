@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
+public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements ListBacked<Dataset.LanguageDataset> {
   public abstract class LanguageFilter<Type extends LanguageCoded, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter, String> {
     abstract Set<Type> getSetFrom(LanguageDataset metadata);
 
@@ -245,7 +246,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     }
   }
 
-  class LanguageDataset {
+  public class LanguageDataset implements Comparable<LanguageDataset> {
     public final String name;
     public final String code;
     public Set<Keyboard> keyboards = new HashSet<>();
@@ -254,6 +255,10 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     public LanguageDataset(String name, String code) {
       this.name = name;
       this.code = code;
+    }
+
+    public int compareTo(LanguageDataset other) {
+      return name.compareTo(other.name);
     }
   }
 
@@ -321,6 +326,14 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     super.notifyDataSetChanged();
     keyboards._notifyDataSetChanged();
     lexicalModels._notifyDataSetChanged();
+  }
+
+  public List<LanguageDataset> asList() {
+    // Convert the value set of our language-code map into the requested list.
+    List<LanguageDataset> list = new ArrayList<>(languageMetadata.values());
+    Collections.sort(list);
+
+    return list;
   }
 
   void _notifyDataSetChanged() {
