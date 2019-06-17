@@ -192,6 +192,8 @@ WEB_OUTPUT="../release/web"
 EMBED_OUTPUT="../release/embedded"
 WEB_OUTPUT_NO_MINI="../release/unminified/web"
 EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
+PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
+PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
 INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
@@ -417,6 +419,9 @@ if [ $BUILD_UI = true ]; then
 
         echo "User interface modules compiled and saved under $WEB_OUTPUT"
     fi
+
+    echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
