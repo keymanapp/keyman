@@ -22,6 +22,11 @@ class LanguageSettingsViewController: UITableViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
+  open override func loadView() {
+    super.loadView()
+    tableView?.delegate = self
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     title = "\(language.name) Settings"
@@ -42,7 +47,7 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   
-    // MARK: - Table view data source
+    // MARK: - Table view data source UITableViewDataSource
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 2
@@ -110,6 +115,38 @@ class LanguageSettingsViewController: UITableViewController {
       cell.textLabel?.font = cell.textLabel?.font?.withSize(16.0)
       return cell
     }
+  
+  // MARK: - UITableViewDelegate
+
+  // fixed font style. use custom view (UILabel) if you want something different
+  override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    var title: String
+    switch (section) {
+    case 0:
+      title = "keyboards"
+    case 1:
+      title = "language settings"
+    default:
+      title = "unknown header"
+    }
+    return title
+  }
+
+  override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat
+  {
+    if (section == 0 || section == 1)
+    {
+      return 32.0;
+    }
+    else
+    {
+      return CGFloat.leastNormalMagnitude;
+    }
+  }
+  
+  override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    return CGFloat.leastNonzeroMagnitude
+  }
 
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     
