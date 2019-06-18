@@ -120,6 +120,7 @@ namespace com.keyman.osk {
     let _Box = oskManager._Box;
     let util = keyman.util;
     let device = util.device;
+    let oskPad = 0;
 
     if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
       return false;
@@ -134,23 +135,21 @@ namespace com.keyman.osk {
     let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
 
-    let kbdHeight = oskManager.getKeyboardHeight()
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight /= window.devicePixelRatio;
-      kbdHeight /= window.devicePixelRatio;
       oskHeight /= window.devicePixelRatio;
     }
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(bannerHeight + oskHeight+oskPad)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     // Sets the layer group to the correct height.
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(oskHeight+oskPad)+'px';
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       b.childNodes.forEach(function(layer: HTMLElement) {
-        layer.style.height = layer.style.maxHeight = (oskHeight + 3) + 'px';
+        layer.style.height = layer.style.maxHeight = (oskHeight + oskPad) + 'px';
       });
     }
 
@@ -163,7 +162,7 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
+      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+oskPad)+'px';
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
@@ -171,7 +170,7 @@ namespace com.keyman.osk {
         rs.bottom=bottom+'px';
         rs.maxHeight=rs.height=rowHeight+'px';
         // Calculate the exact vertical coordinate of the row's center.
-        this.layout.layer[nLayer].row[nRow].proportionalY = ((kbdHeight + 3 - bottom) - rowHeight/2) / (kbdHeight + 3);
+        this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight + oskPad - bottom) - rowHeight/2) / (oskHeight + oskPad);
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {
