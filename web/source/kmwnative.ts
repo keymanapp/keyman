@@ -445,6 +445,13 @@ namespace com.keyman.osk {
               break;
             }
           }
+
+          // Set the kmw-key-square position
+          ks=key.style;
+          ks.bottom=(bottom-pad/2)+'px';
+          ks.height=ks.minHeight=(rowHeight)+'px';
+
+          // Set the kmw-key position
           ks=key.childNodes[j].style;
           ks.bottom=rs.bottom;
           ks.height=ks.minHeight=(rowHeight-pad)+'px';
