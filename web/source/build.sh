@@ -421,7 +421,7 @@ if [ $BUILD_UI = true ]; then
     fi
 
     echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "failed to copy predictive text model"
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
