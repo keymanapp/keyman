@@ -120,7 +120,9 @@ namespace com.keyman.osk {
     let _Box = oskManager._Box;
     let util = keyman.util;
     let device = util.device;
-    let oskPad = 0;
+
+    //TODO: Refactor together with kmwnative.ts:adjustHeights function
+    //TODO: Why do we factor in the banner here but not in kmwnative.ts:adjustHeights?
 
     if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
       return false;
@@ -131,6 +133,7 @@ namespace com.keyman.osk {
         rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
         borderPad=oskManager.getKeyboardHeight() - rowHeight * (nRows == 0 ? 1 : nRows),
         nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+    const oskPad = 0, oskPadOutside = 0;
 
     let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
@@ -141,7 +144,7 @@ namespace com.keyman.osk {
     }
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(bannerHeight + oskHeight+oskPad)+'px';
+    bs.height=bs.maxHeight=(bannerHeight + oskHeight+oskPadOutside)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     // Sets the layer group to the correct height.

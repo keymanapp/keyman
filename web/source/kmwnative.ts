@@ -389,9 +389,8 @@ namespace com.keyman.osk {
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
-        nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0,
-        oskPadOutside=0, // corresponds to kmwosk.css .kmw-banner-bar top offset
-        oskPad=0;
+        nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
+    const oskPad = 0, oskPadOutside = 0;
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
