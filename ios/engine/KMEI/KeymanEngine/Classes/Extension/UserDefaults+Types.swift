@@ -162,14 +162,6 @@ public extension UserDefaults {
     modelPrefs?[key] = preferredLexicalModelID
     languageModelSelections = modelPrefs
   }
-  
-  // returns lexical model id, given language id
-  func preferredLexicalModel(forLanguage lgCode: String) -> InstallableLexicalModel? {
-    if let preferredID = preferredLexicalModelID(forLanguage: lgCode) {
-      return userLexicalModels?.first { $0.id == preferredID }
-    }
-    return nil
-  }
 
   public var currentKeyboardID: FullKeyboardID? {
     get {

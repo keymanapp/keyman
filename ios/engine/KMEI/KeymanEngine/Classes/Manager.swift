@@ -231,6 +231,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return false
   }
   
+  // returns lexical model id, given language id
+  func preferredLexicalModel(_ ud: UserDefaults, forLanguage lgCode: String) -> InstallableLexicalModel? {
+    if let preferredID = ud.preferredLexicalModelID(forLanguage: lgCode) {
+      return ud.userLexicalModels?.first { $0.id == preferredID }
+    }
+    return nil
+  }
+  
 
   /// Set the current keyboard.
   ///
@@ -269,10 +277,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                     object: self,
                                     value: kb)
     
-    let userDefaults = Storage.active.userDefaults
+    let userDefaults: UserDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
     //let lm = Storage.active.userDefaults.userLexicalModel(withFullID: valid_models[0].fullID)!
-    if let preferred_model = userDefaults.preferredLexicalModel(forLanguage: kb.languageID) {
+    if let preferred_model = preferredLexicalModel(userDefaults, forLanguage: kb.languageID) {
       _ = Manager.shared.registerLexicalModel(preferred_model)
     }
     
