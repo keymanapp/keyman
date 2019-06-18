@@ -48,7 +48,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    title = "Languages Settings"
+    title = "Installed Languages"
     selectedSection = NSNotFound
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadStarted,
