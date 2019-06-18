@@ -54,7 +54,7 @@ class LanguageSettingsViewController: UITableViewController {
         let kbct = language.keyboards!.count
         return kbct
       } else {
-        return 4
+        return 3  // 4 in future when we can manage a user dictionary
       }
     }
   
@@ -146,7 +146,7 @@ class LanguageSettingsViewController: UITableViewController {
           } else {
             cell.detailTextLabel?.text = "no models installed"
           }
-        case 3:
+        case 3: // future
           cell.textLabel?.text = "Manage dictionary"
           cell.accessoryType = .disclosureIndicator
           cell.isUserInteractionEnabled = false
