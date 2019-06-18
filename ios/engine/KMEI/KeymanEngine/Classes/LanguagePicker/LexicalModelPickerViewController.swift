@@ -93,6 +93,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     scroll(toSelectedLexicalModel: false)
 }
   
+  // MARK: - Table view data source UITableViewDataSource
+  
   override func numberOfSections(in tableView: UITableView) -> Int {
     return 1
   }
@@ -159,14 +161,16 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     navigationController?.pushViewController(infoView, animated: true)
   }
   
+  // MARK: - UITableViewDelegate
+
   override func tableView(_ tableView: UITableView,
                           willDisplay cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
     let lm = userLexicalModels[indexPath.row]
     
-    cell.textLabel?.text = lm.languageID // maybe do a lookup for lm.languageName
-    cell.detailTextLabel?.text = lm.name
+    cell.textLabel?.text = lm.name
+    cell.detailTextLabel?.text = lm.id // maybe put a longer description here?
     cell.tag = indexPath.row
     
     if Manager.shared.currentLexicalModelID == lm.fullID {
