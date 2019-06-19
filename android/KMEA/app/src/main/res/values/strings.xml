@@ -10,9 +10,10 @@
     <!-- Title for lists-->
     <string name="title_keyboards" translatable="false">Keyboards</string>
     <string name="title_keyboard" translatable="false">Keyboard</string>
+    <string name="title_add_language" translatable="false">Add New Language</string>
     <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
     <string name="title_languages_settings" translatable="false">Installed Languages</string>
-    <string name="title_language_settings" translatable="false">Language Settings</string>
+    <string name="title_language_settings" translatable="false">%s Settings</string>
 
     <!-- Button labels -->
     <string name="label_add" translatable="false">Add</string>

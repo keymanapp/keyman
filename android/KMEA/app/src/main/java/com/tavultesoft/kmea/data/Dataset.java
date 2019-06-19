@@ -30,7 +30,15 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
       // performance of our linked adapters.
       LanguageDataset metadata = Dataset.this.languageMetadata.get(lgCode);
 
-      return new ArrayList<>(getSetFrom(metadata));
+      List<Type> retList = new ArrayList<>(getSetFrom(metadata));
+
+      Collections.sort(retList, new Comparator<Type>() {
+        public int compare(Type obj1, Type obj2) {
+          return obj1.getName().compareTo(obj2.getName());
+        }
+      });
+
+      return retList;
     }
   }
 

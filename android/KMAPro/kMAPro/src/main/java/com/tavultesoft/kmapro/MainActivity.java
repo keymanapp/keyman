@@ -845,19 +845,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     for(int i=0; i<lexicalModelsInstalled.size(); i++) {
       HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-      try {
-        KMManager.addLexicalModel(this, lexicalModelInfo);
-      } catch (RuntimeException e) {
-        // We error-catch this in case it's called from an AsyncTask;
-        // this may happen when installing a new keyboard given that we attempt
-        // to auto-download an appropriate lexical model to match it.
-        Log.e(TAG, "Download error: " + e, e);
-      }
+      KMManager.addLexicalModel(this, lexicalModelInfo);
     }
 
-    // It would be nice to register associated lexical model
-    // But the Keyboard Downloader async task in the background can't modify the WebView
-    // (banner heights get adjusted during model registration)
+    // TODO:  It would be nice to register associated lexical models; this is no longer called
+    //        from the async task, so it may be possible to modify the WebView.
+    //        (banner heights get adjusted during model registration)
   }
 
   private void copyFile(FileInputStream inStream, File dstFile) throws IOException {

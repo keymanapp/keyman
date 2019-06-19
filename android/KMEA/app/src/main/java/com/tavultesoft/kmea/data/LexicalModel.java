@@ -37,6 +37,10 @@ public class LexicalModel implements Serializable, LanguageCoded{
     return this.map.get(KMManager.KMKey_LanguageName);
   }
 
+  public String getName() {
+    return this.map.get(KMManager.KMKey_LexicalModelName);
+  }
+
   public boolean equals(Object obj) {
     if(obj instanceof LexicalModel) {
       boolean lgCodeMatch = ((LexicalModel) obj).getLanguageCode().equals(this.getLanguageCode());

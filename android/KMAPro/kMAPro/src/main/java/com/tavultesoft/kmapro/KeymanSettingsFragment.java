@@ -3,7 +3,6 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -58,10 +57,14 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
   String getInstalledLanguagesText() {
     ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(context);
-    String keyboardCount = (kbList != null && kbList.size() > 1) ?
-        String.format(" (%d)", kbList.size()) : "";
+    boolean multiKbs = (kbList != null && kbList.size() > 1);
 
-    return getString(R.string.installed_languages) + keyboardCount;
+    if(multiKbs) {
+      // Has a %d slot to insert the count.
+      return String.format(getString(R.string.installed_languages), kbList.size());
+    } else {
+      return getString(R.string.installed_languages_empty);
+    }
   }
 
   @Override

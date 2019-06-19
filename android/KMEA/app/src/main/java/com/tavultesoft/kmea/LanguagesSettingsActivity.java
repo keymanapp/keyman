@@ -6,7 +6,6 @@ package com.tavultesoft.kmea;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +14,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 
@@ -64,8 +61,6 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
 
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
-
-//    languagesList = getLanguagesList(context);
 
     Dataset storage = KeyboardPickerActivity.getInstalledDataset(this);
     LanguagesAdapter listAdapter = new LanguagesAdapter(this, storage);

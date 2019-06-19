@@ -36,6 +36,10 @@ public class Keyboard implements Serializable, LanguageCoded {
     return this.map.get(KMManager.KMKey_LanguageName);
   }
 
+  public String getName() {
+    return this.map.get(KMManager.KMKey_KeyboardName);
+  }
+
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
       boolean lgCodeMatch = ((Keyboard) obj).getLanguageCode().equals(this.getLanguageCode());

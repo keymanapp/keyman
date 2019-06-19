@@ -60,7 +60,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     TextView textView = (TextView) findViewById(R.id.bar_title);
-    textView.setText(getString(R.string.title_language_settings));
 
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
@@ -71,6 +70,10 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
       lgCode = bundle.getString(KMManager.KMKey_LanguageID);
       lgName = bundle.getString(KMManager.KMKey_LanguageName);
+
+      // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
+      String title = String.format(getString(R.string.title_language_settings), lgName);
+      textView.setText(title);
 
       adapter = new FilteredKeyboardsAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), lgCode);
     } else {
