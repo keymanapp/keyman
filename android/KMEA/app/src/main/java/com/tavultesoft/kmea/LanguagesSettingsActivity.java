@@ -7,22 +7,31 @@ package com.tavultesoft.kmea;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.adapters.AdapterFilter;
+import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Keyman Settings --> Languages Settings
@@ -34,8 +43,6 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ImageButton addButton = null;
-  private static ArrayList<HashMap<String, String>> languagesList = null;
-  private static ArrayList<HashMap<String, String>> associatedKeyboardsList = null;
 
   private boolean dismissOnSelect = false;
   protected static boolean canAddNewKeyboard = true;
@@ -58,32 +65,25 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
 
-    languagesList = getLanguagesList(context);
+//    languagesList = getLanguagesList(context);
 
-    String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardCount, KMManager.KMKey_Icon};
-    int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
-    ListAdapter listAdapter = new KMListAdapter(context, languagesList, R.layout.list_row_layout2, from, to);
+    Dataset storage = KeyboardPickerActivity.getInstalledDataset(this);
+    LanguagesAdapter listAdapter = new LanguagesAdapter(this, storage);
+
     listView.setAdapter(listAdapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        listView.setItemChecked(position, true);
-        listView.setSelection(position);
+        LanguagesAdapter adapter = ((LanguagesAdapter) listView.getAdapter());
 
-        HashMap<String, String> languageInfo = languagesList.get(position);
-        String langId = languageInfo.get(KMManager.KMKey_LanguageID);
-        String langName = languageInfo.get(KMManager.KMKey_LanguageName);
-        associatedKeyboardsList = KeyboardPickerActivity.getAssociatedKeyboards(langId);
-
-        HashMap<String, String> associatedLexicalModel = KMManager.getAssociatedLexicalModel(langId);
+        Dataset.LanguageDataset languageData = adapter.getItem(position);
+        String langId = languageData.code;
+        String langName = languageData.name;
 
         Bundle args = new Bundle();
         args.putString(KMManager.KMKey_LanguageID, langId);
         args.putString(KMManager.KMKey_LanguageName, langName);
-        if (associatedLexicalModel != null) {
-          args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
-        }
-        args.putSerializable("associatedKeyboards", associatedKeyboardsList);
+
         Intent intent = new Intent(context, LanguageSettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.putExtras(args);
@@ -143,54 +143,54 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     finish();
   }
 
-  /**
-   * Convert from HashMap of installed keyboards list into a mapping of
-   * installed languages and their counts of associated keyboards
-   * @param context
-   * @return ArrayList<HashMap<String, Integer>>
-   */
-  public static ArrayList<HashMap<String, String>> getLanguagesList(Context context) {
-    ArrayList<HashMap<String, String>> keyboardsList = KeyboardPickerActivity.getKeyboardsList(context);
-    ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-    final String oneKeyboard = "(1 keyboard)";
-    final String twoKeyboards = "(2 keyboards)";
+  // Fully details the building of this Activity's list view items.
+  static private class LanguagesAdapter extends NestedAdapter<Dataset.LanguageDataset, Dataset, Void> {
+    static final int RESOURCE = R.layout.list_row_layout2;
 
-    for(HashMap<String, String> keyboardInfo : keyboardsList) {
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
+    public LanguagesAdapter(@NonNull Context context, final Dataset storage) {
+      super(context, RESOURCE, storage, new AdapterFilter<Dataset.LanguageDataset, Dataset, Void>() {
+        public List<Dataset.LanguageDataset> selectFrom(Dataset dataset, Void dummy) {
+          // Filter out any languages without installed keyboards.  This can occur with ad-hoc
+          // lexical model installations.
+          ArrayList<Dataset.LanguageDataset> languages = new ArrayList<>();
 
-      // Search if list has a matching language name with current keyboardInfo
-      int languageIndex = -1;
-      for (HashMap<String, String> languageInfo : list) {
-        if (languageInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(languageID)) {
-          languageIndex = list.indexOf(languageInfo);
-          break;
+          for(Dataset.LanguageDataset language: dataset.asList()) {
+            if(language.keyboards.size() > 0) {
+              languages.add(language);
+            }
+          }
+
+          return languages;
         }
-      }
-
-      // Increment an existing language count
-      if (languageIndex != -1) {
-        HashMap<String, String> matchingLanguageInfoInfo = list.get(languageIndex);
-        String keyboardCount = matchingLanguageInfoInfo.get(KMManager.KMKey_KeyboardCount);
-        if (keyboardCount.equalsIgnoreCase(oneKeyboard)) {
-          matchingLanguageInfoInfo.put(KMManager.KMKey_KeyboardCount, twoKeyboards);
-        } else {
-          int index = keyboardCount.indexOf(" ");
-          Integer currentCount = Integer.parseInt(keyboardCount.substring(1, index));
-          matchingLanguageInfoInfo.put(KMManager.KMKey_KeyboardCount, String.format("(%d keyboards)", currentCount + 1));
-        }
-        list.set(languageIndex, matchingLanguageInfoInfo);
-      } else {
-        // Otherwise, add new entry of language name and count of 1
-        HashMap<String, String> lgInfo = new HashMap<String, String>();
-        lgInfo.put(KMManager.KMKey_LanguageID, languageID);
-        lgInfo.put(KMManager.KMKey_LanguageName, languageName);
-        lgInfo.put(KMManager.KMKey_KeyboardCount, oneKeyboard);
-        lgInfo.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
-        lgInfo.put("isEnabled", "true");
-        list.add(lgInfo);
-      }
+      }, null);
     }
-    return list;
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      Dataset.LanguageDataset data = this.getItem(position);
+
+      // If we're being told to reuse an existing view, do that.  It's automatic optimization.
+      if (convertView == null) {
+        convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+      }
+
+      View view = convertView;
+      view.setAlpha(1.0f);
+
+      ImageView img1 = view.findViewById(R.id.image1);
+      TextView text1 = view.findViewById(R.id.text1);
+      TextView text2 = view.findViewById(R.id.text2);
+
+      text1.setText(data.name);
+      img1.setImageResource(R.drawable.ic_arrow_forward);
+
+      if(data.keyboards.size() == 1) {
+        text2.setText("(1 keyboard)");
+      } else {
+        text2.setText("(" + data.keyboards.size() + " keyboards)");
+      }
+
+      return view;
+    }
   }
 }

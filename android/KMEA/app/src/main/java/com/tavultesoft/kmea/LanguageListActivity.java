@@ -390,9 +390,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     private final Context context;
 
     public LanguagesAdapter(@NonNull Context context, final Dataset repo) {
-      // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
       super(context, RESOURCE, repo);
-
       this.context = context;
     }
 
