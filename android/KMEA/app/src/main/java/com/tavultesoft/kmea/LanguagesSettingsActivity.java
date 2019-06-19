@@ -80,9 +80,15 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
         String langId = languageData.code;
         String langName = languageData.name;
 
+        HashMap<String, String> associatedLexicalModel = KMManager.getAssociatedLexicalModel(langId);
+
         Bundle args = new Bundle();
         args.putString(KMManager.KMKey_LanguageID, langId);
         args.putString(KMManager.KMKey_LanguageName, langName);
+
+        if(associatedLexicalModel != null) {
+          args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
+        }
 
         Intent intent = new Intent(context, LanguageSettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
