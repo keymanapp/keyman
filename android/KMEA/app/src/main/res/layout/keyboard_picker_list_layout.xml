@@ -39,18 +39,5 @@
             android:layout_weight="10"
             android:layout_gravity="center"/>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_button"
-            style="?android:attr/actionButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginTop="@dimen/fab_margin"
-            android:layout_marginBottom="@dimen/fab_margin"
-            android:contentDescription="@string/image_button"
-            android:src="@drawable/ic_add_white"
-            app:fabSize="normal" />
-
     </LinearLayout>
 </RelativeLayout>

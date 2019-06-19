@@ -194,33 +194,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     });
 
-    addButton = (ImageButton) findViewById(R.id.add_button);
-    addButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        // Check that available keyboard information can be obtained via:
-        // 1. connection to cloud catalog
-        // 2. cached file
-        // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
-          KeyboardPickerActivity.hasKeyboardFromPackage()){
-          dismissOnSelect = false;
-          Intent i = new Intent(context, LanguageListActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-          context.startActivity(i);
-        } else {
-          AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
-          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
-          dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
-          AlertDialog dialog = dialogBuilder.create();
-          dialog.show();
-        }
-      }
-    });
-    if (!canAddNewKeyboard) {
-      addButton.setVisibility(View.GONE);
-    }
-
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
   }
