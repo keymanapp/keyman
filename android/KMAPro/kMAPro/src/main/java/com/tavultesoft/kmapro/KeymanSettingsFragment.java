@@ -3,6 +3,7 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -18,6 +19,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
+  private Preference languagesPreference;
+
   @Override
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
     context = getActivity();
@@ -26,12 +29,9 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     // Set the filename so this Fragment uses the common preferences file as other Activities
     getPreferenceManager().setSharedPreferencesName(getString(R.string.kma_prefs_name));
 
-    Preference languagesPreference = new Preference(context);
-    ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(context);
-    String keyboardCount = (kbList != null && kbList.size() > 1) ?
-      String.format(" (%d)", kbList.size()) : "";
+    languagesPreference = new Preference(context);
     languagesPreference.setKey(KeymanSettingsActivity.installedLanguagesKey);
-    languagesPreference.setTitle(getString(R.string.installed_languages) + keyboardCount);
+    languagesPreference.setTitle(getInstalledLanguagesText());
     languagesPreference.setWidgetLayoutResource(R.layout.preference_icon_layout);
     Intent languagesIntent = new Intent();
     languagesIntent.setClassName(context.getPackageName(), "com.tavultesoft.kmea.LanguagesSettingsActivity");
@@ -54,5 +54,21 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(getStartedPreference);
 
     setPreferenceScreen(screen);
+  }
+
+  String getInstalledLanguagesText() {
+    ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(context);
+    String keyboardCount = (kbList != null && kbList.size() > 1) ?
+        String.format(" (%d)", kbList.size()) : "";
+
+    return getString(R.string.installed_languages) + keyboardCount;
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    // Update the language / keyboard count when we return to this menu from deeper levels.
+    languagesPreference.setTitle(getInstalledLanguagesText());
   }
 }
