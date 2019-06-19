@@ -78,43 +78,43 @@ class LanguageSettingsViewController: UITableViewController {
     return switchFrame
   }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cellIdentifier = 0 == indexPath.section ?  "KeyboardInLanguageSettingsCell" : "LanguageSettingsCell"
-      
-      let reusableCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
-      if let cell = reusableCell {
-        return cell
-      }
-      
-      let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
-      if 1 == indexPath.section {
-          //TODO: find the settings these are to show
-          if 0 == indexPath.row {
-            cell.accessoryType = .none
-            let doPredictionsSwitch = UISwitch()
-            let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
-            doPredictionsSwitch.frame = switchFrame
-            doPredictionsSwitch.isOn = false
-            //            showBannerSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
-            cell.addSubview(doPredictionsSwitch)
-          } else if 1 == indexPath.row {
-            cell.accessoryType = .none
-            let doCorrectionsSwitch = UISwitch()
-            let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
-            doCorrectionsSwitch.frame = switchFrame
-            doCorrectionsSwitch.isOn = false
-            //            showBannerSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
-            cell.addSubview(doCorrectionsSwitch)
-          } else { // rows 3 and 4
-            cell.accessoryType = .disclosureIndicator
-        }
-      }
-      let selectionColor = UIView()
-      selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
-      cell.selectedBackgroundView = selectionColor
-      cell.textLabel?.font = cell.textLabel?.font?.withSize(16.0)
+  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cellIdentifier = 0 == indexPath.section ?  "KeyboardInLanguageSettingsCell" : "LanguageSettingsCell"
+    
+    let reusableCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
+    if let cell = reusableCell {
       return cell
     }
+    
+    let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+    if 1 == indexPath.section {
+        //TODO: find the settings these are to show
+        if 0 == indexPath.row {
+          cell.accessoryType = .none
+          let doPredictionsSwitch = UISwitch()
+          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
+          doPredictionsSwitch.frame = switchFrame
+          doPredictionsSwitch.isOn = false
+          //            showBannerSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
+          cell.addSubview(doPredictionsSwitch)
+        } else if 1 == indexPath.row {
+          cell.accessoryType = .none
+          let doCorrectionsSwitch = UISwitch()
+          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
+          doCorrectionsSwitch.frame = switchFrame
+          doCorrectionsSwitch.isOn = false
+          //            showBannerSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
+          cell.addSubview(doCorrectionsSwitch)
+        } else { // rows 3 and 4
+          cell.accessoryType = .disclosureIndicator
+      }
+    }
+    let selectionColor = UIView()
+    selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
+    cell.selectedBackgroundView = selectionColor
+    cell.textLabel?.font = cell.textLabel?.font?.withSize(16.0)
+    return cell
+  }
   
   // MARK: - UITableViewDelegate
 
@@ -163,7 +163,7 @@ class LanguageSettingsViewController: UITableViewController {
       cell.accessoryType = .disclosureIndicator
     } else { // language settings
       cell.accessoryType = .none
-    switch indexPath.row {
+      switch indexPath.row {
         case 0:
           cell.textLabel?.text = "Enable corrections"
         case 1:
@@ -211,8 +211,8 @@ class LanguageSettingsViewController: UITableViewController {
       switch indexPath.row  {
         case 2:
           showLexicalModelsView()
-      default:
-        break
+        default:
+          break
       }
     default:
       break
