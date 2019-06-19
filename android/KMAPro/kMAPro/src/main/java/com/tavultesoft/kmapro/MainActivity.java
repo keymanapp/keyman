@@ -851,6 +851,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         // We error-catch this in case it's called from an AsyncTask;
         // this may happen when installing a new keyboard given that we attempt
         // to auto-download an appropriate lexical model to match it.
+        Log.e(TAG, "Download error: " + e, e);
       }
     }
 
