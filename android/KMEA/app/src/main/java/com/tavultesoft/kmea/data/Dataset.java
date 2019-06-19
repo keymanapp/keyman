@@ -62,6 +62,27 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements Li
     }
   };
 
+  static class LanguageCategorizer<Type extends LanguageCoded, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter, Void> {
+    public List<Type> selectFrom(Adapter adapter, Void dummy) {
+      List<Type> list = new ArrayList<>(adapter.asList());
+
+      Collections.sort(list, new Comparator<Type>() {
+        public int compare(Type obj1, Type obj2) {
+          int langComp = obj1.getLanguageName().compareTo(obj2.getLanguageName());
+          if(langComp != 0) {
+            return langComp;
+          }
+
+          return obj1.getName().compareTo(obj2.getName());
+        }
+      });
+
+      return list;
+    }
+  }
+
+  public static final LanguageCategorizer<Keyboard, Dataset.Keyboards> keyboardPickerSorter = new LanguageCategorizer<Keyboard, Keyboards>();
+
   // Implements common language-tracking functionality for each internally-managed master list.
   private class LanguageCodedAdapter<Type extends LanguageCoded> extends ArrayAdapter<Type> implements ListBacked<Type> {
     private final List<Type> data;

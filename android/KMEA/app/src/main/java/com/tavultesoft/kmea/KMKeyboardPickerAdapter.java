@@ -4,8 +4,6 @@
 
 package com.tavultesoft.kmea;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
@@ -25,21 +23,10 @@ import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, Void> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
 
-  private Context context;
   protected Typeface listFont;
 
-//  static List<Keyboard> mapCast(List<? extends Map<String, String>> data) {
-//    List<Keyboard> kbdData = new ArrayList<>();
-//    for(Map<String, String> kbd: data) {
-//      kbdData.add(new Keyboard(kbd));
-//    }
-//
-//    return kbdData;
-//  }
-
-  // TODO:  End goal:  take in a KeyboardAdapter instead of this list; reference that as needed.
   public KMKeyboardPickerAdapter(Context context, Dataset.Keyboards adapter) {
-    super(context, KEYBOARD_LAYOUT_RESOURCE, adapter);
+    super(context, KEYBOARD_LAYOUT_RESOURCE, adapter, Dataset.keyboardPickerSorter, null);
   }
 
   @Override
@@ -82,7 +69,7 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
   public void onClick(View v) {
     @SuppressWarnings("unchecked")
     Map<String, String> kbInfo = ((Keyboard) v.getTag()).map;
-    Intent i = new Intent(context, KeyboardInfoActivity.class);
+    Intent i = new Intent(this.getContext(), KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
     String packageID = kbInfo.get(KMManager.KMKey_PackageID);
     String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
@@ -93,13 +80,13 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
     i.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
     i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
-    i.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID));
+    i.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID));
     boolean isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
     i.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
     String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
     if (customHelpLink != null)
       i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
     KeyboardInfoActivity.titleFont = listFont;
-    context.startActivity(i);
+    this.getContext().startActivity(i);
   }
 }
