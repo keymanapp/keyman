@@ -46,14 +46,21 @@ EMBED_TARGET=( "keyman.js" )
 echo "Node.js + dependencies check"
 npm install --no-optional
 
+
+# Variables for the LMLayer
+PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
+PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
+
 # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
 cd ../../common/predictive-text/
 echo ""
 echo "Compiling the Language Modeling layer module..."
 ./build.sh || fail "Failed to compile the language modeling layer module."
+cd ../../web/source
+echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
 echo "Language Modeling layer compilation successful."
 echo ""
-cd ../../web/source
 
 if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
@@ -192,8 +199,6 @@ WEB_OUTPUT="../release/web"
 EMBED_OUTPUT="../release/embedded"
 WEB_OUTPUT_NO_MINI="../release/unminified/web"
 EMBED_OUTPUT_NO_MINI="../release/unminified/embedded"
-PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
-PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
 INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
@@ -419,9 +424,6 @@ if [ $BUILD_UI = true ]; then
 
         echo "User interface modules compiled and saved under $WEB_OUTPUT"
     fi
-
-    echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "failed to copy predictive text model"
 fi
 
 if [ $BUILD_DEBUG_EMBED = true ]; then
