@@ -370,6 +370,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     
     return true
   }
+  
   /// Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
   /// The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
   public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
@@ -393,7 +394,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     userDefaults.userLexicalModels = userLexicalModels
     userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
     userDefaults.synchronize()
-  }
+    log.info("Added lexical model ID: \(lexicalModel.id) name: \(lexicalModel.name)")
+}
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
@@ -986,13 +988,22 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         do {
           try Manager.shared.parseLMKMP(kmp.sourceFolder)
           log.info("successfully installed the lexical model from: \(kmp.sourceFolder)")
+          DispatchQueue.main.async {
+            self.apiLexicalModelRepository.delegate?.lexicalModelRepositoryDidFetch(self.apiLexicalModelRepository)
+          }
           //this can fail gracefully and not show errors to users
           try FileManager.default.removeItem(at: downloadedPackageFile)
         } catch {
           log.error("Error installing the lexical model: \(error)")
+          DispatchQueue.main.async {
+            self.apiLexicalModelRepository.delegate?.lexicalModelRepository(self.apiLexicalModelRepository, didFailFetch: error)
+          }
         }
       } else {
         log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
+        DispatchQueue.main.async {
+          self.apiLexicalModelRepository.delegate?.lexicalModelRepository(self.apiLexicalModelRepository, didFailFetch: APILexicalModelFetchError.noData)
+        }
       }
     })
   }
