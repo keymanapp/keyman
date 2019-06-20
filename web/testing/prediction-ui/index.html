@@ -47,9 +47,9 @@
           ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
           : window.location.href;
 
-        var modelStub = {'id': 'example.en.wordlist',
+        var modelStub = {'id': 'example.en.trie',
           languages: ['en'],
-          path: (pageRef + "example.en.wordlist.model.js")
+          path: (pageRef + "simple-en-trie.js")
         };
         kmw.modelManager.register(modelStub);
       });
@@ -57,7 +57,7 @@
   </head>
 
 <!-- Sample page HTML -->  
-  <body class="osk-always-visible"> 
+  <body> 
     <h2>KeymanWeb Sample Page - Predictive Text UI (bootstrapping rig)</h2>
     <p>As we're currently developing the predictive text feature, this page is subject to break as model
       specifications change and new features are added.  Please update the backing model file as necessary.
