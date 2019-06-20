@@ -4,7 +4,10 @@
 
 package com.tavultesoft.kmea;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 
 final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, Void> implements OnClickListener {
@@ -25,8 +29,25 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
 
   protected Typeface listFont;
 
-  public KMKeyboardPickerAdapter(Context context, Dataset.Keyboards adapter) {
-    super(context, KEYBOARD_LAYOUT_RESOURCE, adapter, Dataset.keyboardPickerSorter, null);
+  public KMKeyboardPickerAdapter(final Context context, Dataset.Keyboards adapter) {
+    // TODO:  (13.0) Swap the inline AdapterFilter definition out for Dataset.keyboardPickerSorter
+    //        once KeyboardPickerActivity is sufficiently refactored.  (All references to keyboardList
+    //        should instead refer to this adapter.)
+    super(context, KEYBOARD_LAYOUT_RESOURCE, adapter, new AdapterFilter<Keyboard, Dataset.Keyboards, Void>() {
+
+      // Yeah, so this is a MASSIVE hack.  Right now, it's either this or refactor up to 60
+      // separate references to keyboardList within KeyboardPickerActivity.  Yikes.
+      public List<Keyboard> selectFrom(Dataset.Keyboards adapter, Void dummy) {
+        List<HashMap<String, String>> kbdMapList = KeyboardPickerActivity.getKeyboardsList(context);
+        List<Keyboard> kbdList = new ArrayList<>(kbdMapList.size());
+
+        for(HashMap<String, String> kbdMap: kbdMapList) {
+          kbdList.add(new Keyboard(kbdMap));
+        }
+
+        return kbdList;
+      }
+    }, null);
   }
 
   @Override
