@@ -29,6 +29,7 @@ extern NSString *const kKMVisualKeyboardKey;
 @property (assign, nonatomic, readonly) BOOL isMnemonic;
 @property (assign, nonatomic, readonly) DWORD version;
 @property (strong, nonatomic, readonly) NSArray *store;
+@property (strong, nonatomic, readonly) NSArray *storeSaved;
 @property (strong, nonatomic, readonly) NSArray *group;
 @property (strong, nonatomic, readonly) NSArray *startGroup;
 @property (assign, nonatomic, readonly) DWORD flags;

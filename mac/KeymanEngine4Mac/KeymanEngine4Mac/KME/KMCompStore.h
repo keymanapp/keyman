@@ -20,6 +20,7 @@
 @property (strong, nonatomic) NSString *string;
 
 - (void)setDwSystemID:(DWORD)dwID;
+- (id)copyWithZone:(NSZone *)zone;
 
 @end
 
