@@ -95,6 +95,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
         }
         
         _store = [[NSArray alloc] initWithArray:mStore];
+        _storeSaved = [[NSArray alloc] initWithArray:mStore copyItems:YES];
         
         struct COMP_GROUP cmp_grp[cmp_kb.cxGroupArray];
         [file seekToFileOffset:cmp_kb.dpGroupArray];
