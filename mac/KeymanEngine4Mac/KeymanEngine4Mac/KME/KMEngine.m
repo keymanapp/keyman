@@ -23,6 +23,7 @@ NSString *const Q_DEADKEY = @"Q_DEADKEY";
 NSString *const Q_NUL = @"Q_NUL";
 NSString *const Q_BEEP = @"Q_BEEP";
 NSString *const Q_RETURN = @"Q_RETURN";
+NSString *const Q_SAVEOPT = @"Q_SAVEOPT";
 
 DWORD VKMap[0x80];
 
@@ -101,6 +102,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     }
     
     return _tmpCtxBuf;
+}
+
+- (void)setStore:(DWORD)storeID withValue:(NSString *)value {
+    KMCompStore *store = [self.kmx.store objectAtIndex:storeID];
+    store.string = [[NSString alloc] initWithString:value];
 }
 
 - (NSArray *)processEvent:(NSEvent *)event {
@@ -408,7 +414,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if (!outKey || !outKey.length)
         return nil;
     
-    BOOL handled = NO;
+    BOOL handledWithoutActions = NO;
 
     for (int i = 0; i < outKey.length;) {
         unichar c = [outKey characterAtIndex:i];
@@ -525,7 +531,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     KMCompStore *store1 = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *store2 = [self.kmx.store objectAtIndex:x2];
                     store1.string = [[NSString alloc] initWithString:store2.string];
-                    handled = YES;
+                    handledWithoutActions = YES;
 
                     i+=4;
                     break;
@@ -535,7 +541,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     KMCompStore *store = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
                     store.string = [[NSString alloc] initWithString:storeSaved.string];
-                    handled = YES;
+                    handledWithoutActions = YES;
                     i+=3;
                     break;
                 }
@@ -544,7 +550,15 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     KMCompStore *store = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
                     storeSaved.string = [[NSString alloc] initWithString:store.string];
-                    handled = YES;
+                    handledWithoutActions = YES;
+
+                    NSDictionary *actionObj = [[NSDictionary alloc] initWithObjectsAndKeys:[[NSString alloc] initWithString:store.string], [NSNumber numberWithUnsignedInteger:x1], nil];
+                    NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:actionObj, Q_SAVEOPT, nil];
+                    if (!actions)
+                        actions = [[NSMutableArray alloc] initWithObjects:action, nil];
+                    else
+                        [actions addAction:action];
+                    
                     i+=3;
                     break;
                 }
@@ -569,7 +583,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             NSLog(@"tmpCtxBuf = \"%@\"", [self.tmpCtxBuf codeString]);
     }
     
-    if (!actions && handled) {
+    if (!actions && handledWithoutActions) {
         NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_NUL, nil];
         actions = [[NSMutableArray alloc] initWithObjects:action, nil];
     }

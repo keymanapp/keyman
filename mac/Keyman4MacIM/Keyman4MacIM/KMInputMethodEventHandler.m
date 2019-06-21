@@ -425,6 +425,12 @@ NSRange _previousSelRange;
         else if ([actionType isEqualToString:Q_BEEP]) {
             [[NSSound soundNamed:@"Tink"] play];
         }
+        else if ([actionType isEqualToString:Q_SAVEOPT]) {
+            NSDictionary *save = [action objectForKey:actionType];
+            NSNumber *storeKey = [save allKeys][0];
+            NSString *value = [save objectForKey:storeKey];
+            [self.AppDelegate saveStore:storeKey withValue:value];
+        }
     }
     return YES;
 }
