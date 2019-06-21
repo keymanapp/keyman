@@ -36,9 +36,6 @@
                 [self removeLastObject];
                 [self addObject:mAction];
             }
-            else if ([preActionType isEqualToString:Q_DEADKEY]) {
-                [self addObject:newAction];
-            }
         }
         else if ([preActionType isEqualToString:Q_STR] && [newActionType isEqualToString:Q_BACK]) {
             NSString *preStr = [preAction objectForKey:preActionType];
