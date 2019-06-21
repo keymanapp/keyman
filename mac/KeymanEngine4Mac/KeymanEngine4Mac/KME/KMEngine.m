@@ -550,7 +550,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     KMCompStore *store = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
                     storeSaved.string = [[NSString alloc] initWithString:store.string];
-                    handledWithoutActions = YES;
 
                     NSDictionary *actionObj = [[NSDictionary alloc] initWithObjectsAndKeys:[[NSString alloc] initWithString:store.string], [NSNumber numberWithUnsignedInteger:x1], nil];
                     NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:actionObj, Q_SAVEOPT, nil];
