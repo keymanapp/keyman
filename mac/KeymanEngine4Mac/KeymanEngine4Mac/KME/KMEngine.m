@@ -408,6 +408,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if (!outKey || !outKey.length)
         return nil;
     
+    BOOL handled = NO;
+
     for (int i = 0; i < outKey.length;) {
         unichar c = [outKey characterAtIndex:i];
         if (c == UC_SENTINEL) {
@@ -523,6 +525,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     KMCompStore *store1 = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *store2 = [self.kmx.store objectAtIndex:x2];
                     store1.string = [[NSString alloc] initWithString:store2.string];
+                    handled = YES;
 
                     i+=4;
                     break;
@@ -531,8 +534,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     DWORD x1 = [outKey characterAtIndex:i+2]-1;
                     KMCompStore *store = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
-
                     store.string = [[NSString alloc] initWithString:storeSaved.string];
+                    handled = YES;
                     i+=3;
                     break;
                 }
@@ -541,6 +544,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     KMCompStore *store = [self.kmx.store objectAtIndex:x1];
                     KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
                     storeSaved.string = [[NSString alloc] initWithString:store.string];
+                    handled = YES;
                     i+=3;
                     break;
                 }
@@ -565,6 +569,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             NSLog(@"tmpCtxBuf = \"%@\"", [self.tmpCtxBuf codeString]);
     }
     
+    if (!actions && handled) {
+        NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_NUL, nil];
+        actions = [[NSMutableArray alloc] initWithObjects:action, nil];
+    }
+
     return actions;
 }
 
