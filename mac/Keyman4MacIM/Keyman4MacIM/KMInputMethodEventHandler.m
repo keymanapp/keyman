@@ -489,6 +489,11 @@ NSRange _previousSelRange;
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
     
+    if (event.type == NSFlagsChanged) {
+        _contextOutOfDate = YES;
+        return NO;
+    }
+
     if ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
         [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.

@@ -41,7 +41,7 @@ NSMutableArray *servers;
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    return (NSEventMaskKeyDown);
+    return NSEventMaskKeyDown | NSEventMaskFlagsChanged;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
