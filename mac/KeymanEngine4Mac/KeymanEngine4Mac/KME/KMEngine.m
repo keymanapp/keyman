@@ -106,7 +106,9 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (void)setStore:(DWORD)storeID withValue:(NSString *)value {
     KMCompStore *store = [self.kmx.store objectAtIndex:storeID];
+    KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:storeID];
     store.string = [[NSString alloc] initWithString:value];
+    storeSaved.string = [[NSString alloc] initWithString:value];
 }
 
 - (NSArray *)processEvent:(NSEvent *)event {
