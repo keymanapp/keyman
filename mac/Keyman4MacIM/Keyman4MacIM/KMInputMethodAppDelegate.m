@@ -81,7 +81,7 @@ id _lastServerWithOSKShowing = nil;
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
+        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, CGEventMaskBit(kCGEventFlagsChanged) | CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseUp), (CGEventTapCallBack)eventTapFunction, nil);
         
         if (!self.lowLevelEventTap) {
             NSLog(@"Can't tap into low level events!");
