@@ -83,7 +83,8 @@ public final class KMManager {
   // Globe key actions
   public enum GlobeKeyAction {
     GLOBE_KEY_ACTION_SHOW_MENU,
-    GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,
+    GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
+    GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
@@ -93,6 +94,7 @@ public final class KMManager {
   private static boolean didCopyAssets = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static int sysKbIndexOnLockScreen = -1;
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -1367,12 +1369,27 @@ public final class KMManager {
           if (SystemKeyboard.keyboardPickerEnabled) {
             KeyguardManager km = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
             if(km.inKeyguardRestrictedInputMode()) {
-              // If screen is locked, override GlobeKeyAction to switch to next keyboard
-              advanceToNextInputMode();
-            } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
+              // Override system keyboard globe key action if screen is locked:
+              // 1. Switch to next Keyman keyboard (no menu)
+              // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
+              if (sysKbIndexOnLockScreen == -1) {
+                sysKbIndexOnLockScreen = getCurrentKeyboardIndex(context);
+                sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+              } else if (sysKbIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+                sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
+              }
+            } else {
+              // If screen isn't locked, revert to default system globe key action
+              sysKbIndexOnLockScreen = -1;
+              sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+            }
+
+            if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
             } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
               switchToNextKeyboard(context);
+            } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD) {
+              advanceToNextInputMode();
             }
           } else {
             switchToNextKeyboard(context);
