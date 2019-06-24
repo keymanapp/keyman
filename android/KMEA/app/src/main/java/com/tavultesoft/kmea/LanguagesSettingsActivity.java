@@ -282,9 +282,20 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
     }
   }
 
+  private static class UpdateResult {
+    final int returnCode;
+    List<Bundle> kbdUpdateBundles = null;
+
+    public UpdateResult(int code, List<Bundle> kbdBundles) {
+      this.returnCode = code;
+      this.kbdUpdateBundles = kbdBundles;
+    }
+  }
+
   // TODO:  Handle within the new CloudRepository class (or similar other class)
   private static void checkKeyboardUpdates(final Context context) {
-    new AsyncTask<Void, Integer, Integer>() {
+    new AsyncTask<Void, Integer, UpdateResult>() {
+
       private final boolean hasConnection = KMManager.hasConnection(context);
       private ProgressDialog progressDialog;
       JSONParser jsonParser = new JSONParser();
@@ -308,8 +319,10 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
       }
 
       @Override
-      protected Integer doInBackground(Void... voids) {
+      protected UpdateResult doInBackground(Void... voids) {
         int ret = 0;
+        List<Bundle> kbdUpdateBundles = new ArrayList<>();
+
         if (hasConnection && !isCancelled()) {
           try {
             String deviceType = context.getString(R.string.device_type);
@@ -340,6 +353,22 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
               }
 
               if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+                // Why not create a list of keyboards to update here?
+                String pkgID = keyboardsList.get(i).map.get(KMManager.KMKey_PackageID);
+                String langName = keyboardsList.get(i).map.get(KMManager.KMKey_LanguageName);
+                String kbName = keyboardsList.get(i).map.get(KMManager.KMKey_KeyboardName);
+
+                // TODO:  Test this before committing!
+                Bundle bundle = new Bundle();
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, keyboardID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
+                bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+                bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+
+                kbdUpdateBundles.add(bundle);
+
                 ret++;
               }
             }
@@ -350,7 +379,8 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
           }
         }
 
-        return ret;
+        // TODO:  Add the kbdUpdateBundles list to the return value.
+        return new UpdateResult(ret, kbdUpdateBundles);
       }
 
       @Override
@@ -359,7 +389,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
       }
 
       @Override
-      protected void onPostExecute(Integer result) {
+      protected void onPostExecute(final UpdateResult result) {
         if (progressDialog != null && progressDialog.isShowing()) {
           try {
             progressDialog.dismiss();
@@ -369,9 +399,9 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
           }
         }
 
-        if (result > 0) {
+        if (result.returnCode > 0) {
           failedUpdateCount = 0;
-          updateCount = result;
+          updateCount = result.returnCode;
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(context.getString(R.string.keyboard_updates_available));
           dialogBuilder.setMessage(context.getString(R.string.confirm_update));
@@ -379,40 +409,12 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
             public void onClick(DialogInterface dialog, int which) {
               // Update keyboards
               if (KMManager.hasConnection(context)) {
-                List<Keyboard> keyboardsList = KeyboardPickerActivity.getInstalledDataset(_context).keyboards.asList();
+                List<Bundle> kbdsToUpdate = result.kbdUpdateBundles;
 
-                int len = keyboardsList.size();
-                for (int i = 0; i < len; i++) {
-                  String pkgID = keyboardsList.get(i).map.get(KMManager.KMKey_PackageID);
-                  String kbID = keyboardsList.get(i).map.get(KMManager.KMKey_KeyboardID);
-                  String langID = keyboardsList.get(i).map.get(KMManager.KMKey_LanguageID);
-                  String kbKey = String.format("%s_%s", langID, kbID);
-                  String langName = keyboardsList.get(i).map.get(KMManager.KMKey_LanguageName);
-                  String kbName = keyboardsList.get(i).map.get(KMManager.KMKey_KeyboardName);
-                  String kbVersion = keyboardsList.get(i).map.get(KMManager.KMKey_KeyboardVersion);
-                  String newKbVersion = keyboardVersions.get(kbKey);
-                  if (newKbVersion != null) {
-                    keyboardVersions.put(kbKey, newKbVersion);
-                    if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
-                      if (updateProgress == null || !updateProgress.isShowing()) {
-                        updateProgress = new ProgressDialog(context);
-                        updateProgress.setMessage(context.getString(R.string.updating_keyboards));
-                        updateProgress.setCancelable(false);
-                        updateProgress.show();
-                      }
-
-                      Bundle bundle = new Bundle();
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-                      bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-                      Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
-                      intent.putExtras(bundle);
-                      context.startActivity(intent);
-                    }
-                  }
+                for (Bundle kbdBundle: kbdsToUpdate) {
+                  Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
+                  intent.putExtras(kbdBundle);
+                  context.startActivity(intent);
                 }
               } else {
                 Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
@@ -441,7 +443,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity implement
           } else {
             checkingUpdates = false;
           }
-        } else if (result == 0) {
+        } else if (result.returnCode == 0) {
           Toast.makeText(context, "All keyboards are up to date!", Toast.LENGTH_SHORT).show();
           lastUpdateCheck = Calendar.getInstance();
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
