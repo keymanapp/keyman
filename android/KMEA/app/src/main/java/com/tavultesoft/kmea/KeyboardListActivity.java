@@ -61,7 +61,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     String langID = getIntent().getStringExtra("languageCode");
     String langName = getIntent().getStringExtra("languageName");
 
-    Dataset repo = CloudRepository.shared.fetchDataset(this, null, null);
+    Dataset repo = CloudRepository.shared.fetchDataset(this);
     final FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(this, repo, langID);
 
     textView.setText(langName);
@@ -83,7 +83,6 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
         String lgName = kbInfo.get(KMManager.KMKey_LanguageName);
         String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
         String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, kFont);
-        String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
 
         if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
           // keyboard already exists in packages/ so just add the language association
@@ -96,13 +95,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
           return;
         }
 
-        Bundle args = new Bundle();
-        args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-        args.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, lgID);
-        args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, lgName);
-        args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
+        Bundle args = kbd.buildDownloadBundle();
         Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
         i.putExtras(args);
         startActivity(i);

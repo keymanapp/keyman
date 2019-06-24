@@ -3,12 +3,15 @@ package com.tavultesoft.kmea.data;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.BuildConfig;
@@ -48,6 +51,10 @@ public class CloudRepository {
     // Tracks the time of the most recent cache.  We start at null to indicate that we haven't
     // tried to read the cache yet, as we don't yet have a Context instance to reference.
     lastLoad = null;
+  }
+
+  public interface UpdateHandler {
+    void onUpdateDetection(List<Bundle> updateBundles);
   }
 
   public boolean hasCache(Context context) {
@@ -104,15 +111,20 @@ public class CloudRepository {
     file.delete();
   }
 
+  public Dataset fetchDataset(@NonNull Context context) {
+    return fetchDataset(context, null, null, null);
+  }
+
   /**
    * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
    * services.  Unless recently cached, this object will be populated asynchronously.
    * @param context   The current Activity requesting the Dataset.
-   * @param onSuccess  A callback to run immediately upon successful completion of the download.
-   * @param onFailure  A callback to run immediately upon download failure.
+   * @param updateHandler  An object that can handle update notification if desired.
+   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
+   * @param onFailure  A callback to be triggered upon failure of a query.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
-  public Dataset fetchDataset(@NonNull Context context, Runnable onSuccess, Runnable onFailure) {
+  public Dataset fetchDataset(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, getKeyboardCacheFile(context));
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
 
@@ -151,7 +163,7 @@ public class CloudRepository {
       memCachedDataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray));
     }
 
-    CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, onSuccess, onFailure);
+    CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, updateHandler, onSuccess, onFailure);
 
 //    CloudApiParam[] cloudQueries = new CloudApiParam[2];
 //    int cloudQueryEntries = 0;
@@ -516,12 +528,17 @@ public class CloudRepository {
     private ProgressDialog progressDialog;
 
     private final Context context;
-    private final Runnable success;
+
+    // These keyboard query callback parameters actually aren't used at present.
+    private final Runnable querySuccess;
     private final Runnable failure;
+    private final UpdateHandler updateHandler;
+
+    //
 
     private final Dataset dataset;
 
-    public CloudDownloadTask(Context context, Dataset dataset, Runnable success, Runnable failure) {
+    public CloudDownloadTask(Context context, Dataset dataset, UpdateHandler updateHandler, Runnable success, Runnable failure) {
       this.context = context;
       this.dataset = dataset;
       this.hasConnection = KMManager.hasConnection(context);
@@ -531,8 +548,16 @@ public class CloudRepository {
           // Do nothing.
         }
       };
-      this.success = success != null ? success : dummy;
+      this.querySuccess = success != null ? success : dummy;
       this.failure = failure != null ? failure : dummy;
+
+      this.updateHandler = updateHandler != null ? updateHandler : new UpdateHandler() {
+        @Override
+        public void onUpdateDetection(List<Bundle> updateBundles) {
+          // Do nothing.
+          return;
+        }
+      };
     }
 
     protected void showProgressDialog(final Runnable finishCallback) {
@@ -664,10 +689,24 @@ public class CloudRepository {
       processCloudReturns(jsonTuple, true);
     }
 
+    public Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
+      // Get version from newly-downloaded keyboard.
+      String newKbVersion = cloudResource.getVersion();
+      String kbVersion = existingMatch.getVersion();
+
+      if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+        return cloudResource.buildDownloadBundle();
+      } else {
+        return null;
+      }
+    }
+
     public void processCloudReturns(CloudDownloadReturns jsonTuple, boolean executeCallbacks) {
       // TODO:  Need proper offline check again.
       List<Keyboard> keyboardsArrayList = processKeyboardJSON(jsonTuple.keyboardJSON, false);
       List<LexicalModel> lexicalModelsArrayList = processLexicalModelJSON(jsonTuple.lexicalModelJSON);
+
+      final List<Bundle> updateBundles = new ArrayList<>();
 
       // We're about to do a big batch of edits.
       this.dataset.setNotifyOnChange(false);
@@ -680,7 +719,10 @@ public class CloudRepository {
         Keyboard match = dataset.keyboards.findMatch(keyboard);
 
         if(match != null) {
-          // TODO:  Automatic update check!
+          Bundle bundle = updateCheck(keyboard, match);
+          if(bundle != null) {
+            updateBundles.add(bundle);
+          }
 
           // After update stuff is reasonably handled...
           keyboardsArrayList.remove(keyboard);
@@ -701,7 +743,10 @@ public class CloudRepository {
         LexicalModel match = dataset.lexicalModels.findMatch(model);
 
         if(match != null) {
-          // TODO:  Automatic update check!
+          Bundle bundle = updateCheck(model, match);
+          if(bundle != null) {
+            updateBundles.add(bundle);
+          }
 
           // After update stuff is reasonably handled...
           lexicalModelsArrayList.remove(model);
@@ -712,11 +757,18 @@ public class CloudRepository {
       // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
       dataset.lexicalModels.addAll(lexicalModelsArrayList);
 
+      if(updateBundles.size() > 0) {
+        // Time for updates!
+        Log.v(TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");
+
+        updateHandler.onUpdateDetection(updateBundles);
+      }
+
       // And finish.
       this.dataset.notifyDataSetChanged(); // Edits are done - signal that.
 
       if(executeCallbacks) {
-        success.run();
+        querySuccess.run();
       }
     }
   }

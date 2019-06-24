@@ -80,7 +80,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
     if (!didExecuteParser) {
       didExecuteParser = true;
       //new JSONParse().execute();
-      repo = CloudRepository.shared.fetchDataset(context, null, null);
+      repo = CloudRepository.shared.fetchDataset(context);
 
       listView.setAdapter(new FilteredLexicalModelAdapter(context, repo, languageID));
       listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -88,7 +88,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           int selectedIndex = position;
-          Map<String, String> modelInfo = ((FilteredLexicalModelAdapter) listView.getAdapter()).getItem(position).map;
+          LexicalModel model = ((FilteredLexicalModelAdapter) listView.getAdapter()).getItem(position);
+          Map<String, String> modelInfo = model.map;
           String packageID = modelInfo.get(KMManager.KMKey_PackageID);
           String languageID = modelInfo.get(KMManager.KMKey_LanguageID);
           String modelID = modelInfo.get(KMManager.KMKey_LexicalModelID);
@@ -137,15 +138,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
             // Don't register associated lexical model because this is not a UI view
           } else {
             // Model isn't installed so prompt to download it
-            Bundle args = new Bundle();
-            args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
-            args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
-            args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, modelID);
-            args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, modelName);
-            args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-            args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-            args.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL,
-                modelInfo.get(KMManager.KMKey_LexicalModelPackageFilename));
+            Bundle args = model.buildDownloadBundle();
             Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
             i.putExtras(args);
             startActivity(i);
