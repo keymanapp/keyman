@@ -1,13 +1,8 @@
 
 package com.tavultesoft.kmea;
 
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,16 +22,11 @@ import androidx.appcompat.widget.Toolbar;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.MapCompat;
 
-import org.json.JSONArray;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -206,6 +195,12 @@ public final class ModelPickerActivity extends AppCompatActivity {
     static final int RESOURCE = R.layout.models_list_row_layout;
     private final Context context;
 
+    static private class ViewHolder {
+      ImageView imgInstalled;
+      ImageView imgDetails;
+      TextView text;
+    }
+
     public FilteredLexicalModelAdapter(@NonNull Context context, final Dataset repo, final String languageCode) {
       // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
       super(context, RESOURCE, repo.lexicalModels, repo.lexicalModelFilter, languageCode);
@@ -216,17 +211,20 @@ public final class ModelPickerActivity extends AppCompatActivity {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       LexicalModel model = this.getItem(position);
+      ViewHolder holder;
 
       // If we're being told to reuse an existing view, do that.  It's automatic optimization.
       if (convertView == null) {
         convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+        holder = new ViewHolder();
+
+        holder.imgInstalled = convertView.findViewById(R.id.image1);
+        holder.text = convertView.findViewById(R.id.text1);
+        holder.imgDetails = convertView.findViewById(R.id.image2);
+        convertView.setTag(holder);
+      } else {
+        holder = (ViewHolder) convertView.getTag();
       }
-
-      View view = convertView;
-
-      ImageView img1 = view.findViewById(R.id.image1);
-      TextView text1 = view.findViewById(R.id.text1);
-      ImageView img2 = view.findViewById(R.id.image2);
 
       // Needed for the check below.
       String packageID = model.map.get(KMManager.KMKey_PackageID);
@@ -239,15 +237,16 @@ public final class ModelPickerActivity extends AppCompatActivity {
       // Is this an installed model or not?
 
       if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
-        img1.setImageResource(R.drawable.ic_check);
+        holder.imgInstalled.setImageResource(R.drawable.ic_check);
+        holder.imgDetails.setImageResource(R.drawable.ic_arrow_forward);
       } else {
-        img1.setImageResource(0);
+        holder.imgInstalled.setImageResource(0);
+        holder.imgDetails.setImageResource(0);
       }
 
-      text1.setText(model.map.get(KMManager.KMKey_LexicalModelName));
-      img2.setImageResource(R.drawable.ic_arrow_forward);
+      holder.text.setText(model.map.get(KMManager.KMKey_LexicalModelName));
 
-      return view;
+      return convertView;
     }
   }
 }

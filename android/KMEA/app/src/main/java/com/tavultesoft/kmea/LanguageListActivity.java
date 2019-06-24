@@ -374,6 +374,12 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     static final int RESOURCE = R.layout.list_row_layout2;
     private final Context context;
 
+    private static class ViewHolder {
+      ImageView img;
+      TextView textLang;
+      TextView textKbd;
+    }
+
     public LanguagesAdapter(@NonNull Context context, final Dataset repo) {
       super(context, RESOURCE, repo);
       this.context = context;
@@ -382,36 +388,41 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       Dataset.LanguageDataset data = this.getItem(position);
+      ViewHolder holder;
 
       // If we're being told to reuse an existing view, do that.  It's automatic optimization.
       if (convertView == null) {
         convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+        holder = new ViewHolder();
+
+        holder.img = convertView.findViewById(R.id.image1);
+        holder.textLang = convertView.findViewById(R.id.text1);
+        holder.textKbd = convertView.findViewById(R.id.text2);
+        convertView.setTag(holder);
+      } else {
+        holder = (ViewHolder) convertView.getTag();
       }
 
-      View view = convertView;
-      view.setAlpha(1.0f);
+      convertView.setAlpha(1.0f);
 
-      ImageView img1 = view.findViewById(R.id.image1);
-      TextView text1 = view.findViewById(R.id.text1);
-      TextView text2 = view.findViewById(R.id.text2);
 
-      text1.setText(data.name);
-      img1.setImageResource(0);
+      holder.textLang.setText(data.name);
+      holder.img.setImageResource(0);
 
       if(data.keyboards.size() == 1) {
         Keyboard kbd = data.keyboards.iterator().next();
-        text2.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+        holder.textKbd.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
 
         if (!isEnabled(position)) {
-          view.setAlpha(0.25f);
-          img1.setImageResource(R.drawable.ic_check);
+          convertView.setAlpha(0.25f);
+          holder.img.setImageResource(R.drawable.ic_check);
         }
       } else {
-        text2.setText("");
-        img1.setImageResource(R.drawable.ic_arrow_forward);
+        holder.textKbd.setText("");
+        holder.img.setImageResource(R.drawable.ic_arrow_forward);
       }
 
-      return view;
+      return convertView;
     }
 
     @Override

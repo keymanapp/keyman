@@ -38,6 +38,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private static final String TAG = "KeyboardListActivity";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     String langName = getIntent().getStringExtra("languageName");
 
     Dataset repo = CloudRepository.shared.fetchDataset(this, null, null);
-    FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(this, repo, langID);
+    final FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(this, repo, langID);
 
     textView.setText(langName);
 
@@ -69,14 +70,17 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-        FilteredKeyboardsAdapter adapter = (FilteredKeyboardsAdapter) listView.getAdapter();
-
-        HashMap<String, String> kbInfo = new HashMap<>(adapter.getItem(position).map);
-        final String pkgID = MapCompat.getOrDefault(new HashMap<>(kbInfo), KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+        Keyboard kbd = adapter.getItem(position);
+        if(kbd == null) {
+          Log.e(TAG, "Could not find keyboard corresponding to item click position " + position);
+          return;
+        }
+        HashMap<String, String> kbInfo = new HashMap<>(kbd.map);
+        final String pkgID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
         final String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
-        final String langID = kbInfo.get(KMManager.KMKey_LanguageID);
+        final String lgID = kbInfo.get(KMManager.KMKey_LanguageID);
         String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
-        String langName = kbInfo.get(KMManager.KMKey_LanguageName);
+        String lgName = kbInfo.get(KMManager.KMKey_LanguageName);
         String kFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_Font, "");
         String kOskFont = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_OskFont, kFont);
         String isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
@@ -84,7 +88,7 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
         if (!pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
           // keyboard already exists in packages/ so just add the language association
           KeyboardPickerActivity.addKeyboard(context, kbInfo);
-          KMManager.setKeyboard(pkgID, kbID, langID, kbName, langName, kFont, kOskFont);
+          KMManager.setKeyboard(pkgID, kbID, lgID, kbName, lgName, kFont, kOskFont);
           Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
           // Setting result to 1 so calling activity will finish too
           setResult(1);
@@ -95,9 +99,9 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
         Bundle args = new Bundle();
         args.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
         args.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
+        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, lgID);
         args.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
+        args.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, lgName);
         args.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
         Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
         i.putExtras(args);
@@ -168,6 +172,11 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     static final int RESOURCE = R.layout.list_row_layout1;
     private final Context context;
 
+    private static class ViewHolder {
+      ImageView img;
+      TextView text;
+    }
+
     public FilteredKeyboardsAdapter(@NonNull Context context, final Dataset repo, final String languageCode) {
       // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
       super(context, RESOURCE, repo.keyboards, repo.keyboardFilter, languageCode);
@@ -178,27 +187,31 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       Keyboard kbd = this.getItem(position);
+      ViewHolder holder;
 
       // If we're being told to reuse an existing view, do that.  It's automatic optimization.
       if (convertView == null) {
         convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+        holder = new ViewHolder();
+
+        holder.img = convertView.findViewById(R.id.image1);
+        holder.text = convertView.findViewById(R.id.text1);
+        convertView.setTag(holder);
+      } else {
+        holder = (ViewHolder) convertView.getTag();
       }
 
-      View view = convertView;
-
-      ImageView img1 = view.findViewById(R.id.image1);
-      TextView text1 = view.findViewById(R.id.text1);
-      text1.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+      holder.text.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
 
       if (!this.isEnabled(position)) {
-        view.setAlpha(0.25f);
-        img1.setImageResource(R.drawable.ic_check);
+        convertView.setAlpha(0.25f);
+        holder.img.setImageResource(R.drawable.ic_check);
       } else {
-        view.setAlpha(1.0f);
-        img1.setImageResource(0);
+        convertView.setAlpha(1.0f);
+        holder.img.setImageResource(0);
       }
 
-      return view;
+      return convertView;
     }
 
     @Override

@@ -148,6 +148,12 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   static private class LanguagesAdapter extends NestedAdapter<Dataset.LanguageDataset, Dataset, Void> {
     static final int RESOURCE = R.layout.list_row_layout2;
 
+    private static class ViewHolder {
+      ImageView img;
+      TextView textLang;
+      TextView textCount;
+    }
+
     public LanguagesAdapter(@NonNull Context context, final Dataset storage) {
       super(context, RESOURCE, storage, new AdapterFilter<Dataset.LanguageDataset, Dataset, Void>() {
         public List<Dataset.LanguageDataset> selectFrom(Dataset dataset, Void dummy) {
@@ -169,29 +175,31 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       Dataset.LanguageDataset data = this.getItem(position);
+      ViewHolder holder;
 
       // If we're being told to reuse an existing view, do that.  It's automatic optimization.
       if (convertView == null) {
         convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+        holder = new ViewHolder();
+
+        holder.img = convertView.findViewById(R.id.image1);
+        holder.textLang = convertView.findViewById(R.id.text1);
+        holder.textCount = convertView.findViewById(R.id.text2);
+        convertView.setTag(holder);
+      } else {
+        holder = (ViewHolder) convertView.getTag();
       }
 
-      View view = convertView;
-      view.setAlpha(1.0f);
-
-      ImageView img1 = view.findViewById(R.id.image1);
-      TextView text1 = view.findViewById(R.id.text1);
-      TextView text2 = view.findViewById(R.id.text2);
-
-      text1.setText(data.name);
-      img1.setImageResource(R.drawable.ic_arrow_forward);
+      holder.textLang.setText(data.name);
+      holder.img.setImageResource(R.drawable.ic_arrow_forward);
 
       if(data.keyboards.size() == 1) {
-        text2.setText("(1 keyboard)");
+        holder.textCount.setText("(1 keyboard)");
       } else {
-        text2.setText("(" + data.keyboards.size() + " keyboards)");
+        holder.textCount.setText("(" + data.keyboards.size() + " keyboards)");
       }
 
-      return view;
+      return convertView;
     }
   }
 }

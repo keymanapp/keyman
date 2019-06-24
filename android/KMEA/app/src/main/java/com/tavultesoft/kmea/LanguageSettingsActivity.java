@@ -65,22 +65,22 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     listView.setFastScrollEnabled(true);
 
     Bundle bundle = getIntent().getExtras();
-    FilteredKeyboardsAdapter adapter = null;
-    if (bundle != null) {
-      associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
-      lgCode = bundle.getString(KMManager.KMKey_LanguageID);
-      lgName = bundle.getString(KMManager.KMKey_LanguageName);
-
-      // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
-      String title = String.format(getString(R.string.title_language_settings), lgName);
-      textView.setText(title);
-
-      adapter = new FilteredKeyboardsAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), lgCode);
-    } else {
+    if (bundle == null) {
       // Should never actually happen.
-      Log.v(TAG, "Language data not specified for LanguageSettingsActivity!");
+      Log.e(TAG, "Language data not specified for LanguageSettingsActivity!");
       finish();
+      return;  // We could throw NullPointerException, but this is more graceful in case it slips into production.
     }
+
+    associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
+    lgCode = bundle.getString(KMManager.KMKey_LanguageID);
+    lgName = bundle.getString(KMManager.KMKey_LanguageName);
+
+    // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
+    String title = String.format(getString(R.string.title_language_settings), lgName);
+    textView.setText(title);
+
+    FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), lgCode);
 
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
     textView = (TextView) layout.findViewById(R.id.text1);
@@ -215,6 +215,11 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   static private class FilteredKeyboardsAdapter extends NestedAdapter<com.tavultesoft.kmea.data.Keyboard, Dataset.Keyboards, String> {
     static final int RESOURCE = R.layout.list_row_layout1;
 
+    private static class ViewHolder {
+      ImageView img;
+      TextView text;
+    }
+
     public FilteredKeyboardsAdapter(@NonNull Context context, final Dataset storage, final String languageCode) {
       // Goal:  to not need a custom filter here, instead relying on LanguageDataset's built-in filters.
       super(context, RESOURCE, storage.keyboards, storage.keyboardFilter, languageCode);
@@ -223,20 +228,23 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
       com.tavultesoft.kmea.data.Keyboard kbd = this.getItem(position);
+      ViewHolder holder;
 
       // If we're being told to reuse an existing view, do that.  It's automatic optimization.
       if (convertView == null) {
         convertView = LayoutInflater.from(getContext()).inflate(RESOURCE, parent, false);
+        holder = new ViewHolder();
+        holder.img = convertView.findViewById(R.id.image1);
+        holder.text = convertView.findViewById(R.id.text1);
+        convertView.setTag(holder);
+      } else {
+        holder = (ViewHolder) convertView.getTag();
       }
 
-      View view = convertView;
+      holder.text.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+      holder.img.setImageResource(R.drawable.ic_arrow_forward);
 
-      ImageView img1 = view.findViewById(R.id.image1);
-      TextView text1 = view.findViewById(R.id.text1);
-      text1.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
-      img1.setImageResource(R.drawable.ic_arrow_forward);
-
-      return view;
+      return convertView;
     }
   }
 }

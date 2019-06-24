@@ -27,6 +27,12 @@ import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, Void> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
 
+  private static class ViewHolder {
+    TextView textLang;
+    TextView textKbd;
+    ImageButton imgDetails;
+  }
+
   protected Typeface listFont;
 
   public KMKeyboardPickerAdapter(final Context context, Dataset.Keyboards adapter) {
@@ -53,32 +59,36 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
     Keyboard kbd = getItem(position);
+    ViewHolder holder;
 
     // If we're being told to reuse an existing view, do that.  It's automatic optimization.
     if(convertView == null) {
       convertView = LayoutInflater.from(getContext()).inflate(KEYBOARD_LAYOUT_RESOURCE, parent, false);
+      holder = new ViewHolder();
+
+      holder.textLang = convertView.findViewById(R.id.text1);
+      holder.textKbd = convertView.findViewById(R.id.text2);
+      holder.imgDetails = convertView.findViewById(R.id.imageButton1);
+      convertView.setTag(holder);
+    } else {
+      holder = (ViewHolder) convertView.getTag();
     }
 
-    View view = convertView;
-
-    TextView text1 = view.findViewById(R.id.text1);
-    TextView text2 = view.findViewById(R.id.text2);
-
-    text1.setText(kbd.map.get(KMManager.KMKey_LanguageName));
-    text2.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+    holder.textLang.setText(kbd.map.get(KMManager.KMKey_LanguageName));
+    holder.textKbd.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
 
     if (listFont != null) {
-      text1.setTypeface(listFont, Typeface.BOLD);
-      text2.setTypeface(listFont, Typeface.NORMAL);
+      holder.textLang.setTypeface(listFont, Typeface.BOLD);
+      holder.textKbd.setTypeface(listFont, Typeface.NORMAL);
     }
 
-    if (text2.getText().toString().equals(text1.getText().toString()))
-      text2.setVisibility(View.INVISIBLE);
+    if (holder.textKbd.getText().toString().equals(holder.textLang.getText().toString())) {
+      holder.textKbd.setVisibility(View.INVISIBLE);
+    }
 
-    ImageButton imgButton = (ImageButton) view.findViewById(R.id.imageButton1);
-    imgButton.setTag(kbd);
-    imgButton.setOnClickListener(this);
-    return view;
+    holder.imgDetails.setTag(kbd);
+    holder.imgDetails.setOnClickListener(this);
+    return convertView;
   }
 
   @Override
