@@ -47,6 +47,10 @@ public class CloudRepository {
   private Calendar lastLoad; // To be used for Dataset caching.
   private boolean invalidateLexicalCache = false;
 
+  // DEBUG:  Never allow these to be `true` in production.
+  private static final boolean DEBUG_DISABLE_CACHE = false;
+  private static final boolean DEBUG_SIMULATE_UPDATES = false;
+
   private CloudRepository() {
     // Tracks the time of the most recent cache.  We start at null to indicate that we haven't
     // tried to read the cache yet, as we don't yet have a Context instance to reference.
@@ -58,6 +62,10 @@ public class CloudRepository {
   }
 
   public boolean hasCache(Context context) {
+    if(DEBUG_DISABLE_CACHE) {
+      return false;
+    }
+
     if(shouldUseMemCache(context)) {
       return true;
     } else {
@@ -67,6 +75,10 @@ public class CloudRepository {
   }
 
   private boolean shouldUseMemCache(Context context) {
+    if(DEBUG_DISABLE_CACHE) {
+      return false;
+    }
+
     boolean hasConnection = KMManager.hasConnection(context);
 
     if (memCachedDataset != null) {
@@ -81,6 +93,10 @@ public class CloudRepository {
   }
 
   private boolean shouldUseCache(Context context, File cacheFile) {
+    if(DEBUG_DISABLE_CACHE) {
+      return false;
+    }
+
     boolean hasConnection = KMManager.hasConnection(context);
 
     // Forced cache bypass - we need to load more lexical models (signaled by invalidation).
@@ -690,14 +706,29 @@ public class CloudRepository {
     }
 
     public Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
-      // Get version from newly-downloaded keyboard.
-      String newKbVersion = cloudResource.getVersion();
-      String kbVersion = existingMatch.getVersion();
+      if(DEBUG_SIMULATE_UPDATES) {
+        return cloudResource.buildDownloadBundle();
+      }
 
-      if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+      if (compareVersions(cloudResource, existingMatch) == FileUtils.VERSION_GREATER) {
         return cloudResource.buildDownloadBundle();
       } else {
         return null;
+      }
+    }
+
+    public int compareVersions(LanguageResource addition, LanguageResource original) {
+      // Get version from newly-downloaded keyboard.
+      String addVersion = addition.getVersion();
+      String origVersion = original.getVersion();
+
+      int result = FileUtils.compareVersions(addVersion, origVersion);
+
+      if(DEBUG_SIMULATE_UPDATES && result == FileUtils.VERSION_EQUAL) {
+        // Ensures that we preserve the cloud-based version that provides download URLs.
+        return FileUtils.VERSION_GREATER;
+      } else {
+        return result;
       }
     }
 
@@ -706,12 +737,13 @@ public class CloudRepository {
       List<Keyboard> keyboardsArrayList = processKeyboardJSON(jsonTuple.keyboardJSON, false);
       List<LexicalModel> lexicalModelsArrayList = processLexicalModelJSON(jsonTuple.lexicalModelJSON);
 
+      Dataset installedData = KeyboardPickerActivity.getInstalledDataset(context);
       final List<Bundle> updateBundles = new ArrayList<>();
 
       // We're about to do a big batch of edits.
       this.dataset.setNotifyOnChange(false);
 
-      // Filter out any duplicates from already-installed / KMP keyboards, properly merging the lists.
+      // Filter out any duplicates from KMP keyboards, properly merging the lists.
       for(int i = 0; i < keyboardsArrayList.size(); i++) {
         Keyboard keyboard = keyboardsArrayList.get(i);
 
@@ -719,21 +751,32 @@ public class CloudRepository {
         Keyboard match = dataset.keyboards.findMatch(keyboard);
 
         if(match != null) {
-          Bundle bundle = updateCheck(keyboard, match);
-          if(bundle != null) {
-            updateBundles.add(bundle);
+          if(compareVersions(keyboard, match) == FileUtils.VERSION_GREATER) {
+            dataset.keyboards.remove(match);
+          } else {
+            keyboardsArrayList.remove(keyboard);
+            i--; // Decrement our index to reflect the removal.
           }
-
-          // After update stuff is reasonably handled...
-          keyboardsArrayList.remove(keyboard);
-          i--; // Decrement our index to reflect the removal.
         } // else no match == no special handling.
       }
 
-      Log.d(TAG, keyboardsArrayList.toString());
-
       // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
       dataset.keyboards.addAll(keyboardsArrayList);
+
+      // The actual update check.
+      for(int i = 0; i < installedData.keyboards.getCount(); i++) {
+        Keyboard keyboard = installedData.keyboards.getItem(i);
+
+        // Check for duplicates / possible updates.
+        Keyboard match = dataset.keyboards.findMatch(keyboard);
+
+        if(match != null) {
+          Bundle bundle = updateCheck(match, keyboard);
+          if(bundle != null) {
+            updateBundles.add(bundle);
+          }
+        } // else no match == no special handling.
+      }
 
       // Filter out any duplicates from already-installed models, properly merging the lists.
       for(int i = 0; i < lexicalModelsArrayList.size(); i++) {
@@ -743,19 +786,32 @@ public class CloudRepository {
         LexicalModel match = dataset.lexicalModels.findMatch(model);
 
         if(match != null) {
-          Bundle bundle = updateCheck(model, match);
-          if(bundle != null) {
-            updateBundles.add(bundle);
+          if (compareVersions(model, match) == FileUtils.VERSION_GREATER) {
+            dataset.lexicalModels.remove(match);
+          } else {
+            lexicalModelsArrayList.remove(model);
+            i--; // Decrement our index to reflect the removal.
           }
-
-          // After update stuff is reasonably handled...
-          lexicalModelsArrayList.remove(model);
-          i--; // Decrement our index to reflect the removal.
         } // else no match == no special handling.
       }
 
       // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
       dataset.lexicalModels.addAll(lexicalModelsArrayList);
+
+      // Do the actual update checks.
+      for(int i = 0; i < installedData.lexicalModels.getCount(); i++) {
+        LexicalModel model = installedData.lexicalModels.getItem(i);
+
+        // Check for duplicates / possible updates.
+        LexicalModel match = dataset.lexicalModels.findMatch(model);
+
+        if(match != null) {
+          Bundle bundle = updateCheck(match, model);
+          if(bundle != null) {
+            updateBundles.add(bundle);
+          }
+        } // else no match == no special handling.
+      }
 
       if(updateBundles.size() > 0) {
         // Time for updates!

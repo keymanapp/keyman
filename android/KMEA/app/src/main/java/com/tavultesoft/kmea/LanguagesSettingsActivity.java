@@ -325,6 +325,8 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
         // Update keyboards
         if (KMManager.hasConnection(context)) {
           // For each updatable keyboard, one at a time, do the update.
+          // TODO:  May need a reework to better handle large amounts of updates -
+          //        these calls will stack within the Android subsystem and may have issues accordingly.
           for (Bundle resourceBundle: updatableResources) {
             Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
             intent.putExtras(resourceBundle);

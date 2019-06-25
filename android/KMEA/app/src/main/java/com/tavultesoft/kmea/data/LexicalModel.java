@@ -55,14 +55,22 @@ public class LexicalModel implements Serializable, LanguageResource {
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
 
+    // Make sure we have an actual download URL.  If not, we can't build a proper download bundle -
+    // the downloader conditions on this URL's existence in 12.0!
+    String modelURL = map.get(KMManager.KMKey_LexicalModelPackageFilename);
+    if(modelURL == null) {
+      return null;
+    } else if (modelURL.equals("")) {
+      return null;
+    }
+
     bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, getResourceId());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, getLanguageCode());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, getResourceName());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, getLanguageName());
     bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL,
-        map.get(KMManager.KMKey_LexicalModelPackageFilename));
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL, modelURL);
 
     return bundle;
   }

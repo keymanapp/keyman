@@ -363,7 +363,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     boolean result = false;
 
     if (lexicalModelsList == null) {
-      lexicalModelsList = new ArrayList<HashMap<String, String>>();
+      // First, try loading our existing (file-backed) model list.
+      lexicalModelsList = getLexicalModelsList(context);
+      // If there is no existing list, time to build one from scratch.
+      if(lexicalModelsList == null) {
+        lexicalModelsList = new ArrayList<>();
+      }
     }
 
     if (lexicalModelInfo != null) {
