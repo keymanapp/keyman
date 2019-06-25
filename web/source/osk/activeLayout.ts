@@ -1,4 +1,6 @@
 namespace com.keyman.osk {
+  type KeyDistribution = text.KeyDistribution;
+
   export class ActiveKey implements LayoutKey {
 
     // Defines key defaults
@@ -12,11 +14,14 @@ namespace com.keyman.osk {
     id?: string;
     width?: string;
     pad?: string;
+    layer: string;
+    displayLayer: string;
+    nextlayer: "string";
     
     proportionalX: number;
     proportionalWidth: number;
 
-    static polyfill(key: LayoutKey) {
+    static polyfill(key: LayoutKey, displayLayer: string) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveKey();
       for(let prop in dummy) {
@@ -24,6 +29,10 @@ namespace com.keyman.osk {
           key[prop] = dummy[prop];
         }
       }
+
+      let aKey = key as ActiveKey;
+      aKey.displayLayer = displayLayer;
+      aKey.layer = aKey.layer || displayLayer;
     }
   }
 
@@ -43,7 +52,7 @@ namespace com.keyman.osk {
 
     }
     
-    static polyfill(row: LayoutRow, totalWidth: number, proportionalY: number) {
+    static polyfill(row: LayoutRow, displayLayer: string, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
@@ -70,7 +79,7 @@ namespace com.keyman.osk {
             break;
         }
 
-        ActiveKey.polyfill(key);
+        ActiveKey.polyfill(key, displayLayer);
       }
 
       /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -211,7 +220,7 @@ namespace com.keyman.osk {
       for(let i=0; i<rowCount; i++) {
         // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
         let rowProportionalY = (i + 0.5) / rowCount;
-        ActiveRow.polyfill(layer.row[i], totalWidth, rowProportionalY);
+        ActiveRow.polyfill(layer.row[i], layer.id, totalWidth, rowProportionalY);
       }
 
       // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -245,7 +254,7 @@ namespace com.keyman.osk {
      * @param kbdScaleRatio The ratio of the keyboard's horizontal scale to its vertical scale.
      *                           For a 400 x 200 keyboard, should be 2.
      */
-    getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): {keyId: string, p: number}[] {
+    getTouchProbabilities(touchCoords: {x: number, y: number}, kbdScaleRatio: number): KeyDistribution {
       let distribution = this.simpleTouchDistribution(touchCoords, kbdScaleRatio);
       let list: {keyId: string, p: number}[] = [];
 
@@ -302,6 +311,10 @@ namespace com.keyman.osk {
       // generating a probability distribution.
       this.row.forEach(function(row: ActiveRow): void {
         row.key.forEach(function(key: ActiveKey): void {
+          // If the key lacks an ID, just skip it.  Sometimes used for padding.
+          if(!key.id) {
+            return;
+          }
           // These represent the within-key distance of the touch from the key's center.
           // Both should be on the interval [0, 0.5].
           let dx = Math.abs(touchCoords.x - key.proportionalX);
@@ -341,7 +354,7 @@ namespace com.keyman.osk {
           distY += dy * layer.rowProportionalHeight;
 
           let distance = distX * distX + distY * distY;
-          keyDists[layer.id + '-' + key.id] = distance;
+          keyDists[key.id] = distance;
         });
       });
 
@@ -352,9 +365,9 @@ namespace com.keyman.osk {
       // Keys usually are specified in a "long form" prefixed with their layer's ID.
       if(keyId.indexOf(this.id + '-') == 0) {
         keyId = keyId.replace(this.id + '-', '');
-
-        return this.keyMap[keyId];
       }
+
+      return this.keyMap[keyId];
     }
   }
 
@@ -362,8 +375,17 @@ namespace com.keyman.osk {
     layer: ActiveLayer[];
     font: string;
 
+    /**
+     * Facilitates mapping layer id strings to their specification objects.
+     */
+    layerMap: {[layerId: string]: ActiveLayer};
+
     private constructor() {
 
+    }
+
+    getLayer(layerId: string): ActiveLayer {
+      return this.layerMap[layerId];
     }
 
     /**
@@ -379,6 +401,7 @@ namespace com.keyman.osk {
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number, i: number;
       var layers: LayoutLayer[], layer: LayoutLayer;
+      let layerMap: {[layerId: string]: ActiveLayer} = {};
       var rows: LayoutRow[];
 
       layers=layout['layer'];
@@ -400,6 +423,7 @@ namespace com.keyman.osk {
 
       for(n=0; n<layers.length; n++) {
         ActiveLayer.polyfill(layers[n], formFactor);
+        layerMap[layers[n].id] = layers[n] as ActiveLayer;
       }
 
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
@@ -410,7 +434,10 @@ namespace com.keyman.osk {
         }
       }
 
-      return layout as ActiveLayout;
+      let aLayout = layout as ActiveLayout;
+      aLayout.layerMap = layerMap;
+
+      return aLayout;
     }
   }
 }

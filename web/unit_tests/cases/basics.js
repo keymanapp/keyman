@@ -30,6 +30,7 @@ describe('Basic KeymanWeb', function() {
 Modernizr.on('touchevents', function(result) {
   if(!result) {
     describe('Basic Toggle UI', function() {
+      this.timeout(kmwconfig.timeouts.scriptLoad);
 
       beforeEach(function(done) {
         this.timeout(kmwconfig.timeouts.uiLoad);
