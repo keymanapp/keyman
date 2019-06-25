@@ -2,7 +2,9 @@ var assert = chai.assert;
 var LMLayer = com.keyman.text.prediction.LMLayer;
 
 describe('LMLayerWorker', function () {
-  this.timeout(5000);
+  // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
+  this.timeout(Math.max(config.timeouts.standard, 5000));
+
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {
       assert.isFunction(LMLayerWorkerCode,

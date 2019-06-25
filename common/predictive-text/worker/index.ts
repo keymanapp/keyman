@@ -31,8 +31,8 @@
 
 /// <reference path="../message.d.ts" />
 /// <reference path="models/dummy-model.ts" />
-/// <reference path="models/wordlist-model.ts" />
 /// <reference path="word_breaking/ascii-word-breaker.ts" />
+/// <reference path="./model-compositor.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -247,16 +247,9 @@ class LMLayerWorker {
         switch(payload.message) {
           case 'predict':
             let {transform, context} = payload;
+            let compositor = new ModelCompositor(model); // Yeah, should probably use a persistent one eventually.
 
-            let suggestions = model.predict(transform, context);
-
-            // Let's not rely on the model to copy transform IDs.
-            // Only bother is there IS an ID to copy.
-            if(transform.id !== undefined) {
-              suggestions.forEach(function(s: Suggestion) {
-                s.transformId = transform.id;
-              });
-            }
+            let suggestions = compositor.predict(transform, context);
 
             // Now that the suggestions are ready, send them out!
             this.cast('suggestions', {
@@ -311,6 +304,8 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
   module.exports['models'] = models;
   module.exports['wordBreakers'] = wordBreakers;
+  /// XXX: export the ModelCompositor for testing.
+  module.exports['ModelCompositor'] = ModelCompositor;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as DedicatedWorkerGlobalScope);

@@ -47,9 +47,9 @@
           ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
           : window.location.href;
 
-        var modelStub = {'id': 'example.en.wordlist',
+        var modelStub = {'id': 'example.en.trie',
           languages: ['en'],
-          path: (pageRef + "simple-en-wordlist.js")
+          path: (pageRef + "simple-en-trie.js")
         };
         kmw.modelManager.register(modelStub);
       });

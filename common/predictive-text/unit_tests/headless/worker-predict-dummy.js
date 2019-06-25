@@ -60,7 +60,9 @@ describe('LMLayerWorker dummy model', function() {
         left: "I'm a little ",
         startOfBuffer: true,
         endOfBuffer: true,
-      }, expectedSuggestions);
+      }, expectedSuggestions).map(function(value) {
+        return value.sample;
+      });
      assert.deepEqual(suggestions, expectedSuggestions);
     });
 
@@ -77,13 +79,13 @@ describe('LMLayerWorker dummy model', function() {
 
       // The dummy model should give suggestions in order,
       // regardless of the provided transform and context.
-      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()).map(function(value) { return value.sample }),
                        futureSuggestions[0]);
-      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()).map(function(value) { return value.sample }),
                        futureSuggestions[1]);
-      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()).map(function(value) { return value.sample }),
                        futureSuggestions[2]);
-      assert.deepEqual(model.predict(zeroTransform(), emptyContext()),
+      assert.deepEqual(model.predict(zeroTransform(), emptyContext()).map(function(value) { return value.sample }),
                        futureSuggestions[3]);
     });
   });
