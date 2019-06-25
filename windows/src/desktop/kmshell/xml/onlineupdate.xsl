@@ -10,6 +10,7 @@
 
 <html>
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <title><xsl:value-of select="$locale/String[@Id='S_Update_Title']"/></title>
 <style type="text/css">
 

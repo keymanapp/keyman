@@ -319,7 +319,7 @@ namespace com.keyman.text.prediction {
       this.recordTranscription(transcription);
 
       let transform = transcription.transform;
-      var promise = this.currentPromise = this.lmEngine.predict(transform, context);
+      var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
 
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {

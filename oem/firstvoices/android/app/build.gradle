@@ -1,0 +1,127 @@
+plugins {
+    id 'com.android.application'
+    id 'io.fabric'
+    id 'com.github.triplet.play' version '2.1.0' apply false
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId "com.firstvoices.keyboards"
+        minSdkVersion 17
+        targetSdkVersion 28
+
+        String env_services_json_file = System.getenv('oem_firstvoices_services_json_file')
+
+        if (env_services_json_file != null) {
+            env_services_json_file = String.valueOf(env_services_json_file)
+            println "Copying production google-services.json and using for firstvoices"
+            copy {
+                from env_services_json_file
+                include '*.json'
+                into './'
+            }
+        }
+
+        String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity, so all caps
+        String env_build_counter = System.getenv("build_counter")
+        if (env_build_number != null) {
+            println "Using build number $env_build_number and counter $env_build_counter from environment"
+            versionCode env_build_counter as Integer
+            versionName env_build_number
+        } else {
+            String majorMinorVersion = file('$projectDir/../../../../../resources/VERSION.md').text.trim()
+            versionCode 999
+            versionName majorMinorVersion + '.0.0'
+            println "Using build $majorMinorVersion from project VERSION.md"
+        }
+    }
+
+    String env_release_store_file = System.getenv("oem_firstvoices_release_store_file")
+    String env_release_store_password = System.getenv("oem_firstvoices_release_store_password")
+    String env_release_key_alias = System.getenv("oem_firstvoices_release_key_alias")
+    String env_release_key_password = System.getenv("oem_firstvoices_release_key_password")
+    if (env_release_store_file != null) {
+        signingConfigs {
+            release {
+                println "Using signing from environment"
+                storeFile file(String.valueOf(env_release_store_file))
+                storePassword env_release_store_password
+                keyAlias env_release_key_alias
+                keyPassword env_release_key_password
+            }
+        }
+    }
+
+    buildTypes {
+        /*debug {
+            applicationIdSuffix ".debug"
+        }*/
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (env_release_store_file != null) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+    productFlavors {
+    }
+
+    lintOptions {
+        disable 'MissingTranslation'
+    }
+}
+
+String env_keys_json_file = System.getenv("oem_firstvoices_keys_json_file")
+if (env_keys_json_file != null) {
+    apply plugin: 'com.github.triplet.play'
+
+    play {
+        serviceAccountCredentials = file(String.valueOf(env_keys_json_file))
+
+        // Deactivate lower conflicting version APKs
+        resolutionStrategy = "ignore"
+        switch (System.env.TIER) {
+            case 'beta':
+                track = 'beta'
+                break
+
+            case 'stable':
+                track = 'production'
+                break
+
+            default:
+                track = 'alpha'
+        }
+        println "TIER set to $track"
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+    google()
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'com.google.android.material:material:1.0.0'
+    api(name: 'keyman-engine', ext: 'aar')
+    implementation "com.google.firebase:firebase-core:16.0.9"
+    implementation "com.google.firebase:firebase-crash:16.2.1"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+        transitive = true
+    }
+    implementation 'androidx.preference:preference:1.1.0-alpha05'
+}
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'

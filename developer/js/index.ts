@@ -9,7 +9,7 @@ import * as ts from "typescript";
 import KmpCompiler from "./package-compiler/kmp-compiler";
 import * as fs from "fs";
 import * as path from "path";
-import { createWordListDataStructure, createTrieDataStructure } from "./lexical-model-compiler/build-trie";
+import { createTrieDataStructure } from "./lexical-model-compiler/build-trie";
 
 // The model ID MUST adhere to this pattern:
 //                         author           .bcp47            .uniq
@@ -234,15 +234,7 @@ export default class LexicalModelCompiler {
         (oc as LexicalModelCompiledFst).fst = Buffer.from(sources.join('')).toString('base64');
         this.logError('Unimplemented model format '+modelSource.format);
         return false;
-      case "trie-1.0":
-        func += `var model = {};\n`;
-        func += `model.backingData = ${createWordListDataStructure(sources)};\n`;
-        func += `LMLayerWorker.loadModel(new models.WordListModel(model.backingData`;
-        if (wordBreakingSource) {
-          func += `, {wordBreaking: ${wordBreakingSource}}`;
-        }
-        func += `));\n`;
-        break;
+      case "trie-1.0": // TODO: in lexical-models, rollback all trie-2.0 models to use trie-1.0!
       case 'trie-2.0':
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(sources, modelSource.searchTermToKey)
