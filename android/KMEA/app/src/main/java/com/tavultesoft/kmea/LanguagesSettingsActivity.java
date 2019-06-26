@@ -193,7 +193,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
           updateCheckFailed = false;
           updateFailed = false;
           if (!checkingUpdates) {
-            checkKeyboardUpdates(context);
+            checkResourceUpdates(context);
           }
         }
       }
@@ -279,7 +279,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
     }
   }
 
-  private void checkKeyboardUpdates(final Context context) {
+  private void checkResourceUpdates(final Context context) {
 
     Runnable onSuccess = new Runnable() {
       public void run() {
@@ -287,7 +287,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
           return;
         }
 
-        Toast.makeText(context, "All keyboards are up to date!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "All resources are up to date!", Toast.LENGTH_SHORT).show();
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
