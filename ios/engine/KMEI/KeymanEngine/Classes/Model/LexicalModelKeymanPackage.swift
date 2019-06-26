@@ -9,7 +9,7 @@
 import Foundation
 
 public class LexicalModelKeymanPackage : KeymanPackage {
-  private var models : [KMPLexicalModel]!
+  public var models : [KMPLexicalModel]!
   
   public override func defaultInfoHtml() -> String {
     var str = "Found lexical models in package:<br/>"

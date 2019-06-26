@@ -47,21 +47,21 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   
-    // MARK: - Table view data source UITableViewDataSource
+  // MARK: - Table view data source UITableViewDataSource
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
-    }
+  override func numberOfSections(in tableView: UITableView) -> Int {
+      return 2
+  }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      if 0 == section {
-        // so far as I know, there is always at least one keyboard or else we won't show
-        let kbct = language.keyboards!.count
-        return kbct
-      } else {
-        return 3  // 4 in future when we can manage a user dictionary
-      }
+  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    if 0 == section {
+      // so far as I know, there is always at least one keyboard or else we won't show
+      let kbct = language.keyboards!.count
+      return kbct
+    } else {
+      return 3  // 4 in future when we can manage a user dictionary
     }
+  }
   
   public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
     let rightOffset = cellFrame.size.width

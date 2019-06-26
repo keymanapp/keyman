@@ -344,7 +344,7 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
 // MARK: - LexicalModelRepositoryDelegate
 //may not need  this, as we don't plan ever to fetch the whole lexical model repository (or even the list of all available)
 extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
-  func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository) {
+  func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
     if let languageDict = repository.languages {
       languages = languageList(languageDict)
     }
@@ -367,7 +367,7 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
   func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
+    let vc = LanguageViewController(keyboardRep: Manager.shared.apiKeyboardRepository, modelRep: Manager.shared.apiLexicalModelRepository)
     navigationController?.pushViewController(vc, animated: true)
   }
 }

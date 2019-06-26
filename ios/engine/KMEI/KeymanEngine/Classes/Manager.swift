@@ -297,6 +297,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // If we have a lexical model for the keyboard's language, activate it.
     if let valid_models = Storage.active.userDefaults.userLexicalModels(forLanguage: kb.languageID) {
       if valid_models.count > 0 {
+        //TODO: this is not quite right: currentLexicalModel might not be for this language
+        //  we need to get a preferred model for this language (or at least check that the current model is for this language)
+        //  then register that one.
         if let lm = self.currentLexicalModel {
           _ = Manager.shared.registerLexicalModel(lm)
         } else {
@@ -978,34 +981,29 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return nil
   }
   
-  func  installLexicalModelPackage(downloadedPackageFile: URL) {
+  // return a lexical model so caller can use it in a downloadSucceeded call
+  func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
+    var installedLexicalModel: InstallableLexicalModel? = nil
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     var destination =  documentsDirectory
     destination.appendPathComponent("temp/\(downloadedPackageFile.lastPathComponent)")
     
     KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
-      if let kmp = kmp {
+      if let kmp = kmp as! LexicalModelKeymanPackage? {
         do {
           try Manager.shared.parseLMKMP(kmp.sourceFolder)
-          log.info("successfully installed the lexical model from: \(kmp.sourceFolder)")
-          DispatchQueue.main.async {
-            self.apiLexicalModelRepository.delegate?.lexicalModelRepositoryDidFetch(self.apiLexicalModelRepository)
-          }
+          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
+          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
           //this can fail gracefully and not show errors to users
           try FileManager.default.removeItem(at: downloadedPackageFile)
         } catch {
           log.error("Error installing the lexical model: \(error)")
-          DispatchQueue.main.async {
-            self.apiLexicalModelRepository.delegate?.lexicalModelRepository(self.apiLexicalModelRepository, didFailFetch: error)
-          }
         }
       } else {
         log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
-        DispatchQueue.main.async {
-          self.apiLexicalModelRepository.delegate?.lexicalModelRepository(self.apiLexicalModelRepository, didFailFetch: APILexicalModelFetchError.noData)
-        }
       }
     })
+    return installedLexicalModel
   }
   
   func downloadLexicalModelPackage(string lexicalModelPackageURLString: String) -> Void {
@@ -1020,14 +1018,20 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                   error: Error?) {
         if let error = error {
           log.error("Failed to fetch lexical model KMP file")
-          downloadFailed(forKeyboards: [], error: error)
+          downloadFailed(forLexicalModelPackage: lexicalModelPackageURLString, error: error)
         } else {
           do {
             try data!.write(to: dest)
           } catch {
             log.error("Error writing the lexical model download data: \(error)")
           }
-          installLexicalModelPackage(downloadedPackageFile: dest)
+          if let lm = installLexicalModelPackage(downloadedPackageFile: dest) {
+            downloadSucceeded(forLexicalModel: lm)
+          } else {
+            let installError = NSError(domain: "Keyman", code: 0,
+                                       userInfo: [NSLocalizedDescriptionKey: "installError"])
+            downloadFailed(forLexicalModelPackage: lexicalModelPackageURLString, error: installError )
+          }
         }
       }
 
@@ -1395,6 +1399,20 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private func downloadFailed(forLanguageID languageID: String, error: Error) {
     let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
     NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  private func downloadFailed(forLexicalModelPackage packageURL: String, error: Error) {
+    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: packageURL, error: error)
+    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  private func downloadSucceeded(forLexicalModel lm: InstallableLexicalModel) {
+    let notification = LexicalModelDownloadCompletedNotification([lm])
+    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadCompleted,
                                     object: self,
                                     value: notification)
   }

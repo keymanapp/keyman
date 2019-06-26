@@ -208,6 +208,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
+    log.info("lexicalModelDownloadCompleted LexicalModelPicker")
     if view == navigationController?.topViewController?.view {
       if updateQueue == nil {
         return
