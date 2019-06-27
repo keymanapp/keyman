@@ -535,6 +535,25 @@ public class CloudRepository {
       this.keyboardJSON = keyboardJSON;
       this.lexicalModelJSON = lexicalModelJSON;
     }
+
+    public boolean isEmpty() {
+      boolean emptyKbd = false;
+      boolean emptyLex = false;
+
+      if (keyboardJSON == null) {
+        emptyKbd = true;
+      } else if (keyboardJSON.length() == 0) {
+        emptyKbd = true;
+      }
+
+      if(lexicalModelJSON == null) {
+        emptyLex = true;
+      } else if(lexicalModelJSON.length() == 0) {
+        emptyLex = true;
+      }
+
+      return emptyKbd && emptyLex;
+    }
   }
 
   // This is copied from LanguageListActivity to download a catalog from the cloud.
@@ -627,7 +646,9 @@ public class CloudRepository {
       }
 
       List<CloudApiReturns> retrievedJSON = new ArrayList<>(params.length);
-      progressDialog.setMax(params.length);
+      if(progressDialog != null) {
+        progressDialog.setMax(params.length);
+      }
 
       for(CloudApiParam param:params) {
         JSONParser jsonParser = new JSONParser();
@@ -647,17 +668,20 @@ public class CloudRepository {
             Log.d(TAG, e.getMessage());
           }
         } else {
+          // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.
         }
 
         if(param.type == JSONType.Array) {
-          retrievedJSON.add(new CloudApiReturns(param.target, dataArray));
+          retrievedJSON.add(new CloudApiReturns(param.target, dataArray));  // Null if offline.
         } else {
-          retrievedJSON.add(new CloudApiReturns(param.target, dataObject));
+          retrievedJSON.add(new CloudApiReturns(param.target, dataObject)); // Null if offline.
         }
-        progressDialog.setProgress(progressDialog.getProgress());
+        if(progressDialog != null) {
+          progressDialog.setProgress(progressDialog.getProgress());
+        }
       }
 
-      return new CloudDownloadReturns(retrievedJSON);
+      return new CloudDownloadReturns(retrievedJSON); // Will report empty arrays/objects if offline.
     }
 
     protected JSONArray ensureInit(JSONArray json) {
@@ -733,7 +757,16 @@ public class CloudRepository {
     }
 
     public void processCloudReturns(CloudDownloadReturns jsonTuple, boolean executeCallbacks) {
-      // TODO:  Need proper offline check again.
+      // Only empty if no queries returned data - we're offline.
+      if(jsonTuple.isEmpty()) {
+        if(this.updateHandler == null) {
+          String msg = context.getString(R.string.catalog_unavailable);
+          Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        }
+        this.failure.run(); // Signal failure to download to our failure callback.
+        return;
+      }
+
       List<Keyboard> keyboardsArrayList = processKeyboardJSON(jsonTuple.keyboardJSON, false);
       List<LexicalModel> lexicalModelsArrayList = processLexicalModelJSON(jsonTuple.lexicalModelJSON);
 

@@ -69,7 +69,12 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       // Should never actually happen.
       Log.e(TAG, "Language data not specified for LanguageSettingsActivity!");
       finish();
-      return;  // We could throw NullPointerException, but this is more graceful in case it slips into production.
+
+      if(KMManager.isDebugMode()) {
+        throw new NullPointerException("Language data not specified for LanguageSettingsActivity!");
+      } else {
+        return;
+      }
     }
 
     associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
