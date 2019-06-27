@@ -486,18 +486,21 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
    * @param context
    * @param position - int position in the models list
    */
-  protected static void deleteLexicalModel(Context context, int position) {
+  protected static void deleteLexicalModel(Context context, int position, boolean silenceNotification) {
     String modelID = getModelIDFromPosition(context, position);
     boolean result = removeLexicalModel(context, position);
 
     if (result) {
-      Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show();
+      if(!silenceNotification) {
+        Toast.makeText(context, "" + "Model deleted", Toast.LENGTH_SHORT).show();
+      }
       KMManager.deregisterLexicalModel(modelID);
     }
 
     notifyLexicalModelsUpdate(context);
   }
 
+  // Gets a raw list of installed lexical models.
   @SuppressWarnings("unchecked")
   private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
     ArrayList<HashMap<String, String>> list = null;

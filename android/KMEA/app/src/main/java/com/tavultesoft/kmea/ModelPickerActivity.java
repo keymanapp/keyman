@@ -101,6 +101,9 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
           String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
           boolean modelInstalled = KeyboardPickerActivity.containsLexicalModel(context, modelKey);
+          boolean immediateRegister = false;
+          Map<String, String> preInstalledModelMap = KMManager.getAssociatedLexicalModel(languageID);
+
           if (modelInstalled) {
             // Show Model Info
             listView.setItemChecked(position, true);
@@ -135,13 +138,34 @@ public final class ModelPickerActivity extends AppCompatActivity {
               Toast.makeText(context, "Model installed", Toast.LENGTH_SHORT).show();
             }
 
-            // Don't register associated lexical model because this is not a UI view
+            immediateRegister = true;
           } else {
             // Model isn't installed so prompt to download it
             Bundle args = model.buildDownloadBundle();
             Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
             i.putExtras(args);
             startActivity(i);
+          }
+
+          // If we had a previously-installed lexical model, we should 'deinstall' it so that only
+          // one model is actively linked to any given language.
+          if(!modelInstalled) {
+            // While awkward, we must obtain the preInstalledModelMap before any installations occur.
+            // We don't want to remove the model we just installed, after all!
+            LexicalModel preInstalled = new LexicalModel(preInstalledModelMap);
+            String itemKey = String.format("%s_%s_%s",
+                preInstalled.map.get(KMManager.KMKey_PackageID), preInstalled.getLanguageCode(), preInstalled.getResourceId());
+            int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);
+            KeyboardPickerActivity.deleteLexicalModel(context, modelIndex, true);
+          }
+
+          if(immediateRegister) {
+            // Register associated lexical model if it matches the active keyboard's language code;
+            // it's safe since we're on the same thread.  Needs to be called AFTER deinstalling the old one.
+            String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).get(KMManager.KMKey_LanguageID);
+            if(kbdLgCode.equals(languageID)) {
+              KMManager.registerAssociatedLexicalModel(languageID);
+            }
           }
 
           // Force a display refresh.

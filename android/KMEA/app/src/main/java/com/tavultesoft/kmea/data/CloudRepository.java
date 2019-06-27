@@ -167,7 +167,7 @@ public class CloudRepository {
       languageCodes.add(installedSet.getItem(i).code);
     }
 
-    // Get kmp.json info from installed models.
+    // Get kmp.json info from installed (adhoc and cloud) models.
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
