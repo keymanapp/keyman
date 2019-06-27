@@ -6,6 +6,10 @@
 * Add feature to install lexical model packages (#1641, 1653)
 * Started work on Keyman for Android 12.
 
+## 2019-06-28 11.0.2103 stable
+* Changes:
+  * Allow user to change keyboard from lock screen (#1709)
+
 ## 2019-02-27 11.0.2102 stable
 * Bug fix:
   * Fix crash from language picker trying to show error dialog (#1634)
