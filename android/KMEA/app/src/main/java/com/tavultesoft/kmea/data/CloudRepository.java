@@ -421,7 +421,8 @@ public class CloudRepository {
           // Determine package ID from packageFilename
           modelURL = model.optString("packageFilename", "");
           packageID = FileUtils.getFilename(modelURL);
-          packageID = packageID.replace(".model.kmp", "");
+          // Android keeps the .model part of the file extension as part of the package ID.
+          packageID = packageID.replace(".kmp", "");
         }
 
         // api.keyman.com query returns an array of language IDs Strings while
