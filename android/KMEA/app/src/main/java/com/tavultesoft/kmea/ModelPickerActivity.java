@@ -152,11 +152,13 @@ public final class ModelPickerActivity extends AppCompatActivity {
           if(!modelInstalled) {
             // While awkward, we must obtain the preInstalledModelMap before any installations occur.
             // We don't want to remove the model we just installed, after all!
-            LexicalModel preInstalled = new LexicalModel(preInstalledModelMap);
-            String itemKey = String.format("%s_%s_%s",
-                preInstalled.map.get(KMManager.KMKey_PackageID), preInstalled.getLanguageCode(), preInstalled.getResourceId());
-            int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);
-            KeyboardPickerActivity.deleteLexicalModel(context, modelIndex, true);
+            if(preInstalledModelMap != null) {
+              LexicalModel preInstalled = new LexicalModel(preInstalledModelMap);
+              String itemKey = String.format("%s_%s_%s",
+                  preInstalled.map.get(KMManager.KMKey_PackageID), preInstalled.getLanguageCode(), preInstalled.getResourceId());
+              int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);
+              KeyboardPickerActivity.deleteLexicalModel(context, modelIndex, true);
+            }
           }
 
           if(immediateRegister) {
