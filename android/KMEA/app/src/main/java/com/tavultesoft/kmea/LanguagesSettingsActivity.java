@@ -4,9 +4,13 @@
 
 package com.tavultesoft.kmea;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,33 +20,53 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Keyman Settings --> Languages Settings
  * Displays a list of installed languages and a count of their associated installed keyboards.
  */
-public final class LanguagesSettingsActivity extends AppCompatActivity {
+public final class LanguagesSettingsActivity extends AppCompatActivity
+    implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler {
 
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ImageButton addButton = null;
 
+  // ********* ONLY USED BY UPDATE CODE ***********
+
+  private static boolean updateCheckFailed = false;
+  private static boolean updateFailed = false;
+  private static Calendar lastUpdateCheck = null;
+  private static boolean checkingUpdates = false;
+
+  private static int updateCount = 0;
+  private static int failedUpdateCount = 0;
+  private static ProgressDialog updateProgress;
+
+  // ****** END - ONLY USED BY UPDATE CODE ********
+
   private boolean dismissOnSelect = false;
   protected static boolean canAddNewKeyboard = true;
+
+  private static String TAG = "LanguagesSettingsActivity";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -126,11 +150,63 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   @Override
   public void onResume() {
     super.onResume();
+
+    // From here on is update-specific stuff.
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
+
+    final Context context = this;
+    Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        boolean shouldCheckUpdate = false;
+        if (lastUpdateCheck == null) {
+          SharedPreferences prefs = context.getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+          Long lastUpdateCheckTime = prefs.getLong("lastUpdateCheck", 0);
+          if (lastUpdateCheckTime > 0) {
+            lastUpdateCheck = Calendar.getInstance();
+            lastUpdateCheck.setTime(new Date(lastUpdateCheckTime));
+          }
+        }
+
+        if (lastUpdateCheck != null) {
+          Calendar lastChecked = Calendar.getInstance();
+          lastChecked.setTime(lastUpdateCheck.getTime());
+          if (updateCheckFailed || updateFailed) {
+            lastChecked.add(Calendar.HOUR_OF_DAY, 1);
+          } else {
+            lastChecked.add(Calendar.HOUR_OF_DAY, 24);
+          }
+
+          Calendar now = Calendar.getInstance();
+          if (now.compareTo(lastChecked) > 0) {
+            shouldCheckUpdate = true;
+          }
+        } else {
+          shouldCheckUpdate = true;
+        }
+
+        // TODO:  Extremely temporary code for testing - remove before merging!
+        shouldCheckUpdate = true;
+
+        if (shouldCheckUpdate) {
+          updateCheckFailed = false;
+          updateFailed = false;
+          if (!checkingUpdates) {
+            checkResourceUpdates(context);
+          }
+        }
+      }
+    }, 1000);
   }
 
   @Override
   public void onPause() {
     super.onPause();
+
+    // Intentionally not removing KeyboardDownloadEventListener to
+    // ensure onKeyboardDownloadFinished() gets called
+    // (Transplanted from KeyboardPickerActivity.)
   }
 
   @Override
@@ -194,12 +270,160 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
       holder.img.setImageResource(R.drawable.ic_arrow_forward);
 
       if(data.keyboards.size() == 1) {
-        holder.textCount.setText("(1 keyboard)");
+        holder.textCount.setText(this.getContext().getString(R.string.single_keyboard_count));
       } else {
-        holder.textCount.setText("(" + data.keyboards.size() + " keyboards)");
+        String msg = String.format(this.getContext().getString(R.string.multiple_keyboard_count), data.keyboards.size());
+        holder.textCount.setText(msg);
       }
 
       return convertView;
+    }
+  }
+
+  private void checkResourceUpdates(final Context context) {
+
+    Runnable onSuccess = new Runnable() {
+      public void run() {
+        if(updateCount > 0) {
+          return;
+        }
+
+        Toast.makeText(context, context.getString(R.string.update_check_current), Toast.LENGTH_SHORT).show();
+        lastUpdateCheck = Calendar.getInstance();
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
+        editor.commit();
+        checkingUpdates = false;
+      }
+    };
+
+    Runnable onFailure = new Runnable() {
+      public void run() {
+        if(updateCount > 0) {
+          return;
+        }
+
+        Toast.makeText(context, context.getString(R.string.update_check_unavailable), Toast.LENGTH_SHORT).show();
+        lastUpdateCheck = Calendar.getInstance();
+        updateCheckFailed = true;
+        checkingUpdates = false;
+      }
+    };
+
+    checkingUpdates = true;
+    CloudRepository.shared.fetchDataset(this, this, onSuccess, onFailure);
+  }
+
+  public void onUpdateDetection(final List<Bundle> updatableResources) {
+    failedUpdateCount = 0;
+    updateCount = updatableResources.size();
+    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+    dialogBuilder.setTitle(context.getString(R.string.keyboard_updates_available));
+    dialogBuilder.setMessage(context.getString(R.string.confirm_update));
+    dialogBuilder.setPositiveButton(context.getString(R.string.label_update), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        // Update keyboards
+        if (KMManager.hasConnection(context)) {
+          // For each updatable keyboard, one at a time, do the update.
+          // TODO:  May need a reework to better handle large amounts of updates -
+          //        these calls will stack within the Android subsystem and may have issues accordingly.
+          for (Bundle resourceBundle: updatableResources) {
+            Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
+            intent.putExtras(resourceBundle);
+            context.startActivity(intent);
+          }
+        } else {
+          Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
+          checkingUpdates = false;
+        }
+      }
+    });
+
+    dialogBuilder.setNegativeButton(context.getString(R.string.label_later), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int which) {
+        lastUpdateCheck = Calendar.getInstance();
+        checkingUpdates = false;
+      }
+    });
+
+    AlertDialog dialog = dialogBuilder.create();
+    if (!((AppCompatActivity) context).isFinishing()) {
+      dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        @Override
+        public void onCancel(DialogInterface dialog) {
+          lastUpdateCheck = Calendar.getInstance();
+          checkingUpdates = false;
+        }
+      });
+      dialog.show();
+    } else {
+      checkingUpdates = false;
+    }
+  }
+
+  @Override
+  public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
+    // Do nothing
+  }
+
+  @Override
+  public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
+    if (result > 0) {
+      KeyboardPickerActivity.handleDownloadedKeyboard(this, keyboardInfo);
+    } else if (result < 0) {
+      failedUpdateCount++;
+    }
+
+    if (updateCount > 0) {
+      updateCount--;
+    }
+
+    tryFinalizeUpdate();
+  }
+
+  @Override
+  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
+    // Do nothing
+  }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    if (updateCount > 0) {
+      updateCount -= lexicalModelsInstalled.size();
+    }
+
+    tryFinalizeUpdate();
+  }
+
+  void tryFinalizeUpdate() {
+    if (updateCount == 0 && updateProgress != null && updateProgress.isShowing()) {
+      if (updateProgress != null && updateProgress.isShowing()) {
+        try {
+          updateProgress.dismiss();
+          updateProgress = null;
+        } catch (Exception e) {
+          updateProgress = null;
+        }
+      }
+
+      if (failedUpdateCount > 0) {
+        Toast.makeText(this, "One or more resources failed to update!", Toast.LENGTH_SHORT).show();
+        lastUpdateCheck = Calendar.getInstance();
+        updateFailed = true;
+        checkingUpdates = false;
+      } else {
+        Toast.makeText(this, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
+        lastUpdateCheck = Calendar.getInstance();
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
+        editor.commit();
+        checkingUpdates = false;
+      }
+    }
+    if (updateProgress != null && updateProgress.isShowing()) {
+      updateProgress.dismiss();
     }
   }
 }

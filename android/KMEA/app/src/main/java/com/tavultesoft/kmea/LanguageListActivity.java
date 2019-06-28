@@ -94,7 +94,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     listView.setFastScrollEnabled(true);
 
     // Establish the list view based on the CloudRepository's Dataset.
-    Dataset repo = CloudRepository.shared.fetchDataset(this, null, null);
+    Dataset repo = CloudRepository.shared.fetchDataset(this);
 
     listView.setAdapter(new LanguagesAdapter(this, repo));
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -143,13 +143,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             ((AppCompatActivity) context).finish();
           } else {
             // Keyboard needs to be downloaded
-            Bundle bundle = new Bundle();
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-            bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, language.name);
-            bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.toUpperCase().equals("Y"));
+            Bundle bundle = kbd.buildDownloadBundle();
             Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
             i.putExtras(bundle);
             startActivity(i);

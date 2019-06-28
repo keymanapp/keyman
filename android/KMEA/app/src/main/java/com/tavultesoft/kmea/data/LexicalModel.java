@@ -1,11 +1,14 @@
 package com.tavultesoft.kmea.data;
 
+import android.os.Bundle;
+
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 
 import java.io.Serializable;
 import java.util.Map;
 
-public class LexicalModel implements Serializable, LanguageCoded{
+public class LexicalModel implements Serializable, LanguageResource {
   public final Map<String, String> map;
 
   /* TODO:  (v13 refactor)
@@ -24,7 +27,7 @@ public class LexicalModel implements Serializable, LanguageCoded{
     this.map = modelData;
   }
 
-  public String getId() {
+  public String getResourceId() {
     return this.map.get(KMManager.KMKey_LexicalModelID);
   }
 
@@ -37,14 +40,45 @@ public class LexicalModel implements Serializable, LanguageCoded{
     return this.map.get(KMManager.KMKey_LanguageName);
   }
 
-  public String getName() {
+  public String getResourceName() {
     return this.map.get(KMManager.KMKey_LexicalModelName);
+  }
+
+  public String getVersion() {
+    return this.map.get(KMManager.KMKey_LexicalModelVersion);
+  }
+
+  public String getPackage() {
+    return this.map.get(KMManager.KMKey_PackageID);
+  }
+
+  public Bundle buildDownloadBundle() {
+    Bundle bundle = new Bundle();
+
+    // Make sure we have an actual download URL.  If not, we can't build a proper download bundle -
+    // the downloader conditions on this URL's existence in 12.0!
+    String modelURL = map.get(KMManager.KMKey_LexicalModelPackageFilename);
+    if(modelURL == null) {
+      return null;
+    } else if (modelURL.equals("")) {
+      return null;
+    }
+
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, getResourceId());
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, getLanguageCode());
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, getResourceName());
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, getLanguageName());
+    bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL, modelURL);
+
+    return bundle;
   }
 
   public boolean equals(Object obj) {
     if(obj instanceof LexicalModel) {
       boolean lgCodeMatch = ((LexicalModel) obj).getLanguageCode().equals(this.getLanguageCode());
-      boolean idMatch = ((LexicalModel) obj).getId().equals(this.getId());
+      boolean idMatch = ((LexicalModel) obj).getResourceId().equals(this.getResourceId());
 
       return lgCodeMatch && idMatch;
     }
@@ -54,6 +88,6 @@ public class LexicalModel implements Serializable, LanguageCoded{
 
   @Override
   public int hashCode() {
-    return getId().hashCode() * getLanguageCode().hashCode();
+    return getResourceId().hashCode() * getLanguageCode().hashCode();
   }
 }

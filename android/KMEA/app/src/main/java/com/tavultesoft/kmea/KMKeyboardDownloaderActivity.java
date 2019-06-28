@@ -228,8 +228,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       try {
 
         if (downloadOnlyLexicalModel) {
-          ret = downloadKMPLexicalModel();
-          return new Result(ret);
+          return downloadKMPLexicalModel();
         }
 
         String exceptionStr = "Invalid keyboard";
@@ -295,14 +294,14 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
     /**
      * Download a KMP Keyman lexical model from Keyman cloud
-     * @param remoteLexicalModelUrl String URL of the KMP to download
-     * @return ret int -1 for fail; >0 for success
+     * @return A Result object with a success code and any successfully downloaded lexical models.
      * @throws Exception
      */
-    protected int downloadKMPLexicalModel() throws Exception {
+    protected Result downloadKMPLexicalModel() throws Exception {
       int result = -1;
       File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
       LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+      List<Map<String, String>> installedLexicalModels = null;
 
       if (downloadOnlyLexicalModel) {
         String destination = (context.getCacheDir() + File.separator).toString();
@@ -315,21 +314,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
           if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
             File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-            List<Map<String, String>> installedLexicalModels =
-              kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
-
-            boolean success = installedLexicalModels.size() != 0;
-            if (success) {
-              // This will update the settings UI adapters.  Do NOT put this in anything called
-              // by doInBackground()!
-              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-                installedLexicalModels, 1);
-            }
+            installedLexicalModels = kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
           }
         }
       }
 
-      return result;
+      // We'll notify any listeners of the successful download in onPostExecute.
+      return new Result(result, installedLexicalModels);
     }
 
     /**

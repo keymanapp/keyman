@@ -3,12 +3,15 @@ package com.tavultesoft.kmea.data;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.BuildConfig;
@@ -44,13 +47,25 @@ public class CloudRepository {
   private Calendar lastLoad; // To be used for Dataset caching.
   private boolean invalidateLexicalCache = false;
 
+  // DEBUG:  Never allow these to be `true` in production.
+  private static final boolean DEBUG_DISABLE_CACHE = false;
+  private static final boolean DEBUG_SIMULATE_UPDATES = false;
+
   private CloudRepository() {
     // Tracks the time of the most recent cache.  We start at null to indicate that we haven't
     // tried to read the cache yet, as we don't yet have a Context instance to reference.
     lastLoad = null;
   }
 
+  public interface UpdateHandler {
+    void onUpdateDetection(List<Bundle> updateBundles);
+  }
+
   public boolean hasCache(Context context) {
+    if(DEBUG_DISABLE_CACHE) {
+      return false;
+    }
+
     if(shouldUseMemCache(context)) {
       return true;
     } else {
@@ -60,6 +75,10 @@ public class CloudRepository {
   }
 
   private boolean shouldUseMemCache(Context context) {
+    if(DEBUG_DISABLE_CACHE) {
+      return false;
+    }
+
     boolean hasConnection = KMManager.hasConnection(context);
 
     if (memCachedDataset != null) {
@@ -74,6 +93,10 @@ public class CloudRepository {
   }
 
   private boolean shouldUseCache(Context context, File cacheFile) {
+    if(DEBUG_DISABLE_CACHE) {
+      return false;
+    }
+
     boolean hasConnection = KMManager.hasConnection(context);
 
     // Forced cache bypass - we need to load more lexical models (signaled by invalidation).
@@ -104,15 +127,20 @@ public class CloudRepository {
     file.delete();
   }
 
+  public Dataset fetchDataset(@NonNull Context context) {
+    return fetchDataset(context, null, null, null);
+  }
+
   /**
    * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
    * services.  Unless recently cached, this object will be populated asynchronously.
    * @param context   The current Activity requesting the Dataset.
-   * @param onSuccess  A callback to run immediately upon successful completion of the download.
-   * @param onFailure  A callback to run immediately upon download failure.
+   * @param updateHandler  An object that can handle update notification if desired.
+   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
+   * @param onFailure  A callback to be triggered upon failure of a query.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
-  public Dataset fetchDataset(@NonNull Context context, Runnable onSuccess, Runnable onFailure) {
+  public Dataset fetchDataset(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, getKeyboardCacheFile(context));
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
 
@@ -139,7 +167,7 @@ public class CloudRepository {
       languageCodes.add(installedSet.getItem(i).code);
     }
 
-    // Get kmp.json info from installed models.
+    // Get kmp.json info from installed (adhoc and cloud) models.
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
@@ -151,7 +179,7 @@ public class CloudRepository {
       memCachedDataset.lexicalModels.addAll(processLexicalModelJSON(kmpLexicalModelsArray));
     }
 
-    CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, onSuccess, onFailure);
+    CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, updateHandler, onSuccess, onFailure);
 
 //    CloudApiParam[] cloudQueries = new CloudApiParam[2];
 //    int cloudQueryEntries = 0;
@@ -393,7 +421,8 @@ public class CloudRepository {
           // Determine package ID from packageFilename
           modelURL = model.optString("packageFilename", "");
           packageID = FileUtils.getFilename(modelURL);
-          packageID = packageID.replace(".model.kmp", "");
+          // Android keeps the .model part of the file extension as part of the package ID.
+          packageID = packageID.replace(".kmp", "");
         }
 
         // api.keyman.com query returns an array of language IDs Strings while
@@ -507,6 +536,25 @@ public class CloudRepository {
       this.keyboardJSON = keyboardJSON;
       this.lexicalModelJSON = lexicalModelJSON;
     }
+
+    public boolean isEmpty() {
+      boolean emptyKbd = false;
+      boolean emptyLex = false;
+
+      if (keyboardJSON == null) {
+        emptyKbd = true;
+      } else if (keyboardJSON.length() == 0) {
+        emptyKbd = true;
+      }
+
+      if(lexicalModelJSON == null) {
+        emptyLex = true;
+      } else if(lexicalModelJSON.length() == 0) {
+        emptyLex = true;
+      }
+
+      return emptyKbd && emptyLex;
+    }
   }
 
   // This is copied from LanguageListActivity to download a catalog from the cloud.
@@ -516,12 +564,17 @@ public class CloudRepository {
     private ProgressDialog progressDialog;
 
     private final Context context;
-    private final Runnable success;
+
+    // These keyboard query callback parameters actually aren't used at present.
+    private final Runnable querySuccess;
     private final Runnable failure;
+    private final UpdateHandler updateHandler;
+
+    //
 
     private final Dataset dataset;
 
-    public CloudDownloadTask(Context context, Dataset dataset, Runnable success, Runnable failure) {
+    public CloudDownloadTask(Context context, Dataset dataset, UpdateHandler updateHandler, Runnable success, Runnable failure) {
       this.context = context;
       this.dataset = dataset;
       this.hasConnection = KMManager.hasConnection(context);
@@ -531,8 +584,16 @@ public class CloudRepository {
           // Do nothing.
         }
       };
-      this.success = success != null ? success : dummy;
+      this.querySuccess = success != null ? success : dummy;
       this.failure = failure != null ? failure : dummy;
+
+      this.updateHandler = updateHandler != null ? updateHandler : new UpdateHandler() {
+        @Override
+        public void onUpdateDetection(List<Bundle> updateBundles) {
+          // Do nothing.
+          return;
+        }
+      };
     }
 
     protected void showProgressDialog(final Runnable finishCallback) {
@@ -586,7 +647,9 @@ public class CloudRepository {
       }
 
       List<CloudApiReturns> retrievedJSON = new ArrayList<>(params.length);
-      progressDialog.setMax(params.length);
+      if(progressDialog != null) {
+        progressDialog.setMax(params.length);
+      }
 
       for(CloudApiParam param:params) {
         JSONParser jsonParser = new JSONParser();
@@ -606,17 +669,20 @@ public class CloudRepository {
             Log.d(TAG, e.getMessage());
           }
         } else {
+          // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.
         }
 
         if(param.type == JSONType.Array) {
-          retrievedJSON.add(new CloudApiReturns(param.target, dataArray));
+          retrievedJSON.add(new CloudApiReturns(param.target, dataArray));  // Null if offline.
         } else {
-          retrievedJSON.add(new CloudApiReturns(param.target, dataObject));
+          retrievedJSON.add(new CloudApiReturns(param.target, dataObject)); // Null if offline.
         }
-        progressDialog.setProgress(progressDialog.getProgress());
+        if(progressDialog != null) {
+          progressDialog.setProgress(progressDialog.getProgress());
+        }
       }
 
-      return new CloudDownloadReturns(retrievedJSON);
+      return new CloudDownloadReturns(retrievedJSON); // Will report empty arrays/objects if offline.
     }
 
     protected JSONArray ensureInit(JSONArray json) {
@@ -664,15 +730,54 @@ public class CloudRepository {
       processCloudReturns(jsonTuple, true);
     }
 
+    public Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
+      if(DEBUG_SIMULATE_UPDATES) {
+        return cloudResource.buildDownloadBundle();
+      }
+
+      if (compareVersions(cloudResource, existingMatch) == FileUtils.VERSION_GREATER) {
+        return cloudResource.buildDownloadBundle();
+      } else {
+        return null;
+      }
+    }
+
+    public int compareVersions(LanguageResource addition, LanguageResource original) {
+      // Get version from newly-downloaded keyboard.
+      String addVersion = addition.getVersion();
+      String origVersion = original.getVersion();
+
+      int result = FileUtils.compareVersions(addVersion, origVersion);
+
+      if(DEBUG_SIMULATE_UPDATES && result == FileUtils.VERSION_EQUAL) {
+        // Ensures that we preserve the cloud-based version that provides download URLs.
+        return FileUtils.VERSION_GREATER;
+      } else {
+        return result;
+      }
+    }
+
     public void processCloudReturns(CloudDownloadReturns jsonTuple, boolean executeCallbacks) {
-      // TODO:  Need proper offline check again.
+      // Only empty if no queries returned data - we're offline.
+      if(jsonTuple.isEmpty()) {
+        if(this.updateHandler == null) {
+          String msg = context.getString(R.string.catalog_unavailable);
+          Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        }
+        this.failure.run(); // Signal failure to download to our failure callback.
+        return;
+      }
+
       List<Keyboard> keyboardsArrayList = processKeyboardJSON(jsonTuple.keyboardJSON, false);
       List<LexicalModel> lexicalModelsArrayList = processLexicalModelJSON(jsonTuple.lexicalModelJSON);
+
+      Dataset installedData = KeyboardPickerActivity.getInstalledDataset(context);
+      final List<Bundle> updateBundles = new ArrayList<>();
 
       // We're about to do a big batch of edits.
       this.dataset.setNotifyOnChange(false);
 
-      // Filter out any duplicates from already-installed / KMP keyboards, properly merging the lists.
+      // Filter out any duplicates from KMP keyboards, properly merging the lists.
       for(int i = 0; i < keyboardsArrayList.size(); i++) {
         Keyboard keyboard = keyboardsArrayList.get(i);
 
@@ -680,18 +785,32 @@ public class CloudRepository {
         Keyboard match = dataset.keyboards.findMatch(keyboard);
 
         if(match != null) {
-          // TODO:  Automatic update check!
-
-          // After update stuff is reasonably handled...
-          keyboardsArrayList.remove(keyboard);
-          i--; // Decrement our index to reflect the removal.
+          if(compareVersions(keyboard, match) == FileUtils.VERSION_GREATER) {
+            dataset.keyboards.remove(match);
+          } else {
+            keyboardsArrayList.remove(keyboard);
+            i--; // Decrement our index to reflect the removal.
+          }
         } // else no match == no special handling.
       }
 
-      Log.d(TAG, keyboardsArrayList.toString());
-
       // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
       dataset.keyboards.addAll(keyboardsArrayList);
+
+      // The actual update check.
+      for(int i = 0; i < installedData.keyboards.getCount(); i++) {
+        Keyboard keyboard = installedData.keyboards.getItem(i);
+
+        // Check for duplicates / possible updates.
+        Keyboard match = dataset.keyboards.findMatch(keyboard);
+
+        if(match != null) {
+          Bundle bundle = updateCheck(match, keyboard);
+          if(bundle != null) {
+            updateBundles.add(bundle);
+          }
+        } // else no match == no special handling.
+      }
 
       // Filter out any duplicates from already-installed models, properly merging the lists.
       for(int i = 0; i < lexicalModelsArrayList.size(); i++) {
@@ -701,22 +820,45 @@ public class CloudRepository {
         LexicalModel match = dataset.lexicalModels.findMatch(model);
 
         if(match != null) {
-          // TODO:  Automatic update check!
-
-          // After update stuff is reasonably handled...
-          lexicalModelsArrayList.remove(model);
-          i--; // Decrement our index to reflect the removal.
+          if (compareVersions(model, match) == FileUtils.VERSION_GREATER) {
+            dataset.lexicalModels.remove(match);
+          } else {
+            lexicalModelsArrayList.remove(model);
+            i--; // Decrement our index to reflect the removal.
+          }
         } // else no match == no special handling.
       }
 
       // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
       dataset.lexicalModels.addAll(lexicalModelsArrayList);
 
+      // Do the actual update checks.
+      for(int i = 0; i < installedData.lexicalModels.getCount(); i++) {
+        LexicalModel model = installedData.lexicalModels.getItem(i);
+
+        // Check for duplicates / possible updates.
+        LexicalModel match = dataset.lexicalModels.findMatch(model);
+
+        if(match != null) {
+          Bundle bundle = updateCheck(match, model);
+          if(bundle != null) {
+            updateBundles.add(bundle);
+          }
+        } // else no match == no special handling.
+      }
+
+      if(updateBundles.size() > 0) {
+        // Time for updates!
+        Log.v(TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");
+
+        updateHandler.onUpdateDetection(updateBundles);
+      }
+
       // And finish.
       this.dataset.notifyDataSetChanged(); // Edits are done - signal that.
 
       if(executeCallbacks) {
-        success.run();
+        querySuccess.run();
       }
     }
   }
