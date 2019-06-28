@@ -83,14 +83,20 @@ public final class ModelInfoActivity extends AppCompatActivity {
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
-    // Display model help link (currently disabled)
+    // Display model help link (currently disabled when no custom link is available)
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    boolean enabledHelp = true;
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.help_link));
     hashMap.put(subtitleKey, "");
     hashMap.put(iconKey, icon);
-    hashMap.put(isEnabledKey, "false");
+
+    // We don't yet have help pages on the Keyman site for models, so we disable this for now
+    // when custom help links aren't available.
+    if(customHelpLink == null) {
+      enabledHelp = false;
+    }
     infoList.add(hashMap);
 
     // Display link to uninstall model
@@ -102,7 +108,21 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
     int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
-    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to);
+    final boolean _enabledHelp = enabledHelp;
+    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
+      @Override
+      public boolean isEnabled(int position) {
+        if(position == 0) {
+          // No point in 'clicking' on version info.
+          return false;
+          // Visibly disables the help option when help isn't available.
+        } else if(position == 1 && !_enabledHelp) {
+          return false;
+        }
+
+        return super.isEnabled(position);
+      }
+    };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -131,6 +151,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
             startActivity(i);
           } else {
             // TODO: open browser to Keyman site on lexical models
+            // Directly parallels the equivalent functionality in KeyboardInfoActivity.
             //String helpUrlStr = String.format("http://help.keyman.com/models/%s/%s/", modelID, modelVersion);
             //i.setData(Uri.parse(helpUrlStr));
             //startActivity(i);
