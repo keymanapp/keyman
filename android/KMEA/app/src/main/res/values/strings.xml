@@ -10,9 +10,10 @@
     <!-- Title for lists-->
     <string name="title_keyboards" translatable="false">Keyboards</string>
     <string name="title_keyboard" translatable="false">Keyboard</string>
+    <string name="title_add_language" translatable="false">Add New Language</string>
     <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
-    <string name="title_languages_settings" translatable="false">Languages Settings</string>
-    <string name="title_language_settings" translatable="false">Language Settings</string>
+    <string name="title_languages_settings" translatable="false">Installed Languages</string>
+    <string name="title_language_settings" translatable="false">%s Settings</string>
 
     <!-- Button labels -->
     <string name="label_add" translatable="false">Add</string>
@@ -36,12 +37,12 @@
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
     <string name="confirm_delete_keyboard" translatable="false">Would you like to delete this keyboard?</string>
     <string name="confirm_download_keyboard" translatable="false">Would you like to download this keyboard?</string>
-    <string name="confirm_update" translatable="false">Would you like to update keyboards now?</string>
+    <string name="confirm_update" translatable="false">Would you like to update keyboards and models now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
     <string name="font_failed_to_download" translatable="false">Warning: Font failed to download</string>
     <string name="keyboard_failed_to_download" translatable="false">Error: Keyboard failed to download</string>
-    <string name="keyboard_updates_available" translatable="false">Keyboard Updates Available</string>
+    <string name="keyboard_updates_available" translatable="false">Resource Updates Available</string>
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
     <string name="updating_keyboards" translatable="false">Updating keyboards&#8230;</string>
 
@@ -55,6 +56,11 @@
     <string name="confirm_download_model" translatable="false">Would you like to download this model?</string>
     <string name="checking_model_download" translatable="false">Checking to download model&#8230;</string>
     <string name="downloading_model" translatable="false">Downloading model&#8230;</string>
+    <string name="catalog_unavailable" translatable="false">The resource catalog is unavailable\n</string>
+
+    <!-- General Updates -->
+    <string name="update_check_unavailable" translatable="false">Failed to access server!\n</string>
+    <string name="update_check_current" translatable="false">"All resources are up to date!"</string>
 
     <!-- Model Info -->
     <string name="model_version" translatable="false">Model version</string>
@@ -66,6 +72,8 @@
     <string name="enable_predictions" translatable="false">Enable predictions</string>
     <string name="model" translatable="false">Model</string>
     <string name="manage_dictionary" translatable="false">Manage dictionary</string>
+    <string name="single_keyboard_count" translatable="false">(1 keyboard)</string>
+    <string name="multiple_keyboard_count" translatable="false">(%d keyboards)</string>
 
     <!-- Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>

@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
-  public abstract class LanguageFilter<Type extends LanguageCoded, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter, String> {
+public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> implements ListBacked<Dataset.LanguageDataset> {
+  public abstract class LanguageFilter<Type extends LanguageResource, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter, String> {
     abstract Set<Type> getSetFrom(LanguageDataset metadata);
 
     @Override
@@ -29,7 +30,15 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
       // performance of our linked adapters.
       LanguageDataset metadata = Dataset.this.languageMetadata.get(lgCode);
 
-      return new ArrayList<>(getSetFrom(metadata));
+      List<Type> retList = new ArrayList<>(getSetFrom(metadata));
+
+      Collections.sort(retList, new Comparator<Type>() {
+        public int compare(Type obj1, Type obj2) {
+          return obj1.getResourceName().compareTo(obj2.getResourceName());
+        }
+      });
+
+      return retList;
     }
   }
 
@@ -53,8 +62,29 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     }
   };
 
+  static class LanguageCategorizer<Type extends LanguageResource, Adapter extends LanguageCodedAdapter<Type>> implements AdapterFilter<Type, Adapter, Void> {
+    public List<Type> selectFrom(Adapter adapter, Void dummy) {
+      List<Type> list = new ArrayList<>(adapter.asList());
+
+      Collections.sort(list, new Comparator<Type>() {
+        public int compare(Type obj1, Type obj2) {
+          int langComp = obj1.getLanguageName().compareTo(obj2.getLanguageName());
+          if(langComp != 0) {
+            return langComp;
+          }
+
+          return obj1.getResourceName().compareTo(obj2.getResourceName());
+        }
+      });
+
+      return list;
+    }
+  }
+
+  public static final LanguageCategorizer<Keyboard, Dataset.Keyboards> keyboardPickerSorter = new LanguageCategorizer<Keyboard, Keyboards>();
+
   // Implements common language-tracking functionality for each internally-managed master list.
-  private class LanguageCodedAdapter<Type extends LanguageCoded> extends ArrayAdapter<Type> implements ListBacked<Type> {
+  private class LanguageCodedAdapter<Type extends LanguageResource> extends ArrayAdapter<Type> implements ListBacked<Type> {
     private final List<Type> data;
     private boolean doNotify = true;
     private boolean recursiveBlock = false;
@@ -82,7 +112,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
     public Type findMatch(Type target) {
       for(Type obj: data) {
-        if(obj.getId().equals(target.getId()) && obj.getLanguageCode().equals(target.getLanguageCode())) {
+        if(obj.getResourceId().equals(target.getResourceId()) && obj.getLanguageCode().equals(target.getLanguageCode())) {
           return obj;
         }
       }
@@ -99,7 +129,17 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
       super.add(object);
 
-      getMetadataFor(object); // We can ignore the return; this makes sure the needed object is constructed.
+      LanguageDataset data = getMetadataFor(object); // We can ignore the return; this makes sure the needed object is constructed.
+
+      if(object instanceof Keyboard) {
+        if(!data.keyboards.contains(object)) {
+          data.keyboards.add((Keyboard) object);
+        }
+      } else if(object instanceof LexicalModel) {
+        if(!data.lexicalModels.contains(object)) {
+          data.lexicalModels.add((LexicalModel) object);
+        }
+      }
 
       if(notify) {
         Dataset.this.notifyDataSetChanged();
@@ -154,6 +194,14 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
       super.remove(object);
 
+      LanguageDataset data = getMetadataFor(object);
+
+      if(object instanceof Keyboard) {
+        data.keyboards.remove(object);
+      } else if(object instanceof LexicalModel) {
+        data.lexicalModels.remove(object);
+      }
+
       handleLanguageItemRemoval(object);
 
       if(notify) {
@@ -168,12 +216,21 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
         Dataset.this.setNotifyOnChange(false);
       }
 
-      List<Type> clearedItems = this.asList();
+      // this.asList returns an unmodifiable reference to the internal list -
+      // but that list itself may be modified by this adapter's functions!
+      List<Type> clearedItems = new ArrayList<>(this.asList());
 
       super.clear();
 
-      for(Type kbd: clearedItems) {
-        handleLanguageItemRemoval(kbd);
+      for(Type object: clearedItems) {
+        LanguageDataset data = getMetadataFor(object);
+        if(object instanceof Keyboard) {
+          data.keyboards.remove(object);
+        } else if(object instanceof LexicalModel) {
+          data.lexicalModels.remove(object);
+        }
+
+        handleLanguageItemRemoval(object);
       }
 
       if(notify) {
@@ -195,11 +252,11 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
 
     @Override
     public void notifyDataSetChanged() {
-      doNotify = true;
-      super.notifyDataSetChanged();
+      Dataset.this.notifyDataSetChanged();
     }
 
     void _notifyDataSetChanged() {
+      doNotify = true;
       super.notifyDataSetChanged();
     }
 
@@ -218,7 +275,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     }
   }
 
-  class LanguageDataset {
+  public class LanguageDataset implements Comparable<LanguageDataset> {
     public final String name;
     public final String code;
     public Set<Keyboard> keyboards = new HashSet<>();
@@ -227,6 +284,10 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     public LanguageDataset(String name, String code) {
       this.name = name;
       this.code = code;
+    }
+
+    public int compareTo(LanguageDataset other) {
+      return name.compareTo(other.name);
     }
   }
 
@@ -247,7 +308,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     lexicalModels = new LexicalModels(context);
   }
 
-  protected void handleLanguageItemRemoval(LanguageCoded coded) {
+  protected void handleLanguageItemRemoval(LanguageResource coded) {
     String lgCode = coded.getLanguageCode();
     LanguageDataset lgData = languageMetadata.get(lgCode);
 
@@ -258,7 +319,7 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
     }
   }
 
-  protected LanguageDataset getMetadataFor(LanguageCoded coded) {
+  protected LanguageDataset getMetadataFor(LanguageResource coded) {
     final String lgCode = coded.getLanguageCode();
     LanguageDataset data = Dataset.this.languageMetadata.get(lgCode);
 
@@ -292,8 +353,16 @@ public class Dataset extends ArrayAdapter<Dataset.LanguageDataset> {
   @Override
   public void notifyDataSetChanged() {
     super.notifyDataSetChanged();
-    keyboards.notifyDataSetChanged();
-    lexicalModels.notifyDataSetChanged();
+    keyboards._notifyDataSetChanged();
+    lexicalModels._notifyDataSetChanged();
+  }
+
+  public List<LanguageDataset> asList() {
+    // Convert the value set of our language-code map into the requested list.
+    List<LanguageDataset> list = new ArrayList<>(languageMetadata.values());
+    Collections.sort(list);
+
+    return list;
   }
 
   void _notifyDataSetChanged() {

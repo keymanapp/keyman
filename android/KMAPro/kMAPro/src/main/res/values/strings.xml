@@ -36,7 +36,8 @@
 
   <!-- Keyman Settings menu strings -->
   <string name="keyman_settings" translatable="false">Settings</string>
-  <string name="installed_languages" translatable="false">Installed Languages</string>
+  <string name="installed_languages_empty" translatable="false">Installed languages</string>
+  <string name="installed_languages" translatable="false">Installed languages (%d)</string>
   <string name="show_banner" translatable="false">Show banner</string>
   <string name="show_banner_on" translatable="false">Cannot be switched off when predictive text is enabled</string>
   <!-- reuse show_get_started -->

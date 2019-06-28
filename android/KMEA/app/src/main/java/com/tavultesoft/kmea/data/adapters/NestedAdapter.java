@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ import java.util.List;
  * @param <Element> The shared item type of the two Adapters.
  * @param <A> The type specification of the Adapter to be nested/linked.
  */
-public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>, FilterArg> extends ArrayAdapter<Element>  {
+public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked<Element>, FilterArg> extends ArrayAdapter<Element> implements ListBacked<Element>  {
   final A wrappedAdapter;
   final AdapterFilter<Element, A, FilterArg> filter;
   final List<Element> filteredList;
@@ -81,7 +82,9 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
     this(context, resource, adapter, new AdapterFilter<Element, A, FilterArg>() {
         @Override
         public List<Element> selectFrom(A adapter, FilterArg dummy) {
-            return adapter.asList();
+          // Make sure to duplicate the list so that we don't accidentally try to modify our
+          // wrapped adapter's (unmodifiable) contents.
+          return new ArrayList<>(adapter.asList());
         }
     }, null);
   }
@@ -161,6 +164,10 @@ public class NestedAdapter<Element, A extends ArrayAdapter<Element> & ListBacked
 
     wrappedAdapter.notifyDataSetChanged();
     this.isMutating = false;
+  }
+
+  public List<Element> asList() {
+    return Collections.unmodifiableList(this.filteredList);
   }
 
   // These methods allow bypassing of our externally-visible 'linking' versions for operations
