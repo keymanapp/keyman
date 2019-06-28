@@ -270,9 +270,10 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
       holder.img.setImageResource(R.drawable.ic_arrow_forward);
 
       if(data.keyboards.size() == 1) {
-        holder.textCount.setText("(1 keyboard)");
+        holder.textCount.setText(this.getContext().getString(R.string.single_keyboard_count));
       } else {
-        holder.textCount.setText("(" + data.keyboards.size() + " keyboards)");
+        String msg = String.format(this.getContext().getString(R.string.multiple_keyboard_count), data.keyboards.size());
+        holder.textCount.setText(msg);
       }
 
       return convertView;
@@ -287,7 +288,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
           return;
         }
 
-        Toast.makeText(context, "All resources are up to date!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.update_check_current), Toast.LENGTH_SHORT).show();
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -303,7 +304,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
           return;
         }
 
-        Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.update_check_unavailable), Toast.LENGTH_SHORT).show();
         lastUpdateCheck = Calendar.getInstance();
         updateCheckFailed = true;
         checkingUpdates = false;

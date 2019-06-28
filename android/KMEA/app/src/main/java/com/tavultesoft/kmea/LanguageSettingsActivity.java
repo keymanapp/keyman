@@ -40,6 +40,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
+  private static TextView lexicalModelTextView = null;
   private ImageButton addButton = null;
   private String associatedLexicalModel = "";
   private String lgCode;
@@ -69,10 +70,14 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       // Should never actually happen.
       Log.e(TAG, "Language data not specified for LanguageSettingsActivity!");
       finish();
-      return;  // We could throw NullPointerException, but this is more graceful in case it slips into production.
+
+      if(KMManager.isDebugMode()) {
+        throw new NullPointerException("Language data not specified for LanguageSettingsActivity!");
+      } else {
+        return;
+      }
     }
 
-    associatedLexicalModel = bundle.getString(KMManager.KMKey_LexicalModelName, "");
     lgCode = bundle.getString(KMManager.KMKey_LanguageID);
     lgName = bundle.getString(KMManager.KMKey_LanguageName);
 
@@ -93,11 +98,11 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
     textView.setText(getString(R.string.model));
-    if (!associatedLexicalModel.isEmpty()) {
-      textView = (TextView) layout.findViewById(R.id.text2);
-      textView.setText(associatedLexicalModel);
-      textView.setEnabled(true);
-    }
+
+    lexicalModelTextView = layout.findViewById(R.id.text2);
+
+    updateActiveLexicalModel();
+
     ImageView imageView = (ImageView) layout.findViewById(R.id.image1);
     imageView.setImageResource(R.drawable.ic_arrow_forward);
     layout.setEnabled(true);
@@ -192,6 +197,19 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       // Despite the fact that updates should have been auto-triggered anyway, it seems that we
       // need a manual call here for things to happen in a timely fashion.
       adapter.notifyDataSetChanged();
+    }
+
+    updateActiveLexicalModel();
+  }
+
+  public void updateActiveLexicalModel() {
+    associatedLexicalModel = KMManager.getAssociatedLexicalModel(lgCode).get(KMManager.KMKey_LexicalModelName);
+    if (!associatedLexicalModel.isEmpty()) {
+      lexicalModelTextView.setText(associatedLexicalModel);
+      lexicalModelTextView.setEnabled(true);
+    } else {
+      lexicalModelTextView.setText("");
+      lexicalModelTextView.setEnabled(false);
     }
   }
 
