@@ -241,7 +241,7 @@ namespace com.keyman.osk {
      * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
      * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
      */
-    public apply(target?: text.OutputTarget): text.Transcription {
+    public apply(target?: text.OutputTarget): [text.Transcription, Promise<String>] {
       let keyman = com.keyman.singleton;
 
       if(this.isEmpty()) {
@@ -272,6 +272,7 @@ namespace com.keyman.osk {
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(target);
+        let wordbreakPromise = keyman.modelManager.wordbreak(target); // Also build the display string for the reversion.
         target.apply(transform);
 
         // Signal the necessary text changes to the embedding app, if it exists.
@@ -281,8 +282,9 @@ namespace com.keyman.osk {
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed.
         let preApply = text.Mock.from(original.preInput);
+
         preApply.apply(original.transform);
-        return preApply.buildTranscriptionFrom(target, null);
+        return [preApply.buildTranscriptionFrom(target, null), wordbreakPromise];
       }
     }
 
@@ -526,6 +528,7 @@ namespace com.keyman.osk {
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
     private preAccept: text.Transcription = null;
+    private preAcceptText: String;
     private swallowPrediction: boolean = false;
 
     private previousSuggestions: Suggestion[];
@@ -541,10 +544,15 @@ namespace com.keyman.osk {
     }
 
     private doAccept(suggestion: BannerSuggestion) {
-      let revert = suggestion.apply();
+      let [revert, revertText] = suggestion.apply();
       
+      let _this = this;
+
       if(revert) {
         this.preAccept = revert;
+        revertText.then(function (text) {
+          _this.preAcceptText = text;
+        });
       } else {
         // If null, it's a blank option; we should effectively never 'accept' it.
         return;
