@@ -69,6 +69,7 @@ describe('The default word breaker', function () {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
 
     // A limitation of the current implementation; we should fix this before release.
+    // Then again, when typing this is probably fine; just not when not typing.
     context = { 
       left: 'The quick brown fox jum', startOfBuffer: true,
       right: 'ped over the lazy dog.', endOfBuffer: true
