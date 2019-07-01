@@ -98,10 +98,6 @@ class ModelCompositor {
     });
 
     if(keepOption) {
-      if(suggestions.length == ModelCompositor.MAX_SUGGESTIONS) {
-        suggestions.pop();
-      }
-
       suggestions = [ keepOption ].concat(suggestions);
     }
 

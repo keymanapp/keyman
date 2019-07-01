@@ -520,6 +520,7 @@ namespace com.keyman.osk {
     private initNewContext: boolean = true;
 
     private currentSuggestions: Suggestion[] = [];
+    private keepSuggestion: Suggestion;
     private currentTranscriptionID: number;
 
     private recentAccept: boolean = false;
@@ -664,15 +665,9 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       let suggestions = [];
-      // TODO:  Insert 'current text' if/when valid as the leading option.
-      //        We need the LMLayer to tell us this somehow.
-      if(this.activateKeep()) {
-        // In the meantime, a placeholder:
-        // (generated from the 'true'/original transform)
-        let original = keyman.modelManager.getPredictionState(this.currentTranscriptionID);
-        let nil = new text.TextTransform(original.transform.insert + ' ', original.transform.deleteLeft, original.transform.deleteRight);
-
-        suggestions.push({transform: nil, displayAs: '&lt;keep&gt;', transformId: this.currentTranscriptionID});
+      // Insert 'current text' if/when valid as the leading option.
+      if(this.activateKeep() && this.keepSuggestion) {
+        suggestions.push(this.keepSuggestion);
       }
       suggestions = suggestions.concat(this.currentSuggestions);
 
@@ -715,6 +710,16 @@ namespace com.keyman.osk {
 
       this.currentSuggestions = suggestions;
       this.currentTranscriptionID = prediction.transcriptionID;
+
+      for(let s of suggestions) {
+        if(s.isKeep) {
+          this.keepSuggestion = s;
+        }
+      }
+
+      if(this.keepSuggestion) {
+        this.currentSuggestions.splice(this.currentSuggestions.indexOf(this.keepSuggestion), 1);
+      }
 
       // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
       if(!this.swallowPrediction) {
