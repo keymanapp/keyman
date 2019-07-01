@@ -30,12 +30,12 @@ class KeyPreviewView: UIView {
 
     keyFrame = frame
     let viewWidth = keyFrame.width * (isPortrait ? 1.6 : 1.3)
-    var viewHeight = keyFrame.size.height * 2.1
+    let viewHeight = keyFrame.size.height * 2.1
 
     var viewPosX = keyFrame.origin.x - (viewWidth - keyFrame.width) / 2.0
-    var viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.height)
+    let viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.height)
 
-    let tbHeight = Manager.shared.inputViewController.activeTopBarHeight
+    // let tbHeight = 0 //Manager.shared.inputViewController.activeTopBarHeight
 
     adjY = 0
 

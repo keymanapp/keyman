@@ -25,7 +25,7 @@ namespace com.keyman.osk {
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
       let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
       var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight;
+          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv)*/ /*+ bannerHeight*/;
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
@@ -79,7 +79,7 @@ namespace com.keyman.osk {
     if(on && (typeof showPreview == 'function')) {
       let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
       var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight,
+          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
           kc;
 
       // Find key text element
@@ -392,7 +392,7 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    if(osk.vkbd.adjustHeights()) {
+    if(osk && osk.vkbd && osk.vkbd.adjustHeights()) {
       osk._Load();
     }
   };
