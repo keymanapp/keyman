@@ -22,10 +22,23 @@ class ModelCompositor {
       return b.p - a.p;
     })[0].sample;
 
-    let inputResult = [];
+    // Only allow new-word suggestions if space was the most likely keypress.
+    let allowSpace = inputTransform.insert == " " || inputTransform.insert == "\n";
+    let allowBksp = inputTransform.insert == "" && inputTransform.deleteLeft > 0;
+
+    let postContext = models.Common.applyTransform(inputTransform, context);
+    let keepOptionText = this.lexicalModel.wordbreak(postContext);
+    let keepOption: Suggestion = null;
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
+
+      // Filter out special keys unless they're expected.
+      if((transform.insert == " " || transform.insert == "\n") && !allowSpace) {
+        continue;
+      } else if(transform.insert == "" && transform.deleteLeft > 0 && !allowBksp) {
+        continue;
+      }
       let distribution = this.lexicalModel.predict(transform, context);
 
       distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
@@ -36,15 +49,32 @@ class ModelCompositor {
         }
 
         // Combine duplicate samples.
-        let s = suggestionDistribMap[pair.sample.displayAs];
-        if(s) {
-          s.p += pair.p * alt.p;
+        let displayText = pair.sample.displayAs;
+
+        if(displayText == keepOptionText) {
+          keepOption = pair.sample;
         } else {
-          let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
-          //suggestionDistribution.push(compositedPair);
-          suggestionDistribMap[pair.sample.displayAs] = compositedPair;
+          let s = suggestionDistribMap[displayText];
+          if(s) {
+            s.p += pair.p * alt.p;
+          } else {
+            let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
+            suggestionDistribMap[displayText] = compositedPair;
+          }
         }
       });
+    }
+
+    // Generate a default 'keep' option if one was not otherwise produced.
+    if(!keepOption) {
+      keepOption = {
+        displayAs: keepOptionText,
+        transformId: inputTransform.id,
+        transform: {
+          insert: '',
+          deleteLeft: 0
+        }
+      };
     }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper
