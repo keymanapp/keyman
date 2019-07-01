@@ -148,6 +148,10 @@
 
       return '';
     }
+
+    public wordbreak(context: Context): USVString {
+      return this.getLastWord(context.left);
+    }
   };
 
   /////////////////////////////////////////////////////////////////////////////////

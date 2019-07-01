@@ -41,8 +41,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-type OutgoingMessage = ReadyMessage | SuggestionMessage;
+type OutgoingMessageKind = 'ready' | 'suggestions' | 'word';
+type OutgoingMessage = ReadyMessage | SuggestionMessage | BrokenWordMessage;
 
 /**
  * Tells the keyboard that the LMLayer is ready. Provides
@@ -70,6 +70,25 @@ interface SuggestionMessage {
    * probable last.
    */
   suggestions: Suggestion[];
+}
+
+/**
+ * Sends the keyboard an ordered list of suggestions.
+ */
+interface BrokenWordMessage {
+  message: 'word';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the wordbreak message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * Ordered array of suggestions, most probable first, least
+   * probable last.
+   */
+  word: USVString;
 }
 
 /**

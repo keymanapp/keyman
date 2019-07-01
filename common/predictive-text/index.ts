@@ -51,7 +51,8 @@ namespace com.keyman.text.prediction {
     private _worker: Worker;
     /** Call this when the LMLayer has sent us the 'ready' message! */
     private _declareLMLayerReady: (conf: Configuration) => void;
-    private _promises: PromiseStore<Suggestion[]>;
+    private _predictPromises: PromiseStore<Suggestion[]>;
+    private _wordbreakPromises: PromiseStore<USVString>;
     private _nextToken: number;
     private capabilities: Capabilities;
 
@@ -66,7 +67,8 @@ namespace com.keyman.text.prediction {
       this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
       this._worker.onmessage = this.onMessage.bind(this)
       this._declareLMLayerReady = null;
-      this._promises = new PromiseStore;
+      this._predictPromises = new PromiseStore;
+      this._wordbreakPromises = new PromiseStore<USVString>();
       this._nextToken = Number.MIN_SAFE_INTEGER;
 
       this.sendConfig(capabilities);
@@ -114,13 +116,25 @@ namespace com.keyman.text.prediction {
     predict(transform: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
       let token = this._nextToken++;
       return new Promise((resolve, reject) => {
-        this._promises.make(token, resolve, reject);
+        this._predictPromises.make(token, resolve, reject);
         this._worker.postMessage({
           message: 'predict',
           token: token,
           transform: transform,
           context: context,
         });
+      });
+    }
+
+    wordbreak(context: Context): Promise<USVString> {
+      let token = this._nextToken++;
+      return new Promise((resolve, reject) => {
+        this._wordbreakPromises.make(token, resolve, reject);
+        this._worker.postMessage({
+          message: 'wordbreak',
+          token: token,
+          context: context
+        })
       });
     }
 
@@ -132,7 +146,9 @@ namespace com.keyman.text.prediction {
       if (payload.message === 'ready') {
         this._declareLMLayerReady(event.data.configuration);
       } else if (payload.message === 'suggestions') {
-        this._promises.keep(payload.token, payload.suggestions);
+        this._predictPromises.keep(payload.token, payload.suggestions);
+      } else if (payload.message === 'word') {
+        this._wordbreakPromises.keep(payload.token, payload.word);
       } else {
         // This branch should never execute, but just in case...
         //@ts-ignore
@@ -156,9 +172,9 @@ namespace com.keyman.text.prediction {
      * @param fn The function whose body will be returned.
      */
     static unwrap(fn: Function): string {
-        let wrapper = fn.toString();
-        let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
-        return match[1];
+      let wrapper = fn.toString();
+      let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
+      return match[1];
     }
 
     /**
@@ -183,7 +199,7 @@ namespace com.keyman.text.prediction {
   }
 }
 
-(function(){
+(function () {
   let ns = com.keyman.text.prediction;
 
   // Let LMLayer be available both in the browser and in Node.
