@@ -288,7 +288,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
     
-    //HERE getAssociatedLexicalModel(langID) and setLexicalModel
+    // getAssociatedLexicalModel(langID) and setLexicalModel
     
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
@@ -374,8 +374,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return true
   }
   
-  /// Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
-  /// The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
+  /** Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
+  *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
+  *   I believe this is background-thread-safe (no UI done)
+  */
   public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
     if !FileManager.default.fileExists(atPath: lexicalModelPath) {
@@ -1037,7 +1039,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
       log.info("downloading lexical model from Keyman cloud: \(lexicalModelKMPURL).")
       let task = URLSession.shared.dataTask(with: lexicalModelKMPURL) { (data, response, error) in
-        lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
+        DispatchQueue.main.async {
+          lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
+        }
       }
       task.resume()
 
