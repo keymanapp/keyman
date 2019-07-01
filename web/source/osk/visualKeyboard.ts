@@ -840,7 +840,7 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       
       // We need to compute the 'local', keyboard-based coordinates for the touch.
-      let kbdCoords = keyman.util.getAbsolute(this.kbdDiv);
+      let kbdCoords = keyman.util.getAbsolute(this.kbdDiv.firstChild as HTMLElement);
       let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
 
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
@@ -1223,12 +1223,18 @@ namespace com.keyman.osk {
         }
         x1 = childNode.offsetLeft;
         x2 = x1 + childNode.offsetWidth;
-        dx =x1 - x;
+        if(x >= x1 && x <= x2) {
+          // Within the key square
+          return <KeyElement> childNode.firstChild;
+        }
+        dx = x1 - x;
         if(dx >= 0 && dx < dxMin) {
+          // To right of key
           k0 = k; dxMin = dx;
         }
         dx = x - x2;
         if(dx >= 0 && dx < dxMin) {
+          // To left of key
           k0 = k; dxMin = dx;
         }
       }
