@@ -342,8 +342,11 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
 }
 
 // MARK: - LexicalModelRepositoryDelegate
-//may not need  this, as we don't plan ever to fetch the whole lexical model repository (or even the list of all available)
+
 extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
+  /** lexicalModelRepositoryDidFetchList callback on successful fetching of list of lexical models for a language
+  *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
+  */
   func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
     if let languageDict = repository.languages {
       languages = languageList(languageDict)
@@ -355,6 +358,9 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
     }
   }
   
+  /** lexicalModelRepositoryDidFetchList callback on failure to fetch list of lexical models for a language
+   *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
+   */
   func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
     dismissActivityView()
     showConnectionErrorAlert()
