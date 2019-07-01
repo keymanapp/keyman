@@ -23,6 +23,7 @@
  */
 
 /// <reference path="../word_breaking/placeholder-word-breaker.ts" />
+/// <reference path="common.ts" />
 
 /**
  * @file trie-model.ts
@@ -101,13 +102,15 @@
         })));
       }
 
-      // EVERYTHING to the left of the cursor:
-      let fullLeftContext = context.left || '';
-      // Stuff to the left of the cursor in the current word.
-      let leftContext = this.getLastWord(fullLeftContext);
+      // Compute the results of the keystroke:
+      let newContext = Common.applyTransform(transform, context);
+
+      // Computes the different in word length after applying the transform above.
+      let leftDelOffset = transform.deleteLeft - transform.insert.length;
+
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
-      let prefix = leftContext + (transform.insert || '');
+      let prefix = this.getLastWord(newContext.left);
 
       // Return suggestions from the trie.
       return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
@@ -117,7 +120,7 @@
           // Delete whatever the prefix that the user wrote.
           // Note: a separate capitalization/orthography engine can take this
           // result and transform it as needed.
-          deleteLeft: leftContext.length,
+          deleteLeft: leftDelOffset + prefix.length,
         },
         displayAs: text,
         p: p

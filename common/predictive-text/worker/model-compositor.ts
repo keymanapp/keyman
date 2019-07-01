@@ -9,9 +9,20 @@ class ModelCompositor {
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
     let suggestionDistribution: Distribution<Suggestion> = [];
 
+    // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
+    // When true, we can use an associated array to de-duplicate everything.
+    let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
+
     if(!(transformDistribution instanceof Array)) {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
     }
+
+    // Find the transform for the actual keypress.
+    let inputTransform = transformDistribution.sort(function(a, b) {
+      return b.p - a.p;
+    })[0].sample;
+
+    let inputResult = [];
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
@@ -24,15 +35,24 @@ class ModelCompositor {
           pair.sample.transformId = transform.id;
         }
 
-        let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
-        suggestionDistribution.push(compositedPair);
+        // Combine duplicate samples.
+        let s = suggestionDistribMap[pair.sample.displayAs];
+        if(s) {
+          s.p += pair.p * alt.p;
+        } else {
+          let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
+          //suggestionDistribution.push(compositedPair);
+          suggestionDistribMap[pair.sample.displayAs] = compositedPair;
+        }
       });
     }
 
-    // Now that we've calculated the set of probability masses, time to join 'em together
-    // and return the most likely candidates.
-    
-    // TODO:  What if the model emits duplicate samples, each with their own mass?
+    // Now that we've calculated a unique set of probability masses, time to make them into a proper
+    // distribution and prep for return.
+    for(let key in suggestionDistribMap) {
+      let pair = suggestionDistribMap[key];
+      suggestionDistribution.push(pair);
+    }
 
     suggestionDistribution = suggestionDistribution.sort(function(a, b) {
       return b.p - a.p; // Use descending order - we want the largest probabilty suggestions first!
