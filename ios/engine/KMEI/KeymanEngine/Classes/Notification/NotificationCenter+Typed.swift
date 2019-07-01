@@ -16,7 +16,7 @@ public extension NotificationCenter {
   ///   - name: The typed name of the notification.
   ///   - object: The object posting the notification.
   ///   - value: Value to be sent to observer.
-  public func post<T>(name: NotificationName<T>, object: Any? = nil, value: T) {
+  func post<T>(name: NotificationName<T>, object: Any? = nil, value: T) {
     let userInfo = [userInfoKey: value]
     post(name: name.name, object: object, userInfo: userInfo)
   }
@@ -33,7 +33,7 @@ public extension NotificationCenter {
   /// - Returns: Observer that automatically deregisters itself when deinitializing.
   /// - SeeAlso: `addObserver(name:object:queue:observer:function:)` to add an instance method with a weak reference to
   /// the object instance.
-  public func addObserver<T>(forName name: NotificationName<T>,
+  func addObserver<T>(forName name: NotificationName<T>,
                              object: Any? = nil,
                              queue: OperationQueue? = nil,
                              using block: @escaping (T) -> Void) -> NotificationObserver {
@@ -58,7 +58,7 @@ public extension NotificationCenter {
   ///   - function: A static reference to the instance method that is to be called on `observer`
   ///   (eg. `Class.instanceMethod`).
   /// - Returns: Observer that automatically deregisters itself when deinitializing.
-  public func addObserver<O: AnyObject, T>(forName name: NotificationName<T>,
+  func addObserver<O: AnyObject, T>(forName name: NotificationName<T>,
                                            object: Any? = nil,
                                            queue: OperationQueue? = nil,
                                            observer: O,
@@ -82,7 +82,7 @@ public extension NotificationCenter {
   ///   - function: A static reference to the instance method that is to be called on `observer`
   ///   (eg. `Class.instanceMethod`).
   /// - Returns: Observer that automatically deregisters itself when deinitializing.
-  public func addObserver<O: AnyObject, T>(forName name: NotificationName<T>,
+  func addObserver<O: AnyObject, T>(forName name: NotificationName<T>,
                                            object: Any? = nil,
                                            queue: OperationQueue? = nil,
                                            observer: O,
