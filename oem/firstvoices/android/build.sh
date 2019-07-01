@@ -16,8 +16,8 @@ display_usage ( ) {
   echo "  -no-update              Don't copy or build the Keyman Engine library in (assumes already present)"
   echo "  -lib-build              Force rebuild of the Keyman Engine library"
   echo "  -no-lib-build           Only rebuild the Keyman Engine library if it doesn't exist in /android"
-  echo "  -copy-keyboards: Only copy the keyboards; don't rebuild them"
-  echo "  -clean-keyboards: Clean the keyboards from this repo"
+  echo "  -copy-keyboards         Only copy the keyboards; don't rebuild them"
+  echo "  -clean-keyboards        Clean the keyboards from this repo"
   exit 1
 }
 
