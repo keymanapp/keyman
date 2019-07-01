@@ -276,4 +276,10 @@ interface Suggestion {
    * When suggesting a word, `displayAs` should be that entire word.
    */
   displayAs: string;
+
+  /**
+   * Indicates if this option represents preservation of the user's 
+   * originally-input text (pre-prediction).
+   */
+  isKeep?: boolean;
 }

@@ -53,6 +53,7 @@ class ModelCompositor {
 
         if(displayText == keepOptionText) {
           keepOption = pair.sample;
+          keepOption.isKeep = true;
         } else {
           let s = suggestionDistribMap[displayText];
           if(s) {
@@ -66,14 +67,18 @@ class ModelCompositor {
     }
 
     // Generate a default 'keep' option if one was not otherwise produced.
-    if(!keepOption) {
+    if(!keepOption && keepOptionText != '') {
       keepOption = {
         displayAs: keepOptionText,
         transformId: inputTransform.id,
+        // Replicate the original transform, modified for appropriate language insertion syntax.
         transform: {
-          insert: '',
-          deleteLeft: 0
-        }
+          insert: inputTransform.insert + ' ',
+          deleteLeft: inputTransform.deleteLeft,
+          deleteRight: inputTransform.deleteRight,
+          id: inputTransform.id
+        },
+        isKeep: true
       };
     }
 
@@ -91,6 +96,14 @@ class ModelCompositor {
     let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {
       return value.sample;
     });
+
+    if(keepOption) {
+      if(suggestions.length == ModelCompositor.MAX_SUGGESTIONS) {
+        suggestions.pop();
+      }
+
+      suggestions = [ keepOption ].concat(suggestions);
+    }
 
     return suggestions;
   }
