@@ -282,7 +282,7 @@ namespace com.keyman.text.prediction {
       this.predict_internal();
     }
 
-    public wordbreak(target: OutputTarget): Promise<String> {
+    public wordbreak(target: OutputTarget): Promise<string> {
       let keyman = com.keyman.singleton;
 
       let context = new TranscriptionContext(Mock.from(target), this.configuration);
