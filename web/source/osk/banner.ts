@@ -166,7 +166,7 @@ namespace com.keyman.osk {
     private fontFamily?: string;
 
     private _suggestion: Suggestion;
-    private _applyFunctor: (transform: Transform) => void = null;
+    private _applyFunctor: () => void = null;
 
     private index: number;
 
@@ -226,7 +226,7 @@ namespace com.keyman.osk {
      * @param {Suggestion} suggestion   Suggestion from the lexical model
      * Description  Update the ID and text of the BannerSuggestionSpec
      */
-    public update(suggestion: Suggestion, applyFunctor?: (transform: Transform) => void) {
+    public update(suggestion: Suggestion, applyFunctor?: () => void) {
       this._suggestion = suggestion;
       this._applyFunctor = applyFunctor || null;
       this.updateText();
@@ -249,7 +249,7 @@ namespace com.keyman.osk {
       if(this.isEmpty()) {
         return [null, null];
       } else if(this._applyFunctor) {
-        this._applyFunctor(this.suggestion.transform);
+        this._applyFunctor();
         return [null, null];
       }
       
@@ -582,6 +582,19 @@ namespace com.keyman.osk {
     }
 
     private showRevert() {
+      // Construct a 'revert suggestion' to facilitate a reversion UI component.
+      this.revertSuggestion = {
+        transform: null, // Will not be accurate because of the backspace, so we'll construct it later.
+        displayAs: '"' + this.preAcceptText + '"'
+      };
+
+      this.doRevert = true;
+      this.doUpdate();
+    }
+
+    private _applyReversion: () => void = function(this: SuggestionManager): void {
+      let keyman = com.keyman.singleton;
+
       let current = text.Processor.getOutputTarget();
       let priorState = this.preAccept;
 
@@ -593,22 +606,6 @@ namespace com.keyman.osk {
       // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
       // values as needed for use with their IME interfaces.
       let transform = target.buildTransformFrom(current);
-      
-      // Construct a 'revert suggestion' to facilitate a reversion UI component.
-      this.revertSuggestion = {
-        transform: transform,
-        displayAs: '"' + this.preAcceptText + '"'
-      };
-
-      this.doRevert = true;
-
-      this.doUpdate();
-    }
-
-    private _applyReversion: (transform: Transform) => void = function(this: SuggestionManager, transform: Transform): void {
-      let keyman = com.keyman.singleton;
-
-      let current = text.Processor.getOutputTarget();
       current.apply(transform);
 
       // Signal the necessary text changes to the embedding app, if it exists.
