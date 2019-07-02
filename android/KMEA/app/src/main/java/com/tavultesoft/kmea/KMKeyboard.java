@@ -201,8 +201,15 @@ final class KMKeyboard extends WebView {
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (subKeysWindow != null && suggestionMenuWindow != null) {
-      //popupWindow.getContentView().dispatchTouchEvent(event);
+    // JH:  I'm not sure if we even USE the suggestionMenuWindow construct anywhere, but either way,
+    // this if block is designed explicitly for handling the subKeysWindow.
+    //
+    // Come to think of it, I wonder if suggestionMenuWindow was work being done to link with
+    // suggestion banner longpresses - if so, it's not yet ready for proper integration...
+    // and would need its own rung in this if-else ladder.
+    if (subKeysWindow != null && suggestionMenuWindow == null) {
+      // Passes KMKeyboard (subclass of WebView)'s touch events off to our subkey window
+      // if active, allowing for smooth, integrated gesture control.
       subKeysWindow.getContentView().findViewById(R.id.grid).dispatchTouchEvent(event);
     } else {
       //handleTouchEvent(event);
@@ -717,7 +724,7 @@ final class KMKeyboard extends WebView {
     return;
   }
 
-  @SuppressLint("InflateParams")
+  @SuppressLint({"InflateParams", "ClickableViewAccessibility"})
   private void showSubKeys(Context context) {
     if (subKeysList == null || subKeysWindow != null) {
       return;
@@ -805,12 +812,16 @@ final class KMKeyboard extends WebView {
       Button button = (Button) inflater.inflate(R.layout.subkey_layout, null);
       button.setId(i + 1);
       button.setLayoutParams(new FrameLayout.LayoutParams((int) buttonWidth, (int) buttonHeight));
+      // May as well set them here, keeping them in a closure than a prone-to-change field.
+      // Helps keep things from totally breaking when the event handler triggering subkey menu
+      // generation and the menu's event handler stop talking to each other.
+      final ArrayList<HashMap<String, String>> subkeyList = subKeysList;
       button.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
           int index = v.getId() - 1;
-          String keyId = subKeysList.get(index).get("keyId");
-          String keyText = getSubkeyText(keyId, subKeysList.get(index).get("keyText"));
+          String keyId = subkeyList.get(index).get("keyId");
+          String keyText = getSubkeyText(keyId, subkeyList.get(index).get("keyText"));
           String jsFormat = "javascript:executePopupKey('%s','%s')";
           String jsString = String.format(jsFormat, keyId, keyText);
           loadUrl(jsString);
@@ -863,6 +874,7 @@ final class KMKeyboard extends WebView {
             }
           }
           dismissSubKeysWindow();
+          return true;
         } else if (action == MotionEvent.ACTION_MOVE) {
           int count = ((ViewGroup) v).getChildCount();
           for (int i = 0; i < count; i++) {
@@ -879,6 +891,11 @@ final class KMKeyboard extends WebView {
               button.setPressed(false);
             }
           }
+          return true;
+        } else if (action == MotionEvent.ACTION_DOWN) {
+          // Must return true if we want the others to properly process if and when this handler
+          // becomes decoupled from the keyboard's touch handler.
+          return true;
         }
         return false;
       }

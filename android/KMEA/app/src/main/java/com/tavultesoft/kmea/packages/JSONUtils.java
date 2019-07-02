@@ -195,7 +195,7 @@ public class JSONUtils {
   }
 
   /**
-   * Iterate through each model folder and parse kmp.json
+   * Iterate through each model's folder and parse kmp.json, whether installed or not.
    */
   public static JSONArray getLexicalModels() {
     File[] packages = new File(KMManager.getLexicalModelsDir()).listFiles();
