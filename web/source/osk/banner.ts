@@ -657,13 +657,12 @@ namespace com.keyman.osk {
     tryRevert: () => boolean = function(this: SuggestionManager): boolean {
       if(this.recentAccept) {
         this.showRevert();
-        return false;
+        this.swallowPrediction = true;
       } else if(this.doRevert) {
         this.doRevert = false;
-        return true;
-      } else {
-        return true;
       }
+
+      return true;
     }.bind(this);
 
     /**
