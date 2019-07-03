@@ -83,14 +83,19 @@ public final class ModelInfoActivity extends AppCompatActivity {
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
-    // Display model help link (currently disabled)
+    // Display model help link
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.help_link));
     hashMap.put(subtitleKey, "");
-    hashMap.put(iconKey, icon);
-    hashMap.put(isEnabledKey, "false");
+    if(customHelpLink != null) {
+      hashMap.put(iconKey, icon);
+    } else {
+      hashMap.put(iconKey, noIcon);
+    }
+
     infoList.add(hashMap);
 
     // Display link to uninstall model
@@ -102,7 +107,21 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
     int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
-    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to);
+
+    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
+      @Override
+      public boolean isEnabled(int position) {
+        if(position == 0) {
+          // No point in 'clicking' on version info.
+          return false;
+          // Visibly disables the help option when help isn't available.
+        } else if(position == 1 && customHelpLink == null) {
+          return false;
+        }
+
+        return super.isEnabled(position);
+      }
+    };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -130,10 +149,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
             }
             startActivity(i);
           } else {
-            // TODO: open browser to Keyman site on lexical models
-            //String helpUrlStr = String.format("http://help.keyman.com/models/%s/%s/", modelID, modelVersion);
-            //i.setData(Uri.parse(helpUrlStr));
-            //startActivity(i);
+            // We should always have a help file packaged with models.
           }
         } else if (position == 2) {
           // Confirmation to delete model
