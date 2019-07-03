@@ -92,6 +92,8 @@ namespace com.keyman.text.prediction {
     private recentTranscriptions: Transcription[] = [];
 
     private _enabled: boolean = true;
+    private _enabledPredictions: boolean = true;
+    private _enabledCorrections: boolean = true;
 
     // Tracks registered models by ID.
     private registeredModels: {[id: string]: ModelSpec} = {};
@@ -363,6 +365,10 @@ namespace com.keyman.text.prediction {
     }
 
     public set enabled(flag: boolean) {
+      if(this._enabled == flag) {
+        return;
+      }
+
       let keyman = com.keyman.singleton;
 
       if(keyman.util.getIEVersion() == 10) {
@@ -387,6 +393,22 @@ namespace com.keyman.text.prediction {
         this.unloadModel();
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
+    }
+
+    public get enabledPredictions() {
+      return this._enabledPredictions;
+    }
+
+    public set enabledPredictions(flag: boolean) {
+      this._enabledPredictions = flag;
+    }
+
+    public get enabledCorrections() {
+      return this._enabledCorrections;
+    }
+
+    public set enabledCorrections(flag: boolean) {
+      this._enabledCorrections = flag;
     }
 
     public tryAcceptSuggestion(source: string): boolean {

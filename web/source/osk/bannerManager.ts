@@ -9,6 +9,7 @@ namespace com.keyman.osk {
   export interface BannerOptions {
     persistentBanner?: boolean;
     enablePredictions?: boolean;
+    enableCorrections?: boolean;
     imagePath?: string;
   }
 
@@ -59,6 +60,7 @@ namespace com.keyman.osk {
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
       persistentBanner: false,
       enablePredictions: true,
+      enableCorrections: true,
       imagePath: ""
     }
 
@@ -138,22 +140,26 @@ namespace com.keyman.osk {
           // Each defined option may require specialized handling.
           case 'persistentBanner':
             // Determines the banner type to activate.
-            this.alwaysShows = optionSpec['persistentBanner'];
+            this.alwaysShows = optionSpec[key];
             break;
           case 'enablePredictions':
-            // If we're not going to show suggestions, it's best to turn off predictions.
-            keyman.modelManager.enabled = optionSpec['enablePredictions'];
+            keyman.modelManager.enabledPredictions = optionSpec[key]
+            break;
+          case 'enableCorrections':
+            keyman.modelManager.enabledCorrections = optionSpec[key];
             break;
           case 'imagePath':
             // Determines the image file to use for ImageBanners.
-            this.imagePath = optionSpec['imagePath'];
+            this.imagePath = optionSpec[key];
             break;
           default:
             // Invalid option specified!
         }
-
-        this._options[key] = optionSpec['key'];
+        this._options[key] = optionSpec[key];
       }
+
+      let enableModeling = this._options['enableCorrections'] || this._options['enablePredictions'];
+      keyman.modelManager.enabled = enableModeling;
 
       this.selectBanner();
     }

@@ -12,7 +12,7 @@
     <!-- Enable IE9 Standards mode -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
       
-    <title>KeymanWeb Sample Page - Unminified Source</title>
+    <title>KeymanWeb Testing Page - Predictive Text bootstrapping</title>
 
     <!-- Your page CSS --> 
     <style type='text/css'>   
@@ -53,6 +53,22 @@
         };
         kmw.modelManager.register(modelStub);
       });
+
+      function togglePredictions() {
+        let newVal = !keyman.modelManager.enabledPredictions;
+        keyman.osk.banner.setOptions({'enablePredictions': newVal});
+
+        let btnPredict = document.getElementById("btnPredict");
+        btnPredict.value = (newVal ? "Disable" : "Enable") + " predictions";
+      }
+
+      function toggleCorrections() {
+        let newVal = !keyman.modelManager.enabledCorrections;
+        keyman.osk.banner.setOptions({'enableCorrections': newVal});
+
+        let btnCorrect = document.getElementById("btnCorrect");
+        btnCorrect.value = (newVal ? "Disable" : "Enable") + " corrections";
+      }
     </script>  
   </head>
 
@@ -77,6 +93,8 @@
     <input class='test' value='' placeholder='or here'/>
 
     <h3><a href="./">Return to testing home page</a></h3>
+    <input id="btnPredict" type="button" onclick="togglePredictions();" value="Disable predictions"/>
+    <input id="btnCorrect" type="button" onclick="toggleCorrections();" value="Disable corrections"/>
   </div>
 
   </body>
