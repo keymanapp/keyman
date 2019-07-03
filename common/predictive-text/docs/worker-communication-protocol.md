@@ -283,10 +283,10 @@ _undoing_ the `transform` it has already applied should it apply a
 as if it has never applied the `transform` associated with the input
 event in the first place.
 
+#### Context
+
 The context is the text surrounding the insertion point, _before_ the
 transform is applied to the buffer.
-
-#### Context
 
 ```typescript
 interface Context {
@@ -350,6 +350,7 @@ interface Transform {
 }
 ```
 
+[Transform]: #transform
 
 ### Message: `suggestions`
 
@@ -398,7 +399,7 @@ let suggestions = [
 
 #### Timing
 
-Each suggestion provides a `transform`. This transform is applied
+Each suggestion provides a `transform`. This [transform][Transform] is applied
 _after_ the transform associated with the input event that initiated
 this prediction. That is, the suggested transform applies to the buffer
 after the transform associated with the input event.
@@ -485,7 +486,7 @@ would result in the following reply message:
 }
 ```
 
-Alternatively, 
+Alternatively, if the insertion point is after the space... 
 
 ```javascript
 {
