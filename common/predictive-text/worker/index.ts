@@ -260,7 +260,7 @@ class LMLayerWorker {
           case 'wordbreak':
             let brokenWord = model.wordbreak(payload.context);
 
-            this.cast('word', {
+            this.cast('currentword', {
               token: payload.token,
               word: brokenWord
             });

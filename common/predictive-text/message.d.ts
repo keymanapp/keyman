@@ -41,8 +41,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'ready' | 'suggestions' | 'word';
-type OutgoingMessage = ReadyMessage | SuggestionMessage | BrokenWordMessage;
+type OutgoingMessageKind = 'ready' | 'suggestions' | 'currentword';
+type OutgoingMessage = ReadyMessage | SuggestionMessage | CurrentWordMessage;
 
 /**
  * Tells the keyboard that the LMLayer is ready. Provides
@@ -73,10 +73,10 @@ interface SuggestionMessage {
 }
 
 /**
- * Sends the keyboard an ordered list of suggestions.
+ * Returns the results of a 'wordbreak' request:  the current left-of-caret word.
  */
-interface BrokenWordMessage {
-  message: 'word';
+interface CurrentWordMessage {
+  message: 'currentword';
 
   /**
    * Opaque, unique token that pairs this message
@@ -85,8 +85,8 @@ interface BrokenWordMessage {
   token: Token;
 
   /**
-   * Ordered array of suggestions, most probable first, least
-   * probable last.
+   * Contains the 'current word' left of the caret given the Context
+   * of its source message - the 'wordbreak' message with matching Token value.
    */
   word: USVString;
 }

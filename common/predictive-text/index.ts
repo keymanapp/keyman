@@ -147,7 +147,7 @@ namespace com.keyman.text.prediction {
         this._declareLMLayerReady(event.data.configuration);
       } else if (payload.message === 'suggestions') {
         this._predictPromises.keep(payload.token, payload.suggestions);
-      } else if (payload.message === 'word') {
+      } else if (payload.message === 'currentword') {
         this._wordbreakPromises.keep(payload.token, payload.word);
       } else {
         // This branch should never execute, but just in case...

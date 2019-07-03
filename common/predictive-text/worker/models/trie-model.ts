@@ -103,7 +103,7 @@
       }
 
       // Compute the results of the keystroke:
-      let newContext = Common.applyTransform(transform, context);
+      let newContext = models.applyTransform(transform, context);
 
       // Computes the different in word length after applying the transform above.
       let leftDelOffset = transform.deleteLeft - transform.insert.length;

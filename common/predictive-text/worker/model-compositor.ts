@@ -10,7 +10,7 @@ class ModelCompositor {
     let suggestionDistribution: Distribution<Suggestion> = [];
 
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
-    // When true, we can use an associated array to de-duplicate everything.
+    // When true, we can use an 'associative array' to de-duplicate everything.
     let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
 
     if(!(transformDistribution instanceof Array)) {
@@ -26,7 +26,7 @@ class ModelCompositor {
     let allowSpace = inputTransform.insert == " " || inputTransform.insert == "\n";
     let allowBksp = inputTransform.insert == "" && inputTransform.deleteLeft > 0;
 
-    let postContext = models.Common.applyTransform(inputTransform, context);
+    let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
 
@@ -55,9 +55,9 @@ class ModelCompositor {
           keepOption = pair.sample;
           keepOption.isKeep = true;
         } else {
-          let s = suggestionDistribMap[displayText];
-          if(s) {
-            s.p += pair.p * alt.p;
+          let existingSuggestion = suggestionDistribMap[displayText];
+          if(existingSuggestion) {
+            existingSuggestion.p += pair.p * alt.p;
           } else {
             let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
             suggestionDistribMap[displayText] = compositedPair;
