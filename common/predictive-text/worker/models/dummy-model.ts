@@ -76,5 +76,14 @@ namespace models {
         return makeUniformDistribution(currentSet);
       }
     }
+
+    wordbreak(context: Context): USVString {
+      let words = wordBreakers.default_(context.left);
+      if (words.length > 0) {
+        return words.pop().text;
+      }
+
+      return '';
+    }
   };
 }
