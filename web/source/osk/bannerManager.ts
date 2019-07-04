@@ -158,9 +158,6 @@ namespace com.keyman.osk {
         this._options[key] = optionSpec[key];
       }
 
-      let enableModeling = this._options['enableCorrections'] || this._options['enablePredictions'];
-      keyman.modelManager.enabled = enableModeling;
-
       this.selectBanner();
     }
 

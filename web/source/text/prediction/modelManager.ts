@@ -114,8 +114,7 @@ namespace com.keyman.text.prediction {
         maxRightContextCodeUnits: keyman.isEmbedded ? 0 : 64
       }
 
-      this.enabled = true; // Use the property's set method to filter out cases that are perma-disabled.
-      if(!this.enabled) {
+      if(!this.canEnable()) {
         return;
       }
 
@@ -153,7 +152,7 @@ namespace com.keyman.text.prediction {
     onKeyboardChange(kbdInfo?: KeyboardChangeData | string) {
       let keyman = com.keyman.singleton;
 
-      if(!this._enabled) {
+      if(!this.enabled) {
         return Promise.resolve();
       }
 
@@ -361,27 +360,25 @@ namespace com.keyman.text.prediction {
     }
 
     public get enabled(): boolean {
-      return this._enabled;
+      return this._enabledPredictions || this._enabledCorrections;
     }
 
-    public set enabled(flag: boolean) {
-      if(this._enabled == flag) {
-        return;
-      }
-
+    private canEnable(): boolean {
       let keyman = com.keyman.singleton;
 
       if(keyman.util.getIEVersion() == 10) {
-        this._enabled = false;
-        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.")
-        return;
+        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.");
+        return false;
       } else if(keyman.util.getIEVersion() < 10) {
-        this._enabled = false;
         console.warn("WebWorkers are not supported in this version of IE.");
-        return;
+        return false;
       }
 
-      this._enabled = flag;
+      return true;
+    }
+
+    private doEnable(flag: boolean) {
+      let keyman = com.keyman.singleton;
 
       if(flag) {
         let lgCode = keyman.keyboardManager.getActiveLanguage();
@@ -400,7 +397,16 @@ namespace com.keyman.text.prediction {
     }
 
     public set enabledPredictions(flag: boolean) {
+      let enabled = this.enabled;
+
+      if(!this.canEnable()) {
+        return;
+      }
+
       this._enabledPredictions = flag;
+      if(enabled != this.enabled) {
+        this.doEnable(flag);
+      }
     }
 
     public get enabledCorrections() {
@@ -408,7 +414,16 @@ namespace com.keyman.text.prediction {
     }
 
     public set enabledCorrections(flag: boolean) {
+      let enabled = this.enabled;
+
+      if(!this.canEnable()) {
+        return;
+      }
+
       this._enabledCorrections = flag;
+      if(enabled != this.enabled) {
+        this.doEnable(flag);
+      }
     }
 
     public tryAcceptSuggestion(source: string): boolean {
