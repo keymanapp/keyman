@@ -278,8 +278,8 @@ interface Suggestion {
   displayAs: string;
 
   /**
-   * Indicates if this option represents preservation of the user's 
-   * originally-input text (pre-prediction).
+   * A single metalabel data describing the relation of the suggestion
+   * to the input text.  Ex:  'keep', 'emoji', 'correction', etc.
    */
-  isKeep?: boolean;
+  tag?: string;
 }

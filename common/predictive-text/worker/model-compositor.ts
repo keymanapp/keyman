@@ -53,7 +53,9 @@ class ModelCompositor {
 
         if(displayText == keepOptionText) {
           keepOption = pair.sample;
-          keepOption.isKeep = true;
+          // Specifying 'keep' helps uses of the LMLayer find it quickly
+          // if/when desired.
+          keepOption.tag = 'keep';
         } else {
           let existingSuggestion = suggestionDistribMap[displayText];
           if(existingSuggestion) {
@@ -78,7 +80,7 @@ class ModelCompositor {
           deleteRight: inputTransform.deleteRight,
           id: inputTransform.id
         },
-        isKeep: true
+        tag: 'keep'
       };
     }
 

@@ -748,8 +748,10 @@ namespace com.keyman.osk {
       this.currentSuggestions = suggestions;
       this.currentTranscriptionID = prediction.transcriptionID;
 
+      // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
+      // and prevent it from being hidden after reversion operations.
       for(let s of suggestions) {
-        if(s.isKeep) {
+        if(s.tag == 'keep') {
           this.keepSuggestion = s;
         }
       }
