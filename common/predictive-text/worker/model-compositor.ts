@@ -6,6 +6,20 @@ class ModelCompositor {
     this.lexicalModel = lexicalModel;
   }
 
+  protected isWhitespace(transform: Transform): boolean {
+    // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
+    let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]/iu;
+    let insert = transform.insert;
+
+    insert = insert.replace(whitespaceRemover, '');
+
+    return insert == '';
+  }
+
+  protected isBackspace(transform: Transform): boolean {
+    return transform.insert == "" && transform.deleteLeft > 0;
+  }
+
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
     let suggestionDistribution: Distribution<Suggestion> = [];
 
@@ -23,8 +37,8 @@ class ModelCompositor {
     })[0].sample;
 
     // Only allow new-word suggestions if space was the most likely keypress.
-    let allowSpace = inputTransform.insert == " " || inputTransform.insert == "\n";
-    let allowBksp = inputTransform.insert == "" && inputTransform.deleteLeft > 0;
+    let allowSpace = this.isWhitespace(inputTransform);
+    let allowBksp = this.isBackspace(inputTransform);
 
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
@@ -34,9 +48,9 @@ class ModelCompositor {
       let transform = alt.sample;
 
       // Filter out special keys unless they're expected.
-      if((transform.insert == " " || transform.insert == "\n") && !allowSpace) {
+      if(this.isWhitespace(transform) && !allowSpace) {
         continue;
-      } else if(transform.insert == "" && transform.deleteLeft > 0 && !allowBksp) {
+      } else if(this.isBackspace(transform) && !allowBksp) {
         continue;
       }
       let distribution = this.lexicalModel.predict(transform, context);
