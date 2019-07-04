@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npx tsc -p .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -r ts-node/register tests/**/test-*.ts"
   },
   "author": "Marc Durdin (SIL)",
   "license": "MIT",
