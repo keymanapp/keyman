@@ -9,8 +9,13 @@
       "./node_modules/@types"
     ]
   },
+  "include": [
+    "lexical-model-compiler/**/*",
+    "package-compiler/**/*"
+  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "tests/**/*.ts"
   ]
 }

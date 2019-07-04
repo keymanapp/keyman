@@ -261,6 +261,10 @@ export default class LexicalModelCompiler {
     return func;
   }
 
+  hello() {
+    return 'Hello, world!';
+  }
+
   transpileSources(sources: Array<string>): Array<string> {
     return sources.map((source) => ts.transpileModule(source, {
         compilerOptions: { module: ts.ModuleKind.None }
