@@ -55,16 +55,16 @@
       });
 
       function togglePredictions() {
-        let newVal = !keyman.modelManager.enabledPredictions;
-        keyman.osk.banner.setOptions({'enablePredictions': newVal});
+        let newVal = !keyman.modelManager.mayPredict;
+        keyman.osk.banner.setOptions({'mayPredict': newVal});
 
         let btnPredict = document.getElementById("btnPredict");
         btnPredict.value = (newVal ? "Disable" : "Enable") + " predictions";
       }
 
       function toggleCorrections() {
-        let newVal = !keyman.modelManager.enabledCorrections;
-        keyman.osk.banner.setOptions({'enableCorrections': newVal});
+        let newVal = !keyman.modelManager.mayCorrect;
+        keyman.osk.banner.setOptions({'mayCorrect': newVal});
 
         let btnCorrect = document.getElementById("btnCorrect");
         btnCorrect.value = (newVal ? "Disable" : "Enable") + " corrections";

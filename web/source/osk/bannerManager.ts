@@ -54,7 +54,7 @@ namespace com.keyman.osk {
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
     private activeBanner: Banner;
-    private alwaysShows: boolean;
+    private alwaysShow: boolean;
     private imagePath?: string = "";
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
@@ -138,15 +138,15 @@ namespace com.keyman.osk {
       for(let key in optionSpec) {
         switch(key) {
           // Each defined option may require specialized handling.
-          case 'persistentBanner':
+          case 'alwaysShow':
             // Determines the banner type to activate.
-            this.alwaysShows = optionSpec[key];
+            this.alwaysShow = optionSpec[key];
             break;
-          case 'enablePredictions':
-            keyman.modelManager.enabledPredictions = optionSpec[key]
+          case 'mayPredict':
+            keyman.modelManager.mayPredict = optionSpec[key]
             break;
-          case 'enableCorrections':
-            keyman.modelManager.enabledCorrections = optionSpec[key];
+          case 'mayCorrect':
+            keyman.modelManager.mayCorrect = optionSpec[key];
             break;
           case 'imagePath':
             // Determines the image file to use for ImageBanners.
@@ -217,7 +217,7 @@ namespace com.keyman.osk {
       // when predictions are disabled.
       if(keyman.modelManager.activeModel) {
         this.setBanner('suggestion');
-      } else if(this.alwaysShows) {
+      } else if(this.alwaysShow) {
         this.setBanner('image');
       } else {
         this.setBanner('blank');

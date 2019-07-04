@@ -852,7 +852,7 @@ namespace com.keyman.osk {
 
     getTouchProbabilities(touch: Touch): text.KeyDistribution {
       let keyman = com.keyman.singleton;
-      if(!keyman.modelManager.enabledCorrections) {
+      if(!keyman.modelManager.mayCorrect) {
         return null;
       }
       

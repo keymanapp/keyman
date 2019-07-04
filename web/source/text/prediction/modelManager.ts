@@ -92,8 +92,8 @@ namespace com.keyman.text.prediction {
     private recentTranscriptions: Transcription[] = [];
 
     private _enabled: boolean = true;
-    private _enabledPredictions: boolean = true;
-    private _enabledCorrections: boolean = true;
+    private _mayPredict: boolean = true;
+    private _mayCorrect: boolean = true;
 
     // Tracks registered models by ID.
     private registeredModels: {[id: string]: ModelSpec} = {};
@@ -360,7 +360,7 @@ namespace com.keyman.text.prediction {
     }
 
     public get enabled(): boolean {
-      return this._enabledPredictions || this._enabledCorrections;
+      return this._mayPredict || this._mayCorrect;
     }
 
     private canEnable(): boolean {
@@ -392,35 +392,35 @@ namespace com.keyman.text.prediction {
       }
     }
 
-    public get enabledPredictions() {
-      return this._enabledPredictions;
+    public get mayPredict() {
+      return this._mayPredict;
     }
 
-    public set enabledPredictions(flag: boolean) {
+    public set mayPredict(flag: boolean) {
       let enabled = this.enabled;
 
       if(!this.canEnable()) {
         return;
       }
 
-      this._enabledPredictions = flag;
+      this._mayPredict = flag;
       if(enabled != this.enabled) {
         this.doEnable(flag);
       }
     }
 
-    public get enabledCorrections() {
-      return this._enabledCorrections;
+    public get mayCorrect() {
+      return this._mayCorrect;
     }
 
-    public set enabledCorrections(flag: boolean) {
+    public set mayCorrect(flag: boolean) {
       let enabled = this.enabled;
 
       if(!this.canEnable()) {
         return;
       }
 
-      this._enabledCorrections = flag;
+      this._mayCorrect = flag;
       if(enabled != this.enabled) {
         this.doEnable(flag);
       }
