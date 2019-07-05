@@ -7,9 +7,9 @@ namespace com.keyman.osk {
    * each field.
    */
   export interface BannerOptions {
-    persistentBanner?: boolean;
-    enablePredictions?: boolean;
-    enableCorrections?: boolean;
+    alwaysShow?: boolean;
+    mayPredict?: boolean;
+    mayCorrect?: boolean;
     imagePath?: string;
   }
 
@@ -58,9 +58,9 @@ namespace com.keyman.osk {
     private imagePath?: string = "";
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
-      persistentBanner: false,
-      enablePredictions: true,
-      enableCorrections: true,
+      alwaysShow: false,
+      mayPredict: true,
+      mayCorrect: true,
       imagePath: ""
     }
 
