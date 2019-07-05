@@ -47,11 +47,45 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private String associatedLexicalModel = "";
   private String lgCode;
   private String lgName;
+  private SharedPreferences prefs;
 
   private final static String TAG = "LanguageSettingsAct";
 
   private final static String predictionPrefSuffix = ".mayPredict";
   private final static String correctionPrefSuffix = ".mayCorrect";
+
+  private class PreferenceToggleListener implements View.OnClickListener {
+    String prefsKey;
+    String lgCode;
+
+    public PreferenceToggleListener(String prefsKey, String lgCode) {
+      this.prefsKey = prefsKey;
+      this.lgCode = lgCode;
+    }
+
+    @Override
+    public void onClick(View v) {
+      SwitchCompat correctToggle = (SwitchCompat) v;
+
+      // This will allow preemptively making settings for languages without models.
+      // Seems more trouble than it's worth to block this.
+      SharedPreferences.Editor prefEditor = prefs.edit();
+      prefEditor.putBoolean(prefsKey, correctToggle.isChecked());
+      prefEditor.apply();
+
+      // Don't use/apply language modeling settings for languages without models.
+      if (associatedLexicalModel.isEmpty()) {
+        return;
+      }
+
+      // If the active keyboard is for this language, immediately enact the new pref setting.
+      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).get(KMManager.KMKey_LanguageID);
+      if (kbdLgCode.equals(lgCode)) {
+        // Not only registers the model but also applies our modeling preferences.
+        KMManager.registerAssociatedLexicalModel(lgCode);
+      }
+    }
+  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -94,9 +128,9 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     // The following two layouts/toggles will need to link with these objects.
     Context appContext = this.getApplicationContext();
-    final SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(getLanguagePredictionPreferenceKey(lgCode), false);
-    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(lgCode), false);
+    prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean mayPredict = prefs.getBoolean(getLanguagePredictionPreferenceKey(lgCode), true);
+    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(lgCode), true);
 
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
 
@@ -104,25 +138,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     textView.setText(getString(R.string.enable_corrections));
     SwitchCompat toggle = layout.findViewById(R.id.toggle);
     toggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
-    toggle.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        // Don't modify language modeling settings for languages without models.
-        if(associatedLexicalModel.isEmpty()) {
-          return;
-        }
-
-        SwitchCompat correctToggle = (SwitchCompat) v;
-
-        SharedPreferences.Editor prefEditor = prefs.edit();
-        prefEditor.putBoolean(getLanguageCorrectionPreferenceKey(lgCode), correctToggle.isChecked());
-        prefEditor.apply();
-
-        Log.d(TAG, "Correct toggle is now set to " + correctToggle.isChecked());
-
-        // TODO:  Actually propagate the setting if the language is active.
-      }
-    });
+    String prefsKey = getLanguageCorrectionPreferenceKey(lgCode);
+    toggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
     layout = (RelativeLayout)findViewById(R.id.predictions_toggle);
 
@@ -130,27 +147,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     textView.setText(getString(R.string.enable_predictions));
     toggle = layout.findViewById(R.id.toggle);
     toggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
-    toggle.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        // Don't modify language modeling settings for languages without models.
-        if(associatedLexicalModel.isEmpty()) {
-          return;
-        }
-
-        SwitchCompat predictToggle = (SwitchCompat) v;
-
-        SharedPreferences.Editor prefEditor = prefs.edit();
-        prefEditor.putBoolean(getLanguagePredictionPreferenceKey(lgCode), predictToggle.isChecked());
-        prefEditor.apply();
-
-        Log.d(TAG, "Predict toggle is now set to " + predictToggle.isChecked());
-
-        // TODO:  Actually propagate the setting if the language is active.
-      }
-    });
-
-    // TODO:  On download of first lexical model for a language, auto-set its preferences.
+    prefsKey = getLanguagePredictionPreferenceKey(lgCode);
+    toggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
