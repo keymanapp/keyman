@@ -165,8 +165,13 @@
       kmw.modelManager.deregister(modelID);
     }
 
-    function enableSuggestions(model) {
+    function enableSuggestions(model, mayPredict, mayCorrect) {
       registerModel(model);
+
+      keyman.osk.banner.setOptions({
+        'mayPredict': mayPredict,
+        'mayCorrect': mayCorrect
+      });
     }
 
     function registerModel(model) {

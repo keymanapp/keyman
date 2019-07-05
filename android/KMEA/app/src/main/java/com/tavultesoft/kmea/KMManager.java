@@ -706,14 +706,18 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), false);
+    boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), false);
+
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
+      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
+      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }

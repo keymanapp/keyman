@@ -6,6 +6,7 @@ package com.tavultesoft.kmea;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tavultesoft.kmea.data.CloudRepository;
@@ -47,6 +49,9 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private String lgName;
 
   private final static String TAG = "LanguageSettingsAct";
+
+  private final static String predictionPrefSuffix = ".mayPredict";
+  private final static String correctionPrefSuffix = ".mayCorrect";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -87,13 +92,65 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), lgCode);
 
+    // The following two layouts/toggles will need to link with these objects.
+    Context appContext = this.getApplicationContext();
+    final SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean mayPredict = prefs.getBoolean(getLanguagePredictionPreferenceKey(lgCode), false);
+    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(lgCode), false);
+
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
+
     textView = (TextView) layout.findViewById(R.id.text1);
     textView.setText(getString(R.string.enable_corrections));
+    SwitchCompat toggle = layout.findViewById(R.id.toggle);
+    toggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
+    toggle.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        // Don't modify language modeling settings for languages without models.
+        if(associatedLexicalModel.isEmpty()) {
+          return;
+        }
+
+        SwitchCompat correctToggle = (SwitchCompat) v;
+
+        SharedPreferences.Editor prefEditor = prefs.edit();
+        prefEditor.putBoolean(getLanguageCorrectionPreferenceKey(lgCode), correctToggle.isChecked());
+        prefEditor.apply();
+
+        Log.d(TAG, "Correct toggle is now set to " + correctToggle.isChecked());
+
+        // TODO:  Actually propagate the setting if the language is active.
+      }
+    });
 
     layout = (RelativeLayout)findViewById(R.id.predictions_toggle);
+
     textView = (TextView) layout.findViewById(R.id.text1);
     textView.setText(getString(R.string.enable_predictions));
+    toggle = layout.findViewById(R.id.toggle);
+    toggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
+    toggle.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        // Don't modify language modeling settings for languages without models.
+        if(associatedLexicalModel.isEmpty()) {
+          return;
+        }
+
+        SwitchCompat predictToggle = (SwitchCompat) v;
+
+        SharedPreferences.Editor prefEditor = prefs.edit();
+        prefEditor.putBoolean(getLanguagePredictionPreferenceKey(lgCode), predictToggle.isChecked());
+        prefEditor.apply();
+
+        Log.d(TAG, "Predict toggle is now set to " + predictToggle.isChecked());
+
+        // TODO:  Actually propagate the setting if the language is active.
+      }
+    });
+
+    // TODO:  On download of first lexical model for a language, auto-set its preferences.
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
@@ -203,7 +260,12 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   }
 
   public void updateActiveLexicalModel() {
-    associatedLexicalModel = KMManager.getAssociatedLexicalModel(lgCode).get(KMManager.KMKey_LexicalModelName);
+    HashMap<String, String> lexModelMap = KMManager.getAssociatedLexicalModel(lgCode);
+    if(lexModelMap != null) {
+      associatedLexicalModel = lexModelMap.get(KMManager.KMKey_LexicalModelName);
+    } else {
+      associatedLexicalModel = "";
+    }
     if (!associatedLexicalModel.isEmpty()) {
       lexicalModelTextView.setText(associatedLexicalModel);
       lexicalModelTextView.setEnabled(true);
@@ -227,6 +289,14 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   @Override
   public void onBackPressed() {
     finish();
+  }
+
+  public static String getLanguagePredictionPreferenceKey(String langID) {
+    return langID + predictionPrefSuffix;
+  }
+
+  public static String getLanguageCorrectionPreferenceKey(String langID) {
+    return langID + correctionPrefSuffix;
   }
 
   // Fully details the building of this Activity's list view items.
