@@ -166,6 +166,7 @@ namespace com.keyman.osk {
     private fontFamily?: string;
 
     private _suggestion: Suggestion;
+    private _applyFunctor: () => void = null;
 
     private index: number;
 
@@ -225,8 +226,9 @@ namespace com.keyman.osk {
      * @param {Suggestion} suggestion   Suggestion from the lexical model
      * Description  Update the ID and text of the BannerSuggestionSpec
      */
-    public update(suggestion: Suggestion) {
+    public update(suggestion: Suggestion, applyFunctor?: () => void) {
       this._suggestion = suggestion;
+      this._applyFunctor = applyFunctor || null;
       this.updateText();
     }
 
@@ -241,18 +243,21 @@ namespace com.keyman.osk {
      * @param target (Optional) The OutputTarget to which the `Suggestion` ought be applied.
      * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
      */
-    public apply(target?: text.OutputTarget): text.Transcription {
+    public apply(target?: text.OutputTarget): [text.Transcription, Promise<string>] {
       let keyman = com.keyman.singleton;
 
       if(this.isEmpty()) {
-        return null;
+        return [null, null];
+      } else if(this._applyFunctor) {
+        this._applyFunctor();
+        return [null, null];
       }
       
       // Find the state of the context at the time the prediction-triggering keystroke was applied.
       let original = keyman.modelManager.getPredictionState(this._suggestion.transformId);
       if(!original) {
         console.warn("Could not apply the Suggestion!");
-        return null;
+        return [null, null];
       } else {
         if(!target) {
           /* Assume it's the currently-active `OutputTarget`.  We should probably invalidate 
@@ -272,6 +277,7 @@ namespace com.keyman.osk {
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(target);
+        let wordbreakPromise = keyman.modelManager.wordbreak(target); // Also build the display string for the reversion.
         target.apply(transform);
 
         // Signal the necessary text changes to the embedding app, if it exists.
@@ -281,8 +287,9 @@ namespace com.keyman.osk {
 
         // Build a 'reversion' Transcription that can be used to undo this apply() if needed.
         let preApply = text.Mock.from(original.preInput);
+
         preApply.apply(original.transform);
-        return preApply.buildTranscriptionFrom(target, null);
+        return [preApply.buildTranscriptionFrom(target, null), wordbreakPromise];
       }
     }
 
@@ -520,16 +527,21 @@ namespace com.keyman.osk {
     private initNewContext: boolean = true;
 
     private currentSuggestions: Suggestion[] = [];
+    private keepSuggestion: Suggestion;
+    private revertSuggestion: Suggestion;
+
     private currentTranscriptionID: number;
 
     private recentAccept: boolean = false;
     private recentAccepted: Suggestion;
     private preAccept: text.Transcription = null;
+    private preAcceptText: string;
     private swallowPrediction: boolean = false;
 
     private previousSuggestions: Suggestion[];
     private previousTranscriptionID: number;
 
+    private doRevert: boolean = false;
     private recentRevert: boolean = false;
     private rejectedSuggestions: Suggestion[] = [];
 
@@ -540,10 +552,15 @@ namespace com.keyman.osk {
     }
 
     private doAccept(suggestion: BannerSuggestion) {
-      let revert = suggestion.apply();
+      let [revert, revertText] = suggestion.apply();
       
+      let _this = this;
+
       if(revert) {
         this.preAccept = revert;
+        revertText.then(function (text) {
+          _this.preAcceptText = text;
+        });
       } else {
         // If null, it's a blank option; we should effectively never 'accept' it.
         return;
@@ -551,6 +568,7 @@ namespace com.keyman.osk {
       
       this.selected = null;
       this.recentAccept = true;
+      this.doRevert = false;
       this.recentRevert = false;
       this.recentAccepted = suggestion.suggestion;
 
@@ -563,8 +581,20 @@ namespace com.keyman.osk {
       keyman.modelManager.predict();
     }
 
-    private doRevert() {
+    private showRevert() {
+      // Construct a 'revert suggestion' to facilitate a reversion UI component.
+      this.revertSuggestion = {
+        transform: null, // Will not be accurate because of the backspace, so we'll construct it later.
+        displayAs: '"' + this.preAcceptText + '"'
+      };
+
+      this.doRevert = true;
+      this.doUpdate();
+    }
+
+    private _applyReversion: () => void = function(this: SuggestionManager): void {
       let keyman = com.keyman.singleton;
+
       let current = text.Processor.getOutputTarget();
       let priorState = this.preAccept;
 
@@ -595,9 +625,10 @@ namespace com.keyman.osk {
 
       // Other state maintenance
       this.recentAccept = false;
+      this.doRevert = false;
       this.recentRevert = true;
       this.doUpdate();
-    }
+    }.bind(this);
 
     /**
      * Receives messages from the keyboard that the 'accept' keystroke has been entered.
@@ -622,11 +653,13 @@ namespace com.keyman.osk {
      */
     tryRevert: () => boolean = function(this: SuggestionManager): boolean {
       if(this.recentAccept) {
-        this.doRevert();
-        return false;
-      } else {
-        return true;
+        this.showRevert();
+        this.swallowPrediction = true;
+      } else if(this.doRevert) {
+        this.doRevert = false;
       }
+
+      return true;
     }.bind(this);
 
     /**
@@ -642,6 +675,7 @@ namespace com.keyman.osk {
 
       if(!this.swallowPrediction || source == 'context') {
         this.recentAccept = false;
+        this.doRevert = false;
         this.recentRevert = false;
         this.rejectedSuggestions = [];
 
@@ -664,21 +698,19 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       let suggestions = [];
-      // TODO:  Insert 'current text' if/when valid as the leading option.
-      //        We need the LMLayer to tell us this somehow.
-      if(this.activateKeep()) {
-        // In the meantime, a placeholder:
-        // (generated from the 'true'/original transform)
-        let original = keyman.modelManager.getPredictionState(this.currentTranscriptionID);
-        let nil = new text.TextTransform(original.transform.insert + ' ', original.transform.deleteLeft, original.transform.deleteRight);
-
-        suggestions.push({transform: nil, displayAs: '&lt;keep&gt;', transformId: this.currentTranscriptionID});
+      // Insert 'current text' if/when valid as the leading option.
+      if(this.activateKeep() && this.keepSuggestion) {
+        suggestions.push(this.keepSuggestion);
+      } else if(this.doRevert) {
+        suggestions.push(this.revertSuggestion);
       }
+
       suggestions = suggestions.concat(this.currentSuggestions);
 
       this.options.forEach((option: BannerSuggestion, i: number) => {
         if(i < suggestions.length) {
-          option.update(suggestions[i]);
+          let revertFlag = (i == 0 && this.doRevert);
+          option.update(suggestions[i], revertFlag ? this._applyReversion : null);
         } else {
           option.update(null);
         }
@@ -716,9 +748,22 @@ namespace com.keyman.osk {
       this.currentSuggestions = suggestions;
       this.currentTranscriptionID = prediction.transcriptionID;
 
+      // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
+      // and prevent it from being hidden after reversion operations.
+      for(let s of suggestions) {
+        if(s.tag == 'keep') {
+          this.keepSuggestion = s;
+        }
+      }
+
+      if(this.keepSuggestion) {
+        this.currentSuggestions.splice(this.currentSuggestions.indexOf(this.keepSuggestion), 1);
+      }
+
       // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
       if(!this.swallowPrediction) {
         this.recentAccept = false;
+        this.doRevert = false;
         this.recentRevert = false;
         this.rejectedSuggestions = [];
       } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
