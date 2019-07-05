@@ -151,6 +151,7 @@ namespace com.keyman.text.prediction {
 
     onKeyboardChange(kbdInfo?: KeyboardChangeData | string) {
       let keyman = com.keyman.singleton;
+      let mm: ModelManager = this;
 
       if(!this.enabled) {
         return Promise.resolve();
@@ -182,7 +183,14 @@ namespace com.keyman.text.prediction {
         if(loadPromise) {
           let mm = this;
           loadPromise.then(function() {
-            keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+            // Because this is executed from a Promise, it's possible to have a race condition
+            // where the 'loaded' event triggers after an 'unloaded' event meant to disable the model.
+            // (Especially in the embedded apps.)  This will catch these cases.
+            if(mm.mayPredict || mm.mayCorrect) {
+              keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+            } else {
+              this.unloadModel();
+            }
           }).catch(function(failReason: any) {
             // Does this provide enough logging information?
             console.error("Could not load model '" + model.id + "': " + failReason);
@@ -393,7 +401,7 @@ namespace com.keyman.text.prediction {
           // Just reuse the existing model-change trigger code.
           this.onKeyboardChange(lgCode);
         }
-      } else {
+      } else if(this.activeModel) { // We only need to unload a model when one is actually loaded.
         this.unloadModel();
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
