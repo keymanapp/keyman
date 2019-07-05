@@ -48,6 +48,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     bannerPreference.setKey(KeymanSettingsActivity.showBannerKey);
     bannerPreference.setTitle(getString(R.string.show_banner));
     bannerPreference.setSummaryOn(getString(R.string.show_banner_on));
+    bannerPreference.setSummaryOff(getString(R.string.show_banner_off));
 
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
