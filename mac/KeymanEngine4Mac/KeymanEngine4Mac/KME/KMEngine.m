@@ -821,7 +821,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     DWORD index = [keyCtx characterAtIndex:i+2];
                     if ([ctx characterAtIndex:px] == UC_SENTINEL && [ctx characterAtIndex:px+1] == CODE_DEADKEY) {
                         px+=2;
-                        c = [[NSString stringWithFormat:@"%d", index] characterAtIndex:0];
+                        c = [[NSString stringWithFormat:@"%C", index] characterAtIndex:0];
                         unichar c2 = [ctx characterAtIndex:px];
                         if (c != c2)
                             return 0;
