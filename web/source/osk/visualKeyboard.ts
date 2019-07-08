@@ -851,6 +851,11 @@ namespace com.keyman.osk {
     }
 
     getTouchProbabilities(touch: Touch): text.KeyDistribution {
+      let keyman = com.keyman.singleton;
+      if(!keyman.modelManager.mayCorrect) {
+        return null;
+      }
+      
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
       return this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);

@@ -38,10 +38,17 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     languagesIntent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
     languagesPreference.setIntent(languagesIntent);
 
+    /*
+      Automatically does the following:
+        SharedPreferences.Editor editor = prefs.edit();
+          editor.putBoolean(KeymanSettingsActivity.showBannerKey, isChecked);
+      as part of the default onClick() used by SwitchPreference.
+     */
     SwitchPreference bannerPreference = new SwitchPreference(context);
     bannerPreference.setKey(KeymanSettingsActivity.showBannerKey);
     bannerPreference.setTitle(getString(R.string.show_banner));
     bannerPreference.setSummaryOn(getString(R.string.show_banner_on));
+    bannerPreference.setSummaryOff(getString(R.string.show_banner_off));
 
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
