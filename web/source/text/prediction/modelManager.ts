@@ -91,7 +91,6 @@ namespace com.keyman.text.prediction {
 
     private recentTranscriptions: Transcription[] = [];
 
-    private _enabled: boolean = true;
     private _mayPredict: boolean = true;
     private _mayCorrect: boolean = true;
 
