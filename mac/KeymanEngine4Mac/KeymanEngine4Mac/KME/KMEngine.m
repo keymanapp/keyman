@@ -23,6 +23,7 @@ NSString *const Q_DEADKEY = @"Q_DEADKEY";
 NSString *const Q_NUL = @"Q_NUL";
 NSString *const Q_BEEP = @"Q_BEEP";
 NSString *const Q_RETURN = @"Q_RETURN";
+NSString *const Q_SAVEOPT = @"Q_SAVEOPT";
 
 DWORD VKMap[0x80];
 
@@ -101,6 +102,13 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     }
     
     return _tmpCtxBuf;
+}
+
+- (void)setStore:(DWORD)storeID withValue:(NSString *)value {
+    KMCompStore *store = [self.kmx.store objectAtIndex:storeID];
+    KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:storeID];
+    store.string = [[NSString alloc] initWithString:value];
+    storeSaved.string = [[NSString alloc] initWithString:value];
 }
 
 - (NSArray *)processEvent:(NSEvent *)event {
@@ -408,6 +416,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     if (!outKey || !outKey.length)
         return nil;
     
+    BOOL handledWithoutActions = NO;
+
     for (int i = 0; i < outKey.length;) {
         unichar c = [outKey characterAtIndex:i];
         if (c == UC_SENTINEL) {
@@ -517,6 +527,42 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     i+=2;
                     break;
                 }
+                case CODE_SETOPT: {
+                    DWORD x1 = [outKey characterAtIndex:i+2]-1;
+                    DWORD x2 = [outKey characterAtIndex:i+3]-1;
+                    KMCompStore *store1 = [self.kmx.store objectAtIndex:x1];
+                    KMCompStore *store2 = [self.kmx.store objectAtIndex:x2];
+                    store1.string = [[NSString alloc] initWithString:store2.string];
+                    handledWithoutActions = YES;
+
+                    i+=4;
+                    break;
+                }
+                case CODE_RESETOPT: {
+                    DWORD x1 = [outKey characterAtIndex:i+2]-1;
+                    KMCompStore *store = [self.kmx.store objectAtIndex:x1];
+                    KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
+                    store.string = [[NSString alloc] initWithString:storeSaved.string];
+                    handledWithoutActions = YES;
+                    i+=3;
+                    break;
+                }
+                case CODE_SAVEOPT: {
+                    DWORD x1 = [outKey characterAtIndex:i+2]-1;
+                    KMCompStore *store = [self.kmx.store objectAtIndex:x1];
+                    KMCompStore *storeSaved = [self.kmx.storeSaved objectAtIndex:x1];
+                    storeSaved.string = [[NSString alloc] initWithString:store.string];
+
+                    NSDictionary *actionObj = [[NSDictionary alloc] initWithObjectsAndKeys:[[NSString alloc] initWithString:store.string], [NSNumber numberWithUnsignedInteger:x1], nil];
+                    NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:actionObj, Q_SAVEOPT, nil];
+                    if (!actions)
+                        actions = [[NSMutableArray alloc] initWithObjects:action, nil];
+                    else
+                        [actions addAction:action];
+                    
+                    i+=3;
+                    break;
+                }
                 default:
                     i+=2;
                     break;
@@ -538,6 +584,11 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
             NSLog(@"tmpCtxBuf = \"%@\"", [self.tmpCtxBuf codeString]);
     }
     
+    if (!actions && handledWithoutActions) {
+        NSDictionary *action = [[NSDictionary alloc] initWithObjectsAndKeys:@"", Q_NUL, nil];
+        actions = [[NSMutableArray alloc] initWithObjects:action, nil];
+    }
+
     return actions;
 }
 
@@ -784,13 +835,21 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     break;
                 }
                 case CODE_IFOPT: {
-                    //DWORD x1 = [keyCtx characterAtIndex:i+2]-1;
-                    //DWORD x2 = [keyCtx characterAtIndex:i+3]-1;
-                    //DWORD x3 = [keyCtx characterAtIndex:i+4]-1;
-                    //KMCompStore *store = [self.kmx.store objectAtIndex:x3];
-                    //i+=5;
+                    DWORD x1 = [keyCtx characterAtIndex:i+2]-1;
+                    DWORD x2 = [keyCtx characterAtIndex:i+3]-1;
+                    DWORD x3 = [keyCtx characterAtIndex:i+4]-1;
+                    KMCompStore *store1 = [self.kmx.store objectAtIndex:x1];
+                    KMCompStore *store2 = [self.kmx.store objectAtIndex:x3];
+
+                    BOOL match = [store1.string isEqualToString:store2.string];
+                    if ((match && x2 == EQUAL) || (!match && x2 == NOT_EQUAL)) {
+                        cx+=1000;
+                    }
+                    else {
+                        return 0;
+                    }
                     
-                    return 0; // CODE_IFOPT is not supported
+                    i+=5;
                     break;
                 }
                 case CODE_IFSYSTEMSTORE: {

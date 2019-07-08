@@ -20,6 +20,7 @@ extern NSString *const Q_DEADKEY;
 extern NSString *const Q_NUL;
 extern NSString *const Q_BEEP;
 extern NSString *const Q_RETURN;
+extern NSString *const Q_SAVEOPT;
 
 extern DWORD VKMap[0x80];
 
@@ -31,6 +32,7 @@ extern DWORD VKMap[0x80];
 - (id)initWithKMX:(KMXFile *)kmx contextBuffer:(NSString *)ctxBuf;
 - (void)setContextBuffer:(NSString *)ctxBuf;
 - (NSString *)contextBuffer;
+- (void)setStore:(DWORD)storeID withValue:(NSString *)value;
 - (NSArray *)processEvent:(NSEvent *)event;
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 
