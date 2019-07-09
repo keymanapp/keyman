@@ -27,8 +27,12 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private let lexicalModelRepository: LexicalModelRepository?
   
   private var keyboardDownloadStartedObserver: NotificationObserver?
+  private var keyboardDownloadCompletedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
-  
+  private var lexicalModelDownloadStartedObserver: NotificationObserver?
+  private var lexicalModelDownloadCompletedObserver: NotificationObserver?
+  private var lexicalModelDownloadFailedObserver: NotificationObserver?
+
   init(_ givenLanguages: [String: Language]) {
     self.installedLanguages = givenLanguages
     self.keyboardRepository = nil
@@ -54,21 +58,41 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       forName: Notifications.keyboardDownloadStarted,
       observer: self,
       function: InstalledLanguagesViewController.keyboardDownloadStarted)
+    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadCompleted,
+      observer: self,
+      function: InstalledLanguagesViewController.keyboardDownloadCompleted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadFailed,
       observer: self,
       function: InstalledLanguagesViewController.keyboardDownloadFailed)
+    
+    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadStarted,
+      observer: self,
+      function: InstalledLanguagesViewController.lexicalModelDownloadStarted)
+    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadCompleted,
+      observer: self,
+      function: InstalledLanguagesViewController.lexicalModelDownloadCompleted)
+    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadFailed,
+      observer: self,
+      function: InstalledLanguagesViewController.lexicalModelDownloadFailed)
     
     if Manager.shared.canAddNewKeyboards {
       let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
                                       action: #selector(self.addClicked))
       navigationItem.rightBarButtonItem = addButton
     }
+    
+    log.info("viewDidLoad: InstalledLanguagesViewController (registered for keyboardDownloadStarted)")
   }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     loadUserKeyboards()
+    loadUserLexicalModels()
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -209,10 +233,16 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
   }
   
-  private func keyboardDownloadStarted() {
-    view.isUserInteractionEnabled = false
-    navigationItem.setHidesBackButton(true, animated: true)
-    
+  private func restoreNavigation() {
+    view.isUserInteractionEnabled = true
+    navigationItem.setHidesBackButton(false, animated: true)
+    navigationItem.leftBarButtonItem?.isEnabled = true
+    if navigationItem.rightBarButtonItem != nil {
+      navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+  }
+  
+  private func showDownloading(_ downloadLabel: String) {
     guard let toolbar = navigationController?.toolbar else {
       return
     }
@@ -225,7 +255,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     label.textColor = UIColor.white
     label.textAlignment = .center
     label.center = CGPoint(x: toolbar.frame.width * 0.5, y: toolbar.frame.height * 0.5)
-    label.text = "Downloading\u{2026}"
+    label.text = "Downloading \(downloadLabel)\u{2026}"
     label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
                               .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
     label.tag = toolbarLabelTag
@@ -244,9 +274,78 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     navigationController?.setToolbarHidden(false, animated: true)
   }
   
+  private func hideDownloading() {
+    navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
+    navigationController?.toolbar?.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
+    Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
+                         userInfo: nil, repeats: false)
+  }
+  
+  private func keyboardDownloadStarted() {
+    log.info("keyboardDownloadStarted: InstalledLanguagesViewController")
+    view.isUserInteractionEnabled = false
+    navigationItem.setHidesBackButton(true, animated: true)
+    showDownloading("keyboard")
+  }
+  
+  private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+    log.info("lexicalModelDownloadStarted")
+    showDownloading("dictionary")
+  }
+  
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
+    log.info("keyboardDownloadCompleted: InstalledLanguagesViewController")
+    Manager.shared.shouldReloadKeyboard = true
+    
+    // Update keyboard version
+    for keyboard in keyboards {
+      Manager.shared.updateUserKeyboards(with: keyboard)
+    }
+    let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
+    label?.text = "Keyboard successfully downloaded!"
+    hideDownloading()
+    restoreNavigation()
+    
+    // Add keyboard.
+    for keyboard in keyboards {
+      Manager.shared.addKeyboard(keyboard)
+      _ = Manager.shared.setKeyboard(keyboard)
+    }
+    
+    navigationController?.popToRootViewController(animated: true)
+  }
+  
+  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
+    log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
+    // Add models.
+    for lexicalModel in lexicalModels {
+      Manager.shared.addLexicalModel(lexicalModel)
+      _ = Manager.shared.registerLexicalModel(lexicalModel)
+    }
+    hideDownloading()
+    restoreNavigation()
+    navigationController?.popToRootViewController(animated: true)
+  }
+  
   private func keyboardDownloadFailed() {
-    view.isUserInteractionEnabled = true
-    navigationItem.setHidesBackButton(false, animated: true)
+    log.info("keyboardDownloadFailed: InstalledLanguagesViewController")
+    restoreNavigation()
+  }
+  
+  private func lexicalModelDownloadFailed() {
+    log.info("lexicalModelDownloadFailed: InstalledLanguagesViewController")
+    restoreNavigation()
+    
+    let title = "Lexical Model Download Error"
+    navigationController?.setToolbarHidden(true, animated: true)
+    
+    let alertController = UIAlertController(title: title, message: "",
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
   
   func showActivityView() {
@@ -282,6 +381,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       let dictKey = "\(kb.languageID)_\(kb.id)"
       userKeyboards[dictKey] = kb
     }
+    tableView.reloadData()
   }
   
   func loadUserLexicalModels() {
@@ -294,7 +394,8 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       let dictKey = "\(lm.languageID)_\(lm.id)"
       userLexicalModels[dictKey] = lm
     }
-  }
+    tableView.reloadData()
+ }
   
   private func isAdded(languageID: String?, keyboardID: String?) -> Bool {
     guard let languageID = languageID, let keyboardID = keyboardID else {
@@ -358,12 +459,16 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
     }
   }
   
-  /** lexicalModelRepositoryDidFetchList callback on failure to fetch list of lexical models for a language
+  /** lexicalModelRepository didFailFetch callback on failure to fetch list of lexical models for a language
    *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
    */
   func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
     dismissActivityView()
     showConnectionErrorAlert()
+  }
+  
+  @objc func hideToolbarDelayed(_ timer: Timer) {
+    navigationController?.setToolbarHidden(true, animated: true)
   }
   
   @objc func addClicked(_ sender: Any) {
