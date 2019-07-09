@@ -67,6 +67,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       observer: self,
       function: KeyboardPickerViewController.lexicalModelDownloadFailed)
     
+    log.info("didLoad: KeyboardPickerViewController (registered lexicalModelDownloadCompleted et al)")
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -255,7 +256,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
       navigationController?.popToRootViewController(animated: true)
     }
-    log.info("keyboardDownloadCompleted")
+    log.info("keyboardDownloadCompleted KeyboardPicker")
   }
   
   private func restoreNavigation() {
@@ -304,15 +305,15 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   }
   
   private func lexicalModelDownloadFailed(_ notification: LexicalModelDownloadFailedNotification) {
-    log.info("lexicalModelDownloadFailed")
+    log.info("lexicalModelDownloadFailed KeyboardPicker")
     restoreNavigation()
     
     let title: String
     if view == navigationController?.topViewController?.view {
       updateQueue = nil
-      title = "Lexical Model Update Error"
+      title = "Dictionary Update Error"
     } else {
-      title = "Lexical Model Download Error"
+      title = "Dictionary Download Error"
     }
     navigationController?.setToolbarHidden(true, animated: true)
     

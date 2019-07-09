@@ -58,6 +58,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       forName: Notifications.lexicalModelDownloadFailed,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadFailed)
+    
+    log.info("didLoad: LexicalModelPickerViewController (registered lexicalModelDownloadCompleted et al)")
   }
   
   override func viewWillAppear(_ animated: Bool) {
