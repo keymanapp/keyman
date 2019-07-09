@@ -161,7 +161,21 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * Used by the <code>download</code> method to handle asynchronous downloading and evaluation of
    * packages and keyboards.
    */
-  static class DownloadTask extends AsyncTask<Void, Integer, Integer> {
+  static class DownloadTask extends AsyncTask<Void, Integer, DownloadTask.Result> {
+    static class Result {
+      public final Integer kbdResult;
+      public final List<Map<String, String>> installedLexicalModels;
+
+      public Result(Integer i) {
+        this(i, null);
+      }
+
+      public Result(Integer i, List<Map<String, String>> installedLexicalModels) {
+        this.kbdResult = i;
+        this.installedLexicalModels = installedLexicalModels;
+      }
+    }
+
     private ProgressDialog progressDialog;
     private String kbVersion = "1.0";
     private String kbIsCustom = isCustom ? "Y" : "N";
@@ -205,17 +219,16 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
 
     @Override
-    protected Integer doInBackground(Void... voids) {
+    protected Result doInBackground(Void... voids) {
       int ret = -1;
 
       if (isCancelled())
-        return ret;
+        return new Result(-1);
 
       try {
 
         if (downloadOnlyLexicalModel) {
-          ret = downloadKMPLexicalModel();
-          return ret;
+          return downloadKMPLexicalModel();
         }
 
         String exceptionStr = "Invalid keyboard";
@@ -242,13 +255,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
         }
 
-        ret = downloadNonKMPKeyboard(remoteUrl, remoteLexicalModelUrl);
+        return downloadNonKMPKeyboard(remoteUrl, remoteLexicalModelUrl);
       } catch (Exception e) {
         ret = -1;
-        Log.e(TAG, "Error: " + e);
+        Log.e(TAG, "Error: " + e, e);
       }
 
-      return ret;
+      return new Result(ret);
     }
 
     @Override
@@ -257,7 +270,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostExecute(Integer result) {
+    protected void onPostExecute(Result result) {
       try {
         if (progressDialog != null && progressDialog.isShowing()) {
           progressDialog.dismiss();
@@ -270,20 +283,25 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       ((AppCompatActivity) context).finish();
 
       if (!downloadOnlyLexicalModel) {
-        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result);
+        notifyListeners(KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED, result.kbdResult);
+      }
+
+      if(result.installedLexicalModels != null) {
+        notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+            result.installedLexicalModels, 1);
       }
     }
 
     /**
      * Download a KMP Keyman lexical model from Keyman cloud
-     * @param remoteLexicalModelUrl String URL of the KMP to download
-     * @return ret int -1 for fail; >0 for success
+     * @return A Result object with a success code and any successfully downloaded lexical models.
      * @throws Exception
      */
-    protected int downloadKMPLexicalModel() throws Exception {
+    protected Result downloadKMPLexicalModel() throws Exception {
       int result = -1;
       File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
       LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+      List<Map<String, String>> installedLexicalModels = null;
 
       if (downloadOnlyLexicalModel) {
         String destination = (context.getCacheDir() + File.separator).toString();
@@ -296,19 +314,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
           if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
             File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-            List<Map<String, String>> installedLexicalModels =
-              kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
-
-            boolean success = installedLexicalModels.size() != 0;
-            if (success) {
-              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-                installedLexicalModels, 1);
-            }
+            installedLexicalModels = kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
           }
         }
       }
 
-      return result;
+      // We'll notify any listeners of the successful download in onPostExecute.
+      return new Result(result, installedLexicalModels);
     }
 
     /**
@@ -319,7 +331,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
      * @return ret int -1 for fail; >0 for success; 2 for keyboard downloading but not font
      * @throws Exception
      */
-    protected int downloadNonKMPKeyboard(String remoteUrl, String remoteLexicalModelUrl) throws Exception {
+    protected Result downloadNonKMPKeyboard(String remoteUrl, String remoteLexicalModelUrl) throws Exception {
       int ret = -1;
       JSONParser jsonParser = new JSONParser();
       JSONObject kbData = jsonParser.getJSONObjectFromUrl(remoteUrl);
@@ -429,6 +441,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       int result = 0;
       File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
       LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+      List<Map<String, String>> installedLexicalModels = new ArrayList<>();
       for (String url : urls) {
         String filename = "";
         if (FileUtils.hasJavaScriptExtension(url)) {
@@ -457,17 +470,11 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
           String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
           if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
             File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-            List<Map<String, String>> installedLexicalModels =
-              kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
-
-            boolean success = installedLexicalModels.size() != 0;
-            if (success) {
-              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-                installedLexicalModels, 1);
-            }
+            // Assumption:  only one lexical model KMP will occur per download.
+            installedLexicalModels = kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
           }
-
         }
+
         if (result < 0) {
           if (FileUtils.hasFontExtension(url)) {
             // Propagate warning about font failing to download
@@ -479,7 +486,12 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         }
       }
 
-      return ret;
+      if (installedLexicalModels.size() != 0) {
+        // Let the postExecute method signal the listeners - it's triggered on the main thread.
+        return new Result(ret, installedLexicalModels);
+      }
+
+      return new Result(ret);
     }
 
     /**

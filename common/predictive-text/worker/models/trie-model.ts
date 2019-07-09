@@ -23,6 +23,7 @@
  */
 
 /// <reference path="../word_breaking/placeholder-word-breaker.ts" />
+/// <reference path="common.ts" />
 
 /**
  * @file trie-model.ts
@@ -73,7 +74,9 @@
     readonly breakWords: WordBreakingFunction;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
-      this._trie = new Trie(trieData as Node,
+      this._trie = new Trie(
+        trieData['root'],
+        trieData['totalWeight'],
         options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
@@ -99,13 +102,15 @@
         })));
       }
 
-      // EVERYTHING to the left of the cursor:
-      let fullLeftContext = context.left || '';
-      // Stuff to the left of the cursor in the current word.
-      let leftContext = this.getLastWord(fullLeftContext);
+      // Compute the results of the keystroke:
+      let newContext = models.applyTransform(transform, context);
+
+      // Computes the different in word length after applying the transform above.
+      let leftDelOffset = transform.deleteLeft - transform.insert.length;
+
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
-      let prefix = leftContext + (transform.insert || '');
+      let prefix = this.getLastWord(newContext.left);
 
       // Return suggestions from the trie.
       return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
@@ -115,7 +120,7 @@
           // Delete whatever the prefix that the user wrote.
           // Note: a separate capitalization/orthography engine can take this
           // result and transform it as needed.
-          deleteLeft: leftContext.length,
+          deleteLeft: leftDelOffset + prefix.length,
         },
         displayAs: text,
         p: p
@@ -145,6 +150,10 @@
       }
 
       return '';
+    }
+
+    public wordbreak(context: Context): USVString {
+      return this.getLastWord(context.left);
     }
   };
 
@@ -234,10 +243,10 @@
      */
     toKey: Wordform2Key;
 
-    constructor(root: Node, wordform2key: Wordform2Key) {
+    constructor(root: Node, totalWeight: number, wordform2key: Wordform2Key) {
       this.root = root;
       this.toKey = wordform2key;
-      this.totalWeight = sumWeights(root);
+      this.totalWeight = totalWeight;
     }
 
     /**
@@ -351,26 +360,6 @@
     }
     return results;
 
-  }
-
-  /**
-   * O(n) traversal to sum the total weight of all leaves in the trie, starting
-   * at the provided node. Don't use this if you want lookups to be fast!
-   *
-   * TODO: Move this functionality to the trie compiler!
-   * @param node The node to start summing weights.
-   */
-  function sumWeights(node: Node): number {
-    if (node.type === 'leaf') {
-      return node.entries
-        .map(entry => entry.weight)
-        .reduce((acc, count) => acc + count, 0);
-    } else {
-      // @ts-ignore
-      return Object.values(node.children)
-        .map((child: Node) => sumWeights(child))
-        .reduce((acc: number, count: number) => acc + count, 0);
-    }
   }
 
   /** TypeScript type guard that returns whether the thing is a Node. */

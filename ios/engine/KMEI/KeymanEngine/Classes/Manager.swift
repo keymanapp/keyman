@@ -647,13 +647,13 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             let version = k["version"] as! String
             
             //TODO: handle errors if languages do not exist
-            var languageName = ""
+            //var languageName = ""
             var languageId = ""
             
             var installableLexicalModels : [InstallableLexicalModel] = []
             if let langs = k["languages"] as? [[String:String]] {
               for l in langs {
-                languageName = l["name"]!
+                //languageName = l["name"]!
                 languageId = l["id"]!
                 
                 installableLexicalModels.append( InstallableLexicalModel(

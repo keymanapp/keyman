@@ -223,7 +223,7 @@ namespace com.keyman.text.prediction {
       }
 
       // Is it the active model?
-      if(this.currentModel.id == modelId) {
+      if(this.currentModel && this.currentModel.id == modelId) {
         this.unloadModel();
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
@@ -280,6 +280,13 @@ namespace com.keyman.text.prediction {
       }
       
       this.predict_internal();
+    }
+
+    public wordbreak(target: OutputTarget): Promise<string> {
+      let keyman = com.keyman.singleton;
+
+      let context = new TranscriptionContext(Mock.from(target), this.configuration);
+      return this.lmEngine.wordbreak(context);
     }
 
     public predict(transcription?: Transcription) {

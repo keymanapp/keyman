@@ -58,8 +58,8 @@ public class KeymanPackage
         let data = try Data(contentsOf: path, options: .mappedIfSafe)
         let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
         if let jsonResult = jsonResult as? [String:AnyObject] {
-          if let packagedKeyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
-            if let packagedModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+          if let _ = jsonResult["keyboards"] as? [[String:AnyObject]] {
+            if let _ = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
                 //TODO: rrb show error to user, for now, just log
               log.error("error parsing keyman package: packages  MUST NOT have both keyboards and lexical models")
               return nil
@@ -68,7 +68,7 @@ public class KeymanPackage
             kmp.parse(json: jsonResult)
             return kmp
           }
-          else if let packagedModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+          else if let _ = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
             let kmm = LexicalModelKeymanPackage.init(folder: folder)
             kmm.parse(json: jsonResult)
             return kmm

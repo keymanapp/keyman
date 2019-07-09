@@ -9,7 +9,7 @@
 import Foundation
 
 public extension UserDefaults {
-  public func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
+ func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
     guard let array = array(forKey: key) as? [Data] else {
       return nil
     }
@@ -22,7 +22,7 @@ public extension UserDefaults {
     }
   }
   
-  public func installableLexicalModels(forKey key: String) -> [InstallableLexicalModel]? {
+  func installableLexicalModels(forKey key: String) -> [InstallableLexicalModel]? {
     guard let array = array(forKey: key) as? [Data] else {
       return nil
     }
@@ -35,7 +35,7 @@ public extension UserDefaults {
     }
   }
 
-  public func set(_ keyboards: [InstallableKeyboard]?, forKey key: String) {
+  func set(_ keyboards: [InstallableKeyboard]?, forKey key: String) {
     guard let keyboards = keyboards else {
       removeObject(forKey: key)
       return
@@ -49,7 +49,7 @@ public extension UserDefaults {
     }
   }
     
-  public func set(_ lexicalModels: [InstallableLexicalModel]?, forKey key: String) {
+  func set(_ lexicalModels: [InstallableLexicalModel]?, forKey key: String) {
     guard let lexicalModels = lexicalModels else {
       removeObject(forKey: key)
       return
@@ -63,7 +63,7 @@ public extension UserDefaults {
     }
   }
 
-  public func fullKeyboardID(forKey key: String) -> FullKeyboardID? {
+  func fullKeyboardID(forKey key: String) -> FullKeyboardID? {
     guard let data = data(forKey: key) else {
       return nil
     }
@@ -75,7 +75,7 @@ public extension UserDefaults {
     }
   }
 
-  public func set(_ fullKeyboardID: FullKeyboardID?, forKey key: String) {
+  func set(_ fullKeyboardID: FullKeyboardID?, forKey key: String) {
     guard let id = fullKeyboardID else {
       removeObject(forKey: key)
       return
@@ -88,7 +88,7 @@ public extension UserDefaults {
     }
   }
     
-  public func fullLexicalModelID(forKey key: String) -> FullLexicalModelID? {
+  func fullLexicalModelID(forKey key: String) -> FullLexicalModelID? {
     guard let data = data(forKey: key) else {
       return nil
     }
@@ -100,7 +100,7 @@ public extension UserDefaults {
     }
   }
     
-  public func set(_ fullLexicalModelID: FullLexicalModelID?, forKey key: String) {
+  func set(_ fullLexicalModelID: FullLexicalModelID?, forKey key: String) {
     guard let id = fullLexicalModelID else {
       removeObject(forKey: key)
       return
@@ -113,7 +113,7 @@ public extension UserDefaults {
     }
   }
 
-  public var userKeyboards: [InstallableKeyboard]? {
+  var userKeyboards: [InstallableKeyboard]? {
     get {
       return installableKeyboards(forKey: Key.userKeyboardsList)
     }
@@ -123,7 +123,7 @@ public extension UserDefaults {
     }
   }
     
-  public var userLexicalModels: [InstallableLexicalModel]? {
+  var userLexicalModels: [InstallableLexicalModel]? {
     get {
       return installableLexicalModels(forKey: Key.userLexicalModelsList)
     }
@@ -163,7 +163,7 @@ public extension UserDefaults {
     languageModelSelections = modelPrefs
   }
 
-  public var currentKeyboardID: FullKeyboardID? {
+  var currentKeyboardID: FullKeyboardID? {
     get {
       return fullKeyboardID(forKey: Key.userCurrentKeyboard)
     }
@@ -173,7 +173,7 @@ public extension UserDefaults {
     }
   }
     
-  public var currentLexicalModelID: FullLexicalModelID? {
+  var currentLexicalModelID: FullLexicalModelID? {
     get {
       return fullLexicalModelID(forKey: Key.userCurrentLexicalModel)
     }
@@ -183,11 +183,11 @@ public extension UserDefaults {
     }
   }
 
-  public func userKeyboard(withFullID fullID: FullKeyboardID) -> InstallableKeyboard? {
+  func userKeyboard(withFullID fullID: FullKeyboardID) -> InstallableKeyboard? {
     return userKeyboards?.first { $0.fullID == fullID }
   }
     
-  public func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
+  func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
     return userLexicalModels?.first { $0.fullID == fullID }
   }
 

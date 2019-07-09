@@ -389,25 +389,23 @@ namespace com.keyman.osk {
     var layers=this.kbdDiv.firstChild.childNodes,
         nRows=layers[0].childNodes.length,
         rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
-        borderPad=oskManager.getKeyboardHeight() - rowHeight * (nRows == 0 ? 1 : nRows),
-        nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+        nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad,fs=1.0;
+    const oskPad = 0, oskPadOutside = 0;
 
-    let kbdHeight = oskManager.getKeyboardHeight()
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight = rowHeight/window.devicePixelRatio;
-      kbdHeight /= window.devicePixelRatio;
     }
     let oskHeight : number = nRows*rowHeight;
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(oskHeight+oskPadOutside)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     // Sets the layer group to the correct height.
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(oskHeight+oskPad)+'px';
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       b.childNodes.forEach(function(layer: HTMLElement) {
-        layer.style.height = layer.style.maxHeight = (oskHeight+3)+'px';
+        layer.style.height = layer.style.maxHeight = (oskHeight+oskPad)+'px';
       });
     }
     // Sets the layers to the correct height 
@@ -424,7 +422,7 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
+      (<HTMLElement> layers[nLayer]).style.height=(oskHeight+oskPad)+'px';
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
@@ -432,7 +430,7 @@ namespace com.keyman.osk {
         rs.bottom=bottom+'px';
         rs.maxHeight=rs.height=rowHeight+'px';
         // Calculate the exact vertical coordinate of the row's center.
-        this.layout.layer[nLayer].row[nRow].proportionalY = ((kbdHeight + 3 - bottom) - rowHeight/2) / (kbdHeight + 3);
+        this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight + oskPad - bottom) - rowHeight/2) / (oskHeight + oskPad);
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {
@@ -446,6 +444,13 @@ namespace com.keyman.osk {
               break;
             }
           }
+
+          // Set the kmw-key-square position
+          ks=key.style;
+          ks.bottom=(bottom-pad/2)+'px';
+          ks.height=ks.minHeight=(rowHeight)+'px';
+
+          // Set the kmw-key position
           ks=key.childNodes[j].style;
           ks.bottom=rs.bottom;
           ks.height=ks.minHeight=(rowHeight-pad)+'px';

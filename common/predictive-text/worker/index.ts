@@ -257,6 +257,14 @@ class LMLayerWorker {
               suggestions: suggestions
             });
             break;
+          case 'wordbreak':
+            let brokenWord = model.wordbreak(payload.context);
+
+            this.cast('currentword', {
+              token: payload.token,
+              word: brokenWord
+            });
+            break;
           case 'unload':
             this.unloadModel();
             break;

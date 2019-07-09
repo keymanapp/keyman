@@ -45,6 +45,41 @@ describe('LMLayer using dummy model', function () {
     });
   });
 
+  describe('Wordbreaking', function () {
+    it('will perform (default) wordbreaking and return word at caret', function () {
+      if(navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
+        // Our wordbreaking uses the IE-unsupported .codePointAt() function.
+        console.warn("Bypassing wordbreak test on IE.");
+        return;
+      }
+
+      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                  // the WebWorker boundary, so we should be generous here.
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+
+      // We're testing many as asynchronous messages in a row.
+      // this would be cleaner using async/await syntax, but
+      // alas some of our browsers don't support it.
+      return lmLayer.loadModel(
+        // We need to provide an absolute path since the worker is based within a blob.
+        document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
+      ).then(function (actualConfiguration) {
+        return Promise.resolve();
+      }).then(function () {
+        // We'll keep it simple here, as this is primarily an integration test.
+        // Functionality is handled in the 'headless' test case 'default-word-breaker.js'.
+        let context = { 
+          left: 'The quick brown fox jumped', startOfBuffer: true,
+          right: ' over the lazy dog.', endOfBuffer: true
+        };
+        return lmLayer.wordbreak(context);
+      }).then(function (word) {
+        assert.deepEqual(word, 'jumped');
+        return lmLayer.predict(zeroTransform(), emptyContext());
+      });
+    });
+  });
+
   function emptyContext() {
     return { left: '', startOfBuffer: true, endOfBuffer: true };
   }
