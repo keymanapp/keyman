@@ -11,6 +11,7 @@ import WebKit
 import XCGLogger
 import Zip
 import DeviceKit
+import Reachability
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
@@ -196,12 +197,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     updateUserKeyboards(with: Defaults.keyboard)
 
-    reachability = Reachability(hostName: keymanHostName)
+    reachability = Reachability(hostname: keymanHostName)
 
     if(!Util.isSystemKeyboard) {
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
                                            name: .reachabilityChanged, object: reachability)
-      reachability.startNotifier()
+      do {
+        try reachability.startNotifier()
+      } catch {
+        log.error("failed to start Reachability notifier: \(error)")
+      }
     }
 
     /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
@@ -772,7 +777,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: [keyboard], error: error)
@@ -826,7 +831,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Parameters:
   ///   - url: URL to a JSON description of the keyboard
   public func downloadKeyboard(from url: URL) {
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error)
@@ -886,7 +891,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    if reachability.currentReachabilityStatus() == NotReachable {
+    if reachability.connection == Reachability.Connection.none {
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: installableKeyboards, error: error)
       return
@@ -1094,7 +1099,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 //      return
 //    }
 //
-//    guard reachability.currentReachabilityStatus() != NotReachable else {
+//    guard reachability.connection != Reachability.Connection.none else {
 //      let error = NSError(domain: "Keyman", code: 0,
 //                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
 //      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
@@ -1139,7 +1144,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Parameters:
   ///   - url: URL to a JSON description of the lexical model
   public func downloadLexicalModel(from url: URL) {
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
@@ -1195,7 +1200,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
     
-    if reachability.currentReachabilityStatus() == NotReachable {
+    if reachability.connection == Reachability.Connection.none {
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
       return
@@ -1266,10 +1271,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   @objc func reachabilityChanged(_ notification: Notification) {
     log.debug {
       let reachStr: String
-      switch reachability.currentReachabilityStatus() {
-      case ReachableViaWiFi:
+      switch reachability.connection {
+      case Reachability.Connection.wifi:
         reachStr = "Reachable Via WiFi"
-      case ReachableViaWWAN:
+      case Reachability.Connection.cellular:
         reachStr = "Reachable Via WWan"
       default:
         reachStr = "Not Reachable"
