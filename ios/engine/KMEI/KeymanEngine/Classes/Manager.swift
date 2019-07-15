@@ -301,11 +301,22 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         //  we need to get a preferred model for this language (or at least check that the current model is for this language)
         //  then register that one.
         if let lm = self.currentLexicalModel {
-          _ = Manager.shared.registerLexicalModel(lm)
+          if valid_models.contains(where: { $0.id == lm.id }) {
+            log.debug("current model \(lm) IS among those valid for the current language \(kb.languageID)")
+            _ = Manager.shared.registerLexicalModel(lm)
+          } else {
+            log.error("current model \(lm) is not among those valid for the current language \(kb.languageID)!")
+            _ = Manager.shared.registerLexicalModel(valid_models[0])
+          }
         } else {
+          log.info("no current model, picking first among those valid for the current language \(kb.languageID)")
           _ = Manager.shared.registerLexicalModel(valid_models[0])
         }
+      } else {
+        log.debug("empty current model list for the current language \(kb.languageID)")
       }
+    } else {
+      log.debug("no current model list for the current language \(kb.languageID)")
     }
     
     return true
