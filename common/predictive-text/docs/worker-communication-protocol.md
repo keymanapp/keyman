@@ -117,12 +117,14 @@ Currently there are four message types:
 
 Message       | Direction          | Parameters          | Expected reply      | Uses token
 --------------|--------------------|---------------------|---------------------|---------------
-`config`      | LMLayer -> worker  | capabilities        | No                  | No
+`config`      | LMLayer → worker   | capabilities        | No                  | No
 `load`        | keyboard → LMLayer | model               | Yes — `ready`       | No
 `unload`      | keyboard → LMLayer | none                | No                  | No 
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
 `predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
+`wordbreak`   | LMLayer → worker   | context             | Yes - `currentword` | Yes
+`currentword` | LMLayer → keyboard | string              | No                  | Yes
 
 ### Message: `config`
 
@@ -281,6 +283,8 @@ _undoing_ the `transform` it has already applied should it apply a
 as if it has never applied the `transform` associated with the input
 event in the first place.
 
+#### Context
+
 The context is the text surrounding the insertion point, _before_ the
 transform is applied to the buffer.
 
@@ -314,6 +318,10 @@ interface Context {
 }
 ```
 
+[Context]: #context
+
+#### Transform
+
 The transform parameter describes how the input event will change the
 buffer.
 
@@ -342,6 +350,7 @@ interface Transform {
 }
 ```
 
+[Transform]: #transform
 
 ### Message: `suggestions`
 
@@ -349,7 +358,7 @@ The `suggestions` message is sent from the LMLayer to the keyboard. This
 message sends a ranked array of suggestions, in descending order of
 probability (i.e., entry `0` is most likely, followed by entry `1`,
 etc.). This message **MUST** be in response to a `predict` message, and
-it **MUST** respond with the corresponding [token].
+it **MUST** respond with the corresponding [token][Tokens].
 
 ```typescript
 /**
@@ -390,7 +399,7 @@ let suggestions = [
 
 #### Timing
 
-Each suggestion provides a `transform`. This transform is applied
+Each suggestion provides a `transform`. This [transform][Transform] is applied
 _after_ the transform associated with the input event that initiated
 this prediction. That is, the suggested transform applies to the buffer
 after the transform associated with the input event.
@@ -416,6 +425,106 @@ sending late `suggestions` messages. In either case, a `suggestions`
 message can be identified as appropriate or "late" via its `token`
 property.
 
+
+### Message: `wordbreak`
+
+Sent from the keyboard to the LMLayer to request a wordbreak operation
+on the current [context][Context] for use in its UI operations.  (One useful
+example:  display text for a 'reversion' suggestion that undoes
+previously-applied suggestions.)  The keyboard **SHOULD** track each
+`wordbreak` message using a [token][Tokens].  The token **MUST** be unique
+across all wordbreak events.  The LMLayer **SHOULD** respond to each
+`wordbreak` message with a `currentword` message.  The `wordbreak`
+message **MUST** contain the corresponding token as sent in the initial
+`wordbreak` message.
+
+The keyboard **MUST** send the `context` parameter.  The keyboard **MUST**
+send a unique token.
+
+The semantics of the `wordbreak` message **MUST** be from the perspective
+of this sequence of events:
+
+1. After any pending UI operations are completed, including application
+of any selected suggestion's `transform` to the `context`.
+2. Before the user inputs any additional keystrokes.
+
+### Message: `currentword`
+
+The `currentword` message is sent from the LMLayer to the keyboard.  This
+message sends the single word (as determined by wordbreaking) from
+within context that begins to the left of the insertion point but
+following the last wordbreaking character(s) to the left of the insertion
+point.  If no such wordform exists, this returns an empty string.
+
+This message **MUST** be in response to a `wordbreak` message, and it
+**MUST** respond with the corresponding [token][Tokens].
+
+#### Examples
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    context: {
+      left: 'The quick brown fox jumped',
+      right: ' over the lazy dog',
+      startOfBuffer: true,
+      endOfBuffer: true
+    },
+}
+```
+
+would result in the following reply message:
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    word: 'jumped'
+}
+```
+
+Alternatively, if the insertion point is after the space... 
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    context: {
+      left: 'The quick brown fox jumped ',
+      right: 'over the lazy dog',
+      startOfBuffer: true,
+      endOfBuffer: true
+    },
+}
+```
+
+would result in the following reply message:
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    word: ''
+}
+```
+
+The latter example returns empty string as the final pre-insertion point
+word preceeds the final pre-insertion point wordbreaking character.
+
+#### Late responses
+
+Sometimes, a `currentword` message may arrive after an input event or 
+other UI interaction has already invalidated its request.  The LMLayer
+**MAY** send **late** results.  Consequently, the keyboard **MAY** discard 
+the late wordbreaking `currentword` result.  This is no requirement for
+the keyboard to acknowledge late wordbreaking results, or for the LMLayer
+to avoid sending such late messages.  In either case, a `currentword` message
+can be identified as appropriate or "late" via its `token` property.
 
 ## *Informative*: LMLayer worker as a state machine
 

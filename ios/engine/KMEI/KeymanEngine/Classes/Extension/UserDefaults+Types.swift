@@ -10,6 +10,7 @@ import Foundation
 
 public extension UserDefaults {
   func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
+
     guard let array = array(forKey: key) as? [Data] else {
       return nil
     }

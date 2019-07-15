@@ -14,6 +14,7 @@ import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
+import android.inputmethodservice.Keyboard;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -86,7 +88,8 @@ public final class KMManager {
   // Globe key actions
   public enum GlobeKeyAction {
     GLOBE_KEY_ACTION_SHOW_MENU,
-    GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,
+    GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
+    GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
@@ -96,6 +99,7 @@ public final class KMManager {
   private static boolean didCopyAssets = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+  private static int sysKbIndexOnLockScreen = -1;
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -134,6 +138,7 @@ public final class KMManager {
   public static final String KMKey_LexicalModelID = "lmId";
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
+  public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -167,19 +172,19 @@ public final class KMManager {
 
   private static Context appContext;
 
-  protected static String getResourceRoot() {
+  public static String getResourceRoot() {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
   }
 
-  protected static String getPackagesDir() {
+  public static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
   }
 
-  protected static String getLexicalModelsDir() {
+  public static String getLexicalModelsDir() {
     return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
-  protected static String getCloudDir() {
+  public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
@@ -701,19 +706,28 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
+
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
+      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
+      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
 
   public static boolean deregisterLexicalModel(String modelID) {
+    // Check if current lexical model needs to be cleared
+    if (currentLexicalModel != null && currentLexicalModel.get(KMManager.KMKey_LexicalModelID).equalsIgnoreCase(modelID)) {
+      currentLexicalModel = null;
+    }
+
     String url = String.format("javascript:deregisterModel('%s')", modelID);
     if (InAppKeyboard != null && InAppKeyboardLoaded) {
       InAppKeyboard.loadUrl(url);
@@ -1183,12 +1197,27 @@ public final class KMManager {
     return KeyboardPickerActivity.getKeyboardInfo(context, index);
   }
 
+  public static HashMap<String, String> getLexicalModelInfo(Context context, int index) {
+    return KeyboardPickerActivity.getLexicalModelInfo(context, index);
+  }
+
   public static boolean keyboardExists(Context context, String packageID, String keyboardID, String languageID) {
     boolean result = false;
 
     if (packageID != null && keyboardID != null && languageID != null) {
       String kbKey = String.format("%s_%s", languageID, keyboardID);
       result = KeyboardPickerActivity.containsKeyboard(context, kbKey);
+    }
+
+    return result;
+  }
+
+  public static boolean lexicalModelExists(Context context, String packageID, String languageID, String modelID) {
+    boolean result = false;
+
+    if (packageID != null && languageID != null &&  modelID != null) {
+      String lmKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      result = KeyboardPickerActivity.containsLexicalModel(context, lmKey);
     }
 
     return result;
@@ -1550,10 +1579,29 @@ public final class KMManager {
 
         if (KMManager.shouldAllowSetKeyboard()) {
           if (SystemKeyboard.keyboardPickerEnabled) {
+            KeyguardManager km = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+            if(km.inKeyguardRestrictedInputMode()) {
+              // Override system keyboard globe key action if screen is locked:
+              // 1. Switch to next Keyman keyboard (no menu)
+              // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
+              if (sysKbIndexOnLockScreen == -1) {
+                sysKbIndexOnLockScreen = getCurrentKeyboardIndex(context);
+                sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
+              } else if (sysKbIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+                sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
+              }
+            } else {
+              // If screen isn't locked, revert to default system globe key action
+              sysKbIndexOnLockScreen = -1;
+              sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+            }
+
             if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
               showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
             } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
               switchToNextKeyboard(context);
+            } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD) {
+              advanceToNextInputMode();
             }
           } else {
             switchToNextKeyboard(context);

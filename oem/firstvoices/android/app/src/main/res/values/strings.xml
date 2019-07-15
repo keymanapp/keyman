@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FirstVoices</string>
+    <string name="action_settings">Settings</string>
+    <string name="setup">Setup</string>
+    <string name="regions">Regions</string>
+    <string name="keyboards">Keyboards</string>
+</resources>

@@ -2,6 +2,8 @@ var assert = chai.assert;
 var LMLayer = com.keyman.text.prediction.LMLayer;
 
 describe('LMLayer', function () {
+  this.timeout(config.timeouts.standard);
+
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {
       let lmLayer = new LMLayer(helpers.defaultCapabilities);

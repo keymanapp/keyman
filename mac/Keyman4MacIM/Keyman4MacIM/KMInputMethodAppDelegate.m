@@ -24,6 +24,7 @@
 
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
+NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
@@ -81,7 +82,7 @@ id _lastServerWithOSKShowing = nil;
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
         
-        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
+        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, CGEventMaskBit(kCGEventFlagsChanged) | CGEventMaskBit(kCGEventLeftMouseDown) | CGEventMaskBit(kCGEventLeftMouseUp), (CGEventTapCallBack)eventTapFunction, nil);
         
         if (!self.lowLevelEventTap) {
             NSLog(@"Can't tap into low level events!");
@@ -306,6 +307,53 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _keyboardName = keyboardName;
     if (_oskWindow != nil)
         [_oskWindow.window setTitle:self.oskWindowTitle];
+}
+
+- (void)loadSavedStores {
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
+    if (!allSavedStores) return;
+    NSDictionary *savedStores = [allSavedStores objectForKey:_selectedKeyboard];
+    if (!savedStores) return;
+
+    NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+    fmt.numberStyle = NSNumberFormatterDecimalStyle;
+
+    for (NSString *key in savedStores) {
+        NSString *value = [savedStores objectForKey:key];
+        NSUInteger storeID = [[fmt numberFromString:key] unsignedIntegerValue];
+        [self.kme setStore:(DWORD)storeID withValue:value];
+    }
+}
+
+- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value {
+    NSString *storeKeyStr = [storeKey stringValue];
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
+    NSDictionary *savedStores;
+
+    if (allSavedStores) {
+        savedStores = [allSavedStores objectForKey:_selectedKeyboard];
+    }
+
+    if (savedStores) {
+        NSMutableDictionary *newSavedStores = [savedStores mutableCopy];
+        [newSavedStores setObject:value forKey:storeKeyStr];
+        savedStores = newSavedStores;
+    } else {
+        savedStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKeyStr, nil];
+    }
+
+    if (allSavedStores) {
+        NSMutableDictionary *newAllSavedStores = [allSavedStores mutableCopy];
+        [newAllSavedStores setObject:savedStores forKey:_selectedKeyboard];
+        allSavedStores = newAllSavedStores;
+    } else {
+        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:savedStores, _selectedKeyboard, nil];
+    }
+
+    [userData setObject:allSavedStores forKey:kKMSavedStoresKey];
+    [userData synchronize];
 }
 
 - (NSString *)oskWindowTitle {
@@ -765,6 +813,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 [self setKvk:kvk];
                 [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
                 [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
+                [self loadSavedStores];
 
                 didSetKeyboard = YES;
             }
@@ -800,6 +849,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
             [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
             [self setContextBuffer:nil];
+            [self loadSavedStores];
             [self setSelectedKeyboard:path];
         }
     }

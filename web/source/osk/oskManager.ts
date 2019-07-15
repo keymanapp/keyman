@@ -1303,7 +1303,7 @@ namespace com.keyman.osk {
           Ls.left=Ls.bottom='0px';
           let vkbdHeight = (<HTMLElement> this.vkbd.kbdDiv.firstChild).style.height;
           vkbdHeight = vkbdHeight.substr(0, vkbdHeight.indexOf('px'));
-          Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10)) + 'px';
+          Ls.height=Ls.maxHeight= (this.getBannerHeight() + parseInt(vkbdHeight, 10) + 5 /* kmw-banner-bar top in css */) + 'px';
           Ls.border='none';
           Ls.borderTop='1px solid gray';
 
@@ -1459,6 +1459,10 @@ namespace com.keyman.osk {
     hideNow: () => void = function(this: OSKManager) { // I3363 (Build 301)
       this._Box.removeEventListener('transitionend', this.hideNow, false);
       this._Box.removeEventListener('webkitTransitionEnd', this.hideNow, false);
+
+      if(document.body.className.indexOf('osk-always-visible') >= 0) {
+        return;
+      }
 
       var os=this._Box.style;
       os.display='none';
