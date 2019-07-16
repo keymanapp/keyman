@@ -205,13 +205,14 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   @objc func addClicked(_ sender: Any) {
-    showAddKeyboard()
+    showAddLanguageKeyboard()
   }
   
-  func showAddKeyboard() {
+  func showAddLanguageKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
+    let vc = LanguageSpecificViewController(Manager.shared.apiKeyboardRepository, language: language)
+    vc.title = "Add new \(language.name) keyboard"
     navigationController?.pushViewController(vc, animated: true)
   }
   

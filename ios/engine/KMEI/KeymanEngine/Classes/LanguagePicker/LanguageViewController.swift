@@ -52,12 +52,24 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
+  func postLanguageLoad(languageDict: [String: Language]) {
+    languages = languageList(languageDict)
+  }
+  
+  func idxOfLanguage(languageID: String) -> Int {
+    let langIdx = self.languages.firstIndex(where: {
+      $0.id == languageID
+    }) ?? 0
+    return langIdx
+  }
+  
   override func loadView() {
     super.loadView()
     if let languageDict = keyboardRepository?.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     } else {
+      log.info("Fetching repository from API for keyboard download (LanguageViewController)")
       keyboardRepository?.fetch()
     }
 
@@ -215,7 +227,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     showLanguageDetailView(title: title, languageIndex: indexPath.section)
   }
 
-  private func showLanguageDetailView(title: String, languageIndex: Int) {
+  func showLanguageDetailView(title: String, languageIndex: Int) {
     let langDetailView = LanguageDetailViewController(language: languages[languageIndex])
     langDetailView.title = title
     navigationController?.pushViewController(langDetailView, animated: true)
@@ -344,7 +356,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 extension LanguageViewController: KeyboardRepositoryDelegate {
   func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
     if let languageDict = repository.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     }
     self.dismissActivityView()
     self.tableView.reloadData()
@@ -370,7 +382,7 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
 extension LanguageViewController: LexicalModelRepositoryDelegate {
   func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
     if let languageDict = repository.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     }
     self.dismissActivityView()
     self.tableView.reloadData()
