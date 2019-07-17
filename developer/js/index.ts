@@ -9,7 +9,7 @@ import * as ts from "typescript";
 import KmpCompiler from "./package-compiler/kmp-compiler";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure } from "./lexical-model-compiler/build-trie";
+import { createTrieDataStructure, parseWordList, compileWordListCharacterSet } from "./lexical-model-compiler/build-trie";
 
 // The model ID MUST adhere to this pattern:
 //                         author           .bcp47            .uniq
@@ -245,6 +245,10 @@ export default class LexicalModelCompiler {
         if (modelSource.searchTermToKey) {
           func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
         }
+
+        let wordlist = parseWordList(sources.join('\n'));
+        let charSet = compileWordListCharacterSet(wordlist, modelSource.searchTermToKey);
+        func += `  characterSet: ${charSet},\n`;
         func += `}));\n`;
         break;
       default:

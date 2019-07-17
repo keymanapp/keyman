@@ -5,6 +5,16 @@
 type WordList = [string, number][];
 
 /**
+ * A character set is an array of individual characters comprising the words
+ * represented by a lexical model.
+ * 
+ * The results of this are used to fuel correction algorithms when keyboard
+ * layout information is not available for use.  (As in Keyman v12's edit
+ * distance calculations.)
+ */
+type CharacterSet = [string, number][];
+
+/**
  * Returns a data structure that can be loaded by the TrieModel.
  *
  * It implements a **weighted** trie, whose indices (paths down the trie) are
@@ -63,6 +73,60 @@ export function parseWordList(contents: string): WordList {
     result.push([wordform, count]);
   }
   return result;
+}
+
+export function compileWordListCharacterSet(wordlist: WordList, searchTermToKey?: (wf: string) => string): string {
+  let charMap: {[char: string]: number} = {};
+  let charList: string[] = [];
+
+  for(let [word] of wordlist) {
+    // There's a problem if we have `null` or `undefined` for a word.
+    if(!word) {
+      throw TypeError();
+    }
+
+    // We want to operate on the search-term form, since that's what is used to look up the words in the Trie.
+    if(searchTermToKey) {
+      word = searchTermToKey(word);
+    }
+
+    for(let i=0; i < word.length; i++) {
+      let code = word.charCodeAt(i);
+      let char = word.charAt(i);
+
+      // Check for surrogate pairs
+      if(code >= 0xD800 && code <= 0xDBFF && word.length > i+1) {
+        let pairedCode = word.charCodeAt(i+1);
+
+        // Ensure it's actually a legit paired code
+        if(pairedCode >= 0xDC00 && pairedCode <= 0xDFFF) {
+          // Computes the actual character's code.
+          //code = (code - 0xD800) * 0x400 + pairedCode - 0xDC00 + 0x10000
+
+          // Only process the second code if it's actually paired.
+          char = char + word.charAt(++i); // The second code is processed, so skip it in the loop.
+        } // else handle pairedCode in the next loop iteration.
+      }
+      
+      if(!charMap[char]) {
+        charMap[char] = 1;
+        charList.push(char);
+      } else {
+        charMap[char]++;
+      }
+    }
+  }
+
+  charList.sort();
+
+  let charSet: CharacterSet = [];
+  for(let c of charList) {
+    console.log(c + ": " + charMap[c]);
+
+    charSet.push([c, charMap[c]]);
+  }
+
+  return JSON.stringify(charSet);
 }
 
 namespace Trie {
