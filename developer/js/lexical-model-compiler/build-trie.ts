@@ -121,8 +121,6 @@ export function compileWordListCharacterSet(wordlist: WordList, searchTermToKey?
 
   let charSet: CharacterSet = [];
   for(let c of charList) {
-    console.log(c + ": " + charMap[c]);
-
     charSet.push([c, charMap[c]]);
   }
 
