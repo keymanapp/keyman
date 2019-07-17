@@ -138,6 +138,7 @@ interface WorkerInternalModel {
   configure(capabilities: Capabilities): Configuration;
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
   wordbreak(context: Context): USVString;
+  characterSet?: [string, number][]; 
 }
 
 /**

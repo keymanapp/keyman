@@ -49,6 +49,10 @@ class ModelCompositor {
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
 
+    // if(this.lexicalModel.characterSet) {
+    //   // We can attempt use of edit distance calculations.
+    // }
+
     for(let alt of transformDistribution) {
       let transform = alt.sample;
 
