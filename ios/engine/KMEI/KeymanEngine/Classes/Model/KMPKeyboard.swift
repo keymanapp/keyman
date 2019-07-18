@@ -80,7 +80,7 @@ public class KMPKeyboard
     {
       var installableKeyboards : [InstallableKeyboard] = []
       
-      if let language = self.languages.first {
+      for language in self.languages {
         let keyboard = InstallableKeyboard(id: keyboardId!, name: name!,
                                            languageID: language.languageId,
                                            languageName: language.name,
