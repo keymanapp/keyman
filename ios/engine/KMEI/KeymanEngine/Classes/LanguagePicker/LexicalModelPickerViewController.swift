@@ -137,7 +137,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     if Manager.shared.removeLexicalModel(at: globalIndex) {
       loadUserLexicalModels()
     }
-    setIsDoneButtonEnabled(true)
+    if language == nil {
+      setIsDoneButtonEnabled(true)
+    }
   }
   
   override func tableView(_ tableView: UITableView,
