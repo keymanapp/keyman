@@ -11,7 +11,8 @@
   },
   "include": [
     "lexical-model-compiler/**/*",
-    "package-compiler/**/*"
+    "package-compiler/**/*",
+    "index.ts"
   ],
   "exclude": [
     "node_modules",
