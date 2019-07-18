@@ -197,7 +197,7 @@ namespace Trie {
   interface InternalNode {
     type: 'internal';
     weight: number; // Gets the maximum weight of any child of this node.
-    cumulativeWeight: number;  // Gets the sum total of weights of this node's children.
+    totalWeight: number;  // Gets the sum total of weights of this node's children.
     // TODO: As an optimization, "values" can be a single string!
     values: string[];
     children: { [codeunit: string]: Node };
@@ -210,7 +210,7 @@ namespace Trie {
   interface Leaf {
     type: 'leaf';
     weight: number;
-    cumulativeWeight: number;
+    totalWeight: number;
     entries: Entry[];
     unsorted?: true;
   }
@@ -271,7 +271,7 @@ namespace Trie {
     return {
       type: 'leaf',
       weight: 0,
-      cumulativeWeight: 0,
+      totalWeight: 0,
       entries: []
     };
   }
@@ -324,12 +324,12 @@ namespace Trie {
       node.values.push(char);
     }
     addUnsorted(node.children[char], item, index + 1);
-    node.cumulativeWeight += item.weight;
+    node.totalWeight += item.weight;
   }
 
   function addItemToLeaf(leaf: Leaf, item: Entry) {
     leaf.entries.push(item);
-    leaf.cumulativeWeight = (leaf.cumulativeWeight ? leaf.cumulativeWeight : 0) + item.weight;
+    leaf.totalWeight = (leaf.totalWeight ? leaf.totalWeight : 0) + item.weight;
   }
 
   /**
@@ -350,7 +350,7 @@ namespace Trie {
     delete leaf.entries;
     internal.values = [];
     internal.children = {};
-    internal.cumulativeWeight = 0; // Since we're resetting the children, we should reset the accumulator.
+    internal.totalWeight = 0; // Since we're resetting the children, we should reset the accumulator.
 
     // Convert the old values array into the format for interior nodes.
     for (let item of entries) {
@@ -366,7 +366,7 @@ namespace Trie {
         internal.values.push(char);
       }
       addUnsorted(internal.children[char], item, depth + 1);
-      internal.cumulativeWeight += item.weight;
+      internal.totalWeight += item.weight;
     }
 
     internal.unsorted = true;
