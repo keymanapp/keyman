@@ -15,4 +15,3 @@ FOUNDATION_EXPORT double KeymanEngineVersionNumber;
 FOUNDATION_EXPORT const unsigned char KeymanEngineVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <KeymanEngine/PublicHeader.h>
-//#import <KeymanEngine/Reachability.h>
