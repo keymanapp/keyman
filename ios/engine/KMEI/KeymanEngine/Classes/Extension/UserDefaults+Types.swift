@@ -191,6 +191,12 @@ public extension UserDefaults {
   func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
     return userLexicalModels?.first { $0.fullID == fullID }
   }
+  
+  func userLexicalModelsForLanguage(languageID: String) -> [InstallableLexicalModel]? {
+    return userLexicalModels?.filter({
+      $0.languageID == languageID
+    }) ?? []
+  }
 
   var migrationLevel: Int {
     get {

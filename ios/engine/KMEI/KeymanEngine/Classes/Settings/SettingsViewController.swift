@@ -281,8 +281,8 @@ open class SettingsViewController: UITableViewController {
       } else {
         kbds = [Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil)]
       }
-      let userDefaults = Storage.active.userDefaults
-      let lmListInstalled: [InstallableLexicalModel] = userDefaults.userLexicalModels(forLanguage: k.languageID) ?? []
+      let userDefaults : UserDefaults = Storage.active.userDefaults
+      let lmListInstalled: [InstallableLexicalModel] = userDefaults.userLexicalModelsForLanguage(languageID: l) ?? []
       let lmList = installed2API(lmListInstalled)
       keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: lmList, font: nil, oskFont: nil)
     }
