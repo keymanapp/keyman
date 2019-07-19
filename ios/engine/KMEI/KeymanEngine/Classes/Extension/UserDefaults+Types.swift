@@ -9,7 +9,8 @@
 import Foundation
 
 public extension UserDefaults {
- func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
+  func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
+
     guard let array = array(forKey: key) as? [Data] else {
       return nil
     }
@@ -189,6 +190,12 @@ public extension UserDefaults {
     
   func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
     return userLexicalModels?.first { $0.fullID == fullID }
+  }
+  
+  func userLexicalModelsForLanguage(languageID: String) -> [InstallableLexicalModel]? {
+    return userLexicalModels?.filter({
+      $0.languageID == languageID
+    }) ?? []
   }
 
   var migrationLevel: Int {

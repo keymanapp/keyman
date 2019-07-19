@@ -5,7 +5,7 @@
 //  Created by Randy Boring on 3/19/19.
 //  Copyright © 2019 SIL International. All rights reserved.
 //
-
+import UIKit
 import Foundation
 
 class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate {
@@ -24,7 +24,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   
     infoArray = [[String: String]]()
     infoArray.append([
-        "title": "Lexical model version",
+        "title": "Model version",
         "subtitle": lexicalModelVersion
         ])
   
@@ -35,7 +35,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
           ])
     }
     infoArray.append([
-        "title": "Delete",
+        "title": "Uninstall model",
         "subtitle": ""
         ])
   }
@@ -43,6 +43,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     navigationController?.setToolbarHidden(true, animated: true)
+    log.info("didAppear: LexicalModelInfoViewController")
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {
