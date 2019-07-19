@@ -11,6 +11,7 @@ import WebKit
 import XCGLogger
 import Zip
 import DeviceKit
+import Reachability
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
@@ -212,12 +213,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     updateUserKeyboards(with: Defaults.keyboard)
 
-    reachability = Reachability(hostName: keymanHostName)
+    reachability = Reachability(hostname: keymanHostName)
 
     if(!Util.isSystemKeyboard) {
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
                                            name: .reachabilityChanged, object: reachability)
-      reachability.startNotifier()
+      do {
+        try reachability.startNotifier()
+      } catch {
+        log.error("failed to start Reachability notifier: \(error)")
+      }
     }
 
     /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
@@ -254,6 +259,14 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         return setKeyboard(keyboard)
     }
     return false
+  }
+  
+  // returns lexical model id, given language id
+  func preferredLexicalModel(_ ud: UserDefaults, forLanguage lgCode: String) -> InstallableLexicalModel? {
+    if let preferredID = ud.preferredLexicalModelID(forLanguage: lgCode) {
+      return ud.userLexicalModels?.first { $0.id == preferredID }
+    }
+    return nil
   }
   
 
@@ -294,29 +307,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                     object: self,
                                     value: kb)
     
+    let userDefaults: UserDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
-    if let valid_models = Storage.active.userDefaults.userLexicalModels(forLanguage: kb.languageID) {
-      if valid_models.count > 0 {
-        //TODO: this is not quite right: currentLexicalModel might not be for this language
-        //  we need to get a preferred model for this language (or at least check that the current model is for this language)
-        //  then register that one.
-        if let lm = self.currentLexicalModel {
-          if valid_models.contains(where: { $0.id == lm.id }) {
-            log.debug("current model \(lm) IS among those valid for the current language \(kb.languageID)")
-            _ = Manager.shared.registerLexicalModel(lm)
-          } else {
-            log.error("current model \(lm) is not among those valid for the current language \(kb.languageID)!")
-            _ = Manager.shared.registerLexicalModel(valid_models[0])
-          }
-        } else {
-          log.info("no current model, picking first among those valid for the current language \(kb.languageID)")
-          _ = Manager.shared.registerLexicalModel(valid_models[0])
-        }
-      } else {
-        log.debug("empty current model list for the current language \(kb.languageID)")
-      }
-    } else {
-      log.debug("no current model list for the current language \(kb.languageID)")
+    if let preferred_model = preferredLexicalModel(userDefaults, forLanguage: kb.languageID) {
+      _ = Manager.shared.registerLexicalModel(preferred_model)
     }
     
     return true
@@ -585,7 +579,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             let name = k["name"] as! String
             let keyboardID = k["id"] as! String
             let version = k["version"] as! String
-            
+            //true if the keyboard targets a right-to-left script. false if absent.
+            let isrtl: Bool =  k["rtl"] as? Bool ?? false
+
             var oskFont: Font?
             let osk = k["oskFont"] as? String
             if let _ = osk {
@@ -613,7 +609,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                   languageID: languageId,
                   languageName: languageName,
                   version: version,
-                  isRTL: false,
+                  isRTL: isrtl,
                   font: displayFont,
                   oskFont: oskFont,
                   isCustom: false))
@@ -628,6 +624,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
               throw KMPError.fileSystem
             }
             
+            var haveInstalledOne = false
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               
@@ -656,7 +653,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 log.error("Error saving the download: \(error)")
                 throw KMPError.copyFiles
               }
-              Manager.shared.addKeyboard(keyboard)
+              if !haveInstalledOne {
+                Manager.shared.addKeyboard(keyboard)
+                haveInstalledOne = true
+              }
             }
           }
         }
@@ -807,7 +807,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: [keyboard], error: error)
@@ -861,7 +861,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Parameters:
   ///   - url: URL to a JSON description of the keyboard
   public func downloadKeyboard(from url: URL) {
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error)
@@ -921,7 +921,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    if reachability.currentReachabilityStatus() == NotReachable {
+    if reachability.connection == Reachability.Connection.none {
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: installableKeyboards, error: error)
       return
@@ -1141,7 +1141,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 //      return
 //    }
 //
-//    guard reachability.currentReachabilityStatus() != NotReachable else {
+//    guard reachability.connection != Reachability.Connection.none else {
 //      let error = NSError(domain: "Keyman", code: 0,
 //                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
 //      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
@@ -1186,7 +1186,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Parameters:
   ///   - url: URL to a JSON description of the lexical model
   public func downloadLexicalModel(from url: URL) {
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
@@ -1242,7 +1242,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
     
-    if reachability.currentReachabilityStatus() == NotReachable {
+    if reachability.connection == Reachability.Connection.none {
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
       return
@@ -1313,10 +1313,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   @objc func reachabilityChanged(_ notification: Notification) {
     log.debug {
       let reachStr: String
-      switch reachability.currentReachabilityStatus() {
-      case ReachableViaWiFi:
+      switch reachability.connection {
+      case Reachability.Connection.wifi:
         reachStr = "Reachable Via WiFi"
-      case ReachableViaWWAN:
+      case Reachability.Connection.cellular:
         reachStr = "Reachable Via WWan"
       default:
         reachStr = "Not Reachable"

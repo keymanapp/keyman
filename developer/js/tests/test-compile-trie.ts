@@ -20,6 +20,10 @@ describe('LexicalModelCompiler', function () {
         eval(code);
       }, SyntaxError);
       // TODO: Mock LMLayerWorker.loadModel()
+  
+      // Sanity check: the word list has three total unweighted words, with a
+      // total weight of 3!
+      assert.match(code, /\btotalWeight\b["']?:\s*3\b/);
     });
   })
 });
