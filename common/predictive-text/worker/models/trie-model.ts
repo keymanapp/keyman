@@ -203,6 +203,7 @@
   interface InternalNode {
     type: 'internal';
     weight: number;
+    totalWeight: number;
     /** Maintains the keys of children in descending order of weight. */
     values: string[]; // TODO: As an optimization, "values" can be a single string!
     /**
@@ -216,6 +217,7 @@
   interface Leaf {
     type: 'leaf';
     weight: number;
+    totalWeight: number;
     entries: Entry[];
   }
 
@@ -237,6 +239,8 @@
     private root: Node;
     /** The total weight of the entire trie. */
     private totalWeight: number;
+    private _characterSet: [string, number][];
+
     /**
      * Converts arbitrary strings to a search key. The trie is built up of
      * search keys; not each entry's word form!
@@ -247,6 +251,10 @@
       this.root = root;
       this.toKey = wordform2key;
       this.totalWeight = totalWeight;
+    }
+
+    get characterSet(): [string, number][] {
+      return this._characterSet;
     }
 
     /**
