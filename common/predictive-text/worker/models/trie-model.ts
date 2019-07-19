@@ -48,6 +48,10 @@
      *  This should simplify a search term into a key.
      */
     searchTermToKey?: (searchTerm: string) => string;
+    /**
+     * Defines a table of character frequencies from the backing wordlist
+     */
+    characterSet?: [string, number][];
   }
 
   /**
@@ -72,6 +76,7 @@
     configuration: Configuration;
     private _trie: Trie;
     readonly breakWords: WordBreakingFunction;
+    private _characterSet: [string, number][];
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(
@@ -80,6 +85,11 @@
         options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
+      this._characterSet = options.characterSet;
+    }
+
+    get characterSet(): [string, number][] {
+      return this._characterSet;
     }
 
     configure(capabilities: Capabilities): Configuration {
@@ -239,7 +249,6 @@
     private root: Node;
     /** The total weight of the entire trie. */
     private totalWeight: number;
-    private _characterSet: [string, number][];
 
     /**
      * Converts arbitrary strings to a search key. The trie is built up of
@@ -251,10 +260,6 @@
       this.root = root;
       this.toKey = wordform2key;
       this.totalWeight = totalWeight;
-    }
-
-    get characterSet(): [string, number][] {
-      return this._characterSet;
     }
 
     /**

@@ -86,6 +86,32 @@ class ModelCompositor {
     return exploded;
   }
 
+  protected buildCharacterSetContextTransforms(charSet: [string, number][], magnitude: number, omit?: string): ContextTransform[] {
+    charSet = [].concat(charSet); // Shallow-clone the array so we don't modify our source.  (We don't modify the pairs' values.)
+
+    // Do we wish to omit an element of the set?  If so, do so before we calculate weightings and set cardinality!
+    if(omit) {
+      // Adjust the charSet accordingly, removing the data for the element to omit.
+      for(let i=0; i < charSet.length; i++) {
+        if(charSet[i][0] == omit) {
+          charSet.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    let setCardinality = charSet.length;
+
+    // Currently ignores char frequencies.
+    let denominator = magnitude / setCardinality;
+    return charSet.map(function(pair) {
+      let ct = new ContextTransform();
+      ct.original = { sample: {insert: pair[0], deleteLeft: 0}, p: denominator };
+
+      return ct;
+    });
+  }
+
   protected generateTransformContext(context: Context): TransformContext {
     let charSet = this.lexicalModel.characterSet;
     if(!charSet) {
@@ -96,9 +122,6 @@ class ModelCompositor {
       return pair[0];
     });
 
-    let uniformCharDistribution: Distribution<Transform> = charSet.map(function(pair) {
-      return { sample: {insert: pair[0], deleteLeft: 0}, p: pair[1]/charSet.length };
-    });
 
     // #1 - use split the context's current word into recognized chars, making sure to be SMP-aware as we do so.
     let currentWord = this.lexicalModel.wordbreak(context);
@@ -107,19 +130,31 @@ class ModelCompositor {
     let extendedContext = new TransformContext();
     extendedContext.sequence = [];
 
+    // #2 - set up a single list of potential insertions.  We'll just reuse the reference a bunch.
+    let insertions = this.buildCharacterSetContextTransforms(charSet, .1);  // .1 subject to change
+    for(let i=0; i < insertions.length; i++) {
+      // Yup, infinite tree; a proper edit-distance algorithm shouldn't even try to traverse too deeply anyway.
+      insertions[i].insertions = insertions;
+    }
+
+    // #3 - set up the word-initial insertion ContextTransform.  Null 'original' to represent word-initial insertions.
+    let initial = new ContextTransform();
+    initial.original = {sample: {insert: '', deleteLeft: 0}, p: 0.9};  // 0.9 subject to change.
+    initial.insertions = insertions;
+    extendedContext.sequence.push(initial);
+
+    // #4 - set up a ContextTransform per Unicode char, including replacements and insertions.
     for(let i=0; i < explodedWord.length; i++) {
       let contextTransform = new ContextTransform();
       // Creates a basic insert-only Transform based on the raw text.
-      contextTransform.original = {sample: {insert: explodedWord[i], deleteLeft: 0}, p: 1};
+      contextTransform.original = {sample: {insert: explodedWord[i], deleteLeft: 0}, p: 0.5}; // 0.5 subject to change
+      contextTransform.replacements = this.buildCharacterSetContextTransforms(charSet, 0.4, explodedWord[i]); // 0.4 subject to change
+      contextTransform.insertions = insertions;
 
       extendedContext.sequence.push(contextTransform);
     }
 
-    // Now that the word is spliced, we have the 'originals' for the TransformContext sequence.
-    // We can build the base ContextTransform objects, but what's the best way to set up the subtrees?
- 
-    // TODO:  Return something actually-useful instead.
-    return null;
+    return extendedContext;
   }
 
   protected isWhitespace(transform: Transform): boolean {
