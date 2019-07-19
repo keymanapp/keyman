@@ -23,6 +23,9 @@ public enum Key {
 
   /// Currently/last selected lexical model info in UserDefaults
   static let userCurrentLexicalModel = "UserCurrentLexicalModel"
+  
+  /// Dictionary of lexical model ids keyed by language id in UserDefaults
+  static let userPreferredLexicalModels = "UserPreferredLexicalModels"
 
   // Internal user defaults keys
   static let engineVersion = "KeymanEngineVersion"

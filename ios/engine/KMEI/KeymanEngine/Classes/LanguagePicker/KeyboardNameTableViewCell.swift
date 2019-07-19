@@ -6,6 +6,8 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import UIKit
+
 private let cellSelectedTag = 4576 // arbitrary number
 
 class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {

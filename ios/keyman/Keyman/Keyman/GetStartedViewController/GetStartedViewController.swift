@@ -185,7 +185,27 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   }
 
   private var dontShowGetStarted: Bool {
+    return !shouldShowGetStarted
+  }
+
+  private var shouldShowGetStarted: Bool {
     let userData = AppDelegate.activeUserDefaults()
-    return userData.bool(forKey: dontShowGetStartedKey)
+    var value: Any? = userData.object(forKey: shouldShowGetStartedKey)
+    if nil == value { // new key not present, try the old key
+      value = userData.object(forKey: dontShowGetStartedKey)
+      if nil == value {
+        userData.set(true, forKey: shouldShowGetStartedKey)
+        userData.synchronize()
+        return true // default to showing when no preference has been set
+        // so it shows at startup
+      } else {
+        userData.removeObject(forKey: dontShowGetStartedKey)
+        userData.set(false, forKey: shouldShowGetStartedKey)
+        userData.synchronize()
+        // remove the old, confusing value and set the new value
+        return false
+      }
+    }
+    return userData.bool(forKey: shouldShowGetStartedKey)
   }
 }
