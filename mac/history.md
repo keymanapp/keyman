@@ -1,5 +1,10 @@
 # Keyman for macOS Version History
 
+## 2019-02-26 11.0.221 stable
+* Add support for option stores (if/set/reset/save statements) (#1838)
+* Fix bug where keyboards with more than nine deadkeys did not operate correctly (#1839)
+* Fix out of date context buffer when using command keys (#1840)
+
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release
 

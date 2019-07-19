@@ -21,6 +21,18 @@
     return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    KMCompStore *newStore = [[[self class] allocWithZone:zone] init];
+
+    if (newStore) {
+        [newStore setDwSystemID:[self dwSystemID]];
+        if ([self name]) newStore.name = [[NSString alloc] initWithString:[self name]];
+        if ([self string]) newStore.string = [[NSString alloc] initWithString:[self string]];
+    }
+
+    return newStore;
+}
+
 - (NSString *)description {
     NSString *format = @"<%@:%p ID:0x%X DN:%@ N:%@ S:%@>";
     NSString *str = [NSString stringWithFormat:format,
