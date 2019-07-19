@@ -844,7 +844,7 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       
       // KeymanTouch for Android uses direct insertion of the character string
-      if('oninserttext' in keyman) {
+      if('oninserttext' in keyman && !(outputTarget instanceof Mock)) {
         keyman['oninserttext'](dn,s);
       }
 

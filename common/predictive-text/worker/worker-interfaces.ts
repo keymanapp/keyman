@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
@@ -86,7 +86,7 @@ interface PredictMessage {
    *
    * TODO: test for absent transform!
    */
-  transform?: Transform;
+  transform?: Transform | Distribution<Transform>;
 
   /**
    * The context (text to the left and text to right) at the
@@ -98,6 +98,24 @@ interface PredictMessage {
 
 interface UnloadMessage {
   message: 'unload'
+}
+
+/**
+ * Message used to request the last pre-cursor word in the context.
+ */
+interface WordbreakMessage {
+  message: 'wordbreak';
+
+  /**
+   * Opaque, unique token that pairs this wordbreak message with its return message.
+   */
+  token: Token;
+
+  /**
+   * The context (text to the left and text to right) at the
+   * insertion point/text cursor.
+   */
+  context: Context;
 }
 
 
@@ -118,7 +136,8 @@ interface LMLayerWorkerState {
  */
 interface WorkerInternalModel {
   configure(capabilities: Capabilities): Configuration;
-  predict(transform: Transform, context: Context): Suggestion[];
+  predict(transform: Transform, context: Context): Distribution<Suggestion>;
+  wordbreak(context: Context): USVString;
 }
 
 /**

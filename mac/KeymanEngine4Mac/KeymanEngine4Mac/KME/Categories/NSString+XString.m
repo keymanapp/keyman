@@ -356,7 +356,7 @@
 @implementation NSMutableString (XString)
 
 - (void)appendDeadkey:(NSUInteger)index {
-    NSString *dk = [NSString stringWithFormat:@"%C%C%lu", UC_SENTINEL, CODE_DEADKEY, index];
+    NSString *dk = [NSString stringWithFormat:@"%C%C%C", UC_SENTINEL, CODE_DEADKEY, index];
     [self appendString:dk];
 }
 

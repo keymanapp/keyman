@@ -41,7 +41,7 @@ NSMutableArray *servers;
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    return (NSEventMaskKeyDown);
+    return NSEventMaskKeyDown | NSEventMaskFlagsChanged;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
@@ -223,6 +223,7 @@ NSMutableArray *servers;
         [self.AppDelegate setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
         [self.AppDelegate setContextBuffer:nil];
         [self.AppDelegate setSelectedKeyboard:path];
+        [self.AppDelegate loadSavedStores];
         if (kvk != nil && self.AppDelegate.alwaysShowOSK)
             [self.AppDelegate showOSK];
     }

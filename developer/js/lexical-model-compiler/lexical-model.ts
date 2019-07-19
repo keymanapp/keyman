@@ -9,6 +9,7 @@ interface ClassBasedWordBreaker {
 }
 
 interface LexicalModel {
+  // TODO: remove trie-2.0 when https://github.com/keymanapp/lexical-models/pull/39 is merged.
   readonly format: 'trie-1.0'|'trie-2.0'|'fst-foma-1.0'|'custom-1.0',
   //... metadata ...
 }

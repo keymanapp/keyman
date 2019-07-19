@@ -8,7 +8,7 @@
 
 		<html>
 			<head>
-				<!-- META http-equiv="Page-Enter" CONTENT="progid:DXImageTransform.Microsoft.Pixelate(Duration=1)" / -->
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 
 				<title>fonts</title>
 				<style type="text/css">

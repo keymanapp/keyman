@@ -52,11 +52,38 @@ namespace models {
       return this.configuration;
     }
 
-    predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Suggestion[] {
-      if (injectedSuggestions) {
-        return injectedSuggestions;
+    predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Distribution<Suggestion> {
+      let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
+        let distribution: Distribution<Suggestion> = [];
+        let n = suggestions.length;
+
+        for(let s of suggestions) {
+          distribution.push({sample: s, p: 1});  // For a dummy model, this is sufficient.  The uniformness is all that matters.
+        }
+
+        return distribution;
       }
-      return this._futureSuggestions.shift();
+
+      if (injectedSuggestions) {
+        return makeUniformDistribution(injectedSuggestions);
+      }
+
+      let currentSet = this._futureSuggestions.shift();
+      
+      if(!currentSet) {
+        return [];
+      } else {
+        return makeUniformDistribution(currentSet);
+      }
+    }
+
+    wordbreak(context: Context): USVString {
+      let words = wordBreakers.default_(context.left);
+      if (words.length > 0) {
+        return words.pop().text;
+      }
+
+      return '';
     }
   };
 }

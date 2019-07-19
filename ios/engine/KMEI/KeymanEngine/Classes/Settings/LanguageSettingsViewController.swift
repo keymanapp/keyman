@@ -8,6 +8,8 @@
 
 import UIKit
 
+private let toolbarButtonTag = 100
+
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
   private var userKeyboards: [String: Language] = [:]
@@ -30,19 +32,18 @@ class LanguageSettingsViewController: UITableViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     title = "\(language.name) Settings"
+    log.info("viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")")
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    if Manager.shared.canAddNewKeyboards {
+      let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
+                                      action: #selector(self.addClicked))
+      navigationItem.rightBarButtonItem = addButton
+    }
   }
-
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-//    navigationController?.setToolbarHidden(true, animated: true)
-    // if no rows to show yet, show a loading indicator
+
     log.info("didAppear: LanguageSettingsViewController")
   }
   
@@ -201,6 +202,18 @@ class LanguageSettingsViewController: UITableViewController {
   
   override open func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
     performAction(for: indexPath)
+  }
+  
+  @objc func addClicked(_ sender: Any) {
+    showAddLanguageKeyboard()
+  }
+  
+  func showAddLanguageKeyboard() {
+    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
+    button?.isEnabled = false
+    let vc = LanguageSpecificViewController(Manager.shared.apiKeyboardRepository, language: language)
+    vc.title = "Add new \(language.name) keyboard"
+    navigationController?.pushViewController(vc, animated: true)
   }
   
   private func performAction(for indexPath: IndexPath) {
