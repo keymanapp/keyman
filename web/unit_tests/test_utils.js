@@ -325,7 +325,7 @@ if(typeof(DynamicElements) == 'undefined') {
     if(loadCallback) {
       frame.addEventListener('load', function() {
         // Give KMW's attachment events a chance to run first.
-        window.setTimeout(loadCallback, Math.max(100, kmwconfig.timeouts.scriptLoad / 4));
+        window.setTimeout(loadCallback, Math.max(100, kmwconfig.timeouts.scriptLoad));
       });
     }
     frame.setAttribute("src", "resources/html/iframe.html");
