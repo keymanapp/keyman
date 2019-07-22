@@ -1485,17 +1485,19 @@ public final class KMManager {
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
 
+        /*  // For future implementation
         InAppKeyboard.suggestionWindowPos = new double[]{x, y};
         InAppKeyboard.suggestionJSON = suggestionJSON;
 
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
+        */
       }
       return false;
     }
@@ -1713,14 +1715,19 @@ public final class KMManager {
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
 
+        /*  // For future implementation
+        SystemKeyboard.suggestionWindowPos = new double[]{x, y};
+        SystemKeyboard.suggestionJSON = suggestionJSON;
+
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
+        */
       }
 
       return false;
