@@ -103,7 +103,9 @@ class ModelCompositor {
       };
     }
 
-    keepOption.displayAs = '"' + keepOption.displayAs + '"';
+    if(keepOption) {
+      keepOption.displayAs = '"' + keepOption.displayAs + '"';
+    }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper
     // distribution and prep for return.
