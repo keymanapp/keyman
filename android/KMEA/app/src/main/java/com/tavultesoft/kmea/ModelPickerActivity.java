@@ -68,7 +68,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
     languageID = newLanguageID;
 
     final String languageName = bundle.getString(KMManager.KMKey_LanguageName);
-    textView.setText(String.format("%s model", languageName));
+    textView.setText(String.format(getString(R.string.model_picker_header), languageName));
 
     listView = (ListView) findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
@@ -135,7 +135,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
             modelInfo.put(KMManager.KMKey_CustomHelpLink, "");
             boolean result = KMManager.addLexicalModel(context, new HashMap<>(modelInfo));
             if (result) {
-              Toast.makeText(context, "Model installed", Toast.LENGTH_SHORT).show();
+              Toast.makeText(context, getString(R.string.model_install_toast), Toast.LENGTH_SHORT).show();
             }
 
             immediateRegister = true;
