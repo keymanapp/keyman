@@ -20,4 +20,12 @@ namespace models {
       endOfBuffer: context.endOfBuffer
     };
   }
+
+  export function prependTransform(transform: Transform, prefix: Transform) {
+    transform.insert = prefix.insert + transform.insert;
+    transform.deleteLeft += prefix.deleteLeft;
+    if(prefix.deleteRight) {
+      transform.deleteRight = (transform.deleteRight || 0) + prefix.deleteRight;
+    }
+  }
 }

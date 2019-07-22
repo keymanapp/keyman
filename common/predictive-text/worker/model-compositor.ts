@@ -58,13 +58,28 @@ class ModelCompositor {
       } else if(this.isBackspace(transform) && !allowBksp) {
         continue;
       }
+
+      let preserveWhitespace: boolean = false;
+      if(this.isWhitespace(transform)) {
+        // Detect start of new word; prevent whitespace loss here.
+        let postContext = models.applyTransform(transform, context);
+        preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
+      }
+
       let distribution = this.lexicalModel.predict(transform, context);
 
+      let mc = this;
       distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
         // Let's not rely on the model to copy transform IDs.
         // Only bother is there IS an ID to copy.
         if(transform.id !== undefined) {
           pair.sample.transformId = transform.id;
+        }
+
+        // Prepends the original whitespace, ensuring it is preserved if
+        // the suggestion is accepted.
+        if(preserveWhitespace) {
+          models.prependTransform(pair.sample.transform, transform);
         }
 
         // Combine duplicate samples.
