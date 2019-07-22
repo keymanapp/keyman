@@ -214,7 +214,7 @@ Modernizr.on('touchevents', function(result) {
           DynamicElements.assertAttached(ele, done);
         });
 
-        it('<iframe>', function(done) {
+        it.skip('<iframe>', function(done) {
           this.timeout(kmwconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
           
           var ID = DynamicElements.addIFrame(function() {
@@ -282,7 +282,7 @@ Modernizr.on('touchevents', function(result) {
           DynamicElements.assertAttached(ele, done);
         });
 
-        it('<iframe>', function(done) {
+        it.skip('<iframe>', function(done) {
           this.timeout(kmwconfig.timeouts.scriptLoad * 2);  // Just in case, for iframe loading time.
 
           var ID = DynamicElements.addIFrame(function() {
