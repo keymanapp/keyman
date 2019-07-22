@@ -67,7 +67,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
     final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
-    textView.setText(String.format("%s model", modelName));
+    textView.setText(String.format(getString(R.string.model_info_header), modelName));
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
