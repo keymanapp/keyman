@@ -170,19 +170,19 @@ class LanguageSettingsViewController: UITableViewController {
         case 1:
           cell.textLabel?.text = "Enable predictions"
         case 2:
-          cell.textLabel?.text = "Model"
+          cell.textLabel?.text = "Dictionaries"
           cell.accessoryType = .disclosureIndicator
           if let modelCt = language.lexicalModels?.count {
             switch modelCt {
             case 0:
-              cell.detailTextLabel?.text = "no models installed"
+              cell.detailTextLabel?.text = "no dictionaries installed"
             case 1:
-              cell.detailTextLabel?.text = "one model installed"
+              cell.detailTextLabel?.text = "one dictionary installed: \(language.lexicalModels![0].name)"
             default:
-              cell.detailTextLabel?.text = "\(modelCt) models installed"
+              cell.detailTextLabel?.text = "\(modelCt) dictionaries installed"
             }
           } else {
-            cell.detailTextLabel?.text = "no models installed"
+            cell.detailTextLabel?.text = "no dictionaries installed"
           }
         case 3: // future
           cell.textLabel?.text = "Manage dictionary"
