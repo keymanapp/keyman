@@ -26,15 +26,6 @@ public enum KeyboardState {
   case none
 }
 
-// Possible states that a lexical model can be in
-public enum LexicalModelState {
-  case needsDownload
-  case needsUpdate
-  case upToDate
-  case downloading
-  case none
-}
-
 public enum VibrationSupport {
   case none // Has no vibrator
   case basic // Has only the basic 0.4 sec long vibration
@@ -1074,6 +1065,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+(error as! String))
         self.downloadFailed(forLanguageID: languageID, error: error) //???forKeyboards
       } else if nil == lexicalModels {
+        //TODO: put up an alert instead
         log.info("No lexical models available for language \(languageID) (nil)")
       } else if 0 == lexicalModels?.count {
         log.info("No lexical models available for language \(languageID) (empty)")
@@ -1274,7 +1266,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// - Returns: The current state for a lexical model
-  public func stateForLexicalModel(withID lexicalModelID: String) -> LexicalModelState {
+  public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     if lexicalModelIdForCurrentRequest() == lexicalModelID {
       return .downloading
     }
