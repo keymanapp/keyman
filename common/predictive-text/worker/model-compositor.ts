@@ -8,17 +8,13 @@ class ModelCompositor {
 
   protected isWhitespace(transform: Transform): boolean {
     // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
-    // TODO:  Unfortunately, this regex isn't IE-compatible.  Find a solution that at least
-    //        doesn't prevent loading on IE.
-    //let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]/iu;
+    let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u202f\u205f\u3000]/i;
     
     // Filter out null-inserts; their high probability can cause issues.
     if(transform.insert == '') { // Can actually register as 'whitespace'.
       return false;
     }
 
-    // Temp solution:
-    let whitespaceRemover = /.*\s/; // At least handles standard whitespace.
     let insert = transform.insert;
 
     insert = insert.replace(whitespaceRemover, '');
@@ -73,7 +69,6 @@ class ModelCompositor {
 
       let distribution = this.lexicalModel.predict(transform, context);
 
-      let mc = this;
       distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
         // Let's not rely on the model to copy transform IDs.
         // Only bother is there IS an ID to copy.

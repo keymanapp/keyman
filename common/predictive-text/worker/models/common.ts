@@ -21,6 +21,12 @@ namespace models {
     };
   }
 
+  /**
+   * 
+   * @param transform Merges one transform into another, mutating the first parameter to
+   *                  include the effects of the second.
+   * @param prefix 
+   */
   export function prependTransform(transform: Transform, prefix: Transform) {
     transform.insert = prefix.insert + transform.insert;
     transform.deleteLeft += prefix.deleteLeft;
