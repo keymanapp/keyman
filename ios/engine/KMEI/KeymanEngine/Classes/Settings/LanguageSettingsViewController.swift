@@ -267,7 +267,7 @@ class LanguageSettingsViewController: UITableViewController {
   
   func showLexicalModelsView() {
     //LanguageLexicalModelPickerViewController? (should show just the models for this language)
-    let lmListView = LexicalModelPickerViewController()
+    let lmListView = LexicalModelPickerViewController(self.language)
     lmListView.language = self.language
     navigationController?.pushViewController(lmListView, animated: true)
  }
