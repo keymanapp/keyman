@@ -101,7 +101,9 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     } else {
       log.info("didAppear: LanguageViewController")
     }
- }
+  }
+
+  // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return languages.count
