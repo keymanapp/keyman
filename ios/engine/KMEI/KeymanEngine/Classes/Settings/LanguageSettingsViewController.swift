@@ -177,7 +177,7 @@ class LanguageSettingsViewController: UITableViewController {
             case 0:
               cell.detailTextLabel?.text = "no dictionaries installed"
             case 1:
-              cell.detailTextLabel?.text = "one dictionary installed: \(language.lexicalModels![0].name)"
+              cell.detailTextLabel?.text = "\(language.lexicalModels![0].name)"
             default:
               cell.detailTextLabel?.text = "\(modelCt) dictionaries installed"
             }
