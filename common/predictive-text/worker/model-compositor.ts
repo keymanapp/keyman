@@ -118,6 +118,8 @@ class ModelCompositor {
       };
     }
 
+    // TODO:  Customizable modeling for this formatting.  Different languages
+    //        use different quotation styles.  See https://github.com/keymanapp/keyman/issues/1883.
     if(keepOption) {
       keepOption.displayAs = '"' + keepOption.displayAs + '"';
     }
