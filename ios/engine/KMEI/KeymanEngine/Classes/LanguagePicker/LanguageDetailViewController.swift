@@ -53,6 +53,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     log.info("didAppear: LanguageDetailViewController (actually willAppear)")
   }
 
+  // MARK: - Table view data source UITableViewDataSource
+
   override func numberOfSections(in tableView: UITableView) -> Int {
     return language.keyboards!.count
   }
