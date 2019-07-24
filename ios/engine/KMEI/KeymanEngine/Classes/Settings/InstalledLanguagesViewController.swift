@@ -336,7 +336,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     log.info("lexicalModelDownloadFailed: InstalledLanguagesViewController")
     restoreNavigation()
     
-    let title = "Lexical Model Download Error"
+    let title = "Dicionary Download Error"
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: "",
