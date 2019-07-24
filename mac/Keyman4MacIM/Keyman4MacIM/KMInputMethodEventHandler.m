@@ -58,7 +58,8 @@ NSRange _previousSelRange;
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
             [clientAppId isEqual: @"com.microsoft.Word"] ||
             [clientAppId isEqual: @"org.openoffice.script"] ||
-            [clientAppId isEqual: @"com.adobe.InDesign"]
+            [clientAppId isEqual: @"com.adobe.InDesign"] ||
+            [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
     
     // We used to default to NO, so these were the obvious exceptions. But then we realized that
@@ -494,7 +495,7 @@ NSRange _previousSelRange;
     // OSK key feedback from hardware keyboard is disabled
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
-    
+
     if (event.type == NSFlagsChanged) {
         _contextOutOfDate = YES;
         return NO;
@@ -504,7 +505,7 @@ NSRange _previousSelRange;
         [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.
     }
-    
+
     if (_legacyMode && event.keyCode == kProcessPendingBuffer)
     {
         if ([self.AppDelegate debugMode]) {

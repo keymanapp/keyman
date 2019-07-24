@@ -25,7 +25,6 @@ display_usage() {
     echo "  -clean          Removes all previously-existing build products for anything to be built before building."
     echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
     echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
-    echo "                  (ignored if a deploy option other than 'none' is specified)."
     echo "  -quiet          Do not display any output except for warnings and errors."
     echo
     echo "Targets (to be built and, optionally, cleaned and tested):"
@@ -33,10 +32,25 @@ display_usage() {
     echo "  im              Keyman4MacIM (input method)."
     echo "  testapp         Keyman4Mac (test harness)"
     echo "  If no targets are specified, the default targets are 'engine' and 'im'."
+    echo
+    echo "For deployment, even locally, the app must be code-signed and notarized by Apple. This requires a valid code"
+    echo "certificate and an active Appstoreconnect Apple ID. These must be supplied in environment variables:"
+    echo
+    echo "  * CERTIFICATE_ID: Specifies a certificate from your keychain (e.g. use sha1 or name of certificate)"
+    echo "          Use with -no-codesign if you don't have access to the core developer certificates."
+    echo "          Core development team members should not need to specify this as the certificate reference is"
+    echo "          already configured in the project."
+    echo "  * APPSTORECONNECT_PROVIDER: The shortname of the preferred provider in your Apple Developer account"
+    echo "          To find this, run:"
+    echo "          /Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter \\"
+    echo "            -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off"
+    echo "  * APPSTORECONNECT_USERNAME: Your Apple ID login name."
+    echo "  * APPSTORECONNECT_PASSWORD: Your Apple ID password (may need to be a app-specific password)."
     exit 1
 }
 
 ### DEFINE HELPER FUNCTIONS ###
+
 KEYMAN_MAC_BASE_PATH="${BASH_SOURCE[0]}";
 if ([ -h "${KEYMAN_MAC_BASE_PATH}" ]) then
 	while([ -h "${KEYMAN_MAC_BASE_PATH}" ]) do KEYMAN_MAC_BASE_PATH=`readlink "${KEYMAN_MAC_BASE_PATH}"`; done
@@ -67,10 +81,12 @@ do_clean ( ) {
 }
 
 ### SET PATHS ###
+
 ENGINE_NAME="KeymanEngine4Mac"
 TESTAPP_NAME="Keyman4Mac"
 IM_NAME="Keyman4MacIM"
 XCODE_PROJ_EXT=".xcodeproj"
+PRODUCT_NAME="Keyman"
 
 KME4M_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$ENGINE_NAME"
 KMTESTAPP_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$TESTAPP_NAME"
@@ -79,6 +95,10 @@ KM4MIM_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$IM_NAME"
 KME4M_PROJECT_PATH="$KME4M_BASE_PATH/$ENGINE_NAME$XCODE_PROJ_EXT"
 KMTESTAPP_PROJECT_PATH="$KMTESTAPP_BASE_PATH/$TESTAPP_NAME$XCODE_PROJ_EXT"
 KMIM_WORKSPACE_PATH="$KM4MIM_BASE_PATH/$IM_NAME.xcworkspace"
+
+# Hard-coded keys. These are safe to distribute.
+
+FABRIC_API_KEY_KEYMAN_DEBUG=68056571ada44ad2d93864380272808ada308b24
 
 # KME4M_BUILD_PATH=engine/KME4M/build
 # APP_RESOURCES=keyman/Keyman/Keyman/libKeyman
@@ -117,13 +137,14 @@ while [[ $# -gt 0 ]] ; do
     assertOptionsPrecedeTargets "$key"
     case $key in
         -deploy)
+            # Deployment requires hardening which only happens in Release configuration;
+            # the deployed version cannot be run in the debugger.
             if [[ "$2" =~ ^(l(ocal)?)$ ]]; then
                 LOCALDEPLOY=true
-                CODESIGNING_SUPPRESSION=""
+                CONFIG="Release"
             elif [[ "$2" =~ ^(p(rep(release)?)?)$ ]]; then
                 PREPRELEASE=true
                 CONFIG="Release"
-                CODESIGNING_SUPPRESSION=""
             elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
                 fail "Invalid deploy option. Must be 'none', 'local' or 'preprelease'."
             fi
@@ -182,11 +203,7 @@ while [[ $# -gt 0 ]] ; do
             TEST_ACTION="test"
             ;;
         -no-codesign)
-            if $LOCALDEPLOY || $PREPRELEASE ; then
-                warn "Code-signing is required for selected deployment option."
-            else
-                CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
-            fi
+            CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
             ;;
         -quiet)
             QUIET_FLAG=$1
@@ -245,6 +262,18 @@ displayInfo "" \
     "TEST_ACTION: $TEST_ACTION" \
     ""
 
+### Validate notarization environment variables ###
+
+if $LOCALDEPLOY || $PREPRELEASE ; then
+  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
+    fail "Code signing must be configured for deployment. See build.sh -help for details."
+  fi
+
+  if [ -z "${APPSTORECONNECT_PROVIDER}" ] || [ -z "${APPSTORECONNECT_USERNAME}" ] || [ -z "${APPSTORECONNECT_PASSWORD}" ]; then
+    fail "Appstoreconnect Apple ID credentials must be configured in environment. See build.sh -help for details."
+  fi
+fi
+
 ### START OF THE BUILD ###
 
 if $CLEAN ; then
@@ -291,11 +320,15 @@ updatePlist() {
 	fi
 }
 
+### Build Keyman Engine (kmx processor) ###
+
 if $DO_KEYMANENGINE ; then
     updatePlist "$KME4M_BASE_PATH" "$ENGINE_NAME"
     execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS $TEST_ACTION -scheme $ENGINE_NAME"
     execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
 fi
+
+### Build keyman.app (Input Method and Configuration app) ###
 
 if $DO_KEYMANIM ; then
 	cd "$KM4MIM_BASE_PATH"
@@ -321,7 +354,7 @@ if $DO_KEYMANIM ; then
             Pods/Fabric/upload-symbols -a ${FABRIC_API_KEY_KEYMAN4MACIM} -p mac build/${CONFIGURATION}
         fi
     else
-        Pods/Fabric/upload-symbols -a 68056571ada44ad2d93864380272808ada308b24 -p mac build/${CONFIGURATION}
+        Pods/Fabric/upload-symbols -a ${FABRIC_API_KEY_KEYMAN_DEBUG} -p mac build/${CONFIGURATION}
     fi
     cd "$KEYMAN_MAC_BASE_PATH"
 fi
@@ -331,7 +364,67 @@ if $DO_KEYMANTESTAPP ; then
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
-# Deploy as requested
+### Notarize the app for localdeploy and preprelease ###
+
+if $LOCALDEPLOY || $PREPRELEASE ; then
+  if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
+    fail "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
+  else
+    TARGET_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
+    TARGET_APP_PATH="$TARGET_PATH/$PRODUCT_NAME.app"
+    TARGET_ZIP_PATH="$TARGET_PATH/$PRODUCT_NAME.zip"
+    ALTOOL_LOG_PATH="$TARGET_PATH/altool.log"
+
+    # Note: get-task-allow entitlement must be *off* in our release build (to do this, don't include base entitlements in project build settings)
+
+    # We may need to re-run the code signing if a custom certificate has been passed in
+    if [ ! -z "${CERTIFICATE_ID}" ]; then
+      echo "Signing with custom certificate (CERTIFICATE_ID environment variable)."
+      codesign --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
+    fi
+
+    echo "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
+
+    /usr/bin/ditto -c -k --keepParent "$TARGET_APP_PATH" "$TARGET_ZIP_PATH"
+
+    echo "Uploading Keyman.zip to Apple for notarization"
+
+    xcrun altool --notarize-app --primary-bundle-id "com.Keyman.im.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || fail "altool failed"
+    cat "$ALTOOL_LOG_PATH"
+
+    ALTOOL_UUID=$(/usr/libexec/PlistBuddy -c "Print notarization-upload:RequestUUID" "$ALTOOL_LOG_PATH")
+    ALTOOL_FINISHED=0
+
+    while [ $ALTOOL_FINISHED -eq 0 ]
+    do
+      # We'll sleep 30 seconds before checking status, to give the altool server time to process the archive
+      echo "Waiting 30 seconds for status"
+      sleep 30
+      xcrun altool --notarization-info "$ALTOOL_UUID" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --output-format xml > "$ALTOOL_LOG_PATH" || fail "altool failed"
+      ALTOOL_STATUS=$(/usr/libexec/PlistBuddy -c "Print notarization-info:Status" "$ALTOOL_LOG_PATH")
+      if [ "$ALTOOL_STATUS" == "success" ]; then
+        ALTOOL_FINISHED=1
+      elif [ "$ALTOOL_STATUS" != "in progress" ]; then
+        # Probably failing with 'invalid'
+        cat "$ALTOOL_LOG_PATH"
+        ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
+        curl "$ALTOOL_LOG_URL"
+        fail "Notarization failed with $ALTOOL_STATUS; check log at $ALTOOL_LOG_PATH"
+      fi
+    done
+
+    echo "Notarization completed successfully. Review logs below for any warnings."
+    cat "$ALTOOL_LOG_PATH"
+    ALTOOL_LOG_URL=$(/usr/libexec/PlistBuddy -c "Print notarization-info:LogFileURL" "$ALTOOL_LOG_PATH")
+    curl "$ALTOOL_LOG_URL"
+
+    echo "Attempting to staple notarization to Keyman.app"
+    xcrun stapler staple "$TARGET_APP_PATH" || fail "stapler failed"
+  fi
+fi
+
+### Deploy as requested ###
+
 if $LOCALDEPLOY ; then
     displayInfo "" "Attempting local deployment with command:"
     KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"

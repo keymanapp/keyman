@@ -46,10 +46,13 @@ NSMutableArray *servers;
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
     if ([self.AppDelegate debugMode])
-        NSLog(@"Event = %@", event);
+        NSLog(@"handleEvent: event = %@", event);
     
-    if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil)
+    if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"handleEvent: not handling event");
         return NO; // Not sure this can ever happen.
+    }
     
     return [_eventHandler handleEvent:event client:sender];
 }

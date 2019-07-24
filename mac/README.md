@@ -25,7 +25,7 @@ Note: If Carthage prompts you to allow it access to your github credentials, it'
 [Installing Keyman for Mac OS X](https://help.keyman.com/products/mac/1.0/docs/start_download-install_keyman.php).
 
 ### Compiling from Xcode
-To build using Xcode, you will need to build KeymanEngine4Mac first and then build Keyman4MacIM. The very _first_ time after getting the source code (and any time the Podfile is edited; e.g., to install new pods), you need to go to **keyman/mac/Keyman4MacIM and run "pod install" in Terminal.
+To build using Xcode, you will need to build KeymanEngine4Mac first and then build Keyman4MacIM. The very _first_ time after getting the source code (and any time the Podfile is edited; e.g., to install new pods), you need to go to **keyman/mac/Keyman4MacIM** and run "pod install" in Terminal.
 
 1. Launch Xcode
 2. Open **keyman/mac/KeymanEngine4Mac/KeymanEngine4Mac.xcodeproj**
