@@ -176,7 +176,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     if Manager.shared.currentLexicalModelID == lm.fullID {
       cell.selectionStyle = .blue
       cell.isSelected = true
-      cell.accessoryType = .checkmark
+      cell.accessoryType = .detailDisclosureButton
     } else {
       cell.selectionStyle = .none
       cell.isSelected = false
@@ -388,8 +388,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func scroll(toSelectedLexicalModel animated: Bool) {
-    let index = userLexicalModels.index { kb in
-      return Manager.shared.currentLexicalModelID == kb.fullID
+    let index = userLexicalModels.index { lm in
+      return Manager.shared.currentLexicalModelID == lm.fullID
     }
     
     if let index = index {
