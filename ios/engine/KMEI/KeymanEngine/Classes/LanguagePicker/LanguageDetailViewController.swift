@@ -50,7 +50,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    log.info("didAppear: LanguageDetailViewController (actually willAppear)")
+    log.info("willAppear: LanguageDetailViewController")
   }
 
   // MARK: - Table view data source UITableViewDataSource

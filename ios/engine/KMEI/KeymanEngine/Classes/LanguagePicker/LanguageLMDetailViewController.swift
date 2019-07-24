@@ -53,7 +53,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    log.info("didAppear: LanguageLMDetailViewController (actually willAppear)")
+    log.info("willAppear: LanguageLMDetailViewController")
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -135,16 +135,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   func downloadHandler(_ lexicalModelIndex: Int) {
-//    Manager.shared.downloadLexicalModel(withID: lexicalModels![lexicalModelIndex].id,
-//                                    languageID: language.id, isUpdate: isUpdate)
     Manager.shared.downloadLexicalModelPackage(string: (lexicalModels?[lexicalModelIndex].packageFilename)!)
-    /*
-    if let packageURL = URLComponents(string: (lexicalModels?[lexicalModelIndex].packageFilename)!) {
-      Manager.shared.downloadLexicalModel(from: packageURL.url!)
-    } else {
-      log.error("couldn't make url to download \(lexicalModels?[lexicalModelIndex].packageFilename)")
-    }
- */
   }
   
   private func lexicalModelDownloadStarted() {
