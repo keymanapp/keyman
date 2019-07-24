@@ -264,7 +264,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // returns lexical model id, given language id
   func preferredLexicalModel(_ ud: UserDefaults, forLanguage lgCode: String) -> InstallableLexicalModel? {
     if let preferredID = ud.preferredLexicalModelID(forLanguage: lgCode) {
-      return ud.userLexicalModels?.first { $0.id == preferredID }
+      // We need to match both the model id and the language code - registration fails
+      // when the language code mismatches the current keyboard's set code!
+      return ud.userLexicalModels?.first { $0.id == preferredID && $0.languageID == lgCode }
     }
     return nil
   }

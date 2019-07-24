@@ -181,6 +181,8 @@ namespace com.keyman.osk {
     public setBanner(type: BannerType, height?: number) {
       var banner: Banner;
 
+      console.log("Setting banner type to " + type + ".");
+
       switch(type) {
         case 'blank':
           banner = new BlankBanner();

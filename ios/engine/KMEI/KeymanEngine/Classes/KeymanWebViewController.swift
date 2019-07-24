@@ -293,7 +293,7 @@ extension KeymanWebViewController {
   
   func setBannerHeight(to height: Int) {
     // TODO:
-    webView?.evaluateJavaScript("setBannerHeight(\(height);", completionHandler: nil)
+    webView?.evaluateJavaScript("setBannerHeight(\(height));", completionHandler: nil)
   }
 }
 
