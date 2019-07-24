@@ -262,7 +262,6 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
         }
       }
       
-      // Wait, really?  That might not be the best idea...
       navigationController?.popToRootViewController(animated: true)
     }
   }
