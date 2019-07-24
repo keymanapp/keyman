@@ -25,7 +25,6 @@
             };
         
             var device = 'AppleMobile';
-            var bannerHeight = 0;
             var oskHeight = 0;
             var oskWidth = 0;
             
@@ -71,10 +70,7 @@
                 
                 if(osk.banner.activeType != 'blank') {
                   osk.banner.height = h;
-                  setOskHeight(bannerHeight + oskHeight - h);
                 }
-                
-                bannerHeight = h;
               }
               
               // Refresh KMW's OSK
@@ -89,7 +85,7 @@
             
             function setOskHeight(height) {
                 var kmw=window['keyman'];
-                oskHeight = height - bannerHeight;
+                oskHeight = height - kmw.osk.banner.height;
                 kmw.osk.show(true);
                 kmw['correctOSKTextSize']();
             }
