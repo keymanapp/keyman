@@ -422,7 +422,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       if let error = error {
         log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error as! String))
         DispatchQueue.main.async {
-          self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: language.id, error: error))
+          self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
         }
       } else if nil == lexicalModels {
         log.info("No lexical models available for language \(language.id) (nil)")
