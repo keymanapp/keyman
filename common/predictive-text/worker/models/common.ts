@@ -20,4 +20,18 @@ namespace models {
       endOfBuffer: context.endOfBuffer
     };
   }
+
+  /**
+   * 
+   * @param transform Merges one transform into another, mutating the first parameter to
+   *                  include the effects of the second.
+   * @param prefix 
+   */
+  export function prependTransform(transform: Transform, prefix: Transform) {
+    transform.insert = prefix.insert + transform.insert;
+    transform.deleteLeft += prefix.deleteLeft;
+    if(prefix.deleteRight) {
+      transform.deleteRight = (transform.deleteRight || 0) + prefix.deleteRight;
+    }
+  }
 }

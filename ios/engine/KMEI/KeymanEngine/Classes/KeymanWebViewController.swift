@@ -283,6 +283,8 @@ extension KeymanWebViewController {
   
     log.debug("LexicalModel stub: \(stubString)")
     webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+    
+    setBannerHeight(to: InputViewController.topBarHeight)
   }
   
   func setBannerImage(to path: String) {

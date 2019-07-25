@@ -54,6 +54,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -681,6 +682,10 @@ public final class KMManager {
 
   public static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
     return KeyboardPickerActivity.getLexicalModelsList(context);
+  }
+
+  public static Dataset getInstalledDataset(Context context) {
+    return KeyboardPickerActivity.getInstalledDataset(context);
   }
 
   public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {

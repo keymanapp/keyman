@@ -254,8 +254,10 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       
       // Add lexicalModel.
       for lexicalModel in lexicalModels {
-        Manager.shared.addLexicalModel(lexicalModel)
-        _ = Manager.shared.registerLexicalModel(lexicalModel)
+        if lexicalModel.languageID == language?.id {
+          Manager.shared.addLexicalModel(lexicalModel)
+          switchLexicalModel(lexicalModel)
+        }
       }
       
       navigationController?.popToRootViewController(animated: true)
@@ -287,17 +289,22 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     self.present(alertController, animated: true, completion: nil)
   }
   
-  private func switchLexicalModel(_ index: Int) {
+  private func switchLexicalModel(_ model: InstallableLexicalModel) {
     // Switch lexicalModel and register to user defaults.
-    let lm = userLexicalModels[index]
-    if Manager.shared.registerLexicalModel(lm) {
-      Storage.active.userDefaults.set(preferredLexicalModelID: lm.id, forKey: lm.languageID)
+    if Manager.shared.registerLexicalModel(model) {
       tableView.reloadData()
     }
+    
+    // Register the lexical model in defaults!
+    Storage.active.userDefaults.set(preferredLexicalModelID: model.id, forKey: model.languageID)
     
     if !_isDoneButtonEnabled {
       Manager.shared.dismissLexicalModelPicker(self)
     }
+  }
+  
+  private func switchLexicalModel(_ index: Int) {
+    switchLexicalModel(userLexicalModels[index])
   }
   
   // if we have a language set, filter models down to those of that language

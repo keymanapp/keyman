@@ -10,6 +10,7 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.data.Dataset;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,12 +64,20 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   }
 
   String getInstalledLanguagesText() {
-    ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(context);
-    boolean multiKbs = (kbList != null && kbList.size() > 1);
+    Dataset dataset = KMManager.getInstalledDataset(context);
+    int langCount = 0;
 
-    if(multiKbs) {
+    // Some dataset languages may only have lexical models installed.
+    // This may happen if one model covers multiple variants of one language.  (Ex:  en vs en-us)
+    for(Dataset.LanguageDataset language: dataset.asList()) {
+      if(language.keyboards.size() > 0) {
+        langCount++;
+      }
+    }
+
+    if(langCount > 1) {
       // Has a %d slot to insert the count.
-      return String.format(getString(R.string.installed_languages), kbList.size());
+      return String.format(getString(R.string.installed_languages), langCount);
     } else {
       return getString(R.string.installed_languages_empty);
     }
