@@ -85,7 +85,12 @@ class LanguageSettingsViewController: UITableViewController {
     let userDefaults = Storage.active.userDefaults
     userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
     
-    // If for the active language, apply the setting now.
+    if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
+      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
+        // re-register the model - that'll enact the settings.
+        _ = Manager.shared.registerLexicalModel(lm)
+      }
+    }
   }
   
   @objc
@@ -94,7 +99,12 @@ class LanguageSettingsViewController: UITableViewController {
     let userDefaults = Storage.active.userDefaults
     userDefaults.set(correctSetting: value, forLanguageID: self.language.id)
     
-    // If for the active language, apply the setting now.
+    if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
+      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
+        // re-register the model - that'll enact the settings.
+        _ = Manager.shared.registerLexicalModel(lm)
+      }
+    }
   }
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -185,9 +195,9 @@ class LanguageSettingsViewController: UITableViewController {
       cell.accessoryType = .none
       switch indexPath.row {
         case 0:
-          cell.textLabel?.text = "Enable corrections"
-        case 1:
           cell.textLabel?.text = "Enable predictions"
+        case 1:
+          cell.textLabel?.text = "Enable corrections"
         case 2:
           cell.textLabel?.text = "Model"
           cell.accessoryType = .disclosureIndicator
