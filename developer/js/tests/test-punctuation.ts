@@ -17,7 +17,7 @@ describe('LexicalModelCompiler', function () {
         sources: ['wordlist.tsv'],
         punctuation: {
           quotesForKeepSuggestion: { open: `«`, close: `»`},
-          insertAfterWord: " " ,
+          insertAfterWord: " " , // OGHAM SPACE MARK
         }
       }, PATH) as string;
 
@@ -25,6 +25,7 @@ describe('LexicalModelCompiler', function () {
       assert.match(code, /«/);
       assert.match(code, /»/);
       // TODO: more robust assertions?
+      assert.match(code, /\u1680/);
     });
   })
 });

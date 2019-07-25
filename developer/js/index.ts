@@ -15,6 +15,14 @@ import { createTrieDataStructure } from "./lexical-model-compiler/build-trie";
 //                         author           .bcp47            .uniq
 const MODEL_ID_PATTERN = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$/;
 
+/**
+ * The default punctuation and spacing produced by the model.
+ */
+const DEFAULT_PUNCTUATION = {
+  quotesForKeepSuggestion: { open: `“`, close: `”`},
+  insertAfterWord: " " ,
+}
+
 export default class LexicalModelCompiler {
   compile(modelSource: LexicalModelSource) {
     //
@@ -221,6 +229,11 @@ export default class LexicalModelCompiler {
       }
     }
 
+    // Figure out the punctuation used in the model.
+    let punctuation: LexicalModelPunctuation = Object.assign(
+      {}, DEFAULT_PUNCTUATION, modelSource.punctuation
+    );
+
     //
     // Emit the model as code and data
     //
@@ -245,6 +258,7 @@ export default class LexicalModelCompiler {
         if (modelSource.searchTermToKey) {
           func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
         }
+        func += `  punctuation: ${JSON.stringify(punctuation)},\n`;
         func += `}));\n`;
         break;
       default:

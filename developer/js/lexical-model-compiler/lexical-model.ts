@@ -64,7 +64,7 @@ interface LexicalModelPunctuation {
    * 
    * [ “Hrllo” ] [ Hello ] [ Heck ]
    */
-  readonly quotesForKeepSuggestion: {
+  readonly quotesForKeepSuggestion?: {
     /**
      * What will appear on the opening side of the quote.
      * (left side for LTR scripts; right side for RTL scripts)
