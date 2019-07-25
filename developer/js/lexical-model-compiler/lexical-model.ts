@@ -35,6 +35,13 @@ interface LexicalModelSource extends LexicalModel {
    * This often involves removing accents, lowercasing, etc.
    */
   readonly searchTermToKey?: (term: string) => string;
+
+  /**
+   * Punctuation and spacing suggested by the model.
+   *
+   * @see LexicalModelPunctuation
+   */
+  readonly punctuation?: LexicalModelPunctuation;
 }
 
 interface LexicalModelCompiled extends LexicalModel {
@@ -43,6 +50,44 @@ interface LexicalModelCompiled extends LexicalModel {
 
 interface LexicalModelCompiledTrie extends LexicalModelCompiled {
   trie: string;
+}
+
+/**
+ * Options for various punctuation to use in suggestions.
+ */
+interface LexicalModelPunctuation {
+  /**
+   * The quotes that appear in "keep" suggestions, e.g., keep what the user
+   * typed verbatim.
+   * 
+   * The keep suggestion is often the leftmost one, when suggested.
+   * 
+   * [ “Hrllo” ] [ Hello ] [ Heck ]
+   */
+  readonly quotesForKeepSuggestion: {
+    /**
+     * What will appear on the opening side of the quote.
+     * (left side for LTR scripts; right side for RTL scripts)
+     *
+     * Default: `“`
+     */
+    readonly open: string;
+    /**
+     * What will appear on the closing side of the quote.
+     * (right side for LTR scripts; left side for RTL scripts)
+     *
+     * Default: `”`
+     */
+    readonly close: string;
+  };
+  /**
+   * What punctuation or spacing to insert after every complete word
+   * prediction. This can be set to the empty string when the script does not
+   * use spaces to separate words.
+   * 
+   * Default: ` `
+   */
+  readonly insertAfterWord?: string;
 }
 
 interface LexicalModelCompiledFst extends LexicalModelCompiled {

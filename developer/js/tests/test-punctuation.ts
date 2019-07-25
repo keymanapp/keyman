@@ -7,7 +7,7 @@ const path = require('path');
 
 describe('LexicalModelCompiler', function () {
   describe('spefifying punctuation', function () {
-    const MODEL_ID = 'example.qaa.punctuation';
+    const MODEL_ID = 'example.qaa.trivial';
     const PATH = path.join(__dirname, 'fixtures', MODEL_ID)
 
     it('should compile a trivial word list', function () {
@@ -16,7 +16,7 @@ describe('LexicalModelCompiler', function () {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         punctuation: {
-          quotesForKeepSuggestion: [`«`, `»`],
+          quotesForKeepSuggestion: { open: `«`, close: `»`},
           insertAfterWord: " " ,
         }
       }, PATH) as string;
