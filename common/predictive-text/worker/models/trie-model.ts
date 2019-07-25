@@ -94,7 +94,7 @@
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
         return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
           transform: {
-            insert: text + ' ', // TODO: do NOT add the space here!
+            insert: text,
             deleteLeft: 0
           },
           displayAs: text,

@@ -49,6 +49,7 @@ class ModelCompositor {
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
+    let punctuation = this.lexicalModel.punctuation || DEFAULT_PUNCTUATION;
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
@@ -81,6 +82,12 @@ class ModelCompositor {
         if(preserveWhitespace) {
           models.prependTransform(pair.sample.transform, transform);
         }
+        
+        // The model is trying to add a word; thus, add some custom formatting
+        // to that word.
+        if (pair.sample.transform.insert.length > 0) {
+          pair.sample.transform.insert += punctuation.insertAfterWord;
+        }
 
         // Combine duplicate samples.
         let displayText = pair.sample.displayAs;
@@ -109,7 +116,7 @@ class ModelCompositor {
         transformId: inputTransform.id,
         // Replicate the original transform, modified for appropriate language insertion syntax.
         transform: {
-          insert: inputTransform.insert + ' ',
+          insert: inputTransform.insert + punctuation.insertAfterWord,
           deleteLeft: inputTransform.deleteLeft,
           deleteRight: inputTransform.deleteRight,
           id: inputTransform.id
@@ -118,8 +125,8 @@ class ModelCompositor {
       };
     }
 
+    // Add the surrounding quotes to the "keep" option's display string:
     if (keepOption) {
-      let punctuation = this.lexicalModel.punctuation || DEFAULT_PUNCTUATION;
       let { open, close } = punctuation.quotesForKeepSuggestion;
       keepOption.displayAs = open + keepOption.displayAs + close;
     }
@@ -153,4 +160,4 @@ class ModelCompositor {
 const DEFAULT_PUNCTUATION = {
   quotesForKeepSuggestion: { open: `“`, close: `”`},
   insertAfterWord: " " ,
-}
+};

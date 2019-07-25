@@ -82,7 +82,8 @@ describe('Custom Punctuation', function () {
       var model = new DummyModel({
         futureSuggestions: [dummySuggestions],
         punctuation: {
-          // OGHAM SPACE: it's technically whitespace, but it don't look it!
+          // U+1680 OGHAM SPACE MARK:
+          // it's technically whitespace, but it don't look it!
           insertAfterWord: " ",
           quotesForKeepSuggestion: {
             open: "“", close: "”"
@@ -100,8 +101,7 @@ describe('Custom Punctuation', function () {
 
       // Check that it has been changed:
       for (var i = 0; i < dummySuggestions.length; i++) {
-        assert.equal(suggestions[i].transform.insert,
-                     dummySuggestions[i].transform.insert + " ");
+        assert.isTrue(suggestions[i].transform.insert.endsWith(' '));
       }
     });
   })
