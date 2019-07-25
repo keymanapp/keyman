@@ -207,4 +207,62 @@ public extension UserDefaults {
       set(level, forKey: Key.migrationLevel)
     }
   }
+  
+  // stores a dictionary of predict-enablement settings keyed to language ids, i.e., [langID: Bool]
+  var predictionEnablements: [String: Bool]? {
+    get {
+      return dictionary(forKey: Key.userPredictSettings) as? [String : Bool]
+    }
+    
+    set(prefs) {
+      set(prefs, forKey: Key.userPredictSettings)
+    }
+  }
+  
+  // stores a dictionary of correction-enablement settings keyed to language ids, i.e., [langID: Bool]
+  var correctionEnablements: [String: Bool]? {
+    get {
+      return dictionary(forKey: Key.userCorrectSettings) as? [String : Bool]
+    }
+    
+    set(prefs) {
+      set(prefs, forKey: Key.userCorrectSettings)
+    }
+  }
+  
+  func predictSettingForLanguage(languageID: String) -> Bool {
+    if let dict = predictionEnablements {
+      return dict[languageID] ?? true
+    } else {
+      return true
+    }
+  }
+  
+  func set(predictSetting: Bool, forLanguageID: String) {
+    var prefs: [String: Bool]?
+    prefs = predictionEnablements
+    if prefs == nil {
+      prefs = [String: Bool]()
+    }
+    prefs?[forLanguageID] = predictSetting
+    predictionEnablements = prefs
+  }
+  
+  func correctSettingForLanguage(languageID: String) -> Bool {
+    if let dict = correctionEnablements {
+      return dict[languageID] ?? true
+    } else {
+      return true
+    }
+  }
+  
+  func set(correctSetting: Bool, forLanguageID: String) {
+    var prefs: [String: Bool]?
+    prefs = correctionEnablements
+    if prefs == nil {
+      prefs = [String: Bool]()
+    }
+    prefs?[forLanguageID] = correctSetting
+    correctionEnablements = prefs
+  }
 }
