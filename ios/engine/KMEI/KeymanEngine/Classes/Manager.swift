@@ -17,7 +17,7 @@ typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
 // MARK: - Constants
 
-// Possible states that a keyboard can be in
+// Possible states that a keyboard or lexical model can be in
 public enum KeyboardState {
   case needsDownload
   case needsUpdate
@@ -1266,6 +1266,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// - Returns: The current state for a lexical model
+  //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     if lexicalModelIdForCurrentRequest() == lexicalModelID {
       return .downloading
