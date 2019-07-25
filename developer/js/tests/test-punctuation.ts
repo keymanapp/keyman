@@ -10,7 +10,7 @@ describe('LexicalModelCompiler', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = path.join(__dirname, 'fixtures', MODEL_ID)
 
-    it('should compile a trivial word list', function () {
+    it('should compile punctuation into the generated code', function () {
       let compiler = new LexicalModelCompiler;
       let code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
@@ -29,4 +29,3 @@ describe('LexicalModelCompiler', function () {
     });
   })
 });
-

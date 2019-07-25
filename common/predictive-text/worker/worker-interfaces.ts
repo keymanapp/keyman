@@ -138,6 +138,14 @@ interface WorkerInternalModel {
   configure(capabilities: Capabilities): Configuration;
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
   wordbreak(context: Context): USVString;
+
+  /**
+   * Punctuation and presentational settings that the underlying lexical model
+   * expects to be applied at higher levels. e.g., the ModelCompositor.
+   * 
+   * @see LexicalModelPunctuation
+   */
+  readonly punctuation?: LexicalModelPunctuation;
 }
 
 /**
@@ -188,4 +196,42 @@ interface Span {
   // invariant: each character is BMP UTF-16 code unit, or is a high surrogate
   // UTF-16 code unit followed by a low surrogate UTF-16 code unit.
   readonly text: string;
+}
+
+/**
+ * Options for various punctuation to use in suggestions.
+ */
+interface LexicalModelPunctuation {
+  /**
+   * The quotes that appear in "keep" suggestions, e.g., keep what the user
+   * typed verbatim.
+   * 
+   * The keep suggestion is often the leftmost one, when suggested.
+   * 
+   * [ “Hrllo” ] [ Hello ] [ Heck ]
+   */
+  readonly quotesForKeepSuggestion: {
+    /**
+     * What will appear on the opening side of the quote.
+     * (left side for LTR scripts; right side for RTL scripts)
+     *
+     * Default: `“`
+     */
+    readonly open: string;
+    /**
+     * What will appear on the closing side of the quote.
+     * (right side for LTR scripts; left side for RTL scripts)
+     *
+     * Default: `”`
+     */
+    readonly close: string;
+  };
+  /**
+   * What punctuation or spacing to insert after every complete word
+   * prediction. This can be set to the empty string when the script does not
+   * use spaces to separate words.
+   * 
+   * Default: ` `
+   */
+  readonly insertAfterWord: string;
 }

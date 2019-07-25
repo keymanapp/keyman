@@ -33,13 +33,15 @@ describe('Custom Punctuation', function() {
       }
     ];
 
-    var model = new DummyModel({futureSuggestions: [dummySuggestions] }, {
+    var model = new DummyModel({
+      futureSuggestions: [dummySuggestions],
       punctuation: {
         quotesForKeepSuggestion: {
           open: "«", close: "»"
         }
       }
     });
+
     // The model compositor is responsible for adding this to the display as
     // string.
     var composite = new ModelCompositor(model);

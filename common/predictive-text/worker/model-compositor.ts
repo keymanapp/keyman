@@ -118,10 +118,10 @@ class ModelCompositor {
       };
     }
 
-    // TODO:  Customizable modeling for this formatting.  Different languages
-    //        use different quotation styles.  See https://github.com/keymanapp/keyman/issues/1883.
-    if(keepOption) {
-      keepOption.displayAs = '"' + keepOption.displayAs + '"';
+    if (keepOption) {
+      let punctuation = this.lexicalModel.punctuation || DEFAULT_PUNCTUATION;
+      let { open, close } = punctuation.quotesForKeepSuggestion;
+      keepOption.displayAs = open + keepOption.displayAs + close;
     }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper
@@ -145,4 +145,12 @@ class ModelCompositor {
 
     return suggestions;
   }
+}
+
+/**
+ * The default punctuation and spacing produced by the model.
+ */
+const DEFAULT_PUNCTUATION = {
+  quotesForKeepSuggestion: { open: `“`, close: `”`},
+  insertAfterWord: " " ,
 }
