@@ -302,6 +302,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // If we have a lexical model for the keyboard's language, activate it.
     if let preferred_model = preferredLexicalModel(userDefaults, forLanguage: kb.languageID) {
       _ = Manager.shared.registerLexicalModel(preferred_model)
+    } else if let first_model = userDefaults.userLexicalModels?.first(where: { $0.languageID == kb.languageID }) {
+      _ = Manager.shared.registerLexicalModel(first_model)
     }
     
     return true
@@ -471,30 +473,50 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// Removes the lexical model at index from the lexical models list if it exists.
-  /// - Returns: The lexical model exists and was removed
-  public func removeLexicalModel(at index: Int) -> Bool {
-    let userData = Storage.active.userDefaults
-    
+  public func removeLexicalModelFromUserList(userDefs ud: UserDefaults, at index: Int) -> InstallableLexicalModel? {
     // If user defaults for lexical models list does not exist, do nothing.
-    guard var userLexicalModels = userData.userLexicalModels else {
-      return false
+    guard var userLexicalModels = ud.userLexicalModels else {
+      return nil
     }
     
     guard index < userLexicalModels.count else {
-      return false
+      return nil
     }
     
     let lm = userLexicalModels[index]
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models")
     userLexicalModels.remove(at: index)
-    userData.userLexicalModels = userLexicalModels
-    userData.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-    userData.synchronize()
+    ud.userLexicalModels = userLexicalModels
+    ud.set([Date()], forKey: Key.synchronizeSWLexicalModel)
+    ud.synchronize()
+    return lm
+}
+  
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  public func removeLexicalModelFromLanguagePreference(userDefs ud: UserDefaults, _ lm: InstallableLexicalModel) {
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs")
+    ud.set(preferredLexicalModelID: nil, forKey: lm.languageID)
+  }
+
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  /// - Returns: The lexical model exists and was removed
+  public func removeLexicalModel(at index: Int) -> Bool {
+    let userData = Storage.active.userDefaults
+    guard let lm = removeLexicalModelFromUserList(userDefs: userData, at: index) else {
+      return false
+    }
     
-    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID)")
-    
+    removeLexicalModelFromLanguagePreference(userDefs: userData, lm)
     // Set a new lexical model if deleting the current one
+    let userLexicalModels = userData.userLexicalModels! //removeLexicalModelFromUserList fails above if this is not present
+
     if lm.fullID == currentLexicalModelID {
-      _ = registerLexicalModel(userLexicalModels[0])
+      if let first_lm = userLexicalModels.first(where: {$0.languageID == lm.languageID}) {
+        _ = registerLexicalModel(first_lm)
+      } else {
+        log.info("no more lexical models available for language \(lm.fullID)")
+        currentLexicalModelID = nil
+      }
     }
     
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
