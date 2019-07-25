@@ -289,7 +289,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   private func switchLexicalModel(_ index: Int) {
     // Switch lexicalModel and register to user defaults.
-    if Manager.shared.registerLexicalModel(userLexicalModels[index]) {
+    let lm = userLexicalModels[index]
+    if Manager.shared.registerLexicalModel(lm) {
+      Storage.active.userDefaults.set(preferredLexicalModelID: lm.id, forKey: lm.languageID)
       tableView.reloadData()
     }
     
