@@ -78,8 +78,38 @@ class LanguageSettingsViewController: UITableViewController {
                              height: cellFrame.size.height)
     return switchFrame
   }
+  
+  @objc
+  func predictionSwitchValueChanged(source: UISwitch) {
+    let value = source.isOn;
+    let userDefaults = Storage.active.userDefaults
+    userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
+    
+    if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
+      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
+        // re-register the model - that'll enact the settings.
+        _ = Manager.shared.registerLexicalModel(lm)
+      }
+    }
+  }
+  
+  @objc
+  func correctionSwitchValueChanged(source: UISwitch) {
+    let value = source.isOn;
+    let userDefaults = Storage.active.userDefaults
+    userDefaults.set(correctSetting: value, forLanguageID: self.language.id)
+    
+    if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
+      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
+        // re-register the model - that'll enact the settings.
+        _ = Manager.shared.registerLexicalModel(lm)
+      }
+    }
+  }
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let userDefaults = Storage.active.userDefaults
+    
     let cellIdentifier = 0 == indexPath.section ?  "KeyboardInLanguageSettingsCell" : "LanguageSettingsCell"
     
     let reusableCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier)
@@ -89,22 +119,21 @@ class LanguageSettingsViewController: UITableViewController {
     
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     if 1 == indexPath.section {
-        //TODO: find the settings these are to show
         if 0 == indexPath.row {
           cell.accessoryType = .none
           let doPredictionsSwitch = UISwitch()
           let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
           doPredictionsSwitch.frame = switchFrame
-          doPredictionsSwitch.isOn = false
-          //            showBannerSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
+          doPredictionsSwitch.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+          doPredictionsSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doPredictionsSwitch)
         } else if 1 == indexPath.row {
           cell.accessoryType = .none
           let doCorrectionsSwitch = UISwitch()
           let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
           doCorrectionsSwitch.frame = switchFrame
-          doCorrectionsSwitch.isOn = false
-          //            showBannerSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
+          doCorrectionsSwitch.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
+          doCorrectionsSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doCorrectionsSwitch)
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
@@ -166,9 +195,9 @@ class LanguageSettingsViewController: UITableViewController {
       cell.accessoryType = .none
       switch indexPath.row {
         case 0:
-          cell.textLabel?.text = "Enable corrections"
-        case 1:
           cell.textLabel?.text = "Enable predictions"
+        case 1:
+          cell.textLabel?.text = "Enable corrections"
         case 2:
           cell.textLabel?.text = "Model"
           cell.accessoryType = .disclosureIndicator
@@ -222,6 +251,7 @@ class LanguageSettingsViewController: UITableViewController {
       showKeyboardInfoView(kb: (language.keyboards?[safe: indexPath.row])!)
     case 1:
       switch indexPath.row  {
+        // case 0, 1:  the toggles - but a general 'click' not on the toggle itself.
         case 2:
           showLexicalModelsView()
         default:
