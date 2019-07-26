@@ -20,7 +20,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private var sectionIndexTitles: [String] = []
   private var indices: [Int] = []
   private var selectedSection = 0
-  private var isUpdate = false
   private var installedLanguages: [String: Language]
   private var languages: [Language] = []
   private let keyboardRepository: KeyboardRepository?
@@ -165,49 +164,13 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     }
     
     cell.textLabel?.text = language.name
-    
-    if cell.accessoryType == .disclosureIndicator {
-      return
-    }
-    guard let cell = cell as? KeyboardNameTableViewCell else {
-      return
-    }
-    
-    let keyboardID = language.keyboards![0].id
-    
-    cell.accessoryType = .none
-    cell.isUserInteractionEnabled = true
-    cell.textLabel?.isEnabled = true
-    cell.detailTextLabel?.isEnabled = true
-    
-    let kbState = Manager.shared.stateForKeyboard(withID: keyboardID)
-    cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     selectedSection = indexPath.section
     tableView.cellForRow(at: indexPath)?.isSelected = false
-    if tableView.cellForRow(at: indexPath)?.accessoryType == .disclosureIndicator {
-      let title = tableView.cellForRow(at: indexPath)?.textLabel?.text ?? ""
-      showLanguageSettingsView(title: title, languageIndex: indexPath.section)
-      return
-    }
-    
-    let language = languages[indexPath.section]
-    let keyboardIndex = 0;
-    let keyboard = language.keyboards![keyboardIndex]
-    
-    //TODO: launch real Language Settings controller here
-    let languageSettingsController = UIAlertController(title: "\(language.name): \(keyboard.name)",
-      message: "This  should be Language Settings",
-      preferredStyle: UIAlertControllerStyle.alert)
-    languageSettingsController.addAction(UIAlertAction(title: "Cancel",
-                                            style: UIAlertActionStyle.cancel,
-                                            handler: nil))
-//    languageSettingsController.addAction(UIAlertAction(title: "Download",
-//                                            style: UIAlertActionStyle.default,
-//                                            handler: {_ in self.downloadHandler(keyboardIndex)} ))
-    self.present(languageSettingsController, animated: true, completion: nil)
+    let title = tableView.cellForRow(at: indexPath)?.textLabel?.text ?? ""
+    showLanguageSettingsView(title: title, languageIndex: indexPath.section)
   }
   
   override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
@@ -230,7 +193,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
     let keyboard = language.keyboards![keyboardIndex]
-    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
+    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: false)
   }
   
   private func restoreNavigation() {
@@ -336,7 +299,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     log.info("lexicalModelDownloadFailed: InstalledLanguagesViewController")
     restoreNavigation()
     
-    let title = "Lexical Model Download Error"
+    let title = "Dictionary Download Error"
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: "",

@@ -29,9 +29,9 @@ class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
     }
     self.accessoryType = accessoryType
 
-    let isSelectedView = viewWithTag(cellSelectedTag)
+    let selectedView = viewWithTag(cellSelectedTag)
     if isSelected {
-      if isSelectedView == nil {
+      if selectedView == nil {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height))
         view.tag = cellSelectedTag
         view.backgroundColor = UIColor.green
@@ -39,7 +39,7 @@ class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
         addSubview(view)
       }
     } else {
-      isSelectedView?.removeFromSuperview()
+      selectedView?.removeFromSuperview()
     }
   }
 }

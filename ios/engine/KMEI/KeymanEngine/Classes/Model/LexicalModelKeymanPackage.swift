@@ -12,7 +12,8 @@ public class LexicalModelKeymanPackage : KeymanPackage {
   public var models : [KMPLexicalModel]!
   
   public override func defaultInfoHtml() -> String {
-    var str = "Found lexical models in package:<br/>"
+    let count = models.count
+    var str = "Found "+(count > 1 ? "\(count) dictionaries" : "dictionary")+" in package:<br/>"
     for model in models {
       str += model.lexicalModelId! + "<br/>"
     }

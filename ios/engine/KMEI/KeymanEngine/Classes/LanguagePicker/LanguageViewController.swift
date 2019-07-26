@@ -101,7 +101,9 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     } else {
       log.info("didAppear: LanguageViewController")
     }
- }
+  }
+
+  // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return languages.count
@@ -242,7 +244,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
     let keyboard = language.keyboards![keyboardIndex]
-                Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
+    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
   }
 
   private func keyboardDownloadStarted() {
