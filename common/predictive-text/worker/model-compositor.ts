@@ -113,6 +113,8 @@ class ModelCompositor {
   }
 
   protected generateTransformContext(context: Context): TransformContext {
+    // TODO:  We currently have some hardcoded tweakable weighting parameters.  That should get cleaned up.
+
     let charSet = this.lexicalModel.characterSet;
     if(!charSet) {
       return null;
@@ -184,110 +186,14 @@ class ModelCompositor {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
     }
 
-    // Step 1:  determine the existing context and the transforms that got us here.
-    let currentPrefix = this.lexicalModel.wordbreak(context);
-    // TODO:  Build transform sequence.  Current type plan:  TransformContext
+    let transformContext = this.generateTransformContext(context);
 
-    // Step 2:  determine the new transforms that can reasonably apply.
-    // TODO:  Build transform sequence variants
+    // TODO:  A proper Dijkstra (or similar) over the search space represented by `transformContext`.
 
+    // TODO:  Link in predict if the option's enabled, rooted from each likely correction as prefix.
 
-
-    // Find the transform for the actual keypress.
-    let inputTransform = transformDistribution.sort(function(a, b) {
-      return b.p - a.p;
-    })[0].sample;
-
-    // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
-    // When true, we can use an 'associative array' to de-duplicate everything.
-    let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
-
-    // Only allow new-word suggestions if space was the most likely keypress.
-    let allowSpace = this.isWhitespace(inputTransform);
-    let allowBksp = this.isBackspace(inputTransform);
-
-    let postContext = models.applyTransform(inputTransform, context);
-    let keepOptionText = this.lexicalModel.wordbreak(postContext);
-    let keepOption: Suggestion = null;
-
-    // if(this.lexicalModel.characterSet) {
-    // //   // We can attempt use of edit distance calculations.
-    // }
-
-    for(let alt of transformDistribution) {
-      let transform = alt.sample;
-
-      // Filter out special keys unless they're expected.
-      if(this.isWhitespace(transform) && !allowSpace) {
-        continue;
-      } else if(this.isBackspace(transform) && !allowBksp) {
-        continue;
-      }
-      let distribution = this.lexicalModel.predict(transform, context);
-
-      distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
-        // Let's not rely on the model to copy transform IDs.
-        // Only bother is there IS an ID to copy.
-        if(transform.id !== undefined) {
-          pair.sample.transformId = transform.id;
-        }
-
-        // Combine duplicate samples.
-        let displayText = pair.sample.displayAs;
-
-        if(displayText == keepOptionText) {
-          keepOption = pair.sample;
-          // Specifying 'keep' helps uses of the LMLayer find it quickly
-          // if/when desired.
-          keepOption.tag = 'keep';
-        } else {
-          let existingSuggestion = suggestionDistribMap[displayText];
-          if(existingSuggestion) {
-            existingSuggestion.p += pair.p * alt.p;
-          } else {
-            let compositedPair = {sample: pair.sample, p: pair.p * alt.p};
-            suggestionDistribMap[displayText] = compositedPair;
-          }
-        }
-      });
-    }
-
-    // Generate a default 'keep' option if one was not otherwise produced.
-    if(!keepOption && keepOptionText != '') {
-      keepOption = {
-        displayAs: keepOptionText,
-        transformId: inputTransform.id,
-        // Replicate the original transform, modified for appropriate language insertion syntax.
-        transform: {
-          insert: inputTransform.insert + ' ',
-          deleteLeft: inputTransform.deleteLeft,
-          deleteRight: inputTransform.deleteRight,
-          id: inputTransform.id
-        },
-        tag: 'keep'
-      };
-    }
-
-    // Now that we've calculated a unique set of probability masses, time to make them into a proper
-    // distribution and prep for return.
-    for(let key in suggestionDistribMap) {
-      let pair = suggestionDistribMap[key];
-      suggestionDistribution.push(pair);
-    }
-
-    suggestionDistribution = suggestionDistribution.sort(function(a, b) {
-      return b.p - a.p; // Use descending order - we want the largest probabilty suggestions first!
-    });
-
-    let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {
-      return value.sample;
-    });
-
-    if(keepOption) {
-      suggestions = [ keepOption ].concat(suggestions);
-    }
-
-    return suggestions;
+    // TODO:  Proper returns.  
+    return [];
   }
 
   public predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
@@ -313,8 +219,6 @@ class ModelCompositor {
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
-
-    // TODO:  Utilize the new this.lexicalModel.characterSet.
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
