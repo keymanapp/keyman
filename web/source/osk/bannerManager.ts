@@ -7,8 +7,9 @@ namespace com.keyman.osk {
    * each field.
    */
   export interface BannerOptions {
-    persistentBanner?: boolean;
-    enablePredictions?: boolean;
+    alwaysShow?: boolean;
+    mayPredict?: boolean;
+    mayCorrect?: boolean;
     imagePath?: string;
   }
 
@@ -53,12 +54,13 @@ namespace com.keyman.osk {
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
     private activeBanner: Banner;
-    private alwaysShows: boolean;
+    private alwaysShow: boolean;
     private imagePath?: string = "";
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
-      persistentBanner: false,
-      enablePredictions: true,
+      alwaysShow: false,
+      mayPredict: true,
+      mayCorrect: true,
       imagePath: ""
     }
 
@@ -136,23 +138,24 @@ namespace com.keyman.osk {
       for(let key in optionSpec) {
         switch(key) {
           // Each defined option may require specialized handling.
-          case 'persistentBanner':
+          case 'alwaysShow':
             // Determines the banner type to activate.
-            this.alwaysShows = optionSpec['persistentBanner'];
+            this.alwaysShow = optionSpec[key];
             break;
-          case 'enablePredictions':
-            // If we're not going to show suggestions, it's best to turn off predictions.
-            keyman.modelManager.enabled = optionSpec['enablePredictions'];
+          case 'mayPredict':
+            keyman.modelManager.mayPredict = optionSpec[key]
+            break;
+          case 'mayCorrect':
+            keyman.modelManager.mayCorrect = optionSpec[key];
             break;
           case 'imagePath':
             // Determines the image file to use for ImageBanners.
-            this.imagePath = optionSpec['imagePath'];
+            this.imagePath = optionSpec[key];
             break;
           default:
             // Invalid option specified!
         }
-
-        this._options[key] = optionSpec['key'];
+        this._options[key] = optionSpec[key];
       }
 
       this.selectBanner();
@@ -214,7 +217,7 @@ namespace com.keyman.osk {
       // when predictions are disabled.
       if(keyman.modelManager.activeModel) {
         this.setBanner('suggestion');
-      } else if(this.alwaysShows) {
+      } else if(this.alwaysShow) {
         this.setBanner('image');
       } else {
         this.setBanner('blank');

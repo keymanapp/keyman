@@ -165,7 +165,14 @@
       kmw.modelManager.deregister(modelID);
     }
 
-    function enableSuggestions(model) {
+    function enableSuggestions(model, mayPredict, mayCorrect) {
+      // Set the options first so that KMW's ModelManager can properly handle model enablement states
+      // the moment we actually register the new model.
+      keyman.osk.banner.setOptions({
+        'mayPredict': mayPredict,
+        'mayCorrect': mayCorrect
+      });
+
       registerModel(model);
     }
 

@@ -40,20 +40,41 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     super.init(nibName: nil, bundle: nil)
     lexicalModelRepository.delegate = self
   }
+  
+  init(keyboardRep keyboardRepository: KeyboardRepository, modelRep lexicalModelRepository: LexicalModelRepository) {
+    self.keyboardRepository = keyboardRepository
+    self.lexicalModelRepository = lexicalModelRepository
+    super.init(nibName: nil, bundle: nil)
+    keyboardRepository.delegate = self
+    lexicalModelRepository.delegate = self
+  }
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
+  func postLanguageLoad(languageDict: [String: Language]) {
+    languages = languageList(languageDict)
+  }
+  
+  func idxOfLanguage(languageID: String) -> Int {
+    let langIdx = self.languages.firstIndex(where: {
+      $0.id == languageID
+    }) ?? 0
+    return langIdx
+  }
+  
   override func loadView() {
     super.loadView()
     if let languageDict = keyboardRepository?.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     } else {
+      log.info("Fetching repository from API for keyboard download (LanguageViewController)")
       keyboardRepository?.fetch()
     }
 
     loadUserKeyboards()
+    loadUserLexicalModels()
   }
 
   override func viewDidLoad() {
@@ -76,8 +97,13 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     // if no rows to show yet, show a loading indicator
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
+      log.info("didAppear: LanguageViewController, but no rows to show")
+    } else {
+      log.info("didAppear: LanguageViewController")
     }
   }
+
+  // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return languages.count
@@ -203,7 +229,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     showLanguageDetailView(title: title, languageIndex: indexPath.section)
   }
 
-  private func showLanguageDetailView(title: String, languageIndex: Int) {
+  func showLanguageDetailView(title: String, languageIndex: Int) {
     let langDetailView = LanguageDetailViewController(language: languages[languageIndex])
     langDetailView.title = title
     navigationController?.pushViewController(langDetailView, animated: true)
@@ -218,7 +244,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
     let keyboard = language.keyboards![keyboardIndex]
-                Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
+    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
   }
 
   private func keyboardDownloadStarted() {
@@ -332,7 +358,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 extension LanguageViewController: KeyboardRepositoryDelegate {
   func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
     if let languageDict = repository.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     }
     self.dismissActivityView()
     self.tableView.reloadData()
@@ -354,11 +380,11 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
 }
 
 // MARK: - LexicalModelRepositoryDelegate
- //may not need  this, as we don't plan ever to fetch the whole lexical model repository (or even the list of all available)
+
 extension LanguageViewController: LexicalModelRepositoryDelegate {
-  func lexicalModelRepositoryDidFetch(_ repository: LexicalModelRepository) {
+  func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
     if let languageDict = repository.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     }
     self.dismissActivityView()
     self.tableView.reloadData()

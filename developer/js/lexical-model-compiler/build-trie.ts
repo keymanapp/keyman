@@ -79,7 +79,7 @@ export function compileWordListCharacterSet(wordlist: WordList, searchTermToKey?
   let charMap: {[char: string]: number} = {};
   let charList: string[] = [];
 
-  for(let [word] of wordlist) {
+  for(let [word, weight] of wordlist) {
     // There's a problem if we have `null` or `undefined` for a word.
     if(!word) {
       throw TypeError();
@@ -100,19 +100,17 @@ export function compileWordListCharacterSet(wordlist: WordList, searchTermToKey?
 
         // Ensure it's actually a legit paired code
         if(pairedCode >= 0xDC00 && pairedCode <= 0xDFFF) {
-          // Computes the actual character's code.
-          //code = (code - 0xD800) * 0x400 + pairedCode - 0xDC00 + 0x10000
-
           // Only process the second code if it's actually paired.
-          char = char + word.charAt(++i); // The second code is processed, so skip it in the loop.
+          i++; // We're now processing the second code, so skip it in the loop.
+          char = char + word.charAt(i);
         } // else handle pairedCode in the next loop iteration.
       }
       
       if(!charMap[char]) {
-        charMap[char] = 1;
+        charMap[char] = weight;
         charList.push(char);
       } else {
-        charMap[char]++;
+        charMap[char] += weight;
       }
     }
   }
@@ -413,8 +411,8 @@ namespace Trie {
         .map(entry => entry.weight)
         .reduce((acc, count) => acc + count, 0);
     } else {
-      return Object.values(node.children)
-        .map((child) => sumWeights(child))
+      return Object.keys(node.children)
+        .map((key) => sumWeights(node.children[key]))
         .reduce((acc, count) => acc + count, 0);
     }
   }

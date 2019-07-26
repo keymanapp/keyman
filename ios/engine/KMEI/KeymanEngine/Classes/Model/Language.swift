@@ -19,7 +19,7 @@ public struct Language: Codable {
   /// Corresponding Keyboard objects.
   public let keyboards: [Keyboard]?
     
-  /// Corresponding Keyboard objects.
+  /// Corresponding lexical models.
   public let lexicalModels: [LexicalModel]?
 
   /// Font for input fields (and OSK if `oskFont` is not present).
