@@ -135,9 +135,22 @@ interface LMLayerWorkerState {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
+  // TODO:  Document.
   configure(capabilities: Capabilities): Configuration;
+  // TODO:  Document.
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
+  // TODO:  Document.
   wordbreak(context: Context): USVString;
+  
+  /**
+   * Represents the complete set of characters that may comprise a string usable
+   * for lookup of words within the corresponding lexical model.
+   * 
+   * Each entry is a pair:  [character: string, frequency: number], where
+   * frequency is the frequency of that character across the backing wordlist.
+   * (Subject to change - also weighted by the weights of each word the character
+   * appears within.)
+   */
   characterSet?: [string, number][]; 
 }
 

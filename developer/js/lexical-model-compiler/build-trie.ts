@@ -100,11 +100,9 @@ export function compileWordListCharacterSet(wordlist: WordList, searchTermToKey?
 
         // Ensure it's actually a legit paired code
         if(pairedCode >= 0xDC00 && pairedCode <= 0xDFFF) {
-          // Computes the actual character's code.
-          //code = (code - 0xD800) * 0x400 + pairedCode - 0xDC00 + 0x10000
-
           // Only process the second code if it's actually paired.
-          char = char + word.charAt(++i); // The second code is processed, so skip it in the loop.
+          i++; // We're now processing the second code, so skip it in the loop.
+          char = char + word.charAt(i);
         } // else handle pairedCode in the next loop iteration.
       }
       
