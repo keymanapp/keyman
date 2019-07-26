@@ -1522,7 +1522,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// TextView/TextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
     hideKeyboard()
-    let vc = KeyboardPickerViewController()
+    let vc = shouldAddKeyboard ? KeyboardPickerViewController() :
+      KeyboardSwitcherViewController()
     let nc = UINavigationController(rootViewController: vc)
     nc.modalTransitionStyle = .coverVertical
     nc.modalPresentationStyle = .pageSheet

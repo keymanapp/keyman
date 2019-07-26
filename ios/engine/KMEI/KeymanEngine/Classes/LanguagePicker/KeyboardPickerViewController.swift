@@ -387,7 +387,8 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     updateKeyboards()
   }
 
-  private func checkUpdates() -> Bool {
+  // so KeyboardSwitcherViewController can override this to do nothing
+  public func checkUpdates() -> Bool {
     if Manager.shared.apiKeyboardRepository.languages == nil {
       return false
     }
