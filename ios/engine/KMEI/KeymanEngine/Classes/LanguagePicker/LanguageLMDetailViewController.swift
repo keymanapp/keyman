@@ -15,11 +15,13 @@ private let toolbarActivityIndicatorTag = 102
 
 class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate {
   private var userLexicalModels: [String: InstallableLexicalModel] = [:]
-  private var isUpdate = false
+  private var isUpdate = false // unused currently, may be used when we switch to HTTPDownloader
   private let language: Language
   public var lexicalModels: [LexicalModel]? = nil
   
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
+  //NOTE: there is no need for a CompletedObserver, as our parent LexicalModelPickerViewController
+  //  is registered for that and deals with it by popping us out to root.
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
   
   init(language: Language) {
