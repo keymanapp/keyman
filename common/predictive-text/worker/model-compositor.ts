@@ -8,12 +8,13 @@ class ModelCompositor {
 
   protected isWhitespace(transform: Transform): boolean {
     // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
-    // TODO:  Unfortunately, this regex isn't IE-compatible.  Find a solution that at least
-    //        doesn't prevent loading on IE.
-    //let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]/iu;
+    let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u202f\u205f\u3000]/i;
     
-    // Temp solution:
-    let whitespaceRemover = /.*\s/; // At least handles standard whitespace.
+    // Filter out null-inserts; their high probability can cause issues.
+    if(transform.insert == '') { // Can actually register as 'whitespace'.
+      return false;
+    }
+
     let insert = transform.insert;
 
     insert = insert.replace(whitespaceRemover, '');
@@ -62,6 +63,14 @@ class ModelCompositor {
       } else if(this.isBackspace(transform) && !allowBksp) {
         continue;
       }
+
+      let preserveWhitespace: boolean = false;
+      if(this.isWhitespace(transform)) {
+        // Detect start of new word; prevent whitespace loss here.
+        let postContext = models.applyTransform(transform, context);
+        preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
+      }
+
       let distribution = this.lexicalModel.predict(transform, context);
 
       distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
@@ -69,6 +78,12 @@ class ModelCompositor {
         // Only bother is there IS an ID to copy.
         if(transform.id !== undefined) {
           pair.sample.transformId = transform.id;
+        }
+
+        // Prepends the original whitespace, ensuring it is preserved if
+        // the suggestion is accepted.
+        if(preserveWhitespace) {
+          models.prependTransform(pair.sample.transform, transform);
         }
 
         // Combine duplicate samples.
@@ -105,6 +120,12 @@ class ModelCompositor {
         },
         tag: 'keep'
       };
+    }
+
+    // TODO:  Customizable modeling for this formatting.  Different languages
+    //        use different quotation styles.  See https://github.com/keymanapp/keyman/issues/1883.
+    if(keepOption) {
+      keepOption.displayAs = '"' + keepOption.displayAs + '"';
     }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper

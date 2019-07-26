@@ -54,6 +54,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
@@ -683,6 +684,10 @@ public final class KMManager {
     return KeyboardPickerActivity.getLexicalModelsList(context);
   }
 
+  public static Dataset getInstalledDataset(Context context) {
+    return KeyboardPickerActivity.getInstalledDataset(context);
+  }
+
   public static boolean registerLexicalModel(HashMap<String, String> lexicalModelInfo) {
     String pkgID = lexicalModelInfo.get(KMKey_PackageID);
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
@@ -706,14 +711,18 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
+
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
+      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s)", model));
+      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
@@ -1481,17 +1490,19 @@ public final class KMManager {
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
 
+        /*  // For future implementation
         InAppKeyboard.suggestionWindowPos = new double[]{x, y};
         InAppKeyboard.suggestionJSON = suggestionJSON;
 
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
+        */
       }
       return false;
     }
@@ -1709,14 +1720,19 @@ public final class KMManager {
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
 
+        /*  // For future implementation
+        SystemKeyboard.suggestionWindowPos = new double[]{x, y};
+        SystemKeyboard.suggestionJSON = suggestionJSON;
+
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom);
+          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
         }
+        */
       }
 
       return false;

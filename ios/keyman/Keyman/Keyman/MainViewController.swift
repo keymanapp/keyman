@@ -18,7 +18,8 @@ private let checkedProfilesKey = "CheckedProfiles"
 // External strings
 let userTextKey = "UserText"
 let userTextSizeKey = "UserTextSize"
-let dontShowGetStartedKey = "DontShowGetStarted"
+let dontShowGetStartedKey = "DontShowGetStarted" // older preference setting name, use shouldShowGetStartedKey
+let shouldShowGetStartedKey = "ShouldShowGetStarted"
 let launchedFromUrlNotification = NSNotification.Name("LaunchedFromUrlNotification")
 let urlKey = "url"
 
@@ -269,7 +270,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                           orientation: orientation)
     actionButton.title = "Share"
 
-    dropdownItems = [textSizeButton, trashButton, getStartedButton, infoButton]
+    let settingsButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"), // should find a gear image and use that instead of re-using 'more'
+                                          highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
+                                          imageScale: imageScaleF,
+                                          action: #selector(self.settingsButtonClick),
+                                          orientation: orientation)
+    settingsButton.title = "Settings"
+
+    dropdownItems = [textSizeButton, trashButton, infoButton, getStartedButton, settingsButton]
 
     var scaleF: CGFloat = (UIScreen.main.scale == 2.0) ? 2.0 : 1.5
     scaleF *= (UIDevice.current.userInterfaceIdiom == .phone) ? 1.0 : 2.0
@@ -533,6 +541,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       versionLabel.backgroundColor = UIColor.clear
       navigationItem.titleView = versionLabel
     }
+  }
+
+  @objc func settingsButtonClick(_ sender: Any) {
+    _ = dismissDropDownMenu()
+    popover?.dismiss(animated: false)
+
+    Manager.shared.showKeymanEngineSettings(inVC: self)
   }
 
   @objc func actionButtonClick(_ sender: Any) {
@@ -979,6 +994,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     let userData = AppDelegate.activeUserDefaults()
     if userData.bool(forKey: dontShowGetStartedKey) {
+      return false
+    }
+    if !userData.bool(forKey: shouldShowGetStartedKey) {
       return false
     }
 

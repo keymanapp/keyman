@@ -167,10 +167,11 @@ final class KMKeyboard extends WebView {
         if (subKeysList != null) {
           showSubKeys(context);
           return;
-        } else if(suggestionJSON != null) {
+        } /* For future implementation
+        else if(suggestionJSON != null) {
           showSuggestionLongpress(context);
           return;
-        }
+        }*/
       }
 
       @Override

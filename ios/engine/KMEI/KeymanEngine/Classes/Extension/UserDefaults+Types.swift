@@ -9,7 +9,8 @@
 import Foundation
 
 public extension UserDefaults {
- func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
+  func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
+
     guard let array = array(forKey: key) as? [Data] else {
       return nil
     }
@@ -133,12 +134,34 @@ public extension UserDefaults {
     }
   }
   
-  func userLexicalModels(forLanguage lgCode: String) -> [InstallableLexicalModel]? {
-    if let models = userLexicalModels {
-      return models.compactMap { ($0.languageID == lgCode) ? $0 : nil }
+  // stores a dictionary of lexical model ids keyed to language ids, i.e., [langID: modelID]
+  var languageModelSelections: [String: String]? {
+    get {
+      return dictionary(forKey: Key.userPreferredLexicalModels) as? [String : String]
+    }
+    
+    set(lexicalModelPrefs) {
+      set(lexicalModelPrefs, forKey: Key.userPreferredLexicalModels)
+    }
+  }
+  
+  // returns lexical model id, given language id
+  func preferredLexicalModelID(forLanguage lgCode: String) -> String? {
+    if let modelPrefs = languageModelSelections {
+      return modelPrefs[lgCode]
     } else {
       return nil
     }
+  }
+  
+  func set(preferredLexicalModelID: String?, forKey key: String) {
+    var modelPrefs: [String: String]?
+    modelPrefs = languageModelSelections
+    if modelPrefs == nil {
+      modelPrefs = [String: String]()
+    }
+    modelPrefs?[key] = preferredLexicalModelID
+    languageModelSelections = modelPrefs
   }
 
   var currentKeyboardID: FullKeyboardID? {
@@ -168,6 +191,12 @@ public extension UserDefaults {
   func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
     return userLexicalModels?.first { $0.fullID == fullID }
   }
+  
+  func userLexicalModelsForLanguage(languageID: String) -> [InstallableLexicalModel]? {
+    return userLexicalModels?.filter({
+      $0.languageID == languageID
+    }) ?? []
+  }
 
   var migrationLevel: Int {
     get {
@@ -177,5 +206,63 @@ public extension UserDefaults {
     set(level) {
       set(level, forKey: Key.migrationLevel)
     }
+  }
+  
+  // stores a dictionary of predict-enablement settings keyed to language ids, i.e., [langID: Bool]
+  var predictionEnablements: [String: Bool]? {
+    get {
+      return dictionary(forKey: Key.userPredictSettings) as? [String : Bool]
+    }
+    
+    set(prefs) {
+      set(prefs, forKey: Key.userPredictSettings)
+    }
+  }
+  
+  // stores a dictionary of correction-enablement settings keyed to language ids, i.e., [langID: Bool]
+  var correctionEnablements: [String: Bool]? {
+    get {
+      return dictionary(forKey: Key.userCorrectSettings) as? [String : Bool]
+    }
+    
+    set(prefs) {
+      set(prefs, forKey: Key.userCorrectSettings)
+    }
+  }
+  
+  func predictSettingForLanguage(languageID: String) -> Bool {
+    if let dict = predictionEnablements {
+      return dict[languageID] ?? true
+    } else {
+      return true
+    }
+  }
+  
+  func set(predictSetting: Bool, forLanguageID: String) {
+    var prefs: [String: Bool]?
+    prefs = predictionEnablements
+    if prefs == nil {
+      prefs = [String: Bool]()
+    }
+    prefs?[forLanguageID] = predictSetting
+    predictionEnablements = prefs
+  }
+  
+  func correctSettingForLanguage(languageID: String) -> Bool {
+    if let dict = correctionEnablements {
+      return dict[languageID] ?? true
+    } else {
+      return true
+    }
+  }
+  
+  func set(correctSetting: Bool, forLanguageID: String) {
+    var prefs: [String: Bool]?
+    prefs = correctionEnablements
+    if prefs == nil {
+      prefs = [String: Bool]()
+    }
+    prefs?[forLanguageID] = correctSetting
+    correctionEnablements = prefs
   }
 }

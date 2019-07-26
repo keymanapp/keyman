@@ -8,6 +8,7 @@
 
 import KeymanEngine
 import UIKit
+import Reachability
 
 class InfoViewController: UIViewController, UIWebViewDelegate {
   @IBOutlet var webView: UIWebView!
@@ -28,8 +29,12 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     webView?.delegate = self
     NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
         name: NSNotification.Name.reachabilityChanged, object: nil)
-    networkReachable = Reachability(hostName: "www.keyman.com")
-    networkReachable?.startNotifier()
+    networkReachable = Reachability(hostname: "www.keyman.com")
+    do {
+      try networkReachable?.startNotifier()
+    } catch {
+      log.error("error starting Reachability notifier: \(error)")
+    }
   }
 
   @objc func networkStatusChanged(_ notification: Notification) {
@@ -37,9 +42,9 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   func reloadKeymanHelp() {
-    let networkStatus = networkReachable?.currentReachabilityStatus()
+    let networkStatus = networkReachable?.connection
     switch networkStatus {
-    case NotReachable?:
+    case Reachability.Connection.none?:
       loadFromLocal()
     default:
       loadFromServer()

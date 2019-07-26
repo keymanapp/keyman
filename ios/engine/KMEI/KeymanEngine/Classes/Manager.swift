@@ -11,22 +11,14 @@ import WebKit
 import XCGLogger
 import Zip
 import DeviceKit
+import Reachability
 
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
 // MARK: - Constants
 
-// Possible states that a keyboard can be in
+// Possible states that a keyboard or lexical model can be in
 public enum KeyboardState {
-  case needsDownload
-  case needsUpdate
-  case upToDate
-  case downloading
-  case none
-}
-
-// Possible states that a lexical model can be in
-public enum LexicalModelState {
   case needsDownload
   case needsUpdate
   case upToDate
@@ -120,10 +112,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public var canRemoveLexicalModels = true
   
   /// Allow the default lexical model to be removed.
-  /// The last lexical model cannot be removed, so the default lexical model cannot be removed if it
-  /// is the only lexical model in the list, regardless of the value of this property.
-  /// The default value is false.
-  public var canRemoveDefaultLexicalModel = false
+  /// The last lexical model CAN be removed, as this is an optional feature
+  /// The default value is true.
+  public var canRemoveDefaultLexicalModel = true
   
   public let apiLexicalModelRepository: APILexicalModelRepository
 
@@ -135,7 +126,24 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   public var openURL: ((URL) -> Bool)?
 
   var currentKeyboardID: FullKeyboardID?
-  var currentLexicalModelID: FullLexicalModelID?
+  private var _currentLexicalModelID: FullLexicalModelID?
+  var currentLexicalModelID: FullLexicalModelID? {
+    get {
+      if _currentLexicalModelID == nil {
+        let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+        _currentLexicalModelID = userData.currentLexicalModelID
+      }
+      return _currentLexicalModelID
+    }
+    
+    set(value) {
+      _currentLexicalModelID = value
+      let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
+      userData.currentLexicalModelID = _currentLexicalModelID
+      userData.synchronize()
+    }
+  }
+
   var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
   var shouldReloadLexicalModel = false
@@ -196,12 +204,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
     updateUserKeyboards(with: Defaults.keyboard)
 
-    reachability = Reachability(hostName: keymanHostName)
+    reachability = Reachability(hostname: keymanHostName)
 
     if(!Util.isSystemKeyboard) {
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
                                            name: .reachabilityChanged, object: reachability)
-      reachability.startNotifier()
+      do {
+        try reachability.startNotifier()
+      } catch {
+        log.error("failed to start Reachability notifier: \(error)")
+      }
     }
 
     /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
@@ -214,6 +226,15 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
 
   // MARK: - Keyboard management
+  
+  public func showKeymanEngineSettings(inVC: UIViewController) -> Void {
+    hideKeyboard()
+    let settingsVC = SettingsViewController()
+    let nc = UINavigationController(rootViewController: settingsVC)
+    nc.modalTransitionStyle = .coverVertical
+    nc.modalPresentationStyle = .pageSheet
+    inVC.present(nc, animated: true)
+  }
 
   /// Sets the current keyboard, querying from the user's list of keyboards.
   ///
@@ -229,6 +250,16 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         return setKeyboard(keyboard)
     }
     return false
+  }
+  
+  // returns lexical model id, given language id
+  func preferredLexicalModel(_ ud: UserDefaults, forLanguage lgCode: String) -> InstallableLexicalModel? {
+    if let preferredID = ud.preferredLexicalModelID(forLanguage: lgCode) {
+      // We need to match both the model id and the language code - registration fails
+      // when the language code mismatches the current keyboard's set code!
+      return ud.userLexicalModels?.first { $0.id == preferredID && $0.languageID == lgCode }
+    }
+    return nil
   }
   
 
@@ -263,18 +294,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
     
-    //HERE getAssociatedLexicalModel(langID) and setLexicalModel
+    // getAssociatedLexicalModel(langID) and setLexicalModel
     
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
     
+    let userDefaults: UserDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
-    if let valid_models = Storage.active.userDefaults.userLexicalModels(forLanguage: kb.languageID) {
-      if valid_models.count > 0 {
-        //let lm = Storage.active.userDefaults.userLexicalModel(withFullID: valid_models[0].fullID)!
-        _ = Manager.shared.registerLexicalModel(valid_models[0])
-      }
+    if let preferred_model = preferredLexicalModel(userDefaults, forLanguage: kb.languageID) {
+      _ = Manager.shared.registerLexicalModel(preferred_model)
+    } else if let first_model = userDefaults.userLexicalModels?.first(where: { $0.languageID == kb.languageID }) {
+      _ = Manager.shared.registerLexicalModel(first_model)
     }
     
     return true
@@ -330,10 +361,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     
     inputViewController.registerLexicalModel(lm)
     
-    let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-    userData.currentLexicalModelID = lm.fullID
-    userData.synchronize()
-    
     if isKeymanHelpOn {
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
@@ -346,8 +373,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     
     return true
   }
-  /// Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
-  /// The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
+  
+  /** Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
+  *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
+  *   I believe this is background-thread-safe (no UI done)
+  */
   public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
     if !FileManager.default.fileExists(atPath: lexicalModelPath) {
@@ -369,7 +399,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     userDefaults.userLexicalModels = userLexicalModels
     userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
     userDefaults.synchronize()
-  }
+    log.info("Added lexical model ID: \(lexicalModel.id) name: \(lexicalModel.name)")
+}
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
@@ -444,34 +475,54 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// Removes the lexical model at index from the lexical models list if it exists.
-  /// - Returns: The lexical model exists and was removed
-  public func removeLexicalModel(at index: Int) -> Bool {
-    let userData = Storage.active.userDefaults
-    
+  public func removeLexicalModelFromUserList(userDefs ud: UserDefaults, at index: Int) -> InstallableLexicalModel? {
     // If user defaults for lexical models list does not exist, do nothing.
-    guard var userLexicalModels = userData.userLexicalModels else {
-      return false
+    guard var userLexicalModels = ud.userLexicalModels else {
+      return nil
     }
     
     guard index < userLexicalModels.count else {
+      return nil
+    }
+    
+    let lm = userLexicalModels[index]
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models")
+    userLexicalModels.remove(at: index)
+    ud.userLexicalModels = userLexicalModels
+    ud.set([Date()], forKey: Key.synchronizeSWLexicalModel)
+    ud.synchronize()
+    return lm
+}
+  
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  public func removeLexicalModelFromLanguagePreference(userDefs ud: UserDefaults, _ lm: InstallableLexicalModel) {
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs")
+    ud.set(preferredLexicalModelID: nil, forKey: lm.languageID)
+  }
+
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  /// - Returns: The lexical model exists and was removed
+  public func removeLexicalModel(at index: Int) -> Bool {
+    let userData = Storage.active.userDefaults
+    guard let lm = removeLexicalModelFromUserList(userDefs: userData, at: index) else {
       return false
     }
     
-    let kb = userLexicalModels[index]
-    userLexicalModels.remove(at: index)
-    userData.userLexicalModels = userLexicalModels
-    userData.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-    userData.synchronize()
-    
-    log.info("Removing lexical model with ID \(kb.id) and languageID \(kb.languageID)")
-    
+    removeLexicalModelFromLanguagePreference(userDefs: userData, lm)
     // Set a new lexical model if deleting the current one
-    if kb.fullID == currentLexicalModelID {
-      _ = registerLexicalModel(userLexicalModels[0])
+    let userLexicalModels = userData.userLexicalModels! //removeLexicalModelFromUserList fails above if this is not present
+
+    if lm.fullID == currentLexicalModelID {
+      if let first_lm = userLexicalModels.first(where: {$0.languageID == lm.languageID}) {
+        _ = registerLexicalModel(first_lm)
+      } else {
+        log.info("no more lexical models available for language \(lm.fullID)")
+        currentLexicalModelID = nil
+      }
     }
     
-    if !userLexicalModels.contains(where: { $0.id == kb.id }) {
-      let lexicalModelDir = Storage.active.lexicalModelDir(forID: kb.id)
+    if !userLexicalModels.contains(where: { $0.id == lm.id }) {
+      let lexicalModelDir = Storage.active.lexicalModelDir(forID: lm.id)
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
       log.info("Deleting directory \(lexicalModelDir)")
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
@@ -481,7 +532,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       log.info("User has another language installed. Skipping delete of lexical model files.")
     }
     
-    NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: kb)
+    NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: lm)
     return true
   }
   
@@ -543,7 +594,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
             let name = k["name"] as! String
             let keyboardID = k["id"] as! String
             let version = k["version"] as! String
-            
+            //true if the keyboard targets a right-to-left script. false if absent.
+            let isrtl: Bool =  k["rtl"] as? Bool ?? false
+
             var oskFont: Font?
             let osk = k["oskFont"] as? String
             if let _ = osk {
@@ -571,7 +624,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                   languageID: languageId,
                   languageName: languageName,
                   version: version,
-                  isRTL: false,
+                  isRTL: isrtl,
                   font: displayFont,
                   oskFont: oskFont,
                   isCustom: false))
@@ -586,6 +639,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
               throw KMPError.fileSystem
             }
             
+            var haveInstalledOne = false
             for keyboard in installableKeyboards {
               let storedPath = Storage.active.keyboardURL(for: keyboard)
               
@@ -614,7 +668,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                 log.error("Error saving the download: \(error)")
                 throw KMPError.copyFiles
               }
-              Manager.shared.addKeyboard(keyboard)
+              if !haveInstalledOne {
+                Manager.shared.addKeyboard(keyboard)
+                haveInstalledOne = true
+              }
             }
           }
         }
@@ -765,7 +822,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: [keyboard], error: error)
@@ -819,7 +876,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Parameters:
   ///   - url: URL to a JSON description of the keyboard
   public func downloadKeyboard(from url: URL) {
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error)
@@ -879,7 +936,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
 
-    if reachability.currentReachabilityStatus() == NotReachable {
+    if reachability.connection == Reachability.Connection.none {
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: installableKeyboards, error: error)
       return
@@ -952,16 +1009,19 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     return nil
   }
   
-  func  installLexicalModelPackage(downloadedPackageFile: URL) {
+  // return a lexical model so caller can use it in a downloadSucceeded call
+  func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
+    var installedLexicalModel: InstallableLexicalModel? = nil
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     var destination =  documentsDirectory
     destination.appendPathComponent("temp/\(downloadedPackageFile.lastPathComponent)")
     
     KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
-      if let kmp = kmp {
+      if let kmp = kmp as! LexicalModelKeymanPackage? {
         do {
           try Manager.shared.parseLMKMP(kmp.sourceFolder)
-          log.info("successfully installed the lexical model from: \(kmp.sourceFolder)")
+          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
+          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
           //this can fail gracefully and not show errors to users
           try FileManager.default.removeItem(at: downloadedPackageFile)
         } catch {
@@ -971,6 +1031,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
       }
     })
+    return installedLexicalModel
   }
   
   func downloadLexicalModelPackage(string lexicalModelPackageURLString: String) -> Void {
@@ -985,20 +1046,28 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
                                   error: Error?) {
         if let error = error {
           log.error("Failed to fetch lexical model KMP file")
-          downloadFailed(forKeyboards: [], error: error)
+          downloadFailed(forLexicalModelPackage: lexicalModelPackageURLString, error: error)
         } else {
           do {
             try data!.write(to: dest)
           } catch {
             log.error("Error writing the lexical model download data: \(error)")
           }
-          installLexicalModelPackage(downloadedPackageFile: dest)
+          if let lm = installLexicalModelPackage(downloadedPackageFile: dest) {
+            downloadSucceeded(forLexicalModel: lm)
+          } else {
+            let installError = NSError(domain: "Keyman", code: 0,
+                                       userInfo: [NSLocalizedDescriptionKey: "installError"])
+            downloadFailed(forLexicalModelPackage: lexicalModelPackageURLString, error: installError )
+          }
         }
       }
 
       log.info("downloading lexical model from Keyman cloud: \(lexicalModelKMPURL).")
       let task = URLSession.shared.dataTask(with: lexicalModelKMPURL) { (data, response, error) in
-        lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
+        DispatchQueue.main.async {
+          lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
+        }
       }
       task.resume()
 
@@ -1020,6 +1089,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+(error as! String))
         self.downloadFailed(forLanguageID: languageID, error: error) //???forKeyboards
       } else if nil == lexicalModels {
+        //TODO: put up an alert instead
         log.info("No lexical models available for language \(languageID) (nil)")
       } else if 0 == lexicalModels?.count {
         log.info("No lexical models available for language \(languageID) (empty)")
@@ -1087,7 +1157,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 //      return
 //    }
 //
-//    guard reachability.currentReachabilityStatus() != NotReachable else {
+//    guard reachability.connection != Reachability.Connection.none else {
 //      let error = NSError(domain: "Keyman", code: 0,
 //                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
 //      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : [lexicalModel]
@@ -1132,7 +1202,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// - Parameters:
   ///   - url: URL to a JSON description of the lexical model
   public func downloadLexicalModel(from url: URL) {
-    guard reachability.currentReachabilityStatus() != NotReachable else {
+    guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No connection"])
       downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels
@@ -1188,7 +1258,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       return
     }
     
-    if reachability.currentReachabilityStatus() == NotReachable {
+    if reachability.connection == Reachability.Connection.none {
       let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
       return
@@ -1212,7 +1282,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     downloadQueue!.userInfo = commonUserData
     
     let request = HTTPDownloadRequest(url: lexicalModelURL, userInfo: commonUserData)
-    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version ?? "0.1.0").path
+    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version ?? InstallableConstants.defaultVersion).path
     request.tag = 0
     
     downloadQueue!.addRequest(request)
@@ -1220,7 +1290,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// - Returns: The current state for a lexical model
-  public func stateForLexicalModel(withID lexicalModelID: String) -> LexicalModelState {
+  //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
+  public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     if lexicalModelIdForCurrentRequest() == lexicalModelID {
       return .downloading
     }
@@ -1259,10 +1330,10 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   @objc func reachabilityChanged(_ notification: Notification) {
     log.debug {
       let reachStr: String
-      switch reachability.currentReachabilityStatus() {
-      case ReachableViaWiFi:
+      switch reachability.connection {
+      case Reachability.Connection.wifi:
         reachStr = "Reachable Via WiFi"
-      case ReachableViaWWAN:
+      case Reachability.Connection.cellular:
         reachStr = "Reachable Via WWan"
       default:
         reachStr = "Not Reachable"
@@ -1360,6 +1431,20 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   private func downloadFailed(forLanguageID languageID: String, error: Error) {
     let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
     NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  private func downloadFailed(forLexicalModelPackage packageURL: String, error: Error) {
+    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: packageURL, error: error)
+    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  private func downloadSucceeded(forLexicalModel lm: InstallableLexicalModel) {
+    let notification = LexicalModelDownloadCompletedNotification([lm])
+    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadCompleted,
                                     object: self,
                                     value: notification)
   }
