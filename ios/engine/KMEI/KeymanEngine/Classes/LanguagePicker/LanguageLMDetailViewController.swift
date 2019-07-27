@@ -1,10 +1,11 @@
 //
-//  LanguageDetailViewController.swift
+//  LanguageLMDetailViewController.swift
 //  KeymanEngine
 //
-//  Created by Gabriel Wong on 2017-09-14.
-//  Copyright © 2017 SIL International. All rights reserved.
+//  Created by Randy Boring on 7/19/19.
+//  Copyright © 2019 SIL International. All rights reserved.
 //
+
 
 import UIKit
 
@@ -12,76 +13,87 @@ private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
-class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [String: InstallableKeyboard] = [:]
-  private var isUpdate = false
+class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate {
+  private var userLexicalModels: [String: InstallableLexicalModel] = [:]
+  private var isUpdate = false // unused currently, may be used when we switch to HTTPDownloader
   private let language: Language
-
-  private var keyboardDownloadStartedObserver: NotificationObserver?
-  private var keyboardDownloadFailedObserver: NotificationObserver?
-
+  public var lexicalModels: [LexicalModel]? = nil
+  
+  private var lexicalModelDownloadStartedObserver: NotificationObserver?
+  //NOTE: there is no need for a CompletedObserver, as our parent LexicalModelPickerViewController
+  //  is registered for that and deals with it by popping us out to root.
+  private var lexicalModelDownloadFailedObserver: NotificationObserver?
+  
   init(language: Language) {
     self.language = language
     super.init(nibName: nil, bundle: nil)
   }
-
+  
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   override func loadView() {
     super.loadView()
-    loadUserKeyboards()
+    loadUserLexicalModels()
+    tableView.dataSource = self
   }
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
+    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadStarted,
       observer: self,
-      function: LanguageDetailViewController.keyboardDownloadStarted)
-    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
+      function: LanguageLMDetailViewController.lexicalModelDownloadStarted)
+    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadFailed,
       observer: self,
-      function: LanguageDetailViewController.keyboardDownloadFailed)
-    log.info("viewDidLoad: LanguageDetailViewController (registered for keyboardDownloadStarted)")
+      function: LanguageLMDetailViewController.lexicalModelDownloadFailed)
+    log.info("viewDidLoad: LanguageLMDetailViewController (registered for lexicalModelDownloadStarted)")
   }
   
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    log.info("willAppear: LanguageDetailViewController")
+    log.info("willAppear: LanguageLMDetailViewController")
   }
-
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    log.info("didAppear: LanguageLMDetailViewController")
+    
+    navigationController?.setToolbarHidden(true, animated: true)
+  }
+  
   // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return language.keyboards!.count
+    return lexicalModels!.count
   }
-
+  
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return 1
   }
-
+  
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "Cell"
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       return cell
     }
-
+    
     let cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
     selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
     cell.selectedBackgroundView = selectionColor
     return cell
   }
-
+  
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let keyboard = language.keyboards![indexPath.section]
+    let lexicalModel = lexicalModels![indexPath.section]
     let cell = cell as! KeyboardNameTableViewCell
     cell.indexPath = indexPath
-    cell.textLabel?.text = keyboard.name
-    if isAdded(languageID: language.id, keyboardID: keyboard.id) {
+    cell.textLabel?.text = lexicalModel.name
+    if isAdded(languageID: language.id, lexicalModelID: lexicalModel.id) {
       cell.accessoryType = .checkmark
       cell.isUserInteractionEnabled = false
       cell.textLabel?.isEnabled = false
@@ -92,48 +104,47 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = true
     }
-
-    let kbState = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    
+    let kbState = Manager.shared.stateForLexicalModel(withID: lexicalModel.id)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
-
+  
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
-    let keyboardIndex = indexPath.section
-    let keyboard = language.keyboards![keyboardIndex]
-
-    let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    let lexicalModelIndex = indexPath.section
+    let lexicalModel = lexicalModels![lexicalModelIndex]
+    
+    let state = Manager.shared.stateForLexicalModel(withID: lexicalModel.id)
     if state != .downloading {
       if state == .needsDownload {
         isUpdate = false
       } else {
         isUpdate = true
       }
-    
-        let alertController = UIAlertController(title: "\(language.name): \(keyboard.name)",
-                                                message: "Would you like to download this keyboard?",
-                                                preferredStyle: UIAlertControllerStyle.alert)
-        alertController.addAction(UIAlertAction(title: "Cancel",
-                                                style: UIAlertActionStyle.cancel,
-                                                handler: nil))
-        alertController.addAction(UIAlertAction(title: "Download",
-                                                style: UIAlertActionStyle.default,
-                                                handler: {_ in self.downloadHandler(keyboardIndex)} ))
-        
-        self.present(alertController, animated: true, completion: nil)
+      
+      let alertController = UIAlertController(title: "\(language.name): \(lexicalModel.name)",
+        message: "Would you like to download this dictionary?",
+        preferredStyle: UIAlertControllerStyle.alert)
+      alertController.addAction(UIAlertAction(title: "Cancel",
+                                              style: UIAlertActionStyle.cancel,
+                                              handler: nil))
+      alertController.addAction(UIAlertAction(title: "Download",
+                                              style: UIAlertActionStyle.default,
+                                              handler: {_ in self.downloadHandler(lexicalModelIndex)} ))
+      
+      self.present(alertController, animated: true, completion: nil)
     }
   }
-
-  func downloadHandler(_ keyboardIndex: Int) {
-    Manager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
-                                      languageID: language.id, isUpdate: isUpdate)
+  
+  func downloadHandler(_ lexicalModelIndex: Int) {
+    Manager.shared.downloadLexicalModelPackage(string: (lexicalModels?[lexicalModelIndex].packageFilename)!)
   }
-
-  private func keyboardDownloadStarted() {
-    log.info("keyboardDownloadStarted: LanguageDetailViewController")
+  
+  private func lexicalModelDownloadStarted() {
+    log.info("lexicalModelDownloadStarted: LanguageLMDetailViewController")
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
-
+    
     let toolbarFrame = navigationController!.toolbar.frame
     let labelFrame = CGRect(origin: toolbarFrame.origin,
                             size: CGSize(width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7))
@@ -146,14 +157,14 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
                               .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
     label.tag = toolbarLabelTag
-
+    
     let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     indicatorView.center = CGPoint(x: toolbarFrame.width - indicatorView.frame.width,
                                    y: toolbarFrame.height * 0.5)
     indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
     indicatorView.tag = toolbarActivityIndicatorTag
     indicatorView.startAnimating()
-
+    
     navigationController?.toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
     navigationController?.toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
     navigationController?.toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
@@ -161,30 +172,30 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.toolbar.addSubview(indicatorView)
     navigationController?.setToolbarHidden(false, animated: true)
   }
-
-  private func keyboardDownloadFailed() {
-    log.info("keyboardDownloadFailed: LanguageDetailViewController")
+  
+  private func lexicalModelDownloadFailed() {
+    log.info("lexicalModelDownloadFailed: LanguageLMDetailViewController")
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
-
-  private func loadUserKeyboards() {
-    guard let userKbList = Storage.active.userDefaults.userKeyboards, !userKbList.isEmpty else {
-      userKeyboards = [:]
+  
+  private func loadUserLexicalModels() {
+    guard let userLmList = Storage.active.userDefaults.userLexicalModels, !userLmList.isEmpty else {
+      userLexicalModels = [:]
       return
     }
-
-    userKeyboards = [:]
-    for kb in userKbList {
-      let dictKey = "\(kb.languageID)_\(kb.id)"
-      userKeyboards[dictKey] = kb
+    
+    userLexicalModels = [:]
+    for lm in userLmList {
+      let dictKey = "\(lm.languageID)_\(lm.id)"
+      userLexicalModels[dictKey] = lm
     }
   }
-
-  private func isAdded(languageID: String?, keyboardID: String?) -> Bool {
-    guard let languageID = languageID, let keyboardID = keyboardID else {
+  
+  private func isAdded(languageID: String?, lexicalModelID: String?) -> Bool {
+    guard let languageID = languageID, let lexicalModelID = lexicalModelID else {
       return false
     }
-    return userKeyboards["\(languageID)_\(keyboardID)"] != nil
+    return userLexicalModels["\(languageID)_\(lexicalModelID)"] != nil
   }
 }

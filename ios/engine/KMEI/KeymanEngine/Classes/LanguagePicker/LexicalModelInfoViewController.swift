@@ -24,7 +24,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   
     infoArray = [[String: String]]()
     infoArray.append([
-        "title": "Model version",
+        "title": "Dictionary version",
         "subtitle": lexicalModelVersion
         ])
   
@@ -35,7 +35,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
           ])
     }
     infoArray.append([
-        "title": "Uninstall model",
+        "title": "Uninstall dictionary",
         "subtitle": ""
         ])
   }
@@ -135,7 +135,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   }
   
   private func showDeleteLexicalModel() {
-    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this lexical model?",
+    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this dictionary?",
                                             preferredStyle: UIAlertControllerStyle.alert)
     alertController.addAction(UIAlertAction(title: "Cancel",
                                             style: UIAlertActionStyle.cancel,
