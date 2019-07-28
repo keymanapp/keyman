@@ -1,10 +1,9 @@
 # Keyman for Android
 
-## 12.0 alpha
+## 2019-07-29 12.0 beta
 * Add new "Settings" menu (#1751)
-* Update compile and target Android SDK version to 28 (#1654)
-* Add feature to install lexical model packages (#1641, 1653)
-* Started work on Keyman for Android 12.
+* Add predictive text support (#1641, #1653)
+* Minimum supported Android version is now 4.4 (KitKat) (#1905)
 
 ## 2019-06-28 11.0.2108 stable
 * Changes:
