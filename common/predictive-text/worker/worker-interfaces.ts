@@ -144,8 +144,8 @@ interface WorkerInternalModel {
    * supported, no suggestions requiring this feature should be produced by the model.
    * 
    * Returns a `Configuration` object detailing the capabilities the model plans to
-   * actually utilize, which must be more restrictive than those indicated within
-   * the provided `Capabilities` object.
+   * actually utilize, which must be as restrictive or more restrictive than those 
+   * indicated within the provided `Capabilities` object.
    * @param capabilities 
    */
   configure(capabilities: Capabilities): Configuration;
@@ -177,7 +177,7 @@ interface WorkerInternalModel {
   /**
    * Performs a wordbreak operation given the current context state, returning whatever word
    * or word fragment exists that starts before the caret but after the most recent whitespace
-   * preceedin the caret.
+   * preceding the caret.  If no such text exists, the the empty string is returned.
    * 
    * This function is designed for use in generating display text for 'keep' `Suggestions`
    * and display text for reverting any previously-applied `Suggestions`.
