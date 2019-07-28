@@ -1,6 +1,6 @@
 # Keyman for Android
 
-## 2019-07-29 12.0 beta
+## 2019-07-29 12.0.2200 beta
 * Add new "Settings" menu (#1751)
 * Add predictive text support (#1641, #1653)
 * Minimum supported Android version is now 4.4 (KitKat) (#1905)
