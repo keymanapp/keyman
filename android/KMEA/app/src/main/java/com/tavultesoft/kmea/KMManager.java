@@ -1575,6 +1575,8 @@ public final class KMManager {
         }, 2000);
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
+
+        SystemKeyboard.callJavascriptAfterLoad();
       }
     }
 
