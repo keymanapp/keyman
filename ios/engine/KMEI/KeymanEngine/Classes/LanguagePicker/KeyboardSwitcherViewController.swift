@@ -13,7 +13,7 @@ import UIKit
 private let toolbarButtonTag = 100
 
 class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
+  public var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
   public var accessoryType: UITableViewCellAccessoryType = .none
 
   override func viewDidLoad() {
@@ -37,7 +37,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     scroll(toSelectedKeyboard: false)
   }
   
-  private func scroll(toSelectedKeyboard animated: Bool) {
+  public func scroll(toSelectedKeyboard animated: Bool) {
     let index = userKeyboards.index { kb in
       return Manager.shared.currentKeyboardID == kb.fullID
     }
@@ -110,7 +110,12 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     Manager.shared.dismissKeyboardPicker(self)
   }
   
-  private func loadUserKeyboards() {
+  // never called but on the subclass
+  public func showAddKeyboard() {
+  }
+
+  
+  public func loadUserKeyboards() {
     userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
     tableView.reloadData()
   }

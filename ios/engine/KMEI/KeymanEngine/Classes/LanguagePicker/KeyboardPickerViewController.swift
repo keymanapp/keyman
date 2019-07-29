@@ -12,7 +12,7 @@ private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
-class KeyboardPickerViewController: KeyboardPickerViewController {
+class KeyboardPickerViewController: KeyboardSwitcherViewController {
   private var updateQueue: [InstallableKeyboard]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
@@ -23,7 +23,7 @@ class KeyboardPickerViewController: KeyboardPickerViewController {
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -382,7 +382,7 @@ class KeyboardPickerViewController: KeyboardPickerViewController {
     navigationController?.setToolbarHidden(true, animated: true)
   }
 
-  func showAddKeyboard() {
+  override func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
     let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
