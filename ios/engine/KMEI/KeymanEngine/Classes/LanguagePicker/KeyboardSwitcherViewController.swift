@@ -12,49 +12,106 @@ import UIKit
 
 private let toolbarButtonTag = 100
 
-class KeyboardSwitcherViewController: KeyboardPickerViewController {
+class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate {
+  private var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
+  public var accessoryType: UITableViewCellAccessoryType = .none
 
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    title = "Keyboards"
+    
+    self.accessoryType = .none
+    
     // remove UI that adds keyboards
+    //NEEDED?
     navigationItem.rightBarButtonItem = nil
     
-    // maybe remove, but for now, distinguish this picker via color
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.8, green: 0.25,
-                                                          blue: 0.5, alpha: 0.4)
-    // I don't think we need to remove the download observers
-    //  they just won't be used if we never start a download
-    //keyboardDownloadStartedObserver = nil
-
     log.info("didLoad: KeyboardSwitcherViewController")
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-    // remove the update button, if any
-    navigationController?.toolbar?.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    loadUserKeyboards()
+    scroll(toSelectedKeyboard: false)
+  }
+  
+  private func scroll(toSelectedKeyboard animated: Bool) {
+    let index = userKeyboards.index { kb in
+      return Manager.shared.currentKeyboardID == kb.fullID
+    }
+    
+    if let index = index {
+      let indexPath = IndexPath(row: index, section: 0)
+      tableView.scrollToRow(at: indexPath, at: .middle, animated: animated)
+      
+    }
+  }
+  
+  // MARK: - Table view data source UITableViewDataSource
+  
+  override func numberOfSections(in tableView: UITableView) -> Int {
+    return 1
+  }
+  
+  // MARK: - table view delegate UITableViewDelegate
 
-    log.info("didAppear: KeyboardSwitcherViewController")
+  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return userKeyboards.count
   }
   
-  
-  // override to make it never try to update
-  //NOTE: might we want it to check?
-  override func checkUpdates() -> Bool {
-    return false
+  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cellIdentifier = "Cell"
+    if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+      return cell
+    }
+    
+    let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+    let selectionColor = UIView()
+    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    cell.selectedBackgroundView = selectionColor
+    return cell
   }
   
-  override func tableView(_ tableView: UITableView,
-                          accessoryButtonTappedForRowWith indexPath: IndexPath) {
-    // do not show keyboard info, as it has the ability to delete it
-    //NOTE: we may wish to show info without that ability, but for now, this is easier
-    return
-  }
-
   override func tableView(_ tableView: UITableView,
                           willDisplay cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
-    super.tableView(tableView, willDisplay: cell, forRowAt: indexPath)
-    cell.accessoryType = .none
+    cell.selectionStyle = .none
+    let kb = userKeyboards[indexPath.row]
+    
+    cell.textLabel?.text = kb.languageName
+    cell.detailTextLabel?.text = kb.name
+    cell.tag = indexPath.row
+    
+    if Manager.shared.currentKeyboardID == kb.fullID {
+      cell.selectionStyle = .blue
+      cell.isSelected = true
+      cell.accessoryType = self.accessoryType
+    } else {
+      cell.selectionStyle = .none
+      cell.isSelected = false
+      cell.accessoryType = self.accessoryType
+    }
+  }
+  
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    switchKeyboard(indexPath.row)
+  }
+  
+  // MARK: - keyboard switching
+  
+  public func switchKeyboard(_ index: Int) {
+    // Switch keyboard and register to user defaults.
+    if Manager.shared.setKeyboard(userKeyboards[index]) {
+      tableView.reloadData()
+    }
+    
+    Manager.shared.dismissKeyboardPicker(self)
+  }
+  
+  private func loadUserKeyboards() {
+    userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
+    tableView.reloadData()
   }
 }
