@@ -48,6 +48,11 @@
      *  This should simplify a search term into a key.
      */
     searchTermToKey?: (searchTerm: string) => string;
+
+    /**
+     * Any punctuation to expose to the user.
+     */
+    punctuation?: LexicalModelPunctuation;
   }
 
   /**
@@ -72,6 +77,7 @@
     configuration: Configuration;
     private _trie: Trie;
     readonly breakWords: WordBreakingFunction;
+    readonly punctuation?: LexicalModelPunctuation;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(
@@ -80,6 +86,7 @@
         options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
+      this.punctuation = options.punctuation;
     }
 
     configure(capabilities: Capabilities): Configuration {
