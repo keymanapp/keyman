@@ -1,9 +1,11 @@
 class ModelCompositor {
   private lexicalModel: WorkerInternalModel;
   private static readonly MAX_SUGGESTIONS = 12;
+  private readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: WorkerInternalModel) {
     this.lexicalModel = lexicalModel;
+    this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
   }
 
   protected isWhitespace(transform: Transform): boolean {
@@ -28,6 +30,7 @@ class ModelCompositor {
 
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
     let suggestionDistribution: Distribution<Suggestion> = [];
+    let punctuation = this.punctuation;
 
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
@@ -49,7 +52,6 @@ class ModelCompositor {
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
-    let punctuation = this.determinePunctuationFromModel(this.lexicalModel);
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
@@ -156,14 +158,14 @@ class ModelCompositor {
   /**
    * Returns the punctuation used for this model, filling out unspecified fields
    */
-  private determinePunctuationFromModel(model: WorkerInternalModel): LexicalModelPunctuation {
+  private static determinePunctuationFromModel(model: WorkerInternalModel): LexicalModelPunctuation {
     let defaults = DEFAULT_PUNCTUATION;
 
     // Use the defaults of the model does not provide any punctuation at all.
     if (!model.punctuation)
       return defaults;
 
-    let specifiedPunctuation = this.lexicalModel.punctuation;
+    let specifiedPunctuation = model.punctuation;
     let insertAfterWord = specifiedPunctuation.insertAfterWord;
     if (insertAfterWord !== '' && !insertAfterWord) {
       insertAfterWord = defaults.insertAfterWord;
