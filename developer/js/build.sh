@@ -8,7 +8,7 @@
 EX_USAGE=64
 
 
-# Build the worker and the main script.
+# Build the main script.
 build () {
   npm run build || fail "Could not build top-level JavaScript file."
 }
@@ -18,7 +18,7 @@ display_usage ( ) {
   echo "       $0 -help"
   echo
   echo "  -help               displays this screen and exits"
-  echo "  -test               runs unit and integration tests after building"
+  echo "  -test               runs unit tests after building"
 }
 
 ################################ Main script ################################
