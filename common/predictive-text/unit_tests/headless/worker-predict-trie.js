@@ -6,6 +6,27 @@ var assert = require('chai').assert;
 var TrieModel = require('../../build/intermediate').models.TrieModel;
 
 describe('LMLayerWorker trie model for word lists', function() {
+  describe('instantiation', function () {
+    it('should expose the punctuation object', function () {
+      var spaceMark = "👩🏻‍🚀";
+      var openQuote = "🌜";
+      var closeQuote = "🌛";
+
+      var model = new TrieModel(jsonFixture('tries/english-1000'), {
+        punctuation: {
+          insertAfterWord: spaceMark,
+          quotesForKeepSuggestion: {
+            open: openQuote, close: closeQuote
+          }
+        }
+      })
+      
+      assert.equal(model.punctuation.insertAfterWord, spaceMark);
+      assert.equal(model.punctuation.quotesForKeepSuggestion.open, openQuote);
+      assert.equal(model.punctuation.quotesForKeepSuggestion.close, closeQuote);
+    })
+  });
+
   describe('prediction', function () {
     var MIN_SUGGESTIONS = 3;
 
