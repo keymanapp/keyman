@@ -49,7 +49,7 @@ class ModelCompositor {
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
-    let punctuation = this.determinePunctuationFromModel();
+    let punctuation = this.determinePunctuationFromModel(this.lexicalModel);
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
@@ -153,8 +153,30 @@ class ModelCompositor {
     return suggestions;
   }
 
-  private determinePunctuationFromModel() {
-    return this.lexicalModel.punctuation || DEFAULT_PUNCTUATION;
+  /**
+   * Returns the punctuation used for this model, filling out unspecified fields
+   */
+  private determinePunctuationFromModel(model: WorkerInternalModel): LexicalModelPunctuation {
+    let defaults = DEFAULT_PUNCTUATION;
+
+    // Use the defaults of the model does not provide any punctuation at all.
+    if (!model.punctuation)
+      return defaults;
+
+    let specifiedPunctuation = this.lexicalModel.punctuation;
+    let insertAfterWord = specifiedPunctuation.insertAfterWord;
+    if (insertAfterWord !== '' && !insertAfterWord) {
+      insertAfterWord = defaults.insertAfterWord;
+    }
+
+    let quotesForKeepSuggestion = specifiedPunctuation.quotesForKeepSuggestion;
+    if (!quotesForKeepSuggestion) {
+      quotesForKeepSuggestion = defaults.quotesForKeepSuggestion;
+    }
+
+    return {
+      insertAfterWord, quotesForKeepSuggestion
+    }
   }
 }
 
