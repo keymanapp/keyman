@@ -190,6 +190,12 @@ final class KMKeyboard extends WebView {
 
   public void loadKeyboard() {
     keyboardSet = false;
+
+    if(keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
+      KMManager.InAppKeyboardLoaded = false;
+    else
+      KMManager.SystemKeyboardLoaded = false;
+
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
     setBackgroundColor(0);

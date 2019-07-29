@@ -1301,9 +1301,9 @@ public final class KMManager {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-      if (url.startsWith("file")) { // endsWith(KMFilename_KeyboardHtml)) {
+      /*if (url.startsWith("file")) { // endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = false;
-      }
+      }*/
     }
 
     @Override
@@ -1519,9 +1519,9 @@ public final class KMManager {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-      if (url.endsWith(KMFilename_KeyboardHtml)) {
+      /*if (url.endsWith(KMFilename_KeyboardHtml)) {
         SystemKeyboardLoaded = false;
-      }
+      }*/
     }
 
     @Override
