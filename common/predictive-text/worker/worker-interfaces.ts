@@ -151,9 +151,9 @@ interface WorkerInternalModel {
   configure(capabilities: Capabilities): Configuration;
 
   /**
-   * Generates predictive suggestions corresponding to the state of context resulting from
-   * applying a potential transform to the current context state.  This transform may correspond 
-   * to a 'correction' of a recent keystroke rather than one actually received.
+   * Generates predictive suggestions corresponding to the state of context after the proposed
+   * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
+   * keystroke rather than one actually received.
    * 
    * This method should NOT attempt to perform any form of correction; this is modeled within a
    * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be
