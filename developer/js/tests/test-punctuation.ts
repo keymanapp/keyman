@@ -2,7 +2,7 @@ import LexicalModelCompiler from '../';
 import {assert} from 'chai';
 import 'mocha';
 
-const path = require('path');
+import path = require('path');
 
 
 describe('LexicalModelCompiler', function () {
@@ -24,8 +24,9 @@ describe('LexicalModelCompiler', function () {
       // Check that the punctuation actually made into the code:
       assert.match(code, /«/);
       assert.match(code, /»/);
-      // TODO: more robust assertions?
+      // Ensure we inserted that OGHAM SPACE MARK!
       assert.match(code, /\u1680/);
+      // TODO: more robust assertions?
     });
   })
 });

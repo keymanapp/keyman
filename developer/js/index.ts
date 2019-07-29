@@ -258,7 +258,9 @@ export default class LexicalModelCompiler {
         if (modelSource.searchTermToKey) {
           func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
         }
-        func += `  punctuation: ${JSON.stringify(punctuation)},\n`;
+        if (modelSource.punctuation) {
+          func += `  punctuation: ${JSON.stringify(punctuation)},\n`;
+        }
         func += `}));\n`;
         break;
       default:
