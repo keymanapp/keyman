@@ -49,7 +49,7 @@ class ModelCompositor {
     let postContext = models.applyTransform(inputTransform, context);
     let keepOptionText = this.lexicalModel.wordbreak(postContext);
     let keepOption: Suggestion = null;
-    let punctuation = this.lexicalModel.punctuation || DEFAULT_PUNCTUATION;
+    let punctuation = this.determinePunctuationFromModel();
 
     for(let alt of transformDistribution) {
       let transform = alt.sample;
@@ -151,6 +151,10 @@ class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  private determinePunctuationFromModel() {
+    return this.lexicalModel.punctuation || DEFAULT_PUNCTUATION;
   }
 }
 
