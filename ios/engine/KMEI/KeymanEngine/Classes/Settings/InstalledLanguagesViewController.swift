@@ -360,13 +360,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     tableView.reloadData()
  }
   
-  private func isAdded(languageID: String?, keyboardID: String?) -> Bool {
-    guard let languageID = languageID, let keyboardID = keyboardID else {
-      return false
-    }
-    return userKeyboards["\(languageID)_\(keyboardID)"] != nil
-  }
-  
   private func showConnectionErrorAlert() {
     dismissActivityView()
     let alertController = UIAlertController(title: "Connection Error",
