@@ -1308,7 +1308,13 @@ public final class KMManager {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      Log.d("KMEA", "onPageFinished: [inapp] " + url);
+      shouldOverrideUrlLoading(view, url);
+    }
+
+    private void pageLoaded(WebView view, String url) {
       String langId = KMManager.KMKey_LanguageID;
+      Log.d("KMEA", "pageLoaded: [inapp] " + url);
       if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
 
@@ -1351,13 +1357,14 @@ public final class KMManager {
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
       }
-
-      shouldOverrideUrlLoading(view, url);
     }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      if (url.indexOf("hideKeyboard") >= 0) {
+      Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: "+url);
+      if(url.indexOf("pageLoaded") >= 0) {
+        pageLoaded(view, url);
+      } else if (url.indexOf("hideKeyboard") >= 0) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
           InAppKeyboard.dismissHelpBubble();
           KMTextView textView = (KMTextView) KMTextView.activeView;
@@ -1519,15 +1526,18 @@ public final class KMManager {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-      /*if (url.endsWith(KMFilename_KeyboardHtml)) {
-        SystemKeyboardLoaded = false;
-      }*/
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      Log.d("KMEA", "onPageFinished: [system] " + url);
+      shouldOverrideUrlLoading(view, url);
+    }
+
+    private void pageLoaded(WebView view, String url) {
       String langId = KMManager.KMKey_LanguageID;
-      if (url.endsWith(KMFilename_KeyboardHtml)) {
+      Log.d("KMEA", "pageLoaded: [system] " + url);
+      if (url.startsWith("file:")) {
         SystemKeyboardLoaded = true;
         if (!SystemKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -1566,13 +1576,13 @@ public final class KMManager {
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
       }
-
-      shouldOverrideUrlLoading(view, url);
     }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      if (url.indexOf("hideKeyboard") >= 0) {
+      if(url.indexOf("pageLoaded") >= 0) {
+        pageLoaded(view, url);
+      } else if (url.indexOf("hideKeyboard") >= 0) {
         SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
       } else if (url.indexOf("globeKeyAction") >= 0) {
