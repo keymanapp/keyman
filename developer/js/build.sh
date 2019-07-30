@@ -3,6 +3,9 @@
 # Compiles the developer tools, including the language model compilers.
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
 # Include some helper functions from resources
 . ../../resources/shellHelperFunctions.sh
 EX_USAGE=64
