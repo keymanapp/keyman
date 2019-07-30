@@ -185,7 +185,7 @@ class ModelCompositor {
 /**
  * The default punctuation and spacing produced by the model.
  */
-const DEFAULT_PUNCTUATION = {
+const DEFAULT_PUNCTUATION: LexicalModelPunctuation = {
   quotesForKeepSuggestion: { open: `“`, close: `”`},
   insertAfterWord: " " ,
 };
