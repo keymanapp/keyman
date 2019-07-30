@@ -16,7 +16,7 @@ open class SettingsViewController: UITableViewController {
     super.viewWillAppear(animated)
     
     loadUserLanguages()
-    log.info("didAppear: SettingsViewController (actually willAppear)")
+    log.info("willAppear: SettingsViewController")
  }
   
   override open func viewDidLoad() {
@@ -256,7 +256,13 @@ open class SettingsViewController: UITableViewController {
   }
   
   // MARK: - language access -
-  private func installed2API(_ installedList: [InstallableLexicalModel]) -> [LexicalModel] {
+  
+  /** returns an array of LexicalModel created from an array of InstallableLexicalModel
+   *  @param installedList: The InstallableLexicalModel are probably already installed
+   *  The returned LexicalModels are not complete (usually we go the other way round)
+   *    but sufficient for future API calls
+   */
+  public static func installed2API(_ installedList: [InstallableLexicalModel]) -> [LexicalModel] {
     var returnList = [LexicalModel]()
     for ilm in installedList {
       returnList.append(LexicalModel(id: ilm.id, name: ilm.name, license: "", version: ilm.version, languages: [], authorName: "", fileSize: 0, filename: "no filename", sourcePath: nil, authorEmail: nil, description: nil, packageFileSize: 0, packageFilename: "", packageIncludes: nil, isDefault: false, lastModified: nil, minKeymanVersion: nil))
@@ -283,7 +289,7 @@ open class SettingsViewController: UITableViewController {
       }
       let userDefaults : UserDefaults = Storage.active.userDefaults
       let lmListInstalled: [InstallableLexicalModel] = userDefaults.userLexicalModelsForLanguage(languageID: l) ?? []
-      let lmList = installed2API(lmListInstalled)
+      let lmList = SettingsViewController.installed2API(lmListInstalled)
       keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: lmList, font: nil, oskFont: nil)
     }
     // there shouldn't be any lexical models for languages that don't have a keyboard installed

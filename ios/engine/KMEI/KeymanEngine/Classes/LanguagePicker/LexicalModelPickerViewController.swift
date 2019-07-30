@@ -15,7 +15,7 @@ private let toolbarActivityIndicatorTag = 102
 
 class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelegate {
   private var userLexicalModels: [InstallableLexicalModel] = [InstallableLexicalModel]()
-  public var language: Language? = nil
+  public var language: Language!
   private var updateQueue: [InstallableLexicalModel]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
@@ -24,17 +24,19 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
   
+  public init(_ language: Language) {
+    self.language = language
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    if let langName = language?.name {
-      title = "\(langName) Lexical Models"
-    } else {
-      title = "Lexical Models"
-    }
-    if language == nil {
-      setIsDoneButtonEnabled(false)
-    }
+    title = "\(language.name) Dictionaries"
     isDidUpdateCheck = false
     updateQueue = nil
     if Manager.shared.canAddNewLexicalModels {
@@ -137,7 +139,6 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     if Manager.shared.removeLexicalModel(at: globalIndex) {
       loadUserLexicalModels()
     }
-    setIsDoneButtonEnabled(true)
   }
   
   override func tableView(_ tableView: UITableView,
@@ -146,9 +147,6 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   func showLexicalModelInfoView(with index: Int) {
-    if language == nil {
-      setIsDoneButtonEnabled(true)
-    }
     let lm = userLexicalModels[index]
     let version = lm.version
     
@@ -178,7 +176,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     if Manager.shared.currentLexicalModelID == lm.fullID {
       cell.selectionStyle = .blue
       cell.isSelected = true
-      cell.accessoryType = .checkmark
+      cell.accessoryType = .detailDisclosureButton
     } else {
       cell.selectionStyle = .none
       cell.isSelected = false
@@ -236,14 +234,14 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
         }
         updateQueue = nil
         let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-        label?.text = "Lexical models successfully updated!"
+        label?.text = "Dictionaries successfully updated!"
         navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
         Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
                              userInfo: nil, repeats: false)
       }
     } else {
       let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-      label?.text = "Lexical model successfully downloaded!"
+      label?.text = "Dictionary successfully downloaded!"
       navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
       Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
                            userInfo: nil, repeats: false)
@@ -276,9 +274,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     let title: String
     if view == navigationController?.topViewController?.view {
       updateQueue = nil
-      title = "Lexical model Update Error"
+      title = "Dictionary Update Error"
     } else {
-      title = "Lexical model Download Error"
+      title = "Dictionary Download Error"
     }
     navigationController?.setToolbarHidden(true, animated: true)
     
@@ -399,8 +397,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func scroll(toSelectedLexicalModel animated: Bool) {
-    let index = userLexicalModels.index { kb in
-      return Manager.shared.currentLexicalModelID == kb.fullID
+    let index = userLexicalModels.index { lm in
+      return Manager.shared.currentLexicalModelID == lm.fullID
     }
     
     if let index = index {
@@ -428,13 +426,32 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   func showAddLexicalModel() {
-    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
-    button?.isEnabled = false
-    let vc = LanguageViewController(Manager.shared.apiLexicalModelRepository) //may need to be different for models
-    navigationController?.pushViewController(vc, animated: true)
-    if language == nil {
-      setIsDoneButtonEnabled(true)
+    //get list of lexical models for this languageID and show it
+    func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
+      if let error = error {
+        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error as! String))
+        DispatchQueue.main.async {
+          self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
+        }
+      } else if nil == lexicalModels {
+        log.info("No lexical models available for language \(language.id) (nil)")
+      } else if 0 == lexicalModels?.count {
+        log.info("No lexical models available for language \(language.id) (empty)")
+      } else {
+        log.info("Fetched lexical model list for "+language.id+".")
+        // show the list of lexical models (on the main thread)
+        DispatchQueue.main.async {
+          let button: UIButton? = (self.navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
+          button?.isEnabled = false
+          let vc = LanguageLMDetailViewController(language: self.language)
+          vc.lexicalModels = lexicalModels!
+          self.navigationController?.pushViewController(vc, animated: true)
+        }
+      }
     }
+    
+    Manager.shared.apiLexicalModelRepository.fetchList(languageID: language.id, completionHandler: listCompletionHandler)
   }
+  
 }
 

@@ -135,8 +135,54 @@ interface LMLayerWorkerState {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
+  /**
+   * Processes `config` messages, configuring the newly-loaded model based on the host
+   * platform's capability restrictions.
+   * 
+   * This allows the model to configure its suggestions according to what the platform
+   * allows the host to actually perform - for example, if post-caret deletions are not
+   * supported, no suggestions requiring this feature should be produced by the model.
+   * 
+   * Returns a `Configuration` object detailing the capabilities the model plans to
+   * actually utilize, which must be as restrictive or more restrictive than those 
+   * indicated within the provided `Capabilities` object.
+   * @param capabilities 
+   */
   configure(capabilities: Capabilities): Configuration;
+
+  /**
+   * Generates predictive suggestions corresponding to the state of context after the proposed
+   * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
+   * keystroke rather than one actually received.
+   * 
+   * This method should NOT attempt to perform any form of correction; this is modeled within a
+   * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be
+   * have "this" for a suggestion ("e" has been 'corrected' to "i"), while "there" would be 
+   * a reasonable prediction.  
+   * 
+   * However, addition of diacritics to characters (which may transform the underlying char code 
+   * when Unicode-normalized) is permitted.  For example, "pur" + "e" may reasonably predict
+   * "purée", where "e" has been transformed to "é" as part of the suggestion.
+   * 
+   * When both prediction and correction are permitted, said component (the `ModelCompositor`) will 
+   * generally call this method once per 'likely' generated corrected state of the context, 
+   * utilizing the results to compute an overall likelihood across all possible suggestions.
+   * @param transform A Transform corresponding to a recent input keystroke
+   * @param context A depiction of the context to which `transform` is applied.
+   * @returns A probability distribution (`Distribution<Suggestion>`) on the resulting `Suggestion` 
+   * space for use in determining the most optimal overall suggestions.
+   */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
+
+  /**
+   * Performs a wordbreak operation given the current context state, returning whatever word
+   * or word fragment exists that starts before the caret but after the most recent whitespace
+   * preceding the caret.  If no such text exists, the empty string is returned.
+   * 
+   * This function is designed for use in generating display text for 'keep' `Suggestions`
+   * and display text for reverting any previously-applied `Suggestions`.
+   * @param context 
+   */
   wordbreak(context: Context): USVString;
 
   /**

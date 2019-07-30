@@ -14,7 +14,7 @@
     "url": "git+https://github.com/eddieantonio/keyman-lmlayer-prototype.git"
   },
   "author": "Eddie Antonio Santos <easantos@ualberta.ca> (http://eddieantonio.ca/)",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/eddieantonio/keyman-lmlayer-prototype/issues"
   },
