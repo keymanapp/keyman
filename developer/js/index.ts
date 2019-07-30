@@ -244,11 +244,9 @@ export default class LexicalModelCompiler {
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
         break;
       case "fst-foma-1.0":
-        (oc as LexicalModelCompiledFst).fst = Buffer.from(sources.join('')).toString('base64');
-        this.logError('Unimplemented model format '+modelSource.format);
+        this.logError('Unimplemented model format ' + modelSource.format);
         return false;
-      case "trie-1.0": // TODO: in lexical-models, rollback all trie-2.0 models to use trie-1.0!
-      case 'trie-2.0':
+      case "trie-1.0":
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(sources, modelSource.searchTermToKey)
         }, {\n`;
