@@ -177,7 +177,7 @@ interface WorkerInternalModel {
   /**
    * Performs a wordbreak operation given the current context state, returning whatever word
    * or word fragment exists that starts before the caret but after the most recent whitespace
-   * preceding the caret.  If no such text exists, the the empty string is returned.
+   * preceding the caret.  If no such text exists, the empty string is returned.
    * 
    * This function is designed for use in generating display text for 'keep' `Suggestions`
    * and display text for reverting any previously-applied `Suggestions`.
