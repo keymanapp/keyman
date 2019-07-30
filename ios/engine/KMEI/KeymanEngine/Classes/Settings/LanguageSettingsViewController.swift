@@ -153,9 +153,9 @@ class LanguageSettingsViewController: UITableViewController {
     var title: String
     switch (section) {
     case 0:
-      title = "keyboards"
+      title = "Keyboards"
     case 1:
-      title = "language settings"
+      title = "Language settings"
     default:
       title = "unknown header"
     }
