@@ -8,7 +8,7 @@
     }
 
     Model.punctuation = {
-      quotesForKeepSuggestion: { open: `“`, close: `”`},
+      quotesForKeepSuggestion: { open: '“', close: '”'},
       // Important! Set this, or else the model compositor will
       // insert something for us!
       insertAfterWord: "",
