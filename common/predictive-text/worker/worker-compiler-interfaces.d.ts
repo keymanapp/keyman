@@ -26,7 +26,7 @@ interface WordBreakingFunction {
 }
 
 /**
- * A span of text in a phrase. This is usually meant to reprent words from a
+ * A span of text in a phrase. This is usually meant to represent words from a
  * pharse.
  */
 interface Span {
