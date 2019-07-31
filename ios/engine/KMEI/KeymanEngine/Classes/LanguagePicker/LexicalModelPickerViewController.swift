@@ -319,9 +319,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     tableView.reloadData()
   }
   
-  private func isAdded(languageID langID: String, lexicalModelID lmID: String) -> Bool {
-    return userLexicalModels.contains { lm in lm.languageID == langID && lm.id == lmID }
-  }
+  // MARK: - lexical model adding functionaliry
   
   @objc func doneClicked(_ sender: Any) {
     Manager.shared.dismissLexicalModelPicker(self)
