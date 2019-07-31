@@ -27,6 +27,7 @@
  */
 
 /// <reference path="../message.d.ts" />
+/// <reference path="./worker-compiler-interfaces.d.ts" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
@@ -184,6 +185,14 @@ interface WorkerInternalModel {
    * @param context 
    */
   wordbreak(context: Context): USVString;
+
+  /**
+   * Punctuation and presentational settings that the underlying lexical model
+   * expects to be applied at higher levels. e.g., the ModelCompositor.
+   * 
+   * @see LexicalModelPunctuation
+   */
+  readonly punctuation?: LexicalModelPunctuation;
 }
 
 /**
@@ -195,43 +204,4 @@ interface WorkerInternalModelConstructor {
    * capabilities, plus any parameters they require.
    */
   new(...modelParameters: any[]): WorkerInternalModel;
-}
-
-/**
- * A simple word breaking function takes a phrase, and splits it into "words",
- * for whatever definition of "word" is usable for the language model.
- *
- * For example:
- *
- *   getText(breakWordsEnglish("Hello, world!")) == ["Hello", "world"]
- *   getText(breakWordsCree("ᑕᐻ ᒥᔪ ᑮᓯᑲᐤ ᐊᓄᐦᐨ᙮")) == ["ᑕᐻ", "ᒥᔪ ᑮᓯᑲᐤ""", "ᐊᓄᐦᐨ"]
- *   getText(breakWordsJapanese("英語を話せますか？")) == ["英語", "を", "話せます", "か"]
- *
- * Not all language models take in a configurable word breaking function.
- *
- * @returns an array of spans from the phrase, in order as they appear in the
- *          phrase, each span which representing a word.
- */
-interface WordBreakingFunction {
-  // invariant: span[i].end <= span[i + 1].start
-  // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
-  //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
-  (phrase: USVString): Span[];
-}
-
-/**
- * A span of text in a phrase. This is usually meant to reprent words from a
- * pharse.
- */
-interface Span {
-  // invariant: start < end (empty spans not allowed)
-  readonly start: number;
-  // invariant: end > end (empty spans not allowed)
-  readonly end: number;
-  // invariant: length === end - start
-  readonly length: number;
-  // invariant: text.length === length
-  // invariant: each character is BMP UTF-16 code unit, or is a high surrogate
-  // UTF-16 code unit followed by a low surrogate UTF-16 code unit.
-  readonly text: string;
 }
