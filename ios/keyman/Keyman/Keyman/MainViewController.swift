@@ -285,8 +285,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if UIDevice.current.userInterfaceIdiom == .phone {
       navigationItem.rightBarButtonItems = [moreButton, fixedSpace, browserButton, fixedSpace, actionButton]
     } else {
-      navigationItem.rightBarButtonItems = [infoButton, fixedSpace, getStartedButton, fixedSpace, trashButton,
-          fixedSpace, textSizeButton, fixedSpace, browserButton, fixedSpace, actionButton]
+      navigationItem.rightBarButtonItems = [settingsButton, fixedSpace, infoButton, fixedSpace, getStartedButton,
+      fixedSpace, trashButton, fixedSpace, textSizeButton, fixedSpace, browserButton, fixedSpace, actionButton]
     }
   }
 
