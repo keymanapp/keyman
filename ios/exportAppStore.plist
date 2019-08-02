@@ -7,15 +7,15 @@
     <key>teamID</key>
     <string>3YE4W86L3G</string>
     <key>signingCertificate</key>
-    <string>75E268DBF9EA1618EBC047C82F279E9D027A132F</string>
+    <string>B5388B19BC7040BB9CCBFBA1ED7B685D5733CF7C</string>
     <key>installerSigningCertificate</key>
-    <string>75E268DBF9EA1618EBC047C82F279E9D027A132F</string>
+    <string>B5388B19BC7040BB9CCBFBA1ED7B685D5733CF7C</string>
     <key>provisioningProfiles</key>
     <dict>
         <key>Tavultesoft.Keyman</key>
-        <string>Keyman Distribution (Marc Test)</string>
+        <string>XC iOS: Tavultesoft.Keyman</string>
         <key>Tavultesoft.Keyman.SWKeyboard</key>
-        <string>Keyman Distribution SWKeyboard (Marc Test)</string>
+        <string>XC iOS: Tavultesoft.Keyman.SWKeyboard</string>
     </dict>
     <key>signingStyle</key>
     <string>manual</string>
