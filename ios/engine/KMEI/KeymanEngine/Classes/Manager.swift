@@ -308,6 +308,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       _ = Manager.shared.registerLexicalModel(first_model)
     }
     
+    inputViewController.fixLayout()
+    
     return true
   }
 

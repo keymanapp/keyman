@@ -301,6 +301,11 @@ extension KeymanWebViewController {
     setBannerHeight(to: InputViewController.topBarHeight)
   }
   
+  func showBanner(_ display: Bool) {
+    log.debug("Changing banner's alwaysShow property to \(display).")
+    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
+  }
+  
   func setBannerImage(to path: String) {
     bannerImgPath = path // Save the path in case delayed initializaiton is needed.
     log.debug("Banner image path: '\(path).'")
@@ -512,12 +517,9 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
     log.info("Loaded keyboard.")
     
-    // Now that we've loaded the keyboard page fully, perform any in-page needed init.
-    setBannerImage(to: bannerImgPath)
-    
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
-
+    
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
     var newKb = Defaults.keyboard
     if Manager.shared.currentKeyboardID == nil && !shouldReloadKeyboard {
@@ -532,6 +534,17 @@ extension KeymanWebViewController: KeymanWebDelegate {
       log.info("Setting initial keyboard.")
       _ = Manager.shared.setKeyboard(newKb)
     }
+    
+    if Manager.shared.isSystemKeyboard {
+      showBanner(true)
+    } else {
+      // TODO:  Set banner to visible / not visible based on the toggle in Settings.
+      //        Problem:  we need access to the banner image path there.  It's only set for the system keyboard variant!
+      showBanner(false)
+    }
+    setBannerImage(to: bannerImgPath)
+    // Reset the keyboard's size.
+    keyboardSize = kbSize
     
     fixLayout()
 
