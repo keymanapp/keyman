@@ -261,10 +261,14 @@ extension KeymanWebViewController {
     log.debug("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
+  
+  func deregisterLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
+  }
 
   func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     let stub: [String: Any] = [
-      "id": "LexicalModel_\(lexicalModel.id)",
+      "id": lexicalModel.id,
       "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
       "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
     ]

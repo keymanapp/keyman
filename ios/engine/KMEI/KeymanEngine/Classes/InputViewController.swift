@@ -399,6 +399,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.registerLexicalModel(lm)
   }
   
+  func deregisterLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.deregisterLexicalModel(lm)
+  }
+  
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
   }
