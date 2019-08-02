@@ -507,8 +507,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     guard let lm = removeLexicalModelFromUserList(userDefs: userData, at: index) else {
       return false
     }
-    
+
     removeLexicalModelFromLanguagePreference(userDefs: userData, lm)
+    inputViewController.deregisterLexicalModel(lm);
     // Set a new lexical model if deleting the current one
     let userLexicalModels = userData.userLexicalModels! //removeLexicalModelFromUserList fails above if this is not present
 
