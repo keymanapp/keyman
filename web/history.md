@@ -8,6 +8,19 @@
     * Centralizes code paths to improve parity between hardware and OSK-based keystrokes.
   * In both cases above, significant unit testing was facilitated and has been added as a result, further improving code maintainability into the future.
 * Began adding support for our common LMLayer interface for predictive modeling.
+  * Implemented WebWorker background thread for the heavy lifting; all API calls with relevant return values return Promises.
+  * Provides API for the following language-modeling functions:
+    * predict - Prediction of user's desired word based on context and recent input
+      * Also returns a tagged prediction corresponding to the original context state.
+      * Corrections are currently limited to the most recent input keystroke.
+      * Accepts a probability distribution for the most recent keystroke, which is be used to weight prediction probabilities
+    * wordbreak - Performs wordbreaking on the current context state
+      * A default wordbreaker based on the Unicode specification is provided as a default.
+  * Implements a common "template" for weighted wordlist lexical model functionality:
+    * Accepts a "search term to key" function to facilitate common corrections, such as diacritics,
+    during prediction lookups.
+    * Predictions are weighted based on their frequency and their input likelihood (based on keystroke probabilities).
+  * Accepts fully-specified custom lexical models that do not rely on model "templates."
 * Fix for issue with Mandarin Chinese keyboard's 'picker' UI
 
 ## 2019-02-25 11.0.220 stable

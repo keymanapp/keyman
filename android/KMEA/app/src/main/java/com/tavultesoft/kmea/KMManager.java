@@ -718,11 +718,11 @@ public final class KMManager {
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
       InAppKeyboard.setLayoutParams(params);
-      InAppKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
       SystemKeyboard.setLayoutParams(params);
-      SystemKeyboard.loadUrl(String.format("javascript:enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
   }
@@ -733,13 +733,13 @@ public final class KMManager {
       currentLexicalModel = null;
     }
 
-    String url = String.format("javascript:deregisterModel('%s')", modelID);
-    if (InAppKeyboard != null && InAppKeyboardLoaded) {
-      InAppKeyboard.loadUrl(url);
+    String url = String.format("deregisterModel('%s')", modelID);
+    if (InAppKeyboard != null) { // && InAppKeyboardLoaded) {
+      InAppKeyboard.loadJavascript(url);
     }
 
-    if (SystemKeyboard != null && SystemKeyboardLoaded) {
-      SystemKeyboard.loadUrl(url);
+    if (SystemKeyboard != null) { // && SystemKeyboardLoaded) {
+      SystemKeyboard.loadJavascript(url);
     }
     return true;
   }
@@ -1103,11 +1103,11 @@ public final class KMManager {
   public static void setNumericLayer(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        InAppKeyboard.loadUrl("javascript:setNumericLayer()");
+        InAppKeyboard.loadJavascript("setNumericLayer()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        SystemKeyboard.loadUrl("javascript:setNumericLayer()");
+        SystemKeyboard.loadJavascript("setNumericLayer()");
       }
     }
   }
@@ -1121,14 +1121,14 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
-        InAppKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
+        InAppKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
         result = true;
       }
 
       InAppKeyboardShouldIgnoreTextChange = false;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
-        SystemKeyboard.loadUrl(String.format("javascript:updateKMText('%s')", kmText));
+        SystemKeyboard.loadJavascript(String.format("updateKMText('%s')", kmText));
         result = true;
       }
 
@@ -1142,7 +1142,7 @@ public final class KMManager {
     boolean result = false;
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreSelectionChange) {
-        InAppKeyboard.loadUrl(String.format("javascript:updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        InAppKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1157,7 +1157,7 @@ public final class KMManager {
           }
         }
 
-        SystemKeyboard.loadUrl(String.format("javascript:updateKMSelectionRange(%d,%d)", selStart, selEnd));
+        SystemKeyboard.loadJavascript(String.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
         result = true;
       }
 
@@ -1170,11 +1170,11 @@ public final class KMManager {
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (InAppKeyboard != null && InAppKeyboardLoaded) {
-        InAppKeyboard.loadUrl("javascript:resetContext()");
+        InAppKeyboard.loadJavascript("resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (SystemKeyboard != null && SystemKeyboardLoaded) {
-        SystemKeyboard.loadUrl("javascript:resetContext()");
+        SystemKeyboard.loadJavascript("resetContext()");
       }
     }
   }
@@ -1301,15 +1301,18 @@ public final class KMManager {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-      if (url.endsWith(KMFilename_KeyboardHtml)) {
-        InAppKeyboardLoaded = false;
-      }
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      Log.d("KMEA", "onPageFinished: [inapp] " + url);
+      shouldOverrideUrlLoading(view, url);
+    }
+
+    private void pageLoaded(WebView view, String url) {
       String langId = KMManager.KMKey_LanguageID;
-      if (url.endsWith(KMFilename_KeyboardHtml)) {
+      Log.d("KMEA", "pageLoaded: [inapp] " + url);
+      if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
 
         if (!InAppKeyboard.keyboardSet) {
@@ -1342,20 +1345,23 @@ public final class KMManager {
           public void run() {
             SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
             if (prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true)) {
-              InAppKeyboard.loadUrl("javascript:showHelpBubble()");
+              InAppKeyboard.loadJavascript("showHelpBubble()");
             }
           }
         }, 2000);
 
+        InAppKeyboard.callJavascriptAfterLoad();
+
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_INAPP, EventType.KEYBOARD_LOADED, null);
       }
-
-      shouldOverrideUrlLoading(view, url);
     }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      if (url.indexOf("hideKeyboard") >= 0) {
+      Log.d("KMEA", "shouldOverrideUrlLoading [inapp]: "+url);
+      if(url.indexOf("pageLoaded") >= 0) {
+        pageLoaded(view, url);
+      } else if (url.indexOf("hideKeyboard") >= 0) {
         if (KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
           InAppKeyboard.dismissHelpBubble();
           KMTextView textView = (KMTextView) KMTextView.activeView;
@@ -1517,15 +1523,18 @@ public final class KMManager {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-      if (url.endsWith(KMFilename_KeyboardHtml)) {
-        SystemKeyboardLoaded = false;
-      }
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
+      Log.d("KMEA", "onPageFinished: [system] " + url);
+      shouldOverrideUrlLoading(view, url);
+    }
+
+    private void pageLoaded(WebView view, String url) {
       String langId = KMManager.KMKey_LanguageID;
-      if (url.endsWith(KMFilename_KeyboardHtml)) {
+      Log.d("KMEA", "pageLoaded: [system] " + url);
+      if (url.startsWith("file:")) {
         SystemKeyboardLoaded = true;
         if (!SystemKeyboard.keyboardSet) {
           SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -1557,20 +1566,22 @@ public final class KMManager {
           public void run() {
             SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
             if (prefs.getBoolean(KMManager.KMKey_ShouldShowHelpBubble, true)) {
-              SystemKeyboard.loadUrl("javascript:showHelpBubble()");
+              SystemKeyboard.loadJavascript("showHelpBubble()");
             }
           }
         }, 2000);
 
         KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, KeyboardType.KEYBOARD_TYPE_SYSTEM, EventType.KEYBOARD_LOADED, null);
-      }
 
-      shouldOverrideUrlLoading(view, url);
+        SystemKeyboard.callJavascriptAfterLoad();
+      }
     }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      if (url.indexOf("hideKeyboard") >= 0) {
+      if(url.indexOf("pageLoaded") >= 0) {
+        pageLoaded(view, url);
+      } else if (url.indexOf("hideKeyboard") >= 0) {
         SystemKeyboard.dismissHelpBubble();
         IMService.requestHideSelf(0);
       } else if (url.indexOf("globeKeyAction") >= 0) {
