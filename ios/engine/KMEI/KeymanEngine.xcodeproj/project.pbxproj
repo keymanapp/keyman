@@ -928,7 +928,6 @@
 				C06D37271F81F4E100F61AE0 /* Frameworks */,
 				C06D37281F81F4E100F61AE0 /* Headers */,
 				C06D37291F81F4E100F61AE0 /* Resources */,
-				9A0FC9FE22D66DF300D33F86 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1070,27 +1069,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		9A0FC9FE22D66DF300D33F86 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/../../Carthage/Build/iOS/Reachability.framework",
-				"$(SRCROOT)/../../Carthage/Build/iOS/DeviceKit.framework",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Reachability.framework",
-				"$(DERIVED_FILE_DIR)/DeviceKit.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks\n\n";
-		};
 		C06D37C61F82364E00F61AE0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1551,7 +1529,7 @@
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks @executable_path/Frameworks/KeymanEngine.framework/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine;
@@ -1599,7 +1577,7 @@
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks @executable_path/Frameworks/KeymanEngine.framework/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Engine;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
