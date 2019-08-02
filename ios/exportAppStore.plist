@@ -2,7 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>method</key>
-	<string>app-store</string>
+    <key>method</key>
+    <string>app-store</string>
+    <key>teamID</key>
+    <string>3YE4W86L3G</string>
+    <key>signingCertificate</key>
+    <string>75E268DBF9EA1618EBC047C82F279E9D027A132F</string>
+    <key>installerSigningCertificate</key>
+    <string>75E268DBF9EA1618EBC047C82F279E9D027A132F</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>Tavultesoft.Keyman</key>
+        <string>Keyman Distribution (Marc Test)</string>
+        <key>Tavultesoft.Keyman.SWKeyboard</key>
+        <string>Keyman Distribution SWKeyboard (Marc Test)</string>
+    </dict>
+    <key>signingStyle</key>
+    <string>manual</string>
 </dict>
 </plist>
