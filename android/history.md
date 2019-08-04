@@ -1,6 +1,6 @@
 # Keyman for Android
 
-## 2019-08-05 13.0 alpha
+## 13.0 alpha
 * Start version 13.0
 
 ## 2019-07-29 12.0.4074 beta
