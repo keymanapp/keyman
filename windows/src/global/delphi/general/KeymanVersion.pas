@@ -20,6 +20,7 @@ unit KeymanVersion;
 interface
 
 const
+  SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';
   SKeymanVersion110 = '11.0';
   SKeymanVersion100 = '10.0';
