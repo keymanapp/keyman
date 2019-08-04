@@ -1,9 +1,17 @@
 # Keyman for Linux Version History
 
-## 12.0 alpha
-* Started work on Keyman for Linux 12
+## 13.0 alpha
+* Start version 13.0
 
-## 2019-02-25 11.0.120 stable
+## 2019-07-29 12.0.12 beta
+* Initial beta release of Keyman for Linux 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Alinux+base%3Amaster)
+
+* Bug Fixes:
+  * Clean up readme for km-package (#1660)
+  * Ensure automated build uses correct tier (#1670)
+
+## 2019-02-25 11.0.124 stable
 * 11.0 Stable release
 
 ## 2019-02-22 11.0.111 beta
