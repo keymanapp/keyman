@@ -1,6 +1,6 @@
 # Keyman for macOS Version History
 
-## 2019-08-05 13.0 alpha
+## 13.0 alpha
 * Start version 13.0
 
 ## 2019-07-29 12.0.5 beta
