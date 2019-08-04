@@ -581,7 +581,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 12.0;
+				PRODUCT_VERSION = 13.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -609,7 +609,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 12.0;
+				PRODUCT_VERSION = 13.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
