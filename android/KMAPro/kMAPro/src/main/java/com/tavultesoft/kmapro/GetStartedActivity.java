@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.widget.TextView;
 
 public class GetStartedActivity extends AppCompatActivity {
 
@@ -64,6 +65,14 @@ public class GetStartedActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(showGetStartedKey, isChecked);
         editor.commit();
+      }
+    });
+
+    final TextView getStartedText = findViewById(R.id.getStartedText);
+    getStartedText.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        checkBox.setChecked(!checkBox.isChecked());
       }
     });
 
