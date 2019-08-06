@@ -3,7 +3,10 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.view.inputmethod.InputMethodManager;
 
+import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
@@ -12,14 +15,13 @@ import androidx.preference.SwitchPreference;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Dataset;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
   private Preference languagesPreference;
+  private CheckBoxPreference setSystemKeyboardPreference;
+  private CheckBoxPreference setDefaultKeyboardPreference;
 
   @Override
   public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -55,7 +57,47 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     getStartedPreference.setTitle(getString(R.string.show_get_started));
     getStartedPreference.setDefaultValue(true);
 
+    setSystemKeyboardPreference = new CheckBoxPreference(context);
+    setSystemKeyboardPreference.setTitle(R.string.enable_system_keyboard);
+    setSystemKeyboardPreference.setDefaultValue(GetStartedActivity.isEnabledAsSystemKB(context));
+    setSystemKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        return false;
+      }
+    });
+    setSystemKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        // Blocks the checkmark from changing from user interaction.
+        return false;
+      }
+    });
+
+    setDefaultKeyboardPreference = new CheckBoxPreference(context);
+    setDefaultKeyboardPreference.setTitle(R.string.set_keyman_as_default);
+    setDefaultKeyboardPreference.setDefaultValue(GetStartedActivity.isDefaultKB(context));
+    setDefaultKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imManager.showInputMethodPicker();
+        return false;
+      }
+    });
+    setDefaultKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        // Blocks the checkmark from changing from user interaction.
+        return false;
+      }
+    });
+
     screen.addPreference(languagesPreference);
+    screen.addPreference(setSystemKeyboardPreference);
+    screen.addPreference(setDefaultKeyboardPreference);
+
     screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);
 
@@ -85,6 +127,14 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   @Override
   public void onResume() {
     super.onResume();
+
+    update();
+  }
+
+  public void update() {
+    setSystemKeyboardPreference.setChecked(GetStartedActivity.isEnabledAsSystemKB(context));
+    // This function isn't called after the default-keyboard selection and cannot fix the option.
+    setDefaultKeyboardPreference.setChecked(GetStartedActivity.isDefaultKB(context));
 
     // Update the language / keyboard count when we return to this menu from deeper levels.
     languagesPreference.setTitle(getInstalledLanguagesText());
