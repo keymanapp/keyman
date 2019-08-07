@@ -123,7 +123,7 @@
       return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
         transform: {
           // Insert the suggestion from the Trie, verbatim
-          insert: text + ' ',  // TODO: append space at a higher-level
+          insert: text,
           // Delete whatever the prefix that the user wrote.
           // Note: a separate capitalization/orthography engine can take this
           // result and transform it as needed.
