@@ -155,7 +155,7 @@ public class GetStartedActivity extends AppCompatActivity {
         list.get(0).put(iconKey, one);
       }
 
-      if (isEnabledAsSystemKB(this)) {
+      if (SystemIMESettings.isEnabledAsSystemKB(this)) {
         list.get(1).put(iconKey, checkbox_on);
         list.get(2).put(isEnabledKey, "true");
       } else {
@@ -163,7 +163,7 @@ public class GetStartedActivity extends AppCompatActivity {
         list.get(2).put(isEnabledKey, "false");
       }
 
-      if (isDefaultKB(this)) {
+      if (SystemIMESettings.isDefaultKB(this)) {
         list.get(2).put(iconKey, checkbox_on);
       } else {
         list.get(2).put(iconKey, three);
@@ -176,25 +176,5 @@ public class GetStartedActivity extends AppCompatActivity {
       listAdapter = new KMListAdapter(this, list, R.layout.get_started_row_layout, from, to);
       listView.setAdapter(listAdapter);
     }
-  }
-
-  protected static boolean isEnabledAsSystemKB(Context context) {
-    InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-    List<InputMethodInfo> imList = imManager.getEnabledInputMethodList();
-    boolean isEnabled = false;
-    int size = imList.size();
-    for (int i = 0; i < size; i++) {
-      if (imList.get(i).getServiceName().equals("com.keyman.android.SystemKeyboard")) {
-        isEnabled = true;
-        break;
-      }
-    }
-
-    return isEnabled;
-  }
-
-  protected static boolean isDefaultKB(Context context) {
-    String inputMethod = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
-    return inputMethod.equals(context.getPackageName() + "/com.keyman.android.SystemKeyboard");
   }
 }

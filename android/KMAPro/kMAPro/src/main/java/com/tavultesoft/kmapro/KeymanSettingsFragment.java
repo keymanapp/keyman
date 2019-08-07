@@ -68,7 +68,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     setSystemKeyboardPreference = new CheckBoxPreference(context);
     setSystemKeyboardPreference.setTitle(R.string.enable_system_keyboard);
-    setSystemKeyboardPreference.setDefaultValue(GetStartedActivity.isEnabledAsSystemKB(context));
+    setSystemKeyboardPreference.setDefaultValue(SystemIMESettings.isEnabledAsSystemKB(context));
     setSystemKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
       public boolean onPreferenceClick(Preference preference) {
@@ -80,7 +80,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     setDefaultKeyboardPreference = new CheckBoxPreference(context);
     setDefaultKeyboardPreference.setTitle(R.string.set_keyman_as_default);
-    setDefaultKeyboardPreference.setDefaultValue(GetStartedActivity.isDefaultKB(context));
+    setDefaultKeyboardPreference.setDefaultValue(SystemIMESettings.isDefaultKB(context));
     setDefaultKeyboardPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
       @Override
       public boolean onPreferenceClick(Preference preference) {
@@ -133,8 +133,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   }
 
   public void update() {
-    setSystemKeyboardPreference.setChecked(GetStartedActivity.isEnabledAsSystemKB(context));
-    setDefaultKeyboardPreference.setChecked(GetStartedActivity.isDefaultKB(context));
+    setSystemKeyboardPreference.setChecked(SystemIMESettings.isEnabledAsSystemKB(context));
+    setDefaultKeyboardPreference.setChecked(SystemIMESettings.isDefaultKB(context));
 
     // Update the language / keyboard count when we return to this menu from deeper levels.
     languagesPreference.setTitle(getInstalledLanguagesText());
