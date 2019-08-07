@@ -40,12 +40,13 @@
                 android:paddingBottom="@dimen/checkbox_padding" />
 
             <TextView
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginLeft="@dimen/checkbox_margin_left"
-              android:layout_marginStart="@dimen/checkbox_margin_left"
-              android:layout_gravity="center_vertical"
-              android:text="@string/show_get_started" />
+                android:id="@+id/getStartedText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/checkbox_margin_left"
+                android:layout_marginLeft="@dimen/checkbox_margin_left"
+                android:text="@string/show_get_started" />
 
         </LinearLayout>
 
