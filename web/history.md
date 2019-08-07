@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-07 12.0.75 beta
+* Fixes issue where keyboard name / language caption was missing from spacebar (#1937)
+
 ## 2019-08-06 12.0.74 beta
 * Fixes issue with an extra space being added after accepted predictive suggestions (#1936)
 
