@@ -3,8 +3,11 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-08-05 12.0.4075 beta
+## 2019-08-06 12.0.4076 beta
 * Adjustments to Settings UI
+
+## 2019-08-05 12.0.4075 beta
+* Fixes issue with suggestion text misalignment (#1932)
 
 ## 2019-07-29 12.0.4074 beta
 * Initial beta release of Keyman for Android 12
