@@ -228,7 +228,7 @@ describe('LMLayerWorker trie model for word lists', function() {
 
       var newBuffer = applyTransform(context, suggestion.transform);
       // The suggestion should change it to lowercase.
-      assert.strictEqual(newBuffer, 'the ');
+      assert.strictEqual(newBuffer, 'the');
   });
 
   function applyTransform(context, transform) {
