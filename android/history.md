@@ -4,7 +4,7 @@
 * Start version 13.0
 
 ## 2019-08-06 12.0.4076 beta
-* Adjustments to Settings UI
+* Adjustments to Settings UI (#1931)
 
 ## 2019-08-05 12.0.4075 beta
 * Fixes issue with suggestion text misalignment (#1932)

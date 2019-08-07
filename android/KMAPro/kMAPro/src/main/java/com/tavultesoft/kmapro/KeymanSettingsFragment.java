@@ -57,6 +57,15 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     getStartedPreference.setTitle(getString(R.string.show_get_started));
     getStartedPreference.setDefaultValue(true);
 
+    // Blocks the default checkmark interaction; we want to control the checkmark's state separately
+    // from within update() based on if the user has taken the appropriate actions with the OS.
+    final Preference.OnPreferenceChangeListener checkBlocker = new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        return false;
+      }
+    };
+
     setSystemKeyboardPreference = new CheckBoxPreference(context);
     setSystemKeyboardPreference.setTitle(R.string.enable_system_keyboard);
     setSystemKeyboardPreference.setDefaultValue(GetStartedActivity.isEnabledAsSystemKB(context));
@@ -67,13 +76,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
         return false;
       }
     });
-    setSystemKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-      @Override
-      public boolean onPreferenceChange(Preference preference, Object newValue) {
-        // Blocks the checkmark from changing from user interaction.
-        return false;
-      }
-    });
+    setSystemKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
 
     setDefaultKeyboardPreference = new CheckBoxPreference(context);
     setDefaultKeyboardPreference.setTitle(R.string.set_keyman_as_default);
@@ -86,13 +89,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
         return false;
       }
     });
-    setDefaultKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-      @Override
-      public boolean onPreferenceChange(Preference preference, Object newValue) {
-        // Blocks the checkmark from changing from user interaction.
-        return false;
-      }
-    });
+    setDefaultKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
 
     screen.addPreference(languagesPreference);
     screen.addPreference(setSystemKeyboardPreference);
@@ -128,12 +125,15 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   public void onResume() {
     super.onResume();
 
-    update();
+    // The onResume() function isn't called after the default-keyboard selection and cannot fix that
+    // option, though it is sufficient for handling the system-keyboard enablement option.
+    //
+    // As a result, we rely on KeymanSettingsActivity.onWindowFocusChanged to call
+    // .update() on our behalf.
   }
 
   public void update() {
     setSystemKeyboardPreference.setChecked(GetStartedActivity.isEnabledAsSystemKB(context));
-    // This function isn't called after the default-keyboard selection and cannot fix the option.
     setDefaultKeyboardPreference.setChecked(GetStartedActivity.isDefaultKB(context));
 
     // Update the language / keyboard count when we return to this menu from deeper levels.
