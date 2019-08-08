@@ -59,9 +59,9 @@
     // Keyboard rule "q" + "q" > nul
     [client handleEventIfNotHandledBy:im event:event];
     [self helperVerifyAndProcessPendingDelete:client inputMethodEventHandler:im];
-    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
+    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"d" keyCode:kVK_ANSI_B]];
     assert([client length] == 2);
-    assert([[client getResult] isEqualToString:@"ab"]);
+    assert([[client getResult] isEqualToString:@"ad"]);
 }
 
 - (void)testHandleEvent_Actions1QBack2Nul_Legacy_followingCharacter_ExistingContextCharacterDeleted {
@@ -122,9 +122,9 @@
     [client handleEventIfNotHandledBy:im event:event];
     // Keyboard rule "q" + "q" > nul
     [client handleEventIfNotHandledBy:im event:event];
-    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
+    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"d" keyCode:kVK_ANSI_B]];
     assert([client length] == 2);
-    assert([[client getResult] isEqualToString:@"ab"]);
+    assert([[client getResult] isEqualToString:@"ad"]);
 }
 
 - (void)testHandleEvent_Actions1QBack2Nul_NoContext_followingCharacter_ExistingContextCharacterDeleted {
@@ -162,9 +162,9 @@
     [client handleEventIfNotHandledBy:im event:event];
     // Keyboard rule "q" + "q" > nul
     [client handleEventIfNotHandledBy:im event:event];
-    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
+    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"d" keyCode:kVK_ANSI_B]];
     assert([client length] == 2);
-    assert([[client getResult] isEqualToString:@"ab"]);
+    assert([[client getResult] isEqualToString:@"ad"]);
 }
 
 - (void)testHandleEvent_Actions1QBack2Nul_AppleCompliant_followingCharacter_ExistingContextCharacterDeleted {
