@@ -44,7 +44,7 @@ NSRange _previousSelRange;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
-    senderForDeleteBack = sender;
+    self.senderForDeleteBack = sender;
     // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
     // with Apple's IM framework) have a problem in that if the user selects a different font (or other
     // formatting) and then types a sequence that causes characters to be added to the document and then
@@ -507,17 +507,17 @@ NSRange _previousSelRange;
 // we handle here should never be passed on to Keyman Engine for transform,
 // as it will be part of the output from the transform.
 - (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
-    ignoreNextDeleteBackHighLevel = NO;
+    self.ignoreNextDeleteBackHighLevel = NO;
     if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
         BOOL updateEngineContext = YES;
         if ([self.AppDelegate debugMode]) {
             NSLog(@"legacy: delete-back received, processing");
         }
         [self processUnhandledDeleteBack:self.senderForDeleteBack updateEngineContext: &updateEngineContext];
-        ignoreNextDeleteBackHighLevel = YES;
+        self.ignoreNextDeleteBackHighLevel = YES;
     }
 
-    return ignoreNextDeleteBackHighLevel;
+    return self.ignoreNextDeleteBackHighLevel;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
@@ -551,7 +551,7 @@ NSRange _previousSelRange;
         return YES;
     }
 
-    if(event.keyCode == kVK_Delete && _legacyMode && ignoreNextDeleteBackHighLevel) {
+    if(event.keyCode == kVK_Delete && _legacyMode && self.ignoreNextDeleteBackHighLevel) {
         // This event was sent by Keyman and we should just
         // pass it through to the app. handleDeleteBackLowLevel
         // already did anything we need with it.
