@@ -305,7 +305,11 @@ open class SettingsViewController: UITableViewController {
     }
 
     userLanguages = keyboardLanguages
-    itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
+    if 1 == userLanguages.count {
+      itemsArray[0]["subtitle"] = "one language installed"
+    } else {
+      itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
+    }
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {
