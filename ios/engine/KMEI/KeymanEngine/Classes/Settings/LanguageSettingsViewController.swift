@@ -122,19 +122,33 @@ class LanguageSettingsViewController: UITableViewController {
         if 0 == indexPath.row {
           cell.accessoryType = .none
           let doPredictionsSwitch = UISwitch()
+          doPredictionsSwitch.translatesAutoresizingMaskIntoConstraints = false
+          
           let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
           doPredictionsSwitch.frame = switchFrame
+          
           doPredictionsSwitch.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
           doPredictionsSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doPredictionsSwitch)
+          if #available(iOSApplicationExtension 11.0, *) {
+            doPredictionsSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+            doPredictionsSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+          }
         } else if 1 == indexPath.row {
           cell.accessoryType = .none
           let doCorrectionsSwitch = UISwitch()
+          doCorrectionsSwitch.translatesAutoresizingMaskIntoConstraints = false
+          
           let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
           doCorrectionsSwitch.frame = switchFrame
+          
           doCorrectionsSwitch.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
           doCorrectionsSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doCorrectionsSwitch)
+          if #available(iOSApplicationExtension 11.0, *) {
+            doCorrectionsSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+            doCorrectionsSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+          }
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
       }
