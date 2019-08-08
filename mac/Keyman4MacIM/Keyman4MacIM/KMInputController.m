@@ -57,6 +57,16 @@ NSMutableArray *servers;
     return [_eventHandler handleEvent:event client:sender];
 }
 
+// Passthrough from the app delegate low level event hook
+// to the input method event handler for Delete Back. 
+- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+    if(_eventHandler != nil) {
+        return [_eventHandler handleDeleteBackLowLevel:event];
+    }
+
+    return NO;
+}
+
 - (void)activateServer:(id)sender {
     @synchronized(servers) {
         [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
@@ -84,7 +94,9 @@ NSMutableArray *servers;
             _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] init];
         }
         else {
-            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId];
+            // We cache the client for use with events sourced from the low level tap
+            // where we don't necessarily have any access to the current client.
+            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
         }
     }
 }
@@ -122,6 +134,7 @@ NSMutableArray *servers;
         }
     }
 }
+
 
 /*
 - (NSDictionary *)modes:(id)sender {

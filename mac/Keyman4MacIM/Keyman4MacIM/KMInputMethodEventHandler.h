@@ -14,8 +14,9 @@
 
 @interface KMInputMethodEventHandler : NSObject
 
-- (instancetype)initWithClient:(NSString *)clientAppId;
+- (instancetype)initWithClient:(NSString *)clientAppId client:(id)sender;
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender;
+- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event;
 - (void)deactivate;
 
 @end
