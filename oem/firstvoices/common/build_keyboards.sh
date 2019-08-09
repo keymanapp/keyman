@@ -3,6 +3,9 @@
 # Build the keyboards referred to in ../keyboards.csv and copy them + metadata 
 # to the FirstVoices/Keyboards folder
 
+# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
+# the same parent folder as this repo, with the default name 'keyboards'
+
 # keyboards.csv has columns Shortname,ID,Name,Region,OldVersion
 
 # Set sensible script defaults:
@@ -12,9 +15,6 @@ set -e
 set -u
 # set -x: Debugging use, print each statement
 # set -x
-
-# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
-# the same parent folder as this repo, with the default name 'keyboards'
 
 
 
