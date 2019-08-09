@@ -86,10 +86,6 @@ type
 var
   frmMessages: TfrmMessages;
 
-  FCompilingFile: string;
-
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
-
 implementation
 
 uses
@@ -138,6 +134,7 @@ procedure TfrmMessages.Clear;
 begin
   FMessageItems.Clear;
   memoMessage.Clear;
+  ProjectCompilerMessageClear;
 end;
 
 procedure TfrmMessages.memoMessageDblClick(Sender: TObject);
@@ -205,31 +202,6 @@ end;
 procedure TfrmMessages.cmdmPreviousMessageClick(Sender: TObject);
 begin
   PrevMessage;
-end;
-
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
-var
-  errtype: string;
-begin
-  (*subtext := text;
-  n := Pos('chr:', subtext);
-  if n > 0 then
-  begin
-    if TryStrToInt(Trim(Copy(subtext, n+4, MAXINT)), v) then
-    begin
-      Delete(subtext, n, MAXINT);
-    end;
-  end;*)
-
-  case msgcode and $F000 of
-    $1000: errtype := 'fatal';
-    $2000: errtype := 'warning';
-    $4000: errtype := 'error';
-    $8000: errtype := 'fatal';
-  end;
-
-  frmMessages.Add(FCompilingFile, Format('line %d  %s %x: %s', [line, errtype, msgcode, text]));
-  Result := 1;
 end;
 
 procedure TfrmMessages.NextMessage;

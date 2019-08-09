@@ -23,6 +23,8 @@
 + (KMXFile *)getKmxFileTestMacEngine;
 + (KMXFile *)getKmxFileForPlatformTest;
 + (KMXFile *)getKmxFileForCipherMusicTests;
++ (KMXFile *)getKmxFileForSilIpaTests;
++ (KMXFile *)getKmxFileForIndexOffsetTests;
 @end
 
 #endif /* KeymanEngineTestsStaticHelperMethods_h */

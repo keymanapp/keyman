@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-08 12.0.12 beta
+* Fixes toggle alignment issues in the Settings UI (#1947)
+
 ## 2019-07-29 12.0.11 beta
 * Initial beta release of Keyman for iPhone and iPad 12
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Aios+base%3Amaster)

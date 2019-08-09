@@ -3,6 +3,12 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-07 12.0.75 beta
+* Fixes issue where keyboard name / language caption was missing from spacebar (#1937)
+
+## 2019-08-06 12.0.74 beta
+* Fixes issue with an extra space being added after accepted predictive suggestions (#1936)
+
 ## 2019-07-29 12.0.72 beta
 * Initial beta release of KeymanWeb 12
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Aweb+base%3Amaster)

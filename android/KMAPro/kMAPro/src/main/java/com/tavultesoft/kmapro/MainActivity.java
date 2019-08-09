@@ -602,10 +602,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       if (kbList != null && kbList.size() < 2)
         shouldShowGetStarted = true;
 
-      if (!GetStartedActivity.isEnabledAsSystemKB(this))
+      if (!SystemIMESettings.isEnabledAsSystemKB(this))
         shouldShowGetStarted = true;
 
-      if (!GetStartedActivity.isDefaultKB(this))
+      if (!SystemIMESettings.isDefaultKB(this))
         shouldShowGetStarted = true;
 
       if (shouldShowGetStarted)

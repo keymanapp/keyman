@@ -10,6 +10,46 @@
 
 @implementation NSString (XString)
 
+// For calculating offset including system stores
+- (NSUInteger)xLengthIncludingIf {
+  NSUInteger cx = 0;
+  for (int i = 0; i < self.length;) {
+    unichar c = [self characterAtIndex:i];
+    if (c == UC_SENTINEL) {
+      c = [self characterAtIndex:i+1];
+      switch (c) {
+        case CODE_ANY:
+        case CODE_NOTANY:
+        case CODE_CONTEXTEX:
+        case CODE_DEADKEY:
+        case CODE_NULLCHAR:
+          cx++;
+          i+=3;
+          break;
+        case CODE_INDEX:
+          cx++;
+          i+=4;
+          break;
+        case CODE_IFOPT:
+        case CODE_IFSYSTEMSTORE:
+          cx++;
+          i+=5;
+          break;
+        case CODE_NUL:
+        default:
+          i+=2;
+          break;
+      }
+    }
+    else {
+      cx++;
+      i++;
+    }
+  }
+
+  return cx;
+}
+
 - (NSUInteger)xLength {
     NSUInteger cx = 0;
     for (int i = 0; i < self.length;) {

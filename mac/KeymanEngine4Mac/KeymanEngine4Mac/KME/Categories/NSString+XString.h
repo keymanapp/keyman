@@ -12,6 +12,7 @@
 @interface NSString (XString)
 
 - (NSUInteger)xLength;
+- (NSUInteger)xLengthIncludingIf;
 - (NSUInteger)deadKeyCount;
 - (NSString *)lastNChars:(NSUInteger)n;
 - (NSString *)codeString;
