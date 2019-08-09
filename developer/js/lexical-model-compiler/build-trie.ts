@@ -23,16 +23,19 @@ export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?:
  *
  * Format specification:
  *
- *  - the file is a UTF-8 encoded text file
- *  - new lines are either LF or CRLF
- *  - the file either consists of a comment or an entry
- *  - comment lines MUST start with the '#' character on the very first column
+ *  - the file is a UTF-8 encoded text file.
+ *  - new lines are either LF or CRLF.
+ *  - the file MAY start with the UTF-8 byte-order mark (BOM); that is, if the
+ *    first three bytes of the file are EF BB BF, these will be interepreted as
+ *    the BOM and will be ignored.
+ *  - the file either consists of a comment or an entry.
+ *  - comment lines MUST start with the '#' character on the very first column.
  *  - entries are one to three columns, separated by the (horizontal) tab
- *    character
+ *    character.
  *  - column 1 (REQUIRED): the wordform: can have any character except tab, CR,
  *    LF. Surrounding whitespace characters are trimmed.
  *  - column 2 (optional): the count: a non-negative integer specifying how many
- *    times this entry has appeared in the corpus. Blank means 'indeterminate'
+ *    times this entry has appeared in the corpus. Blank means 'indeterminate'.
  *  - column 3 (optional): comment: an informative comment, ignored by the tool.
  */
 export function parseWordList(contents: string): WordList {
@@ -50,6 +53,7 @@ export function parseWordList(contents: string): WordList {
     let [wordform, countText, _comment] = line.split(TAB);
     // Clean the word form.
     // TODO: what happens if we get duplicate forms?
+    // NOTE: String.prototype.trim() removes the byte-order mark (BOM), if present!
     wordform = wordform.normalize('NFC').trim();
     countText = (countText || '').trim();
     let count = parseInt(countText, 10);
