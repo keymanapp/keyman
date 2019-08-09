@@ -110,33 +110,6 @@ class KeyboardPickerViewController: KeyboardSwitcherViewController {
   
   // MARK: - table view delegate UITableViewDelegate
 
-  // TODO: Refactor. Duplicated in KeyboardInfoViewController
-  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    if !Manager.shared.canRemoveKeyboards {
-      return false
-    }
-
-    if !Manager.shared.canRemoveDefaultKeyboard {
-      return indexPath.row != 0
-    }
-    if indexPath.row > 0 {
-      return true
-    }
-    return userKeyboards.count > 1
-  }
-
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
-                          forRowAt indexPath: IndexPath) {
-    if editingStyle != .delete {
-      return
-    }
-
-    if Manager.shared.removeKeyboard(at: indexPath.row) {
-      loadUserKeyboards()
-    }
-    setIsDoneButtonEnabled(true)
-  }
-
   override func tableView(_ tableView: UITableView,
                           accessoryButtonTappedForRowWith indexPath: IndexPath) {
     showKeyboardInfoView(with: indexPath.row)
