@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-09 12.0.76 beta
+* The suggestion banner will no longer activate if predictions are not enabled, regardless of correction state.  (#1960)
+
 ## 2019-08-07 12.0.75 beta
 * Fixes issue where keyboard name / language caption was missing from spacebar (#1937)
 
