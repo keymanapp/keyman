@@ -310,6 +310,7 @@ open class SettingsViewController: UITableViewController {
     } else {
       itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
     }
+    tableView.reloadData()
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {
