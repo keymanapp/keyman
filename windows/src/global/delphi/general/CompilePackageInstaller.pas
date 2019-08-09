@@ -41,7 +41,7 @@ uses Windows, kpsfile, kmpinffile, PackageInfo, CompilePackage,
   Keyman.Developer.System.Project.Projectlog,
   jwaMsi, jwaMsiQuery, SysUtils;
 
-function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean; ALicense, ATitleImage, AAppName: string): Boolean;   // I4598   // I4688
+function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename, ARedistSetupPath: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean; ALicense, ATitleImage, AAppName: string): Boolean;   // I4598   // I4688
 function DoCompileMSIInstaller(FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename, ARedistSetupPath, ALicense, ATitleImage, AAppName: string): Boolean;  // I2562
 
 implementation
@@ -82,9 +82,9 @@ type
     property OnMessage: TCompilePackageMessageEvent read FOnMessage write FOnMessage;
   end;
 
-function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean; ALicense, ATitleImage, AAppName: string): Boolean;   // I4598   // I4688
+function DoCompilePackageInstaller(pack: TKPSFile; FMessageEvent: TCompilePackageMessageEvent; FSilent: Boolean; AInstallerMSI, AOutputFilename, ARedistSetupPath: string; AUpdateInstaller: Boolean; ABuildPackage: Boolean; ALicense, ATitleImage, AAppName: string): Boolean;   // I4598   // I4688
 begin
-  with TCompilePackageInstaller.Create(pack, FSilent, AInstallerMSI, AUpdateInstaller, ABuildPackage, AOutputFilename, '', ALicense, ATitleImage, AAppName) do  // I2562   // I4598   // I4688
+  with TCompilePackageInstaller.Create(pack, FSilent, AInstallerMSI, AUpdateInstaller, ABuildPackage, AOutputFilename, ARedistSetupPath, ALicense, ATitleImage, AAppName) do  // I2562   // I4598   // I4688
   try
     OnMessage := FMessageEvent;
     Run;
@@ -273,10 +273,14 @@ begin
         FPack.SaveXML;
 
       if FRedistSetupPath = '' then
+      begin
         FRedistSetupPath := GetRedistSetupPath;
+        WriteMessage('Redist path not specified, loading default ('+FRedistSetupPath+')');
+      end;
+
       if not FileExists(FRedistSetupPath + 'setup.exe') then
       begin
-        FatalMessage('setup.exe is missing from redist.');
+        FatalMessage('setup.exe is missing from redist ('+FRedistSetupPath+').');
         Exit;
       end;
 

@@ -9,7 +9,9 @@
 DESKTOP_FILES=firstvoices.wixobj desktopui.wixobj
 MSI=firstvoices.msi
 EXE=firstvoices.exe
-APPTITLE="Keyman for FirstVoices"
+KMP=fv_all.kmp
+INTEXE=firstvoices-fv_all.exe
+APPTITLE="FirstVoices Keyboards"
 TITLEIMAGE=setuptitle.png
 
 # If doing manual build of the project, manual-setup is the default target
@@ -26,11 +28,28 @@ prereq:
     cd $(FVROOT)\src\inst
     $(PROGRAM)\buildtools\mkver -v -u download.in download.mak $(ROOT)\src\desktop\version.txt
 
+    #
+    # Build FirstVoices keyboards fv_all.kmp
+    #
+
+    cd $(KEYMAN_ROOT)\..\keyboards
+
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) build.sh release/packages/fv_all
+!else
+    start /wait ./build.sh release/packages/fv_all
+!endif
+
+    copy release\packages\fv_all\build\fv_all.kmp $(FVROOT)\src\inst
+    cd $(FVROOT)\src\inst
+
 desktop: prereq
     $(MAKE) -fdownload.mak candle-desktop
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out $(MSI) -ext WixUIExtension $(DESKTOP_FILES) 
     $(SIGNCODE) /d $(APPTITLE) $(MSI)
-    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE)
+    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE) -n "FirstVoices Keyboards" $(KMP)
+    if exist $(EXE) del $(EXE)
+    ren $(INTEXE) $(EXE)
     $(SIGNCODE) /d $(APPTITLE) $(EXE)
     $(MAKE) -fdownload.mak copyredist-desktop
 
@@ -46,6 +65,7 @@ clean:
     -del /Q *.pcp
     -del /Q download.mak
     -del /Q desktopui.wxs
+    -del /Q $(KMP)
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine

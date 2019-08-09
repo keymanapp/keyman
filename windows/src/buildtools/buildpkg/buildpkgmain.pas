@@ -84,7 +84,7 @@ begin
 
     try
       if not DoCompilePackageInstaller(pack, Params.CompilerMessage, False, Params.MSIFileName,
-          ChangeFileExt(Params.MSIFileName,'')+'-'+ChangeFileExt(ExtractFileName(Params.KMPFileName),'')+'.exe',
+          ChangeFileExt(Params.MSIFileName,'')+'-'+ChangeFileExt(ExtractFileName(Params.KMPFileName),'')+'.exe', Params.RedistPath,
           False, False, Params.LicenseFileName, Params.TitleImageFileName, Params.AppName) then   // I4598   // I4694   // I4764
         ExitCode := 1
       else
