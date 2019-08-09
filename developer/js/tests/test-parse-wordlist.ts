@@ -13,10 +13,11 @@ describe('parseWordList', function () {
     let expected = [
       [word, count]
     ];
-    let withoutBOM = parseWordList(`${word}\t${count}\n`);
-    assert.deepEqual(withoutBOM, expected);
-    let withBOM = parseWordList(`${BOM}${word}\t${count}\n`)
-    assert.deepEqual(withBOM, expected);
+    let file = `# this is a comment\n${word}\t${count}`;
+    let withoutBOM = parseWordList(file);
+    assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
+    let withBOM = parseWordList(`${BOM}${file}`)
+    assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
   });
 });
 

@@ -47,13 +47,17 @@ export function parseWordList(contents: string): WordList {
 
   let result: WordList = [];
   for (let line of lines) {
+    // Remove the byte-order mark (BOM) from the beginning of the string.
+    // Because `contents` can be the concatenation of several files, we have to remove
+    // the BOM from every possible start of file -- i.e., beginning of every line.
+    line = line.replace(/^\uFEFF/, '');
+
     if (line.startsWith('#') || line === "") {
       continue; // skip comments and empty lines
     }
     let [wordform, countText, _comment] = line.split(TAB);
     // Clean the word form.
     // TODO: what happens if we get duplicate forms?
-    // NOTE: String.prototype.trim() removes the byte-order mark (BOM), if present!
     wordform = wordform.normalize('NFC').trim();
     countText = (countText || '').trim();
     let count = parseInt(countText, 10);
