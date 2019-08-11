@@ -8,6 +8,10 @@
 
 import Foundation
 
+struct InstallableConstants {
+  static let defaultVersion = "1.0"
+}
+
 /// Mainly differs from the API `LexicalModel` by having an associated language.
 public struct InstallableLexicalModel: Codable {
   public var id: String
@@ -38,7 +42,7 @@ public struct InstallableLexicalModel: Codable {
     self.name = lexicalModel.name
     self.languageID = languageID
 //    self.languageName = language.name
-    self.version = lexicalModel.version ?? "0.1.0"
+    self.version = lexicalModel.version ?? InstallableConstants.defaultVersion
     self.isCustom = isCustom
   }
 }

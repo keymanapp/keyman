@@ -1,0 +1,12 @@
+﻿store(&NAME) 'Test index() with if() on mac for #1892'
+store(&TARGETS) 'windows macosx'
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(opt) ''
+
+store(foo) 'xyz'
+store(bar) 'XYZ'
+
+if(opt='') any(foo) + 'a' > index(bar, 2)

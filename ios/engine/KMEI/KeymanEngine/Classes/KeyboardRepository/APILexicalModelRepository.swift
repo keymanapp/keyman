@@ -75,7 +75,7 @@ public class APILexicalModelRepository: LexicalModelRepository {
     
     log.info("Request list completed -- \(result.lexicalModels.count) lexical models.")
     DispatchQueue.main.async {
-      self.delegate?.lexicalModelRepositoryDidFetch(self)
+      self.delegate?.lexicalModelRepositoryDidFetchList(self)
       fetchCompletionHandler(lexicalModels, nil)
     }
   }

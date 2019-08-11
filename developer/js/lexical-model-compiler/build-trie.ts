@@ -168,10 +168,14 @@ namespace Trie {
    *
    * @param wordlist    The wordlist with non-negative weights.
    * @param keyFunction Function that converts word forms into indexed search keys
-   * @returns The root node as a JSON-serialiable object.
+   * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
   export function buildTrie(wordlist: WordList, keyFunction: Wordform2Key = defaultWordform2Key): object {
-    return new Trie(keyFunction).buildFromWordList(wordlist).root;
+    let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
+    return {
+      totalWeight: sumWeights(root),
+      root: root
+    }
   }
 
   /**
@@ -326,6 +330,24 @@ namespace Trie {
     }
 
     delete node.unsorted;
+  }
+
+  /**
+   * O(n) recursive traversal to sum the total weight of all leaves in the
+   * trie, starting at the provided node.
+   *
+   * @param node The node to start summing weights.
+   */
+  function sumWeights(node: Node): number {
+    if (node.type === 'leaf') {
+      return node.entries
+        .map(entry => entry.weight)
+        .reduce((acc, count) => acc + count, 0);
+    } else {
+      return Object.keys(node.children)
+        .map((key) => sumWeights(node.children[key]))
+        .reduce((acc, count) => acc + count, 0);
+    }
   }
 
   /**

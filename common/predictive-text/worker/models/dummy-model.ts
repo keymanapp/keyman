@@ -33,6 +33,7 @@ namespace models {
    */
   export class DummyModel implements WorkerInternalModel {
     configuration: Configuration;
+    punctuation?: LexicalModelPunctuation;
     private _futureSuggestions: Suggestion[][];
 
     constructor(options?: any) {
@@ -41,6 +42,10 @@ namespace models {
       // this class mutates the array.
       this._futureSuggestions = options.futureSuggestions
         ? options.futureSuggestions.slice() : [];
+
+      if (options.punctuation) {
+        this.punctuation = options.punctuation;
+      }
     }
 
     configure(capabilities: Capabilities): Configuration {
@@ -75,6 +80,15 @@ namespace models {
       } else {
         return makeUniformDistribution(currentSet);
       }
+    }
+
+    wordbreak(context: Context): USVString {
+      let words = wordBreakers.default_(context.left);
+      if (words.length > 0) {
+        return words.pop().text;
+      }
+
+      return '';
     }
   };
 }

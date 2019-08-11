@@ -1,16 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2017",
     "module": "commonjs",
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
-    "typeRoots": [
-      "./node_modules/@types"
-    ]
   },
+  "include": [
+    "lexical-model-compiler/**/*",
+    "package-compiler/**/*",
+    "index.ts"
+  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "tests/**/*.ts"
   ]
 }

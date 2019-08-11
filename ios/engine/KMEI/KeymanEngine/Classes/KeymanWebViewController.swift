@@ -261,10 +261,14 @@ extension KeymanWebViewController {
     log.debug("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
+  
+  func deregisterLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
+  }
 
   func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     let stub: [String: Any] = [
-      "id": "LexicalModel_\(lexicalModel.id)",
+      "id": lexicalModel.id,
       "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
       "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
     ]
@@ -282,7 +286,28 @@ extension KeymanWebViewController {
     }
   
     log.debug("LexicalModel stub: \(stubString)")
-    webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+    if lexicalModel.languageID == Manager.shared.currentKeyboardID?.languageID {
+      // We're registering a lexical model for the now-current keyboard.
+      // Enact any appropriate language-modeling settings!
+      
+      let userDefaults = Storage.active.userDefaults
+      
+      let predict = userDefaults.predictSettingForLanguage(languageID: lexicalModel.languageID)
+      let correct = userDefaults.correctSettingForLanguage(languageID: lexicalModel.languageID)
+      
+      // Pass these off to KMW!
+      // We do these first so that they're automatically set for the to-be-registered model in advance.
+      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
+    } else {  // We're registering a model in the background - don't change settings.
+      webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+    }
+    
+    setBannerHeight(to: InputViewController.topBarHeight)
+  }
+  
+  func showBanner(_ display: Bool) {
+    log.debug("Changing banner's alwaysShow property to \(display).")
+    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
   }
   
   func setBannerImage(to path: String) {
@@ -293,7 +318,7 @@ extension KeymanWebViewController {
   
   func setBannerHeight(to height: Int) {
     // TODO:
-    webView?.evaluateJavaScript("setBannerHeight(\(height);", completionHandler: nil)
+    webView?.evaluateJavaScript("setBannerHeight(\(height));", completionHandler: nil)
   }
 }
 
@@ -496,12 +521,9 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
     log.info("Loaded keyboard.")
     
-    // Now that we've loaded the keyboard page fully, perform any in-page needed init.
-    setBannerImage(to: bannerImgPath)
-    
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
-
+    
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
     var newKb = Defaults.keyboard
     if Manager.shared.currentKeyboardID == nil && !shouldReloadKeyboard {
@@ -516,6 +538,17 @@ extension KeymanWebViewController: KeymanWebDelegate {
       log.info("Setting initial keyboard.")
       _ = Manager.shared.setKeyboard(newKb)
     }
+    
+    if Manager.shared.isSystemKeyboard {
+      showBanner(true)
+    } else {
+      // TODO:  Set banner to visible / not visible based on the toggle in Settings.
+      //        Problem:  we need access to the banner image path there.  It's only set for the system keyboard variant!
+      showBanner(false)
+    }
+    setBannerImage(to: bannerImgPath)
+    // Reset the keyboard's size.
+    keyboardSize = kbSize
     
     fixLayout()
 

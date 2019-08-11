@@ -86,9 +86,9 @@ class SubKeysView: UIView {
     let containerFrame = CGRect(x: strokeWidth, y: strokeWidth, width: containerWidth, height: containerHeight)
     let viewWidth = containerWidth + 2 * strokeWidth
     let baseHeight = keyFrame.size.height + marginY
-    var viewHeight = baseHeight + containerHeight - marginY + strokeWidth
+    let viewHeight = baseHeight + containerHeight - marginY + strokeWidth
     var viewPosX = keyFrame.origin.x - (viewWidth - keyFrame.size.width) / 2.0
-    var viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.size.height)
+    let viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.size.height + strokeWidth)
     adjX = 0
     adjY = 0
 

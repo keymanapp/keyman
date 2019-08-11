@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 28
 
         //println "===DUMPING PROPERTIES==="

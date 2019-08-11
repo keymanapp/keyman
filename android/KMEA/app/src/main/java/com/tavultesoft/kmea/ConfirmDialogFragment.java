@@ -76,7 +76,7 @@ public class ConfirmDialogFragment extends DialogFragment {
             case DIALOG_TYPE_DELETE_KEYBOARD :
               // Confirmation to delete keyboard
               int keyboardIndex = KeyboardPickerActivity.getKeyboardIndex(getActivity(), itemKey);
-              KeyboardPickerActivity.deleteKeyboard(getContext(), keyboardIndex);
+              KeyboardPickerActivity.deleteKeyboard(getActivity(), keyboardIndex);
               dismissOnSelect = true;
               break;
             case DIALOG_TYPE_DOWNLOAD_MODEL :
@@ -90,7 +90,7 @@ public class ConfirmDialogFragment extends DialogFragment {
             case DIALOG_TYPE_DELETE_MODEL :
               // Confirmation to delete model
               int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(getActivity(), itemKey);
-              KeyboardPickerActivity.deleteLexicalModel(getContext(), modelIndex);
+              KeyboardPickerActivity.deleteLexicalModel(getActivity(), modelIndex, false);
               dismissOnSelect = true;
               break;
             default :

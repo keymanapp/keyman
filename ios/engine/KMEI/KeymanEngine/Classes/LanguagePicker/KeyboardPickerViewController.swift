@@ -12,8 +12,7 @@ private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
-class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
-  private var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
+class KeyboardPickerViewController: KeyboardSwitcherViewController {
   private var updateQueue: [InstallableKeyboard]?
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
@@ -24,11 +23,13 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    title = "Keyboards"
+    self.accessoryType = .detailDisclosureButton
+
+    // adding keyboards is unique to this subclass, so is updating them
     setIsDoneButtonEnabled(false)
     isDidUpdateCheck = false
     updateQueue = nil
@@ -53,13 +54,21 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       forName: Notifications.keyboardDownloadFailed,
       observer: self,
       function: KeyboardPickerViewController.keyboardDownloadFailed)
-  }
-
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-
-    loadUserKeyboards()
-    scroll(toSelectedKeyboard: false)
+    
+    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadStarted,
+      observer: self,
+      function: KeyboardPickerViewController.lexicalModelDownloadStarted)
+    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadCompleted,
+      observer: self,
+      function: KeyboardPickerViewController.lexicalModelDownloadCompleted)
+    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.lexicalModelDownloadFailed,
+      observer: self,
+      function: KeyboardPickerViewController.lexicalModelDownloadFailed)
+    
+    log.info("didLoad: KeyboardPickerViewController (registered lexicalModelDownloadCompleted et al)")
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -85,28 +94,21 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
     navigationController?.setToolbarHidden(false, animated: true)
     scroll(toSelectedKeyboard: false)
+    log.info("didAppear: KeyboardPickerViewController")
   }
-
-  override func numberOfSections(in tableView: UITableView) -> Int {
-    return 1
-  }
-
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return userKeyboards.count
-  }
-
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cellIdentifier = "Cell"
-    if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
-      return cell
+  
+  override func switchKeyboard(_ index: Int) {
+    // Switch keyboard and register to user defaults.
+    if Manager.shared.setKeyboard(userKeyboards[index]) {
+      tableView.reloadData()
     }
-
-    let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
-    let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
-    cell.selectedBackgroundView = selectionColor
-    return cell
+    
+    if !_isDoneButtonEnabled {
+      Manager.shared.dismissKeyboardPicker(self)
+    }
   }
+  
+  // MARK: - table view delegate UITableViewDelegate
 
   // TODO: Refactor. Duplicated in KeyboardInfoViewController
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -155,39 +157,18 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     infoView.isCustomKeyboard = kb.isCustom
     navigationController?.pushViewController(infoView, animated: true)
   }
-
-  override func tableView(_ tableView: UITableView,
-                          willDisplay cell: UITableViewCell,
-                          forRowAt indexPath: IndexPath) {
-    cell.selectionStyle = .none
-    let kb = userKeyboards[indexPath.row]
-
-    cell.textLabel?.text = kb.languageName
-    cell.detailTextLabel?.text = kb.name
-    cell.tag = indexPath.row
-
-    if Manager.shared.currentKeyboardID == kb.fullID {
-      cell.selectionStyle = .blue
-      cell.isSelected = true
-      cell.accessoryType = .detailDisclosureButton
-    } else {
-      cell.selectionStyle = .none
-      cell.isSelected = false
-      cell.accessoryType = .detailDisclosureButton
-    }
-  }
-
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    switchKeyboard(indexPath.row)
-  }
+  
+  // MARK: - keyboard and lexical model downloading
 
   private func keyboardDownloadStarted(_ keyboards: [InstallableKeyboard]) {
+    log.info("keyboardDownloadStarted")
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
     
   private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+    log.info("lexicalModelDownloadStarted")
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
@@ -212,11 +193,8 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
         Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
       } else {
         loadUserKeyboards()
-        view.isUserInteractionEnabled = true
-        navigationItem.leftBarButtonItem?.isEnabled = true
-        if navigationItem.rightBarButtonItem != nil {
-          navigationItem.rightBarButtonItem?.isEnabled = true
-        }
+        restoreNavigation()
+
         updateQueue = nil
         let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
         label?.text = "Keyboards successfully updated!"
@@ -231,11 +209,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
       Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
                            userInfo: nil, repeats: false)
 
-      view.isUserInteractionEnabled = true
-      navigationItem.leftBarButtonItem?.isEnabled = true
-      if navigationItem.rightBarButtonItem != nil {
-        navigationItem.rightBarButtonItem?.isEnabled = true
-      }
+      restoreNavigation()
 
       // Add keyboard.
       for keyboard in keyboards {
@@ -245,9 +219,30 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
 
       navigationController?.popToRootViewController(animated: true)
     }
+    log.info("keyboardDownloadCompleted KeyboardPicker")
   }
-
+  
+  private func restoreNavigation() {
+    view.isUserInteractionEnabled = true
+    navigationItem.leftBarButtonItem?.isEnabled = true
+    if navigationItem.rightBarButtonItem != nil {
+      navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+  }
+  
+  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
+    log.info("lexicalModelDownloadCompleted KeyboardPicker")
+    // Add models.
+    for lexicalModel in lexicalModels {
+      Manager.shared.addLexicalModel(lexicalModel)
+      _ = Manager.shared.registerLexicalModel(lexicalModel)
+    }
+    restoreNavigation()
+    navigationController?.popToRootViewController(animated: true)
+  }
+  
   private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
+    log.info("keyboardDownloadFailed KeyboardPicker")
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
     if let item = navigationItem.rightBarButtonItem {
@@ -271,26 +266,30 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     
     self.present(alertController, animated: true, completion: nil)
   }
-
-  private func switchKeyboard(_ index: Int) {
-    // Switch keyboard and register to user defaults.
-    if Manager.shared.setKeyboard(userKeyboards[index]) {
-      tableView.reloadData()
+  
+  private func lexicalModelDownloadFailed(_ notification: LexicalModelDownloadFailedNotification) {
+    log.info("lexicalModelDownloadFailed KeyboardPicker")
+    restoreNavigation()
+    
+    let title: String
+    if view == navigationController?.topViewController?.view {
+      updateQueue = nil
+      title = "Dictionary Update Error"
+    } else {
+      title = "Dictionary Download Error"
     }
-
-    if !_isDoneButtonEnabled {
-      Manager.shared.dismissKeyboardPicker(self)
-    }
+    navigationController?.setToolbarHidden(true, animated: true)
+    
+    let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.cancel,
+                                            handler: nil))
+    
+    self.present(alertController, animated: true, completion: nil)
   }
-
-  private func loadUserKeyboards() {
-    userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
-    tableView.reloadData()
-  }
-
-  private func isAdded(languageID langID: String, keyboardID kbID: String) -> Bool {
-    return userKeyboards.contains { kb in kb.languageID == langID && kb.id == kbID }
-  }
+  
+  // MARK: - keyboard adding
 
   @objc func doneClicked(_ sender: Any) {
     Manager.shared.dismissKeyboardPicker(self)
@@ -333,7 +332,8 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     updateKeyboards()
   }
 
-  private func checkUpdates() -> Bool {
+  // so KeyboardSwitcherViewController can override this to do nothing
+  public func checkUpdates() -> Bool {
     if Manager.shared.apiKeyboardRepository.languages == nil {
       return false
     }
@@ -365,18 +365,6 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  private func scroll(toSelectedKeyboard animated: Bool) {
-    let index = userKeyboards.index { kb in
-      return Manager.shared.currentKeyboardID == kb.fullID
-    }
-
-    if let index = index {
-      let indexPath = IndexPath(row: index, section: 0)
-      tableView.scrollToRow(at: indexPath, at: .middle, animated: animated)
-
-    }
-  }
-
   private func setIsDoneButtonEnabled(_ value: Bool) {
     _isDoneButtonEnabled = value
     if _isDoneButtonEnabled {
@@ -394,7 +382,7 @@ class KeyboardPickerViewController: UITableViewController, UIAlertViewDelegate {
     navigationController?.setToolbarHidden(true, animated: true)
   }
 
-  func showAddKeyboard() {
+  override func showAddKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
     let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)

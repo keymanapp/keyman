@@ -41,8 +41,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-type OutgoingMessage = ReadyMessage | SuggestionMessage;
+type OutgoingMessageKind = 'ready' | 'suggestions' | 'currentword';
+type OutgoingMessage = ReadyMessage | SuggestionMessage | CurrentWordMessage;
 
 /**
  * Tells the keyboard that the LMLayer is ready. Provides
@@ -70,6 +70,25 @@ interface SuggestionMessage {
    * probable last.
    */
   suggestions: Suggestion[];
+}
+
+/**
+ * Returns the results of a 'wordbreak' request:  the current left-of-caret word.
+ */
+interface CurrentWordMessage {
+  message: 'currentword';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the wordbreak message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * Contains the 'current word' left of the caret given the Context
+   * of its source message - the 'wordbreak' message with matching Token value.
+   */
+  word: USVString;
 }
 
 /**
@@ -257,4 +276,10 @@ interface Suggestion {
    * When suggesting a word, `displayAs` should be that entire word.
    */
   displayAs: string;
+
+  /**
+   * A single metalabel data describing the relation of the suggestion
+   * to the input text.  Ex:  'keep', 'emoji', 'correction', etc.
+   */
+  tag?: string;
 }

@@ -1,0 +1,410 @@
+﻿c IPAUni14.KMN
+c IPA Unicode Keyboard for Tavultesoft Keyboard Manager 6.0
+c Keyboard: FF Keying for use with SIL Unicode IPA fonts
+c Author:   M. Hosken & D. Bevan
+c Date:     31-JUL-2001
+c 
+c Changes:
+c IPA.KMN
+c MJPH  1.0     15-Apr-1994     initial version
+c MJPH  1.0.2   18-May-1994     sort out i-widths
+c MJPH  1.0.3   26-May-1994     change hotkey from Ctrl+Shift+I to
+c Ctrl+Shift+P. Since Ctrl+Shift+I is the italic
+c speedkey in WinWord
+c MJPH  1.1.0   28-Sep-1994     add BS support for 3.1
+c MJPH  1.1.1   28-Nov-1994     add generic BS rule to get round 3.1 bug
+c MJPH  1.1.2   13-Feb-1995     reverse rounded and unrounded
+c support #<<, #>>, #==, @&, auto tone height
+c [[[ is OK
+c DIB   1.2     20-Feb-1995     add d203 (extra low 'advanced' diac) support
+c fix @04 and @40 to give extra-high versions
+c make auto tone height work with ldiacs
+c fix tone height above d040
+c allow tone above angstrom
+c fix schwa+[[ bug
+c fix ~ beep
+c IPA93.KMN
+c DIB   1.0     17-Jul-1996     make changes for new IPA93 fonts
+c MJPH  2.0     25-AUG-2000     Add Unicode support, including upper case, etc.
+c MJPH  2.1     17-OCT-2000     Remove some bugs from Unicode keyboard
+c MJPH  2.1.1   25-JUL-2001     Add U to store references in 2 Unicode rules (minor)
+c 
+c ipaUni10.kmn
+c MJPH  1.0     31-JUL-2001     Remove ANSI keyboard. Change name
+c MJPH  1.0.1   27-AUG-2001     Tidy up for release. ? > ?
+c MJPH  1.0.2   23-APR-2002     Add g< > U+0261
+c MJPH  1.0.3   30-SEP-2003     Add mnemonic layout indicator
+c LAP   1.0.3   03-MAY-2004     changed ~~ to l~~ and upstep and downstep
+c LAP   1.0.4   22-JUL-2004     changed F180 > 1D50 and F182 > 1D51
+c VER   1.0.5   28-SEP-2004     added missing IPA char 025E, removed 029A (obsolete)
+c LAP   1.0.6   15-MAR-2006     added modifier vowels
+c LAP   1.0.6   04-APR-2006     added other modifiers
+c LAP   1.1.0   21-NOV-2006     changed for Unicode 5.0 and merged ETP and Chinese requests
+c added pitch contours
+c LAP   1.1.1   23-FEB-2007     added dot under and dot above for SAG
+c LAP   1.1.2   12-JUN-2007     removed restraints for keyboarding stacking diacritics.
+c renamed keyboard to match PUA deprecation policy
+c LAP   1.1.3   10-SEP-2007     a fix for the problem of fast typing reordering keystrokes when using Keyman with TSF.
+c LAP   1.1.4   24-SEP-2007     previous rule was in the wrong place, moved to end.
+c LAP   1.1.5   12-FEB-2008     added CGJ and changed license
+c LAP   1.2     07-MAY-2008     updated for Unicode 5.1 (F25F>2C71, F19C>A71B, F19D>A71C, F21A>2C73
+c LPE   1.3     15-FEB-2013     added U+030D, U+25cc and U+2205
+c LPE   1.4     25-FEB-2014     added U+A71d..U+A71F
+c LPE   1.5     27-FEB-2018     All changes are now reflected in HISTORY.md
+ 
+store(&VERSION) '10.0'
+store(&NAME) 'SIL IPA'
+store(&BITMAP) 'sil_ipa.ico'
+c HOTKEY  "^+P"
+store(&COPYRIGHT) '© 2002-2019 SIL International'
+store(&MESSAGE) 'The SIL IPA Keyman keyboard is distributed under The MIT License (MIT).'
+c store(&author) "M. Hosken, D. Bevan"
+c store(&language) ""
+c store(&WINDOWSLANGUAGES) 'x040F'
+store(&KEYBOARDVERSION) '1.7'
+store(&LAYOUTFILE) 'sil_ipa.keyman-touch-layout'
+store(&TARGETS) 'any'
+
+begin Unicode > use(Unicode)
+
+c $keymanonly: store(&mnemoniclayout) '1'
+
+store(&mnemoniclayout) "1"
+
+c This new store (10-Sept-2007) is a fix for the problem of fast typing reordering keystrokes when using Keyman with TSF
+c 12/12/2017 no longer needed
+c store(chars) 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]\{}|;:",./<>?' "'`~"
+ 
+c need to include international keyboards in this list also
+c store(nonK) "ACDFJKMPSTVWXYZ`|<>0123456789=^&*()';" U+0153
+c store(notrans) "abcdefghijklmnopqrstuvwxyz- /"
+
+store(singleK) "BEHILNOQRU.#?!:}_"                
+store(singleU) "BEHILNOQRU.#?" U+01C3 U+02D0 U+02C8 U+0320
+
+c store(equalK) "BEGHILNOQRU#?.!abcdefghijlnoprstuvwxyz" "#="
+  store(equalD) "B"    "E"    "G"    "H"    "I"    "L"    "N"    "O" \
+                "Q"    "R"    "S"    "U"    "Z"    "#"    "?"    "."    U+01C3 \
+                "abcdefghi" "jlnoprst" "uvwxyz" U+203F U+031F \
+                "0"
+  store(equalU) U+0299 U+0258 U+0262 U+029C U+0268 U+029F U+0274 U+0275 \
+                U+02A1 U+0280 U+1D98 U+0289 U+1D9A U+203F U+0294 U+2016 U+01C2 \
+                U+0251 U+03B2 U+00E7 U+00F0 U+0259 U+0278 U+0263 U+0265 U+026A \
+                U+025F U+026C U+0272 U+0252 U+0298 U+0279 U+0283 U+03B8 \
+                U+026F U+028B U+028D U+03C7 U+028F U+0292 U+203F U+002B \
+                U+2205
+
+c store(greatK) "AEGHLOR#!abdeghjlmnoruwz" "#>"
+  store(greatD) "A"    "E"    "G"    "H"    "I"    "L"    "O"    "R"    "#" \
+                "="    U+01C3 "a"    "b"    "c"    "d"    "e"    "g" \
+                "h"    "j"    "k"    "l"    "m"    "n"    "o"    "p" \
+                "q"    "r"    "s"    "t"    "u"    "w"    "U"    "z" \
+                U+A71B "0" c unused "fivxy"
+  store(greatU) U+1D02 U+0276 U+029B U+0267 U+1D7C U+027A U+0264 U+0281 U+A71B \
+                U+2192 U+01C1 U+0250 U+0253 U+0188 U+0257 U+025C U+0260 \
+                U+0127 U+0284 U+0199 U+026E U+0271 U+014B U+00F8 U+01A5 \
+                U+02A0 U+027E U+03C3 U+01AD U+028C U+0270 U+1D7E U+0291 \
+                U+2197 U+25CC 
+
+c store(lessK)  "ELOQR?.#!acdehjlnorstuz" "#<"
+  store(lessD)  "E"    "I"    "L"    "O"    "Q"    "R"    "?"    "."    "#" \   
+                U+01C3 "a"    "c"    "d"    "e"    "g"    "h"    "j" \
+                "l"    "n"    "o"    "r"    "s"    "t"    "u"    "v" \  
+                "w"    "y"    "z"    U+A71C "="
+  store(lessU)  U+0153 U+1D7B U+028E U+025E U+02A2 U+027B U+0295 U+007C U+A71C \
+                U+01C0 U+00E6 U+0255 U+0256 U+025B U+0261 U+0266 U+029D \
+                U+026D U+0273 U+0254 U+027D U+0282 U+0288 U+028A U+2C71 \
+                U+2C73 U+0265 U+0290 U+2198 U+034F
+
+c store(hatK)  "?gjnwlh" "0123456789-" "m" "n=" "n>"
+   store(hatD)  "0123456789" \
+                "-"    "+"    "="    "("    ")"    U+01C3 \
+                U+0295 U+0294 "b"    U+03B2 "c"    U+0255 "d"    U+00F0 "f" \
+                "g"    U+0261 U+0263 "h"    U+0266 U+0265 "j"    U+029D \
+                U+025F "k" \
+                "l"    U+026D U+029F "m"    U+0271 "n"    U+0272 U+014B U+0273 U+0274 \
+                "p"    U+0278 "r"    U+0279 U+027B U+0281 "s"    U+0282 U+0283 \
+                "t"    U+0270 "v"    U+028B "w"    "x"    "z"    U+0291 U+0290 U+0292 \
+                U+03B8 \
+                "a"    U+0250 U+0251 U+0252 U+1D02 "e"    U+0259 U+025B U+025C \
+                "i"    U+0268 U+026A "o"    U+0153 U+0275 U+0254 \
+                "u"    U+0289 "y"    U+026F U+028C U+028A
+
+   store(hatU)  U+2070 U+00B9 U+00B2 U+00B3 U+2074 U+2075 U+2076 U+2077 U+2078 U+2079 \
+                U+207B U+207A U+207C U+207D U+207E U+A71D \
+                U+02E4 U+02C0 U+1D47 U+1D5D U+1D9C U+1D9D U+1D48 U+1D9E U+1DA0 \
+                U+1D4D U+1Da2 U+02E0 U+02B0 U+02B1 U+1DA3 U+02B2 U+1DA8 \
+                U+1DA1 U+1D4F \
+                U+02E1 U+1DA9 U+1DAB U+1D50 U+1DAC U+207F U+1DAE U+1D51 U+1DAF U+1DB0 \
+                U+1D56 U+1DB2 U+02B3 U+02B4 U+02B5 U+02B6 U+02E2 U+1DB3 U+1DB4 \
+                U+1D57 U+1DAD U+1D5B U+1DB9 U+02B7 U+02E3 U+1DBB U+1DBD U+1DBC U+1DBE \
+                U+1DBF \
+                U+1D43 U+1D44 U+1D45 U+1D9B U+1D46 U+1D49 U+1D4A U+1D4B U+1D9F \
+                U+2071 U+1DA4 U+1DA6 U+1D52 U+A7F9 U+1DB1 U+1D53 \
+                U+1D58 U+1DB6 U+02B8 U+1D5A U+1DBA U+1DB7
+
+c Stores added for option key
+   store(EqSupK)         "?"    "b"    "d"    "g"    "h"    "j"    "L"    "n" \
+                         "N"    "f"    "r"    "s"    "v"    "z"    "t"    "a" \
+                         "o"    "e"    "I"    "i"    "O"    "U"    "u"
+   store(EqSuperscript)  U+02C0 U+1D5D U+1D9E U+02E0 U+1DA3 U+1DA1 U+1DAB U+1DAE  \
+                         U+1DB0 U+1DB2 U+02B4 U+1DB4 U+1DB9 U+1DBE U+1DBF U+1D45 \
+                         U+1D9B U+1D4A U+1DA4 U+1DA6 U+1DB1 U+1DB6 U+1D5A 
+                
+   store(LessSupK)         "?"    "c"    "g"    "h"    "y"    "j"    "l"    "n" \
+                           "R"    "s"    "z"    "e"    "E"    "o"    "u"
+   store(LessSuperscript)  U+02E4 U+1D9D U+1Da2 U+02B1 U+1DA3 U+1DA8 U+1DA9 U+1DAF \
+                           U+02B5 U+1DB3 U+1DBC U+1D4B U+A7F9 U+1D53 U+1DB7 
+
+   store(GreatSupK)        "m"    "n"    "R"    "w"    "z"    "a"    "A"    "e"    "u" 
+   store(GreatSuperscript)  U+1DAC U+1D51 U+02B6 U+1DAD U+1DBD U+1D44 U+1D46 U+1D9F U+1DBA 
+
+c "AETYZ" "adehilntuyz"  and un-superscript "1234567890"
+store(pipeD)  "A"    "E"    "T"    "Y"    "Z"    \
+              "a"    "d"    "e"    "h"    "i"    "l"    "n" \
+              "t"    "u"    "y"    "z" 
+store(pipeU)  U+1D00 U+1D07 U+0287 U+02AF U+0285 \
+              U+03B1 U+0221 U+029A U+0452 U+0269 U+0234 U+0235 \
+              U+0236 U+0277 U+02AE U+027F
+
+store(ldiaK) "+_%${"
+store(ldiaU) U+031F U+0331 U+0325 U+0329 U+032A
+
+c this one shouldn't work LP
+store(udiaK) '~*'
+store(udiaU) U+0303 U+0308 U+033D U+0306 U+030A
+
+store(toneU) U+030F U+030C U+0300 U+0304 U+0301 U+0302 U+030B \
+             U+1DC4 U+1DC6 U+1DC8 U+1DC9
+
+store(segmentU) U+02E9 U+02E8 U+02E7 U+02E6 U+02E5 U+A71C U+A71B U+2197 \
+                U+2198 U+02D0 U+02D1 U+207F U+02DE U+02BC U+031A U+005B \
+                U+005C U+005D U+02C8 U+02CC U+035C U+0361 U+203F
+
+store(fenceU) U+02E5 U+02E6 U+02E7 U+02E8 U+02E9
+store(leftstemU) U+A712 U+A713 U+A714 U+A715 U+A716
+
+c Removed because they are PUA
+c store(PitchContoursK) "1"    "2"    "3"    "4"    "5"    "6"    "7"    "8"    "9"
+c store(PitchContoursU) U+F1F1 U+F1F2 U+F1F3 U+F1F4 U+F1F5 U+F1F6 U+F1F7 U+F1F8 U+F1F9
+
+store(tildeK) "b"    "d"    "f"    "l"    "m"    "n"    "p"    "r"    \
+              U+027E "s"    "t"    "z"
+store(tildeU) U+1D6C U+1D6D U+1D6E U+026B U+1D6F U+1D70 U+1D71 U+1D72 \
+              U+1D73 U+1D74 U+1D75 U+1D76
+
+store(PalatalHookK) "b"    "d"    "f"    U+0261 "k"    "l"    "m"    "n" \
+                    "p"    "r"    "s"    U+0283 "v"    "x"    "z"
+store(PalatalHookU) U+1D80 U+1D81 U+1D82 U+1D83 U+1D84 U+1D85 U+1D86 U+1D87 \
+                    U+1D88 U+1D89 U+1D8A U+1D8B U+1D8C U+1D8D U+1D8E     
+store(RetroflexHookK) "a"    U+0251 U+0257 "e"    U+025B U+025C U+0259 "i" \
+                      U+0254 U+0283 "u"    U+0292
+store(RetroflexHookU) U+1D8F U+1D90 U+1D91 U+1D92 U+1D93 U+1D94 U+1D95 U+1D96 \
+                      U+1D97 U+1D98 U+1D99 U+1D9A 
+group(Unicode) using keys
+
+c handle ~~ for centre tilde
+any(tildeK) U+0303 + '~' > index(tildeU,1)
+
+c handle * (upper diacritic)
+U+0308 + '*' > U+033D
+U+033D + '*' > U+0306
+U+0306 + '*' > U+0307
+U+0307 + '*' > U+0310
+
+c handle $ (lower diacritic)
+U+0329 + '$' > U+032F
+U+032F + '$' > U+0330  
+any(RetroflexHookK) U+0330 + '$' > index(RetroflexHookU,1)
+U+0330 + '$' > U+0329
+
+c handle { (lower diacritic)
+U+032A + '{' > U+033A
+U+033A + '{' > U+033B
+U+033B + '{' > U+033C 
+U+033C + '{' > U+0323
+U+0323 + '{' > U+032A
+
+c handle % (lower diacritic)
+U+0325 + '%' > U+032C
+U+032C + '%' > U+0324
+any(PalatalHookK) U+0324 + '%' > index(PalatalHookU,1)
+U+0324 + '%' > U+0325
+
+c #0 #1 #2 #3 #4 #02 #20 #42 #24 #04 #40
+any(fenceU) + "0" > context U+02E9
+any(fenceU) + "1" > context U+02E8
+any(fenceU) + "2" > context U+02E7
+any(fenceU) + "3" > context U+02E6
+any(fenceU) + "4" > context U+02E5
+
+'#' + "0" > U+02E9
+'#' + "1" > U+02E8
+'#' + "2" > U+02E7
+'#' + "3" > U+02E6
+'#' + "4" > U+02E5
+
+any(leftstemU) + "0" > context U+A712
+any(leftstemU) + "1" > context U+A713
+any(leftstemU) + "2" > context U+A714
+any(leftstemU) + "3" > context U+A715
+any(leftstemU) + "4" > context U+A716
+
+c ##1 ##2 ##3 ##4 ##5 ##6 ##7 ##8 ##9
+
+c '##' + any(PitchContoursK) > index(PitchContoursU,3)
+c any(PitchContoursU) + any(PitchContoursK) > context index(PitchContoursU,2)
+c 
+'&' + "0" > U+A712
+'&' + "1" > U+A713
+'&' + "2" > U+A714
+'&' + "3" > U+A715
+'&' + "4" > U+A716
+
+c tie bar
+'#' + "&" > U+0361
+
+'#' + "!" > U+A71E c raised Africanist downstep
+'##' + "!" > U+A71F c raised Africanist downstep
+
+c @& for overlink
+U+030A + "&" > U+035C
+
+c handle ::
+U+02D0 + ":" > U+02D1
+U+02D1 + ":" > U+02D0 U+02D0
+
+c handle [[ which is really [[[
+"[" + "[" > U+02BD    c light aspiration
+U+02BD + "[" > U+02DE c rhoticity
+U+02DE + "[" > context
+
+c handle ]] and ]]]
+"]" + "]" > U+02BC
+U+02BC + "]" > U+031A
+U+031A + "]" > U+02BB c added for Chinese IPA
+
+c handle }}
+U+02C8 + "}" > U+02CC
+U+02CC + "}" > U+0348 c fortis
+U+0348 + "}" > U+1DC2 c lenis
+
+
+c Now all the diacritics
+
+c @
+c o-width first
+U+030A + "0" > U+030F
+U+030F + "0" > U+030F
+U+030F + "4" > U+030C
+
+c any(high) "*" + "1" > index(high,1) d152
+c any(high) any(ldia) "*" + "1" > index(high,1) index(ldia, 2) d152
+U+030A + "1" > U+0300
+U+0300 + "1" > U+0300
+U+0300 + "2" > U+1DC5 c low rising
+U+0300 + "3" > U+030C
+U+0301 + "2" > U+1DC7 c mid rising
+U+030C + "1" > U+1DC8 c low-high-low
+
+U+030A + "2" > U+0304
+U+0304 + "2" > U+0304 c mid
+U+0304 + "3" > U+1DC4 c mid-high
+U+0304 + "1" > U+1DC6 c mid-low
+
+U+030A + "3" > U+0301
+U+0301 + "3" > U+0301
+U+0301 + "1" > U+0302
+U+0302 + "3" > U+1DC9 c high-low-high
+
+U+030A + "4" > U+030B
+U+030B + "4" > U+030B
+U+030B + "0" > U+0302
+
+c + and _ sequences
+U+031F + "+" > U+031D
+U+031D + "+" > U+0318
+U+0318 + "+" > U+0339
+U+0339 + "+" > U+031F
+
+U+0320 + "_" > U+031E
+U+031E + "_" > U+0319
+U+0319 + "_" > U+031C                      
+"c"    + "_" > U+00E7 c preserve c cedilla at one codepoint
+U+031C + "_" > U+0327 c 0327 was added for Chinese IPA
+U+0327 + "_" > U+0320
+
+c General rules
+    + any(singleK) > index(singleU,1)
+c any(equalD) + "="  > index(equalU,1)
+c any(greatD) + ">"  > index(greatU,1)
+c any(lessD)  + "<"  > index(lessU,1)
+c any(hatD)   + "^"  > index(hatU,1)
+c any(pipeD)  + "|"  > index(pipeU,1) c this was added for Chinese IPA
+
+store(option_key) ''
+
+store(controls)  "=><^|"
+$keymanonly: store(controls-before) ["="][SHIFT ">"] [SHIFT "<"] [SHIFT '^'] [SHIFT "|"]
+
+$keymanonly: if(option_key = 'before') "=" + any(equalD)  > index(equalU,3)
+$keymanonly: if(option_key = 'before') ">" + any(greatD)  > index(greatU,3)
+$keymanonly: if(option_key = 'before') "<" + any(lessD)   > index(lessU,3)
+$keymanonly: if(option_key = 'before') "^" + any(hatD)    > index(hatU,3)
+$keymanonly: if(option_key = 'before') "|" + any(pipeD)   > index(pipeU,3) c this was added for Chinese IPA
+
+$keymanonly: if(option_key = 'before') "=" + "!"  > U+01C2 c added this rule since ! is already U+01C3 so above rules don't work
+$keymanonly: if(option_key = 'before') ">" + "!"  > U+01C1 c added this rule since ! is already U+01C3 so above rules don't work
+$keymanonly: if(option_key = 'before') "<" + "!"  > U+01C0 c added this rule since ! is already U+01C3 so above rules don't work
+$keymanonly: if(option_key = 'before') "=" + "+"  > U+002B c added this rule since + is already U+031F so above rules don't work
+$keymanonly: if(option_key = 'before') "=" + ">"  > U+2192 c added this rule since >= does not make as much sense
+$keymanonly: if(option_key = 'before') "=" + "<"  > U+034F c added this rule to retain existing sequence
+$keymanonly: if(option_key = 'before') "#" + "<"  > U+A71C c added this rule to retain existing sequence
+$keymanonly: if(option_key = 'before') "#" + ">"  > U+A71B c added this rule to retain existing sequence
+$keymanonly: if(option_key = 'before') U+01C3 + "^" > U+A71D c added this rule to retain existing sequence
+$keymanonly: if(option_key = 'before') U+A71B + ">" > U+2197 c added this rule to retain existing sequence
+$keymanonly: if(option_key = 'before') U+A71C + "<" > U+2198 c added this rule to retain existing sequence
+$keymanonly: if(option_key = 'before') "S"  + ">"  > U+03C3 c added this rule to retain existing sequence
+
+$keymanonly: if(option_key = 'before') U+207C + any(EqSupK)    > index(EqSuperscript,3)
+$keymanonly: if(option_key = 'before') "^<" + any(LessSupK)  > index(LessSuperscript,4)
+$keymanonly: if(option_key = 'before') "^>" + any(GreatSupK) > index(GreatSuperscript,4)
+
+if(option_key = '') any(equalD) + "="  > index(equalU,2)
+if(option_key = '') any(greatD) + ">"  > index(greatU,2)
+if(option_key = '') any(lessD)  + "<"  > index(lessU,2)
+if(option_key = '') any(hatD)   + "^"  > index(hatU,2)
+if(option_key = '') any(pipeD)  + "|"  > index(pipeU,2) c this was added for Chinese IPA
+
+c lower diacritic
+any(segmentU) + any(ldiaK) > context beep
+c any(udiaU) + any(ldiaK) > context beep
+c any(ldiaU) + any(ldiaK) > context beep
+c any(toneU) + any(ldiaK) > context beep
+          + any(ldiaK) > index(ldiaU,1)
+
+c upper diacritic
+any(segmentU) + any(udiaK) > context beep
+c any(toneU) + any(udiaK) > context beep
+c any(udiaU) + any(udiaK) > context beep
+          + any(udiaK) > index(udiaU,1)
+
+c tones
+any(toneU)    + "@" > context beep
+c any(segmentU) + "@" > context beep
+              + "@" > U+030A
+U+030A        + "@" > U+030D
+
+c This new rule (10-Sept-2007) is a fix for the problem of fast typing reordering keystrokes when using Keyman with TSF. I apparently must be the last rule in the group.
+c 12/12/2017 no longer needed
+c + any(chars) > index(chars, 1)
+
+c Added for touch screen
+ + [T_02D0_02D0] > U+02d0 U+02d0
+ + [T_02e7_02e5] > U+02e7 U+02e5
+ + [T_02e7_02e9] > U+02e7 U+02e9
+ + [T_02e8_02e5_02e8] > U+02e8 U+02e5 U+02e8
+ + [T_02e9_02e5] >      U+02e9 U+02e5
+ + [T_02e5_02e9] >   U+02e5 U+02e9
+ + [T_02e9_02e7] > U+02e9 U+02e7
+ + [T_02e8_02e7_02e8] > U+02e8 U+02e7 U+02e8
