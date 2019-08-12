@@ -35,8 +35,10 @@ prereq:
     cd $(KEYMAN_ROOT)\..\keyboards
 
 !ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) build.sh release/fv
     $(GIT_BASH_FOR_KEYMAN) build.sh release/packages/fv_all
 !else
+    start /wait ./build.sh release/fv
     start /wait ./build.sh release/packages/fv_all
 !endif
 
