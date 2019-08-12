@@ -110,7 +110,6 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
         }
 
         Intent intent = new Intent(context, LanguageSettingsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.putExtras(args);
         startActivity(intent);
 

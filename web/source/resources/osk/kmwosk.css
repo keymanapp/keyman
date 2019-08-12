@@ -181,7 +181,8 @@
   background-color: #b4b4b8; 
   display:inline-block; 
   text-align: center; 
-  border-radius: 5px
+  border-radius: 5px;
+  vertical-align: top;
 }
 
 .tablet.android .kmw-suggestion-text {

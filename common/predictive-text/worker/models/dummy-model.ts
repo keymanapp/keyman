@@ -33,6 +33,7 @@ namespace models {
    */
   export class DummyModel implements WorkerInternalModel {
     configuration: Configuration;
+    punctuation?: LexicalModelPunctuation;
     private _futureSuggestions: Suggestion[][];
 
     constructor(options?: any) {
@@ -41,6 +42,10 @@ namespace models {
       // this class mutates the array.
       this._futureSuggestions = options.futureSuggestions
         ? options.futureSuggestions.slice() : [];
+
+      if (options.punctuation) {
+        this.punctuation = options.punctuation;
+      }
     }
 
     configure(capabilities: Capabilities): Configuration {

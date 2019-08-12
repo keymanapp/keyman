@@ -1,15 +1,25 @@
 #!/bin/bash
 
+# Set sensible script defaults:
+# set -e: Terminate script if a command returns an error
+set -e
+# set -u: Terminate script if an unset variable is used
+set -u
+# set -x: Debugging use, print each statement
+# set -x
+
 if [ -z "$TARGET" ]; then
   exit 1
 fi
 
 display_usage ( ) {
-    echo "build.sh [-no-daemon] [-debug]"
-    echo
+    echo "build_common.sh [-no-daemon] [-debug] [-no-update] [-lib-build|-no-lib-build]"
     echo "Build $TARGET"
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
     echo "  -debug                  Compile only Debug variant"
+    echo "  -no-update              Don't copy or build the Keyman Engine library in (assumes already present)"
+    echo "  -lib-build              Force rebuild of the Keyman Engine library"
+    echo "  -no-lib-build           Only rebuild the Keyman Engine library if it doesn't exist in /android"
     exit 1
 }
 
@@ -49,7 +59,7 @@ while [[ $# -gt 0 ]] ; do
         -lib-build)
             FORCE_KMEA_BUILD=true
             ;;
-        -lib-nobuild)
+        -lib-nobuild|-no-lib-build)
             ALLOW_KMEA_BUILD=false
             ;;
         -h|-?)

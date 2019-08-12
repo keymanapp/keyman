@@ -1,7 +1,31 @@
 # Keyman for iPhone and iPad Version History
 
-## 12.0 alpha
-* Started work on Keyman for iPhone and iPad 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-08-11 12.0.13 beta
+* Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
+
+## 2019-08-08 12.0.12 beta
+* Fixes toggle alignment issues in the Settings UI (#1947)
+
+## 2019-07-29 12.0.11 beta
+* Initial beta release of Keyman for iPhone and iPad 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Aios+base%3Amaster)
+
+* New Features:
+  * Add new "Settings" menu (#1824)
+  * Add predictive text support (#1824)
+
+* Changes:
+  * Add automated tests (#1865)
+
+* Bug Fixes:
+  * Install a multilingual keyboard only to first language by default (#1610)
+  * Fix issue with LTR and RTL marks breaking Keyman context checks (#1756)
+
+## 2019-05-14 11.0.323 stable
+* Fixes bug with keyboards using 'nul' and 'context' statements (#1212)
 
 ## 2019-02-25 11.0.320 stable
 * 11.0 Stable release

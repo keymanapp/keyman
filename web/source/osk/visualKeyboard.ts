@@ -1539,11 +1539,11 @@ namespace com.keyman.osk {
       }
 
       try {
-        var t=<HTMLElement> this.spaceBar.firstChild.firstChild;
+        var t=<HTMLElement> this.spaceBar.firstChild;
         let tParent = <HTMLElement> t.parentNode;
         if(typeof(tParent.className) == 'undefined' || tParent.className == '') {
           tParent.className='kmw-spacebar';
-        } else {
+        } else if(tParent.className.indexOf('kmw-spacebar') == -1) {
           tParent.className +=' kmw-spacebar';
         }
 

@@ -1,10 +1,27 @@
 # Keyman for Android
 
-## 12.0 alpha
-* Add new "Settings" menu (#1751)
-* Update compile and target Android SDK version to 28 (#1654)
-* Add feature to install lexical model packages (#1641, 1653)
-* Started work on Keyman for Android 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-08-06 12.0.4076 beta
+* Adjustments to Settings UI (#1931)
+
+## 2019-08-05 12.0.4075 beta
+* Fixes issue with suggestion text misalignment (#1932)
+
+## 2019-07-29 12.0.4074 beta
+* Initial beta release of Keyman for Android 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Aandroid+base%3Amaster)
+
+* New Features:
+  * Add new "Settings" menu (#1751)
+  * Add predictive text support (#1641, #1653)
+
+* Changes:
+  * Minimum supported Android version is now 4.4 (KitKat) (#1905)
+
+* Bug Fixes:
+  * Improve stability of keyboard loading and app startup (#1907)
 
 ## 2019-06-28 11.0.2108 stable
 * Changes:

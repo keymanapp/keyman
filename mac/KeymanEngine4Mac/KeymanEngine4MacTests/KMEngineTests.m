@@ -491,4 +491,26 @@ NSString * names[nCombinations];
 //    NSString *output = [action objectForKey:actionType];
 //    XCTAssert([output isEqualToString:@"hardware macosx desktop native undefined !touch undefined macosx"], @"Expected !touch.");
 //}
+
+
+- (void)testEngine_ipaKeyboardAction_DoesNotCrash_Issue1892 {
+//  KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForSilIpaTests];
+//  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"a"];
+//  NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"=" charactersIgnoringModifiers:@"=" isARepeat:NO keyCode:kVK_ANSI_Equal];
+    KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForIndexOffsetTests];
+    KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"z"];
+    NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
+    NSArray *actions = [engine processEvent:event];
+    XCTAssert(actions.count == 2, @"Expected 2 actions");
+    NSDictionary *action = actions[0];
+    NSString *actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_BACK], @"Expected Q_BACK action");
+
+    action = actions[1];
+    actionType = [[action allKeys] objectAtIndex:0];
+    XCTAssert([actionType isEqualToString:Q_STR], @"Expected Q_STR action");
+    NSString *output = [action objectForKey:actionType];
+    XCTAssert([output isEqualToString:@"Z"], @"Expected output to be 'Z'.");
+}
+
 @end

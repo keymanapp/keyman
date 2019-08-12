@@ -48,6 +48,11 @@
      *  This should simplify a search term into a key.
      */
     searchTermToKey?: (searchTerm: string) => string;
+
+    /**
+     * Any punctuation to expose to the user.
+     */
+    punctuation?: LexicalModelPunctuation;
   }
 
   /**
@@ -72,6 +77,7 @@
     configuration: Configuration;
     private _trie: Trie;
     readonly breakWords: WordBreakingFunction;
+    readonly punctuation?: LexicalModelPunctuation;
 
     constructor(trieData: object, options: TrieModelOptions = {}) {
       this._trie = new Trie(
@@ -80,6 +86,7 @@
         options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
       this.breakWords = options.wordBreaker || wordBreakers.placeholder;
+      this.punctuation = options.punctuation;
     }
 
     configure(capabilities: Capabilities): Configuration {
@@ -94,7 +101,7 @@
       if (!transform.insert && context.startOfBuffer && context.endOfBuffer) {
         return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
           transform: {
-            insert: text + ' ', // TODO: do NOT add the space here!
+            insert: text,
             deleteLeft: 0
           },
           displayAs: text,
@@ -116,7 +123,7 @@
       return makeDistribution(this._trie.lookup(prefix).map(({text, p}) => ({
         transform: {
           // Insert the suggestion from the Trie, verbatim
-          insert: text + ' ',  // TODO: append space at a higher-level
+          insert: text,
           // Delete whatever the prefix that the user wrote.
           // Note: a separate capitalization/orthography engine can take this
           // result and transform it as needed.

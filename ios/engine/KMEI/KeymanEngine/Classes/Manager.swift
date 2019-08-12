@@ -17,17 +17,8 @@ typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
 // MARK: - Constants
 
-// Possible states that a keyboard can be in
+// Possible states that a keyboard or lexical model can be in
 public enum KeyboardState {
-  case needsDownload
-  case needsUpdate
-  case upToDate
-  case downloading
-  case none
-}
-
-// Possible states that a lexical model can be in
-public enum LexicalModelState {
   case needsDownload
   case needsUpdate
   case upToDate
@@ -264,7 +255,9 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   // returns lexical model id, given language id
   func preferredLexicalModel(_ ud: UserDefaults, forLanguage lgCode: String) -> InstallableLexicalModel? {
     if let preferredID = ud.preferredLexicalModelID(forLanguage: lgCode) {
-      return ud.userLexicalModels?.first { $0.id == preferredID }
+      // We need to match both the model id and the language code - registration fails
+      // when the language code mismatches the current keyboard's set code!
+      return ud.userLexicalModels?.first { $0.id == preferredID && $0.languageID == lgCode }
     }
     return nil
   }
@@ -311,7 +304,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     // If we have a lexical model for the keyboard's language, activate it.
     if let preferred_model = preferredLexicalModel(userDefaults, forLanguage: kb.languageID) {
       _ = Manager.shared.registerLexicalModel(preferred_model)
+    } else if let first_model = userDefaults.userLexicalModels?.first(where: { $0.languageID == kb.languageID }) {
+      _ = Manager.shared.registerLexicalModel(first_model)
     }
+    
+    inputViewController.fixLayout()
     
     return true
   }
@@ -480,30 +477,51 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// Removes the lexical model at index from the lexical models list if it exists.
-  /// - Returns: The lexical model exists and was removed
-  public func removeLexicalModel(at index: Int) -> Bool {
-    let userData = Storage.active.userDefaults
-    
+  public func removeLexicalModelFromUserList(userDefs ud: UserDefaults, at index: Int) -> InstallableLexicalModel? {
     // If user defaults for lexical models list does not exist, do nothing.
-    guard var userLexicalModels = userData.userLexicalModels else {
-      return false
+    guard var userLexicalModels = ud.userLexicalModels else {
+      return nil
     }
     
     guard index < userLexicalModels.count else {
-      return false
+      return nil
     }
     
     let lm = userLexicalModels[index]
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from user list of all models")
     userLexicalModels.remove(at: index)
-    userData.userLexicalModels = userLexicalModels
-    userData.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-    userData.synchronize()
-    
-    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID)")
-    
+    ud.userLexicalModels = userLexicalModels
+    ud.set([Date()], forKey: Key.synchronizeSWLexicalModel)
+    ud.synchronize()
+    return lm
+}
+  
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  public func removeLexicalModelFromLanguagePreference(userDefs ud: UserDefaults, _ lm: InstallableLexicalModel) {
+    log.info("Removing lexical model with ID \(lm.id) and languageID \(lm.languageID) from per-language prefs")
+    ud.set(preferredLexicalModelID: nil, forKey: lm.languageID)
+  }
+
+  /// Removes the lexical model at index from the lexical models list if it exists.
+  /// - Returns: The lexical model exists and was removed
+  public func removeLexicalModel(at index: Int) -> Bool {
+    let userData = Storage.active.userDefaults
+    guard let lm = removeLexicalModelFromUserList(userDefs: userData, at: index) else {
+      return false
+    }
+
+    removeLexicalModelFromLanguagePreference(userDefs: userData, lm)
+    inputViewController.deregisterLexicalModel(lm);
     // Set a new lexical model if deleting the current one
+    let userLexicalModels = userData.userLexicalModels! //removeLexicalModelFromUserList fails above if this is not present
+
     if lm.fullID == currentLexicalModelID {
-      _ = registerLexicalModel(userLexicalModels[0])
+      if let first_lm = userLexicalModels.first(where: {$0.languageID == lm.languageID}) {
+        _ = registerLexicalModel(first_lm)
+      } else {
+        log.info("no more lexical models available for language \(lm.fullID)")
+        currentLexicalModelID = nil
+      }
     }
     
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
@@ -1074,6 +1092,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+(error as! String))
         self.downloadFailed(forLanguageID: languageID, error: error) //???forKeyboards
       } else if nil == lexicalModels {
+        //TODO: put up an alert instead
         log.info("No lexical models available for language \(languageID) (nil)")
       } else if 0 == lexicalModels?.count {
         log.info("No lexical models available for language \(languageID) (empty)")
@@ -1274,7 +1293,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   }
   
   /// - Returns: The current state for a lexical model
-  public func stateForLexicalModel(withID lexicalModelID: String) -> LexicalModelState {
+  //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
+  public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     if lexicalModelIdForCurrentRequest() == lexicalModelID {
       return .downloading
     }
@@ -1520,7 +1540,8 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   /// TextView/TextField to enable/disable the keyboard picker
   public func showKeyboardPicker(in viewController: UIViewController, shouldAddKeyboard: Bool) {
     hideKeyboard()
-    let vc = KeyboardPickerViewController()
+    let vc = shouldAddKeyboard ? KeyboardPickerViewController() :
+      KeyboardSwitcherViewController()
     let nc = UINavigationController(rootViewController: vc)
     nc.modalTransitionStyle = .coverVertical
     nc.modalPresentationStyle = .pageSheet

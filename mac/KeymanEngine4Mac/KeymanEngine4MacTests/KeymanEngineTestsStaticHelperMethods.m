@@ -28,4 +28,17 @@
     KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
     return kmxFile;
 }
+
++ (KMXFile *)getKmxFileForSilIpaTests {
+  NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"sil_ipa.kmx" ofType:nil];
+  KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+  return kmxFile;
+}
+
++ (KMXFile *)getKmxFileForIndexOffsetTests {
+  NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"indexoffset1892.kmx" ofType:nil];
+  KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+  return kmxFile;
+}
+
 @end

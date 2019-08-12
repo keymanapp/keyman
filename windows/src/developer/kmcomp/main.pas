@@ -63,6 +63,10 @@ uses
 var
   hOutfile: THandle;
   HasWarning: Boolean = False;
+  MessageCount: Integer = 0;
+
+const
+  MAX_MESSAGES = 100;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FSilent, FWarnAsError: Boolean): Boolean; forward;   // I4706
 
@@ -79,7 +83,16 @@ begin
   else if (msgcode and CERR_FATAL) <> 0   then p := 'Fatal'
   else p := 'Memory';
 
-  str := System.AnsiStrings.Format('%s %d: %8.8X %s', [p, line, msgcode, text]);   // I3310
+  if(msgcode <> CWARN_Info) then
+  begin
+    Inc(MessageCount);
+    if MessageCount > MAX_MESSAGES then
+      Exit(1);
+
+    if MessageCount = MAX_MESSAGES
+      then str := System.AnsiStrings.Format('%s %d: 00000000 More than %d warnings or errors received; suppressing further messages', [p, line, MAX_MESSAGES])
+      else str := System.AnsiStrings.Format('%s %d: %8.8X %s', [p, line, msgcode, text]);   // I3310
+  end;
 
 	if hOutfile <> 0 then
   begin

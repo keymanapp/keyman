@@ -34,6 +34,7 @@
   <string name="more_info" translatable="false">More info</string>
   <string name="show_get_started" translatable="false">Show \"Get Started\" on startup</string>
 
+
   <!-- Keyman Settings menu strings -->
   <string name="keyman_settings" translatable="false">Settings</string>
   <string name="installed_languages_empty" translatable="false">Installed languages</string>

@@ -16,7 +16,7 @@ open class SettingsViewController: UITableViewController {
     super.viewWillAppear(animated)
     
     loadUserLanguages()
-    log.info("didAppear: SettingsViewController (actually willAppear)")
+    log.info("willAppear: SettingsViewController")
  }
   
   override open func viewDidLoad() {
@@ -118,34 +118,37 @@ open class SettingsViewController: UITableViewController {
       case "showbanner":
         cell.accessoryType = .none
         let showBannerSwitch = UISwitch()
+        showBannerSwitch.translatesAutoresizingMaskIntoConstraints = false
+        
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
         showBannerSwitch.frame = switchFrame
+        
         showBannerSwitch.isOn = false //TODO: find the setting this is to show!
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
+        
+        if #available(iOSApplicationExtension 9.0, *) {
+          showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        }
       case "showgetstarted":
         cell.accessoryType = .none
         let dontShowAgainSwitch = UISwitch()
-//        let rightOffset = cell.frame.size.width
-//        let switchWidth: CGFloat = 20
-//        let switchX = rightOffset - switchWidth
-//        let dontShowAgainSwitch = UISwitch()
-//        let switchHeight = dontShowAgainSwitch.frame.size.height
-//        let cellSwitchHeightDiff = cell.frame.size.height - switchHeight
-//        let switchY = cell.frame.origin.y + 0.5 * cellSwitchHeightDiff
-
-//        let switchFrame = CGRect(x: switchX,
-//                                 y: switchY,
-//                                 width: switchWidth,
-//                                 height: cell.frame.size.height)
+        dontShowAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
+        
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: dontShowAgainSwitch.frame.size)
         dontShowAgainSwitch.frame = switchFrame
+        
         dontShowAgainSwitch.isOn = dontShowGetStarted
         dontShowAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(dontShowAgainSwitch)
-
+        
+        if #available(iOSApplicationExtension 9.0, *) {
+          dontShowAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          dontShowAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        }
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
@@ -256,7 +259,13 @@ open class SettingsViewController: UITableViewController {
   }
   
   // MARK: - language access -
-  private func installed2API(_ installedList: [InstallableLexicalModel]) -> [LexicalModel] {
+  
+  /** returns an array of LexicalModel created from an array of InstallableLexicalModel
+   *  @param installedList: The InstallableLexicalModel are probably already installed
+   *  The returned LexicalModels are not complete (usually we go the other way round)
+   *    but sufficient for future API calls
+   */
+  public static func installed2API(_ installedList: [InstallableLexicalModel]) -> [LexicalModel] {
     var returnList = [LexicalModel]()
     for ilm in installedList {
       returnList.append(LexicalModel(id: ilm.id, name: ilm.name, license: "", version: ilm.version, languages: [], authorName: "", fileSize: 0, filename: "no filename", sourcePath: nil, authorEmail: nil, description: nil, packageFileSize: 0, packageFilename: "", packageIncludes: nil, isDefault: false, lastModified: nil, minKeymanVersion: nil))
@@ -283,7 +292,7 @@ open class SettingsViewController: UITableViewController {
       }
       let userDefaults : UserDefaults = Storage.active.userDefaults
       let lmListInstalled: [InstallableLexicalModel] = userDefaults.userLexicalModelsForLanguage(languageID: l) ?? []
-      let lmList = installed2API(lmListInstalled)
+      let lmList = SettingsViewController.installed2API(lmListInstalled)
       keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: lmList, font: nil, oskFont: nil)
     }
     // there shouldn't be any lexical models for languages that don't have a keyboard installed
@@ -299,7 +308,12 @@ open class SettingsViewController: UITableViewController {
     }
 
     userLanguages = keyboardLanguages
-    itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
+    if 1 == userLanguages.count {
+      itemsArray[0]["subtitle"] = "one language installed"
+    } else {
+      itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
+    }
+    tableView.reloadData()
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {

@@ -9,7 +9,7 @@
 import Foundation
 
 struct InstallableConstants {
-  static let defaultVersion = "0.1.0"
+  static let defaultVersion = "1.0"
 }
 
 /// Mainly differs from the API `LexicalModel` by having an associated language.

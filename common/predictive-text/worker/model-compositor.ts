@@ -1,19 +1,22 @@
 class ModelCompositor {
   private lexicalModel: WorkerInternalModel;
   private static readonly MAX_SUGGESTIONS = 12;
+  private readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: WorkerInternalModel) {
     this.lexicalModel = lexicalModel;
+    this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
   }
 
   protected isWhitespace(transform: Transform): boolean {
     // Matches prefixed text + any instance of a character with Unicode general property Z* or the following: CR, LF, and Tab.
-    // TODO:  Unfortunately, this regex isn't IE-compatible.  Find a solution that at least
-    //        doesn't prevent loading on IE.
-    //let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]/iu;
+    let whitespaceRemover = /.*[\u0009\u000A\u000D\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u202f\u205f\u3000]/i;
     
-    // Temp solution:
-    let whitespaceRemover = /.*\s/; // At least handles standard whitespace.
+    // Filter out null-inserts; their high probability can cause issues.
+    if(transform.insert == '') { // Can actually register as 'whitespace'.
+      return false;
+    }
+
     let insert = transform.insert;
 
     insert = insert.replace(whitespaceRemover, '');
@@ -27,6 +30,7 @@ class ModelCompositor {
 
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
     let suggestionDistribution: Distribution<Suggestion> = [];
+    let punctuation = this.punctuation;
 
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
@@ -58,6 +62,14 @@ class ModelCompositor {
       } else if(this.isBackspace(transform) && !allowBksp) {
         continue;
       }
+
+      let preserveWhitespace: boolean = false;
+      if(this.isWhitespace(transform)) {
+        // Detect start of new word; prevent whitespace loss here.
+        let postContext = models.applyTransform(transform, context);
+        preserveWhitespace = (this.lexicalModel.wordbreak(postContext) == '');
+      }
+
       let distribution = this.lexicalModel.predict(transform, context);
 
       distribution.forEach(function(pair: ProbabilityMass<Suggestion>) {
@@ -65,6 +77,18 @@ class ModelCompositor {
         // Only bother is there IS an ID to copy.
         if(transform.id !== undefined) {
           pair.sample.transformId = transform.id;
+        }
+
+        // Prepends the original whitespace, ensuring it is preserved if
+        // the suggestion is accepted.
+        if(preserveWhitespace) {
+          models.prependTransform(pair.sample.transform, transform);
+        }
+        
+        // The model is trying to add a word; thus, add some custom formatting
+        // to that word.
+        if (pair.sample.transform.insert.length > 0) {
+          pair.sample.transform.insert += punctuation.insertAfterWord;
         }
 
         // Combine duplicate samples.
@@ -94,13 +118,19 @@ class ModelCompositor {
         transformId: inputTransform.id,
         // Replicate the original transform, modified for appropriate language insertion syntax.
         transform: {
-          insert: inputTransform.insert + ' ',
+          insert: inputTransform.insert + punctuation.insertAfterWord,
           deleteLeft: inputTransform.deleteLeft,
           deleteRight: inputTransform.deleteRight,
           id: inputTransform.id
         },
         tag: 'keep'
       };
+    }
+
+    // Add the surrounding quotes to the "keep" option's display string:
+    if (keepOption) {
+      let { open, close } = punctuation.quotesForKeepSuggestion;
+      keepOption.displayAs = open + keepOption.displayAs + close;
     }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper
@@ -124,4 +154,38 @@ class ModelCompositor {
 
     return suggestions;
   }
+
+  /**
+   * Returns the punctuation used for this model, filling out unspecified fields
+   */
+  private static determinePunctuationFromModel(model: WorkerInternalModel): LexicalModelPunctuation {
+    let defaults = DEFAULT_PUNCTUATION;
+
+    // Use the defaults of the model does not provide any punctuation at all.
+    if (!model.punctuation)
+      return defaults;
+
+    let specifiedPunctuation = model.punctuation;
+    let insertAfterWord = specifiedPunctuation.insertAfterWord;
+    if (insertAfterWord !== '' && !insertAfterWord) {
+      insertAfterWord = defaults.insertAfterWord;
+    }
+
+    let quotesForKeepSuggestion = specifiedPunctuation.quotesForKeepSuggestion;
+    if (!quotesForKeepSuggestion) {
+      quotesForKeepSuggestion = defaults.quotesForKeepSuggestion;
+    }
+
+    return {
+      insertAfterWord, quotesForKeepSuggestion
+    }
+  }
 }
+
+/**
+ * The default punctuation and spacing produced by the model.
+ */
+const DEFAULT_PUNCTUATION: LexicalModelPunctuation = {
+  quotesForKeepSuggestion: { open: `“`, close: `”`},
+  insertAfterWord: " " ,
+};

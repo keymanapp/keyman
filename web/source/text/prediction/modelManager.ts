@@ -185,10 +185,10 @@ namespace com.keyman.text.prediction {
             // Because this is executed from a Promise, it's possible to have a race condition
             // where the 'loaded' event triggers after an 'unloaded' event meant to disable the model.
             // (Especially in the embedded apps.)  This will catch these cases.
-            if(mm.mayPredict || mm.mayCorrect) {
+            if(mm.enabled) {
               keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
             } else {
-              this.unloadModel();
+              mm.unloadModel();
             }
           }).catch(function(failReason: any) {
             // Does this provide enough logging information?
@@ -374,7 +374,7 @@ namespace com.keyman.text.prediction {
     }
 
     public get enabled(): boolean {
-      return this._mayPredict || this._mayCorrect;
+      return this._mayPredict;
     }
 
     private canEnable(): boolean {
@@ -396,12 +396,16 @@ namespace com.keyman.text.prediction {
 
       if(flag) {
         let lgCode = keyman.keyboardManager.getActiveLanguage();
-        if(this.registeredModels[lgCode]) {
+        if(this.languageModelMap[lgCode]) {
           // Just reuse the existing model-change trigger code.
           this.onKeyboardChange(lgCode);
         }
-      } else if(this.activeModel) { // We only need to unload a model when one is actually loaded.
-        this.unloadModel();
+      } else {
+        if(this.activeModel) { // We only need to unload a model when one is actually loaded.
+          this.unloadModel();
+        }
+
+        // Ensure that the banner is unloaded.
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
     }
@@ -428,16 +432,7 @@ namespace com.keyman.text.prediction {
     }
 
     public set mayCorrect(flag: boolean) {
-      let enabled = this.enabled;
-
-      if(!this.canEnable()) {
-        return;
-      }
-
       this._mayCorrect = flag;
-      if(enabled != this.enabled) {
-        this.doEnable(flag);
-      }
     }
 
     public tryAcceptSuggestion(source: string): boolean {

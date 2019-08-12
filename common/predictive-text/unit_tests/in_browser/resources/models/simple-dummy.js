@@ -7,6 +7,13 @@
     function Model() { // implements Model
     }
 
+    Model.punctuation = {
+      quotesForKeepSuggestion: { open: '“', close: '”'},
+      // Important! Set this, or else the model compositor will
+      // insert something for us!
+      insertAfterWord: "",
+    };
+
     // A direct import/copy from i_got_distracted_by_hazel.json.
     Model.futureSuggestions = [
       [
@@ -29,7 +36,7 @@
             "insert": "Oh ",
             "deleteLeft": 0
           },
-          "displayAs": "Oh "
+          "displayAs": "Oh"
         }
       ],
       [
@@ -107,5 +114,5 @@
   }());
 
   // It's a 'dummy' model, so there's no need for extra methods and such within the Model's class definition.
-  LMLayerWorker.loadModel(new models.DummyModel({futureSuggestions: Model.futureSuggestions}));
+  LMLayerWorker.loadModel(new models.DummyModel({futureSuggestions: Model.futureSuggestions, punctuation: Model.punctuation}));
 })();

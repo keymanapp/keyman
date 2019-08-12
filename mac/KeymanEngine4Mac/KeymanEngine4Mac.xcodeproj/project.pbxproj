@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D022FCCF0A00B481B5 /* sil_ipa.kmx */; };
+		378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D222FCD93300B481B5 /* indexoffset1892.kmx */; };
 		980053351B37C9B50088DDDD /* NFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053311B37C9B50088DDDD /* NFont.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		980053361B37C9B50088DDDD /* NFont.m in Sources */ = {isa = PBXBuildFile; fileRef = 980053321B37C9B50088DDDD /* NFont.m */; };
 		980053371B37C9B50088DDDD /* NKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053331B37C9B50088DDDD /* NKey.h */; };
@@ -64,6 +66,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		378568D022FCCF0A00B481B5 /* sil_ipa.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = sil_ipa.kmx; sourceTree = "<group>"; };
+		378568D222FCD93300B481B5 /* indexoffset1892.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = indexoffset1892.kmx; sourceTree = "<group>"; };
 		980053311B37C9B50088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
 		980053321B37C9B50088DDDD /* NFont.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NFont.m; sourceTree = "<group>"; };
 		980053331B37C9B50088DDDD /* NKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKey.h; sourceTree = "<group>"; };
@@ -204,6 +208,8 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				378568D222FCD93300B481B5 /* indexoffset1892.kmx */,
+				378568D022FCCF0A00B481B5 /* sil_ipa.kmx */,
 				E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */,
 				E224323E20D37E97006940A1 /* PlatformTest.kmx */,
 				E2537D99201641DA0069FEA6 /* TestMacEngine.kmx */,
@@ -346,6 +352,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 984C2AC81A79C98D0023F89D;
@@ -371,8 +378,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */,
 				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
 				E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */,
+				378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */,
 				E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
