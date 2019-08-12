@@ -144,7 +144,7 @@ uses
 
   extctrls, stdctrls, comctrls;
 
-function FirstRun(FQuery: string): Boolean; forward;  // I2562
+function FirstRun(FQuery, FDisablePackages: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 
@@ -186,7 +186,8 @@ begin
   end;
 end;
 
-function Init(var FMode: TKMShellMode; KeyboardFileNames: TWideStrings; var FSilent, FForce, FNoWelcome: Boolean; var FLogFile, FQuery: string): Boolean;
+function Init(var FMode: TKMShellMode; KeyboardFileNames: TWideStrings; var FSilent, FForce, FNoWelcome: Boolean;
+  var FLogFile, FQuery: string; var FDisablePackages: string; var FStartWithConfiguration: Boolean): Boolean;
 var
   s: string;
   i: Integer;
@@ -195,6 +196,8 @@ begin
   FSilent := False;
   FForce := False;
   FNoWelcome := False;
+  FStartWithConfiguration := False;
+  FDisablePackages := '';
   FQuery := '';
   FMode := fmStart;
   KeyboardFileNames.Clear;
@@ -237,6 +240,8 @@ begin
       else if s = '-upgrademnemoniclayout' then FMode := fmUpgradeMnemonicLayout   // I4553
       else if s = '-repair' then FMode := fmRepair   // I4773
       else if s = '-keepintouch' then FMode := fmKeepInTouch
+      else if Copy(s,1,Length('-disablepackages')) = '-disablepackages' then begin FDisablePackages := Copy(s, Length('-disablepackages')+2, MaxInt); end // Used with -firstrun
+      else if s = '-startwithconfiguration' then FStartWithConfiguration := True
       else if s = '-q'   then
       begin
         FQuery := ''; Inc(i);
@@ -264,7 +269,8 @@ begin
   RegisterClasses([TImage, TCheckBox, TLabel, TButton, TPanel, TGroupBox, TPageControl, TTabSheet]);
 end;
 
-procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean; FLogFile, FQuery: string); forward;
+procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean;
+  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean); forward;
 
 procedure Run;
 var
@@ -274,7 +280,8 @@ var
   FNoWelcome: Boolean;
   FForce: Boolean;
   FLogFile: string;
-
+  FDisablePackages: string;
+  FStartWithConfiguration: Boolean;
 begin
   RegisterControlClasses;
 
@@ -291,7 +298,7 @@ begin
 
   KeyboardFileNames := TWideStringList.Create;
   try
-    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery) then
+    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration) then
     begin
   //TODO:   TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
       Exit;
@@ -299,7 +306,7 @@ begin
 
     if not LoadKMCOM then Exit;
     try
-      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery);
+      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration);
     finally
       kmcom := nil;
     end;
@@ -308,7 +315,8 @@ begin
   end;
 end;
 
-procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean; FLogFile, FQuery: string);
+procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean;
+  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean);
 var
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
@@ -378,7 +386,7 @@ begin
       PrintKeyboard(FirstKeyboardFileName);
 
     fmFirstRun:  // I2562
-      if FirstRun(FQuery)
+      if FirstRun(FQuery, FDisablePackages)
         then ExitCode := 0
         else ExitCode := 2;
 
@@ -412,7 +420,7 @@ begin
 
     fmStart:
       begin  // I2720
-        StartKeyman(False, FSilent);
+        StartKeyman(False, FSilent, FStartWithConfiguration);
       end;
     fmSplash:
       ShowSplash;
@@ -495,7 +503,7 @@ begin
   FreeAndNil(FMutex);  // I2720
 end;
 
-function FirstRun(FQuery: string): Boolean; // I2562
+function FirstRun(FQuery, FDisablePackages: string): Boolean; // I2562
 var
   DoAdmin: Boolean;
 begin
@@ -505,7 +513,11 @@ begin
   if not DoAdmin then
   begin
     // I2651 - options not matching, case sensitivity, 8.0.309.0
-    Result := FirstRunInstallDefaults(Pos('installdefaults', FQuery) > 0, Pos('startwithwindows', FQuery) > 0, Pos('checkforupdates', FQuery) > 0);  // I2651, I2753
+    Result := FirstRunInstallDefaults(
+      Pos('installdefaults', FQuery) > 0,
+      Pos('startwithwindows', FQuery) > 0,
+      Pos('checkforupdates', FQuery) > 0,
+      FDisablePackages);  // I2651, I2753
   end;
 
   UpdateAllLocaleDoctypes; // I2605

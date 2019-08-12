@@ -46,6 +46,7 @@ type
     TooManyParams: Boolean;
   public
     OutputPath, RedistPath, MSIFileName, KMPFileName, KMPName, AppName, LicenseFileName, TitleImageFileName: WideString;  // I2562   // I4763
+    StartDisabled, StartWithConfiguration: Boolean;
     constructor Create;
     function Validate: Boolean;
     function Completed: Boolean;
@@ -85,7 +86,8 @@ begin
     try
       if not DoCompilePackageInstaller(pack, Params.CompilerMessage, False, Params.MSIFileName,
           ChangeFileExt(Params.MSIFileName,'')+'-'+ChangeFileExt(ExtractFileName(Params.KMPFileName),'')+'.exe', Params.RedistPath,
-          False, False, Params.LicenseFileName, Params.TitleImageFileName, Params.AppName) then   // I4598   // I4694   // I4764
+          False, False, Params.LicenseFileName, Params.TitleImageFileName, Params.AppName,
+          Params.StartDisabled, Params.StartWithConfiguration) then   // I4598   // I4694   // I4764
         ExitCode := 1
       else
         ExitCode := 0;
@@ -105,7 +107,8 @@ begin
         Params.OutputPath := ChangeFileExt(Params.MSIFileName, '.exe');
 
       if not DoCompileMSIInstaller(Params.CompilerMessage, False, Params.MSIFileName, Params.OutputPath, Params.RedistPath,
-        Params.LicenseFileName, Params.TitleImageFileName, Params.AppName) then  // I2562
+        Params.LicenseFileName, Params.TitleImageFileName, Params.AppName,
+        Params.StartDisabled, Params.StartWithConfiguration) then  // I2562
         ExitCode := 1
       else
         ExitCode := 0;
@@ -164,6 +167,14 @@ begin
       TitleImageFileName := ParamStr(i)
     else if Flag = '-a' then
       AppName := ParamStr(i)
+    else if SameText(Flag, '-startDisabled') then
+    begin
+      Dec(i); StartDisabled := True;
+    end
+    else if SameText(Flag, '-startWithConfiguration') then
+    begin
+      Dec(i); StartWithConfiguration := True;
+    end
     else
     begin
       KMPFileName := Flag;

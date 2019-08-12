@@ -90,7 +90,7 @@ begin
 
   try
     try
-      Result := DoCompilePackageInstaller(pack, SelfMessage, FSilent, '', TargetInstallerFilename, '', False, True, '', '', '');
+      Result := DoCompilePackageInstaller(pack, SelfMessage, FSilent, '', TargetInstallerFilename, '', False, True, '', '', '', False, False);
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
         Result := False;
 

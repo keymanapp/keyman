@@ -14,7 +14,6 @@ inherited frmSplash: TfrmSplash
   inherited web: TKeymanEmbeddedWB
     Width = 409
     Height = 332
-    Silent = False
     ExplicitWidth = 409
     ExplicitHeight = 330
     ControlData = {

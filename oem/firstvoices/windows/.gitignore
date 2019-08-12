@@ -4,6 +4,7 @@ src/inst/*.wixpdb
 src/inst/*.msi
 src/inst/*.exe
 src/inst/download.mak
+src/inst/fv_all.kmp
 **/Thumbs.db
 
 # Temporary ignores

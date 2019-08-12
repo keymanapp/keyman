@@ -47,7 +47,7 @@ desktop: prereq
     $(MAKE) -fdownload.mak candle-desktop
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out $(MSI) -ext WixUIExtension $(DESKTOP_FILES) 
     $(SIGNCODE) /d $(APPTITLE) $(MSI)
-    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE) -n "FirstVoices Keyboards" $(KMP)
+    $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE) -n "FirstVoices Keyboards" -startDisabled -startWithConfiguration $(KMP)
     if exist $(EXE) del $(EXE)
     ren $(INTEXE) $(EXE)
     $(SIGNCODE) /d $(APPTITLE) $(EXE)

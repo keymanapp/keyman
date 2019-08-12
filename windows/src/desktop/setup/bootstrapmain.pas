@@ -64,6 +64,8 @@ type
     FStrings: TStrings;
     FLicenseFileName: WideString;  // I2562
     FTitleImageFilename: string;
+    FStartDisabled: Boolean;
+    FStartWithConfiguration: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -78,6 +80,8 @@ type
     property Packages: TStrings read FPackages;
     property LicenseFileName: WideString read FLicenseFileName;  // I2562
     property TitleImageFilename: string read FTitleImageFilename;
+    property StartDisabled: Boolean read FStartDisabled;
+    property StartWithConfiguration: Boolean read FStartWithConfiguration;
   end;
 
 var
@@ -524,7 +528,9 @@ begin
         else if WideSameText(nm, 'MSIFileName') then FMSIFileName := val
         else if WideSameText(nm, 'TitleImage') then FTitleImageFileName := val
         else if WideSameText(nm, 'License') then FLicenseFileName := val  // I2562
-        else if WideSameText(nm, 'MSIOptions') then FMSIOptions := val;   // I3126
+        else if WideSameText(nm, 'MSIOptions') then FMSIOptions := val   // I3126
+        else if WideSameText(nm, 'StartWithConfiguration') then FStartWithConfiguration := StrToBoolDef(val, False)
+        else if WideSameText(nm, 'StartDisabled') then FStartDisabled := StrToBoolDef(val, False);
       end
       else if FInPackages then
         FPackages.Add(Strings[i])
