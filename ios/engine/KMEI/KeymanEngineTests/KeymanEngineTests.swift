@@ -9,6 +9,8 @@
 import XCTest
 
 @testable import KeymanEngine
+import DeviceKit
+
 
 class KeymanEngineTests: XCTestCase {
   

@@ -1,7 +1,19 @@
 # Keyman for macOS Version History
 
-## 12.0 alpha
-* Started work on Keyman for macOS 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-07-29 12.0.5 beta
+* Initial beta release of Keyman for Mac 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Amac+base%3Amaster)
+
+* Bug Fixes:
+  * Fix keyboard download passed wrong version string (#1814)
+
+## 2019-02-26 11.0.221 stable
+* Add support for option stores (if/set/reset/save statements) (#1838)
+* Fix bug where keyboards with more than nine deadkeys did not operate correctly (#1839)
+* Fix out of date context buffer when using command keys (#1840)
 
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release

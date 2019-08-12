@@ -89,6 +89,8 @@ extern NSString *const kWebSite;
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
+- (void)loadSavedStores;
+- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;

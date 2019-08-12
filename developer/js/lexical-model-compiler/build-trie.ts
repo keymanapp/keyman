@@ -5,22 +5,6 @@
 type WordList = [string, number][];
 
 /**
- * Returns a data structure suitable for use by the wordlist model.
- *
- * @param sourceFiles an array of the CONTENTS of source files
- *
- * @return a data structure that will be used internally by the wordlist
- *         implemention. Currently this is an array of [wordlist, count] pairs.
- */
-export function createWordListDataStructure(sourceFiles: string[]): string {
-  // NOTE: this generates a simple array of word forms --- not a trie!
-  // In the future, this function may construct a true trie data structure,
-  // but this is not yet implemented.
-  let contents = sourceFiles.join('\n');
-  return JSON.stringify(parseWordList(contents));
-}
-
-/**
  * Returns a data structure that can be loaded by the TrieModel.
  *
  * It implements a **weighted** trie, whose indices (paths down the trie) are
@@ -39,16 +23,19 @@ export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?:
  *
  * Format specification:
  *
- *  - the file is a UTF-8 encoded text file
- *  - new lines are either LF or CRLF
- *  - the file either consists of a comment or an entry
- *  - comment lines MUST start with the '#' character on the very first column
+ *  - the file is a UTF-8 encoded text file.
+ *  - new lines are either LF or CRLF.
+ *  - the file MAY start with the UTF-8 byte-order mark (BOM); that is, if the
+ *    first three bytes of the file are EF BB BF, these will be interepreted as
+ *    the BOM and will be ignored.
+ *  - the file either consists of a comment or an entry.
+ *  - comment lines MUST start with the '#' character on the very first column.
  *  - entries are one to three columns, separated by the (horizontal) tab
- *    character
+ *    character.
  *  - column 1 (REQUIRED): the wordform: can have any character except tab, CR,
  *    LF. Surrounding whitespace characters are trimmed.
  *  - column 2 (optional): the count: a non-negative integer specifying how many
- *    times this entry has appeared in the corpus. Blank means 'indeterminate'
+ *    times this entry has appeared in the corpus. Blank means 'indeterminate'.
  *  - column 3 (optional): comment: an informative comment, ignored by the tool.
  */
 export function parseWordList(contents: string): WordList {
@@ -60,6 +47,11 @@ export function parseWordList(contents: string): WordList {
 
   let result: WordList = [];
   for (let line of lines) {
+    // Remove the byte-order mark (BOM) from the beginning of the string.
+    // Because `contents` can be the concatenation of several files, we have to remove
+    // the BOM from every possible start of file -- i.e., beginning of every line.
+    line = line.replace(/^\uFEFF/, '');
+
     if (line.startsWith('#') || line === "") {
       continue; // skip comments and empty lines
     }
@@ -108,17 +100,17 @@ namespace Trie {
   //   The MIT License
   //   Copyright (c) 2015-2017 Conrad Irwin <conrad.irwin@gmail.com>
   //   Copyright (c) 2011 Marc Campbell <marc.e.campbell@gmail.com>
-  // 
+  //
   //   Permission is hereby granted, free of charge, to any person obtaining a copy
   //   of this software and associated documentation files (the "Software"), to deal
   //   in the Software without restriction, including without limitation the rights
   //   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   //   copies of the Software, and to permit persons to whom the Software is
   //   furnished to do so, subject to the following conditions:
-  // 
+  //
   //   The above copyright notice and this permission notice shall be included in
   //   all copies or substantial portions of the Software.
-  // 
+  //
   //   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   //   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   //   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -184,10 +176,14 @@ namespace Trie {
    *
    * @param wordlist    The wordlist with non-negative weights.
    * @param keyFunction Function that converts word forms into indexed search keys
-   * @returns The root node as a JSON-serialiable object.
+   * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
   export function buildTrie(wordlist: WordList, keyFunction: Wordform2Key = defaultWordform2Key): object {
-    return new Trie(keyFunction).buildFromWordList(wordlist).root;
+    let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
+    return {
+      totalWeight: sumWeights(root),
+      root: root
+    }
   }
 
   /**
@@ -345,6 +341,24 @@ namespace Trie {
   }
 
   /**
+   * O(n) recursive traversal to sum the total weight of all leaves in the
+   * trie, starting at the provided node.
+   *
+   * @param node The node to start summing weights.
+   */
+  function sumWeights(node: Node): number {
+    if (node.type === 'leaf') {
+      return node.entries
+        .map(entry => entry.weight)
+        .reduce((acc, count) => acc + count, 0);
+    } else {
+      return Object.keys(node.children)
+        .map((key) => sumWeights(node.children[key]))
+        .reduce((acc, count) => acc + count, 0);
+    }
+  }
+
+  /**
    * Converts word forms in into an indexable form. It does this by converting
    * the string to uppercase and trying to remove diacritical marks.
    *
@@ -364,7 +378,7 @@ namespace Trie {
     const COMBINING_DIACRITICAL_MARKS = /[\u0300-\u036f]/g;
     return wordform
       .normalize('NFD')
-      .toUpperCase()
+      .toLowerCase()
       // remove diacritical marks.
       .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
   }

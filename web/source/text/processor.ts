@@ -38,7 +38,7 @@ namespace com.keyman.text {
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
       var Lkc: KeyEvent;
 
       let keyName = Lkc.kName;
@@ -70,16 +70,26 @@ namespace com.keyman.text {
 
         switch(code) {
           case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            keyman.interface.defaultBackspace();
+            if(disableDOM) {
+              return '\b'; // the escape sequence for backspace.
+            } else {
+              keyman.interface.defaultBackspace();
+            }
             return '';
           case Codes.keyCodes['K_TAB']:
-            domManager.moveToNext(keyShiftState);
+            if(!disableDOM) {
+              domManager.moveToNext(keyShiftState);
+            }
             break;
           case Codes.keyCodes['K_TABBACK']:
-            domManager.moveToNext(true);
+            if(!disableDOM) {
+              domManager.moveToNext(true);
+            }
             break;
           case Codes.keyCodes['K_TABFWD']:
-            domManager.moveToNext(false);
+            if(!disableDOM) {
+              domManager.moveToNext(false);
+            }
             break;
           case Codes.keyCodes['K_ENTER']:
             // Insert new line in text area fields
@@ -95,12 +105,13 @@ namespace com.keyman.text {
               } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
                 inputEle = <HTMLInputElement> Lelem.base;
               }
-
-              if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
-                inputEle.disabled=false;
-                inputEle.form.submit();
-              } else {
-                domManager.moveToNext(false);
+              if(!disableDOM) {
+                if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
+                  inputEle.disabled=false;
+                  inputEle.form.submit();
+                } else {
+                  domManager.moveToNext(false);
+                }
               }
             }
             break;
@@ -210,33 +221,20 @@ namespace com.keyman.text {
       }
     }
 
-    _GetClickEventProperties(e: osk.KeyElement, Lelem: HTMLElement): KeyEvent {
+    _GetClickEventProperties(e: osk.ActiveKey, Lelem: HTMLElement): KeyEvent {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let formFactor = keyman.util.device.formFactor;
-      let outputTarget = Processor.getOutputTarget(Lelem);
 
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
       // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer=e['key'].spec.layer || e['key'].layer || '', keyName=e['keyId'].toUpperCase();
-      var keyShiftState = this.getModifierState(keyman['osk'].vkbd.layerId);
-
-      keyman.domManager.initActiveElement(Lelem);
-
-      // Turn off key highlighting (or preview)
-      keyman['osk'].vkbd.highlightKey(e,false);
-      
-      // Clear any cached codepoint data; we can rebuild it if it's unchanged.
-      outputTarget.invalidateSelection();
-      // Deadkey matching continues to be troublesome.
-      // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-      outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+      var layer = e.layer || e.displayLayer || '', keyName=e.id.toUpperCase();
 
       // Start:  mirrors _GetKeyEventProperties
 
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      keyShiftState = this.getModifierState(e['key'].spec['layer'] || layer);
+      var keyShiftState = this.getModifierState(layer);
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: KeyEvent = {
@@ -248,7 +246,8 @@ namespace com.keyman.text {
         vkCode: 0,
         kName: keyName,
         kLayer: layer,
-        kNextLayer: e['key'].spec['nextlayer']
+        kbdLayer: e.displayLayer,
+        kNextLayer: e.nextlayer
       };
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
@@ -314,6 +313,53 @@ namespace com.keyman.text {
       }
     }
 
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): boolean {
+      let keyman = com.keyman.singleton;
+
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      let kbdInterface = keyman.interface;
+      let keyMapManager = keyman.keyMapManager;
+
+      if(!keyman.isEmbedded && !fromOSK && !window.event) {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
+          keyEvent.Lcode=keyMapManager.browserMap.FF['k'+keyEvent.Lcode];
+        }
+      }
+
+      var LeventMatched = 0;
+      this.swallowKeypress = false;
+
+      // Pass this key code and state to the keyboard program
+      if(activeKeyboard && keyEvent.Lcode != 0) {
+        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+      }
+
+      if(!LeventMatched) {
+        // Restore the virtual key code if a mnemonic keyboard is being used
+        // If no vkCode value was stored, maintain the original Lcode value.
+        keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
+
+        // Handle unmapped keys, including special keys
+        // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
+        if(ch) {
+          if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
+            // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
+            kbdInterface.defaultBackspace(outputTarget);
+          } else {
+            kbdInterface.output(0, outputTarget, ch);
+          }
+          LeventMatched = 1;
+        } else if(keyEvent.Lcode == 8) { // Backspace
+          LeventMatched = 1;
+        }
+      }
+
+      return LeventMatched == 1;
+    }
+
     /**
      * Simulate a keystroke according to the touched keyboard button element
      *
@@ -323,7 +369,6 @@ namespace com.keyman.text {
      */
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
-      //var Lelem = keyman.domManager.getLastActiveElement();
 
       let fromOSK = !!e; // If specified, it's from the OSK.
 
@@ -332,8 +377,6 @@ namespace com.keyman.text {
         e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
       }
 
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      let kbdInterface = keyman.interface;
       let formFactor = keyman.util.device.formFactor;
       let keyMapManager = keyman.keyMapManager;
 
@@ -408,29 +451,7 @@ namespace com.keyman.text {
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
-      var LeventMatched = 0;
-      this.swallowKeypress = false;
-
-      // Pass this key code and state to the keyboard program
-      if(activeKeyboard && keyEvent.Lcode != 0) {
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
-      }
-
-      if(!LeventMatched) {
-        // Restore the virtual key code if a mnemonic keyboard is being used
-        // If no vkCode value was stored, maintain the original Lcode value.
-        keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
-
-        // Handle unmapped keys, including special keys
-        // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true);
-        if(ch) {
-          kbdInterface.output(0, outputTarget, ch);
-          LeventMatched = 1;
-        } else if(keyEvent.Lcode == 8) { // Backspace
-          LeventMatched = 1;
-        }
-      }
+      let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
@@ -439,8 +460,30 @@ namespace com.keyman.text {
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
       if(LeventMatched) {
-        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent);
+        let alternates: Alternate[];
+
+        if(keyEvent.keyDistribution) {
+          let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
+          alternates = [];
+  
+          for(let pair of keyEvent.keyDistribution) {
+            let mock = Mock.from(preInputMock);
+            
+            let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
+            if(!altKey) {
+              console.warn("Potential fat-finger key could not be found in layer!");
+              continue;
+            }
+
+            let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
+            if(this.processKeystroke(altEvent, mock, fromOSK, true)) {
+              alternates.push({sample: mock.buildTransformFrom(preInputMock), 'p': pair.p});
+            }
+          }
+        }
+        
         // Notify the ModelManager of new input
+        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent, alternates);
         keyman.modelManager.predict(transcription);
 
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
@@ -476,12 +519,29 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      element touched (or clicked)
      */
-    clickKey(e: osk.KeyElement) {
+    clickKey(e: osk.KeyElement, touch?: Touch, layerId?: string, keyDistribution?: KeyDistribution) {
       let keyman = com.keyman.singleton;
       var Lelem = keyman.domManager.getLastActiveElement();
 
       if(Lelem != null) {
-        let Lkc = this._GetClickEventProperties(e, Lelem);
+        // Handle any DOM state management related to click inputs.
+        let outputTarget = Processor.getOutputTarget(Lelem);
+        keyman.domManager.initActiveElement(Lelem);
+  
+        // Turn off key highlighting (or preview)
+        keyman['osk'].vkbd.highlightKey(e,false);
+        
+        // Clear any cached codepoint data; we can rebuild it if it's unchanged.
+        outputTarget.invalidateSelection();
+        // Deadkey matching continues to be troublesome.
+        // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
+        outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+  
+        let Lkc = this._GetClickEventProperties(e['key'].spec as osk.ActiveKey, Lelem);
+        if(keyman.modelManager.enabled) {
+          Lkc.source = touch;
+          Lkc.keyDistribution = keyDistribution;
+        }
         return this.processKeyEvent(Lkc, e);
       } else {
         return true;
@@ -502,7 +562,7 @@ namespace com.keyman.text {
         
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = null;
-        var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false);
+        var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false, true);
         if(mappedChar) {
           // FIXME;  Warning - will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
           Lkc.Lcode = mappedChar.charCodeAt(0);

@@ -62,6 +62,8 @@ final class KMKeyboard extends WebView {
   private String keyboardName;
   private String keyboardVersion;
 
+  protected ArrayList<String> javascriptAfterLoad = new ArrayList<String>();
+
   private static String currentKeyboard = null;
   private static String txtFont = "";
   private static String oskFont = null;
@@ -136,12 +138,16 @@ final class KMKeyboard extends WebView {
       public boolean onConsoleMessage(ConsoleMessage cm) {
         if (KMManager.isDebugMode()) {
           Log.d("KMEA", "Keyman JS Log: Line " + cm.lineNumber() + ", " + cm.sourceId() + ":" + cm.message());
+          if (cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
+            Log.e("KMEA", "Keyman JS Log: ERROR");
+          }
         }
 
         // Send console errors to Firebase Analytics.
         // (Ignoring spurious message "No keyboard stubs exist = ...")
         // TODO: Analyze if this error warrants reverting to default keyboard
         // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
+
         if ((cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) && (!cm.message().startsWith("No keyboard stubs exist"))) {
           sendKMWError(cm.lineNumber(), cm.sourceId(), cm.message());
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
@@ -151,6 +157,7 @@ final class KMKeyboard extends WebView {
             KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
             KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
         }
+
         return true;
       }
     });
@@ -167,10 +174,11 @@ final class KMKeyboard extends WebView {
         if (subKeysList != null) {
           showSubKeys(context);
           return;
-        } else if(suggestionJSON != null) {
+        } /* For future implementation
+        else if(suggestionJSON != null) {
           showSuggestionLongpress(context);
           return;
-        }
+        }*/
       }
 
       @Override
@@ -182,27 +190,69 @@ final class KMKeyboard extends WebView {
 
   public void loadKeyboard() {
     keyboardSet = false;
+
+    if(keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
+      KMManager.InAppKeyboardLoaded = false;
+    else
+      KMManager.SystemKeyboardLoaded = false;
+
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
     setBackgroundColor(0);
   }
 
+  public void loadJavascript(String func) {
+    this.javascriptAfterLoad.add(func);
+
+    if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardLoaded) ||
+      (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardLoaded)) {
+
+      if(this.javascriptAfterLoad.size() == 1)
+        callJavascriptAfterLoad();
+    }
+  }
+
+  public void callJavascriptAfterLoad() {
+    if(this.javascriptAfterLoad.size() > 0) {
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          if(javascriptAfterLoad.size() > 0) {
+            loadUrl("javascript:" + javascriptAfterLoad.get(0));
+            javascriptAfterLoad.remove(0);
+            if (javascriptAfterLoad.size() > 0) {
+              callJavascriptAfterLoad();
+            }
+          }
+        }
+      }, 1);
+    }
+  }
+
   public void hideKeyboard() {
-    String jsString = "javascript:hideKeyboard()";
-    loadUrl(jsString);
+    String jsString = "hideKeyboard()";
+    loadJavascript(jsString);
   }
 
   public void executeHardwareKeystroke(int code, int shift, int lstates, int eventModifiers) {
-    String jsFormat = "javascript:executeHardwareKeystroke(%d,%d, %d, %d)";
+    String jsFormat = "executeHardwareKeystroke(%d,%d, %d, %d)";
     String jsString = String.format(jsFormat, code, shift, lstates, eventModifiers);
-    loadUrl(jsString);
+    loadJavascript(jsString);
   }
 
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (subKeysWindow != null && suggestionMenuWindow != null) {
-      //popupWindow.getContentView().dispatchTouchEvent(event);
+    // JH:  I'm not sure if we even USE the suggestionMenuWindow construct anywhere, but either way,
+    // this if block is designed explicitly for handling the subKeysWindow.
+    //
+    // Come to think of it, I wonder if suggestionMenuWindow was work being done to link with
+    // suggestion banner longpresses - if so, it's not yet ready for proper integration...
+    // and would need its own rung in this if-else ladder.
+    if (subKeysWindow != null && suggestionMenuWindow == null) {
+      // Passes KMKeyboard (subclass of WebView)'s touch events off to our subkey window
+      // if active, allowing for smooth, integrated gesture control.
       subKeysWindow.getContentView().findViewById(R.id.grid).dispatchTouchEvent(event);
     } else {
       //handleTouchEvent(event);
@@ -218,8 +268,8 @@ final class KMKeyboard extends WebView {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
     // Ensure window is loaded for javascript functions
-    loadUrl(String.format(
-      "javascript:window.onload = function(){ setOskWidth(\"%d\");"+
+    loadJavascript(String.format(
+      "window.onload = function(){ setOskWidth(\"%d\");"+
       "setOskHeight(\"0\"); };", kbWidth));
     if (ShouldShowHelpBubble) {
       ShouldShowHelpBubble = false;
@@ -227,7 +277,7 @@ final class KMKeyboard extends WebView {
       handler.postDelayed(new Runnable() {
         @Override
         public void run() {
-          loadUrl("javascript:showHelpBubble()");
+          loadJavascript("showHelpBubble()");
         }
       }, 2000);
     }
@@ -250,15 +300,15 @@ final class KMKeyboard extends WebView {
     dismissKeyPreview(0);
     dismissSubKeysWindow();
     int bannerHeight = KMManager.getBannerHeight(context);
-    loadUrl(String.format("javascript:setBannerHeight(%d)", bannerHeight));
-    loadUrl(String.format("javascript:setOskWidth(%d)", newConfig.screenWidthDp));
-    loadUrl("javascript:setOskHeight(0)");
+    loadJavascript(String.format("setBannerHeight(%d)", bannerHeight));
+    loadJavascript(String.format("setOskWidth(%d)", newConfig.screenWidthDp));
+    loadJavascript("setOskHeight(0)");
     if (dismissHelpBubble()) {
       Handler handler = new Handler();
       handler.postDelayed(new Runnable() {
         @Override
         public void run() {
-          loadUrl("javascript:showHelpBubble()");
+          loadJavascript("showHelpBubble()");
         }
       }, 2000);
     }
@@ -378,9 +428,9 @@ final class KMKeyboard extends WebView {
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     languageName = languageName.replaceAll("\'", "\\\\'");
 
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
+    String jsFormat = "setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
-    loadUrl(jsString);
+    loadJavascript(jsString);
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;
@@ -394,7 +444,7 @@ final class KMKeyboard extends WebView {
       handler.postDelayed(new Runnable() {
         @Override
         public void run() {
-          loadUrl("javascript:showHelpBubble()");
+          loadJavascript("showHelpBubble()");
         }
       }, 2000);
     }
@@ -479,9 +529,9 @@ final class KMKeyboard extends WebView {
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     languageName = languageName.replaceAll("\'", "\\\\'");
 
-    String jsFormat = "javascript:setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
+    String jsFormat = "setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
     String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
-    loadUrl(jsString);
+    loadJavascript(jsString);
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;
@@ -495,7 +545,7 @@ final class KMKeyboard extends WebView {
       handler.postDelayed(new Runnable() {
         @Override
         public void run() {
-          loadUrl("javascript:showHelpBubble()");
+          loadJavascript("showHelpBubble()");
         }
       }, 2000);
     }
@@ -705,19 +755,19 @@ final class KMKeyboard extends WebView {
       public void onDismiss() {
         suggestionJSON = null;
         suggestionMenuWindow = null;
-        String jsString = "javascript:popupVisible(0)";
-        loadUrl(jsString);
+        String jsString = "popupVisible(0)";
+        loadJavascript(jsString);
       }
     });
 
     suggestionMenuWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX , posY);
-    String jsString = "javascript:popupVisible(1)";
-    loadUrl(jsString);
+    String jsString = "popupVisible(1)";
+    loadJavascript(jsString);
 
     return;
   }
 
-  @SuppressLint("InflateParams")
+  @SuppressLint({"InflateParams", "ClickableViewAccessibility"})
   private void showSubKeys(Context context) {
     if (subKeysList == null || subKeysWindow != null) {
       return;
@@ -805,15 +855,19 @@ final class KMKeyboard extends WebView {
       Button button = (Button) inflater.inflate(R.layout.subkey_layout, null);
       button.setId(i + 1);
       button.setLayoutParams(new FrameLayout.LayoutParams((int) buttonWidth, (int) buttonHeight));
+      // May as well set them here, keeping them in a closure than a prone-to-change field.
+      // Helps keep things from totally breaking when the event handler triggering subkey menu
+      // generation and the menu's event handler stop talking to each other.
+      final ArrayList<HashMap<String, String>> subkeyList = subKeysList;
       button.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
           int index = v.getId() - 1;
-          String keyId = subKeysList.get(index).get("keyId");
-          String keyText = getSubkeyText(keyId, subKeysList.get(index).get("keyText"));
-          String jsFormat = "javascript:executePopupKey('%s','%s')";
+          String keyId = subkeyList.get(index).get("keyId");
+          String keyText = getSubkeyText(keyId, subkeyList.get(index).get("keyText"));
+          String jsFormat = "executePopupKey('%s','%s')";
           String jsString = String.format(jsFormat, keyId, keyText);
-          loadUrl(jsString);
+          loadJavascript(jsString);
         }
       });
       button.setClickable(false);
@@ -863,6 +917,7 @@ final class KMKeyboard extends WebView {
             }
           }
           dismissSubKeysWindow();
+          return true;
         } else if (action == MotionEvent.ACTION_MOVE) {
           int count = ((ViewGroup) v).getChildCount();
           for (int i = 0; i < count; i++) {
@@ -879,6 +934,11 @@ final class KMKeyboard extends WebView {
               button.setPressed(false);
             }
           }
+          return true;
+        } else if (action == MotionEvent.ACTION_DOWN) {
+          // Must return true if we want the others to properly process if and when this handler
+          // becomes decoupled from the keyboard's touch handler.
+          return true;
         }
         return false;
       }
@@ -892,8 +952,8 @@ final class KMKeyboard extends WebView {
       public void onDismiss() {
         subKeysList = null;
         subKeysWindow = null;
-        String jsString = "javascript:popupVisible(0)";
-        loadUrl(jsString);
+        String jsString = "popupVisible(0)";
+        loadJavascript(jsString);
       }
     });
 
@@ -916,8 +976,8 @@ final class KMKeyboard extends WebView {
 
     // And now to actually display it.
     subKeysWindow.showAtLocation(KMKeyboard.this, Gravity.TOP | Gravity.LEFT, posX, posY);
-    String jsString = "javascript:popupVisible(1)";
-    loadUrl(jsString);
+    String jsString = "popupVisible(1)";
+    loadJavascript(jsString);
   }
 
   // Attempt to get the subkey text.

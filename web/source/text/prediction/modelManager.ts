@@ -91,7 +91,8 @@ namespace com.keyman.text.prediction {
 
     private recentTranscriptions: Transcription[] = [];
 
-    private _enabled: boolean = true;
+    private _mayPredict: boolean = true;
+    private _mayCorrect: boolean = true;
 
     // Tracks registered models by ID.
     private registeredModels: {[id: string]: ModelSpec} = {};
@@ -112,8 +113,7 @@ namespace com.keyman.text.prediction {
         maxRightContextCodeUnits: keyman.isEmbedded ? 0 : 64
       }
 
-      this.enabled = true; // Use the property's set method to filter out cases that are perma-disabled.
-      if(!this.enabled) {
+      if(!this.canEnable()) {
         return;
       }
 
@@ -150,8 +150,9 @@ namespace com.keyman.text.prediction {
 
     onKeyboardChange(kbdInfo?: KeyboardChangeData | string) {
       let keyman = com.keyman.singleton;
+      let mm: ModelManager = this;
 
-      if(!this._enabled) {
+      if(!this.enabled) {
         return Promise.resolve();
       }
 
@@ -181,7 +182,14 @@ namespace com.keyman.text.prediction {
         if(loadPromise) {
           let mm = this;
           loadPromise.then(function() {
-            keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+            // Because this is executed from a Promise, it's possible to have a race condition
+            // where the 'loaded' event triggers after an 'unloaded' event meant to disable the model.
+            // (Especially in the embedded apps.)  This will catch these cases.
+            if(mm.enabled) {
+              keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+            } else {
+              mm.unloadModel();
+            }
           }).catch(function(failReason: any) {
             // Does this provide enough logging information?
             console.error("Could not load model '" + model.id + "': " + failReason);
@@ -223,7 +231,7 @@ namespace com.keyman.text.prediction {
       }
 
       // Is it the active model?
-      if(this.currentModel.id == modelId) {
+      if(this.currentModel && this.currentModel.id == modelId) {
         this.unloadModel();
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
@@ -282,6 +290,13 @@ namespace com.keyman.text.prediction {
       this.predict_internal();
     }
 
+    public wordbreak(target: OutputTarget): Promise<string> {
+      let keyman = com.keyman.singleton;
+
+      let context = new TranscriptionContext(Mock.from(target), this.configuration);
+      return this.lmEngine.wordbreak(context);
+    }
+
     public predict(transcription?: Transcription) {
       let keyman = com.keyman.singleton;
 
@@ -319,7 +334,7 @@ namespace com.keyman.text.prediction {
       this.recordTranscription(transcription);
 
       let transform = transcription.transform;
-      var promise = this.currentPromise = this.lmEngine.predict(transform, context);
+      var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
 
       let mm = this;
       promise.then(function(suggestions: Suggestion[]) {
@@ -359,34 +374,65 @@ namespace com.keyman.text.prediction {
     }
 
     public get enabled(): boolean {
-      return this._enabled;
+      return this._mayPredict;
     }
 
-    public set enabled(flag: boolean) {
+    private canEnable(): boolean {
       let keyman = com.keyman.singleton;
 
       if(keyman.util.getIEVersion() == 10) {
-        this._enabled = false;
-        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.")
-        return;
+        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.");
+        return false;
       } else if(keyman.util.getIEVersion() < 10) {
-        this._enabled = false;
         console.warn("WebWorkers are not supported in this version of IE.");
-        return;
+        return false;
       }
 
-      this._enabled = flag;
+      return true;
+    }
+
+    private doEnable(flag: boolean) {
+      let keyman = com.keyman.singleton;
 
       if(flag) {
         let lgCode = keyman.keyboardManager.getActiveLanguage();
-        if(this.registeredModels[lgCode]) {
+        if(this.languageModelMap[lgCode]) {
           // Just reuse the existing model-change trigger code.
           this.onKeyboardChange(lgCode);
         }
       } else {
-        this.unloadModel();
+        if(this.activeModel) { // We only need to unload a model when one is actually loaded.
+          this.unloadModel();
+        }
+
+        // Ensure that the banner is unloaded.
         keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
+    }
+
+    public get mayPredict() {
+      return this._mayPredict;
+    }
+
+    public set mayPredict(flag: boolean) {
+      let enabled = this.enabled;
+
+      if(!this.canEnable()) {
+        return;
+      }
+
+      this._mayPredict = flag;
+      if(enabled != this.enabled) {
+        this.doEnable(flag);
+      }
+    }
+
+    public get mayCorrect() {
+      return this._mayCorrect;
+    }
+
+    public set mayCorrect(flag: boolean) {
+      this._mayCorrect = flag;
     }
 
     public tryAcceptSuggestion(source: string): boolean {

@@ -44,6 +44,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
   private final String titleKey = "title";
   private final String subtitleKey = "subtitle";
   private final String iconKey = "icon";
+  private final String isEnabledKey = "isEnabled";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -66,14 +67,15 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
     final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
-    textView.setText(String.format("%s model", modelName));
+    textView.setText(String.format(getString(R.string.model_info_header), modelName));
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
     final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
-    boolean isCustomModel = getIntent().getBooleanExtra(KMManager.KMKey_CustomModel, false);
+    final String customModel = getIntent().getStringExtra(KMManager.KMKey_CustomModel);
 
     infoList = new ArrayList<HashMap<String, String>>();
+    // Display model title
     final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.model_version));
@@ -81,16 +83,22 @@ public final class ModelInfoActivity extends AppCompatActivity {
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
+    // Display model help link
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-    if (!isCustomModel || customHelpLink != null) {
-      String icon = String.valueOf(R.drawable.ic_arrow_forward);
-      hashMap = new HashMap<String, String>();
-      hashMap.put(titleKey, getString(R.string.help_link));
-      hashMap.put(subtitleKey, "");
+
+    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    hashMap = new HashMap<String, String>();
+    hashMap.put(titleKey, getString(R.string.help_link));
+    hashMap.put(subtitleKey, "");
+    if(customHelpLink != null) {
       hashMap.put(iconKey, icon);
-      infoList.add(hashMap);
+    } else {
+      hashMap.put(iconKey, noIcon);
     }
 
+    infoList.add(hashMap);
+
+    // Display link to uninstall model
     hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.uninstall_model));
     hashMap.put(subtitleKey, "");
@@ -99,7 +107,21 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
     int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
-    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to);
+
+    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
+      @Override
+      public boolean isEnabled(int position) {
+        if(position == 0) {
+          // No point in 'clicking' on version info.
+          return false;
+          // Visibly disables the help option when help isn't available.
+        } else if(position == 1 && customHelpLink == null) {
+          return false;
+        }
+
+        return super.isEnabled(position);
+      }
+    };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -127,14 +149,11 @@ public final class ModelInfoActivity extends AppCompatActivity {
             }
             startActivity(i);
           } else {
-            // TODO: open browser to Keyman site on lexical models
-            //String helpUrlStr = String.format("http://help.keyman.com/models/%s/%s/", modelID, modelVersion);
-            //i.setData(Uri.parse(helpUrlStr));
-            //startActivity(i);
+            // We should always have a help file packaged with models.
           }
         } else if (position == 2) {
           // Confirmation to delete model
-          String lexicalModelKey = String.format("%s_%s_%s", languageID, packageID, modelID);
+          String lexicalModelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
           DialogFragment dialog = ConfirmDialogFragment.newInstance(
             DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);
           dialog.show(getFragmentManager(), "dialog");

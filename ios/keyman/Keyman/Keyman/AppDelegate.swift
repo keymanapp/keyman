@@ -155,7 +155,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     action: #selector(cancelAdHocBtnHandler))
     let installBtn = UIBarButtonItem(title: "Install", style: .plain,
                                      target: self,
-                                     action: (isKbd ? #selector(installAdHocKeyboardBtnHandler) : #selector(installAdHocLexicalModelBtnHandler)) )
+                                     action: (isKbd ? #selector(installAdHocKeyboardBtnHandler) :
+                                       #selector(installAdHocLexicalModelBtnHandler)) )
     vc.navigationItem.leftBarButtonItem = cancelBtn
     vc.navigationItem.rightBarButtonItem = installBtn
     let nvc = UINavigationController.init(rootViewController: vc)
@@ -184,7 +185,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       })
     }
   }
-  
+
   @objc func installAdHocLexicalModelBtnHandler() {
     if let adhocDir = _adhocDirectory {
       self.window?.rootViewController?.dismiss(animated: true, completion: {
@@ -194,7 +195,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
           self.showKMPError(error as! KMPError)
         }
-        
+
         //this can fail gracefully and not show errors to users
         do {
           try FileManager.default.removeItem(at: adhocDir)

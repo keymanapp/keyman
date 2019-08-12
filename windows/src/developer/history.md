@@ -1,7 +1,37 @@
 # Keyman Developer Version History
 
-## 12.0 alpha
-* Started work on Keyman Developer 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-07-29 12.0.9 beta
+* Initial beta release of Keyman Desktop 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Adeveloper+base%3Amaster)
+
+* New Features:
+  * Lexical model compiler - currently only available from source (#1766)
+  * Add keyboard source analysis and automated regression test tool "kmanalyze" (#1696)
+
+## 2019-06-12 11.0.1360.0 stable
+* No changes
+
+## 2019-06-05 11.0.1357.0 stable
+* No changes
+
+## 2019-04-29 11.0.1355.0 stable
+* No changes
+
+## 2019-04-24 11.0.1354.0 stable
+* Bug fix: Keyman Developer touch layout editor would not save key caps for subkeys (#1731)
+* Bug fix: Compiler could occasionally fail with undefined results when using Unicode store names (#1736)
+
+## 2019-04-06 11.0.1353.0 stable
+* Bug fix: For large keyboards, Keyman Developer would generate a .js file that Chrome was unable to parse (#1717)
+
+## 2019-02-27 11.0.1352.0 stable
+* No changes
+
+## 2019-02-26 11.0.1351.0 stable
+* Not released
 
 ## 2019-02-25 11.0.1350.0 stable
 * 11.0 Stable release

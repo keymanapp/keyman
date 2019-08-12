@@ -34,11 +34,14 @@
   <string name="more_info" translatable="false">More info</string>
   <string name="show_get_started" translatable="false">Show \"Get Started\" on startup</string>
 
+
   <!-- Keyman Settings menu strings -->
   <string name="keyman_settings" translatable="false">Settings</string>
-  <string name="installed_languages" translatable="false">Installed Languages</string>
-  <string name="show_banner" translatable="false">Show banner</string>
-  <string name="show_banner_on" translatable="false">Cannot be switched off when predictive text is enabled</string>
+  <string name="installed_languages_empty" translatable="false">Installed languages</string>
+  <string name="installed_languages" translatable="false">Installed languages (%d)</string>
+  <string name="show_banner" translatable="false">Always show banner</string>
+  <string name="show_banner_on" translatable="false">To be implemented</string>
+  <string name="show_banner_off" translatable="false">When off, only shown when predictive text is enabled</string>
   <!-- reuse show_get_started -->
 
   <!-- Web Browser strings -->

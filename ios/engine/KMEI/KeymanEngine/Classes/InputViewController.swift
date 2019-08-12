@@ -179,8 +179,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     // Necessary for existing infrastructure to resend info for the keyboard after reloading
-    // as system keyboard.
-    Manager.shared.shouldReloadKeyboard = true
+    // as system keyboard.  Do NOT perform if in-app, as this unnecessarily resets the WebView.
+    if(Manager.shared.isSystemKeyboard) {
+      Manager.shared.shouldReloadKeyboard = true
+    }
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
@@ -395,6 +397,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     
   func registerLexicalModel(_ lm: InstallableLexicalModel) {
     keymanWeb.registerLexicalModel(lm)
+  }
+  
+  func deregisterLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.deregisterLexicalModel(lm)
   }
   
   func showHelpBubble() {

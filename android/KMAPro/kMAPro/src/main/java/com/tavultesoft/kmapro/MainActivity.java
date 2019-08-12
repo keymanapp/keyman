@@ -602,10 +602,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       if (kbList != null && kbList.size() < 2)
         shouldShowGetStarted = true;
 
-      if (!GetStartedActivity.isEnabledAsSystemKB(this))
+      if (!SystemIMESettings.isEnabledAsSystemKB(this))
         shouldShowGetStarted = true;
 
-      if (!GetStartedActivity.isDefaultKB(this))
+      if (!SystemIMESettings.isDefaultKB(this))
         shouldShowGetStarted = true;
 
       if (shouldShowGetStarted)
@@ -843,9 +843,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    String langId = KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID);
+    boolean matchingModel = false;
+
     for(int i=0; i<lexicalModelsInstalled.size(); i++) {
       HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+        matchingModel = true;
+      }
       KMManager.addLexicalModel(this, lexicalModelInfo);
+    }
+
+    // We're on the main thread, so if the active keyboard's language code matches,
+    // let's register the associated lexical model.
+    if(matchingModel) {
+      KMManager.registerAssociatedLexicalModel(langId);
     }
   }
 

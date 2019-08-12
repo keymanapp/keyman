@@ -2934,14 +2934,16 @@ begin
 
   KMXFileName2 := KMXFileName.Name;   // I4181
 
+  TProject.CompilerMessageFile := ProjectFile;
   frmMessages.Clear;
-  if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, CompilerMessage) <= 0 then   // I4181   // I4865   // I4866
+  if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, ProjectCompilerMessage) <= 0 then   // I4181   // I4865   // I4866
   begin
     frmMessages.DoShowForm;
     ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
     FreeAndNil(KMXFileName);   // I4181
   end;
   FreeAndNil(KMNFileName);   // I4181
+  TProject.CompilerMessageFile := nil;
 end;
 
 procedure TfrmKeymanWizard.OSKImportKMXFinished(Sender: TObject; KMXFileName: TTempFile);   // I4181

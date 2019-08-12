@@ -728,10 +728,9 @@ var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_
  */
 
 describe('Engine', function() {
+  this.timeout(kmwconfig.timeouts.scriptLoad);
 
   before(function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad);
-
     fixture.setBase('unit_tests/fixtures');
     setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });

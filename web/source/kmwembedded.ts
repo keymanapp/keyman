@@ -25,7 +25,7 @@ namespace com.keyman.osk {
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
       let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
       var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight;
+          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv)*/ /*+ bannerHeight*/;
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
@@ -79,7 +79,7 @@ namespace com.keyman.osk {
     if(on && (typeof showPreview == 'function')) {
       let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
       var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight,
+          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
           kc;
 
       // Find key text element
@@ -121,6 +121,9 @@ namespace com.keyman.osk {
     let util = keyman.util;
     let device = util.device;
 
+    //TODO: Refactor together with kmwnative.ts:adjustHeights function
+    //TODO: Why do we factor in the banner here but not in kmwnative.ts:adjustHeights?
+
     if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
       return false;
     }
@@ -130,27 +133,26 @@ namespace com.keyman.osk {
         rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
         borderPad=oskManager.getKeyboardHeight() - rowHeight * (nRows == 0 ? 1 : nRows),
         nLayer: number,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+    const oskPad = 0, oskPadOutside = 0;
 
     let bannerHeight : number = oskManager.getBannerHeight();
     let oskHeight : number = nRows*rowHeight;
 
-    let kbdHeight = oskManager.getKeyboardHeight()
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       rowHeight /= window.devicePixelRatio;
-      kbdHeight /= window.devicePixelRatio;
       oskHeight /= window.devicePixelRatio;
     }
 
     var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(bannerHeight + oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(bannerHeight + oskHeight+oskPadOutside)+'px';
     b = <HTMLElement> b.childNodes.item(1).firstChild;
     bs=b.style;
     // Sets the layer group to the correct height.
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
+    bs.height=bs.maxHeight=(oskHeight+oskPad)+'px';
 
     if(device.OS == 'Android' && 'devicePixelRatio' in window) {
       b.childNodes.forEach(function(layer: HTMLElement) {
-        layer.style.height = layer.style.maxHeight = (oskHeight + 3) + 'px';
+        layer.style.height = layer.style.maxHeight = (oskHeight + oskPad) + 'px';
       });
     }
 
@@ -163,7 +165,7 @@ namespace com.keyman.osk {
     for(nLayer=0;nLayer<layers.length; nLayer++) {
       // Check the heights of each row, in case different layers have different row counts.
       nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
+      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+oskPad)+'px';
 
       for(nRow=0; nRow<nRows; nRow++) {
         rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
@@ -171,7 +173,7 @@ namespace com.keyman.osk {
         rs.bottom=bottom+'px';
         rs.maxHeight=rs.height=rowHeight+'px';
         // Calculate the exact vertical coordinate of the row's center.
-        this.layout.layer[nLayer].row[nRow].proportionalY = ((kbdHeight + 3 - bottom) - rowHeight/2) / (kbdHeight + 3);
+        this.layout.layer[nLayer].row[nRow].proportionalY = ((oskHeight + oskPad - bottom) - rowHeight/2) / (oskHeight + oskPad);
         keys=layers[nLayer].childNodes[nRow].childNodes;
         nKeys=keys.length;
         for(nKey=0;nKey<nKeys;nKey++) {
@@ -182,6 +184,12 @@ namespace com.keyman.osk {
               break;
             }
           }
+          // Set the kmw-key-square position
+          ks=key.style;
+          ks.bottom=(bottom-pad/2)+'px';
+          ks.height=ks.minHeight=(rowHeight)+'px';
+
+          // Set the kmw-key position
           ks=key.childNodes[j].style;
           ks.bottom=rs.bottom;
           ks.height=ks.minHeight=(rowHeight-pad)+'px';
@@ -214,7 +222,7 @@ namespace com.keyman.text {
   let nativeDefaultKeyOutput = Processor.prototype.defaultKeyOutput;
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
     let keyman = com.keyman.singleton;
 
     // Note:  this assumes Lelem is properly attached and has an element interface.
@@ -227,8 +235,12 @@ namespace com.keyman.text {
     if (code == Codes.keyCodes.K_SPACE) {
       return ' ';
     } else if (code == Codes.keyCodes.K_BKSP) {
-      keyman['interface'].defaultBackspace();
-      return '';
+      if(!disableDOM) {
+        keyman['interface'].defaultBackspace();
+        return '';
+      } else {
+        return '\b';
+      }
     } else if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
       if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
@@ -380,7 +392,7 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    if(osk.vkbd.adjustHeights()) {
+    if(osk && osk.vkbd && osk.vkbd.adjustHeights()) {
       osk._Load();
     }
   };
