@@ -27,6 +27,7 @@
  */
 
 /// <reference path="../message.d.ts" />
+/// <reference path="./worker-compiler-interfaces.d.ts" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
@@ -135,13 +136,64 @@ interface LMLayerWorkerState {
  * The model implementation, within the Worker.
  */
 interface WorkerInternalModel {
-  // TODO:  Document.
+  /**
+   * Processes `config` messages, configuring the newly-loaded model based on the host
+   * platform's capability restrictions.
+   * 
+   * This allows the model to configure its suggestions according to what the platform
+   * allows the host to actually perform - for example, if post-caret deletions are not
+   * supported, no suggestions requiring this feature should be produced by the model.
+   * 
+   * Returns a `Configuration` object detailing the capabilities the model plans to
+   * actually utilize, which must be as restrictive or more restrictive than those 
+   * indicated within the provided `Capabilities` object.
+   * @param capabilities 
+   */
   configure(capabilities: Capabilities): Configuration;
-  // TODO:  Document.
+
+  /**
+   * Generates predictive suggestions corresponding to the state of context after the proposed
+   * transform is applied to it.  This transform may correspond to a 'correction' of a recent 
+   * keystroke rather than one actually received.
+   * 
+   * This method should NOT attempt to perform any form of correction; this is modeled within a
+   * separate component of the LMLayer predictive engine.  That is, "th" + "e" should not be
+   * have "this" for a suggestion ("e" has been 'corrected' to "i"), while "there" would be 
+   * a reasonable prediction.  
+   * 
+   * However, addition of diacritics to characters (which may transform the underlying char code 
+   * when Unicode-normalized) is permitted.  For example, "pur" + "e" may reasonably predict
+   * "purée", where "e" has been transformed to "é" as part of the suggestion.
+   * 
+   * When both prediction and correction are permitted, said component (the `ModelCompositor`) will 
+   * generally call this method once per 'likely' generated corrected state of the context, 
+   * utilizing the results to compute an overall likelihood across all possible suggestions.
+   * @param transform A Transform corresponding to a recent input keystroke
+   * @param context A depiction of the context to which `transform` is applied.
+   * @returns A probability distribution (`Distribution<Suggestion>`) on the resulting `Suggestion` 
+   * space for use in determining the most optimal overall suggestions.
+   */
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
-  // TODO:  Document.
+
+  /**
+   * Performs a wordbreak operation given the current context state, returning whatever word
+   * or word fragment exists that starts before the caret but after the most recent whitespace
+   * preceding the caret.  If no such text exists, the empty string is returned.
+   * 
+   * This function is designed for use in generating display text for 'keep' `Suggestions`
+   * and display text for reverting any previously-applied `Suggestions`.
+   * @param context 
+   */
   wordbreak(context: Context): USVString;
-  
+
+  /**
+   * Punctuation and presentational settings that the underlying lexical model
+   * expects to be applied at higher levels. e.g., the ModelCompositor.
+   * 
+   * @see LexicalModelPunctuation
+   */
+  readonly punctuation?: LexicalModelPunctuation;
+
   /**
    * Represents the complete set of characters that may comprise a string usable
    * for lookup of words within the corresponding lexical model.
@@ -163,43 +215,4 @@ interface WorkerInternalModelConstructor {
    * capabilities, plus any parameters they require.
    */
   new(...modelParameters: any[]): WorkerInternalModel;
-}
-
-/**
- * A simple word breaking function takes a phrase, and splits it into "words",
- * for whatever definition of "word" is usable for the language model.
- *
- * For example:
- *
- *   getText(breakWordsEnglish("Hello, world!")) == ["Hello", "world"]
- *   getText(breakWordsCree("ᑕᐻ ᒥᔪ ᑮᓯᑲᐤ ᐊᓄᐦᐨ᙮")) == ["ᑕᐻ", "ᒥᔪ ᑮᓯᑲᐤ""", "ᐊᓄᐦᐨ"]
- *   getText(breakWordsJapanese("英語を話せますか？")) == ["英語", "を", "話せます", "か"]
- *
- * Not all language models take in a configurable word breaking function.
- *
- * @returns an array of spans from the phrase, in order as they appear in the
- *          phrase, each span which representing a word.
- */
-interface WordBreakingFunction {
-  // invariant: span[i].end <= span[i + 1].start
-  // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
-  //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
-  (phrase: USVString): Span[];
-}
-
-/**
- * A span of text in a phrase. This is usually meant to reprent words from a
- * pharse.
- */
-interface Span {
-  // invariant: start < end (empty spans not allowed)
-  readonly start: number;
-  // invariant: end > end (empty spans not allowed)
-  readonly end: number;
-  // invariant: length === end - start
-  readonly length: number;
-  // invariant: text.length === length
-  // invariant: each character is BMP UTF-16 code unit, or is a high surrogate
-  // UTF-16 code unit followed by a low surrogate UTF-16 code unit.
-  readonly text: string;
 }

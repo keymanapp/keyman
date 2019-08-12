@@ -1,9 +1,11 @@
 class ModelCompositor {
   private lexicalModel: WorkerInternalModel;
   private static readonly MAX_SUGGESTIONS = 12;
+  private readonly punctuation: LexicalModelPunctuation;
 
   constructor(lexicalModel: WorkerInternalModel) {
     this.lexicalModel = lexicalModel;
+    this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
   }
 
   protected isWhitespace(transform: Transform): boolean {
@@ -28,6 +30,7 @@ class ModelCompositor {
 
   predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
     let suggestionDistribution: Distribution<Suggestion> = [];
+    let punctuation = this.punctuation;
 
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
@@ -83,6 +86,12 @@ class ModelCompositor {
         if(preserveWhitespace) {
           models.prependTransform(pair.sample.transform, transform);
         }
+        
+        // The model is trying to add a word; thus, add some custom formatting
+        // to that word.
+        if (pair.sample.transform.insert.length > 0) {
+          pair.sample.transform.insert += punctuation.insertAfterWord;
+        }
 
         // Combine duplicate samples.
         let displayText = pair.sample.displayAs;
@@ -111,7 +120,7 @@ class ModelCompositor {
         transformId: inputTransform.id,
         // Replicate the original transform, modified for appropriate language insertion syntax.
         transform: {
-          insert: inputTransform.insert + ' ',
+          insert: inputTransform.insert + punctuation.insertAfterWord,
           deleteLeft: inputTransform.deleteLeft,
           deleteRight: inputTransform.deleteRight,
           id: inputTransform.id
@@ -120,10 +129,10 @@ class ModelCompositor {
       };
     }
 
-    // TODO:  Customizable modeling for this formatting.  Different languages
-    //        use different quotation styles.  See https://github.com/keymanapp/keyman/issues/1883.
-    if(keepOption) {
-      keepOption.displayAs = '"' + keepOption.displayAs + '"';
+    // Add the surrounding quotes to the "keep" option's display string:
+    if (keepOption) {
+      let { open, close } = punctuation.quotesForKeepSuggestion;
+      keepOption.displayAs = open + keepOption.displayAs + close;
     }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper
@@ -147,4 +156,38 @@ class ModelCompositor {
 
     return suggestions;
   }
+
+  /**
+   * Returns the punctuation used for this model, filling out unspecified fields
+   */
+  private static determinePunctuationFromModel(model: WorkerInternalModel): LexicalModelPunctuation {
+    let defaults = DEFAULT_PUNCTUATION;
+
+    // Use the defaults of the model does not provide any punctuation at all.
+    if (!model.punctuation)
+      return defaults;
+
+    let specifiedPunctuation = model.punctuation;
+    let insertAfterWord = specifiedPunctuation.insertAfterWord;
+    if (insertAfterWord !== '' && !insertAfterWord) {
+      insertAfterWord = defaults.insertAfterWord;
+    }
+
+    let quotesForKeepSuggestion = specifiedPunctuation.quotesForKeepSuggestion;
+    if (!quotesForKeepSuggestion) {
+      quotesForKeepSuggestion = defaults.quotesForKeepSuggestion;
+    }
+
+    return {
+      insertAfterWord, quotesForKeepSuggestion
+    }
+  }
 }
+
+/**
+ * The default punctuation and spacing produced by the model.
+ */
+const DEFAULT_PUNCTUATION: LexicalModelPunctuation = {
+  quotesForKeepSuggestion: { open: `“`, close: `”`},
+  insertAfterWord: " " ,
+};

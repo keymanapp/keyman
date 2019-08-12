@@ -9,6 +9,8 @@ public class KeymanSettingsActivity extends AppCompatActivity {
   protected static final String installedLanguagesKey = "InstalledLanguages";
   protected static final String showBannerKey = "ShowBanner";
 
+  protected KeymanSettingsFragment innerFragment;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -21,6 +23,17 @@ public class KeymanSettingsActivity extends AppCompatActivity {
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);
       getSupportActionBar().setDisplayShowHomeEnabled(true);
       getSupportActionBar().setDisplayShowTitleEnabled(true);
+    }
+
+    innerFragment = (KeymanSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.keyman_settings_fragment);
+  }
+
+  @Override
+  public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+
+    if(hasFocus) {
+      innerFragment.update();
     }
   }
 }

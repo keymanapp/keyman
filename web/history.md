@@ -1,14 +1,53 @@
 # KeymanWeb Version History
 
-## 12.0 alpha
-* Resumed TypeScript conversion work, resulting in significant internal restructuring and reorganization while leaving our published API intact.
-  * Mobile web "touch alias" elements have been refactored into their own type.
-  * Heavily reorganizes and refactors the keystroke processing engine of KMW.
-    * Attachment to all supported element types has now been abstracted, splitting keystroke processing from related DOM management.
-    * Centralizes code paths to improve parity between hardware and OSK-based keystrokes.
-  * In both cases above, significant unit testing was facilitated and has been added as a result, further improving code maintainability into the future.
-* Began adding support for our common LMLayer interface for predictive modeling.
-* Fix for issue with Mandarin Chinese keyboard's 'picker' UI
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-08-09 12.0.76 beta
+* The suggestion banner will no longer activate if predictions are not enabled, regardless of correction state.  (#1960)
+
+## 2019-08-07 12.0.75 beta
+* Fixes issue where keyboard name / language caption was missing from spacebar (#1937)
+
+## 2019-08-06 12.0.74 beta
+* Fixes issue with an extra space being added after accepted predictive suggestions (#1936)
+
+## 2019-07-29 12.0.72 beta
+* Initial beta release of KeymanWeb 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Aweb+base%3Amaster)
+
+* New Features:
+  * Began adding support for our common LMLayer interface for predictive modeling.
+    * Implemented WebWorker background thread for the heavy lifting; all API calls with relevant return values return Promises.
+    * Provides API for the following language-modeling functions:
+      * predict - Prediction of user's desired word based on context and recent input
+        * Also returns a tagged prediction corresponding to the original context state.
+        * Corrections are currently limited to the most recent input keystroke.
+        * Accepts a probability distribution for the most recent keystroke, which is be used to weight prediction probabilities
+      * wordbreak - Performs wordbreaking on the current context state
+        * A default wordbreaker based on the Unicode specification is provided as a default.
+    * Implements a common "template" for weighted wordlist lexical model functionality:
+      * Accepts a "search term to key" function to facilitate common corrections, such as diacritics,
+      during prediction lookups.
+      * Predictions are weighted based on their frequency and their input likelihood (based on keystroke probabilities).
+    * Accepts fully-specified custom lexical models that do not rely on model "templates."
+
+* Changes:
+  * Resumed TypeScript conversion work, resulting in significant internal restructuring and reorganization while leaving our published API intact.
+    * Mobile web "touch alias" elements have been refactored into their own type.
+    * Heavily reorganizes and refactors the keystroke processing engine of KMW.
+      * Attachment to all supported element types has now been abstracted, splitting keystroke processing from related DOM management.
+      * Centralizes code paths to improve parity between hardware and OSK-based keystrokes.
+    * In both cases above, significant unit testing was facilitated and has been added as a result, further improving code maintainability into the future.
+
+## 2019-04-25 11.0.225 stable
+* Fixes bug with Mandarin Chinese 'picker' UI
+
+## 2019-02-27 11.0.222 stable
+* Fixes bug with OSK keys set as if on a different layer from the one they are actually on (#1628)
+
+## 2019-02-26 11.0.221 stable
+* Fixes bug with the Toolbar UI (#1629)
 
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release

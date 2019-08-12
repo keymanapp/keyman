@@ -107,31 +107,8 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
     if !isCustomLexicalModel {
       if indexPath.row == 1 {
         cell.accessoryType = .disclosureIndicator
-      } else if indexPath.row == 2 && !canDeleteLexicalModel {
-        cell.isUserInteractionEnabled = false
-        cell.textLabel?.isEnabled = false
-        cell.detailTextLabel?.isEnabled = false
       }
-    } else if indexPath.row == 1 && !canDeleteLexicalModel {
-      cell.isUserInteractionEnabled = false
-      cell.textLabel?.isEnabled = false
-      cell.detailTextLabel?.isEnabled = false
     }
-  }
-  
-  private var canDeleteLexicalModel: Bool {
-    if !Manager.shared.canRemoveLexicalModels {
-      return false
-    }
-  
-    if !Manager.shared.canRemoveDefaultLexicalModel {
-      return lexicalModelIndex != 0
-    }
-  
-    if lexicalModelIndex > 0 {
-      return true
-    }
-    return lexicalModelCount > 1
   }
   
   private func showDeleteLexicalModel() {

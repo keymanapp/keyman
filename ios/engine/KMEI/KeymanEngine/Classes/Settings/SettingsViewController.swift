@@ -118,34 +118,37 @@ open class SettingsViewController: UITableViewController {
       case "showbanner":
         cell.accessoryType = .none
         let showBannerSwitch = UISwitch()
+        showBannerSwitch.translatesAutoresizingMaskIntoConstraints = false
+        
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
         showBannerSwitch.frame = switchFrame
+        
         showBannerSwitch.isOn = false //TODO: find the setting this is to show!
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
+        
+        if #available(iOSApplicationExtension 9.0, *) {
+          showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        }
       case "showgetstarted":
         cell.accessoryType = .none
         let dontShowAgainSwitch = UISwitch()
-//        let rightOffset = cell.frame.size.width
-//        let switchWidth: CGFloat = 20
-//        let switchX = rightOffset - switchWidth
-//        let dontShowAgainSwitch = UISwitch()
-//        let switchHeight = dontShowAgainSwitch.frame.size.height
-//        let cellSwitchHeightDiff = cell.frame.size.height - switchHeight
-//        let switchY = cell.frame.origin.y + 0.5 * cellSwitchHeightDiff
-
-//        let switchFrame = CGRect(x: switchX,
-//                                 y: switchY,
-//                                 width: switchWidth,
-//                                 height: cell.frame.size.height)
+        dontShowAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
+        
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: dontShowAgainSwitch.frame.size)
         dontShowAgainSwitch.frame = switchFrame
+        
         dontShowAgainSwitch.isOn = dontShowGetStarted
         dontShowAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(dontShowAgainSwitch)
-
+        
+        if #available(iOSApplicationExtension 9.0, *) {
+          dontShowAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          dontShowAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+        }
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
@@ -305,7 +308,11 @@ open class SettingsViewController: UITableViewController {
     }
 
     userLanguages = keyboardLanguages
-    itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
+    if 1 == userLanguages.count {
+      itemsArray[0]["subtitle"] = "one language installed"
+    } else {
+      itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
+    }
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {

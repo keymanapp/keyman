@@ -28,11 +28,6 @@
             var oskHeight = 0;
             var oskWidth = 0;
             
-            var bannerOptions = {
-                'alwaysShow': true,
-                'imagePath': '' // Need to route the actual banner image here.
-            };
-            
             window.addEventListener('load', init, false);
             
             function init() {
@@ -49,14 +44,17 @@
                     kmw['beepKeyboard'] = beepKeyboard;
                     kmw['setActiveElement']('ta');
                     
-                    kmw.osk.banner.setOptions(bannerOptions);
                 //});
             }
         
+            function showBanner(flag) {
+              console.log("Setting banner display for dictionaryless keyboards to " + flag);
+              keyman.osk.banner.setOptions({'alwaysShow': flag});
+            }
+        
             function setBannerImage(path) {
-              bannerOptions['imagePath'] = path;
               var kmw=window['keyman'];
-              kmw.osk.banner.setOptions(bannerOptions);
+              kmw.osk.banner.setOptions({"imagePath": path});
             }
         
             function setBannerHeight(h) {
@@ -85,7 +83,7 @@
             
             function setOskHeight(height) {
                 var kmw=window['keyman'];
-                oskHeight = height - kmw.osk.banner.height;
+                oskHeight = height;
                 kmw.osk.show(true);
                 kmw['correctOSKTextSize']();
             }
@@ -105,7 +103,11 @@
             }
             
             function getOskHeight() {
-                return oskHeight;
+                var height = oskHeight;
+                if(keyman.osk.banner._activeType != 'blank') {
+                  height = height - keyman.osk.banner.height;
+                }
+                return height;
             }
             
             var keyboardOffset = 0;

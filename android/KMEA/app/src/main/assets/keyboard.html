@@ -12,6 +12,7 @@
     var device = window.jsInterface.getDeviceType();
     var oskHeight = window.jsInterface.getKeyboardHeight();
     var oskWidth = 0;
+    var fragmentToggle = 0;
     window.addEventListener('load', init, false);
 
     function init() {
@@ -39,6 +40,18 @@
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
       kmw.addEventListener('mm.modelchange', onModelChange);
+
+      notifyHost('pageLoaded');
+    }
+
+    function notifyHost(event, params) {
+      // TODO: Update all other host notifications to use notifyHost instead of directly setting window.location.hash
+      window.setTimeout(function() {
+        // We use a timeout so that the navigation doesn't cause the calling function to abort after the call
+        fragmentToggle = (fragmentToggle + 1) % 100;
+        params = params ? '+'+params : '';
+        window.location.hash = event+'-'+fragmentToggle+params;
+      }, 10);
     }
 
     // Update the KMW banner height
@@ -211,7 +224,6 @@
       kmw['setActiveElement'](ta);
     }
 
-    var fragmentToggle = 0;
     function oskCreateKeyPreview(x,y,w,h,t) {
       fragmentToggle = (fragmentToggle + 1) % 100;
       var div = document.createElement('div');

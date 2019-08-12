@@ -122,19 +122,33 @@ class LanguageSettingsViewController: UITableViewController {
         if 0 == indexPath.row {
           cell.accessoryType = .none
           let doPredictionsSwitch = UISwitch()
+          doPredictionsSwitch.translatesAutoresizingMaskIntoConstraints = false
+          
           let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
           doPredictionsSwitch.frame = switchFrame
+          
           doPredictionsSwitch.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
           doPredictionsSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doPredictionsSwitch)
+          if #available(iOSApplicationExtension 9.0, *) {
+            doPredictionsSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+            doPredictionsSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+          }
         } else if 1 == indexPath.row {
           cell.accessoryType = .none
           let doCorrectionsSwitch = UISwitch()
+          doCorrectionsSwitch.translatesAutoresizingMaskIntoConstraints = false
+          
           let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
           doCorrectionsSwitch.frame = switchFrame
+          
           doCorrectionsSwitch.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
           doCorrectionsSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
           cell.addSubview(doCorrectionsSwitch)
+          if #available(iOSApplicationExtension 9.0, *) {
+            doCorrectionsSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+            doCorrectionsSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+          }
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
       }
@@ -153,9 +167,9 @@ class LanguageSettingsViewController: UITableViewController {
     var title: String
     switch (section) {
     case 0:
-      title = "keyboards"
+      title = "Keyboards"
     case 1:
-      title = "language settings"
+      title = "Language settings"
     default:
       title = "unknown header"
     }
@@ -233,6 +247,40 @@ class LanguageSettingsViewController: UITableViewController {
     performAction(for: indexPath)
   }
   
+  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    if !Manager.shared.canRemoveKeyboards {
+      return false
+    }
+    
+    if indexPath.section != 0 {
+      return false
+    }
+    
+    // Filter- prevent deleting the default keyboard and just that one.
+    if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
+      // Assumption - default keyboard is index 0.  Probably should make something more robust, though.
+      if globalIndex == 0 {
+        return false
+      }
+    }
+
+    return true
+  }
+  
+  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+                          forRowAt indexPath: IndexPath) {
+    if editingStyle == .delete {
+      if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
+        if Manager.shared.removeKeyboard(at: globalIndex) {
+          // For now, a pop-back will be sufficient.
+          navigationController?.popToRootViewController(animated: true)
+        }
+      }
+    }
+
+    // Do nothing for now.
+  }
+  
   @objc func addClicked(_ sender: Any) {
     showAddLanguageKeyboard()
   }
@@ -262,6 +310,27 @@ class LanguageSettingsViewController: UITableViewController {
     }
   }
   
+  func getKeyboardIndex(kb: Keyboard) -> Int? {
+    let matchingFullID = FullKeyboardID(keyboardID: kb.id, languageID: language.id)
+    let userData = Storage.active.userDefaults
+
+    // If user defaults for keyboards list does not exist, do nothing.
+    guard var globalUserKeyboards = userData.userKeyboards else {
+      log.error("no keyboards in the global keyboards list!")
+      return nil
+    }
+
+    if let index = globalUserKeyboards.index(where: { $0.fullID == matchingFullID }) {
+      guard index < globalUserKeyboards.count else {
+        return nil
+      }
+      return index
+    } else {
+      log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
+      return nil
+    }
+  }
+  
   func showKeyboardInfoView(kb: Keyboard) {
     let version = kb.version
     let matchingFullID = FullKeyboardID(keyboardID: kb.id, languageID: language.id)
@@ -274,7 +343,7 @@ class LanguageSettingsViewController: UITableViewController {
       return
     }
 
-    if let index = globalUserKeyboards.index(where: { $0.fullID == matchingFullID }) {
+    if let index = getKeyboardIndex(kb: kb) {
       guard index < globalUserKeyboards.count else {
         return
       }

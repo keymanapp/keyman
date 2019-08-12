@@ -740,6 +740,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     
     // Context match length
     NSUInteger cx = keyCtx.xLength;
+    NSUInteger cxIf = keyCtx.xLengthIncludingIf;
     if (self.tmpCtxBuf.xLength < cx)
         return 0;
     
@@ -747,8 +748,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSString *ctx = [self.tmpCtxBuf lastNChars:cx];
     //if (self.debugMode)
         //NSLog(@"contextMatch \"%@\" ? \"%@\"", keyCtx.codeString, ctx.codeString);
-    self.indexStack = [[NSMutableArray alloc] initWithCapacity:cx];
-    for (int i = 0; i < cx; i++)
+    self.indexStack = [[NSMutableArray alloc] initWithCapacity:cxIf];
+    for (int i = 0; i < cxIf; i++)
         [self.indexStack addObject:[NSNumber numberWithUnsignedInteger:0]];
     
     BOOL checkNul = NO;
@@ -848,7 +849,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     else {
                         return 0;
                     }
-                    
+
+                    sx++;
                     i+=5;
                     break;
                 }
@@ -870,7 +872,8 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
                     else {
                         return 0; // CODE_IFSYSTEMSTORE is not supported except TSS_PLATFORM
                     }
-                    
+
+                    sx++;
                     i+=5;
                     break;
                 }

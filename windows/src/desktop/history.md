@@ -1,10 +1,34 @@
 # Keyman Desktop Version History
 
-## 12.0 alpha
-* Started work on Keyman Desktop 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-07-29 12.0.9 beta
+* Initial beta release of Keyman Desktop 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Awindows+base%3Amaster)
+
+* No significant changes.
+
+## 2019-06-12 11.0.1360.0 stable
+* Bug Fix: Crash "Object doesn't support property or method..." starting Keyman Configuration on some systems (#1827)
+
+## 2019-06-05 11.0.1357.0 stable
+* Bug Fix: Error in shutdown of Keyman Engine can cause other applications to crash (#1820)
 
 ## 2019-04-29 11.0.1355.0 stable
 * Bug Fix: Error in initialization of Keyman Engine causes FieldWorks to crash if Keyman Developer installed but not Keyman Desktop. (#1739)
+
+## 2019-04-06 11.0.1354.0 stable
+* No changes
+
+## 2019-04-06 11.0.1353.0 stable
+* No changes
+
+## 2019-02-27 11.0.1352.0 stable
+* No changes
+
+## 2019-02-26 11.0.1351.0 stable
+* Not released
 
 ## 2019-02-25 11.0.1350.0 stable
 * 11.0 Stable release
