@@ -312,10 +312,13 @@ class KeyboardPickerViewController: KeyboardSwitcherViewController {
     }
 
     isDidUpdateCheck = true
-    return userKeyboards.contains { keyboard in
-      let kbID = keyboard.id
-      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
-    }
+    
+    // FIXME:  Undo this temporary 'forced update' line.
+    return true
+//    return userKeyboards.contains { keyboard in
+//      let kbID = keyboard.id
+//      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
+//    }
   }
 
   private func updateKeyboards() {

@@ -22,6 +22,22 @@ public class APILexicalModelRepository: LexicalModelRepository {
   public private(set) var languages: [String: Language]?
   public private(set) var lexicalModels: [String: LexicalModel]?
   
+  public func fetch(completionHandler: CompletionHandler?) {
+    let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
+    let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    var urlComponents = modelsAPIURL
+    urlComponents.queryItems = [
+      URLQueryItem(name: "q", value: "")
+    ]
+    log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
+    let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
+      self.apiCompletionHandler(data: data, response: response, error: error,
+                                fetchCompletionHandler: completionHandler)
+    }
+    task.resume()
+  }
+
+  
   public func fetchList(languageID: String, completionHandler: @escaping ListCompletionHandler) {
     var urlComponents = modelsAPIURL
     let bcp47Value = "bcp47:" + languageID
@@ -34,6 +50,13 @@ public class APILexicalModelRepository: LexicalModelRepository {
                                 fetchCompletionHandler: completionHandler)
     }
     task.resume()
+  }
+  
+  private func apiCompletionHandler(data: Data?,
+                                    response: URLResponse?,
+                                    error: Error?,
+                                    fetchCompletionHandler: CompletionHandler?) {
+    // TODO:  Implement properly.  Compare against APIKeyboardRepository.
   }
   
   private func apiListCompletionHandler(data: Data?,

@@ -25,6 +25,11 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private let keyboardRepository: KeyboardRepository?
   private let lexicalModelRepository: LexicalModelRepository?
   
+  private var updateKbdQueue: [InstallableKeyboard]?
+  private var updateLexQueue: [InstallableLexicalModel]?
+  private var _isDoneButtonEnabled = false
+  private var isDidUpdateCheck = false
+  
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadCompletedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
@@ -51,6 +56,11 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    isDidUpdateCheck = false
+    updateKbdQueue = nil
+    updateLexQueue = nil
+    
     title = "Installed Languages"
     selectedSection = NSNotFound
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
@@ -102,6 +112,15 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       showActivityView()
     }
     log.info("didAppear: InstalledLanguagesViewController")
+    
+    // Are there updates worth doing?
+    if isDidUpdateCheck || !checkUpdates() {
+      // Nope; don't make an 'update' button.
+      return
+    }
+    
+    // We do have updates - prepare the UI!
+    addUpdateToolbar()
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -370,6 +389,80 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
     return languageDict.values.sorted { a, b -> Bool in
       a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
     }
+  }
+  
+  public func checkUpdates() -> Bool {
+    if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
+      return false
+    }
+
+    isDidUpdateCheck = true
+    let hasKbdUpdate = userKeyboards.contains { keyboard in
+      let kbID = keyboard.value.id
+      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
+    }
+    
+    let hasLexUpdate = userLexicalModels.contains { lexicalModel in
+      let lmID = lexicalModel.value.id
+      return Manager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
+    }
+    
+    // FIXME:  Testing only!  Forces 'update'.
+    return true
+    //return hasKbdUpdate || hasLexUpdate
+  }
+  
+  private func addUpdateToolbar() {
+    let toolbarFrame = navigationController!.toolbar!.frame
+    let button = UIButton(type: .roundedRect)
+    button.addTarget(self, action: #selector(self.updateClicked), for: .touchUpInside)
+    button.backgroundColor = UIColor.green
+
+    button.frame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
+                          width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7)
+    button.center = CGPoint(x: toolbarFrame.width / 2, y: toolbarFrame.height / 2)
+    button.tintColor = UIColor(red: 0.75, green: 1.0, blue: 0.5, alpha: 1.0)
+    button.setTitleColor(UIColor.white, for: .normal)
+    button.setTitle("Update available", for: .normal)
+    button.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
+                               .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
+    button.tag = toolbarButtonTag
+    navigationController?.toolbar?.addSubview(button)
+
+    navigationController?.setToolbarHidden(false, animated: true)
+  }
+  
+  private func setUpdatingToolbar() {
+    navigationController?.toolbar?.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
+    let toolbarFrame = navigationController!.toolbar!.frame
+    let width = toolbarFrame.width * 0.95
+    let height = toolbarFrame.height * 0.7
+    let labelFrame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
+                            width: width, height: height)
+
+    let label = UILabel(frame: labelFrame)
+    label.backgroundColor = UIColor.green
+    label.textColor = UIColor.white
+    label.textAlignment = .center
+    label.center = CGPoint(x: width * 0.5, y: height * 0.5)
+    label.text = "Updating\u{2026}"
+    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
+                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
+    label.tag = toolbarLabelTag
+
+    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    indicatorView.center = CGPoint(x: width - indicatorView.frame.width, y: height * 0.5)
+    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
+    indicatorView.tag = toolbarActivityIndicatorTag
+    indicatorView.startAnimating()
+    navigationController?.toolbar?.addSubview(label)
+    navigationController?.toolbar?.addSubview(indicatorView)
+  }
+  
+  @objc func updateClicked(_ sender: Any) {
+    setUpdatingToolbar()
+    
+    // Do the actual updates!
   }
 }
 
