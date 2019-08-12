@@ -108,6 +108,7 @@ type
     procedure SetFocus; override;  // I2720
     property DialogName: WideString read FDialogName;
 
+
     procedure Do_Content_Render(FRefreshKeyman: Boolean); virtual;
   end;
 
