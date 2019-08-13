@@ -61,6 +61,9 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     updateKbdQueue = nil
     updateLexQueue = nil
     
+    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
+                                                          blue: 0.25, alpha: 0.9)
+    
     title = "Installed Languages"
     selectedSection = NSNotFound
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
@@ -416,7 +419,6 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
     let toolbarFrame = navigationController!.toolbar!.frame
     let button = UIButton(type: .roundedRect)
     button.addTarget(self, action: #selector(self.updateClicked), for: .touchUpInside)
-    button.backgroundColor = UIColor.green
 
     button.frame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
                           width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7)
@@ -441,7 +443,6 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
                             width: width, height: height)
 
     let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.green
     label.textColor = UIColor.white
     label.textAlignment = .center
     label.center = CGPoint(x: width * 0.5, y: height * 0.5)
@@ -463,6 +464,49 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
     setUpdatingToolbar()
     
     // Do the actual updates!
+    //TODO:  Integrate updateKeyboards and updateLexicalModels - be sure to handle the notifications, too.
+  }
+
+  private func updateKeyboards() {
+    updateKbdQueue = []
+    var kbIDs = Set<String>()
+    for kbTuple in userKeyboards {
+      let kb = kbTuple.value
+      let kbState = Manager.shared.stateForKeyboard(withID: kb.id)
+      if kbState == .needsUpdate {
+        if !kbIDs.contains(kb.id) {
+          kbIDs.insert(kb.id)
+          updateKbdQueue!.append(kb)
+        }
+      }
+    }
+
+    if !updateKbdQueue!.isEmpty {
+      let langID = updateKbdQueue![0].languageID
+      let kbID = updateKbdQueue![0].id
+      Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
+    }
+  }
+
+  private func updateLexicalModels() {
+    updateLexQueue = []
+    var lmIDs = Set<String>()
+    for lmTuple in userLexicalModels {
+      let lm = lmTuple.value
+      let lmState = Manager.shared.stateForLexicalModel(withID: lm.id)
+      if lmState == .needsUpdate {
+        if !lmIDs.contains(lm.id) {
+          lmIDs.insert(lm.id)
+          updateLexQueue!.append(lm)
+        }
+      }
+    }
+
+    if !updateLexQueue!.isEmpty {
+      let langID = updateLexQueue![0].languageID
+      let lmID = updateLexQueue![0].id
+      Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
+    }
   }
 }
 
