@@ -21,6 +21,8 @@ const enum SysExits {
 function loadFromFilename(filename: string): LexicalModelSource {
   let sourceCode = fs.readFileSync(filename, 'utf8');
   // Compile the module to JavaScript code.
+  sourceCode = '/// <reference path="./lexical-model-compiler/lexical-model.ts" />\n' + sourceCode;
+
   let compilation = TypeScript.transpileModule(sourceCode, {
     compilerOptions: { module: TypeScript.ModuleKind.CommonJS }
   })
