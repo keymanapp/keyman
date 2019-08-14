@@ -1,6 +1,6 @@
 /// <reference path="lexical-model-compiler/lexical-model.ts" />
 
-import * as TypeScript from 'typescript';
+import * as ts from 'typescript';
 import * as fs from 'fs';
 
 import LexicalModelCompiler from "./";
@@ -24,10 +24,10 @@ function loadFromFilename(filename: string): LexicalModelSource {
   // Compile the module to JavaScript code.
   // NOTE: transpile module does a very simple TS to JS compilation.
   // It DOES NOT check for types!
-  let compilationOutput = TypeScript.transpile(sourceCode, {
+  let compilationOutput = ts.transpile(sourceCode, {
     // Our runtime should support ES6 with Node/CommonJS modules.
-    target: TypeScript.ScriptTarget.ES2015,
-    module: TypeScript.ModuleKind.CommonJS,
+    target: ts.ScriptTarget.ES2015,
+    module: ts.ModuleKind.CommonJS,
   });
 
   // Turn the module into a function in which we can inject a global.
