@@ -61,9 +61,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     updateKbdQueue = nil
     updateLexQueue = nil
     
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
-                                                          blue: 0.25, alpha: 0.9)
-    
     title = "Installed Languages"
     selectedSection = NSNotFound
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
@@ -123,7 +120,18 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     }
     
     // We do have updates - prepare the UI!
-    addUpdateToolbar()
+    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      toolbar.displayButton("Update available", with: self, callback: #selector(self.updateClicked))
+    }
+  }
+  
+  @objc func updateClicked(_ sender: Any) {
+    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      toolbar.displayStatus("Updating\u{2026}", withIndicator: true)
+    }
+    
+    // Do the actual updates!
+    //TODO:  Integrate updateKeyboards and updateLexicalModels - be sure to handle the notifications, too.
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -413,58 +421,6 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
     // FIXME:  Testing only!  Forces 'update'.
     return true
     //return hasKbdUpdate || hasLexUpdate
-  }
-  
-  private func addUpdateToolbar() {
-    let toolbarFrame = navigationController!.toolbar!.frame
-    let button = UIButton(type: .roundedRect)
-    button.addTarget(self, action: #selector(self.updateClicked), for: .touchUpInside)
-
-    button.frame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
-                          width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7)
-    button.center = CGPoint(x: toolbarFrame.width / 2, y: toolbarFrame.height / 2)
-    button.tintColor = UIColor(red: 0.75, green: 1.0, blue: 0.5, alpha: 1.0)
-    button.setTitleColor(UIColor.white, for: .normal)
-    button.setTitle("Update available", for: .normal)
-    button.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                               .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    button.tag = toolbarButtonTag
-    navigationController?.toolbar?.addSubview(button)
-
-    navigationController?.setToolbarHidden(false, animated: true)
-  }
-  
-  private func setUpdatingToolbar() {
-    navigationController?.toolbar?.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    let toolbarFrame = navigationController!.toolbar!.frame
-    let width = toolbarFrame.width * 0.95
-    let height = toolbarFrame.height * 0.7
-    let labelFrame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
-                            width: width, height: height)
-
-    let label = UILabel(frame: labelFrame)
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: width * 0.5, y: height * 0.5)
-    label.text = "Updating\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: width - indicatorView.frame.width, y: height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-    navigationController?.toolbar?.addSubview(label)
-    navigationController?.toolbar?.addSubview(indicatorView)
-  }
-  
-  @objc func updateClicked(_ sender: Any) {
-    setUpdatingToolbar()
-    
-    // Do the actual updates!
-    //TODO:  Integrate updateKeyboards and updateLexicalModels - be sure to handle the notifications, too.
   }
 
   private func updateKeyboards() {
