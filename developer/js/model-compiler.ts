@@ -1,7 +1,7 @@
 /// <reference path="lexical-model-compiler/lexical-model.ts" />
+
 import * as TypeScript from 'typescript';
 import * as fs from 'fs';
-import * as assert from 'assert';
 
 import LexicalModelCompiler from "./";
 
@@ -20,17 +20,20 @@ const enum SysExits {
  */
 function loadFromFilename(filename: string): LexicalModelSource {
   let sourceCode = fs.readFileSync(filename, 'utf8');
-  // Compile the module to JavaScript code.
-  sourceCode = '/// <reference path="./lexical-model-compiler/lexical-model.ts" />\n' + sourceCode;
 
-  let compilation = TypeScript.transpileModule(sourceCode, {
-    compilerOptions: { module: TypeScript.ModuleKind.CommonJS }
-  })
+  // Compile the module to JavaScript code.
+  // NOTE: transpile module does a very simple TS to JS compilation.
+  // It DOES NOT check for types!
+  let compilationOutput = TypeScript.transpile(sourceCode, {
+    // Our runtime should support ES6 with Node/CommonJS modules.
+    target: TypeScript.ScriptTarget.ES2015,
+    module: TypeScript.ModuleKind.CommonJS,
+  });
 
   // Turn the module into a function in which we can inject a global.
-  let moduleCode = '(function(exports){' + compilation.outputText + '})';
+  let moduleCode = '(function(exports){' + compilationOutput + '})';
 
-  // Run the module; its exports will be placed on the given object.
+  // Run the module; its exports will be assigned to `moduleExports`.
   let moduleExports = {};
   let module = eval(moduleCode);
   module(moduleExports);
@@ -49,6 +52,5 @@ if (process.argv.length < 3) {
 }
 
 let o = loadFromFilename(process.argv[2]);
-// @ts-ignore
 let code = (new LexicalModelCompiler).generateLexicalModelCode('<unknown>', o, '.');
 console.log(code);
