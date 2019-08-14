@@ -96,7 +96,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    navigationController?.setToolbarHidden(true, animated: true)
+    
     // if no rows to show yet, show a loading indicator
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
@@ -206,42 +206,11 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func showDownloading(_ downloadLabel: String) {
-    guard let toolbar = navigationController?.toolbar else {
+    guard let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar else {
       return
     }
     
-    let labelFrame = CGRect(origin: toolbar.frame.origin,
-                            size: CGSize(width: toolbar.frame.width * 0.95,
-                                         height: toolbar.frame.height * 0.7))
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: toolbar.frame.width * 0.5, y: toolbar.frame.height * 0.5)
-    label.text = "Downloading \(downloadLabel)\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-    
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: toolbar.frame.width - indicatorView.frame.width,
-                                   y: toolbar.frame.height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-    toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    toolbar.addSubview(label)
-    toolbar.addSubview(indicatorView)
-    navigationController?.setToolbarHidden(false, animated: true)
-  }
-  
-  private func hideDownloading() {
-    navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    navigationController?.toolbar?.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
-                         userInfo: nil, repeats: false)
+    toolbar.displayStatus("Downloading \(downloadLabel)\u{2026}", withIndicator: true)
   }
   
   private func keyboardDownloadStarted() {
@@ -264,9 +233,10 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     for keyboard in keyboards {
       Manager.shared.updateUserKeyboards(with: keyboard)
     }
-    let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-    label?.text = "Keyboard successfully downloaded!"
-    hideDownloading()
+    
+    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      toolbar.displayStatus("Keyboard successfully downloaded!", withIndicator: false, duration: 3.0)
+    }
     restoreNavigation()
     
     // Add keyboard.
@@ -285,7 +255,12 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       Manager.shared.addLexicalModel(lexicalModel)
       _ = Manager.shared.registerLexicalModel(lexicalModel)
     }
-    hideDownloading()
+    
+    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      toolbar.displayStatus("Dictionary successfully downloaded!", withIndicator: false, duration: 3.0)
+    }
+    restoreNavigation()
+    
     restoreNavigation()
     navigationController?.popToRootViewController(animated: true)
   }
@@ -423,17 +398,12 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
     showConnectionErrorAlert()
   }
   
-  @objc func hideToolbarDelayed(_ timer: Timer) {
-    navigationController?.setToolbarHidden(true, animated: true)
-  }
-  
   @objc func addClicked(_ sender: Any) {
     showAddKeyboard()
   }
   
   func showAddKeyboard() {
-    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
-    button?.isEnabled = false
+    navigationController?.setToolbarHidden(true, animated: true)
     let vc = LanguageViewController(keyboardRep: Manager.shared.apiKeyboardRepository, modelRep: Manager.shared.apiLexicalModelRepository)
     navigationController?.pushViewController(vc, animated: true)
   }

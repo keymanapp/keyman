@@ -229,8 +229,18 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
   
   public func showKeymanEngineSettings(inVC: UIViewController) -> Void {
     hideKeyboard()
+    
+    // Allows us to set a custom UIToolbar for download/update status displays.
+    let nc = UINavigationController(navigationBarClass: nil, toolbarClass: ResourceDownloadStatusToolbar.self)
+    
+    // Grab our newly-generated toolbar instance and inform it of its parent NavigationController.
+    // This will help streamline use of the 'toolbar' as a status/update bar.
+    let toolbar = nc.toolbar as? ResourceDownloadStatusToolbar
+    toolbar?.navigationController = nc
+    
+    // As it's the first added view controller, settingsVC will function as root automatically.
     let settingsVC = SettingsViewController()
-    let nc = UINavigationController(rootViewController: settingsVC)
+    nc.pushViewController(settingsVC, animated: false)
     nc.modalTransitionStyle = .coverVertical
     nc.modalPresentationStyle = .pageSheet
     inVC.present(nc, animated: true)

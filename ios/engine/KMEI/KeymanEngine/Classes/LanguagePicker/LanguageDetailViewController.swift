@@ -133,33 +133,6 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     log.info("keyboardDownloadStarted: LanguageDetailViewController")
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
-
-    let toolbarFrame = navigationController!.toolbar.frame
-    let labelFrame = CGRect(origin: toolbarFrame.origin,
-                            size: CGSize(width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7))
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: toolbarFrame.width * 0.5, y: toolbarFrame.height * 0.5)
-    label.text = "Downloading\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: toolbarFrame.width - indicatorView.frame.width,
-                                   y: toolbarFrame.height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-
-    navigationController?.toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    navigationController?.toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    navigationController?.toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    navigationController?.toolbar.addSubview(label)
-    navigationController?.toolbar.addSubview(indicatorView)
-    navigationController?.setToolbarHidden(false, animated: true)
   }
 
   private func keyboardDownloadFailed() {

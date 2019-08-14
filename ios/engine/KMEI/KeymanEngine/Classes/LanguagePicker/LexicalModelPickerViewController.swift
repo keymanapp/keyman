@@ -233,19 +233,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
           navigationItem.rightBarButtonItem?.isEnabled = true
         }
         updateQueue = nil
-        let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-        label?.text = "Dictionaries successfully updated!"
-        navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-        Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
-                             userInfo: nil, repeats: false)
       }
     } else {
-      let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-      label?.text = "Dictionary successfully downloaded!"
-      navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-      Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
-                           userInfo: nil, repeats: false)
-      
       view.isUserInteractionEnabled = true
       navigationItem.leftBarButtonItem?.isEnabled = true
       if navigationItem.rightBarButtonItem != nil {
