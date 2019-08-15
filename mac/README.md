@@ -18,7 +18,7 @@ test builds. This requires additional configuration for your build environment.
    you generated from Keychain and copy its SHA-1 fingerprint. You'll need to remove spaces
    from between the hex pairs; you'll use this in step 3.
 
-2. Determine the Apple ID details in order to run a build. You'll need to create an
+2. Determine the Apple ID details in order to run a build. You may wish to create an
    App-Specific Password at https://appleid.apple.com/ and use this. Your Shortname will
    be either your 10-digit Team Identifier or a shortname that can be extracted with
    the following command:
