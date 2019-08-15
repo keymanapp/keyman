@@ -1357,6 +1357,7 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
 
   // MARK: - HTTPDownloadDelegate methods
 
+  // TODO:  Remove these from Manager.swift!
   func downloadQueueFinished(_ queue: HTTPDownloader) { }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {

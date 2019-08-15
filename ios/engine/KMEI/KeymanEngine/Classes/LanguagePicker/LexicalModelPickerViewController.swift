@@ -209,6 +209,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
     log.info("lexicalModelDownloadCompleted LexicalModelPicker")
+    
+    // Is not the case.  Would probably trigger if we tried to do lex model udates.
     if view == navigationController?.topViewController?.view {
       if updateQueue == nil {
         return
@@ -226,6 +228,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
         let lmID = updateQueue![0].id
         Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
       } else {
+        // Update queue empty; reset our state to allow interactions again.
         loadUserLexicalModels()
         view.isUserInteractionEnabled = true
         navigationItem.leftBarButtonItem?.isEnabled = true
@@ -235,6 +238,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
         updateQueue = nil
       }
     } else {
+      // Actually used now.
       view.isUserInteractionEnabled = true
       navigationItem.leftBarButtonItem?.isEnabled = true
       if navigationItem.rightBarButtonItem != nil {

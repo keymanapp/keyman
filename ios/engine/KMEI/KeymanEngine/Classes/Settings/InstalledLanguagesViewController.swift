@@ -25,9 +25,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private let keyboardRepository: KeyboardRepository?
   private let lexicalModelRepository: LexicalModelRepository?
   
-  private var updateKbdQueue: [InstallableKeyboard]?
-  private var updateLexQueue: [InstallableLexicalModel]?
-  private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
   
   private var keyboardDownloadStartedObserver: NotificationObserver?
@@ -56,10 +53,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    isDidUpdateCheck = false
-    updateKbdQueue = nil
-    updateLexQueue = nil
     
     title = "Installed Languages"
     selectedSection = NSNotFound
@@ -114,8 +107,13 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     log.info("didAppear: InstalledLanguagesViewController")
     
     // Are there updates worth doing?
-    if isDidUpdateCheck || !checkUpdates() {
+    if isDidUpdateCheck {
       // Nope; don't make an 'update' button.
+      return
+    }
+    
+    if !ResourceDownloadManager.shared.updatesAvailable() {
+      // No updates available?  Don't do update-y things.
       return
     }
     
@@ -131,7 +129,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     }
     
     // Do the actual updates!
-    //TODO:  Integrate updateKeyboards and updateLexicalModels - be sure to handle the notifications, too.
+    //TODO:  Call a function on ResourceDownloadManager.shared.
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {
@@ -399,69 +397,6 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
   private func languageList(_ languageDict: [String: Language]) -> [Language] {
     return languageDict.values.sorted { a, b -> Bool in
       a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
-    }
-  }
-  
-  public func checkUpdates() -> Bool {
-    if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
-      return false
-    }
-
-    isDidUpdateCheck = true
-    let hasKbdUpdate = userKeyboards.contains { keyboard in
-      let kbID = keyboard.value.id
-      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
-    }
-    
-    let hasLexUpdate = userLexicalModels.contains { lexicalModel in
-      let lmID = lexicalModel.value.id
-      return Manager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
-    }
-    
-    // FIXME:  Testing only!  Forces 'update'.
-    return true
-    //return hasKbdUpdate || hasLexUpdate
-  }
-
-  private func updateKeyboards() {
-    updateKbdQueue = []
-    var kbIDs = Set<String>()
-    for kbTuple in userKeyboards {
-      let kb = kbTuple.value
-      let kbState = Manager.shared.stateForKeyboard(withID: kb.id)
-      if kbState == .needsUpdate {
-        if !kbIDs.contains(kb.id) {
-          kbIDs.insert(kb.id)
-          updateKbdQueue!.append(kb)
-        }
-      }
-    }
-
-    if !updateKbdQueue!.isEmpty {
-      let langID = updateKbdQueue![0].languageID
-      let kbID = updateKbdQueue![0].id
-      Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
-    }
-  }
-
-  private func updateLexicalModels() {
-    updateLexQueue = []
-    var lmIDs = Set<String>()
-    for lmTuple in userLexicalModels {
-      let lm = lmTuple.value
-      let lmState = Manager.shared.stateForLexicalModel(withID: lm.id)
-      if lmState == .needsUpdate {
-        if !lmIDs.contains(lm.id) {
-          lmIDs.insert(lm.id)
-          updateLexQueue!.append(lm)
-        }
-      }
-    }
-
-    if !updateLexQueue!.isEmpty {
-      let langID = updateLexQueue![0].languageID
-      let lmID = updateLexQueue![0].id
-      Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
     }
   }
 }
