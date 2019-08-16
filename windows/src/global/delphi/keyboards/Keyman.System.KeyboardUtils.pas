@@ -25,6 +25,10 @@ type
       #13#10#13#10 +
       'Do you wish to continue?';
 
+    const SPackageNameDoesNotFollowLexicalModelConventions_Message: string =
+      'The package file %0:s does not follow the recommended model filename conventions. The name should be all lower case, '+
+      'include only alphanumeric characters and underscore (_), and should have the structure <author>.<bcp47>.<uniq>.model.kps';
+
     class function KeyboardFileNameToID(filename: string): string;
     class function CleanKeyboardID(const Name: WideString): WideString; static;
     class function IsValidKeyboardID(const Name: string; EnforceCaseAndWhitespace: Boolean): Boolean; static;
@@ -32,6 +36,8 @@ type
     class function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString; static;
     class function DoesFilenameFollowConventions(const Name: string): Boolean; static;
     class function DoesKeyboardFilenameFollowConventions(const Name: string): Boolean; static;
+    class function DoesPackageFilenameFollowLexicalModelConventions(
+      const Name: string): Boolean; static;
   end;
 
 implementation
@@ -83,6 +89,15 @@ begin
   // use punctuation apart from ., _, -, and +.
   // The filename does not need to be lowercase
   Result := (CleanComponent(e) = e) and (CleanComponent(n) = n);
+end;
+
+class function TKeyboardUtils.DoesPackageFilenameFollowLexicalModelConventions(
+  const Name: string): Boolean;
+// The model ID SHOULD adhere to this pattern (see also developer/js/index.ts):
+//                         author           .bcp47            .uniq
+const MODEL_ID_PATTERN = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
+begin
+  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN);
 end;
 
 class function TKeyboardUtils.DoesKeyboardFilenameFollowConventions(
