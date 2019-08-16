@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-16 12.0.15 beta
+* Add support for lexical models in packages for development tools (#1977)
+
 ## 2019-07-29 12.0.9 beta
 * Initial beta release of Keyman Desktop 12
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Adeveloper+base%3Amaster)
