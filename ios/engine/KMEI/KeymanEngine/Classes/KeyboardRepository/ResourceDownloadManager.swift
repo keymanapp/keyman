@@ -14,16 +14,14 @@ private class DownloadTask {
     case keyboard, lexicalModel, other
   }
   
-  public final var resource: Resource
-  public final var resourceID: String
-  public final var lgID: String
+  public final var type: Resource
+  public final var resources: [LanguageResource]?
   public final var request: HTTPDownloadRequest
   
-  public init(do request: HTTPDownloadRequest, for resourceType: DownloadTask.Resource, resID: String, lgID: String) {
-    self.resource = resourceType
-    self.resourceID = resID
-    self.lgID = lgID
+  public init(do request: HTTPDownloadRequest, for resources: [LanguageResource]?, type: DownloadTask.Resource) {
     self.request = request
+    self.type = type
+    self.resources = resources
   }
 }
 
@@ -42,14 +40,14 @@ private class DownloadBatch {
    * - [.update,   -don't-care-]:   batch update of all resources.
    */
   public final var activity: Activity
-  public final var resource: DownloadTask.Resource
+  public final var type: DownloadTask.Resource
   
   public final var tasks: [DownloadTask]
   //public final var promise: Int
   
-  public init(do tasks: [DownloadTask], as activity: Activity, ofType resource: DownloadTask.Resource) {
+  public init(do tasks: [DownloadTask], as activity: Activity, ofType type: DownloadTask.Resource) {
     self.activity = activity
-    self.resource = resource
+    self.type = type
     self.tasks = tasks
   }
 }
@@ -232,9 +230,9 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     return true
   }
   
-  private func queueDownloadBatch(_ batch: DownloadBatch, userInfo: [String: Any]) {
+  private func queueDownloadBatch(_ batch: DownloadBatch) {
     downloadQueue = HTTPDownloader(self)
-    downloadQueue!.userInfo = userInfo
+    downloadQueue!.userInfo = [Key.downloadBatch: batch]
     
     batch.tasks.forEach { task in
       downloadQueue!.addRequest(task.request)
@@ -293,14 +291,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       return
     }
 
-    // TODO: Better typing
-    let commonUserData: [String: Any] = [
-      Key.keyboardInfo: [keyboard],
-      Key.update: isUpdate
-    ]
-
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboard, withOptions: options, withFilename: filename, asActivity: .download, with: commonUserData) {
-      queueDownloadBatch(dlBatch, userInfo: commonUserData)
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboard, withOptions: options, withFilename: filename, asActivity: isUpdate ? .update : .download) {
+      queueDownloadBatch(dlBatch)
       
       self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
     }
@@ -331,21 +323,21 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
 
     downloadQueue = HTTPDownloader(self)
-    let commonUserData: [String: Any] = [
-      Key.keyboardInfo: installableKeyboards,
-      Key.update: isUpdate
-    ]
-    downloadQueue!.userInfo = commonUserData
 
     // We're only installing a single keyboard, even if for multiple languages.  We should only do the actual 'download' task once.
     if let dlBatch = buildKeyboardDownloadBatch(for: installableKeyboards[0], withOptions: keyboardAPI.options, withFilename: filename,
-                                                asActivity: .download, with: commonUserData) {
-      queueDownloadBatch(dlBatch, userInfo: commonUserData)
+                                                asActivity: isUpdate ? .update : .download) {
+      // Since we're working from a direct-KMP install, we actually want to denote ALL language variants the KMP lists.
+      // This differs from cloud installs.
+      dlBatch.tasks.forEach { task in
+        task.resources = installableKeyboards
+      }
+      queueDownloadBatch(dlBatch)
     }
   }
   
   private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withOptions options: Options, withFilename filename: String,
-                                          asActivity activity: DownloadBatch.Activity, with userInfo: [String:Any]) -> DownloadBatch? {
+                                          asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
     let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
@@ -358,23 +350,28 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       return nil
     }
 
-    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: userInfo)
+    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
     request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
     request.tag = 0
 
-    let keyboardTask = DownloadTask(do: request, for: .keyboard, resID: keyboard.id, lgID: keyboard.languageID)
+    let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
     var batchTasks: [DownloadTask] = [ keyboardTask ]
     
     for (i, url) in fontURLs.enumerated() {
-      request = HTTPDownloadRequest(url: url, userInfo: userInfo)
+      request = HTTPDownloadRequest(url: url, userInfo: [:])
       request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
       request.tag = i + 1
       
-      let fontTask = DownloadTask(do: request, for: .other, resID: keyboard.id, lgID: keyboard.languageID)
+      let fontTask = DownloadTask(do: request, for: nil, type: .other)
       batchTasks.append(fontTask)
     }
     
     let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
+    batch.tasks.forEach { task in
+      task.request.userInfo[Key.downloadBatch] = batch
+      task.request.userInfo[Key.downloadTask] = task
+    }
+    
     return batch
   }
 
@@ -741,32 +738,42 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
     // If we're downloading a new keyboard.
     // The extra check is there to filter out other potential request types in the future.
-    if request.tag == 0 && request.typeCode == .downloadFile {
-      NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
-                                      object: self,
-                                      value: request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard])
+    if request.tag == 0 {
+      let task = request.userInfo[Key.downloadTask] as! DownloadTask
+      if task.type == .keyboard {
+        NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
+                                        object: self,
+                                        value: task.resources as! [InstallableKeyboard])
+      } else if task.type == .lexicalModel {
+        NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
+                                        object: self,
+                                        value: task.resources as! [InstallableLexicalModel])
+      }
     }
   }
 
   func downloadRequestFinished(_ request: HTTPDownloadRequest) {
-    switch request.typeCode {
-    case .downloadFile:
-      let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
-      let keyboard = keyboards[0]
-      let isUpdate = request.userInfo[Key.update] as! Bool
-
-      if let statusCode = request.responseStatusCode, statusCode == 200 {
+    let batch = request.userInfo[Key.downloadBatch] as! DownloadBatch
+    let isUpdate = batch.activity == .update
+    
+    let task = request.userInfo[Key.downloadTask] as! DownloadTask
+    
+    // FIXME
+    if let statusCode = request.responseStatusCode, statusCode == 200 {
+      if task.type == .keyboard {
         // The request has succeeded.
         if downloadQueue!.requestsCount == 0 {
+          let keyboards = task.resources as? [InstallableKeyboard]
+
           // Download queue finished.
           downloadQueue = nil
           FontManager.shared.registerCustomFonts()
-          log.info("Downloaded keyboard: \(keyboard.id).")
+          log.info("Downloaded keyboard: \(keyboards![0].id).")
 
           NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
                                           object: self,
-                                          value: keyboards)
-          // Trigger by notification.
+                                          value: keyboards!)
+          // TODO: Trigger by notification.  Needs to be done on Manager.swift, not this class.
 //          if isUpdate {
 //            shouldReloadKeyboard = true
 //            inputViewController.reload()
@@ -775,7 +782,10 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
           userDefaults.synchronize()
         }
-      } else { // Possible request error (400 Bad Request, 404 Not Found, etc.)
+      }
+    } else { // Possible request error (400 Bad Request, 404 Not Found, etc.)
+      if task.type == .keyboard {
+        let keyboards = task.resources as? [InstallableKeyboard]
         downloadQueue!.cancelAllOperations()
         downloadQueue = nil
 
@@ -787,7 +797,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
         if !isUpdate {
           // Clean up keyboard file if anything fails
           // TODO: Also clean up remaining fonts
-          try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboard))
+          try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
         }
 
         // TODO:
@@ -795,6 +805,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       }
     }
   }
+  
+  //func downloadRequestSuccess(
 
   func downloadRequestFailed(_ request: HTTPDownloadRequest) {
     switch request.typeCode {
@@ -803,18 +815,23 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       let error = request.error!
       log.error("Keyboard download failed: \(error).")
 
-      let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
-      let keyboard = keyboards[0]
-      let isUpdate = request.userInfo[Key.update] as! Bool
-
-      if !isUpdate {
-        // Clean up keyboard file if anything fails
-        // TODO: Also clean up remaining fonts
-        try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboard))
-      }
+      let task = request.userInfo[Key.downloadTask] as! DownloadTask
+      let batch = request.userInfo[Key.downloadBatch] as! DownloadBatch
+      let isUpdate = batch.activity == .update
       
-      // TODO:
-      //Manager.shared.downloadFailed(forKeyboards: keyboards, error: error as NSError)
+      if task.type == .keyboard {
+        // FIXME
+        let keyboards = task.resources as? [InstallableKeyboard]
+
+        if !isUpdate {
+          // Clean up keyboard file if anything fails
+          // TODO: Also clean up remaining fonts
+          try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
+        }
+        
+        // TODO:
+        //Manager.shared.downloadFailed(forKeyboards: keyboards, error: error as NSError)
+      }
     }
   }
   // End REWORK THIS SECTION ------

@@ -13,10 +13,10 @@ struct InstallableConstants {
 }
 
 /// Mainly differs from the API `LexicalModel` by having an associated language.
-public struct InstallableLexicalModel: Codable {
-  public var id: String
+public struct InstallableLexicalModel: Codable, LanguageResource {
+  private var _id: String
   public var name: String
-  public var languageID: String
+  private var _languageID: String
   public var version: String
   public var isCustom: Bool
   
@@ -29,21 +29,33 @@ public struct InstallableLexicalModel: Codable {
               languageID: String,
               version: String,
               isCustom: Bool) {
-    self.id = id
+    self._id = id
     self.name = name
-    self.languageID = languageID
+    self._languageID = languageID
 //    self.languageName = languageName
     self.version = version
     self.isCustom = isCustom
   }
   
   public init(lexicalModel: LexicalModel, languageID: String, isCustom: Bool) {
-    self.id = lexicalModel.id
+    self._id = lexicalModel.id
     self.name = lexicalModel.name
-    self.languageID = languageID
+    self._languageID = languageID
 //    self.languageName = language.name
     self.version = lexicalModel.version ?? InstallableConstants.defaultVersion
     self.isCustom = isCustom
+  }
+  
+  public var id: String {
+    get {
+      return _id
+    }
+  }
+  
+  public var languageID: String {
+    get {
+      return _languageID
+    }
   }
 }
 

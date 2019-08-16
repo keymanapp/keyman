@@ -50,6 +50,10 @@ public enum Key {
 
   // Other keys
   static let update = "update"
+  
+  // ResourceDownloadManager keys
+  static let downloadTask = "downloadTask"
+  static let downloadBatch = "downloadBatch"
 }
 
 public enum Defaults {
