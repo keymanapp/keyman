@@ -39,7 +39,7 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 // URLs - used for reachability test
 private let keymanHostName = "api.keyman.com"
 
-public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegate {
+public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
 
@@ -144,7 +144,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
 
-  var currentRequest: HTTPDownloadRequest?
   var shouldReloadKeyboard = false
   var shouldReloadLexicalModel = false
 
@@ -166,19 +165,11 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
     }
   }
 
-  private var downloadQueue: HTTPDownloader?
-  private var sharedQueue: HTTPDownloader!
+  //private var downloadQueue: HTTPDownloader?
   private var reachability: Reachability!
   var didSynchronize = false
 
   // MARK: - Object Admin
-  deinit {
-    NotificationCenter.default.removeObserver(self)
-    // FIXME: Likely unneeded unless a reference exists to currentRequest outside of Manager
-    if let currentRequest = currentRequest {
-      currentRequest.userInfo["completionBlock"] = nil
-    }
-  }
 
   private override init() {
     apiKeyboardRepository = APIKeyboardRepository()
@@ -215,11 +206,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
         log.error("failed to start Reachability notifier: \(error)")
       }
     }
-
-    /* HTTPDownloader only uses this for its delegate methods.  So long as we don't
-     * set the queue running, this should be perfectly fine.
-     */
-    sharedQueue = HTTPDownloader.init(self)
 
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
@@ -881,114 +867,6 @@ public class Manager: NSObject, HTTPDownloadDelegate, UIGestureRecognizerDelegat
       }
       return "Reachability changed to '\(reachStr)'"
     }
-  }
-
-  // MARK: - HTTPDownloadDelegate methods
-
-  // TODO:  Remove these from Manager.swift!
-  func downloadQueueFinished(_ queue: HTTPDownloader) { }
-
-  func downloadRequestStarted(_ request: HTTPDownloadRequest) {
-    // If we're downloading a new keyboard.
-    // The extra check is there to filter out other potential request types in the future.
-    if request.tag == 0 && request.typeCode == .downloadFile {
-      NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
-                                      object: self,
-                                      value: request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard])
-    }
-  }
-
-  func downloadRequestFinished(_ request: HTTPDownloadRequest) {
-    switch request.typeCode {
-    case .downloadFile:
-      let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
-      let keyboard = keyboards[0]
-      let isUpdate = request.userInfo[Key.update] as! Bool
-
-      if let statusCode = request.responseStatusCode, statusCode == 200 {
-        // The request has succeeded.
-        if downloadQueue!.requestsCount == 0 {
-          // Download queue finished.
-          downloadQueue = nil
-          FontManager.shared.registerCustomFonts()
-          log.info("Downloaded keyboard: \(keyboard.id).")
-
-          NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
-                                          object: self,
-                                          value: keyboards)
-          if isUpdate {
-            shouldReloadKeyboard = true
-            inputViewController.reload()
-          }
-          let userDefaults = Storage.active.userDefaults
-          userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-          userDefaults.synchronize()
-        }
-      } else { // Possible request error (400 Bad Request, 404 Not Found, etc.)
-        downloadQueue!.cancelAllOperations()
-        downloadQueue = nil
-
-        let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
-        let error = NSError(domain: "Keyman", code: 0,
-                            userInfo: [NSLocalizedDescriptionKey: errorMessage])
-        log.error("Keyboard download failed: \(error).")
-
-        if !isUpdate {
-          // Clean up keyboard file if anything fails
-          // TODO: Also clean up remaining fonts
-          try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboard))
-        }
-        downloadFailed(forKeyboards: keyboards, error: error)
-      }
-    }
-  }
-
-  func downloadRequestFailed(_ request: HTTPDownloadRequest) {
-    switch request.typeCode {
-    case .downloadFile:
-      downloadQueue = nil
-      let error = request.error!
-      log.error("Keyboard download failed: \(error).")
-
-      let keyboards = request.userInfo[Key.keyboardInfo] as! [InstallableKeyboard]
-      let keyboard = keyboards[0]
-      let isUpdate = request.userInfo[Key.update] as! Bool
-
-      if !isUpdate {
-        // Clean up keyboard file if anything fails
-        // TODO: Also clean up remaining fonts
-        try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboard))
-      }
-      downloadFailed(forKeyboards: keyboards, error: error as NSError)
-    }
-  }
-
-  private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
-    let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
-    NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  private func downloadFailed(forLanguageID languageID: String, error: Error) {
-    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  private func downloadFailed(forLexicalModelPackage packageURL: String, error: Error) {
-    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: packageURL, error: error)
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  private func downloadSucceeded(forLexicalModel lm: InstallableLexicalModel) {
-    let notification = LexicalModelDownloadCompletedNotification([lm])
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadCompleted,
-                                    object: self,
-                                    value: notification)
   }
 
   // MARK: - Loading custom keyboards
