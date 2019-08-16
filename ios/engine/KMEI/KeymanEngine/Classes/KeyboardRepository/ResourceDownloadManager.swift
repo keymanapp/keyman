@@ -55,8 +55,7 @@ private class DownloadBatch {
 }
 
 public class ResourceDownloadManager: HTTPDownloadDelegate {
-  private var activeTask: DownloadTask?
-  private var taskQueue: [DownloadTask] = []
+  private var currentBatch: DownloadBatch?
   
   private var downloadQueue: HTTPDownloader? = nil
   var currentRequest: HTTPDownloadRequest?
@@ -190,6 +189,37 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   }
   
   // MARK: - Downloading keyboards and lexical models
+  
+  private func checkCanDownload(keyboards: [InstallableKeyboard]) -> Bool {
+    guard reachability.connection != Reachability.Connection.none else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+      downloadFailed(forKeyboards: keyboards, error: error)
+      return false
+    }
+    
+    // At this stage, we now have everything needed to generate download requests.
+    guard downloadQueue == nil else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+      downloadFailed(forKeyboards: keyboards, error: error)
+      return false
+    }
+    
+    return true
+  }
+  
+  private func queueDownloadBatch(_ batch: DownloadBatch, userInfo: [String: Any]) {
+    downloadQueue = HTTPDownloader(self)
+    downloadQueue!.userInfo = userInfo
+    
+    batch.tasks.forEach { task in
+      downloadQueue!.addRequest(task.request)
+    }
+    
+    currentBatch = batch
+    downloadQueue!.run()
+  }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
   /// See `Notifications` for notification on success/failiure.
@@ -235,18 +265,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       return
     }
 
-    guard reachability.connection != Reachability.Connection.none else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: [keyboard], error: error)
-      return
-    }
-    
-    // At this stage, we now have everything needed to generate download requests.
-    guard downloadQueue == nil else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forKeyboards: [keyboard], error: error)
+    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+    if !checkCanDownload(keyboards: [keyboard]) {
       return
     }
 
@@ -256,18 +276,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       Key.update: isUpdate
     ]
 
-    let dlBatch = buildKeyboardDownloadBatch(for: keyboard, withOptions: options, withFilename: filename, asActivity: .download, with: commonUserData)
-
-    downloadQueue = HTTPDownloader(self)
-    downloadQueue!.userInfo = commonUserData
-    
-    dlBatch?.tasks.forEach { task in
-      downloadQueue!.addRequest(task.request)
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboard, withOptions: options, withFilename: filename, asActivity: .download, with: commonUserData) {
+      queueDownloadBatch(dlBatch, userInfo: commonUserData)
+      
+      self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
     }
-    
-    downloadQueue!.run()
-    
-    self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
   }
 
   private func keyboardFontURLs(forFont font: Font?, options: Options) -> [URL] {
@@ -287,25 +300,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
 
     let filename = keyboard.filename
 
-    if downloadQueue != nil {
-      // Download queue is active.
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forKeyboards: installableKeyboards, error: error)
-      return
-    }
-
-    if reachability.connection == Reachability.Connection.none {
-      let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: installableKeyboards, error: error)
-      return
-    }
-
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
+    // Perform the standard 'ready-to-download' checks.
+    if !checkCanDownload(keyboards: installableKeyboards) {
       return
     }
 
@@ -319,17 +315,10 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     downloadQueue!.userInfo = commonUserData
 
     // We're only installing a single keyboard, even if for multiple languages.  We should only do the actual 'download' task once.
-    let dlBatch = buildKeyboardDownloadBatch( for: installableKeyboards[0], withOptions: keyboardAPI.options, withFilename: filename,
-                                              asActivity: .download, with: commonUserData)
-
-    downloadQueue = HTTPDownloader(self)
-    downloadQueue!.userInfo = commonUserData
-    
-    dlBatch?.tasks.forEach { task in
-      downloadQueue!.addRequest(task.request)
+    if let dlBatch = buildKeyboardDownloadBatch(for: installableKeyboards[0], withOptions: keyboardAPI.options, withFilename: filename,
+                                                asActivity: .download, with: commonUserData) {
+      queueDownloadBatch(dlBatch, userInfo: commonUserData)
     }
-    
-    downloadQueue!.run()
   }
   
   private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withOptions options: Options, withFilename filename: String,
@@ -730,7 +719,10 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   
   //MARK: - HTTPDownloadDelegate methods
   
-  func downloadQueueFinished(_ queue: HTTPDownloader) { }
+  func downloadQueueFinished(_ queue: HTTPDownloader) {
+    // We can use the properties of the current "batch" to generate specialized notifications.
+    currentBatch = nil
+  }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
     // If we're downloading a new keyboard.
@@ -810,82 +802,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       // TODO:
       //Manager.shared.downloadFailed(forKeyboards: keyboards, error: error as NSError)
     }
-  }
-  
-  // TODO:  REWORK THIS SECTION -------
-  // Nothing here is actually used yet; the goal is to overhaul these notifications into something more generally useful.
-  private func keyboardDownloadStarted() {
-    log.info("keyboardDownloadStarted: ResourceDownloadManager")
-//    view.isUserInteractionEnabled = false
-//    navigationItem.setHidesBackButton(true, animated: true)
-//    showDownloading("keyboard")
-  }
-  
-  private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
-    log.info("lexicalModelDownloadStarted: ResourceDownloadManager")
-//    showDownloading("dictionary")
-  }
-  
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    log.info("keyboardDownloadCompleted: ResourceDownloadManager")
-    Manager.shared.shouldReloadKeyboard = true
-    
-    // Update keyboard version
-    for keyboard in keyboards {
-      Manager.shared.updateUserKeyboards(with: keyboard)
-    }
-    
-//    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-//      toolbar.displayStatus("Keyboard successfully downloaded!", withIndicator: false, duration: 3.0)
-//    }
-//    restoreNavigation()
-    
-    // Add keyboard.
-    for keyboard in keyboards {
-      Manager.shared.addKeyboard(keyboard)
-      _ = Manager.shared.setKeyboard(keyboard)
-    }
-    
-//    navigationController?.popToRootViewController(animated: true)
-  }
-  
-  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
-    log.info("lexicalModelDownloadCompleted: ResourceDownloadManager")
-    // Add models.
-    for lexicalModel in lexicalModels {
-      // TODO:  Do we need a language id check?
-      Manager.shared.addLexicalModel(lexicalModel)
-      _ = Manager.shared.registerLexicalModel(lexicalModel)
-    }
-    // Add lexicalModel.
-    
-//    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-//      toolbar.displayStatus("Dictionary successfully downloaded!", withIndicator: false, duration: 3.0)
-//    }
-//
-//    restoreNavigation()
-//    navigationController?.popToRootViewController(animated: true)
-  }
-  
-  private func keyboardDownloadFailed() {
-    log.info("keyboardDownloadFailed: ResourceDownloadManager")
-//    restoreNavigation()
-  }
-  
-  private func lexicalModelDownloadFailed() {
-    log.info("lexicalModelDownloadFailed: ResourceDownloadManager")
-//    restoreNavigation()
-    
-//    let title = "Dictionary Download Error"
-//    navigationController?.setToolbarHidden(true, animated: true)
-//
-//    let alertController = UIAlertController(title: title, message: "",
-//                                            preferredStyle: UIAlertControllerStyle.alert)
-//    alertController.addAction(UIAlertAction(title: "OK",
-//                                            style: UIAlertActionStyle.cancel,
-//                                            handler: nil))
-//
-//    self.present(alertController, animated: true, completion: nil)
   }
   // End REWORK THIS SECTION ------
 }
