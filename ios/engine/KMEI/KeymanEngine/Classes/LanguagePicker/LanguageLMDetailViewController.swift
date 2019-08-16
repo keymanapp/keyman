@@ -137,7 +137,8 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   func downloadHandler(_ lexicalModelIndex: Int) {
-    ResourceDownloadManager.shared.downloadLexicalModelPackage(string: (lexicalModels?[lexicalModelIndex].packageFilename)!)
+    let urlString = (lexicalModels?[lexicalModelIndex].packageFilename)!
+    ResourceDownloadManager.shared.downloadLexicalModelPackage(url: URL.init(string: urlString)!)
   }
   
   private func lexicalModelDownloadStarted() {

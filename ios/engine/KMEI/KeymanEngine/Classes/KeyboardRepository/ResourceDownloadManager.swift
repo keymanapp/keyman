@@ -487,47 +487,41 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   }
   
   // Actively used in Settings
-  func downloadLexicalModelPackage(string lexicalModelPackageURLString: String) -> Void {
-    if let lexicalModelKMPURL = URL.init(string: lexicalModelPackageURLString) {
-      //determine where to put the data (local  file  URL)
-      var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      destinationUrl.appendPathComponent("\(lexicalModelKMPURL.lastPathComponent).zip")
-      //callback to handle the data downloaded
-      func lexicalModelDownloaded(data: Data?,
-                                  response: URLResponse?,
-                                  dest: URL,
-                                  error: Error?) {
-        if let error = error {
-          log.error("Failed to fetch lexical model KMP file")
-          downloadFailed(forLexicalModelPackage: lexicalModelPackageURLString, error: error)
+  func downloadLexicalModelPackage(url lexicalModelPackageURL: URL) -> Void {
+    //determine where to put the data (local  file  URL)
+    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    destinationUrl.appendPathComponent("\(lexicalModelPackageURL.lastPathComponent).zip")
+    //callback to handle the data downloaded
+    func lexicalModelDownloaded(data: Data?,
+                                response: URLResponse?,
+                                dest: URL,
+                                error: Error?) {
+      if let error = error {
+        log.error("Failed to fetch lexical model KMP file")
+        downloadFailed(forLexicalModelPackage: "\(lexicalModelPackageURL)", error: error)
+      } else {
+        do {
+          try data!.write(to: dest)
+        } catch {
+          log.error("Error writing the lexical model download data: \(error)")
+        }
+        if let lm = installLexicalModelPackage(downloadedPackageFile: dest) {
+          downloadSucceeded(forLexicalModel: lm)
         } else {
-          do {
-            try data!.write(to: dest)
-          } catch {
-            log.error("Error writing the lexical model download data: \(error)")
-          }
-          if let lm = installLexicalModelPackage(downloadedPackageFile: dest) {
-            downloadSucceeded(forLexicalModel: lm)
-          } else {
-            let installError = NSError(domain: "Keyman", code: 0,
-                                       userInfo: [NSLocalizedDescriptionKey: "installError"])
-            downloadFailed(forLexicalModelPackage: lexicalModelPackageURLString, error: installError )
-          }
+          let installError = NSError(domain: "Keyman", code: 0,
+                                     userInfo: [NSLocalizedDescriptionKey: "installError"])
+          downloadFailed(forLexicalModelPackage: "\(lexicalModelPackageURL)", error: installError )
         }
       }
-
-      log.info("downloading lexical model from Keyman cloud: \(lexicalModelKMPURL).")
-      let task = URLSession.shared.dataTask(with: lexicalModelKMPURL) { (data, response, error) in
-        DispatchQueue.main.async {
-          lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
-        }
-      }
-      task.resume()
-
-    } else {
-      log.info("\(lexicalModelPackageURLString) is not a URL string?")
-      // might want to download the .js file directly, then, instead
     }
+
+    log.info("downloading lexical model from Keyman cloud: \(lexicalModelPackageURL).")
+    let task = URLSession.shared.dataTask(with: lexicalModelPackageURL) { (data, response, error) in
+      DispatchQueue.main.async {
+        lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
+      }
+    }
+    task.resume()
   }
   
   // Can be called by the cloud keyboard downloader and utilized.
@@ -554,7 +548,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
         //  for now, this just downloads the first one
         let chosenIndex = 0
         if let lexicalModel = lexicalModels?[chosenIndex] {
-          downloadLexicalModelPackage(string: lexicalModel.packageFilename)
+          downloadLexicalModelPackage(url: URL.init(string: lexicalModel.packageFilename)!)
         } else {
           log.info("no error, but no lexical model in list, either!")
         }
