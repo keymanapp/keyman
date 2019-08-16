@@ -163,7 +163,8 @@ function TPackageInfoRefreshLexicalModels.IsLexicalModelFileByName(f: TPackageCo
 begin
   // Need to test if the JS is a valid lexical model file.
   // This is a bit of a pain... but we have to stick with .js for compat
-  Result := FileExists(f.FileName) or IsLexicalModelFileByContent(f);
+  Result := TLexicalModelUtils.DoesJSFilenameFollowLexicalModelConventions(f.FileName) and
+    (not FileExists(f.FileName) or IsLexicalModelFileByContent(f));
 end;
 
 function TPackageInfoRefreshLexicalModels.FindLexicalModelFileByID(const id: string): TPackageContentFile;

@@ -13,6 +13,8 @@ type
     class function LexicalModelIDToFileName(id: string): string;
     class function DoesPackageFilenameFollowLexicalModelConventions(
       const Name: string): Boolean; static;
+    class function DoesJSFilenameFollowLexicalModelConventions(
+      const Name: string): Boolean; static;
   end;
 
 implementation
@@ -26,13 +28,23 @@ uses
 const
   SLexicalModelExtension = '.model.js';
 
+  // The model ID SHOULD adhere to this pattern (see also developer/js/index.ts):
+  //                           author           .bcp47            .uniq
+  MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(js)$';
+  MODEL_ID_PATTERN_PACKAGE = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
+
+class function TLexicalModelUtils.DoesJSFilenameFollowLexicalModelConventions(
+  const Name: string): Boolean;
+begin
+  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_JS);
+end;
+
 class function TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventions(
   const Name: string): Boolean;
 // The model ID SHOULD adhere to this pattern (see also developer/js/index.ts):
 //                         author           .bcp47            .uniq
-const MODEL_ID_PATTERN = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
 begin
-  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN);
+  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_PACKAGE);
 end;
 
 class function TLexicalModelUtils.LexicalModelFileNameToID(filename: string): string;
