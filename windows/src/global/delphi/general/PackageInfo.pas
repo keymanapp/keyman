@@ -1575,7 +1575,8 @@ begin
   Files.LoadJSON(ARoot);
   Options.LoadJSON(ARoot);
   Keyboards.LoadJSON(ARoot);
-  LexicalModels.LoadJSON(ARoot);
+  if FVersion = SKeymanVersion120 then
+    LexicalModels.LoadJSON(ARoot);
 end;
 
 procedure TPackage.DoLoadXML(ARoot: IXMLNode);
@@ -1616,7 +1617,8 @@ begin
   Info.SaveJSON(ARoot);
   Files.SaveJSON(ARoot);
   Keyboards.SaveJSON(ARoot);
-  LexicalModels.SaveJSON(ARoot);
+  if FVersion = SKeymanVersion120 then
+    LexicalModels.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
@@ -1631,7 +1633,8 @@ begin
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
   Keyboards.SaveXML(ARoot);
-  LexicalModels.SaveXML(ARoot);
+  if FVersion = SKeymanVersion120 then
+    LexicalModels.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
