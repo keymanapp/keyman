@@ -96,6 +96,13 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
 //      function: ResourceDownloadManager.lexicalModelDownloadFailed)
   }
   
+  deinit {
+    // Just to be safe, we'll invalidate any pending download requests when this class is deinitialized.
+    if let currentRequest = currentRequest {
+      currentRequest.userInfo["completionBlock"] = nil
+    }
+  }
+  
   public func updatesAvailable() -> Bool {
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
       return false
@@ -105,13 +112,13 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
     let userKeyboards = Storage.active.userDefaults.userKeyboards
     let hasKbdUpdate = userKeyboards?.contains { keyboard in
       let kbID = keyboard.id
-      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
+      return stateForKeyboard(withID: kbID) == .needsUpdate
     } ?? false
     
     let userLexicalModels = Storage.active.userDefaults.userLexicalModels
     let hasLexUpdate = userLexicalModels?.contains { lexicalModel in
       let lmID = lexicalModel.id
-      return Manager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
+      return stateForLexicalModel(withID: lmID) == .needsUpdate
     } ?? false
     
     // FIXME:  Testing only!  Forces 'update'.
@@ -130,7 +137,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
     
     // Build the keyboard update queue
     Storage.active.userDefaults.userKeyboards?.forEach { kb in
-      let kbState = Manager.shared.stateForKeyboard(withID: kb.id)
+      let kbState = stateForKeyboard(withID: kb.id)
       if kbState == .needsUpdate {
         if(!kbIDs.contains(kb.id)) {
           kbIDs.insert(kb.id)
@@ -143,7 +150,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
     if !updateKbdQueue!.isEmpty {
       let langID = updateKbdQueue![0].languageID
       let kbID = updateKbdQueue![0].id
-      Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
+      downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
     }
   }
 
@@ -153,7 +160,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
     var lmIDs = Set<String>()
     
     Storage.active.userDefaults.userLexicalModels?.forEach { lm in
-      let lmState = Manager.shared.stateForLexicalModel(withID: lm.id)
+      let lmState = stateForLexicalModel(withID: lm.id)
       if lmState == .needsUpdate {
         if !lmIDs.contains(lm.id) {
           lmIDs.insert(lm.id)
@@ -166,7 +173,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
     if !updateLexQueue!.isEmpty {
       let langID = updateLexQueue![0].languageID
       let lmID = updateLexQueue![0].id
-      Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
+      downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
     }
   }
   
