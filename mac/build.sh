@@ -20,8 +20,8 @@ display_usage() {
     echo "  -version #.#.#  Used to specify the build version number, which should be in the"
     echo "                  form Major.Minor.BuildCounter (optional, but expected if deploy preprelease)"
     echo "  -config NAME    NAME is passed to xcodebuild as -configuration parameter. Defaults to Debug, unless"
-    echo "                  the deploy option is used to specify preprelease, in which configuration will be"
-    echo "                  Release (i.e., -config option is ignored)."
+    echo "                  the -deploy option is used, in which configuration will be Release (i.e., -config option"
+    echo"                   is ignored)."
     echo "  -clean          Removes all previously-existing build products for anything to be built before building."
     echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
     echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
@@ -282,9 +282,9 @@ if $CLEAN ; then
 fi
 
 if [ "$TEST_ACTION" == "test" ]; then
-	carthage bootstrap		
+	carthage bootstrap
 fi
- 
+
 execBuildCommand() {
     typeset component="$1"
     shift
@@ -304,7 +304,7 @@ updatePlist() {
 	    KM_COMPONENT_BASE_PATH="$1"
 	    KM_COMPONENT_NAME="$2"
 		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
-		if [ -f "$KM_PLIST" ]; then 
+		if [ -f "$KM_PLIST" ]; then
 			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION in $KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $KM_VERSION" "$KM_PLIST"
 			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
@@ -347,7 +347,7 @@ if $DO_KEYMANIM ; then
     fi
 
     # Upload symbols (this was hanging when called from xcodebuild)
-    # Actually, it's probably better from here than in the project as we don't need 
+    # Actually, it's probably better from here than in the project as we don't need
     # to upload symbols when developing within xcode, only when doing a real build
     # See https://stackoverflow.com/questions/53488083/why-is-fabric-upload-symbols-hanging-on-step-begin-processing-dsym-under-xcode
 
@@ -435,7 +435,7 @@ fi
 if $LOCALDEPLOY ; then
     echo_heading "Attempting local deployment with command:"
     KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
-    displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\"" 
+    displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
     eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
     if [ $? == 0 ]; then
         displayInfo "Local deployment succeeded!" ""

@@ -43,6 +43,7 @@ To build Keyman for macOS, do the following:
 3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
     * If you have signing credentials from the core development team, you can build a signed version by omitting `-no-codesign`. Somewhat misleadingly, `-no-codesign` only stops
     automatic signing using the certificate maintained by the core development team!
+    * If you want to deploy, you will need to also add `-config Release`, as a Debug build cannot be notarized.
 
 Note: If Carthage prompts you to allow it access to your github credentials, it's fine to click Deny.
 
