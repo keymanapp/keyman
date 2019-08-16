@@ -52,8 +52,10 @@ uses
   KeymanVersion,
 
   Keyman.System.KeyboardUtils,
+  Keyman.System.LexicalModelUtils,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.PackageInfoRefreshKeyboards,
+  Keyman.System.PackageInfoRefreshLexicalModels,
 
   RedistFiles,
   TempFileManager;
@@ -123,7 +125,7 @@ begin
 
   if pack.LexicalModels.Count > 0 then
   begin
-    if not TKeyboardUtils.DoesPackageFilenameFollowLexicalModelConventions(pack.FileName) then
+    if not TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventions(pack.FileName) then
       WriteMessage(plsWarning, Format(TKeyboardUtils.SPackageNameDoesNotFollowLexicalModelConventions_Message, [ExtractFileName(pack.FileName)]));
   end
   else
@@ -230,6 +232,18 @@ begin
     // {Keyboards} section
 
     with TPackageInfoRefreshKeyboards.Create(kmpinf) do
+    try
+      OnError := Self.FOnMessage;
+      if not Execute then
+      begin
+        WriteMessage(plsError, 'The package build was not successful.');
+        Exit;
+      end;
+    finally
+      Free;
+    end;
+
+    with TPackageInfoRefreshLexicalModels.Create(kmpinf) do
     try
       OnError := Self.FOnMessage;
       if not Execute then

@@ -36,14 +36,11 @@ type
     class function GetKeymanWebCompiledNameFromFileName(const FileName: WideString): WideString; static;
     class function DoesFilenameFollowConventions(const Name: string): Boolean; static;
     class function DoesKeyboardFilenameFollowConventions(const Name: string): Boolean; static;
-    class function DoesPackageFilenameFollowLexicalModelConventions(
-      const Name: string): Boolean; static;
   end;
 
 implementation
 
 uses
-  System.RegularExpressions,
   System.SysUtils;
 
 { TKeyboardUtil }
@@ -89,15 +86,6 @@ begin
   // use punctuation apart from ., _, -, and +.
   // The filename does not need to be lowercase
   Result := (CleanComponent(e) = e) and (CleanComponent(n) = n);
-end;
-
-class function TKeyboardUtils.DoesPackageFilenameFollowLexicalModelConventions(
-  const Name: string): Boolean;
-// The model ID SHOULD adhere to this pattern (see also developer/js/index.ts):
-//                         author           .bcp47            .uniq
-const MODEL_ID_PATTERN = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
-begin
-  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN);
 end;
 
 class function TKeyboardUtils.DoesKeyboardFilenameFollowConventions(
