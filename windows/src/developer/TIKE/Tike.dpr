@@ -21,7 +21,6 @@ uses
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
-  ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas',
   UfrmEditor in 'child\UfrmEditor.pas' {frmEditor},
   MenuImgList in '..\..\global\delphi\comp\MenuImgList.pas',
   UfrmSelectKey in 'dialogs\UfrmSelectKey.pas' {frmSelectKey},

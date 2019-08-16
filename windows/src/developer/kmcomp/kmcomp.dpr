@@ -8,7 +8,6 @@ uses
   kccompilepackage in 'kccompilepackage.pas',
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
-  ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',

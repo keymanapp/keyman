@@ -101,6 +101,8 @@ const
 
   SRegValue_MnemonicLayoutVersion = 'mnemonic layout version';                      // LM DWord   // I4553
 
+  SRegValue_Engine_OEMProductPath = 'oem product path';
+
   SRegValue_Transparency = 'transparency';                                          // CU, 0 or missing = heuristic, 1 = force enable, 2 = force disable, I2555
 
 //  SRegValue_UnknownLayoutID         = 'unknown layout id';                          // LM

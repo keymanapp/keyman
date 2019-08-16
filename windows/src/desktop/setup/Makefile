@@ -29,6 +29,14 @@ test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
     $(MT) -nologo -inputresource:$(PROGRAM)\desktop\setup.exe -validate_manifest
 
+debug-manifest:
+    # make a non-elevated manifest for testing purposes
+    -del manifest.res
+    copy manifest.xml std-manifest.xml
+    copy debug-manifest.xml manifest.xml
+    $(MAKE) manifest.res
+    copy std-manifest.xml manifest.xml
+
 install:
     rem
 

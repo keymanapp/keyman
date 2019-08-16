@@ -35,6 +35,10 @@ const
 
   SKeymanInstallerComponentCode = '{C289B903-7EE8-49C7-B186-BE98259EC540}';
 
+const
+  SKeymanDeveloperName = 'Keyman Developer';
+  SKeymanDesktopName = 'Keyman Desktop';
+
 implementation
 
 end.

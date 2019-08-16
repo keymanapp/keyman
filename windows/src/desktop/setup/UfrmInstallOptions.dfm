@@ -3,7 +3,7 @@ object frmInstallOptions: TfrmInstallOptions
   Top = 0
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'Install Options'
+  Caption = 'ssOptionsTitle'
   ClientHeight = 213
   ClientWidth = 505
   Color = clBtnFace
@@ -20,45 +20,45 @@ object frmInstallOptions: TfrmInstallOptions
   object chkStartWithWindows: TCheckBox
     Left = 16
     Top = 16
-    Width = 281
+    Width = 473
     Height = 17
-    Caption = 'Start Keyman Desktop when Windows starts'
+    Caption = 'ssOptionsStartWithWindows'
     TabOrder = 0
   end
   object chkStartAfterInstall: TCheckBox
     Left = 16
     Top = 44
-    Width = 325
+    Width = 473
     Height = 17
-    Caption = 'Start Keyman Desktop when installation completes'
+    Caption = 'ssOptionsStartAfterInstall'
     TabOrder = 1
   end
   object chkCheckForUpdates: TCheckBox
     Left = 16
     Top = 72
-    Width = 269
+    Width = 473
     Height = 17
-    Caption = 'Check for updates online periodically'
+    Caption = 'ssOptionsCheckForUpdates'
     TabOrder = 2
   end
   object chkCheckForUpdatesInstall: TCheckBox
     Left = 44
     Top = 100
-    Width = 273
+    Width = 445
     Height = 17
-    Caption = 'Check for updates before installing'
+    Caption = 'ssOptionsCheckForUpdatesBeforeInstall'
     TabOrder = 3
   end
   object chkUpgradeKeyman7: TCheckBox
     Left = 16
     Top = 127
-    Width = 441
+    Width = 473
     Height = 17
-    Caption = 'Upgrade Keyman Desktop 6 - 10 keyboards to Keyman Desktop 11'
+    Caption = 'ssOptionsUpgradeKeyboards'
     TabOrder = 4
   end
   object cmdOK: TButton
-    Left = 138
+    Left = 172
     Top = 172
     Width = 73
     Height = 25
@@ -68,7 +68,7 @@ object frmInstallOptions: TfrmInstallOptions
     TabOrder = 5
   end
   object cmdCancel: TButton
-    Left = 226
+    Left = 260
     Top = 172
     Width = 73
     Height = 25

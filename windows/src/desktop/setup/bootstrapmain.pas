@@ -46,10 +46,9 @@ unit bootstrapmain;  // I3306
 interface
 
 uses
-  Classes,
-  SysUtils,
-  SetupStrings,
-  WideStrings;
+  System.Classes,
+  System.SysUtils,
+  SetupStrings;
 
 type
   EInstallInfo = class(Exception);
@@ -57,14 +56,16 @@ type
 
   TInstallInfo = class
   private
-    FEditionTitle: WideString;
+    FAppName: WideString;
     FMSIFileName: WideString;
     FMSIOptions: string;  // I3126
     FVersion: WideString;
     FPackages: TStrings;
     FStrings: TStrings;
-    FBitmapFileName: WideString;
     FLicenseFileName: WideString;  // I2562
+    FTitleImageFilename: string;
+    FStartDisabled: Boolean;
+    FStartWithConfiguration: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -72,13 +73,15 @@ type
     function Text(const Name: TInstallInfoText): WideString; overload;
     function Text(const Name: TInstallInfoText; const Args: array of const): WideString; overload;
     property Strings: TStrings read FStrings;
-    property EditionTitle: WideString read FEditionTitle;
+    property EditionTitle: WideString read FAppName;
     property MSIFileName: WideString read FMSIFileName;
     property MSIOptions: string read FMSIOptions;  // I3126
     property Version: WideString read FVersion write FVersion;
     property Packages: TStrings read FPackages;
-    property BitmapFileName: WideString read FBitmapFileName;
     property LicenseFileName: WideString read FLicenseFileName;  // I2562
+    property TitleImageFilename: string read FTitleImageFilename;
+    property StartDisabled: Boolean read FStartDisabled;
+    property StartWithConfiguration: Boolean read FStartWithConfiguration;
   end;
 
 var
@@ -90,25 +93,27 @@ procedure Run;
 implementation
 
 uses
-  Forms,
+  System.StrUtils,
+  System.TypInfo,
+  Vcl.Forms,
+  Winapi.ActiveX,
+  Winapi.Windows,
+
+  CommonControls,
+  ErrorControlledRegistry,
   GetOsVersion,
-  TntDialogHelp,
-  TypInfo,
-  UfrmRunDesktop,
-  Upload_Settings,
-  ActiveX,
-  SetupForm,
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
-  CommonControls,
   OnlineConstants,
-  ErrorControlledRegistry,
   RegistryHelpers,
   RegistryKeys,
-  utilexecute,
-  Windows,
-  SFX;
+  SetupForm,
+  SFX,
+  TntDialogHelp,
+  UfrmRunDesktop,
+  Upload_Settings,
+  utilexecute;
 
 function CheckDependencies(FSilent: Boolean): Boolean; forward;   // I4470
 
@@ -118,9 +123,6 @@ var
 const
   ICC_PROGRESS_CLASS     = $00000020; // progress
 
- STR_E_OLDOSVERSION_INSTALLKEYBOARDS = 'Keyman Desktop 10 requires Windows 7 or later to install.  However, Keyman Desktop 7 or 8 has been detected.  Do you want to install the keyboards included in this installer into Keyman Desktop 7, 8 or 9?';   // I4460
- STR_E_OLDKEYMANVERSION_INSTALLKEYBOARDS = 'This installer includes Keyman Desktop 10.  However, Keyman Desktop 7 or 8 has been detected.  Do you want to upgrade to Keyman Desktop 10 as well as installing the keyboards in this package?  '+   // I4460
-  '(Selecting No will install the keyboards without upgrading Keyman Desktop)';
 
 var
   TempPath: string = '';
@@ -273,7 +275,7 @@ begin
     // No keyboards installed, so we determine install based on Windows version
     if GetOS in [osLegacy, osVista] then   // I4365
     begin
-      if MessageDlgW(STR_E_OLDOSVERSION_DOWNLOAD, mtConfirmation, mbOkCancel, 0) = mrOk then
+      if MessageDlgW(FInstallInfo.Text(ssOldOsVersionDownload), mtConfirmation, mbOkCancel, 0) = mrOk then
         TUtilExecute.URL(MakeKeymanURL(URLPath_ArchivedDownloads));
       SetExitVal(ERROR_OLD_WIN_VERSION);
       Exit(True);
@@ -288,12 +290,12 @@ begin
   begin
     if OldKMShellPath <> '' then
     begin
-      if MessageDlgW(STR_E_OLDOSVERSION_INSTALLKEYBOARDS, mtConfirmation, mbYesNoCancel, 0) = mrYes then
+      if MessageDlgW(FInstallInfo.Text(ssOldOsVersionInstallKeyboards), mtConfirmation, mbYesNoCancel, 0) = mrYes then
         InstallKeyboardsInOldVersion(OldKMShellPath);
     end
     else
     begin
-      if MessageDlgW(STR_E_OLDOSVERSION_DOWNLOAD, mtConfirmation, mbOkCancel, 0) = mrOk then
+      if MessageDlgW(FInstallInfo.Text(ssOldOsVersionDownload), mtConfirmation, mbOkCancel, 0) = mrOk then
         TUtilExecute.URL(MakeKeymanURL(URLPath_ArchivedDownloads));
     end;
     SetExitVal(ERROR_OLD_WIN_VERSION);
@@ -302,7 +304,7 @@ begin
 
   if OldKMShellPath <> '' then
   begin
-    case MessageDlgW(STR_E_OLDKEYMANVERSION_INSTALLKEYBOARDS, mtConfirmation, mbYesNoCancel, 0) of
+    case MessageDlgW(FInstallInfo.Text(ssOldKeymanVersionInstallKeyboards), mtConfirmation, mbYesNoCancel, 0) of
       mrYes: Exit(False);
       mrNo: begin InstallKeyboardsInOldVersion(OldKMShellPath); SetExitVal(ERROR_OLD_WIN_VERSION); Exit(True); end;
       mrCancel: begin SetExitVal(ERROR_OLD_WIN_VERSION); Exit(True); end;
@@ -327,7 +329,7 @@ BEGIN
   try
     try
 
-    Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
+    Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
 
     FInstallInfo := TInstallInfo.Create;
 
@@ -392,7 +394,7 @@ BEGIN
 
         ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3476
 
-        if not SysUtils.FileExists(ExtPath + 'setup.inf') then  // I3476
+        if not System.SysUtils.FileExists(ExtPath + 'setup.inf') then  // I3476
         begin
           LogError('The file "setup.inf" is missing.  Setup cannot continue.');
           SetExitVal(ERROR_FILE_NOT_FOUND);
@@ -467,6 +469,7 @@ end;
 constructor TInstallInfo.Create;
 begin
   inherited Create;
+  FAppName := SKeymanDesktopName;
   FPackages := TStringList.Create;
   FStrings := TStringList.Create;
 end;
@@ -486,7 +489,9 @@ begin
   Result := FStrings.Values[s];
   if Result = '' then
     Result := FDefaultStrings[Name];
-  //ssWelcome_Keyboards
+
+  Result := ReplaceText(Result, '$VERSION', SKeymanVersion);
+  Result := ReplaceText(Result, '$APPNAME', FAppName);
 end;
 
 procedure TInstallInfo.Load;
@@ -500,6 +505,7 @@ begin
   FInSetup := False;
   FInPackages := False;
   FInStrings := False;
+
   with TStringList.Create do
   try
     LoadFromFile(ExtPath + 'setup.inf');  // We'll just use the preamble for encoding  // I3476
@@ -518,11 +524,13 @@ begin
       begin
         nm := Names[i]; val := ValueFromIndex[i];
         if WideSameText(nm, 'Version') then FVersion := val
-        else if WideSameText(nm, 'Title') then FEditionTitle := val
+        else if WideSameText(nm, 'AppName') then FAppName := val
         else if WideSameText(nm, 'MSIFileName') then FMSIFileName := val
-        else if WideSameText(nm, 'BitmapFileName') then FBitmapFileName := val
+        else if WideSameText(nm, 'TitleImage') then FTitleImageFileName := val
         else if WideSameText(nm, 'License') then FLicenseFileName := val  // I2562
-        else if WideSameText(nm, 'MSIOptions') then FMSIOptions := val;   // I3126
+        else if WideSameText(nm, 'MSIOptions') then FMSIOptions := val   // I3126
+        else if WideSameText(nm, 'StartWithConfiguration') then FStartWithConfiguration := StrToBoolDef(val, False)
+        else if WideSameText(nm, 'StartDisabled') then FStartDisabled := StrToBoolDef(val, False);
       end
       else if FInPackages then
         FPackages.Add(Strings[i])
@@ -533,17 +541,17 @@ begin
     if (FVersion = '') then
       raise EInstallInfo.Create('setup.inf is corrupt (code 1).  Setup cannot continue.');
 
-    if not SysUtils.FileExists(ExtPath + FMSIFileName) then  // I3476
+    if not System.SysUtils.FileExists(ExtPath + FMSIFileName) then  // I3476
       raise EInstallInfo.Create('Installer '+FMSIFileName+' does not exist (code 3).  Setup cannot continue.');
 
-    if not SysUtils.FileExists(ExtPath + FBitmapFileName) then  // I3476
-      FBitmapFileName := '';
+    if not System.SysUtils.FileExists(ExtPath + FTitleImageFileName) then  // I3476
+      FTitleImageFileName := '';
 
 //    ReadSectionValues('Packages', FPackages);
 //    ReadSectionValues('Strings', FStrings);
 
     for i := FPackages.Count - 1 downto 0 do
-      if not SysUtils.FileExists(ExtPath + FPackages.Names[i]) then  // I3476
+      if not System.SysUtils.FileExists(ExtPath + FPackages.Names[i]) then  // I3476
       begin
         ShowMessageW(Self.Text(ssPackageMissing, [FPackages.ValueFromIndex[i], FPackages.Names[i]]));
         FPackages.Delete(i);
