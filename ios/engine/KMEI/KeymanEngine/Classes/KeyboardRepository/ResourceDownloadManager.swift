@@ -137,7 +137,10 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     //return hasKbdUpdate || hasLexUpdate
   }
   
+  // TODO:  Not yet ready.
   public func performUpdates() {
+    // The plan is to create new notifications to handle batch updates here, rather than
+    // require a UI to manage the update queue.
     updateKeyboards()
     updateLexicalModels()
   }
@@ -203,6 +206,26 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
       downloadFailed(forKeyboards: keyboards, error: error)
+      return false
+    }
+    
+    return true
+  }
+  
+  private func checkCanDownload(lexicalModels: [InstallableLexicalModel]) -> Bool {
+    // Original implementation actually used the 'forKeyboards' versions seen below.
+    guard reachability.connection != Reachability.Connection.none else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+      downloadFailed(forKeyboards: [], error: error)
+      return false
+    }
+    
+    // At this stage, we now have everything needed to generate download requests.
+    guard downloadQueue == nil else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+      downloadFailed(forKeyboards: [], error: error)
       return false
     }
     
@@ -400,6 +423,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
 
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
+    // Needs validation - I don't think this if-condition can be met in Keyman's current state
+    // (as of 2019-08-16)
     if keyboardIdForCurrentRequest() == keyboardID {
       return .downloading
     }
@@ -419,6 +444,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     return .upToDate
   }
 
+  // Needs validation - I don't think this function is practically utilized (as of 2019-08-16)
   func keyboardIdForCurrentRequest() -> String? {
     if let currentRequest = currentRequest {
       let tmpStr = currentRequest.url.lastPathComponent
@@ -435,6 +461,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   }
   
   // return a lexical model so caller can use it in a downloadSucceeded call
+  // is called by other class funcs
   func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
     var installedLexicalModel: InstallableLexicalModel? = nil
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -459,6 +486,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     return installedLexicalModel
   }
   
+  // Actively used in Settings
   func downloadLexicalModelPackage(string lexicalModelPackageURLString: String) -> Void {
     if let lexicalModelKMPURL = URL.init(string: lexicalModelPackageURLString) {
       //determine where to put the data (local  file  URL)
@@ -501,6 +529,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       // might want to download the .js file directly, then, instead
     }
   }
+  
+  // Can be called by the cloud keyboard downloader and utilized.
   
   /// Starts the process of fetching the package file of the lexical model for the given language ID
   ///   first it fetches the list of lexical models for the given language
@@ -606,17 +636,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     let packageFilename = lexicalModel.packageFilename
     let lexicalModelURL = URL(string: "https://api.keyman.com/model")!.appendingPathComponent(packageFilename)
     
-    if downloadQueue != nil {
-      // Download queue is active.
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
-      return
-    }
-    
-    if reachability.connection == Reachability.Connection.none {
-      let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: [], error: error) //??? forLexicalModels : installableLexicalModels
+    if !checkCanDownload(lexicalModels: installableLexicalModels) {
       return
     }
     

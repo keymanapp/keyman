@@ -105,7 +105,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       cell.detailTextLabel?.isEnabled = true
     }
     
-    let kbState = Manager.shared.stateForLexicalModel(withID: lexicalModel.id)
+    let kbState = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
   
@@ -114,7 +114,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
     let lexicalModelIndex = indexPath.section
     let lexicalModel = lexicalModels![lexicalModelIndex]
     
-    let state = Manager.shared.stateForLexicalModel(withID: lexicalModel.id)
+    let state = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
     if state != .downloading {
       if state == .needsDownload {
         isUpdate = false
@@ -137,7 +137,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   func downloadHandler(_ lexicalModelIndex: Int) {
-    Manager.shared.downloadLexicalModelPackage(string: (lexicalModels?[lexicalModelIndex].packageFilename)!)
+    ResourceDownloadManager.shared.downloadLexicalModelPackage(string: (lexicalModels?[lexicalModelIndex].packageFilename)!)
   }
   
   private func lexicalModelDownloadStarted() {

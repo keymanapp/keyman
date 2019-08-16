@@ -226,7 +226,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       if !updateQueue!.isEmpty {
         let langID = updateQueue![0].languageID
         let lmID = updateQueue![0].id
-        Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
+        ResourceDownloadManager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
       } else {
         // Update queue empty; reset our state to allow interactions again.
         loadUserLexicalModels()
@@ -363,7 +363,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     isDidUpdateCheck = true
     return userLexicalModels.contains { lexicalModel in
       let lmID = lexicalModel.id
-      return Manager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
+      return ResourceDownloadManager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
     }
   }
   
@@ -371,7 +371,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     updateQueue = []
     var lmIDs = Set<String>()
     for lm in userLexicalModels {
-      let lmState = Manager.shared.stateForLexicalModel(withID: lm.id)
+      let lmState = ResourceDownloadManager.shared.stateForLexicalModel(withID: lm.id)
       if lmState == .needsUpdate {
         if !lmIDs.contains(lm.id) {
           lmIDs.insert(lm.id)
@@ -383,7 +383,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     if !updateQueue!.isEmpty {
       let langID = updateQueue![0].languageID
       let lmID = updateQueue![0].id
-      Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
+      ResourceDownloadManager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
     }
   }
   
