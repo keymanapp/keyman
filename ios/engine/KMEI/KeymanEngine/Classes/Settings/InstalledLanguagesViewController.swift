@@ -221,7 +221,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
     let keyboard = language.keyboards![keyboardIndex]
-    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: false)
+    ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: false)
   }
   
   private func restoreNavigation() {

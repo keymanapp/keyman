@@ -125,7 +125,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   func downloadHandler(_ keyboardIndex: Int) {
-    Manager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
+    ResourceDownloadManager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
                                       languageID: language.id, isUpdate: isUpdate)
   }
 

@@ -10,43 +10,55 @@ import Foundation
 import Reachability
 
 private class DownloadTask {
-  public enum Task {
-    case download, update
-  }
-  
   public enum Resource {
-    case Keyboard, LexicalModel
+    case keyboard, lexicalModel, other
   }
   
-  public final var task: Task
   public final var resource: Resource
   public final var resourceID: String
   public final var lgID: String
-  public final var url: String
+  public final var request: HTTPDownloadRequest
   
-  public init(task: Task, resource: Resource, resourceID: String, lgID: String, url: String) {
-    self.task = task
-    self.resource = resource
-    self.resourceID = resourceID
+  public init(do request: HTTPDownloadRequest, for resourceType: DownloadTask.Resource, resID: String, lgID: String) {
+    self.resource = resourceType
+    self.resourceID = resID
     self.lgID = lgID
-    self.url = url
+    self.request = request
   }
 }
 
+/**
+ * Represents one overall resource-related command for requests against the Keyman Cloud API.
+ */
 private class DownloadBatch {
+  public enum Activity {
+    case download, update
+  }
+  
+  /*
+   * Three main cases so far:
+   * - [.download, .keyboard]:      download new Keyboard (possibly with an associated lexical model)
+   * - [.download, .lexicalModel]:  download new LexicalModel
+   * - [.update,   -don't-care-]:   batch update of all resources.
+   */
+  public final var activity: Activity
+  public final var resource: DownloadTask.Resource
+  
   public final var tasks: [DownloadTask]
   //public final var promise: Int
   
-  public init(tasks: [DownloadTask]) {
+  public init(do tasks: [DownloadTask], as activity: Activity, ofType resource: DownloadTask.Resource) {
+    self.activity = activity
+    self.resource = resource
     self.tasks = tasks
   }
 }
 
-class ResourceDownloadManager: HTTPDownloadDelegate {
+public class ResourceDownloadManager: HTTPDownloadDelegate {
   private var activeTask: DownloadTask?
   private var taskQueue: [DownloadTask] = []
   
-  private var downloadQueue: HTTPDownloader!
+  private var downloadQueue: HTTPDownloader? = nil
   var currentRequest: HTTPDownloadRequest?
   private var reachability: Reachability!
   private let keymanHostName = "api.keyman.com"
@@ -66,7 +78,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
   public static let shared = ResourceDownloadManager()
   
   private init() {
-    downloadQueue = HTTPDownloader(self)
+    //downloadQueue = HTTPDownloader(self) // TODO:  Consider using a persistent one.
     reachability = Reachability(hostname: keymanHostName)
     
 //    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
@@ -212,6 +224,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
       return
     }
 
+    // Grab info for the relevant API version of the keyboard.
     guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: keyboardID, languageID: languageID),
       let filename = keyboards[keyboardID]?.filename
     else {
@@ -222,6 +235,14 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
       return
     }
 
+    guard reachability.connection != Reachability.Connection.none else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+      downloadFailed(forKeyboards: [keyboard], error: error)
+      return
+    }
+    
+    // At this stage, we now have everything needed to generate download requests.
     guard downloadQueue == nil else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
@@ -229,45 +250,23 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
       return
     }
 
-    guard reachability.connection != Reachability.Connection.none else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: [keyboard], error: error)
-      return
-    }
-
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
-      return
-    }
-
-    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
-                             keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
-
     // TODO: Better typing
-    downloadQueue = HTTPDownloader(self)
     let commonUserData: [String: Any] = [
       Key.keyboardInfo: [keyboard],
       Key.update: isUpdate
     ]
+
+    let dlBatch = buildKeyboardDownloadBatch(for: keyboard, withOptions: options, withFilename: filename, asActivity: .download, with: commonUserData)
+
+    downloadQueue = HTTPDownloader(self)
     downloadQueue!.userInfo = commonUserData
-
-    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: commonUserData)
-    request.destinationFile = Storage.active.keyboardURL(for: keyboard).path
-    request.tag = 0
-    downloadQueue!.addRequest(request)
-
-    for (i, url) in fontURLs.enumerated() {
-      request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboardID, filename: url.lastPathComponent).path
-      request.tag = i + 1
-      downloadQueue!.addRequest(request)
+    
+    dlBatch?.tasks.forEach { task in
+      downloadQueue!.addRequest(task.request)
     }
+    
     downloadQueue!.run()
+    
     self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
   }
 
@@ -278,50 +277,7 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
     return font.source.filter({ $0.hasFontExtension })
       .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
-
-  /// Downloads a custom keyboard from the URL
-  /// - Parameters:
-  ///   - url: URL to a JSON description of the keyboard
-  public func downloadKeyboard(from url: URL) {
-    guard reachability.connection != Reachability.Connection.none else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No connection"])
-      downloadFailed(forKeyboards: [], error: error)
-      return
-    }
-
-    guard let data = try? Data(contentsOf: url) else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
-      downloadFailed(forKeyboards: [], error: error)
-      return
-    }
-    
-    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
-  }
-
-  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = decodingStrategy
   
-    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
-      downloadKeyboard(keyboard)
-    } else {
-      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
-      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
-        downloadKeyboard(keyboard)
-      } else {
-        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
-        do {
-          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
-          downloadKeyboard(keyboard)
-        } catch {
-          downloadFailed(forKeyboards: [], error: error)
-        }
-      }
-    }
-  }
-
   /// Assumes that Keyboard has font and oskFont set and ignores fonts contained in Language.
   private func downloadKeyboard(_ keyboardAPI: KeyboardAPICall) {
     let keyboard = keyboardAPI.keyboard
@@ -378,6 +334,83 @@ class ResourceDownloadManager: HTTPDownloadDelegate {
       downloadQueue!.addRequest(request)
     }
     downloadQueue!.run()
+  }
+  
+  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withOptions options: Options, withFilename filename: String,
+                                          asActivity activity: DownloadBatch.Activity, with userInfo: [String:Any]) -> DownloadBatch? {
+    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
+    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
+                             keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
+
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return nil
+    }
+
+    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: userInfo)
+    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
+    request.tag = 0
+
+    let keyboardTask = DownloadTask(do: request, for: .keyboard, resID: keyboard.id, lgID: keyboard.languageID)
+    var batchTasks: [DownloadTask] = [ keyboardTask ]
+    
+    for (i, url) in fontURLs.enumerated() {
+      request = HTTPDownloadRequest(url: url, userInfo: userInfo)
+      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
+      request.tag = i + 1
+      
+      let fontTask = DownloadTask(do: request, for: .other, resID: keyboard.id, lgID: keyboard.languageID)
+      batchTasks.append(fontTask)
+    }
+    
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
+    return batch
+  }
+
+  /// Downloads a custom keyboard from the URL
+  /// - Parameters:
+  ///   - url: URL to a JSON description of the keyboard
+  public func downloadKeyboard(from url: URL) {
+    guard reachability.connection != Reachability.Connection.none else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No connection"])
+      downloadFailed(forKeyboards: [], error: error)
+      return
+    }
+
+    guard let data = try? Data(contentsOf: url) else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
+      downloadFailed(forKeyboards: [], error: error)
+      return
+    }
+    
+    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
+  }
+
+  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = decodingStrategy
+  
+    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+      downloadKeyboard(keyboard)
+    } else {
+      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
+      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+        downloadKeyboard(keyboard)
+      } else {
+        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
+        do {
+          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+          downloadKeyboard(keyboard)
+        } catch {
+          downloadFailed(forKeyboards: [], error: error)
+        }
+      }
+    }
   }
 
   /// - Returns: The current state for a keyboard

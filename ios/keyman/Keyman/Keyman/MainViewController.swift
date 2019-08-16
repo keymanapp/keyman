@@ -892,7 +892,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
     if let keyboard = keyboardToDownload {
-      Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
+      ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
     }
   }
 
