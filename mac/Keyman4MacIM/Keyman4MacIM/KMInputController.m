@@ -46,12 +46,25 @@ NSMutableArray *servers;
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
     if ([self.AppDelegate debugMode])
-        NSLog(@"Event = %@", event);
+        NSLog(@"handleEvent: event = %@", event);
     
-    if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil)
+    if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"handleEvent: not handling event");
         return NO; // Not sure this can ever happen.
+    }
     
     return [_eventHandler handleEvent:event client:sender];
+}
+
+// Passthrough from the app delegate low level event hook
+// to the input method event handler for Delete Back. 
+- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+    if(_eventHandler != nil) {
+        return [_eventHandler handleDeleteBackLowLevel:event];
+    }
+
+    return NO;
 }
 
 - (void)activateServer:(id)sender {
@@ -81,7 +94,9 @@ NSMutableArray *servers;
             _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] init];
         }
         else {
-            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId];
+            // We cache the client for use with events sourced from the low level tap
+            // where we don't necessarily have any access to the current client.
+            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
         }
     }
 }
@@ -119,6 +134,7 @@ NSMutableArray *servers;
         }
     }
 }
+
 
 /*
 - (NSDictionary *)modes:(id)sender {

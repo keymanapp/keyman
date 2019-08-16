@@ -82,7 +82,17 @@ if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]]; then
     ERROR_RED=$(tput setaf 1)
     WARNING_YELLOW=$(tput setaf 3)
     NORMAL=$(tput sgr0)
+    TERM_HEADING=$(tput setaf 4)
+else
+    ERROR_RED=
+    WARNING_YELLOW=
+    NORMAL=
+    TERM_HEADING=
 fi
+
+echo_heading() {
+  echo "${TERM_HEADING}$*${NORMAL}"
+}
 
 fail() {
     FAILURE_MSG="$1"
