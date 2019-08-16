@@ -183,9 +183,9 @@ type
     editInstallerOutputFilename: TEdit;
     cmdInstallWith: TButton;
     pageLexicalModels: TTabSheet;
-    Panel6: TPanel;
-    Label6: TLabel;
-    Label7: TLabel;
+    panLexicalModels: TPanel;
+    lblLexlicalModels: TLabel;
+    lblLexicalModelsSubtitle: TLabel;
     lblLexicalModelFilename: TLabel;
     lblLexicalModelDescription: TLabel;
     lblLexicalModelVersion: TLabel;
@@ -254,6 +254,9 @@ type
     procedure cmdLexicalModelLanguageAddClick(Sender: TObject);
     procedure cmdLexicalModelLanguageEditClick(Sender: TObject);
     procedure cmdLexicalModelLanguageRemoveClick(Sender: TObject);
+    procedure chkLexicalModelRTLClick(Sender: TObject);
+    procedure editLexicalModelDescriptionChange(Sender: TObject);
+    procedure editLexicalModelVersionChange(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -1934,6 +1937,43 @@ begin
   lm.Languages.Remove(lang);
   RefreshLanguageList(gridLexicalModelLanguages, lm.Languages);
   EnableLexicalModelTabControls;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.editLexicalModelDescriptionChange(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+begin
+  if FSetup > 0 then
+    Exit;
+
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lm.Name := editLexicalModelDescription.Text;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.editLexicalModelVersionChange(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+begin
+  if FSetup > 0 then
+    Exit;
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lm.Version := editLexicalModelVersion.Text;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.chkLexicalModelRTLClick(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+begin
+  if FSetup > 0 then
+    Exit;
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lm.RTL := chkLexicalModelRTL.Checked;
   Modified := True;
 end;
 

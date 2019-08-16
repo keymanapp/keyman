@@ -569,7 +569,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageLexicalModels: TTabSheet
       Caption = 'pageLexicalModels'
       ImageIndex = 6
-      object Panel6: TPanel
+      object panLexicalModels: TPanel
         Left = 0
         Top = 0
         Width = 872
@@ -582,7 +582,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         DesignSize = (
           872
           622)
-        object Label6: TLabel
+        object lblLexlicalModels: TLabel
           Left = 15
           Top = 10
           Width = 140
@@ -595,7 +595,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object Label7: TLabel
+        object lblLexicalModelsSubtitle: TLabel
           Left = 15
           Top = 37
           Width = 546
@@ -648,9 +648,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 275
           Height = 21
           TabStop = False
-          ParentColor = True
-          ReadOnly = True
           TabOrder = 1
+          OnChange = editLexicalModelDescriptionChange
         end
         object editLexicalModelVersion: TEdit
           Left = 342
@@ -658,8 +657,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 148
           Height = 21
           TabStop = False
-          ReadOnly = True
           TabOrder = 2
+          OnChange = editLexicalModelVersionChange
         end
         object gridLexicalModelLanguages: TStringGrid
           Left = 260
@@ -716,6 +715,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 17
           Caption = 'Is Right-to-left'
           TabOrder = 7
+          OnClick = chkLexicalModelRTLClick
         end
         object editLexicalModelFilename: TEdit
           Left = 342

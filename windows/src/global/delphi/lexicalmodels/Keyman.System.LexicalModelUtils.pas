@@ -39,7 +39,7 @@ class function TLexicalModelUtils.LexicalModelFileNameToID(filename: string): st
 begin
   Result := ExtractFileName(filename);
   if Result.EndsWith(SLexicalModelExtension) then
-    Result.Remove(Result.Length - SLexicalModelExtension.Length);
+    Result := Result.Remove(Result.Length - SLexicalModelExtension.Length);
 end;
 
 class function TLexicalModelUtils.LexicalModelIDToFileName(id: string): string;
