@@ -806,7 +806,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         return
       }
 
-      if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
+      if ResourceDownloadManager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
         keyboardToDownload = keyboard
         confirmInstall(withTitle: "\(keyboard.languageName): \(keyboard.name)",
           message: "Would you like to install this keyboard?",
@@ -912,7 +912,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
     if let url = customKeyboardToDownload {
-      Manager.shared.downloadKeyboard(from: url)
+      ResourceDownloadManager.shared.downloadKeyboard(from: url)
     }
     showGetStartedIfNeeded(withAction: action)
   }

@@ -93,7 +93,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       cell.detailTextLabel?.isEnabled = true
     }
 
-    let kbState = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    let kbState = ResourceDownloadManager.shared.stateForKeyboard(withID: keyboard.id)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
 
@@ -102,7 +102,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     let keyboardIndex = indexPath.section
     let keyboard = language.keyboards![keyboardIndex]
 
-    let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    let state = ResourceDownloadManager.shared.stateForKeyboard(withID: keyboard.id)
     if state != .downloading {
       if state == .needsDownload {
         isUpdate = false

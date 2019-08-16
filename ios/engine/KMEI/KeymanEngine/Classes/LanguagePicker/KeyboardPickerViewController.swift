@@ -163,7 +163,7 @@ class KeyboardPickerViewController: KeyboardSwitcherViewController {
       if !updateQueue!.isEmpty {
         let langID = updateQueue![0].languageID
         let kbID = updateQueue![0].id
-        Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
+        ResourceDownloadManager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
       } else {
         loadUserKeyboards()
         restoreNavigation()
@@ -317,7 +317,7 @@ class KeyboardPickerViewController: KeyboardSwitcherViewController {
     return true
 //    return userKeyboards.contains { keyboard in
 //      let kbID = keyboard.id
-//      return Manager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
+//      return ResourceDownloadManager.shared.stateForKeyboard(withID: kbID) == .needsUpdate
 //    }
   }
 
@@ -325,7 +325,7 @@ class KeyboardPickerViewController: KeyboardSwitcherViewController {
     updateQueue = []
     var kbIDs = Set<String>()
     for kb in userKeyboards {
-      let kbState = Manager.shared.stateForKeyboard(withID: kb.id)
+      let kbState = ResourceDownloadManager.shared.stateForKeyboard(withID: kb.id)
       if kbState == .needsUpdate {
         if !kbIDs.contains(kb.id) {
           kbIDs.insert(kb.id)
@@ -337,7 +337,7 @@ class KeyboardPickerViewController: KeyboardSwitcherViewController {
     if !updateQueue!.isEmpty {
       let langID = updateQueue![0].languageID
       let kbID = updateQueue![0].id
-      Manager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
+      ResourceDownloadManager.shared.downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
     }
   }
 
