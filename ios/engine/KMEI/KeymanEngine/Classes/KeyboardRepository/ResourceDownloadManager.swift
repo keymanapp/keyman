@@ -286,10 +286,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
 
     let filename = keyboard.filename
-    let keyboardURL = keyboardAPI.options.keyboardBaseURL.appendingPathComponent(filename)
-
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: keyboardAPI.options) +
-                             keyboardFontURLs(forFont: keyboard.oskFont, options: keyboardAPI.options)))
 
     if downloadQueue != nil {
       // Download queue is active.
@@ -322,17 +318,17 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     ]
     downloadQueue!.userInfo = commonUserData
 
-    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: commonUserData)
-    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
-    request.tag = 0
+    // We're only installing a single keyboard, even if for multiple languages.  We should only do the actual 'download' task once.
+    let dlBatch = buildKeyboardDownloadBatch( for: installableKeyboards[0], withOptions: keyboardAPI.options, withFilename: filename,
+                                              asActivity: .download, with: commonUserData)
 
-    downloadQueue!.addRequest(request)
-    for (i, url) in fontURLs.enumerated() {
-      request = HTTPDownloadRequest(url: url, userInfo: commonUserData)
-      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
-      request.tag = i + 1
-      downloadQueue!.addRequest(request)
+    downloadQueue = HTTPDownloader(self)
+    downloadQueue!.userInfo = commonUserData
+    
+    dlBatch?.tasks.forEach { task in
+      downloadQueue!.addRequest(task.request)
     }
+    
     downloadQueue!.run()
   }
   
@@ -817,6 +813,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   }
   
   // TODO:  REWORK THIS SECTION -------
+  // Nothing here is actually used yet; the goal is to overhaul these notifications into something more generally useful.
   private func keyboardDownloadStarted() {
     log.info("keyboardDownloadStarted: ResourceDownloadManager")
 //    view.isUserInteractionEnabled = false
