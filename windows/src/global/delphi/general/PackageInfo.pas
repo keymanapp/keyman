@@ -1575,7 +1575,7 @@ begin
   Files.LoadJSON(ARoot);
   Options.LoadJSON(ARoot);
   Keyboards.LoadJSON(ARoot);
-  if FVersion = SKeymanVersion120 then
+  if Options.FileVersion = SKeymanVersion120 then
     LexicalModels.LoadJSON(ARoot);
 end;
 
@@ -1617,7 +1617,7 @@ begin
   Info.SaveJSON(ARoot);
   Files.SaveJSON(ARoot);
   Keyboards.SaveJSON(ARoot);
-  if FVersion = SKeymanVersion120 then
+  if Options.FileVersion = SKeymanVersion120 then
     LexicalModels.SaveJSON(ARoot);
 end;
 
@@ -1633,7 +1633,7 @@ begin
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
   Keyboards.SaveXML(ARoot);
-  if FVersion = SKeymanVersion120 then
+  if Options.FileVersion = SKeymanVersion120 then
     LexicalModels.SaveXML(ARoot);
 end;
 
