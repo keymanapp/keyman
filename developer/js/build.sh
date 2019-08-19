@@ -27,6 +27,7 @@ display_usage ( ) {
 ################################ Main script ################################
 
 run_tests=0
+install_dependencies=1
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
@@ -38,6 +39,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
     -test)
       run_tests=1
+      install_dependencies=0
       ;;
     *)
       echo "$0: invalid option: $key"
@@ -50,6 +52,10 @@ done
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+
+if (( install_dependencies )) ; then
+  npm install || fail "Could not download dependencies."
+fi
 
 build || fail "Compilation failed."
 echo "Typescript compilation successful."
