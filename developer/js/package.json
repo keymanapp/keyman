@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npx tsc -p .",
+    "build": "tsc",
     "test": "mocha -r ts-node/register tests/**/test-*.ts"
   },
   "author": "Marc Durdin (SIL)",
