@@ -2,13 +2,14 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true
   },
   "include": [
     "source/**/*.ts"
