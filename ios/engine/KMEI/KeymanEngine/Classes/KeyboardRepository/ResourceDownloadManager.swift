@@ -30,30 +30,44 @@ private class DownloadTask {
  */
 private class DownloadBatch {
   public enum Activity {
-    case download, update
+    case download, update, batch
   }
   
   /*
    * Three main cases so far:
    * - [.download, .keyboard]:      download new Keyboard (possibly with an associated lexical model)
-   * - [.download, .lexicalModel]:  download new LexicalModel
-   * - [.update,   -don't-care-]:   batch update of all resources.
+   * - [.download, .lexicalModel]:  download new LexicalModel.
+   * - [.batch,    .other]:   batch update of all resources, containing the following within its compositeQueue
+   *   - [.update, .keyboard]:      updates one Keyboard
+   *   - [.update, .lexicalModel]:  updates one LexicalModel
    */
   public final var activity: Activity
   public final var type: DownloadTask.Resource
   
-  public final var tasks: [DownloadTask]
+  public final var tasks: [DownloadTask]?
+  public final var batchQueue: [DownloadBatch]?
   //public final var promise: Int
   
   public init(do tasks: [DownloadTask], as activity: Activity, ofType type: DownloadTask.Resource) {
     self.activity = activity
     self.type = type
     self.tasks = tasks
+    
+    self.batchQueue = nil
+  }
+  
+  public init(queue: [DownloadBatch]) {
+    self.activity = .batch
+    self.type = .other
+    self.batchQueue = queue
+    
+    self.tasks = nil
   }
 }
 
 public class ResourceDownloadManager: HTTPDownloadDelegate {
   private var currentBatch: DownloadBatch?
+  private var batchQueue: [DownloadBatch] = []
   
   private var downloadQueue: HTTPDownloader? = nil
   var currentRequest: HTTPDownloadRequest?
@@ -111,6 +125,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       currentRequest.userInfo["completionBlock"] = nil
     }
   }
+  
+  // MARK: Update checks + management
   
   public func updatesAvailable() -> Bool {
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
@@ -189,7 +205,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
   }
   
-  // MARK: - Downloading keyboards and lexical models
+  
+  // MARK: - Common functionality
   
   private func checkCanDownload(keyboards: [InstallableKeyboard]) -> Bool {
     guard reachability.connection != Reachability.Connection.none else {
@@ -230,16 +247,76 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     return true
   }
   
-  private func queueDownloadBatch(_ batch: DownloadBatch) {
+  private func executeDownloadBatch(_ batch: DownloadBatch) {
+    // TODO:  Handling composite batches.
     downloadQueue = HTTPDownloader(self)
     downloadQueue!.userInfo = [Key.downloadBatch: batch]
     
-    batch.tasks.forEach { task in
+    batch.tasks?.forEach { task in
       downloadQueue!.addRequest(task.request)
     }
     
     currentBatch = batch
     downloadQueue!.run()
+  }
+  
+  private func queueDownloadBatch(_ batch: DownloadBatch) {
+    if currentBatch == nil {
+      executeDownloadBatch(batch)
+    } else {
+      batchQueue.append(batch)
+    }
+  }
+  
+  private func fetchHandler(for resourceType: DownloadTask.Resource, _ completionHandler: @escaping () -> Void)
+                            -> (_ error: Error?) -> Void {
+    return { error in
+      if let error = error {
+        // TODO:  Connect to an error handler (or just render appropriate text) based on the resource type.
+        self.downloadFailed(forKeyboards: [], error: error)
+      } else {
+        log.info("Fetched repository. Continuing with download.")
+        completionHandler()
+      }
+    }
+  }
+  
+  // MARK - Downloading keyboards
+  
+  private func getInstallableKeyboardMetadata(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
+    // Grab info for the relevant API version of the keyboard.
+    guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: keyboardID, languageID: languageID)
+    else {
+      let message = "Keyboard not found with id: \(keyboardID), languageID: \(languageID)"
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: message])
+      downloadFailed(forKeyboards: [], error: error)
+      return nil
+    }
+    
+    return keyboard
+  }
+  
+  // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
+  // since this will expose the generated Promise for the caller's use.
+  private func downloadKeyboardCore(withMetadata keyboards: [InstallableKeyboard], asActivity activity: DownloadBatch.Activity,
+      withFilename filename: String, withOptions options: Options) -> DownloadBatch? {
+    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+    // The parameter facilitates error logging.
+    if !checkCanDownload(keyboards: keyboards) {
+      return nil
+    }
+
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options) {
+      // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
+      dlBatch.tasks?.forEach { task in
+        task.resources = keyboards
+      }
+      
+      queueDownloadBatch(dlBatch)
+      return dlBatch
+    }
+    return nil
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
@@ -251,49 +328,31 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
                                languageID: String,
                                isUpdate: Bool,
                                fetchRepositoryIfNeeded: Bool = true) {
-    guard let keyboards = Manager.shared.apiKeyboardRepository.keyboards,
+    guard let _ = Manager.shared.apiKeyboardRepository.keyboards,
       let options = Manager.shared.apiKeyboardRepository.options
     else {
       if fetchRepositoryIfNeeded {
         log.info("Fetching repository from API for keyboard download")
-        Manager.shared.apiKeyboardRepository.fetch { error in
-          if let error = error {
-            self.downloadFailed(forKeyboards: [], error: error)
-          } else {
-            log.info("Fetched repository. Continuing with keyboard download.")
-            self.downloadKeyboard(withID: keyboardID,
-                                  languageID: languageID,
-                                  isUpdate: isUpdate,
-                                  fetchRepositoryIfNeeded: false)
-          }
-        }
+        Manager.shared.apiKeyboardRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
+          self.downloadKeyboard(withID: keyboardID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
+        })
+        return
+      } else {
+        let message = "Keyboard repository not yet fetched"
+        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+        downloadFailed(forKeyboards: [], error: error)
         return
       }
-      let message = "Keyboard repository not yet fetched"
-      let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-      downloadFailed(forKeyboards: [], error: error)
-      return
     }
 
     // Grab info for the relevant API version of the keyboard.
-    guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: keyboardID, languageID: languageID),
-      let filename = keyboards[keyboardID]?.filename
+    guard let keyboard = getInstallableKeyboardMetadata(withID: keyboardID, languageID: languageID),
+      let filename = Manager.shared.apiKeyboardRepository.keyboards?[keyboardID]?.filename
     else {
-      let message = "Keyboard not found with id: \(keyboardID), languageID: \(languageID)"
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: message])
-      downloadFailed(forKeyboards: [], error: error)
       return
     }
-
-    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-    if !checkCanDownload(keyboards: [keyboard]) {
-      return
-    }
-
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboard, withOptions: options, withFilename: filename, asActivity: isUpdate ? .update : .download) {
-      queueDownloadBatch(dlBatch)
-      
+    
+    if let _ = downloadKeyboardCore(withMetadata: [keyboard], asActivity: isUpdate ? .update : .download, withFilename: filename, withOptions: options) {
       self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
     }
   }
@@ -306,6 +365,51 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
   
+  /// Downloads a custom keyboard from the URL (old ad-hoc method)
+  /// - Parameters:
+  ///   - url: URL to a JSON description of the keyboard
+  public func downloadKeyboard(from url: URL) {
+    guard reachability.connection != Reachability.Connection.none else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "No connection"])
+      downloadFailed(forKeyboards: [], error: error)
+      return
+    }
+
+    guard let data = try? Data(contentsOf: url) else {
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
+      downloadFailed(forKeyboards: [], error: error)
+      return
+    }
+    
+    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
+  }
+
+  // Step 2 of old ad-hoc process.  May be worth preserving for use with .kmp packages.
+  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = decodingStrategy
+  
+    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+      downloadKeyboard(keyboard)
+    } else {
+      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
+      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
+        downloadKeyboard(keyboard)
+      } else {
+        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
+        do {
+          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
+          downloadKeyboard(keyboard)
+        } catch {
+          downloadFailed(forKeyboards: [], error: error)
+        }
+      }
+    }
+  }
+  
+  // Step 3 of the old ad-hoc process.
   /// Assumes that Keyboard has font and oskFont set and ignores fonts contained in Language.
   private func downloadKeyboard(_ keyboardAPI: KeyboardAPICall) {
     let keyboard = keyboardAPI.keyboard
@@ -322,22 +426,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
 
     let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
 
-    downloadQueue = HTTPDownloader(self)
-
-    // We're only installing a single keyboard, even if for multiple languages.  We should only do the actual 'download' task once.
-    if let dlBatch = buildKeyboardDownloadBatch(for: installableKeyboards[0], withOptions: keyboardAPI.options, withFilename: filename,
-                                                asActivity: isUpdate ? .update : .download) {
-      // Since we're working from a direct-KMP install, we actually want to denote ALL language variants the KMP lists.
-      // This differs from cloud installs.
-      dlBatch.tasks.forEach { task in
-        task.resources = installableKeyboards
-      }
-      queueDownloadBatch(dlBatch)
-    }
+    _ = downloadKeyboardCore(withMetadata: installableKeyboards, asActivity: isUpdate ? .update : .download, withFilename: filename, withOptions: keyboardAPI.options)
   }
   
-  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withOptions options: Options, withFilename filename: String,
-                                          asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
+  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withFilename filename: String,
+                                          asActivity activity: DownloadBatch.Activity, withOptions options: Options) -> DownloadBatch? {
     let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
@@ -367,7 +460,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
     
     let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
-    batch.tasks.forEach { task in
+    batch.tasks?.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
@@ -375,49 +468,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     return batch
   }
 
-  /// Downloads a custom keyboard from the URL
-  /// - Parameters:
-  ///   - url: URL to a JSON description of the keyboard
-  public func downloadKeyboard(from url: URL) {
-    guard reachability.connection != Reachability.Connection.none else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No connection"])
-      downloadFailed(forKeyboards: [], error: error)
-      return
-    }
-
-    guard let data = try? Data(contentsOf: url) else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
-      downloadFailed(forKeyboards: [], error: error)
-      return
-    }
-    
-    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
-  }
-
-  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = decodingStrategy
-  
-    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
-      downloadKeyboard(keyboard)
-    } else {
-      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
-      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
-        downloadKeyboard(keyboard)
-      } else {
-        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
-        do {
-          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
-          downloadKeyboard(keyboard)
-        } catch {
-          downloadFailed(forKeyboards: [], error: error)
-        }
-      }
-    }
-  }
-
+  // TODO:  Needs an update!
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // Needs validation - I don't think this if-condition can be met in Keyman's current state
@@ -457,33 +508,79 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     return nil
   }
   
-  // return a lexical model so caller can use it in a downloadSucceeded call
-  // is called by other class funcs
-  func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
-    var installedLexicalModel: InstallableLexicalModel? = nil
-    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    var destination =  documentsDirectory
-    destination.appendPathComponent("temp/\(downloadedPackageFile.lastPathComponent)")
+  
+  
+  
+  // MARK - Lexical models
+  
+
+  private func getInstallableLexicalModelMetadata(withID lexicalModelID: String, languageID: String) -> InstallableLexicalModel? {
+    // Grab info for the relevant API version of the keyboard.
+    guard let keyboard = Manager.shared.apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID)
+    else {
+      let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: message])
+      // TODO: better error target.
+      downloadFailed(forKeyboards: [], error: error)
+      return nil
+    }
     
-    KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
-      if let kmp = kmp as! LexicalModelKeymanPackage? {
-        do {
-          try Manager.shared.parseLMKMP(kmp.sourceFolder)
-          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
-          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
-          //this can fail gracefully and not show errors to users
-          try FileManager.default.removeItem(at: downloadedPackageFile)
-        } catch {
-          log.error("Error installing the lexical model: \(error)")
-        }
-      } else {
-        log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
-      }
-    })
-    return installedLexicalModel
+    return keyboard
   }
   
-  // Actively used in Settings
+  // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
+  // since this will expose the generated Promise for the caller's use.
+  private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel], asActivity activity: DownloadBatch.Activity,
+      fromPath path: URL) -> DownloadBatch? {
+    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+    // The parameter facilitates error logging.
+    if !checkCanDownload(lexicalModels: lexicalModels) {
+      return nil
+    }
+
+    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], fromPath: path, asActivity: activity) {
+      // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
+      dlBatch.tasks?.forEach { task in
+        task.resources = lexicalModels
+      }
+      
+      // TODO:  Uncomment this.  It's temporary to facilitate testing.
+      //queueDownloadBatch(dlBatch)
+      return dlBatch
+    }
+    return nil
+  }
+  
+  private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel, fromPath path: URL,
+      asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return nil
+    }
+
+    let request = HTTPDownloadRequest(url: path, userInfo: [:])
+    request.destinationFile = Storage.active.keyboardURL(forID: lexicalModel.id, version: lexicalModel.version).path
+    request.tag = 0
+
+    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
+    let batchTasks: [DownloadTask] = [ lexicalModelTask ]
+    
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
+    batch.tasks?.forEach { task in
+      task.request.userInfo[Key.downloadBatch] = batch
+      task.request.userInfo[Key.downloadTask] = task
+    }
+    
+    return batch
+  }
+
+
+
+  // Actively used in Settings, is also called on installs triggered by keyboards
   func downloadLexicalModelPackage(url lexicalModelPackageURL: URL) -> Void {
     //determine where to put the data (local  file  URL)
     var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -564,15 +661,29 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
                                    languageID: String,
                                    isUpdate: Bool,
                                    fetchRepositoryIfNeeded: Bool = true) {
-    // Everything here was already commented-out.
-  }
-  
-  private func lexicalModelFontURLs(forFont font: Font?, options: Options) -> [URL] {
-    guard let font = font else {
-      return []
+    guard let _ = Manager.shared.apiLexicalModelRepository.lexicalModels else {
+      if fetchRepositoryIfNeeded {
+        log.info("Fetching repository from API for keyboard download")
+        Manager.shared.apiKeyboardRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
+          self.downloadKeyboard(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
+        })
+        return
+      } else {
+        let message = "Keyboard repository not yet fetched"
+        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+        downloadFailed(forKeyboards: [], error: error)
+        return
+      }
     }
-    return font.source.filter({ $0.hasFontExtension })
-      .map({ options.fontBaseURL.appendingPathComponent($0) })
+
+    // Grab info for the relevant API version of the keyboard.
+    guard let lexicalModel = getInstallableLexicalModelMetadata(withID: lexicalModelID, languageID: languageID),
+      let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.packageFilename
+    else {
+      return
+    }
+    
+    _ = downloadLexicalModelCore(withMetadata: [lexicalModel], asActivity: isUpdate ? .update : .download, fromPath: URL.init(string: filename)!)
   }
   
   /// Downloads a custom lexical model from the URL
@@ -692,6 +803,34 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
     return nil
   }
+  
+  // Processes fetched lexical models.
+  // return a lexical model so caller can use it in a downloadSucceeded call
+  // is called by other class funcs
+  func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
+    var installedLexicalModel: InstallableLexicalModel? = nil
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    var destination =  documentsDirectory
+    destination.appendPathComponent("temp/\(downloadedPackageFile.lastPathComponent)")
+    
+    KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
+      if let kmp = kmp as! LexicalModelKeymanPackage? {
+        do {
+          try Manager.shared.parseLMKMP(kmp.sourceFolder)
+          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
+          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
+          //this can fail gracefully and not show errors to users
+          try FileManager.default.removeItem(at: downloadedPackageFile)
+        } catch {
+          log.error("Error installing the lexical model: \(error)")
+        }
+      } else {
+        log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
+      }
+    })
+    return installedLexicalModel
+  }
+  
   
   
   // MARK - deprecated helper/handler methods - they help avoid errors for now.
