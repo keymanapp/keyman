@@ -577,46 +577,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     
     return batch
   }
-
-
-
-  // Actively used in Settings, is also called on installs triggered by keyboards
-  func downloadLexicalModelPackage(url lexicalModelPackageURL: URL) -> Void {
-    //determine where to put the data (local  file  URL)
-    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    destinationUrl.appendPathComponent("\(lexicalModelPackageURL.lastPathComponent).zip")
-    //callback to handle the data downloaded
-    func lexicalModelDownloaded(data: Data?,
-                                response: URLResponse?,
-                                dest: URL,
-                                error: Error?) {
-      if let error = error {
-        log.error("Failed to fetch lexical model KMP file")
-        downloadFailed(forLexicalModelPackage: "\(lexicalModelPackageURL)", error: error)
-      } else {
-        do {
-          try data!.write(to: dest)
-        } catch {
-          log.error("Error writing the lexical model download data: \(error)")
-        }
-        if let lm = installLexicalModelPackage(downloadedPackageFile: dest) {
-          downloadSucceeded(forLexicalModel: lm)
-        } else {
-          let installError = NSError(domain: "Keyman", code: 0,
-                                     userInfo: [NSLocalizedDescriptionKey: "installError"])
-          downloadFailed(forLexicalModelPackage: "\(lexicalModelPackageURL)", error: installError )
-        }
-      }
-    }
-
-    log.info("downloading lexical model from Keyman cloud: \(lexicalModelPackageURL).")
-    let task = URLSession.shared.dataTask(with: lexicalModelPackageURL) { (data, response, error) in
-      DispatchQueue.main.async {
-        lexicalModelDownloaded(data: data, response: response, dest: destinationUrl, error: error)
-      }
-    }
-    task.resume()
-  }
   
   // Can be called by the cloud keyboard downloader and utilized.
   
@@ -642,7 +602,9 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
         //  for now, this just downloads the first one
         let chosenIndex = 0
         if let lexicalModel = lexicalModels?[chosenIndex] {
-          downloadLexicalModelPackage(url: URL.init(string: lexicalModel.packageFilename)!)
+          //downloadLexicalModelPackage(url: URL.init(string: lexicalModel.packageFilename)!)
+          // We've already fetched part of the repository to do this.
+          downloadLexicalModel(withID: lexicalModel.id, languageID: languageID, isUpdate: false, fetchRepositoryIfNeeded: false)
         } else {
           log.info("no error, but no lexical model in list, either!")
         }
@@ -661,10 +623,18 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
                                    languageID: String,
                                    isUpdate: Bool,
                                    fetchRepositoryIfNeeded: Bool = true) {
+    
+    // TODO:  We should always force a refetch after new keyboards are installed so we can redo our language queries.
+    //        That should probably be done on successful keyboard installs, not here, though.
+    if fetchRepositoryIfNeeded {
+      // A temp measure to make sure things aren't totally broken.  Definitely not optimal.
+      Manager.shared.apiLexicalModelRepository.fetch(completionHandler: nil)
+    }
+    
     guard let _ = Manager.shared.apiLexicalModelRepository.lexicalModels else {
       if fetchRepositoryIfNeeded {
         log.info("Fetching repository from API for keyboard download")
-        Manager.shared.apiKeyboardRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
+        Manager.shared.apiLexicalModelRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
           self.downloadKeyboard(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
         })
         return
@@ -752,6 +722,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     
     let isUpdate = Storage.active.userDefaults.userLexicalModels?.contains { $0.id == lexicalModel.id } ?? false
     
+    // TODO:  Fix this section.
     downloadQueue = HTTPDownloader(self)
     let commonUserData: [String: Any] = [
       Key.lexicalModelInfo: installableLexicalModels,
@@ -928,6 +899,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
           let installError = NSError(domain: "Keyman", code: 0,
                                      userInfo: [NSLocalizedDescriptionKey: "installError"])
           downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError )
+        }
+        
+        // Temp - gotta clear the queue to match original behavior for now.
+        if downloadQueue!.requestsCount == 0 {
+          downloadQueue = nil
         }
       }
     } else { // Possible request error (400 Bad Request, 404 Not Found, etc.)
