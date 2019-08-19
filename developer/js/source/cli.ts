@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+/**
+ * kmlmc - Keyman Lexical Model Compiler
+ */
 /// <reference path="lexical-model-compiler/lexical-model.ts" />
 
 import * as ts from 'typescript';
