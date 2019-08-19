@@ -72,7 +72,7 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSImage *keyboardIcon;
 @property (nonatomic, strong) NSAlert *downloadInfoView;
 @property (nonatomic, strong) NSProgressIndicator *progressIndicator;
-@property (nonatomic, weak) IMKInputController *inputController;
+@property (nonatomic, weak) KMInputController *inputController;
 @property (nonatomic, strong) NSWindowController *configWindow;
 @property (nonatomic, strong) NSWindowController *downloadKBWindow;
 @property (nonatomic, strong) KMAboutWindowController *aboutWindow;

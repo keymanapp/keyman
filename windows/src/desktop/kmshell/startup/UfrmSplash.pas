@@ -63,6 +63,7 @@ type
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
   private
     FShouldDisplay: Boolean;
+    FShowConfigurationOnLoad: Boolean;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser(var Message: TMessage); message WM_USER;
   protected
@@ -73,9 +74,10 @@ type
     function ShouldSetAppTitle: Boolean; override;  // I2786
   public
     procedure Do_Content_Render(FRefreshKeyman: Boolean); override;
+    property ShowConfigurationOnLoad: Boolean read FShowConfigurationOnLoad write FShowConfigurationOnLoad;
   end;
 
-procedure StartKeyman(ForceSplash, Silent: Boolean);  // I2562
+procedure StartKeyman(ForceSplash, Silent, StartWithConfiguration: Boolean);  // I2562
 procedure ShowSplash;
 
 implementation
@@ -186,7 +188,14 @@ begin
     SetFocus;
     FormStyle := fsStayOnTop; // I2643
   end;
+
   inherited;
+
+  if FShowConfigurationOnLoad then
+  begin
+    Main(Self);
+    Do_Content_Render(True);
+  end;
 end;
 
 procedure TfrmSplash.FireCommand(const command: WideString; params: TStringList);
@@ -235,7 +244,7 @@ begin
   ModalResult := mrCancel;
 end;
 
-procedure StartKeyman(ForceSplash, Silent: Boolean);  // I2562
+procedure StartKeyman(ForceSplash, Silent, StartWithConfiguration: Boolean);  // I2562
 var
   hKeymanControl: THandle;
   FMutex: TKeymanMutex;
@@ -272,6 +281,7 @@ begin
       begin
         with TfrmSplash.Create(nil) do
         try
+          ShowConfigurationOnLoad := StartWithConfiguration;
           if ShowModal = mrCancel then
             Exit;
         finally

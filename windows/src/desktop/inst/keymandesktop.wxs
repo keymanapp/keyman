@@ -102,7 +102,7 @@
                 <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],1" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],2" />
               </Component>
-              
+
               <Component>
                 <File Name="menu.txt" Source="..\..\desktop\branding\menu.txt" KeyPath="yes" />
               </Component>
@@ -110,15 +110,15 @@
               <Component>
                 <File Name="messages.txt" Source="..\..\desktop\branding\messages.txt" KeyPath="yes" />
               </Component>
-              
+
+              <Component>
+                <File Name="menutitle.png" Source="..\..\desktop\branding\menutitle.png" KeyPath="yes" />
+              </Component>
+
               <Component>
                 <File Id="trayicon.ico" Name="trayicon.ico" Source="..\..\desktop\branding\trayicon.ico" KeyPath="yes" />
               </Component>
-                            
-              <Component>
-                <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" KeyPath="yes" />
-              </Component>
-              
+
               <Component>
                 <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
               </Component>
@@ -126,7 +126,11 @@
               <Component>
                 <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\..\global\res\90\desktop\cfgicon.ico" KeyPath="yes" />
               </Component>
-              
+                            
+              <Component>
+                <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" KeyPath="yes" />
+              </Component>
+                            
               <Component>
                 <File Name="unicodedata.mdb" Source="..\..\global\inst\data\unicodedata.mdb" />
               </Component>
@@ -248,6 +252,7 @@
       <ComponentRef Id="KeymanDesktop.chm" />
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />
+      <ComponentRef Id="menutitle.png" />
       <ComponentRef Id="unicodedata.mdb" />
       
       <ComponentRef Id="Reg_RootPath" />
