@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2017",
     "module": "commonjs",
-    "outDir": "dist",
+    "target": "es2017",
+    "noImplicitReturns": true,
+    "moduleResolution": "node",
     "sourceMap": true,
+    "outDir": "dist",
     "declaration": true
   },
   "include": [

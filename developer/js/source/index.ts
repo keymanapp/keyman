@@ -182,6 +182,8 @@ export default class LexicalModelCompiler {
     set_model_metadata('sourcePath', [groupPath, authorPath, bcp47Path].join('/'));
 
     fs.writeFileSync(modelInfoFileName, JSON.stringify(model_info, null, 2));
+
+    return true;
   };
 
   /**
