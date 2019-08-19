@@ -6,6 +6,7 @@
 
 import * as ts from 'typescript';
 import * as fs from 'fs';
+import * as program from 'commander';
 
 import LexicalModelCompiler from "./";
 
@@ -17,6 +18,34 @@ const enum SysExits {
   EX_USAGE = 64,
   EX_DATAERR = 65,
 };
+
+let inputFilename: string;
+
+/* Arguments */
+program
+  .description('Compiles Keyman lexical models')
+  .version(require('../package.json').version)
+  .arguments('<infile>')
+  .action(infile => inputFilename = infile)
+  .option('-o, --outFile <filename>', 'where to save the resultant file');
+
+program.parse(process.argv);
+
+// Deal with input arguments:
+if (!inputFilename) {
+  exitDueToUsageError('Must provide a lexical model source file.');
+}
+
+// Compile:
+let o = loadFromFilename(inputFilename);
+let code = (new LexicalModelCompiler).generateLexicalModelCode('<unknown>', o, '.');
+
+// Output:
+if (program.outFile) {
+  fs.writeFileSync(program.outFile, code, 'utf8');
+} else {
+  console.log(code);
+}
 
 /**
  * Loads a lexical model's source module from the given filename.
@@ -50,11 +79,9 @@ function loadFromFilename(filename: string): LexicalModelSource {
   return moduleExports['default'] as LexicalModelSource;
 }
 
-if (process.argv.length < 3) {
-  console.error('Must provide a lexical model source file.');
-  process.exit(SysExits.EX_USAGE);
+function exitDueToUsageError(message: string): never  {
+  console.error(`${program._name}: ${message}`);
+  console.error();
+  program.outputHelp();
+  return process.exit(SysExits.EX_USAGE);
 }
-
-let o = loadFromFilename(process.argv[2]);
-let code = (new LexicalModelCompiler).generateLexicalModelCode('<unknown>', o, '.');
-console.log(code);
