@@ -49,7 +49,7 @@ export default class LexicalModelCompiler {
      *    "authorEmail": "nobody@example.com",
      *    "description": "Example wordlist model"
      *  }
-     * 
+     *
      * For full documentation, see:
      * https://help.keyman.com/developer/cloud/model_info/1.0/
      */
@@ -90,7 +90,16 @@ export default class LexicalModelCompiler {
     // Build the compiled lexical model
     //
 
-    let func = this.generateLexicalModelCode(model_id, modelSource, sourcePath);
+    let func: string;
+    try {
+      func = this.generateLexicalModelCode(model_id, modelSource, sourcePath);
+    } catch (e) {
+      if (e instanceof ModelSourceError) {
+        this.logError(e.message);
+        return false;
+      }
+      throw e;
+    }
 
     //
     // Save full model to build folder as Javascript for use in KeymanWeb
@@ -151,10 +160,10 @@ export default class LexicalModelCompiler {
 
     // we strip the mailto: from the .kps file for the .model_info
     set_model_metadata('authorEmail', kmpJsonData.info.author.url.match(/^(mailto\:)?(.+)$/)[2], false);
-    
+
     // extract the language identifiers from the language metadata
     // arrays for each of the lexical models in the kmp.json file,
-    // and merge into a single array of identifiers in the 
+    // and merge into a single array of identifiers in the
     // .model_info file.
 
     model_info.languages = model_info.languages || kmpJsonData.lexicalModels.reduce((a, e) => [].concat(a, e.languages.map((f) => f.id)), []);
@@ -163,7 +172,7 @@ export default class LexicalModelCompiler {
     set_model_metadata('packageFilename', kmpFileName);
 
     // Always overwrite with actual file size
-    model_info.packageFileSize = fs.statSync(model_info.packageFilename).size; 
+    model_info.packageFileSize = fs.statSync(model_info.packageFilename).size;
 
     set_model_metadata('jsFilename', modelFileName);
 
@@ -171,12 +180,12 @@ export default class LexicalModelCompiler {
     model_info.jsFileSize = fs.statSync(model_info.jsFilename).size;
 
     // Always overwrite source data
-    model_info.packageIncludes = kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : []; 
+    model_info.packageIncludes = kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
 
     set_model_metadata('version', kmpJsonData.info.version.description);
 
     // The minimum Keyman version detected in the package file may be manually set higher by the developer
-    set_model_metadata('minKeymanVersion', minKeymanVersion, false); 
+    set_model_metadata('minKeymanVersion', minKeymanVersion, false);
 
     //TODO: model_info.helpLink = model_info.helpLink || ... if source/help/id.php exists?
     set_model_metadata('sourcePath', [groupPath, authorPath, bcp47Path].join('/'));
@@ -190,7 +199,7 @@ export default class LexicalModelCompiler {
    * Returns the generated code for the model that will ultimately be loaded by
    * the LMLayer worker. This code contains all model parameters, and specifies
    * word breakers and auxilary functions that may be required.
-   * 
+   *
    * @param model_id      The model ID. TODO: not sure if this is actually required!
    * @param modelSource   A specification of the model to compile
    * @param sourcePath    Where to find auxilary sources files
@@ -231,8 +240,7 @@ export default class LexicalModelCompiler {
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
         break;
       case "fst-foma-1.0":
-        this.logError('Unimplemented model format ' + modelSource.format);
-        return false;
+        throw new ModelSourceError(`Unimplemented model format: ${modelSource.format}`);
       case "trie-1.0":
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(sources, modelSource.searchTermToKey)
@@ -249,8 +257,7 @@ export default class LexicalModelCompiler {
         func += `}));\n`;
         break;
       default:
-        this.logError('Unknown model format '+modelSource.format);
-        return false;
+        throw new ModelSourceError(`Unknown model format: ${modelSource.format}`);
     }
 
     //
@@ -269,7 +276,10 @@ export default class LexicalModelCompiler {
     );
   };
 
-  logError(s) {
+  logError(s: string) {
     console.error(require('chalk').red(s));
   };
 };
+
+export class ModelSourceError extends Error {
+}
