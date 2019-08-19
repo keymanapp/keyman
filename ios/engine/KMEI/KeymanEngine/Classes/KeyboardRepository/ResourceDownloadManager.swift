@@ -546,7 +546,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       }
       
       // TODO:  Uncomment this.  It's temporary to facilitate testing.
-      //queueDownloadBatch(dlBatch)
+      queueDownloadBatch(dlBatch)
       return dlBatch
     }
     return nil
@@ -563,7 +563,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
 
     let request = HTTPDownloadRequest(url: path, userInfo: [:])
-    request.destinationFile = Storage.active.keyboardURL(forID: lexicalModel.id, version: lexicalModel.version).path
+    request.destinationFile = Storage.active.lexicalModelPackageURL(forID: lexicalModel.id, version: lexicalModel.version).path
     request.tag = 0
 
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
@@ -921,16 +921,25 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
           userDefaults.synchronize()
         }
+      } else if task.type == .lexicalModel {
+        if let lm = installLexicalModelPackage(downloadedPackageFile: URL.init(string: task.request.destinationFile!)!) {
+          downloadSucceeded(forLexicalModel: lm)
+        } else {
+          let installError = NSError(domain: "Keyman", code: 0,
+                                     userInfo: [NSLocalizedDescriptionKey: "installError"])
+          downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError )
+        }
       }
     } else { // Possible request error (400 Bad Request, 404 Not Found, etc.)
+      downloadQueue!.cancelAllOperations()
+      downloadQueue = nil
+
+      let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
+      let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: errorMessage])
+      
       if task.type == .keyboard {
         let keyboards = task.resources as? [InstallableKeyboard]
-        downloadQueue!.cancelAllOperations()
-        downloadQueue = nil
-
-        let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
-        let error = NSError(domain: "Keyman", code: 0,
-                            userInfo: [NSLocalizedDescriptionKey: errorMessage])
         log.error("Keyboard download failed: \(error).")
 
         if !isUpdate {
@@ -939,8 +948,18 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
           try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
         }
 
-        // TODO:
-        //Manager.shared.downloadFailed(forKeyboards: keyboards, error: error)
+        downloadFailed(forKeyboards: keyboards ?? [], error: error)
+      } else if task.type == .lexicalModel {
+        let lexicalModels = task.resources as? [InstallableLexicalModel]
+        log.error("Dictionary download failed: \(error).")
+
+        if !isUpdate {
+          // Clean up keyboard file if anything fails
+          // TODO: Also clean up remaining fonts
+          try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
+        }
+
+        downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error)
       }
     }
   }
@@ -952,14 +971,13 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     case .downloadFile:
       downloadQueue = nil
       let error = request.error!
-      log.error("Keyboard download failed: \(error).")
 
       let task = request.userInfo[Key.downloadTask] as! DownloadTask
       let batch = request.userInfo[Key.downloadBatch] as! DownloadBatch
       let isUpdate = batch.activity == .update
       
       if task.type == .keyboard {
-        // FIXME
+        log.error("Keyboard download failed: \(error).")
         let keyboards = task.resources as? [InstallableKeyboard]
 
         if !isUpdate {
@@ -968,8 +986,16 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
           try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
         }
         
-        // TODO:
-        //Manager.shared.downloadFailed(forKeyboards: keyboards, error: error as NSError)
+        downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
+      } else if task.type == .lexicalModel {
+        log.error("Dictionary download failed: \(error).")
+        let lexicalModels = task.resources as? [InstallableLexicalModel]
+        
+        if !isUpdate {
+          try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
+        }
+        
+        downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
       }
     }
   }
