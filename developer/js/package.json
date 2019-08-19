@@ -14,6 +14,9 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
+  "bin": {
+    "kmlmc": "dist/cli.js"
+  },
   "dependencies": {
     "node": "^11.7.0",
     "node-zip": "^1.1.1",
