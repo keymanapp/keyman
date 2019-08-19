@@ -208,11 +208,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   
   // MARK: - Common functionality
   
-  private func checkCanDownload(keyboards: [InstallableKeyboard]) -> Bool {
+  private func checkCanExecute(_ batch: DownloadBatch) -> Bool {
     guard reachability.connection != Reachability.Connection.none else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: keyboards, error: error)
+      downloadFailed(forBatch: batch, error: error)
       return false
     }
     
@@ -220,27 +220,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     guard downloadQueue == nil else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forKeyboards: keyboards, error: error)
-      return false
-    }
-    
-    return true
-  }
-  
-  private func checkCanDownload(lexicalModels: [InstallableLexicalModel]) -> Bool {
-    // Original implementation actually used the 'forKeyboards' versions seen below.
-    guard reachability.connection != Reachability.Connection.none else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forKeyboards: [], error: error)
-      return false
-    }
-    
-    // At this stage, we now have everything needed to generate download requests.
-    guard downloadQueue == nil else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forKeyboards: [], error: error)
+      downloadFailed(forBatch: batch, error: error)
       return false
     }
     
@@ -301,11 +281,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   // since this will expose the generated Promise for the caller's use.
   private func downloadKeyboardCore(withMetadata keyboards: [InstallableKeyboard], asActivity activity: DownloadBatch.Activity,
       withFilename filename: String, withOptions options: Options) -> DownloadBatch? {
-    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-    // The parameter facilitates error logging.
-    if !checkCanDownload(keyboards: keyboards) {
-      return nil
-    }
 
     if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options) {
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
@@ -313,10 +288,55 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
         task.resources = keyboards
       }
       
+      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+      // The parameter facilitates error logging.
+      if !checkCanExecute(dlBatch) {
+        return nil
+      }
+      
       queueDownloadBatch(dlBatch)
       return dlBatch
     }
     return nil
+  }
+  
+  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withFilename filename: String,
+                                          asActivity activity: DownloadBatch.Activity, withOptions options: Options) -> DownloadBatch? {
+    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
+    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
+                             keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
+
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create dir for download: \(error)")
+      return nil
+    }
+
+    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
+    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
+    request.tag = 0
+
+    let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
+    var batchTasks: [DownloadTask] = [ keyboardTask ]
+    
+    for (i, url) in fontURLs.enumerated() {
+      request = HTTPDownloadRequest(url: url, userInfo: [:])
+      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
+      request.tag = i + 1
+      
+      let fontTask = DownloadTask(do: request, for: nil, type: .other)
+      batchTasks.append(fontTask)
+    }
+    
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
+    batch.tasks?.forEach { task in
+      task.request.userInfo[Key.downloadBatch] = batch
+      task.request.userInfo[Key.downloadTask] = task
+    }
+    
+    return batch
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
@@ -418,56 +438,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
 
     let filename = keyboard.filename
-
-    // Perform the standard 'ready-to-download' checks.
-    if !checkCanDownload(keyboards: installableKeyboards) {
-      return
-    }
-
     let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
 
     _ = downloadKeyboardCore(withMetadata: installableKeyboards, asActivity: isUpdate ? .update : .download, withFilename: filename, withOptions: keyboardAPI.options)
   }
   
-  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withFilename filename: String,
-                                          asActivity activity: DownloadBatch.Activity, withOptions options: Options) -> DownloadBatch? {
-    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
-                             keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
-
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
-      return nil
-    }
-
-    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
-    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
-    request.tag = 0
-
-    let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
-    var batchTasks: [DownloadTask] = [ keyboardTask ]
-    
-    for (i, url) in fontURLs.enumerated() {
-      request = HTTPDownloadRequest(url: url, userInfo: [:])
-      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
-      request.tag = i + 1
-      
-      let fontTask = DownloadTask(do: request, for: nil, type: .other)
-      batchTasks.append(fontTask)
-    }
-    
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
-    batch.tasks?.forEach { task in
-      task.request.userInfo[Key.downloadBatch] = batch
-      task.request.userInfo[Key.downloadTask] = task
-    }
-    
-    return batch
-  }
-
   // TODO:  Needs an update!
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
@@ -522,7 +497,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: message])
       // TODO: better error target.
-      downloadFailed(forKeyboards: [], error: error)
+      downloadFailed(forLanguageID: "", error: error)
       return nil
     }
     
@@ -533,11 +508,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   // since this will expose the generated Promise for the caller's use.
   private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel], asActivity activity: DownloadBatch.Activity,
       fromPath path: URL) -> DownloadBatch? {
-    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-    // The parameter facilitates error logging.
-    if !checkCanDownload(lexicalModels: lexicalModels) {
-      return nil
-    }
 
     if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], fromPath: path, asActivity: activity) {
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
@@ -545,7 +515,12 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
         task.resources = lexicalModels
       }
       
-      // TODO:  Uncomment this.  It's temporary to facilitate testing.
+      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+      // The parameter facilitates error logging.
+      if !checkCanExecute(dlBatch) {
+        return nil
+      }
+      
       queueDownloadBatch(dlBatch)
       return dlBatch
     }
@@ -708,9 +683,9 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     let packageFilename = lexicalModel.packageFilename
     let lexicalModelURL = URL(string: "https://api.keyman.com/model")!.appendingPathComponent(packageFilename)
     
-    if !checkCanDownload(lexicalModels: installableLexicalModels) {
-      return
-    }
+//    if !checkCanExecute(batch) {
+//      return
+//    }
     
     do {
       try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
@@ -805,6 +780,24 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   
   
   // MARK - deprecated helper/handler methods - they help avoid errors for now.
+  
+  private func downloadFailed(forBatch batch: DownloadBatch, error: Error) {
+    if batch.activity == .batch {
+      // It's an update operation.
+      // TODO:  Needs implementation.
+    } else if batch.type == .keyboard {
+      let keyboards = batch.tasks?.compactMap { task in
+        return task.resources as? [InstallableKeyboard]
+      }.flatMap {$0}
+      downloadFailed(forKeyboards: keyboards ?? [], error: error)
+    } else if batch.type == .lexicalModel {
+      let lexModels = batch.tasks?.compactMap { task in
+        return task.resources as? [InstallableLexicalModel]
+      }.flatMap {$0}
+      downloadFailed(forLanguageID: lexModels![0].languageID, error: error)
+    }
+  }
+  
   private func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
     let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
     NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
