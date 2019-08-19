@@ -196,8 +196,6 @@ export default class LexicalModelCompiler {
    * @param sourcePath    Where to find auxilary sources files
    */
   generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string) {
-    let oc: LexicalModelCompiled = {id: model_id, format: modelSource.format};
-
     let sources: string[] = modelSource.sources.map(function(source) {
       return fs.readFileSync(path.join(sourcePath, source), 'utf8');
     });

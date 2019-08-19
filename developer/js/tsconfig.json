@@ -3,6 +3,8 @@
     "module": "commonjs",
     "target": "es2017",
     "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
