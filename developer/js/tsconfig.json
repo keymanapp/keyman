@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es2017",
     "module": "commonjs",
-    "outDir": "dist",
+    "target": "es2017",
+    "moduleResolution": "node",
     "sourceMap": true,
+    "outDir": "dist",
     "declaration": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true
   },
   "include": [
-    "lexical-model-compiler/**/*",
-    "package-compiler/**/*",
-    "index.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests/**/*.ts"
+    "source/**/*.ts"
   ]
 }
