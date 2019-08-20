@@ -215,6 +215,7 @@
 		CE17ABDE23069E76005FBB14 /* LanguageResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE17ABDD23069E76005FBB14 /* LanguageResource.swift */; };
 		CE1E1EC12303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1E1EC02303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift */; };
 		CE1F67A32304EB3800FF6972 /* ResourceDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */; };
+		CE22DFBA230B94DB00A4551C /* ResourceDownloadQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */; };
 		CE24ECF021B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
 		CE24ECF121B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
 		CE24ECF221B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
@@ -420,6 +421,7 @@
 		CE17ABDD23069E76005FBB14 /* LanguageResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageResource.swift; sourceTree = "<group>"; };
 		CE1E1EC02303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadStatusToolbar.swift; sourceTree = "<group>"; };
 		CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManager.swift; sourceTree = "<group>"; };
+		CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadQueue.swift; sourceTree = "<group>"; };
 		CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeymanResponder+Types.swift"; sourceTree = "<group>"; };
 		CE2B1E4521B60E7C007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
@@ -724,6 +726,7 @@
 				C07A9D8D1FD1798900828ADD /* APIKeyboardRepository.swift */,
 				9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */,
 				CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */,
+				CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */,
 			);
 			path = KeyboardRepository;
 			sourceTree = "<group>";
@@ -1286,6 +1289,7 @@
 				9A079E40223B602B00581263 /* LexicalModel.swift in Sources */,
 				C0E30C8C1FC40D0400C80416 /* Storage.swift in Sources */,
 				C045148A1F85DF9100D88416 /* InputViewController.swift in Sources */,
+				CE22DFBA230B94DB00A4551C /* ResourceDownloadQueue.swift in Sources */,
 				9A9CB084224170F700231FB9 /* LexicalModelRepository.swift in Sources */,
 				C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */,
 				9A4609992242047400B0BFD1 /* LexicalModelAPICall.swift in Sources */,
