@@ -266,7 +266,7 @@ public class ResourceDownloadManager {
   private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel], asActivity activity: DownloadBatch.Activity,
       fromPath path: URL) -> DownloadBatch? {
 
-    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], fromPath: path, asActivity: activity) {
+    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity) {
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       dlBatch.tasks?.forEach { task in
         task.resources = lexicalModels
@@ -284,7 +284,7 @@ public class ResourceDownloadManager {
     return nil
   }
   
-  private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel, fromPath path: URL,
+  private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel, withFilename path: URL,
       asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
     do {
       try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
@@ -457,7 +457,7 @@ public class ResourceDownloadManager {
     
     let isUpdate = Storage.active.userDefaults.userLexicalModels?.contains { $0.id == lexicalModel.id } ?? false
     
-    if let batch = buildLexicalModelDownloadBatch(for: installableLexicalModels[0], fromPath: lexicalModelURL, asActivity: isUpdate ? .update : .download) {
+    if let batch = buildLexicalModelDownloadBatch(for: installableLexicalModels[0], withFilename: lexicalModelURL, asActivity: isUpdate ? .update : .download) {
       if !downloader.canExecute(batch) {
         return
       }
@@ -508,21 +508,43 @@ public class ResourceDownloadManager {
       return stateForLexicalModel(withID: lmID) == .needsUpdate
     } ?? false
     
-    // FIXME:  Testing only!  Forces 'update'.
-    return true
-    //return hasKbdUpdate || hasLexUpdate
+    return hasKbdUpdate || hasLexUpdate
   }
   
   // TODO:  Not yet ready.
   public func performUpdates() {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
-    updateKeyboards()
-    updateLexicalModels()
+    let updateKbds = getUpdatableKeyboards()
+    let updateLexs = getUpdatableLexicalModels()
+    
+    var batches: [DownloadBatch] = []
+    
+    updateKbds.forEach { kbd in
+      if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
+         let options = Manager.shared.apiKeyboardRepository.options {
+        if let batch = self.buildKeyboardDownloadBatch(for: kbd, withFilename: filename, asActivity: .update, withOptions: options) {
+          batches.append(batch)
+        }
+      }
+    }
+    
+    updateLexs.forEach { lex in
+      if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.filename,
+         let path = URL.init(string: filename) {
+        if let batch = self.buildLexicalModelDownloadBatch(for: lex, withFilename: path, asActivity: .update) {
+          batches.append(batch)
+        }
+      }
+    }
+    
+    let batchUpdate = DownloadBatch(queue: batches)
+    // TODO:  Not yet supported properly
+    //downloader.queue(batchUpdate)
   }
   
-  private func updateKeyboards() {
-    var updateKbdQueue: [InstallableKeyboard]? = []
+  private func getUpdatableKeyboards() -> [InstallableKeyboard] {
+    var updateQueue: [InstallableKeyboard] = []
     var kbIDs = Set<String>()
     
     // Build the keyboard update queue
@@ -531,22 +553,17 @@ public class ResourceDownloadManager {
       if kbState == .needsUpdate {
         if(!kbIDs.contains(kb.id)) {
           kbIDs.insert(kb.id)
-          updateKbdQueue?.append(kb)
+          updateQueue.append(kb)
         }
       }
     }
-
-    // Execute the keyboard update queue
-    if !updateKbdQueue!.isEmpty {
-      let langID = updateKbdQueue![0].languageID
-      let kbID = updateKbdQueue![0].id
-      downloadKeyboard(withID: kbID, languageID: langID, isUpdate: true)
-    }
+    
+    return updateQueue
   }
 
-  private func updateLexicalModels() {
+  private func getUpdatableLexicalModels() -> [InstallableLexicalModel] {
     // Build the lexical model update queue
-    var updateLexQueue: [InstallableLexicalModel]? = []
+    var updateQueue: [InstallableLexicalModel] = []
     var lmIDs = Set<String>()
     
     Storage.active.userDefaults.userLexicalModels?.forEach { lm in
@@ -554,18 +571,11 @@ public class ResourceDownloadManager {
       if lmState == .needsUpdate {
         if !lmIDs.contains(lm.id) {
           lmIDs.insert(lm.id)
-          updateLexQueue!.append(lm)
+          updateQueue.append(lm)
         }
       }
     }
 
-    // Execute the lexical model update queue
-    if !updateLexQueue!.isEmpty {
-      let langID = updateLexQueue![0].languageID
-      let lmID = updateLexQueue![0].id
-      downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
-    }
+    return updateQueue
   }
-  
-
 }

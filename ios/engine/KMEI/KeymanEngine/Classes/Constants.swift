@@ -51,7 +51,7 @@ public enum Key {
   // Other keys
   static let update = "update"
   
-  // ResourceDownloadManager keys
+  // ResourceDownloadQueue keys
   static let downloadTask = "downloadTask"
   static let downloadBatch = "downloadBatch"
 }
