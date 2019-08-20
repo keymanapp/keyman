@@ -79,44 +79,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   private var _isDoneButtonEnabled = false
   private var isDidUpdateCheck = false
   
-//  private var keyboardDownloadStartedObserver: NotificationObserver?
-//  private var keyboardDownloadCompletedObserver: NotificationObserver?
-//  private var keyboardDownloadFailedObserver: NotificationObserver?
-//  private var lexicalModelDownloadStartedObserver: NotificationObserver?
-//  private var lexicalModelDownloadCompletedObserver: NotificationObserver?
-//  private var lexicalModelDownloadFailedObserver: NotificationObserver?
-  
   public static let shared = ResourceDownloadManager()
   
   private init() {
     //downloadQueue = HTTPDownloader(self) // TODO:  Consider using a persistent one.
     reachability = Reachability(hostname: keymanHostName)
-    
-//    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-//      forName: Notifications.keyboardDownloadStarted,
-//      observer: self,
-//      function: ResourceDownloadManager.keyboardDownloadStarted)
-//    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-//      forName: Notifications.keyboardDownloadCompleted,
-//      observer: self,
-//      function: ResourceDownloadManager.keyboardDownloadCompleted)
-//    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-//      forName: Notifications.keyboardDownloadFailed,
-//      observer: self,
-//      function: ResourceDownloadManager.keyboardDownloadFailed)
-//
-//    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-//      forName: Notifications.lexicalModelDownloadStarted,
-//      observer: self,
-//      function: ResourceDownloadManager.lexicalModelDownloadStarted)
-//    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
-//      forName: Notifications.lexicalModelDownloadCompleted,
-//      observer: self,
-//      function: ResourceDownloadManager.lexicalModelDownloadCompleted)
-//    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-//      forName: Notifications.lexicalModelDownloadFailed,
-//      observer: self,
-//      function: ResourceDownloadManager.lexicalModelDownloadFailed)
   }
   
   deinit {
@@ -204,7 +171,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
     }
   }
-  
   
   // MARK: - Common functionality
   
@@ -482,12 +448,8 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
     return nil
   }
-  
-  
-  
-  
+
   // MARK - Lexical models
-  
 
   private func getInstallableLexicalModelMetadata(withID lexicalModelID: String, languageID: String) -> InstallableLexicalModel? {
     // Grab info for the relevant API version of the keyboard.
@@ -561,6 +523,11 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   /// - Parameters:
   ///   - languageID: the bcp47 string of the desired language
   public func downloadLexicalModelsForLanguageIfExists(languageID: String) {
+    // TODO:  This fetch will conflict with the fetch in the next method; we need some scheme to reset
+    //        the other's fetch after this completes.
+    //
+    //        It _may_ be better to retool how this looks up the lexical model for a language.  Not sure yet.
+  
     //get list of lexical models for this languageID  /?q=bcp47:en
     func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
       if let error = error {
@@ -652,6 +619,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     decodeLexicalModelData(data, decodingStrategy: .ios8601WithFallback)
   }
   
+  // This should be usable as part of the .model.kmp processing process; we have a kmp.json, after all.
   private func decodeLexicalModelData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = decodingStrategy
@@ -674,6 +642,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
   }
   
+  // Accordingly, this could be retooled to help with .model.kmp files too.
   private func downloadLexicalModel(_ lexicalModelAPI: LexicalModelAPICall) {
     let lexicalModel = lexicalModelAPI.lexicalModels[0]
     let installableLexicalModels = lexicalModel.languages.map { language in
@@ -682,10 +651,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     
     let packageFilename = lexicalModel.packageFilename
     let lexicalModelURL = URL(string: "https://api.keyman.com/model")!.appendingPathComponent(packageFilename)
-    
-//    if !checkCanExecute(batch) {
-//      return
-//    }
     
     do {
       try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
@@ -697,20 +662,13 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     
     let isUpdate = Storage.active.userDefaults.userLexicalModels?.contains { $0.id == lexicalModel.id } ?? false
     
-    // TODO:  Fix this section.
-    downloadQueue = HTTPDownloader(self)
-    let commonUserData: [String: Any] = [
-      Key.lexicalModelInfo: installableLexicalModels,
-      Key.update: isUpdate
-    ]
-    downloadQueue!.userInfo = commonUserData
-    
-    let request = HTTPDownloadRequest(url: lexicalModelURL, userInfo: commonUserData)
-    request.destinationFile = Storage.active.lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version ?? InstallableConstants.defaultVersion).path
-    request.tag = 0
-    
-    downloadQueue!.addRequest(request)
-    downloadQueue!.run()
+    if let batch = buildLexicalModelDownloadBatch(for: installableLexicalModels[0], fromPath: lexicalModelURL, asActivity: isUpdate ? .update : .download) {
+      if !checkCanExecute(batch) {
+        return
+      }
+
+      queueDownloadBatch(batch)
+    }
   }
   
   /// - Returns: The current state for a lexical model
@@ -826,11 +784,6 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
                                     value: notification)
   }
 
-  
-  
-  
-  
-  
   //MARK: - HTTPDownloadDelegate methods
   
   func downloadQueueFinished(_ queue: HTTPDownloader) {
