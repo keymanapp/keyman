@@ -1,0 +1,7 @@
+# These files generated during release build should not be committed
+cef.wxs
+keymandeveloper.msi
+setup.inf
+setup.zip
+templates.wxs
+xml.wxs
