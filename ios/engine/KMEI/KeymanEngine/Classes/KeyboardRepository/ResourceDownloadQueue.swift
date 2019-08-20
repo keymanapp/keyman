@@ -79,6 +79,9 @@ class DownloadBatch: DownloadNode {
   }
 }
 
+// This is a private class used internally by ResourceDownloadQueue to track progress through
+// the queue and its DownloadBatches.  We need a stack scheme - each instance of this corresponds
+// to one frame of the stack.
 private class DownloadQueueFrame {
   public var nodes: [DownloadNode] = []
   public var index: Int = 0
@@ -96,6 +99,8 @@ private class DownloadQueueFrame {
   }
 }
 
+// The other half of ResourceDownloadManager, this class is responsible for executing the downloads
+// and handling the results.
 class ResourceDownloadQueue: HTTPDownloadDelegate {
   private var queueRoot: DownloadQueueFrame?
   private var batchQueue: [DownloadQueueFrame] = []
