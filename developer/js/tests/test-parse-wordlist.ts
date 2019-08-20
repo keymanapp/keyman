@@ -1,8 +1,6 @@
-import {parseWordList} from '../lexical-model-compiler/build-trie';
+import {parseWordList} from '../dist/lexical-model-compiler/build-trie';
 import {assert} from 'chai';
 import 'mocha';
-
-import path = require('path');
 
 const BOM = '\ufeff';
 
