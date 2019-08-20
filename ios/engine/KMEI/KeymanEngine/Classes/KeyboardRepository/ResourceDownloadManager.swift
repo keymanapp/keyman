@@ -9,7 +9,9 @@
 import Foundation
 import Reachability
 
-private class DownloadTask {
+private protocol DownloadNode { }
+
+private class DownloadTask: DownloadNode {
   public enum Resource {
     case keyboard, lexicalModel, other
   }
@@ -28,18 +30,19 @@ private class DownloadTask {
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-private class DownloadBatch {
+private class DownloadBatch: DownloadNode {
   public enum Activity {
-    case download, update, batch
+    case download, update, composite
   }
   
   /*
    * Three main cases so far:
-   * - [.download, .keyboard]:      download new Keyboard (possibly with an associated lexical model)
-   * - [.download, .lexicalModel]:  download new LexicalModel.
-   * - [.batch,    .other]:   batch update of all resources, containing the following within its compositeQueue
+   * - [.download,  .keyboard]:      download new Keyboard (possibly with an associated lexical model)
+   * - [.download,  .lexicalModel]:  download new LexicalModel.
+   * - [.composite, .other]:   batch update of all resources, containing the following within its compositeQueue
    *   - [.update, .keyboard]:      updates one Keyboard
    *   - [.update, .lexicalModel]:  updates one LexicalModel
+   *   - Depending on needs, this may be extended to allow 'nested' .composite instances.
    */
   public final var activity: Activity
   public final var type: DownloadTask.Resource
@@ -48,16 +51,27 @@ private class DownloadBatch {
   public final var batchQueue: [DownloadBatch]?
   //public final var promise: Int
   
-  public init(do tasks: [DownloadTask], as activity: Activity, ofType type: DownloadTask.Resource) {
+  public init?(do tasks: [DownloadTask], as activity: Activity, ofType type: DownloadTask.Resource) {
     self.activity = activity
     self.type = type
     self.tasks = tasks
+    
+    // Indicates 'composite' mode, which should use the other initializer.
+    if activity == .composite {
+      return nil
+    }
+
+    // A batch containing tasks should always be targeting a 'primary' language resource.
+    // .other exists to handle fonts packaged with keyboards, not our primary resources.
+    if type == .other {
+      return nil
+    }
     
     self.batchQueue = nil
   }
   
   public init(queue: [DownloadBatch]) {
-    self.activity = .batch
+    self.activity = .composite
     self.type = .other
     self.batchQueue = queue
     
@@ -65,9 +79,26 @@ private class DownloadBatch {
   }
 }
 
+private class DownloadQueueFrame {
+  public var nodes: [DownloadNode] = []
+  public var index: Int = 0
+  private(set) var isComposite = false
+  
+  public static func from(batch: DownloadBatch) {
+    let frame = DownloadQueueFrame()
+    
+    if batch.activity == .composite {
+      frame.isComposite = true
+      frame.nodes.append(contentsOf: batch.batchQueue!)
+    } else {
+      frame.nodes.append(contentsOf: batch.tasks!)
+    }
+  }
+}
+
 public class ResourceDownloadManager: HTTPDownloadDelegate {
-  private var currentBatch: DownloadBatch?
-  private var batchQueue: [DownloadBatch] = []
+  private var queueRoot: DownloadQueueFrame?
+  private var batchQueue: [DownloadQueueFrame] = []
   
   private var downloadQueue: HTTPDownloader? = nil
   var currentRequest: HTTPDownloadRequest?
@@ -202,15 +233,17 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
       downloadQueue!.addRequest(task.request)
     }
     
-    currentBatch = batch
+    //currentBatch = batch
+    queueRoot = DownloadQueueFrame()
+    queueRoot!.nodes.append(batch)
     downloadQueue!.run()
   }
   
   private func queueDownloadBatch(_ batch: DownloadBatch) {
-    if currentBatch == nil {
+    if queueRoot == nil {
       executeDownloadBatch(batch)
     } else {
-      batchQueue.append(batch)
+      queueRoot?.nodes.append(batch)
     }
   }
   
@@ -297,7 +330,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     }
     
     let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
-    batch.tasks?.forEach { task in
+    batch!.tasks?.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
@@ -507,7 +540,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
     let batchTasks: [DownloadTask] = [ lexicalModelTask ]
     
     let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
-    batch.tasks?.forEach { task in
+    batch!.tasks?.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
@@ -740,7 +773,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   // MARK - deprecated helper/handler methods - they help avoid errors for now.
   
   private func downloadFailed(forBatch batch: DownloadBatch, error: Error) {
-    if batch.activity == .batch {
+    if batch.activity == .composite {
       // It's an update operation.
       // TODO:  Needs implementation.
     } else if batch.type == .keyboard {
@@ -788,7 +821,7 @@ public class ResourceDownloadManager: HTTPDownloadDelegate {
   
   func downloadQueueFinished(_ queue: HTTPDownloader) {
     // We can use the properties of the current "batch" to generate specialized notifications.
-    currentBatch = nil
+    queueRoot = nil
   }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
