@@ -2,7 +2,7 @@
  * Interfaces and constants used by the lexical model compiler. These target
  * the LMLayer's internal worker code, so we provide those definitions too.
  */
-/// <reference path="../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
+/// <reference path="../../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
 
 interface ClassBasedWordBreaker {
   allowedCharacters?: { initials?: string, medials?: string, finals?: string } | string,

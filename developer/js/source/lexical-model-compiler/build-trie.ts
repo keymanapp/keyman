@@ -55,7 +55,10 @@ export function parseWordList(contents: string): WordList {
     if (line.startsWith('#') || line === "") {
       continue; // skip comments and empty lines
     }
-    let [wordform, countText, _comment] = line.split(TAB);
+
+    // The third column is the comment. Always ignored!
+    let [wordform, countText] = line.split(TAB);
+
     // Clean the word form.
     // TODO: what happens if we get duplicate forms?
     wordform = wordform.normalize('NFC').trim();
