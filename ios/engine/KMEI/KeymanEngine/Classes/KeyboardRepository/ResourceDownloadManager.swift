@@ -221,7 +221,6 @@ public class ResourceDownloadManager {
     _ = downloadKeyboardCore(withMetadata: installableKeyboards, asActivity: isUpdate ? .update : .download, withFilename: filename, withOptions: keyboardAPI.options)
   }
   
-  // TODO:  Needs an update!
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // Needs validation - I don't think this if-condition can be met in Keyman's current state

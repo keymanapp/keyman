@@ -168,6 +168,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   //private var downloadQueue: HTTPDownloader?
   private var reachability: Reachability!
   var didSynchronize = false
+  
+  
+  private var keyboardDownloadCompletedObserver: NotificationObserver?
 
   // MARK: - Object Admin
 
@@ -206,6 +209,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         log.error("failed to start Reachability notifier: \(error)")
       }
     }
+    
+    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.keyboardDownloadCompleted,
+      observer: self,
+      function: Manager.keyboardDownloadCompleted)
 
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
@@ -964,5 +972,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     } else {
       return .none
     }
+  }
+  
+  // Keyboard download notification observers
+  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
+    // TODO:  Only do this if it's an update.  We'll need a bit of notification retooling for this first.
+    shouldReloadKeyboard = true
+    inputViewController.reload()
   }
 }

@@ -363,11 +363,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
                                           object: self,
                                           value: keyboards!)
-          // TODO: Trigger by notification.  Needs to be done on Manager.swift, not this class.
-//          if isUpdate {
-//            shouldReloadKeyboard = true
-//            inputViewController.reload()
-//          }
+
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
           userDefaults.synchronize()
@@ -407,7 +403,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
         if !isUpdate {
           // Clean up keyboard file if anything fails
-          // TODO: Also clean up remaining fonts
           try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
         }
 
