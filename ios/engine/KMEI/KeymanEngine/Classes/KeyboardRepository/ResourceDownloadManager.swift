@@ -491,59 +491,60 @@ public class ResourceDownloadManager {
   }
   
   // MARK: Update checks + management
+  public var updatesAvailable: Bool {
+    get {
+      return getAvailableUpdates() != nil
+    }
+  }
   
-  public func updatesAvailable() -> Bool {
+  public func getAvailableUpdates() -> [LanguageResource]? {
     // Relies upon KMManager's preload; this was the case before the rework.
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
-      return false
+      return nil
     }
 
     isDidUpdateCheck = true
-    let userKeyboards = Storage.active.userDefaults.userKeyboards
-    let hasKbdUpdate = userKeyboards?.contains { keyboard in
-      let kbID = keyboard.id
-      return stateForKeyboard(withID: kbID) == .needsUpdate
-    } ?? false
     
-    let userLexicalModels = Storage.active.userDefaults.userLexicalModels
-    let hasLexUpdate = userLexicalModels?.contains { lexicalModel in
-      let lmID = lexicalModel.id
-      return stateForLexicalModel(withID: lmID) == .needsUpdate
-    } ?? false
+    var updatables: [LanguageResource] = []
     
-    return hasKbdUpdate || hasLexUpdate
+    let kbds = getUpdatableKeyboards()
+    updatables.append(contentsOf: kbds)
+    
+    let lexModels = getUpdatableLexicalModels()
+    updatables.append(contentsOf: lexModels)
+    
+    if updatables.count > 0 {
+      return updatables
+    } else {
+      return nil
+    }
   }
   
-  // TODO:  Not yet ready.
-  public func performUpdates() {
+  public func performUpdates(forResources resources: [LanguageResource]) {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
-    let updateKbds = getUpdatableKeyboards()
-    let updateLexs = getUpdatableLexicalModels()
-    
     var batches: [DownloadBatch] = []
     
-    updateKbds.forEach { kbd in
-      if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
-         let options = Manager.shared.apiKeyboardRepository.options {
-        if let batch = self.buildKeyboardDownloadBatch(for: kbd, withFilename: filename, asActivity: .update, withOptions: options) {
-          batches.append(batch)
+    resources.forEach { res in
+      if let kbd = res as? InstallableKeyboard {
+        if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
+           let options = Manager.shared.apiKeyboardRepository.options {
+          if let batch = self.buildKeyboardDownloadBatch(for: kbd, withFilename: filename, asActivity: .update, withOptions: options) {
+            batches.append(batch)
+          }
         }
-      }
-    }
-    
-    updateLexs.forEach { lex in
-      if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.filename,
-         let path = URL.init(string: filename) {
-        if let batch = self.buildLexicalModelDownloadBatch(for: lex, withFilename: path, asActivity: .update) {
-          batches.append(batch)
+      } else if let lex = res as? InstallableLexicalModel {
+        if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.filename,
+           let path = URL.init(string: filename) {
+          if let batch = self.buildLexicalModelDownloadBatch(for: lex, withFilename: path, asActivity: .update) {
+            batches.append(batch)
+          }
         }
       }
     }
     
     let batchUpdate = DownloadBatch(queue: batches)
-    // TODO:  Not yet supported properly
-    //downloader.queue(batchUpdate)
+    downloader.queue(batchUpdate)
   }
   
   private func getUpdatableKeyboards() -> [InstallableKeyboard] {

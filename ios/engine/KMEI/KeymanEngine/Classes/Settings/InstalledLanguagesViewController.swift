@@ -112,7 +112,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       return
     }
     
-    if !ResourceDownloadManager.shared.updatesAvailable() {
+    if ResourceDownloadManager.shared.updatesAvailable == false {
       // No updates available?  Don't do update-y things.
       return
     }
@@ -129,7 +129,10 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     }
     
     // Do the actual updates!
-    //TODO:  Call a function on ResourceDownloadManager.shared.
+    // TODO:  Consider prompting per resource, rather than wholesale as a group.
+    // (This would be an enhancement, though.)
+    let availableUpdates = ResourceDownloadManager.shared.getAvailableUpdates()!
+    ResourceDownloadManager.shared.performUpdates(forResources: availableUpdates)
   }
   
   override func numberOfSections(in tableView: UITableView) -> Int {

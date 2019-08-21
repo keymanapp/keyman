@@ -109,7 +109,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
-    downloader = HTTPDownloader(self)
   }
   
   public func hasConnection() -> Bool {
@@ -180,7 +179,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       if frame.index == frame.nodes.count {
         // We've hit the end of this stack frame's commands; time to pop and continue from the previous frame's perspective.
         _ = queueStack.popLast()
-        executeNext() // the only recursive case here.
+        
+        // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
+        finalizeCurrentBatch()
+        executeNext()
         return
       } else {
         // We've got more batches left within this stack frame.  Continue.
@@ -200,6 +202,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       innerExecute(batch.tasks[0] as! DownloadBatch)
       return
     } else {
+      // Make a separate one for each batch; this simplifies event handling when multiple batches are in queue,
+      // as the old downloader will have a final event left to trigger at this point.  (downloadQueueFinished)
+      downloader = HTTPDownloader(self)
       let tasks = batch.tasks as! [DownloadTask]
       downloader!.userInfo = [Key.downloadBatch: batch]
       
@@ -208,7 +213,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       }
       
       downloader!.run()
-      // TODO:  Notify abou the new batch being started!
+      // TODO:  Notify about the new batch being started!
     }
   }
   
@@ -238,10 +243,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         return String(tmpStr.dropLast(3))
       }
     } else {
-      let kbInfo = downloader!.userInfo[Key.keyboardInfo]
-      if let keyboards = kbInfo as? [InstallableKeyboard], let keyboard = keyboards.first {
-        return keyboard.id
-      }
+      // TODO:  search the queue instead.
+//      let kbInfo = downloader!.userInfo[Key.keyboardInfo]
+//      if let keyboards = kbInfo as? [InstallableKeyboard], let keyboard = keyboards.first {
+//        return keyboard.id
+//      }
     }
     return nil
   }
@@ -253,10 +259,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         return String(tmpStr.dropLast(3))
       }
     } else {
-      let kbInfo = downloader!.userInfo[Key.lexicalModelInfo]
-      if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
-        return lexicalModel.id
-      }
+      // TODO: search the queue instead.
+//      let kbInfo = downloader!.userInfo[Key.lexicalModelInfo]
+//      if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
+//        return lexicalModel.id
+//      }
     }
     return nil
   }
@@ -267,7 +274,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let tasks = batch.tasks as! [DownloadTask]
     if batch.activity == .composite {
       // It's an update operation.
-      // TODO:  Needs implementation.
+      // Not yet called in this case.
     } else if batch.type == .keyboard {
       let keyboards = tasks.compactMap { task in
         return task.resources as? [InstallableKeyboard]
@@ -313,6 +320,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   
   func downloadQueueFinished(_ queue: HTTPDownloader) {
     // We can use the properties of the current "batch" to generate specialized notifications.
+    
+    // Completing the queue means having completed a batch.  We should only move forward in this class's
+    // queue at this time, once a batch's task queue is complete.
+    finalizeCurrentBatch()
+    executeNext()
   }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
@@ -338,7 +350,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     
     let task = request.userInfo[Key.downloadTask] as! DownloadTask
     
-    // FIXME
     if let statusCode = request.responseStatusCode, statusCode == 200 {
       if task.type == .keyboard {
         // The request has succeeded.
@@ -403,9 +414,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error)
       }
     }
-    
-    finalizeCurrentBatch()
-    executeNext()
   }
   
   //func downloadRequestSuccess(
@@ -441,9 +449,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
       }
     }
-    
-    finalizeCurrentBatch()
-    executeNext()
   }
   
   // MARK - Language resource installation methods
