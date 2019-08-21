@@ -61,6 +61,8 @@
               <Directory Id="dirRedist" Name="Redist">
                 <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
+              <Directory Id="dirNode" Name="node.js" />
+              <Directory Id="dirModelCompiler" Name="Model Compiler" />
               <Directory Id="dirProjects" Name="Projects" />
             </Directory>
           </Directory>
@@ -243,7 +245,26 @@
       </Component>
       
     </ComponentGroup>
-    
+
+    <ComponentGroup Id="Node">
+      <Component Directory="dirNode" SourceDir="..\..\developer\inst\dist">
+        <File Name='node.exe' KeyPath="yes" />
+        <File Name='CHANGELOG.md' />
+        <File Name='LICENSE' />
+        <File Name='README.md' />
+      </Component>
+      
+      <Component Directory="INSTALLDIR" SourceDir="..\..\developer\inst">
+        <File Name='kmlmc.cmd' KeyPAth="yes" />
+      </Component>
+    </ComponentGroup>
+<!--
+    <ComponentGroup Id="modelCompiler">
+
+      <Component Directory="dirModelCompiler" SourceDir="..\..\developer\js">
+    </ComponentGroup>
+-->
+
     <ComponentGroup Id="AppData">
       <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}" Directory="App_KeymanDev_Databases">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
@@ -325,6 +346,8 @@
       <ComponentGroupRef Id="XML" />
       <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Templates" />
+      <ComponentGroupRef Id="ModelCompiler" />
+      <ComponentRef Id="Node" />
       
       <MergeRef Id='keymanengine' />
     </Feature>

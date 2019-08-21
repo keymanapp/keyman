@@ -61,6 +61,7 @@ clean:
     -del /Q xml.wxs
     -del /Q cef.wxs
     -del /Q templates.wxs
+    -del /Q kmlmc.wxs
 
 test-releaseexists:
     cd $(ROOT)\src\developer\inst
@@ -70,6 +71,7 @@ test-releaseexists:
 
 install:
     @rem
+
 # ----------------------------------------------------------------------
 
 !include ..\..\Target.mak
