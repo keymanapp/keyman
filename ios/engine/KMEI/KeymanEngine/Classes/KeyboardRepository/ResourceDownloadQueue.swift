@@ -9,7 +9,9 @@
 import Foundation
 import Reachability
 
-protocol DownloadNode { }
+protocol DownloadNode {
+  var resources: [LanguageResource]? { get }
+}
 
 class DownloadTask: DownloadNode {
   public enum Resource {
@@ -71,6 +73,18 @@ class DownloadBatch: DownloadNode {
     self.activity = .composite
     self.type = .other
     self.tasks = queue
+  }
+  
+  public var resources: [LanguageResource]? {
+    get {
+      var resArray: [LanguageResource] = []
+      
+      tasks.forEach{ task in
+        resArray.append(contentsOf: task.resources ?? [])
+      }
+      
+      return resArray
+    }
   }
 }
 
@@ -180,6 +194,12 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         // We've hit the end of this stack frame's commands; time to pop and continue from the previous frame's perspective.
         _ = queueStack.popLast()
         
+        // In the current state of the app, this is only the case for batch updates.
+        if frame.isComposite {
+          let parentFrame = queueStack[queueStack.count - 1]
+          updateBatchSucceeded(parentFrame.nodes[parentFrame.index] as! DownloadBatch)
+        }
+        
         // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
         finalizeCurrentBatch()
         executeNext()
@@ -194,6 +214,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   private func innerExecute(_ batch: DownloadBatch) {
     if batch.activity == .composite {
+      if batch.type == .other {
+        // It's the top level of an update operation.  Time to make a correpsonding notification.
+        updateBatchStarted(batch)
+      }
       // We're a batch composed of multiple sub-batches.  Time to set that up on the queue!
       let frame = DownloadQueueFrame(from: batch)!
       queueStack.append(frame)
@@ -315,6 +339,25 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
                                     object: self,
                                     value: notification)
   }
+  
+  
+  public func updateBatchStarted(_ batch: DownloadBatch) {
+    let notification = BatchUpdateStartedNotification(batch.resources!)
+    NotificationCenter.default.post(name: Notifications.batchUpdateStarted,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  public func updateBatchSucceeded(_ batch: DownloadBatch) {
+    let notification = BatchUpdateCompletedNotification(batch.resources!)
+    NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
+                                    object: self,
+                                    value: notification)
+  }
+  
+  public func updateBatchFailed(_ batch: DownloadBatch) {
+    // TODO - what sort of info should really go here?  When do we throw this?
+  }
 
   //MARK: - HTTPDownloadDelegate methods
   
@@ -330,7 +373,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
     // If we're downloading a new keyboard.
     // The extra check is there to filter out other potential request types in the future.
-    if request.tag == 0 {
+    let batch = request.userInfo[Key.downloadBatch] as! DownloadBatch
+
+    if request.tag == 0 && batch.activity != .update {
       let task = request.userInfo[Key.downloadTask] as! DownloadTask
       if task.type == .keyboard {
         NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
@@ -360,9 +405,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           FontManager.shared.registerCustomFonts()
           log.info("Downloaded keyboard: \(keyboards![0].id).")
 
-          NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
-                                          object: self,
-                                          value: keyboards!)
+          if(!isUpdate) {
+            NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
+                                            object: self,
+                                            value: keyboards!)
+          }
 
           let userDefaults = Storage.active.userDefaults
           userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
@@ -370,8 +417,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         }
       } else if task.type == .lexicalModel {
         if let lm = installLexicalModelPackage(downloadedPackageFile: URL.init(string: task.request.destinationFile!)!) {
-          downloadSucceeded(forLexicalModel: lm)
-        } else {
+          if !isUpdate {
+            downloadSucceeded(forLexicalModel: lm)
+          }
+        } else if !isUpdate {
           let installError = NSError(domain: "Keyman", code: 0,
                                      userInfo: [NSLocalizedDescriptionKey: "installError"])
           downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError )
@@ -394,9 +443,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           // Clean up keyboard file if anything fails
           // TODO: Also clean up remaining fonts
           try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
+          downloadFailed(forKeyboards: keyboards ?? [], error: error)
         }
-
-        downloadFailed(forKeyboards: keyboards ?? [], error: error)
       } else if task.type == .lexicalModel {
         let lexicalModels = task.resources as? [InstallableLexicalModel]
         log.error("Dictionary download failed: \(error).")
@@ -404,10 +452,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         if !isUpdate {
           // Clean up keyboard file if anything fails
           try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
+          downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error)
         }
-
-        downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error)
       }
+      
+      self.downloadQueueFinished(downloader!)
     }
   }
   
@@ -430,18 +479,16 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           // Clean up keyboard file if anything fails
           // TODO: Also clean up remaining fonts
           try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
+          downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
         }
-        
-        downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
       } else if task.type == .lexicalModel {
         log.error("Dictionary download failed: \(error).")
         let lexicalModels = task.resources as? [InstallableLexicalModel]
         
         if !isUpdate {
           try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
+          downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
         }
-        
-        downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
       }
     }
   }

@@ -33,6 +33,8 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
+  private var batchUpdateStartedObserver: NotificationObserver?
+  private var batchUpdateCompletedObserver: NotificationObserver?
 
   init(_ givenLanguages: [String: Language]) {
     self.installedLanguages = givenLanguages
@@ -81,6 +83,15 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
       forName: Notifications.lexicalModelDownloadFailed,
       observer: self,
       function: InstalledLanguagesViewController.lexicalModelDownloadFailed)
+    
+    batchUpdateStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.batchUpdateStarted,
+      observer: self,
+      function: InstalledLanguagesViewController.batchUpdateStarted)
+    batchUpdateCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.batchUpdateCompleted,
+      observer: self,
+      function: InstalledLanguagesViewController.batchUpdateCompleted)
     
     if Manager.shared.canAddNewKeyboards {
       let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
@@ -253,6 +264,8 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   
   private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
     log.info("lexicalModelDownloadStarted")
+    view.isUserInteractionEnabled = false
+    navigationItem.setHidesBackButton(true, animated: true)
     showDownloading("dictionary")
   }
   
@@ -290,7 +303,6 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
       toolbar.displayStatus("Dictionary successfully downloaded!", withIndicator: false, duration: 3.0)
     }
-    restoreNavigation()
     
     restoreNavigation()
     navigationController?.popToRootViewController(animated: true)
@@ -315,6 +327,26 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
                                             handler: nil))
     
     self.present(alertController, animated: true, completion: nil)
+  }
+  
+  private func batchUpdateStarted(_: [LanguageResource]) {
+    log.info("batchUpdateStarted: InstalledLanguagesViewController")
+    view.isUserInteractionEnabled = false
+    navigationItem.setHidesBackButton(true, animated: true)
+    
+    guard let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar else {
+      return
+    }
+    
+    toolbar.displayStatus("Updating\u{2026}", withIndicator: true)
+  }
+  
+  private func batchUpdateCompleted(_: [LanguageResource]) {
+    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      toolbar.displayStatus("Updates successfully downloaded!", withIndicator: false, duration: 3.0)
+    }
+    
+    restoreNavigation()
   }
   
   func showActivityView() {
