@@ -23,7 +23,7 @@ candle: heat-cef heat-xml heat-templates heat-model-compiler
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dModelCompilerSourceDir=$(KEYMAN_MODELCOMPILER_ROOT) kmlmc.wxs
     
 heat-xml:
     # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
