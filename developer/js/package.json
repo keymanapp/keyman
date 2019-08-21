@@ -21,7 +21,8 @@
     "commander": "^3.0.0",
     "node": "^11.7.0",
     "node-zip": "^1.1.1",
-    "typescript": "^3.2.4"
+    "typescript": "^3.2.4",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -30,7 +31,6 @@
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
     "mocha": "^6.1.4",
-    "ts-node": "^8.3.0",
-    "xml2js": "^0.4.19"
+    "ts-node": "^8.3.0"
   }
 }

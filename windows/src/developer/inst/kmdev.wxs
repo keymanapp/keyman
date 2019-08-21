@@ -105,6 +105,8 @@
           <Shortcut Id="desktopTIKE" Advertise="yes" Directory="DesktopFolder" Name="Keyman Developer" WorkingDirectory='INSTALLDIR' Icon="TIKE.ico" IconIndex="0" />
         </File>
 
+        <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]" Permanent="no" Part="last" Action="set" System="yes" />
+
         <RemoveFile Id="excmagic.log" On="uninstall" Name="excmagic.log" />
         <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Developer" />
 
