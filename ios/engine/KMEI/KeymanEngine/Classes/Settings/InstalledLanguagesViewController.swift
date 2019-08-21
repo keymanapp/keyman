@@ -14,7 +14,7 @@ private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
-class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelegate {
+public class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelegate {
   private var userKeyboards: [String: InstallableKeyboard] = [:]
   private var userLexicalModels: [String: InstallableLexicalModel] = [:]
   private var sectionIndexTitles: [String] = []
@@ -36,8 +36,12 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private var batchUpdateStartedObserver: NotificationObserver?
   private var batchUpdateCompletedObserver: NotificationObserver?
 
-  init(_ givenLanguages: [String: Language]) {
-    self.installedLanguages = givenLanguages
+  public init(_ givenLanguages: [String: Language]? = nil) {
+    if(givenLanguages == nil) {
+      self.installedLanguages = InstalledLanguagesViewController.loadUserLanguages()
+    } else {
+      self.installedLanguages = givenLanguages!
+    }
     self.keyboardRepository = nil
     self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
@@ -48,12 +52,12 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     fatalError("init(coder:) has not been implemented")
   }
   
-  override func loadView() {
+  override public func loadView() {
     super.loadView()
     languages = languageList(installedLanguages)
   }
   
-  override func viewDidLoad() {
+  override public func viewDidLoad() {
     super.viewDidLoad()
     
     title = "Installed Languages"
@@ -102,13 +106,13 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     log.info("viewDidLoad: InstalledLanguagesViewController (registered for keyboardDownloadStarted)")
   }
   
-  override func viewWillAppear(_ animated: Bool) {
+  override public func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     loadUserKeyboards()
     loadUserLexicalModels()
   }
   
-  override func viewDidAppear(_ animated: Bool) {
+  override public func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
     // if no rows to show yet, show a loading indicator
@@ -146,15 +150,51 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     ResourceDownloadManager.shared.performUpdates(forResources: availableUpdates)
   }
   
-  override func numberOfSections(in tableView: UITableView) -> Int {
+  override public func numberOfSections(in tableView: UITableView) -> Int {
     return languages.count
   }
   
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  private static func loadUserLanguages() -> [String: Language] {
+    //iterate the list of installed languages and save their names
+    // Get keyboards list if it exists in user defaults, otherwise create a new one
+    let userDefaults = Storage.active.userDefaults
+    let userKeyboards = userDefaults.userKeyboards ?? []
+
+    var keyboardLanguages = [String: Language]()
+    for k in userKeyboards {
+      let l = k.languageID
+      var kbds: [Keyboard]
+      if let existingLanguage = keyboardLanguages[l] {
+        kbds = existingLanguage.keyboards ?? []
+        kbds.append(Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil))
+      } else {
+        kbds = [Keyboard(name: k.name, id: k.id, filename: "no filename", isDefault: nil, isRTL: k.isRTL, lastModified: Date(), fileSize: 0, version: k.version, languages: nil, font: nil, oskFont: nil)]
+      }
+      let userDefaults : UserDefaults = Storage.active.userDefaults
+      let lmListInstalled: [InstallableLexicalModel] = userDefaults.userLexicalModelsForLanguage(languageID: l) ?? []
+      let lmList = SettingsViewController.installed2API(lmListInstalled)
+      keyboardLanguages[l] = Language(name: k.languageName, id: k.languageID, keyboards: kbds, lexicalModels: lmList, font: nil, oskFont: nil)
+    }
+    // there shouldn't be any lexical models for languages that don't have a keyboard installed
+    //  but check
+    let userLexicalModels = userDefaults.userLexicalModels ?? []
+    for lm in userLexicalModels {
+      let l = lm.languageID
+      if let langName = keyboardLanguages[l]?.name {
+        log.info("keyboard language \(l) \(langName) has lexical model")
+      } else {
+        log.error("lexical model language \(l) has no keyboard installed!")
+      }
+    }
+
+    return keyboardLanguages
+  }
+  
+  override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return 1
   }
   
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifierType1 = "CellType1"
     let cellIdentifierType2 = "CellType2"
     let keyboards = languages[indexPath.section].keyboards!
@@ -179,7 +219,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   }
   
   // Create sections by first letter
-  override func sectionIndexTitles(for tableView: UITableView) -> [String] {
+  override public func sectionIndexTitles(for tableView: UITableView) -> [String] {
     if !sectionIndexTitles.isEmpty {
       return sectionIndexTitles
     }
@@ -196,11 +236,11 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     return sectionIndexTitles
   }
   
-  override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+  override public func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
     return indices[index]
   }
   
-  override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  override public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     guard let language = languages[safe: indexPath.section] else {
       return
     }
@@ -208,14 +248,14 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
     cell.textLabel?.text = language.name
   }
   
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  override public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     selectedSection = indexPath.section
     tableView.cellForRow(at: indexPath)?.isSelected = false
     let title = tableView.cellForRow(at: indexPath)?.textLabel?.text ?? ""
     showLanguageSettingsView(title: title, languageIndex: indexPath.section)
   }
   
-  override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+  override public func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
     let title = tableView.cellForRow(at: indexPath)?.textLabel?.text ?? ""
     showLanguageSettingsView(title: title, languageIndex: indexPath.section)
   }
@@ -413,7 +453,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
 
 // MARK: - KeyboardRepositoryDelegate
 extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
-  func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
+  public func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
     if let languageDict = repository.languages {
       languages = languageList(languageDict)
     }
@@ -424,7 +464,7 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
     }
   }
   
-  func keyboardRepository(_ repository: KeyboardRepository, didFailFetch error: Error) {
+  public func keyboardRepository(_ repository: KeyboardRepository, didFailFetch error: Error) {
     dismissActivityView()
     showConnectionErrorAlert()
   }
@@ -442,7 +482,7 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
   /** lexicalModelRepositoryDidFetchList callback on successful fetching of list of lexical models for a language
   *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
   */
-  func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
+  public func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
     if let languageDict = repository.languages {
       languages = languageList(languageDict)
     }
@@ -456,7 +496,7 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
   /** lexicalModelRepository didFailFetch callback on failure to fetch list of lexical models for a language
    *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
    */
-  func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
+  public func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
     dismissActivityView()
     showConnectionErrorAlert()
   }

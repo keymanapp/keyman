@@ -48,7 +48,7 @@ open class SettingsViewController: UITableViewController {
 //    self.init(style: UITableViewStyle.grouped)
 //  }
   
-  init(/*storage: Storage*/) {
+  public init(/*storage: Storage*/) {
 //    self.storage = storage
     super.init(nibName: nil, bundle: nil)
     

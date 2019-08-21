@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ResourceDownloadStatusToolbar: UIToolbar {
+public class ResourceDownloadStatusToolbar: UIToolbar {
   private var statusLabel: UILabel?
   private var activityIndicator: UIActivityIndicatorView?
   private var actionButton: UIButton?
@@ -26,7 +26,7 @@ class ResourceDownloadStatusToolbar: UIToolbar {
     super.init(coder: coder)
   }
   
-  var navigationController: UINavigationController? {
+  public var navigationController: UINavigationController? {
     get {
       return _navigationController
     }
