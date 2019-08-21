@@ -247,15 +247,15 @@
     </ComponentGroup>
 
     <ComponentGroup Id="Node">
-      <Component Directory="dirNode" SourceDir="..\..\developer\inst\dist">
-        <File Name='node.exe' KeyPath="yes" />
-        <File Name='CHANGELOG.md' />
-        <File Name='LICENSE' />
-        <File Name='README.md' />
+      <Component Directory="dirNode">
+        <File Name='node.exe' KeyPath="yes" Source="..\..\developer\inst\dist\node.exe" />
+        <File Name='CHANGELOG.md' Source="..\..\developer\inst\dist\CHANGELOG.md" />
+        <File Name='LICENSE' Source="..\..\developer\inst\dist\LICENSE" />
+        <File Name='README.md' Source="..\..\developer\inst\dist\README.md" />
       </Component>
-      
-      <Component Directory="INSTALLDIR" SourceDir="..\..\developer\inst">
-        <File Name='kmlmc.cmd' KeyPAth="yes" />
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmc.cmd' KeyPath="yes" Source="..\..\developer\inst\kmlmc.cmd" />
       </Component>
     </ComponentGroup>
 <!--

@@ -56,20 +56,24 @@ heat-cef:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 heat-model-compiler:
-    # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    mkdir $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_WIX_TEMP_MODELCOMPILER)\ /s
-    
-    # Remove files we don't want to harvest
-    cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    
+    # Build kmlmc
+    cd $(KEYMAN_MODELCOMPILER_ROOT)
+
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh
 !else
     start /wait .\build.sh
 !endif    
 
+    # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
+
+
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+    mkdir $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+    xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_WIX_TEMP_MODELCOMPILER)\ /s
+    
+    # Remove files we don't want to harvest
+    cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\node_modules
     npm install --production
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\source
