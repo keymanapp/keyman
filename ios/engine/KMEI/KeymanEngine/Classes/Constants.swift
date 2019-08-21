@@ -54,6 +54,7 @@ public enum Key {
   // ResourceDownloadQueue keys
   static let downloadTask = "downloadTask"
   static let downloadBatch = "downloadBatch"
+  static let downloadQueueFrame = "queueFrame"
 }
 
 public enum Defaults {

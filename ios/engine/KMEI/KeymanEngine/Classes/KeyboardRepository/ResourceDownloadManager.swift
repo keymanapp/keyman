@@ -60,8 +60,9 @@ public class ResourceDownloadManager {
       withFilename filename: String, withOptions options: Options) -> DownloadBatch? {
 
     if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options) {
+      let tasks = dlBatch.tasks as! [DownloadTask]
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
-      dlBatch.tasks?.forEach { task in
+      tasks.forEach { task in
         task.resources = keyboards
       }
       
@@ -108,7 +109,7 @@ public class ResourceDownloadManager {
     }
     
     let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
-    batch!.tasks?.forEach { task in
+    batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
@@ -267,8 +268,9 @@ public class ResourceDownloadManager {
       fromPath path: URL) -> DownloadBatch? {
 
     if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity) {
+      let tasks = dlBatch.tasks as! [DownloadTask]
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
-      dlBatch.tasks?.forEach { task in
+      tasks.forEach { task in
         task.resources = lexicalModels
       }
       
@@ -302,7 +304,7 @@ public class ResourceDownloadManager {
     let batchTasks: [DownloadTask] = [ lexicalModelTask ]
     
     let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
-    batch!.tasks?.forEach { task in
+    batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
@@ -491,6 +493,7 @@ public class ResourceDownloadManager {
   // MARK: Update checks + management
   
   public func updatesAvailable() -> Bool {
+    // Relies upon KMManager's preload; this was the case before the rework.
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
       return false
     }
