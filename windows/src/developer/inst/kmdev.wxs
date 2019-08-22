@@ -62,7 +62,6 @@
                 <Directory Id="dirRedistSetup" Name="Setup" />
               </Directory>
               <Directory Id="dirNode" Name="node.js" />
-              <Directory Id="dirModelCompiler" Name="Model Compiler" />
               <Directory Id="dirProjects" Name="Projects" />
             </Directory>
           </Directory>
@@ -260,12 +259,6 @@
         <File Name='kmlmc.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmc.cmd" />
       </Component>
     </ComponentGroup>
-<!--
-    <ComponentGroup Id="modelCompiler">
-
-      <Component Directory="dirModelCompiler" SourceDir="..\..\developer\js">
-    </ComponentGroup>
--->
 
     <ComponentGroup Id="AppData">
       <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}" Directory="App_KeymanDev_Databases">
