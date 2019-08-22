@@ -1,6 +1,19 @@
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import { SysExits } from './cli';
+import LexicalModelCompiler from '.';
+
+/**
+ * Compiles a model.ts file, using paths relative to its location.
+ *
+ * @param filename path to model.ts source.
+ * @return model source code
+ */
+export function compileModel(filename: string): string {
+  let modelSource = loadFromFilename(filename);
+  return (new LexicalModelCompiler)
+    .generateLexicalModelCode('<unknown>', modelSource, '.');
+}
 
 /**
  * Loads a lexical model's source module from the given filename.

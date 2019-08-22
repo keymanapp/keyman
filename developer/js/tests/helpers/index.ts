@@ -4,6 +4,13 @@
 import * as path from 'path';
 import {assert} from 'chai';
 
+export interface CompilationResult {
+  hasSyntaxError: boolean;
+  modelConstructorName: string;
+  error: Error;
+  exportedModel: object;
+}
+
 export function makePathToFixture(name: string): string {
   return path.join(__dirname, '..', 'fixtures', name)
 }

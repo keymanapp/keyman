@@ -7,8 +7,7 @@
 import * as fs from 'fs';
 import * as program from 'commander';
 
-import LexicalModelCompiler from "./";
-import { loadFromFilename } from './loadFromFilename';
+import {  compileModel } from './util';
 
 /**
  * Exit codes defined in <sysexits.h>:
@@ -37,8 +36,7 @@ if (!inputFilename) {
 }
 
 // Compile:
-let o = loadFromFilename(inputFilename);
-let code = (new LexicalModelCompiler).generateLexicalModelCode('<unknown>', o, '.');
+let code = compileModel(inputFilename);
 
 // Output:
 if (program.outFile) {
