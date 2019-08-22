@@ -26,13 +26,13 @@ type
     ftFont, ftReadme, ftTextFile,
     ftKeymanWizard, ftOther, ftBitmap,
     ftVisualKeyboard, ftXMLFile, ftHTMLFile, ftJavascript,
-    ftTouchLayout, ftVisualKeyboardSource);
+    ftTouchLayout, ftVisualKeyboardSource, ftModelSource);
 const
   FileTypeNames: array[TKMFileType] of string = ('Keyman Source File', 'Package Source File',
     'Keyman Keyboard File', 'Keyman Package File', 'Font', 'Readme File', 'Text File',
     'Keyman Wizard File', 'Other File', 'Bitmap File',
     'Keyman Visual Keyboard File', 'XML File', 'HTML File', 'Javascript File',
-    'Keyman Touch Layout Source File', 'Keyman Visual Keyboard Source File');
+    'Keyman Touch Layout Source File', 'Keyman Visual Keyboard Source File', 'Lexical Model Source File');
 
 
 type
@@ -53,8 +53,9 @@ const
   Ext_ProjectSource = '.kpj';
   Ext_ProjectSourceUser = '.kpj.user';
   Ext_Javascript = '.js';
+  Ext_LexicalModelSource = '.ts'; // can't use .model.ts unless we change all extension comparisons to support multiple dots...
 
-const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (
+const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
   (Ext: Ext_KeymanSource; FileType: ftKeymanSource),
   (Ext: Ext_PackageSource; FileType: ftPackageSource),
   (Ext: Ext_KeymanFile; FileType: ftKeymanFile),
@@ -67,6 +68,7 @@ const ExtFileTypes: array[0..12] of TKMFileTypeInfo = (
   (Ext: Ext_VisualKeyboardSource; FileType: ftVisualKeyboardSource),
   (Ext: Ext_Javascript; FileType: ftJavascript),
   (Ext: Ext_KeymanTouchLayout; FileType: ftTouchLayout),
+  (Ext: Ext_LexicalModelSource; FileType: ftModelSource),
   (Ext: ''; FileType: ftOther));
 
 function GetFileTypeFromFileName(const FileName: string): TKMFileType;

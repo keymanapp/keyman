@@ -5,6 +5,7 @@
 
   <xsl:import href="welcome.xsl"/>
   <xsl:import href="keyboards.xsl"/>
+  <xsl:import href="models.xsl"/>
   <xsl:import href="packages.xsl"/>
   <xsl:import href="distribution.xsl"/>
 
@@ -21,6 +22,7 @@
         <div id="pages" class="pages">
           <xsl:call-template name="page_welcome" />
           <xsl:call-template name="page_keyboard" />
+          <xsl:call-template name="page_model" />
           <xsl:call-template name="page_packaging" />
           <xsl:call-template name="page_distribution" />
         </div>
@@ -38,11 +40,16 @@
           </div>
 
           <div id="tabb2" class="tabb" onmousedown="javascript:selecttabb(2);">
+            <img alt="Models" src='res/tab_model.png' />
+            Models
+          </div>
+
+          <div id="tabb3" class="tabb" onmousedown="javascript:selecttabb(3);">
             <img alt="Packaging" src='res/tab_package.png' />
             Packaging
           </div>
 
-          <div id="tabb3" class="tabb" onmousedown="javascript:selecttabb(3);">
+          <div id="tabb4" class="tabb" onmousedown="javascript:selecttabb(4);">
             <img alt="Distribution" src='res/tab_distrib.png' />
             Distribution
           </div>

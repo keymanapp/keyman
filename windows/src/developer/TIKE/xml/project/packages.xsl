@@ -3,8 +3,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_packaging">
-    <div class="page" id="page-2">
-      <div class="help-container" id="uppertext2">
+    <div class="page" id="page-3">
+      <div class="help-container" id="uppertext3">
         <div class="headerimage">
           <p><img src='res/header_package.png' /></p>
           <div class='quicklinks'>

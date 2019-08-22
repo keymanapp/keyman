@@ -21,8 +21,9 @@ function selecttabb(n) {
   switch (n) {
     case 0: title = 'Welcome'; break;
     case 1: title = 'Keyboards'; break;
-    case 2: title = 'Packaging'; break;
-    case 3: title = 'Distribution'; break;
+    case 2: title = 'Models'; break;
+    case 3: title = 'Packaging'; break;
+    case 4: title = 'Distribution'; break;
     default: alert(n); return;
   }
 

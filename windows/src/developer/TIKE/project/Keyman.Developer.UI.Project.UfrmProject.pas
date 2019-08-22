@@ -107,6 +107,7 @@ uses
   KeymanDeveloperOptions,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.modelTsProjectFile,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.ProjectFileUI,
@@ -330,6 +331,7 @@ procedure TfrmProject.WebCommand(Command: WideString; Params: TStringList);
     begin
       if Params.Values['type'] = 'keyboard' then Result := ftKeymanSource
       else if Params.Values['type'] = 'package' then Result := ftPackageSource
+      else if Params.Values['type'] = 'model' then Result := ftModelSource
       else Result := ftOther;
     end;
 
@@ -447,8 +449,11 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
-      if FGlobalProject.Files[i] is TkmnProjectFile then
+      if (FGlobalProject.Files[i] is TkmnProjectFile) or
+        (FGlobalProject.Files[i] is TmodelTsProjectFile) then
+      begin
         if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
+      end;
     end;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
@@ -482,6 +487,25 @@ begin
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
   end
+  else if Command = 'model_compileall' then
+  begin
+    ClearMessages;
+    for i := 0 to FGlobalProject.Files.Count - 1 do
+    begin
+      if FGlobalProject.Files[i] is TmodelTsProjectFile then
+        (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
+    end;
+  end
+  else if Command = 'model_cleanall' then   // I4692
+  begin
+    ClearMessages;
+    for i := 0 to FGlobalProject.Files.Count - 1 do
+    begin
+      if FGlobalProject.Files[i] is TmodelTsProjectFile then
+        (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
+    end;
+  end
+
   else if Command = 'package_compileall' then
   begin
     ClearMessages;
