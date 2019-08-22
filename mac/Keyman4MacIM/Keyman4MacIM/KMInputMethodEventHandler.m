@@ -43,9 +43,10 @@ NSRange _previousSelRange;
 }
 
 // This is the public initializer.
-- (instancetype)initWithClient:(NSString *)clientAppId {
+- (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
+    self.senderForDeleteBack = sender;
     // TODO: Pages and Keynote (and possibly lots of other undiscovered apps that are otherwise compliant
-    // with Apple's IM faramework) have a problem in that if the user selects a different font (or other
+    // with Apple's IM framework) have a problem in that if the user selects a different font (or other
     // formatting) and then types a sequence that causes characters to be added to the document and then
     // subsequently replaced, the replacement causes the formatting decision to be forgotten. This can be
     // "fixed" by treating them as legacy apps, but it causes other problems.
@@ -58,9 +59,15 @@ NSRange _previousSelRange;
             [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
             [clientAppId isEqual: @"com.microsoft.Word"] ||
             [clientAppId isEqual: @"org.openoffice.script"] ||
-            [clientAppId isEqual: @"com.adobe.InDesign"]
+            [clientAppId isEqual: @"com.adobe.illustrator"] ||
+            [clientAppId isEqual: @"com.adobe.InDesign"] ||
+            [clientAppId isEqual: @"com.adobe.Photoshop"] ||
+            [clientAppId isEqual: @"com.adobe.AfterEffects"] ||
+            [clientAppId isEqual: @"com.microsoft.VSCode"] ||
+            [clientAppId isEqual: @"com.google.Chrome"] ||
+            [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
                /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */);
-    
+
     // We used to default to NO, so these were the obvious exceptions. But then we realized that
     // in any app, command keys can change the selection, so now we default to YES, and only have
     // a few situations where we pretend it can't. This flag should probably be renamed to something
@@ -70,7 +77,7 @@ NSRange _previousSelRange;
     //        [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
     //        _clientSelectionCanChangeUnexpectedly = YES;
     //    }
-    
+
     // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is the current keyboard and you type "Crashlytics force now", it will force a simulated crash to test reporting to fabric.io.
     if ([self.AppDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
         NSLog(@"Crashlytics - Preparing to detect Easter egg.");
@@ -78,7 +85,7 @@ NSRange _previousSelRange;
     }
     else
         _easterEggForCrashlytics = nil;
-    
+
     // For the Atom editor, this isn't really true (the context CAN change unexpectedly), but we can't get
     // the context, so we pretend/hope it won't.
     BOOL selectionCanChangeUnexpectedly = (![clientAppId isEqual: @"com.github.atom"]);
@@ -147,14 +154,14 @@ NSRange _previousSelRange;
         return;
     }
     NSString* text = [self pendingBuffer];
-    
+
     if ([self.AppDelegate debugMode])
         NSLog(@"Inserting text from pending buffer: \"%@\"", text);
-        
+
     [client insertText:text replacementRange:NSMakeRange(NSNotFound, NSNotFound)];
     _previousSelRange.location += text.length;
     _previousSelRange.length = 0;
-    
+
     [self setPendingBuffer:@""];
 }
 
@@ -219,9 +226,9 @@ NSRange _previousSelRange;
         NSLog(@"*** updateContextBuffer ***");
         NSLog(@"sender: %@", sender);
     }
-    
+
     NSRange selRange = [self getSelectionRangefromClient: sender];
-    
+
     // Since client can't tell us the actual current position, we assume the previously known location in the context.
     // (It won't matter anyway if the client also fails to report its context.)
     NSUInteger len = (_clientCanProvideSelectionInfo != Yes) ? _previousSelRange.length : selRange.location;
@@ -242,7 +249,7 @@ NSRange _previousSelRange;
 -(NSString *)getLimitedContextFrom:(id)sender at:(NSUInteger) len {
     if (![sender respondsToSelector:@selector(attributedSubstringFromRange:)])
         return nil;
-        
+
     NSUInteger start = 0;
     if (len > kMaxContext) {
         if ([self.AppDelegate debugMode])
@@ -250,7 +257,7 @@ NSRange _previousSelRange;
         start = len - kMaxContext;
         len = kMaxContext;
     }
-    
+
     NSString *preBuffer = [[sender attributedSubstringFromRange:NSMakeRange(start, len)] string];
     if ([self.AppDelegate debugMode]) {
         NSLog(@"preBuffer = \"%@\"", preBuffer ? preBuffer : @"nil");
@@ -259,7 +266,7 @@ NSRange _previousSelRange;
         else
             NSLog(@"preBuffer has a length of 0");
     }
-    
+
     return preBuffer;
 }
 
@@ -300,7 +307,7 @@ NSRange _previousSelRange;
         _contextOutOfDate = YES;
         self.AppDelegate.contextChangingEventDetected = NO;
     }
-  
+
     if (_contextOutOfDate)
         [self updateContextBuffer:client];
 }
@@ -346,7 +353,7 @@ NSRange _previousSelRange;
     }
     else
         return NO;
-    
+
     if ([self.AppDelegate debugMode]) {
         NSLog(@"actions = %@", actions);
     }
@@ -356,7 +363,7 @@ NSRange _previousSelRange;
             NSLog(@"Handling %@ action...", actionType);
             NSLog(@"contextBuffer = \"%@\"", self.contextBuffer.length?[self.contextBuffer codeString]:@"{empty}");
         }
-        
+
         if ([actionType isEqualToString:Q_STR]) {
             NSString *output = [action objectForKey:actionType];
             if ([self.AppDelegate debugMode])
@@ -389,7 +396,7 @@ NSRange _previousSelRange;
                     [self replaceExistingSelectionIn:sender with:output];
                 }
             }
-            
+
             // Even if the characters to insert are pending, we want to append them to the context buffer now.
             // Waiting until they are inserted would probably be safe, but on the off-chance that the engine
             // generates additional actions beyond this current one, we want to be sure that the context reflects
@@ -405,7 +412,7 @@ NSRange _previousSelRange;
             // (which could include deadkeys the client doesn't know about).
             [self.contextBuffer deleteLastNChars:n];
             n -= dc;
-            
+
             // n is now the number of characters to delete from the client.
             if (n > 0) {
                 deleteBackPosted = [self deleteBack:n in:sender for: event];
@@ -440,7 +447,7 @@ NSRange _previousSelRange;
         NSLog(@"Processing an unhandled delete-back...");
         NSLog(@"_numberOfPostedDeletesToExpect = %lu", _numberOfPostedDeletesToExpect);
     }
-    
+
     // If we have pending characters to insert following the delete-back, then
     // the context buffer has already been properly set to reflect the deletions.
     if ((_legacyMode && (_pendingBuffer == nil || _pendingBuffer.length == 0)) ||
@@ -459,7 +466,7 @@ NSRange _previousSelRange;
         if (--_numberOfPostedDeletesToExpect == 0) {
             if ([self.AppDelegate debugMode])
                 NSLog(@"Processing final posted delete-back...");
-            
+
             self.willDeleteNullChar = NO;
             if (_legacyMode) {
                 if (_pendingBuffer != nil && _pendingBuffer.length > 0) {
@@ -490,11 +497,34 @@ NSRange _previousSelRange;
     }
 }
 
+// handleDeleteBackLowLevel: handles the situation for Delete Back for
+// some 'legacy' mode apps such as Adobe apps, because when we inject
+// the Delete Back, it is passed through to the app but we never see it
+// in our normal handleEvent function. However, other apps, such as Word,
+// show the event both in the low level tap and in the normal IM
+// handleEvent. Thus, we set a flag after processing a Delete Back here so
+// that we don't accidentally process it twice. Note that a Delete Back that
+// we handle here should never be passed on to Keyman Engine for transform,
+// as it will be part of the output from the transform.
+- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+    self.ignoreNextDeleteBackHighLevel = NO;
+    if(event.keyCode == kVK_Delete && _legacyMode && [self pendingBuffer].length > 0) {
+        BOOL updateEngineContext = YES;
+        if ([self.AppDelegate debugMode]) {
+            NSLog(@"legacy: delete-back received, processing");
+        }
+        [self processUnhandledDeleteBack:self.senderForDeleteBack updateEngineContext: &updateEngineContext];
+        self.ignoreNextDeleteBackHighLevel = YES;
+    }
+
+    return self.ignoreNextDeleteBackHighLevel;
+}
+
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
     // OSK key feedback from hardware keyboard is disabled
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
-    
+
     if (event.type == NSFlagsChanged) {
         _contextOutOfDate = YES;
         return NO;
@@ -504,12 +534,12 @@ NSRange _previousSelRange;
         [self handleCommand:event];
         return NO; // We let the client app handle all Command-key events.
     }
-    
+
     if (_legacyMode && event.keyCode == kProcessPendingBuffer)
     {
         if ([self.AppDelegate debugMode]) {
             NSLog(@"Processing the special %hu code", kProcessPendingBuffer);
-            
+
             NSUInteger length = [self pendingBuffer].length;
             if (length > 0) {
                 for (NSUInteger ich = 0; ich < length; ich++)
@@ -520,19 +550,26 @@ NSRange _previousSelRange;
         [self insertPendingBufferTextIn:sender];
         return YES;
     }
-    
+
+    if(event.keyCode == kVK_Delete && _legacyMode && self.ignoreNextDeleteBackHighLevel) {
+        // This event was sent by Keyman and we should just
+        // pass it through to the app. handleDeleteBackLowLevel
+        // already did anything we need with it.
+        return NO; // We'll let the client app accept the Delete Back
+    }
+
     [self checkContextIn:sender];
 
     [self updateContextBufferIfNeeded:sender];
-    
+
     if ([self.AppDelegate debugMode]) {
         NSLog(@"sender type = %@", NSStringFromClass([sender class]));
         if (_clientCanProvideSelectionInfo == Yes)
             NSLog(@"sender selection range location = %lu", [self getSelectionRangefromClient:sender].location);
     }
-    
+
     BOOL handled = [self handleKeymanEngineActions:event in: sender];
-    
+
     if (!handled) {
         NSUInteger nc = [self.contextBuffer deleteLastNullChars];
         if (nc > 0) {
@@ -543,10 +580,10 @@ NSRange _previousSelRange;
             self.willDeleteNullChar = YES;
             [self postDeleteBacks:nc for:event];
             _keyCodeOfOriginalEvent = event.keyCode;
-            
+
             return YES;
         }
-        
+
         // For other events that the Keyman engine does not have rules, just apply context changes
         // and let client handle the event
         NSString* charactersToAppend = nil;
@@ -554,9 +591,9 @@ NSRange _previousSelRange;
         unsigned short keyCode = event.keyCode;
         switch (keyCode) {
             case kVK_Delete:
-                [self processUnhandledDeleteBack:sender updateEngineContext:&updateEngineContext];
+                [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
                 break;
-                
+
             case kVK_LeftArrow:
                 // I had started some code to try to guess where in the context we ended up after a left arrow,
                 // but too many potential pitfalls. Marc says it's better to just let it be dumb.
@@ -570,12 +607,12 @@ NSRange _previousSelRange;
                 _contextOutOfDate = YES;
                 updateEngineContext = NO;
                 break;
-                
+
             case kVK_Return:
             case kVK_ANSI_KeypadEnter:
                 charactersToAppend = @"\n";
                 break;
-                
+
             default:
                 {
                     // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
@@ -601,12 +638,12 @@ NSRange _previousSelRange;
                 _previousSelRange.length = 0;
             }
         }
-        
+
         if (updateEngineContext) {
             [self.kme setContextBuffer:self.contextBuffer];
         }
     }
-    
+
     if ([self.AppDelegate debugMode]) {
         if (_contextOutOfDate)
             NSLog(@"Context now out of date.");
@@ -619,7 +656,7 @@ NSRange _previousSelRange;
         }
         NSLog(@"***");
     }
-    
+
     // Note: Although this would seem to be the obvious place to set _previousSelRange (in legacy mode), we can't
     // because the selection range doesn't get updated until after we return from this method.
     return handled;
@@ -634,7 +671,7 @@ NSRange _previousSelRange;
         [self deleteBack:n at: pos in: client];
     if (_legacyMode)
         return [self deleteBackLegacy:n at: pos with: selectedRange for: event];
-    
+
     return NO;
 }
 
@@ -643,13 +680,13 @@ NSRange _previousSelRange;
         NSLog(@"Using Apple IM-compliant mode.");
         NSLog(@"pos = %lu", pos);
     }
-    
+
     if (pos >= n && pos != NSNotFound) {
         NSInteger preCharPos = pos - (n+1);
         if ((preCharPos) >= 0) {
             NSUInteger nbrOfPreCharacters;
             NSString *preChar = nil;
-            
+
             // This regex will look back through the context until it finds a *known* base
             // character because some (non-legacy) apps (e.g., Mail) do not properly handle sending
             // combining marks on their own via insertText. One potentially negative implication
@@ -665,7 +702,7 @@ NSRange _previousSelRange;
             // which always used just a single character regardless of its class.
             NSError *error = NULL;
             NSRegularExpression *regexNonCombiningMark = [NSRegularExpression regularExpressionWithPattern:@"\\P{M}" options:NSRegularExpressionCaseInsensitive error:&error];
-            
+
             for (nbrOfPreCharacters = 1; YES; nbrOfPreCharacters++, preCharPos--) {
                 if ([client respondsToSelector:@selector(attributedSubstringFromRange:)])
                     preChar = [[client attributedSubstringFromRange:NSMakeRange(preCharPos, nbrOfPreCharacters)] string];
@@ -681,7 +718,7 @@ NSRange _previousSelRange;
                 }
                 if ([self.AppDelegate debugMode])
                     NSLog(@"Testing preChar: %@", preChar);
-                
+
                 if ([regexNonCombiningMark numberOfMatchesInString:preChar options:NSMatchingAnchored range:NSMakeRange(0, 1)] > 0)
                     break;
                 if (preCharPos == 0) {
@@ -720,12 +757,12 @@ NSRange _previousSelRange;
     if (self.contextBuffer != nil && (pos == 0 || pos == NSNotFound)) {
         pos = self.contextBuffer.length + n;
     }
-    
+
     if ([self.AppDelegate debugMode]) {
         NSLog(@"Using Legacy mode.");
         NSLog(@"pos = %lu", pos);
     }
-    
+
     if (pos >= n) {
         // n is now the number of delete-backs we need to post (plus one more if there is selected text)
         if ([self.AppDelegate debugMode]) {
@@ -733,21 +770,20 @@ NSRange _previousSelRange;
             if (_clientCanProvideSelectionInfo == No || _clientCanProvideSelectionInfo == Unreliable)
                 NSLog(@"Cannot trust client to report accurate selection length - assuming no selection.");
         }
-        
+
+        if (_pendingBuffer != nil && [[self pendingBuffer] length] > 0) {
+            // We shouldn't be sending out characters before the corresponding Delete Back events are received
+            // if this does happen, that's unexpected...
+            NSLog(@"Legacy mode: ERROR: did not find expected Delete Back event");
+        }
+
         // Note: If pos is "not found", most likely the client can't accurately report the location. This might be
         // dangerous, but for now let's go ahead and attempt to delete the characters we think should be there.
-        if (_pendingBuffer != nil && [[self pendingBuffer] length] > 0) {
-            NSException* exception = [NSException
-                                      exceptionWithName:@"InvalidOperationException"
-                                      reason:@"Cannot process subsequent Q_BACK after Q_STR"
-                                      userInfo:nil];
-            @throw exception;
-        }
-        
+
         if (_clientCanProvideSelectionInfo == Yes && selectedRange.length > 0)
             n++; // First delete-back will delete the existing selection.
         [self postDeleteBacks:n for:event];
-        
+
         CFRelease(_sourceFromOriginalEvent);
         _sourceFromOriginalEvent = nil;
         return YES;
@@ -758,14 +794,14 @@ NSRange _previousSelRange;
 - (void)sendEvent:(NSEvent *)event {
     ProcessSerialNumber psn;
     GetFrontProcess(&psn);
-    
+
     CGEventSourceRef source = CGEventCreateSourceFromEvent([event CGEvent]);
     CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, event.keyCode, true);
     CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(source, event.keyCode, false);
-    
+
     CGEventPostToPSN(&psn, keyDownEvent);
     CGEventPostToPSN(&psn, keyUpEvent);
-    
+
     CFRelease(source);
     CFRelease(keyDownEvent);
     CFRelease(keyUpEvent);
@@ -773,9 +809,9 @@ NSRange _previousSelRange;
 
 - (void)postDeleteBacks:(NSUInteger)count for:(NSEvent *) event {
     _numberOfPostedDeletesToExpect = count;
-    
+
     _sourceFromOriginalEvent = CGEventCreateSourceFromEvent([event CGEvent]);
-    
+
     for (int db = 0; db < count; db++)
     {
         if ([self.AppDelegate debugMode]) {
@@ -794,7 +830,7 @@ NSRange _previousSelRange;
 - (void)postKeyPressToFrontProcess:(CGKeyCode)code from:(CGEventSourceRef) source {
     ProcessSerialNumber psn;
     GetFrontProcess(&psn);
-    
+
     if ([self.AppDelegate debugMode]) {
         if (code == kProcessPendingBuffer) {
             NSLog(@"Posting code to tell Keyman to process characters in pending buffer.");
@@ -803,7 +839,7 @@ NSRange _previousSelRange;
             NSLog(@"Posting a keypress (down/up) to the 'front process' for the %hu key.", code);
         }
     }
-    
+
     [self.AppDelegate postKeyboardEventWithSource:source code:code postCallback:^(CGEventRef eventToPost) {
         CGEventPostToPSN((ProcessSerialNumberPtr)&psn, eventToPost);
     }];

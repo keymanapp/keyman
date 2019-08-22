@@ -406,6 +406,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# check that our PRODUCT_VERSION matches this git branch's KM_VERSION from ../../resources/VERSION.md\n(cd .. ; ./is_same_version.sh KeymanEngine4Mac || exit 1 ; cd -)\n";
+			showEnvVarsInLog = 0;
 		};
 		E2588F2F1F2647A50061C9C4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

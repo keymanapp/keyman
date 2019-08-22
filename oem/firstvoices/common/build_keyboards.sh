@@ -3,6 +3,9 @@
 # Build the keyboards referred to in ../keyboards.csv and copy them + metadata 
 # to the FirstVoices/Keyboards folder
 
+# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
+# the same parent folder as this repo, with the default name 'keyboards'
+
 # keyboards.csv has columns Shortname,ID,Name,Region,OldVersion
 
 # Set sensible script defaults:
@@ -13,9 +16,7 @@ set -u
 # set -x: Debugging use, print each statement
 # set -x
 
-# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
-# the same parent folder as this repo, with the default name 'keyboards'
-KEYBOARDS_ROOT=../../../../keyboards
+
 
 function die {
   echo "FATAL: $1"
@@ -92,7 +93,7 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
       if [ $DO_COPY = true ]; then
         echo "Copying $id ($name) to $KEYBOARDS_TARGET"
         mkdir -p "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id"
-        unzip release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
+        unzip -o release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
         # cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
       fi
 #        die "done"
@@ -101,3 +102,5 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
 
   popd
 fi
+
+echo "Keyboards built successfully."

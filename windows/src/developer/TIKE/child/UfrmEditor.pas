@@ -128,7 +128,6 @@ uses
   kwhelp,
   OnlineConstants,
   Keyman.Developer.System.Project.Project,
-  ResourceStrings,
   KeymanDeveloperOptions,
   KMDevResourceStrings,
   KeymanDeveloperUtils,

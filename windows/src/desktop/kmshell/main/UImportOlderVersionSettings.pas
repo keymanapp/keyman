@@ -24,7 +24,7 @@ unit UImportOlderVersionSettings;
 
 interface
 
-function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean): Boolean;  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages: string): Boolean;  // I2753
 
 implementation
 
@@ -42,10 +42,11 @@ uses
   RegistryKeys,
   UImportOlderKeyboardUtils;
 
-function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean): Boolean;  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages: string): Boolean;  // I2753
 var
-  I: Integer;
+  n, I: Integer;
   v: Integer;
+  p: string;
 begin
   { Copy over all the user settings and set defaults for version 8.0: http://blog.tavultesoft.com/2011/02/keyman-desktop-80-default-options.html }
 
@@ -145,6 +146,40 @@ begin
       // present.
       Exit(False);
     end;
+  end;
+
+  // Disable packages per command line setting
+  // Initially used for the FirstVoices Keyboards app -- installs all keyboards
+  // but makes them not enabled by default for the user.
+  if FDisablePackages <> '' then
+  begin
+    while FDisablePackages <> '' do
+    begin
+      if FDisablePackages[1] = '"' then
+      begin
+        Delete(FDisablePackages, 1, 1);
+        n := Pos('"', FDisablePackages);
+        if n = 0 then
+          Break;
+        p := Copy(FDisablePackages, 1, n-1);
+        Delete(FDisablePackages, 1, n);
+        if Copy(FDisablePackages, 1, 1) = ',' then
+          Delete(FDisablePackages, 1, 1);
+      end
+      else
+      begin
+        n := Pos(',', FDisablePackages);
+        if n = 0 then n := Length(FDisablePackages) + 1;
+        p := Copy(FDisablePackages, 1, n - 1);
+        Delete(FDisablePackages, 1, n);
+      end;
+
+      for i := 0 to kmcom.Keyboards.Count - 1 do
+        if (kmcom.Keyboards[i].OwnerPackage <> nil) and
+            SameText(kmcom.Keyboards[i].OwnerPackage.ID, p) then
+          kmcom.Keyboards[i].Loaded := False;
+    end;
+    kmcom.Apply;
   end;
 
   Result := True;

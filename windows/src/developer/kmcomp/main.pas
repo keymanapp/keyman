@@ -52,9 +52,9 @@ uses
   VersionInfo,
   compile,
   KCCompilePackage,
-  ResourceStrings,
   KCCompileProject,
   KCCompileKVK,
+  KeymanVersion,
   CompileKeymanWeb,
   JsonExtractKeyboardInfo,
   ValidateKeyboardInfo,
@@ -226,7 +226,7 @@ begin
 
   if (not FSilent and not FNologo) or FError then   // I4706
   begin
-    writeln(DevApplicationTitle + ' Compiler');
+    writeln(SKeymanDeveloperName + ' Compiler');
     writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
   end;
 

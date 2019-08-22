@@ -247,6 +247,40 @@ class LanguageSettingsViewController: UITableViewController {
     performAction(for: indexPath)
   }
   
+  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    if !Manager.shared.canRemoveKeyboards {
+      return false
+    }
+    
+    if indexPath.section != 0 {
+      return false
+    }
+    
+    // Filter- prevent deleting the default keyboard and just that one.
+    if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
+      // Assumption - default keyboard is index 0.  Probably should make something more robust, though.
+      if globalIndex == 0 {
+        return false
+      }
+    }
+
+    return true
+  }
+  
+  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+                          forRowAt indexPath: IndexPath) {
+    if editingStyle == .delete {
+      if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
+        if Manager.shared.removeKeyboard(at: globalIndex) {
+          // For now, a pop-back will be sufficient.
+          navigationController?.popToRootViewController(animated: true)
+        }
+      }
+    }
+
+    // Do nothing for now.
+  }
+  
   @objc func addClicked(_ sender: Any) {
     showAddLanguageKeyboard()
   }
@@ -276,6 +310,27 @@ class LanguageSettingsViewController: UITableViewController {
     }
   }
   
+  func getKeyboardIndex(kb: Keyboard) -> Int? {
+    let matchingFullID = FullKeyboardID(keyboardID: kb.id, languageID: language.id)
+    let userData = Storage.active.userDefaults
+
+    // If user defaults for keyboards list does not exist, do nothing.
+    guard var globalUserKeyboards = userData.userKeyboards else {
+      log.error("no keyboards in the global keyboards list!")
+      return nil
+    }
+
+    if let index = globalUserKeyboards.index(where: { $0.fullID == matchingFullID }) {
+      guard index < globalUserKeyboards.count else {
+        return nil
+      }
+      return index
+    } else {
+      log.error("this keyboard \(matchingFullID) not found among user's installed keyboards!")
+      return nil
+    }
+  }
+  
   func showKeyboardInfoView(kb: Keyboard) {
     let version = kb.version
     let matchingFullID = FullKeyboardID(keyboardID: kb.id, languageID: language.id)
@@ -288,7 +343,7 @@ class LanguageSettingsViewController: UITableViewController {
       return
     }
 
-    if let index = globalUserKeyboards.index(where: { $0.fullID == matchingFullID }) {
+    if let index = getKeyboardIndex(kb: kb) {
       guard index < globalUserKeyboards.count else {
         return
       }
