@@ -3,6 +3,15 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-23 12.0.4079 beta
+* Disable version and copyright text on splash screen
+
+## 2019-08-16 12.0.4078 beta
+* No changes to Keyman for Android
+
+## 2019-08-12 12.0.4077 beta
+* No changes to Keyman for Android
+
 ## 2019-08-06 12.0.4076 beta
 * Adjustments to Settings UI (#1931)
 

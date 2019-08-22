@@ -29,12 +29,13 @@ public class SplashScreenActivity extends Activity {
     } catch (PackageManager.NameNotFoundException e) {
       // Could not get version number
     }
-    version.setText(ver);
+    // TODO: Add version and copyright info when Android supports TextViews in the splash screen
+    //version.setText(ver);
 
     TextView copyright = (TextView)findViewById(R.id.splash_copyright);
     int year = Calendar.getInstance().get(Calendar.YEAR);
     String date = String.format("%s%s", copyright.getText(), year);
-    copyright.setText(date);
+    //copyright.setText(date);
 
     new Handler().postDelayed(new Runnable() {
       @Override

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/title_version"
+        android:text="@string/splash_blank"
         android:textSize="@dimen/activity_splash_textsize" />
 
     <TextView
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/splash_copyright"
+        android:text="@string/splash_blank"
         android:textSize="@dimen/activity_splash_textsize" />
 
 </LinearLayout>
