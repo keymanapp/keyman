@@ -2,7 +2,7 @@ import 'mocha';
 import {assert} from 'chai';
 import * as path from 'path';
 
-import {compileModel} from '../dist/loadFromFilename';
+import {compileModel} from '../dist/util';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers';
 
 describe('compileModel', function () {
@@ -16,7 +16,6 @@ describe('compileModel', function () {
     assert.doesNotThrow(() => {
       r = compileModelSourceCode(code);
     });
-
     let compilation = r as CompilationResult;
 
     assert.isFalse(compilation.hasSyntaxError);

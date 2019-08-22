@@ -1,5 +1,7 @@
-import * as ts from 'typescript';
 import * as fs from 'fs';
+import * as path from 'path';
+import * as ts from 'typescript';
+
 import { SysExits } from './cli';
 import LexicalModelCompiler from '.';
 
@@ -11,8 +13,10 @@ import LexicalModelCompiler from '.';
  */
 export function compileModel(filename: string): string {
   let modelSource = loadFromFilename(filename);
+  let containingDirectory = path.dirname(filename);
+
   return (new LexicalModelCompiler)
-    .generateLexicalModelCode('<unknown>', modelSource, '.');
+    .generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
 }
 
 /**
