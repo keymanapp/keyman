@@ -21,11 +21,11 @@ public struct LexicalModelDownloadFailedNotification {
   public let error: Error
 }
 public typealias BatchUpdateStartedNotification = [LanguageResource]
-public typealias BatchUpdateCompletedNotification = [LanguageResource]
-public struct BatchUpdateFailedNotification {
-  public let batch: [LanguageResource]
-  public let index: Int
-  public let error: Error
+
+public struct BatchUpdateCompletedNotification {
+  public let successes: [[LanguageResource]]
+  public let failures: [[LanguageResource]]
+  public let errors: [Error]
 }
 
 public typealias KeyboardLoadedNotification = InstallableKeyboard
@@ -78,7 +78,5 @@ public struct Notifications {
   public static let batchUpdateStarted =
     NotificationName<BatchUpdateStartedNotification>("KeymanBatchUpdateStarted")
   public static let batchUpdateCompleted =
-    NotificationName<BatchUpdateStartedNotification>("KeymanBatchUpdateCompleted")
-  public static let batchUpdateFailed =
-    NotificationName<BatchUpdateStartedNotification>("KeymanBatchUpdateFailed")
+    NotificationName<BatchUpdateCompletedNotification>("KeymanBatchUpdateCompleted")
 }

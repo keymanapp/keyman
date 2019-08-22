@@ -381,7 +381,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     toolbar.displayStatus("Updating\u{2026}", withIndicator: true)
   }
   
-  private func batchUpdateCompleted(_: [LanguageResource]) {
+  private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
       toolbar.displayStatus("Updates successfully downloaded!", withIndicator: false, duration: 3.0)
     }

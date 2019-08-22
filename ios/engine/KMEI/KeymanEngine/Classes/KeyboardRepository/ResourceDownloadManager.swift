@@ -302,7 +302,7 @@ public class ResourceDownloadManager {
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
     let batchTasks: [DownloadTask] = [ lexicalModelTask ]
     
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task

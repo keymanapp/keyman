@@ -138,7 +138,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup Keyman Manager & fetch keyboards list
     Manager.shared.canRemoveDefaultKeyboard = true
-    
+
     // Pre-load for use in update checks.
     Manager.shared.apiKeyboardRepository.fetch()
     Manager.shared.apiLexicalModelRepository.fetch()
