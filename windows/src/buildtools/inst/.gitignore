@@ -1,0 +1,2 @@
+# These files generated during release build should not be committed
+copydebug.mak

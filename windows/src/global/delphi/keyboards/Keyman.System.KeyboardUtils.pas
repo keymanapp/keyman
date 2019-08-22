@@ -25,6 +25,10 @@ type
       #13#10#13#10 +
       'Do you wish to continue?';
 
+    const SPackageNameDoesNotFollowLexicalModelConventions_Message: string =
+      'The package file %0:s does not follow the recommended model filename conventions. The name should be all lower case, '+
+      'include only alphanumeric characters and underscore (_), and should have the structure <author>.<bcp47>.<uniq>.model.kps';
+
     class function KeyboardFileNameToID(filename: string): string;
     class function CleanKeyboardID(const Name: WideString): WideString; static;
     class function IsValidKeyboardID(const Name: string; EnforceCaseAndWhitespace: Boolean): Boolean; static;
@@ -37,7 +41,6 @@ type
 implementation
 
 uses
-  System.RegularExpressions,
   System.SysUtils;
 
 { TKeyboardUtil }

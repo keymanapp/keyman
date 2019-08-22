@@ -3,10 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-08-11 12.0.13 beta
-* Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
 
-## 2019-08-08 12.0.12 beta
+## 2019-08-22 12.0.12 beta
+* Fixes Get Started display logic (#1988)
+* Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
 * Fixes toggle alignment issues in the Settings UI (#1947)
 
 ## 2019-07-29 12.0.11 beta
