@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/developer-lexical-model-compiler",
-  "version": "1.0.0",
+  "version": "12.0.0-beta+20190819",
   "description": "Keyman Developer lexical model compiler",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,11 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
+  "bin": {
+    "kmlmc": "dist/cli.js"
+  },
   "dependencies": {
+    "commander": "^3.0.0",
     "node": "^11.7.0",
     "node-zip": "^1.1.1",
     "typescript": "^3.2.4"
