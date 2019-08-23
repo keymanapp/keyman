@@ -23,7 +23,6 @@ public class APILexicalModelRepository: LexicalModelRepository {
   public private(set) var lexicalModels: [String: LexicalModel]?
   
   public func fetch(completionHandler: CompletionHandler?) {
-    let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     var urlComponents = modelsAPIURL
     urlComponents.queryItems = [
       URLQueryItem(name: "q", value: "")
@@ -97,8 +96,8 @@ public class APILexicalModelRepository: LexicalModelRepository {
       return
     }
     
-    let lexicalModels = result.lexicalModels
-    self.lexicalModels = Dictionary(uniqueKeysWithValues: result.lexicalModels.map { ($0.id, $0) })
+    let lexicalModels = result.lexicalModels // Simpler debugging this way.
+    self.lexicalModels = Dictionary(uniqueKeysWithValues: lexicalModels.map { ($0.id, $0) })
 
     
     log.info("Request list completed -- \(result.lexicalModels.count) lexical models.")

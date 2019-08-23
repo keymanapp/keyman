@@ -315,7 +315,7 @@ class LanguageSettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
 
     // If user defaults for keyboards list does not exist, do nothing.
-    guard var globalUserKeyboards = userData.userKeyboards else {
+    guard let globalUserKeyboards = userData.userKeyboards else {
       log.error("no keyboards in the global keyboards list!")
       return nil
     }

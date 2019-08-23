@@ -352,7 +352,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let notification = KeyboardDownloadCompletedNotification(keyboards)
     NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
                                     object: self,
-                                    value: keyboards)
+                                    value: notification)
   }
   
   public func downloadSucceeded(forLexicalModel lm: InstallableLexicalModel) {
