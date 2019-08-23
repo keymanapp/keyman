@@ -284,7 +284,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
                                             preferredStyle: UIAlertControllerStyle.alert)
     alertController.addAction(UIAlertAction(title: "OK",
                                             style: UIAlertActionStyle.cancel,
-                                            handler: nil))
+                                            handler: { _ in
+                                              self.navigationController?.popToRootViewController(animated: true)
+                                            }))
     
     self.present(alertController, animated: true, completion: nil)
   }
@@ -427,7 +429,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     //get list of lexical models for this languageID and show it
     func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
       if let error = error {
-        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error as! String))
+        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error.localizedDescription))
         DispatchQueue.main.async {
           self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
         }
