@@ -24,6 +24,11 @@
 
         <menu>
             <item
+                android:id="@+id/action_file_browser"
+                android:title="@string/action_file_browser"
+                android:icon="@drawable/ic_folder_open" />
+
+            <item
                 android:id="@+id/action_text_size"
                 android:title="@string/action_text_size"
                 app:showAsAction="never"

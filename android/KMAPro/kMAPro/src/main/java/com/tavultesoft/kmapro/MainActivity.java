@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   // Fields used for installing kmp packages
   private static final int PERMISSION_REQUEST_STORAGE = 0;
+  private static final int READ_REQUEST_CODE = 42;
   Uri data;
 
   private static final String TAG = "MainActivity";
@@ -181,6 +182,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (resultCode != RESULT_OK) {
       checkGetStarted();
       return;
+    } else if (requestCode == READ_REQUEST_CODE) {
+      // Handle kmp file selected from file browser
+      if (returnIntent != null) {
+        String kmpFilename = returnIntent.getDataString();
+        Uri data = Uri.parse(kmpFilename);
+        useLocalKMP(data);
+      }
     } else {
       boolean didFail = false;
       ClipData userdata = returnIntent.getClipData();
@@ -369,6 +377,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         return true;
       case R.id.action_share:
         showShareDialog();
+        return true;
+      case R.id.action_file_browser:
+        showFileBrowser();
         return true;
       case R.id.action_web:
         showWebBrowser();
@@ -702,7 +713,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
         FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
       } else {
-        String noKeyboardsInstalledMessage = " is not a valid keyboard package file.\nNo keyboards were installed.";
+        String noKeyboardsInstalledMessage = " is not a valid Keyman package file.\n" +
+          "No keyboards/dictionaries were installed.";
         Toast.makeText(getApplicationContext(),
           filename + noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
       }
@@ -726,6 +738,15 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void showGetStarted() {
     Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
     startActivity(getStartedIntent);
+  }
+
+  // Launch System file browser for user to navigate to local .kmp files
+  private void showFileBrowser() {
+    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    // Unfortunately, we can't filter for a "kmp" mime type
+    intent.setType("*/*");
+    startActivityForResult(intent, READ_REQUEST_CODE);
   }
 
   private void showSettings() {
