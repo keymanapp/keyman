@@ -10,9 +10,9 @@ import Foundation
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
 public struct InstallableKeyboard: Codable, LanguageResource {
-  private var _id: String
+  public private(set) var id: String
   public var name: String
-  private var _languageID: String
+  public private(set) var languageID: String
   public var languageName: String
   public var version: String
   public var isRTL: Bool
@@ -33,9 +33,9 @@ public struct InstallableKeyboard: Codable, LanguageResource {
               font: Font?,
               oskFont: Font?,
               isCustom: Bool) {
-    self._id = id
+    self.id = id
     self.name = name
-    self._languageID = languageID
+    self.languageID = languageID
     self.languageName = languageName
     self.version = version
     self.isRTL = isRTL
@@ -45,26 +45,14 @@ public struct InstallableKeyboard: Codable, LanguageResource {
   }
 
   public init(keyboard: Keyboard, language: Language, isCustom: Bool) {
-    self._id = keyboard.id
+    self.id = keyboard.id
     self.name = keyboard.name
-    self._languageID = language.id
+    self.languageID = language.id
     self.languageName = language.name
     self.version = keyboard.version
     self.isRTL = keyboard.isRTL
     self.font = keyboard.font
     self.oskFont = keyboard.oskFont
     self.isCustom = isCustom
-  }
-  
-  public var id: String {
-    get {
-      return _id
-    }
-  }
-  
-  public var languageID: String {
-    get {
-      return _languageID
-    }
   }
 }
