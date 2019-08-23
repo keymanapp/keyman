@@ -15,6 +15,7 @@
   <string name="textview_hint" translatable="false">Start typing here&#8230;</string>
 
   <!-- Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false"></string>
   <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
 
   <!-- Text Size dialog -->
