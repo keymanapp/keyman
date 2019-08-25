@@ -73,13 +73,13 @@
         <div >
           <xsl:choose>
             <xsl:when test="not(enabled)">
-              <xsl:attribute name="style">vertical-align: middle; display: inline; margin-left: 3px; color: #808080</xsl:attribute>
+              <xsl:attribute name="style">display: inline; margin-left: 3px; color: #808080</xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:attribute name="style">vertical-align: middle; display: inline; margin-left: 3px;</xsl:attribute>
+              <xsl:attribute name="style">display: inline; margin-left: 3px; </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
-					<xsl:value-of select="$locale/String[@Id=current()/id]"/>
+			  <xsl:value-of select="$locale/String[@Id=current()/id]"/>
         </div>
       </div>
 
