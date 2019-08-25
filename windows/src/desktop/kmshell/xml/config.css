@@ -19,7 +19,7 @@
 {
   position: absolute;
   left: 0px;
-  top: 37px;
+  top: 40px;
   width: 117px;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -68,7 +68,7 @@
 {
   background: #79C3DA;
   width: 117px;
-  height: 37px;
+  height: 40px;
   position: absolute;
   top: 0;
   left: 0;
@@ -79,7 +79,7 @@
   background: none;
   overflow-x: hidden;
   overflow-y: auto;
-  font-size: 12px;
+  font-size: 13px;
   border-right: 1px solid #6D6C6F;
   border-top: 1px solid #6D6C6F;
   border-bottom: 1px solid #6D6C6F;
@@ -167,10 +167,10 @@ html
 
 .helplinks
 {
-  padding: 4px 4px 0 0;
+  padding: 6px 4px 0 0;
   float: right;
-  font-size: 12px; 
-  font-weight: normal;
+  font-size: 12px;
+  font-weight: normal;  
 }
 .helplinks a
 {
@@ -555,8 +555,8 @@ table tr
   font-size: 16px;
 }
 #options
-{
-  left: 0;
+{	
+  left: 0;  
   top: 0;
   xpadding: 6px 4px 4px 4px;
 }
@@ -578,12 +578,11 @@ table tr
 
 .options_list_header
 {
- background: #e0e5ef;
+  background: #e0e5ef;
   font-size: 13.3px;
   font-weight: bold;
   color: #001020;
   padding: 4px 8px;
-  height: 16px;
 }
 
 .options_list_help
@@ -711,7 +710,7 @@ th
 
 .support_links {
   right: 0;
-  top: 38px;
+  top: 41px;
   width: 140px;
   height: 100%;
   padding: 12px;

@@ -12,7 +12,7 @@
 
 				<title>fonts</title>
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; font-size: 13.3px; }
+					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
 					body { padding: 24px 16px; margin: 0px; overflow: auto; height: 100%; background: #A0C1DC; border: none; }
 					html { padding: 0px; margin: 0px; overflow: auto; }
@@ -60,7 +60,7 @@
 						<div><xsl:copy-of select="$locale/String[@Id='S_FontHelper_NoFonts'][1]"/></div>
 					</xsl:otherwise>
 				</xsl:choose>
-				
+
 				<div style="margin-top: 24px">
           <xsl:copy-of select="$locale/String[@Id='S_FontHelper_Hint1']"/>
           <xsl:text xml:space="preserve"> </xsl:text>
@@ -73,7 +73,7 @@
           <xsl:copy-of select="$locale/String[@Id='S_FontHelper_Hint2']"/>
         </div>
 			</body>
-			
+
 		</html>
 	</xsl:template>
 
@@ -83,7 +83,7 @@
 				<a>
 					<xsl:attribute name="href">keyman:selectfont?font=<xsl:value-of select="@Name"/></xsl:attribute>
 					<xsl:value-of select="@Name" />
-				</a> 
+				</a>
 			</td>
 			<td>
 				<xsl:value-of select="@Coverage" />%

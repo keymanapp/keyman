@@ -15,7 +15,7 @@
 					<xsl:value-of select="$locale/String[@Id='Usage_Title']" />
 				</title>
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; font-size: 13.3px; }
+					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
 					body { padding: 6px; margin: 0px; overflow: auto;
 					background: #A0C1DC; border: none; }
@@ -52,7 +52,7 @@
 					  </xsl:otherwise>
 					</xsl:choose>
 					<div id="buttons">
-					
+
 					  <xsl:if test="not(/Keyman/HasWelcome) and not(/Keyman/HasOSK)">
 							<input type="button" onclick="javascript:location.href='keyman:help'">
 								<xsl:attribute name='Value'>
@@ -60,19 +60,19 @@
 								</xsl:attribute>
 							</input>
 						</xsl:if>
-					
+
 						<xsl:if test="/Keyman/HasWelcome">
 							<input type="button" onclick="javascript:location.href='keyman:welcome'">
 								<xsl:attribute name='Value'>
 									<xsl:value-of select="$locale/String[@Id='S_Usage_Welcome']"/>
 								</xsl:attribute>
-							</input> 
+							</input>
 						</xsl:if>
-					  
+
 					  <xsl:if test="/Keyman/HasWelcome and /Keyman/HasOSK">
 						  &#160; &#160; &#160;
 						</xsl:if>
-						
+
 						<xsl:if test="/Keyman/HasOSK">
 							<input type="button" onclick="javascript:location.href='keyman:osk'">
 								<xsl:attribute name='Value'>
@@ -81,7 +81,7 @@
 							</input>
 						</xsl:if>
 					</div>
-					
+
 				</div>
 			</body>
 		</html>

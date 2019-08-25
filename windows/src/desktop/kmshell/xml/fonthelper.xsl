@@ -15,13 +15,13 @@
 
 				<title>fonts</title>
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; font-size: 12px; }
+					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 12px; }
 
 					body { padding: 0px 0px; margin: 0px; width: 100%; height: 100%; background: #A0C1DC; border: none;}
 					html { padding: 0px; margin: 0px; overflow: auto; }
 					table { margin: 12px 0; border-collapse: collapse; width: <xsl:value-of select="count(/Keyman/Chars/Ch) * 15 + 250" />px; }
-					table tr td.font { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; white-space: nowrap; font-size: 11px; font-weight: bold; margin: 0px; padding: 0px; border-left: none; border-right: none; }
-					table tr td.coverage { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; white-space: nowrap; font-size: 11px; margin: 0px; padding-left: 6px; border-left: none; }
+					table tr td.font { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; white-space: nowrap; font-size: 11px; font-weight: bold; margin: 0px; padding: 0px; border-left: none; border-right: none; }
+					table tr td.coverage { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; white-space: nowrap; font-size: 11px; margin: 0px; padding-left: 6px; border-left: none; }
           
           td.char { text-align: center; vertical-align: middle; border: solid 1px #80A1BC; font-size: 13.3px; background: white; }
           td.excluded { background: #FFcfc0; }

@@ -62,7 +62,7 @@ div {
   max-height: 84px;
   overflow-y: auto;
   width: 400px;
-  padding: 0px 16px 0 0;
+  padding: 0 16px 0 0;
 }
 
 a.button {
@@ -79,7 +79,7 @@ a.button {
   height: 26px; 
   font-weight: bold;
   font-size: 18px;
-  padding: 6px 12px 2px 12px;
+  padding: 4px 12px 4px 12px;
   text-align: center; 
   border-radius: 4px;
   color: #33333f; 
@@ -102,7 +102,7 @@ a.button {
   width: 61px; 
   height: 20px; 
   font-size: 15px; 
-  padding: 2px 6px 0 6px; 
+  padding: 1px 6px 1px 6px; 
   background: #F68924;
   border-radius: 3px; 
 }
@@ -159,3 +159,4 @@ a.button {
 #showAtStartupBox #hideAtStartup { display: inline; }
 #showAtStartupBox.hideAtStartup #showAtStartup { display: inline; }
 #showAtStartupBox.hideAtStartup #hideAtStartup { display: none; }
+
