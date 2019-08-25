@@ -21,3 +21,17 @@ tested or supported. It is likely in the future that the kmcomp
 # Transition steps
 
 1. Split .kps and model compilers into separate paths
+
+# Folders
+
+## inst
+
+Contains a minimal distribution of node.js intended just for compiling
+lexical models. If more  dependencies are required, then the 
+developer will be expected to install node.js themselves; this gets 
+users going without requiring a large installer or a full node.js 
+install.
+
+## js
+
+Source files for node-based compilers.
