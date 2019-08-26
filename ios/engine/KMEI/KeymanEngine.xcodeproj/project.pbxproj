@@ -210,6 +210,7 @@
 		C0D3F3601F9F3AD80055C7CF /* InstallableKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */; };
 		C0E30C8C1FC40D0400C80416 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E30C8B1FC40D0400C80416 /* Storage.swift */; };
 		C0EF3E7B1F95B65300CE9BD4 /* KeymanWebDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */; };
+		CE1E1EC12303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1E1EC02303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift */; };
 		CE24ECF021B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
 		CE24ECF121B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
 		CE24ECF221B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
@@ -411,6 +412,7 @@
 		C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloadRequest.swift; sourceTree = "<group>"; };
 		C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloader.swift; sourceTree = "<group>"; };
 		C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanWebDelegate.swift; sourceTree = "<group>"; };
+		CE1E1EC02303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadStatusToolbar.swift; sourceTree = "<group>"; };
 		CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeymanResponder+Types.swift"; sourceTree = "<group>"; };
 		CE2B1E4521B60E7C007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
@@ -636,6 +638,7 @@
 				9A3B14D1229370B20052A11F /* InstalledLanguagesViewController.swift */,
 				9AD4F53A229F85AC007992D3 /* LanguageSettingsViewController.swift */,
 				9AD4F53B229F85AC007992D3 /* LanguageSettingsViewController.xib */,
+				CE1E1EC02303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1213,6 +1216,7 @@
 				C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */,
 				C0452BAF1F9F22A80064431A /* Font.swift in Sources */,
 				C0D3F3601F9F3AD80055C7CF /* InstallableKeyboard.swift in Sources */,
+				CE1E1EC12303C8CC001C7BE0 /* ResourceDownloadStatusToolbar.swift in Sources */,
 				C042ED5D1FC6A65A001D82F4 /* Version.swift in Sources */,
 				C0D3F35E1F9F33490055C7CF /* Options.swift in Sources */,
 				C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */,

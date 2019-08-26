@@ -248,36 +248,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private func keyboardDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
-
-    guard let toolbar = navigationController?.toolbar else {
-      return
-    }
-
-    let labelFrame = CGRect(origin: toolbar.frame.origin,
-                            size: CGSize(width: toolbar.frame.width * 0.95,
-                                         height: toolbar.frame.height * 0.7))
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: toolbar.frame.width * 0.5, y: toolbar.frame.height * 0.5)
-    label.text = "Downloading\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: toolbar.frame.width - indicatorView.frame.width,
-                                   y: toolbar.frame.height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-    toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    toolbar.addSubview(label)
-    toolbar.addSubview(indicatorView)
-    navigationController?.setToolbarHidden(false, animated: true)
   }
 
   private func keyboardDownloadFailed() {
