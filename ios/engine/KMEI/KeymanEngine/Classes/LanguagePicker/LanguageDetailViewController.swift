@@ -43,12 +43,14 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   override func loadView() {
     super.loadView()
     
-    if let languageDict = keyboardRepository?.languages {
-      self.postLanguageLoad(languageDict: languageDict)
-    } else {
-      log.info("Fetching repository from API for keyboard download (LanguageDetailViewController)")
-      pendingFetch = true
-      keyboardRepository?.fetch()
+    if keyboardRepository != nil {
+      if let languageDict = keyboardRepository?.languages {
+        self.postLanguageLoad(languageDict: languageDict)
+      } else {
+        log.info("Fetching repository from API for keyboard download (LanguageDetailViewController)")
+        pendingFetch = true
+        keyboardRepository?.fetch()
+      }
     }
     
     loadUserKeyboards()
