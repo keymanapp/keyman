@@ -39,7 +39,7 @@
                 android:id="@+id/action_info"
                 android:title="@string/action_info"
                 app:showAsAction="never"
-                android:icon="@drawable/ic_light_action_info" />
+                android:icon="@drawable/ic_info_outline" />
 
             <item
                 android:id="@+id/action_get_started"
