@@ -59,7 +59,9 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     
     if let language = languageDict[self.language.id] {
       self.language = language
-      // Do something to update the view.
+      
+      // Case 1 - called immediately during loadView() - UI is built after the load, so we're fine.
+      // Case 2 - called by keyboardRepositoryDidFetch() - UI updated by self.tableView.reloadData()
     }
   }
 
