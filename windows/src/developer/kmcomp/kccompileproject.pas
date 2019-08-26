@@ -30,6 +30,7 @@ uses
 
   Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.System.Project.kpsProjectFileAction,
+  Keyman.Developer.System.Project.modelTsProjectFileAction,
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.ProjectFile;
 
@@ -52,6 +53,7 @@ var
   Found: Boolean;
   kmn: TkmnProjectFileAction;
   kps: TkpsProjectFileAction;
+  modelTs: TmodelTsProjectFileAction;
 
   function Matches(AFile: TProjectFile; AClass: TProjectFileClass): Boolean;
   begin
@@ -82,7 +84,21 @@ begin
         else
           if not kmn.CompileKeyboard then Exit;
         Found := True;
+      end
+      else if Matches(Files[i], TmodelTsProjectFileAction) then
+      begin
+        modelTs := Files[i] as TmodelTsProjectFileAction;
+        modelTs.Debug := ADebug;
+        modelTs.WarnAsError := AWarnAsError;
+        if AClean then
+        begin
+          if not modelTs.Clean then Exit;
+        end
+        else
+          if not modelTs.CompileModel then Exit;
+        Found := True;
       end;
+
 
     for i := 0 to Files.Count - 1 do
       if Matches(Files[i], TkpsProjectFileAction) then

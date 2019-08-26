@@ -46,7 +46,7 @@ begin
   if not OwnerProject.Options.CheckFilenameConventions then
     Exit;
 
-  if not TLexicalModelUtils.DoesJSFilenameFollowLexicalModelConventions(FileName) then
+  if not TLexicalModelUtils.DoesTSFilenameFollowLexicalModelConventions(FileName) then
   begin
     HasCompileWarning := True;
     Log(plsWarning, Format(TLexicalModelUtils.SModelFileNameDoesNotFollowConventions_Message, [ExtractFileName(FileName)]));

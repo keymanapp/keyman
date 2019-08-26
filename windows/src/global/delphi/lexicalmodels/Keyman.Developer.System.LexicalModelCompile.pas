@@ -25,7 +25,15 @@ begin
   ec := 0;
   logtext := '';
   cmdline := Format('"%skmlmc.cmd" "%s" -o "%s"', [ExtractFilePath(ParamStr(0)), infile, outfile]);
-  Result := TUtilExecute.Console(cmdline, ExtractFileDir(infile), logtext, ec) or (ec <> 0);
+  Result := TUtilExecute.Console(cmdline, ExtractFileDir(infile), logtext, ec);
+
+  if not Result then
+  begin
+    ProjectFile.Project.Log(plsError, infile,
+      Format('Compiler failed to start with error %d: %s', [GetLastError, SysErrorMessage(GetLastError)]));
+  end;
+
+  Result := Result and (ec = 0);
 
   s := TStringList.Create;
   try
