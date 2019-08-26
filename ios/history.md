@@ -9,6 +9,7 @@
 * Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
 * Fixes toggle alignment issues in the Settings UI (#1947)
 * Polishes loading of specific-language keyboard downloading menu.  (#1944)
+* Moves update functionality to the Installed Language menu and added dictionary updates. (#1979)
 
 ## 2019-07-29 12.0.11 beta
 * Initial beta release of Keyman for iPhone and iPad 12

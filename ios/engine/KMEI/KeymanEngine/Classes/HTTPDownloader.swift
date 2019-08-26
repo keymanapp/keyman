@@ -13,6 +13,7 @@ protocol HTTPDownloadDelegate: class {
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
   func downloadRequestFailed(_ request: HTTPDownloadRequest)
   func downloadQueueFinished(_ queue: HTTPDownloader)
+  func downloadQueueCancelled(_ queue: HTTPDownloader)
 }
 
 class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate,
@@ -132,6 +133,8 @@ URLSessionDataDelegate {
     if let currentRequest = currentRequest {
       currentRequest.task?.cancel()
     }
+    
+    self.handler?.downloadQueueCancelled(self)
   }
 
   var requestsCount: Int {
