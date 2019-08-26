@@ -42,7 +42,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     } else {
       self.installedLanguages = givenLanguages!
     }
-    self.keyboardRepository = nil
+    self.keyboardRepository = Manager.shared.apiKeyboardRepository //nil
     self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
 //    keyboardRepository.delegate = self
