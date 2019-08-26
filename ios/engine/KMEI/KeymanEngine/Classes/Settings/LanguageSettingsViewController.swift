@@ -12,7 +12,6 @@ private let toolbarButtonTag = 100
 
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
-  private var userKeyboards: [String: Language] = [:]
   private var settingsArray = [[String: String]]()
 
   public init(_ inLanguage: Language) {
@@ -351,7 +350,7 @@ class LanguageSettingsViewController: UITableViewController {
       let thisKb = globalUserKeyboards[kbIndex]
       let infoView = KeyboardInfoViewController()
       infoView.title = thisKb.name
-      infoView.keyboardCount = userKeyboards.count
+      infoView.keyboardCount = globalUserKeyboards.count
       infoView.keyboardIndex = index
       infoView.keyboardID = thisKb.id
       infoView.languageID = language.id
