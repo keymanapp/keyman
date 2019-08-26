@@ -267,6 +267,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   
   // MARK - helper methods for ResourceDownloadManager
   
+  // TODO:  Eliminate this property coompletely.
   var currentRequest: HTTPDownloadRequest? {
     get {
       // This was literally the state of this property when the refactor producing this class was performed.
@@ -274,7 +275,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  // Needs validation.
+  // TODO: Needs validation.
   func keyboardIdForCurrentRequest() -> String? {
     if let currentRequest = currentRequest {
       let tmpStr = currentRequest.url.lastPathComponent
@@ -473,8 +474,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // Did we finish, but with an request error code?
     if request.responseStatusCode != 200 {
       // Possible request error (400 Bad Request, 404 Not Found, etc.)
-      // TODO:  Should we clear the entire queue in this case, or just the current batch?
-      //        If just the batch, make sure we handle any corresponding notifications correctly.
 
       let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
       let error = NSError(domain: "Keyman", code: 0,
