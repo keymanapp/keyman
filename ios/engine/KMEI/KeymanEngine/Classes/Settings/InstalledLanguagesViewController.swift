@@ -261,7 +261,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
   
   private func showLanguageSettingsView(title: String, languageIndex: Int) {
-    let langSettingsView = LanguageSettingsViewController(languages[languageIndex])
+    let langSettingsView = LanguageSettingsViewController(keyboardRepository, languages[languageIndex])
     langSettingsView.title = title
     navigationController?.pushViewController(langSettingsView, animated: true)
   }

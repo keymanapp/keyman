@@ -8,12 +8,6 @@ uses
 var
   ExtPath: string = '';
 
-const
- { Errors }
- STR_E_OLDOSVERSION = 'This product requires Windows 7 or later to install';   // I4365
- STR_E_OLDOSVERSION_DOWNLOAD = 'This product requires Windows 7 or later to install.  Do you want to download Keyman Desktop 8?';   // I4365   // I4460
-
-
 function ProcessArchive: Boolean;
 
 implementation

@@ -236,9 +236,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    if !languages.isEmpty {
-        navigationController?.popToRootViewController(animated: true)
-    }
+    navigationController?.popToRootViewController(animated: true)
   }
     
   func downloadHandler(_ keyboardIndex: Int) {

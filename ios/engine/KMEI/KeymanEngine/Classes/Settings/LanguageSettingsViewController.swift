@@ -14,9 +14,11 @@ class LanguageSettingsViewController: UITableViewController {
   let language: Language
   private var userKeyboards: [String: Language] = [:]
   private var settingsArray = [[String: String]]()
+  private var keyboardRepository: KeyboardRepository?
 
-  public init(_ inLanguage: Language) {
+  public init(_ keyboardRepository: KeyboardRepository?, _ inLanguage: Language) {
     language = inLanguage
+    self.keyboardRepository = keyboardRepository
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -288,7 +290,7 @@ class LanguageSettingsViewController: UITableViewController {
   func showAddLanguageKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageSpecificViewController(Manager.shared.apiKeyboardRepository, language: language)
+    let vc = LanguageDetailViewController(keyboardRepository, language: language)
     vc.title = "Add new \(language.name) keyboard"
     navigationController?.pushViewController(vc, animated: true)
   }

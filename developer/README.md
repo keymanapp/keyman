@@ -10,7 +10,6 @@ platforms.
 # Lexical Model Compiler
 
 
-
 # Package Compiler
 
 The package compiler is broadly compatible with the kmcomp .kps
@@ -21,7 +20,18 @@ tested or supported. It is likely in the future that the kmcomp
 
 # Transition steps
 
-1. Move both of the above compilers into the keyman repo
-2. Split .kps and model compilers into separate paths
-3. Update lexical-models repo to pull these compiler(s)
-4. Refactor compiler code to address https://github.com/keymanapp/lexical-models/issues/28 and https://github.com/keymanapp/lexical-models/issues/29
+1. Split .kps and model compilers into separate paths
+
+# Folders
+
+## inst
+
+Contains a minimal distribution of node.js intended just for compiling
+lexical models. If more  dependencies are required, then the 
+developer will be expected to install node.js themselves; this gets 
+users going without requiring a large installer or a full node.js 
+install.
+
+## js
+
+Source files for node-based compilers.

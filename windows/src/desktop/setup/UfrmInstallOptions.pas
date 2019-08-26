@@ -62,14 +62,20 @@ implementation
 {$R *.dfm}
 
 uses
-  KeymanVersion;
+  bootstrapmain,
+  SetupStrings;
 
 { TfrmInstallOptions }
 
 procedure TfrmInstallOptions.FormCreate(Sender: TObject);
 begin
+  Caption := FInstallInfo.Text(ssOptionsTitle);
+  chkStartWithWindows.Caption := FInstallInfo.Text(ssOptionsStartWithWindows);
+  chkStartAfterInstall.Caption := FInstallInfo.Text(ssOptionsStartAfterInstall);
+  chkCheckForUpdates.Caption := FInstallInfo.Text(ssOptionsCheckForUpdates);
+  chkCheckForUpdatesInstall.Caption := FInstallInfo.Text(ssOptionsCheckForUpdatesBeforeInstall);
   // Keyman 11 and later version keyboards will always automatically update
-  chkUpgradeKeyman7.Caption := 'Upgrade earlier version Keyman Desktop keyboards to Keyman Desktop '+SKeymanVersion;
+  chkUpgradeKeyman7.Caption := FInstallInfo.Text(ssOptionsUpgradeKeyboards);
 end;
 
 function TfrmInstallOptions.GetCanUpgradeKeyman7: Boolean;

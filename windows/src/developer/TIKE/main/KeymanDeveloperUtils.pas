@@ -94,7 +94,7 @@ uses
   Winapi.ShellApi,
   Classes, SysUtils, ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
-     ResourceStrings, CRC32, VisualKeyboard, Controls;
+     KeymanVersion, CRC32, VisualKeyboard, Controls;
 
 var
   hMutex: THandle;
@@ -446,7 +446,7 @@ begin
   Result := IncludeTrailingPathDelimiter(RootPath);
 
   if not FileExists(Result + 'keyman32.dll') then
-    ShowMessage('The executable keyman32.dll could not be found.  You should reinstall '+DistApplicationTitle+'.');
+    ShowMessage('The executable keyman32.dll could not be found.  You should reinstall '+SKeymanDesktopName+'.');
 end;
 
 

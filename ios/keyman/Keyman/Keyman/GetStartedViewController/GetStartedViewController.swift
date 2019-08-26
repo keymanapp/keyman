@@ -179,7 +179,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   @objc func switchValueChanged(_ sender: Any) {
     let userData = AppDelegate.activeUserDefaults()
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: dontShowGetStartedKey)
+      userData.set(!toggle.isOn, forKey: shouldShowGetStartedKey)
       userData.synchronize()
     }
   }

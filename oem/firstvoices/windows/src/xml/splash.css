@@ -1,0 +1,168 @@
+* { 
+  font-family: Calibri;
+}
+
+html, body { 
+  padding: 0px;
+  margin: 0px; 
+  overflow: hidden; 
+  font-size: 15px;
+  background: white;
+}
+
+div { 
+  position: static; 
+}
+
+#size {
+  position: absolute; 
+  left: 0; 
+  top: 0;
+  border: solid 1px #444444;
+  background: white;
+  width: 630px;
+  height: 470px;
+}
+
+#displaylanguage { top: 40px; right: 12px; position: absolute; color: white; }
+#displaylanguage a { color: white; }
+
+#titleBox { 
+  position: absolute; left: 20px; top: 24px; background: url("keyman-desktop-for-first-voices-486x86-black.png"); width: 486px; height: 86px; 
+}
+
+#silLogo {
+  position: absolute; right: 20px; top: 24px; background: url("fpcc-53x50.png"); width: 53px; height: 50px; 
+}
+
+#family {
+  position: absolute; left: 0px; top: 128px; width: 630px; height: 210px;
+  background: url("fv-intro-background.jpg");
+}
+
+#footer {
+  left: 0;
+  bottom: 0;
+  position: absolute;
+  width: 700px; 
+  padding: 8px;
+}
+
+#version { 
+  position: absolute; font-size: 0.8em; right: 90px; bottom: 10px; color: #F68924 
+}
+
+#beta { 
+  color: red; font-weight: bold;
+}
+
+#keyboards {
+  position: absolute;
+  left: 15px;
+  top: 348px;
+  font-size: 12pt;
+  color: #626364;
+  height: 84px;
+  max-height: 84px;
+  overflow-y: auto;
+  width: 400px;
+  padding: 0 16px 0 0;
+}
+
+a.button {
+  cursor: pointer;
+  text-align: center;
+  color: black;
+  text-decoration: none;
+  position: absolute;
+}
+
+.btn {
+  float: left; 
+  width: 160px; 
+  height: 26px; 
+  font-weight: bold;
+  font-size: 18px;
+  font-family: Calibri;
+  padding: 6px 12px 2px 12px;
+  text-align: center; 
+  border-radius: 4px;
+  color: #33333f; 
+}
+
+.btn-orange { 
+  background: #F68924; 
+}
+
+.btn-blue { 
+  background: #79C3DA;
+}
+
+.btn-red {
+  background: #CC3846;
+  color: #fcf8f8;
+}
+
+.btn-small { 
+  width: 61px; 
+  height: 20px; 
+  font-size: 15px; 
+  padding: 2px 6px 0 6px; 
+  background: #F68924;
+  border-radius: 3px; 
+}
+
+#ribbon { 
+  display:none;
+  position: absolute; 
+  left: 0; 
+  top: 100px; 
+  width: 100%; 
+  height: 8px; 
+  background: #79C3DA; 
+}
+
+#ribbon div {
+  position: static;
+  float: left;
+  height: 8px;
+}
+
+#ribbon #ribbon1 {
+  width: 56%;
+  background: #F68924;
+}
+
+#ribbon #ribbon2 {
+  width: 24%;
+  background: #CC3846;
+}
+
+#tasks { 
+  position: absolute; 
+  left: 0; bottom: 0; margin-left: 8px; margin-bottom: 8px; font-size: 13px }
+#tasks div { margin-bottom: 2px; margin-left: 4px }
+
+#startNow { 
+  left: 434px;
+  top: 352px; 
+  height: 1.2em;
+}
+
+#config {
+  left: 434px;
+  top: 392px;
+}
+
+#exit { right: 12px; bottom: 12px; }
+
+#tasks div#showAtStartupBox { margin-top: 6px; margin-left: 0; }
+#tasks a, #showAtStartupLabel { color: #F68924; text-decoration: none; }
+#tasks a:hover { text-decoration: underline; }
+#showAtStartup { margin: 0 4px 0 0; }
+
+#showAtStartupBox #showAtStartup { display: none; }
+#showAtStartupBox #hideAtStartup { display: inline; }
+#showAtStartupBox.hideAtStartup #showAtStartup { display: inline; }
+#showAtStartupBox.hideAtStartup #hideAtStartup { display: none; }
+

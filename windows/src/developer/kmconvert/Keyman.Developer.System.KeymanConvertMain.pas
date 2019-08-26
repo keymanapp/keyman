@@ -13,7 +13,7 @@ uses
   Keyman.Developer.System.KMConvertParameters,
   Keyman.Developer.System.ImportWindowsKeyboard,
   Keyman.Developer.System.KeyboardProjectTemplate,
-  ResourceStrings,
+  KeymanVersion,
   VersionInfo;
 
 function DoRun: Boolean; forward;
@@ -104,7 +104,7 @@ end;
 
 procedure WriteBanner;
 begin
-  writeln(DevApplicationTitle + ' Conversion Utility');
+  writeln(SKeymanDeveloperName + ' Conversion Utility');
   writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
   writeln;
 end;

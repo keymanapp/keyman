@@ -79,8 +79,7 @@ uses
   TouchLayoutUtils in '..\TIKE\oskbuilder\TouchLayoutUtils.pas',
   KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
-  utilicon in '..\..\global\delphi\general\utilicon.pas',
-  ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas';
+  utilicon in '..\..\global\delphi\general\utilicon.pas';
 
 {$R icons.RES}
 {$R version.res}
