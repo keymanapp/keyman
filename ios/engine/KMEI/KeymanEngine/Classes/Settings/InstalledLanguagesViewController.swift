@@ -32,10 +32,10 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
 
-  init(_ givenLanguages: [String: Language]) {
+  public init(_ givenLanguages: [String: Language]) {
     self.installedLanguages = givenLanguages
-    self.keyboardRepository = nil
-    self.lexicalModelRepository = nil
+    self.keyboardRepository = Manager.shared.apiKeyboardRepository
+    self.lexicalModelRepository = Manager.shared.apiLexicalModelRepository
     super.init(nibName: nil, bundle: nil)
 //    keyboardRepository.delegate = self
   }
@@ -179,7 +179,7 @@ class InstalledLanguagesViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func showLanguageSettingsView(title: String, languageIndex: Int) {
-    let langSettingsView = LanguageSettingsViewController(languages[languageIndex])
+    let langSettingsView = LanguageSettingsViewController(keyboardRepository, languages[languageIndex])
     langSettingsView.title = title
     navigationController?.pushViewController(langSettingsView, animated: true)
   }
