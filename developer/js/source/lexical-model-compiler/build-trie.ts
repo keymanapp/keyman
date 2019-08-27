@@ -18,6 +18,10 @@ export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?:
   return JSON.stringify(trie);
 }
 
+export function parseWordListFromFilename(filename: string): WordList {
+  throw new Error('not implemented');
+}
+
 /**
  * Reads a tab-separated values file into a word list.
  *
