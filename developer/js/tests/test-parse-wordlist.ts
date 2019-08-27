@@ -26,5 +26,12 @@ describe('parseWordList', function () {
     let wordlist = parseWordListFromFilename(filename);
     assert.lengthOf(wordlist, 10);
   });
+
+  it('should read wordlists in UTF-16 LE (with BOM)', function () {
+    // N.B.: this format... might be output by MS Excel? Maybe?
+    const filename = makePathToFixture('example.qaa.utf16be', 'wordlist.txt');
+    let wordlist = parseWordListFromFilename(filename);
+    assert.lengthOf(wordlist, 10);
+  });
 });
 
