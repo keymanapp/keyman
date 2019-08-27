@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+
 /**
  * A word list is an array of pairs: the concrete word form itself, followed by
  * a non-negative count.
@@ -19,6 +21,14 @@ export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?:
 }
 
 export function parseWordListFromFilename(filename: string): WordList {
+  // Note: BOM is U+FEFF
+  // in little endian, this is 0xFF 0xFE
+  // in big endian, this is 0xFE 0xFF
+  let buffer = readFileSync(filename);
+  if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
+    return parseWordList(readFileSync(filename, 'utf16le'));
+  }
+
   throw new Error('not implemented');
 }
 
