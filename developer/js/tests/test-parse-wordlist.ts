@@ -19,19 +19,20 @@ describe('parseWordList', function () {
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
   });
 
-  it('should read wordlists in UTF-16 LE (with BOM)', function () {
+  it('should read wordlists in UTF-16 little-endian (with BOM)', function () {
     // N.B.: this is the format exported by MS Excel when selecting
-    // "UTF-16" text.
+    // "UTF-16" text (tested on Excel for macOS).
     const filename = makePathToFixture('example.qaa.utf16le', 'wordlist.txt');
     let wordlist = parseWordListFromFilename(filename);
     assert.lengthOf(wordlist, 10);
   });
 
-  it('should read wordlists in UTF-16 LE (with BOM)', function () {
-    // N.B.: this format... might be output by MS Excel? Maybe?
+  it('should NOT read wordlists in UTF-16 big-endian (with BOM)', function () {
+    // N.B.: Does anything output this format...?
     const filename = makePathToFixture('example.qaa.utf16be', 'wordlist.txt');
-    let wordlist = parseWordListFromFilename(filename);
-    assert.lengthOf(wordlist, 10);
+    assert.throws(() => {
+      parseWordListFromFilename(filename);
+    }, 'unsupported file format');
   });
 });
 

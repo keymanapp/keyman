@@ -27,6 +27,8 @@ export function parseWordListFromFilename(filename: string): WordList {
   let buffer = readFileSync(filename);
   if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
     return parseWordList(readFileSync(filename, 'utf16le'));
+  } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
+    return parseWordList(readFileSync(filename, 'UTF-16'));
   }
 
   throw new Error('not implemented');
