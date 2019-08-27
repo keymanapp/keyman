@@ -11,8 +11,16 @@ export interface CompilationResult {
   exportedModel: object;
 }
 
-export function makePathToFixture(name: string): string {
-  return path.join(__dirname, '..', 'fixtures', name)
+/**
+ * Builds a path to the fixture with the given path components.
+ * 
+ * e.g., makePathToFixture('example.qaa.trivial')
+ * e.g., makePathToFixture('example.qaa.trivial', 'model.ts')
+ * 
+ * @param components One or more path components.
+ */
+export function makePathToFixture(...components: string[]): string {
+  return path.join(__dirname, '..', 'fixtures', ...components);
 }
 
 /**
