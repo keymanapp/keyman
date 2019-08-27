@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-27 12.0.4080 beta
+* Fix menu icon and text alignment (#1999)
+
 ## 2019-08-23 12.0.4079 beta
 * Disable version and copyright text on splash screen (#1989)
 
