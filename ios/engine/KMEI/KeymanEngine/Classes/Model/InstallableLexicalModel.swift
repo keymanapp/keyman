@@ -13,10 +13,10 @@ struct InstallableConstants {
 }
 
 /// Mainly differs from the API `LexicalModel` by having an associated language.
-public struct InstallableLexicalModel: Codable {
-  public var id: String
+public struct InstallableLexicalModel: Codable, LanguageResource {
+  public private(set) var id: String
   public var name: String
-  public var languageID: String
+  public private(set) var languageID: String
   public var version: String
   public var isCustom: Bool
   

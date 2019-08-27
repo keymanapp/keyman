@@ -13,16 +13,27 @@ private let toolbarLabelTag = 101
 private let toolbarActivityIndicatorTag = 102
 
 class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
+  private let activityViewTag = -2
+
   private var userKeyboards: [String: InstallableKeyboard] = [:]
   private var isUpdate = false
-  private let language: Language
+  private var language: Language
+  private var keyboardRepository: KeyboardRepository?
+  private var pendingFetch: Bool = false
 
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
 
-  init(language: Language) {
+  convenience init(language: Language) {
+    self.init(nil, language: language)
+  }
+  
+  init(_ keyboardRepository: KeyboardRepository?, language: Language) {
     self.language = language
     super.init(nibName: nil, bundle: nil)
+    
+    self.keyboardRepository = keyboardRepository
+    keyboardRepository?.delegate = self
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -31,7 +42,29 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   override func loadView() {
     super.loadView()
+    
+    if keyboardRepository != nil {
+      if let languageDict = keyboardRepository?.languages {
+        self.postLanguageLoad(languageDict: languageDict)
+      } else {
+        log.info("Fetching repository from API for keyboard download (LanguageDetailViewController)")
+        pendingFetch = true
+        keyboardRepository?.fetch()
+      }
+    }
+    
     loadUserKeyboards()
+  }
+  
+  func postLanguageLoad(languageDict: [String: Language]) {
+    pendingFetch = false
+    
+    if let language = languageDict[self.language.id] {
+      self.language = language
+      
+      // Case 1 - called immediately during loadView() - UI is built after the load, so we're fine.
+      // Case 2 - called by keyboardRepositoryDidFetch() - UI updated by self.tableView.reloadData()
+    }
   }
 
   override func viewDidLoad() {
@@ -47,10 +80,16 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     log.info("viewDidLoad: LanguageDetailViewController (registered for keyboardDownloadStarted)")
   }
   
-  override open func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    
-    log.info("willAppear: LanguageDetailViewController")
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    navigationController?.setToolbarHidden(true, animated: true)
+    // if no rows to show yet, show a loading indicator
+    if pendingFetch {
+      showActivityView()
+      log.info("didAppear: LanguageDetailViewController, but fetch is not yet complete")
+    } else {
+      log.info("didAppear: LanguageDetailViewController")
+    }
   }
 
   // MARK: - Table view data source UITableViewDataSource
@@ -93,7 +132,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       cell.detailTextLabel?.isEnabled = true
     }
 
-    let kbState = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    let kbState = ResourceDownloadManager.shared.stateForKeyboard(withID: keyboard.id)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
 
@@ -102,7 +141,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     let keyboardIndex = indexPath.section
     let keyboard = language.keyboards![keyboardIndex]
 
-    let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    let state = ResourceDownloadManager.shared.stateForKeyboard(withID: keyboard.id)
     if state != .downloading {
       if state == .needsDownload {
         isUpdate = false
@@ -125,41 +164,53 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   func downloadHandler(_ keyboardIndex: Int) {
-    Manager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
+    ResourceDownloadManager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
                                       languageID: language.id, isUpdate: isUpdate)
+  }
+  
+  func showActivityView() {
+    view.isUserInteractionEnabled = false
+    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let activityView = UIView(frame: indicatorView.bounds.insetBy(dx: -10.0, dy: -10.0))
+    activityView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
+    activityView.layer.cornerRadius = 6.0
+    activityView.center = view.center
+    activityView.tag = activityViewTag
+    activityView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
+                                     .flexibleBottomMargin]
+
+    indicatorView.center = CGPoint(x: activityView.bounds.size.width * 0.5, y: activityView.bounds.size.height * 0.5)
+    indicatorView.startAnimating()
+    activityView.addSubview(indicatorView)
+    view.addSubview(activityView)
+  }
+
+  func dismissActivityView() {
+    let activityView = view.viewWithTag(activityViewTag)
+    activityView?.removeFromSuperview()
+    view.isUserInteractionEnabled = true
+  }
+  
+  private func showConnectionErrorAlert() {
+    dismissActivityView()
+    let alertController = UIAlertController(title: "Connection Error",
+                                            message: "Could not reach Keyman server. Please try again later.",
+                                            preferredStyle: UIAlertControllerStyle.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertActionStyle.default,
+                                            handler: errorAcknowledgmentHandler))
+    
+    self.present(alertController, animated: true, completion: nil)
+  }
+  
+  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
+    navigationController?.popToRootViewController(animated: true)
   }
 
   private func keyboardDownloadStarted() {
     log.info("keyboardDownloadStarted: LanguageDetailViewController")
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
-
-    let toolbarFrame = navigationController!.toolbar.frame
-    let labelFrame = CGRect(origin: toolbarFrame.origin,
-                            size: CGSize(width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7))
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: toolbarFrame.width * 0.5, y: toolbarFrame.height * 0.5)
-    label.text = "Downloading\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: toolbarFrame.width - indicatorView.frame.width,
-                                   y: toolbarFrame.height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-
-    navigationController?.toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    navigationController?.toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    navigationController?.toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    navigationController?.toolbar.addSubview(label)
-    navigationController?.toolbar.addSubview(indicatorView)
-    navigationController?.setToolbarHidden(false, animated: true)
   }
 
   private func keyboardDownloadFailed() {
@@ -186,5 +237,30 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       return false
     }
     return userKeyboards["\(languageID)_\(keyboardID)"] != nil
+  }
+}
+
+// MARK: - KeyboardRepositoryDelegate
+extension LanguageDetailViewController: KeyboardRepositoryDelegate {
+  func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
+    if let languageDict = repository.languages {
+      self.postLanguageLoad(languageDict: languageDict)
+    }
+    self.dismissActivityView()
+    self.tableView.reloadData()
+    if self.numberOfSections(in: self.tableView) == 0 {
+      self.showConnectionErrorAlert()
+    }
+  }
+
+  func keyboardRepository(_ repository: KeyboardRepository, didFailFetch error: Error) {
+    dismissActivityView()
+    showConnectionErrorAlert()
+  }
+
+  private func languageList(_ languageDict: [String: Language]) -> [Language] {
+    return languageDict.values.sorted { a, b -> Bool in
+      a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+    }
   }
 }

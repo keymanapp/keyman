@@ -4,10 +4,12 @@
 * Start version 13.0
 
 
-## 2019-08-22 12.0.12 beta
+## 2019-08-26 12.0.14 beta
 * Fixes Get Started display logic (#1988)
 * Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
 * Fixes toggle alignment issues in the Settings UI (#1947)
+* Polishes loading of specific-language keyboard downloading menu.  (#1944)
+* Moves update functionality to the Installed Language menu and added dictionary updates. (#1979)
 
 ## 2019-07-29 12.0.11 beta
 * Initial beta release of Keyman for iPhone and iPad 12

@@ -100,12 +100,21 @@ class Storage {
     return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
   }
   
+  func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
+    return lexicalModelPackageURL(forID: lexicalModel.id, version: lexicalModel.version)
+  }
+  
   func keyboardURL(forID keyboardID: String, version: String) -> URL {
     return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
   
   func lexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
     return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
+  }
+  
+  func lexicalModelPackageURL(forID lexicalModelID: String, version: String) -> URL {
+    // Our unzipping dependency requires a .zip extension to function, so we append that here.
+    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp.zip")
   }
 
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {

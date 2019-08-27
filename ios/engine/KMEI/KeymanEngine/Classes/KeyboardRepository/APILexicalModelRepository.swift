@@ -22,6 +22,20 @@ public class APILexicalModelRepository: LexicalModelRepository {
   public private(set) var languages: [String: Language]?
   public private(set) var lexicalModels: [String: LexicalModel]?
   
+  public func fetch(completionHandler: CompletionHandler?) {
+    var urlComponents = modelsAPIURL
+    urlComponents.queryItems = [
+      URLQueryItem(name: "q", value: "")
+    ]
+    log.info("Connecting to Keyman cloud: \(urlComponents.url!).")
+    let task = URLSession.shared.dataTask(with: urlComponents.url!) { (data, response, error) in
+      self.apiCompletionHandler(data: data, response: response, error: error,
+                                fetchCompletionHandler: completionHandler)
+    }
+    task.resume()
+  }
+
+  
   public func fetchList(languageID: String, completionHandler: @escaping ListCompletionHandler) {
     var urlComponents = modelsAPIURL
     let bcp47Value = "bcp47:" + languageID
@@ -36,26 +50,23 @@ public class APILexicalModelRepository: LexicalModelRepository {
     task.resume()
   }
   
-  private func apiListCompletionHandler(data: Data?,
-                                    response: URLResponse?,
-                                    error: Error?,
-                                    fetchCompletionHandler: @escaping ListCompletionHandler) {
+  private func commonErrorCheck(data: Data?, response: URLResponse?, error: Error?, errorForwarder: @escaping (_ error: Error) -> Void) -> LexicalModelAPICall? {
     let errorHandler = { (error: Error) -> Void in
       DispatchQueue.main.async {
         self.delegate?.lexicalModelRepository(self, didFailFetch: error)
-        fetchCompletionHandler(nil, error)
+        errorForwarder(error)
       }
     }
-    
+  
     if let error = error {
       log.error("Network error fetching languages: \(error)")
       errorHandler(APILexicalModelFetchError.networkError(error))
-      return
+      return nil
     }
     guard let data = data else {
       log.error("Language API did not return data")
       errorHandler(APILexicalModelFetchError.noData)
-      return
+      return nil
     }
     
     let decoder = JSONDecoder()
@@ -66,6 +77,45 @@ public class APILexicalModelRepository: LexicalModelRepository {
     } catch {
       log.error("Failed parsing API lexical models: \(error)")
       errorHandler(APILexicalModelFetchError.parsingError(error))
+      return nil
+    }
+    
+    // No errors!
+    return result
+  }
+  
+  private func apiCompletionHandler(data: Data?,
+                                    response: URLResponse?,
+                                    error: Error?,
+                                    fetchCompletionHandler: CompletionHandler?) {
+    let errorHandler = { (error: Error) -> Void in
+        fetchCompletionHandler?(error)
+    }
+    
+    guard let result = commonErrorCheck(data: data, response: response, error: error, errorForwarder: errorHandler) else {
+      return
+    }
+    
+    let lexicalModels = result.lexicalModels // Simpler debugging this way.
+    self.lexicalModels = Dictionary(uniqueKeysWithValues: lexicalModels.map { ($0.id, $0) })
+
+    
+    log.info("Request list completed -- \(result.lexicalModels.count) lexical models.")
+    DispatchQueue.main.async {
+      self.delegate?.lexicalModelRepositoryDidFetchList(self)
+      fetchCompletionHandler?(nil)
+    }
+  }
+  
+  private func apiListCompletionHandler(data: Data?,
+                                    response: URLResponse?,
+                                    error: Error?,
+                                    fetchCompletionHandler: @escaping ListCompletionHandler) {
+    let errorHandler = { (error: Error) -> Void in
+        fetchCompletionHandler(nil, error)
+    }
+    
+    guard let result = commonErrorCheck(data: data, response: response, error: error, errorForwarder: errorHandler) else {
       return
     }
     
