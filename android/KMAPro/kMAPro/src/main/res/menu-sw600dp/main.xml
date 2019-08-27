@@ -16,12 +16,6 @@
         android:icon="@drawable/ic_light_action_web" />
 
     <item
-        android:id="@+id/action_file_browser"
-        app:showAsAction="always"
-        android:title="@string/action_file_browser"
-        android:icon="@drawable/ic_folder_open" />
-
-    <item
         android:id="@+id/action_text_size"
         app:showAsAction="always"
         android:title="@string/action_text_size"
