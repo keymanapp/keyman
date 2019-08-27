@@ -14,8 +14,11 @@ type WordList = [string, number][];
  *
  * @param sourceFiles an array of source files that will be read to generate the trie.
  */
-export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?: (wf: string) => string): string {
-  let wordlist =  parseWordList(sourceFiles.join('\n'));
+export function createTrieDataStructure(filenames: string[], searchTermToKey?: (wf: string) => string): string {
+  // Make one big word list out of all of the filenames provided.
+  let wordlist = filenames
+    .map(parseWordListFromFilename)
+    .reduce((bigWordlist, current) => bigWordlist.concat(current), []);
   let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.Wordform2Key);
   return JSON.stringify(trie);
 }
