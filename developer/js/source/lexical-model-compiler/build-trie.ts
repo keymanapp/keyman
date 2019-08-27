@@ -22,13 +22,14 @@ export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?:
 
 export function parseWordListFromFilename(filename: string): WordList {
   // Note: BOM is U+FEFF
-  // in little endian, this is 0xFF 0xFE
-  // in big endian, this is 0xFE 0xFF
+  // In little endian, this is 0xFF 0xFE
+  // Big Endian, is NOT supported because Node does not support it (???)
+  // See: https://stackoverflow.com/a/14551669/6626414
   let buffer = readFileSync(filename);
   if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
     return parseWordList(readFileSync(filename, 'utf16le'));
   } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
-    return parseWordList(readFileSync(filename, 'UTF-16'));
+    throw new Error('UTF-16BE is unsupported')
   }
 
   throw new Error('not implemented');

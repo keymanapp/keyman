@@ -32,7 +32,7 @@ describe('parseWordList', function () {
     const filename = makePathToFixture('example.qaa.utf16be', 'wordlist.txt');
     assert.throws(() => {
       parseWordListFromFilename(filename);
-    }, 'unsupported file format');
+    }, 'UTF-16BE is unsupported');
   });
 });
 
