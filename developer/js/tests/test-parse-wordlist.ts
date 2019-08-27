@@ -22,7 +22,7 @@ describe('parseWordList', function () {
   it('should read word lists in UTF-8', function () {
     // N.B.: this is the format exported by MS Excel when selecting
     // "UTF-16" text (tested on Excel for macOS).
-    const filename = makePathToFixture('example.qaa.trivial', 'wordlist.tsv');
+    const filename = makePathToFixture('example.qaa.sencoten', 'wordlist.tsv');
     let wordlist = parseWordListFromFilename(filename);
     assert.lengthOf(wordlist, 10);
   });
