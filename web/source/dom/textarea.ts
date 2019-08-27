@@ -75,9 +75,16 @@ namespace com.keyman.dom {
     }
 
     setCaret(caret: number) {
-      let domCaret = this.root.value._kmwCodePointToCodeUnit(caret);
-      this.root.setSelectionRange(domCaret, domCaret);
-      this.processedSelectionEnd = caret;
+      this.setSelection(caret, caret);
+    }
+
+    setSelection(start: number, end: number) {
+      let domStart = this.root.value._kmwCodePointToCodeUnit(start);
+      let domEnd = this.root.value._kmwCodePointToCodeUnit(end);
+      this.root.setSelectionRange(domStart, domEnd);
+
+      this.processedSelectionStart = start;
+      this.processedSelectionEnd = end;
     }
 
     getTextBeforeCaret(): string {
@@ -90,6 +97,13 @@ namespace com.keyman.dom {
       this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
 
       this.setCaret(newCaret);
+    }
+
+    protected setTextAfterCaret(s: string) {
+      let c = this.getCaret();
+
+      this.root.value = this.getTextBeforeCaret() + s;
+      this.setCaret(c);
     }
 
     getTextAfterCaret(): string {

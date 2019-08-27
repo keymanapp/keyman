@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
@@ -39,9 +38,9 @@ import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,12 +59,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -92,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private int textSize = minTextSize;
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
-  protected static final String dontShowGetStartedKey = "DontShowGetStarted";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
@@ -289,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             }
 
             // Only handle ad-hoc kmp packages
-            if (FileUtils.hasKeyboardPackageExtension(url)) {
+            if (FileUtils.hasKeymanPackageExtension(url)) {
               try {
                 // Download the KMP to app cache
                 downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -385,6 +382,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       case R.id.action_get_started:
         showGetStarted();
         return true;
+      case R.id.action_settings:
+        showSettings();
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
@@ -422,9 +422,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   private void resizeTextView(boolean isKeyboardVisible) {
+    int bannerHeight = 0;
     int keyboardHeight = 0;
-    if (isKeyboardVisible)
+    if (isKeyboardVisible) {
+      bannerHeight = KMManager.getBannerHeight(this);
       keyboardHeight = KMManager.getKeyboardHeight(this);
+    }
 
     TypedValue outValue = new TypedValue();
     getTheme().resolveAttribute(android.R.attr.actionBarSize, outValue, true);
@@ -439,7 +442,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     Point size = new Point(0, 0);
     getWindowManager().getDefaultDisplay().getSize(size);
     int screenHeight = size.y;
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - keyboardHeight);
+    Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
+    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
   }
 
   private void showInfo() {
@@ -591,17 +595,17 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   private void checkGetStarted() {
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean dontShowGetStarted = prefs.getBoolean(MainActivity.dontShowGetStartedKey, false);
-    if (!dontShowGetStarted) {
+    boolean showGetStarted = prefs.getBoolean(GetStartedActivity.showGetStartedKey, true);
+    if (showGetStarted) {
       boolean shouldShowGetStarted = false;
       ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() < 2)
         shouldShowGetStarted = true;
 
-      if (!GetStartedActivity.isEnabledAsSystemKB(this))
+      if (!SystemIMESettings.isEnabledAsSystemKB(this))
         shouldShowGetStarted = true;
 
-      if (!GetStartedActivity.isDefaultKB(this))
+      if (!SystemIMESettings.isDefaultKB(this))
         shouldShowGetStarted = true;
 
       if (shouldShowGetStarted)
@@ -675,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
-          isKMP = FileUtils.hasKeyboardPackageExtension(filename);
+          isKMP = FileUtils.hasKeymanPackageExtension(filename);
           cacheKMPFilename = filename;
           inputFile = getContentResolver().openInputStream(data);
           break;
@@ -683,7 +687,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         case "file":
           File kmpFile = new File(data.getPath());
           filename = kmpFile.getName();
-          isKMP = FileUtils.hasKeyboardPackageExtension(data.toString());
+          isKMP = FileUtils.hasKeymanPackageExtension(data.toString());
           cacheKMPFilename = kmpFile.getName();
           inputFile = new FileInputStream(kmpFile);
           break;
@@ -722,6 +726,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void showGetStarted() {
     Intent getStartedIntent = new Intent(this, GetStartedActivity.class);
     startActivity(getStartedIntent);
+  }
+
+  private void showSettings() {
+    Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
+    startActivity(settingsIntent);
   }
 
   public static Drawable getActionBarDrawable(Context context) {
@@ -807,7 +816,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
       }
     } else {
-      Toast.makeText(this, "Keyboard " + keyboardID + " download failed", Toast.LENGTH_SHORT).show();
+      // Error notifications handled in LanguageListActivity
     }
   }
 
@@ -829,6 +838,26 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
       }
+    }
+  }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+    String langId = KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID);
+    boolean matchingModel = false;
+
+    for(int i=0; i<lexicalModelsInstalled.size(); i++) {
+      HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+        matchingModel = true;
+      }
+      KMManager.addLexicalModel(this, lexicalModelInfo);
+    }
+
+    // We're on the main thread, so if the active keyboard's language code matches,
+    // let's register the associated lexical model.
+    if(matchingModel) {
+      KMManager.registerAssociatedLexicalModel(langId);
     }
   }
 

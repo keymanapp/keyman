@@ -1,6 +1,6 @@
 <html>
 <!--
- Copyright (C) 2017-2018 SIL International. All rights reserved.
+ Copyright (C) 2017-2019 SIL International. All rights reserved.
 -->
 
 <head>
@@ -12,13 +12,14 @@
     var device = window.jsInterface.getDeviceType();
     var oskHeight = window.jsInterface.getKeyboardHeight();
     var oskWidth = 0;
+    var fragmentToggle = 0;
     window.addEventListener('load', init, false);
 
     function init() {
       //document.body.style.backgroundColor="transparent";
       //window.console.log('Device type = '+device);
       //window.console.log('Keyboard height = '+oskHeight);
-      var kmw=window['keyman'];
+      var kmw=com.keyman.singleton;
       kmw.init({'app':device,'fonts':'packages/'});
       kmw['util']['setOption']('attachType','manual');
       kmw['oninserttext'] = insertText;
@@ -32,8 +33,36 @@
 
       ta.readOnly = false;
 
+      // Tell KMW the default banner height to use
+      com.keyman.osk.Banner.DEFAULT_HEIGHT = 
+        Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
+      kmw.addEventListener('mm.modelchange', onModelChange);
+
+      notifyHost('pageLoaded');
+    }
+
+    function notifyHost(event, params) {
+      // TODO: Update all other host notifications to use notifyHost instead of directly setting window.location.hash
+      window.setTimeout(function() {
+        // We use a timeout so that the navigation doesn't cause the calling function to abort after the call
+        fragmentToggle = (fragmentToggle + 1) % 100;
+        params = params ? '+'+params : '';
+        window.location.hash = event+'-'+fragmentToggle+params;
+      }, 10);
+    }
+
+    // Update the KMW banner height
+    function setBannerHeight(h) {
+      var kmw=com.keyman.singleton;
+      if (h > 0) {
+        var osk = kmw.osk;
+        osk.banner.height = Math.ceil(h / window.devicePixelRatio);
+      }
+      // Refresh KMW OSK
+      kmw.correctOSKTextSize();
     }
 
     function setOskHeight(h) {
@@ -64,6 +93,17 @@
 
     function beepKeyboard() {
       window.jsInterface.beepKeyboard();
+    }
+
+    function onModelChange(change) {
+      //window.console.log('onModelChange change: ' + change);
+
+      // Refresh KMW OSK
+      var kmw=window['keyman'];
+      kmw['correctOSKTextSize']();
+
+      fragmentToggle = (fragmentToggle + 1) % 100;
+      window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
     }
 
     // Query KMW if a given keyboard uses chiral modifiers.
@@ -121,9 +161,38 @@
       kmw['osk']['show'](true);
     }
 
-    function insertText(dn, s) {
-      //window.console.log('insertText('+ dn +', ' + s +');');
-      window.jsInterface.insertText(dn, s);
+    /**
+     * Inserts the selected string <i>s</i>
+     * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+     * @param s   Text to insert
+     * @param dr  Number of post-caret code points to delete.  (optional)
+     */
+    function insertText(dn, s, dr) {
+      dr = dr || 0; // Sets a default value of zero when dr is undefined
+      //window.console.log('insertText('+ dn +', ' + s +', ' + dr + ');');
+      window.jsInterface.insertText(dn, s, dr);
+    }
+
+    function deregisterModel(modelID) {
+      var kmw=window['keyman'];
+      kmw.modelManager.deregister(modelID);
+    }
+
+    function enableSuggestions(model, mayPredict, mayCorrect) {
+      // Set the options first so that KMW's ModelManager can properly handle model enablement states
+      // the moment we actually register the new model.
+      keyman.osk.banner.setOptions({
+        'mayPredict': mayPredict,
+        'mayCorrect': mayCorrect
+      });
+
+      registerModel(model);
+    }
+
+    function registerModel(model) {
+      var kmw=window['keyman'];
+      //window.console.log('registerModel: ' + model);
+      kmw.registerModel(model);
     }
 
     function resetContext() {
@@ -155,7 +224,6 @@
       kmw['setActiveElement'](ta);
     }
 
-    var fragmentToggle = 0;
     function oskCreateKeyPreview(x,y,w,h,t) {
       fragmentToggle = (fragmentToggle + 1) % 100;
       var div = document.createElement('div');
@@ -187,6 +255,21 @@
         if(shift) {
           hash = hash + '+font=' + 'SpecialOSK';
         }
+        window.location.hash = hash;
+      }
+    }
+
+    function suggestionPopup(obj,custom,x,y,w,h) {
+      if(obj != null) {
+        let s = JSON.stringify(obj);
+
+        fragmentToggle=(fragmentToggle+1) % 100;
+        let hash = 'suggestPopup-' + fragmentToggle;
+
+        hash = hash + '&x=' + encodeURIComponent(x) + '&y=' + encodeURIComponent(y);
+        hash = hash + '&w=' + encodeURIComponent(w) + '&h=' + encodeURIComponent(h);
+        hash = hash + '&suggestion=' + encodeURIComponent(s) + '&custom=' + encodeURIComponent(custom);
+
         window.location.hash = hash;
       }
     }

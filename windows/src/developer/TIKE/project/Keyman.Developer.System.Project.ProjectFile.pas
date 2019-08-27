@@ -294,11 +294,13 @@ type
     FBuildPath: string;
     FWarnDeprecatedCode: Boolean;   // I4866
     FCompilerWarningsAsErrors: Boolean;   // I4865
+    FCheckFilenameConventions: Boolean;
   public
     constructor Create;
     property BuildPath: string read FBuildPath write FBuildPath;
     property WarnDeprecatedCode: Boolean read FWarnDeprecatedCode write FWarnDeprecatedCode;   // I4866
     property CompilerWarningsAsErrors: Boolean read FCompilerWarningsAsErrors write FCompilerWarningsAsErrors;   // I4865
+    property CheckFilenameConventions: Boolean read FCheckFilenameConventions write FCheckFilenameConventions;
   end;
 
 const
@@ -306,6 +308,7 @@ const
 
 function GlobalProjectStateWndHandle: THandle;
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
+procedure ProjectCompilerMessageClear;
 
 implementation
 
@@ -1141,6 +1144,17 @@ begin
   end;
 end;
 
+const
+  MAX_MESSAGES = 100;
+
+var
+  MessageCount: Integer = 0;
+
+procedure ProjectCompilerMessageClear;
+begin
+  MessageCount := 0;
+end;
+
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
 const // from compile.pas
   CERR_FATAL   = $00008000;
@@ -1165,7 +1179,18 @@ begin
   if FLogState = plsWarning then   // I4706
     TProject.CompilerMessageFile.FHasWarning := True;
 
+  if(FLogState <> plsInfo) then
+  begin
+    Inc(MessageCount);
+    if MessageCount > MAX_MESSAGES then
+      Exit(1);
+  end;
+
   TProject.CompilerMessageFile.Log(FLogState, Format('line %d  %s %x: %s', [line, errtype, msgcode, text]));   // I4706
+
+  if (FLogState <> plsInfo) and (MessageCount = MAX_MESSAGES) then
+      TProject.CompilerMessageFile.Log(plsInfo, Format('Warning: line %d  warning 0000: More than %d warnings or errors received; suppressing further messages', [line, MAX_MESSAGES]));
+
   Result := 1;
 end;
 
@@ -1175,6 +1200,7 @@ constructor TProjectOptions.Create;
 begin
   WarnDeprecatedCode := True;   // I4866
   CompilerWarningsAsErrors := False;   // I4865
+  CheckFilenameConventions := True; // default to TRUE for new projects
 end;
 
 type

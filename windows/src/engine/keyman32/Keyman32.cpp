@@ -161,8 +161,26 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 		break;
 	case DLL_PROCESS_DETACH:
     //if(!TestDebugProcess()) return FALSE;
-		UninitialiseProcess(FALSE);
-    Globals_UninitProcess();
+    if (reserved == NULL) {
+      // If reserved == NULL, that means the library is being unloaded, but
+      // the process is not terminating.
+      //
+      // We only cleanup after ourselves if the process is not terminating
+      // because of an issue with the order of DLL detach: if msctf.dll is
+      // detached first, then we end up causing an exception in msctf when
+      // we try to do our cleanup in CloseTSF.
+      //
+      // https://devblogs.microsoft.com/oldnewthing/20120105-00/?p=8683
+      //
+      // See https://github.com/keymanapp/keyman/issues/1723 for details
+      // relating to SumatraPDF. Note that this is hard to reproduce; I
+      // have been unable to reproduce the issue on my test machines.
+      //
+      // Note: Keyman may be violating a loader lock rule by calling 
+      // CloseTSF from here. This needs further investigation...
+      UninitialiseProcess(FALSE);
+      Globals_UninitProcess();
+    }
 		break;
 	case DLL_THREAD_ATTACH:
     //if(!TestDebugProcess()) return FALSE;

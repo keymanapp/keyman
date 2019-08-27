@@ -1,11 +1,57 @@
 // Defines KMW's string extension functions.
 ///<reference path="../text/kmwstring.ts" />
-// Makes TS aware of Window-based type prototypes
-///<reference path="../kmwexthtml.ts" />
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
+// Defines relevant LMLayer-related interfaces.
+///<reference path="../includes/lmMsgs.d.ts" />
+// Defines the KeyEvent type.
+///<reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
+  export class TextTransform implements Transform {
+    readonly insert: string;
+    readonly deleteLeft: number;
+    readonly deleteRight?: number;
+
+    constructor(insert: string, deleteLeft: number, deleteRight?: number) {
+      this.insert = insert;
+      this.deleteLeft = deleteLeft;
+      this.deleteRight = deleteRight || 0;
+    }
+
+    public static readonly nil = new TextTransform('', 0, 0);
+  }
+
+  export class Transcription {
+    readonly token: number;
+    readonly keystroke: KeyEvent;
+    readonly transform: Transform;
+    readonly alternates: Alternate[];
+    readonly preInput: Mock;
+
+    private static tokenSeed: number = 0;
+
+    constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
+      let token = this.token = Transcription.tokenSeed++;
+
+      this.keystroke = keystroke;
+      this.transform = transform;
+      this.alternates = alternates;
+      this.preInput = preInput;
+
+      this.transform.id = this.token;
+
+      // Assign the ID to each alternate, as well.
+      if(alternates) {
+        alternates.forEach(function(alt) {
+          alt.sample.id = token;
+        });
+      }
+    }
+  }
+
+  export type Alternate = ProbabilityMass<Transform>;
+
   export abstract class OutputTarget {
     private _dks: text.DeadkeyTracker;
 
@@ -43,6 +89,99 @@ namespace com.keyman.text {
     protected setDeadkeys(dks: text.DeadkeyTracker) {
       this._dks = dks.clone();
     }
+
+    /**
+     * Determines the basic operations needed to reconstruct the current OutputTarget's text from the prior state specified
+     * by another OutputTarget based on their text and caret positions.
+     * 
+     * This is designed for use as a "before and after" comparison to determine the effect of a single keyboard rule at a time.
+     * As such, it assumes that the caret is immediately after any inserted text.
+     * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
+     */
+    buildTransformFrom(original: OutputTarget): Transform {
+      let to = this.getText();
+      let from = original.getText();
+
+      let fromCaret = original.getDeadkeyCaret();
+      let toCaret = this.getDeadkeyCaret();
+
+      // Step 1:  Determine the number of left-deletions.
+      for(var newCaret=0; newCaret < fromCaret; newCaret++) {
+        if(from._kmwCharAt(newCaret) != to._kmwCharAt(newCaret)) {
+          break;
+        }
+      }
+
+      let deletedLeft = fromCaret - newCaret;
+
+      // Step 2:  Determine the other properties.
+      // Since the 'after' OutputTarget's caret indicates the end of any inserted text, we
+      // can easily calculate the rest.
+      let insertedLength = toCaret - newCaret;
+      let delta = to._kmwSubstr(newCaret, insertedLength);
+
+      let undeletedRight = to._kmwLength() - toCaret;
+      let originalRight = from._kmwLength() - fromCaret;
+
+      return new TextTransform(delta, deletedLeft, originalRight - undeletedRight);
+    }
+
+    buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, alternates?: Alternate[]): Transcription {
+      let transform = this.buildTransformFrom(original);
+
+      // If we ever decide to re-add deadkey tracking, this is the place for it.
+
+      return new Transcription(keyEvent, transform, Mock.from(original), alternates);
+    }
+
+    /**
+     * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
+     * @param original An `OutputTarget` (usually a `Mock`).
+     */
+    restoreTo(original: OutputTarget) {
+      //
+      this.setTextBeforeCaret(original.getTextBeforeCaret());
+      this.setTextAfterCaret(original.getTextAfterCaret());
+
+      // Also, restore the deadkeys!
+      this._dks = original._dks.clone();
+    }
+
+    apply(transform: Transform) {
+      if(transform.deleteRight) {
+        this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
+      }
+
+      if(transform.deleteLeft) {
+        this.deleteCharsBeforeCaret(transform.deleteLeft);
+      }
+
+      if(transform.insert) {
+        this.insertTextBeforeCaret(transform.insert);
+      }
+
+      // We assume that all deadkeys are invalidated after applying a Transform, since
+      // prediction implies we'll be completing a word, post-deadkeys.
+      this._dks.clear();
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected setTextBeforeCaret(s: string): void {
+      // This one's easy enough to provide a default implementation for.
+      this.deleteCharsBeforeCaret(this.getTextBeforeCaret()._kmwLength());
+      this.insertTextBeforeCaret(s);
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'after' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected abstract setTextAfterCaret(s: string): void;
 
     /**
      * Returns the underlying element / document modeled by the wrapper.
@@ -118,6 +257,90 @@ namespace com.keyman.text {
      */
     restoreProperties(){
       // Most element interfaces won't need anything here. 
+    }
+  }
+
+  // Due to some interesting requirements on compile ordering in TS,
+  // this needs to be in the same file as OutputTarget now.
+  export class Mock extends OutputTarget {
+    text: string;
+    caretIndex: number;
+
+    constructor(text?: string, caretPos?: number) {
+      super();
+
+      this.text = text ? text : "";
+      var defaultLength = this.text._kmwLength();
+      this.caretIndex = caretPos ? caretPos : defaultLength;
+    }
+
+    // Clones the state of an existing EditableElement, creating a Mock version of its state.
+    static from(outputTarget: OutputTarget) {
+      let preText = outputTarget.getTextBeforeCaret();
+      let caretIndex = preText._kmwLength();
+
+      // We choose to ignore (rather, pre-emptively remove) any actively-selected text,
+      // as since it's always removed instantly during any text mutation operations.
+      let clone = new Mock(preText + outputTarget.getTextAfterCaret(), caretIndex);
+
+      clone.setDeadkeys(outputTarget.deadkeys());
+
+      return clone;
+    }
+
+    getElement(): HTMLElement {
+      return null;
+    }
+    
+    clearSelection(): void {
+      return;
+    }
+
+    invalidateSelection(): void {
+      return;
+    }
+
+    hasSelection(): boolean {
+      return true;
+    }
+
+    getDeadkeyCaret(): number {
+      return this.caretIndex;
+    }
+
+    setDeadkeyCaret(index: number) {
+      if(index < 0 || index > this.text._kmwLength()) {
+        throw new Error("Provided caret index is out of range.");
+      }
+      this.caretIndex = index;
+    }
+
+    getTextBeforeCaret(): string {
+      return this.text.kmwSubstr(0, this.caretIndex);
+    }
+
+    getTextAfterCaret(): string {
+      return this.text.kmwSubstr(this.caretIndex);
+    }
+
+    getText(): string {
+      return this.text;
+    }
+
+    deleteCharsBeforeCaret(dn: number): void {
+      if(dn >= 0) {
+        this.text = this.text.kmwSubstr(0, this.caretIndex - dn) + this.getTextAfterCaret();
+        this.caretIndex -= dn;
+      }
+    }
+
+    insertTextBeforeCaret(s: string): void {
+      this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
+      this.caretIndex += s.kmwLength();
+    }
+
+    protected setTextAfterCaret(s: string): void {
+      this.text = this.getTextBeforeCaret() + s;
     }
   }
 }

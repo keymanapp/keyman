@@ -7,37 +7,27 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.BuildConfig;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.MapCompat;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,25 +39,22 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public final class KeyboardPickerActivity extends AppCompatActivity implements OnKeyboardDownloadEventListener {
+public final class KeyboardPickerActivity extends AppCompatActivity {
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
-  private static ImageButton addButton = null;
   private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
+
+  // Lists of installed keyboards and installed lexical models
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
-  private static HashMap<String, String> keyboardVersions = null;
-  private static boolean checkingUpdates = false;
-  private static int updateCount = 0;
-  private static int failedUpdateCount = 0;
-  private static ProgressDialog updateProgress;
-  private static boolean didUpdate = false;
-  private static boolean updateCheckFailed = false;
-  private static boolean updateFailed = false;
-  private static Calendar lastUpdateCheck = null;
+  private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
+  private static Dataset storageDataset = null;
+
+  //private static boolean didUpdate = false;
   private static int selectedIndex = 0;
   private static final String TAG = "KeyboardPickerActivity";
 
@@ -88,11 +75,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     final Context context = this;
     setContentView(R.layout.keyboard_picker_list_layout);
 
-    toolbar = (Toolbar) findViewById(R.id.keyboard_picker_toolbar);
+    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+    TextView textView = (TextView) findViewById(R.id.bar_title);
+    textView.setText(getString(R.string.title_keyboards));
 
     closeButton = (Button) findViewById(R.id.close_keyman_button);
     Bundle bundle = getIntent().getExtras();
@@ -127,15 +116,27 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       keyboardsList.add(kbInfo);
 
       // We'd prefer not to overwrite a file if it exists
-      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE),
+        KMManager.KMFilename_KeyboardsList);
       if (!file.exists()) {
-        saveKeyboardsList(context);
+        saveList(context, KMManager.KMFilename_KeyboardsList);
       }
     }
 
-    String[] from = new String[]{KMManager.KMKey_LanguageName, KMManager.KMKey_KeyboardName};
-    int[] to = new int[]{R.id.text1, R.id.text2};
-    listAdapter = new KMKeyboardPickerAdapter(context, keyboardsList, R.layout.list_row_layout3, from, to);
+    lexicalModelsList = getLexicalModelsList(context);
+    if (lexicalModelsList == null) {
+      lexicalModelsList = new ArrayList<HashMap<String, String>>();
+
+      // We'd prefer not to overwrite a file if it exists
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE),
+        KMManager.KMFilename_LexicalModelsList);
+      if (!file.exists()) {
+        saveList(context, KMManager.KMFilename_LexicalModelsList);
+      }
+    }
+
+    // TODO:  Use a persistently-loaded version of the installed dataset.
+    listAdapter = new KMKeyboardPickerAdapter(context, getInstalledDataset(context).keyboards);
     listAdapter.listFont = listFont;
     listView.setAdapter(listAdapter);
     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -157,7 +158,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
           popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
               if (item.getItemId() == R.id.popup_delete) {
-                deleteKeyboard(position);
+                deleteKeyboard(context, position);
                 return true;
               } else {
                 return false;
@@ -172,33 +173,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       }
     });
 
-    addButton = (ImageButton) findViewById(R.id.add_button);
-    addButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        // Check that available keyboard information can be obtained via:
-        // 1. connection to cloud catalog
-        // 2. cached file
-        // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
-          KeyboardPickerActivity.hasKeyboardFromPackage()){
-          dismissOnSelect = false;
-          Intent i = new Intent(context, LanguageListActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-          context.startActivity(i);
-        } else {
-          AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
-          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
-          dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
-          AlertDialog dialog = dialogBuilder.create();
-          dialog.show();
-        }
-      }
-    });
-    if (!canAddNewKeyboard) {
-      addButton.setVisibility(View.GONE);
-    }
-
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
   }
@@ -206,72 +180,26 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
   @Override
   protected void onResume() {
     super.onResume();
-    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     BaseAdapter adapter = (BaseAdapter) listAdapter;
-    adapter.notifyDataSetChanged();
+    if(listAdapter != null) {
+      adapter.notifyDataSetChanged();
+    }
+
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
     if (!shouldCheckKeyboardUpdates)
       return;
-
-    final Context context = this;
-    Handler handler = new Handler();
-    handler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        boolean shouldCheckUpdate = false;
-        if (lastUpdateCheck == null) {
-          SharedPreferences prefs = context.getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          Long lastUpdateCheckTime = prefs.getLong("lastUpdateCheck", 0);
-          if (lastUpdateCheckTime > 0) {
-            lastUpdateCheck = Calendar.getInstance();
-            lastUpdateCheck.setTime(new Date(lastUpdateCheckTime));
-          }
-        }
-
-        if (lastUpdateCheck != null) {
-          Calendar lastChecked = Calendar.getInstance();
-          lastChecked.setTime(lastUpdateCheck.getTime());
-          if (updateCheckFailed || updateFailed) {
-            lastChecked.add(Calendar.HOUR_OF_DAY, 1);
-          } else {
-            lastChecked.add(Calendar.HOUR_OF_DAY, 24);
-          }
-
-          Calendar now = Calendar.getInstance();
-          if (now.compareTo(lastChecked) > 0) {
-            shouldCheckUpdate = true;
-          }
-        } else {
-          shouldCheckUpdate = true;
-        }
-
-        if (shouldCheckUpdate) {
-          updateCheckFailed = false;
-          updateFailed = false;
-          if (!checkingUpdates) {
-            checkKeyboardUpdates(context);
-          }
-        }
-      }
-    }, 1000);
   }
 
   @Override
   protected void onPause() {
     super.onPause();
 
-    // Intentionally not removing KeyboardDownloadEventListener to
-    // ensure onKeyboardDownloadFinished() gets called
-
-    if (didUpdate) {
-      if (KMManager.InAppKeyboard != null) {
-        KMManager.InAppKeyboard.loadKeyboard();
-      }
-      if (KMManager.SystemKeyboard != null) {
-        KMManager.SystemKeyboard.loadKeyboard();
-      }
-      didUpdate = false;
+    if (KMManager.InAppKeyboard != null) {
+      KMManager.InAppKeyboard.loadKeyboard();
+    }
+    if (KMManager.SystemKeyboard != null) {
+      KMManager.SystemKeyboard.loadKeyboard();
     }
   }
 
@@ -306,10 +234,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return pos;
   }
 
-  private static boolean hasKeyboardFromPackage() {
+  protected static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
-      String packageID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-      if (!packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      String customKeyboard = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
+      if (customKeyboard.equalsIgnoreCase("Y")) {
         return true;
       }
     }
@@ -317,37 +245,62 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return false;
   }
 
-  private static boolean saveKeyboardsList(Context context) {
+  private static boolean saveList(Context context, String listName) {
     boolean result;
     try {
-      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), listName);
       ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-      outputStream.writeObject(keyboardsList);
+      if (listName.equalsIgnoreCase(KMManager.KMFilename_KeyboardsList)) {
+        outputStream.writeObject(keyboardsList);
+      } else if (listName.equalsIgnoreCase(KMManager.KMFilename_LexicalModelsList)) {
+        outputStream.writeObject(lexicalModelsList);
+      }
       outputStream.flush();
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save keyboards list. Error: " + e);
+      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
       result = false;
     }
 
     return result;
   }
 
+  /**
+   * Save the list of installed keyboards
+   * @param context
+   * @param list
+   * @return boolean - Status if the keyboard list was successfully saved
+   */
   protected static boolean updateKeyboardsList(Context context, ArrayList<HashMap<String, String>> list) {
     boolean result;
     keyboardsList = list;
-    result = saveKeyboardsList(context);
+    result = saveList(context, KMManager.KMFilename_KeyboardsList);
+    notifyKeyboardsUpdate(context);
     return result;
   }
 
-  private void setSelection(int position) {
+  /**
+   * Save the list of installed lexical models
+   * @param context
+   * @param list
+   * @return boolean - Status if the lexical models list was successfully saved
+   */
+  protected static boolean updateLexicalModelsList(Context context, ArrayList<HashMap<String, String>> list) {
+    boolean result;
+    lexicalModelsList = list;
+    result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+    notifyLexicalModelsUpdate(context);
+    return result;
+  }
+
+  private static void setSelection(int position) {
     listView.setItemChecked(position, true);
     listView.setSelection(position);
     selectedIndex = position;
   }
 
-  private void switchKeyboard(int position) {
+  private static void switchKeyboard(int position) {
     setSelection(position);
     HashMap<String, String> kbInfo = keyboardsList.get(position);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
@@ -378,16 +331,21 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
       String pkgID = keyboardInfo.get(KMManager.KMKey_PackageID);
       String kbID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
       String langID = keyboardInfo.get(KMManager.KMKey_LanguageID);
+
+      // TODO:  Possible optimization - do we have anything with this language code already?
+      //        Only invalidate the lexical cache if not.
+      CloudRepository.shared.invalidateLexicalModelCache(context);
+
       if (pkgID != null && kbID != null && langID != null) {
         String kbKey = String.format("%s_%s", langID, kbID);
         if (kbKey.length() >= 3) {
           int x = getKeyboardIndex(context, kbKey);
           if (x >= 0) {
             keyboardsList.set(x, keyboardInfo);
-            result = saveKeyboardsList(context);
+            result = saveList(context, KMManager.KMFilename_KeyboardsList);
           } else {
             keyboardsList.add(keyboardInfo);
-            result = saveKeyboardsList(context);
+            result = saveList(context, KMManager.KMFilename_KeyboardsList);
             if (!result) {
               keyboardsList.remove(keyboardsList.size() - 1);
             }
@@ -395,6 +353,48 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
         }
       }
     }
+
+    notifyKeyboardsUpdate(context);
+
+    return result;
+  }
+
+  protected static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+    boolean result = false;
+
+    if (lexicalModelsList == null) {
+      // First, try loading our existing (file-backed) model list.
+      lexicalModelsList = getLexicalModelsList(context);
+      // If there is no existing list, time to build one from scratch.
+      if(lexicalModelsList == null) {
+        lexicalModelsList = new ArrayList<>();
+      }
+    }
+
+    if (lexicalModelInfo != null) {
+      String pkgID = lexicalModelInfo.get(KMManager.KMKey_PackageID);
+      String modelID = lexicalModelInfo.get(KMManager.KMKey_LexicalModelID);
+      String langID = lexicalModelInfo.get(KMManager.KMKey_LanguageID);
+
+      if (pkgID != null && modelID != null && langID != null) {
+        String lmKey = String.format("%s_%s_%s", pkgID, langID, modelID);
+        if (lmKey.length() >= 5) {
+          int x = getLexicalModelIndex(context, lmKey);
+          if (x >= 0) {
+            lexicalModelsList.set(x, lexicalModelInfo);
+            result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+          } else {
+            lexicalModelsList.add(lexicalModelInfo);
+            result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+            if (!result) {
+              lexicalModelsList.remove(lexicalModelsList.size() - 1);
+            }
+          }
+        }
+      }
+    }
+
+    notifyLexicalModelsUpdate(context);
 
     return result;
   }
@@ -407,47 +407,185 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
 
     if (keyboardsList != null && position >= 0 && position < keyboardsList.size()) {
       keyboardsList.remove(position);
-      result = saveKeyboardsList(context);
+      result = saveList(context, KMManager.KMFilename_KeyboardsList);
     }
+
+    notifyKeyboardsUpdate(context);
 
     return result;
   }
 
-  protected void deleteKeyboard(int position) {
+  protected static void deleteKeyboard(Context context, int position) {
     int curKbPos = getCurrentKeyboardIndex();
-    boolean result = removeKeyboard(this, position);
-    ;
+    boolean result = removeKeyboard(context, position);
 
     if (result) {
-      Toast.makeText(this, "Keyboard deleted", Toast.LENGTH_SHORT).show();
+      Toast.makeText(context, "Keyboard deleted", Toast.LENGTH_SHORT).show();
       BaseAdapter adapter = (BaseAdapter) listAdapter;
-      adapter.notifyDataSetChanged();
-      if (position == curKbPos) {
+      if(adapter != null) {
+        adapter.notifyDataSetChanged();
+      }
+      if (position == curKbPos && listView != null) {
         switchKeyboard(0);
-      } else {
+      } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = getCurrentKeyboardIndex();
         setSelection(curKbPos);
       }
     }
+
+    notifyKeyboardsUpdate(context);
   }
 
+  /**
+   * getModelIDFromPosition - Get the lexical model ID at a given position
+   * @param context
+   * @param position - int position of the lexical model
+   * @return String - model ID. Blank if invalid position
+   */
+  protected static String getModelIDFromPosition(Context context, int position) {
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    String modelID = "";
+    if (lexicalModelsList != null && position >= 0 && position < lexicalModelsList.size()) {
+      HashMap<String, String> lexicalModelInfo = lexicalModelsList.get(position);
+      modelID = lexicalModelInfo.get(KMManager.KMKey_LexicalModelID);
+    }
+
+    return modelID;
+  }
+
+  /**
+   * removeLexicalModel - Remove lexical model at a given position from the installed lexical models list
+   * @param context
+   * @param position - int position of the lexical model to remove
+   * @return boolean - result of the model could be removed and list saved
+   */
+  protected static boolean removeLexicalModel(Context context, int position) {
+    boolean result = false;
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null && position >= 0 && position < lexicalModelsList.size()) {
+      lexicalModelsList.remove(position);
+      result = saveList(context, KMManager.KMFilename_LexicalModelsList);
+    }
+
+    notifyLexicalModelsUpdate(context);
+
+    return result;
+  }
+
+
+  /**
+   * deleteLexicalModel - Remove lexical model from the installed list
+   * and deregister the model with KMW
+   * @param context
+   * @param position - int position in the models list
+   */
+  protected static void deleteLexicalModel(Context context, int position, boolean silenceNotification) {
+    String modelID = getModelIDFromPosition(context, position);
+    boolean result = removeLexicalModel(context, position);
+
+    if (result) {
+      if(!silenceNotification) {
+        Toast.makeText(context, "" + "Model deleted", Toast.LENGTH_SHORT).show();
+      }
+      KMManager.deregisterLexicalModel(modelID);
+    }
+
+    notifyLexicalModelsUpdate(context);
+  }
+
+  // Gets a raw list of installed lexical models.
   @SuppressWarnings("unchecked")
-  protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
+  private static ArrayList<HashMap<String, String>> getList(Context context, String filename) {
     ArrayList<HashMap<String, String>> list = null;
 
-    File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), KMManager.KMFilename_KeyboardsList);
+    File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), filename);
     if (file.exists()) {
       try {
         ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e(TAG, "Failed to read keyboards list. Error: " + e);
+        Log.e(TAG, "Failed to read " + filename + ". Error: " + e);
         list = null;
       }
     }
 
     return list;
+  }
+
+  public static Dataset getInstalledDataset(Context context) {
+    if(storageDataset != null) {
+      return storageDataset;
+    }
+
+    List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
+    List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
+
+    for(Map<String, String> map: kbdMapList) {
+      kbdsList.add(new Keyboard(map));
+    }
+
+    List<? extends Map<String, String>> lexMapList = getLexicalModelsList(context);
+    if(lexMapList == null) {
+      lexMapList = new ArrayList<>(0);
+    }
+    List<LexicalModel> lexList = new ArrayList<>(lexMapList.size());
+
+    for(Map<String, String> map: lexMapList) {
+      lexList.add(new LexicalModel(map));
+    }
+
+    storageDataset = new Dataset(context);
+    storageDataset.keyboards.addAll(kbdsList);
+    storageDataset.lexicalModels.addAll(lexList);
+
+    return storageDataset;
+  }
+
+  // While the two following methods aren't exactly ideal, they should be enough to get the job done
+  // for 12.0 before a more complete refactor of this class is done.
+  protected static void notifyKeyboardsUpdate(Context context) {
+    Dataset storage = getInstalledDataset(context);
+    storage.keyboards.setNotifyOnChange(false);
+    storage.keyboards.clear();
+
+    List<? extends Map<String, String>> mapList = getKeyboardsList(context);
+    List<Keyboard> kbdList = new ArrayList<>(mapList.size());
+    for(Map<String, String> map: mapList) {
+      kbdList.add(new Keyboard(map));
+    }
+    storage.keyboards.addAll(kbdList);
+    storage.keyboards.notifyDataSetChanged();
+  }
+
+  protected static void notifyLexicalModelsUpdate(Context context) {
+    Dataset storage = getInstalledDataset(context);
+    storage.lexicalModels.setNotifyOnChange(false);
+    storage.lexicalModels.clear();
+
+    List<? extends Map<String, String>> mapList = getLexicalModelsList(context);
+    List<LexicalModel> lexList = new ArrayList<>(mapList.size());
+    for(Map<String, String> map: mapList) {
+      lexList.add(new LexicalModel(map));
+    }
+    storage.lexicalModels.addAll(lexList);
+
+    storage.lexicalModels.notifyDataSetChanged();
+  }
+
+  protected static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
+    return getList(context, KMManager.KMFilename_KeyboardsList);
+  }
+
+  protected static ArrayList<HashMap<String, String>> getLexicalModelsList(Context context) {
+    return getList(context, KMManager.KMFilename_LexicalModelsList);
   }
 
   protected static boolean containsKeyboard(Context context, String keyboardKey) {
@@ -467,6 +605,26 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
 
     return kbKeys.contains(keyboardKey);
+  }
+
+  public static boolean containsLexicalModel(Context context, String lexicalModelKey) {
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList == null) {
+      return false;
+    }
+
+    for(HashMap<String, String> lmInfo : lexicalModelsList) {
+      String key = String.format("%s_%s_%s", lmInfo.get(KMManager.KMKey_PackageID),
+        lmInfo.get(KMManager.KMKey_LanguageID), lmInfo.get(KMManager.KMKey_LexicalModelID));
+      if (lexicalModelKey.equalsIgnoreCase(key)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   protected static int getCurrentKeyboardIndex(Context context) {
@@ -526,6 +684,58 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return index;
   }
 
+  /**
+   * Get the list of associated keyboards for a given language ID
+   * @param langId
+   * @return ArrayList of keyboard
+   */
+  public static ArrayList<HashMap<String, String>> getAssociatedKeyboards(String langId) {
+    if (keyboardsList != null) {
+      ArrayList<HashMap<String, String>> associatedKeyboards = new ArrayList<HashMap<String, String>>();
+      for (HashMap<String, String> keyboardInfo: keyboardsList) {
+        if (keyboardInfo.get(KMManager.KMKey_LanguageID).equalsIgnoreCase(langId)) {
+          keyboardInfo.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
+          keyboardInfo.put("isEnabled", "true");
+          associatedKeyboards.add(keyboardInfo);
+        }
+      }
+      return associatedKeyboards;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the index of a lexical model key in the list of installed lexical models.
+   * @param context
+   * @param lexicalModelKey - key of "{package ID}_{language ID}_{lexical model ID}"
+   * @return Index >= 0 if the lexical model key exists. Otherwise -1
+   */
+  protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
+    int index = -1;
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i=0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        String pkgId = lmInfo.get(KMManager.KMKey_PackageID);
+        String langId = lmInfo.get(KMManager.KMKey_LanguageID);
+        String lmId = lmInfo.get(KMManager.KMKey_LexicalModelID);
+        String lmKey = String.format("%s_%s_%s", pkgId, langId, lmId);
+        if (lmKey.equals(lexicalModelKey)) {
+          index = i;
+          break;
+        }
+      }
+    }
+
+    return index;
+  }
+
   protected static HashMap<String, String> getKeyboardInfo(Context context, int index) {
     if (index < 0) {
       return null;
@@ -547,6 +757,23 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     return null;
   }
 
+  protected static HashMap<String, String> getLexicalModelInfo(Context context,int index) {
+    if (index < 0) {
+      return null;
+    }
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null && index < lexicalModelsList.size()) {
+      HashMap<String, String> lmInfo = lexicalModelsList.get(index);
+      return lmInfo;
+    }
+
+    return null;
+  }
+
   protected static void showLanguageList(Context context) {
     if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
       Intent i = new Intent(context, LanguageListActivity.class);
@@ -562,239 +789,17 @@ public final class KeyboardPickerActivity extends AppCompatActivity implements O
     }
   }
 
-  private static void checkKeyboardUpdates(final Context context) {
-    new AsyncTask<Void, Integer, Integer>() {
-      private final boolean hasConnection = KMManager.hasConnection(context);
-      private ProgressDialog progressDialog;
-      JSONParser jsonParser = new JSONParser();
-
-      @Override
-      protected void onPreExecute() {
-        super.onPreExecute();
-        checkingUpdates = true;
-        if (hasConnection) {
-          progressDialog = new ProgressDialog(context);
-          progressDialog.setMessage(context.getString(R.string.checking_keyboard_updates));
-          progressDialog.setCancelable(false);
-          if (!((AppCompatActivity) context).isFinishing()) {
-            progressDialog.show();
-          } else {
-            cancel(true);
-            progressDialog = null;
-          }
-        }
-      }
-
-      @Override
-      protected Integer doInBackground(Void... voids) {
-        int ret = 0;
-        if (hasConnection && !isCancelled()) {
-          try {
-            String deviceType = context.getString(R.string.device_type);
-            if (deviceType.equals("AndroidTablet")) {
-              deviceType = "androidtablet";
-            } else {
-              deviceType = "androidphone";
-            }
-
-            keyboardVersions = new HashMap<String, String>();
-            int len = keyboardsList.size();
-            for (int i = 0; i < len; i++) {
-              String packageID = keyboardsList.get(i).get(KMManager.KMKey_PackageID);
-              String languageID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
-              String keyboardID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
-              String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
-              String url = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
-                KMKeyboardDownloaderActivity.kKeymanApiBaseURL, languageID, keyboardID,  BuildConfig.VERSION_NAME, deviceType);
-              JSONObject kbData = jsonParser.getJSONObjectFromUrl(url);
-              JSONObject language = kbData.optJSONObject(KMKeyboardDownloaderActivity.KMKey_Language);
-              JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-              JSONObject keyboard = keyboards.getJSONObject(0);
-              String newKbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-              String kbKey = String.format("%s_%s", languageID, keyboardID);
-              if (keyboardVersions.get(kbKey) == null) {
-                keyboardVersions.put(kbKey, newKbVersion);
-              }
-
-              if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
-                ret++;
-              }
-            }
-          } catch (Exception e) {
-            Log.e(TAG, "Failed to compare keyboard version. Error: " + e);
-            keyboardVersions = null;
-            ret = -1;
-          }
-        }
-
-        return ret;
-      }
-
-      @Override
-      protected void onProgressUpdate(Integer... progress) {
-        // Do nothing
-      }
-
-      @Override
-      protected void onPostExecute(Integer result) {
-        if (progressDialog != null && progressDialog.isShowing()) {
-          try {
-            progressDialog.dismiss();
-            progressDialog = null;
-          } catch (Exception e) {
-            progressDialog = null;
-          }
-        }
-
-        if (result > 0) {
-          failedUpdateCount = 0;
-          updateCount = result;
-          AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-          dialogBuilder.setTitle(context.getString(R.string.keyboard_updates_available));
-          dialogBuilder.setMessage(context.getString(R.string.confirm_update));
-          dialogBuilder.setPositiveButton(context.getString(R.string.label_update), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-              // Update keyboards
-              if (KMManager.hasConnection(context)) {
-                int len = keyboardsList.size();
-                for (int i = 0; i < len; i++) {
-                  String pkgID = keyboardsList.get(i).get(KMManager.KMKey_PackageID);
-                  String kbID = keyboardsList.get(i).get(KMManager.KMKey_KeyboardID);
-                  String langID = keyboardsList.get(i).get(KMManager.KMKey_LanguageID);
-                  String kbKey = String.format("%s_%s", langID, kbID);
-                  String langName = keyboardsList.get(i).get(KMManager.KMKey_LanguageName);
-                  String kbName = keyboardsList.get(i).get(KMManager.KMKey_KeyboardName);
-                  String kbVersion = keyboardsList.get(i).get(KMManager.KMKey_KeyboardVersion);
-                  String newKbVersion = keyboardVersions.get(kbKey);
-                  if (newKbVersion != null) {
-                    keyboardVersions.put(kbKey, newKbVersion);
-                    if (FileUtils.compareVersions(newKbVersion, kbVersion) == FileUtils.VERSION_GREATER) {
-                      if (updateProgress == null || !updateProgress.isShowing()) {
-                        updateProgress = new ProgressDialog(context);
-                        updateProgress.setMessage(context.getString(R.string.updating_keyboards));
-                        updateProgress.setCancelable(false);
-                        updateProgress.show();
-                      }
-
-                      Bundle bundle = new Bundle();
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, pkgID);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, kbID);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, langID);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, kbName);
-                      bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, langName);
-                      bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
-                      Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
-                      intent.putExtras(bundle);
-                      context.startActivity(intent);
-                    }
-                  }
-                }
-              } else {
-                Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-                checkingUpdates = false;
-              }
-            }
-          });
-
-          dialogBuilder.setNegativeButton(context.getString(R.string.label_later), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-              lastUpdateCheck = Calendar.getInstance();
-              checkingUpdates = false;
-            }
-          });
-
-          AlertDialog dialog = dialogBuilder.create();
-          if (!((AppCompatActivity) context).isFinishing()) {
-            dialog.setOnCancelListener(new OnCancelListener() {
-              @Override
-              public void onCancel(DialogInterface dialog) {
-                lastUpdateCheck = Calendar.getInstance();
-                checkingUpdates = false;
-              }
-            });
-            dialog.show();
-          } else {
-            checkingUpdates = false;
-          }
-        } else if (result == 0) {
-          Toast.makeText(context, "All keyboards are up to date!", Toast.LENGTH_SHORT).show();
-          lastUpdateCheck = Calendar.getInstance();
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          SharedPreferences.Editor editor = prefs.edit();
-          editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
-          editor.commit();
-          checkingUpdates = false;
-        } else {
-          Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
-          lastUpdateCheck = Calendar.getInstance();
-          updateCheckFailed = true;
-          checkingUpdates = false;
-        }
-      }
-    }.execute();
-  }
-
-  @Override
-  public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
-    // Do nothing
-  }
-
-  @Override
-  public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    if (result > 0) {
-      didUpdate = true;
-      String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-      String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String kbKey = String.format("%s_%s", languageID, keyboardID);
-      int index = getKeyboardIndex(this, kbKey);
-      if (index == -1) {
-        // Add the downloaded keyboard if not found
-        addKeyboard(this, keyboardInfo);
-        index = getKeyboardIndex(this, kbKey);
-      }
-      keyboardsList.set(index, keyboardInfo);
-      saveKeyboardsList(this);
-    } else if (result < 0) {
-      failedUpdateCount++;
+  static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+    String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
+    String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
+    String kbKey = String.format("%s_%s", languageID, keyboardID);
+    int index = getKeyboardIndex(context, kbKey);
+    if (index == -1) {
+      // Add the downloaded keyboard if not found
+      addKeyboard(context, keyboardInfo);
+      index = getKeyboardIndex(context, kbKey);
     }
-
-    if (updateCount > 0) {
-      updateCount--;
-    }
-
-    if (updateCount == 0 && updateProgress != null && updateProgress.isShowing()) {
-      if (updateProgress != null && updateProgress.isShowing()) {
-        try {
-          updateProgress.dismiss();
-          updateProgress = null;
-        } catch (Exception e) {
-          updateProgress = null;
-        }
-      }
-
-      if (failedUpdateCount > 0) {
-        Toast.makeText(this, "One or more keyboards failed to update!", Toast.LENGTH_SHORT).show();
-        keyboardVersions = null;
-        lastUpdateCheck = Calendar.getInstance();
-        updateFailed = true;
-        checkingUpdates = false;
-      } else {
-        Toast.makeText(this, "Keyboards successfully updated!", Toast.LENGTH_SHORT).show();
-        lastUpdateCheck = Calendar.getInstance();
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
-        editor.commit();
-        checkingUpdates = false;
-      }
-    }
-    if (updateProgress != null && updateProgress.isShowing()) {
-      updateProgress.dismiss();
-    }
-  }
-
-  @Override
-  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // Do nothing
+    keyboardsList.set(index, keyboardInfo);
+    saveList(context, KMManager.KMFilename_KeyboardsList);
   }
 }

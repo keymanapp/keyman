@@ -10,6 +10,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMInputMethodBrowserClientEventHandler.h"
 #import "KMInputMethodSafariClientEventHandler.h"
+#import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 
 @implementation KMInputController
@@ -40,17 +41,30 @@ NSMutableArray *servers;
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    return (NSEventMaskKeyDown);
+    return NSEventMaskKeyDown | NSEventMaskFlagsChanged;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
     if ([self.AppDelegate debugMode])
-        NSLog(@"Event = %@", event);
+        NSLog(@"handleEvent: event = %@", event);
     
-    if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil)
+    if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"handleEvent: not handling event");
         return NO; // Not sure this can ever happen.
+    }
     
     return [_eventHandler handleEvent:event client:sender];
+}
+
+// Passthrough from the app delegate low level event hook
+// to the input method event handler for Delete Back. 
+- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event {
+    if(_eventHandler != nil) {
+        return [_eventHandler handleDeleteBackLowLevel:event];
+    }
+
+    return NO;
 }
 
 - (void)activateServer:(id)sender {
@@ -80,7 +94,9 @@ NSMutableArray *servers;
             _eventHandler = [[KMInputMethodBrowserClientEventHandler alloc] init];
         }
         else {
-            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId];
+            // We cache the client for use with events sourced from the low level tap
+            // where we don't necessarily have any access to the current client.
+            _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
         }
     }
 }
@@ -118,6 +134,7 @@ NSMutableArray *servers;
         }
     }
 }
+
 
 /*
 - (NSDictionary *)modes:(id)sender {
@@ -166,6 +183,7 @@ NSMutableArray *servers;
     return self.AppDelegate.kmx;
 }
 
+
 - (void)menuAction:(id)sender {
     NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
     NSInteger itag = mItem.tag;
@@ -174,9 +192,18 @@ NSMutableArray *servers;
     if (itag == 2) {
         // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
         // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-        // TODO: This bug should be fixed in 10.13.4, so after that has been available for a few weeks, we
-        // can create a PR for branch mac-revert-high-sierra-showPreferences-workaround and merge it.
-        [self.AppDelegate showConfigurationWindow];
+        // rrb: where Apple's API is broken (10.13.1-10.13.3) call our workaround, otherwise, call showPreferences
+        u_int16_t systemVersion = [KMOSVersion SystemVersion];
+        if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
+        {
+            NSLog(@"Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
+            [self.AppDelegate showConfigurationWindow]; // call our workaround
+        }
+        else
+        {
+            NSLog(@"Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
+            [self showPreferences:sender]; // call Apple API
+        }
     }
     else if (itag == 3) {
         [self.AppDelegate showOSK];
@@ -212,6 +239,7 @@ NSMutableArray *servers;
         [self.AppDelegate setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
         [self.AppDelegate setContextBuffer:nil];
         [self.AppDelegate setSelectedKeyboard:path];
+        [self.AppDelegate loadSavedStores];
         if (kvk != nil && self.AppDelegate.alwaysShowOSK)
             [self.AppDelegate showOSK];
     }

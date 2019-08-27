@@ -211,7 +211,9 @@ type
     FTabStop: string;   // I3681
     fMnemonic: Boolean;
     FCompilerWarningsAsErrors: Boolean;
-    FTouchLayoutFont: string;   // I4872
+    FTouchLayoutFont: string;
+    FFix183_LadderLength: Integer;
+    FCloseBrace: Boolean;   // I4872
 
     function JavaScript_String(ch: DWord): string;  // I2242
 
@@ -227,8 +229,10 @@ type
     function JavaScript_Key(fkp: PFILE_KEY; FMnemonic: Boolean): Integer;
     function JavaScript_KeyAsString(fkp: PFILE_KEY; FMnemonic: Boolean): string;
     function JavaScript_ContextLength(Context: PWideChar): Integer;
-    function JavaScript_OutputString(fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
+    function JavaScript_OutputString(FTabstops: string; fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
     function JavaScript_ContextMatch(fkp: PFILE_KEY; context: PWideChar): string;
+    function JavaScript_Rule(FTabStops, FElse: string; fgp: PFILE_GROUP; fkp: PFILE_KEY): string;
+    function JavaScript_Rules(fgp: PFILE_GROUP): string;
     function JavaScript_CompositeContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function JavaScript_FullContextValue(fkp: PFILE_KEY; pwsz: PWideChar): string;
     function RuleIsExcludedByPlatform(fkp: PFILE_KEY): Boolean;
@@ -264,6 +268,7 @@ uses
 
   CompileErrorCodes,
   JsonUtil,
+  KeymanDeveloperOptions,
   KeyboardParser,
   Keyman.System.KeyboardUtils,
   KeymanWebKeyCodes,
@@ -377,6 +382,7 @@ end;
 constructor TCompileKeymanWeb.Create;
 begin
   FillChar(fk, sizeof(fk), 0);
+  FFix183_LadderLength := FKeymanDeveloperOptions.Fix183_LadderLength; // How frequently to break ladders
 end;
 
 destructor TCompileKeymanWeb.Destroy;
@@ -637,6 +643,142 @@ begin
     else Result := JavaScript_CompositeContextValue(fkp, context);
 end;
 
+function TCompileKeymanWeb.JavaScript_Rule(FTabStops, FElse: string; fgp: PFILE_GROUP; fkp: PFILE_KEY): string;
+var
+  predicate, linecomment: string;
+  FIndent: string;
+begin
+  Result := '';
+
+  if (fkp.Line > 0) and FDebug   // I4384
+    then linecomment := Format('   // Line %d', [fkp.Line])   // I4373
+    else linecomment := '';
+
+  if xstrlen(fkp.dpContext) > 0
+    then predicate := JavaScript_ContextMatch(fkp, fkp.dpContext)
+    else predicate := '1'; // Always pass
+
+  FIndent := FTabStops+FTabStop;
+  FCloseBrace := True;
+  Result := Result + Format('%s%sif(%s){%s', [
+    FTabStops,
+    FElse,
+    predicate,
+    nl
+    ]);
+
+  if(fgp.fUsingKeys)                                                                                        // I1959
+    then Result := Result + Format('%sr=m=1;%s%s', [FIndent,linecomment,JavaScript_OutputString(FIndent, fkp, fkp.dpOutput, fgp)])    // I1959   // I3681
+    else Result := Result + Format('%sm=1;%s%s', [FIndent,linecomment,JavaScript_OutputString(FIndent, fkp, fkp.dpOutput, fgp)]);    // I1959   // I3681
+  if not FCloseBrace
+    then Result := Result + nl
+    else Result := Result + Format('%s%s}%s', [nl, FTabStops, nl]);   // I3681
+end;
+
+function TCompileKeymanWeb.JavaScript_Rules(fgp: PFILE_GROUP): string;
+  function IsEqualKey(k1, k2: PFILE_KEY): Boolean;
+  begin
+    Result :=
+      (JavaScript_Key(k1, FMnemonic) = JavaScript_Key(k2, FMnemonic)) and
+      (JavaScript_Shift(k1, FMnemonic) = JavaScript_Shift(k2, FMnemonic));
+  end;
+
+var
+  j, j2: Integer;
+  HasRules: Boolean;
+  fkp2, fkp: PFILE_KEY;
+  processed_rule: array of Boolean;
+  LocalHasRules: Boolean;
+  LocalCounter: Integer;
+  Counter: Integer;
+begin
+  Result := '';
+  fkp := fgp.dpKeyArray;
+  HasRules := False;
+
+  SetLength(processed_rule, fgp.cxKeyArray);
+  for j := 0 to Integer(fgp.cxKeyArray) - 1 do
+    processed_rule[j] := False;
+
+  j := 0;
+  Counter := 0;
+  while j < Integer(fgp.cxKeyArray) do    // I1964
+  begin
+    if not processed_rule[j] and not RuleIsExcludedByPlatform(fkp) then
+    begin
+      // Break down by key code
+      // We know the rules are sorted by context length and then key code.
+      // First pass, break the grouping down by key code.
+
+      if fgp.fUsingKeys then
+      begin
+        Result := Result + Format('%s%sif(k.KKM(e,%s,%s)) {%s',
+          [
+          FTabStop+FTabStop,
+          IfThen(HasRules, 'else ', ''),
+          JavaScript_ShiftAsString(fkp, fMnemonic),
+          JavaScript_KeyAsString(fkp, fMnemonic),
+          nl
+          ]);
+
+        HasRules := True;
+        Inc(Counter);
+
+        LocalHasRules := False;
+        fkp2 := fkp;
+        j2 := j;
+        LocalCounter := 0;
+        while (j < Integer(fgp.cxKeyArray)) do
+        begin
+          if not processed_rule[j] and not RuleIsExcludedByPlatform(fkp) and IsEqualKey(fkp, fkp2) then
+          begin
+            processed_rule[j] := True;
+            Result := Result + JavaScript_Rule(FTabStop + FTabStop + FTabStop, IfThen(LocalHasRules, 'else ', ''), fgp, fkp);
+            Inc(LocalCounter);
+
+            if (FFix183_LadderLength <> 0) and ((LocalCounter mod FFix183_LadderLength) = 0) then
+            begin
+              // Break if/else ladders
+              Result := Result + Format('%sif(m) {}%s', [FTabStop + FTabStop + FTabStop, nl]);
+            end;
+            LocalHasRules := True;
+          end;
+
+          Inc(fkp);
+          Inc(j);
+        end;
+
+        Result := Result + FTabStop + FTabStop + '}' + nl;
+        fkp := fkp2;
+        j := j2 + 1;
+        Inc(fkp);
+        // Inc(j);
+      end
+      else
+      begin
+        // TODO: context character level switches instead of full context comparisons
+        Result := Result + JavaScript_Rule(FTabStop + FTabStop + FTabStop, IfThen(HasRules, 'else ', ''), fgp, fkp);
+        HasRules := True;
+        Inc(Counter);
+        Inc(fkp);
+        Inc(j);
+      end;
+
+      if (FFix183_LadderLength <> 0) and ((Counter mod FFix183_LadderLength) = 0) then
+      begin
+        // Break if/else ladders
+        // We need to only match if no previous line is matched (i.e. m is false)
+        Result := Result + Format('%sif(m) {}%s', [FTabStop + FTabStop + FTabStop, nl]);
+      end;
+    end
+    else
+    begin
+      Inc(fkp);
+      Inc(j);
+    end;
+  end;
+end;
+
 const // I1585 - add space to conversion
   USEnglishUnshift: WideString = ' `'     + '1234567890' + '-' +  '='  + 'qwertyuiop' + '['  + ']'  + '\'  + 'asdfghjkl' + ';'  + '''' + 'zxcvbnm' + ','  + '.'  + '/';
   USEnglishShift: WideString   = #$FF'~'  + '!@#$%^&*()' + '_' +  '+'  + 'QWERTYUIOP' + '{'  + '}'  + '|'  + 'ASDFGHJKL' + ':'  + '"'  + 'ZXCVBNM' + '<'  + '>'  + '?';
@@ -738,7 +880,7 @@ begin
   end;
 end;
 
-function TCompileKeymanWeb.JavaScript_OutputString(fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
+function TCompileKeymanWeb.JavaScript_OutputString(FTabstops: string; fkp: PFILE_KEY; pwszOutput: PWideChar; fgp: PFILE_GROUP): string;
 var
   i, n, len: Integer;
   InQuotes: Boolean;
@@ -816,7 +958,7 @@ var
   end;
 
 begin
-  nlt := nl + FTabstop+FTabstop+FTabstop;   // I3681
+  nlt := nl + FTabStops;   // I3681
   Result := '';
 	InQuotes := False;
 
@@ -1869,47 +2011,55 @@ begin
 
     fkp := fgp.dpKeyArray;
     HasRules := False;
-		for j := 0 to Integer(fgp.cxKeyArray) - 1 do    // I1964
+
+    if FFix183_LadderLength <> 0 then
     begin
-      if not RuleIsExcludedByPlatform(fkp) then
+      Result := Result + JavaScript_Rules(fgp);
+    end
+    else
+    begin
+      for j := 0 to Integer(fgp.cxKeyArray) - 1 do    // I1964
       begin
-        Result := Result + FTabstop+FTabstop;   // I3681
-        if HasRules then Result := Result + 'else ';
-        HasRules := TRue;
-        if fgp.fUsingKeys then
+        if not RuleIsExcludedByPlatform(fkp) then
         begin
-            Result := Result + Format('if(k.KKM(e,%s,%s)',
-              [JavaScript_ShiftAsString(fkp, fMnemonic),
-              JavaScript_KeyAsString(fkp, fMnemonic)]);
+          Result := Result + FTabstop+FTabstop;   // I3681
+          if HasRules then Result := Result + 'else ';
+          HasRules := TRue;
+          if fgp.fUsingKeys then
+          begin
+              Result := Result + Format('if(k.KKM(e,%s,%s)',
+                [JavaScript_ShiftAsString(fkp, fMnemonic),
+                JavaScript_KeyAsString(fkp, fMnemonic)]);
+          end;
+
+          if xstrlen(fkp.dpContext) > 0 then
+          begin
+            if not fgp.fUsingKeys
+              then Result := Result + 'if('
+              else Result := Result + '&&';
+
+            Result := Result + JavaScript_ContextMatch(fkp, fkp.dpContext);
+          end
+          else if not fgp.fUsingKeys then
+            Result := Result + 'if(1';
+
+          if (fkp.Line > 0) and FDebug   // I4384
+            then linecomment := Format('   // Line %d', [fkp.Line])   // I4373
+            else linecomment := '';
+
+          Result := Result + Format(
+            ') {%s%s'+
+            '%s',
+            [linecomment, nl,
+            FTabstop+FTabstop+FTabstop]);   // I3681
+          if(fgp.fUsingKeys)                                                                                        // I1959
+            then Result := Result + Format('r=m=1;%s', [JavaScript_OutputString(FTabStop + FTabStop + FTabStop, fkp, fkp.dpOutput, fgp)])    // I1959   // I3681
+            else Result := Result + Format('m=1;%s', [JavaScript_OutputString(FTabStop + FTabStop + FTabStop, fkp, fkp.dpOutput, fgp)]);    // I1959   // I3681
+          Result := Result + Format('%s%s}%s', [nl, FTabstop+FTabstop, nl]);   // I3681
         end;
-
-        if xstrlen(fkp.dpContext) > 0 then
-        begin
-          if not fgp.fUsingKeys
-            then Result := Result + 'if('
-            else Result := Result + '&&';
-
-          Result := Result + JavaScript_ContextMatch(fkp, fkp.dpContext);
-        end
-        else if not fgp.fUsingKeys then
-          Result := Result + 'if(1';
-
-        if (fkp.Line > 0) and FDebug   // I4384
-          then linecomment := Format('   // Line %d', [fkp.Line])   // I4373
-          else linecomment := '';
-
-        Result := Result + Format(
-          ') {%s%s'+
-          '%s',
-          [linecomment, nl,
-          FTabstop+FTabstop+FTabstop]);   // I3681
-        if(fgp.fUsingKeys)                                                                                        // I1959
-          then Result := Result + Format('r=m=1;%s', [JavaScript_OutputString(fkp, fkp.dpOutput, fgp)])    // I1959   // I3681
-          else Result := Result + Format('m=1;%s', [JavaScript_OutputString(fkp, fkp.dpOutput, fgp)]);    // I1959   // I3681
-        Result := Result + Format('%s%s}%s', [nl, FTabstop+FTabstop, nl]);   // I3681
+        Inc(fkp);
       end;
-      Inc(fkp);
-		end;
+    end;
 
 		if Assigned(fgp.dpMatch) then
       Result := Result + Format(
@@ -1917,7 +2067,7 @@ begin
         '%s%s%s'+
         '%s}%s',
         [FTabstop+FTabstop, nl,
-        FTabstop+Ftabstop, JavaScript_OutputString(nil, fgp.dpMatch, fgp), nl,
+        FTabstop+Ftabstop, JavaScript_OutputString(FTabStop + FTabStop + FTabStop, nil, fgp.dpMatch, fgp), nl,
         FTabstop+FTabstop, nl]);   // I3681
 		if Assigned(fgp.dpNoMatch) then
       if fgp.fUsingKeys then    // I1382 - fixup m=1 to m=g()
@@ -1926,7 +2076,7 @@ begin
           '%sr=1;%s%s'+
           '%s}%s',
           [FTabstop+FTabstop, nl,
-          FTabstop+FTabstop+FTabstop, JavaScript_OutputString(nil, fgp.dpNoMatch, fgp), nl,
+          FTabstop+FTabstop+FTabstop, JavaScript_OutputString(FTabStop + FTabStop + FTabStop, nil, fgp.dpNoMatch, fgp), nl,
           FTabstop+FTabstop, nl])   // I1959. part 2, I2224   // I3681
       else
         Result := Result + Format(
@@ -1934,7 +2084,7 @@ begin
           '%s%s%s'+
           '%s}%s',
           [FTabstop+FTabstop, nl,
-          FTabstop+FTabstop, JavaScript_OutputString(nil, fgp.dpNoMatch, fgp), nl,
+          FTabstop+FTabstop, JavaScript_OutputString(FTabStop + FTabStop + FTabStop, nil, fgp.dpNoMatch, fgp), nl,
           FTabstop+FTabstop, nl]);  // I1959   // I3681
 
     Result := Result + Format('%sreturn r;%s'+

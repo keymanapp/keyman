@@ -21,7 +21,7 @@ unit kccompileproject;   // I4699
 
 interface
 
-function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADebug, AClean, AWarnAsError: Boolean; ATarget: string): Boolean;   // I4706
+function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADebug, AClean, AWarnAsError, ACheckFilenameConventions: Boolean; ATarget: string): Boolean;   // I4706
 
 implementation
 
@@ -46,7 +46,7 @@ type
     property FullySilent: Boolean read FFullySilent write FFullySilent;
   end;
 
-function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADebug, AClean, AWarnAsError: Boolean; ATarget: string): Boolean;   // I4706
+function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADebug, AClean, AWarnAsError, ACheckFilenameConventions: Boolean; ATarget: string): Boolean;   // I4706
 var
   i: Integer;
   Found: Boolean;
@@ -66,6 +66,7 @@ begin
   Found := False;
   with TProjectConsole.Create(AProjectFilename, False) do
   try
+    Options.CheckFilenameConventions := Options.CheckFilenameConventions or ACheckFilenameConventions; // never downgrade this option
     FullySilent := AFullySilent;
     Silent := ASilent;
     for i := 0 to Files.Count - 1 do

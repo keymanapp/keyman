@@ -297,9 +297,14 @@ namespace com.keyman {
      *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
      */       
     disableInputElement(Pelem: HTMLElement, isAlias?: boolean) { 
+      if(!Pelem) {
+        return;
+      }
+      
       var baseElement = isAlias ? Pelem['base'] : Pelem;
       // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
-      if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
+      if((Pelem.ownerDocument.defaultView && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) ||
+          Pelem instanceof HTMLIFrameElement) {
         this._DetachFromIframe(Pelem);
       } else { 
         var cnIndex = baseElement.className.indexOf('keymanweb-font');
@@ -378,7 +383,7 @@ namespace com.keyman {
 
       if(this.isKMWInput(Pelem)) {
         if(!this.isKMWDisabled(Pelem)) {
-          if(touchable) {
+          if(touchable && !this.keyman.isEmbedded) {
             this.enableTouchElement(Pelem);
           } else {
             this.enableInputElement(Pelem);
@@ -445,11 +450,17 @@ namespace com.keyman {
         }
       } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement && !touchable) { // Do not allow iframe attachment if in 'touch' mode.
         try {
-          if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
-            return true;
-          }
+          if(x.contentWindow) {
+            if(x.contentWindow.document) {  // Only allow attachment if the iframe's internal document is valid.
+              return true;
+            }
+          } // else nothing?
         }
-        catch(err) { /* Do not attempt to access iframes outside this site */ }
+        catch(err) { 
+          /* Do not attempt to access iframes outside this site */ 
+          console.warn("Error during attachment to / detachment from iframe: ");
+          console.warn(err);
+        }
       } else if(x.isContentEditable && !touchable) { // Only allow contentEditable attachment outside of 'touch' mode.
         return true;
       }
@@ -1437,6 +1448,7 @@ namespace com.keyman {
         });
       }
 
+      keyman.modelManager.init();
       this.keyman._MasterDocument = window.document;
 
       /**

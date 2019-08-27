@@ -19,12 +19,15 @@ public struct Options: Codable {
 
   /// Base URL for keyboard filenames.
   public let keyboardBaseURL: URL
+  /// Base URL for lexical model filenames.
+  public let lexicalModelBaseURL: URL?
 
   /// Base URL for font filenames.
   public let fontBaseURL: URL
 
   public enum CodingKeys: String, CodingKey {
     case keyboardBaseURL = "keyboardBaseUri"
+    case lexicalModelBaseURL = "lexicalModelBaseUri"
     case fontBaseURL = "fontBaseUri"
   }
 }

@@ -107,7 +107,7 @@ begin
   try
     pack.FileName := FRoot+'\'+Path;
     pack.LoadXML;
-    res := DoCompilePackage(pack, PackageMessage, False, FRoot+'\'+ChangeFileExt(Path,'.kmp'));
+    res := DoCompilePackage(pack, PackageMessage, False, False, FRoot+'\'+ChangeFileExt(Path,'.kmp'));
     Assert.AreEqual(not ExpectError, res);
   finally
     pack.Free;

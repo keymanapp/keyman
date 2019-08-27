@@ -33,6 +33,13 @@ namespace com.keyman.text {
       return this.o < other.o;
     }
 
+    clone(): Deadkey {
+      let dk = new Deadkey(this.p, this.d);
+      dk.o = this.o;
+
+      return dk;
+    }
+
     /**
      * Sorts the deadkeys in reverse order.
      */
@@ -57,7 +64,13 @@ namespace com.keyman.text {
 
     clone(): DeadkeyTracker {
       let dkt = new DeadkeyTracker();
-      dkt.dks = this.toSortedArray();
+      let dks = this.toSortedArray();
+
+      // Make sure to clone the deadkeys themselves - the Deadkey object is mutable.
+      dkt.dks = [];
+      dks.forEach(function(value: Deadkey) {
+        dkt.dks.push(value.clone());
+      });
 
       return dkt;
     }

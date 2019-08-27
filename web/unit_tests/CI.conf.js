@@ -49,18 +49,21 @@ module.exports = function(config) {
       os: 'OS X',
       os_version: 'Mojave'
     },
-    bs_safari_mac_hs: {
-      browser: 'safari',
-      browser_version: '11.1',
-      os: 'OS X',
-      os_version: 'High Sierra'
-    },
-    bs_safari_mac_m: {
-      browser: 'safari',
-      browser_version: '12',
-      os: 'OS X',
-      os_version: 'Mojave'
-    },
+    // Unfortunately, BrowserStack's Safari test clients have been quite unstable recently,
+    // failing to even start running their tests.  We're disabling them until the issue goes away.
+
+    // bs_safari_mac_hs: {
+    //   browser: 'safari',
+    //   browser_version: '11.1',
+    //   os: 'OS X',
+    //   os_version: 'High Sierra'
+    // },
+    // bs_safari_mac_m: {
+    //   browser: 'safari',
+    //   browser_version: '12',
+    //   os: 'OS X',
+    //   os_version: 'Mojave'
+    // },
     bs_chrome_mac: {
       browser: 'chrome',
       browser_version: '70.0',

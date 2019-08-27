@@ -31,12 +31,20 @@ type
     ssFontName_Dialog,
     ssFontName_Title,
     ssFontName_InstallButton,
+
     ssApplicationTitle,
     ssTitle,
     ssWelcome_Keyboards,
-    ssWelcome_Plain,
-    ssCheckForUpdates,
+    ssInstallSuccess,
+    ssCancelQuery,
+
+    ssFreeCaption,
+    ssLicenseLink,
+    ssInstallOptionsLink,
+
+    ssOkButton,
     ssInstallButton,
+    ssCancelButton,
     ssExitButton,
 
     ssPackageMissing,
@@ -63,59 +71,92 @@ type
     ssMustRestart,
     ssRedistRequired,
 
-    ssQueryInstallLightMoreThan2Keyboards,
-    ssQueryUpgradeVersion6,
-    ssQueryUpgradeVersion7
-    );
+    ssOldOsVersionInstallKeyboards,
+    ssOldKeymanVersionInstallKeyboards,
+
+    ssOldOsVersionDownload,
+
+    { Options dialog }
+
+    ssOptionsTitle,
+
+    ssOptionsStartWithWindows,
+    ssOptionsStartAfterInstall,
+    ssOptionsCheckForUpdates,
+    ssOptionsCheckForUpdatesBeforeInstall,
+    ssOptionsUpgradeKeyboards
+  );
 
 const
   FDefaultStrings: array[TInstallInfoText] of WideString = (
     '16', '24', '18',
     '', '', '',
 
-    'Keyman Desktop Setup',
-    '%0:s Setup',
-    'Setup will install %0:s and the following keyboards:',
-    'Setup will install %0:s',
-    'Check for &updates online before installing',
-    '&Install Keyman Desktop',
-    'E&xit',
+  {ssApplicationTitle}                        '$APPNAME $VERSION Setup',
+  {ssTitle}                                   'Install $APPNAME $VERSION',
+  {ssWelcome_Keyboards}                       'This install includes:'#13#10+'• $APPNAME $VERSION',
+  {ssInstallSuccess}                          '$APPNAME $VERSION has been installed successfully.',
+  {ssCancelQuery}                             'Are you sure you want to cancel the installation of $APPNAME?',
 
-    'Package %0:s (%1:s) is missing.  Setup can continue but will not install this package.',
+  {ssFreeCaption}                             '$APPNAME $VERSION is free and open source',
+  {ssLicenseLink}                             '&Read the license',
+  {ssInstallOptionsLink}                      'Install &options',
 
-    'Error %0:d downloading update from server',
-    'Unable to contact server',
-    'Unable to contact server, error was: %0:s',
+  {ssOkButton}                                'OK',
+  {ssInstallButton}                           '&Install $APPNAME',
+  {ssCancelButton}                            'Cancel',
+  {ssExitButton}                              'E&xit',
 
-    'Checking Internet Explorer version',
-    'Checking for updates online',
-    'Installing Keyman Desktop',
-    'Installing package %0:s',
-    'Installation Complete',
+  {ssPackageMissing}                          'Package %0:s (%1:s) is missing.  Setup can continue but will not install this package.',
 
-    'Internet Explorer 9.0 or later is required to install Keyman Desktop.  Please use Windows Update to update your system before installing Keyman Destop.',   // I4470
+  {ssErrorDownloadingUpdate}                  'Error %0:d downloading update from server',
+  {ssErrorUnableToContactServer}              'Unable to contact server',
+  {ssErrorUnableToContactServerDetailed}      'Unable to contact server, error was: %0:s',
 
-    'Version %1:s of Keyman Desktop has been released and is available for download.  This update is %0:dKB.  '+
-      'Do you want to download and install the updated version (recommended)?',
+  {ssStatusCheckingInternetExplorer}          'Checking Internet Explorer version',
+  {ssStatusCheckingForUpdates}                'Checking for updates online',
+  {ssStatusInstalling}                        'Installing $APPNAME',
+  {ssStatusInstallingPackage}                 'Installing package %0:s',
+  {ssStatusComplete}                          'Installation Complete',
 
-    'The package %0:s is already installed.  Do you wish to update it now?',
+  {ssQueryUpdateInternetExplorer}             'Internet Explorer 9.0 or later is required to install $APPNAME.  '+
+                                              'Please use Windows Update to update your system before installing $APPNAME.',   // I4470
 
-    'You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.'#13#10#13#10'Restart now?',
-    'Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman.',
+  {ssQueryUpdateVersion}                      'Version %1:s of $APPNAME has been released and is available for download.  This update is %0:dKB.  '+
+                                              'Do you want to download and install the updated version (recommended)?',
+  {ssQueryUpdatePackage}                      'The package %0:s is already installed.  Do you wish to update it now?',
 
-    'Internet Explorer 9.0 or later is required to install Keyman Desktop.',   // I4470
+  {ssQueryRestart}                            'You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.'+
+                                              #13#10#13#10'Restart now?',
+  {ssErrorUnableToAutomaticallyRestart}       'Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman.',
+  {ssRedistIEUpdateRequired}                  'Internet Explorer 9.0 or later is required to install $APPNAME.',   // I4470
+  {ssMustRestart}                             'You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.',
+  {ssRedistRequired}                          'A redistributable %0:s is required but is not available in the install path.  '+
+                                              'This redistributable can be downloaded from the Keyman website.',
 
-    'You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.',
+  {ssOldOsVersionInstallKeyboards}            '$APPNAME $VERSION requires Windows 7 or later to install.  '+
+                                              'However, Keyman Desktop 7, 8 or 9 has been detected.  '+
+                                              'Do you want to install the keyboards included in this installer '+
+                                              'into the installed Keyman Desktop version?',   // I4460
+  {ssOldKeymanVersionInstallKeyboards}        'This installer includes $APPNAME $VERSION.  '+
+                                              'However, an earlier version of Keyman Desktop has been detected.  '+
+                                              'Do you want to upgrade to $APPNAME $VERSION as well as installing '+
+                                              'the keyboards in this package?  '+
+                                              '(Selecting No will install the keyboards without upgrading $APPNAME)',
 
-    'A redistributable %0:s is required but is not available in the install path.  This redistributable can be downloaded from the Keyman website.',
+  {ssOldOsVersionDownload}                    'This product requires Windows 7 or later to install.  '+
+                                              'Do you want to download Keyman Desktop 8?',
 
-    'Keyman Desktop Light Setup has detected that you have Keyman 6 installed.  However, you have more than 2 keyboards installed, '+
-    'so Setup will not be able to upgrade your keyboards.  We recommend that you install Keyman Desktop Professional '+
-    'to use more than 2 keyboards.  Do you want to continue Setup?',
+  { Options dialog }
 
-    'Setup has detected that Keyman 6 is installed.  Do you want to copy your Keyman 6 keyboard configuration into Keyman Desktop 8?',
-    'Setup has detected that Keyman Desktop 7.x is installed.  Do you want to copy your Keyman Desktop 7.x keyboard configuration into Keyman Desktop 8?'
-    );
+  {ssOptionsTitle}                            'Install Options',
+
+  {ssOptionsStartWithWindows}                 'Start $APPNAME when Windows starts',
+  {ssOptionsStartAfterInstall}                'Start $APPNAME when installation completes',
+  {ssOptionsCheckForUpdates}                  'Check for updates online periodically',
+  {ssOptionsCheckForUpdatesBeforeInstall}     'Check for updates before installing',
+  {ssOptionsUpgradeKeyboards}                 'Upgrade keyboards installed with older versions to version $VERSION'
+);
 
 implementation
 

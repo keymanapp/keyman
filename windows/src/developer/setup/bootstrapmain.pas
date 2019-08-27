@@ -172,11 +172,11 @@ BEGIN
   try
     try
 
-    if GetOS in [osLegacy, osVista] then   // I4366
+    {if GetOS in [osLegacy, osVista] then   // I4366
     begin
       ShowMessageW(STR_E_OLDOSVERSION);
       Exit;
-    end;
+    end;}
 
     FInstallInfo := TInstallInfo.Create;
 

@@ -72,7 +72,7 @@ extern NSString *const kWebSite;
 @property (nonatomic, strong) NSImage *keyboardIcon;
 @property (nonatomic, strong) NSAlert *downloadInfoView;
 @property (nonatomic, strong) NSProgressIndicator *progressIndicator;
-@property (nonatomic, weak) IMKInputController *inputController;
+@property (nonatomic, weak) KMInputController *inputController;
 @property (nonatomic, strong) NSWindowController *configWindow;
 @property (nonatomic, strong) NSWindowController *downloadKBWindow;
 @property (nonatomic, strong) KMAboutWindowController *aboutWindow;
@@ -89,6 +89,8 @@ extern NSString *const kWebSite;
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
+- (void)loadSavedStores;
+- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;

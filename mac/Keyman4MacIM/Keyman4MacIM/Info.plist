@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Keyman needs to send key events to the target application.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
@@ -34,7 +36,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>10.0.0</string>
+	<string>$(PRODUCT_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -49,7 +51,9 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>10.0.0</string>
+	<string>$(PRODUCT_VERSION)</string>
+	<key>CFBundleGetInfoString</key>
+	<string>$(GET_INFO_STRING)</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -77,7 +81,7 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018 SIL International. All rights reserved.</string>
+	<string>$(COPYRIGHT_STRING)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

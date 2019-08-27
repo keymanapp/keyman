@@ -1,10 +1,14 @@
 var assert = chai.assert;
+var LMLayer = com.keyman.text.prediction.LMLayer;
 
 describe('LMLayer', function () {
+  this.timeout(config.timeouts.standard);
+
   describe('[[constructor]]', function () {
-    it('should construct with zero arguments', function () {
-      let lmLayer = new LMLayer();
+    it('should construct with a single argument', function () {
+      let lmLayer = new LMLayer(helpers.defaultCapabilities);
       assert.instanceOf(lmLayer, LMLayer);
+      lmLayer.shutdown();
     });
   });
 
@@ -24,6 +28,7 @@ describe('LMLayer', function () {
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(event) {
         assert.propertyVal(event, 'data', 'fhqwhgads');
+        worker.terminate();
         done();
       };
     })

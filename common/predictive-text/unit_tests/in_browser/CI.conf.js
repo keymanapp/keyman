@@ -49,18 +49,21 @@ module.exports = function(config) {
       os: 'OS X',
       os_version: 'Mojave'
     },
-    bs_safari_mac_hs: {
-      browser: 'safari',
-      browser_version: '11.1',
-      os: 'OS X',
-      os_version: 'High Sierra'
-    },
-    bs_safari_mac_m: {
-      browser: 'safari',
-      browser_version: '12',
-      os: 'OS X',
-      os_version: 'Mojave'
-    },
+    // Unfortunately, BrowserStack's Safari test clients have been quite unstable recently,
+    // failing to even start running their tests.  We're disabling them until the issue goes away.
+
+    // bs_safari_mac_hs: {
+    //   browser: 'safari',
+    //   browser_version: '11.1',
+    //   os: 'OS X',
+    //   os_version: 'High Sierra'
+    // },
+    // bs_safari_mac_m: {
+    //   browser: 'safari',
+    //   browser_version: '12',
+    //   os: 'OS X',
+    //   os_version: 'Mojave'
+    // },
     bs_chrome_mac: {
       browser: 'chrome',
       browser_version: '70.0',
@@ -70,12 +73,14 @@ module.exports = function(config) {
   };
 
   var CURRENT_WIN_LAUNCHERS = {
-    bs_firefox_win: {
-      os: 'Windows',
-      os_version: '10',
-      browser: 'firefox',
-      browser_version: '62.0'
-    },
+    // Currently, Firefox launcher is unstable; see https://github.com/karma-runner/karma-firefox-launcher/issues/93
+    // (in particular "not maintained" commentary). 
+    //bs_firefox_win: {
+    //  os: 'Windows',
+    //  os_version: '10',
+    //  browser: 'firefox',
+    //  browser_version: '62.0'
+    //},
     bs_chrome_win: {
       os: 'Windows',
       os_version: '10',
@@ -88,12 +93,13 @@ module.exports = function(config) {
       browser: 'ie',
       browser_version: '11.0'
     },
-    bs_edge_win: {
-      os: 'Windows',
-      os_version: '10',
-      browser: 'edge',
-      browser_version: '17.0'
-    }
+    // On recent versions of Edge, launcher fails to start and/or stop Edge successfully
+    //bs_edge_win: {
+    //  os: 'Windows',
+    //  os_version: '10',
+    //  browser: 'edge',
+    //  browser_version: '17.0'
+    //}
   }
 
   var CURRENT_ANDROID_LAUNCHERS = {

@@ -273,6 +273,7 @@ function savestate() {
 
   appendElement(xmlDoc, 'tab', tabselected.toString());
   appendElement(xmlDoc, 'showhelp', document.getElementById('upperexpand').className == 'checkbox' ? "0":"1");
+  appendElement(xmlDoc, 'path', projectPath);
   
   var files = document.getElementsByTagName('span');
   for(var i = 0; i < files.length; i++) {

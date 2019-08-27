@@ -27,7 +27,7 @@ verify_on_mac() {
 }
 
 # The list of valid projects that our build scripts ought expect.
-projects=("android" "ios" "linux" "mac" "web" "windows")
+projects=("android" "ios" "linux" "lmlayer" "mac" "web" "windows")
 
 # Used to validate a specified 'project' parameter.
 verify_project() {
@@ -45,7 +45,7 @@ verify_project() {
 }
 
 # The list of valid platforms that our build scripts ought expect.
-platforms=("android" "ios" "linux" "mac" "web" "desktop" "developer")
+platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "desktop" "developer")
 
 # Used to validate a specified 'platform' parameter.
 verify_platform() {
@@ -69,6 +69,8 @@ get_platform_folder() {
   
   if [[ $1 = "desktop" || $1 = "developer" ]]; then
     platform_folder="$_shf_base_dir/windows/src/$1"
+  elif [[ $1 = "lmlayer" ]]; then
+    platform_folder="common/predictive-text"
   else
     platform_folder="$_shf_base_dir/$1"
   fi
@@ -80,7 +82,17 @@ if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]]; then
     ERROR_RED=$(tput setaf 1)
     WARNING_YELLOW=$(tput setaf 3)
     NORMAL=$(tput sgr0)
+    TERM_HEADING=$(tput setaf 4)
+else
+    ERROR_RED=
+    WARNING_YELLOW=
+    NORMAL=
+    TERM_HEADING=
 fi
+
+echo_heading() {
+  echo "${TERM_HEADING}$*${NORMAL}"
+}
 
 fail() {
     FAILURE_MSG="$1"

@@ -9,12 +9,18 @@
 
 LMLAYER_OUTPUT=build
 WORKER_OUTPUT=build/intermediate
+INCLUDES_OUTPUT=build/includes
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
 
 
 # Build the worker and the main script.
 build ( ) {
+  # Ensure that the build-product destination for any generated include .d.ts files exists.
+  if ! [ -d $INCLUDES_OUTPUT ]; then
+    mkdir -p "$INCLUDES_OUTPUT"
+  fi
+
   # Build worker first; the main file depends on it.
   # Then wrap the worker; Then build the main file.
 
@@ -24,6 +30,8 @@ build ( ) {
 # Builds the top-level JavaScript file (the second stage of compilation)
 build-main () {
   npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level JavaScript file."
+  cp ./index.d.ts $INCLUDES_OUTPUT/LMLayer.d.ts
+  cp ./message.d.ts $INCLUDES_OUTPUT/message.d.ts
 }
 
 # Builds the inner JavaScript worker (the first stage of compilation).
@@ -34,6 +42,20 @@ build-worker () {
   fi
 
   npm run tsc -- -p ./worker/tsconfig.json || fail "Could not build worker."
+
+  get_builder_OS
+
+  # macOS has a slightly different sed, which needs an extension to use for a backup file.  Thanks, Apple.
+  BACKUP_EXT=
+  if [ $os_id == 'mac' ]; then
+    BACKUP_EXT='.bak'
+  fi
+
+  # Tweak the output index.d.ts to have an updated reference to message.d.ts
+  sed -i $BACKUP_EXT 's/path="\.\.\/\.\.\/message\.d\.ts"/path="message\.d\.ts"/g' "${WORKER_OUTPUT}/index.d.ts" \
+    || fail "Could not update message.d.ts reference"
+
+  mv $WORKER_OUTPUT/index.d.ts $INCLUDES_OUTPUT/LMLayerWorker.d.ts
 }
 
 # A nice, extensible method for -clean operations.  Add to this as necessary.

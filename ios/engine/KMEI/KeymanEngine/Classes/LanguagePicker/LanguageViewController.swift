@@ -15,35 +15,66 @@ private let toolbarActivityIndicatorTag = 102
 
 class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var userKeyboards: [String: InstallableKeyboard] = [:]
+  private var userLexicalModels: [String: InstallableLexicalModel] = [:]
   private var sectionIndexTitles: [String] = []
   private var indices: [Int] = []
   private var selectedSection = 0
   private var isUpdate = false
   private var languages: [Language] = []
-  private let keyboardRepository: KeyboardRepository
+  private let keyboardRepository: KeyboardRepository?
+  private let lexicalModelRepository: LexicalModelRepository?
 
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
 
   init(_ keyboardRepository: KeyboardRepository) {
     self.keyboardRepository = keyboardRepository
+    self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
     keyboardRepository.delegate = self
+  }
+
+  init(_ lexicalModelRepository: LexicalModelRepository) {
+    self.lexicalModelRepository = lexicalModelRepository
+    self.keyboardRepository = nil
+    super.init(nibName: nil, bundle: nil)
+    lexicalModelRepository.delegate = self
+  }
+  
+  init(keyboardRep keyboardRepository: KeyboardRepository, modelRep lexicalModelRepository: LexicalModelRepository) {
+    self.keyboardRepository = keyboardRepository
+    self.lexicalModelRepository = lexicalModelRepository
+    super.init(nibName: nil, bundle: nil)
+    keyboardRepository.delegate = self
+    lexicalModelRepository.delegate = self
   }
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
+  func postLanguageLoad(languageDict: [String: Language]) {
+    languages = languageList(languageDict)
+  }
+  
+  func idxOfLanguage(languageID: String) -> Int {
+    let langIdx = self.languages.firstIndex(where: {
+      $0.id == languageID
+    }) ?? 0
+    return langIdx
+  }
+  
   override func loadView() {
     super.loadView()
-    if let languageDict = keyboardRepository.languages {
-      languages = languageList(languageDict)
+    if let languageDict = keyboardRepository?.languages {
+      self.postLanguageLoad(languageDict: languageDict)
     } else {
-      keyboardRepository.fetch()
+      log.info("Fetching repository from API for keyboard download (LanguageViewController)")
+      keyboardRepository?.fetch()
     }
 
     loadUserKeyboards()
+    loadUserLexicalModels()
   }
 
   override func viewDidLoad() {
@@ -66,8 +97,13 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     // if no rows to show yet, show a loading indicator
     if numberOfSections(in: tableView) == 0 {
       showActivityView()
+      log.info("didAppear: LanguageViewController, but no rows to show")
+    } else {
+      log.info("didAppear: LanguageViewController")
     }
   }
+
+  // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return languages.count
@@ -193,7 +229,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     showLanguageDetailView(title: title, languageIndex: indexPath.section)
   }
 
-  private func showLanguageDetailView(title: String, languageIndex: Int) {
+  func showLanguageDetailView(title: String, languageIndex: Int) {
     let langDetailView = LanguageDetailViewController(language: languages[languageIndex])
     langDetailView.title = title
     navigationController?.pushViewController(langDetailView, animated: true)
@@ -208,7 +244,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
     let keyboard = language.keyboards![keyboardIndex]
-                Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
+    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
   }
 
   private func keyboardDownloadStarted() {
@@ -277,7 +313,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   func loadUserKeyboards() {
     userKeyboards = [:]
     guard let userKbList = Storage.active.userDefaults.userKeyboards else {
-      userKeyboards = [:]
       return
     }
 
@@ -286,6 +321,18 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       userKeyboards[dictKey] = kb
     }
   }
+    
+    func loadUserLexicalModels() {
+        userLexicalModels = [:]
+        guard let userLmList = Storage.active.userDefaults.userLexicalModels else {
+            return
+        }
+        
+        for lm in userLmList {
+            let dictKey = "\(lm.languageID)_\(lm.id)"
+            userLexicalModels[dictKey] = lm
+        }
+    }
 
   private func isAdded(languageID: String?, keyboardID: String?) -> Bool {
     guard let languageID = languageID, let keyboardID = keyboardID else {
@@ -311,7 +358,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
 extension LanguageViewController: KeyboardRepositoryDelegate {
   func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
     if let languageDict = repository.languages {
-      languages = languageList(languageDict)
+      self.postLanguageLoad(languageDict: languageDict)
     }
     self.dismissActivityView()
     self.tableView.reloadData()
@@ -329,5 +376,25 @@ extension LanguageViewController: KeyboardRepositoryDelegate {
     return languageDict.values.sorted { a, b -> Bool in
       a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
     }
+  }
+}
+
+// MARK: - LexicalModelRepositoryDelegate
+
+extension LanguageViewController: LexicalModelRepositoryDelegate {
+  func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
+    if let languageDict = repository.languages {
+      self.postLanguageLoad(languageDict: languageDict)
+    }
+    self.dismissActivityView()
+    self.tableView.reloadData()
+    if self.numberOfSections(in: self.tableView) == 0 {
+      self.showConnectionErrorAlert()
+    }
+  }
+  
+  func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
+    dismissActivityView()
+    showConnectionErrorAlert()
   }
 }

@@ -10,13 +10,17 @@
     <!-- Title for lists-->
     <string name="title_keyboards" translatable="false">Keyboards</string>
     <string name="title_keyboard" translatable="false">Keyboard</string>
+    <string name="title_add_language" translatable="false">Add New Language</string>
     <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
+    <string name="title_languages_settings" translatable="false">Installed Languages</string>
+    <string name="title_language_settings" translatable="false">%s Settings</string>
 
     <!-- Button labels -->
     <string name="label_add" translatable="false">Add</string>
     <string name="label_cancel" translatable="false">Cancel</string>
     <string name="label_close" translatable="false">Close</string>
     <string name="label_close_keyman" translatable="false">Close Keyman</string>
+
     <string name="label_download" translatable="false">Download</string>
     <string name="label_install" translatable="false">Install</string>
     <string name="label_later" translatable="false">Later</string>
@@ -25,20 +29,54 @@
 
     <!-- For the following, &#8230; is the ellipsis character "..." -->
 
+    <!-- Cloud API related strings -->
+    <string name="getting_cloud_catalog" translatable="false">Getting keyboard and dictionary catalogs.\nThis may take a while&#8230;</string>
+
     <!-- Keyboard Updates -->
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
-    <string name="confirm_download" translatable="false">Would you like to download this keyboard?</string>
-    <string name="confirm_update" translatable="false">Would you like to update keyboards now?</string>
+    <string name="confirm_delete_keyboard" translatable="false">Would you like to delete this keyboard?</string>
+    <string name="confirm_download_keyboard" translatable="false">Would you like to download this keyboard?</string>
+    <string name="confirm_update" translatable="false">Would you like to update keyboards and dictionaries now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
-    <string name="keyboard_updates_available" translatable="false">Keyboard Updates Available</string>
+    <string name="font_failed_to_download" translatable="false">Warning: Font failed to download</string>
+    <string name="keyboard_failed_to_download" translatable="false">Error: Keyboard failed to download</string>
+    <string name="keyboard_updates_available" translatable="false">Resource Updates Available</string>
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
     <string name="updating_keyboards" translatable="false">Updating keyboards&#8230;</string>
 
-    <!-- Keyboard Info -->
+    <!-- Keyboard Info and Keyboard Settings -->
     <string name="keyboard_version" translatable="false">Keyboard version</string>
     <string name="help_link" translatable="false">Help link</string>
+    <string name="uninstall_keyboard" translatable="false">Uninstall keyboard</string>
+
+    <!-- Model Updates -->
+    <string name="getting_model_catalog" translatable="false">Getting dictionary catalog.\nThis may take a while&#8230;</string>
+    <string name="confirm_download_model" translatable="false">Would you like to download this dictionary?</string>
+    <string name="checking_model_download" translatable="false">Checking to download dictionary&#8230;</string>
+    <string name="downloading_model" translatable="false">Downloading dictionary&#8230;</string>
+    <string name="catalog_unavailable" translatable="false">The resource catalog is unavailable\n</string>
+
+    <!-- General Updates -->
+    <string name="update_check_unavailable" translatable="false">Failed to access server!\n</string>
+    <string name="update_check_current" translatable="false">"All resources are up to date!"</string>
+
+    <!-- Model Info -->
+    <string name="model_version" translatable="false">Dictionary version</string>
+    <string name="uninstall_model" translatable="false">Uninstall dictionary</string>
+    <string name="confirm_delete_model" translatable="false">Would you like to delete this dictionary?</string>
+
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections" translatable="false">Enable corrections</string>
+    <string name="enable_predictions" translatable="false">Enable predictions</string>
+    <string name="model" translatable="false">Dictionary</string>
+    <string name="model_info_header" translatable="false">Dictionary: %s</string>
+    <string name="model_picker_header" translatable="false">%s dictionaries</string>
+    <string name="manage_dictionary" translatable="false">Manage dictionary</string>
+    <string name="model_install_toast" translatable="false">Dictionary installed</string>
+    <string name="single_keyboard_count" translatable="false">(1 keyboard)</string>
+    <string name="multiple_keyboard_count" translatable="false">(%d keyboards)</string>
 
     <!-- Content descriptions -->
     <string name="image_button" translatable="false">Image Button</string>

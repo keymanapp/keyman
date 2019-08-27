@@ -41,8 +41,8 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'ready' | 'suggestions';
-type OutgoingMessage = ReadyMessage | SuggestionMessage;
+type OutgoingMessageKind = 'ready' | 'suggestions' | 'currentword';
+type OutgoingMessage = ReadyMessage | SuggestionMessage | CurrentWordMessage;
 
 /**
  * Tells the keyboard that the LMLayer is ready. Provides
@@ -70,6 +70,25 @@ interface SuggestionMessage {
    * probable last.
    */
   suggestions: Suggestion[];
+}
+
+/**
+ * Returns the results of a 'wordbreak' request:  the current left-of-caret word.
+ */
+interface CurrentWordMessage {
+  message: 'currentword';
+
+  /**
+   * Opaque, unique token that pairs this message
+   * with the wordbreak message that initiated it.
+   */
+  token: Token;
+
+  /**
+   * Contains the 'current word' left of the caret given the Context
+   * of its source message - the 'wordbreak' message with matching Token value.
+   */
+  word: USVString;
 }
 
 /**
@@ -149,6 +168,15 @@ interface Configuration {
  */
 interface Transform {
   /**
+   * Facilitates use of unique identifiers for tracking the Transform and
+   * any related data from its original source, as the reference cannot be
+   * preserved across WebWorker boundaries.
+   * 
+   * This is *separate* from any LMLayer-internal identification values.
+   */
+  id?: number;
+
+  /**
    * The Unicode scalar values (i.e., characters) to be inserted at the
    * cursor position.
    *
@@ -169,6 +197,26 @@ interface Transform {
    */
   deleteRight?: number;
 }
+
+/**
+ * Represents members of a probability distribution over potential outputs
+ * from ambiguous text sequences.  Designed for use with fat-finger correction
+ * and similar typing ambiguities.
+ */
+interface ProbabilityMass<T> {
+  /**
+   * An individual sample from a Distribution over the same type.
+   */
+  sample: T;
+
+  /**
+   * The probability mass for this member of the distribution,
+   * calculated devoid of any language-modeling influences.
+   */
+  p: number;
+}
+
+type Distribution<T> = ProbabilityMass<T>[];
 
 /**
  * The text and environment surrounding the insertion point (text cursor).
@@ -208,6 +256,13 @@ interface Context {
  */
 interface Suggestion {
   /**
+   * Indicates the externally-supplied id of the Transform that prompted
+   * the Suggestion.  Automatically handled by the LMLayer; models should
+   * not handle this field.
+   */
+  transformId?: number;
+
+  /**
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */
@@ -221,4 +276,10 @@ interface Suggestion {
    * When suggesting a word, `displayAs` should be that entire word.
    */
   displayAs: string;
+
+  /**
+   * A single metalabel data describing the relation of the suggestion
+   * to the input text.  Ex:  'keep', 'emoji', 'correction', etc.
+   */
+  tag?: string;
 }

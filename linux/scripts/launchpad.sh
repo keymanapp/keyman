@@ -23,8 +23,9 @@ if [[ -z "${TIER}" ]]; then
     # This is the tier that the latest version is currently found on
     # This should be changed to stable before the first stable build
     # In master branch this should be alpha and the debian/watch files should check alpha dir
-    tier="beta"
-#    tier="stable"
+#    tier="alpha"
+#    tier="beta"
+    tier="stable"
 else
     tier="${TIER}"
 fi

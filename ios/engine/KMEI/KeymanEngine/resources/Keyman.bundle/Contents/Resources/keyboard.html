@@ -27,19 +27,52 @@
             var device = 'AppleMobile';
             var oskHeight = 0;
             var oskWidth = 0;
+            
             window.addEventListener('load', init, false);
             
             function init() {
                 var kmw=window['keyman'];
-                kmw.init({'app':device,'fonts':'fonts/'});
-                kmw['util']['setOption']('attachType','manual');
-                kmw['oninserttext'] = insertText;
-                kmw['showKeyboardList'] = menuKeyDown;
-                kmw['hideKeyboard'] = hideKeyboard;
-                kmw['getOskHeight'] = getOskHeight;
-                kmw['getOskWidth'] = getOskWidth;
-                kmw['beepKeyboard'] = beepKeyboard;
-                kmw['setActiveElement']('ta');
+                // We could convert to relying on the promise, but the underlying input element
+                // tends to show a bit due to the delay when we do so.
+                kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
+                    kmw['util']['setOption']('attachType','manual');
+                    kmw['oninserttext'] = insertText;
+                    kmw['showKeyboardList'] = menuKeyDown;
+                    kmw['hideKeyboard'] = hideKeyboard;
+                    kmw['getOskHeight'] = getOskHeight;
+                    kmw['getOskWidth'] = getOskWidth;
+                    kmw['beepKeyboard'] = beepKeyboard;
+                    kmw['setActiveElement']('ta');
+                    
+                //});
+            }
+        
+            function showBanner(flag) {
+              console.log("Setting banner display for dictionaryless keyboards to " + flag);
+              keyman.osk.banner.setOptions({'alwaysShow': flag});
+            }
+        
+            function setBannerImage(path) {
+              var kmw=window['keyman'];
+              kmw.osk.banner.setOptions({"imagePath": path});
+            }
+        
+            function setBannerHeight(h) {
+              var kmw = com.keyman.singleton;
+              var osk = kmw.osk;
+
+              if(h >= 0) {
+                // The banner itself may not be loaded yet.  This will preemptively help set
+                // its eventual display height.
+                com.keyman.osk.Banner.DEFAULT_HEIGHT = h;
+                
+                if(osk.banner.activeType != 'blank') {
+                  osk.banner.height = h;
+                }
+              }
+              
+              // Refresh KMW's OSK
+              kmw.correctOSKTextSize();
             }
             
             function setDeviceType(deviceType) {
@@ -49,8 +82,8 @@
             }
             
             function setOskHeight(height) {
-                oskHeight = height;
                 var kmw=window['keyman'];
+                oskHeight = height;
                 kmw.osk.show(true);
                 kmw['correctOSKTextSize']();
             }
@@ -70,7 +103,11 @@
             }
             
             function getOskHeight() {
-                return oskHeight;
+                var height = oskHeight;
+                if(keyman.osk.banner._activeType != 'blank') {
+                  height = height - keyman.osk.banner.height;
+                }
+                return height;
             }
             
             var keyboardOffset = 0;
@@ -83,10 +120,16 @@
             }
             
             var fragmentToggle = 0;
-            function insertText(dn, s) {
+            /**
+             * Inserts the selected string <i>s</i>
+             * @param dn  Number of pre-caret code points (UTF+8 characters) to delete
+             * @param s   Text to insert
+             * @param dr  Number of post-caret code points to delete.  (optional)
+             */
+            function insertText(dn, s, dr) {
+                dr = dr || 0;  // Sets a default value of zero when dr is undefined
                 fragmentToggle = (fragmentToggle + 1) % 100;
-                var insertHash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
-                //window.location.hash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s);
+                var insertHash = 'insertText-'+ fragmentToggle + '+dn=' + dn + '+s=' + toHex(s) + '+dr=' + dr;
                 if (typeof(window.webkit) != 'undefined')
                     window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
             }
@@ -143,6 +186,27 @@
                     if (typeof(window.webkit) != 'undefined')
                         window.webkit.messageHandlers.keyman.postMessage('#' + hash);
                 }
+            }
+        
+            function suggestionPopup(obj,custom,x,y,w,h) {
+              if(obj != null) {
+                fragmentToggle=(fragmentToggle+1) % 100;
+                
+                var cmd = {
+                  'suggestion': obj,
+                  'isCustom': custom,
+                  'x': x,
+                  'y': y,
+                  'width': w,
+                  'height': h
+                };
+                
+                var hash = 'suggestPopup-' + fragmentToggle + '+cmd=' + JSON.stringify(cmd);
+
+                if (typeof(window.webkit) != 'undefined') {
+                  window.webkit.messageHandlers.keyman.postMessage('#' + hash);
+                }
+              }
             }
         
             function menuKeyDown() {
@@ -215,6 +279,17 @@
                     hexString += theHex + ',';
                 }
                 return hexString.substr(0, hexString.length-1);
+            }
+        
+            function enableSuggestions(model, mayPredict, mayCorrect) {
+              // Set the options first so that KMW's ModelManager can properly handle model enablement states
+              // the moment we actually register the new model.
+              keyman.osk.banner.setOptions({
+                'mayPredict': mayPredict,
+                'mayCorrect': mayCorrect
+              });
+
+              keyman.modelManager.register(model);
             }
         
             </script>

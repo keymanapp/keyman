@@ -49,6 +49,10 @@ class KeymanWebViewController: UIViewController {
   
   /// Stores the keyboard view's current size.
   private var kbSize: CGSize = CGSize.zero
+  
+  /// Stores the current image for use by the Banner
+  /// when predictive text is not active
+  private var bannerImgPath: String = ""
 
   init(storage: Storage) {
     self.storage = storage
@@ -184,10 +188,20 @@ extension KeymanWebViewController {
 
   func setText(_ text: String?) {
     var text = text ?? ""
+    // Remove any system-added LTR/RTL marks.
+    text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
+    text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
+    text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
+
+    // JavaScript escape-sequence encodings.
     text = text.replacingOccurrences(of: "\\", with: "\\\\")
     text = text.replacingOccurrences(of: "'", with: "\\'")
     text = text.replacingOccurrences(of: "\n", with: "\\n")
     webView!.evaluateJavaScript("setKeymanVal('\(text)');", completionHandler: nil)
+  }
+  
+  func resetContext() {
+    webView!.evaluateJavaScript("keyman.interface.resetContext();", completionHandler: nil)
   }
 
   func setDeviceType(_ idiom: UIUserInterfaceIdiom) {
@@ -247,6 +261,65 @@ extension KeymanWebViewController {
     log.debug("Keyboard stub: \(stubString)")
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
+  
+  func deregisterLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    webView!.evaluateJavaScript("keyman.modelManager.deregister(\"\(lexicalModel.id)\")")
+  }
+
+  func registerLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+    let stub: [String: Any] = [
+      "id": lexicalModel.id,
+      "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
+      "path": storage.lexicalModelURL(for: lexicalModel).absoluteString
+    ]
+  
+    let data: Data
+    do {
+      data = try JSONSerialization.data(withJSONObject: stub, options: [])
+    } catch {
+      log.error("Failed to serialize lexical model stub: \(error)")
+      return
+    }
+    guard let stubString = String(data: data, encoding: .utf8) else {
+      log.error("Failed to create stub string")
+      return
+    }
+  
+    log.debug("LexicalModel stub: \(stubString)")
+    if lexicalModel.languageID == Manager.shared.currentKeyboardID?.languageID {
+      // We're registering a lexical model for the now-current keyboard.
+      // Enact any appropriate language-modeling settings!
+      
+      let userDefaults = Storage.active.userDefaults
+      
+      let predict = userDefaults.predictSettingForLanguage(languageID: lexicalModel.languageID)
+      let correct = userDefaults.correctSettingForLanguage(languageID: lexicalModel.languageID)
+      
+      // Pass these off to KMW!
+      // We do these first so that they're automatically set for the to-be-registered model in advance.
+      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
+    } else {  // We're registering a model in the background - don't change settings.
+      webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
+    }
+    
+    setBannerHeight(to: InputViewController.topBarHeight)
+  }
+  
+  func showBanner(_ display: Bool) {
+    log.debug("Changing banner's alwaysShow property to \(display).")
+    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
+  }
+  
+  func setBannerImage(to path: String) {
+    bannerImgPath = path // Save the path in case delayed initializaiton is needed.
+    log.debug("Banner image path: '\(path).'")
+    webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
+  }
+  
+  func setBannerHeight(to height: Int) {
+    // TODO:
+    webView?.evaluateJavaScript("setBannerHeight(\(height));", completionHandler: nil)
+  }
 }
 
 // MARK: - WKScriptMessageHandler
@@ -260,9 +333,14 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     if fragment.hasPrefix("#insertText-") {
       let dnRange = fragment.range(of: "+dn=")!
       let sRange = fragment.range(of: "+s=")!
+      let drRange = fragment.range(of: "+dr=")!
 
       let dn = Int(fragment[dnRange.upperBound..<sRange.lowerBound])!
-      let s = fragment[sRange.upperBound...]
+      let s = fragment[sRange.upperBound..<drRange.lowerBound]
+      // This computes the number of requested right-deletion characters.
+      // Use it when we're ready to implement that.
+      // Our .insertText will need to be adjusted accordingly.
+      _ = Int(fragment[drRange.upperBound...])!
 
       // KMW uses dn == -1 to perform special processing of deadkeys.
       // This is handled outside of Swift so we don't delete any characters.
@@ -356,6 +434,28 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     } else if fragment.hasPrefix("#beep-") {
       beep(self)
       delegate?.beep(self)
+    } else if fragment.hasPrefix("#suggestPopup"){
+      let cmdKey = fragment.range(of: "+cmd=")!
+      let cmdStr = fragment[cmdKey.upperBound..<fragment.endIndex]
+      
+      let cmdData = cmdStr.data(using: .utf16)
+      let decoder = JSONDecoder()
+      
+      do {
+        let cmd = try decoder.decode(SuggestionPopup.self, from: cmdData!)
+        log.verbose("Longpress detected on suggestion: \"\(cmd.suggestion.displayAs)\".")
+      } catch {
+        log.error("Unexpected JSON parse error: \(error).")
+      }
+      
+      // Will need processing upon extraction from the resulting object.
+//      let frameComponents = baseFrame.components(separatedBy: ",")
+//      let x = CGFloat(Float(frameComponents[0])!)
+//      let y = CGFloat(Float(frameComponents[1])!)
+//      let w = CGFloat(Float(frameComponents[2])!)
+//      let h = CGFloat(Float(frameComponents[3])!)
+//      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
+      
     } else {
       log.error("Unexpected KMW event: \(fragment)")
     }
@@ -390,7 +490,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
         // We use this style b/c it's short, and in essence it is a minor UI element collision -
         // a single key with blocked (erroneous) output.
         // Oddly, is a closer match to SystemSoundID 1520 than 1521.
-        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackStyle.heavy)
+        let vibrator = UIImpactFeedbackGenerator(style: UIImpactFeedbackGenerator.FeedbackStyle.heavy)
         vibrator.impactOccurred()
       } else {
         // Fallback on earlier feedback style
@@ -420,9 +520,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
+    
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
-
+    
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
     var newKb = Defaults.keyboard
     if Manager.shared.currentKeyboardID == nil && !shouldReloadKeyboard {
@@ -437,6 +538,17 @@ extension KeymanWebViewController: KeymanWebDelegate {
       log.info("Setting initial keyboard.")
       _ = Manager.shared.setKeyboard(newKb)
     }
+    
+    if Manager.shared.isSystemKeyboard {
+      showBanner(true)
+    } else {
+      // TODO:  Set banner to visible / not visible based on the toggle in Settings.
+      //        Problem:  we need access to the banner image path there.  It's only set for the system keyboard variant!
+      showBanner(false)
+    }
+    setBannerImage(to: bannerImgPath)
+    // Reset the keyboard's size.
+    keyboardSize = kbSize
     
     fixLayout()
 
@@ -454,9 +566,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
   }
 
   func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    if UIDevice.current.userInterfaceIdiom == .pad
-      || (Util.isSystemKeyboard && Manager.shared.inputViewController.activeTopBarHeight == 0)
-      || isSubKeysMenuVisible {
+    if UIDevice.current.userInterfaceIdiom == .pad || isSubKeysMenuVisible {
       return
     }
 
@@ -578,6 +688,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
   }
 
   private func touchHoldBegan() {
+    // Is also called for banner longpresses.  Will need a way to properly differentiate.
     let isPad = UIDevice.current.userInterfaceIdiom == .pad
     let fontSize = isPad ? UIFont.buttonFontSize * 2 : UIFont.buttonFontSize
 

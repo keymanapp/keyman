@@ -67,6 +67,7 @@ async function loadSettings() {
       function (response) {
         context.loading = true;
         editor.setValue(response);
+        editor.focus();
         context.loading = false;
       },
       "text"
@@ -84,6 +85,10 @@ async function loadSettings() {
     //
     // Setup callbacks
     //
+
+    window.addEventListener('resize', function() {
+      editor.layout();
+    });
 
     const model = editor.getModel();
 

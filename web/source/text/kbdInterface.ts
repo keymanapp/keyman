@@ -844,7 +844,7 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       
       // KeymanTouch for Android uses direct insertion of the character string
-      if('oninserttext' in keyman) {
+      if('oninserttext' in keyman && !(outputTarget instanceof Mock)) {
         keyman['oninserttext'](dn,s);
       }
 
@@ -1092,10 +1092,6 @@ namespace com.keyman.text {
       var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
-      if(matched && outputTarget.getElement()) {
-        this.doInputEvent(outputTarget.getElement());
-      }
-
       return matched;
     }
     
@@ -1142,6 +1138,9 @@ namespace com.keyman.text {
       }
     }
 
+    // Needed for some legacy CJK keyboards.
+    ['ShowPinnedHelp'] = this['showPinnedHelp'];
+
     resetContext() {
       let keyman = com.keyman.singleton;
       if(!keyman.isHeadless && keyman.osk.vkbd) {
@@ -1155,6 +1154,10 @@ namespace com.keyman.text {
       }
       this.resetContextCache();
       this.resetVKShift();
+      
+      if(keyman.modelManager) {
+        keyman.modelManager.invalidateContext();
+      }
 
       if(!keyman.isHeadless) {
         keyman.osk._Show();

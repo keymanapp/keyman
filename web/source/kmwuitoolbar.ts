@@ -337,7 +337,7 @@ if(!window['keyman']['ui']['name']) {
           if(Keyboards[j]['RegionCode'] != i) continue;              // Not this region
 
           // Get JUST the language code for this section.  BCP-47 codes can include more!
-          var bcpSubtags: string[] = keymanweb['util'].getLanguageCodes(Keyboards[j]['LanguageCode']);
+          var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
           if(bcpSubtags[0] == languageCode) continue; // Same language as previous keyboard
           languageCode = bcpSubtags[0];
 
@@ -351,7 +351,7 @@ if(!window['keyman']['ui']['name']) {
         {           
           if(Keyboards[j]['RegionCode'] != i) continue;      // Not this region
 
-          var bcpSubtags: string[] = keymanweb['util'].getLanguageCodes(Keyboards[j]['LanguageCode']);
+          var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
           if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
             var x = ui.languages[languageCode].keyboards;
 

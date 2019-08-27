@@ -115,6 +115,10 @@ def check_keyman_dir(basedir, error_message):
 			raise InstallError(InstallStatus.Abort, error_message)
 		os.mkdir(keyman_dir)
 
+def extract_package_id(inputfile):
+	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	return packageID.lower()
+
 def install_kmp_shared(inputfile, online=False):
 	"""
 	Install a kmp file to /usr/local/share/keyman
@@ -127,7 +131,7 @@ def install_kmp_shared(inputfile, online=False):
 	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
 	check_keyman_dir('/usr/local/share/fonts', "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts")
 
-	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	packageID = extract_package_id(inputfile)
 	packageDir = os.path.join('/usr/local/share/keyman', packageID)
 	kmpdocdir = os.path.join('/usr/local/share/doc/keyman', packageID)
 	kmpfontdir = os.path.join('/usr/local/share/fonts/keyman', packageID)
@@ -173,10 +177,17 @@ def install_kmp_shared(inputfile, online=False):
 				name, ext = os.path.splitext(f['name'])
 				ldmlfile = os.path.join(packageDir, name+".ldml")
 				output_ldml(ldmlfile, ldml)
-				# Special handling of icon to convert to PNG
 			elif ftype == KMFileTypes.KM_ICON:
+				# Special handling of icon to convert to PNG
 				logging.info("Converting %s to PNG and installing both as keyman files", f['name'])
 				checkandsaveico(fpath)
+			elif ftype == KMFileTypes.KM_KMX:
+				# Sanitize keyboard filename if not lower case
+				kmx_id, ext = os.path.splitext(os.path.basename(f['name']))
+				for kb in keyboards:
+					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
+						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+
 		for kb in keyboards:
 			# install all kmx for first lang not just packageID
 			kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
@@ -191,7 +202,7 @@ def install_kmp_shared(inputfile, online=False):
 		raise InstallError(InstallStatus.Abort, message)
 
 def install_kmp_user(inputfile, online=False):
-	packageID, ext = os.path.splitext(os.path.basename(inputfile))
+	packageID = extract_package_id(inputfile)
 	packageDir=user_keyboard_dir(packageID)
 	if not os.path.isdir(packageDir):
 		os.makedirs(packageDir)
@@ -234,6 +245,13 @@ def install_kmp_user(inputfile, online=False):
 			elif ftype == KMFileTypes.KM_SOURCE:
 				#TODO for the moment just leave it for ibus-kmfl to ignore if it doesn't load
 				pass
+			elif ftype == KMFileTypes.KM_KMX:
+				# Sanitize keyboard filename if not lower case
+				kmx_id, ext = os.path.splitext(os.path.basename(f['name']))
+				for kb in keyboards:
+					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
+						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+
 		install_keyboards_to_ibus(keyboards, packageDir)
 	else:
 		logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
@@ -250,7 +268,7 @@ def install_keyboards_to_ibus(keyboards, packageDir):
 			# install all kmx for first lang not just packageID
 			for kb in keyboards:
 				kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
-				if "languages" in kb:
+				if "languages" in kb and len(kb["languages"]) > 0:
 					logging.debug(kb["languages"][0])
 					keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
 				else:

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public enum APIKeyboardFetchError: Error {
   case networkError(Error)

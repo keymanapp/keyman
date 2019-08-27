@@ -1,6 +1,70 @@
 # Keyman Desktop Version History
 
-## 12.0 alpha
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-07-29 12.0.9 beta
+* Initial beta release of Keyman Desktop 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Awindows+base%3Amaster)
+
+* No significant changes.
+
+## 2019-06-12 11.0.1360.0 stable
+* Bug Fix: Crash "Object doesn't support property or method..." starting Keyman Configuration on some systems (#1827)
+
+## 2019-06-05 11.0.1357.0 stable
+* Bug Fix: Error in shutdown of Keyman Engine can cause other applications to crash (#1820)
+
+## 2019-04-29 11.0.1355.0 stable
+* Bug Fix: Error in initialization of Keyman Engine causes FieldWorks to crash if Keyman Developer installed but not Keyman Desktop. (#1739)
+
+## 2019-04-06 11.0.1354.0 stable
+* No changes
+
+## 2019-04-06 11.0.1353.0 stable
+* No changes
+
+## 2019-02-27 11.0.1352.0 stable
+* No changes
+
+## 2019-02-26 11.0.1351.0 stable
+* Not released
+
+## 2019-02-25 11.0.1350.0 stable
+* 11.0 Stable release
+
+## 2019-02-25 11.0.1313.0 beta
+* Bug Fix: AltGr causes sticky Left Control when some Windows European layouts are installed. (#1621)
+
+## 2019-02-21 11.0.1312.0 beta
+* Bug Fix: Make sure backspace in Word (TSF) deletes both halves of surrogate pair for supplementary multilingual plane scripts (#1603)
+
+## 2019-02-20 11.0.1311.0 beta
+* Minor tweaks to Kannada localization (#1598)
+
+## 2019-02-19 11.0.1310.0 beta
+* No changes to Keyman Desktop
+
+## 2019-02-15 11.0.1309.0 beta
+* Bug Fix: Upgrading from 9.0 to 11.0 did not preserve keyboards and settings (#1548)
+
+## 2019-02-14 11.0.1308.0 beta
+* No changes to Keyman Desktop
+
+## 2019-02-01 11.0.1307.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-18 11.0.1306.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-17 11.0.1305.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-15 11.0.1304.0 beta
+* No changes to Keyman Desktop
+
+## 2019-01-15 11.0.1303.0 beta
+* No changes to Keyman Desktop
 
 ## 2019-01-09 11.0.1302.0 beta
 * Bug Fix: Switching between keyboards in same language would sometimes fail (#1505)

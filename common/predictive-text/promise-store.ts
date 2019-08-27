@@ -28,61 +28,63 @@ interface PromiseCallbacks<T> {
   reject: Reject;
 }
 
-/**
- * Associate tokens with promises.
- *
- * First, .make() a promise -- associate a token with resolve/reject callbacks.
- *
- * You can either .keep() a promise -- resolve() and forget it;
- * Or you may also .break() a promise -- reject() and forget it.
- * 
- * <T> is the type of resolved value (value yielded successfully by promise).
- */
-class PromiseStore<T> {
-  // IE11 offers partial support for new Map().
-  // Assume only .get(), .set(), .has(), .delete(), and .size work.
-  // See: http://kangax.github.io/compat-table/es6/#test-Map
-  private _promises: Map<Token, PromiseCallbacks<T>>;
-  constructor() {
-    this._promises = new Map();
-  }
+namespace com.keyman.text.prediction {
   /**
-   * How many promises are currently being tracked?
+   * Associate tokens with promises.
+   *
+   * First, .make() a promise -- associate a token with resolve/reject callbacks.
+   *
+   * You can either .keep() a promise -- resolve() and forget it;
+   * Or you may also .break() a promise -- reject() and forget it.
+   * 
+   * <T> is the type of resolved value (value yielded successfully by promise).
    */
-  get length(): number {
-    return this._promises.size;
-  }
-  /**
-   * Associate a token with its respective resolve and reject callbacks.
-   */
-  make(token: Token, resolve: Resolve<T>, reject: Reject): void {
-    if (this._promises.has(token)) {
-      return reject(`Existing request with token ${token}`);
+  export class PromiseStore<T> {
+    // IE11 offers partial support for new Map().
+    // Assume only .get(), .set(), .has(), .delete(), and .size work.
+    // See: http://kangax.github.io/compat-table/es6/#test-Map
+    private _promises: Map<Token, PromiseCallbacks<T>>;
+    constructor() {
+      this._promises = new Map();
     }
-    this._promises.set(token, { reject, resolve });
-  }
-  /**
-   * Resolve the promise associated with a token (with a value!).
-   * Once the promise is resolved, the token is removed..
-   */
-  keep(token: Token, value: T) {
-    let callbacks = this._promises.get(token);
-    if (!callbacks) {
-      throw new Error(`No promise associated with token: ${token}`);
+    /**
+     * How many promises are currently being tracked?
+     */
+    get length(): number {
+      return this._promises.size;
     }
-    let accept = callbacks.resolve;
-    this._promises.delete(token);
-    return accept(value);
-  }
-  /**
-   * Instantly reject and forget a promise associated with the token.
-   */
-  break(token: Token, reason?: any): void {
-    let callbacks = this._promises.get(token);
-    if (!callbacks) {
-      throw new Error(`No promise associated with token: ${token}`);
+    /**
+     * Associate a token with its respective resolve and reject callbacks.
+     */
+    make(token: Token, resolve: Resolve<T>, reject: Reject): void {
+      if (this._promises.has(token)) {
+        return reject(`Existing request with token ${token}`);
+      }
+      this._promises.set(token, { reject, resolve });
     }
-    this._promises.delete(token);
-    callbacks.reject(reason);
+    /**
+     * Resolve the promise associated with a token (with a value!).
+     * Once the promise is resolved, the token is removed..
+     */
+    keep(token: Token, value: T) {
+      let callbacks = this._promises.get(token);
+      if (!callbacks) {
+        throw new Error(`No promise associated with token: ${token}`);
+      }
+      let accept = callbacks.resolve;
+      this._promises.delete(token);
+      return accept(value);
+    }
+    /**
+     * Instantly reject and forget a promise associated with the token.
+     */
+    break(token: Token, reason?: any): void {
+      let callbacks = this._promises.get(token);
+      if (!callbacks) {
+        throw new Error(`No promise associated with token: ${token}`);
+      }
+      this._promises.delete(token);
+      callbacks.reject(reason);
+    }
   }
 }

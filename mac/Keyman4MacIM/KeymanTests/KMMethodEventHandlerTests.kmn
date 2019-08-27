@@ -7,3 +7,4 @@ begin Unicode > use(main)
 
 group(main) using keys
 "q" + "q" > nul
+"a" + "b" > "c"

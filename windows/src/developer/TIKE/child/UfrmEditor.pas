@@ -128,7 +128,6 @@ uses
   kwhelp,
   OnlineConstants,
   Keyman.Developer.System.Project.Project,
-  ResourceStrings,
   KeymanDeveloperOptions,
   KMDevResourceStrings,
   KeymanDeveloperUtils,
@@ -232,15 +231,11 @@ function TfrmEditor.DoOpenFile: Boolean;
 begin
   RefreshOptions;
 
-  if FileExists(FileName) then
+  FEditorFrame.LoadFromFile(FileName);
+  UpdateEditorFormat;
+
+  if not FileExists(FileName) then
   begin
-    FEditorFrame.LoadFromFile(FileName);
-    UpdateEditorFormat;
-  end
-  else
-  begin
-    TextFileFormat := tffUTF8;
-    UpdateEditorFormat;
     case EditorFormat of    // I1423 - default template
       efXML: SetEditorText(GetXMLTemplate);
       efHTML: SetEditorText(GetHTMLTemplate);

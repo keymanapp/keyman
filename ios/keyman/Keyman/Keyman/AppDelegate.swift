@@ -143,6 +143,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   public func promptAdHocInstall(_ kmp: KeymanPackage) {
     _adhocDirectory = kmp.sourceFolder
+    let isKbd = kmp.isKeyboard()
 
     let vc = UIViewController()
     vc.view.backgroundColor = .red
@@ -154,7 +155,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     action: #selector(cancelAdHocBtnHandler))
     let installBtn = UIBarButtonItem(title: "Install", style: .plain,
                                      target: self,
-                                     action: #selector(installAdHocBtnHandler))
+                                     action: (isKbd ? #selector(installAdHocKeyboardBtnHandler) :
+                                       #selector(installAdHocLexicalModelBtnHandler)) )
     vc.navigationItem.leftBarButtonItem = cancelBtn
     vc.navigationItem.rightBarButtonItem = installBtn
     let nvc = UINavigationController.init(rootViewController: vc)
@@ -164,12 +166,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     })
   }
 
-  @objc func installAdHocBtnHandler() {
+  @objc func installAdHocKeyboardBtnHandler() {
     if let adhocDir = _adhocDirectory {
       self.window?.rootViewController?.dismiss(animated: true, completion: {
         do {
-          try Manager.shared.parseKMP(adhocDir)
-          self.showSimpleAlert(title: "Success", message: "All keyboards installed successfully.")
+          try Manager.shared.parseKbdKMP(adhocDir)
+          self.showSimpleAlert(title: "Success", message: "Installed successfully.")
+        } catch {
+          self.showKMPError(error as! KMPError)
+        }
+
+        //this can fail gracefully and not show errors to users
+        do {
+          try FileManager.default.removeItem(at: adhocDir)
+        } catch {
+          log.error("unable to delete temp files")
+        }
+      })
+    }
+  }
+
+  @objc func installAdHocLexicalModelBtnHandler() {
+    if let adhocDir = _adhocDirectory {
+      self.window?.rootViewController?.dismiss(animated: true, completion: {
+        do {
+          try Manager.shared.parseLMKMP(adhocDir)
+          self.showSimpleAlert(title: "Success", message: "Installed successfully.")
         } catch {
           self.showKMPError(error as! KMPError)
         }

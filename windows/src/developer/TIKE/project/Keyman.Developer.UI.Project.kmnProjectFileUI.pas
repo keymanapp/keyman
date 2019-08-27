@@ -95,8 +95,6 @@ function TkmnProjectFileUI.CompileKeyboard(FSilent: Boolean): Boolean;
 begin
   Result := False;
 
-  FCompilingFile := ProjectFile.FileName;
-
   if ProjectFile.Modified then
   begin
     if not FSilent then

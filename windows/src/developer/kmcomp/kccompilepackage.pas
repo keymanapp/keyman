@@ -32,7 +32,7 @@ uses
   PackageInfo,
   kpsfile;
 
-function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsError, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
+function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
 
 implementation
 
@@ -58,7 +58,7 @@ begin
   end;
 end;
 
-function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsError, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
+function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
 var
   tcp: TKCCompilePackage;
   pack: TKPSFile;
@@ -82,13 +82,13 @@ begin
       tcp.FFullySilent := AFullySilent;
       tcp.FSilent := ASilent;
       tcp.pack := pack;
-      Result := DoCompilePackage(pack, tcp.SelfMessage, ASilent, ChangeFileExt(pack.FileName, '.kmp'));   // I4694
+      Result := DoCompilePackage(pack, tcp.SelfMessage, ASilent, ACheckFilenameConventions, ChangeFileExt(pack.FileName, '.kmp'));   // I4694
       if AWarnAsError and tcp.FHasWarning then Result := False;
 
       if AInstaller and Result then
       begin
         Result := DoCompilePackageInstaller(pack, tcp.SelfMessage, ASilent, AInstallerMSI,   // I4694
-          ChangeFileExt(pack.FileName, '.exe'), AUpdateInstaller);
+          ChangeFileExt(pack.FileName, '.exe'), '', AUpdateInstaller, True, '', '', '', False, False);
         if AWarnAsError and tcp.FHasWarning then Result := False;
       end;
     finally

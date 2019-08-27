@@ -44,7 +44,16 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
       forName: Notifications.keyboardDownloadFailed,
       observer: self,
       function: LanguageDetailViewController.keyboardDownloadFailed)
+    log.info("viewDidLoad: LanguageDetailViewController (registered for keyboardDownloadStarted)")
   }
+  
+  override open func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    log.info("willAppear: LanguageDetailViewController")
+  }
+
+  // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
     return language.keyboards!.count
@@ -121,6 +130,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func keyboardDownloadStarted() {
+    log.info("keyboardDownloadStarted: LanguageDetailViewController")
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
 
@@ -153,6 +163,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func keyboardDownloadFailed() {
+    log.info("keyboardDownloadFailed: LanguageDetailViewController")
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

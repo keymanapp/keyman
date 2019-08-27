@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <InputMethodKit/InputMethodKit.h>
 #import <Carbon/Carbon.h>
-#import "KMInputMethodAppDelegate.h"
 
 @interface KMInputController : IMKInputController
 
 - (void)menuAction:(id)sender;
+- (BOOL)handleDeleteBackLowLevel:(NSEvent *)event;
 
 @end

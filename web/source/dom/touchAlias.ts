@@ -59,5 +59,9 @@ namespace com.keyman.dom {
       this.adjustDeadkeys(s._kmwLength());
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);
     }
+
+    protected setTextAfterCaret(s: string) {
+      this.root.setText(this.getTextBeforeCaret() + s, this.getTextBeforeCaret()._kmwLength());
+    }
   }
 }

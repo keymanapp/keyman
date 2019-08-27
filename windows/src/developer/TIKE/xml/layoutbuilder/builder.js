@@ -686,6 +686,7 @@ $(function () {
     builder.selectKey(null, false);
     builder.selectSubKey(null);
     builder.prepareLayer();
+    builder.saveState();
   });
   
   $('#chkShowAllModifierOptions').click(function () {
@@ -1317,6 +1318,7 @@ $(function () {
       $('.skcontrol.wedge-horz,.skcontrol.wedge-vert,div#btnDelSubKey,input#inpSubKeyCap').css('display', '');
       builder.enableSubKeyControls();
     }
+    builder.saveState();
   }
 
   this.selectKey = function (key, adjustResizable) {
@@ -1346,6 +1348,7 @@ $(function () {
       builder.enableKeyControls();
       builder.enableSubKeyControls();
     }
+    builder.saveState();
   };
 
   this.selectedKey = function () {
@@ -1655,40 +1658,26 @@ $(function () {
       builder.hasSavedKeyUndo = false;
     });
 
+  builder.updateSubKeyCap = function (val) {
+    var k = builder.selectedSubKey();
+    if (k.length == 0) return;
+    $('.text', k).text(builder.renameSpecialKey(val));
+    k.data('text', val);
+
+    builder.updateCharacterMap(val, true);
+    builder.generateSubKeys();
+  };
+
   $('#inpSubKeyCap').change(builder.wrapChange(function () {
-    var val = $(this).val();
-
-    var k = builder.selectedSubKey();
-    if (k.length == 0) return;
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
-
-    builder.updateCharacterMap(val, true);
-    builder.generateSubKeys();
-  }));
-
-  builder.updateSubKeyCap = builder.wrapChange(function () {
-    var val = $(this).val();
-
-    var k = builder.selectedSubKey();
-    if (k.length == 0) return;
-    $('.text', k).text(builder.renameSpecialKey(val));
-    k.data('text', val);
-
-    builder.updateCharacterMap(val, true);
-    builder.generateSubKeys();
-  }, {saveOnce: true});
-
-  $('#inpSubKeyCap').change(function () {
     builder.updateSubKeyCap($(this).val());
-  }).autocomplete({
+  }, {saveOnce: true})).autocomplete({
     source: builder.specialKeyNames,
-    change: function () {
+    change: builder.wrapChange(function () {
       builder.updateSubKeyCap($(this).val());
-    }
-  }).keyup(function () {
+    }, {saveOnce: true})
+  }).keyup(builder.wrapChange(function () {
     builder.updateSubKeyCap($(this).val());
-  }).mouseup(function () {
+  },{saveOnce: true})).mouseup(function () {
     builder.updateCharacterMap($(this).val(), false);
   }).focus(function () {
     builder.updateCharacterMap($(this).val(), false);
@@ -1820,11 +1809,13 @@ $(function () {
   $('#selPlatform').change(function () {
     if (builder.lastPlatform) builder.generate();
     builder.selectPlatform();
+    builder.saveState();
   });
 
   $('#selLayer').change(function () {
     if (builder.lastPlatform) builder.generate();
     builder.selectLayer();
+    builder.saveState();
   });
 
   //
@@ -2157,7 +2148,67 @@ $(function () {
     target.val(target.val() + o.text);
   };
   
+  builder.loadingState = true;
+  
+  builder.saveState = function() {
+    if(builder.loadingState) return;
+    
+    var state = {
+      platform: builder.lastPlatform,
+      layer: builder.lastLayerIndex,
+      presentation: $('#selPlatformPresentation').val()
+    };
+    
+    var key = builder.selectedKey();
+    if(key.length > 0) {
+      state.key = key.data('id');
+    }
+    
+    var subkey = builder.selectedSubKey();
+    if (subkey.length > 0) {
+      state.subkey = $(subkey).data('id');
+    }
+    
+    $.post('/app/source/toucheditor/state', {
+      'Filename': builder.filename,
+      'State': JSON.stringify(state)
+    });
+  };
+  
+  builder.loadState = function() {
+    $.get('/app/source/toucheditor/state', 
+      {
+        'Filename': builder.filename
+      },
+      function(data) {
+        builder.loadingState = false;
+        if(typeof data === 'object') {
+          if(data.platform) {
+            $('#selPlatform').val(data.platform);
+            builder.selectPlatform();
+          }
+          if(data.presentation) {
+            $('#selPlatformPresentation').val(data.presentation);
+            builder.prepareLayer();
+          }
+          if(data.layer) {
+            $('#selLayer').val(data.layer);
+            builder.selectLayer();
+          }
+          if(data.key) {
+            builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === data.key; }).first());
+          }         
+          if(data.subkey) {
+            builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === data.subkey; }).first());
+          }
+        }
+      }
+    );
+  };
+  
   builder.preparePlatforms();
   builder.enableUndoControls();
+    
+  builder.loadState();
 });
   

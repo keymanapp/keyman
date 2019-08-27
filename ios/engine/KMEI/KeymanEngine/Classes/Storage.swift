@@ -48,6 +48,7 @@ extension Storage {
 class Storage {
   let baseDir: URL
   let keyboardDir: URL
+  let lexicalModelDir: URL
   let userDefaults: UserDefaults
 
   let kmwURL: URL
@@ -56,13 +57,15 @@ class Storage {
   private init?(baseURL: URL, userDefaults: UserDefaults) {
     guard
       let baseDir = Storage.createSubdirectory(baseDir: baseURL, name: "keyman"),
-      let keyboardDir = Storage.createSubdirectory(baseDir: baseDir, name: "keyboards")
+      let keyboardDir = Storage.createSubdirectory(baseDir: baseDir, name: "keyboards"),
+      let lexicalModelDir = Storage.createSubdirectory(baseDir: baseDir, name: "lexicalModels")
     else {
       return nil
     }
 
     self.baseDir = baseDir
     self.keyboardDir = keyboardDir
+    self.lexicalModelDir = lexicalModelDir
     self.userDefaults = userDefaults
     kmwURL = baseDir.appendingPathComponent(Resources.kmwFilename)
     specialOSKFontURL = baseDir.appendingPathComponent(Resources.oskFontFilename)
@@ -80,17 +83,29 @@ class Storage {
       return nil
     }
   }
-
+    
   func keyboardDir(forID keyboardID: String) -> URL {
     return keyboardDir.appendingPathComponent(keyboardID)
   }
-
+  
+  func lexicalModelDir(forID lexicalModelID: String) -> URL {
+    return lexicalModelDir.appendingPathComponent(lexicalModelID)
+  }
+  
   func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
     return keyboardURL(forID: keyboard.id, version: keyboard.version)
   }
-
+  
+  func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
+    return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
+  }
+  
   func keyboardURL(forID keyboardID: String, version: String) -> URL {
     return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
+  }
+  
+  func lexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
+    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
 
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
@@ -127,6 +142,12 @@ extension Storage {
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
                      dstDir: baseDir)
+    // For debug compilations - IF we have a sourcemap file, copy that over too.
+    if bundle.url(forResource: "keyman.js.map", withExtension: nil) != nil {
+      try Storage.copy(from: bundle,
+                       resourceName: "keyman.js.map",
+                       dstDir: baseDir)
+    }
     try Storage.copy(from: bundle,
                      resourceName: "kmwosk.css",
                      dstDir: baseDir)

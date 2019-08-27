@@ -34,6 +34,9 @@ typedef NS_ENUM(NSInteger, ClientCapability) {
 @property (assign) BOOL clientSelectionCanChangeUnexpectedly; // REVIEW: Maybe we can get notification from these clients by handling mouseDownOnCharacterIndex.
 @property (assign) ClientCapability clientCanProvideSelectionInfo;
 
+@property id senderForDeleteBack;
+@property BOOL ignoreNextDeleteBackHighLevel;
+
 - (instancetype)initWithLegacyMode:(BOOL)legacy clientSelectionCanChangeUnexpectedly:(BOOL) flagClientSelectionCanChangeUnexpectedly;
 - (void)handleCommand:(NSEvent *)event;
 // This just sets the legacyMode property to true and spits out a debug message to that effect.

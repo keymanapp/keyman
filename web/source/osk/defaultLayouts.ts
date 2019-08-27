@@ -16,6 +16,7 @@ namespace com.keyman.osk {
     "text"?: string,
     "sp"?: ButtonClass,
     "width"?: string,
+    "layer"?: string, // Key derives any modifiers from the value set here if specified, not the actual display layer.
     "nextlayer"?: string,
     "pad"?: string,
     "sk"?: LayoutKey[]
@@ -35,6 +36,7 @@ namespace com.keyman.osk {
     capsKey?: LayoutKey,
     numKey?: LayoutKey,
     scrollKey?: LayoutKey
+    aligned?: boolean
   }
 
   export type LayoutFormFactor = {

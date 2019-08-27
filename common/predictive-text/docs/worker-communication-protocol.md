@@ -117,69 +117,93 @@ Currently there are four message types:
 
 Message       | Direction          | Parameters          | Expected reply      | Uses token
 --------------|--------------------|---------------------|---------------------|---------------
-`initialize`  | keyboard → LMLayer | capabilities, model | Yes — `ready`       | No
+`config`      | LMLayer → worker   | capabilities        | No                  | No
+`load`        | keyboard → LMLayer | model               | Yes — `ready`       | No
+`unload`      | keyboard → LMLayer | none                | No                  | No 
 `ready`       | LMLayer → keyboard | configuration       | No                  | No
 `predict`     | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
 `suggestions` | LMLayer → keyboard | suggestions         | No                  | Yes
+`wordbreak`   | LMLayer → worker   | context             | Yes - `currentword` | Yes
+`currentword` | LMLayer → keyboard | string              | No                  | Yes
 
-
-### Message: `initialize`
+### Message: `config`
 
 Must be sent from the keyboard to the LMLayer so that the LMLayer
-initializes a model. It will send `initialization` which is a plain
-JavaScript object specify the path to the model, as well configurations
-and platform restrictions.
+may properly configure loaded models. It will send `config`, a plain
+JavaScript object specifying platform restrictions.
 
-The keyboard **MUST NOT** send any messages to the LMLayer prior to
-sending `initialize`. The keyboard **SHOULD NOT** send another message
-to the keyboard until it receives `ready` message from the LMLayer
-before sending another message.
+The keyboard **MUST NOT** send any messages to the LMLayer prior to sending `config`.
+After this, it is safe to assume the `config` was performed successfully and is ready to
+`load` a model.
 
-The LMLayer needs to know the platform's abilities and restrictions (capabilities), as well as which concrete language model to instantiate. These properties are passed as `capabilities` and `model`, respectively.
+The LMLayer needs to know the platform's abilities and restrictions (capabilities).
 
 ```typescript
-interface InitializeMessage {
-  message: 'initialize';
+interface LoadMessage {
+  message: 'load';
 
   /**
-   * A ModelDescription that describes the language model and its parameters.
-   * The concrete documentation on is a valid ModelDescription
-   * can be found elsewhere.
+   * The path to the model's compiled script file.
    */
-  model: {
-    /**
-     * What kind of model to instantiate. This is subject to availability,
-     * but common examples are 'wordlist', 'fst', and 'dummy'.
-     */
-    type: string;
-    /**
-     * Each model type defines a set of configurable parameters. Please
-     * see the corresponding model's documentation for an extensive list.
-     */
-    ...parameters: any;
-  };
-
   capabilities: {
     /**
-     * Whether the platform supports deleting to the right.
-     * The absence of this rule implies false.
-     */
-    supportsDeleteRight?: false,
-
-    /**
-     * The maximum amount of UTF-16 code units that the keyboard will
-     * provide to the left of the cursor, as an integer.
+     * The maximum amount of UTF-16 code units that the keyboard will provide to
+     * the left of the cursor, as an integer.
      */
     maxLeftContextCodeUnits: number,
 
     /**
-     * The maximum amount of code units that the keyboard will provide to
-     * the right of the cursor, as an integer. The absence of this rule
-     * implies the platform is incapable of supplying right contexts. 
-     * See also, [[supportsRightContexts]].
+     * The maximum amount of code units that the keyboard will provide to the
+     * right of the cursor, as an integer. The value 0 or the absence of this
+     * rule implies that the right contexts are not supported.
      */
     maxRightContextCodeUnits?: number,
+
+    /**
+     * Whether the platform supports deleting to the right. The absence of this
+     * rule implies false.
+     */
+    supportsDeleteRight?: false,
   }
+}
+```
+
+### Message: `load`
+
+Must be sent from the keyboard to the LMLayer so that the LMLayer
+loads a model. It will send `load` which is a plain
+JavaScript object specify the path to the model, as well configurations
+and platform restrictions.
+
+After a single `config` message, the keyboard **MUST NOT** send any messages 
+to the LMLayer prior to sending `load`. The keyboard **SHOULD NOT** send another 
+message to the keyboard until it receives `ready` message from the LMLayer
+before sending another message.
+
+The LMLayer needs to know which concrete language model to instantiate. This is provided
+by the file at the path specified by the `model` string parameter.
+
+```typescript
+interface LoadMessage {
+  message: 'load';
+
+  /**
+   * The path to the model's compiled script file.
+   */
+  model: string
+}
+```
+
+### Message: `unload`
+
+Must be sent from the keyboard to the LMLayer so that the LMLayer
+resets itself in preparation for loading a new model. It will send `unload`
+which is a plain message to trigger release of old model resources.
+
+
+```typescript
+interface UnloadMessage {
+  message: 'unload';
 }
 ```
 
@@ -187,7 +211,7 @@ interface InitializeMessage {
 ### Message: `ready`
 
 Must be sent from the LMLayer to the keyboard when the LMLayer's model
-as a response to `initialize`. It will send `configuration`, which is
+as a response to `load`. It will send `configuration`, which is
 a plain JavaScript object requesting configuration from the keyboard.
 
 There are only two options defined so far:
@@ -259,6 +283,8 @@ _undoing_ the `transform` it has already applied should it apply a
 as if it has never applied the `transform` associated with the input
 event in the first place.
 
+#### Context
+
 The context is the text surrounding the insertion point, _before_ the
 transform is applied to the buffer.
 
@@ -292,6 +318,10 @@ interface Context {
 }
 ```
 
+[Context]: #context
+
+#### Transform
+
 The transform parameter describes how the input event will change the
 buffer.
 
@@ -320,6 +350,7 @@ interface Transform {
 }
 ```
 
+[Transform]: #transform
 
 ### Message: `suggestions`
 
@@ -327,7 +358,7 @@ The `suggestions` message is sent from the LMLayer to the keyboard. This
 message sends a ranked array of suggestions, in descending order of
 probability (i.e., entry `0` is most likely, followed by entry `1`,
 etc.). This message **MUST** be in response to a `predict` message, and
-it **MUST** respond with the corresponding [token].
+it **MUST** respond with the corresponding [token][Tokens].
 
 ```typescript
 /**
@@ -368,7 +399,7 @@ let suggestions = [
 
 #### Timing
 
-Each suggestion provides a `transform`. This transform is applied
+Each suggestion provides a `transform`. This [transform][Transform] is applied
 _after_ the transform associated with the input event that initiated
 this prediction. That is, the suggested transform applies to the buffer
 after the transform associated with the input event.
@@ -393,3 +424,117 @@ keyboard to acknowledge late suggestions, or for the LMLayer to avoid
 sending late `suggestions` messages. In either case, a `suggestions`
 message can be identified as appropriate or "late" via its `token`
 property.
+
+
+### Message: `wordbreak`
+
+Sent from the keyboard to the LMLayer to request a wordbreak operation
+on the current [context][Context] for use in its UI operations.  (One useful
+example:  display text for a 'reversion' suggestion that undoes
+previously-applied suggestions.)  The keyboard **SHOULD** track each
+`wordbreak` message using a [token][Tokens].  The token **MUST** be unique
+across all wordbreak events.  The LMLayer **SHOULD** respond to each
+`wordbreak` message with a `currentword` message.  The `wordbreak`
+message **MUST** contain the corresponding token as sent in the initial
+`wordbreak` message.
+
+The keyboard **MUST** send the `context` parameter.  The keyboard **MUST**
+send a unique token.
+
+The semantics of the `wordbreak` message **MUST** be from the perspective
+of this sequence of events:
+
+1. After any pending UI operations are completed, including application
+of any selected suggestion's `transform` to the `context`.
+2. Before the user inputs any additional keystrokes.
+
+### Message: `currentword`
+
+The `currentword` message is sent from the LMLayer to the keyboard.  This
+message sends the single word (as determined by wordbreaking) from
+within context that begins to the left of the insertion point but
+following the last wordbreaking character(s) to the left of the insertion
+point.  If no such wordform exists, this returns an empty string.
+
+This message **MUST** be in response to a `wordbreak` message, and it
+**MUST** respond with the corresponding [token][Tokens].
+
+#### Examples
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    context: {
+      left: 'The quick brown fox jumped',
+      right: ' over the lazy dog',
+      startOfBuffer: true,
+      endOfBuffer: true
+    },
+}
+```
+
+would result in the following reply message:
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    word: 'jumped'
+}
+```
+
+Alternatively, if the insertion point is after the space... 
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    context: {
+      left: 'The quick brown fox jumped ',
+      right: 'over the lazy dog',
+      startOfBuffer: true,
+      endOfBuffer: true
+    },
+}
+```
+
+would result in the following reply message:
+
+```javascript
+{
+    message: 'wordbreak',
+
+    token: 1,
+    word: ''
+}
+```
+
+The latter example returns empty string as the final pre-insertion point
+word preceeds the final pre-insertion point wordbreaking character.
+
+#### Late responses
+
+Sometimes, a `currentword` message may arrive after an input event or 
+other UI interaction has already invalidated its request.  The LMLayer
+**MAY** send **late** results.  Consequently, the keyboard **MAY** discard 
+the late wordbreaking `currentword` result.  This is no requirement for
+the keyboard to acknowledge late wordbreaking results, or for the LMLayer
+to avoid sending such late messages.  In either case, a `currentword` message
+can be identified as appropriate or "late" via its `token` property.
+
+## *Informative*: LMLayer worker as a state machine
+
+The LMLayer worker can be seen in the following states:
+
+ - `unconfigured`
+ - `model-less`
+ - `ready`
+
+The transitions of this diagram correspond to messages as described
+above.
+
+![State machine of the LMLayer](./lmlayer-states.png)

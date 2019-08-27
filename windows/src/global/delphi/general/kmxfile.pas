@@ -77,6 +77,7 @@ type
     MemoryDump: TMemoryStream;
     ProductID: Integer;
     MnemonicLayout: Boolean;
+    KMW_RTL: Boolean;
     WindowsLanguages: WideString;
     ISO6393Languages: WideString;
     KeyboardVersion: WideString;   // I4136
@@ -201,7 +202,7 @@ var
   mem: TMemoryStream;
   ver: WideString;
   shver: string;
-  smnemonic: WideString;
+  srtl, smnemonic: WideString;
   signature: Integer;
   bmpsig: array[0..2] of ansichar;  // I3310
 begin
@@ -249,6 +250,8 @@ begin
         ki.KeyboardVersion := '1.0';
 
       ki.MnemonicLayout := GetSystemStore(Memory, TSS_MNEMONIC, smnemonic) and (smnemonic <> '0');
+
+      ki.KMW_RTL := GetSystemStore(Memory, TSS_KMW_RTL, srtl) and (srtl <> '0');
 
       ki.KeyboardID := kfh.KeyboardID;
       ki.DefaultHotKey := kfh.HotKey;

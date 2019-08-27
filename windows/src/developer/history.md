@@ -1,6 +1,84 @@
 # Keyman Developer Version History
 
-## 12.0 alpha
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-08-16 12.0.15 beta
+* Add support for lexical models in packages for development tools (#1977)
+
+## 2019-07-29 12.0.9 beta
+* Initial beta release of Keyman Desktop 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Adeveloper+base%3Amaster)
+
+* New Features:
+  * Lexical model compiler - currently only available from source (#1766)
+  * Add keyboard source analysis and automated regression test tool "kmanalyze" (#1696)
+
+## 2019-06-12 11.0.1360.0 stable
+* No changes
+
+## 2019-06-05 11.0.1357.0 stable
+* No changes
+
+## 2019-04-29 11.0.1355.0 stable
+* No changes
+
+## 2019-04-24 11.0.1354.0 stable
+* Bug fix: Keyman Developer touch layout editor would not save key caps for subkeys (#1731)
+* Bug fix: Compiler could occasionally fail with undefined results when using Unicode store names (#1736)
+
+## 2019-04-06 11.0.1353.0 stable
+* Bug fix: For large keyboards, Keyman Developer would generate a .js file that Chrome was unable to parse (#1717)
+
+## 2019-02-27 11.0.1352.0 stable
+* No changes
+
+## 2019-02-26 11.0.1351.0 stable
+* Not released
+
+## 2019-02-25 11.0.1350.0 stable
+* 11.0 Stable release
+
+## 2019-02-25 11.0.1313.0 beta
+* No changes to Keyman Developer
+
+## 2019-02-21 11.0.1312.0 beta
+* Bug fix: Connect buttons to actions in Distribution tab in Project (#1606)
+* Bug fix: Fix crash saving new keyboard when missing files are referenced (#1605)
+* Bug fix: Fix resizing of text editor windows (#1607)
+
+## 2019-02-20 11.0.1311.0 beta
+* No changes to Keyman Developer
+
+## 2019-02-19 11.0.1310.0 beta
+* Bug fix: Developer does not focus the text editor automatically after load (#1582)
+
+## 2019-02-15 11.0.1309.0 beta
+* Bug fix: Developer was not maintaining project state between page loads (#1580)
+* Bug fix: Developer now maintains the view state when switching between Design and Code views of touch layout editor (#1579)
+* Bug fix: New Project Wizard wasn't adding metadata files to project (#1578)
+* Bug Fix: Package RTL keyboard metadata was being overwritten if .kmx was after .js in package file list (#1576)
+
+## 2019-02-14 11.0.1308.0 beta
+* Change: Adds option to check filename conventions (#1549)
+
+## 2019-02-01 11.0.1307.0 beta
+* Change: Removed unused test window (#1560)
+
+## 2019-01-18 11.0.1306.0 beta
+* Change: Update included KeymanWeb to 11.0.206 (#1537)
+
+## 2019-01-17 11.0.1305.0 beta
+* Change: Allow the "display underlying" flag to be set for each platform (#1539)
+
+## 2019-01-15 11.0.1304.0 beta
+* Change: Tidy up ambiguities in user interface in touch layout editor (#1534)
+
+## 2019-01-15 11.0.1303.0 beta
+* No changes to Keyman Developer
+
+## 2019-01-10 11.0.1302.0 beta
+* Change: Update included KeymanWeb to 11.0.205
 
 ## 2019-01-07 11.0.1301.0 beta
 * Bug fix: Developer does not open a new project after it is created (#1499)

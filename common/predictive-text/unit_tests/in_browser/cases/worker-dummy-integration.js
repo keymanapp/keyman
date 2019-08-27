@@ -1,4 +1,5 @@
 var assert = chai.assert;
+var LMLayer = com.keyman.text.prediction.LMLayer;
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -6,25 +7,23 @@ var assert = chai.assert;
  * **injectable** suggestions: that is, you, as the tester, have
  * to provide the predictions. The dummy model does not create any
  * suggestions on its own. The dummy model can take in a series
- * of suggestions when initialized and return them sequentially.
+ * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
+  this.timeout(config.timeouts.standard);
+
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
-      var lmLayer = new LMLayer();
-      var capabilities = {
-        maxLefContextCodeUnits: 32 + ~~Math.random() * 32
-      };
+      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                  // the WebWorker boundary, so we should be generous here.
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
-      return lmLayer.initialize(
-        capabilities,
-        {
-            type: 'dummy',
-            futureSuggestions: iGotDistractedByHazel()
-        }
+      return lmLayer.loadModel(
+        // We need to provide an absolute path since the worker is based within a blob.
+        document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
       ).then(function (actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
@@ -40,7 +39,43 @@ describe('LMLayer using dummy model', function () {
         return lmLayer.predict(zeroTransform(), emptyContext());
       }).then(function (suggestions) {
         assert.deepEqual(suggestions, iGotDistractedByHazel()[3]);
+        lmLayer.shutdown();
         return Promise.resolve();
+      });
+    });
+  });
+
+  describe('Wordbreaking', function () {
+    it('will perform (default) wordbreaking and return word at caret', function () {
+      if(navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
+        // Our wordbreaking uses the IE-unsupported .codePointAt() function.
+        console.warn("Bypassing wordbreak test on IE.");
+        return;
+      }
+
+      this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
+                                                  // the WebWorker boundary, so we should be generous here.
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+
+      // We're testing many as asynchronous messages in a row.
+      // this would be cleaner using async/await syntax, but
+      // alas some of our browsers don't support it.
+      return lmLayer.loadModel(
+        // We need to provide an absolute path since the worker is based within a blob.
+        document.location.protocol + '//' + document.location.host + "/resources/models/simple-dummy.js"
+      ).then(function (actualConfiguration) {
+        return Promise.resolve();
+      }).then(function () {
+        // We'll keep it simple here, as this is primarily an integration test.
+        // Functionality is handled in the 'headless' test case 'default-word-breaker.js'.
+        let context = { 
+          left: 'The quick brown fox jumped', startOfBuffer: true,
+          right: ' over the lazy dog.', endOfBuffer: true
+        };
+        return lmLayer.wordbreak(context);
+      }).then(function (word) {
+        assert.deepEqual(word, 'jumped');
+        return lmLayer.predict(zeroTransform(), emptyContext());
       });
     });
   });

@@ -8,11 +8,15 @@
 
 #import "KMAboutWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMOSVersion.h"
 
 @interface KMAboutWindowController ()
 @property (nonatomic, weak) IBOutlet NSTextField *versionLabel;
 @property (nonatomic, weak) IBOutlet NSTextField *copyrightLabel;
 @property (nonatomic, weak) IBOutlet NSButton *licenseButton;
+// not needed at the moment but might be:
+@property (nonatomic, weak) IBOutlet NSButton *closeButton;
+@property (nonatomic, weak) IBOutlet NSButton *configureButton;
 @end
 
 @implementation KMAboutWindowController
@@ -49,9 +53,18 @@
 - (IBAction)configAction:(id)sender {
     // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
     // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-    // TODO: This bug should be fixed in 10.13.4, so after that has been available for a few weeks, we
-    // can create a PR for branch mac-revert-high-sierra-showPreferences-workaround and merge it.
-    [self.AppDelegate showConfigurationWindow];
+    // rrb: where Apple's API is broken (10.13.1-10.13.3) call our workaround, otherwise, call showPreferences
+    u_int16_t systemVersion = [KMOSVersion SystemVersion];
+    if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
+    {
+        NSLog(@"About Box: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
+        [self.AppDelegate showConfigurationWindow]; // call our workaround
+    }
+    else
+    {
+        NSLog(@"About Box: calling Apple's showPreferences (sys ver %x)", systemVersion);
+        [self.AppDelegate.inputController showPreferences:sender]; // call Apple API
+    }
     [self close];
 }
 

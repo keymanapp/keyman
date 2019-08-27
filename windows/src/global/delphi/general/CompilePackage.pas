@@ -30,7 +30,7 @@ uses
   kpsfile, kmpinffile, PackageInfo,
   Keyman.Developer.System.Project.ProjectLog;
 
-function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
+function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
 
 implementation
 
@@ -49,9 +49,13 @@ uses
   RegistryKeys,
   kmxfile,
   KeymanDeveloperOptions,
+  KeymanVersion,
 
+  Keyman.System.KeyboardUtils,
+  Keyman.System.LexicalModelUtils,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.PackageInfoRefreshKeyboards,
+  Keyman.System.PackageInfoRefreshLexicalModels,
 
   RedistFiles,
   TempFileManager;
@@ -67,23 +71,26 @@ type
 
     FOutputFileName: string;
     FTempFiles: TTempFiles;
+    FCheckFilenameConventions: Boolean;
 
     procedure FatalMessage(const msg: string);
     procedure WriteMessage(AState: TProjectLogState; const msg: string);   // I4706
 
     function BuildKMP: Boolean;
 
-    constructor Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string);   // I4688
+    constructor Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string);   // I4688
     destructor Destroy; override;
     function Compile: Boolean;
     procedure CheckForDangerousFiles;
     procedure CheckKeyboardVersions;
     procedure CheckKeyboardLanguages;
+    procedure CheckFilenameConventions;
+    function CheckLexicalModels: Boolean;
   end;
 
-function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string): Boolean;   // I4688
+function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
 begin
-  with TCompilePackage.Create(pack, AMessageEvent, ASilent, AOutputFileName) do   // I4688
+  with TCompilePackage.Create(pack, AMessageEvent, ASilent, ACheckFilenameConventions, AOutputFileName) do   // I4688
   try
     Result := Compile;
   finally
@@ -92,7 +99,7 @@ begin
 end;
 
 
-constructor TCompilePackage.Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent: Boolean; const AOutputFileName: string);   // I4688
+constructor TCompilePackage.Create(APack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string);   // I4688
 begin
   inherited Create;
   pack := APack;
@@ -100,12 +107,52 @@ begin
   FSilent := ASilent;
   FOutputFileName := AOutputFileName;
   FTempFiles := TTempFiles.Create;
+  FCheckFilenameConventions := ACheckFilenameConventions;
 end;
 
 destructor TCompilePackage.Destroy;
 begin
   FreeAndNil(FTempFiles);
   inherited Destroy;
+end;
+
+procedure TCompilePackage.CheckFilenameConventions;
+var
+  i: Integer;
+begin
+  if not FCheckFilenameConventions then
+    Exit;
+
+  if pack.LexicalModels.Count > 0 then
+  begin
+    if not TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventions(pack.FileName) then
+      WriteMessage(plsWarning, Format(TKeyboardUtils.SPackageNameDoesNotFollowLexicalModelConventions_Message, [ExtractFileName(pack.FileName)]));
+  end
+  else
+  begin
+    if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(pack.FileName) then
+      WriteMessage(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(pack.FileName)]));
+  end;
+
+  for i := 0 to pack.Files.Count - 1 do
+  begin
+    if not TKeyboardUtils.DoesFilenameFollowConventions(pack.Files[i].FileName) then
+      WriteMessage(plsWarning, Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Message, [ExtractFileName(pack.Files[i].FileName)]));
+  end;
+end;
+
+function TCompilePackage.CheckLexicalModels: Boolean;
+begin
+  if pack.LexicalModels.Count > 0 then
+  begin
+    if pack.Keyboards.Count > 0 then
+    begin
+      FatalMessage('The package contains both lexical models and keyboards, which is not permitted.');
+      Exit(False);
+    end;
+  end;
+
+  Exit(True);
 end;
 
 function TCompilePackage.Compile: Boolean;
@@ -130,9 +177,11 @@ begin
     Exit;
   end;
 
+  CheckFilenameConventions;
   CheckForDangerousFiles;
   CheckKeyboardVersions;
   CheckKeyboardLanguages;
+  if not CheckLexicalModels then Exit;
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -194,6 +243,18 @@ begin
       Free;
     end;
 
+    with TPackageInfoRefreshLexicalModels.Create(kmpinf) do
+    try
+      OnError := Self.FOnMessage;
+      if not Execute then
+      begin
+        WriteMessage(plsError, 'The package build was not successful.');
+        Exit;
+      end;
+    finally
+      Free;
+    end;
+
     //
     // Update the package version to the current compiled
     // keyboard version.
@@ -201,33 +262,55 @@ begin
 
     if pack.KPSOptions.FollowKeyboardVersion then
     begin
-      if kmpinf.Keyboards.Count = 0 then
+      if (kmpinf.Keyboards.Count = 0) and (kmpinf.LexicalModels.Count = 0) then
       begin
-        FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
+        FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards (or lexical models) in the package.');
         Exit;
       end;
 
-      FPackageVersion := kmpinf.Keyboards[0].Version;
+      if kmpinf.Keyboards.Count > 0 then
+      begin
+        FPackageVersion := kmpinf.Keyboards[0].Version;
+        for i := 1 to kmpinf.Keyboards.Count - 1 do
+          if kmpinf.Keyboards[i].Version <> FPackageVersion then
+          begin
+            FatalMessage(
+              'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
+              'and the keyboards have mismatching versions.');
+            Exit;
+          end;
+      end
+      else
+      begin
+        FPackageVersion := kmpinf.LexicalModels[0].Version;
+        for i := 1 to kmpinf.LexicalModels.Count - 1 do
+          if kmpinf.LexicalModels[i].Version <> FPackageVersion then
+          begin
+            FatalMessage(
+              'The option "Follow Keyboard Version" is set but the package contains more than one lexical model, '+
+              'and the models have mismatching versions.');
+            Exit;
+          end;
+      end;
 
-      for i := 1 to kmpinf.Keyboards.Count - 1 do
-        if kmpinf.Keyboards[i].Version <> FPackageVersion then
-        begin
-          FatalMessage(
-            'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
-            'and the keyboards have mismatching versions.');
-          Exit;
-        end;
-      kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;;
+      kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;
     end;
 
     kmpinf.RemoveFilePaths;
 
-    psf := TPackageContentFile.Create(kmpinf);
-    psf.FileName := 'kmp.inf';
-    psf.Description := 'Package information';
-    psf.CopyLocation := pfclPackage;
+    if kmpinf.LexicalModels.Count = 0
+      then kmpinf.Options.FileVersion := SKeymanVersion70
+      else kmpinf.Options.FileVersion := SKeymanVersion120;
 
-    kmpinf.Files.Add(psf);
+    if kmpinf.Options.FileVersion = SKeymanVersion70 then
+    begin
+      psf := TPackageContentFile.Create(kmpinf);
+      psf.FileName := 'kmp.inf';
+      psf.Description := 'Package information';
+      psf.CopyLocation := pfclPackage;
+
+      kmpinf.Files.Add(psf);
+    end;
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.json';
