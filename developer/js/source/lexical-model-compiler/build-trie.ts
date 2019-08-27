@@ -20,19 +20,19 @@ export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?:
   return JSON.stringify(trie);
 }
 
+/**
+ * Parses a word list from its filename.
+ * 
+ * The word list may be encoded in:
+ * 
+ *  - UTF-8, with or without BOM [exported by most software]
+ *  - UTF-16, little endian, with BOM [exported by Microsoft Excel]
+ * 
+ * @param filename filename of the word list
+ */
 export function parseWordListFromFilename(filename: string): WordList {
-  // Note: BOM is U+FEFF
-  // In little endian, this is 0xFF 0xFE
-  // Big Endian, is NOT supported because Node does not support it (???)
-  // See: https://stackoverflow.com/a/14551669/6626414
-  let buffer = readFileSync(filename);
-  if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
-    return parseWordList(readFileSync(filename, 'utf16le'));
-  } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
-    throw new Error('UTF-16BE is unsupported')
-  }
-
-  throw new Error('not implemented');
+  let contents = readFileSync(filename, detectEncoding(filename));
+  return parseWordList(contents);
 }
 
 /**
@@ -401,5 +401,37 @@ namespace Trie {
       .toLowerCase()
       // remove diacritical marks.
       .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
+  }
+}
+
+
+/**
+ * Detects the encoding of a text file.
+ * 
+ * Supported encodings are:
+ * 
+ *  - UTF-8, with or without BOM
+ *  - UTF-16, little endian, with BOM
+ * 
+ * UTF-16 in big endian is explicitly NOT supported! The reason is two-fold:
+ * 1) Node does not support it without resorting to an external library (or
+ * swapping every byte in the file!); and 2) I'm not sure anything actually
+ * outputs in this format anyway!
+ * 
+ * @param filename filename of the file to detect encoding
+ */
+function detectEncoding(filename: string): 'utf8' | 'utf16le' {
+  let buffer = readFileSync(filename);
+  // Note: BOM is U+FEFF
+  // In little endian, this is 0xFF 0xFE
+  if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
+    return 'utf16le';
+  } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
+    // Big Endian, is NOT supported because Node does not support it (???)
+    // See: https://stackoverflow.com/a/14551669/6626414
+    throw new Error('UTF-16BE is unsupported')
+  } else {
+    // Assume its in UTF-8, with or without a BOM.
+    return 'utf8';
   }
 }
