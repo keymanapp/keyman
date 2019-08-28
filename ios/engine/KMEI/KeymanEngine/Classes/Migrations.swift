@@ -14,7 +14,35 @@ private enum MigrationLevel {
   static let migratedForKMP = 20
 }
 
+struct VersionResourceSet {
+  var version: Version
+  var resources: [LanguageResource]
+  // but how to handle deprecation?
+
+  init(version: Version, resources: [LanguageResource]) {
+    self.version = version
+    self.resources = resources
+  }
+}
+
 enum Migrations {
+  static let resourceHistory: [VersionResourceSet] = {
+    //let eurolatin2 =
+    let sil_euro_latin = Defaults.keyboard  // We're already storing the exact metadata needed.
+
+    // Unknown transition point:  european
+    // Before v11:  european2
+    // Before v12:  sil_euro_latin
+    // At v12:      sil_euro_latin + nrc.en.mtnt (lex model)
+    var timeline: [VersionResourceSet] = []
+
+    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin])
+
+    timeline.append(v12_resources)
+
+    return timeline
+  }()
+
   static func migrate(storage: Storage) {
     if storage.userDefaults.migrationLevel < MigrationLevel.migratedUserDefaultsToStructs {
       migrateUserDefaultsToStructs(storage: storage)
@@ -29,6 +57,21 @@ enum Migrations {
       log.info("KMP directory migration already performed. Skipping.")
     }
     storage.userDefaults.synchronize()
+  }
+
+  static func updateResources(storage: Storage) {
+    let lastVersion = storage.userDefaults.lastEngineVersion ?? Version.fallback
+    if lastVersion < Version("12.0")! {
+      // While the key to track version info existed before v12, it was unused until then.
+      log.info("Upgrading from pre-tracked version of KeymanEngine to v12.0")
+    }
+
+    // Check against resource history.
+
+    let history = resourceHistory
+
+    // FIXME:  Once the work is done, the following line should be active, not commented.
+    // storage.userDefaults.lastEngineVersion = Version("12.0")
   }
 
   static func migrateUserDefaultsToStructs(storage: Storage) {

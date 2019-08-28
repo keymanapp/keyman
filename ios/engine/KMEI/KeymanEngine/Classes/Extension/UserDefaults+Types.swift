@@ -207,6 +207,20 @@ public extension UserDefaults {
       set(level, forKey: Key.migrationLevel)
     }
   }
+
+  var lastEngineVersion: Version? {
+    get {
+      if let valueString = string(forKey: Key.engineVersion) {
+        return Version(valueString)
+      } else {
+        return nil
+      }
+    }
+
+    set(version) {
+      set(version?.string, forKey: Key.engineVersion)
+    }
+  }
   
   // stores a dictionary of predict-enablement settings keyed to language ids, i.e., [langID: Bool]
   var predictionEnablements: [String: Bool]? {

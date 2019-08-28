@@ -1024,7 +1024,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if userData.bool(forKey: dontShowGetStartedKey) {
       return false
     }
-    
+
     // Needs a nil check to ensure Get Started displays for the initial install - userData.bool defaults to false.
     if !userData.bool(forKey: shouldShowGetStartedKey) && userData.object(forKey: shouldShowGetStartedKey) != nil {
       return false

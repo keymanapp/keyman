@@ -185,6 +185,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
     }
+    Migrations.updateResources(storage: Storage.active)
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
