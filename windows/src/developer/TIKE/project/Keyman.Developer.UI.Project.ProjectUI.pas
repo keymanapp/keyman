@@ -21,10 +21,11 @@ unit Keyman.Developer.UI.Project.ProjectUI;   // I4687
 interface
 
 uses
+  Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI;
 
 function GetGlobalProjectUI: TProjectUI;
-function LoadGlobalProjectUI(AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
+function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
 procedure FreeGlobalProjectUI;
 
 implementation
@@ -44,10 +45,10 @@ begin
   FreeAndNil(FGlobalProject);
 end;
 
-function LoadGlobalProjectUI(AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
+function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
 begin
   Assert(not Assigned(FGlobalProject));
-  Result := TProjectUI.Create(AFilename, ALoadPersistedUntitledProject);   // I4687
+  Result := TProjectUI.Create(pt, AFilename, ALoadPersistedUntitledProject);   // I4687
   FGlobalProject := Result;
 end;
 

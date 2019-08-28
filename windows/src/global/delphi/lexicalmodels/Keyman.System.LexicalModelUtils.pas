@@ -4,10 +4,19 @@ interface
 
 type
   TLexicalModelUtils = class
+  private
   public
     const SPackageNameDoesNotFollowLexicalModelConventions_Message: string =
       'The package file %0:s does not follow the recommended model filename conventions. The name should be all lower case, '+
       'include only alphanumeric characters and underscore (_), and should have the structure <author>.<bcp47>.<uniq>.model.kps';
+
+    const SModelFileNameDoesNotFollowConventions_Message: string =
+      'The model source file %0:s does not follow the recommended model filename conventions. The name should be all lower case, '+
+      'include only alphanumeric characters and underscore (_), and should have the structure <author>.<bcp47>.<uniq>.model.ts';
+
+    const SProjectFileNameDoesNotFollowLexicalModelConventions_Message: string =
+      'The model project file %0:s does not follow the recommended model filename conventions. The name should be all lower case, '+
+      'include only alphanumeric characters and underscore (_), and should have the structure <author>.<bcp47>.<uniq>.model.kpj';
 
     class function LexicalModelFileNameToID(filename: string): string;
     class function LexicalModelIDToFileName(id: string): string;
@@ -15,13 +24,23 @@ type
       const Name: string): Boolean; static;
     class function DoesJSFilenameFollowLexicalModelConventions(
       const Name: string): Boolean; static;
+    class function DoesTSFilenameFollowLexicalModelConventions(
+      const Name: string): Boolean; static;
+    class function DoesProjectFilenameFollowLexicalModelConventions(
+      const Name: string): Boolean; static;
+
+    class function ExtractFileExt(filename: string): string; static;
+    class function RemoveFileExt(filename: string): string; static;
+    class function ChangeFileExt(filename, ext: string): string; static;
   end;
 
 implementation
 
 uses
   System.RegularExpressions,
-  System.SysUtils;
+  System.SysUtils,
+
+  utilfiletypes;
 
 { TLexicalModelUtils }
 
@@ -30,13 +49,21 @@ const
 
   // The model ID SHOULD adhere to this pattern (see also developer/js/index.ts):
   //                           author           .bcp47            .uniq
-  MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(js)$';
+  MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.js$';
+  MODEL_ID_PATTERN_TS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.ts$';
   MODEL_ID_PATTERN_PACKAGE = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
+  MODEL_ID_PATTERN_PROJECT = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.kpj$';
 
 class function TLexicalModelUtils.DoesJSFilenameFollowLexicalModelConventions(
   const Name: string): Boolean;
 begin
   Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_JS);
+end;
+
+class function TLexicalModelUtils.DoesTSFilenameFollowLexicalModelConventions(
+  const Name: string): Boolean;
+begin
+  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_TS);
 end;
 
 class function TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventions(
@@ -45,6 +72,12 @@ class function TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventio
 //                         author           .bcp47            .uniq
 begin
   Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_PACKAGE);
+end;
+
+class function TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(
+  const Name: string): Boolean;
+begin
+  Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_PROJECT);
 end;
 
 class function TLexicalModelUtils.LexicalModelFileNameToID(filename: string): string;
@@ -57,6 +90,35 @@ end;
 class function TLexicalModelUtils.LexicalModelIDToFileName(id: string): string;
 begin
   Result := id + SLexicalModelExtension;
+end;
+
+// Note: This isn't ideal. The dotted a.b.c.model.blah filename convention makes it impossible to
+// generically extract an extension. This is the best we can do, adding special handling for specific
+// file extensions
+
+class function TLexicalModelUtils.RemoveFileExt(filename: string): string;
+begin
+  Result := Copy(filename, 1, Length(filename) - Length(TLexicalModelUtils.ExtractFileExt(filename)));
+end;
+
+class function TLexicalModelUtils.ChangeFileExt(filename, ext: string): string;
+begin
+  Result := Copy(filename, 1, Length(filename) - Length(TLexicalModelUtils.ExtractFileExt(filename))) + ext;
+end;
+
+class function TLexicalModelUtils.ExtractFileExt(filename: string): string;
+var
+  Second: string;
+begin
+  Result := System.SysUtils.ExtractFileExt(filename);
+  if Result = '' then
+    Exit;
+  Second := System.SysUtils.ExtractFileExt(Copy(filename, 1, Length(filename)-Length(Result)));
+  if (SameText(Result, Ext_LexicalModelSource) or
+      SameText(Result, Ext_PackageSource) or
+      SameText(Result, Ext_ProjectSource)) and
+     SameText(Second, Ext_Model_Component) then
+    Result := Second + Result;
 end;
 
 end.

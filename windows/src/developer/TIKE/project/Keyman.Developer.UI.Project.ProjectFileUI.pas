@@ -50,7 +50,7 @@ type
     procedure DoRefreshCaption; override;
 
   public
-    constructor Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False); override;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); override;
     destructor Destroy; override;
 
     procedure Log(AState: TProjectLogState; Filename, Msg: string); override;   // I4706
@@ -135,7 +135,7 @@ end;
 
 { TProjectUI }
 
-constructor TProjectUI.Create(AFileName: string;
+constructor TProjectUI.Create(AProjectType: TProjectType; AFileName: string;
   ALoadPersistedUntitledProject: Boolean);
 begin
   inherited;

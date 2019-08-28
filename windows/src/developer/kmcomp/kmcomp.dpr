@@ -106,6 +106,9 @@ uses
   Keyman.Developer.System.Project.kmnProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
   Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
+  Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
+  Keyman.Developer.System.Project.modelTsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas',
+  Keyman.Developer.System.LexicalModelCompile in '..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas',
   Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
 
 {$R icons.RES}

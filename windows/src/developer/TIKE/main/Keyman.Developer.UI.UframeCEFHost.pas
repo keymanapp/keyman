@@ -614,7 +614,7 @@ end;
 procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
-  Result := source = FOCUS_SOURCE_NAVIGATION;
+  Result := source <> FOCUS_SOURCE_NAVIGATION;
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);

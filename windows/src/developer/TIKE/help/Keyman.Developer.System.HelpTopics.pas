@@ -23,6 +23,7 @@ const
   SHelpTopic_Context_New = 'context/new';
   SHelpTopic_Context_NewProject = 'context/new-project';
   SHelpTopic_Context_NewProjectParameters = 'context/new-project-parameters';
+  SHelpTopic_Context_NewModelProjectParameters = 'context/new-model-project-parameters';
   SHelpTopic_Context_NewFileDetails = 'context/new-file-details';
   SHelpTopic_Context_OnScreenKeyboardEditor = 'context/keyboard-editor#toc-on-screen-tab';
   SHelpTopic_Context_Options = 'context/options';

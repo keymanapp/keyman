@@ -73,6 +73,7 @@ begin
   FFileName := AFileName;
 end;
 
+
 procedure TProjectLoader.Execute;   // I4698
 var
   n, i: Integer;
@@ -109,6 +110,11 @@ begin
     if VarIsNull(node.ChildValues['CheckFilenameConventions'])
       then FProject.Options.CheckFilenameConventions := False // existing projects default to FALSE (new projects default to TRUE)
       else FProject.Options.CheckFilenameConventions := node.ChildValues['CheckFilenameConventions'];
+
+    FProject.Options.ProjectType := ProjectTypeFromString(VarToStr(node.ChildValues['ProjectType']));
+    if FProject.Options.ProjectType = ptUnknown then
+      // Support projects without a defined projecttype
+      FProject.Options.ProjectType := ptKeyboard;
   end;
 
   { Load root nodes first - I708 }

@@ -517,7 +517,7 @@ begin
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
     FActiveProject := '';
 
-  LoadGlobalProjectUI(FActiveProject, True);
+  LoadGlobalProjectUI(ptUnknown, FActiveProject, True);
 
   InitDock;
 
