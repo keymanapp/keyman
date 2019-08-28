@@ -55,7 +55,8 @@ describe('LexicalModelCompiler', function () {
     let compiler = new LexicalModelCompiler;
     let code = compiler.generateLexicalModelCode(MODEL_ID, {
       format: 'trie-1.0',
-      sources: ['wordlist.txt'],
+      sources: ['wordlist.tsv'],
+      // This is a possible word breaking function:
       wordBreaking(phrase: string): Span[] {
         return [];
       }

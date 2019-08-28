@@ -28,7 +28,7 @@ interface LexicalModelSource extends LexicalModel {
   /**
    * What kind of word breaking to use, if any.
    */
-  readonly wordBreaking?: 'default' | 'ascii' | 'placeholder' | ClassBasedWordBreaker;
+  readonly wordBreaking?: 'default' | 'ascii' | 'placeholder' | WordBreakingFunction | ClassBasedWordBreaker;
   /**
    * How to simplify words, to convert them into simplifired search keys
    * This often involves removing accents, lowercasing, etc.

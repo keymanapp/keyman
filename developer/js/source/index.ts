@@ -218,6 +218,12 @@ export default class LexicalModelCompiler {
       if (typeof modelSource.wordBreaking === "string") {
         // It must be a builtin word breaker, so just instantiate it.
         wordBreakingSource = `wordBreakers['${modelSource.wordBreaking}']`;
+      } else if (typeof modelSource.wordBreaking === "function") {
+        // The word breaker was passed as a literal function; use its source code.
+        wordBreakingSource = modelSource.wordBreaking.toString()
+        // Note: the .toString() might just be the property name, but we want a
+        // plain function:
+          .replace(/^wordBreaking\b/, 'function');
       } else if (modelSource.wordBreaking.sources) {
         let wordBreakingSources: string[] = modelSource.wordBreaking.sources.map(function(source) {
           return fs.readFileSync(path.join(sourcePath, source), 'utf8');
@@ -251,7 +257,7 @@ export default class LexicalModelCompiler {
           createTrieDataStructure(filenames, modelSource.searchTermToKey)
         }, {\n`;
         if (wordBreakingSource) {
-          func += `  wordBreaking: ${wordBreakingSource},\n`;
+          func += `  wordBreaker: ${wordBreakingSource},\n`;
         }
         if (modelSource.searchTermToKey) {
           func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
