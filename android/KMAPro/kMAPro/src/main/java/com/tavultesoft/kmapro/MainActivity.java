@@ -733,15 +733,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     startActivity(getStartedIntent);
   }
 
-  // Launch System file browser for user to navigate to local .kmp files
-  private void showFileBrowser() {
-    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-    intent.addCategory(Intent.CATEGORY_OPENABLE);
-    // Unfortunately, we can't filter for a "kmp" mime type
-    intent.setType("*/*");
-    startActivityForResult(intent, READ_REQUEST_CODE);
-  }
-
   private void showSettings() {
     Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
     startActivity(settingsIntent);
