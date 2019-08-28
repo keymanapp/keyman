@@ -196,7 +196,8 @@ enum Migrations {
       userModels = [Defaults.lexicalModel] + userModels
       Storage.active.userDefaults.userLexicalModels = userModels
     }
-    // Must still do the actual install.
+
+    // Must still do the actual install.  This comes after the copyKMWFiles step, though.
 
     // Store the version we just upgraded to.
     storage.userDefaults.lastEngineVersion = Version.current
