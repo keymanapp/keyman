@@ -27,7 +27,29 @@ struct VersionResourceSet {
 
 enum Migrations {
   static let resourceHistory: [VersionResourceSet] = {
-    //let eurolatin2 =
+    let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
+
+    let european =  InstallableKeyboard(id: "european",
+                                         name: "EuroLatin Keyboard",
+                                         languageID: "en",
+                                         languageName: "English",
+                                         version: "1.7",
+                                         isRTL: false,
+                                         font: font,
+                                         oskFont: nil,
+                                         isCustom: false)
+
+    // Default keyboard in version 10.0 (and likely before)
+    let european2 = InstallableKeyboard(id: "european2",
+                                         name: "EuroLatin2 Keyboard",
+                                         languageID: "en",
+                                         languageName: "English",
+                                         version: "1.6",
+                                         isRTL: false,
+                                         font: font,
+                                         oskFont: nil,
+                                         isCustom: false)
+
     let sil_euro_latin = Defaults.keyboard  // We're already storing the exact metadata needed.
 
     // Unknown transition point:  european
@@ -36,8 +58,14 @@ enum Migrations {
     // At v12:      sil_euro_latin + nrc.en.mtnt (lex model)
     var timeline: [VersionResourceSet] = []
 
+    let legacy_resources = VersionResourceSet(version: Version.fallback, resources: [european])
+    let v10_resources = VersionResourceSet(version: Version("10.0")!, resources: [european2])
+    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin])
     let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin])
 
+    timeline.append(legacy_resources)
+    timeline.append(v10_resources)
+    timeline.append(v11_resources)
     timeline.append(v12_resources)
 
     return timeline
@@ -59,16 +87,88 @@ enum Migrations {
     storage.userDefaults.synchronize()
   }
 
-  static func updateResources(storage: Storage) {
-    let lastVersion = storage.userDefaults.lastEngineVersion ?? Version.fallback
-    if lastVersion < Version("12.0")! {
-      // While the key to track version info existed before v12, it was unused until then.
-      log.info("Upgrading from pre-tracked version of KeymanEngine to v12.0")
+  static func detectLegacyKeymanVersion(): [Version] {
+    // While the 'key' used to track version info existed before v12, it was unused until then.
+    log.info("Prior engine version unknown; attepting to auto-detect.")
+
+    // Detect possible version matches.
+    let userResources = Storage.active.userDefaults.userResources ?? []
+    let possibleMatches: [Version] = resourceHistory.compactMap { set in
+      if set.version < Version("12.0")! {
+        // Are all of the version's default resources present?
+        let match = set.resources.allSatisfy { res in
+          return userResources.contains(where: { res2 in
+            return res.id == res2.id && res.languageID == res2.languageID
+          })
+        }
+
+        // If so, report that we can match this version.
+        if match {
+          return set.version
+        } else {
+          // No match; don't consider this version.
+          return nil
+        }
+      } else {
+        // If it were at least version 12.0, the version would be specified and we wouldn't be guessing.
+        return nil
+      }
     }
 
-    // Check against resource history.
+    return possibleMatches
+  }
 
-    let history = resourceHistory
+  static func updateResources(storage: Storage) {
+    var lastVersion = storage.userDefaults.lastEngineVersion
+    if (lastVersion ?? Version.fallback) == Version("12.0") {
+      // We're current; no need to do anything here.
+      return
+    }
+
+    // Future-proofing - migrating from an old versiont to a new one.
+    if (lastVersion ?? Version.fallback) < Version("12.0")! {
+      let possibleMatches: [Version] = detectLegacyKeymanVersion()
+
+      // Now we have a list of possible original versions of the Keyman app.
+      if possibleMatches.count > 1 {
+        // If more than one case matches, the user never cleaned out deprecated keyboards.
+        // They're probably fine with it, so the easiest solution is to give them one more
+        // and make it the updated default.
+
+        // No de-installs here; just additional install later in the method.
+      } else if possibleMatches.count == 1 {
+        // Simplest case - remove old default material so that we can insert the updated
+        // resources in a later part of the method.
+        lastVersion = possibleMatches[0]
+      } else { // if possibleMatches.count == 0
+        // The user has previously decided that they don't want our defaults and has already
+        // significantly customized their resource selection.  No need to 'update' anything.
+        return
+      }
+    }
+
+    if lastVersion != nil {
+      // Time to deinstall the old version's resources.
+      let resources = resourceHistory.first(where: { set in
+        return set.version == lastVersion
+      })!.resources
+
+      resources.forEach { res in
+        if let kbd = res as? InstallableKeyboard {
+          var userKeyboards = Storage.active.userDefaults.userKeyboards
+
+          userKeyboards?.removeAll(where: { kbd2 in
+            return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
+          })
+          Storage.active.userDefaults.userKeyboards = userKeyboards
+        } // else do likewise for Lexical Models.  Not yet implemented, though.
+      }
+    }
+
+    // Now to install the new version's resources.
+    var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
+    userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
+    Storage.active.userDefaults.userKeyboards = userKeyboards
 
     // FIXME:  Once the work is done, the following line should be active, not commented.
     // storage.userDefaults.lastEngineVersion = Version("12.0")
