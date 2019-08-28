@@ -120,13 +120,15 @@ enum Migrations {
 
   static func updateResources(storage: Storage) {
     var lastVersion = storage.userDefaults.lastEngineVersion
-    if (lastVersion ?? Version.fallback) == Version("12.0") {
-      // We're current; no need to do anything here.
+    if (lastVersion ?? Version.fallback) >= Version.current {
+      // We're either current or have just been downgraded; no need to do modify resources.
+      // If it's a downgrade, it's near-certainly a testing environment.
       return
     }
 
-    // Future-proofing - migrating from an old versiont to a new one.
-    if (lastVersion ?? Version.fallback) < Version("12.0")! {
+    // Legacy check - what was the old version?  If it's older than 12.0,
+    // we don't actually know.
+    if (lastVersion ?? Version.fallback) < Version.firstTracked! {
       let possibleMatches: [Version] = detectLegacyKeymanVersion()
 
       // Now we have a list of possible original versions of the Keyman app.
@@ -157,6 +159,7 @@ enum Migrations {
         if let kbd = res as? InstallableKeyboard {
           var userKeyboards = Storage.active.userDefaults.userKeyboards
 
+          // Does not remove the deprecated keyboard's files - just the registration.
           userKeyboards?.removeAll(where: { kbd2 in
             return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
           })
@@ -177,8 +180,8 @@ enum Migrations {
       Storage.active.userDefaults.userKeyboards = userKeyboards
     }
 
-    // FIXME:  Once the work is done, the following line should be active, not commented.
-    // storage.userDefaults.lastEngineVersion = Version("12.0")
+    // Store the version we just upgraded to.
+    storage.userDefaults.lastEngineVersion = Version.current
   }
 
   static func migrateUserDefaultsToStructs(storage: Storage) {
