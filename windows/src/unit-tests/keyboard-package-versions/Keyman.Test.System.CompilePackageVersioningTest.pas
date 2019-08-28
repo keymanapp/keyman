@@ -68,7 +68,7 @@ begin
   //
   FUnitTestKMCmpDllPath := FRoot + '\..\..\developer\kmcmpdll\';
 
-  p := TProjectConsole.Create(FRoot+'\test-1.0\test-1.0.kpj', False);
+  p := TProjectConsole.Create(ptUnknown, FRoot+'\test-1.0\test-1.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
       if p.Files[i] is TkmnProjectFileAction then
@@ -77,7 +77,7 @@ begin
     p.Free;
   end;
 
-  p := TProjectConsole.Create(FRoot+'\test-2.0\test-2.0.kpj', False);
+  p := TProjectConsole.Create(ptUnknown, FRoot+'\test-2.0\test-2.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
       if p.Files[i] is TkmnProjectFileAction then
