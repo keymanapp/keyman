@@ -1,17 +1,16 @@
 import 'mocha';
 import {assert} from 'chai';
-import * as path from 'path';
 
 import {compileModel} from '../dist/util';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers';
 
 describe('compileModel', function () {
   const MODEL_ID = 'example.qaa.trivial';
-  const MODEL_DIR = makePathToFixture(MODEL_ID);
+  const MODEL_PATH = makePathToFixture(MODEL_ID, `${MODEL_ID}.model.ts`);
 
   it('should load word lists relative to the model.ts file', function () {
 
-    let code = compileModel(path.join(MODEL_DIR, 'model.ts'));
+    let code = compileModel(MODEL_PATH);
     let r;
     assert.doesNotThrow(() => {
       r = compileModelSourceCode(code);
