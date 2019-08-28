@@ -106,15 +106,26 @@ function showhideupper()
   }
   savestate();
 }
+function isTabVisible(n) {
+  return document.getElementById('tabb'+n).offsetParent != null;
+}
 document.onkeydown = function()
 {
   switch(event.keyCode)
   {
   case 33: //pgup
-    if(tabselected > 0) selecttabb(tabselected-1);
+    if(tabselected > 0) {
+      do {
+        selecttabb(tabselected-1);
+      } while(!isTabVisible(tabselected) && tabselected > 0);
+    }
     break;
   case 34: //pgdn
-    if(tabselected < 3) selecttabb(tabselected+1);
+    if(tabselected < 4) {
+      do {
+        selecttabb(tabselected+1);
+      } while(!isTabVisible(tabselected) && tabselected < 4) 
+    }
     break;
   default:
     event.returnValue = true;

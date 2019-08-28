@@ -66,7 +66,7 @@ var
 begin
   Result := False;
   Found := False;
-  with TProjectConsole.Create(AProjectFilename, False) do
+  with TProjectConsole.Create(ptUnknown, AProjectFilename, False) do
   try
     Options.CheckFilenameConventions := Options.CheckFilenameConventions or ACheckFilenameConventions; // never downgrade this option
     FullySilent := AFullySilent;

@@ -14,10 +14,7 @@
 
             <ul>
               <li>
-                <a href="help:guides/develop/tutorial">Model Tutorial</a>
-              </li>
-              <li>
-                <a href="help:language/">Keyman Model Reference</a>
+                <a href="help:guides/lexical-models/intro">Model Tutorial</a>
               </li>
             </ul>
           </div>
@@ -26,7 +23,21 @@
           <h2>Creating your first lexical model</h2>
 
           <p>
-            Click the New Model button to create a model for any device.  This will open the Model Editor.
+            Click the New Model button to create a lexical model for predictive text. Lexical model source files are TypeScript files.
+            In version 12, the model format supported is "trie-1.0". The model source file will include references to wordlist source
+            files of .tsv format, which can be edited in a compatible spreadsheet program or generated from a number of other tools; 
+            check the <a href='help:guides/lexical-models/intro'>online documentation</a> for more details.
+          </p>
+
+          <p>
+            Lexical model filenames should have the format <b><i>author</i>.<i>bcp47</i>.<i>uniq</i>.model.ts</b>. A compiled lexical 
+            model file is a JavaScript file. 
+          </p>
+
+          <p>
+            A corresponding package file will be needed (with extension <b>.model.kps</b>) in order to deploy the model to mobile
+            devices. This can be created in the <b>Packages</b> tab. Note that a package file can contain either model file(s) or
+            keyboard file(s), not both.
           </p>
 
           <table class="io">

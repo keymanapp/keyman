@@ -1,22 +1,26 @@
-inherited frmNewProjectParameters: TfrmNewProjectParameters
+inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'New Basic Keyboard Project'
+  Caption = 'New Wordlist Lexical Model Project'
   ClientHeight = 309
   ClientWidth = 625
+  OldCreateOrder = True
   Position = poScreenCenter
   OnDestroy = FormDestroy
   ExplicitWidth = 631
   ExplicitHeight = 338
+  DesignSize = (
+    625
+    309)
   PixelsPerInch = 96
   TextHeight = 13
   object lblFileName: TLabel
     Left = 12
     Top = 275
-    Width = 64
+    Width = 46
     Height = 13
-    Caption = '&Keyboard ID:'
-    FocusControl = editFileName
+    Caption = '&Model ID:'
+    FocusControl = editModelID
   end
   object lblPath: TLabel
     Left = 12
@@ -26,17 +30,17 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Caption = '&Path:'
     FocusControl = editPath
   end
-  object lblKeyboardName: TLabel
+  object lblAuthorID: TLabel
     Left = 12
     Top = 11
-    Width = 80
+    Width = 51
     Height = 13
-    Caption = 'Keyboard &Name:'
-    FocusControl = editKeyboardName
+    Caption = 'Aut&hor ID:'
+    FocusControl = editAuthorID
   end
   object lblCoypright: TLabel
     Left = 12
-    Top = 38
+    Top = 113
     Width = 51
     Height = 13
     Caption = '&Copyright:'
@@ -44,7 +48,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblVersion: TLabel
     Left = 12
-    Top = 65
+    Top = 140
     Width = 39
     Height = 13
     Caption = '&Version:'
@@ -52,19 +56,11 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object lblAuthor: TLabel
     Left = 12
-    Top = 92
-    Width = 37
+    Top = 167
+    Width = 67
     Height = 13
-    Caption = 'A&uthor:'
+    Caption = 'A&uthor Name:'
     FocusControl = editAuthor
-  end
-  object lblTargets: TLabel
-    Left = 12
-    Top = 119
-    Width = 41
-    Height = 13
-    Caption = '&Targets:'
-    FocusControl = clbTargets
   end
   object lblKeyboardLanguages: TLabel
     Left = 339
@@ -74,13 +70,30 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Caption = '&Languages'
     FocusControl = gridKeyboardLanguages
   end
-  object editFileName: TEdit
+  object lblBCP47: TLabel
+    Left = 12
+    Top = 38
+    Width = 95
+    Height = 13
+    Caption = 'Primary BCP47 &Tag:'
+  end
+  object lblUniq: TLabel
+    Left = 12
+    Top = 65
+    Width = 67
+    Height = 13
+    Caption = 'Uni&que Name:'
+    FocusControl = editUniq
+  end
+  object editModelID: TEdit
     Left = 120
     Top = 272
     Width = 149
     Height = 21
-    TabOrder = 10
-    OnChange = editFileNameChange
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 11
+    OnChange = editModelIDChange
   end
   object cmdBrowse: TButton
     Left = 275
@@ -88,7 +101,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 78
     Height = 21
     Caption = '&Browse...'
-    TabOrder = 11
+    TabOrder = 12
     OnClick = cmdBrowseClick
   end
   object editPath: TEdit
@@ -96,41 +109,41 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 245
     Width = 233
     Height = 21
-    TabOrder = 9
+    TabOrder = 10
     OnChange = editPathChange
   end
-  object editKeyboardName: TEdit
+  object editAuthorID: TEdit
     Left = 120
     Top = 8
     Width = 205
     Height = 21
     TabOrder = 0
-    OnChange = editKeyboardNameChange
+    OnChange = editModelIDComponentChange
   end
   object editCopyright: TEdit
     Left = 120
-    Top = 35
+    Top = 110
     Width = 205
     Height = 21
-    TabOrder = 1
+    TabOrder = 3
     Text = #169
     OnChange = editCopyrightChange
   end
   object editVersion: TEdit
     Left = 120
-    Top = 62
+    Top = 137
     Width = 205
     Height = 21
-    TabOrder = 2
+    TabOrder = 4
     Text = '1.0'
     OnChange = editVersionChange
   end
   object editAuthor: TEdit
     Left = 120
-    Top = 89
+    Top = 164
     Width = 205
     Height = 21
-    TabOrder = 3
+    TabOrder = 5
     OnChange = editAuthorChange
   end
   object cmdOK: TButton
@@ -140,7 +153,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 12
+    TabOrder = 13
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
@@ -151,16 +164,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 13
-  end
-  object clbTargets: TCheckListBox
-    Left = 120
-    Top = 116
-    Width = 205
-    Height = 97
-    OnClickCheck = clbTargetsClickCheck
-    ItemHeight = 13
-    TabOrder = 4
+    TabOrder = 14
   end
   object gridKeyboardLanguages: TStringGrid
     Left = 339
@@ -173,7 +177,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     FixedCols = 0
     RowCount = 9
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-    TabOrder = 5
+    TabOrder = 6
     OnClick = gridKeyboardLanguagesClick
     OnDblClick = gridKeyboardLanguagesDblClick
     ColWidths = (
@@ -187,7 +191,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = '&Add...'
-    TabOrder = 6
+    TabOrder = 7
     OnClick = cmdKeyboardAddLanguageClick
   end
   object cmdKeyboardEditLanguage: TButton
@@ -197,7 +201,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Ed&it...'
-    TabOrder = 7
+    TabOrder = 8
     OnClick = cmdKeyboardEditLanguageClick
   end
   object cmdKeyboardRemoveLanguage: TButton
@@ -207,14 +211,32 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = '&Remove'
-    TabOrder = 8
+    TabOrder = 9
     OnClick = cmdKeyboardRemoveLanguageClick
+  end
+  object editUniq: TEdit
+    Left = 120
+    Top = 62
+    Width = 205
+    Height = 21
+    TabOrder = 2
+    OnChange = editModelIDComponentChange
+  end
+  object cbBCP47: TComboBox
+    Left = 120
+    Top = 35
+    Width = 205
+    Height = 21
+    Style = csDropDownList
+    TabOrder = 1
+    OnClick = editModelIDComponentChange
   end
   object dlgSave: TSaveDialog
     DefaultExt = 'kpj'
     Filter = 'Project files (*.kpj)|*.kpj|All files (*.*)|*.*'
     FilterIndex = 0
     Title = 'Create New Project'
+    OnCanClose = dlgSaveCanClose
     Left = 396
     Top = 240
   end

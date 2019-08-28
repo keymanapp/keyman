@@ -11,6 +11,15 @@
 
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:k="http://www.tavultesoft.com/xml/70">
+      <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
+      <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+
+      <xsl:attribute name='class'>
+        <xsl:choose>
+          <xsl:when test="translate(/KeymanDeveloperProject/Options/ProjectType, $uppercase, $lowercase) = 'lexicalmodel'">type-lexical-model</xsl:when>
+          <xsl:otherwise>type-keyboard</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <xsl:call-template name="head" />
       <body onload="pageload()">
         <div id="state"><xsl:copy-of select="/KeymanDeveloperProject/ViewState" /></div>

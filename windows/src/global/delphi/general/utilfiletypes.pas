@@ -54,6 +54,10 @@ const
   Ext_ProjectSourceUser = '.kpj.user';
   Ext_Javascript = '.js';
   Ext_LexicalModelSource = '.ts'; // can't use .model.ts unless we change all extension comparisons to support multiple dots...
+  Ext_LexicalModelSource_FULL = '.model.ts'; // TODO: Refactor these two constants
+  Ext_LexicalModelWordlist = '.tsv';
+  Ext_LexicalModelPackageSource = '.model.kps';
+  Ext_LexicalModelProject = '.model.kpj';
 
 const ExtFileTypes: array[0..13] of TKMFileTypeInfo = (
   (Ext: Ext_KeymanSource; FileType: ftKeymanSource),
@@ -87,7 +91,7 @@ type
   end;
 
 type
-  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank, kptImportWindowsKeyboard);
+  TKeymanProjectType = (kptUnknown, kptBasic, kptBlank, kptImportWindowsKeyboard, kptBlankLexicalModel, kptWordlistLexicalModel);
 
 implementation
 
