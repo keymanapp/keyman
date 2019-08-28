@@ -87,7 +87,7 @@ enum Migrations {
     storage.userDefaults.synchronize()
   }
 
-  static func detectLegacyKeymanVersion(): [Version] {
+  static func detectLegacyKeymanVersion() -> [Version] {
     // While the 'key' used to track version info existed before v12, it was unused until then.
     log.info("Prior engine version unknown; attepting to auto-detect.")
 
@@ -167,8 +167,15 @@ enum Migrations {
 
     // Now to install the new version's resources.
     var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
-    userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
-    Storage.active.userDefaults.userKeyboards = userKeyboards
+
+    // Don't add the keyboard a second time if it's already installed!  Can happen
+    // if multiple Keyman versions match.
+    if !userKeyboards.contains(where: { kbd in
+      kbd.id == Defaults.keyboard.id && kbd.languageID == Defaults.keyboard.languageID
+    }) {
+      userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
+      Storage.active.userDefaults.userKeyboards = userKeyboards
+    }
 
     // FIXME:  Once the work is done, the following line should be active, not commented.
     // storage.userDefaults.lastEngineVersion = Version("12.0")
