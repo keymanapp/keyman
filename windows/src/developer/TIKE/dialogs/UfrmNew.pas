@@ -73,6 +73,7 @@ type
     function GetFileName: string;
     function GetDefaultExt: string;
     function CheckFilenameConventions: Boolean;
+    function FileIsNotAppropriateForProject: Boolean;
   protected
     function GetHelpTopic: string; override;
   public
@@ -86,6 +87,7 @@ implementation
 uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFile,
   Keyman.System.KeyboardUtils,
   Keyman.System.LexicalModelUtils,
   shlobj,
@@ -145,9 +147,27 @@ begin
   end;
 end;
 
+function TfrmNew.FileIsNotAppropriateForProject: Boolean;
+begin
+  if (GetFileType = ftModelSource) and (FGlobalProject.Options.ProjectType = ptKeyboard) then
+  begin
+    ShowMessage('You cannot add a lexical model to keyboard project.');
+    Exit;
+  end;
+
+  if (GetFileType = ftKeymanSource) and (FGlobalProject.Options.ProjectType = ptLexicalModel) then
+  begin
+    ShowMessage('You cannot add a keyboard to a lexical model project.');
+    Exit;
+  end;
+end;
+
 procedure TfrmNew.cmdOKClick(Sender: TObject);
 begin
   if not CheckFilenameConventions then
+    Exit;
+
+  if FileIsNotAppropriateForProject then
     Exit;
 
   if FileExists(FileName) then
