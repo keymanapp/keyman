@@ -73,7 +73,7 @@ type
     function GetFileName: string;
     function GetDefaultExt: string;
     function CheckFilenameConventions: Boolean;
-    function FileIsNotAppropriateForProject: Boolean;
+    function FileIsAppropriateForProject: Boolean;
   protected
     function GetHelpTopic: string; override;
   public
@@ -147,19 +147,21 @@ begin
   end;
 end;
 
-function TfrmNew.FileIsNotAppropriateForProject: Boolean;
+function TfrmNew.FileIsAppropriateForProject: Boolean;
 begin
   if (GetFileType = ftModelSource) and (FGlobalProject.Options.ProjectType = ptKeyboard) then
   begin
     ShowMessage('You cannot add a lexical model to keyboard project.');
-    Exit;
+    Exit(False);
   end;
 
   if (GetFileType = ftKeymanSource) and (FGlobalProject.Options.ProjectType = ptLexicalModel) then
   begin
     ShowMessage('You cannot add a keyboard to a lexical model project.');
-    Exit;
+    Exit(False);
   end;
+
+  Result := True;
 end;
 
 procedure TfrmNew.cmdOKClick(Sender: TObject);
@@ -167,7 +169,7 @@ begin
   if not CheckFilenameConventions then
     Exit;
 
-  if FileIsNotAppropriateForProject then
+  if not FileIsAppropriateForProject then
     Exit;
 
   if FileExists(FileName) then

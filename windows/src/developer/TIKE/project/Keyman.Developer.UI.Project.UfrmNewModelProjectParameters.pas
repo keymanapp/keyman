@@ -30,7 +30,7 @@ type
     lblCoypright: TLabel;
     lblVersion: TLabel;
     lblAuthor: TLabel;
-    lblKeyboardLanguages: TLabel;
+    lblLanguages: TLabel;
     editModelID: TEdit;
     cmdBrowse: TButton;
     editPath: TEdit;
@@ -40,10 +40,10 @@ type
     editAuthor: TEdit;
     cmdOK: TButton;
     cmdCancel: TButton;
-    gridKeyboardLanguages: TStringGrid;
-    cmdKeyboardAddLanguage: TButton;
-    cmdKeyboardEditLanguage: TButton;
-    cmdKeyboardRemoveLanguage: TButton;
+    gridLanguages: TStringGrid;
+    cmdAddLanguage: TButton;
+    cmdEditLanguage: TButton;
+    cmdRemoveLanguage: TButton;
     dlgSave: TSaveDialog;
     lblBCP47: TLabel;
     lblUniq: TLabel;
@@ -52,11 +52,11 @@ type
     procedure cmdOKClick(Sender: TObject);
     procedure editModelIDComponentChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure gridKeyboardLanguagesClick(Sender: TObject);
-    procedure gridKeyboardLanguagesDblClick(Sender: TObject);
-    procedure cmdKeyboardAddLanguageClick(Sender: TObject);
-    procedure cmdKeyboardEditLanguageClick(Sender: TObject);
-    procedure cmdKeyboardRemoveLanguageClick(Sender: TObject);
+    procedure gridLanguagesClick(Sender: TObject);
+    procedure gridLanguagesDblClick(Sender: TObject);
+    procedure cmdAddLanguageClick(Sender: TObject);
+    procedure cmdEditLanguageClick(Sender: TObject);
+    procedure cmdRemoveLanguageClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
     procedure editVersionChange(Sender: TObject);
@@ -75,7 +75,7 @@ type
     function GetVersion: string;
     function Validate: Boolean;
     procedure EnableControls;
-    function SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+    function SelectedLanguage: TPackageKeyboardLanguage;
     procedure LanguageGrid_Fill;
     procedure BCP47_Fill;
     function SelectedLexicalModel: TPackageLexicalModel;
@@ -108,19 +108,9 @@ uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
-  Keyman.Developer.System.KeyboardProjectTemplate,
   Keyman.Developer.System.ModelProjectTemplate,
   Keyman.Developer.System.ProjectTemplate,
   Keyman.Developer.UI.UfrmSelectBCP47Language;
-
-// 1. project filename
-// 2. location
-// 3. keyboard name
-// 4. copyright
-// 5. targets
-// 6. author
-// 7. version
-// 8. bcp47 tags
 
 {$R *.dfm}
 
@@ -228,7 +218,7 @@ begin
   end;
 end;
 
-procedure TfrmNewModelProjectParameters.cmdKeyboardAddLanguageClick(
+procedure TfrmNewModelProjectParameters.cmdAddLanguageClick(
   Sender: TObject);
 var
   lm: TPackageLexicalModel;
@@ -249,8 +239,8 @@ begin
 
       BCP47_Fill;
       LanguageGrid_Fill;
-      gridKeyboardLanguages.Row := gridKeyboardLanguages.RowCount - 1;
-      gridKeyboardLanguagesClick(gridKeyboardLanguages);
+      gridLanguages.Row := gridLanguages.RowCount - 1;
+      gridLanguagesClick(gridLanguages);
       EnableControls;
     end;
   finally
@@ -258,7 +248,7 @@ begin
   end;
 end;
 
-procedure TfrmNewModelProjectParameters.cmdKeyboardEditLanguageClick(
+procedure TfrmNewModelProjectParameters.cmdEditLanguageClick(
   Sender: TObject);
 var
   lm: TPackageLexicalModel;
@@ -268,7 +258,7 @@ begin
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
 
-  lang := SelectedKeyboardLanguage;
+  lang := SelectedLanguage;
   Assert(Assigned(lang));
 
   frm := TfrmSelectBCP47Language.Create(Self);
@@ -288,7 +278,7 @@ begin
   end;
 end;
 
-procedure TfrmNewModelProjectParameters.cmdKeyboardRemoveLanguageClick(
+procedure TfrmNewModelProjectParameters.cmdRemoveLanguageClick(
   Sender: TObject);
 var
   lm: TPackageLexicalModel;
@@ -296,7 +286,7 @@ var
 begin
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lang := SelectedKeyboardLanguage;
+  lang := SelectedLanguage;
   Assert(Assigned(lang));
 
   lm.Languages.Remove(lang);
@@ -367,12 +357,12 @@ begin
 
   cmdOK.Enabled := e;
 
-  e := gridKeyboardLanguages.RowCount > 1;
-  gridKeyboardLanguages.Enabled := e;
-  cmdKeyboardRemoveLanguage.Enabled := e;
-  cmdKeyboardEditLanguage.Enabled := e;
+  e := gridLanguages.RowCount > 1;
+  gridLanguages.Enabled := e;
+  cmdRemoveLanguage.Enabled := e;
+  cmdEditLanguage.Enabled := e;
   if e then
-    gridKeyboardLanguages.FixedRows := 1;
+    gridLanguages.FixedRows := 1;
 end;
 
 function TfrmNewModelProjectParameters.GetAuthor: string;
@@ -417,17 +407,17 @@ begin
   Result := Trim(editVersion.Text);
 end;
 
-procedure TfrmNewModelProjectParameters.gridKeyboardLanguagesClick(
+procedure TfrmNewModelProjectParameters.gridLanguagesClick(
   Sender: TObject);
 begin
   EnableControls;
 end;
 
-procedure TfrmNewModelProjectParameters.gridKeyboardLanguagesDblClick(
+procedure TfrmNewModelProjectParameters.gridLanguagesDblClick(
   Sender: TObject);
 begin
-  if SelectedKeyboardLanguage <> nil then
-    cmdKeyboardEditLanguage.Click;
+  if SelectedLanguage <> nil then
+    cmdEditLanguage.Click;
 end;
 
 function TfrmNewModelProjectParameters.Validate: Boolean;
@@ -461,7 +451,7 @@ begin
   Result := pack.LexicalModels[0];
 end;
 
-function TfrmNewModelProjectParameters.SelectedKeyboardLanguage: TPackageKeyboardLanguage;
+function TfrmNewModelProjectParameters.SelectedLanguage: TPackageKeyboardLanguage;
 var
   lm: TPackageLexicalModel;
 begin
@@ -469,10 +459,10 @@ begin
   if not Assigned(lm) then
     Exit(nil);
 
-  if gridKeyboardLanguages.Row = 0 then
+  if gridLanguages.Row = 0 then
     Exit(nil);
 
-  Result := gridKeyboardLanguages.Objects[0, gridKeyboardLanguages.Row] as TPackageKeyboardLanguage;
+  Result := gridLanguages.Objects[0, gridLanguages.Row] as TPackageKeyboardLanguage;
 end;
 
 procedure TfrmNewModelProjectParameters.LanguageGrid_Fill;
@@ -482,27 +472,27 @@ var
 begin
   Inc(FSetup);
   try
-    gridKeyboardLanguages.Cells[0, 0] := 'BCP 47 tag';
-    gridKeyboardLanguages.Cells[1, 0] := 'Language name';
-    gridKeyboardLanguages.ColWidths[0] := 120;
-    gridKeyboardLanguages.ColWidths[1] := 10;
+    gridLanguages.Cells[0, 0] := 'BCP 47 tag';
+    gridLanguages.Cells[1, 0] := 'Language name';
+    gridLanguages.ColWidths[0] := 120;
+    gridLanguages.ColWidths[1] := 10;
 
     lm := SelectedLexicalModel;
     if not Assigned(lm) then
     begin
-      gridKeyboardLanguages.RowCount := 1;
+      gridLanguages.RowCount := 1;
       EnableControls;
       Exit;
     end;
 
-    gridKeyboardLanguages.RowCount := lm.Languages.Count + 1;
-    gridKeyboardLanguages.ColWidths[1] := gridKeyboardLanguages.ClientWidth - 120 - 1;
+    gridLanguages.RowCount := lm.Languages.Count + 1;
+    gridLanguages.ColWidths[1] := gridLanguages.ClientWidth - 120 - 1;
 
     for i := 0 to lm.Languages.Count - 1 do
     begin
-      gridKeyboardLanguages.Objects[0, i+1] := lm.Languages[i];
-      gridKeyboardLanguages.Cells[0, i+1] := lm.Languages[i].ID;
-      gridKeyboardLanguages.Cells[1, i+1] := lm.Languages[i].Name;
+      gridLanguages.Objects[0, i+1] := lm.Languages[i];
+      gridLanguages.Cells[0, i+1] := lm.Languages[i].ID;
+      gridLanguages.Cells[1, i+1] := lm.Languages[i].Name;
     end;
 
     EnableControls;

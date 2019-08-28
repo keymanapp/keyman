@@ -62,13 +62,13 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Caption = 'A&uthor Name:'
     FocusControl = editAuthor
   end
-  object lblKeyboardLanguages: TLabel
+  object lblLanguages: TLabel
     Left = 339
     Top = 11
     Width = 52
     Height = 13
     Caption = '&Languages'
-    FocusControl = gridKeyboardLanguages
+    FocusControl = gridLanguages
   end
   object lblBCP47: TLabel
     Left = 12
@@ -166,7 +166,7 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     ModalResult = 2
     TabOrder = 14
   end
-  object gridKeyboardLanguages: TStringGrid
+  object gridLanguages: TStringGrid
     Left = 339
     Top = 32
     Width = 278
@@ -178,13 +178,13 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     RowCount = 9
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
     TabOrder = 6
-    OnClick = gridKeyboardLanguagesClick
-    OnDblClick = gridKeyboardLanguagesDblClick
+    OnClick = gridLanguagesClick
+    OnDblClick = gridLanguagesDblClick
     ColWidths = (
       78
       64)
   end
-  object cmdKeyboardAddLanguage: TButton
+  object cmdAddLanguage: TButton
     Left = 340
     Top = 191
     Width = 73
@@ -192,9 +192,9 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Anchors = [akLeft, akBottom]
     Caption = '&Add...'
     TabOrder = 7
-    OnClick = cmdKeyboardAddLanguageClick
+    OnClick = cmdAddLanguageClick
   end
-  object cmdKeyboardEditLanguage: TButton
+  object cmdEditLanguage: TButton
     Left = 419
     Top = 191
     Width = 73
@@ -202,9 +202,9 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Anchors = [akLeft, akBottom]
     Caption = 'Ed&it...'
     TabOrder = 8
-    OnClick = cmdKeyboardEditLanguageClick
+    OnClick = cmdEditLanguageClick
   end
-  object cmdKeyboardRemoveLanguage: TButton
+  object cmdRemoveLanguage: TButton
     Left = 498
     Top = 191
     Width = 72
@@ -212,7 +212,7 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Anchors = [akLeft, akBottom]
     Caption = '&Remove'
     TabOrder = 9
-    OnClick = cmdKeyboardRemoveLanguageClick
+    OnClick = cmdRemoveLanguageClick
   end
   object editUniq: TEdit
     Left = 120
