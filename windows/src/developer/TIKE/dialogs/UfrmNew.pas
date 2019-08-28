@@ -87,6 +87,7 @@ uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.System.KeyboardUtils,
+  Keyman.System.LexicalModelUtils,
   shlobj,
   utilsystem;
 
@@ -124,6 +125,14 @@ begin
       Exit(True);
 
     Result := MessageDlg(Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Prompt, [editFileName.Text]),
+      mtConfirmation, mbOkCancel, 0) = mrOk;
+  end
+  else if FileType = ftModelSource then
+  begin
+    if TLexicalModelUtils.DoesTSFilenameFollowLexicalModelConventions(FileName) then
+      Exit(True);
+
+    Result := MessageDlg(Format(TLexicalModelUtils.SModelFileNameDoesNotFollowConventions_Message, [editFileName.Text]),
       mtConfirmation, mbOkCancel, 0) = mrOk;
   end
   else
@@ -177,7 +186,7 @@ begin
   editFileName.Enabled := e;
   cmdBrowse.Enabled := e;
   chkAddToProject.Enabled := e and
-    (ChangeFileExt(ExtractFileName(editFileName.Text),'') <> '');   // I4798
+    (TLexicalModelUtils.ChangeFileExt(ExtractFileName(editFileName.Text),'') <> '');   // I4798
   cmdOK.Enabled := e and (GetFileName <> '');   // I4798
 end;
 
@@ -241,7 +250,7 @@ end;
 
 function TfrmNew.GetFileName: string;
 var
-  s: WideString;
+  s: string;
 begin
   if not editFileName.Enabled then   // I4798
     Exit('');
@@ -249,15 +258,15 @@ begin
   if Pos('\', editFileName.Text) > 0 then   // I4798
     Exit('');
 
-  s := ExtractFileExt(editFileName.Text);
+  s := TLexicalModelUtils.ExtractFileExt(editFileName.Text);
   if (CompareText(GetDefaultExt, '.html') = 0) or (CompareText(GetDefaultExt, '.htm') = 0) then
   begin  // I1420 - support .htm extension
     if (CompareText(s, '.htm') = 0) or (CompareText(s, '.html') = 0)
       then Result := IncludeTrailingPathDelimiter(editPath.Text) + editFileName.Text   // I4798
-      else Result := IncludeTrailingPathDelimiter(editPath.Text) + ChangeFileExt(editFileName.Text, GetDefaultExt);   // I4798
+      else Result := IncludeTrailingPathDelimiter(editPath.Text) + TLexicalModelUtils.ChangeFileExt(editFileName.Text, GetDefaultExt);   // I4798
   end
   else
-    Result := IncludeTrailingPathDelimiter(editPath.Text) + ChangeFileExt(editFileName.Text, GetDefaultExt);   // I4798
+    Result := IncludeTrailingPathDelimiter(editPath.Text) + TLexicalModelUtils.ChangeFileExt(editFileName.Text, GetDefaultExt);   // I4798
 end;
 
 function TfrmNew.GetFileType: TKMFileType;
@@ -276,6 +285,8 @@ begin
     Result := ftHTMLFile
   else if lvItems.Selected.Caption = 'HTM' then
     Result := ftHTMLFile
+  else if lvItems.Selected.Caption = 'Model' then
+    Result := ftModelSource
   else
     Result := ftOther;
 end;
@@ -297,7 +308,7 @@ begin
   if editFileName.Text <> '' then
   begin
     FRootPath := editPath.Text;   // I4798
-    FFileName := ChangeFileExt(ExtractFileName(editFileName.Text), '');
+    FFileName := TLexicalModelUtils.ChangeFileExt(ExtractFileName(editFileName.Text), '');
   end
   else
     FFileName := 'Untitled';

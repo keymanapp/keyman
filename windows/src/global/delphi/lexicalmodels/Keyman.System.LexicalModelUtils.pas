@@ -28,13 +28,19 @@ type
       const Name: string): Boolean; static;
     class function DoesProjectFilenameFollowLexicalModelConventions(
       const Name: string): Boolean; static;
+
+    class function ExtractFileExt(filename: string): string; static;
+    class function RemoveFileExt(filename: string): string; static;
+    class function ChangeFileExt(filename, ext: string): string; static;
   end;
 
 implementation
 
 uses
   System.RegularExpressions,
-  System.SysUtils;
+  System.SysUtils,
+
+  utilfiletypes;
 
 { TLexicalModelUtils }
 
@@ -84,6 +90,35 @@ end;
 class function TLexicalModelUtils.LexicalModelIDToFileName(id: string): string;
 begin
   Result := id + SLexicalModelExtension;
+end;
+
+// Note: This isn't ideal. The dotted a.b.c.model.blah filename convention makes it impossible to
+// generically extract an extension. This is the best we can do, adding special handling for specific
+// file extensions
+
+class function TLexicalModelUtils.RemoveFileExt(filename: string): string;
+begin
+  Result := Copy(filename, 1, Length(filename) - Length(TLexicalModelUtils.ExtractFileExt(filename)));
+end;
+
+class function TLexicalModelUtils.ChangeFileExt(filename, ext: string): string;
+begin
+  Result := Copy(filename, 1, Length(filename) - Length(TLexicalModelUtils.ExtractFileExt(filename))) + ext;
+end;
+
+class function TLexicalModelUtils.ExtractFileExt(filename: string): string;
+var
+  Second: string;
+begin
+  Result := System.SysUtils.ExtractFileExt(filename);
+  if Result = '' then
+    Exit;
+  Second := System.SysUtils.ExtractFileExt(Copy(filename, 1, Length(filename)-Length(Result)));
+  if (SameText(Result, Ext_LexicalModelSource) or
+      SameText(Result, Ext_PackageSource) or
+      SameText(Result, Ext_ProjectSource)) and
+     SameText(Second, Ext_Model_Component) then
+    Result := Second + Result;
 end;
 
 end.

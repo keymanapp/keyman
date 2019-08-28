@@ -54,8 +54,11 @@ const
   Ext_ProjectSourceUser = '.kpj.user';
   Ext_Javascript = '.js';
   Ext_LexicalModelSource = '.ts'; // can't use .model.ts unless we change all extension comparisons to support multiple dots...
-  Ext_LexicalModelSource_FULL = '.model.ts'; // TODO: Refactor these two constants
   Ext_LexicalModelWordlist = '.tsv';
+
+  Ext_Model_Component = '.model';
+
+  Ext_LexicalModelSource_FULL = '.model.ts'; // TODO: Refactor this constant
   Ext_LexicalModelPackageSource = '.model.kps';
   Ext_LexicalModelProject = '.model.kpj';
 
