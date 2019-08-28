@@ -51,7 +51,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       public boolean onPreferenceClick(Preference preference) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", false);
         // Unfortunately, we can't filter for a "kmp" mime type
         intent.setType("*/*");
         startActivityForResult(intent, MainActivity.READ_REQUEST_CODE);
