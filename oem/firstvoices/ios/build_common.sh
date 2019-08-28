@@ -46,12 +46,14 @@ BUILD_FOLDER=build
 
 do_clean ( ) {
   rm -rf $BUILD_FOLDER
+  rm -rf Carthage
 }
 
 ### START OF THE BUILD ###
 
 DO_UPDATE=true
 DO_ARCHIVE=true
+DO_CARTHAGE=true
 FORCE_KMEI_BUILD=false
 ALLOW_KMEI_BUILD=true
 CODE_SIGN=true
@@ -74,6 +76,9 @@ while [[ $# -gt 0 ]] ; do
         -no-codesign)
             CODE_SIGN=false
             KMEI_FLAGS="$KMEI_FLAGS -no-codesign"
+            ;;
+        -no-carthage)
+            DO_CARTHAGE=false
             ;;
         -no-archive)
             DO_ARCHIVE=false
@@ -98,7 +103,7 @@ done
 # Build Keyman Engine
 #
 
-KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-universal/KeymanEngine.framework"
+KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-iphoneos/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
@@ -128,6 +133,14 @@ if [ $DO_UPDATE = true ]; then
 
     # Copy resources.
     cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
+fi
+
+# First things first - update our dependencies.
+
+if [ $DO_CARTHAGE = true ]; then
+    echo
+    echo "Load dependencies with Carthage"
+    carthage bootstrap --platform iOS || fail "carthage boostrap failed"
 fi
 
 #
