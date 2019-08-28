@@ -184,13 +184,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (resultCode != RESULT_OK) {
       checkGetStarted();
       return;
-    } else if (requestCode == READ_REQUEST_CODE) {
-      // Handle kmp file selected from file browser
-      if (returnIntent != null && returnIntent.hasExtra("kmpFilename")) {
-        String kmpFilename = returnIntent.getExtras().getString("kmpFilename");
-        Uri data = Uri.parse(kmpFilename);
-        useLocalKMP(context, data);
-      }
     } else {
       boolean didFail = false;
       ClipData userdata = returnIntent.getClipData();

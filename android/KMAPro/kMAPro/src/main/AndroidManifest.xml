@@ -123,7 +123,7 @@
                  impossible to match such a type except by using a global
                  wildcard.
             -->
-      <intent-filter android:priority="50" android:icon="@drawable/ic_launcher_round">
+      <intent-filter android:priority="50">
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.BROWSABLE" />
