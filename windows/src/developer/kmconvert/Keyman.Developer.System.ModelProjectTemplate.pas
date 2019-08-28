@@ -59,9 +59,7 @@ uses
   Keyman.Developer.System.Project.ProjectFiles,
   PackageInfo,
   RedistFiles,
-  TouchLayout,
-  utilstr,
-  VisualKeyboard;
+  utilstr;
 
 { TModelProjectTemplate }
 
@@ -133,7 +131,7 @@ begin
     kpj.Options.CompilerWarningsAsErrors := True;
     kpj.Options.CheckFilenameConventions := True;
 
-    // Add keyboard and package to project
+    // Add model and package to project
     kpj.Files.Add(TmodelTsProjectFile.Create(kpj, GetModelFilename, nil));
     kpj.Files.Add(TkpsProjectFile.Create(kpj, GetPackageFilename, nil));
 
@@ -180,7 +178,7 @@ begin
     kps.Files.Add(f);
     kps.Options.ReadmeFile := f;
 
-    // Add metadata about the keyboard
+    // Add metadata about the lexical model
     plm := TPackageLexicalModel.Create(kps);
     plm.Name := Name;
     plm.ID := ID;
