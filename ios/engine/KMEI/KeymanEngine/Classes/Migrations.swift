@@ -128,7 +128,7 @@ enum Migrations {
 
     // Legacy check - what was the old version?  If it's older than 12.0,
     // we don't actually know.
-    if (lastVersion ?? Version.fallback) < Version.firstTracked! {
+    if (lastVersion ?? Version.fallback) < Version.firstTracked {
       let possibleMatches: [Version] = detectLegacyKeymanVersion()
 
       // Now we have a list of possible original versions of the Keyman app.
