@@ -171,6 +171,9 @@ extension Storage {
     try Storage.copy(from: bundle,
                      resourceName: "DejaVuSans.ttf",
                      dstDir: defaultKeyboardDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "\(Defaults.lexicalModel.id).model.kmp",
+                     dstDir: baseDir)
   }
 
   func copyFiles(to dst: Storage) throws {

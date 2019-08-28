@@ -529,7 +529,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   // Processes fetched lexical models.
   // return a lexical model so caller can use it in a downloadSucceeded call
   // is called by other class funcs
-  func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
+  public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
     var installedLexicalModel: InstallableLexicalModel? = nil
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     var destination =  documentsDirectory
