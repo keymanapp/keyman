@@ -205,9 +205,6 @@ export default class LexicalModelCompiler {
    * @param sourcePath    Where to find auxilary sources files
    */
   generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string) {
-    let sources: string[] = modelSource.sources.map(function(source) {
-      return fs.readFileSync(path.join(sourcePath, source), 'utf8');
-    });
 
     // TODO: add metadata in comment
     const filePrefix: string = `(function() {\n'use strict';\n`;
@@ -236,14 +233,22 @@ export default class LexicalModelCompiler {
 
     switch(modelSource.format) {
       case "custom-1.0":
+        let sources: string[] = modelSource.sources.map(function(source) {
+          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
+        });
         func += this.transpileSources(sources).join('\n');
         func += `LMLayerWorker.loadModel(new ${modelSource.rootClass}());\n`;
         break;
       case "fst-foma-1.0":
         throw new ModelSourceError(`Unimplemented model format: ${modelSource.format}`);
       case "trie-1.0":
+        // Convert all relative path names to paths relative to the enclosing
+        // directory. This way, we'll read the files relative to the model.ts
+        // file, rather than the current working directory.
+        let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
+
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(sources, modelSource.searchTermToKey)
+          createTrieDataStructure(filenames, modelSource.searchTermToKey)
         }, {\n`;
         if (wordBreakingSource) {
           func += `  wordBreaking: ${wordBreakingSource},\n`;

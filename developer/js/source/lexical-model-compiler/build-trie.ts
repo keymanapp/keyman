@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+
 /**
  * A word list is an array of pairs: the concrete word form itself, followed by
  * a non-negative count.
@@ -12,10 +14,28 @@ type WordList = [string, number][];
  *
  * @param sourceFiles an array of source files that will be read to generate the trie.
  */
-export function createTrieDataStructure(sourceFiles: string[], searchTermToKey?: (wf: string) => string): string {
-  let wordlist =  parseWordList(sourceFiles.join('\n'));
+export function createTrieDataStructure(filenames: string[], searchTermToKey?: (wf: string) => string): string {
+  // Make one big word list out of all of the filenames provided.
+  let wordlist = filenames
+    .map(parseWordListFromFilename)
+    .reduce((bigWordlist, current) => bigWordlist.concat(current), []);
   let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.Wordform2Key);
   return JSON.stringify(trie);
+}
+
+/**
+ * Parses a word list from its filename.
+ * 
+ * The word list may be encoded in:
+ * 
+ *  - UTF-8, with or without BOM [exported by most software]
+ *  - UTF-16, little endian, with BOM [exported by Microsoft Excel]
+ * 
+ * @param filename filename of the word list
+ */
+export function parseWordListFromFilename(filename: string): WordList {
+  let contents = readFileSync(filename, detectEncoding(filename));
+  return parseWordList(contents);
 }
 
 /**
@@ -384,5 +404,37 @@ namespace Trie {
       .toLowerCase()
       // remove diacritical marks.
       .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
+  }
+}
+
+
+/**
+ * Detects the encoding of a text file.
+ * 
+ * Supported encodings are:
+ * 
+ *  - UTF-8, with or without BOM
+ *  - UTF-16, little endian, with BOM
+ * 
+ * UTF-16 in big endian is explicitly NOT supported! The reason is two-fold:
+ * 1) Node does not support it without resorting to an external library (or
+ * swapping every byte in the file!); and 2) I'm not sure anything actually
+ * outputs in this format anyway!
+ * 
+ * @param filename filename of the file to detect encoding
+ */
+function detectEncoding(filename: string): 'utf8' | 'utf16le' {
+  let buffer = readFileSync(filename);
+  // Note: BOM is U+FEFF
+  // In little endian, this is 0xFF 0xFE
+  if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
+    return 'utf16le';
+  } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
+    // Big Endian, is NOT supported because Node does not support it (???)
+    // See: https://stackoverflow.com/a/14551669/6626414
+    throw new Error('UTF-16BE is unsupported')
+  } else {
+    // Assume its in UTF-8, with or without a BOM.
+    return 'utf8';
   }
 }
