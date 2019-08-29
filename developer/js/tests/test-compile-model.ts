@@ -1,24 +1,30 @@
 import 'mocha';
 import {assert} from 'chai';
-import * as path from 'path';
 
 import {compileModel} from '../dist/util';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers';
 
 describe('compileModel', function () {
-  const MODEL_ID = 'example.qaa.trivial';
-  const MODEL_DIR = makePathToFixture(MODEL_ID);
+  // Try to compile ALL of the correct models.
+  const MODELS = [
+    'example.qaa.sencoten',
+    'example.qaa.trivial',
+    'example.qaa.utf16le',
+  ];
 
-  it('should load word lists relative to the model.ts file', function () {
+  for (let modelID of MODELS) {
+    let modelPath = makePathToFixture(modelID, `${modelID}.model.ts`);
 
-    let code = compileModel(path.join(MODEL_DIR, 'model.ts'));
-    let r;
-    assert.doesNotThrow(() => {
-      r = compileModelSourceCode(code);
+    it(`should compile ${modelID}`, function () {
+      let code = compileModel(modelPath);
+      let r;
+      assert.doesNotThrow(() => {
+        r = compileModelSourceCode(code);
+      });
+      let compilation = r as CompilationResult;
+
+      assert.isFalse(compilation.hasSyntaxError);
+      assert.equal(compilation.modelConstructorName, 'TrieModel');
     });
-    let compilation = r as CompilationResult;
-
-    assert.isFalse(compilation.hasSyntaxError);
-    assert.equal(compilation.modelConstructorName, 'TrieModel');
-  });
+  }
 });

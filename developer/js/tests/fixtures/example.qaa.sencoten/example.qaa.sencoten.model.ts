@@ -1,5 +1,5 @@
 const source: LexicalModelSource = {
   format: 'trie-1.0',
-  sources: ['wordlist.txt'],
+  sources: ['wordlist.tsv'],
 };
 export default source;
