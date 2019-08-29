@@ -538,7 +538,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
       if let kmp = kmp as! LexicalModelKeymanPackage? {
         do {
-          try Manager.shared.parseLMKMP(kmp.sourceFolder)
+          try Manager.parseLMKMP(kmp.sourceFolder)
           log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
           installedLexicalModel = kmp.models[0].installableLexicalModels[0]
           //this can fail gracefully and not show errors to users

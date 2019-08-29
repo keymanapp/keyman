@@ -186,13 +186,13 @@ extension Storage {
 
     // Because of how our .zip dependency works, we need to make the .kmp look like a .zip.  A simple rename will do.
     do {
-      try FileManager.default.copyItem(at: lexicalModelURL, to: lexicalModelURLasZIP)
+      try Storage.copyAndExcludeFromBackup(at: lexicalModelURL, to: lexicalModelURLasZIP)
       let downloader = ResourceDownloadQueue()
 
       // Hijacking the download queue's KMP installer.
       // Issue - requests DL confirmation
       // Issue - in a roundabout way, results in attempted access to Manager.shared during Manager.init, causing crash.
-      //_ = downloader.installLexicalModelPackage(downloadedPackageFile: lexicalModelURLasZIP)
+      _ = downloader.installLexicalModelPackage(downloadedPackageFile: lexicalModelURLasZIP)
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
     }
