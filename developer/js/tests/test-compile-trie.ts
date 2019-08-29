@@ -57,7 +57,7 @@ describe('LexicalModelCompiler', function () {
       format: 'trie-1.0',
       sources: ['wordlist.tsv'],
       // This is a possible word breaking function:
-      wordBreaking(phrase: string): Span[] {
+      wordBreaker(phrase: string): Span[] {
         return [];
       }
     }, PATH) as string;
