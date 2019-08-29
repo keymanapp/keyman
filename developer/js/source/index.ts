@@ -205,31 +205,44 @@ export default class LexicalModelCompiler {
    * @param sourcePath    Where to find auxilary sources files
    */
   generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string) {
+    let compiler = this;
 
     // TODO: add metadata in comment
     const filePrefix: string = `(function() {\n'use strict';\n`;
     const fileSuffix: string = `})();`;
     let func = filePrefix;
 
-    let wordBreakingSource: string = null;
-
     // Figure out what word breaker the model is using, if any.
-    if (modelSource.wordBreaking) {
-      if (typeof modelSource.wordBreaking === "string") {
+    let wordBreakerSpec = getWordBreakingSpec();
+    let wordBreakerSourceCode: string = null;
+    if (wordBreakerSpec) {
+      if (typeof wordBreakerSpec === "string") {
         // It must be a builtin word breaker, so just instantiate it.
-        wordBreakingSource = `wordBreakers['${modelSource.wordBreaking}']`;
-      } else if (typeof modelSource.wordBreaking === "function") {
+        wordBreakerSourceCode = `wordBreakers['${wordBreakerSpec}']`;
+      } else if (typeof wordBreakerSpec === "function") {
         // The word breaker was passed as a literal function; use its source code.
-        wordBreakingSource = modelSource.wordBreaking.toString()
+        wordBreakerSourceCode = wordBreakerSpec.toString()
         // Note: the .toString() might just be the property name, but we want a
         // plain function:
-          .replace(/^wordBreaking\b/, 'function');
-      } else if (modelSource.wordBreaking.sources) {
-        let wordBreakingSources: string[] = modelSource.wordBreaking.sources.map(function(source) {
+          .replace(/^wordBreak(ing|er)\b/, 'function');
+      } else if (wordBreakerSpec.sources) {
+        compiler.logError('class-based word breaker is not officially supported :/');
+        let wordBreakerSources: string[] = wordBreakerSpec.sources.map(function(source) {
           return fs.readFileSync(path.join(sourcePath, source), 'utf8');
         });
 
-        wordBreakingSource = this.transpileSources(wordBreakingSources).join('\n');
+        wordBreakerSourceCode = this.transpileSources(wordBreakerSources).join('\n');
+      }
+    }
+
+    function getWordBreakingSpec() {
+      if (modelSource.wordBreaker) {
+        return modelSource.wordBreaker;
+      } else if (modelSource.wordBreaking) {
+        compiler.logError('`wordBreaking` will be deleted; please use `wordBreaker` instead!');
+        return modelSource.wordBreaking;
+      } else {
+        return null;
       }
     }
 
@@ -256,8 +269,8 @@ export default class LexicalModelCompiler {
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(filenames, modelSource.searchTermToKey)
         }, {\n`;
-        if (wordBreakingSource) {
-          func += `  wordBreaker: ${wordBreakingSource},\n`;
+        if (wordBreakerSourceCode) {
+          func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
         }
         if (modelSource.searchTermToKey) {
           func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
