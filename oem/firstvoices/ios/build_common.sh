@@ -178,10 +178,10 @@ if [ $CODE_SIGN = true ]; then
 
     xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
   else
-    xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
+    xcodebuild $XCODEFLAGS -scheme "$TARGET"
   fi
 else
-  xcodebuild -quiet CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -target "$TARGET" -config "$CONFIG"
+  xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO $XCODEFLAGS -scheme "$TARGET"
 fi
 
 if [ $? = 0 ]; then
