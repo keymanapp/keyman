@@ -190,7 +190,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if let adhocDir = _adhocDirectory {
       self.window?.rootViewController?.dismiss(animated: true, completion: {
         do {
-          try Manager.shared.parseLMKMP(adhocDir)
+          try Manager.parseLMKMP(adhocDir)
           self.showSimpleAlert(title: "Success", message: "Installed successfully.")
         } catch {
           self.showKMPError(error as! KMPError)

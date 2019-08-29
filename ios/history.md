@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-29 12.0.20 beta
+* Automatically updates old default resources to the new set (#2007)
+* Includes the English (MTNT) dictionary by default for English (#2010)
 
 ## 2019-08-26 12.0.14 beta
 * Fixes Get Started display logic (#1988)

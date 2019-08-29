@@ -51,6 +51,7 @@ enum Migrations {
                                          isCustom: false)
 
     let sil_euro_latin = Defaults.keyboard  // We're already storing the exact metadata needed.
+    let nrc_en_mtnt = Defaults.lexicalModel
 
     // Unknown transition point:  european
     // Before v11:  european2
@@ -61,7 +62,7 @@ enum Migrations {
     let legacy_resources = VersionResourceSet(version: Version.fallback, resources: [european])
     let v10_resources = VersionResourceSet(version: Version("10.0")!, resources: [european2])
     let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin])
-    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin])
+    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin, nrc_en_mtnt])
 
     timeline.append(legacy_resources)
     timeline.append(v10_resources)
@@ -164,12 +165,21 @@ enum Migrations {
             return kbd.id == kbd2.id && kbd.languageID == kbd2.languageID
           })
           Storage.active.userDefaults.userKeyboards = userKeyboards
-        } // else do likewise for Lexical Models.  Not yet implemented, though.
+        } else if let lex = res as? InstallableLexicalModel {
+          var userModels = Storage.active.userDefaults.userLexicalModels
+
+          // Parallels the issue with deprecated files for keyboards.
+          userModels?.removeAll(where: { lex2 in
+            return lex.id == lex2.id && lex.languageID == lex2.languageID
+          })
+          Storage.active.userDefaults.userLexicalModels = userModels
+        } // else Not yet implemented
       }
     }
 
     // Now to install the new version's resources.
     var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
+    var userModels = Storage.active.userDefaults.userLexicalModels ?? []
 
     // Don't add the keyboard a second time if it's already installed!  Can happen
     // if multiple Keyman versions match.
@@ -179,6 +189,15 @@ enum Migrations {
       userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
       Storage.active.userDefaults.userKeyboards = userKeyboards
     }
+
+    if !userModels.contains(where: { lex in
+      lex.id == Defaults.lexicalModel.id && lex.languageID == Defaults.lexicalModel.languageID
+    }) {
+      userModels = [Defaults.lexicalModel] + userModels
+      Storage.active.userDefaults.userLexicalModels = userModels
+    }
+
+    // Must still do the actual install.  This comes after the copyKMWFiles step, though.
 
     // Store the version we just upgraded to.
     storage.userDefaults.lastEngineVersion = Version.current
