@@ -105,6 +105,16 @@ class Storage {
   }
   
   func keyboardURL(forID keyboardID: String, version: String) -> URL {
+    // We no longer embed version numbers into filenames
+    // This allows us to support existing installs and OEM products that
+    // still include the version string, at reasonable cost
+    // Note, that for installing a keyboard, it will no longer perform this
+    // rename with this model, as the target file will obviously not already
+    // exist.
+    let filename = keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID).js")
+    if FileManager.default.fileExists(atPath: filename.path) {
+      return filename
+    }
     return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
   
