@@ -9,7 +9,6 @@
 import UIKit
 import WebKit
 import XCGLogger
-import Zip
 import DeviceKit
 import Reachability
 
@@ -185,6 +184,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
     }
+    Migrations.updateResources(storage: Storage.active)
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
@@ -384,7 +384,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
   *   I believe this is background-thread-safe (no UI done)
   */
-  public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+  static public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
     if !FileManager.default.fileExists(atPath: lexicalModelPath) {
       log.error("Could not add lexical model with ID: \(lexicalModel.id) because the lexical model file does not exist")
@@ -690,7 +690,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
     
   // MARK: - Adhoc lexical models
-  public func parseLMKMP(_ folder: URL) throws -> Void {
+  static public func parseLMKMP(_ folder: URL) throws -> Void {
     do {
       var path = folder
       path.appendPathComponent("kmp.json")
@@ -750,7 +750,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                 log.error("Error saving the lexical model download: \(error)")
                 throw KMPError.copyFiles
               }
-              Manager.shared.addLexicalModel(lexicalModel)
+              Manager.addLexicalModel(lexicalModel)
             }
           }
         }
@@ -758,22 +758,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     } catch {
       log.error("error parsing lexical model kmp: \(error)")
       throw KMPError.invalidPackage
-    }
-  }
-  
-  public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void)
-  {
-    do {
-      try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
-                        password: nil,
-                        progress: { (progress) -> () in
-                          //TODO: add timeout
-                          if(progress == 1.0) {
-                            complete()
-                          }
-                        })
-    } catch {
-      log.error("error unzipping archive: \(error)")
     }
   }
   

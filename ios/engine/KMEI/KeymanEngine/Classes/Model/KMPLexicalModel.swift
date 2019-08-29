@@ -103,7 +103,7 @@ public class KMPLexicalModel
           throw KMPError.copyFiles
         }
       }
-      Manager.shared.addLexicalModel(lexicalModel)
+      Manager.addLexicalModel(lexicalModel)
     }
   }
 }
