@@ -462,7 +462,8 @@ namespace com.keyman.text {
       if(LeventMatched) {
         let alternates: Alternate[];
 
-        if(keyEvent.keyDistribution) {
+        // Note - we don't yet do fat-fingering with longpress keys.
+        if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
           let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
           alternates = [];
   
