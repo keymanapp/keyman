@@ -24,6 +24,7 @@ describe('compileModel', function () {
       let compilation = r as CompilationResult;
 
       assert.isFalse(compilation.hasSyntaxError);
+      assert.isNull(compilation.error);
       assert.equal(compilation.modelConstructorName, 'TrieModel');
     });
   }

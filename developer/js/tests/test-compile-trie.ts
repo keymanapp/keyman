@@ -57,13 +57,13 @@ describe('LexicalModelCompiler', function () {
       format: 'trie-1.0',
       sources: ['wordlist.tsv'],
       // This is a possible word breaking function:
-      wordBreaking(phrase: string): Span[] {
+      wordBreaker(phrase: string): Span[] {
         return [];
       }
     }, PATH) as string;
 
     let result = compileModelSourceCode(code);
-    assert.isFalse(result.hasSyntaxError);
+    assert.isFalse(result.hasSyntaxError, `Syntax error in ${code}`);
     assert.isNotNull(result.exportedModel);
     assert.equal(result.modelConstructorName, 'TrieModel');
 

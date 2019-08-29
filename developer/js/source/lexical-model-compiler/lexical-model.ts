@@ -4,6 +4,12 @@
  */
 /// <reference path="../../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
 
+/**
+ * ****** TODO: DELETE ME******
+ *
+ * This form of specifying word breakers is not implemented.
+ *
+ */
 interface ClassBasedWordBreaker {
   allowedCharacters?: { initials?: string, medials?: string, finals?: string } | string,
   defaultBreakCharacter?: string
@@ -25,8 +31,24 @@ interface LexicalModelSource extends LexicalModel {
    * The name of the type to instantiate (without parameters) as the base object for a custom predictive model.
    */
   readonly rootClass?: string
+
   /**
-   * What kind of word breaking to use, if any.
+   * Which word breaker to use. Choose from:
+   *
+   *  - 'default' -- breaks according to Unicode UAX #29 §4.1 Default Word
+   *    Boundary Specification, which works well for *most* languages.
+   *  - 'ascii' -- a very simple word breaker, for demonstration purposes only.
+   *  - word breaking function -- provide your own function that breaks words.
+   */
+  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
+
+  /**
+   * ****** TODO: DELETE ME******
+   *
+   * This used to be the way that word breaking was specified, but
+   * this should be deleted once keymanapp/lexical-models#54 is merged.
+   *
+   * https://github.com/keymanapp/lexical-models/pull/54
    */
   readonly wordBreaking?: 'default' | 'ascii' | 'placeholder' | WordBreakingFunction | ClassBasedWordBreaker;
   /**
