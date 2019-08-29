@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-30 12.0.4081 beta
+* New Feature:
+  * Allow user to "Add keyboard from local device" from Settings menu (#1992)
+
 ## 2019-08-27 12.0.4080 beta
 * Fix menu icon and text alignment (#1999)
 
