@@ -5,7 +5,7 @@
 /// <reference path="../../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
 
 /**
- * ******DELETE ME******
+ * ****** TODO: DELETE ME******
  *
  * This form of specifying word breakers is not implemented.
  *
@@ -43,7 +43,7 @@ interface LexicalModelSource extends LexicalModel {
   readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
 
   /**
-   * ******DELETE ME******
+   * ****** TODO: DELETE ME******
    *
    * This used to be the way that word breaking was specified, but
    * this should be deleted once keymanapp/lexical-models#54 is merged.
