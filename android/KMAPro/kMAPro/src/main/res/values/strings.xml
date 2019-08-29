@@ -5,6 +5,7 @@
 
   <string name="action_share" translatable="false">Share</string>
   <string name="action_web" translatable="false">Web Browser</string>
+  <string name="action_file_browser" translatable="false">File Browser</string>
   <string name="action_text_size" translatable="false">Text Size</string>
   <string name="action_overflow" translatable="false">More</string>
   <string name="action_clear_text" translatable="false">Clear Text</string>

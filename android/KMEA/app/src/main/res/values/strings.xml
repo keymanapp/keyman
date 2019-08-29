@@ -12,6 +12,7 @@
     <string name="title_keyboard" translatable="false">Keyboard</string>
     <string name="title_add_language" translatable="false">Add New Language</string>
     <string name="title_add_keyboard" translatable="false">Add New Keyboard</string>
+    <string name="title_add_keyboard_from_device" translatable="false">Add Keyboard from Device</string>
     <string name="title_languages_settings" translatable="false">Installed Languages</string>
     <string name="title_language_settings" translatable="false">%s Settings</string>
 
