@@ -73,7 +73,6 @@ public final class ModelInfoActivity extends AppCompatActivity {
       textView.setTypeface(titleFont, Typeface.BOLD);
 
     final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
-    final boolean isCustom = getIntent().getBooleanExtra(KMManager.KMKey_CustomModel, false);
 
     infoList = new ArrayList<HashMap<String, String>>();
     // Display model version title
@@ -118,7 +117,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
           // No point in 'clicking' on version info.
           return false;
           // Visibly disables the help option when help isn't available.
-        } else if (itemTitle.equals(getString(R.string.help_link)) && isCustom && customHelpLink.equals("")) {
+        } else if (itemTitle.equals(getString(R.string.help_link)) && customHelpLink.equals("")) {
           return false;
         }
 
@@ -144,7 +143,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, "com.tavulesoft.kmea.fileProvider", customHelp);
+                  context, "com.tavultesoft.kmea.fileProvider", customHelp);
                 i.setDataAndType(contentUri, "text/html");
               } catch (Exception e) {
                 Log.e("ModelInfoActivity", "Failed to access " + customHelp.toString());
