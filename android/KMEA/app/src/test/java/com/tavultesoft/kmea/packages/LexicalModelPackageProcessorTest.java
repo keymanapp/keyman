@@ -73,6 +73,7 @@ public class LexicalModelPackageProcessorTest {
     en_custom.put(KMManager.KMKey_LexicalModelVersion, "1.0.0");
     en_custom.put(KMManager.KMKey_LanguageID, "en");
     en_custom.put(KMManager.KMKey_LanguageName, "English");
+    en_custom.put(KMManager.KMKey_CustomHelpLink, "");
 
     Assert.assertEquals(en_custom, models[0]);
 

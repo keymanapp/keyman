@@ -7,6 +7,9 @@
 * New Feature:
   * Allow user to "Add keyboard from local device" from Settings menu (#1992)
 
+* Bug Fix:
+  * Fix keyboard and dictionary info pages (#2020)
+
 ## 2019-08-27 12.0.4080 beta
 * Fix menu icon and text alignment (#1999)
 
