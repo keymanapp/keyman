@@ -107,6 +107,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
 
         if(associatedLexicalModel != null) {
           args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
+          args.putString(KMManager.KMKey_CustomHelpLink, associatedLexicalModel.get(KMManager.KMKey_CustomHelpLink));
         }
 
         Intent intent = new Intent(context, LanguageSettingsActivity.class);

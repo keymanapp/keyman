@@ -47,6 +47,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private String associatedLexicalModel = "";
   private String lgCode;
   private String lgName;
+  private String customHelpLink;
   private SharedPreferences prefs;
 
   private final static String TAG = "LanguageSettingsAct";
@@ -119,6 +120,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     lgCode = bundle.getString(KMManager.KMKey_LanguageID);
     lgName = bundle.getString(KMManager.KMKey_LanguageName);
+    customHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
 
     // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
     String title = String.format(getString(R.string.title_language_settings), lgName);
@@ -168,6 +170,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString(KMManager.KMKey_LanguageID, lgCode);
         bundle.putString(KMManager.KMKey_LanguageName, lgName);
+        bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
         Intent i = new Intent(context, ModelPickerActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);

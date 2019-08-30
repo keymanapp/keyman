@@ -123,8 +123,16 @@ public final class ModelPickerActivity extends AppCompatActivity {
             bundle.putString(KMManager.KMKey_LexicalModelName, modelName);
             bundle.putString(KMManager.KMKey_LexicalModelVersion,
                 modelInfo.get(KMManager.KMKey_LexicalModelVersion));
-            bundle.putString(KMManager.KMKey_CustomModel,
-                MapCompat.getOrDefault(new HashMap<>(modelInfo), KMManager.KMKey_CustomModel, "N"));
+            boolean isCustom = false;
+            if (modelInfo.containsKey(KMManager.KMKey_CustomModel) && modelInfo.get(KMManager.KMKey_CustomModel).equals("Y")) {
+              isCustom = true;
+            }
+            bundle.putBoolean(KMManager.KMKey_CustomModel, isCustom);
+            String customHelpLink = "";
+            if (modelInfo.containsKey(KMManager.KMKey_CustomHelpLink)) {
+              customHelpLink = modelInfo.get(KMManager.KMKey_CustomHelpLink);
+            }
+            bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
             Intent i = new Intent(context, ModelInfoActivity.class);
             i.putExtras(bundle);
             startActivityForResult(i, 1);
