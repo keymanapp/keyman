@@ -21,18 +21,6 @@ display_usage ( ) {
 exit 1
 }
 
-set_version ( ) {
-  PRODUCT_PATH=$1
-
-  if [ $BUILD_NUMBER ]; then
-    if [ $2 ]; then  # $2 = product name.
-      echo "Setting version numbers in $2 to $BUILD_NUMBER."
-    fi
-    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
-    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
-  fi
-}
-
 do_clean ( ) {
   rm -rf $BUILD_PATH
   rm -rf Carthage
