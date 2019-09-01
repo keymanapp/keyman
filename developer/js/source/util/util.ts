@@ -1,9 +1,11 @@
+// TODO: this file is really only for lexical model compiler tests. Find a good name.
+//
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
 
-import { SysExits } from './cli';
-import LexicalModelCompiler from '.';
+import { SysExits } from "./sysexits";
+import LexicalModelCompiler from '..';
 
 /**
  * Compiles a model.ts file, using paths relative to its location.
@@ -42,7 +44,7 @@ export function loadFromFilename(filename: string): LexicalModelSource {
   module(moduleExports);
   if (!moduleExports['__esModule'] || !moduleExports['default']) {
     console.error(`Model source '${filename}' does have a default export. Did you remember to write \`export default source;\`?`);
-    // TODO: throw an Error instead. 
+    // TODO: throw an Error instead.
     process.exit(SysExits.EX_DATAERR);
   }
   return moduleExports['default'] as LexicalModelSource;

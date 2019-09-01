@@ -11,7 +11,7 @@ import KmpCompiler from "./package-compiler/kmp-compiler";
 import * as fs from "fs";
 import * as path from "path";
 import { createTrieDataStructure } from "./lexical-model-compiler/build-trie";
-import ModelInfoCompiler from "./model-info-compiler/model-info-compiler";
+import { writeMergedModelMetadataFile, ModelInfoOptions as ModelInfoOptions } from "./model-info-compiler/model-info-compiler";
 
 // The model ID MUST adhere to this pattern:
 //                         author           .bcp47            .uniq
@@ -132,7 +132,15 @@ export default class LexicalModelCompiler {
     //TODO: model_info.helpLink = model_info.helpLink || ... if source/help/id.php exists?
     let repoSourcePath = [groupPath, authorPath, bcp47Path].join('/');
 
-    (new ModelInfoCompiler).writeMergedModelMetadataFile('../'+modelInfoFileName, '../build/'+modelInfoFileName, model_id, kmpJsonData, repoSourcePath, modelFileName, kmpFileName);
+    let modelInfoOptions: ModelInfoOptions = {
+      model_id: model_id,
+      kmpJsonData: kmpJsonData,
+      sourcePath: repoSourcePath,
+      modelFileName: modelFileName,
+      kmpFileName: kmpFileName
+    };
+    
+    writeMergedModelMetadataFile('../'+modelInfoFileName, '../build/'+modelInfoFileName, modelInfoOptions);
 
     return true;
   };

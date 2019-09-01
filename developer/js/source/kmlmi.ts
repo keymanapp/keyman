@@ -7,16 +7,8 @@ import * as program from 'commander';
 import * as fs from 'fs';
 import * as path from 'path';
 import KmpCompiler from './package-compiler/kmp-compiler';
-import ModelInfoCompiler from './model-info-compiler/model-info-compiler';
-
-/**
- * Exit codes defined in <sysexits.h>:
- * https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
- */
-export const enum SysExits {
-  EX_USAGE = 64,
-  EX_DATAERR = 65,
-};
+import { ModelInfoOptions as ModelInfoOptions, writeMergedModelMetadataFile } from './model-info-compiler/model-info-compiler';
+import { SysExits } from './util/sysexits';
 
 let inputFilename: string;
 
@@ -38,7 +30,7 @@ program.parse(process.argv);
 // Deal with input arguments:
 
 if (!inputFilename) {
-  exitDueToUsageError('Must provide a lexical model package source file.');
+  exitDueToUsageError('Must provide a lexical model .model_info source file.');
 }
 
 let model_id: string = program.model ? program.model : path.basename(inputFilename).replace(/\.model_info$/, "");
@@ -59,14 +51,18 @@ let kmpJsonData = kmpCompiler.transformKpsToKmpObject(kpsString);
 // Write out the merged .model_info file
 //
 
-(new ModelInfoCompiler).writeMergedModelMetadataFile(
+let modelInfoOptions: ModelInfoOptions = {
+  model_id: model_id,
+  kmpJsonData: kmpJsonData,
+  sourcePath: program.source,
+  modelFileName: jsFilename,
+  kmpFileName: kmpFilename
+};
+
+writeMergedModelMetadataFile(
   inputFilename,
   outputFilename,
-  model_id,
-  kmpJsonData,
-  program.source,
-  jsFilename,
-  kmpFilename);
+  modelInfoOptions);
 
 function exitDueToUsageError(message: string): never  {
   console.error(`${program._name}: ${message}`);
