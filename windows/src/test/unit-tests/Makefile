@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=group-helper-rsp19902 kmcomp shared-data
+TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler
 
 test: 
     $(MAKE) -DTARGET=test $(TARGETS)
