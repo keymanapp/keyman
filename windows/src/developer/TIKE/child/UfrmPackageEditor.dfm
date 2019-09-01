@@ -567,8 +567,8 @@ inherited frmPackageEditor: TfrmPackageEditor
       end
     end
     object pageLexicalModels: TTabSheet
-      Caption = 'pageLexicalModels'
-      ImageIndex = 6
+      Caption = 'Lexical Models'
+      ImageIndex = 17
       object panLexicalModels: TPanel
         Left = 0
         Top = 0
