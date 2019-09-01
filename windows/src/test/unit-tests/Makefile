@@ -25,6 +25,11 @@ shared-data:
     cd $(ROOT)\src\test\unit-tests\shared-data
     $(MAKE) $(TARGET)
 
+lexical-model-compiler:
+    cd $(KEYMAN_ROOT)\developer\js
+    npm run build
+    npm test
+
 # ----------------------------------------------------------------------
 
 !include ..\..\Target.mak

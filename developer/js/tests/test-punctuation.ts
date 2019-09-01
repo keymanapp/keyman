@@ -7,7 +7,7 @@ import { compileModelSourceCode } from './helpers';
 
 
 describe('LexicalModelCompiler', function () {
-  describe('spefifying punctuation', function () {
+  describe('specifying punctuation', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = path.join(__dirname, 'fixtures', MODEL_ID)
 
