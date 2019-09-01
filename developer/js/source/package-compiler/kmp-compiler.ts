@@ -9,7 +9,7 @@ let zip = require('node-zip')();
 
 export default class KmpCompiler {
 
-  public transformKpsToKmpObject(modelId: string, kpsString: string): KmpJsonFile {
+  public transformKpsToKmpObject(kpsString: string): KmpJsonFile {
 
     // Load the KPS data from XML as JS structured data.
 

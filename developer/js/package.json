@@ -15,7 +15,9 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "bin": {
-    "kmlmc": "dist/cli.js"
+    "kmlmc": "dist/cli.js",
+    "kmlmp": "dist/kmlmp.js",
+    "kmlmi": "dist/kmlmi.js"
   },
   "dependencies": {
     "commander": "^3.0.0",
