@@ -27,6 +27,7 @@ shared-data:
 
 lexical-model-compiler:
     cd $(KEYMAN_ROOT)\developer\js
+    npm install
     npm run build
     npm test
 
