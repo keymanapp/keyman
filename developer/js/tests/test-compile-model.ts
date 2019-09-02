@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert} from 'chai';
 
-import {compileModel} from '../dist/util';
+import {compileModel} from '../dist/util/util';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers';
 
 describe('compileModel', function () {

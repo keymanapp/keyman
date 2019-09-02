@@ -6,22 +6,22 @@
     <Package Keywords="Keyman,Keyboard,Engine" Compressed="yes"
              Description="Keyman Developer $(var.RELEASE)" Comments="Contact:  Your local administrator"
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
-    
+
     <!-- Upgrade from Developer 7.0 -->
     <!-- ProductID for 7.0 = {5889CA65-3E9F-445b-A22F-9277A0FB43C6} -->
     <Upgrade Id="FF590D53-075C-45a4-89C2-EC7BA4E1ECD4">
-      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes"
                       Maximum="8.0.314.0" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDERFOUND" />
     </Upgrade>
 
     <!-- Upgrade from Developer 8.0 -->
-    
+
     <Upgrade Id="490D8B83-276E-4434-B1EA-30713F7916C7">
-      <UpgradeVersion OnlyDetect="no" Minimum="8.0.314.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="8.0.314.0" IncludeMinimum="yes"
                       Maximum="9.0.507.0" IncludeMaximum="yes" MigrateFeatures="yes" Property="VERSION8FOUND" />
         <!-- bug in Developer 9.0 installer means 9.0.507.0 and earlier are treated as 8.x -->
     </Upgrade>
-    
+
     <!-- Upgrade from Developer 9.0 -->
 
     <Upgrade Id="E0159651-CEA3-46CF-ACD7-0B0330C1B547">
@@ -45,7 +45,7 @@
                       Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
-    
+
     <Property Id="ALLUSERS"><![CDATA[1]]></Property>
 
     <Condition Message="Keyman Developer requires Windows 7 or later"><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
@@ -67,9 +67,9 @@
           </Directory>
         </Directory>
       </Directory>
-      
+
       <Directory Id="FontsFolder" />
-      
+
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ProgramMenuDir" Name="Keyman Developer" />
       </Directory>
@@ -130,13 +130,13 @@
         <RegistryValue Root="HKCR" Key=".kmx" Type="string" Value="Keyman.File.Keyboard" />
         <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
         <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
-        
+
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard" Type="string" Value="Keyman Developer Keyboard Source File" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],1" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
-        
+
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package" Type="string" Value="Keyman Developer Package Source File" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],2" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell" Type="string" Value="edit" />
@@ -154,7 +154,7 @@
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
-       
+
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project" Type="string" Value="Keyman Developer Project Source File" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\DefaultIcon" Type="string" Value="[#tike.exe],5" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell" Type="string" Value="open" />
@@ -172,18 +172,18 @@
         <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
-        
+
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard" Type="string" Value="Keyman Developer On Screen Keyboard File" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],11" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
       </Component>
-      
+
       <Component>
         <File Name="kmcomp.exe" KeyPath="yes" />
       </Component>
-      
+
       <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
       </Component>
@@ -191,21 +191,21 @@
       <Component>
         <File Name="kmcmpdll.dll" KeyPath="yes" />
       </Component>
-      
+
       <Component>
         <File Name="debughost.kmx" KeyPath="yes" Source="..\..\developer\tike\redist\debughost.kmx" />
       </Component>
-      
+
       <Component>
         <File Name="keyboard_info.distribution.json" Source="..\..\global\inst\data\keyboard_info\" KeyPath="yes" />
       </Component>
-      
+
       <Component>
         <File Name="keyboard_info.source.json" Source="..\..\global\inst\data\keyboard_info\" KeyPath="yes" />
       </Component>
 
-      <!-- Data Files --> 
-      
+      <!-- Data Files -->
+
       <Component>
         <File Name="unicodedata.mdb" Source="..\..\global\inst\data\" KeyPath="yes" />
       </Component>
@@ -218,11 +218,11 @@
         <File Name="blocks.txt" Source="..\..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
       </Component>
     </ComponentGroup>
-    
+
     <ComponentGroup Id="FontsAndRedist" Source="..\..\developer\inst\fonts\">
 
-      <!-- Fonts --> 
-      
+      <!-- Fonts -->
+
       <Component Directory="FontsFolder">
         <File Name="code2000.ttf" TrueType="yes" KeyPath="yes" />
       </Component>
@@ -233,18 +233,18 @@
 
       <Component Directory="FontsFolder">
         <File Name="code2002.ttf" TrueType="yes" KeyPath="yes" />
-      </Component>  
-      
+      </Component>
+
       <Component Directory="FontsFolder">
         <File Name='keymanweb-osk.ttf' TrueType='yes' Source='..\..\developer\tike\xml\layoutbuilder\keymanweb-osk.ttf' KeyPath="yes" />
       </Component>
-                
+
       <!-- Redistributable files -->
 
       <Component Directory="dirRedistSetup">
         <File Name="setup.exe" Source="..\..\..\bin\desktop\setup.exe" KeyPath="yes" />
       </Component>
-      
+
     </ComponentGroup>
 
     <ComponentGroup Id="Node">
@@ -257,6 +257,14 @@
 
       <Component Directory="INSTALLDIR">
         <File Name='kmlmc.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmc.cmd" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmi.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmi.cmd" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmp.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmp.cmd" />
       </Component>
     </ComponentGroup>
 
@@ -271,7 +279,7 @@
         <RemoveFile Id="AD_KeymanDev_Databases_Uninstall_F" Directory="App_KeymanDev_Databases" On="uninstall"  Name="*.mdb" />
       </Component>
     </ComponentGroup>
-      
+
     <ComponentGroup Id="Samples">
       <Component Guid="{BC44DD9F-F91B-4DB8-B792-CA5744FE5990}" Directory="Samples">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Readme" Value="" />
@@ -279,7 +287,7 @@
         <RemoveFolder Id="Samples" On="uninstall" />
         <RemoveFolder Id="KMDevSamples" Directory="KMDevSamples" On="uninstall" />
       </Component>
-    
+
       <Component Directory="Samples">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="Link" Value="" />
         <CreateFolder>
@@ -287,7 +295,7 @@
             WorkingDirectory='INSTALLDIR' Icon="samples.ico" IconIndex="0" />
         </CreateFolder>
       </Component>
-              
+
       <Component Guid="{003288A1-C6BE-4EE0-A91A-AD9C82A6DEE1}" Directory="Samples_IMSample">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="IMSample" Value="" />
         <File Name="imsample.dll" Source="..\..\..\bin\developer\imsample.dll" />
@@ -317,7 +325,7 @@
         <File Id="sk_readme.txt" Name="readme.txt" Source="..\..\developer\samples\Examples\" />
         <RemoveFolder Id="Samples_Keyboards" On="uninstall" />
       </Component>
-      
+
       <Component Guid="{4B72D2E9-D8F4-4C41-81DF-CBDF0CE9C97F}" Directory="Samples_Keyboards_European">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer\Samples" Type="string" Name="European" Value="" />
         <File Id="ske_european.bmp" Name="european.bmp" Source="..\..\developer\samples\Examples\European\" />
@@ -343,7 +351,7 @@
       <ComponentGroupRef Id="Templates" />
       <ComponentGroupRef Id="ModelCompiler" />
       <ComponentGroupRef Id="Node" />
-      
+
       <MergeRef Id='keymanengine' />
     </Feature>
 
@@ -379,7 +387,7 @@
       <Custom Action='CachedInstallDirParent' After='CostFinalize' />
 
       <RemoveExistingProducts After='InstallValidate'>VERSION8FOUND or VERSION9FOUND or VERSION10FOUND or VERSION11FOUND or OLDERFOUND</RemoveExistingProducts><!--I2839-->
-      
+
       <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>CURRENTVERSIONFOUND</Custom>
       <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND</Custom>
     </InstallExecuteSequence>
