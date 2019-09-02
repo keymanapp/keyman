@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018 SIL International. All rights reserved.
+ * Copyright (C) 2018-2019 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,7 +62,6 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
-
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -96,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
-
   private Toolbar toolbar;
   private Menu menu;
 
