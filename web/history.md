@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-02 12.0.78 beta
+* Fixes erroneous 'beep' feedback on mobile form-factors (#2013)
+* Longpress menu disappears properly after selecting a subkey (#2013)
+
 ## 2019-08-09 12.0.76 beta
 * The suggestion banner will no longer activate if predictions are not enabled, regardless of correction state.  (#1960)
 
