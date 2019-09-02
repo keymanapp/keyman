@@ -87,7 +87,6 @@ div {
 					{
 						if(event.keyCode == 13 <![CDATA[&&]]> (!event.srcElement.type || event.srcElement.type != 'button') <![CDATA[&&]]> !document.getElementById('submitButton').disabled)
 						{
-
 							event.cancelBubble = true; event.returnValue = false;
 							location.href='keyman:installnow';
 						}
@@ -97,7 +96,6 @@ div {
 							location.href='keyman:installlater';
 						}
 					}
-
           function updateTick(id)
           {
             enableControls();
@@ -106,7 +104,6 @@ div {
             if(e.checked) location.href='keyman:tickupdate?id='+id;
             else location.href='keyman:untickupdate?id='+id;
           }
-
           function enableControls()
           {
             var e = false, admin = false;
