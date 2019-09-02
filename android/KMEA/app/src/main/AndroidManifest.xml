@@ -69,6 +69,16 @@
             android:theme="@style/Theme.AppCompat.Light.Dialog" >
         </activity>
 
+        <provider
+          android:name="androidx.core.content.FileProvider"
+          android:authorities="com.tavultesoft.kmea.fileProvider"
+          android:exported="false"
+          android:grantUriPermissions="true">
+          <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>

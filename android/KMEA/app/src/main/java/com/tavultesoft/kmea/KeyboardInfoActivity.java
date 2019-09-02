@@ -100,7 +100,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
+                  context, "com.tavultesoft.kmea.fileProvider", customHelp);
                 i.setDataAndType(contentUri, "text/html");
               } catch (Exception e) {
                 Log.e("KeyboardInfoActivity", "Failed to access " + customHelp.toString());

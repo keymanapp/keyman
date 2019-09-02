@@ -336,7 +336,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
     // Add models.
     for lexicalModel in lexicalModels {
-      Manager.shared.addLexicalModel(lexicalModel)
+      Manager.addLexicalModel(lexicalModel)
       _ = Manager.shared.registerLexicalModel(lexicalModel)
     }
     

@@ -529,7 +529,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   // Processes fetched lexical models.
   // return a lexical model so caller can use it in a downloadSucceeded call
   // is called by other class funcs
-  func  installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
+  public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
     var installedLexicalModel: InstallableLexicalModel? = nil
     let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     var destination =  documentsDirectory
@@ -538,7 +538,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
       if let kmp = kmp as! LexicalModelKeymanPackage? {
         do {
-          try Manager.shared.parseLMKMP(kmp.sourceFolder)
+          try Manager.parseLMKMP(kmp.sourceFolder)
           log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
           installedLexicalModel = kmp.models[0].installableLexicalModels[0]
           //this can fail gracefully and not show errors to users

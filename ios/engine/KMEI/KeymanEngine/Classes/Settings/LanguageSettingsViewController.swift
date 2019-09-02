@@ -12,7 +12,6 @@ private let toolbarButtonTag = 100
 
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
-  private var userKeyboards: [String: Language] = [:]
   private var settingsArray = [[String: String]]()
   private var keyboardRepository: KeyboardRepository?
 
@@ -253,20 +252,18 @@ class LanguageSettingsViewController: UITableViewController {
     if !Manager.shared.canRemoveKeyboards {
       return false
     }
-    
+
+    // No deletion of the settings toggles!
     if indexPath.section != 0 {
       return false
     }
-    
-    // Filter- prevent deleting the default keyboard and just that one.
-    if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
-      // Assumption - default keyboard is index 0.  Probably should make something more robust, though.
-      if globalIndex == 0 {
-        return false
-      }
+
+    // Will we have at least one keyboard left somewhere if this one is deleted?  (Even if not same language)
+    if Storage.active.userDefaults.userKeyboards?.count ?? 0 > 1 {
+      return true
     }
 
-    return true
+    return false
   }
   
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
@@ -353,7 +350,7 @@ class LanguageSettingsViewController: UITableViewController {
       let thisKb = globalUserKeyboards[kbIndex]
       let infoView = KeyboardInfoViewController()
       infoView.title = thisKb.name
-      infoView.keyboardCount = userKeyboards.count
+      infoView.keyboardCount = globalUserKeyboards.count
       infoView.keyboardIndex = index
       infoView.keyboardID = thisKb.id
       infoView.languageID = language.id

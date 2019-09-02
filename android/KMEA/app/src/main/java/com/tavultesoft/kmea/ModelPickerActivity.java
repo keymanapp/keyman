@@ -46,6 +46,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
   private final static String TAG = "ModelPickerActivity";
 
   private String languageID = "";
+  private String customHelpLink = "";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -63,9 +64,11 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
     Bundle bundle = getIntent().getExtras();
     String newLanguageID = bundle.getString(KMManager.KMKey_LanguageID);
+    String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
 
     // Sometimes we need to re-initialize the list of models that are displayed in the ListView
     languageID = newLanguageID;
+    customHelpLink = newCustomHelpLink;
 
     final String languageName = bundle.getString(KMManager.KMKey_LanguageName);
     textView.setText(String.format(getString(R.string.model_picker_header), languageName));
@@ -123,8 +126,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
             bundle.putString(KMManager.KMKey_LexicalModelName, modelName);
             bundle.putString(KMManager.KMKey_LexicalModelVersion,
                 modelInfo.get(KMManager.KMKey_LexicalModelVersion));
-            bundle.putString(KMManager.KMKey_CustomModel,
-                MapCompat.getOrDefault(new HashMap<>(modelInfo), KMManager.KMKey_CustomModel, "N"));
+            bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
             Intent i = new Intent(context, ModelInfoActivity.class);
             i.putExtras(bundle);
             startActivityForResult(i, 1);

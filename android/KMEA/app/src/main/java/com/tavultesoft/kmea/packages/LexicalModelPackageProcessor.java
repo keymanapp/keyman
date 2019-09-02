@@ -80,6 +80,8 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
           File welcomeFile = new File(packageDir, "welcome.htm");
           // Only storing relative instead of absolute paths as a convenience for unit tests.
           models[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+        } else {
+          models[i].put(KMManager.KMKey_CustomHelpLink, "");
         }
       }
       return models;

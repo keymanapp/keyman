@@ -43,7 +43,7 @@ export function compileModelSourceCode(code: string) {
 
   let module: ModuleType | null = null;
   try {
-    module = new Function('LMLayerWorker', 'models', code) as ModuleType;
+    module = new Function('LMLayerWorker', 'models', 'wordBreakers', code) as ModuleType;
   } catch (err) {
     if (err instanceof SyntaxError) {
       hasSyntaxError = true;
@@ -88,7 +88,7 @@ export function compileModelSourceCode(code: string) {
   });
 
   try {
-    module(fakeLMLayerWorker, modelsNamespace);
+    module(fakeLMLayerWorker, modelsNamespace, {});
   } catch (err) {
     error = err;
   }
@@ -98,8 +98,9 @@ export function compileModelSourceCode(code: string) {
   };
 }
 
-type ModuleType = (a: LMLayerWorker, b: ModelsNamespace) => any;
+type ModuleType = (a: LMLayerWorker, b: ModelsNamespace, c: WordBreakersNamespace) => any;
 interface LMLayerWorker {
   loadModel(model: object): void;
 }
 type ModelsNamespace = object;
+type WordBreakersNamespace = object;

@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert} from 'chai';
 
-import {compileModel} from '../dist/util';
+import {compileModel} from '../dist/util/util';
 import {makePathToFixture, compileModelSourceCode, CompilationResult} from './helpers';
 
 describe('compileModel', function () {
@@ -24,6 +24,7 @@ describe('compileModel', function () {
       let compilation = r as CompilationResult;
 
       assert.isFalse(compilation.hasSyntaxError);
+      assert.isNull(compilation.error);
       assert.equal(compilation.modelConstructorName, 'TrieModel');
     });
   }

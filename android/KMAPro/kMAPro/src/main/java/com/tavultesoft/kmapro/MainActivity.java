@@ -75,10 +75,12 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
-  ActivityCompat.OnRequestPermissionsResultCallback {
+    ActivityCompat.OnRequestPermissionsResultCallback {
+  public static Context context;
 
   // Fields used for installing kmp packages
   private static final int PERMISSION_REQUEST_STORAGE = 0;
+  public static final int READ_REQUEST_CODE = 42;
   Uri data;
 
   private static final String TAG = "MainActivity";
@@ -132,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
+    context = this;
     resultReceiver = new DownloadResultReceiver(new Handler());
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -619,7 +622,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       // Request for storage permission
       if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
-        useLocalKMP(data);
+        useLocalKMP(context, data);
       } else {
         // Permission request denied
         String message = "Storage permission request was denied. Unable to install keyboard package";
@@ -634,14 +637,14 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
         PackageManager.PERMISSION_GRANTED) {
-        useLocalKMP(data);
+        useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
         requestStoragePermission();
       }
     } else {
       // Permission automatically granted on older Android versions
-      useLocalKMP(data);
+      useLocalKMP(context, data);
     }
   }
 
@@ -664,7 +667,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
-  private void useLocalKMP(Uri data) {
+  // TODO: Move this to KMEA during Keyman 13.0 refactoring
+  public static void useLocalKMP(Context context, Uri data) {
     String filename = "";
     String cacheKMPFilename = "";
     File cacheKMPFile = null;
@@ -675,13 +679,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       switch (data.getScheme().toLowerCase()) {
         case "content":
           // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
-          Cursor cursor = getContentResolver().query(data, null, null, null, null);
+          Cursor cursor = context.getContentResolver().query(data, null, null, null, null);
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
           isKMP = FileUtils.hasKeymanPackageExtension(filename);
           cacheKMPFilename = filename;
-          inputFile = getContentResolver().openInputStream(data);
+          inputFile = context.getContentResolver().openInputStream(data);
           break;
 
         case "file":
@@ -695,21 +699,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
       if (isKMP) {
         // Copy KMP to app cache
-        cacheKMPFile = new File(MainActivity.this.getCacheDir().toString(), cacheKMPFilename);
+        cacheKMPFile = new File(context.getCacheDir().toString(), cacheKMPFilename);
         if (cacheKMPFile.exists()) {
           cacheKMPFile.delete();
         }
 
         FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
       } else {
-        String noKeyboardsInstalledMessage = " is not a valid keyboard package file.\nNo keyboards were installed.";
-        Toast.makeText(getApplicationContext(),
+        String noKeyboardsInstalledMessage = " is not a valid Keyman package file.\n" +
+          "No keyboards/dictionaries were installed.";
+        Toast.makeText(context,
           filename + noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
       }
     } catch (Exception e) {
       String message = "Access denied to " + filename +
         ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
-      Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+      Toast.makeText(context, message, Toast.LENGTH_LONG).show();
       Log.e(TAG, "Unable to copy " + filename + " to app cache");
       return;
     }
@@ -717,9 +722,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (cacheKMPFile != null) {
       bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
 
-      Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
+      Intent packageIntent = new Intent(context, PackageActivity.class);
       packageIntent.putExtras(bundle);
-      startActivity(packageIntent);
+      context.startActivity(packageIntent);
     }
   }
 

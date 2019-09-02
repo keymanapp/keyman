@@ -7,16 +7,8 @@
 import * as fs from 'fs';
 import * as program from 'commander';
 
-import {  compileModel } from './util';
-
-/**
- * Exit codes defined in <sysexits.h>:
- * https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
- */
-export const enum SysExits {
-  EX_USAGE = 64,
-  EX_DATAERR = 65,
-};
+import { compileModel } from './util/util';
+import { SysExits } from './util/sysexits';
 
 let inputFilename: string;
 
