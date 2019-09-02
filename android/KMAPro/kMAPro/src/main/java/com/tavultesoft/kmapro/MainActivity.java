@@ -259,16 +259,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     PackageActivity.addKeyboardDownloadEventListener(this);
 
     // Check if default dictionary model package should be installed
-    boolean shouldInstallDefaultDictionary = false;
-    if (shouldInstallDefaultDictionary) {
-      if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
-        KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID)) {
-        File defaultDictionaryKMP = new File(
-          new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
-        Uri uri = FileProvider.getUriForFile(
-          context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
-        useLocalKMP(context, uri, true);
-      }
+    if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
+      KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID)) {
+      File defaultDictionaryKMP = new File(
+        new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
+      Uri uri = FileProvider.getUriForFile(
+        context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
+      useLocalKMP(context, uri, true);
     }
 
     Intent intent = getIntent();
