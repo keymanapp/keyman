@@ -47,7 +47,6 @@ div {
   width: <xsl:value-of select="$locale_proxyconfiguration/@Width - 2" />px;
   height: <xsl:value-of select="$locale_proxyconfiguration/@Height - 2" />px;
   }
-
 #content {
  padding: 10px;
  text-align: center;
