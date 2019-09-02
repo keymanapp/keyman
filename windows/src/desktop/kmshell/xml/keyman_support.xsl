@@ -9,7 +9,6 @@
       <xsl:call-template name="header_helplinks" />
       <xsl:value-of select="$locale/String[@Id='S_Support']"/>
     </div>
-
     <div id="subcontent_support" class="content">
       <div id="support_content">
         <div class="support_title">
