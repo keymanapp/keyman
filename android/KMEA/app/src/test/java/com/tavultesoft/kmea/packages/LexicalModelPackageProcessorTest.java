@@ -64,10 +64,10 @@ public class LexicalModelPackageProcessorTest {
 
     Assert.assertNotNull(json);
 
-    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom.model");
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom");
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
-    en_custom.put(KMManager.KMKey_PackageID, "example.en.custom.model");
+    en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");
     en_custom.put(KMManager.KMKey_LexicalModelName, "Example (English) Template Custom Model");
     en_custom.put(KMManager.KMKey_LexicalModelID, "example.en.custom");
     en_custom.put(KMManager.KMKey_LexicalModelVersion, "1.0.0");

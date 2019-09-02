@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -61,6 +62,8 @@ import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
+
   private Toolbar toolbar;
   private Menu menu;
 
@@ -256,6 +260,19 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
+
+    // Check if default dictionary model package should be installed
+    boolean shouldInstallDefaultDictionary = false;
+    if (shouldInstallDefaultDictionary) {
+      if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
+        KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID)) {
+        File defaultDictionaryKMP = new File(
+          new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
+        Uri uri = FileProvider.getUriForFile(
+          context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
+        useLocalKMP(context, uri, true);
+      }
+    }
 
     Intent intent = getIntent();
     data = intent.getData();
@@ -669,6 +686,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   // TODO: Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
+    useLocalKMP(context, data, false);
+  }
+
+  public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
     String filename = "";
     String cacheKMPFilename = "";
     File cacheKMPFile = null;
@@ -721,6 +742,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
     if (cacheKMPFile != null) {
       bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
+      bundle.putBoolean("silentInstall", silentInstall);
 
       Intent packageIntent = new Intent(context, PackageActivity.class);
       packageIntent.putExtras(bundle);
@@ -848,7 +870,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-    String langId = KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID);
+    String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+      KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID) :
+      KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 
     for(int i=0; i<lexicalModelsInstalled.size(); i++) {
