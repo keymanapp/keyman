@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-03 12.0.79 beta
+* Tweaks suggestion banner behavior after multiple backspaces. (#2027)
+
 ## 2019-09-02 12.0.78 beta
 * Fixes erroneous 'beep' feedback on mobile form-factors (#2013)
 * Longpress menu disappears properly after selecting a subkey (#2013)
