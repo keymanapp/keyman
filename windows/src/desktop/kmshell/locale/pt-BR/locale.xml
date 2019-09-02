@@ -211,8 +211,8 @@
   <String Type="PlainText" Id="S_Yes">Sim</String>
   <String Type="Caption" Caption="Save as Web Page...">&amp;Salvar como Página da Web</String>
   <String Type="Caption" Caption="Show Toolbar">Mostrar Barra de &amp;Ferramentas</String>
-  <String Type="PlainText" Id="SK_UIFontName">Tahoma</String>
-  <String Type="PlainText" Id="SK_UIFontSize">8</String>
+  <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
+  <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
   
   
