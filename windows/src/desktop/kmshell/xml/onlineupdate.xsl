@@ -14,7 +14,7 @@
 <title><xsl:value-of select="$locale/String[@Id='S_Update_Title']"/></title>
 <style type="text/css">
 
-* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; }
+* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; }
 
 html { overflow: hidden }
 
@@ -27,7 +27,7 @@ body {
 }
 
 .button {
- font: 11px <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />;
+ font: 11px <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
  height: 23px; width: 128px;
 }
 
@@ -39,7 +39,7 @@ body {
 </xsl:if>
   
 div {
-  font: 13.3px <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />
+  font: 13.3px <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
 }
 
 #border { 

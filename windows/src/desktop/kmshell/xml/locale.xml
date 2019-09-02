@@ -11,8 +11,8 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">Keyman</String>
   
-<String Group='_Font' Type="PlainText" Id="SK_UIFontName" Version="7.0.230.0" Description="The standard font">Tahoma</String>
-<String Group='_Font' Type="PlainText" Id="SK_UIFontSize" Version="7.0.230.0" Description="The standard font size">8</String>
+<String Group='_Font' Type="PlainText" Id="SK_UIFontName" Version="7.0.230.0" Description="The standard font">Segoe UI</String>
+<String Group='_Font' Type="PlainText" Id="SK_UIFontSize" Version="7.0.230.0" Description="The standard font size">9</String>
 
 <!-- BETA ONLY ENTITIES -->
 

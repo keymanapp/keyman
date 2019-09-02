@@ -15,7 +15,7 @@
 					<xsl:value-of select="$locale/String[@Id='Usage_Title']" />
 				</title>
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; font-size: 13.3px; }
+					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
 					body { padding: 6px; margin: 0px; overflow: auto;
 					background: #A0C1DC; border: none; }

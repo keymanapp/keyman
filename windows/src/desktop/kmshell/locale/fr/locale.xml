@@ -13,7 +13,7 @@ Entries not in this file will be sourced from the default locale.xml file in the
 
 -->
 
-<String Type="PlainText" Id="SK_UIFontName">Tahoma</String>
+<String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
 <String Type="PlainText" Id="SK_UIFontSize">9</String>
 
 <!-- BETA ONLY ENTITIES -->

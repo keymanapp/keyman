@@ -12,7 +12,7 @@
 
 				<title>hintbar</title>
 				<style type="text/css">
-          * { font-family: Tahoma; font-size: 11px; }
+          * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 11px; }
 
           body { padding: 0px 0px 0px 0px; margin: 0px; overflow: hidden;  width: 100%; height: 100%; background: #5E97A8 ; }
           html { padding: 0px; margin: 0px; overflow: hidden; }

@@ -21,6 +21,7 @@
       <head>
         <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<style> *{font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
         <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
@@ -59,7 +60,7 @@
   <xsl:template name="header_helplinks">
     <div class="helplinks">
       <a href="keyman:help" onmouseover="this.style.cursor='hand';" >
-        <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: 0 4px 0 4px;'>
+        <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;'>
           <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath'/>help24.png</xsl:attribute>
         </img>
         <xsl:value-of select="$locale/String[@Id='S_Caption_Help']" />
@@ -97,5 +98,4 @@
       </xsl:call-template>
     </div>
   </xsl:template>
-  
 </xsl:stylesheet>

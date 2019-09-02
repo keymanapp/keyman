@@ -13,10 +13,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <title><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Title']"/></title>
 <style type="text/css">
-  * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; }
+  * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; }
 
 html {
- font-size:		 11px;
+ font-size:		 13px;
  text-align:	justify;
  margin: 	 0px;
  width:    <xsl:value-of select="$locale_proxyconfiguration/@Width" />px;
@@ -25,7 +25,7 @@ html {
 }
 
 body {
- font-size:	 	 11px;
+ font-size:	 	 13px;
  text-align:	justify;
  margin:	 0px;
  width:    <xsl:value-of select="$locale_proxyconfiguration/@Width" />px;
@@ -39,7 +39,7 @@ body {
 }
 
 div {
-  font-size: 13.3px;
+  font-size: 13px;
 }
 
 #border { 
@@ -141,4 +141,5 @@ div {
 </body>
 </html>
     </xsl:template>
+
   </xsl:stylesheet>
