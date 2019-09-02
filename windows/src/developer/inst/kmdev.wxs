@@ -257,8 +257,14 @@
 
       <Component Directory="INSTALLDIR">
         <File Name='kmlmc.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmc.cmd" />
-        <File Name='kmlmi.cmd' Source="..\..\..\..\developer\inst\kmlmi.cmd" />
-        <File Name='kmlmp.cmd' Source="..\..\..\..\developer\inst\kmlmp.cmd" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmi.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmi.cmd" />
+      </Component>
+
+      <Component Directory="INSTALLDIR">
+        <File Name='kmlmp.cmd' KeyPath="yes" Source="..\..\..\..\developer\inst\kmlmp.cmd" />
       </Component>
     </ComponentGroup>
 
