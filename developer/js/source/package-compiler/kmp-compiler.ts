@@ -2,7 +2,7 @@
 /// <reference path="kps-file.ts" />
 /// <reference path="kmp-json-file.ts" />
 
-let fs = require('fs'); 
+let fs = require('fs');
 let path = require('path');
 let xml2js = require('xml2js');
 let zip = require('node-zip')();
@@ -55,7 +55,7 @@ export default class KmpCompiler {
       }
       return [a];
     };
-  
+
     let kpsLanguagesToKmpLanguages = function(language: KpsFileLanguage[]): KmpJsonFileLanguage[] {
       return language.map((element) => { return { name: element._, id: element.$.ID } });
     };
@@ -64,7 +64,7 @@ export default class KmpCompiler {
 
     let kmp: KmpJsonFile = {
       system: kps.system,
-      options: { 
+      options: {
         followKeyboardVersion: kps.options.followKeyboardVersion === ''
       }
     };
@@ -96,7 +96,7 @@ export default class KmpCompiler {
     }
 
     if(kps.startMenu) {
-      kmp.startMenu = {};      
+      kmp.startMenu = {};
       if(kps.startMenu.addUninstallEntry) kmp.startMenu.addUninstallEntry = kps.startMenu.addUninstallEntry === '';
       if(kps.startMenu.folder) kmp.startMenu.folder = kps.startMenu.folder;
       if(kps.startMenu.items && kps.startMenu.items.item) kmp.startMenu.items = arrayWrap(kps.startMenu.items.item);
@@ -123,7 +123,7 @@ export default class KmpCompiler {
     kmpJsonData.files.forEach(function(value) {
       // Make file path slashes compatible across platforms
       let filename : string = value.name.replace(/\\/g, "/");
-      
+
       let data = fs.readFileSync(path.join('../source', filename), 'utf8');
       zip.file(path.basename(filename), data);
 
@@ -131,7 +131,7 @@ export default class KmpCompiler {
       value.name = path.basename(filename);
     });
 
-    zip.file(kmpJsonFileName, JSON.stringify(kmpJsonData));
+    zip.file(kmpJsonFileName, JSON.stringify(kmpJsonData, null, 2));
 
     // Generate kmp file
     var data = zip.generate({base64:false,compression:'DEFLATE'});

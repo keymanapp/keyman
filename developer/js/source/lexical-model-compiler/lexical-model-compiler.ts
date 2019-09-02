@@ -30,7 +30,7 @@ export default class LexicalModelCompiler {
     let func = filePrefix;
 
     // Figure out what word breaker the model is using, if any.
-    let wordBreakerSpec = getWordBreakingSpec();
+    let wordBreakerSpec = getWordBreakerSpec();
     let wordBreakerSourceCode: string = null;
     if (wordBreakerSpec) {
       if (typeof wordBreakerSpec === "string") {
@@ -52,7 +52,7 @@ export default class LexicalModelCompiler {
       }
     }
 
-    function getWordBreakingSpec() {
+    function getWordBreakerSpec() {
       if (modelSource.wordBreaker) {
         return modelSource.wordBreaker;
       } else if (modelSource.wordBreaking) {

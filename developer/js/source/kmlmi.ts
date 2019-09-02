@@ -22,8 +22,8 @@ program
   .option('-m, --model <model_id>', 'model id, defaults to basename of input file sans .model_info extension')
   .option('-s, --source <source>', 'path to source of model, relative to lexical-models repo root')
   .option('--kpsFilename <kpsFilename>', 'path to .model.kps file, defaults to source/<model_id>.model.kps')
-  .option('--kmpFilename <kmpFilename>', 'path to .model.kmps file, defaults to build/<model_id>.model.kmp')
-  .option('--jsFilename <kmpFilename>', 'path to .model.js file, defaults to build/<model_id>.model.js');
+  .option('--kmpFilename <kmpFilename>', 'path to .model.kmp file, defaults to build/<model_id>.model.kmp')
+  .option('--jsFilename <jsFilename>', 'path to .model.js file, defaults to build/<model_id>.model.js');
 
 program.parse(process.argv);
 
