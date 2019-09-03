@@ -1,7 +1,7 @@
 inherited frmNewProjectParameters: TfrmNewProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'New Project'
+  Caption = 'New Basic Keyboard Project'
   ClientHeight = 309
   ClientWidth = 625
   Position = poScreenCenter
@@ -215,7 +215,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Filter = 'Project files (*.kpj)|*.kpj|All files (*.*)|*.*'
     FilterIndex = 0
     Title = 'Create New Project'
-    Left = 188
-    Top = 152
+    Left = 396
+    Top = 240
   end
 end

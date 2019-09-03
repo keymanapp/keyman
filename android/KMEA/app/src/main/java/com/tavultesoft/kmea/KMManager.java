@@ -701,6 +701,7 @@ public final class KMManager {
       languageJSONArray.put(languageID);
       modelObj.put("languages", languageJSONArray);
       modelObj.put("path", path);
+      modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
       Log.e(TAG, "Invalid lexical model to register");
       return false;
@@ -770,7 +771,7 @@ public final class KMManager {
    * Search the installed lexical models list and see if there's an
    * associated model for a given language ID
    * @param langId - String of the language ID
-   * @return HashMap<String, String> Keyboard information if it exists. Otherwise null
+   * @return HashMap<String, String> Model information if it exists. Otherwise null
    */
   public static HashMap<String, String> getAssociatedLexicalModel(String langId) {
     ArrayList<HashMap<String, String>> lexicalModelsList = getLexicalModelsList(appContext);

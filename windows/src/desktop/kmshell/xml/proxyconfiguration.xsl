@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-  
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:include href="elements.xsl"/>
 
   <xsl:variable name="locale_proxyconfiguration" select="$locale/Dialog[@Id='ProxyConfiguration'][1]" />
-  
+
   <xsl:template match="/">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -42,12 +42,11 @@ div {
   font-size: 13px;
 }
 
-#border { 
-  border: 1px solid #AD4A29; 
-  width: <xsl:value-of select="$locale_proxyconfiguration/@Width - 2" />px; 
+#border {
+  border: 1px solid #AD4A29;
+  width: <xsl:value-of select="$locale_proxyconfiguration/@Width - 2" />px;
   height: <xsl:value-of select="$locale_proxyconfiguration/@Height - 2" />px;
   }
-  
 #content {
  padding: 10px;
  text-align: center;
@@ -59,7 +58,7 @@ div {
   height: 36px;
   text-align: center;
   width: 100%;
-} 
+}
 
 .form { position: absolute; display: block; vertical-align: middle; height: 24px; }
 #ProxyServerLabel { left: 16px; top: 20px;}
@@ -86,7 +85,7 @@ div {
       '&username='+document.getElementById('Form_ProxyUsername').value+
       '&password='+document.getElementById('Form_ProxyPassword').value;
   }
-	
+
 	document.onkeydown = function()
 	{
 		if(event.keyCode == 13 && (!event.srcElement.type || event.srcElement.type != 'button')) ok();
@@ -107,7 +106,7 @@ div {
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Server"/></xsl:attribute>
       </input>
     </div>
-    
+
     <div class='form' id="ProxyPortLabel"><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Port']" /></div>
     <div class='form' id="ProxyPort">
       <input type="text" id="Form_ProxyPort">
@@ -128,7 +127,7 @@ div {
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Password"/></xsl:attribute>
       </input>
     </div>
-  </div>    
+  </div>
   <div id="footer">
     <input type="submit" class='button' onclick="javascript:ok()">
       <xsl:attribute name="value"><xsl:value-of select="$locale/String[@Id='S_Button_OK']"/></xsl:attribute>
@@ -141,5 +140,4 @@ div {
 </body>
 </html>
     </xsl:template>
-
   </xsl:stylesheet>

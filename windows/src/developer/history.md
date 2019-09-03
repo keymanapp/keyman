@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-02 12.0.23 beta
+* Add kmlmc, kmlmi and kmlmp command line tools for building lexical models (#2024)
+
 ## 2019-08-16 12.0.15 beta
 * Add support for lexical models in packages for development tools (#1977)
 
@@ -109,7 +112,7 @@
   * Improved performance of web server (#1433)
   * Current project is now shown in title bar (#1369)
   * Tweaked setup user interface and structure (#1098, #1175, #1178, #1245, #1238)
-  
+
 * Bug Fixes:
   * Support for display (avoiding crash) when loading large icons (#1416)
   * Importing .kvks into .keyman-touch-layout no longer uses incorrect layer names for some rare modifiers (#1415)
@@ -159,7 +162,7 @@
 
 ## 2018-06-12 10.0.1106.0 beta
 * No changes to Keyman Developer
- 
+
 ## 2018-06-11 10.0.1105.0 beta
 * No changes to Keyman Developer
 
@@ -292,7 +295,7 @@
 * No changes in Keyman Developer
 
 ## 2018-03-22 10.0.1054.0 beta
-* Initial beta release of Keyman Developer 10 
+* Initial beta release of Keyman Developer 10
 
 ## 10.0 alpha
 * Keyman Developer moved to open source (#121)
@@ -300,7 +303,7 @@
 * KeymanWeb is now continuously integrated with Developer, ensuring that each update uses the most current version possible (#122)
   - Additional KeymanWeb compatibility fixes (#349)
 * Keyman Developer now connects only to *api.keyman.com* and *keyman.com* for online tools (#653)
-  
+
 ### Compilers
 * Keyman Developer compiler now generates keyboards that distinguish left and right ctrl/alt for web (#313)
 * Packages can now include .js files for deployment to iOS and Android (#461)
@@ -383,7 +386,7 @@
 * Fixed: Character Map and Character Identifier don't match tokens at start of line (I4842)
 * Fixed: Delete key doesn't work in the keyboard debugger (I4845)
 * Fixed: Code editor does not get focus automatically when file is loaded (I4847)
-  
+
 ## 9.0.511 stable
 * Added: Refresh Keyman Developer look and feel for release (I4796)
 * Added: Split Path and Name boxes in New File dialogs (I4798)
@@ -737,7 +740,7 @@
 ### KeymanWeb Pack
 * KeymanWeb compiler and design tools integrated into Keyboard Editor
 * KeymanWeb keyboard test window
-  
+
 ### Branding Pack
 * Create your own product using the Branding Pack and the Keyman Engine
 * Fully customisable user interface for your product with Branding Editor
@@ -753,4 +756,4 @@
 * Modern Windows Installer for straightforward deployment
 * Windows Vista support
 * Unicode support throughout Keyman Developer
-* Automated online updates 
+* Automated online updates

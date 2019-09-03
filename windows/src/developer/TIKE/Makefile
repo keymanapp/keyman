@@ -10,6 +10,7 @@ build: version.res manifest.res icons dirs xml
     $(TDS2DBG) tike.exe 
     $(MAKEJCLDBG) tike.map
     $(COPY) tike.exe $(PROGRAM)\developer
+    $(COPY) kmlmc.cmd $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer
 
 xml: pull-keymanweb pull-npm

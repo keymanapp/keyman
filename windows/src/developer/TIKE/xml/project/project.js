@@ -21,8 +21,9 @@ function selecttabb(n) {
   switch (n) {
     case 0: title = 'Welcome'; break;
     case 1: title = 'Keyboards'; break;
-    case 2: title = 'Packaging'; break;
-    case 3: title = 'Distribution'; break;
+    case 2: title = 'Models'; break;
+    case 3: title = 'Packaging'; break;
+    case 4: title = 'Distribution'; break;
     default: alert(n); return;
   }
 
@@ -105,15 +106,26 @@ function showhideupper()
   }
   savestate();
 }
+function isTabVisible(n) {
+  return document.getElementById('tabb'+n).offsetParent != null;
+}
 document.onkeydown = function()
 {
   switch(event.keyCode)
   {
   case 33: //pgup
-    if(tabselected > 0) selecttabb(tabselected-1);
+    if(tabselected > 0) {
+      do {
+        selecttabb(tabselected-1);
+      } while(!isTabVisible(tabselected) && tabselected > 0);
+    }
     break;
   case 34: //pgdn
-    if(tabselected < 3) selecttabb(tabselected+1);
+    if(tabselected < 4) {
+      do {
+        selecttabb(tabselected+1);
+      } while(!isTabVisible(tabselected) && tabselected < 4) 
+    }
     break;
   default:
     event.returnValue = true;

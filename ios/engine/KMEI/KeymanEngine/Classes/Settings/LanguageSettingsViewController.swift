@@ -12,11 +12,12 @@ private let toolbarButtonTag = 100
 
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
-  private var userKeyboards: [String: Language] = [:]
   private var settingsArray = [[String: String]]()
+  private var keyboardRepository: KeyboardRepository?
 
-  public init(_ inLanguage: Language) {
+  public init(_ keyboardRepository: KeyboardRepository?, _ inLanguage: Language) {
     language = inLanguage
+    self.keyboardRepository = keyboardRepository
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -251,20 +252,18 @@ class LanguageSettingsViewController: UITableViewController {
     if !Manager.shared.canRemoveKeyboards {
       return false
     }
-    
+
+    // No deletion of the settings toggles!
     if indexPath.section != 0 {
       return false
     }
-    
-    // Filter- prevent deleting the default keyboard and just that one.
-    if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
-      // Assumption - default keyboard is index 0.  Probably should make something more robust, though.
-      if globalIndex == 0 {
-        return false
-      }
+
+    // Will we have at least one keyboard left somewhere if this one is deleted?  (Even if not same language)
+    if Storage.active.userDefaults.userKeyboards?.count ?? 0 > 1 {
+      return true
     }
 
-    return true
+    return false
   }
   
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
@@ -288,7 +287,7 @@ class LanguageSettingsViewController: UITableViewController {
   func showAddLanguageKeyboard() {
     let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
     button?.isEnabled = false
-    let vc = LanguageSpecificViewController(Manager.shared.apiKeyboardRepository, language: language)
+    let vc = LanguageDetailViewController(keyboardRepository, language: language)
     vc.title = "Add new \(language.name) keyboard"
     navigationController?.pushViewController(vc, animated: true)
   }
@@ -315,7 +314,7 @@ class LanguageSettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
 
     // If user defaults for keyboards list does not exist, do nothing.
-    guard var globalUserKeyboards = userData.userKeyboards else {
+    guard let globalUserKeyboards = userData.userKeyboards else {
       log.error("no keyboards in the global keyboards list!")
       return nil
     }
@@ -351,7 +350,7 @@ class LanguageSettingsViewController: UITableViewController {
       let thisKb = globalUserKeyboards[kbIndex]
       let infoView = KeyboardInfoViewController()
       infoView.title = thisKb.name
-      infoView.keyboardCount = userKeyboards.count
+      infoView.keyboardCount = globalUserKeyboards.count
       infoView.keyboardIndex = index
       infoView.keyboardID = thisKb.id
       infoView.languageID = language.id

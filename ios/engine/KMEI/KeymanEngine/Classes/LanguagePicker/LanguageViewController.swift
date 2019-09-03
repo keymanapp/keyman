@@ -191,7 +191,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = true
     }
-    let kbState = Manager.shared.stateForKeyboard(withID: keyboardID)
+    let kbState = ResourceDownloadManager.shared.stateForKeyboard(withID: keyboardID)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
 
@@ -208,7 +208,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     let keyboardIndex = 0;
     let keyboard = language.keyboards![keyboardIndex]
 
-    let state = Manager.shared.stateForKeyboard(withID: keyboard.id)
+    let state = ResourceDownloadManager.shared.stateForKeyboard(withID: keyboard.id)
     if state != .downloading {
       isUpdate = state != .needsDownload
       let alertController = UIAlertController(title: "\(language.name): \(keyboard.name)",
@@ -236,50 +236,18 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    if !languages.isEmpty {
-        navigationController?.popToRootViewController(animated: true)
-    }
+    navigationController?.popToRootViewController(animated: true)
   }
     
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
     let keyboard = language.keyboards![keyboardIndex]
-    Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
+    ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: isUpdate)
   }
 
   private func keyboardDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
-
-    guard let toolbar = navigationController?.toolbar else {
-      return
-    }
-
-    let labelFrame = CGRect(origin: toolbar.frame.origin,
-                            size: CGSize(width: toolbar.frame.width * 0.95,
-                                         height: toolbar.frame.height * 0.7))
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: toolbar.frame.width * 0.5, y: toolbar.frame.height * 0.5)
-    label.text = "Downloading\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: toolbar.frame.width - indicatorView.frame.width,
-                                   y: toolbar.frame.height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-    toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    toolbar.addSubview(label)
-    toolbar.addSubview(indicatorView)
-    navigationController?.setToolbarHidden(false, animated: true)
   }
 
   private func keyboardDownloadFailed() {

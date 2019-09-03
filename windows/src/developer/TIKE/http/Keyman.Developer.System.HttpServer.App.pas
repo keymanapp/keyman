@@ -118,7 +118,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
     end;
 
     // Transform the .kpj
-    with TProject.Create(path) do
+    with TProject.Create(ptUnknown, path) do
     try
       AResponseInfo.ContentType := 'text/html; charset=UTF-8';
       AResponseInfo.ContentText := Render;

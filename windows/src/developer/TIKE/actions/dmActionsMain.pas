@@ -49,10 +49,25 @@ unit dmActionsMain;  // I3306
 interface
 
 uses
+  System.Actions,
+  System.Classes,
+  System.ImageList,
+  System.SysUtils,
   System.UITypes,
-  SysUtils, Classes, StdActns, ActnList, ImgList,
-  Controls, MenuImgList, KMDActions, XPStyleActnCtrls, ActnMan,
-  KMDActionInterfaces, Windows, System.ImageList, System.Actions;
+  Vcl.ActnList,
+  Vcl.ActnMan,
+  Vcl.Controls,
+  Vcl.ImgList,
+  Vcl.StdActns,
+  Vcl.XPStyleActnCtrls,
+  Winapi.Windows,
+
+  MenuImgList,
+
+  Keyman.Developer.System.Project.ProjectFile,
+  KMDActions,
+  KMDActionInterfaces,
+  utilfiletypes;
 
 type
   TmodActionsMain = class(TDataModule)
@@ -211,6 +226,7 @@ type
     procedure AboutShowStartup(Sender: TObject);
     function CheckFilenameConventions(FileName: string): Boolean;
   public
+    procedure NewProject(pt: TProjectType);
     procedure OpenProject(FileName: WideString);
   end;
 
@@ -231,7 +247,6 @@ uses
   Printers,
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
-  Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
@@ -261,7 +276,7 @@ uses
   Keyman.Developer.UI.Project.UfrmProjectSettings,
   UfrmStartup,
   Upload_Settings,
-  utilfiletypes, UfrmMDIChild;
+  UfrmMDIChild;
 
 procedure TmodActionsMain.actFileNewExecute(Sender: TObject);
 var
@@ -537,8 +552,17 @@ begin
 
   FGlobalProject.Save;
   FreeGlobalProjectUI;
-  LoadGlobalProjectUI(FileName);   // I4687
+  LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
   frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
+  frmKeymanDeveloper.ShowProject;
+  frmKeymanDeveloper.UpdateCaption;
+end;
+
+procedure TmodActionsMain.NewProject(pt: TProjectType);
+begin
+  FGlobalProject.Save;
+  FreeGlobalProjectUI;
+  LoadGlobalProjectUI(pt, '', False);   // I4687
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;
 end;

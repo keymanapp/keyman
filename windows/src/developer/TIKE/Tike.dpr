@@ -36,7 +36,7 @@ uses
   Keyman.Developer.System.Project.ProjectFiles in 'project\Keyman.Developer.System.Project.ProjectFiles.pas',
   Keyman.Developer.System.Project.kpsProjectFile in 'project\Keyman.Developer.System.Project.kpsProjectFile.pas',
   Keyman.Developer.System.Project.kmxProjectFile in 'project\Keyman.Developer.System.Project.kmxProjectFile.pas',
-  Keyman.Developer.System.Project.kmnProjectFile in 'project\Keyman.Developer.System.Project.kmnProjectFile.pas',
+  Keyman.Developer.System.Project.modelTsProjectFile in 'project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
   Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
   Keyman.Developer.UI.Project.ProjectFileUI in 'project\Keyman.Developer.UI.Project.ProjectFileUI.pas',
   Keyman.Developer.UI.Project.ProjectUI in 'project\Keyman.Developer.UI.Project.ProjectUI.pas',
@@ -275,7 +275,14 @@ uses
   Keyman.Developer.System.ImportKeyboardDLL in '..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
-  Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
+  Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
+  Keyman.Developer.System.Project.kmnProjectFile in 'project\Keyman.Developer.System.Project.kmnProjectFile.pas',
+  Keyman.Developer.System.Project.modelTsProjectFileAction in 'project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas',
+  Keyman.Developer.System.LexicalModelCompile in '..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas',
+  Keyman.Developer.UI.Project.modelTsProjectFileUI in 'project\Keyman.Developer.UI.Project.modelTsProjectFileUI.pas',
+  Keyman.Developer.System.ModelProjectTemplate in '..\kmconvert\Keyman.Developer.System.ModelProjectTemplate.pas',
+  Keyman.Developer.System.ProjectTemplate in '..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas',
+  Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters};
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -302,8 +309,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  ShowStartup;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+      ShowStartup;
       Application.Run;
     end;
   finally

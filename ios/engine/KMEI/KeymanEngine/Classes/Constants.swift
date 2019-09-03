@@ -50,6 +50,11 @@ public enum Key {
 
   // Other keys
   static let update = "update"
+  
+  // ResourceDownloadQueue keys
+  static let downloadTask = "downloadTask"
+  static let downloadBatch = "downloadBatch"
+  static let downloadQueueFrame = "queueFrame"
 }
 
 public enum Defaults {
@@ -62,6 +67,11 @@ public enum Defaults {
                                                    isRTL: false,
                                                    font: font,
                                                    oskFont: nil,
+                                                   isCustom: false)
+  public static let lexicalModel = InstallableLexicalModel(id: "nrc.en.mtnt",
+                                                   name: "English dictionary (MTNT)",
+                                                   languageID: "en",
+                                                   version: "0.1.2",
                                                    isCustom: false)
 }
 

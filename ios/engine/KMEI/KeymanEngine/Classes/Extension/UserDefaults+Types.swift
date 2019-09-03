@@ -133,6 +133,20 @@ public extension UserDefaults {
       set(lexicalModels, forKey: Key.userLexicalModelsList)
     }
   }
+
+  var userResources: [LanguageResource]? {
+    get {
+      let keyboards = userKeyboards ?? []
+      let lexicalModels = userLexicalModels ?? []
+      
+      let resources: [LanguageResource] = keyboards + lexicalModels
+      if resources.count == 0 {
+        return nil
+      } else {
+        return resources
+      }
+    }
+  }
   
   // stores a dictionary of lexical model ids keyed to language ids, i.e., [langID: modelID]
   var languageModelSelections: [String: String]? {
@@ -205,6 +219,20 @@ public extension UserDefaults {
 
     set(level) {
       set(level, forKey: Key.migrationLevel)
+    }
+  }
+
+  var lastEngineVersion: Version? {
+    get {
+      if let valueString = string(forKey: Key.engineVersion) {
+        return Version(valueString)
+      } else {
+        return nil
+      }
+    }
+
+    set(version) {
+      set(version?.string, forKey: Key.engineVersion)
     }
   }
   

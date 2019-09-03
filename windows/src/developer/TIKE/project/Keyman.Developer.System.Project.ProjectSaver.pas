@@ -96,6 +96,7 @@ begin
   node.AddChild('CompilerWarningsAsErrors').NodeValue := FProject.Options.CompilerWarningsAsErrors;   // I4866
   node.AddChild('WarnDeprecatedCode').NodeValue := FProject.Options.WarnDeprecatedCode;   // I4865
   node.AddChild('CheckFilenameConventions').NodeValue := FProject.Options.CheckFilenameConventions;   // I4866
+  node.AddChild('ProjectType').NodeValue := ProjectTypeToString(FProject.Options.ProjectType);
 
   // files
 

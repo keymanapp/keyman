@@ -250,7 +250,7 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
 
   func downloadCustomKeyboard() {
     let url = URL(string: "https://sites.google.com/site/hebrewsoftware/files/yiddish_zc-1.0.json")
-    Manager.shared.downloadKeyboard(from: url!)
+    ResourceDownloadManager.shared.downloadKeyboard(from: url!)
   }
 
   func showActivityIndicator() {

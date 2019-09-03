@@ -100,12 +100,31 @@ class Storage {
     return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
   }
   
+  func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
+    return lexicalModelPackageURL(forID: lexicalModel.id, version: lexicalModel.version)
+  }
+  
   func keyboardURL(forID keyboardID: String, version: String) -> URL {
+    // We no longer embed version numbers into filenames
+    // This allows us to support existing installs and OEM products that
+    // still include the version string, at reasonable cost
+    // Note, that for installing a keyboard, it will no longer perform this
+    // rename with this model, as the target file will obviously not already
+    // exist.
+    let filename = keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID).js")
+    if FileManager.default.fileExists(atPath: filename.path) {
+      return filename
+    }
     return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
   
   func lexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
     return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
+  }
+  
+  func lexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = true) -> URL {
+    // Our unzipping dependency requires a .zip extension to function, so we append that here.
+    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
   }
 
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
@@ -155,13 +174,39 @@ extension Storage {
                      resourceName: "keymanweb-osk.ttf",
                      dstDir: baseDir)
     let defaultKeyboardDir = self.keyboardDir(forID: Defaults.keyboard.id)
+    let defaultLexicalModelDir = self.lexicalModelDir(forID: Defaults.lexicalModel.id)
     try FileManager.default.createDirectory(at: defaultKeyboardDir, withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(at: defaultLexicalModelDir, withIntermediateDirectories: true)
     try Storage.copy(from: bundle,
                      resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
                      dstDir: defaultKeyboardDir)
     try Storage.copy(from: bundle,
                      resourceName: "DejaVuSans.ttf",
                      dstDir: defaultKeyboardDir)
+    try Storage.copy(from: bundle,
+                     resourceName: "\(Defaults.lexicalModel.id)-\(Defaults.lexicalModel.version).model.kmp",
+                     dstDir: defaultLexicalModelDir)
+
+    // Perform an auto-install of the lexical model's KMP if not already installed.
+    let lexicalModelURLasZIP = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
+                                                                     version: Defaults.lexicalModel.version)
+    let lexicalModelURL = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
+                                                                version: Defaults.lexicalModel.version,
+                                                                asZip: false)
+
+    // Because of how our .zip dependency works, we need to make the .kmp look like a .zip.  A simple rename will do.
+    do {
+      try Storage.copyAndExcludeFromBackup(at: lexicalModelURL, to: lexicalModelURLasZIP)
+      let downloader = ResourceDownloadQueue()
+
+      // Hijacking the download queue's KMP installer.
+      // Issue - requests DL confirmation
+      // Issue - in a roundabout way, results in attempted access to Manager.shared during Manager.init, causing crash.
+      _ = downloader.installLexicalModelPackage(downloadedPackageFile: lexicalModelURLasZIP)
+    } catch {
+      log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
+    }
+
   }
 
   func copyFiles(to dst: Storage) throws {

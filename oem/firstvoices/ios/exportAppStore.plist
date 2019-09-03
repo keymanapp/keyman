@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>app-store</string>
+    <key>teamID</key>
+    <string>D7TR486TEH</string>
+    <key>signingCertificate</key>
+    <string>7763825382B847E9787532932A32003D0481E530</string>
+    <key>installerSigningCertificate</key>
+    <string>7763825382B847E9787532932A32003D0481E530</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.firstvoices.keyboards</key>
+        <string>FirstVoices_Keyboards</string>
+        <key>com.firstvoices.keyboards.swkeyboard</key>
+        <string>FirstVoices_Keyboards_SWKeyboard</string>
+    </dict>
+    <key>signingStyle</key>
+    <string>manual</string>
+
+</dict>
+</plist>

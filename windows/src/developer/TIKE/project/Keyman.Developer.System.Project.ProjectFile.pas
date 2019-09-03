@@ -79,7 +79,8 @@ uses
 
   mrulist,
   Keyman.Developer.System.Project.ProjectLog,
-  TempFileManager;
+  TempFileManager,
+  utilfiletypes;
 
 type
   { Forward declarations }
@@ -92,6 +93,7 @@ type
   TProjectOptions = class;
 
   TProjectState = (psCreating, psReady, psLoading, psSaving, psDestroying);
+  TProjectType = (ptUnknown, ptKeyboard, ptLexicalModel); // distinct from utilfiletypes.TKeymanProjectType
 
   { TProject }
 
@@ -134,7 +136,7 @@ type
   public
     procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual;
 
-    constructor Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
     destructor Destroy; override;
 
     procedure Refresh;
@@ -295,12 +297,14 @@ type
     FWarnDeprecatedCode: Boolean;   // I4866
     FCompilerWarningsAsErrors: Boolean;   // I4865
     FCheckFilenameConventions: Boolean;
+    FProjectType: TProjectType;
   public
     constructor Create;
     property BuildPath: string read FBuildPath write FBuildPath;
     property WarnDeprecatedCode: Boolean read FWarnDeprecatedCode write FWarnDeprecatedCode;   // I4866
     property CompilerWarningsAsErrors: Boolean read FCompilerWarningsAsErrors write FCompilerWarningsAsErrors;   // I4865
     property CheckFilenameConventions: Boolean read FCheckFilenameConventions write FCheckFilenameConventions;
+    property ProjectType: TProjectType read FProjectType write FProjectType;
   end;
 
 const
@@ -309,6 +313,9 @@ const
 function GlobalProjectStateWndHandle: THandle;
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
 procedure ProjectCompilerMessageClear;
+
+function ProjectTypeFromString(s: string): TProjectType;
+function ProjectTypeToString(pt: TProjectType): string;
 
 implementation
 
@@ -330,7 +337,6 @@ uses
   UMD5Hash,
   Unicode,
   utildir,
-  utilfiletypes,
   utilsystem;
 
 { TProjectFileList }
@@ -679,11 +685,16 @@ begin
   end;
 end;
 
-constructor TProject.Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False);
+constructor TProject.Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False);
 var
   i: Integer;
 begin
   FOptions := TProjectOptions.Create;   // I4688
+
+  if AProjectType = ptUnknown
+    then FOptions.ProjectType := ptKeyboard
+    else FOptions.ProjectType := AProjectType;
+
   FState := psCreating;
   inherited Create;
   FMRU := TMRUList.Create('');
@@ -1201,6 +1212,7 @@ begin
   WarnDeprecatedCode := True;   // I4866
   CompilerWarningsAsErrors := False;   // I4865
   CheckFilenameConventions := True; // default to TRUE for new projects
+  ProjectType := ptKeyboard;
 end;
 
 type
@@ -1260,6 +1272,22 @@ end;
 function GlobalProjectStateWndHandle: THandle;
 begin
   Result := FGlobalProjectStateWndHandle;
+end;
+
+function ProjectTypeFromString(s: string): TProjectType;
+begin
+  if SameText(s, 'keyboard') then Result := ptKeyboard
+  else if SameText(s, 'lexicalmodel') then Result := ptLexicalModel
+  else Result := ptUnknown;
+end;
+
+function ProjectTypeToString(pt: TProjectType): string;
+begin
+  case pt of
+    ptUnknown: Result := '';
+    ptKeyboard: Result := 'keyboard';
+    ptLexicalModel: Result := 'lexicalmodel';
+  end;
 end;
 
 initialization

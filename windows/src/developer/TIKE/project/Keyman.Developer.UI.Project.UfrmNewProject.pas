@@ -79,8 +79,10 @@ implementation
 uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
+  Keyman.Developer.UI.Project.UfrmNewModelProjectParameters,
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager,
   dmActionsMain,
   utilsystem;
@@ -106,9 +108,16 @@ begin
       Assert(False, 'Should not be able to have a project type of unknown here');
     kptBasic:
       Result := ShowNewProjectParameters(Owner);
+    kptWordlistLexicalModel:
+      Result := ShowNewModelProjectParameters(Owner);
+    kptBlankLexicalModel:
+      begin
+        modActionsMain.NewProject(ptLexicalModel);
+        Result := True;
+      end;
     kptBlank:
       begin
-        modActionsMain.OpenProject('');
+        modActionsMain.NewProject(ptKeyboard);
         Result := True;
       end;
     kptImportWindowsKeyboard:
@@ -147,6 +156,10 @@ begin
     Result := kptBlank
   else if lvItems.Selected.Caption = 'Import Windows Keyboard' then
     Result := kptImportWindowsKeyboard
+  else if lvItems.Selected.Caption = 'Blank Lexical Model' then
+    Result := kptBlankLexicalModel
+  else if lvItems.Selected.Caption = 'Wordlist Lexical Model' then
+    Result := kptWordlistLexicalModel
   else
     Result := kptUnknown;
 end;

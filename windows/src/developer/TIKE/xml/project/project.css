@@ -43,7 +43,8 @@
 body.tab-0 .tabb#tabb0,
 body.tab-1 .tabb#tabb1,
 body.tab-2 .tabb#tabb2,
-body.tab-3 .tabb#tabb3 {
+body.tab-3 .tabb#tabb3,
+body.tab-4 .tabb#tabb4 {
   border-top: none; 
   width: 90px; 
   border-left: 2px solid #CC3846; 
@@ -59,10 +60,21 @@ body.tab-3 .tabb#tabb3 {
 body.tab-0 .page#page-0,
 body.tab-1 .page#page-1,
 body.tab-2 .page#page-2,
-body.tab-3 .page#page-3 {
+body.tab-3 .page#page-3,
+body.tab-4 .page#page-4 {
   display: block;
 }
-  
+
+html.type-lexical-model .tabb#tabb1 {
+  /* Hide keyboards tab for lexical model projects */
+  display: none;
+}
+
+html.type-keyboard .tabb#tabb2 {
+  /* Hide lexical-models tab for keyboard projects */
+  display: none;
+}
+
 
 .help-container {
   display: none;

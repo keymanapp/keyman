@@ -647,6 +647,11 @@ namespace com.keyman.text {
     beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
+      // Do not trigger a 'beep' when operating on alternates - the use case of Mocks.
+      if(outputTarget instanceof Mock) {
+        return;
+      }
+
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();

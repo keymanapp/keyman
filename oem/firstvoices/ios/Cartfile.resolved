@@ -1,0 +1,4 @@
+github "DaveWoodCom/XCGLogger" "6.1.0"
+github "ashleymills/Reachability.swift" "v4.3.1"
+github "dennisweissmann/DeviceKit" "1.13.0"
+github "marmelroy/Zip" "1.1.0"

@@ -183,6 +183,24 @@
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template name="filetype_model_ts">
+    <xsl:call-template name="filetype"> 
+      <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">model.ts</xsl:with-param> <xsl:with-param name="title">Keyman Lexical Model Source File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="filetype_model_tsv">
+    <xsl:call-template name="filetype"> 
+      <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">tsv</xsl:with-param> <xsl:with-param name="title">Keyman Lexical Model Wordlist Source File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="filetype_model_js">
+    <xsl:call-template name="filetype"> 
+      <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">model.js</xsl:with-param> <xsl:with-param name="title">Keyman Lexical Model File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
   <!-- Filetype (Non-Keyman) Templates -->
 
   <xsl:template name="filetype_msi">
@@ -208,7 +226,7 @@
       <xsl:with-param name="type">html</xsl:with-param> <xsl:with-param name="title">HTML File</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-  
+    
   <!-- Filetype Generic Templates -->
 
   <xsl:template name="filetype__arrow">

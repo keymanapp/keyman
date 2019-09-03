@@ -66,7 +66,7 @@ verify_platform() {
 # Sets $platform_folder accordingly.
 get_platform_folder() {
   verify_platform $1
-  
+
   if [[ $1 = "desktop" || $1 = "developer" ]]; then
     platform_folder="$_shf_base_dir/windows/src/$1"
   elif [[ $1 = "lmlayer" ]]; then
@@ -225,3 +225,17 @@ write_download_info() {
   echo "  \"size\": \"${FILE_SIZE}\"" >> "$DOWNLOAD_INFO_FILEPATH"
   echo } >> "$DOWNLOAD_INFO_FILEPATH"
 }
+
+# set_version sets the file version on mac/ios projects
+set_version ( ) {
+  PRODUCT_PATH=$1
+
+  if [ $BUILD_NUMBER ]; then
+    if [ $2 ]; then  # $2 = product name.
+      echo "Setting version numbers in $2 to $BUILD_NUMBER."
+    fi
+    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+  fi
+}
+

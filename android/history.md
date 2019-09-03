@@ -3,6 +3,25 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-08-30 12.0.4081 beta
+* New Feature:
+  * Allow user to "Add keyboard from local device" from Settings menu (#1992)
+
+* Bug Fix:
+  * Fix keyboard and dictionary info pages (#2020)
+
+## 2019-08-27 12.0.4080 beta
+* Fix menu icon and text alignment (#1999)
+
+## 2019-08-23 12.0.4079 beta
+* Disable version and copyright text on splash screen (#1989)
+
+## 2019-08-16 12.0.4078 beta
+* No changes to Keyman for Android
+
+## 2019-08-12 12.0.4077 beta
+* No changes to Keyman for Android
+
 ## 2019-08-06 12.0.4076 beta
 * Adjustments to Settings UI (#1931)
 

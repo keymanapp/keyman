@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
 
@@ -72,10 +73,9 @@ public final class ModelInfoActivity extends AppCompatActivity {
       textView.setTypeface(titleFont, Typeface.BOLD);
 
     final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
-    final String customModel = getIntent().getStringExtra(KMManager.KMKey_CustomModel);
 
     infoList = new ArrayList<HashMap<String, String>>();
-    // Display model title
+    // Display model version title
     final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.model_version));
@@ -85,17 +85,16 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     // Display model help link
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.help_link));
     hashMap.put(subtitleKey, "");
-    if(customHelpLink != null) {
+    // For now, lexical model help only available when installed via custom packages
+    if(!customHelpLink.equals("")) {
       hashMap.put(iconKey, icon);
     } else {
       hashMap.put(iconKey, noIcon);
     }
-
     infoList.add(hashMap);
 
     // Display link to uninstall model
@@ -111,11 +110,14 @@ public final class ModelInfoActivity extends AppCompatActivity {
     ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
       @Override
       public boolean isEnabled(int position) {
-        if(position == 0) {
+        HashMap<String, String> hashMap = (HashMap<String, String>)infoList.get(position);
+        String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
+
+        if (itemTitle.equals(getString(R.string.model_version))) {
           // No point in 'clicking' on version info.
           return false;
           // Visibly disables the help option when help isn't available.
-        } else if(position == 1 && customHelpLink == null) {
+        } else if (itemTitle.equals(getString(R.string.help_link)) && customHelpLink.equals("")) {
           return false;
         }
 
@@ -127,18 +129,21 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (position == 1) {
-          // Help link to model
+        HashMap<String, String> hashMap = (HashMap<String, String>)parent.getItemAtPosition(position);
+        String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
+
+        // "Help" link clicked
+        if (itemTitle.equals(getString(R.string.help_link))) {
           Intent i = new Intent(Intent.ACTION_VIEW);
 
-          if (customHelpLink != null) {
+          if (!customHelpLink.equals("")) {
             if (FileUtils.isWelcomeFile(customHelpLink)) {
               File customHelp = new File(new File(customHelpLink).getAbsolutePath());
               i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
+                  context, "com.tavultesoft.kmea.fileProvider", customHelp);
                 i.setDataAndType(contentUri, "text/html");
               } catch (Exception e) {
                 Log.e("ModelInfoActivity", "Failed to access " + customHelp.toString());
@@ -151,8 +156,9 @@ public final class ModelInfoActivity extends AppCompatActivity {
           } else {
             // We should always have a help file packaged with models.
           }
-        } else if (position == 2) {
-          // Confirmation to delete model
+        // "Uninstall Model" clicked
+        } else if (itemTitle.equals(getString(R.string.uninstall_model))) {
+          // Uninstall selected model
           String lexicalModelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
           DialogFragment dialog = ConfirmDialogFragment.newInstance(
             DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);

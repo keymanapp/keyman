@@ -39,6 +39,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_MODEL_ID = "KMKeyboardActivity.modelID";
   public static final String ARG_MODEL_NAME = "KMKeyboardActivity.modelName";
   public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
+  public static final String ARG_MODEL_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
 
   // custom keyboard
   public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";

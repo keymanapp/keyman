@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  
+
   <xsl:include href="elements.xsl"/>
 
   <xsl:variable name="locale_keyman" select="$locale/Dialog[@Id='Keyman']" />
-  
+
   <xsl:include href="keyman_menu.xsl"/>
 
   <xsl:include href="keyman_keyboardlist.xsl"/>
@@ -15,7 +15,7 @@
   <xsl:include href="keyman_keepintouch.xsl"/>
 
   <xsl:include href="keyman_footer.xsl"/>
-  
+
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
@@ -29,10 +29,10 @@
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>config.js</xsl:attribute><xsl:text> </xsl:text></script>
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu.js</xsl:attribute><xsl:text> </xsl:text></script>
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu-frame.js</xsl:attribute><xsl:text> </xsl:text></script>
-      </head>      
-      
+      </head>
+
       <body visited="white">
-        
+
         <div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10">
           <div id="header-pad"></div>
           <div id="menuframe" tabindex="-1">
@@ -56,7 +56,7 @@
       </body>
     </html>
   </xsl:template>
-  
+
   <xsl:template name="header_helplinks">
     <div class="helplinks">
       <a href="keyman:help" onmouseover="this.style.cursor='hand';" >
@@ -66,16 +66,16 @@
         <xsl:value-of select="$locale/String[@Id='S_Caption_Help']" />
       </a>
 
-            &#160; 
+            &#160;
       <xsl:value-of select="$locale/String[@Id='S_DisplayIn']" />:
-        <a id="button_uilanguage" href="#" 
-           onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;" 
+        <a id="button_uilanguage" href="#"
+           onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;"
            onkeydown="if(event.keyCode == 32) ShowMenu('uilanguage','right'); else return true; return false;"
         ><xsl:value-of select="$locale/String[@Id='SKUILanguageNameWithEnglish']"/></a>
-      
+
     </div>
   </xsl:template>
-  
+
   <xsl:template name="popupmenu_uilanguage">
     <div class="menu" id="menu_uilanguage">
       <xsl:for-each select="/Keyman/uilanguages/uilanguage">

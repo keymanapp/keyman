@@ -40,7 +40,7 @@
 						if(elems[i].className == 'hint') hints.push(elems[i]);
 						nexthint();
 					}
-          
+
           function filterchange()
           {
             if(inner.filters[0].status == 0)
@@ -49,13 +49,13 @@
               inner.style.filter='';
             }
           }
-          
+
           function setScrollTimeout(tm)
           {
             if(startScrollTimeout != null) window.clearTimeout(startScrollTimeout);
             startScrollTimeout = window.setTimeout(startScroll, tm);
           }
-          
+
           function startScroll()
           {
             stopScroll();
@@ -64,7 +64,7 @@
             if(activehint.offsetWidth+activehint.offsetLeft > inner.offsetWidth - control.offsetWidth)
               scrollInterval = window.setInterval(scroll, 75);
           }
-          
+
           function stopScroll()
           {
             if(scrollInterval != null) window.clearInterval(scrollInterval);
@@ -82,7 +82,7 @@
               setScrollTimeout(5000);
             }
           }
-          
+
 					function autohint()
 					{
             inner.style.filter='progid:DXImageTransform.Microsoft.Fade(duration=0.25,overlap=1.0)';
@@ -90,13 +90,13 @@
             gotohint(1);
 						inner.filters[0].Play();
           }
-          
+
           function gotohint(n)
           {
 						if(hints.length == 0) return;
-						
+
             stopScroll();
-            
+
 						hints[currhint].style.display = '';
             hints[currhint].style.left = '0px';
             currhint += n;

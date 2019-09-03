@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=group-helper-rsp19902 kmcomp shared-data
+TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler
 
 test: 
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -24,6 +24,12 @@ kmcomp:
 shared-data:
     cd $(ROOT)\src\test\unit-tests\shared-data
     $(MAKE) $(TARGET)
+
+lexical-model-compiler:
+    cd $(KEYMAN_ROOT)\developer\js
+    npm install
+    npm run build
+    npm test
 
 # ----------------------------------------------------------------------
 
