@@ -385,7 +385,7 @@ namespace com.keyman {
       } else if(!isNaN(val = Number(fs))) {
         // Note:  this one is NOT natively handled by browsers!
         //        We'll treat it as if it were 'pt', since that's likely the user's
-        //        most famiilar font size unit.
+        //        most familiar font size unit.
         return {val: (4 * val / 3), absolute: true};
       } else {
         // Cannot parse.
