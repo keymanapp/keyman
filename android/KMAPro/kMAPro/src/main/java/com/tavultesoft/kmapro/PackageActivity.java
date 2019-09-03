@@ -41,10 +41,7 @@ public class PackageActivity extends AppCompatActivity {
   private WebView webView;
   private AlertDialog alertDialog;
   private File kmpFile;
-  private boolean silentInstall;
   private File tempPackagePath;
-  private List<Map<String, String>> installedPackageKeyboards;
-  private List<Map<String, String>> installedLexicalModels;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private PackageProcessor kmpProcessor;
 
@@ -53,14 +50,13 @@ public class PackageActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_package_installer);
+    boolean silentInstall = false;
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       kmpFile = new File(bundle.getString("kmpFile"));
-      silentInstall = bundle.getBoolean("silentInstall");
-    } else {
-      silentInstall = false;
+      silentInstall = bundle.getBoolean("silentInstall", false);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -252,8 +248,8 @@ public class PackageActivity extends AppCompatActivity {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
-        installedPackageKeyboards = kmpProcessor.processKMP(kmpFile, tempPackagePath,
-          PackageProcessor.PP_KEYBOARDS_KEY);
+        List<Map<String, String>> installedPackageKeyboards =
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
         // Do the notifications!
         boolean success = installedPackageKeyboards.size() != 0;
         if (success) {
@@ -268,8 +264,8 @@ public class PackageActivity extends AppCompatActivity {
           showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
         }
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-        installedLexicalModels = kmpProcessor.processKMP(kmpFile, tempPackagePath,
-          PackageProcessor.PP_LEXICAL_MODELS_KEY);
+        List<Map<String, String>> installedLexicalModels =
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
         // Do the notifications
         boolean success = installedLexicalModels.size() != 0;
         if (success) {

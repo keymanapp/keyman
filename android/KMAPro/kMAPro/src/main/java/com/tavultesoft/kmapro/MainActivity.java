@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
+  private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
+  private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
@@ -240,18 +242,28 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
 
-    if (!KMManager.keyboardExists(this, KMManager.KMDefault_UndefinedPackageID,
-      KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
-      HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-      kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-      kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-      kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-      kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-        this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
-      kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-      KMManager.addKeyboard(this, kbInfo);
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+
+    // Check if default keyboard should be added
+    boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
+    if (!installDefaultKeyboard) {
+      if (!KMManager.keyboardExists(this, KMManager.KMDefault_UndefinedPackageID,
+        KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
+        HashMap<String, String> kbInfo = new HashMap<String, String>();
+        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+        kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
+        kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
+        kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
+        kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
+        kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
+          this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
+        kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+        KMManager.addKeyboard(this, kbInfo);
+      }
+
+      editor.putBoolean(defaultKeyboardInstalled, true);
+      editor.commit();
     }
 
     KMManager.addKeyboardEventListener(this);
@@ -259,13 +271,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     PackageActivity.addKeyboardDownloadEventListener(this);
 
     // Check if default dictionary model package should be installed
-    if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
-      KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID)) {
-      File defaultDictionaryKMP = new File(
-        new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
-      Uri uri = FileProvider.getUriForFile(
-        context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
-      useLocalKMP(context, uri, true);
+    // This also depends on a current keyboard being loaded
+    HashMap<String, String> curKbInfo = KMManager.getCurrentKeyboardInfo(this);
+    boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
+    if (!installDefaultDictionary && curKbInfo != null) {
+      if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
+        KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID)) {
+        File defaultDictionaryKMP = new File(
+          new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
+        Uri uri = FileProvider.getUriForFile(
+          context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
+        useLocalKMP(context, uri, true);
+      }
+
+      editor.putBoolean(defaultDictionaryInstalled, true);
+      editor.commit();
     }
 
     Intent intent = getIntent();
