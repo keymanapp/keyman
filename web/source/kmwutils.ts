@@ -172,7 +172,8 @@ namespace com.keyman {
         var func=this.events[event][i], result=false;
         try {
           result=func(params); 
-        } catch(strExcept) { 
+        } catch(strExcept) {
+          console.error(strExcept);
           result=false; 
         } //don't know whether to use true or false here      
         if(result === false) {
