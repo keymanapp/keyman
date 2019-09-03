@@ -1797,7 +1797,7 @@ namespace com.keyman.osk {
 
       var fs=1.0;
       // TODO: Logically, this should be needed for Android, too - may need to be changed for the next version!
-      if(device.OS == 'iOS') {
+      if(device.OS == 'iOS' && !keyman.isEmbedded) {
         fs=fs/keyman.util.getViewportScale();
       }
 
