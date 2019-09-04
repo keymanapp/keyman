@@ -143,10 +143,12 @@ public final class ModelInfoActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, "com.tavultesoft.kmea.fileProvider", customHelp);
+                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
                 i.setDataAndType(contentUri, "text/html");
-              } catch (Exception e) {
-                Log.e("ModelInfoActivity", "Failed to access " + customHelp.toString());
+              } catch (NullPointerException e) {
+                String message = "FileProvider undefined in app to load" + customHelp.toString();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.e("ModelInfoActivity", message);
               }
             }
             else {

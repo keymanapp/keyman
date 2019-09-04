@@ -25,6 +25,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
@@ -143,10 +144,12 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, "com.tavultesoft.kmea.fileProvider", customHelp);
+                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
                 i.setDataAndType(contentUri, "text/html");
-              } catch (Exception e) {
-                Log.e("KeyboardInfoActivity", "Failed to access " + customHelp.toString());
+              } catch (NullPointerException e) {
+                String message = "FileProvider undefined in app to load" + customHelp.toString();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.e("KeyboardInfoActivity", message);
               }
             }
             else {
